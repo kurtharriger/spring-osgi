@@ -76,8 +76,8 @@ public class OnTheFlyBundleCreatorTestsTest extends TestCase {
 		// start reading the jar
 		JarFile jar = new JarFile(jarFile);
 		assertEquals(mf, jar.getManifest());
-		Enumeration enum = jar.entries();
-		enum.nextElement();
+		Enumeration entriesEnum = jar.entries();
+		entriesEnum.nextElement();
 		InputStream jarContent = jar.getInputStream(jar.getEntry("file:"+clazzURL.getFile()));
 		InputStream originalFile = clazzURL.openStream();
 

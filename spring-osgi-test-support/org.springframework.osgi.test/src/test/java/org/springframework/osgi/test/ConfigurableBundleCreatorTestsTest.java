@@ -43,7 +43,7 @@ public class ConfigurableBundleCreatorTestsTest extends TestCase {
 	public void testGetSettingsLocation() throws Exception {
 
 		assertEquals(bundleCreator.getClass().getPackage().getName().replace('.', '/')
-				+ "/ConfigurableBundleCreatorTestsTests$1-bundle.properties", bundleCreator.getSettingsLocation());
+				+ "/ConfigurableBundleCreatorTestsTest$1-bundle.properties", bundleCreator.getSettingsLocation());
 	}
 
 	public void testDefaultJarSettings() throws Exception {
@@ -60,7 +60,7 @@ public class ConfigurableBundleCreatorTestsTest extends TestCase {
 		Properties testSettings = bundleCreator.getSettings();
 
 		Properties props = new Properties();
-		props.load(new ClassPathResource("org/springframework/osgi/test/ConfigurableBundleCreatorTestsTests$1-bundle.properties").getInputStream());
+		props.load(new ClassPathResource("org/springframework/osgi/test/ConfigurableBundleCreatorTestsTest$1-bundle.properties").getInputStream());
 
 		assertEquals(props.getProperty(ConfigurableBundleCreatorTests.INCLUDE_PATTERNS),
 				testSettings.getProperty(ConfigurableBundleCreatorTests.INCLUDE_PATTERNS));
