@@ -27,6 +27,12 @@
   <modules>
     <module>aop-alliance</module>
     <module>commons-logging</module>
+    <module>commons-attributes</module>
+    <module>commons-collections</module>
+    <module>commons-pool</module>
     <module>log4j</module>
+    <module>asm</module>
+    <module>cglib</module>
+    <module>aspectj</module>
   </modules>
 </project>
