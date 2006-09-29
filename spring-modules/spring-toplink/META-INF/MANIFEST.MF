@@ -29,5 +29,5 @@ Import-Package: oracle.toplink.exceptions,
    org.springframework.transaction;version=2.1,
    org.springframework.transaction.support;version=2.1,
    org.springframework.util;version=2.1
-Export-Package: org.springframework.orm.ojb;version=2.1
-   org.springframework.orm.ojb.support;version=2.1 
+Export-Package: org.springframework.orm.toplink;version=2.1
+   org.springframework.orm.toplink.support;version=2.1 
