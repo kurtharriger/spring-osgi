@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<project>
+  <parent>
+    <artifactId>spring-framework-required-libraries</artifactId>
+    <groupId>org.springframework</groupId>
+    <version>2.1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>commons-collections</groupId>
+  <artifactId>commons-collections.osgi</artifactId>
+  <packaging>osgi-bundle</packaging>
+  <name>Jakarta Commons Collections (OSGi version)</name>
+  <version>3.2</version>
+  <url>http://www.springframework.org/osgi</url>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dependency-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>commons-collections</groupId>
+                  <artifactId>commons-collections</artifactId>
+                  <version>3.2</version>
+                  <type>jar</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>
+                ${project.build.directory}/classes
+              </outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.2</version>
+    </dependency>
+  </dependencies>
+</project>

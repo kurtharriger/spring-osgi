@@ -1,0 +1,12 @@
+Implementation-Title: commons-attributes
+Implementation-Version: 1.1
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: jakarta.commons.attributes
+Bundle-Name: commons-attributes
+Bundle-Version: 1.1
+Bundle-Vendor: Apache Jakarta Commons
+Export-Package: org.apache.commons.attributes
+Bundle-ClassPath: .,
+ target/commons-attributes.osgi-2.2.jar
+
+
