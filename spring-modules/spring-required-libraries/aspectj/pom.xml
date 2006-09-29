@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<project>
+  <parent>
+    <artifactId>spring-framework-required-libraries</artifactId>
+    <groupId>org.springframework</groupId>
+    <version>2.1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.aspectj</groupId>
+  <artifactId>aspectjrt.osgi</artifactId>
+  <packaging>osgi-bundle</packaging>
+  <name>AspectJ Runtime Library</name>
+  <version>1.5.3</version>
+  <url>http://www.springframework.org/osgi</url>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dependency-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.aspectj</groupId>
+                  <artifactId>aspectjrt</artifactId>
+                  <version>1.5.3</version>
+                  <type>jar</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>
+                ${project.build.directory}/classes
+              </outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+      <version>1.5.3</version>
+    </dependency>
+  </dependencies>
+</project>
