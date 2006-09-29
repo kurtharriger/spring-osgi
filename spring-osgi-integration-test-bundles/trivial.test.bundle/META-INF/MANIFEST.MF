@@ -1,0 +1,3 @@
+Bundle-Name: Trivial-Bundle-Tests
+Bundle-SymbolicName: org.springframework.osgi.test.trivial.tests
+Import-Package: org.springframework.osgi.test.trivial;junit.framework

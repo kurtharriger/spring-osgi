@@ -1,0 +1,2 @@
+Bundle-Name: Spring-Integration-Tests
+Bundle-SymbolicName: org.springframework.osgi.integration.tests

@@ -1,0 +1,4 @@
+Bundle-Name: Trivial-Bundle
+Bundle-SymbolicName: org.springframework.osgi.test.trivial
+Export-Package: org.springframework.osgi.test.trivial
+
