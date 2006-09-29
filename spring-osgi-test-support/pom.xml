@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <artifactId>spring-osgi</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi</groupId>
+  <artifactId>spring-osgi-test-support</artifactId>
+  <packaging>pom</packaging>
+  <name>Spring JUnit support for OSGi</name>
+  <version>1.0-SNAPSHOT</version>
+  <url>http://www.springframework.org/osgi</url>
+   <modules>
+    <module>org.springframework.osgi.test</module>
+  </modules>
+</project>

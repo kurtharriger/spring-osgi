@@ -1,0 +1,32 @@
+Implementation-Title: Spring Framework
+Implementation-Version: 2.1
+Spring-Version: 2.1
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.jdo
+Bundle-Name: org.springframework.jdo
+Bundle-Version: 2.0
+Bundle-Vendor: Spring Framework
+Import-Package: javax.jdo,
+   javax.portlet;resolution:=optional,
+   javax.servlet;resolution:=optional,
+   javax.servlet.http;resolution:=optional,
+   org.aopalliance.intercept,
+   org.apache.commons.logging,
+   org.springframework.beans.factory;version=2.1,
+   org.springframework.core.io;version=2.1,
+   org.springframework.core.io.support;version=2.1,
+   org.springframework.dao;version=2.1,
+   org.springframework.dao.support;version=2.1,
+   org.springframework.jdbc.datasource;version=2.1,
+   org.springframework.jdbc.support;version=2.1,
+   org.springframework.orm;version=2.1,
+   org.springframework.transaction;version=2.1,
+   org.springframework.transaction.support;version=2.1,
+   org.springframework.util;version=2.1,
+   org.springframework.web.context;version=2.1,
+   org.springframework.web.context.support;version=2.1,
+   org.springframework.web.filter;version=2.1,
+   org.springframework.web.portlet.handler;version=2.1,
+   org.springframework.web.servlet.handler;version=2.1
+Export-Package: org.springframework.orm.jdo;version=2.1,
+   org.springframework.orm.jdo.support;version=2.1

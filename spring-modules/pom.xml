@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <artifactId>spring-osgi</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework</groupId>
+  <artifactId>spring-modules</artifactId>
+  <packaging>pom</packaging>
+  <name>Spring Framework jars packaged as OSGi bundles</name>
+  <version>2.1-SNAPSHOT</version>
+  <url>http://www.springframework.org/osgi</url>
+  <properties>
+    <base.spring.version>2.0</base.spring.version>
+  </properties>
+  <modules>
+    <module>spring-aop</module>
+    <module>spring-aspects</module>
+    <module>spring-beans</module>
+    <module>spring-context</module>
+    <module>spring-core</module>
+    <module>spring-dao</module>
+    <module>spring-hibernate2</module>
+    <module>spring-hibernate3</module>
+    <module>spring-ibatis</module>
+    <module>spring-jca</module>
+    <module>spring-jdbc</module>
+    <module>spring-jdo</module>
+    <module>spring-jms</module>
+    <module>spring-jmx</module>
+    <module>spring-jpa</module>
+    <module>spring-mock</module>
+    <module>spring-portlet</module>
+    <module>spring-remoting</module>
+    <module>spring-struts</module>
+    <module>spring-support</module>
+    <module>spring-toplink</module>
+    <module>spring-web</module>
+    <module>spring-webmvc</module>
+    <module>spring-required-libraries</module>
+  </modules>
+</project>

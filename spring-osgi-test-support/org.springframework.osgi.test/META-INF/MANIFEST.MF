@@ -1,0 +1,14 @@
+Bundle-Name: Spring-OSGi-Test-Framework
+Bundle-SymbolicName: org.springframework.osgi.test
+Bundle-Activator: org.springframework.osgi.test.OsgiJUnitService
+Import-Package: junit.framework
+Dynamic-ImportPackage: javax.swing, javax.swing.border,
+  javax.swing.event, javax.swing.text, javax.swing.tree,
+  org.eclipse.core.runtime.adaptor,
+  org.knopflerfish.framework,
+  org.apache.felix.framework,
+  org.apache.felix.framework.util,
+  org.apache.felix,main, *
+Export-Package: org.springframework.osgi.test,
+org.springframework.osgi.test.runner
+

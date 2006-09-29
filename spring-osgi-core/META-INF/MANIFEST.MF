@@ -1,0 +1,2 @@
+Bundle-Name: Spring-OSGi-Support
+Bundle-SymbolicName: org.springframework.osgi.core

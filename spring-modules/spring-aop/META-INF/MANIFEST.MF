@@ -1,0 +1,45 @@
+Implementation-Title: Spring Framework
+Implementation-Version: 2.1
+Spring-Version: 2.1
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.aop
+Bundle-Name: org.springframework.aop
+Bundle-Version: 2.0
+Bundle-Vendor: Spring Framework
+Import-Package: com.jamonapi;resolution:=optional,
+   net.sf.cglib.core;resolution:=optional,
+   net.sf.cglib.proxy;resolution:=optional,
+   net.sf.cglib.transform.impl;resolution:=optional,
+   org.apache.commons.attributes;resolution:=optional,
+   org.apache.commons.logging,
+   org.apache.commons.pool;resolution:=optional,
+   org.apache.commons.pool.impl;resolution:=optional,
+   org.apache.oro.text.regex;resolution:=optional,
+   org.aspectj.bridge;resolution:=optional,
+   org.aspectj.lang;resolution:=optional,
+   org.aspectj.lang.JoinPoint;resolution:=optional,
+   org.aspectj.lang.annotation;resolution:=optional,
+   org.aspectj.lang.reflect;resolution:=optional,
+   org.aspectj.runtime.internal;resolution:=optional,
+   org.aspectj.util;resolution:=optional,
+   org.aspectj.weaver.tools;resolution:=optional,
+   org.springframework.beans;version=2.1,
+   org.springframework.beans.factory;version=2.1,
+   org.springframework.beans.factory.config;version=2.1,
+   org.springframework.beans.factory.parsing;version=2.1,
+   org.springframework.beans.factory.support;version=2.1,
+   org.springframework.beans.factory.xml;version=2.1,
+   org.springframework.core;version=2.1,
+   org.springframework.core.annotation;version=2.1,
+   org.springframework.util;version=2.1,
+   org.springframework.util.xml;version=2.1,
+   org.aopalliance.aop,
+   org.aopalliance.intercept
+Export-Package: org.springframework.aop;version=2.1,
+   org.springframework.aop.config;version=2.1,
+   org.springframework.aop.framework;version=2.1,
+   org.springframework.aop.support;version=2.1,
+   org.springframework.aop.target;version=2.1,
+   org.springframework.aop.target.dynamic;version=2.1,
+   org.springframework.metadata;version=2.1
+

@@ -1,0 +1,16 @@
+<?xml version="1.0"?><project>
+  <parent>
+    <artifactId>spring-osgi</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi</groupId>
+  <artifactId>spring-osgi-core</artifactId>
+  <packaging>osgi-bundle</packaging>
+  <name>org.springframework.osgi.core bundle</name>
+  <version>1.0-SNAPSHOT</version>
+  <url>http://www.springframework.org/osgi</url>
+  <dependencies>
+  </dependencies>
+</project>

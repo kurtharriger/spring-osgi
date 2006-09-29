@@ -1,0 +1,28 @@
+Implementation-Title: Spring Framework
+Implementation-Version: 2.1
+Spring-Version: 2.1
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.beans
+Bundle-Name: org.springframework.beans
+Bundle-Version: 2.0
+Bundle-Vendor: Spring Framework
+Import-Package: net.sf.cglib.proxy;resolution:=optional,
+   org.apache.commons.logging,
+   org.springframework.core;version=2.1,
+   org.springframework.core.annotation;version=2.1,
+   org.springframework.core.io;version=2.1,
+   org.springframework.core.io.support;version=2.1,
+   org.springframework.util;version=2.1,
+   org.springframework.util.xml;version=2.1
+Export-Package: org.springframework.beans;version=2.1,
+   org.springframework.beans.annotation;version=2.1,
+   org.springframework.beans.factory;version=2.1,
+   org.springframework.beans.factory.access;version=2.1,
+   org.springframework.beans.factory.annotation;version=2.1,
+   org.springframework.beans.factory.wiring;version=2.1,
+   org.springframework.beans.factory.config;version=2.1,
+   org.springframework.beans.factory.support;version=2.1,
+   org.springframework.beans.factory.xml;version=2.1,
+   org.springframework.beans.factory.parsing;version=2.1,
+   org.springframework.beans.propertyeditors;version=2.1,
+   org.springframework.beans.support;version=2.1

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<project>
+  <parent>
+    <artifactId>spring-osgi</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi</groupId>
+  <artifactId>spring-osgi-extender</artifactId>
+  <packaging>osgi-bundle</packaging>
+  <name>org.springframework.osgi.extender bundle</name>
+  <version>1.0-SNAPSHOT</version>
+  <url>http://www.springframework.org/osgi</url>
+  <dependencies>
+  </dependencies>
+
+<!--
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apachee.felix.plugins</groupId>
+        <artifactId>maven-osgi-plugin</artifactId>
+        <configuration>
+          <bundleName>Spring-Extender</bundleName>
+          <bundleSymbolicName>org.springframework.osgi.extender</bundleSymbolicName>
+          <bundleDescription>Spring OSGi Extender - automatically
+      creates application context on activation for bundles with Spring resources</bundleDescription>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+-->
+</project>
