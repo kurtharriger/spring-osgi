@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry output="target/test-classes" kind="src" path="src/test/java"/>
+	<classpathentry output="target/test-classes" kind="src" path="src/test/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/equinox/org.eclipse.osgi/3.2.0/org.eclipse.osgi-3.2.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/knopflerfish/framework/2.0.1/framework-2.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.framework/0.8.0-SNAPSHOT/org.apache.felix.framework-0.8.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/0.8.0-SNAPSHOT/org.apache.felix.main-0.8.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-core/2.1-SNAPSHOT/spring-core-2.1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging.osgi/1.1/commons-logging.osgi-1.1.jar"/>
+	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
