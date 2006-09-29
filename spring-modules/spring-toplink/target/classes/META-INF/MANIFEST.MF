@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Ant-Version: Apache Ant 1.6.5
-Created-By: 1.5.0_05-b05 (Sun Microsystems Inc.)
-Implementation-Title: Spring Framework
-Implementation-Version: 2.0
-Spring-Version: 2.0
-
