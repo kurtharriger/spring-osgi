@@ -10,6 +10,27 @@
 	<name>Spring OSGi</name>
 	<url>http://www.springframework.org/osgi</url>
 
+	<ciManagement>
+		<system>continuum</system>
+		<notifiers>
+			<notifier>
+				<type>mail</type>
+				<configuration>
+					<address>adrian.colyer@interface21.com</address>
+				</configuration>
+			</notifier>
+		</notifiers>
+	</ciManagement>
+	<scm>
+		<connection>
+			https://svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
+		</connection>
+		<developerConnection>
+			https://svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
+		</developerConnection>
+		<url>http://svn.sourceforge.net/viewcvs.cgi/springframework/spring-osgi/trunk</url>
+	</scm>
+	
 	<!-- modules for Spring-OSGi -->
 	<modules>
 		<module>spring-osgi-extender</module>
