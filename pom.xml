@@ -23,10 +23,10 @@
 	</ciManagement>
 	<scm>
 		<connection>
-			https://svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
+			scm:svn:https://svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
 		</connection>
 		<developerConnection>
-			https://svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
+			scm:svn:https://svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
 		</developerConnection>
 		<url>http://svn.sourceforge.net/viewcvs.cgi/springframework/spring-osgi/trunk</url>
 	</scm>
