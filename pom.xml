@@ -55,7 +55,9 @@
 				<configuration>
 					<systemProperties>
 						<property>
-							<name>org.springframework.osgi.test.framework</name>
+							<name>
+								org.springframework.osgi.test.framework
+							</name>
 							<value>${osgi.test.platform}</value>
 						</property>
 					</systemProperties>
@@ -122,27 +124,40 @@
 			</dependencies>
 			<properties>
 				<osgi.test.platform>felix</osgi.test.platform>
-			</properties>			
+			</properties>
 		</profile>
 	</profiles>
 
 	<repositories>
-	  <repository>
-	    <snapshots><enabled>true</enabled></snapshots>
-            <id>apache-snapshots</id>
-            <name>Apache Snapshots</name>
-            <url>http://cvs.apache.org/maven-snapshot-repository</url>
-          </repository>
-          <repository>
-            <id>safehaus-repository</id>
-            <name>Safehaus Repository</name>
-            <url>http://m2.safehaus.org</url>
-          </repository>
-          <repository>
-            <id>ibiblio</id>
-            <name>central</name>
-            <url>http://www.ibiblio.org/maven2/</url>
-          </repository>
-        </repositories>
+		<repository>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<id>apache-snapshots</id>
+			<name>Apache Snapshots</name>
+			<url>http://cvs.apache.org/maven-snapshot-repository</url>
+		</repository>
+		<repository>
+			<id>safehaus-repository</id>
+			<name>Safehaus Repository</name>
+			<url>http://m2.safehaus.org</url>
+		</repository>
+		<repository>
+			<id>ibiblio</id>
+			<name>central</name>
+			<url>http://www.ibiblio.org/maven2/</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<id>apache.snapshots</id>
+			<name>Apache Snapshots</name>
+			<url>http://cvs.apache.org/maven-snapshot-repository/</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 </project>
