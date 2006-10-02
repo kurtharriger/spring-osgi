@@ -55,8 +55,6 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
 	// file
 	private byte[] readWriteJarBuffer = new byte[1024];
 
-	private boolean includedActivator = false;
-
 	public OnTheFlyBundleCreatorTests() {
 	}
 
@@ -133,9 +131,6 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
 		if (entryName.charAt(0) == '/')
 			entryName = entryName.substring(1);
 
-		if (entryName.equals("/org/springframework/osgi/test/activator/JUnitTestActivator.class"))
-			includedActivator = true;
-
 		if (log.isDebugEnabled())
 			log.debug("adding resource " + res.toString() + " under name " + entryName);
 		jarStream.putNextEntry(new ZipEntry(entryName));
@@ -201,11 +196,6 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
 				writeToJar(resources[i][j], determineRelativeName(rootPath, resources[i][j]), jarStream);
 			}
 		}
-
-		// add (automatically) the JUnit activator
-		if (!includedActivator)
-			writeToJar(new ClassPathResource("/org/springframework/osgi/test/activator/JUnitTestActivator.class"),
-					"/org/springframework/osgi/test/activator/JUnitTestActivator.class", jarStream);
 
 		jarStream.finish();
 		jarStream.closeEntry();
