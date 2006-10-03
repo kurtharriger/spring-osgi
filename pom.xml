@@ -16,9 +16,11 @@
 
   <issueManagement>
     <system>JIRA</system>
-    <url>http://opensource.atlassian.com/projects/spring/browse/OSGI</url>
+    <url>
+      http://opensource.atlassian.com/projects/spring/browse/OSGI
+    </url>
   </issueManagement>
-  
+
   <ciManagement>
     <system>continuum</system>
     <notifiers>
@@ -30,7 +32,7 @@
       </notifier>
     </notifiers>
   </ciManagement>
-  
+
   <scm>
     <connection>
       scm:svn:https://svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
@@ -44,7 +46,7 @@
   </scm>
 
   <inceptionYear>2006</inceptionYear>
-  
+
   <developers>
     <developer>
       <id>adrian-colyer</id>
@@ -80,7 +82,7 @@
       </roles>
       <timezone>0</timezone>
     </developer>
-        <developer>
+    <developer>
       <id>TODO</id>
       <name>Hal Hildebrand</name>
       <email>hal.hildebrand at oracle.com</email>
@@ -92,15 +94,15 @@
       <timezone>-8</timezone>
     </developer>
   </developers>
-  
+
   <licenses>
-  
+
   </licenses>
 
   <!-- =================================================== -->
   <!-- Project Modules, Dependencies, Plugins and Profiles -->
   <!-- =================================================== -->
-  
+
   <!-- modules for Spring-OSGi -->
   <modules>
     <module>spring-osgi-extender</module>
@@ -251,6 +253,33 @@
     </plugins>
   </reporting>
 
+  <distributionManagement>
+    <repository>
+      <id>static.springframework.org</id>
+      <url>
+        scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2
+      </url>
+    </repository>
+    <snapshotRepository>
+      <id>static.springframework.org</id>
+      <url>
+        scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2-snapshots
+      </url>
+    </snapshotRepository>
+    <!-- for publication of site when configured...
+         will provide access to source xrefs, test results etc. 
+    <site>
+      <id>static.springframework.org</id>
+      <name>SpringFramework.org</name>
+      <url>
+        scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2/site
+      </url>
+    </site>
+     -->
+  </distributionManagement>
+
+
+
   <!-- ================================================ -->
   <!--            Repository Configuration              -->
   <!-- ================================================ -->
@@ -277,7 +306,9 @@
     <repository>
       <id>spring-ext</id>
       <name>Spring External Dependencies Repository</name>
-      <url>https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/</url>
+      <url>
+        https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+      </url>
     </repository>
   </repositories>
 
