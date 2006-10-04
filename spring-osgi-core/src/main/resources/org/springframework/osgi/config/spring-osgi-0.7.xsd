@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<xsd:schema xmlns="http://www.springframework.org/schema/osgi"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:beans="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.springframework.org/schema/osgi"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans"/>
+
+	<!-- reference -->
+	<xsd:element name="reference" type="Treference"/>
+
+	<xsd:complexType name="Treference">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+					<xsd:element name="property" type="beans:propertyType" minOccurs="0"/>
+					<xsd:element name="listener" type="Tlistener" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attribute name="interface" use="required" type="xsd:string"/>
+				<xsd:attribute name="filter" use="optional" type="xsd:string"/>
+				<xsd:attribute name="cardinality" use="optional" type="Tcardinality" default="1..1"/>
+				<xsd:attribute name="timeout" use="optional" type="xsd:int" default="0"/>
+				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
+				<xsd:attribute name="context-classloader" type="TreferenceClassLoaderOptions" default="client"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:simpleType name="Tcardinality">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="0..1"/>
+			<xsd:enumeration value="0..n"/>
+			<xsd:enumeration value="1..1"/>
+			<xsd:enumeration value="1..n"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="TreferenceClassLoaderOptions">
+	 	<xsd:restriction base="xsd:string">
+	 		<xsd:enumeration value="client"/>
+	 		<xsd:enumeration value="service-provider"/>
+	 		<xsd:enumeration value="unmanaged"/>
+	 	</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:complexType name="Tlistener">
+		<xsd:attribute name="ref" type="xsd:string" use="required"/>
+		<xsd:attribute name="bind-method" type="xsd:string" use="optional"/>
+		<xsd:attribute name="unbind-method" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+
+	<!-- service -->
+	<xsd:element name="service" type="Tservice"/>
+
+	<xsd:complexType name="Tservice">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:sequence minOccurs="0" maxOccurs="1">
+					<xsd:element name="interfaces" type="beans:listOrSetType" minOccurs="0"/>
+					<xsd:element name="service-properties" type="beans:propsType" minOccurs="0"/>
+					<!--  this next entry is to allow a nested bean element -->
+					<xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="skip"/>
+				</xsd:sequence>
+				<xsd:attribute name="ref" type="xsd:string" use="optional"/>
+				<xsd:attribute name="interface" type="xsd:string" use="optional"/>
+				<xsd:attribute name="lazy-init" type="xsd:boolean" use="optional" default="false"/>
+				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
+				<xsd:attribute name="context-classloader" type="TserviceClassLoaderOptions" default="unmanaged"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:simpleType name="TserviceClassLoaderOptions">
+	 	<xsd:restriction base="xsd:string">
+	 		<xsd:enumeration value="service-provider"/>
+	 		<xsd:enumeration value="unmanaged"/>
+	 	</xsd:restriction>
+	</xsd:simpleType>
+
+	<!-- property placeholder -->
+	<xsd:element name="property-placeholder" type="TpropertyPlaceholder"/>
+
+	<xsd:complexType name="TpropertyPlaceholder">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:attribute name="persistent-id" type="xsd:string" use="required"/>
+				<xsd:attribute name="placeholder-prefix" type="xsd:string" use="optional" default="${"/>
+				<xsd:attribute name="placeholder-suffix" type="xsd:string" use="optional" default="}"/>
+				<xsd:attribute name="default-properties" type="xsd:string" use="optional"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+    <!-- config object -->
+    <xsd:element name="config" type="Tconfig"/>
+    
+    <xsd:complexType name="Tconfig">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+					<xsd:element name="config-listener" type="TconfigListener"/>
+				</xsd:sequence>
+		    	<xsd:attribute name="persistent-id" type="xsd:string" use="required"/>
+			</xsd:extension>
+		</xsd:complexContent>
+    </xsd:complexType>
+
+	<xsd:complexType name="TconfigListener">
+		<xsd:attribute name="ref" type="xsd:string" use="required"/>
+		<xsd:attribute name="update-method" type="xsd:string" use="required"/>
+	</xsd:complexType>
+
+	<!-- bundle -->
+	<xsd:element name="bundle" type="Tbundle"/>
+
+	<xsd:complexType name="Tbundle">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:attribute name="symbolic-name" type="xsd:string" use="optional"/>
+				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
+				<xsd:attribute name="location" type="xsd:string" use="optional"/>
+				<xsd:attribute name="state" type="Tstate" use="optional"/>
+				<xsd:attribute name="start-level" type="xsd:int" use="optional" default="0"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:simpleType name="Tstate">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="start"/>
+			<xsd:enumeration value="stop"/>
+			<xsd:enumeration value="install"/>
+			<xsd:enumeration value="uninstall"/>
+			<xsd:enumeration value="update"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<!-- virtual-bundle -->
+	<xsd:element name="virtual-bundle" type="TvirtualBundle"/>
+
+	<xsd:complexType name="TvirtualBundle">
+		<xsd:complexContent>
+			<xsd:extension base="Tbundle">
+				<xsd:all>
+					<xsd:element name="imports" type="TpackageList" minOccurs="0"/>
+					<xsd:element name="exports" type="TpackageList" minOccurs="0"/>
+					<xsd:element name="dynamic-imports" type="TpackageList" minOccurs="0"/>
+				</xsd:all>
+				<xsd:attribute name="version" type="xsd:string" use="optional"/>
+				<xsd:attribute name="group-id" type="xsd:string" use="optional"/>
+				<xsd:attribute name="artifact-id" type="xsd:string" use="optional"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="TpackageList">
+		<xsd:sequence>
+			<xsd:element name="package" type="Tpackage" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Tpackage">
+		<xsd:sequence>
+			<xsd:element name="uses" type="TpackageList" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string" use="required"/>
+		<xsd:attribute name="version" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+
+</xsd:schema>
