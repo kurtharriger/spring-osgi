@@ -1,4 +1,6 @@
-package org.springframework.osgi.test.trivial;
+package org.springframework.osgi.test.trivial.tests;
+
+import org.springframework.osgi.test.trivial.TrivialClass;
 
 import junit.framework.TestCase;
 
