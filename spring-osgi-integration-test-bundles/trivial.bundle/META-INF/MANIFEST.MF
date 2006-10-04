@@ -1,4 +1,7 @@
 Bundle-Name: Trivial-Bundle
 Bundle-SymbolicName: org.springframework.osgi.test.trivial
 Export-Package: org.springframework.osgi.test.trivial
+Bundle-Version: 1.0
+Bundle-ClassPath: target/classes/,
+ .
 
