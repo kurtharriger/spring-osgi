@@ -35,4 +35,18 @@
     <module>cglib</module>
     <module>aspectj</module>
   </modules>
+  <reporting>
+   <excludeDefaults>true</excludeDefaults>
+   <!-- the above doesn't work, so we spell it out in full below -->
+   <plugins>
+     <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-project-info-reports-plugin</artifactId>
+       <inherited>true</inherited>
+       <reportSets>
+        <reportSet></reportSet>
+       </reportSets>
+     </plugin>   
+   </plugins>
+  </reporting>
 </project>
