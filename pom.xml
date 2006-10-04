@@ -139,12 +139,12 @@ limitations under the License.
 
   <!-- modules for Spring-OSGi -->
   <modules>
-    <module>spring-osgi-extender</module>
-    <module>spring-osgi-core</module>
-    <module>spring-osgi-test-support</module>
-    <module>spring-osgi-integration-tests</module>
     <module>spring-modules</module>
+    <module>spring-osgi-core</module>
+    <module>spring-osgi-extender</module>
+    <module>spring-osgi-test-support</module>
     <module>spring-osgi-integration-test-bundles</module>
+    <module>spring-osgi-integration-tests</module>
   </modules>
 
   <!-- shared dependencies across modules -->
