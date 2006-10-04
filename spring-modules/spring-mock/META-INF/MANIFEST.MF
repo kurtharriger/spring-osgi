@@ -39,7 +39,7 @@ Import-Package: javax.naming;resolution:=optional,
   junit.framework
 Export-Package: org.springframework.mock.jndi,
   org.springframework.mock.web,
-  org.springframemork.mock.web.portlet,
+  org.springframework.mock.web.portlet,
   org.springframework.test,
   org.springframework.test.web,
   org.springframework.test.annotation,
