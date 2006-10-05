@@ -11,7 +11,7 @@
   <artifactId>aspectjrt.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>AspectJ Runtime Library</name>
-  <version>1.5.3</version>
+  <version>1.5.2a</version>
   <url>http://www.springframework.org/osgi</url>
 
   <build>
@@ -31,7 +31,7 @@
                 <artifactItem>
                   <groupId>org.aspectj</groupId>
                   <artifactId>aspectjrt</artifactId>
-                  <version>1.5.3</version>
+                  <version>1.5.2a</version>
                   <type>jar</type>
                 </artifactItem>
               </artifactItems>
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
-      <version>1.5.3</version>
+      <version>1.5.2a</version>
     </dependency>
   </dependencies>
 </project>

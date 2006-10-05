@@ -1,15 +1,15 @@
 Implementation-Title: aspectjrt
-Implementation-Version: 1.5.3
+Implementation-Version: 1.5.2a
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.aspectj.aspectjrt
 Bundle-Name: aspecjrt
-Bundle-Version: 1.5.3
+Bundle-Version: 1.5.2.a
 Bundle-Vendor: Eclipse.org
 Export-Package: org.aspectj.lang,
  org.aspectj.lang.annotation,
  org.aspectj.lang.reflect,
  org.aspectj.runtime
-Bundle-ClassPath: target/aspectjrt.osgi-1.5.3.jar,
+Bundle-ClassPath: target/aspectjrt.osgi-1.5.2a.jar,
  .
 
 
