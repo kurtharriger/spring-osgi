@@ -11,7 +11,7 @@
   <artifactId>aspectjrt.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>AspectJ Runtime Library</name>
-  <version>1.5.2a</version>
+  <version>1.5.2a-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
 
   <build>

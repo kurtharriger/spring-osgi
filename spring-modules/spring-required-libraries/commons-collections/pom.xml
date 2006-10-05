@@ -11,7 +11,7 @@
   <artifactId>commons-collections.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>Jakarta Commons Collections (OSGi version)</name>
-  <version>3.2</version>
+  <version>3.2-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
 
   <build>

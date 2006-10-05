@@ -11,7 +11,7 @@
   <artifactId>aopalliance.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>AOP Alliance (OSGi version)</name>
-  <version>1.0</version>
+  <version>1.0-SNAPSHOT</version>
   <url>http:// www.springframework.org</url>
 
   <build>
