@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>cglib</groupId>
+  <groupId>org.springframework.osgi</groupId>
   <artifactId>cglib-nodep.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>cglib (OSGi version)</name>

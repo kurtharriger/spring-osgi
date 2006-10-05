@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>commons-logging</groupId>
+  <groupId>org.springframework.osgi</groupId>
   <artifactId>commons-logging.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>Jakarta Commons Logging (OSGi version)</name>

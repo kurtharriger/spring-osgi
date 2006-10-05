@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>commons-attributes</groupId>
+  <groupId>org.springframework.osgi</groupId>
   <artifactId>commons-attributes.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>Jakarta Commons Attributes (OSGi version)</name>
