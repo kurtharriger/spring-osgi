@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>asm</groupId>
+  <groupId>org.springframework.osgi</groupId>
   <artifactId>asm.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>asm (OSGi version)</name>

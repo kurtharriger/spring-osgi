@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>commons-collections</groupId>
+  <groupId>org.springframework.osgi</groupId>
   <artifactId>commons-collections.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>Jakarta Commons Collections (OSGi version)</name>

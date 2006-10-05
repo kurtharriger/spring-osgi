@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.aopalliance</groupId>
+  <groupId>org.springframework.osgi</groupId>
   <artifactId>aopalliance.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>AOP Alliance (OSGi version)</name>

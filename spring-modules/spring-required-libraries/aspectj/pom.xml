@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.aspectj</groupId>
+  <groupId>org.springframework.osgi</groupId>
   <artifactId>aspectjrt.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>AspectJ Runtime Library</name>
