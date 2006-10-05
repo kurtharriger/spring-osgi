@@ -334,11 +334,6 @@ limitations under the License.
       <url>http://m2.safehaus.org</url>
     </repository>
     <repository>
-      <id>ibiblio</id>
-      <name>central</name>
-      <url>http://www.ibiblio.org/maven2/</url>
-    </repository>
-    <repository>
       <id>spring-ext</id>
       <name>Spring External Dependencies Repository</name>
       <url>
