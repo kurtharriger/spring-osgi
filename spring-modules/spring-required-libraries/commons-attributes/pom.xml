@@ -11,7 +11,7 @@
   <artifactId>commons-attributes.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>Jakarta Commons Attributes (OSGi version)</name>
-  <version>2.2</version>
+  <version>2.2-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
 
   <build>
