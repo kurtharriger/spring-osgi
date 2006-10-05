@@ -40,6 +40,12 @@
           <address>adrian.colyer@interface21.com</address>
         </configuration>
       </notifier>
+      <notifier>
+        <type>mail</type>
+        <configuration>
+          <address>costin.leau@interface21.com</address>
+        </configuration>
+      </notifier>
     </notifiers>
   </ciManagement>
 
@@ -78,7 +84,7 @@
     <developer>
       <id>costin_leau</id>
       <name>Costin Leau</name>
-      <email>costin.lea at interface21.com</email>
+      <email>costin.leau at interface21.com</email>
       <organization>Interface21</organization>
       <organizationUrl>http://www.interface21.com</organizationUrl>
       <roles>
