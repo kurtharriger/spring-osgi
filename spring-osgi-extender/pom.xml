@@ -19,7 +19,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apachee.felix.plugins</groupId>
+        <groupId>org.apache.felix.plugins</groupId>
         <artifactId>maven-osgi-plugin</artifactId>
         <configuration>
           <bundleName>Spring-Extender</bundleName>
@@ -31,4 +31,21 @@
     </plugins>
   </build>
 -->
+
+  <!-- disable reporting for this project until it has some real content! -->
+  <reporting>
+   <excludeDefaults>true</excludeDefaults>
+   <!-- the above doesn't work, so we spell it out in full below -->
+   <plugins>
+     <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-project-info-reports-plugin</artifactId>
+       <inherited>true</inherited>
+       <reportSets>
+        <reportSet></reportSet>
+       </reportSets>
+     </plugin>   
+   </plugins>
+  </reporting>
+
 </project>
