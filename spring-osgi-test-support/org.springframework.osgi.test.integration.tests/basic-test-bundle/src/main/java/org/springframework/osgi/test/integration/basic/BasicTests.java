@@ -15,8 +15,6 @@
  */
 package org.springframework.osgi.test.integration.basic;
 
-import java.io.File;
-
 import org.springframework.osgi.test.AbstractOsgiTests;
 
 /**
@@ -30,11 +28,9 @@ public class BasicTests extends AbstractOsgiTests {
       * @see org.springframework.osgi.test.OsgiTest#getBundles()
       */
     protected String[] getBundlesLocations() {
-        String jar
-                = "org/springframework/osgi-junit-framework-testing-bundle/2.1/osgi-junit-framework-testing-bundle-2.1.jar";
-        File repo = new File(new File(System.getProperty("user.home")), ".m2/repository");
-        return new String[]{"file:" + new File(repo, jar).getAbsolutePath()};
-
+        return new String[] { 
+        	localMavenBundle("org.springframework.osgi.test", "basic-test-bundle", "1.0-SNAPSHOT")
+        };
     }
 
 
