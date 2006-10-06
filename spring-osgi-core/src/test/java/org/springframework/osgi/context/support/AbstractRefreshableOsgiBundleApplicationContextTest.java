@@ -31,7 +31,7 @@ import org.springframework.osgi.context.OsgiBundleResource;
  * @author Costin Leau
  * 
  */
-public class AbstractRefreshableOsgiBundleApplicationContextTests extends TestCase {
+public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCase {
 
 	private AbstractRefreshableOsgiBundleApplicationContext context;
 
