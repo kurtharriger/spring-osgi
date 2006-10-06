@@ -34,6 +34,7 @@
     <module>asm</module>
     <module>cglib</module>
     <module>aspectj</module>
+    <module>junit</module>
   </modules>
   <reporting>
    <excludeDefaults>true</excludeDefaults>
