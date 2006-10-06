@@ -32,7 +32,7 @@ import org.springframework.context.support.GenericApplicationContext;
  * 
  * @author Costin Leau
  */
-public class AbstractBundleXmlApplicationContextTests extends TestCase {
+public class AbstractBundleXmlApplicationContextTest extends TestCase {
 
 	AbstractBundleXmlApplicationContext xmlContext;
 

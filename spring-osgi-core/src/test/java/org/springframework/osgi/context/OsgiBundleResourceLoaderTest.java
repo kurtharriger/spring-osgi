@@ -27,7 +27,7 @@ import org.springframework.core.io.Resource;
  * @author Costin Leau
  * 
  */
-public class OsgiBundleResourceLoaderTests extends TestCase {
+public class OsgiBundleResourceLoaderTest extends TestCase {
 
 	OsgiBundleResourceLoader loader;
 
