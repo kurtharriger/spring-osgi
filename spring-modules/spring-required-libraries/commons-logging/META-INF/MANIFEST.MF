@@ -6,7 +6,7 @@ Bundle-Name: commons-logging
 Bundle-Version: 1.1
 Bundle-Vendor: Apache Jakarta Commons
 Export-Package: org.apache.commons.logging
-Bundle-ClassPath: target/commons-logging.osgi-1.1.jar,
- .
+Bundle-ClassPath: .,
+ target/commons-logging.osgi-1.1-SNAPSHOT.jar
 
 
