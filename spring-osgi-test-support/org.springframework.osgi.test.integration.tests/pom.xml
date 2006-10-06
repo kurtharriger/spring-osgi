@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   <parent>
-    <artifactId>spring-osgi</artifactId>
+    <artifactId>spring-osgi-test-support</artifactId>
     <groupId>org.springframework.osgi</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
-  <artifactId>spring-osgi-test-support</artifactId>
+  <artifactId>spring-osgi-test-support-integration-tests</artifactId>
   <packaging>pom</packaging>
-  <name>Spring JUnit support for OSGi</name>
+  <name>Spring JUnit support for OSGi (integration tests)</name>
   <version>1.0-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
    <modules>
-    <module>org.springframework.osgi.test</module>
-    <module>org.springframework.osgi.test.integration.tests</module>
+    <module>basic-test-bundle</module>
+    <module>integration-tests</module>
   </modules>
 </project>
