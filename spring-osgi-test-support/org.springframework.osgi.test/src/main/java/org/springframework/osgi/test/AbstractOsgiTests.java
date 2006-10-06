@@ -69,7 +69,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
     // The OSGi BundleContext
     private BundleContext bundleContext;
 
-    private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.activator.JUnitTestActivator";
+    private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
 
 	public static final String EQUINOX_PLATFORM = "equinox";
 	public static final String KNOPFLERFISH_PLATFORM = "knopflerfish";
@@ -80,16 +80,25 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	protected final Log log = LogFactory.getLog(getClass());
 
 	private static String getSpringOSGiTestBundleUrl() {
-		return localMavenBundle("org.springframework", "spring-osgi-test", "2.1");
+		return localMavenBundle("org.springframework.osgi", "org.springframework.osgi.test", "1.0-SNAPSHOT");
 	}
 
 	private static String getSpringCoreBundleUrl() {
-		return localMavenBundle("org.springframework", "spring-core", "2.1");
+		return localMavenBundle("org.springframework.osgi", "spring-core", "2.1-SNAPSHOT");
 	}
 
-	private static String getCommonLibUrl() {
-		return localMavenBundle("org.springframework", "common-lib", "1.0");
+	private static String getLog4jLibUrl() {
+		return localMavenBundle("org.springframework.osgi", "log4j.osgi", "1.2.13-SNAPSHOT");
 	}
+
+	private static String getCommonsLoggingLibUrl() {
+		return localMavenBundle("org.springframework.osgi", "commons-logging.osgi", "1.1-SNAPSHOT");
+	}
+	
+	private static String getJUnitLibUrl() {
+		return localMavenBundle("org.springframework.osgi", "junit.osgi", "3.8.1-SNAPSHOT");
+	}
+
 
 
     /**
@@ -131,7 +140,12 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 * @return the array of mandatory bundle names
 	 */
 	private String[] getMandatoryBundles() {
-		return new String[] { getCommonLibUrl(), getSpringCoreBundleUrl(), getSpringOSGiTestBundleUrl() };
+		return new String[] { 
+				getJUnitLibUrl(),
+				getLog4jLibUrl(), 
+				getCommonsLoggingLibUrl(), 
+				getSpringCoreBundleUrl(), 
+				getSpringOSGiTestBundleUrl() };
 	}
 
 	public AbstractOsgiTests() {
@@ -277,7 +291,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 				try {
 					bundles[i].start();
 				}
-				catch (RuntimeException ex) {
+				catch (Throwable ex) {
 					log.warn("can't start bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName()
 							+ "]", ex);
 				}
@@ -385,7 +399,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	private void shutdownTest() {
 		cleanupStreams();
 
-		log.info("shuting down OSGi platform");
+		log.info("shutting down OSGi platform");
 		if (osgiPlatform != null) {
 			try {
 				osgiPlatform.stop();
