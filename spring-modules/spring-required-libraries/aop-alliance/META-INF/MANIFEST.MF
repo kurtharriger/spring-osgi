@@ -6,6 +6,6 @@ Bundle-Name: aopalliance
 Bundle-Version: 1.0
 Bundle-Vendor: AOP Alliance
 Export-Package: org.aopalliance.aop, org.aopalliance.intercept
-Bundle-ClassPath: target/aopalliance.osgi-1.0.jar,
- .
+Bundle-ClassPath: .,
+ target/aopalliance.osgi-1.0-SNAPSHOT.jar
 
