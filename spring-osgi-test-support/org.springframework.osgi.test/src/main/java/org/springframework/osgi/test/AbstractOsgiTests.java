@@ -80,23 +80,23 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	protected final Log log = LogFactory.getLog(getClass());
 
 	private static String getSpringOSGiTestBundleUrl() {
-		return localMavenBundle("org.springframework.osgi", "org.springframework.osgi.test", "1.0-SNAPSHOT");
+		return localMavenArtifact("org.springframework.osgi.test", "1.0-SNAPSHOT");
 	}
 
 	private static String getSpringCoreBundleUrl() {
-		return localMavenBundle("org.springframework.osgi", "spring-core", "2.1-SNAPSHOT");
+		return localMavenArtifact("spring-core", "2.1-SNAPSHOT");
 	}
 
 	private static String getLog4jLibUrl() {
-		return localMavenBundle("org.springframework.osgi", "log4j.osgi", "1.2.13-SNAPSHOT");
+		return localMavenArtifact("log4j.osgi", "1.2.13-SNAPSHOT");
 	}
 
 	private static String getCommonsLoggingLibUrl() {
-		return localMavenBundle("org.springframework.osgi", "commons-logging.osgi", "1.1-SNAPSHOT");
+		return localMavenArtifact("commons-logging.osgi", "1.1-SNAPSHOT");
 	}
 	
 	private static String getJUnitLibUrl() {
-		return localMavenBundle("org.springframework.osgi", "junit.osgi", "3.8.1-SNAPSHOT");
+		return localMavenArtifact("junit.osgi", "3.8.1-SNAPSHOT");
 	}
 
 
@@ -123,6 +123,17 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
         location += version;
         location += ".jar";
         return "file:" + new File(repositoryHome, location).getAbsolutePath();
+    }
+    
+    public static String localMavenArtifact(String artifactId, String version) {
+    	try {
+    		File found = new MavenPackagedArtifactFinder(artifactId,version).findPackagedArtifact(new File("."));
+    		return found.toURL().toExternalForm();
+    	} catch (IOException ioEx) {
+    		throw new IllegalStateException(
+    			"Artifact " + artifactId + "-" + version + ".jar" + 
+    			" could not be found",ioEx);
+    	}
     }
 
 	/**
