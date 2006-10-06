@@ -29,7 +29,7 @@ public class BasicTests extends AbstractOsgiTests {
       */
     protected String[] getBundlesLocations() {
         return new String[] { 
-        	localMavenBundle("org.springframework.osgi.test", "basic-test-bundle", "1.0-SNAPSHOT")
+        	localMavenArtifact("basic-test-bundle", "1.0-SNAPSHOT")
         };
     }
 
