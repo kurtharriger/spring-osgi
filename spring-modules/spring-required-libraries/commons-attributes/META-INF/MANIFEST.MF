@@ -7,6 +7,6 @@ Bundle-Version: 1.1
 Bundle-Vendor: Apache Jakarta Commons
 Export-Package: org.apache.commons.attributes
 Bundle-ClassPath: .,
- target/commons-attributes.osgi-2.2.jar
+ target/commons-attributes.osgi-2.2-SNAPSHOT.jar
 
 
