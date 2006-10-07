@@ -247,7 +247,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			else {
 				String[] list = new String[resourceList.size()];
 				for (int i = 0; i < list.length; i++) {
-					list[i] = (String) resourceList.get(0);
+					list[i] = (String) resourceList.get(i);
 				}
 				return addBundlePrefixTo(list);
 			}
