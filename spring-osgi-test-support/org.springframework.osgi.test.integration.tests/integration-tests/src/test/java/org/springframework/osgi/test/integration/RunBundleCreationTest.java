@@ -1,6 +1,9 @@
 package org.springframework.osgi.test.integration;
 
+import java.util.Enumeration;
+
 import junit.framework.TestCase;
+import junit.framework.TestFailure;
 import junit.framework.TestResult;
 
 /**
@@ -22,7 +25,31 @@ public class RunBundleCreationTest extends TestCase {
         test.run(result);
 
         assertEquals(4, result.runCount());
+        
+        if (result.errorCount() > 1) {
+        	// tell us what went wrong...
+        	Enumeration errors = result.errors();
+        	while (errors.hasMoreElements()) {
+        		TestFailure testFailure = (TestFailure) errors.nextElement();
+        		reportOn(testFailure);
+        	}
+        }
         assertEquals(1, result.errorCount());
+        
+        if (result.failureCount() > 2) {
+        	// tell us what went wrong...
+        	Enumeration failures = result.failures();
+        	while (failures.hasMoreElements()) {
+        		TestFailure testFailure = (TestFailure) failures.nextElement();
+        		reportOn(testFailure);
+        	}
+        }
         assertEquals(2, result.failureCount());
+    }
+    
+    private void reportOn(TestFailure aFailure) {
+    	System.err.println(aFailure.failedTest());
+    	System.err.println(aFailure.exceptionMessage());
+    	System.err.println(aFailure.trace());
     }
 }
