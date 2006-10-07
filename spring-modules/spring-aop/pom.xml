@@ -2,7 +2,7 @@
 <project>
   <parent>
     <artifactId>spring-modules</artifactId>
-    <groupId>org.springframework</groupId>
+    <groupId>org.springframework.osgi</groupId>
     <version>2.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
