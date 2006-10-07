@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi</artifactId>
@@ -151,6 +149,7 @@ limitations under the License.
     <module>spring-osgi-test-support</module>
     <module>spring-osgi-integration-test-bundles</module>
     <module>spring-osgi-integration-tests</module>
+    <module>samples</module>
   </modules>
 
   <!-- shared dependencies across modules -->
@@ -290,6 +289,10 @@ limitations under the License.
             <group>
                <title>Spring OSGi JUnit Support</title>
                <packages>org.springframework.osgi.test*</packages>
+            </group>
+            <group>
+               <title>Samples</title>
+               <packages>org.springframework.osgi.sample*</packages>
             </group>
           </groups>
           <excludePackageNames>org.springframework.osgi.test.trivial* org.springframework.osgi.test.integration*</excludePackageNames>
