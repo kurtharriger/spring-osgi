@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-Name: test
+Bundle-Description: placeholder for dynamically created test bundle
+Bundle-SymbolicName: the-actual-JUnit-test
+Bundle-Vendor: Spring Framework
+Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator
+Import-Package: org.osgi.framework,
+  junit.framework,
+  org.springframework.osgi.test,
+  org.springframework.osgi.test.runner,
+  org.springframework.core.io
+
+  
