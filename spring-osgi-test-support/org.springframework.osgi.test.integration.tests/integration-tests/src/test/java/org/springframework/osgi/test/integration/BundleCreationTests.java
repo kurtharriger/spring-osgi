@@ -33,7 +33,7 @@ public class BundleCreationTests extends ConfigurableBundleCreatorTests {
 	 * 
 	 * @see org.springframework.osgi.test.OsgiTest#getBundles()
 	 */
-	protected String[] getBundlesLocations() {
+	protected String[] getBundleLocations() {
 
 		// no test bundle is included
 		return new String[] {};
