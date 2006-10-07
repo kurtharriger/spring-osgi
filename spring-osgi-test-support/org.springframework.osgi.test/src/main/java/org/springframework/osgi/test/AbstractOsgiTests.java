@@ -141,7 +141,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 *
 	 * @return the array of bundles to install
 	 */
-	protected String[] getBundlesLocations() {
+	protected String[] getBundleLocations() {
 		return new String[] {};
 	}
 
@@ -282,7 +282,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			context = osgiPlatform.getBundleContext();
 			// merge bundles
 			String[] mandatoryBundles = getMandatoryBundles();
-			String[] optionalBundles = getBundlesLocations();
+			String[] optionalBundles = getBundleLocations();
 
 			String[] allBundles = new String[mandatoryBundles.length + optionalBundles.length];
 			System.arraycopy(mandatoryBundles, 0, allBundles, 0, mandatoryBundles.length);
