@@ -25,9 +25,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>commons-logging</groupId>
+      <groupId>org.springframework.osgi</groupId>
       <artifactId>commons-logging.osgi</artifactId>
-      <version>1.1</version>
+      <version>1.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
