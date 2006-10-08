@@ -75,7 +75,7 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 
 	public void testGetBundleName() {
 		String symbolicName = "symbolic";
-		bundleCtrl.reset();
+		//bundleCtrl.reset();
 		bundleCtrl.expectAndReturn(bundle.getSymbolicName(), symbolicName, MockControl.ONE_OR_MORE);
 		bundleCtxCtrl.replay();
 		bundleCtrl.replay();
