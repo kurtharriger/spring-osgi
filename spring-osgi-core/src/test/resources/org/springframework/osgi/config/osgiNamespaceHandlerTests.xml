@@ -19,4 +19,24 @@
 
 	<!-- 
 		filter="(myService)" timeout="123" classloaderContext="service-provider" -->
+
+
+	<!-- simple service -->
+	<osgi:service id="string-service" ref="string"
+		interface="java.io.Serializable" lazy-init="true" />
+
+	<bean name="string" class="java.lang.String" />
+
+	<!-- full service -->
+	<osgi:service id="full-service" ref="string">
+		<osgi:interfaces>
+			<value>java.io.Serializable</value>
+			<value>java.lang.Cloneable</value>
+		</osgi:interfaces>
+		<osgi:service-properties>
+			<prop key="foo">bar</prop>
+			<prop key="white">horse</prop>
+		</osgi:service-properties>
+	</osgi:service>
+
 </beans>
