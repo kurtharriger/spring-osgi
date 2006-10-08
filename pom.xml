@@ -149,6 +149,7 @@ limitations under the License.
     <module>spring-osgi-test-support</module>
     <module>spring-osgi-integration-test-bundles</module>
     <module>spring-osgi-integration-tests</module>
+	<module>spring-osgi-mock</module>    
     <module>samples</module>
   </modules>
 
