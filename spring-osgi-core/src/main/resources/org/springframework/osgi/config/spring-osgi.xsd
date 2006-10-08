@@ -73,7 +73,9 @@
 				<xsd:attribute name="interface" type="xsd:string" use="optional"/>
 				<xsd:attribute name="lazy-init" type="xsd:boolean" use="optional" default="false"/>
 				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
+				<!-- CL: commented out for the moment - need to add an equivalent inside OsgiServiceFB
 				<xsd:attribute name="context-classloader" type="TserviceClassLoaderOptions" default="unmanaged"/>
+				-->
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>

@@ -26,23 +26,22 @@ import org.w3c.dom.Element;
  * @author Hal Hildebrand
  * @author Andy Piper
  */
-public class OsgiNamespaceHandler extends NamespaceHandlerSupport
-{
-	/* (non-Javadoc)
- * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
- */
+public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
+	 */
 	public void init() {
 		registerBeanDefinitionParser("service", new ServiceBeanDefinitionParser());
 		registerBeanDefinitionParser("reference", new ReferenceBeanDefinitionParser());
-		registerBeanDefinitionParser("bundle", new DependentAbstractSingleBeanDefinitionParser()
-		{
+		registerBeanDefinitionParser("bundle", new DependentAbstractSingleBeanDefinitionParser() {
 			protected Class getBeanClass(Element element) {
 				return BundleFactoryBean.class;
 			}
 		});
 		registerBeanDefinitionParser("virtual-bundle", new VirtualBundleBeanDefinitionParser());
-		registerBeanDefinitionParser("config", new AbstractSimpleBeanDefinitionParser()
-		{
+		registerBeanDefinitionParser("config", new AbstractSimpleBeanDefinitionParser() {
 			protected Class getBeanClass(Element element) {
 				return OsgiConfig.class;
 			}
@@ -50,6 +49,13 @@ public class OsgiNamespaceHandler extends NamespaceHandlerSupport
 			protected boolean autogenerateId() {
 				return true;
 			}
+		});
+		registerBeanDefinitionParser("property-placeholder", new AbstractSimpleBeanDefinitionParser() {
+
+			protected Class getBeanClass(Element arg0) {
+				throw new UnsupportedOperationException("property-placeholder tag not supported yet");
+			}
+
 		});
 	}
 
