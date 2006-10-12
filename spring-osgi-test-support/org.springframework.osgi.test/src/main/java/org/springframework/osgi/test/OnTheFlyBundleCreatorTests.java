@@ -31,7 +31,6 @@ import java.util.zip.ZipEntry;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;

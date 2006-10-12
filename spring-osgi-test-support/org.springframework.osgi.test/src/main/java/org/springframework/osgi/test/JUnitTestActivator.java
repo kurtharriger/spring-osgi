@@ -88,7 +88,8 @@ public class JUnitTestActivator implements BundleActivator {
 	 */
 	public void stop(BundleContext bc) throws Exception {
 		bc.ungetService(reference);
-		registration.unregister();
+		if (registration != null)
+			registration.unregister();
 	}
 
 }
