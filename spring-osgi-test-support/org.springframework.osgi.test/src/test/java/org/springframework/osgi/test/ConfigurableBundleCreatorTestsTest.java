@@ -17,9 +17,9 @@ package org.springframework.osgi.test;
 
 import java.util.Properties;
 
-import org.springframework.core.io.ClassPathResource;
-
 import junit.framework.TestCase;
+
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * Test Case for ConfigurableBundleCreatorTests.
