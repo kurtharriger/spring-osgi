@@ -44,7 +44,7 @@ public class MockBundleContext implements BundleContext {
 	static {
 		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_VERSION, "1.0-SNAPSHOT");
 		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_VENDOR, "Interface21");
-		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_LANGUAGE, System.getProperty("file.encoding"));
+		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_LANGUAGE, System.getProperty("user.language"));
 		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_OS_NAME, System.getProperty("os.name"));
 		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_OS_VERSION, System.getProperty("os.version"));
 		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_PROCESSOR, System.getProperty("os.arch"));

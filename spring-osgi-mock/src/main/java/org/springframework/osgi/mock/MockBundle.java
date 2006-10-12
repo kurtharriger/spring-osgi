@@ -28,6 +28,8 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 
 /**
+ * This bundle uses the current classloader to for loading classes/resources.
+ * 
  * @author Costin Leau
  * 
  */
@@ -36,6 +38,10 @@ public class MockBundle implements Bundle {
 	private String location;
 	private Dictionary headers;
 	private BundleContext bundleContext;
+	private ClassLoader loader = getClass().getClassLoader();
+
+	private Dictionary defaultHeaders = new Hashtable(0);
+	private final String SYMBOLIC_NAME = "Mock-Bundle_" + System.currentTimeMillis();
 
 	private class EmptyEnumeration implements Enumeration {
 		public boolean hasMoreElements() {
@@ -64,8 +70,10 @@ public class MockBundle implements Bundle {
 	}
 
 	public MockBundle(String location, Dictionary headers, BundleContext context) {
+		defaultHeaders.put("Bundle-SymbolicName", SYMBOLIC_NAME);
+
 		this.location = (location == null ? "<default location>" : location);
-		this.headers = (headers == null ? new Hashtable() : headers);
+		this.headers = (headers == null ? defaultHeaders : headers);
 		this.bundleContext = (context == null ? new MockBundleContext(this) : context);
 	}
 
@@ -94,7 +102,7 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#getEntry(java.lang.String)
 	 */
 	public URL getEntry(String name) {
-		return null;
+		return getClass().getResource(name);
 	}
 
 	/*
@@ -103,7 +111,7 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#getEntryPaths(java.lang.String)
 	 */
 	public Enumeration getEntryPaths(String path) {
-		return null;
+		return new EmptyEnumeration();
 	}
 
 	/*
@@ -121,7 +129,7 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#getHeaders(java.lang.String)
 	 */
 	public Dictionary getHeaders(String locale) {
-		return null;
+		return getHeaders();
 	}
 
 	/*
@@ -157,7 +165,7 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#getResource(java.lang.String)
 	 */
 	public URL getResource(String name) {
-		return null;
+		return loader.getResource(name);
 	}
 
 	/*
@@ -166,7 +174,7 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#getResources(java.lang.String)
 	 */
 	public Enumeration getResources(String name) throws IOException {
-		return new EmptyEnumeration();
+		return loader.getResources(name);
 	}
 
 	/*
@@ -193,7 +201,7 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#getSymbolicName()
 	 */
 	public String getSymbolicName() {
-		return "MockBundle";
+		return SYMBOLIC_NAME;
 	}
 
 	/*
@@ -211,7 +219,7 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#loadClass(java.lang.String)
 	 */
 	public Class loadClass(String name) throws ClassNotFoundException {
-		throw new ClassNotFoundException();
+		return loader.loadClass(name);
 	}
 
 	/*
