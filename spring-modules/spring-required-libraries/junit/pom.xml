@@ -42,6 +42,19 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.felix.plugins</groupId>
+        <artifactId>maven-osgi-plugin</artifactId>
+        <extensions>true</extensions>
+        <version>0.8.0-SNAPSHOT</version>
+        <configuration>
+          <osgiManifest>
+              <dynamicImportPackage>
+                  javax.swing, javax.swing.border, javax.swing.event, javax.swing.text, javax.swing.tree
+              </dynamicImportPackage>
+          </osgiManifest>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   
