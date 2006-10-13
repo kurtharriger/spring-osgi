@@ -18,14 +18,12 @@ package org.springframework.osgi.mock;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Properties;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleListener;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.InvalidSyntaxException;
@@ -39,16 +37,7 @@ import org.osgi.framework.ServiceRegistration;
  */
 public class MockBundleContext implements BundleContext {
 
-	public static final Properties DEFAULT_PROPERTIES = new Properties();
-
-	static {
-		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_VERSION, "1.0-SNAPSHOT");
-		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_VENDOR, "Interface21");
-		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_LANGUAGE, System.getProperty("user.language"));
-		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_OS_NAME, System.getProperty("os.name"));
-		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_OS_VERSION, System.getProperty("os.version"));
-		DEFAULT_PROPERTIES.put(Constants.FRAMEWORK_PROCESSOR, System.getProperty("os.arch"));
-	}
+	public static final Properties DEFAULT_PROPERTIES = new DefaultBundleContextProperties();
 
 	private Bundle bundle;
 	private Properties properties;
@@ -62,7 +51,7 @@ public class MockBundleContext implements BundleContext {
 	}
 
 	public MockBundleContext(Bundle bundle, Properties props) {
-		this.bundle = (bundle == null ? new MockBundle(this) : bundle);
+		this.bundle = (bundle == null ? new MockBundle() : bundle);
 		properties = new Properties(DEFAULT_PROPERTIES);
 		if (props != null)
 			properties.putAll(props);
@@ -162,7 +151,7 @@ public class MockBundleContext implements BundleContext {
 	 * @see org.osgi.framework.BundleContext#getProperty(java.lang.String)
 	 */
 	public String getProperty(String key) {
-		return null;
+		return properties.getProperty(key);
 	}
 
 	/*

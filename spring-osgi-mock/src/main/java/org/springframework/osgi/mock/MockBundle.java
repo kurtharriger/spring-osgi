@@ -21,10 +21,12 @@ import java.net.URL;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.NoSuchElementException;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
 /**
@@ -37,6 +39,9 @@ public class MockBundle implements Bundle {
 
 	private String location;
 	private Dictionary headers;
+
+	// required for introspection by util classes (should be removed)
+	
 	private BundleContext bundleContext;
 	private ClassLoader loader = getClass().getClassLoader();
 
@@ -49,7 +54,7 @@ public class MockBundle implements Bundle {
 		}
 
 		public Object nextElement() {
-			return null;
+			throw new NoSuchElementException();
 		}
 	}
 
@@ -102,7 +107,7 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#getEntry(java.lang.String)
 	 */
 	public URL getEntry(String name) {
-		return getClass().getResource(name);
+		return loader.getResource(name);
 	}
 
 	/*
@@ -201,7 +206,8 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#getSymbolicName()
 	 */
 	public String getSymbolicName() {
-		return SYMBOLIC_NAME;
+		String name = (String) headers.get(Constants.BUNDLE_SYMBOLICNAME);
+		return (name == null ? SYMBOLIC_NAME : name);
 	}
 
 	/*
@@ -210,7 +216,7 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#hasPermission(java.lang.Object)
 	 */
 	public boolean hasPermission(Object permission) {
-		return false;
+		return true;
 	}
 
 	/*

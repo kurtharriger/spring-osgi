@@ -21,6 +21,7 @@ import java.util.Hashtable;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Costin Leau
@@ -28,20 +29,26 @@ import org.osgi.framework.ServiceReference;
  */
 public class MockServiceReference implements ServiceReference {
 
-	private Hashtable properties;
 	private Bundle bundle;
+	private ServiceRegistration registration;
+	private Dictionary properties;
 
 	public MockServiceReference() {
-		this(new MockBundle(), new Hashtable());
+		this(null, null, null);
 	}
 
 	public MockServiceReference(Bundle bundle) {
-		this(bundle, new Hashtable());
+		this(bundle, null, null);
 	}
 
-	public MockServiceReference(Bundle bundle, Hashtable props) {
-		this.bundle = bundle;
-		this.properties = props;
+	public MockServiceReference(ServiceRegistration registration) {
+		this(null, null, registration);
+	}
+
+	public MockServiceReference(Bundle bundle, Dictionary properties, ServiceRegistration registration) {
+		this.bundle = (bundle == null ? new MockBundle() : bundle);
+		this.registration = (registration == null ? new MockServiceRegistration() : registration);
+		this.properties = (properties == null ? new Hashtable() : properties);
 	}
 
 	/*
@@ -98,13 +105,16 @@ public class MockServiceReference implements ServiceReference {
 	}
 
 	public void setProperties(Dictionary properties) {
-		this.properties.clear();
+		/*
+		 * Enumeration keys = props.keys(); while (keys.hasMoreElements())
+		 * this.properties.remove(keys.nextElement());
+		 * 
+		 * Enumeration enm = props.keys(); while (enm.hasMoreElements()) {
+		 * Object key = enm.nextElement(); this.properties.put(key,
+		 * props.get(key)); }
+		 */
 
-		Enumeration enm = properties.keys();
-		while (enm.hasMoreElements()) {
-			Object key = enm.nextElement();
-			this.properties.put(key, properties.get(key));
-		}
+		if (properties != null)
+			this.properties = properties;
 	}
-
 }

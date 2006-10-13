@@ -26,7 +26,16 @@ import org.osgi.framework.ServiceRegistration;
  */
 public class MockServiceRegistration implements ServiceRegistration {
 
-	private MockServiceReference reference = new MockServiceReference();
+	private ServiceReference reference;
+
+	public MockServiceRegistration() {
+		this(null);
+	}
+
+	public MockServiceRegistration(Dictionary props) {
+		reference = new MockServiceReference(this);
+		setProperties(props);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -37,13 +46,21 @@ public class MockServiceRegistration implements ServiceRegistration {
 		return reference;
 	}
 
+	public void setReference(ServiceReference reference) {
+		this.reference = reference;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.osgi.framework.ServiceRegistration#setProperties(java.util.Dictionary)
 	 */
-	public void setProperties(Dictionary properties) {
-		reference.setProperties(properties);
+	public void setProperties(Dictionary props) {
+		if (reference instanceof MockServiceReference)
+			((MockServiceReference) reference).setProperties(props);
+		else
+			throw new IllegalArgumentException("cannot update properties - service reference is not a "
+					+ MockServiceReference.class.getName());
 	}
 
 	/*
