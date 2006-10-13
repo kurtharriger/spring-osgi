@@ -122,7 +122,6 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
 	 * @param res
 	 * @param entryName
 	 * @param jarStream
-	 * @param buffer
 	 * @throws Exception
 	 */
 	private void writeToJar(Resource res, String entryName, JarOutputStream jarStream) throws Exception {
@@ -240,8 +239,7 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
 					+ "]", stream);
 		}
 		finally {
-			if (stream != null)
-				stream.close();
+			stream.close();
 		}
 
 		log.debug("start bundle");
