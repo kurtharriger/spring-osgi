@@ -102,7 +102,7 @@
       <timezone>0</timezone>
     </developer>
     <developer>
-      <id>TODO</id>
+      <id>jconstantine</id>
       <name>Hal Hildebrand</name>
       <email>hal.hildebrand at oracle.com</email>
       <organization>Oracle</organization>
@@ -225,6 +225,21 @@ limitations under the License.
           <groupId>org.knopflerfish</groupId>
           <artifactId>framework</artifactId>
           <version>2.0.0</version>
+          <type>jar</type>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+      <properties>
+        <osgi.test.platform>knopflerfish</osgi.test.platform>
+      </properties>
+    </profile>
+    <profile>
+      <id>knopflerfish-2.0.1</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.knopflerfish</groupId>
+          <artifactId>framework</artifactId>
+          <version>2.0.1</version>
           <type>jar</type>
           <scope>provided</scope>
         </dependency>

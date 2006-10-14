@@ -2,6 +2,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--
+    <parent>
+        <artifactId>spring-osgi</artifactId>
+        <groupId>org.springframework.osgi</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    -->
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.example</groupId>
     <artifactId>integration-test</artifactId>
@@ -57,12 +64,44 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>org.eclipse.equinox</groupId>
-          <artifactId>org.eclipse.osgi</artifactId>
-          <version>3.2.0</version>
-          <type>jar</type>
-          <scope>test</scope>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>0.8.0-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.main</artifactId>
+            <version>0.8.0-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.knopflerfish</groupId>
+            <artifactId>framework</artifactId>
+            <version>2.0.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.equinox</groupId>
+            <artifactId>org.eclipse.osgi</artifactId>
+            <version>3.2.0</version>
+            <type>jar</type>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <forkMode>pertest</forkMode>
+                    <argLine>-enableassertions</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 

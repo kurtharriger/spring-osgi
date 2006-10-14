@@ -184,12 +184,18 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		if (platformName != null) {
 			platformName = platformName.toLowerCase();
 
-			if (platformName.contains(FELIX_PLATFORM))
-				return new FelixPlatform();
-			if (platformName.contains(KNOPFLERFISH_PLATFORM))
-				return new KnopflerfishPlatform();
-		}
+			if (platformName.contains(FELIX_PLATFORM)) {
+                log.info("Creating Felix Platform");
+                return new FelixPlatform();
 
+            }
+			if (platformName.contains(KNOPFLERFISH_PLATFORM)) {
+                log.info("Creating Knopflerfish Platform");
+				return new KnopflerfishPlatform();
+            }
+        }
+
+        log.info("Creating Equinox Platform");
 		return new EquinoxPlatform();
 	}
 
