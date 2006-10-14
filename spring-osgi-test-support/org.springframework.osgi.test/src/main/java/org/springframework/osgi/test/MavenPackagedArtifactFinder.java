@@ -18,6 +18,7 @@ package org.springframework.osgi.test;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 
 /**
  * @author Adrian Colyer
@@ -48,8 +49,12 @@ public class MavenPackagedArtifactFinder {
 				startingDirectory + " does not contain a pom.xml file");
 		}
 		File rootMavenProjectDir = findRootMavenProjectDir(startingDirectory.getCanonicalFile());
-		return findInDirectoryTree(artifactName,rootMavenProjectDir);
-	}
+		File found = findInDirectoryTree(artifactName,rootMavenProjectDir);
+        if (found == null) {
+            throw new FileNotFoundException("Cannot find the artifact <" + artifactName + ">");
+        }
+        return found;
+    }
 
 	private boolean isMavenProjectDirectory(File dir) {
 		if (!dir.isDirectory()) {
