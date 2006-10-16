@@ -84,23 +84,23 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 	protected final Log log = LogFactory.getLog(getClass());
 
-	private static String getSpringOSGiTestBundleUrl() {
+	private String getSpringOSGiTestBundleUrl() {
 		return localMavenArtifact("org.springframework.osgi.test", "1.0-SNAPSHOT");
 	}
 
-	private static String getSpringCoreBundleUrl() {
+	private String getSpringCoreBundleUrl() {
 		return localMavenArtifact("spring-core", "2.1-SNAPSHOT");
 	}
 
-	private static String getLog4jLibUrl() {
+	private String getLog4jLibUrl() {
 		return localMavenArtifact("log4j.osgi", "1.2.13-SNAPSHOT");
 	}
 
-	private static String getCommonsLoggingLibUrl() {
+	private String getCommonsLoggingLibUrl() {
 		return localMavenArtifact("commons-logging.osgi", "1.1-SNAPSHOT");
 	}
 	
-	private static String getJUnitLibUrl() {
+	private String getJUnitLibUrl() {
 		return localMavenArtifact("junit.osgi", "3.8.1-SNAPSHOT");
 	}
 
@@ -155,7 +155,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 *
 	 * @return the array of mandatory bundle names
 	 */
-	private String[] getMandatoryBundles() {
+	protected String[] getMandatoryBundles() {
 		return new String[] { 
 				getJUnitLibUrl(),
 				getLog4jLibUrl(), 
