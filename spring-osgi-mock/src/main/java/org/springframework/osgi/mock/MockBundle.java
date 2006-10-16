@@ -42,7 +42,7 @@ public class MockBundle implements Bundle {
 
 	// required for introspection by util classes (should be removed)	
 	private BundleContext bundleContext;
-	
+
 	private ClassLoader loader = getClass().getClassLoader();
 
 	private Dictionary defaultHeaders = new Hashtable(0);
@@ -82,14 +82,23 @@ public class MockBundle implements Bundle {
 		this.bundleContext = (context == null ? new MockBundleContext(this) : context);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Delegates to the classloader. Identical to classLoader.getResources(path +
+	 * filePattern);
 	 * 
 	 * @see org.osgi.framework.Bundle#findEntries(java.lang.String,
 	 *      java.lang.String, boolean)
 	 */
 	public Enumeration findEntries(String path, String filePattern, boolean recurse) {
-		return new EmptyEnumeration();
+		Enumeration enm = null;
+
+		try {
+			enm = loader.getResources(path + filePattern);
+		}
+		catch (Exception ex) {
+			// catch to allow nice behavior
+		}
+		return (enm == null ? new EmptyEnumeration() : enm);
 	}
 
 	/*
