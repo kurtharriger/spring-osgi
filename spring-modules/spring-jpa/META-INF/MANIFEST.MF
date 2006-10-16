@@ -44,4 +44,3 @@ Import-Package: javax.persistence,
 Export-Package: org.springframework.orm.jpa;version=2.1,
    org.springframework.orm.jpa.support;version=2.1,
    org.springframework.orm.jpa.vendor;version=2.1
-Bundle-ClassPath: target/spring-jpa-2.1-SNAPSHOT.jar
