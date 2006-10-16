@@ -19,21 +19,19 @@ import java.lang.reflect.Field;
 
 import junit.framework.TestCase;
 
-import org.easymock.ArgumentsMatcher;
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.mock.MockServiceRegistration;
 import org.springframework.osgi.test.runner.TestRunner;
 
 public class JUnitTestActivatorTest extends TestCase {
 
 	private JUnitTestActivator activator;
-	private ServiceRegistration registration;
-	private ServiceReference reference;
+//	private ServiceRegistration registration;
+//	private ServiceReference reference;
 
 	public static class TestExample implements OsgiJUnitTest {
 		private static BundleContext context;
@@ -48,7 +46,7 @@ public class JUnitTestActivatorTest extends TestCase {
 		}
 
 		public void setBundleContext(BundleContext bundleContext) {
-			this.context = bundleContext;
+			context = bundleContext;
 		}
 
 		public BundleContext getBundleContext() {
@@ -62,8 +60,8 @@ public class JUnitTestActivatorTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		activator = new JUnitTestActivator();
-		reference = new MockServiceReference();
-		registration = new MockServiceRegistration();
+		//reference = new MockServiceReference();
+		//registration = new MockServiceRegistration();
 	}
 
 	protected void tearDown() throws Exception {
