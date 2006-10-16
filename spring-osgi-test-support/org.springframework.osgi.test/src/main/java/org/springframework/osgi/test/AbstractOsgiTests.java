@@ -85,26 +85,44 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	protected final Log log = LogFactory.getLog(getClass());
 
 	private String getSpringOSGiTestBundleUrl() {
-		return localMavenArtifact("org.springframework.osgi.test", "1.0-SNAPSHOT");
+		return localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test", "1.0-SNAPSHOT");
 	}
 
 	private String getSpringCoreBundleUrl() {
-		return localMavenArtifact("spring-core", "2.1-SNAPSHOT");
+		return localMavenArtifact("org.springframework.osgi", "spring-core", "2.1-SNAPSHOT");
 	}
 
 	private String getLog4jLibUrl() {
-		return localMavenArtifact("log4j.osgi", "1.2.13-SNAPSHOT");
+		return localMavenArtifact("org.springframework.osgi", "log4j.osgi", "1.2.13-SNAPSHOT");
 	}
 
 	private String getCommonsLoggingLibUrl() {
-		return localMavenArtifact("commons-logging.osgi", "1.1-SNAPSHOT");
+		return localMavenArtifact("org.springframework.osgi", "commons-logging.osgi", "1.1-SNAPSHOT");
 	}
 	
 	private String getJUnitLibUrl() {
-		return localMavenArtifact("junit.osgi", "3.8.1-SNAPSHOT");
+		return localMavenArtifact("org.springframework.osgi", "junit.osgi", "3.8.1-SNAPSHOT");
 	}
 
 
+	/**
+	 * Find a local maven artifact. First tries to find the resource as a packaged artifact
+	 * produced by a local maven build, and if that fails will search the local maven
+	 * repository.
+	 * 
+	 * @param groupId - the groupId of the organization supplying the bundle
+     * @param artifact - the artifact id of the bundle
+     * @param version - the version of the bundle
+     * @return the String representing the URL location of this bundle 
+	 */
+	protected String localMavenArtifact(String groupId, String artifactId, String version) {
+		try {
+			return localMavenBuildArtifact(artifactId, version);
+		}
+		catch(IllegalStateException illStateEx) {
+			return localMavenBundle(groupId, artifactId, version);
+		}
+	}
 
     /**
      * Answer the url string of the indicated bundle in the local Maven repository
@@ -114,7 +132,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
      * @param version - the version of the bundle
      * @return the String representing the URL location of this bundle
      */
-    public static String localMavenBundle(String groupId, String artifact, String version) {
+    protected String localMavenBundle(String groupId, String artifact, String version) {
 		File userHome = new File(System.getProperty("user.home"));
 		File repositoryHome = new File(userHome, ".m2/repository");
         String location = groupId.replace('.', '/');
@@ -130,7 +148,15 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
         return "file:" + new File(repositoryHome, location).getAbsolutePath();
     }
     
-    public static String localMavenArtifact(String artifactId, String version) {
+    /**
+     * Find a local maven artifact in the current build tree. This searches for resources
+     * produced by the package phase of a maven build.
+     * 
+     * @param artifactId
+     * @param version
+     * @return a String representing the URL location of this bundle
+     */
+    protected String localMavenBuildArtifact(String artifactId, String version) {
     	try {
     		File found = new MavenPackagedArtifactFinder(artifactId,version).findPackagedArtifact(new File("."));
     		return found.toURL().toExternalForm();
