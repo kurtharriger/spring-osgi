@@ -1,0 +1,22 @@
+<archetype>
+  <id>spring-osgi-bundle-artifact</id>
+  <sources>
+    <source>src/main/java/Bean.java</source>
+    <source>src/main/java/impl/BeanImpl.java</source>
+  </sources>
+  <resources>
+    <resource>META-INF/MANIFEST.MF</resource>
+    <resource>src/main/resources/META-INF/spring/bundle-context.xml</resource>
+    <resource>src/main/resources/META-INF/spring/bundle-context-osgi.xml</resource>
+    <resource>.classpath</resource>
+    <resource>.project</resource>
+    <resource>build.properties</resource>
+  </resources>
+  <testSources>
+    <source>src/test/java/impl/BeanImplTest.java</source>
+    <source>src/test/java/impl/BeanIntegrationTest.java</source>
+  </testSources>
+  <testResources>
+    <resource>src/test/resources/readme.txt</resource>
+  </testResources>
+</archetype>
