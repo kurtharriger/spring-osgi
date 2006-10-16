@@ -29,30 +29,31 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>org.springframework.osgi.test</artifactId>
       <version>1.0-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
         <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-core</artifactId>
       <version>2.1-SNAPSHOT</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-context</artifactId>
       <version>2.1-SNAPSHOT</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-beans</artifactId>
       <version>2.1-SNAPSHOT</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>commons-logging.osgi</artifactId>
       <version>1.1-SNAPSHOT</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>    
   </dependencies>
 
