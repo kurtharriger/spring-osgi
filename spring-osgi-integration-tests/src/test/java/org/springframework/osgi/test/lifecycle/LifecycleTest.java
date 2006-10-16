@@ -25,9 +25,13 @@ import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
  */
 public class LifecycleTest extends ConfigurableBundleCreatorTests {
 
-    static {
-        System.setProperty(OSGI_FRAMEWORK_SELECTOR, EQUINOX_PLATFORM);
-    }
+	//	AMC: no need to explicitly set framework here:
+	//  a) equinox is the default anyway, and 
+	//  b) it will prevent testing with alternate OSGi runtimes via maven when using the profiles
+	//
+	//   static {
+	//       System.setProperty(OSGI_FRAMEWORK_SELECTOR, EQUINOX_PLATFORM);
+	//    }
 
 
     protected String getManifestLocation() {
