@@ -33,7 +33,7 @@ public class KnopflerfishPlatform implements OsgiPlatform {
 	/**
 	 * Not used at the moment
 	 */
-	private String[] ARGS = new String[] { "-init", "-launch" };
+	// private String[] ARGS = new String[] { "-init", "-launch" };
 	
 	private Properties SYSTEM_PROPS = new Properties();
 
