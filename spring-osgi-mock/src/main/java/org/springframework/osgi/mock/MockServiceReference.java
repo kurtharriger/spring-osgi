@@ -30,7 +30,7 @@ import org.osgi.framework.ServiceRegistration;
 public class MockServiceReference implements ServiceReference {
 
 	private Bundle bundle;
-	private ServiceRegistration registration;
+//	private ServiceRegistration registration;
 	private Dictionary properties;
 
 	public MockServiceReference() {
@@ -47,7 +47,7 @@ public class MockServiceReference implements ServiceReference {
 
 	public MockServiceReference(Bundle bundle, Dictionary properties, ServiceRegistration registration) {
 		this.bundle = (bundle == null ? new MockBundle() : bundle);
-		this.registration = (registration == null ? new MockServiceRegistration() : registration);
+//		this.registration = (registration == null ? new MockServiceRegistration() : registration);
 		this.properties = (properties == null ? new Hashtable() : properties);
 	}
 

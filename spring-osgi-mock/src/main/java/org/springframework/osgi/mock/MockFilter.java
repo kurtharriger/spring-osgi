@@ -63,4 +63,7 @@ public class MockFilter implements Filter {
 		return false;
 	}
 
+	public String toString() {
+		return "filter: " + filter;
+	}
 }
