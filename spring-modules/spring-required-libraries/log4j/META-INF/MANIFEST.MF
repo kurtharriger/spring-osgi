@@ -6,5 +6,7 @@ Bundle-Name: log4j
 Bundle-Version: 1.2.13
 Bundle-Vendor: Apache
 Export-Package: org.apache.log4j, org.apache.log4j.xml
-Import-Package: com.sun.jdmk.com;resolution:=optional 
+Import-Package: com.sun.jdmk.com;resolution:=optional
+Bundle-ClassPath: .,
+ target/log4j.osgi-1.2.13-SNAPSHOT.jar
 

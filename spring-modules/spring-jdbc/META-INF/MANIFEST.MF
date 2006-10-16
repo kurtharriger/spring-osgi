@@ -37,3 +37,5 @@ Export-Package: org.springframework.jdbc;version=2.1,
    org.springframework.jdbc.support.nativejdbc;version=2.1,
    org.springframework.jdbc.support.rowset;version=2.1,
    org.springframework.orm;version=2.1
+Bundle-ClassPath: target/spring-jdbc-2.1-SNAPSHOT.jar,
+ .
