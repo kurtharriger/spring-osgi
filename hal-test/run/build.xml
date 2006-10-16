@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<project name="Simple example" default="kf" basedir=".">
+
+    <property name="maven.local.repository.root" value="${user.home}/.m2/repository/"/>
+    <property name="kf-framework.jar"
+              value="${maven.local.repository.root}org/knopflerfish/framework/2.0.1/framework-2.0.1.jar"/>
+
+    <target name="kf" description="Runs the spell checker sample in the Knopflerfish container">
+        <echo message="file:${maven.local.repository.root}" />
+        <java jar="${kf-framework.jar}" fork="true">
+            <sysproperty key="org.knopflerfish.gosg.jars" value="file:${maven.local.repository.root}"/>
+            <arg value="-xargs"/>
+            <arg value="test.xargs"/>
+        </java>
+    </target>
+</project>

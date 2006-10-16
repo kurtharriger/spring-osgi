@@ -17,6 +17,7 @@
   <modules>
     <module>trivial.bundle</module>
     <module>trivial.test.bundle</module>
+    <module>lifecycle.test.bundle</module>
   </modules>
   <reporting>
    <excludeDefaults>true</excludeDefaults>

@@ -1,0 +1,4 @@
+Bundle-Name: org.springframework.osgi.test.lifecycle
+Bundle-SymbolicName: org.springframework.osgi.test.lifecycle
+Bundle-Version: 2.0
+Bundle-ClassPath: . 
