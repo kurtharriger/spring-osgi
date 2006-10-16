@@ -14,11 +14,13 @@
   <url>http://www.springframework.org/osgi</url>
 
   <dependencies>
-   <dependency>
-     <groupId>org.osgi</groupId>
-     <artifactId>org.osgi.core</artifactId>
-     <version>4.0</version>
-   </dependency>
+    <dependency>
+          <groupId>org.eclipse.equinox</groupId>
+          <artifactId>org.eclipse.osgi</artifactId>
+          <version>3.2.0</version>
+          <type>jar</type>
+          <scope>provided</scope>
+        </dependency>
    
    <dependency>
      <groupId>junit</groupId>
