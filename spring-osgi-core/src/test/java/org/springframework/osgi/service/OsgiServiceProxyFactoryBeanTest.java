@@ -44,26 +44,28 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		this.mockControl = MockControl.createControl(BundleContext.class);
 		this.bundleContext = (BundleContext) this.mockControl.getMock();
 	}
-	
+
 	public void testAfterPropertiesSetNoBundle() {
 		try {
 			this.serviceFactoryBean.afterPropertiesSet();
 			fail("should have throw IllegalArgumentException since bundle context was not set");
-		} catch ( IllegalArgumentException ex ) {
-			assertEquals("Required bundleContext property was not set",ex.getMessage());
+		}
+		catch (IllegalArgumentException ex) {
+			assertEquals("Required bundleContext property was not set", ex.getMessage());
 		}
 	}
-	
+
 	public void testAfterPropertiesSetNoServiceType() {
 		this.serviceFactoryBean.setBundleContext(this.bundleContext);
 		try {
 			this.serviceFactoryBean.afterPropertiesSet();
 			fail("should have throw IllegalArgumentException since service type was not set");
-		} catch ( IllegalArgumentException ex ) {
-			assertEquals("Required serviceType property was not set",ex.getMessage());
+		}
+		catch (IllegalArgumentException ex) {
+			assertEquals("Required serviceType property was not set", ex.getMessage());
 		}
 	}
-	
+
 	// this test can only be run with a real framework,
 	// not against the osgi jar
 	// TODO: move to integration test
@@ -74,98 +76,134 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		try {
 			this.serviceFactoryBean.afterPropertiesSet();
 			fail("should have throw IllegalArgumentException since filter has invalid syntax");
-		} catch ( IllegalArgumentException ex ) {
-			assertTrue("message should say that filter string blah is not valid",
-					ex.getMessage().startsWith("Filter string 'this is not a valid filter expression' set on OsgiServiceProxyFactoryBean has invalid syntax:"));
-		}		
+		}
+		catch (IllegalArgumentException ex) {
+			assertTrue(
+					"message should say that filter string blah is not valid",
+					ex.getMessage().startsWith(
+							"Filter string 'this is not a valid filter expression' set on OsgiServiceProxyFactoryBean has invalid syntax:"));
+		}
 	}
-	
+
 	public void testGetObjectType() {
 		this.serviceFactoryBean.setInterface(ApplicationContext.class);
-		assertEquals(ApplicationContext.class,this.serviceFactoryBean.getObjectType());		
+		assertEquals(ApplicationContext.class, this.serviceFactoryBean.getObjectType());
 	}
-	
+
 	// this test can only be run with a real framework,
 	// not against the osgi jar
 	// TODO: move to integration test
 	public void xtestGetObjectWithFilterOnly() throws Exception {
-		// OsgiServiceUtils are tested independently in error cases, here we test the
-		// correct behaviour of the ProxyFactoryBean when OsgiServiceUtils succesfully
+		// OsgiServiceUtils are tested independently in error cases, here we
+		// test the
+		// correct behaviour of the ProxyFactoryBean when OsgiServiceUtils
+		// succesfully
 		// finds the service.
 		this.serviceFactoryBean.setBundleContext(this.bundleContext);
 		this.serviceFactoryBean.setInterface(MyServiceInterface.class);
 		String filter = "(beanName=myBean)";
 		this.serviceFactoryBean.setTarget(filter);
 		this.serviceFactoryBean.afterPropertiesSet();
-		this.bundleContext.getServiceReferences(MyServiceInterface.class.getName(),filter);
+		this.bundleContext.getServiceReferences(MyServiceInterface.class.getName(), filter);
 		ServiceReference ref = getServiceReference();
-		this.mockControl.setReturnValue(new ServiceReference[] {ref});
+		this.mockControl.setReturnValue(new ServiceReference[] { ref });
 		this.bundleContext.getService(ref);
-		MyServiceInterface serviceObj = new MyServiceInterface() {};
+		MyServiceInterface serviceObj = new MyServiceInterface() {
+		};
 		this.mockControl.setReturnValue(serviceObj);
 		this.bundleContext.addServiceListener(null);
 		this.mockControl.setMatcher(new AlwaysMatcher());
 		this.mockControl.replay();
 		MyServiceInterface s = (MyServiceInterface) this.serviceFactoryBean.getObject();
-		assertTrue("s should be proxied",s instanceof Advised);
-		assertSame("proxy target should be the service",serviceObj,((Advised)s).getTargetSource().getTarget());
+		assertTrue("s should be proxied", s instanceof Advised);
+		assertSame("proxy target should be the service", serviceObj, ((Advised) s).getTargetSource().getTarget());
 		this.mockControl.verify();
 	}
-	
+
 	public void testGetObjectWithBeanNameOnly() throws Exception {
-		// OsgiServiceUtils are tested independently in error cases, here we test the
-		// correct behaviour of the ProxyFactoryBean when OsgiServiceUtils succesfully
+		// OsgiServiceUtils are tested independently in error cases, here we
+		// test the
+		// correct behaviour of the ProxyFactoryBean when OsgiServiceUtils
+		// succesfully
 		// finds the service.
 		this.serviceFactoryBean.setBundleContext(this.bundleContext);
 		this.serviceFactoryBean.setInterface(MyServiceInterface.class);
 		this.serviceFactoryBean.setBeanName("myBean");
 		this.serviceFactoryBean.afterPropertiesSet();
-		this.bundleContext.getServiceReferences(MyServiceInterface.class.getName(),"(org.springframework.osgi.beanname=myBean)");
+		this.bundleContext.getServiceReferences(MyServiceInterface.class.getName(),
+				"(org.springframework.osgi.beanname=myBean)");
 		ServiceReference ref = getServiceReference();
-		this.mockControl.setReturnValue(new ServiceReference[] {ref});
+		this.mockControl.setReturnValue(new ServiceReference[] { ref });
 		this.bundleContext.getService(ref);
-		MyServiceInterface serviceObj = new MyServiceInterface() {};		
+		MyServiceInterface serviceObj = new MyServiceInterface() {
+		};
 		this.mockControl.setReturnValue(serviceObj);
 		this.bundleContext.addServiceListener(null);
 		this.mockControl.setMatcher(new AlwaysMatcher());
 		this.mockControl.replay();
 		MyServiceInterface s = (MyServiceInterface) this.serviceFactoryBean.getObject();
-		assertTrue("s should be proxied",s instanceof Advised);
-		assertSame("proxy target should be the service",serviceObj,((Advised)s).getTargetSource().getTarget());
-		this.mockControl.verify();		
+		assertTrue("s should be proxied", s instanceof Advised);
+		assertSame("proxy target should be the service", serviceObj, ((Advised) s).getTargetSource().getTarget());
+		this.mockControl.verify();
 	}
-	
+
 	// this test can only be run with a real framework,
 	// not against the osgi jar
 	// TODO: move to integration test
 	public void xtestGetObjectWithFilterAndBeanName() throws Exception {
-		// OsgiServiceUtils are tested independently in error cases, here we test the
-		// correct behaviour of the ProxyFactoryBean when OsgiServiceUtils succesfully
+		// OsgiServiceUtils are tested independently in error cases, here we
+		// test the
+		// correct behaviour of the ProxyFactoryBean when OsgiServiceUtils
+		// succesfully
 		// finds the service.
 		this.serviceFactoryBean.setBundleContext(this.bundleContext);
 		this.serviceFactoryBean.setInterface(MyServiceInterface.class);
 		this.serviceFactoryBean.setTarget("(xyz=*)");
 		this.serviceFactoryBean.setBeanName("myBean");
 		this.serviceFactoryBean.afterPropertiesSet();
-		this.bundleContext.getServiceReferences(MyServiceInterface.class.getName(),"(&(xyz=*)(org.springframework.osgi.beanname=myBean))");
+		this.bundleContext.getServiceReferences(MyServiceInterface.class.getName(),
+				"(&(xyz=*)(org.springframework.osgi.beanname=myBean))");
 		ServiceReference ref = getServiceReference();
-		this.mockControl.setReturnValue(new ServiceReference[] {ref});
+		this.mockControl.setReturnValue(new ServiceReference[] { ref });
 		this.bundleContext.getService(ref);
-		MyServiceInterface serviceObj = new MyServiceInterface() {};		
+		MyServiceInterface serviceObj = new MyServiceInterface() {
+		};
 		this.mockControl.setReturnValue(serviceObj);
 		this.bundleContext.addServiceListener(null);
 		this.mockControl.setMatcher(new AlwaysMatcher());
 		this.mockControl.replay();
 		MyServiceInterface s = (MyServiceInterface) this.serviceFactoryBean.getObject();
-		assertTrue("s should be proxied",s instanceof Advised);
-		assertSame("proxy target should be the service",serviceObj,((Advised)s).getTargetSource().getTarget());
-		this.mockControl.verify();		
+		assertTrue("s should be proxied", s instanceof Advised);
+		assertSame("proxy target should be the service", serviceObj, ((Advised) s).getTargetSource().getTarget());
+		this.mockControl.verify();
 	}
-	
+
 	private ServiceReference getServiceReference() {
 		MockControl sRefControl = MockControl.createNiceControl(ServiceReference.class);
 		return (ServiceReference) sRefControl.getMock();
 	}
-	
-	public interface MyServiceInterface {}
+
+	public interface MyServiceInterface {
+	}
+
+	public void testClassLoadingOptionsConstant() throws Exception {
+		serviceFactoryBean.setContextClassloader("client");
+		serviceFactoryBean.setContextClassloader("service-provider");
+		serviceFactoryBean.setContextClassloader("unmanaged");
+	}
+
+	public void testCardinalityConstant() throws Exception {
+		serviceFactoryBean.setCardinality("0..1");
+		serviceFactoryBean.setCardinality("0..n");
+		serviceFactoryBean.setCardinality("1..1");
+		serviceFactoryBean.setCardinality("1..n");
+
+		try {
+			serviceFactoryBean.setCardinality("bogus");
+			fail("should have thrown exception ");
+		}
+		catch (Exception ex) {
+			// expected
+		}
+	}
 }

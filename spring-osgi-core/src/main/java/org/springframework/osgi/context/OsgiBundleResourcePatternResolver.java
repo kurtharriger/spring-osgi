@@ -110,8 +110,8 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	protected void doRetrieveMatchingBundleEntries(Bundle bundle, String fullPattern, String dir, Set result)
 			throws IOException {
 
-		// get only the resources from current folder
-		Enumeration candidates = bundle.findEntries(dir, "*", false);
+		// get only the resources from current folder (use null instead of * to make it work over mocks also)
+		Enumeration candidates = bundle.findEntries(dir, null, false);
 		if (candidates != null) {
 			boolean dirDepthNotFixed = (fullPattern.indexOf("**") != -1);
 			while (candidates.hasMoreElements()) {

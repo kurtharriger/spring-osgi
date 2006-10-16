@@ -97,4 +97,19 @@ public class OsgiBundleResourceLoaderTest extends TestCase {
 		assertSame(expected, resource.getURL());
 		control.verify();
 	}
+
+	public void testGetResourceByPath() throws Exception {
+		try {
+			loader.getResourceByPath(null);
+			fail("should have thrown exception");
+		}
+		catch (Exception ex) {
+			// expected
+		}
+		String path = "foo";
+		Resource res = loader.getResourceByPath(path);
+		assertNotNull(res);
+		assertSame(OsgiBundleResource.class, res.getClass());
+		assertEquals(path, ((OsgiBundleResource) res).getPath());
+	}
 }

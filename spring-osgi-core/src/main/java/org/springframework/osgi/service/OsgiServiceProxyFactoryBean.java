@@ -39,6 +39,8 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.ConstantException;
+import org.springframework.core.Constants;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.LocalBundleContext;
@@ -46,16 +48,15 @@ import org.springframework.util.StringUtils;
 
 /**
  * Factory bean for OSGi services. Returns a proxy implementing the service
- * interface. This allows Spring to manage service lifecycle events
- * (such as the bundle providing the service being stopped and restarted)
- * and transparently rebind to a new service instance if one is available.
- *
+ * interface. This allows Spring to manage service lifecycle events (such as the
+ * bundle providing the service being stopped and restarted) and transparently
+ * rebind to a new service instance if one is available.
+ * 
  * @author Adrian Colyer
  * @since 2.0
  */
-public class OsgiServiceProxyFactoryBean implements FactoryBean,
-		InitializingBean, DisposableBean, BundleContextAware, ApplicationContextAware
-{
+public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean, BundleContextAware,
+		ApplicationContextAware {
 
 	public static final long DEFAULT_MILLIS_BETWEEN_RETRIES = 1000;
 	public static final int DEFAULT_MAX_RETRIES = 3;
@@ -63,10 +64,34 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 	public static final String INTERFACE_ATTRIBUTE = "interface";
 
 	/**
+	 * Reference classloading options costants.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	protected class ReferenceClassLoadingOptions {
+		public static final int CLIENT = 0;
+		public static final int SERVICE_PROVIDER = 1;
+		public static final int UNMANAGED = 2;
+	}
+
+	/**
+	 * Cardinality constants.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	protected class Cardinality {
+		public static final int C_0__1 = 0;
+		public static final int C_0__N = 1;
+		public static final int C_1__1 = 2;
+		public static final int C_1__N = 3;
+	}
+
+	/**
 	 * Logger, available to subclasses.
 	 */
 	protected final Log logger = LogFactory.getLog(getClass());
-
 
 	private BundleContext bundleContext;
 	private ServiceReference serviceReference;
@@ -74,13 +99,22 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 	private int retryTimes = DEFAULT_MAX_RETRIES;
 	private boolean broadcast = false;
 	private String resultSummarizer;
-	private String cardinality;
 
+	private int cardinality;
+
+	private int contextClassloader;
+
+	private int timeout;
+	
 	private PropertyValues properties;
 
 	private List listeners = new ArrayList();
 
 	private long retryDelayMs = DEFAULT_MILLIS_BETWEEN_RETRIES;
+
+	private static final Constants CARDINALITY = new Constants(Cardinality.class);
+
+	private static final Constants REFERENCE_CL_OPTIONS = new Constants(ReferenceClassLoadingOptions.class);
 
 	// not required to be an interface, but usually should be...
 	private Class serviceType;
@@ -88,37 +122,47 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 	// filter used to narrow service matches, may be null
 	private String filter;
 
-	// if looking for a bean published as a service, this is the name we're after
+	// if looking for a bean published as a service, this is the name we're
+	// after
 	private String beanName;
 
 	// reference to our app context (we need the classloader for proxying...)
 	private ApplicationContext applicationContext;
 	private boolean pushBundleAsContextClassLoader;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	public Object getObject() throws Exception {
 		// try to find the service
 		String lookupFilter = getFilterStringForServiceLookup();
-		// REVIEW andyp -- the bundle hosting this service may not have come up and hence the service
-		// may not even exist, so we block based on the service availability attributes
+		// REVIEW andyp -- the bundle hosting this service may not have come up
+		// and hence the service
+		// may not even exist, so we block based on the service availability
+		// attributes
 		int numAttempts = 0;
 		do {
 			try {
 				this.serviceReference = OsgiServiceUtils.getService(this.bundleContext, getInterface(), lookupFilter);
 				if (logger.isDebugEnabled()) {
-					logger.debug("Resolved service reference: [" + this.serviceReference + "] after " + (numAttempts + 1) + " attempts");
+					logger.debug("Resolved service reference: [" + this.serviceReference + "] after "
+							+ (numAttempts + 1) + " attempts");
 				}
-			} catch (NoSuchServiceException nsse) {
+			}
+			catch (NoSuchServiceException nsse) {
 				this.serviceReference = null;
 				if (numAttempts++ < this.retryTimes && retryOnUnregisteredService) {
 					try {
 						Thread.sleep(this.retryDelayMs);
-					} catch (InterruptedException ie) {
-						return null;  // Never silently catch an InterruptedException!!!
 					}
-				} else {
+					catch (InterruptedException ie) {
+						return null; // Never silently catch an
+						// InterruptedException!!!
+					}
+				}
+				else {
 					throw nsse;
 				}
 			}
@@ -132,7 +176,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 	private void applyServiceProperties(Object target) {
 		if (properties != null) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Setting properties [" + properties + "] on [" + target +"]");
+				logger.debug("Setting properties [" + properties + "] on [" + target + "]");
 			}
 			BeanWrapper bw = new BeanWrapperImpl(target);
 			bw.setPropertyValues(properties);
@@ -141,21 +185,27 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 		applicationContext.getAutowireCapableBeanFactory().initializeBean(target, beanName);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
 	public Class getObjectType() {
 		return getInterface();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
 	 */
 	public boolean isSingleton() {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws IllegalArgumentException {
@@ -166,40 +216,39 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 			throw new IllegalArgumentException("Required serviceType property was not set");
 		}
 		if (getTarget() != null) {
-			// this call forces parsing of the filter string to generate an exception right
+			// this call forces parsing of the filter string to generate an
+			// exception right
 			// now if it is not well-formed
 			try {
 				FrameworkUtil.createFilter(getFilterStringForServiceLookup());
 			}
 			catch (InvalidSyntaxException ex) {
-				throw new IllegalArgumentException(
-						"Filter string '" + getTarget() +
-								"' set on OsgiServiceProxyFactoryBean has invalid syntax: " +
-								ex.getMessage(), ex);
+				throw new IllegalArgumentException("Filter string '" + getTarget()
+						+ "' set on OsgiServiceProxyFactoryBean has invalid syntax: " + ex.getMessage(), ex);
 			}
 		}
 		if (!listeners.isEmpty()) {
 			for (Iterator i = listeners.iterator(); i.hasNext();) {
 				Object listener = i.next();
 				if (!(listener instanceof ServiceLifecycleListener)) {
-					throw new IllegalArgumentException("Listener [" + listener.getClass().getName() + "] does not implement ServiceLifecycleListener or its derivatives");
+					throw new IllegalArgumentException("Listener [" + listener.getClass().getName()
+							+ "] does not implement ServiceLifecycleListener or its derivatives");
 				}
 			}
 		}
 		if (this.applicationContext == null) {
 			throw new IllegalArgumentException("Required applicationContext property was not set");
 		}
-		if (! (this.applicationContext instanceof DefaultResourceLoader)) {
-			throw new IllegalArgumentException(
-					"ApplicationContext does not provide access to classloader, " +
-							"provided type was : '" + this.applicationContext.getClass().getName() +
-							"' which does not extend DefaultResourceLoader");
+		if (!(this.applicationContext instanceof DefaultResourceLoader)) {
+			throw new IllegalArgumentException("ApplicationContext does not provide access to classloader, "
+					+ "provided type was : '" + this.applicationContext.getClass().getName()
+					+ "' which does not extend DefaultResourceLoader");
 		}
 	}
 
 	/**
 	 * Returns the bean properties for initializing the service.
-	 *
+	 * 
 	 * @return the service properties
 	 */
 	public PropertyValues getProperties() {
@@ -235,9 +284,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 	}
 
 	/**
-	 * An OSGi filter used to narrow service matches. If you
-	 * just want to find a spring bean published as a service by
-	 * the OsgiServiceExporter, use the beanName property instead.
+	 * An OSGi filter used to narrow service matches. If you just want to find a
+	 * spring bean published as a service by the OsgiServiceExporter, use the
+	 * beanName property instead.
 	 */
 	public void setTarget(String filter) {
 		this.filter = filter;
@@ -259,7 +308,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 
 	/**
 	 * Set the registered service listeners.
-	 *
+	 * 
 	 * @param listeners
 	 */
 	public void setListeners(List listeners) {
@@ -267,45 +316,69 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 	}
 
 	/**
-	 * To find a bean published as a service by the OsgiServiceExporter,
-	 * simply set this property. You may specify additional filtering
-	 * criteria if needed (using the filter property) but this is not
-	 * required.
+	 * To find a bean published as a service by the OsgiServiceExporter, simply
+	 * set this property. You may specify additional filtering criteria if
+	 * needed (using the filter property) but this is not required.
 	 */
 	public void setBeanName(String beanName) {
 		this.beanName = beanName;
 	}
 
 	/**
-	 * Determines whether invocations on the remote service should be performed in the context
-	 * of the target bundle's ClassLoader. The default is false.
+	 * Determines whether invocations on the remote service should be performed
+	 * in the context of the target bundle's ClassLoader. The default is false.
 	 */
 	public boolean isPushBundleAsContextClassloader() {
 		return pushBundleAsContextClassLoader;
 	}
 
 	/**
-	 * Determines whether invocations on the remote service should be performed in the context
-	 * of the target bundle's ClassLoader. The default is false.
-	 *
+	 * Determines whether invocations on the remote service should be performed
+	 * in the context of the target bundle's ClassLoader. The default is false.
+	 * 
 	 * @param pushBundleAsContextClassLoader
 	 */
 	public void setPushBundleAsContextClassloader(boolean pushBundleAsContextClassLoader) {
 		this.pushBundleAsContextClassLoader = pushBundleAsContextClassLoader;
 	}
 
-	public String getCardinality() {
-		return cardinality;
-	}
-
 	/**
-	 * The optional cardinality attribute allows a reference cardinality to be specified (0..1, 1..1, 0..n, or 1..n).
-	 * The default is ?1..1?.
-	 *
+	 * The optional cardinality attribute allows a reference cardinality to be
+	 * specified (0..1, 1..1, 0..n, or 1..n). The default is '1..1'.
+	 * 
 	 * @param cardinality
 	 */
 	public void setCardinality(String cardinality) {
-		this.cardinality = cardinality;
+		// transform string to the constant representation
+		// a. C_ is appended to the string
+		// b. . -> _
+
+		if (cardinality != null) {
+			try {
+				this.cardinality = CARDINALITY.asNumber("C_".concat(cardinality.replace('.', '_'))).intValue();
+				return;
+			}
+			catch (ConstantException ex) {
+				// catch exception to not confuse the user with a different
+				// constant name(will be handled afterwards)
+			}
+		}
+		throw new IllegalArgumentException("invalid constant, " + cardinality);
+	}
+
+	public void setContextClassloader(int options) {
+		if (!REFERENCE_CL_OPTIONS.getValues(null).contains(new Integer(options)))
+			throw new IllegalArgumentException("only reference classloader options allowed");
+
+		this.contextClassloader = options;
+	}
+
+	public void setContextClassloader(String options) {
+		// transform "-" into "_" (for service-provider)
+		if (options == null)
+			throw new IllegalArgumentException("non-null argument required");
+
+		this.contextClassloader = REFERENCE_CL_OPTIONS.asNumber(options.replace("-", "_")).intValue();
 	}
 
 	public String getResultSummarizer() {
@@ -313,40 +386,28 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 	}
 
 	/**
-	 * The result-summarizer attribute is required for any reference cardinality other than 1..1.
-	 * It specifies the name of a result summarizing bean.
-	 * <p/>
+	 * The result-summarizer attribute is required for any reference cardinality
+	 * other than 1..1. It specifies the name of a result summarizing bean. <p/>
 	 * A result summarizer must implement the ResultSummarizer interface.
-	 *
+	 * 
 	 * @param resultSummarizer
 	 */
 	public void setResultSummarizer(String resultSummarizer) {
 		this.resultSummarizer = resultSummarizer;
 	}
 
-	public boolean isBroadcast() {
-		return broadcast;
-	}
-
-	/**
-	 * The optional broadcast attribute specifies the behaviour when an operation is invoked on a reference with multiple cardinality.
-	 * If set to ?true?, then the operation is invoked on all matching target services.
-	 * The default is ?false?, which means that any one of the matching target services will be selected.
-	 *
-	 * @param broadcast
-	 */
-	public void setBroadcast(boolean broadcast) {
-		this.broadcast = broadcast;
-	}
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.osgi.context.BundleContextAware#setBundleContext(org.osgi.framework.BundleContext)
 	 */
 	public void setBundleContext(BundleContext context) {
 		this.bundleContext = context;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
 	 */
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -356,12 +417,10 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 	/**
 	 * If the target OSGi service is unregistered, should we attempt to rebind
 	 * to a replacement? (For example, if the bundle providing the service is
-	 * stopped and then subsequently started again).
-	 * <p/>
-	 * By default retry <em>will</em> be attempted.
-	 * <p/>
-	 * Changing this property after initialization is complete has no effect.
-	 *
+	 * stopped and then subsequently started again). <p/> By default retry
+	 * <em>will</em> be attempted. <p/> Changing this property after
+	 * initialization is complete has no effect.
+	 * 
 	 * @param retryOnUnregisteredService The retryOnUnregisteredService to set.
 	 */
 	public void setRetryOnUnregisteredService(boolean retryOnUnregisteredService) {
@@ -374,10 +433,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 
 	/**
 	 * How many times should we attempt to rebind to a target service if the
-	 * service we are currently using is unregistered. Default is 3 times.
-	 * <p/>
+	 * service we are currently using is unregistered. Default is 3 times. <p/>
 	 * Changing this property after initialization is complete has no effect.
-	 *
+	 * 
 	 * @param maxRetries The maxRetries to set.
 	 */
 	public void setRetryTimes(int maxRetries) {
@@ -388,13 +446,11 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 		return retryTimes;
 	}
 
-
 	/**
 	 * How long should we wait between failed attempts at rebinding to a service
-	 * that has been unregistered.
-	 * <p/>
-	 * Changing this property after initialization is complete has no effect.
-	 *
+	 * that has been unregistered. <p/> Changing this property after
+	 * initialization is complete has no effect.
+	 * 
 	 * @param millisBetweenRetries The millisBetweenRetries to set.
 	 */
 	public void setRetryDelayMs(long millisBetweenRetries) {
@@ -430,12 +486,15 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 		String filter = sb.toString();
 		if (StringUtils.hasText(filter)) {
 			return filter;
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
@@ -445,24 +504,21 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 	}
 
 	/**
-	 * We proxy the actual service so that we can listen to service events
-	 * and rebind transparently if the service goes down and comes back up
-	 * for example
+	 * We proxy the actual service so that we can listen to service events and
+	 * rebind transparently if the service goes down and comes back up for
+	 * example
 	 */
 	private Object getServiceProxyFor(Object target, String lookupFilter) {
 		ProxyFactory pf = new ProxyFactory();
 		if (getInterface().isInterface()) {
-			pf.setInterfaces(new Class[]{getInterface()});
+			pf.setInterfaces(new Class[] { getInterface() });
 		}
 		HotSwappableTargetSource targetSource = new HotSwappableTargetSource(target);
 		pf.setTargetSource(targetSource);
 
-		OsgiServiceInterceptor interceptor
-				= new OsgiServiceInterceptor(this.bundleContext,
-				this.serviceReference,
+		OsgiServiceInterceptor interceptor = new OsgiServiceInterceptor(this.bundleContext, this.serviceReference,
 				targetSource, getInterface(), lookupFilter, listeners);
-		interceptor.setMaxRetries(this.retryOnUnregisteredService ? this
-				.retryTimes : 0);
+		interceptor.setMaxRetries(this.retryOnUnregisteredService ? this.retryTimes : 0);
 		interceptor.setRetryIntervalMillis(this.retryDelayMs);
 
 		pf.addAdvice(interceptor);
@@ -471,10 +527,40 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean,
 		}
 		// Add advice for pushing the bundle context
 		pf.addAdvice(new LocalBundleContext(serviceReference.getBundle()));
-		// FIXME andyp -- using the application context classloader discriminates against Spring classes
-		// that we may want to see, for instance org.springframework.aop.framework.Advised
+		// FIXME andyp -- using the application context classloader
+		// discriminates against Spring classes
+		// that we may want to see, for instance
+		// org.springframework.aop.framework.Advised
 		ClassLoader classLoader = this.applicationContext.getClassLoader();
 		return pf.getProxy(classLoader);
+	}
+
+	/**
+	 * @return Returns the filter.
+	 */
+	public String getFilter() {
+		return filter;
+	}
+
+	/**
+	 * @param filter The filter to set.
+	 */
+	public void setFilter(String filter) {
+		this.filter = filter;
+	}
+
+	/**
+	 * @return Returns the timeout.
+	 */
+	public int getTimeout() {
+		return timeout;
+	}
+
+	/**
+	 * @param timeout The timeout to set.
+	 */
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
 	}
 
 }
