@@ -25,6 +25,8 @@ import org.osgi.framework.Constants;
  */
 class DefaultBundleContextProperties extends Properties {
 
+	private static final long serialVersionUID = 7814061041669242672L;
+
 	public DefaultBundleContextProperties() {
 		this(null);
 	}

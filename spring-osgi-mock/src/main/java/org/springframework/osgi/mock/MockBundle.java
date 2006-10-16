@@ -40,9 +40,9 @@ public class MockBundle implements Bundle {
 	private String location;
 	private Dictionary headers;
 
-	// required for introspection by util classes (should be removed)
-	
+	// required for introspection by util classes (should be removed)	
 	private BundleContext bundleContext;
+	
 	private ClassLoader loader = getClass().getClassLoader();
 
 	private Dictionary defaultHeaders = new Hashtable(0);
