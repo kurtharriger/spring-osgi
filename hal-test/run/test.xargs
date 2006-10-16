@@ -1,0 +1,20 @@
+# This is the Knopflerfish argument file which runs the spellchecker sample
+
+#-Dorg.knopflerfish.verbosity=30
+-Dorg.knopflerfish.framework.debug.packages=false
+-Dorg.knopflerfish.framework.debug.errors=true
+-Dorg.knopflerfish.framework.debug.classloader=false
+-Dorg.knopflerfish.framework.system.export.all_15=true
+-Dorg.osgi.framework.system.packages=
+-Dorg.knopflerfish.osgi.setcontextclassloader=false
+
+-Dorg.knopflerfish.startlevel.use=true
+
+-Dorg.knopflerfis.gosg.jars=file:/Users/hhildebrand/.m2/repository/
+
+-init
+
+# loads the spring bundles + dependencies
+-xargs spring.xargs 
+
+-launch

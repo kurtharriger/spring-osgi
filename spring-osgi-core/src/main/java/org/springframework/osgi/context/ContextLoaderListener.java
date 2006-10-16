@@ -152,7 +152,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		case BundleEvent.STARTED:
 			startBundle(event.getBundle());
 			break;
-		case BundleEvent.STOPPED:
+		case BundleEvent.STOPPING:
 			stopBundle(event.getBundle());
 			break;
 		case BundleEvent.RESOLVED:
