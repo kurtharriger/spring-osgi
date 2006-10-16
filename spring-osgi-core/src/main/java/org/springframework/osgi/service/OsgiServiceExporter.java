@@ -40,35 +40,39 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.core.Constants;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * A bean that transparently publishes other beans in the same
- * application context as OSGi services.
- * <p/>
- * The service properties used when publishing the service are
- * determined by the OsgiServicePropertiesResolver. The default
+ * A bean that transparently publishes other beans in the same application
+ * context as OSGi services. <p/> The service properties used when publishing
+ * the service are determined by the OsgiServicePropertiesResolver. The default
  * implementation uses
  * <ul>
  * <li>BundleSymbolicName=&lt;bundle symbolic name&gt;</li>
  * <li>BundleVersion=&lt;bundle version&gt;</li>
  * <li>org.springframework.osgi.beanname="&lt;bean name&gt;</li>
  * </ul>
- *
+ * 
  * @author Adrian Colyer
  * @since 2.0
  */
-public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, InitializingBean, DisposableBean, BundleContextAware
-{
+public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, InitializingBean, DisposableBean,
+		BundleContextAware {
 
-	private Log log = LogFactory.getLog(OsgiServiceExporter.class);
+	protected class ClassLoaderOptions {
+		public static final int UNMANAGED = 0;
+		public static final int SERVICE_PROVIDER = 1;
+	}
+
+	private static final Log log = LogFactory.getLog(OsgiServiceExporter.class);
 
 	private BundleContext bundleContext;
 	private OsgiServicePropertiesResolver resolver = new BeanNameServicePropertiesResolver();
 	private BeanFactory beanFactory;
-	private Set/*<ServiceRegistration>*/ publishedServices = new HashSet();
+	private Set/* <ServiceRegistration> */publishedServices = new HashSet();
 	private Properties serviceProperties;
 	private String beanName = OsgiServiceExporter.class.getName();
 	private String ref;
@@ -76,7 +80,13 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	private String activationMethod;
 	private String deactivationMethod;
 
-	/* (non-Javadoc)
+	private static final Constants CL_OPTIONS = new Constants(ClassLoaderOptions.class);
+
+	private int contextClassloader;
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
 	 */
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -85,7 +95,8 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 
 	public void setBundleContext(BundleContext context) {
 		this.bundleContext = context;
-		// REVIEW andyp -- when coming through the ContextLoaderListener this seems necessary.
+		// REVIEW andyp -- when coming through the ContextLoaderListener this
+		// seems necessary.
 		if (resolver instanceof BundleContextAware) {
 			((BundleContextAware) resolver).setBundleContext(context);
 		}
@@ -105,7 +116,9 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 		this.resolver = resolver;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
 	public void setBeanName(String name) {
@@ -152,9 +165,11 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 		this.serviceProperties = serviceProperties;
 	}
 
-	/* (non-Javadoc)
-	     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	     */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
 	public void afterPropertiesSet() throws Exception {
 		if (this.beanFactory == null) {
 			throw new IllegalArgumentException("Required property beanFactory has not been set");
@@ -171,7 +186,9 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 		publishBeans();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
@@ -181,7 +198,8 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 				sReg.unregister();
 			}
 			catch (IllegalStateException ise) {
-				// Service was already unregistered, probably because the bundle was stopped.
+				// Service was already unregistered, probably because the bundle
+				// was stopped.
 				if (log.isInfoEnabled()) {
 					log.info("Service [" + sReg + "] has already been unregistered");
 				}
@@ -192,7 +210,8 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	private void publishBeans() throws NoSuchBeanDefinitionException {
 		if (serviceInterface == null || serviceInterface.length == 0) {
 			publishBeanAsService(ref, mergeServiceProperties(ref));
-		} else {
+		}
+		else {
 			publishService(serviceInterface, ref, mergeServiceProperties(ref));
 		}
 	}
@@ -213,8 +232,9 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 				ifs[i] = interfaces[i].getName();
 			}
 			publishService(ifs, bean, serviceProperties);
-		} else {
-			publishService(new String[]{bean.getClass().getName()}, bean, serviceProperties);
+		}
+		else {
+			publishService(new String[] { bean.getClass().getName() }, bean, serviceProperties);
 		}
 	}
 
@@ -224,19 +244,18 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 		}
 		// Service registration optionally proxied to avoid eager creation
 		ServiceRegistration s;
-		if (beanFactory.containsBean("&" + beanName)
-				|| (beanFactory instanceof BeanDefinitionRegistry)
+		if (beanFactory.containsBean("&" + beanName) || (beanFactory instanceof BeanDefinitionRegistry)
 				&& ((BeanDefinitionRegistry) beanFactory).getBeanDefinition(beanName).isLazyInit()) {
 			s = bundleContext.registerService(names, new BeanServiceFactory(beanName), serviceProperties);
-		} else {
+		}
+		else {
 			s = bundleContext.registerService(names, beanFactory.getBean(beanName), serviceProperties);
 		}
 		this.publishedServices.add(s);
 		return s;
 	}
 
-	private class BeanServiceFactory implements ServiceFactory
-	{
+	private class BeanServiceFactory implements ServiceFactory {
 		private String beanName;
 
 		public BeanServiceFactory(String beanName) {
@@ -249,12 +268,16 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 				Method m = BeanUtils.resolveSignature(activationMethod, beanFactory.getType(beanName));
 				try {
 					m.invoke(bean, null);
-				} catch (IllegalAccessException e) {
-					throw new IllegalArgumentException(e);
-				} catch (InvocationTargetException e) {
-					log.error("Activation method on bean with name '" + beanName + "' threw an exception", e.getTargetException());
 				}
-			} else if (bean instanceof ServiceActivationLifecycleListener) {
+				catch (IllegalAccessException e) {
+					throw new IllegalArgumentException(e);
+				}
+				catch (InvocationTargetException e) {
+					log.error("Activation method on bean with name '" + beanName + "' threw an exception",
+							e.getTargetException());
+				}
+			}
+			else if (bean instanceof ServiceActivationLifecycleListener) {
 				((ServiceActivationLifecycleListener) bean).activate(serviceRegistration.getClass());
 			}
 			return bean;
@@ -265,14 +288,38 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 				Method m = BeanUtils.resolveSignature(deactivationMethod, beanFactory.getType(beanName));
 				try {
 					m.invoke(bean, null);
-				} catch (IllegalAccessException e) {
-					throw new IllegalArgumentException(e);
-				} catch (InvocationTargetException e) {
-					log.error("Deactivation method on bean with name '" + beanName + "' threw an exception", e.getTargetException());
 				}
-			} else if (bean instanceof ServiceDeactivationLifecycleListener) {
+				catch (IllegalAccessException e) {
+					throw new IllegalArgumentException(e);
+				}
+				catch (InvocationTargetException e) {
+					log.error("Deactivation method on bean with name '" + beanName + "' threw an exception",
+							e.getTargetException());
+				}
+			}
+			else if (bean instanceof ServiceDeactivationLifecycleListener) {
 				((ServiceDeactivationLifecycleListener) bean).deactivate(serviceRegistration.getClass());
 			}
 		}
 	}
+
+
+	/**
+	 * @param contextClassloader The contextClassloader to set.
+	 */
+	public void setContextClassloader(int contextClassloader) {
+		if (!CL_OPTIONS.getValues(null).contains(new Integer(contextClassloader)))
+			throw new IllegalArgumentException("illegal constant:" + contextClassloader);
+
+		this.contextClassloader = contextClassloader;
+	}
+	
+	public void setContextClassloader(String options) {
+		// transform "-" into "_" (for service-provider)
+		if (options == null)
+			throw new IllegalArgumentException("non-null argument required");
+
+		this.contextClassloader = CL_OPTIONS.asNumber(options.replace("-", "_")).intValue();
+	}
+
 }

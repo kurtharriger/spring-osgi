@@ -20,16 +20,13 @@
 					<xsd:element name="listener" type="Tlistener" minOccurs="0"/>
 				</xsd:sequence>
 				<xsd:attribute name="interface" use="required" type="xsd:string"/>
-				<!-- CL: commented out for the moment - need to add an equivalent inside OsgiServiceFB
+				<!-- CL: commented out for the moment - need to add an equivalent inside OsgiServiceFB -->
 				<xsd:attribute name="filter" use="optional" type="xsd:string"/>
 				<xsd:attribute name="timeout" use="optional" type="xsd:int" default="0"/>
-				-->
 				<xsd:attribute name="cardinality" use="optional" type="Tcardinality" default="1..1"/>
 				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
-				<!-- CL: commented out for the moment - need to add an equivalent inside OsgiServiceFB
+				<!-- CL: commented out for the moment - need to add an equivalent inside OsgiServiceFB -->
 				<xsd:attribute name="context-classloader" type="TreferenceClassLoaderOptions" default="client"/>
-				
-				 -->
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -73,9 +70,8 @@
 				<xsd:attribute name="interface" type="xsd:string" use="optional"/>
 				<xsd:attribute name="lazy-init" type="xsd:boolean" use="optional" default="false"/>
 				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
-				<!-- CL: commented out for the moment - need to add an equivalent inside OsgiServiceFB
+				<!-- CL: commented out for the moment - need to add an equivalent inside OsgiServiceFB -->
 				<xsd:attribute name="context-classloader" type="TserviceClassLoaderOptions" default="unmanaged"/>
-				-->
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>

@@ -15,10 +15,9 @@
 		cardinality="0..n" />
 
 	<!-- full options -->
-	<osgi:reference id="full-options" interface="java.lang.Cloneable" />
-
-	<!-- 
-		filter="(myService)" timeout="123" classloaderContext="service-provider" -->
+	<osgi:reference id="full-options" interface="java.lang.Cloneable"
+		cardinality="1..n" context-classloader="service-provider"
+		timeout="123" filter="(c=*)" />
 
 
 	<!-- simple service -->
@@ -28,7 +27,7 @@
 	<bean name="string" class="java.lang.String" />
 
 	<!-- full service -->
-	<osgi:service id="full-service" ref="string">
+	<osgi:service id="full-service" ref="string" context-classloader="service-provider">
 		<osgi:interfaces>
 			<value>java.io.Serializable</value>
 			<value>java.lang.Cloneable</value>
