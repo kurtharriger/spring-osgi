@@ -151,6 +151,7 @@ limitations under the License.
     <module>spring-osgi-integration-test-bundles</module>
     <module>spring-osgi-integration-tests</module>
     <module>samples</module>
+    <module>spring-osgi-bundle-archetype</module>
   </modules>
 
   <!-- shared dependencies across modules -->
