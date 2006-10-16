@@ -64,12 +64,12 @@ public class SimpleServiceBundleTest extends ConfigurableBundleCreatorTests {
 	 */
 	protected String[] getBundleLocations() {
 		return new String[] {
-			localMavenArtifact("aopalliance.osgi","1.0-SNAPSHOT"),
-			localMavenArtifact("spring-context", "2.1-SNAPSHOT"),
-			localMavenArtifact("spring-beans","2.1-SNAPSHOT"),
-			localMavenArtifact("spring-osgi-core","1.0-SNAPSHOT"),
-			localMavenArtifact("spring-aop","2.1-SNAPSHOT"),
-			localMavenArtifact("simple-service-bundle","1.0-SNAPSHOT")
+			localMavenArtifact("org.springframework.osgi", "aopalliance.osgi","1.0-SNAPSHOT"),
+			localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
+			localMavenArtifact("org.springframework.osgi", "spring-beans","2.1-SNAPSHOT"),
+			localMavenArtifact("org.springframework.osgi", "spring-osgi-core","1.0-SNAPSHOT"),
+			localMavenArtifact("org.springframework.osgi", "spring-aop","2.1-SNAPSHOT"),
+			localMavenArtifact("org.springframework.osgi", "simple-service-bundle","1.0-SNAPSHOT")
 		};
 	}
 	
