@@ -80,4 +80,5 @@ Export-Package: org.springframework.scheduling;version=2.1,
    org.springframework.scripting.config;version=2.1,
    org.springframework.scripting.groovy;version=2.1,
    org.springframework.scripting.jruby;version=2.1,
-   org.springframework.scripting.support;version=2.1  
+   org.springframework.scripting.support;version=2.1
+Bundle-ClassPath: target/spring-support-2.1-SNAPSHOT.jar

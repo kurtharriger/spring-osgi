@@ -16,6 +16,8 @@ Export-Package: org.apache.commons.collections,
  org.apache.commons.collections.keyvalue,
  org.apache.commons.collections.list,
  org.apache.commons.collections.map,
- org.apache.commons.collections.set 
+ org.apache.commons.collections.set
+Bundle-ClassPath: .,
+ target/commons-collections.osgi-3.2-SNAPSHOT.jar
 
 
