@@ -44,6 +44,5 @@ Export-Package: org.springframework.mock.jndi,
   org.springframework.test.web,
   org.springframework.test.annotation,
   org.springframework.test.jpa
-Bundle-ClassPath: target/spring-mock-2.1-SNAPSHOT.jar
 
 

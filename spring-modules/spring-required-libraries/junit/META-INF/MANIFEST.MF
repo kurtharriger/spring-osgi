@@ -4,7 +4,5 @@ Bundle-ManifestVersion: 2
 Bundle-SymbolicName: junit
 Bundle-Name: junit
 Bundle-Version: 3.8.1
-Export-Package: junit.framework
-Bundle-ClassPath: .,
- target/junit.osgi-3.8.1-SNAPSHOT.jar
+Export-Package: junit.framework 
 

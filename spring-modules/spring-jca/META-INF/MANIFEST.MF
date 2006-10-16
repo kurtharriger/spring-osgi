@@ -22,4 +22,3 @@ Export-Package: org.springframework.jca.cci;version=2.1,
    org.springframework.jca.cci.core.support;version=2.1,
    org.springframework.jca.cci.object;version=2.1,
    org.springframework.jca.support;version=2.1
-Bundle-ClassPath: target/spring-jca-2.1-SNAPSHOT.jar

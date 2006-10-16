@@ -6,8 +6,6 @@ Bundle-Name: commons-pool
 Bundle-Version: 1.0
 Bundle-Vendor: Apache Jakarta Commons
 Export-Package: org.apache.commons.pool,
- org.apache.commons.pool.impl
-Bundle-ClassPath: .,
- target/commons-pool.osgi-1.0-SNAPSHOT.jar
+ org.apache.commons.pool.impl 
 
 
