@@ -2,6 +2,6 @@ Bundle-Version: 1.0
 Bundle-SymbolicName: ${groupId}.${artifactId}
 Bundle-Name: ${groupId}.${artifactId}
 Export-Package: ${groupId};version:=${version}
-#Import-Package: <your-imports-here>
+TODO-Import-Package: <your-imports-here>
 
 
