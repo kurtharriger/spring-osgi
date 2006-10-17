@@ -25,5 +25,5 @@ Import-Package: javax.servlet,
    org.springframework.web.context.support;version=2.1,
    org.springframework.web.util;version=2.1
 Export-Package: org.springframework.web.struts;version=2.1
-Bundle-ClassPath: target/spring-struts-2.1-SNAPSHOT.jar,
- .
+Bundle-ClassPath: .,
+ target/classes/
