@@ -41,4 +41,6 @@ Export-Package: org.springframework.aop;version=2.1,
    org.springframework.aop.target;version=2.1,
    org.springframework.aop.target.dynamic;version=2.1,
    org.springframework.metadata;version=2.1
+Bundle-ClassPath: .,
+ target/classes/
 
