@@ -312,7 +312,7 @@ limitations under the License.
                <packages>org.springframework.osgi.sample*</packages>
             </group>
           </groups>
-          <excludePackageNames>org.springframework.osgi.test.trivial* org.springframework.osgi.test.integration*</excludePackageNames>
+          <excludePackageNames>org.springframework.osgi.test.trivial*</excludePackageNames>
           <links>
             <link>http://java.sun.com/j2se/1.4.2/docs/api/</link>
             <link>
