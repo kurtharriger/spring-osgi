@@ -10,6 +10,6 @@ Export-Package: org.aspectj.lang,
  org.aspectj.lang.reflect,
  org.aspectj.runtime
 Bundle-ClassPath: .,
- target/aspectjrt.osgi-1.5.2a-SNAPSHOT.jar
+ target/classes/
 
 
