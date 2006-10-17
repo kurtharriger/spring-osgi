@@ -50,6 +50,7 @@
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
       <version>1.5.2a</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
