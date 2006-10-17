@@ -50,6 +50,7 @@
       <groupId>org.aopalliance</groupId>
       <artifactId>aopalliance</artifactId>
       <version>1.0</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>  
 </project>
