@@ -69,14 +69,9 @@ public class JUnitTestActivator implements BundleActivator {
 			OsgiJUnitTest test = (OsgiJUnitTest) clazz.newInstance();
 			test.setBundleContext(context);
 			return test;
+
 		}
-		catch (ClassNotFoundException ex) {
-			throw new RuntimeException(ex);
-		}
-		catch (InstantiationException ex) {
-			throw new RuntimeException(ex);
-		}
-		catch (IllegalAccessException ex) {
+		catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
