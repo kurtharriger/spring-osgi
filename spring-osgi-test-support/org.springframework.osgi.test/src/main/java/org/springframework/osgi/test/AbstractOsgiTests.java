@@ -467,9 +467,9 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 */
 	private void setupStreams() throws IOException {
 
-		// 4K seems to be enough
-		byte[] inArray = new byte[1024 * 4];
-		byte[] outArray = new byte[1024 * 4];
+		byte[] inArray = new byte[1024 * 2];
+		// 16K seems to be enough
+		byte[] outArray = new byte[1024 * 16];
 
 		Properties systemProps = System.getProperties();
 
