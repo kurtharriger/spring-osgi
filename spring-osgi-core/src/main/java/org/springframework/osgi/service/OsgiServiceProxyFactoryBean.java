@@ -366,19 +366,19 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		throw new IllegalArgumentException("invalid constant, " + cardinality);
 	}
 
-	public void setContextClassloader(int options) {
-		if (!REFERENCE_CL_OPTIONS.getValues(null).contains(new Integer(options)))
-			throw new IllegalArgumentException("only reference classloader options allowed");
+//	public void setContextClassloader(int options) {
+//		if (!REFERENCE_CL_OPTIONS.getValues(null).contains(new Integer(options)))
+//			throw new IllegalArgumentException("only reference classloader options allowed");
+//
+//		this.contextClassloader = options;
+//	}
 
-		this.contextClassloader = options;
-	}
-
-	public void setContextClassloader(String options) {
+	public void setContextClassloader(String classLoaderManagementOption) {
 		// transform "-" into "_" (for service-provider)
-		if (options == null)
+		if (classLoaderManagementOption == null)
 			throw new IllegalArgumentException("non-null argument required");
 
-		this.contextClassloader = REFERENCE_CL_OPTIONS.asNumber(options.replace("-", "_")).intValue();
+		this.contextClassloader = REFERENCE_CL_OPTIONS.asNumber(classLoaderManagementOption.replace("-", "_")).intValue();
 	}
 
 	public String getResultSummarizer() {

@@ -304,22 +304,22 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	}
 
 
-	/**
-	 * @param contextClassloader The contextClassloader to set.
-	 */
-	public void setContextClassloader(int contextClassloader) {
-		if (!CL_OPTIONS.getValues(null).contains(new Integer(contextClassloader)))
-			throw new IllegalArgumentException("illegal constant:" + contextClassloader);
-
-		this.contextClassloader = contextClassloader;
-	}
+//	/**
+//	 * @param contextClassloader The contextClassloader to set.
+//	 */
+//	private void setContextClassloader(int contextClassloader) {
+//		if (!CL_OPTIONS.getValues(null).contains(new Integer(contextClassloader)))
+//			throw new IllegalArgumentException("illegal constant:" + contextClassloader);
+//
+//		this.contextClassloader = contextClassloader;
+//	}
 	
-	public void setContextClassloader(String options) {
+	public void setContextClassloader(String classloaderManagementOption) {
 		// transform "-" into "_" (for service-provider)
-		if (options == null)
+		if (classloaderManagementOption == null)
 			throw new IllegalArgumentException("non-null argument required");
 
-		this.contextClassloader = CL_OPTIONS.asNumber(options.replace("-", "_")).intValue();
+		this.contextClassloader = CL_OPTIONS.asNumber(classloaderManagementOption.replace("-", "_")).intValue();
 	}
 
 }
