@@ -8,6 +8,6 @@ Bundle-Vendor: Apache Jakarta Commons
 Export-Package: org.apache.commons.logging
 Import-Package: com.sun.jdmk.com;resolution:=optional
 Bundle-ClassPath: .,
- target/commons-logging.osgi-1.1-SNAPSHOT.jar
+ target/classes/
 
 
