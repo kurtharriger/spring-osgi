@@ -8,5 +8,5 @@ Bundle-Vendor: Apache
 Export-Package: org.apache.log4j, org.apache.log4j.xml
 Import-Package: com.sun.jdmk.com;resolution:=optional
 Bundle-ClassPath: .,
- target/log4j.osgi-1.2.13-SNAPSHOT.jar
+ target/classes/
 
