@@ -7,6 +7,6 @@ Bundle-Version: 2.2.2
 Bundle-Vendor: ObjectWeb
 Export-Package: org.objectweb.asm, org.objectweb.asm.commons
 Bundle-ClassPath: .,
- target/asm.osgi-2.2.2-SNAPSHOT.jar
+ target/classes/
 
 
