@@ -50,6 +50,7 @@
       <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
       <version>1.0</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

@@ -8,6 +8,6 @@ Bundle-Vendor: Apache Jakarta Commons
 Export-Package: org.apache.commons.pool,
  org.apache.commons.pool.impl
 Bundle-ClassPath: .,
- target/commons-pool.osgi-1.0-SNAPSHOT.jar
+ target/classes/
 
 
