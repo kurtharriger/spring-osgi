@@ -37,4 +37,5 @@ Export-Package: org.springframework.context;version=2.1,
    org.springframework.ui.context;version=2.1,
    org.springframework.ui.context.support;version=2.1,
    org.springframework.validation;version=2.1
-Bundle-ClassPath: .,target/spring-context-2.1-SNAPSHOT.jar
+Bundle-ClassPath: .,
+ target/classes/
