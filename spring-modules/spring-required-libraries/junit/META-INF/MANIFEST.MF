@@ -6,5 +6,5 @@ Bundle-Name: junit
 Bundle-Version: 3.8.1
 Export-Package: junit.framework
 Bundle-ClassPath: .,
- target/junit.osgi-3.8.1-SNAPSHOT.jar
+ target/classes/
 
