@@ -31,3 +31,5 @@ Import-Package: oracle.toplink.exceptions,
    org.springframework.util;version=2.1
 Export-Package: org.springframework.orm.toplink;version=2.1
    org.springframework.orm.toplink.support;version=2.1 
+Bundle-ClassPath: .,
+ target/classes/
