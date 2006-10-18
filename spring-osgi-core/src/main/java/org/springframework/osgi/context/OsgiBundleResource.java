@@ -45,6 +45,7 @@ import org.springframework.util.StringUtils;
 public class OsgiBundleResource extends AbstractResource {
 
 	public static final String BUNDLE_URL_PREFIX = "bundle:";
+	public static final String BUNDLE_URL_URL_PREFIX = "bundle-url:";
 	private static final char PREFIX_SEPARATOR = ':';
 	private static final String ABSOLUTE_PATH_PREFIX = "/";
 
@@ -102,6 +103,9 @@ public class OsgiBundleResource extends AbstractResource {
 		if (this.path.startsWith(BUNDLE_URL_PREFIX)) {
 			url = getResourceFromBundle(this.path.substring(BUNDLE_URL_PREFIX.length()));
 		}
+		else if (this.path.startsWith(BUNDLE_URL_URL_PREFIX)) {
+			url = new URL(this.path.substring(BUNDLE_URL_URL_PREFIX.length()));
+		}
 		else if (this.path.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)) {
 			url = getResourceFromBundleClasspath(this.path.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length()));
 		}
@@ -128,23 +132,9 @@ public class OsgiBundleResource extends AbstractResource {
 	 * @see org.osgi.framework.Bundle#getEntry(String)
 	 */
 	protected URL getResourceFromBundle(String bundleRelativePath) {
-		//TODO: Felix workaround - should be removed when issue is better
-		// understood. Felix returns URLs that look like "/0/<path to file>",
-		// but then doesn't like the prefix "/0" when you pass the same thing
-		// back into getEntry, so we trim it off here...
-		bundleRelativePath = felixHack(bundleRelativePath);
 		return bundle.getEntry(bundleRelativePath);
 	}
 
-	private String felixHack(String bundlePath) {
-		if (bundlePath.startsWith("/0")) {
-			return bundlePath.substring(2);
-		}
-		else {
-			return bundlePath;
-		}
-	}
-	
 	/**
 	 * Resolves a resource from the bundle's classpath. This will find resources
 	 * in this bundle and also in imported packages from other bundles.
@@ -155,11 +145,6 @@ public class OsgiBundleResource extends AbstractResource {
 	 * @see org.osgi.framework.Bundle#getResource(String)
 	 */
 	protected URL getResourceFromBundleClasspath(String bundleRelativePath) {
-		//TODO: Felix workaround - should be removed when issue is better
-		// understood. Felix returns URLs that look like "/0/<path to file>",
-		// but then doesn't like the prefix "/0" when you pass the same thing
-		// back into getEntry, so we trim it off here...
-		bundleRelativePath = felixHack(bundleRelativePath);		
 		return bundle.getResource(bundleRelativePath);
 	}
 
