@@ -38,6 +38,10 @@
     <module>junit</module>
     <module>servlet-api.osgi</module>
     <module>jstl.osgi</module>
+    <module>jsp-api.osgi</module>
+    <module>struts.osgi</module>
+    <module>commons-beanutils.osgi</module>
+    <module>portlet-api.osgi</module>
   </modules>
   <reporting>
    <excludeDefaults>true</excludeDefaults>
