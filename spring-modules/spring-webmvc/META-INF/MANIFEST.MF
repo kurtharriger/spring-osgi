@@ -67,7 +67,7 @@ Import-Package: com.lowagie.text;resolution:=optional,
    org.springframework.web;version=2.1,
    org.springframework.web.bind;version=2.1,
    org.springframework.web.context;version=2.1,
-   org.springframework.web.context.scope;version=2.1,
+   org.springframework.web.context.request;version=2.1,
    org.springframework.web.context.support;version=2.1,
    org.springframework.web.multipart;version=2.1,
    org.springframework.web.util;version=2.1
@@ -89,8 +89,6 @@ Export-Package: org.springframework.web.servlet;version=2.1,
    org.springframework.web.servlet.view.jasperreports;version=2.1,
    org.springframework.web.servlet.view.tiles;version=2.1,
    org.springframework.web.servlet.view.velocity;version=2.1,
-   org.springframework.web.servlet.view.xslt;version=2.1,
-   org.springframework.web.struts;version=2.1,
-   org.springframework.web.util;version=2.1
+   org.springframework.web.servlet.view.xslt;version=2.1
 Bundle-ClassPath: .,
  target/classes/
