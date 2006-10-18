@@ -15,9 +15,13 @@
 		cardinality="0..n" />
 
 	<!-- full options -->
+    <!-- this version can only safely be tested *inside* OSGi
+         because of the creation of a filter. Commenting out for
+         now, needs to be moved into an integration test...
 	<osgi:reference id="full-options" interface="java.lang.Cloneable"
 		cardinality="1..n" context-classloader="service-provider"
 		timeout="123" filter="(c=*)" />
+     -->
 
 
 	<!-- simple service -->
