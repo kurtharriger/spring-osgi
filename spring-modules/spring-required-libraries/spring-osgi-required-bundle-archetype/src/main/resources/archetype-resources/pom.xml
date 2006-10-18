@@ -29,8 +29,8 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>${sourceGroupId}</groupId>
-                  <artifactId>${sourceArtifactId}</artifactId>
+                  <groupId>TODO</groupId>
+                  <artifactId>TODO</artifactId>
                   <version>${version}</version>
                   <type>jar</type>
                 </artifactItem>
@@ -47,8 +47,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>${sourceGroupId}</groupId>
-      <artifactId>${sourceArtifactId}</artifactId>
+      <groupId>TODO</groupId>
+      <artifactId>TODO</artifactId>
       <version>${version}</version>
       <scope>provided</scope>
     </dependency>
