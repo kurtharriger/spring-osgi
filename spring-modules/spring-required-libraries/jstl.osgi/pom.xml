@@ -8,7 +8,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>jstl.osgi</artifactId>
   <packaging>osgi-bundle</packaging>
-  <name>Some Java Library (OSGi version)</name>
+  <name>JSTL (OSGi version)</name>
   <version>1.1.2-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   <build>
