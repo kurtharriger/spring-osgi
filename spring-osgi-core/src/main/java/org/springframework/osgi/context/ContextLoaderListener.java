@@ -37,14 +37,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.xml.PluggableSchemaResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.osgi.context.support.AbstractBundleXmlApplicationContext;
 import org.springframework.osgi.context.support.AbstractRefreshableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.DefaultOsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.OsgiResourceUtils;
-import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -223,14 +220,14 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			List ret = new ArrayList();
 			for (int i = 0; i < locs.length; i++) {
 				if (bundle.getEntry(locs[i]) != null) {
-					ret.add(SPRING_CONTEXT_DIRECTORY + locs[i]);
+					ret.add(OsgiBundleResource.BUNDLE_URL_PREFIX + SPRING_CONTEXT_DIRECTORY + locs[i]);
 				}
 			}
 			if (ret.isEmpty()) {
 				return null;
 			}
 			else {
-				return addBundlePrefixTo((String[]) ret.toArray());
+				return (String[]) ret.toArray();
 			}
 		}
 		else {
@@ -238,36 +235,18 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			Enumeration resources = bundle.findEntries(SPRING_CONTEXT_DIRECTORY, "*.xml", false);
 			if (resources != null) {
 				while (resources.hasMoreElements()) {
-					resourceList.add( ((URL) resources.nextElement()).getFile());
+					URL resourceURL = (URL) resources.nextElement();
+					resourceList.add(OsgiBundleResource.BUNDLE_URL_URL_PREFIX + resourceURL.toExternalForm());
 				}
 			}
 			if (resourceList.isEmpty()) {
 				return null;
 			}
 			else {
-				String[] list = new String[resourceList.size()];
-				for (int i = 0; i < list.length; i++) {
-					list[i] = (String) resourceList.get(i);
+				String[] ret = new String[resourceList.size()];
+				return (String[]) resourceList.toArray(ret);
 				}
-				return addBundlePrefixTo(list);
-			}
 		}
-	}
-
-	/**
-	 * add the "bundle:" prefix to the resource location paths in the given
-	 * argument. This ensures that only this bundle will be searched for
-	 * matching resources. <p/> Modifies the argument in place and returns it.
-	 */
-	private String[] addBundlePrefixTo(String[] resourcePaths) {
-		for (int i = 0; i < resourcePaths.length; i++) {
-			if (!resourcePaths[i].startsWith(AbstractBundleXmlApplicationContext.BUNDLE_URL_PREFIX)
-					&& !resourcePaths[i].startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)
-					&& !resourcePaths[i].startsWith(ResourceUtils.FILE_URL_PREFIX)) {
-				resourcePaths[i] = AbstractBundleXmlApplicationContext.BUNDLE_URL_PREFIX + resourcePaths[i];
-			}
-		}
-		return resourcePaths;
 	}
 
 	private class UpdateThread extends Thread {
