@@ -10,7 +10,7 @@
   <artifactId>spring-framework-required-libraries</artifactId>
   <packaging>pom</packaging>
   <name>Spring Framework dependencies packaged as OSGi bundles</name>
-  <version>2.1-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   <build>
     <plugins>
@@ -25,6 +25,7 @@
     </plugins>
   </build>
   <modules>
+    <module>spring-osgi-required-bundle-archetype</module>
     <module>aop-alliance</module>
     <module>commons-logging</module>
     <module>commons-attributes</module>
@@ -35,6 +36,7 @@
     <module>cglib</module>
     <module>aspectj</module>
     <module>junit</module>
+    <module>servlet-api.osgi</module>
   </modules>
   <reporting>
    <excludeDefaults>true</excludeDefaults>
@@ -45,7 +47,7 @@
        <artifactId>maven-project-info-reports-plugin</artifactId>
        <inherited>true</inherited>
        <reportSets>
-        <reportSet></reportSet>
+        <reportSet/>
        </reportSets>
      </plugin>   
    </plugins>
