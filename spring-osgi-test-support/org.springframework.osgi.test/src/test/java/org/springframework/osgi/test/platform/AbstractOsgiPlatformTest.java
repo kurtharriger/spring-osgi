@@ -52,7 +52,7 @@ public abstract class AbstractOsgiPlatformTest extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.osgi.test.platform.EquinoxPlatform#start()}.
 	 */
-	public void testEquinoxPlatform() throws Exception {
+	public void testOsgiPlatform() throws Exception {
 		BundleContext context = platform.getBundleContext();
 		assertNotNull(context);
 		assertCorrectPlatform(context);
