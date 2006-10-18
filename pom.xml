@@ -225,21 +225,6 @@ limitations under the License.
         <dependency>
           <groupId>org.knopflerfish</groupId>
           <artifactId>framework</artifactId>
-          <version>2.0.0</version>
-          <type>jar</type>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
-      <properties>
-        <osgi.test.platform>knopflerfish</osgi.test.platform>
-      </properties>
-    </profile>
-    <profile>
-      <id>knopflerfish-2.0.1</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.knopflerfish</groupId>
-          <artifactId>framework</artifactId>
           <version>2.0.1</version>
           <type>jar</type>
           <scope>provided</scope>
