@@ -178,7 +178,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			if (log.isInfoEnabled()) {
 				log.info("Starting bundle [" + bundle.getHeaders().get(Constants.BUNDLE_NAME)
 						+ "] with configuration ["
-						+ (applicationContextLocations == null ? "none" : applicationContextLocations[0]) + "]");
+						+ (applicationContextLocations == null ? "none" : StringUtils.arrayToCommaDelimitedString(applicationContextLocations) + "]"));
 			}
 			ConfigurableApplicationContext ctx = contextFactory.createApplicationContextWithBundleContext(null,
 					bundleContext, applicationContextLocations, plugins, true);
@@ -237,8 +237,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			List resourceList = new ArrayList();
 			Enumeration resources = bundle.findEntries(SPRING_CONTEXT_DIRECTORY, "*.xml", false);
 			if (resources != null) {
-				for (; resources.hasMoreElements();) {
-					resourceList.add(((URL) resources.nextElement()).getFile());
+				while (resources.hasMoreElements()) {
+					resourceList.add( ((URL) resources.nextElement()).getFile());
 				}
 			}
 			if (resourceList.isEmpty()) {
