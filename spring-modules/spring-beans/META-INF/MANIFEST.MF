@@ -13,8 +13,8 @@ Import-Package: net.sf.cglib.proxy;resolution:=optional,
    org.springframework.core.io;version=2.1,
    org.springframework.core.io.support;version=2.1,
    org.springframework.util;version=2.1,
-   org.springframework.util.xml;version=2.1,
-   org.xml.sax,
+   org.springframework.util.xml;version=2.1
+DynamicImport-Package: org.xml.sax,
    javax.xml.parsers,
    org.w3c.dom
 Export-Package: org.springframework.beans;version=2.1,
