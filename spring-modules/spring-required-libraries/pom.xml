@@ -37,6 +37,7 @@
     <module>aspectj</module>
     <module>junit</module>
     <module>servlet-api.osgi</module>
+    <module>jstl.osgi</module>
   </modules>
   <reporting>
    <excludeDefaults>true</excludeDefaults>
