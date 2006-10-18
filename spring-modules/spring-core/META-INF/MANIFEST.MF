@@ -12,7 +12,9 @@ Import-Package: org.apache.commons.collections.map;resolution:=optional,
    org.apache.log4j,
    org.apache.log4j.xml,
    org.objectweb.asm;resolution:=optional,
-   org.objectweb.asm.commons;resolution:=optional
+   org.objectweb.asm.commons;resolution:=optional,
+   org.xml.sax,
+   org.w3c.dom
 Export-Package: org.springframework.core.io.support;version="2.1.0",
  org.springframework.core;version="2.1.0",
  org.springframework.core.annotation;version="2.1.0",
