@@ -4,7 +4,7 @@ Spring-Version: 2.1
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.springframework.mock
 Bundle-Name: org.springframework.mock
-Bundle-Version: 2.0
+Bundle-Version: 2.0.0
 Bundle-Vendor: Spring Framework
 Import-Package: javax.naming;resolution:=optional,
   javax.naming.spi;resolution:=optional,
@@ -24,7 +24,7 @@ Import-Package: javax.naming;resolution:=optional,
   org.springframework.beans,
   org.springframework.beans.factory,
   org.springframework.beans.factory.config,
-  org.springframework.beans,factory.support,
+  org.springframework.beans.factory.support,
   org.springframework.beans.factory.xml,
   org.springframework.context,
   org.springframework.dao,
