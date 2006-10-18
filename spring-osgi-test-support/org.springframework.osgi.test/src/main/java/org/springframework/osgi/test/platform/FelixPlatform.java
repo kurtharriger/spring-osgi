@@ -15,9 +15,13 @@
  */
 package org.springframework.osgi.test.platform;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.felix.framework.Felix;
 import org.apache.felix.framework.util.MutablePropertyResolverImpl;
 import org.apache.felix.main.Main;
@@ -34,8 +38,11 @@ import org.springframework.core.io.Resource;
  */
 public class FelixPlatform implements OsgiPlatform {
 
+	protected final Log log = LogFactory.getLog(getClass());
+
 	private BundleContext context;
 	private Felix platform;
+	private File felixCacheDir;
 
 	/*
 	 * (non-Javadoc)
@@ -54,6 +61,21 @@ public class FelixPlatform implements OsgiPlatform {
 	protected Properties getLocalConfiguration() {
 		Properties props = new Properties();
 
+		// specify a cache directory
+		try {
+			File tempFileName = File.createTempFile("org.springframework.osgi", "felix");
+			tempFileName.delete(); // we want it to be a directory...
+			this.felixCacheDir = new File(tempFileName.getAbsolutePath());
+			this.felixCacheDir.mkdir();
+			this.felixCacheDir.deleteOnExit();
+			props.setProperty("felix.cache.dir", this.felixCacheDir.getAbsolutePath());
+		}
+		catch (IOException ex) {
+			if (log.isWarnEnabled()) {
+				log.warn("Could not create temporary directory for Felix, using default", ex);
+			}
+		}
+		
 		// specify a cache profile
 		props.setProperty("felix.cache.profile", "spring.osgi.junit.test");
 		// embedded use
