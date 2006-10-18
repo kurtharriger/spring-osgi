@@ -2,7 +2,7 @@ Implementation-Title: asm
 Implementation-Version: 2.2.2
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.objectweb.asm
-Bundle-Name: commons-logging
+Bundle-Name: asm
 Bundle-Version: 2.2.2
 Bundle-Vendor: ObjectWeb
 Export-Package: org.objectweb.asm, org.objectweb.asm.commons
