@@ -111,7 +111,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 * repository.
 	 * 
 	 * @param groupId - the groupId of the organization supplying the bundle
-     * @param artifact - the artifact id of the bundle
+     * @param artifactId - the artifact id of the bundle
      * @param version - the version of the bundle
      * @return the String representing the URL location of this bundle 
 	 */
@@ -133,8 +133,14 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
      * @return the String representing the URL location of this bundle
      */
     protected String localMavenBundle(String groupId, String artifact, String version) {
-		File userHome = new File(System.getProperty("user.home"));
-		File repositoryHome = new File(userHome, ".m2/repository");
+        // Check to see if the user has overridden the default maven home
+        String m2_home = System.getenv("M2_HOME");
+        if (m2_home == null) {
+            // use User Home
+            m2_home = System.getProperty("user.home");
+
+        }
+	File repositoryHome = new File(new File(m2_home), ".m2/repository");
         String location = groupId.replace('.', '/');
         location += '/';
         location += artifact;
@@ -192,7 +198,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 	public AbstractOsgiTests() {
 		super();
-	};
+	}
 
 	public AbstractOsgiTests(String name) {
 		super(name);
