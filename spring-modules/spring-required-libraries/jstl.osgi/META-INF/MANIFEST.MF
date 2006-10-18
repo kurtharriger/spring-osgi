@@ -1,0 +1,11 @@
+Bundle-Version: 1.1.2
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: javax.servlet.jsp.jstl
+Bundle-Name: Java-Standard-Template-Library
+Export-Package: javax.servlet.jsp.jstl.core,
+  javax.servlet.jsp.jstl.fmt,
+  javax.servlet.jsp.jstl.sql,
+  javax.servlet.jsp.jstl.tlv
+
+
+
