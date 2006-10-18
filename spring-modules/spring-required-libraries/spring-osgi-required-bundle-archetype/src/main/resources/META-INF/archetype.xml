@@ -1,0 +1,9 @@
+<archetype>
+  <id>spring-osgi-bundle-artifact</id>
+  <resources>
+    <resource>META-INF/MANIFEST.MF</resource>
+    <resource>.classpath</resource>
+    <resource>.project</resource>
+    <resource>build.properties</resource>
+  </resources>
+</archetype>
