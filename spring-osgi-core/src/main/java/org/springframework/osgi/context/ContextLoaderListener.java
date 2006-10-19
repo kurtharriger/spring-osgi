@@ -194,8 +194,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 	private void resolveBundle(Bundle bundle) {
-		if (bundle.getEntry(SPRING_HANDLER_MAPPINGS_LOCATION) != null
-				|| bundle.getEntry(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
+		if (bundle.getResource(SPRING_HANDLER_MAPPINGS_LOCATION) != null
+				|| bundle.getResource(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
 			plugins.addHandler(bundle);
 		}
 	}
