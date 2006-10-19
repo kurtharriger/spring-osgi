@@ -3,3 +3,5 @@ Bundle-SymbolicName: org.springframework.osgi.samples.simpleservice
 Bundle-Name: Simple-Service-Sample
 Bundle-Vendor: Spring Framework
 Export-Package: org.springframework.osgi.samples.simpleservice
+Bundle-ClassPath: .,
+ target/classes/
