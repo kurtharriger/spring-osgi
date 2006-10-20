@@ -41,6 +41,7 @@ import org.springframework.osgi.context.support.AbstractRefreshableOsgiBundleApp
 import org.springframework.osgi.context.support.DefaultOsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
+import org.springframework.osgi.context.support.OsgiPlatformDetector;
 import org.springframework.osgi.context.support.OsgiResourceUtils;
 import org.springframework.util.StringUtils;
 
@@ -84,6 +85,9 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	private OsgiBundleXmlApplicationContextFactory contextFactory = new DefaultOsgiBundleXmlApplicationContextFactory();
 
 	private Map managedBundles = new HashMap();
+	
+	// required to work around knopflerfish getResource bug...
+	private boolean isKnopflerfish = false;
 
 	public static NamespacePlugins plugins() {
 		return plugins;
@@ -104,6 +108,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 	public void start(BundleContext context) throws Exception {
+		this.isKnopflerfish = OsgiPlatformDetector.isKnopflerfish(context);
+		
 		// Collect all previously resolved bundles which have namespace plugins
 		Bundle[] previousBundles = context.getBundles();
 		for (int i = 0; i < previousBundles.length; i++) {
@@ -194,9 +200,19 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 	private void resolveBundle(Bundle bundle) {
-		if (bundle.getResource(SPRING_HANDLER_MAPPINGS_LOCATION) != null
-				|| bundle.getResource(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
-			plugins.addHandler(bundle);
+		if (isKnopflerfish) {
+			// knopflerfish (2.0.0) has a bug which gives a classcast exception if you call getResource
+			// from outside of the bundle, yet getResource works bettor on equinox....
+			if (bundle.getEntry(SPRING_HANDLER_MAPPINGS_LOCATION) != null
+					|| bundle.getEntry(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
+				plugins.addHandler(bundle);
+			}			
+		}
+		else {
+			if (bundle.getResource(SPRING_HANDLER_MAPPINGS_LOCATION) != null
+					|| bundle.getResource(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
+				plugins.addHandler(bundle);
+			}
 		}
 	}
 
