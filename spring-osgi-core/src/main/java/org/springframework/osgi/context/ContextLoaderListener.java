@@ -201,8 +201,9 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 	private void resolveBundle(Bundle bundle) {
 		if (isKnopflerfish) {
-			// knopflerfish (2.0.0) has a bug which gives a classcast exception if you call getResource
+			// knopflerfish (2.0.0) has a bug #1581187 which gives a classcast exception if you call getResource
 			// from outside of the bundle, yet getResource works bettor on equinox....
+			// see http://sourceforge.net/tracker/index.php?func=detail&aid=1581187&group_id=82798&atid=567241
 			if (bundle.getEntry(SPRING_HANDLER_MAPPINGS_LOCATION) != null
 					|| bundle.getEntry(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
 				plugins.addHandler(bundle);
