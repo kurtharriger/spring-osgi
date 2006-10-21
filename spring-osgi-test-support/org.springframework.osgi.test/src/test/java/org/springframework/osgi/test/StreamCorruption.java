@@ -65,7 +65,7 @@ public class StreamCorruption extends TestCase {
 				in.close();
 			}
 			catch (Exception ex) {
-				// TODO: handle exception
+				// ignore
 			}
 		}
 
@@ -74,7 +74,7 @@ public class StreamCorruption extends TestCase {
 				out.close();
 			}
 			catch (Exception ex) {
-				// TODO: handle exception
+				// ignore
 			}
 		}
 		
