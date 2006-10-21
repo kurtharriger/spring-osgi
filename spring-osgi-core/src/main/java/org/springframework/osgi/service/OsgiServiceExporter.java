@@ -17,7 +17,6 @@
  */
 package org.springframework.osgi.service;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,11 +37,12 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.Constants;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -57,11 +57,18 @@ import org.springframework.util.StringUtils;
  * </ul>
  * 
  * @author Adrian Colyer
+ * @author Costin Leau
  * @since 2.0
  */
 public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, InitializingBean, DisposableBean,
 		BundleContextAware {
 
+	/**
+	 * ClassLoaderOptions Constants Class.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
 	protected class ClassLoaderOptions {
 		public static final int UNMANAGED = 0;
 		public static final int SERVICE_PROVIDER = 1;
@@ -70,19 +77,23 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	private static final Log log = LogFactory.getLog(OsgiServiceExporter.class);
 
 	private BundleContext bundleContext;
+
 	private OsgiServicePropertiesResolver resolver = new BeanNameServicePropertiesResolver();
 	private BeanFactory beanFactory;
-	private Set/* <ServiceRegistration> */publishedServices = new HashSet();
+	private Set publishedServices = new HashSet();
+
 	private Properties serviceProperties;
 	private String beanName = OsgiServiceExporter.class.getName();
-	private String ref;
-	private String[] serviceInterface;
+	private Class[] interfaces;
+
+	// TODO: what are these?
 	private String activationMethod;
 	private String deactivationMethod;
 
 	private static final Constants CL_OPTIONS = new Constants(ClassLoaderOptions.class);
 
 	private int contextClassloader;
+	private Object target;
 
 	/*
 	 * (non-Javadoc)
@@ -125,20 +136,12 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 		this.beanName = name;
 	}
 
-	public String getRef() {
-		return ref;
+	public Class[] getInterfaces() {
+		return interfaces;
 	}
 
-	public void setRef(String ref) {
-		this.ref = ref;
-	}
-
-	public String[] getInterfaces() {
-		return serviceInterface;
-	}
-
-	public void setInterfaces(String[] serviceInterface) {
-		this.serviceInterface = serviceInterface;
+	public void setInterfaces(Class[] serviceInterface) {
+		this.interfaces = serviceInterface;
 	}
 
 	public String getActivationMethod() {
@@ -171,19 +174,12 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		if (this.beanFactory == null) {
-			throw new IllegalArgumentException("Required property beanFactory has not been set");
-		}
-		if (this.bundleContext == null) {
-			throw new IllegalArgumentException("Required property bundleContext has not been set");
-		}
-		if (this.resolver == null) {
-			throw new IllegalArgumentException("Required property resolver was set to a null value");
-		}
-		if (ref == null || ref.length() == 0) {
-			throw new IllegalArgumentException("Required property ref has not been set");
-		}
-		publishBeans();
+		Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
+		Assert.notNull(bundleContext, "required property 'bundleContext' has not been set");
+		Assert.notNull(resolver, "required property 'resolver' was set to a null value");
+		Assert.notNull(target, "required property 'target' has not been set");
+
+		publishService(target, mergeServiceProperties(beanName));
 	}
 
 	/*
@@ -207,15 +203,6 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 		}
 	}
 
-	private void publishBeans() throws NoSuchBeanDefinitionException {
-		if (serviceInterface == null || serviceInterface.length == 0) {
-			publishBeanAsService(ref, mergeServiceProperties(ref));
-		}
-		else {
-			publishService(serviceInterface, ref, mergeServiceProperties(ref));
-		}
-	}
-
 	private Properties mergeServiceProperties(String beanName) {
 		Properties p = resolver.getServiceProperties(beanName);
 		if (serviceProperties != null) {
@@ -224,32 +211,41 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 		return p;
 	}
 
-	protected void publishBeanAsService(String bean, Properties serviceProperties) {
-		Class[] interfaces = ClassUtils.getAllInterfaces(bean);
-		if (interfaces != null && interfaces.length > 0) {
-			String[] ifs = new String[interfaces.length];
-			for (int i = 0; i < ifs.length; i++) {
-				ifs[i] = interfaces[i].getName();
-			}
-			publishService(ifs, bean, serviceProperties);
-		}
-		else {
-			publishService(new String[] { bean.getClass().getName() }, bean, serviceProperties);
-		}
+	protected void publishService(Object bean, Properties serviceProperties) {
+		Class[] intfs = interfaces;
+
+		// detect interfaces (if necessary)
+		if (intfs == null || intfs.length == 0)
+			intfs = ClassUtils.getAllInterfaces(bean);
+
+		// fallback to classname
+		if (intfs == null || intfs.length == 0)
+			intfs = new Class[] { bean.getClass() };
+
+		publishService(intfs, bean, serviceProperties);
 	}
 
-	protected ServiceRegistration publishService(String[] names, String beanName, Properties serviceProperties) {
+	protected ServiceRegistration publishService(Class[] intfs, Object bean, Properties serviceProperties) {
+		String[] names = new String[intfs.length];
+
+		for (int i = 0; i < names.length; i++) {
+			names[i] = intfs[i].getName();
+		}
+
 		if (log.isInfoEnabled()) {
 			log.info("Publishing service [" + Arrays.toString(names) + "]");
 		}
 		// Service registration optionally proxied to avoid eager creation
 		ServiceRegistration s;
-		if (beanFactory.containsBean("&" + beanName) || (beanFactory instanceof BeanDefinitionRegistry)
-				&& ((BeanDefinitionRegistry) beanFactory).getBeanDefinition(beanName).isLazyInit()) {
-			s = bundleContext.registerService(names, new BeanServiceFactory(beanName), serviceProperties);
-		}
-		else {
-			s = bundleContext.registerService(names, beanFactory.getBean(beanName), serviceProperties);
+
+		// TODO: rework this (bean name is unknown)
+//		if (beanFactory.containsBean("&" + beanName) || (beanFactory instanceof BeanDefinitionRegistry)
+//				&& ((BeanDefinitionRegistry) beanFactory).getBeanDefinition(beanName).isLazyInit()) {
+//			s = bundleContext.registerService(names, new BeanServiceFactory(beanName), serviceProperties);
+//		}
+//		else 
+		{
+			s = bundleContext.registerService(names, bean, serviceProperties);
 		}
 		this.publishedServices.add(s);
 		return s;
@@ -262,64 +258,75 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 			this.beanName = beanName;
 		}
 
+		// TODO: reworks this
 		public Object getService(Bundle bundle, ServiceRegistration serviceRegistration) {
 			Object bean = beanFactory.getBean(beanName);
 			if (StringUtils.hasText(activationMethod)) {
 				Method m = BeanUtils.resolveSignature(activationMethod, beanFactory.getType(beanName));
 				try {
-					m.invoke(bean, null);
+					ReflectionUtils.invokeMethod(m, bean);
 				}
-				catch (IllegalAccessException e) {
-					throw new IllegalArgumentException(e);
-				}
-				catch (InvocationTargetException e) {
-					log.error("Activation method on bean with name '" + beanName + "' threw an exception",
-							e.getTargetException());
+				catch (RuntimeException ex) {
+					log.error("Activation method on bean with name '" + beanName + "' threw an exception", ex);
 				}
 			}
-			else if (bean instanceof ServiceActivationLifecycleListener) {
-				((ServiceActivationLifecycleListener) bean).activate(serviceRegistration.getClass());
-			}
+			// else if (bean instanceof ServiceActivationLifecycleListener) {
+			// ((ServiceActivationLifecycleListener)
+			// bean).activate(serviceRegistration.getClass());
+			// }
 			return bean;
 		}
 
+		// TODO: reworks this
 		public void ungetService(Bundle bundle, ServiceRegistration serviceRegistration, Object bean) {
 			if (StringUtils.hasText(deactivationMethod)) {
 				Method m = BeanUtils.resolveSignature(deactivationMethod, beanFactory.getType(beanName));
 				try {
-					m.invoke(bean, null);
+					ReflectionUtils.invokeMethod(m, bean);
 				}
-				catch (IllegalAccessException e) {
-					throw new IllegalArgumentException(e);
-				}
-				catch (InvocationTargetException e) {
-					log.error("Deactivation method on bean with name '" + beanName + "' threw an exception",
-							e.getTargetException());
+				catch (RuntimeException ex) {
+					log.error("Deactivation method on bean with name '" + beanName + "' threw an exception", ex);
 				}
 			}
-			else if (bean instanceof ServiceDeactivationLifecycleListener) {
-				((ServiceDeactivationLifecycleListener) bean).deactivate(serviceRegistration.getClass());
-			}
+			// else if (bean instanceof ServiceDeactivationLifecycleListener) {
+			// ((ServiceDeactivationLifecycleListener)
+			// bean).deactivate(serviceRegistration.getClass());
+			// }
 		}
 	}
 
+	// /**
+	// * @param contextClassloader The contextClassloader to set.
+	// */
+	// private void setContextClassloader(int contextClassloader) {
+	// if (!CL_OPTIONS.getValues(null).contains(new
+	// Integer(contextClassloader)))
+	// throw new IllegalArgumentException("illegal constant:" +
+	// contextClassloader);
+	//
+	// this.contextClassloader = contextClassloader;
+	// }
 
-//	/**
-//	 * @param contextClassloader The contextClassloader to set.
-//	 */
-//	private void setContextClassloader(int contextClassloader) {
-//		if (!CL_OPTIONS.getValues(null).contains(new Integer(contextClassloader)))
-//			throw new IllegalArgumentException("illegal constant:" + contextClassloader);
-//
-//		this.contextClassloader = contextClassloader;
-//	}
-	
 	public void setContextClassloader(String classloaderManagementOption) {
 		// transform "-" into "_" (for service-provider)
 		if (classloaderManagementOption == null)
 			throw new IllegalArgumentException("non-null argument required");
 
 		this.contextClassloader = CL_OPTIONS.asNumber(classloaderManagementOption.replace("-", "_")).intValue();
+	}
+
+	/**
+	 * @return Returns the target.
+	 */
+	public Object getTarget() {
+		return target;
+	}
+
+	/**
+	 * @param target The target to set.
+	 */
+	public void setTarget(Object target) {
+		this.target = target;
 	}
 
 }

@@ -17,11 +17,6 @@
  */
 package org.springframework.osgi.service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
@@ -105,10 +100,10 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	private int contextClassloader;
 
 	private int timeout;
-	
+
 	private PropertyValues properties;
 
-	private List listeners = new ArrayList();
+	private TargetSourceLifecycleListener[] listeners;
 
 	private long retryDelayMs = DEFAULT_MILLIS_BETWEEN_RETRIES;
 
@@ -128,7 +123,6 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 	// reference to our app context (we need the classloader for proxying...)
 	private ApplicationContext applicationContext;
-	private boolean pushBundleAsContextClassLoader;
 
 	/*
 	 * (non-Javadoc)
@@ -227,15 +221,6 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 						+ "' set on OsgiServiceProxyFactoryBean has invalid syntax: " + ex.getMessage(), ex);
 			}
 		}
-		if (!listeners.isEmpty()) {
-			for (Iterator i = listeners.iterator(); i.hasNext();) {
-				Object listener = i.next();
-				if (!(listener instanceof ServiceLifecycleListener)) {
-					throw new IllegalArgumentException("Listener [" + listener.getClass().getName()
-							+ "] does not implement ServiceLifecycleListener or its derivatives");
-				}
-			}
-		}
 		if (this.applicationContext == null) {
 			throw new IllegalArgumentException("Required applicationContext property was not set");
 		}
@@ -300,46 +285,12 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	}
 
 	/**
-	 * @return the registered service listeners
-	 */
-	public List getListeners() {
-		return listeners;
-	}
-
-	/**
-	 * Set the registered service listeners.
-	 * 
-	 * @param listeners
-	 */
-	public void setListeners(List listeners) {
-		this.listeners = listeners;
-	}
-
-	/**
 	 * To find a bean published as a service by the OsgiServiceExporter, simply
 	 * set this property. You may specify additional filtering criteria if
 	 * needed (using the filter property) but this is not required.
 	 */
 	public void setBeanName(String beanName) {
 		this.beanName = beanName;
-	}
-
-	/**
-	 * Determines whether invocations on the remote service should be performed
-	 * in the context of the target bundle's ClassLoader. The default is false.
-	 */
-	public boolean isPushBundleAsContextClassloader() {
-		return pushBundleAsContextClassLoader;
-	}
-
-	/**
-	 * Determines whether invocations on the remote service should be performed
-	 * in the context of the target bundle's ClassLoader. The default is false.
-	 * 
-	 * @param pushBundleAsContextClassLoader
-	 */
-	public void setPushBundleAsContextClassloader(boolean pushBundleAsContextClassLoader) {
-		this.pushBundleAsContextClassLoader = pushBundleAsContextClassLoader;
 	}
 
 	/**
@@ -366,12 +317,13 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		throw new IllegalArgumentException("invalid constant, " + cardinality);
 	}
 
-//	public void setContextClassloader(int options) {
-//		if (!REFERENCE_CL_OPTIONS.getValues(null).contains(new Integer(options)))
-//			throw new IllegalArgumentException("only reference classloader options allowed");
-//
-//		this.contextClassloader = options;
-//	}
+	// public void setContextClassloader(int options) {
+	// if (!REFERENCE_CL_OPTIONS.getValues(null).contains(new Integer(options)))
+	// throw new IllegalArgumentException("only reference classloader options
+	// allowed");
+	//
+	// this.contextClassloader = options;
+	// }
 
 	public void setContextClassloader(String classLoaderManagementOption) {
 		// transform "-" into "_" (for service-provider)
@@ -516,15 +468,18 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		HotSwappableTargetSource targetSource = new HotSwappableTargetSource(target);
 		pf.setTargetSource(targetSource);
 
+		// TODO: add listeners to the interceptor
 		OsgiServiceInterceptor interceptor = new OsgiServiceInterceptor(this.bundleContext, this.serviceReference,
-				targetSource, getInterface(), lookupFilter, listeners);
+				targetSource, getInterface(), lookupFilter);
 		interceptor.setMaxRetries(this.retryOnUnregisteredService ? this.retryTimes : 0);
 		interceptor.setRetryIntervalMillis(this.retryDelayMs);
 
 		pf.addAdvice(interceptor);
-		if (pushBundleAsContextClassLoader) {
-			pf.addAdvice(new BundleContextClassLoaderAdvice(serviceReference.getBundle()));
-		}
+		// TODO: add classloading behavior
+		// if (pushBundleAsContextClassLoader) {
+		// pf.addAdvice(new
+		// BundleContextClassLoaderAdvice(serviceReference.getBundle()));
+		// }
 		// Add advice for pushing the bundle context
 		pf.addAdvice(new LocalBundleContext(serviceReference.getBundle()));
 		// FIXME andyp -- using the application context classloader
@@ -561,6 +516,20 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 */
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
+	}
+
+	/**
+	 * @return Returns the listeners.
+	 */
+	public TargetSourceLifecycleListener[] getListeners() {
+		return listeners;
+	}
+
+	/**
+	 * @param listeners The listeners to set.
+	 */
+	public void setListeners(TargetSourceLifecycleListener[] listeners) {
+		this.listeners = listeners;
 	}
 
 }

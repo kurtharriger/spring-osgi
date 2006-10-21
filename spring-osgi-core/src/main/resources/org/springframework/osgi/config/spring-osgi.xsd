@@ -20,12 +20,10 @@
 					<xsd:element name="listener" type="Tlistener" minOccurs="0"/>
 				</xsd:sequence>
 				<xsd:attribute name="interface" use="required" type="xsd:string"/>
-				<!-- CL: commented out for the moment - need to add an equivalent inside OsgiServiceFB -->
 				<xsd:attribute name="filter" use="optional" type="xsd:string"/>
 				<xsd:attribute name="timeout" use="optional" type="xsd:int" default="0"/>
 				<xsd:attribute name="cardinality" use="optional" type="Tcardinality" default="1..1"/>
 				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
-				<!-- CL: commented out for the moment - need to add an equivalent inside OsgiServiceFB -->
 				<xsd:attribute name="context-classloader" type="TreferenceClassLoaderOptions" default="client"/>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -49,7 +47,13 @@
 	</xsd:simpleType>
 	
 	<xsd:complexType name="Tlistener">
-		<xsd:attribute name="ref" type="xsd:string" use="required"/>
+		<xsd:sequence minOccurs="0" maxOccurs="1">
+			<!-- nested bean declaration -->
+			<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
+		</xsd:sequence>
+
+		<!-- shortcut for bean references -->		
+		<xsd:attribute name="ref" type="xsd:string" use="optional"/>
 		<xsd:attribute name="bind-method" type="xsd:string" use="optional"/>
 		<xsd:attribute name="unbind-method" type="xsd:string" use="optional"/>
 	</xsd:complexType>
@@ -63,14 +67,13 @@
 				<xsd:sequence minOccurs="0" maxOccurs="1">
 					<xsd:element name="interfaces" type="beans:listOrSetType" minOccurs="0"/>
 					<xsd:element name="service-properties" type="beans:propsType" minOccurs="0"/>
-					<!--  this next entry is to allow a nested bean element -->
+					<!-- nested bean declaration -->
 					<xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="skip"/>
 				</xsd:sequence>
-				<xsd:attribute name="ref" type="xsd:string" use="optional"/>
 				<xsd:attribute name="interface" type="xsd:string" use="optional"/>
+				<xsd:attribute name="ref" type="xsd:string" use="optional"/>
 				<xsd:attribute name="lazy-init" type="xsd:boolean" use="optional" default="false"/>
 				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
-				<!-- CL: commented out for the moment - need to add an equivalent inside OsgiServiceFB -->
 				<xsd:attribute name="context-classloader" type="TserviceClassLoaderOptions" default="unmanaged"/>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -89,10 +92,14 @@
 	<xsd:complexType name="TpropertyPlaceholder">
 		<xsd:complexContent>
 			<xsd:extension base="beans:identifiedType">
+				<xsd:sequence minOccurs="0" maxOccurs="1">
+					<!-- nested properties declaration -->
+					<xsd:element name="default-properties" type="beans:propsType" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
 				<xsd:attribute name="persistent-id" type="xsd:string" use="required"/>
 				<xsd:attribute name="placeholder-prefix" type="xsd:string" use="optional" default="${"/>
 				<xsd:attribute name="placeholder-suffix" type="xsd:string" use="optional" default="}"/>
-				<xsd:attribute name="default-properties" type="xsd:string" use="optional"/>
+				<xsd:attribute name="defaults-ref" type="xsd:string" use="optional"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>

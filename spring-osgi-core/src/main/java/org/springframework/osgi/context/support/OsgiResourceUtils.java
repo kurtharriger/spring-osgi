@@ -70,7 +70,7 @@ public class OsgiResourceUtils
     }
   }
 
-  // FIXME:
+  // FIXME: Ugly hack - should be standardized somehow
   public static BundleContext getBundleContext(Bundle bundle) {
     if (bundle == null) return null;
     try {

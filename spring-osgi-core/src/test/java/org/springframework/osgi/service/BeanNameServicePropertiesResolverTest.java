@@ -39,7 +39,7 @@ public class BeanNameServicePropertiesResolverTest extends TestCase {
 			fail( "Should have thrown IllegalArgumentException");
 		} 
 		catch (IllegalArgumentException ex) {
-			assertEquals("Required property bundleContext has not been set",ex.getMessage());
+			// expected
 		}
 	}
 	

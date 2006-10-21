@@ -39,15 +39,15 @@ public abstract class DependentAbstractSingleBeanDefinitionParser extends Abstra
 			Attr attribute = (Attr) attributes.item(x);
 			String name = attribute.getLocalName();
 
-			if (ID_ATTRIBUTE.equals(name)) {
-				continue;
-			} else if (ParserUtils.DEPENDS_ON.equals(name)) {
-				ParserUtils.parseDependsOn(attribute,  builder);
-			} else if (LAZY_INIT.equals(name)) {
-				builder.setLazyInit(Boolean.getBoolean(attribute.getValue()));
-			} else if (!doParseAttribute(attribute, builder)) {
-				builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
-			}
+//			if (ID_ATTRIBUTE.equals(name)) {
+//				continue;
+//			} else if (ParserUtils.DEPENDS_ON.equals(name)) {
+//				ParserUtils.parseDependsOn(attribute,  builder);
+//			} else if (LAZY_INIT.equals(name)) {
+//				builder.setLazyInit(Boolean.getBoolean(attribute.getValue()));
+//			} else if (!doParseAttribute(attribute, builder)) {
+//				builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
+//			}
 		}
 	}
 

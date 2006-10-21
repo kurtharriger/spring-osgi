@@ -28,9 +28,7 @@ import org.osgi.framework.Constants;
  * 
  * @author Adrian Colyer
  */
-public class OsgiPlatformDetector {
-	
-	private OsgiPlatformDetector() {};
+public abstract class OsgiPlatformDetector {
 	
 	public static boolean isEquinox(BundleContext aContext) {
 		String vendorProperty = aContext.getProperty(Constants.FRAMEWORK_VENDOR);

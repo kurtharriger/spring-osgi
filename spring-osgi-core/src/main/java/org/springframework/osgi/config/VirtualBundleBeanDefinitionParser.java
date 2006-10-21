@@ -34,11 +34,10 @@ import java.util.Set;
 
 /**
  * Parser for VirtualBundleFactoryBean
- *
+ * 
  * @author Andy Piper
  */
-class VirtualBundleBeanDefinitionParser extends AbstractBeanDefinitionParser
-{
+class VirtualBundleBeanDefinitionParser extends AbstractBeanDefinitionParser {
 	public static final String PACKAGE_ELEMENT = "package";
 	public static final String ID_NAME = "name";
 	public static final String ID_VERSION = "version";
@@ -50,13 +49,15 @@ class VirtualBundleBeanDefinitionParser extends AbstractBeanDefinitionParser
 			Attr attribute = (Attr) attributes.item(x);
 			String name = attribute.getLocalName();
 
-			if (ID_ATTRIBUTE.equals(name)) {
-				continue;
-			} else if (ParserUtils.DEPENDS_ON.equals(name)) {
-				ParserUtils.parseDependsOn(attribute,  builder);
-			} else {
-				builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
-			}
+//			if (ID_ATTRIBUTE.equals(name)) {
+//				continue;
+//			}
+//			else if (ParserUtils.DEPENDS_ON.equals(name)) {
+//				ParserUtils.parseDependsOn(attribute, builder);
+//			}
+//			else {
+//				builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
+//			}
 		}
 		Element e = DomUtils.getChildElementByTagName(element, "exports");
 		if (e != null) {
@@ -87,7 +88,8 @@ class VirtualBundleBeanDefinitionParser extends AbstractBeanDefinitionParser
 				String name = attribute.getLocalName();
 				if (ID_NAME.equals(name)) {
 					p.setName(attribute.getValue());
-				} else if (ID_VERSION.equals(name)) {
+				}
+				else if (ID_VERSION.equals(name)) {
 					p.setVersion(attribute.getValue());
 				}
 			}
