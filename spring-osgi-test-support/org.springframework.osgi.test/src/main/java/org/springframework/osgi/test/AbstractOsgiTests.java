@@ -42,13 +42,13 @@ import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.util.Assert;
 
 /**
- *
+ * 
  * Base teste for OSGi environments. It will start the OSGi platform, install
  * the given bundles and then delegate the execution to a test copy which
  * executes inside OSGi.
- *
+ * 
  * @author Costin Leau
- *
+ * 
  */
 public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTest {
 
@@ -71,10 +71,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	// the test results used by the triggering test runner
 	private TestResult originalResult;
 
-    // The OSGi BundleContext
-    private BundleContext bundleContext;
+	// The OSGi BundleContext
+	private BundleContext bundleContext;
 
-    private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
+	private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
 
 	public static final String EQUINOX_PLATFORM = "equinox";
 	public static final String KNOPFLERFISH_PLATFORM = "knopflerfish";
@@ -99,83 +99,86 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	private String getCommonsLoggingLibUrl() {
 		return localMavenArtifact("org.springframework.osgi", "commons-logging.osgi", "1.1-SNAPSHOT");
 	}
-	
+
 	private String getJUnitLibUrl() {
 		return localMavenArtifact("org.springframework.osgi", "junit.osgi", "3.8.1-SNAPSHOT");
 	}
 
-
 	/**
-	 * Find a local maven artifact. First tries to find the resource as a packaged artifact
-	 * produced by a local maven build, and if that fails will search the local maven
-	 * repository.
+	 * Find a local maven artifact. First tries to find the resource as a
+	 * packaged artifact produced by a local maven build, and if that fails will
+	 * search the local maven repository.
 	 * 
 	 * @param groupId - the groupId of the organization supplying the bundle
-     * @param artifactId - the artifact id of the bundle
-     * @param version - the version of the bundle
-     * @return the String representing the URL location of this bundle 
+	 * @param artifactId - the artifact id of the bundle
+	 * @param version - the version of the bundle
+	 * @return the String representing the URL location of this bundle
 	 */
 	protected String localMavenArtifact(String groupId, String artifactId, String version) {
 		try {
 			return localMavenBuildArtifact(artifactId, version);
 		}
-		catch(IllegalStateException illStateEx) {
+		catch (IllegalStateException illStateEx) {
 			return localMavenBundle(groupId, artifactId, version);
 		}
 	}
 
-    /**
-     * Answer the url string of the indicated bundle in the local Maven repository
-     *
-     * @param groupId - the groupId of the organization supplying the bundle
-     * @param artifact - the artifact id of the bundle
-     * @param version - the version of the bundle
-     * @return the String representing the URL location of this bundle
-     */
-    protected String localMavenBundle(String groupId, String artifact, String version) {
-        // Check to see if the user has overridden the default maven home
-        String m2_home = System.getenv("M2_HOME");
-        if (m2_home == null) {
-            // use User Home
-            m2_home = System.getProperty("user.home");
+	/**
+	 * Answer the url string of the indicated bundle in the local Maven
+	 * repository
+	 * 
+	 * @param groupId - the groupId of the organization supplying the bundle
+	 * @param artifact - the artifact id of the bundle
+	 * @param version - the version of the bundle
+	 * @return the String representing the URL location of this bundle
+	 */
+	protected String localMavenBundle(String groupId, String artifact, String version) {
+		// Check to see if the user has overridden the default maven home
+		String m2_home = null; 
+		//= System.getenv("M2_HOME");
+		if (m2_home == null) {
+			// use User Home
+			m2_home = System.getProperty("user.home");
 
-        }
-	File repositoryHome = new File(new File(m2_home), ".m2/repository");
-        String location = groupId.replace('.', '/');
-        location += '/';
-        location += artifact;
-        location += '/';
-        location += version;
-        location += '/';
-        location += artifact;
-        location += '-';
-        location += version;
-        location += ".jar";
-        return "file:" + new File(repositoryHome, location).getAbsolutePath();
-    }
-    
-    /**
-     * Find a local maven artifact in the current build tree. This searches for resources
-     * produced by the package phase of a maven build.
-     * 
-     * @param artifactId
-     * @param version
-     * @return a String representing the URL location of this bundle
-     */
-    protected String localMavenBuildArtifact(String artifactId, String version) {
-    	try {
-    		File found = new MavenPackagedArtifactFinder(artifactId,version).findPackagedArtifact(new File("."));
-    		return found.toURL().toExternalForm();
-    	} catch (IOException ioEx) {
-    		throw new IllegalStateException(
-    			"Artifact " + artifactId + "-" + version + ".jar" + 
-    			" could not be found",ioEx);
-    	}
-    }
+		}
+		File repositoryHome = new File(new File(m2_home), ".m2/repository");
+		String location = groupId.replace('.', '/');
+		location += '/';
+		location += artifact;
+		location += '/';
+		location += version;
+		location += '/';
+		location += artifact;
+		location += '-';
+		location += version;
+		location += ".jar";
+		return "file:" + new File(repositoryHome, location).getAbsolutePath();
+	}
+
+	/**
+	 * Find a local maven artifact in the current build tree. This searches for
+	 * resources produced by the package phase of a maven build.
+	 * 
+	 * @param artifactId
+	 * @param version
+	 * @return a String representing the URL location of this bundle
+	 */
+	protected String localMavenBuildArtifact(String artifactId, String version) {
+		try {
+			File found = new MavenPackagedArtifactFinder(artifactId, version).findPackagedArtifact(new File("."));
+			String path = found.toURL().toExternalForm();
+			System.out.println("found local maven artifact " + path + " for " + artifactId + "|" + version);
+			return path;
+		}
+		catch (IOException ioEx) {
+			throw new IllegalStateException("Artifact " + artifactId + "-" + version + ".jar" + " could not be found",
+					ioEx);
+		}
+	}
 
 	/**
 	 * Bundles that should be installed before the test execution.
-	 *
+	 * 
 	 * @return the array of bundles to install
 	 */
 	protected String[] getBundleLocations() {
@@ -184,15 +187,11 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 	/**
 	 * Mandator bundles (part of the test setup).
-	 *
+	 * 
 	 * @return the array of mandatory bundle names
 	 */
 	protected String[] getMandatoryBundles() {
-		return new String[] { 
-				getJUnitLibUrl(),
-				getLog4jLibUrl(), 
-				getCommonsLoggingLibUrl(), 
-				getSpringCoreBundleUrl(), 
+		return new String[] { getJUnitLibUrl(), getLog4jLibUrl(), getCommonsLoggingLibUrl(), getSpringCoreBundleUrl(),
 				getSpringOSGiTestBundleUrl() };
 	}
 
@@ -208,7 +207,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 * OSGi platform creation. The chooseOsgiPlatform method is called to
 	 * determine what platform will be used by the test - if an invalid/null
 	 * String is returned, Equinox will be used by default.
-	 *
+	 * 
 	 * @return the OSGi platform
 	 */
 	protected OsgiPlatform createPlatform() {
@@ -217,24 +216,24 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			platformName = platformName.toLowerCase();
 
 			if (platformName.contains(FELIX_PLATFORM)) {
-                log.info("Creating Felix Platform");
-                return new FelixPlatform();
+				log.info("Creating Felix Platform");
+				return new FelixPlatform();
 
-            }
+			}
 			if (platformName.contains(KNOPFLERFISH_PLATFORM)) {
-                log.info("Creating Knopflerfish Platform");
+				log.info("Creating Knopflerfish Platform");
 				return new KnopflerfishPlatform();
-            }
-        }
+			}
+		}
 
-        log.info("Creating Equinox Platform");
+		log.info("Creating Equinox Platform");
 		return new EquinoxPlatform();
 	}
 
 	/**
 	 * Indicate what OSGi platform to be used by the test suite. By default, the
 	 * 'spring.osgi.test.framework' is used.
-	 *
+	 * 
 	 * @return platform
 	 */
 	protected String getPlatformName() {
@@ -272,7 +271,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	/**
 	 * Customized setUp - the OSGi platform will be started (if needed) and
 	 * cached for the test suite execution.
-	 *
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected final void setUp() throws Exception {
@@ -288,14 +287,15 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		setupStreams();
 
 		// start OSGi platform (the caching is done inside the method).
-        try {
-            startup();
-        } catch (Exception e) {
-            log.debug("Caught exception starting up", e);
-            throw e;
-        }
+		try {
+			startup();
+		}
+		catch (Exception e) {
+			log.debug("Caught exception starting up", e);
+			throw e;
+		}
 
-        log.debug("writing test name to stream:" + getName());
+		log.debug("writing test name to stream:" + getName());
 		// write test name to OSGi
 		outputStream.writeUTF(getName());
 		outputStream.flush();
@@ -313,7 +313,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 */
 	private void startup() throws Exception {
 		if (osgiPlatform == null) {
-			
+
 			// make sure the platform is closed properly
 			registerShutdownHook();
 
@@ -552,12 +552,12 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		super.run(result);
 	}
 
-    public final void setBundleContext(BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
-    }
+	public final void setBundleContext(BundleContext bundleContext) {
+		this.bundleContext = bundleContext;
+	}
 
-    public BundleContext getBundleContext() {
-        return bundleContext;
-    }
+	public BundleContext getBundleContext() {
+		return bundleContext;
+	}
 
 }
