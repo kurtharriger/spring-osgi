@@ -23,15 +23,16 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * OsgiServicePropertiesResolver that creats a service property set with
- * the following properties:
+ * OsgiServicePropertiesResolver that creats a service property set with the
+ * following properties:
  * <ul>
- *   <li>Bundle-SymbolicName=&lt;bundle symbolic name&gt;</li>
- *   <li>Bundle-Version=&lt;bundle version&gt;</li>
- *   <li>org.springframework.osgi.beanname="&lt;bean name&gt;</li>
+ * <li>Bundle-SymbolicName=&lt;bundle symbolic name&gt;</li>
+ * <li>Bundle-Version=&lt;bundle version&gt;</li>
+ * <li>org.springframework.osgi.beanname="&lt;bean name&gt;</li>
  * </ul>
  * 
  * @see OsgiServicePropertiesResolver
@@ -40,18 +41,22 @@ import org.springframework.util.StringUtils;
  * @author Adrian Colyer
  * @since 2.0
  */
-public class BeanNameServicePropertiesResolver implements
-		OsgiServicePropertiesResolver, BundleContextAware, InitializingBean {
+public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesResolver, BundleContextAware,
+		InitializingBean {
 
 	public static final Object BEAN_NAME_PROPERTY_KEY = "org.springframework.osgi.beanname";
 
 	private BundleContext bundleContext;
 
-	public BeanNameServicePropertiesResolver() {}
+	public BeanNameServicePropertiesResolver() {
+	}
 
-	/* (non-Javadoc)
-	   * @see org.springframework.osgi.service.OsgiServicePropertiesResolver#getServiceProperties(java.lang.Object, java.lang.String)
-	   */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.osgi.service.OsgiServicePropertiesResolver#getServiceProperties(java.lang.Object,
+	 *      java.lang.String)
+	 */
 	public Properties getServiceProperties(String beanName) {
 		Properties p = new Properties();
 		p.put(BEAN_NAME_PROPERTY_KEY, beanName);
@@ -78,13 +83,13 @@ public class BeanNameServicePropertiesResolver implements
 		this.bundleContext = context;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		if (this.bundleContext == null) {
-			throw new IllegalArgumentException("Required property bundleContext has not been set");
-		}
+		Assert.notNull(bundleContext, "required property bundleContext has not been set");
 	}
 
 }

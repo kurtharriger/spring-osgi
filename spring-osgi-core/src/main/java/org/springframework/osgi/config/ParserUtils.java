@@ -18,25 +18,23 @@ package org.springframework.osgi.config;
 
 import java.util.StringTokenizer;
 
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.ManagedList;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
+import org.springframework.core.Conventions;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 
 /**
  * @author Andy Piper
+ * @author Costin Leau
  * @since 2.1
  */
-public class ParserUtils
-{
-	public final static String LISTENER_ID = "listeners";
-	public final static String DEPENDS_ON = "depends-on";
-  public static final String LAZY_INIT = "lazy-init";
+public class ParserUtils {
 
 	public static void parseDependsOn(Attr attribute, BeanDefinitionBuilder builder) {
-		for (StringTokenizer dependents = new StringTokenizer(attribute.getValue(), ", ");
-		     dependents.hasMoreElements();) {
+		for (StringTokenizer dependents = new StringTokenizer(attribute.getValue(), ", "); dependents.hasMoreElements();) {
 			String dep = (String) dependents.nextElement();
 			if (StringUtils.hasText(dep)) {
 				builder.addDependsOn(dep);
@@ -44,16 +42,46 @@ public class ParserUtils
 		}
 	}
 
-	public static void parseListeners(Attr attribute, BeanDefinitionBuilder builder) {
-		ManagedList alist = new ManagedList();
-		for (StringTokenizer listeners = new StringTokenizer(attribute.getValue(), ", ");
-		     listeners.hasMoreElements();) {
-			String l = (String) listeners.nextElement();
-			if (StringUtils.hasText(l)) {
-				alist.add(new RuntimeBeanReference(l));
+	/**
+	 * Parse default attributes such as ID, LAZY-INIT, DEPENDS-ON.
+	 * 
+	 * @param element
+	 * @param builder
+	 */
+	public static void parseCustomAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback callback) {
+		NamedNodeMap attributes = element.getAttributes();
+
+		for (int x = 0; x < attributes.getLength(); x++) {
+			Attr attribute = (Attr) attributes.item(x);
+			String name = attribute.getLocalName();
+
+			if (BeanDefinitionParserDelegate.ID_ATTRIBUTE.equals(name)) {
+				continue;
+			}
+			else if (BeanDefinitionParserDelegate.DEPENDS_ON_ATTRIBUTE.equals(name)) {
+				builder.getBeanDefinition().setDependsOn(
+						(StringUtils.tokenizeToStringArray(attribute.getValue(),
+								BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS)));
+			}
+			else if (BeanDefinitionParserDelegate.LAZY_INIT_ATTRIBUTE.equals(name)) {
+				builder.setLazyInit(Boolean.getBoolean(attribute.getValue()));
+			}
+			else {
+				callback.process(element, attribute, builder);
 			}
 		}
-		builder.addPropertyValue(LISTENER_ID, alist);
+	}
+
+	/**
+	 * Simple callback used for parsing attributes that have not been covered by
+	 * the skipBeanAttributes method.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	public static interface AttributeCallback {
+
+		public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder);
 	}
 
 }

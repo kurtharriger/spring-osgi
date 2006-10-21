@@ -2,10 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd		
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
+	<!-- osgi:reference -->
 
 	<!-- simple one -->
 	<osgi:reference id="serializable" interface="java.io.Serializable" />
@@ -15,23 +18,32 @@
 		cardinality="0..n" />
 
 	<!-- full options -->
-    <!-- this version can only safely be tested *inside* OSGi
-         because of the creation of a filter. Commenting out for
-         now, needs to be moved into an integration test...
 	<osgi:reference id="full-options" interface="java.lang.Cloneable"
 		cardinality="1..n" context-classloader="service-provider"
-		timeout="123" filter="(c=*)" />
-     -->
+		timeout="123" filter="(c=*)">
+		<osgi:listener>
+			<bean id="listener"
+				class="org.springframework.osgi.config.DummyListener" />
+		</osgi:listener>
+		<osgi:listener bind-method="bind" unbind-method="unbind">
+			<ref bean="firstListener" />
+		</osgi:listener>
+		<osgi:listener ref="firstListener" />
+	</osgi:reference>
 
+	<bean id="firstListener"
+		class="org.springframework.osgi.config.DummyListener" />
 
-	<!-- simple service -->
-	<osgi:service id="string-service" ref="string"
-		interface="java.io.Serializable" lazy-init="true" />
 
 	<bean name="string" class="java.lang.String" />
 
-	<!-- full service -->
-	<osgi:service id="full-service" ref="string" context-classloader="service-provider">
+
+	<!-- osgi:service -->
+
+	<osgi:service interface="java.io.Serializable" lazy-init="true"
+		ref="string" />
+
+	<osgi:service context-classloader="service-provider">
 		<osgi:interfaces>
 			<value>java.io.Serializable</value>
 			<value>java.lang.Cloneable</value>
@@ -40,6 +52,25 @@
 			<prop key="foo">bar</prop>
 			<prop key="white">horse</prop>
 		</osgi:service-properties>
+		<ref local="string" />
 	</osgi:service>
 
+	<!-- osgi:property-placeholder -->
+
+	<util:properties id="external-props" location="org/springframework/osgi/config/properties.props"/>
+	
+	<!-- simple -->
+	<osgi:property-placeholder persistent-id="com.xyz.myapp" />
+	<!-- average -->
+	<osgi:property-placeholder persistent-id="com.xyz.myapp"
+		defaults-ref="external-props" />
+
+	<!-- full options -->
+	<osgi:property-placeholder persistent-id="com.xyz.myapp"
+		placeholder-prefix="#" placeholder-suffix="%">
+		<osgi:default-properties>
+			<prop key="rod">johnson</prop>
+			<prop key="rick">evans</prop>
+		</osgi:default-properties>
+	</osgi:property-placeholder>
 </beans>

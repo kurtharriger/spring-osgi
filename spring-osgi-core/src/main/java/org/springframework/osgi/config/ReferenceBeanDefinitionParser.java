@@ -16,45 +16,238 @@
  */
 package org.springframework.osgi.config;
 
+import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.RuntimeBeanNameReference;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
+import org.springframework.beans.factory.support.ManagedList;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
+import org.springframework.osgi.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Andy Piper
+ * @author Costin Leau
  * @since 2.1
  */
-class ReferenceBeanDefinitionParser extends AbstractBeanDefinitionParser
-{
+class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+
 	public static final String PROPERTIES = "properties";
+	public static final String LISTENER = "listener";
+	public static final String LISTENERS_PROPERTY = "listeners";
+	public static final String BIND_METHOD = "bind-method";
+	public static final String UNBIND_METHOD = "unbind-method";
+	public static final String REF = "ref";
 
-	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(OsgiServiceProxyFactoryBean.class);
-		NamedNodeMap attributes = element.getAttributes();
-		for (int x = 0; x < attributes.getLength(); x++) {
-			Attr attribute = (Attr) attributes.item(x);
-			String name = attribute.getLocalName();
+	static class ServiceListenerWrapper implements TargetSourceLifecycleListener, InitializingBean {
+		private Method bind, unbind;
+		private String bindMethod, unbindMethod;
+		private final Class[] METHODS_ARGS = new Class[] { String.class, Object.class };
+		private Object target;
 
-			if (ID_ATTRIBUTE.equals(name)) {
-				continue;
-			} else if (ParserUtils.DEPENDS_ON.equals(name)) {
-				ParserUtils.parseDependsOn(attribute,  builder);
-			} else if (ParserUtils.LAZY_INIT.equals(name)) {
-				builder.setLazyInit(Boolean.getBoolean(attribute.getValue()));
-			} else if (ParserUtils.LISTENER_ID.equals(name)) {
-				ParserUtils.parseListeners(attribute,  builder);
-			} else {
-				builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
-			}
+		private boolean isLifecycleListener;
+
+		public ServiceListenerWrapper(Object object) {
+			this.target = object;
 		}
 
-		parserContext.getDelegate().parsePropertyElements(element, builder.getBeanDefinition());
-		return builder.getBeanDefinition();
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+		 */
+		public void afterPropertiesSet() throws Exception {
+			Assert.notNull(target, "target property required");
+
+			isLifecycleListener = target instanceof TargetSourceLifecycleListener;
+
+			bind = determineCustomMethod(bindMethod);
+			unbind = determineCustomMethod(unbindMethod);
+
+			if (!isLifecycleListener && (bind == null || unbind == null))
+				throw new IllegalArgumentException("target object needs to implement "
+						+ TargetSourceLifecycleListener.class + " or custom bind/unbind methods have to be specified");
+		}
+
+		/**
+		 * Determine a custom method (if specified) on the given object. If the
+		 * methodName is not null and no method is found, an exception is
+		 * thrown.
+		 * 
+		 * @param methodName
+		 * @return
+		 */
+		private Method determineCustomMethod(String methodName) {
+			Method method = null;
+			if (methodName != null) {
+				method = ReflectionUtils.findMethod(target.getClass(), methodName, METHODS_ARGS);
+				if (method == null)
+					throw new IllegalArgumentException("incorrect custom method specified " + methodName);
+			}
+			return method;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.springframework.osgi.service.TargetSourceLifecycleListener#bind(java.lang.String,
+		 *      java.lang.Object)
+		 */
+		public void bind(String serviceBeanName, Object service) {
+			// first call interface method (if it exists)
+			if (isLifecycleListener)
+				((TargetSourceLifecycleListener) target).bind(serviceBeanName, service);
+
+			if (bind != null)
+				ReflectionUtils.invokeMethod(bind, target, new Object[] { serviceBeanName, service });
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.springframework.osgi.service.TargetSourceLifecycleListener#unbind(java.lang.String,
+		 *      java.lang.Object)
+		 */
+		public void unbind(String serviceBeanName, Object service) {
+			// first call interface method (if it exists)
+			if (isLifecycleListener)
+				((TargetSourceLifecycleListener) target).unbind(serviceBeanName, service);
+
+			if (unbind != null)
+				ReflectionUtils.invokeMethod(unbind, target, new Object[] { serviceBeanName, service });
+
+		}
+
+		/**
+		 * @param bindMethod The bindMethod to set.
+		 */
+		public void setBindMethod(String bindMethod) {
+			this.bindMethod = bindMethod;
+		}
+
+		/**
+		 * @param unbindMethod The unbindMethod to set.
+		 */
+		public void setUnbindMethod(String unbindMethod) {
+			this.unbindMethod = unbindMethod;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser#getBeanClass(org.w3c.dom.Element)
+	 */
+	protected Class getBeanClass(Element element) {
+		return OsgiServiceProxyFactoryBean.class;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser#doParse(org.w3c.dom.Element,
+	 *      org.springframework.beans.factory.xml.ParserContext,
+	 *      org.springframework.beans.factory.support.BeanDefinitionBuilder)
+	 */
+	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+		AbstractBeanDefinition def = (AbstractBeanDefinition) builder.getBeanDefinition();
+
+		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.springframework.osgi.config.ParserUtils.AttributeCallback#process(org.w3c.dom.Element,
+			 *      org.w3c.dom.Attr,
+			 *      org.springframework.beans.factory.support.BeanDefinitionBuilder)
+			 */
+			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
+				String name = attribute.getLocalName();
+				// ref attribute will be handled separately
+				builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
+			}
+		});
+
+		// parse subelements
+		// context.getDelegate().parsePropertyElements(element,
+		// builder.getBeanDefinition());
+		List listeners = DomUtils.getChildElementsByTagName(element, LISTENER);
+
+		ManagedList listenersRef = new ManagedList();
+		// loop on listeners
+		for (Iterator iter = listeners.iterator(); iter.hasNext();) {
+			Element listnr = (Element) iter.next();
+
+			// wrapper target object
+			Object target = null;
+
+			// filter elements
+			NodeList nl = listnr.getChildNodes();
+
+			for (int i = 0; i < nl.getLength(); i++) {
+				Node node = nl.item(i);
+				if (node instanceof Element) {
+					Element beanDef = (Element) node;
+
+					// check inline ref
+					if (listnr.hasAttribute(REF))
+						context.getReaderContext().error(
+								"nested bean declaration is not allowed if 'ref' attribute has been specified", beanDef);
+
+					target = context.getDelegate().parsePropertySubElement(beanDef, def);
+				}
+			}
+
+
+			// extract bind/unbind attributes from <osgi:listener>
+			// Element
+
+			MutablePropertyValues vals = new MutablePropertyValues();
+
+			NamedNodeMap attrs = listnr.getAttributes();
+			for (int x = 0; x < attrs.getLength(); x++) {
+				Attr attribute = (Attr) attrs.item(x);
+				String name = attribute.getLocalName();
+
+				if (REF.equals(name))
+					target = new RuntimeBeanReference(StringUtils.trimWhitespace(attribute.getValue()));
+				else
+					vals.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
+			}
+
+			// create serviceListener wrapper
+			RootBeanDefinition wrapperDef = new RootBeanDefinition(ServiceListenerWrapper.class);
+
+			ConstructorArgumentValues cav = new ConstructorArgumentValues();
+			cav.addIndexedArgumentValue(0, target);
+
+			wrapperDef.setConstructorArgumentValues(cav);
+			wrapperDef.setPropertyValues(vals);
+			listenersRef.add(wrapperDef);
+
+		}
+
+		def.getPropertyValues().addPropertyValue(LISTENERS_PROPERTY, listenersRef);
 	}
 }

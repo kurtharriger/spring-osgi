@@ -66,10 +66,7 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		}
 	}
 
-	// this test can only be run with a real framework,
-	// not against the osgi jar
-	// TODO: move to integration test
-	public void xtestAfterPropertiesSetBadFilter() {
+	public void testAfterPropertiesSetBadFilter() {
 		this.serviceFactoryBean.setBundleContext(this.bundleContext);
 		this.serviceFactoryBean.setInterface(ApplicationContext.class);
 		this.serviceFactoryBean.setTarget("this is not a valid filter expression");
@@ -90,10 +87,7 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		assertEquals(ApplicationContext.class, this.serviceFactoryBean.getObjectType());
 	}
 
-	// this test can only be run with a real framework,
-	// not against the osgi jar
-	// TODO: move to integration test
-	public void xtestGetObjectWithFilterOnly() throws Exception {
+	public void testGetObjectWithFilterOnly() throws Exception {
 		// OsgiServiceUtils are tested independently in error cases, here we
 		// test the
 		// correct behaviour of the ProxyFactoryBean when OsgiServiceUtils
@@ -147,10 +141,8 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		this.mockControl.verify();
 	}
 
-	// this test can only be run with a real framework,
-	// not against the osgi jar
-	// TODO: move to integration test
-	public void xtestGetObjectWithFilterAndBeanName() throws Exception {
+
+	public void testGetObjectWithFilterAndBeanName() throws Exception {
 		// OsgiServiceUtils are tested independently in error cases, here we
 		// test the
 		// correct behaviour of the ProxyFactoryBean when OsgiServiceUtils

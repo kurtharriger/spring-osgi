@@ -19,7 +19,6 @@ package org.springframework.osgi.config;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.osgi.context.BundleFactoryBean;
-import org.springframework.osgi.service.OsgiServiceExporter;
 import org.w3c.dom.Element;
 
 /**
@@ -33,14 +32,12 @@ public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
 	 * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
 	 */
 	public void init() {
-		registerBeanDefinitionParser("service", new ServiceBeanDefinitionParser());
 		registerBeanDefinitionParser("reference", new ReferenceBeanDefinitionParser());
-		registerBeanDefinitionParser("bundle", new DependentAbstractSingleBeanDefinitionParser() {
-			protected Class getBeanClass(Element element) {
-				return BundleFactoryBean.class;
-			}
-		});
-		registerBeanDefinitionParser("virtual-bundle", new VirtualBundleBeanDefinitionParser());
+		
+		registerBeanDefinitionParser("service", new ServiceBeanDefinitionParser());
+
+		registerBeanDefinitionParser("property-placeholder", new OsgiPropertyPlaceholderDefinitionParser());
+		
 		registerBeanDefinitionParser("config", new AbstractSimpleBeanDefinitionParser() {
 			protected Class getBeanClass(Element element) {
 				return OsgiConfig.class;
@@ -50,13 +47,14 @@ public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
 				return true;
 			}
 		});
-		registerBeanDefinitionParser("property-placeholder", new AbstractSimpleBeanDefinitionParser() {
 
-			protected Class getBeanClass(Element arg0) {
-				throw new UnsupportedOperationException("property-placeholder tag not supported yet");
+		registerBeanDefinitionParser("bundle", new DependentAbstractSingleBeanDefinitionParser() {
+			protected Class getBeanClass(Element element) {
+				return BundleFactoryBean.class;
 			}
-
 		});
+
+		registerBeanDefinitionParser("virtual-bundle", new VirtualBundleBeanDefinitionParser());
 	}
 
 }

@@ -48,7 +48,7 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListen
 	private boolean serviceUnavailable = false;
 	private int maxRetries = OsgiServiceProxyFactoryBean.DEFAULT_MAX_RETRIES;
 	private long retryIntervalMillis = OsgiServiceProxyFactoryBean.DEFAULT_MILLIS_BETWEEN_RETRIES;
-	private List listeners;
+	//private List listeners;
 
 	/**
 	 * @param context
@@ -61,13 +61,13 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListen
 			ServiceReference reference,
 			HotSwappableTargetSource targetSource,
 			Class serviceType,
-			String lookupFilter, List listeners) {
+			String lookupFilter) {
 		this.bundleContext = context;
 		this.serviceReference = reference;
 		this.targetSource = targetSource;
 		this.serviceType = serviceType;
 		this.lookupFilter = lookupFilter;
-		this.listeners = listeners;
+		//this.listeners = listeners;
 		registerAsServiceListener();
 	}
 
@@ -131,13 +131,13 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListen
 			// something has changed in the target service
 			switch (event.getType()) {
 				case ServiceEvent.REGISTERED:
-					handleServiceAvailable();
+					//handleServiceAvailable();
 					break;
 				case ServiceEvent.UNREGISTERING:
-					handleServiceUnavailable();
+					//handleServiceUnavailable();
 					break;
 				case ServiceEvent.MODIFIED:
-					handleServiceModified();
+					//handleServiceModified();
 					break;
 				default:
 					throw new IllegalStateException("Unrecognised OSGi ServiceEvent type: " + event.getType());
@@ -145,54 +145,54 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListen
 		}
 	}
 
-	private synchronized void handleServiceAvailable() {
-		if (!listeners.isEmpty()) {
-			for (Iterator i = listeners.iterator(); i.hasNext();) {
-				ServiceLifecycleListener slc = (ServiceLifecycleListener) i.next();
-				if (slc instanceof ServiceActivationLifecycleListener) {
-					((ServiceActivationLifecycleListener) slc).activate(serviceType);
-				}
-			}
-		}
-	}
-
-	/**
-	 * The target service has been modified, rebind to it
-	 */
-	private synchronized void handleServiceModified() {
-		Object newTarget = this.bundleContext.getService(this.serviceReference);
-		this.targetSource.swap(newTarget);
-		log.info("Target OSGi service of type '" + this.serviceType +
-				"' matched by filter '" + this.lookupFilter + "' was rebound.");
-				if (!listeners.isEmpty()) {
-			for (Iterator i = listeners.iterator(); i.hasNext();) {
-				ServiceLifecycleListener slc = (ServiceLifecycleListener) i.next();
-				if (slc instanceof ServiceRebindLifecycleListener) {
-					((ServiceRebindLifecycleListener) slc).rebind(serviceType);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Servcie has gone away.
-	 */
-	private synchronized void handleServiceUnavailable() {
-		if (log.isInfoEnabled()) {
-			log.info("Target OSGi service of type '" + this.serviceType +
-					"' matched by filter '" + this.lookupFilter + "' has been unregistered.");
-		}
-		this.serviceUnavailable = true;
-		if (!listeners.isEmpty()) {
-			for (Iterator i = listeners.iterator(); i.hasNext();) {
-				ServiceLifecycleListener slc = (ServiceLifecycleListener) i.next();
-				if (slc instanceof ServiceDeactivationLifecycleListener) {
-					((ServiceDeactivationLifecycleListener) slc).deactivate(serviceType);
-				}
-			}
-		}
-	}
-
+//	private synchronized void handleServiceAvailable() {
+//		if (!listeners.isEmpty()) {
+//			for (Iterator i = listeners.iterator(); i.hasNext();) {
+//				ServiceLifecycleListener slc = (ServiceLifecycleListener) i.next();
+//				if (slc instanceof ServiceActivationLifecycleListener) {
+//					((ServiceActivationLifecycleListener) slc).activate(serviceType);
+//				}
+//			}
+//		}
+//	}
+//
+//	/**
+//	 * The target service has been modified, rebind to it
+//	 */
+//	private synchronized void handleServiceModified() {
+//		Object newTarget = this.bundleContext.getService(this.serviceReference);
+//		this.targetSource.swap(newTarget);
+//		log.info("Target OSGi service of type '" + this.serviceType +
+//				"' matched by filter '" + this.lookupFilter + "' was rebound.");
+//				if (!listeners.isEmpty()) {
+//			for (Iterator i = listeners.iterator(); i.hasNext();) {
+//				ServiceLifecycleListener slc = (ServiceLifecycleListener) i.next();
+//				if (slc instanceof ServiceRebindLifecycleListener) {
+//					((ServiceRebindLifecycleListener) slc).rebind(serviceType);
+//				}
+//			}
+//		}
+//	}
+//
+//	/**
+//	 * Servcie has gone away.
+//	 */
+//	private synchronized void handleServiceUnavailable() {
+//		if (log.isInfoEnabled()) {
+//			log.info("Target OSGi service of type '" + this.serviceType +
+//					"' matched by filter '" + this.lookupFilter + "' has been unregistered.");
+//		}
+//		this.serviceUnavailable = true;
+//		if (!listeners.isEmpty()) {
+//			for (Iterator i = listeners.iterator(); i.hasNext();) {
+//				ServiceLifecycleListener slc = (ServiceLifecycleListener) i.next();
+//				if (slc instanceof ServiceDeactivationLifecycleListener) {
+//					((ServiceDeactivationLifecycleListener) slc).deactivate(serviceType);
+//				}
+//			}
+//		}
+//	}
+//
 	private synchronized boolean rebindToService() {
 		log.info("Attempting to rebind to OSGi service of type '" + this.serviceType +
 				"' using filter '" + this.lookupFilter + "'.");
@@ -206,7 +206,7 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListen
 		}
 
 		this.serviceReference = ref;
-		handleServiceModified();
+		//handleServiceModified();
 		this.serviceUnavailable = false;
 		return true;
 	}

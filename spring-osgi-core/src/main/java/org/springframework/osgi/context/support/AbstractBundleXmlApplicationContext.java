@@ -203,12 +203,7 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 			}
 		}
 		catch (IllegalStateException alreadyUnregisteredException) {
-			// TODO: I don't like silently swallowing this
-			// since we don't expect anyone else to have unregistered the
-			// service,
-			// we should probably log this (nothing more severe since we're
-			// shutting down
-			// anyway).
+			logger.warn("exception thrown while shutting down service " + alreadyUnregisteredException);
 		}
 		super.close();
 	}
