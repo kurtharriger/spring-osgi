@@ -1,5 +1,5 @@
 Bundle-Version: 2.4
-Bundle-ManifestVersion: 2.0
+Bundle-ManifestVersion: 2
 Bundle-SymbolicName: javax.servlet
 Bundle-Name: Servlet API
 Export-Package: javax.servlet,
