@@ -381,6 +381,7 @@ limitations under the License.
   </repositories>
 
   <pluginRepositories>
+    <!--
     <pluginRepository>
       <snapshots>
         <enabled>true</enabled>
@@ -389,6 +390,7 @@ limitations under the License.
       <name>Apache Snapshots</name>
       <url>http://cvs.apache.org/maven-snapshot-repository/</url>
     </pluginRepository>
+    -->
   </pluginRepositories>
 
 </project>
