@@ -41,6 +41,7 @@
             <version>3.8.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+	<!--
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
@@ -62,6 +63,7 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+	-->
         <dependency>
             <groupId>org.knopflerfish</groupId>
             <artifactId>framework</artifactId>
