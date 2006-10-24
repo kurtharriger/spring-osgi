@@ -16,7 +16,6 @@
 package org.springframework.osgi.config;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Properties;
@@ -29,9 +28,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.support.PropertiesLoaderSupport;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
-import org.springframework.osgi.context.support.OsgiPropertyPlaceholder;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.service.OsgiServiceExporter;
 import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
@@ -51,7 +48,7 @@ public class OsgiNamespaceHandlerTest extends TestCase {
 
 	ServiceReference mockReference;
 
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		bundleContext = new MockBundleContext();
 		bundle = bundleContext.getBundle();
 
@@ -114,41 +111,4 @@ public class OsgiNamespaceHandlerTest extends TestCase {
 		prop.setProperty("white", "horse");
 		assertEquals(prop, exporter.getServiceProperties());
 	}
-
-	public void testSimplePlaceholder() throws Exception {
-		OsgiPropertyPlaceholder simple = (OsgiPropertyPlaceholder) appContext.getBean(OsgiPropertyPlaceholder.class.getName());
-		assertEquals("com.xyz.myapp", simple.getPersistentId());
-	}
-
-	public void testAveragePlaceholder() throws Exception {
-		OsgiPropertyPlaceholder average = (OsgiPropertyPlaceholder) appContext.getBean(OsgiPropertyPlaceholder.class.getName()
-				+ "#1");
-		assertEquals("com.xyz.myapp", average.getPersistentId());
-		Properties[] props = (Properties[]) getField(average, PropertiesLoaderSupport.class, "localProperties");
-		assertEquals(1, props.length);
-
-		assertEquals(appContext.getBean("external-props"), props[0]);
-	}
-
-	public void testFullPlaceholder() throws Exception {
-		OsgiPropertyPlaceholder full = (OsgiPropertyPlaceholder) appContext.getBean(OsgiPropertyPlaceholder.class.getName()
-				+ "#2");
-		assertEquals("com.xyz.myapp", full.getPersistentId());
-		
-		Properties[] props = (Properties[]) getField(full, PropertiesLoaderSupport.class, "localProperties");
-		assertEquals(1, props.length);
-
-		Properties correctProperties = new Properties();
-		correctProperties.setProperty("rod", "johnson");
-		correctProperties.setProperty("rick", "evans");
-
-		assertEquals(correctProperties, props[0]);
-	}
-
-	private Object getField(Object target, Class clazz, String fieldName) throws Exception {
-		Field field = clazz.getDeclaredField(fieldName);
-		field.setAccessible(true);
-		return field.get(target);
-	}
-
 }
