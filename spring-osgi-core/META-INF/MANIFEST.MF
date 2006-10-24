@@ -9,6 +9,7 @@ Bundle-Vendor: Spring Framework
 Import-Package: org.apache.commons.logging,
    org.osgi.framework,
    org.osgi.service.startlevel,
+   org.osgi.service.cm;version=1.2;resolution:=optional, 
    org.springframework.aop;version=2.1.0,
    org.springframework.aop.framework;version=2.1.0,
    org.springframework.aop.target;version=2.1.0,
