@@ -114,6 +114,7 @@
 					<xsd:element name="config-listener" type="TconfigListener"/>
 				</xsd:sequence>
 		    	<xsd:attribute name="persistent-id" type="xsd:string" use="required"/>
+		    	<xsd:attribute name="factory" type="xsd:boolean" default="false"/>
 			</xsd:extension>
 		</xsd:complexContent>
     </xsd:complexType>
@@ -121,6 +122,7 @@
 	<xsd:complexType name="TconfigListener">
 		<xsd:attribute name="ref" type="xsd:string" use="required"/>
 		<xsd:attribute name="update-method" type="xsd:string" use="required"/>
+		<xsd:attribute name="deleted-method" type="xsd:string" use="optional"/>
 	</xsd:complexType>
 
 	<!-- bundle -->
