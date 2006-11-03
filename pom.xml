@@ -241,8 +241,7 @@ limitations under the License.
     </profile>
     <profile>
       <id>felix</id>
-      <dependencies>
-       
+      <dependencies>       
         <dependency>
           <groupId>org.apache.felix</groupId>
           <artifactId>org.apache.felix.framework</artifactId>
@@ -267,7 +266,7 @@ limitations under the License.
       </dependencies>
       <properties>
         <osgi.test.platform>felix</osgi.test.platform>
-		<org.osgi.vendor.framework>org.apache.felix.framework</org.osgi.vendor.framework>
+		<org.osgi.vendor.framework>org.osgi.framework</org.osgi.vendor.framework>
       </properties>
     </profile>
   </profiles>
@@ -356,7 +355,6 @@ limitations under the License.
   <!-- ================================================ -->
 
   <repositories>
-    <!--
     <repository>
       <snapshots>
         <enabled>true</enabled>
@@ -365,7 +363,6 @@ limitations under the License.
       <name>Apache Snapshots</name>
       <url>http://cvs.apache.org/maven-snapshot-repository</url>
     </repository>
-    -->
     <repository>
       <id>safehaus-repository</id>
       <name>Safehaus Repository</name>
