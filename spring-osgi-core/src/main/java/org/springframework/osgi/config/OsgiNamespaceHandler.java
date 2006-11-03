@@ -38,15 +38,7 @@ public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
 
 		registerBeanDefinitionParser("property-placeholder", new OsgiPropertyPlaceholderDefinitionParser());
 		
-		registerBeanDefinitionParser("config", new AbstractSimpleBeanDefinitionParser() {
-			protected Class getBeanClass(Element element) {
-				return OsgiConfig.class;
-			}
-
-			protected boolean autogenerateId() {
-				return true;
-			}
-		});
+		registerBeanDefinitionParser("config", new OsgiConfigDefinitionParser());
 
 		registerBeanDefinitionParser("bundle", new DependentAbstractSingleBeanDefinitionParser() {
 			protected Class getBeanClass(Element element) {
