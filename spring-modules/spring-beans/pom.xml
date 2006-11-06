@@ -22,7 +22,10 @@
         <executions>
           <execution>
             <id>unpack</id>
-            <phase>compile</phase>
+            <!-- Because we are overwriting the spring.handlers/schemas resources, the
+                 unpacking has to occur before the resources are copied from the local
+                 build -->
+            <phase>generate-resources</phase>
             <goals>
               <goal>unpack</goal>
             </goals>

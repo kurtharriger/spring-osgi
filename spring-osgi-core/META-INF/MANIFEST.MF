@@ -36,5 +36,6 @@ Export-Package: org.springframework.osgi.bundle.support;version=2.1.0,
    org.springframework.osgi.service;version=2.1.0
 DynamicImport-Package: org.springframework.web.context;version=2.1.0,
    org.springframework.web.context.support;version=2.1.0,
-   org.w3c.dom
+   org.w3c.dom,
+   org.osgi.service.cm;version=1.2
 Bundle-Activator: org.springframework.osgi.context.ContextLoaderListener
