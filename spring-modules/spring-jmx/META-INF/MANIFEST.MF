@@ -32,5 +32,6 @@ Export-Package: org.springframework.jmx;version=2.1,
    org.springframework.jmx.export.naming;version=2.1,
    org.springframework.jmx.export.notification;version=2.1,
    org.springframework.jmx.support;version=2.1
+DynamicImport-Package: weblogic.management
 Bundle-ClassPath: .,
  target/classes/
