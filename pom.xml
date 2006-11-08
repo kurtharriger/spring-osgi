@@ -162,7 +162,6 @@ limitations under the License.
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    <!-- todo: add dependency on osgi.jar -->
   </dependencies>
 
   <build>
@@ -191,11 +190,12 @@ limitations under the License.
               <name>org.springframework.osgi.test.framework</name>
               <value>${osgi.test.platform}</value>
             </property>
-            <!-- required by felix case -->
+            <!-- 
             <property>
               <name>org.osgi.vendor.framework</name>
               <value>${org.osgi.vendor.framework}</value>
             </property>
+             -->
           </systemProperties>
         </configuration>
       </plugin>
@@ -262,11 +262,11 @@ limitations under the License.
           <version>0.8.0-SNAPSHOT</version>
           <type>jar</type>
           <scope>runtime</scope>
-        </dependency>        
+        </dependency>      
       </dependencies>
       <properties>
         <osgi.test.platform>felix</osgi.test.platform>
-		<org.osgi.vendor.framework>org.osgi.framework</org.osgi.vendor.framework>
+		<!-- <org.osgi.vendor.framework>org.apache.felix.framework</org.osgi.vendor.framework>  -->
       </properties>
     </profile>
   </profiles>
@@ -385,6 +385,14 @@ limitations under the License.
       <id>apache.snapshots</id>
       <name>Apache Snapshots</name>
       <url>http://cvs.apache.org/maven-snapshot-repository/</url>
+    </pluginRepository>
+    <pluginRepository>
+    	<snapshots>
+    	  <enabled>true</enabled>
+    	</snapshots>
+    	<id>codehaus-snapshot-repository</id>
+    	<name>Codehaus Snapshots Repository</name>
+    	<url>http://snapshots.repository.codehaus.org</url>
     </pluginRepository>
   </pluginRepositories>
 
