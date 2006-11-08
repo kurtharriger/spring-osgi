@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -172,6 +173,10 @@ public class OsgiPropertyPlaceholder extends PropertyPlaceholderConfigurer imple
 		// placeholder
 		cmProperties = new Properties();
 		Dictionary dict = config.getProperties();
+		if (dict == null) {
+		    dict = new Hashtable();
+		}
+
 		// copy dictionary into properties
 		for (Enumeration keys = dict.keys(); keys.hasMoreElements();) {
 			Object key = keys.nextElement();
