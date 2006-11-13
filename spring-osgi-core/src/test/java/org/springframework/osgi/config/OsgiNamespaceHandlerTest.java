@@ -79,7 +79,7 @@ public class OsgiNamespaceHandlerTest extends TestCase {
 		OsgiServiceProxyFactoryBean factory = (OsgiServiceProxyFactoryBean) appContext.getBean("&full-options");
 		TargetSourceLifecycleListener[] listeners = factory.getListeners();
 		assertNotNull(listeners);
-		assertEquals(3, listeners.length);
+		assertEquals(5, listeners.length);
 
 		assertEquals(0, DummyListener.BIND_CALLS);
 		assertEquals(0, DummyListener.UNBIND_CALLS);
@@ -90,7 +90,19 @@ public class OsgiNamespaceHandlerTest extends TestCase {
 
 		listeners[1].unbind(null, null);
 		assertEquals(2, DummyListener.UNBIND_CALLS);
-	}
+
+        listeners[3].bind(null, null);
+        assertEquals(1, DummyListenerServiceSignature.BIND_CALLS);
+
+        listeners[3].unbind(null, null);
+        assertEquals(1, DummyListenerServiceSignature.UNBIND_CALLS);
+
+        listeners[4].bind(null, null);
+        assertEquals(1, DummyListenerServiceSignature2.BIND_CALLS);
+
+        listeners[4].unbind(null, null);
+        assertEquals(1, DummyListenerServiceSignature2.UNBIND_CALLS);
+    }
 
 	public void testSimpleService() throws Exception {
 		Object bean = appContext.getBean(OsgiServiceExporter.class.getName());
