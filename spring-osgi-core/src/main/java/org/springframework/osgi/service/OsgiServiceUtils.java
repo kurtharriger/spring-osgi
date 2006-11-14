@@ -20,6 +20,7 @@ package org.springframework.osgi.service;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.springframework.util.Assert;
 
 /**
  * Utility class offering easy access to OSGi services
@@ -46,7 +47,9 @@ public class OsgiServiceUtils {
 	public static ServiceReference getService(BundleContext context, Class serviceClass, String filter)
 	throws NoSuchServiceException, AmbiguousServiceReferenceException, IllegalArgumentException 
 	{
-		try {
+        Assert.notNull(context, "context cannot be null");
+        Assert.notNull(serviceClass, "serviceClass cannot be null");
+        try {
 			ServiceReference[] serviceReferences = 
 				context.getServiceReferences(serviceClass.getName(),filter);
 			if (serviceReferences == null || serviceReferences.length == 0) {
