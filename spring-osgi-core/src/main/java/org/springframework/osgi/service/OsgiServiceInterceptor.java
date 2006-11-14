@@ -48,9 +48,10 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListen
 	private boolean serviceUnavailable = false;
 	private int maxRetries = OsgiServiceProxyFactoryBean.DEFAULT_MAX_RETRIES;
 	private long retryIntervalMillis = OsgiServiceProxyFactoryBean.DEFAULT_MILLIS_BETWEEN_RETRIES;
-	//private List listeners;
+    private String beanName;
+    private TargetSourceLifecycleListener[] listeners;
 
-	/**
+    /**
 	 * @param context
 	 * @param reference
 	 * @param targetSource
@@ -62,13 +63,25 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListen
 			HotSwappableTargetSource targetSource,
 			Class serviceType,
 			String lookupFilter) {
+        this(context,reference,targetSource, serviceType, lookupFilter, null, null);
+    }
+
+    public OsgiServiceInterceptor(
+			BundleContext context,
+			ServiceReference reference,
+			HotSwappableTargetSource targetSource,
+			Class serviceType,
+			String lookupFilter,
+            TargetSourceLifecycleListener[] listeners,
+            String beanName) {
 		this.bundleContext = context;
 		this.serviceReference = reference;
 		this.targetSource = targetSource;
 		this.serviceType = serviceType;
 		this.lookupFilter = lookupFilter;
-		//this.listeners = listeners;
-		registerAsServiceListener();
+        this.listeners = listeners;
+        this.beanName = beanName;
+        registerAsServiceListener();
 	}
 
 
@@ -131,10 +144,10 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListen
 			// something has changed in the target service
 			switch (event.getType()) {
 				case ServiceEvent.REGISTERED:
-					//handleServiceAvailable();
+					serviceRegistered();
 					break;
 				case ServiceEvent.UNREGISTERING:
-					//handleServiceUnavailable();
+					serviceUnregistering();
 					break;
 				case ServiceEvent.MODIFIED:
 					//handleServiceModified();
@@ -145,55 +158,33 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListen
 		}
 	}
 
-//	private synchronized void handleServiceAvailable() {
-//		if (!listeners.isEmpty()) {
-//			for (Iterator i = listeners.iterator(); i.hasNext();) {
-//				ServiceLifecycleListener slc = (ServiceLifecycleListener) i.next();
-//				if (slc instanceof ServiceActivationLifecycleListener) {
-//					((ServiceActivationLifecycleListener) slc).activate(serviceType);
-//				}
-//			}
-//		}
-//	}
-//
-//	/**
-//	 * The target service has been modified, rebind to it
-//	 */
-//	private synchronized void handleServiceModified() {
-//		Object newTarget = this.bundleContext.getService(this.serviceReference);
-//		this.targetSource.swap(newTarget);
-//		log.info("Target OSGi service of type '" + this.serviceType +
-//				"' matched by filter '" + this.lookupFilter + "' was rebound.");
-//				if (!listeners.isEmpty()) {
-//			for (Iterator i = listeners.iterator(); i.hasNext();) {
-//				ServiceLifecycleListener slc = (ServiceLifecycleListener) i.next();
-//				if (slc instanceof ServiceRebindLifecycleListener) {
-//					((ServiceRebindLifecycleListener) slc).rebind(serviceType);
-//				}
-//			}
-//		}
-//	}
-//
-//	/**
-//	 * Servcie has gone away.
-//	 */
-//	private synchronized void handleServiceUnavailable() {
-//		if (log.isInfoEnabled()) {
-//			log.info("Target OSGi service of type '" + this.serviceType +
-//					"' matched by filter '" + this.lookupFilter + "' has been unregistered.");
-//		}
-//		this.serviceUnavailable = true;
-//		if (!listeners.isEmpty()) {
-//			for (Iterator i = listeners.iterator(); i.hasNext();) {
-//				ServiceLifecycleListener slc = (ServiceLifecycleListener) i.next();
-//				if (slc instanceof ServiceDeactivationLifecycleListener) {
-//					((ServiceDeactivationLifecycleListener) slc).deactivate(serviceType);
-//				}
-//			}
-//		}
-//	}
-//
-	private synchronized boolean rebindToService() {
+    private void serviceRegistered() {
+        if (listeners == null) {
+            return;
+        }
+        for (int i = 0; i < listeners.length; i++) {
+            try {
+                listeners[i].bind(beanName, this);
+            } catch (Throwable e) {
+                log.error("Exception in listener when binding service", e);
+            }
+        }
+    }
+
+    private void serviceUnregistering() {
+        if (listeners == null) {
+            return;
+        }
+        for (int i = 0; i < listeners.length; i++) {
+            try {
+                listeners[i].unbind(beanName, this);
+            } catch (Throwable e) {
+                log.error("Exception in listener when unbinding service", e);
+            }
+        }
+    } 
+
+    private synchronized boolean rebindToService() {
 		log.info("Attempting to rebind to OSGi service of type '" + this.serviceType +
 				"' using filter '" + this.lookupFilter + "'.");
 		ServiceReference ref = findService();

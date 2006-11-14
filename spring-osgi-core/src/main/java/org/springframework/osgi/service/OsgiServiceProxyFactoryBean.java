@@ -19,10 +19,7 @@ package org.springframework.osgi.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
+import org.osgi.framework.*;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.HotSwappableTargetSource;
 import org.springframework.beans.BeanWrapper;
@@ -48,6 +45,7 @@ import org.springframework.util.StringUtils;
  * rebind to a new service instance if one is available.
  * 
  * @author Adrian Colyer
+ * @author Hal Hildebrand
  * @since 2.0
  */
 public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean, BundleContextAware,
@@ -83,7 +81,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		public static final int C_1__N = 3;
 	}
 
-	/**
+    /**
 	 * Logger, available to subclasses.
 	 */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -124,11 +122,11 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	// reference to our app context (we need the classloader for proxying...)
 	private ApplicationContext applicationContext;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
-	 */
+    /*
+      * (non-Javadoc)
+      *
+      * @see org.springframework.beans.factory.FactoryBean#getObject()
+      */
 	public Object getObject() throws Exception {
 		// try to find the service
 		String lookupFilter = getFilterStringForServiceLookup();
@@ -162,10 +160,10 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 			}
 		} while (this.serviceReference == null && numAttempts <= this.retryTimes && retryOnUnregisteredService);
 		Object target = this.bundleContext.getService(this.serviceReference);
-		// Apply any service properties to the underlying bean
+        // Apply any service properties to the underlying bean
 		applyServiceProperties(target);
-		return getServiceProxyFor(target, lookupFilter);
-	}
+		return getServiceProxyFor(target, lookupFilter); 
+    }
 
 	private void applyServiceProperties(Object target) {
 		if (properties != null) {
@@ -450,10 +448,10 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
-		if (this.serviceReference != null) {
-			this.bundleContext.ungetService(this.serviceReference);
-		}
-	}
+        if (this.serviceReference != null) {
+            this.bundleContext.ungetService(this.serviceReference);
+        }
+    }
 
 	/**
 	 * We proxy the actual service so that we can listen to service events and
@@ -470,7 +468,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 		// TODO: add listeners to the interceptor
 		OsgiServiceInterceptor interceptor = new OsgiServiceInterceptor(this.bundleContext, this.serviceReference,
-				targetSource, getInterface(), lookupFilter);
+				                                                        targetSource, getInterface(),
+                                                                        lookupFilter, listeners, beanName);
 		interceptor.setMaxRetries(this.retryOnUnregisteredService ? this.retryTimes : 0);
 		interceptor.setRetryIntervalMillis(this.retryDelayMs);
 
@@ -531,5 +530,4 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	public void setListeners(TargetSourceLifecycleListener[] listeners) {
 		this.listeners = listeners;
 	}
-
 }
