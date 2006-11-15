@@ -18,71 +18,29 @@
 package org.springframework.osgi.service;
 
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
-import org.springframework.aop.MethodBeforeAdvice;
+import org.springframework.aop.MethodBeforeAdvice; 
 import org.springframework.aop.target.HotSwappableTargetSource;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.BundleContext;
 
 /**
  * @author Adrian Colyer
+ * @author Hal Hildebrand
  * @since 2.0
  */
-public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListener
-{
-
-	private static final Log log = LogFactory.getLog(OsgiServiceInterceptor.class);
-
-	private final BundleContext bundleContext;
+public class OsgiServiceInterceptor implements MethodBeforeAdvice {
 	private final HotSwappableTargetSource targetSource;
 	private final Class serviceType;
-	private final String lookupFilter;
-
-	private ServiceReference serviceReference;
-	private boolean serviceUnavailable = false;
 	private int maxRetries = OsgiServiceProxyFactoryBean.DEFAULT_MAX_RETRIES;
 	private long retryIntervalMillis = OsgiServiceProxyFactoryBean.DEFAULT_MILLIS_BETWEEN_RETRIES;
-    private String beanName;
-    private TargetSourceLifecycleListener[] listeners;
 
-    /**
-	 * @param context
-	 * @param reference
-	 * @param targetSource
-	 * @param listeners
-	 */
-	public OsgiServiceInterceptor(
-			BundleContext context,
-			ServiceReference reference,
-			HotSwappableTargetSource targetSource,
-			Class serviceType,
-			String lookupFilter) {
-        this(context,reference,targetSource, serviceType, lookupFilter, null, null);
-    }
-
-    public OsgiServiceInterceptor(
-			BundleContext context,
-			ServiceReference reference,
-			HotSwappableTargetSource targetSource,
-			Class serviceType,
-			String lookupFilter,
-            TargetSourceLifecycleListener[] listeners,
-            String beanName) {
-		this.bundleContext = context;
-		this.serviceReference = reference;
+    public OsgiServiceInterceptor(HotSwappableTargetSource targetSource, Class serviceType) {
 		this.targetSource = targetSource;
 		this.serviceType = serviceType;
-		this.lookupFilter = lookupFilter;
-        this.listeners = listeners;
-        this.beanName = beanName;
-        registerAsServiceListener();
-	}
+    }
 
 
 	/**
@@ -109,111 +67,17 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice, ServiceListen
 	 * @see org.springframework.aop.MethodBeforeAdvice#before(java.lang.reflect.Method, java.lang.Object[], java.lang.Object)
 	 */
 	public synchronized void before(Method method, Object[] args, Object target) throws Throwable {
-		if (this.serviceUnavailable) {
-			int numAttempts = 0;
-			while ((numAttempts++ < this.maxRetries) && !rebindToService()) {
-				Thread.sleep(this.retryIntervalMillis);
-			}
-			if (this.serviceUnavailable) {
-				// no luck!
-				throw new ServiceUnavailableException(
-						"The target OSGi service of type '" + this.serviceType +
-								"' matching filter '" + this.lookupFilter + "' was unregistered " +
-								"and no suitable replacement was found after retrying " +
-								this.maxRetries + " times.",
-						this.serviceType,
-						this.lookupFilter);
-			}
-		}
-	}
-
-	/**
-	 * Start listening to service events in case the service we are proxying
-	 * becomes unavailable.
-	 */
-	private void registerAsServiceListener() {
-		this.bundleContext.addServiceListener(this);
-	}
-
-
-	/* (non-Javadoc)
-		 * @see org.osgi.framework.ServiceListener#serviceChanged(org.osgi.framework.ServiceEvent)
-		 */
-	public void serviceChanged(ServiceEvent event) {
-		if (event.getServiceReference().equals(this.serviceReference)) {
-			// something has changed in the target service
-			switch (event.getType()) {
-				case ServiceEvent.REGISTERED:
-					serviceRegistered();
-					break;
-				case ServiceEvent.UNREGISTERING:
-					serviceUnregistering();
-					break;
-				case ServiceEvent.MODIFIED:
-					//handleServiceModified();
-					break;
-				default:
-					throw new IllegalStateException("Unrecognised OSGi ServiceEvent type: " + event.getType());
-			}
-		}
-	}
-
-    private void serviceRegistered() {
-        if (listeners == null) {
-            return;
+        int numAttempts = 0;
+        while (targetSource.getTarget() == null && (numAttempts++ < this.maxRetries)) {
+            Thread.sleep(this.retryIntervalMillis);
         }
-        for (int i = 0; i < listeners.length; i++) {
-            try {
-                listeners[i].bind(beanName, this);
-            } catch (Throwable e) {
-                log.error("Exception in listener when binding service", e);
-            }
+        if (targetSource.getTarget() == null) {
+            // no luck!
+            throw new ServiceUnavailableException(
+                    "The target OSGi service of type '" + "was unregistered " +
+                    "and no suitable replacement was found after retrying " +
+                    this.maxRetries + " times.",
+                    this.serviceType, null);
         }
     }
-
-    private void serviceUnregistering() {
-        if (listeners == null) {
-            return;
-        }
-        for (int i = 0; i < listeners.length; i++) {
-            try {
-                listeners[i].unbind(beanName, this);
-            } catch (Throwable e) {
-                log.error("Exception in listener when unbinding service", e);
-            }
-        }
-    } 
-
-    private synchronized boolean rebindToService() {
-		log.info("Attempting to rebind to OSGi service of type '" + this.serviceType +
-				"' using filter '" + this.lookupFilter + "'.");
-		ServiceReference ref = findService();
-		if (ref == null) {
-			if (log.isInfoEnabled()) {
-				log.info("No target OSGi service of type '" + this.serviceType +
-						"' matching filter '" + this.lookupFilter + "' is available.");
-			}
-			return false;
-		}
-
-		this.serviceReference = ref;
-		//handleServiceModified();
-		this.serviceUnavailable = false;
-		return true;
-	}
-
-	private ServiceReference findService() {
-		// first try to find one that is guaranteed compatible
-		ServiceReference[] sRefs = OsgiServiceUtils.getServices(this.bundleContext, this.serviceType, this.lookupFilter);
-		if (sRefs == null || sRefs.length == 0) {
-			// then try to find one that *may* be compatible
-			// TODO: make this second step optional
-			sRefs = OsgiServiceUtils.getAllServices(this.bundleContext, this.serviceType, this.lookupFilter);
-		}
-		if (sRefs != null && sRefs.length > 0) {
-			return sRefs[0];
-		} else {
-			return null;
-		}
-	}
 }

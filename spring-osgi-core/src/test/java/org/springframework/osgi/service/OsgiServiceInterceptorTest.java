@@ -17,8 +17,6 @@
  */
 package org.springframework.osgi.service;
 
-import java.util.ArrayList;
-
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
@@ -30,6 +28,7 @@ import org.springframework.aop.target.HotSwappableTargetSource;
 
 /**
  * @author Adrian Colyer
+ * @author Hal Hildebrand
  * @since 2.0
  */
 public class OsgiServiceInterceptorTest extends TestCase {
@@ -57,12 +56,9 @@ public class OsgiServiceInterceptorTest extends TestCase {
 	 */
 	private void createInterceptor() {
 		this.interceptor = new OsgiServiceInterceptor(
-				this.bundleContext,
-				this.serviceRef,
-				this.tgtSource,
-				SI.class,
-				"(attr=value)"
-				);
+                this.tgtSource,
+				SI.class
+        );
 	}
 
 	public void tstServiceModified() {
@@ -76,8 +72,6 @@ public class OsgiServiceInterceptorTest extends TestCase {
 		createInterceptor();
 		assertSame("should have original target",this.targetObject,
 				this.tgtSource.getTarget());
-		ServiceEvent event = new ServiceEvent(ServiceEvent.MODIFIED,this.serviceRef);
-		this.interceptor.serviceChanged(event);
 		
 		this.mockContextControl.verify();
 		assertSame("target has been swapped",newTarget,this.tgtSource.getTarget());
@@ -101,8 +95,6 @@ public class OsgiServiceInterceptorTest extends TestCase {
 		createInterceptor();
 		assertSame("should have original target",this.targetObject,
 				this.tgtSource.getTarget());
-		ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING,this.serviceRef);
-		this.interceptor.serviceChanged(event);
 		this.interceptor.before(null, null, null);
 		
 		this.mockContextControl.verify();
@@ -126,9 +118,7 @@ public class OsgiServiceInterceptorTest extends TestCase {
 		this.mockContextControl.setReturnValue(new ServiceReference[0]);
 		this.mockContextControl.replay();
 		
-		createInterceptor();
-		ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING,this.serviceRef);
-		this.interceptor.serviceChanged(event);
+		createInterceptor(); 
 		try {
 			this.interceptor.before(null, null, null);
 			fail("should have thrown ServiceUnavailableException");

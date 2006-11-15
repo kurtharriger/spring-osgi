@@ -37,7 +37,6 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.Constants;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.util.Assert;
@@ -58,6 +57,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Adrian Colyer
  * @author Costin Leau
+ * @author Hal Hildebrand
  * @since 2.0
  */
 public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, InitializingBean, DisposableBean,
@@ -188,12 +188,11 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
-		for (Iterator iter = this.publishedServices.iterator(); iter.hasNext();) {
+        for (Iterator iter = this.publishedServices.iterator(); iter.hasNext();) {
 			ServiceRegistration sReg = (ServiceRegistration) iter.next();
 			try {
 				sReg.unregister();
-			}
-			catch (IllegalStateException ise) {
+			} catch (IllegalStateException ise) {
 				// Service was already unregistered, probably because the bundle
 				// was stopped.
 				if (log.isInfoEnabled()) {
@@ -204,7 +203,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	}
 
 	private Properties mergeServiceProperties(String beanName) {
-		Properties p = resolver.getServiceProperties(beanName);
+		Properties p = resolver.getServiceProperties();
 		if (serviceProperties != null) {
 			p.putAll(serviceProperties);
 		}

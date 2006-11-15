@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 /**
  * @author Adrian Colyer
+ * @author Hal Hildebrand
  * @since 2.0
  */
 public class BeanNameServicePropertiesResolverTest extends TestCase {
@@ -65,13 +66,12 @@ public class BeanNameServicePropertiesResolverTest extends TestCase {
 		
 		BeanNameServicePropertiesResolver resolver = new BeanNameServicePropertiesResolver();
 		resolver.setBundleContext(mockContext);
-		Properties ret = resolver.getServiceProperties("myBeanName");
+		Properties ret = resolver.getServiceProperties();
 		
 		bundleControl.verify();
 		bundleContextControl.verify();
 		
-		assertEquals("3 properties",3,ret.size());
-		assertEquals("myBeanName",ret.get("org.springframework.osgi.beanname"));
+		assertEquals("2 properties",2,ret.size()); 
 		assertEquals("symbolic-name",ret.get("Bundle-SymbolicName"));
 		assertEquals("1.0.0",ret.get("Bundle-Version"));
 	}

@@ -23,6 +23,7 @@ import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.Bundle;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.test.runner.TestRunner;
@@ -56,7 +57,16 @@ public class JUnitTestActivatorTest extends TestCase {
 		public void setName(String name) {
 		}
 
-	}
+
+        public Bundle findBundleByLocation(String bundleLocation) {
+            return null;
+        }
+
+
+        public Bundle findBundleBySymbolicName(String bundleSymbolicName) {
+            return null;
+        }
+    }
 
 	protected void setUp() throws Exception {
 		activator = new JUnitTestActivator();

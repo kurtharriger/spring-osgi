@@ -39,13 +39,11 @@ import org.springframework.util.StringUtils;
  * @see OsgiServiceExporter
  * 
  * @author Adrian Colyer
+ * @author Hal Hildebrand
  * @since 2.0
  */
 public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesResolver, BundleContextAware,
-		InitializingBean {
-
-	public static final Object BEAN_NAME_PROPERTY_KEY = "org.springframework.osgi.beanname";
-
+		InitializingBean { 
 	private BundleContext bundleContext;
 
 	public BeanNameServicePropertiesResolver() {
@@ -57,9 +55,8 @@ public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesR
 	 * @see org.springframework.osgi.service.OsgiServicePropertiesResolver#getServiceProperties(java.lang.Object,
 	 *      java.lang.String)
 	 */
-	public Properties getServiceProperties(String beanName) {
+	public Properties getServiceProperties() {
 		Properties p = new Properties();
-		p.put(BEAN_NAME_PROPERTY_KEY, beanName);
 		String name = getSymbolicName();
 		if (StringUtils.hasLength(name)) {
 			p.put(Constants.BUNDLE_SYMBOLICNAME, name);

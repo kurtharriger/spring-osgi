@@ -28,6 +28,7 @@ import org.springframework.beans.factory.BeanFactory;
 
 /**
  * @author Adrian Colyer
+ * @author Hal Hildebrand
  * @since 2.0
  */
 public class OsgiServiceExporterTest extends TestCase {
@@ -113,7 +114,7 @@ public class OsgiServiceExporterTest extends TestCase {
 		//Object thisBean = new Object();
 		//this.beanFactoryControl.setReturnValue(thisBean);
 
-		resolver.getServiceProperties(beanName);
+		resolver.getServiceProperties();
 		mc.setReturnValue(new Properties());
 
 		this.bundleContext.registerService((String[]) null, null, null);
