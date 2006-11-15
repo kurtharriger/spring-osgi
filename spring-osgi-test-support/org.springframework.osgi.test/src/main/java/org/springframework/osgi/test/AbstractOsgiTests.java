@@ -35,6 +35,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.test.platform.EquinoxPlatform;
 import org.springframework.osgi.test.platform.FelixPlatform;
 import org.springframework.osgi.test.platform.KnopflerfishPlatform;
@@ -57,7 +58,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 	// the OSGi fixture
 	private static OsgiPlatform osgiPlatform;
-	private static BundleContext context;
+	private static BundleContext platformContext;
 	private static Bundle[] bundles;
 
 	// JUnit Service
@@ -73,6 +74,9 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 	// The OSGi BundleContext
 	private BundleContext bundleContext;
+	
+	// OsgiResourceLoader
+	private ResourceLoader resourceLoader;
 
 	private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
 
@@ -86,6 +90,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 	private String getSpringOSGiTestBundleUrl() {
 		return localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test", "1.0-SNAPSHOT");
+	}
+
+	private String getSpringOSGiIoBundleUrl() {
+		return localMavenArtifact("org.springframework.osgi", "spring-osgi-io", "1.0-SNAPSHOT");
 	}
 
 	private String getSpringCoreBundleUrl() {
@@ -189,7 +197,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 */
 	protected String[] getMandatoryBundles() {
 		return new String[] { getJUnitLibUrl(), getLog4jLibUrl(), getCommonsLoggingLibUrl(), getSpringCoreBundleUrl(),
-				getSpringOSGiTestBundleUrl() };
+				getSpringOSGiIoBundleUrl(), getSpringOSGiTestBundleUrl() };
 	}
 
 	public AbstractOsgiTests() {
@@ -239,15 +247,21 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		return (systemProperty == null ? EQUINOX_PLATFORM : systemProperty);
 	}
 
+	/**
+	 * Return the resource loader used by this test.
+	 * 
+	 * @return an OsgiBundleResourceLoader if the bundleContext was set or null otherwise.
+	 */
 	protected ResourceLoader getResourceLoader() {
-		return new DefaultResourceLoader();
+		return resourceLoader;
 	}
 
 	private Resource[] createResources(String[] bundles) {
 		Resource[] res = new Resource[bundles.length];
-
+		ResourceLoader loader = new DefaultResourceLoader();
+		
 		for (int i = 0; i < bundles.length; i++) {
-			res[i] = getResourceLoader().getResource(bundles[i]);
+			res[i] = loader.getResource(bundles[i]);
 		}
 		return res;
 	}
@@ -319,7 +333,9 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			osgiPlatform = createPlatform();
 			// start platform
 			osgiPlatform.start();
-			context = osgiPlatform.getBundleContext();
+			// platform context
+			platformContext = osgiPlatform.getBundleContext();
+			
 			// merge bundles
 			String[] mandatoryBundles = getMandatoryBundles();
 			String[] optionalBundles = getBundleLocations();
@@ -328,7 +344,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			System.arraycopy(mandatoryBundles, 0, allBundles, 0, mandatoryBundles.length);
 			System.arraycopy(optionalBundles, 0, allBundles, mandatoryBundles.length, optionalBundles.length);
 
-			// install bundles
+			// install bundles (from the local system/classpath)
 			Resource[] bundleResources = createResources(allBundles);
 
 			bundles = new Bundle[bundleResources.length];
@@ -348,16 +364,16 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 				}
 
 			}
-			postProcessBundleContext(context);
+			postProcessBundleContext(platformContext);
 
 			// get JUnit test service reference
 			// this is a loose reference - update it if the Activator class is
 			// changed.
-			ServiceReference reference = context.getServiceReference(ACTIVATOR_REFERENCE);
+			ServiceReference reference = platformContext.getServiceReference(ACTIVATOR_REFERENCE);
 			if (reference == null)
 				throw new IllegalStateException("no OSGi service reference found at " + ACTIVATOR_REFERENCE);
 
-			service = context.getService(reference);
+			service = platformContext.getService(reference);
 			if (service == null) {
 				throw new IllegalStateException("no service found for reference: " + reference);
 			}
@@ -389,10 +405,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 * @throws Exception
 	 */
 	private Bundle installBundle(Resource location) throws Exception {
-		Assert.notNull(context);
+		Assert.notNull(platformContext);
 		Assert.notNull(location);
 		log.debug("installing bundle from location " + location.getDescription());
-		return context.installBundle(location.getDescription(), location.getInputStream());
+		return platformContext.installBundle(location.getDescription(), location.getInputStream());
 	}
 
 	/**
@@ -549,8 +565,14 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		super.run(result);
 	}
 
+	/**
+	 * Set the bundle context to be used by this test. This method is called automatically by the test
+	 * infrastructure after the OSGi platform is being setup.
+	 */
 	public final void setBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
+		// instantiate ResourceLoader
+		this.resourceLoader = new OsgiBundleResourceLoader(bundleContext.getBundle());
 	}
 
 	public BundleContext getBundleContext() {

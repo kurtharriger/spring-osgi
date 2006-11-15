@@ -25,9 +25,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.context.OsgiBundleResource;
-import org.springframework.osgi.context.OsgiBundleResourceLoader;
-import org.springframework.osgi.context.OsgiBundleResourcePatternResolver;
+import org.springframework.osgi.io.OsgiBundleResource;
+import org.springframework.osgi.io.OsgiBundleResourceLoader;
+import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 

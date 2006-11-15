@@ -7,46 +7,21 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
-  <artifactId>spring-osgi-core</artifactId>
+  <artifactId>spring-osgi-io</artifactId>
   <packaging>osgi-bundle</packaging>
-  <name>org.springframework.osgi.core bundle</name>
+  <name>org.springframework.osgi.io bundle</name>
   <version>1.0-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   <dependencies>
-
     <dependency>
       <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-osgi-io</artifactId>
+      <artifactId>spring-osgi-mock</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-   <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-beans</artifactId>
-      <version>2.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>2.1-SNAPSHOT</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-core</artifactId>
-      <version>2.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-aop</artifactId>
-      <version>2.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-web</artifactId>
       <version>2.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
@@ -56,22 +31,11 @@
       <version>1.1</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.aopalliance</groupId>
-      <artifactId>aopalliance</artifactId>
-      <version>1.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
-      <scope>provided</scope>
-    </dependency>    
+    
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi_R4_compendium</artifactId>
-      <version>1.0</version>
+      <artifactId>org.osgi.core</artifactId>
+      <version>4.0</version>
       <scope>provided</scope>
     </dependency>    
     
@@ -87,13 +51,6 @@
       <version>1.2_Java1.3</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-osgi-mock</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-        
   </dependencies>
 
   <build>

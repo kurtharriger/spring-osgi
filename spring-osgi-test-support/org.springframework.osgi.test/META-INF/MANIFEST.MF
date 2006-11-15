@@ -2,7 +2,8 @@ Bundle-Name: Spring-OSGi-Test-Framework
 Bundle-Version: 1.0
 Bundle-SymbolicName: org.springframework.osgi.test
 Bundle-Activator: org.springframework.osgi.test.OsgiJUnitService
-Import-Package: junit.framework
+Import-Package: junit.framework,
+  org.springframework.osgi.io
 DynamicImport-Package: javax.swing, javax.swing.border,
   javax.swing.event, javax.swing.text, javax.swing.tree,
   org.eclipse.core.runtime.adaptor,

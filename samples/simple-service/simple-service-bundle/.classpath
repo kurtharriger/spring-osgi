@@ -13,5 +13,6 @@
 	<classpathentry sourcepath="/M2_REPO/org/springframework/spring/2.0/spring-2.0-sources.jar" kind="var" path="M2_REPO/org/springframework/osgi/spring-context/2.1-SNAPSHOT/spring-context-2.1-SNAPSHOT.jar"/>
 	<classpathentry sourcepath="/M2_REPO/org/springframework/spring/2.0/spring-2.0-sources.jar" kind="var" path="M2_REPO/org/springframework/osgi/spring-beans/2.1-SNAPSHOT/spring-beans-2.1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/commons-logging.osgi/1.1-SNAPSHOT/commons-logging.osgi-1.1-SNAPSHOT.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/OSGi(Equinox 3.2)"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

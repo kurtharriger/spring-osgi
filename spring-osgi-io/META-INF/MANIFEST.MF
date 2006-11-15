@@ -1,0 +1,14 @@
+Implementation-Title: Spring Framework
+Implementation-Version: 2.1
+Spring-Version: 2.1
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.osgi.io
+Bundle-Name: org.springframework.osgi.io
+Bundle-Version: 2.1.0
+Bundle-Vendor: Spring Framework
+Import-Package: org.apache.commons.logging,
+   org.osgi.framework,
+   org.springframework.core.io;version=2.1.0,
+   org.springframework.core.io.support;version=2.1.0,
+   org.springframework.util;version=2.1.0
+Export-Package: org.springframework.osgi.io;version=2.1.0
