@@ -199,12 +199,25 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
         // Lookup the initial service
         for (int i = 0; i < retryTimes; i++) {
-            ServiceReference[] refs = bundleContext.getServiceReferences(serviceType.getCanonicalName(),
-                                                                         getFilterStringForServiceLookup());
-            if (refs == null) {
+            try {
+                reference = OsgiServiceUtils.getService(this.bundleContext,
+                                                        getInterface(),
+                                                        getFilterStringForServiceLookup());
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Resolved service reference: [" + reference + "] after "
+                                 + (i + 1) + " attempts");
+                }
+            }
+            catch (NoSuchServiceException nsse) {
+                reference = null;
+                if (!retryOnUnregisteredService) {
+                    throw nsse;
+                }
+            }
+            if (reference == null) {
                 Thread.sleep(retryDelayMs);
             } else {
-                reference = refs[0];
                 service = bundleContext.getService(reference);  // obviously only works for cardinality = 1
                 break;
             }
