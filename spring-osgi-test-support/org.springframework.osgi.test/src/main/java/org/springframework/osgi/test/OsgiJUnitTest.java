@@ -16,6 +16,7 @@
 package org.springframework.osgi.test;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Bundle;
 
 /**
  * JUnit contract for OSGi environments.
@@ -70,4 +71,18 @@ public interface OsgiJUnitTest {
      * @param bundleContext
      */
     public void setBundleContext(BundleContext bundleContext);
+
+
+    /**
+     * Find a bundle by the bundle's location.
+     * @return the bundle matching the location or null if not found
+     */
+    public Bundle findBundleByLocation(String bundleLocation);
+
+
+    /**
+     * Find a bundle by the bundle's symbolic name
+     * @return the bundle matching the symbolic name or null if not found
+     */
+    public Bundle findBundleBySymbolicName(String bundleSymbolicName);
 }

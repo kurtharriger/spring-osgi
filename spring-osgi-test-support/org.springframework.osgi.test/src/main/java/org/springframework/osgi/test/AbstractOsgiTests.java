@@ -560,4 +560,25 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		return bundleContext;
 	}
 
+
+    public Bundle findBundleByLocation(String bundleLocation) {
+        Bundle[] bundles = bundleContext.getBundles();
+        for (int i = 0; i < bundles.length; i++) {
+            if (bundles[i].getLocation().equals(bundleLocation)) {
+                return bundles[i];
+            }
+        }
+        return null;
+    }
+
+
+    public Bundle findBundleBySymbolicName(String sybmolicName) {
+        Bundle[] bundles = bundleContext.getBundles();
+        for (int i = 0; i < bundles.length; i++) {
+            if (bundles[i].getSymbolicName().equals(sybmolicName)) {
+                return bundles[i];
+            }
+        }
+        return null;
+    }
 }

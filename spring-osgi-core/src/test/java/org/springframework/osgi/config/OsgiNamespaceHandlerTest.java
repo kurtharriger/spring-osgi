@@ -81,24 +81,24 @@ public class OsgiNamespaceHandlerTest extends TestCase {
 		assertNotNull(listeners);
 		assertEquals(5, listeners.length);
 
-		assertEquals(0, DummyListener.BIND_CALLS);
+		assertEquals(8, DummyListener.BIND_CALLS);
 		assertEquals(0, DummyListener.UNBIND_CALLS);
 
 		listeners[1].bind(null, null);
 
-		assertEquals(2, DummyListener.BIND_CALLS);
+		assertEquals(10, DummyListener.BIND_CALLS);
 
 		listeners[1].unbind(null, null);
 		assertEquals(2, DummyListener.UNBIND_CALLS);
 
         listeners[3].bind(null, null);
-        assertEquals(1, DummyListenerServiceSignature.BIND_CALLS);
+        assertEquals(3, DummyListenerServiceSignature.BIND_CALLS);
 
         listeners[3].unbind(null, null);
         assertEquals(1, DummyListenerServiceSignature.UNBIND_CALLS);
 
         listeners[4].bind(null, null);
-        assertEquals(1, DummyListenerServiceSignature2.BIND_CALLS);
+        assertEquals(3, DummyListenerServiceSignature2.BIND_CALLS);
 
         listeners[4].unbind(null, null);
         assertEquals(1, DummyListenerServiceSignature2.UNBIND_CALLS);
