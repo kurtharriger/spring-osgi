@@ -51,7 +51,7 @@ public class OsgiServiceUtils {
         Assert.notNull(serviceClass, "serviceClass cannot be null");
         try {
 			ServiceReference[] serviceReferences = 
-				context.getServiceReferences(serviceClass.getName(),filter);
+				context.getServiceReferences(serviceClass.getCanonicalName(),filter);
 			if (serviceReferences == null || serviceReferences.length == 0) {
 				throw new NoSuchServiceException(
 						"A service of type '" + serviceClass.getName() + "' matching filter '" +
