@@ -134,13 +134,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 */
 	protected String localMavenBundle(String groupId, String artifact, String version) {
 		// Check to see if the user has overridden the default maven home
-	        // Please leave this check in here - HSH
 		String m2_home = System.getenv("M2_HOME");
-		if (m2_home == null || m2_home.length() == 0) {
-			// use User Home
-			m2_home = System.getProperty("user.home");
-
-		}
+		if (m2_home == null || m2_home.length() == 0 || !new File(new File(m2_home), ".m2/repository").exists()) { 
+			m2_home = System.getProperty("user.home"); 
+        }
 		File repositoryHome = new File(new File(m2_home), ".m2/repository");
 		String location = groupId.replace('.', '/');
 		location += '/';
