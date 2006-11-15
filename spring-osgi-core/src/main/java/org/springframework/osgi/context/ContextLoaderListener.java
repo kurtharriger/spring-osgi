@@ -43,6 +43,7 @@ import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.OsgiPlatformDetector;
 import org.springframework.osgi.context.support.OsgiResourceUtils;
+import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.util.StringUtils;
 
 /**

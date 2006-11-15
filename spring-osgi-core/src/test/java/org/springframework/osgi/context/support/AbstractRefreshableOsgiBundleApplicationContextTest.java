@@ -25,7 +25,7 @@ import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.context.OsgiBundleResource;
+import org.springframework.osgi.io.OsgiBundleResource;
 
 /**
  * @author Costin Leau

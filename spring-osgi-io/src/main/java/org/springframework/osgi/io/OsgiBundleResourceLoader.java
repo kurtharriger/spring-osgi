@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context;
+package org.springframework.osgi.io;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.DefaultResourceLoader;

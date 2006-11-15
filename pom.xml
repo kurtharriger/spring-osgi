@@ -145,6 +145,7 @@ limitations under the License.
   <modules>
     <module>spring-modules</module>
     <module>spring-osgi-mock</module>    
+	<module>spring-osgi-io</module>    
     <module>spring-osgi-core</module>
     <module>spring-osgi-extender</module>
     <module>spring-osgi-test-support</module>
@@ -190,12 +191,12 @@ limitations under the License.
               <name>org.springframework.osgi.test.framework</name>
               <value>${osgi.test.platform}</value>
             </property>
-            <!-- 
+            <!--
             <property>
               <name>org.osgi.vendor.framework</name>
               <value>${org.osgi.vendor.framework}</value>
             </property>
-             -->
+            -->
           </systemProperties>
         </configuration>
       </plugin>
@@ -249,6 +250,7 @@ limitations under the License.
           <type>jar</type>
           <scope>provided</scope>
         </dependency>
+                <!--
         <dependency>
           <groupId>org.apache.felix</groupId>
           <artifactId>org.apache.felix.main</artifactId>
@@ -263,10 +265,11 @@ limitations under the License.
           <type>jar</type>
           <scope>runtime</scope>
         </dependency>      
+        -->
       </dependencies>
       <properties>
         <osgi.test.platform>felix</osgi.test.platform>
-		<!-- <org.osgi.vendor.framework>org.apache.felix.framework</org.osgi.vendor.framework>  -->
+		<org.osgi.vendor.framework>org.apache.felix.framework</org.osgi.vendor.framework>
       </properties>
     </profile>
   </profiles>

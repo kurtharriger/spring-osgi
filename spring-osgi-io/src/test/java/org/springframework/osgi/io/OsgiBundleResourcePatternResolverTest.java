@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+package org.springframework.osgi.io;
 
 import junit.framework.TestCase;
 
@@ -93,6 +89,6 @@ public class OsgiBundleResourcePatternResolverTest extends TestCase {
 		assertEquals(new OsgiBundleResource(bundle, "bundle://foo"), res[0]);
 
 		// TODO: need a functional test here
-		res = resolver.getResources("bundle:org/springframework/osgi/context/OsgiBundleResourcePatternResolverT*");
+		res = resolver.getResources("bundle:org/springframework/osgi/io/OsgiBundleResourcePatternResolverT*");
 	}
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context;
+package org.springframework.osgi.io;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -164,7 +164,7 @@ public class OsgiBundleResourceTest extends TestCase {
 		String location = "foo";
 		Resource res = resource.createRelative(location);
 		assertSame(OsgiBundleResource.class, res.getClass());
-		assertEquals("org/springframework/osgi/context/" + location, ((OsgiBundleResource) res).getPath());
+		assertEquals("org/springframework/osgi/io/" + location, ((OsgiBundleResource) res).getPath());
 	}
 
 	/**
