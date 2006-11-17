@@ -15,33 +15,33 @@
  */
 package org.springframework.osgi.test.propertyplaceholder;
 
-import java.lang.reflect.Field;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Properties;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.springframework.osgi.context.support.OsgiPropertyPlaceholder;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.service.OsgiServiceUtils;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 
 /**
+ * 
+ * Integration test for OsgiPropertyPlaceholder.
+ * 
  * @author Costin Leau
  * 
  */
 public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 
-	private OsgiPropertyPlaceholder placeholder;
-
 	private final static String ID = "PropertyPlaceholderTest-123";
 
 	private final static Dictionary DICT = new Hashtable();
 
+	private ConfigurableApplicationContext ctx;
+
 	static {
-		// this is already added by the framework but it's useful when doing the assertion
-		DICT.put("service.pid", ID);
 		DICT.put("foo", "bar");
 		DICT.put("white", "horse");
 	}
@@ -54,8 +54,8 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 		return new String[] { localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
+				localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
 				// required by cm_all for logging
 				localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
@@ -65,11 +65,13 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 	public void onSetUp() throws Exception {
 		prepareConfiguration();
 
-		placeholder = new OsgiPropertyPlaceholder();
-		placeholder.setBundleContext(getBundleContext());
-		// add persistence id in here
-		placeholder.setPersistentId(ID);
-		placeholder.afterPropertiesSet();
+		ctx = new OsgiBundleXmlApplicationContext(getBundleContext(),
+				new String[] { "org/springframework/osgi/test/propertyplaceholder/placeholder.xml" });
+	}
+
+	public void onTearDown() throws Exception {
+		if (ctx != null)
+			ctx.close();
 	}
 
 	// add a default table into OSGi
@@ -82,15 +84,13 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 		config.update(DICT);
 	}
 
-	private Properties getProperties() throws Exception {
-		Field field = placeholder.getClass().getDeclaredField("cmProperties");
-		field.setAccessible(true);
-		return (Properties) field.get(placeholder);
+	public void testFoundProperties() throws Exception {
+		String bean = (String) ctx.getBean("bean1");
+		assertEquals("horse", bean);
 	}
 
-	public void testDummy() throws Exception {
-		Properties props = getProperties();
-		
-		assertEquals(DICT, props);
+	public void testFallbackProperties() throws Exception {
+		String bean = (String) ctx.getBean("bean2");
+		assertEquals("treasures", bean);
 	}
 }

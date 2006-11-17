@@ -9,5 +9,8 @@ Import-Package: junit.framework,
   org.springframework.osgi.test.runner,
   org.springframework.osgi.context,
   org.springframework.osgi.context.support,
+  org.springframework.beans,
+  org.springframework.beans.factory,  
+  org.springframework.context,
   org.springframework.osgi.service,
   org.osgi.service.cm
