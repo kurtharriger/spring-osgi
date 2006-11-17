@@ -7,5 +7,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.springframework.osgi.test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Basic test bundle"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.0/spring-core-2.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.test.lifecycle/1.0-SNAPSHOT/org.springframework.osgi.test.lifecycle-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.0-SNAPSHOT/spring-osgi-core-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.0/spring-beans-2.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.test.service.listener/1.0-SNAPSHOT/org.springframework.osgi.test.service.listener-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
