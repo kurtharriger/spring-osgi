@@ -1,8 +1,8 @@
 package org.springframework.osgi.test.serviceListener;
 
+import org.osgi.framework.Bundle;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.service.listener.MyListener;
-import org.osgi.framework.Bundle;
 
 /**
  * @author Hal Hildebrand
@@ -25,6 +25,7 @@ public class ServiceListenerTest extends ConfigurableBundleCreatorTests {
                 localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
+				localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
                 localMavenArtifact("org.springframework.osgi.samples", "simple-service-bundle",
                                    "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.service.listener",

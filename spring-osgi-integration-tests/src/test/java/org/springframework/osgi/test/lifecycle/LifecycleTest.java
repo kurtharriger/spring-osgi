@@ -39,6 +39,7 @@ public class LifecycleTest extends ConfigurableBundleCreatorTests {
                 localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
+				localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.lifecycle", "1.0-SNAPSHOT")
 
         };
