@@ -64,6 +64,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractBundleXmlApplicatio
 	public OsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations, ClassLoader classLoader,
 			NamespacePlugins namespacePlugins) {
 		super(context, configLocations, classLoader, namespacePlugins);
+		publishContextAsOsgiService();
+		refresh();
 	}
 
 	public OsgiBundleXmlApplicationContext(ApplicationContext parent, BundleContext context, String[] configLocations,
@@ -71,8 +73,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractBundleXmlApplicatio
 		super(parent, context, configLocations, classLoader, plugins);
 
 		publishContextAsOsgiService();
-        
-        refresh();
-    }
+
+		refresh();
+	}
 
 }
