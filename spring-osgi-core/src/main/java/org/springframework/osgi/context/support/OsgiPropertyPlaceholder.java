@@ -188,7 +188,10 @@ public class OsgiPropertyPlaceholder extends PropertyPlaceholderConfigurer imple
 	}
 
 	protected Properties mergeProperties() throws IOException {
-		Properties prop = super.mergeProperties();
+		// add local properties as defaults
+		Properties prop = new Properties(super.mergeProperties());
+		
+		// add the OSGi properties on top
 		if (cmProperties != null)
 			prop.putAll(cmProperties);
 		return prop;
