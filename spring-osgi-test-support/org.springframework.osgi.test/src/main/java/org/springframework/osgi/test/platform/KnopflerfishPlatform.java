@@ -57,8 +57,9 @@ public class KnopflerfishPlatform implements OsgiPlatform {
 	public void start() throws Exception {
 		SYSTEM_PROPS.put("org.knopflerfish.framework.bundlestorage", "memory");
 		SYSTEM_PROPS.put("org.knopflerfish.startlevel.use", "true");
+        SYSTEM_PROPS.put("org.osgi.framework.bootdelegation", "javax.*,org.w3c.*,sun.*,org.xml.*,com.sun.*"); 
 
-		for (Iterator iter = SYSTEM_PROPS.entrySet().iterator(); iter.hasNext();) {
+        for (Iterator iter = SYSTEM_PROPS.entrySet().iterator(); iter.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();
 			System.setProperty((String) entry.getKey(), (String) entry.getValue());
 		}

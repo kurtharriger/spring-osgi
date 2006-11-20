@@ -44,6 +44,8 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 	static {
 		DICT.put("foo", "bar");
 		DICT.put("white", "horse");
+        // This is needed when running under KF
+        System.setProperty("com.gatespace.bundle.cm.store", System.getProperty("user.dir"));
 	}
 
 	protected String getManifestLocation() {
