@@ -36,6 +36,10 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
 /**
  * Factory bean for OSGi services. Returns a proxy implementing the service
  * interface. This allows Spring to manage service lifecycle events (such as the
@@ -196,13 +200,13 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
     protected void constructProxy() throws Exception {
         Object service = null;
         ServiceReference reference = null;
+        final Class serviceInterface = getInterface();
+        final String filter = getFilterStringForServiceLookup();
 
         // Lookup the initial service
         for (int i = 0; i < retryTimes; i++) {
             try {
-                reference = OsgiServiceUtils.getService(this.bundleContext,
-                                                        getInterface(),
-                                                        getFilterStringForServiceLookup());
+                reference = OsgiServiceUtils.getService(this.bundleContext, serviceInterface, filter);
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("Resolved service reference: [" + reference + "] after "
@@ -227,7 +231,20 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
                                              getFilterStringForServiceLookup());
         }
 
-        listener = new Listener();
+
+        // Create the object which stands in for the actual service when the service is unavailable
+        InvocationHandler unavailableServiceHandler = new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                throw new ServiceUnavailableException("Service is currently unavailable", serviceInterface, filter);
+            }
+        };
+
+        Object unavailableService = Proxy.newProxyInstance(serviceInterface.getClassLoader(),
+                                                           new Class[]{serviceInterface},
+                                                           unavailableServiceHandler);
+
+        // Our listener to handle the service lifecycle
+        listener = new Listener(unavailableService);
 
         HotSwappableTargetSource targetSource = new HotSwappableTargetSource(service);
         listener.setTargetSource(targetSource);
@@ -538,11 +555,13 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 
     protected class Listener implements ServiceListener {
+        private Object unavailableService;
         private HotSwappableTargetSource targetSource;
         private Filter filter;
 
 
-        protected Listener() {
+        protected Listener(Object unavailableService) {
+            this.unavailableService = unavailableService;
             try {
                 filter = FrameworkUtil.createFilter(getFilterStringForServiceLookup());
             } catch (InvalidSyntaxException e) {
@@ -565,7 +584,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
                     break;
                 case ServiceEvent.UNREGISTERING:
                     unbind();
-                    targetSource.swap(null);
+                    targetSource.swap(unavailableService);
                     break;
                 default:
             }
