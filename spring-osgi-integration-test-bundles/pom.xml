@@ -19,6 +19,7 @@
     <module>trivial.test.bundle</module>
     <module>lifecycle.test.bundle</module>
     <module>service.listener.bundle</module>
+    <module>reference.test.bundle</module>
   </modules>
   <reporting>
    <excludeDefaults>true</excludeDefaults>

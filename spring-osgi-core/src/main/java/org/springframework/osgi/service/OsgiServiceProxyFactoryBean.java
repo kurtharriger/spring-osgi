@@ -255,7 +255,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
         }
         pf.setTargetSource(targetSource);
 
-        OsgiServiceInterceptor interceptor = new OsgiServiceInterceptor(targetSource, getInterface());
+        OsgiServiceInterceptor interceptor = new OsgiServiceInterceptor(targetSource, getInterface(),
+                                                                        unavailableService);
 
         interceptor.setMaxRetries(this.retryOnUnregisteredService ? this.retryTimes : 0);
         interceptor.setRetryIntervalMillis(this.retryDelayMs);

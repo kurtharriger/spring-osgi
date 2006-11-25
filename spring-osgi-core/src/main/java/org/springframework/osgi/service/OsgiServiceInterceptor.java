@@ -32,14 +32,16 @@ import org.osgi.framework.BundleContext;
  * @since 2.0
  */
 public class OsgiServiceInterceptor implements MethodBeforeAdvice {
-	private final HotSwappableTargetSource targetSource;
+    private final Object unavailableService;
+    private final HotSwappableTargetSource targetSource;
 	private final Class serviceType;
 	private int maxRetries = OsgiServiceProxyFactoryBean.DEFAULT_MAX_RETRIES;
 	private long retryIntervalMillis = OsgiServiceProxyFactoryBean.DEFAULT_MILLIS_BETWEEN_RETRIES;
 
-    public OsgiServiceInterceptor(HotSwappableTargetSource targetSource, Class serviceType) {
+    public OsgiServiceInterceptor(HotSwappableTargetSource targetSource, Class serviceType, Object unavailableService) {
 		this.targetSource = targetSource;
 		this.serviceType = serviceType;
+        this.unavailableService = unavailableService;
     }
 
 
@@ -68,16 +70,16 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice {
 	 */
 	public synchronized void before(Method method, Object[] args, Object target) throws Throwable {
         int numAttempts = 0;
-        while (targetSource.getTarget() == null && (numAttempts++ < this.maxRetries)) {
+        while (targetSource.getTarget() == unavailableService && (numAttempts++ < this.maxRetries)) {
             Thread.sleep(this.retryIntervalMillis);
         }
-        if (targetSource.getTarget() == null) {
+        if (targetSource.getTarget() == unavailableService) {
             // no luck!
             throw new ServiceUnavailableException(
                     "The target OSGi service of type '" + "was unregistered " +
                     "and no suitable replacement was found after retrying " +
                     this.maxRetries + " times.",
                     this.serviceType, null);
-        }
+        } 
     }
 }
