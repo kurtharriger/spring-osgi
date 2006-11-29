@@ -170,8 +170,11 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 	private void startBundle(Bundle bundle) {
 		String[] applicationContextLocations = getApplicationContextLocations(bundle);
+        if (applicationContextLocations == null) {
+            return; // Nothing to do...
+        }
 
-		BundleContext bundleContext = OsgiResourceUtils.getBundleContext(bundle);
+        BundleContext bundleContext = OsgiResourceUtils.getBundleContext(bundle);
 		if (bundleContext == null) {
 			log.error("Could not resolve BundleContext for bundle [" + bundle + "]");
 			return;
@@ -180,9 +183,11 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		// for us.
 		try {
 			if (log.isInfoEnabled()) {
-				log.info("Starting bundle [" + bundle.getHeaders().get(Constants.BUNDLE_NAME)
-						+ "] with configuration ["
-						+ (applicationContextLocations == null ? "none" : StringUtils.arrayToCommaDelimitedString(applicationContextLocations) + "]"));
+				log.info("Starting bundle ["
+                         + bundle.getHeaders().get(Constants.BUNDLE_NAME)
+                         + "] with configuration ["
+                         + StringUtils.arrayToCommaDelimitedString(applicationContextLocations)
+                         + "]");
 			}
 			ConfigurableApplicationContext ctx = contextFactory.createApplicationContextWithBundleContext(null,
 					bundleContext, applicationContextLocations, plugins, true);
