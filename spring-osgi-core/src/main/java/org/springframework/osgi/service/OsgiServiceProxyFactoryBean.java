@@ -102,7 +102,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 	private int contextClassloader;
 
-	private int timeout;
+	private long timeout;
 
 	private PropertyValues properties;
 
@@ -548,7 +548,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	/**
 	 * @return Returns the timeout.
 	 */
-	public int getTimeout() {
+	public long getTimeout() {
 		return timeout;
 	}
 
@@ -556,7 +556,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	/**
 	 * @param timeout The timeout to set.
 	 */
-	public void setTimeout(int timeout) {
+	public void setTimeout(long timeout) {
 		this.timeout = timeout;
 		// This is kind of a hack
 		if (timeout > 0) setRetryTimes((int) (timeout / getRetryDelayMs()));

@@ -35,23 +35,21 @@ public class ReferenceProxyTest extends ConfigurableBundleCreatorTests {
         };
     }
 
-	public void testNoTest() {
-		// just to stop the tests barfing.
-	}
-
-	// FIXME -- this just hangs. I can't work out what is going on.
-    public void XtestReferenceProxyLifecycle() throws Exception {
+    public void testReferenceProxyLifecycle() throws Exception {
         MyService reference = ServiceReferer.serviceReference;
         assertNotNull(reference.stringValue());
 
         Bundle simpleServiceBundle = findBundleBySymbolicName("org.springframework.osgi.samples.simpleservice");
 
         assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
+        System.out.println("stopping bundle");
         simpleServiceBundle.stop();
 
         while (simpleServiceBundle.getState() == Bundle.STOPPING) {
+            System.out.println("waiting for bundle to stop");
             Thread.sleep(10);
         }
+        System.out.println("bundle stopped");
 
         // Service should be unavailable
         try {
@@ -61,12 +59,15 @@ public class ReferenceProxyTest extends ConfigurableBundleCreatorTests {
             // Expected
         }
 
+        System.out.println("starting bundle");
         simpleServiceBundle.start();
 
         while (simpleServiceBundle.getState() != Bundle.ACTIVE) {
+            System.out.println("waiting for bundle to start");
             Thread.sleep(10);
         }
 
+        System.out.println("bundle started");
         //Service should be running
         assertNotNull(reference.stringValue());
     }
