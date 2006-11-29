@@ -66,7 +66,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 	}
 
 	public Bundle getBundle() throws Exception {
-		Assert.notNull(bundleUrl, "BundleUrl is required");
+		Assert.notNull(bundleUrl, "location is required");
 		Assert.notNull(bundleContext, "BundleContext is required");
 
 		if (bundle == null) {
@@ -88,6 +88,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 	}
 
 	public void setLocation(Resource url) throws Exception {
+		System.out.println("URL set to:" + url);
 		bundleUrl = url;
 	}
 

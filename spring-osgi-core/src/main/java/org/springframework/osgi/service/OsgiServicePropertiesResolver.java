@@ -32,6 +32,6 @@ import java.util.Properties;
  */
 public interface OsgiServicePropertiesResolver {
 
-	Properties getServiceProperties();
+	Properties getServiceProperties(String beanName);
 	
 }

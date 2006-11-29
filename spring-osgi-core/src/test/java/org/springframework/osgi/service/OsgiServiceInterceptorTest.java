@@ -18,11 +18,9 @@
 package org.springframework.osgi.service;
 
 import junit.framework.TestCase;
-
 import org.easymock.MockControl;
 import org.easymock.internal.AlwaysMatcher;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.target.HotSwappableTargetSource;
 
@@ -39,15 +37,16 @@ public class OsgiServiceInterceptorTest extends TestCase {
 	private ServiceReference serviceRef;
 	private HotSwappableTargetSource tgtSource;
 	private SI targetObject;
-	
-	
-	
+
+
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.mockContextControl = MockControl.createControl(BundleContext.class);
 		this.bundleContext = (BundleContext) this.mockContextControl.getMock();
 		this.serviceRef = getServiceReference();
-		this.targetObject = new SI() { public void process() {} };
+		this.targetObject = new SI() {
+			public void process() {}
+		};
 		this.tgtSource = new HotSwappableTargetSource(targetObject);
 	}
 
@@ -56,90 +55,94 @@ public class OsgiServiceInterceptorTest extends TestCase {
 	 */
 	private void createInterceptor() {
 		this.interceptor = new OsgiServiceInterceptor(
-                this.tgtSource,
-				SI.class,
-                new Object()
-        );
+			this.tgtSource,
+			SI.class,
+			new Object()
+		);
+
 	}
 
 	public void tstServiceModified() {
 		this.bundleContext.addServiceListener(null);
 		this.mockContextControl.setMatcher(new AlwaysMatcher());
 		this.bundleContext.getService(this.serviceRef);
-		SI newTarget = new SI() { public void process() {} };
+		SI newTarget = new SI() {
+			public void process() {}
+		};
 		this.mockContextControl.setReturnValue(newTarget);
 		this.mockContextControl.replay();
 
 		createInterceptor();
-		assertSame("should have original target",this.targetObject,
-				this.tgtSource.getTarget());
-		
+		assertSame("should have original target", this.targetObject,
+			this.tgtSource.getTarget());
+
 		this.mockContextControl.verify();
-		assertSame("target has been swapped",newTarget,this.tgtSource.getTarget());
+		assertSame("target has been swapped", newTarget, this.tgtSource.getTarget());
 	}
-	
+
 	public void tstServiceUnregisteredAndRebinds() throws Throwable {
 		this.bundleContext.addServiceListener(null);
 		this.mockContextControl.setMatcher(new AlwaysMatcher());
-		this.bundleContext.getServiceReferences(SI.class.getName(),"(attr=value)");
+		this.bundleContext.getServiceReferences(SI.class.getName(), "(attr=value)");
 		this.mockContextControl.setReturnValue(new ServiceReference[0]);
-		this.bundleContext.getAllServiceReferences(SI.class.getName(),"(attr=value)");
+		this.bundleContext.getAllServiceReferences(SI.class.getName(), "(attr=value)");
 		this.mockContextControl.setReturnValue(new ServiceReference[0]);
-		this.bundleContext.getServiceReferences(SI.class.getName(),"(attr=value)");
+		this.bundleContext.getServiceReferences(SI.class.getName(), "(attr=value)");
 		ServiceReference newServiceReference = getServiceReference();
-		this.mockContextControl.setReturnValue(new ServiceReference[] {newServiceReference});		
-		this.bundleContext.getService(newServiceReference);		
-		SI newTarget = new SI() { public void process() {} };
+		this.mockContextControl.setReturnValue(new ServiceReference[]{newServiceReference});
+		this.bundleContext.getService(newServiceReference);
+		SI newTarget = new SI() {
+			public void process() {}
+		};
 		this.mockContextControl.setReturnValue(newTarget);
 		this.mockContextControl.replay();
-		
+
 		createInterceptor();
-		assertSame("should have original target",this.targetObject,
-				this.tgtSource.getTarget());
+		assertSame("should have original target", this.targetObject,
+			this.tgtSource.getTarget());
 		this.interceptor.before(null, null, null);
-		
+
 		this.mockContextControl.verify();
-		assertSame("target has been swapped",newTarget,this.tgtSource.getTarget());
+		assertSame("target has been swapped", newTarget, this.tgtSource.getTarget());
 	}
 
 	public void tstServiceUnregisteredAndFailsToRebind() throws Throwable {
 		this.bundleContext.addServiceListener(null);
 		this.mockContextControl.setMatcher(new AlwaysMatcher());
-		this.bundleContext.getServiceReferences(SI.class.getName(),"(attr=value)");
+		this.bundleContext.getServiceReferences(SI.class.getName(), "(attr=value)");
 		this.mockContextControl.setReturnValue(new ServiceReference[0]);
-		this.bundleContext.getAllServiceReferences(SI.class.getName(),"(attr=value)");
+		this.bundleContext.getAllServiceReferences(SI.class.getName(), "(attr=value)");
 		this.mockContextControl.setReturnValue(new ServiceReference[0]);
-		this.bundleContext.getServiceReferences(SI.class.getName(),"(attr=value)");
+		this.bundleContext.getServiceReferences(SI.class.getName(), "(attr=value)");
 		this.mockContextControl.setReturnValue(new ServiceReference[0]);
-		this.bundleContext.getAllServiceReferences(SI.class.getName(),"(attr=value)");
+		this.bundleContext.getAllServiceReferences(SI.class.getName(), "(attr=value)");
 		this.mockContextControl.setReturnValue(new ServiceReference[0]);
-		this.bundleContext.getServiceReferences(SI.class.getName(),"(attr=value)");
+		this.bundleContext.getServiceReferences(SI.class.getName(), "(attr=value)");
 		this.mockContextControl.setReturnValue(new ServiceReference[0]);
-		this.bundleContext.getAllServiceReferences(SI.class.getName(),"(attr=value)");
+		this.bundleContext.getAllServiceReferences(SI.class.getName(), "(attr=value)");
 		this.mockContextControl.setReturnValue(new ServiceReference[0]);
 		this.mockContextControl.replay();
-		
-		createInterceptor(); 
+
+		createInterceptor();
 		try {
 			this.interceptor.before(null, null, null);
 			fail("should have thrown ServiceUnavailableException");
-		} 
-		catch(ServiceUnavailableException ex) {
-			assertTrue("Message should start with 'The target OSGi service",
-					ex.getMessage().startsWith("The target OSGi service"));
-			assertEquals(SI.class, ex.getServiceType());
-			assertEquals("(attr=value)",ex.getFilter());
 		}
-		
+		catch (ServiceUnavailableException ex) {
+			assertTrue("Message should start with 'The target OSGi service",
+				ex.getMessage().startsWith("The target OSGi service"));
+			assertEquals(SI.class, ex.getServiceType());
+			assertEquals("(attr=value)", ex.getFilter());
+		}
+
 		this.mockContextControl.verify();
-		
+
 	}
 
-	public void testDummy()
-	{
-		
+	public void testDummy() {
+
 	}
-	
+
 	private ServiceReference getServiceReference() {
 		MockControl sRefControl = MockControl.createNiceControl(ServiceReference.class);
 		return (ServiceReference) sRefControl.getMock();

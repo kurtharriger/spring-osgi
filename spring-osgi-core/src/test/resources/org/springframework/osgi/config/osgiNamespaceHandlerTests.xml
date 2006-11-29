@@ -20,7 +20,7 @@
 	<!-- full options -->
 	<osgi:reference id="full-options" interface="java.lang.Cloneable"
 		cardinality="1..n" context-classloader="service-provider"
-		timeout="123" filter="(c=*)">
+		timeout="2000" filter="(c=*)">
 		<osgi:listener>
 			<bean id="listener" class="org.springframework.osgi.config.DummyListener" />
 		</osgi:listener>

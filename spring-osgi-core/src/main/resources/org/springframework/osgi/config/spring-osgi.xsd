@@ -24,6 +24,7 @@
 				<xsd:attribute name="timeout" use="optional" type="xsd:int" default="0"/>
 				<xsd:attribute name="cardinality" use="optional" type="Tcardinality" default="1..1"/>
 				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
+				<xsd:attribute name="bean-name" type="xsd:string" use="optional"/>
 				<xsd:attribute name="context-classloader" type="TreferenceClassLoaderOptions" default="client"/>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -81,6 +82,7 @@
 
 	<xsd:simpleType name="TserviceClassLoaderOptions">
 	 	<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="client"/>
 	 		<xsd:enumeration value="service-provider"/>
 	 		<xsd:enumeration value="unmanaged"/>
 	 	</xsd:restriction>

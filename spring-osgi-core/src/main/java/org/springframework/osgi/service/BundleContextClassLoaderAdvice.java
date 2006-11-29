@@ -19,11 +19,11 @@ package org.springframework.osgi.service;
 
 import java.lang.reflect.Method;
 
-import org.springframework.aop.MethodBeforeAdvice;
+import org.osgi.framework.Bundle;
 import org.springframework.aop.AfterReturningAdvice;
+import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.aop.ThrowsAdvice;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.osgi.framework.Bundle;
 
 /**
  * Around advice that pushes a {@link Bundle}'s {@link ClassLoader} as the context classloader.

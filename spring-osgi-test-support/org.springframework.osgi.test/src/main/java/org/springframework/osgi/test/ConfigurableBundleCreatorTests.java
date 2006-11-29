@@ -117,6 +117,7 @@ public abstract class ConfigurableBundleCreatorTests extends OnTheFlyBundleCreat
 	 */
 	protected Properties getSettings() throws Exception {
 		Properties settings = new Properties(DEFAULT_SETTINGS);
+		settings.setProperty(ROOT_DIR, super.getRootPath());
 		Resource resource = new ClassPathResource(getSettingsLocation());
 
 		if (resource.exists()) {

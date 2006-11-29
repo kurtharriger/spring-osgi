@@ -44,21 +44,15 @@ class VirtualBundleBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(VirtualBundleFactoryBean.class);
-		NamedNodeMap attributes = element.getAttributes();
-		for (int x = 0; x < attributes.getLength(); x++) {
-			Attr attribute = (Attr) attributes.item(x);
-			String name = attribute.getLocalName();
 
-//			if (ID_ATTRIBUTE.equals(name)) {
-//				continue;
-//			}
-//			else if (ParserUtils.DEPENDS_ON.equals(name)) {
-//				ParserUtils.parseDependsOn(attribute, builder);
-//			}
-//			else {
-//				builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
-//			}
-		}
+		ParserUtils.parseCustomAttributes(element, builder, new ParserUtils.AttributeCallback() {
+
+			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
+				builder.addPropertyValue(Conventions.attributeNameToPropertyName(attribute.getLocalName()),
+					attribute.getValue());
+			}
+		});
+
 		Element e = DomUtils.getChildElementByTagName(element, "exports");
 		if (e != null) {
 			builder.addPropertyValue("exports", extractPackageSet(e));

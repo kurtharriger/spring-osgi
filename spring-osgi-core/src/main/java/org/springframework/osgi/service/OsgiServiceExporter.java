@@ -34,9 +34,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.Constants;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.util.Assert;
@@ -54,22 +54,24 @@ import org.springframework.util.StringUtils;
  * <li>BundleVersion=&lt;bundle version&gt;</li>
  * <li>org.springframework.osgi.beanname="&lt;bean name&gt;</li>
  * </ul>
- * 
+ *
  * @author Adrian Colyer
  * @author Costin Leau
  * @author Hal Hildebrand
+ * @author Andy Piper
  * @since 2.0
  */
-public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, InitializingBean, DisposableBean,
-		BundleContextAware {
+public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, DisposableBean,
+		BundleContextAware
+{
 
 	/**
 	 * ClassLoaderOptions Constants Class.
-	 * 
+	 *
 	 * @author Costin Leau
-	 * 
 	 */
-	protected class ClassLoaderOptions {
+	protected class ClassLoaderOptions
+	{
 		public static final int UNMANAGED = 0;
 		public static final int SERVICE_PROVIDER = 1;
 	}
@@ -83,7 +85,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	private Set publishedServices = new HashSet();
 
 	private Properties serviceProperties;
-	private String beanName = OsgiServiceExporter.class.getName();
+	private String targetBeanName = OsgiServiceExporter.class.getName();
 	private Class[] interfaces;
 
 	// TODO: what are these?
@@ -132,8 +134,8 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
-	public void setBeanName(String name) {
-		this.beanName = name;
+	public void setTargetBeanName(String name) {
+		this.targetBeanName = name;
 	}
 
 	public Class[] getInterfaces() {
@@ -179,7 +181,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 		Assert.notNull(resolver, "required property 'resolver' was set to a null value");
 		Assert.notNull(target, "required property 'target' has not been set");
 
-		publishService(target, mergeServiceProperties(beanName));
+		publishService(target, mergeServiceProperties(targetBeanName));
 	}
 
 	/*
@@ -188,11 +190,12 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
-        for (Iterator iter = this.publishedServices.iterator(); iter.hasNext();) {
+		for (Iterator iter = this.publishedServices.iterator(); iter.hasNext();) {
 			ServiceRegistration sReg = (ServiceRegistration) iter.next();
 			try {
 				sReg.unregister();
-			} catch (IllegalStateException ise) {
+			}
+			catch (IllegalStateException ise) {
 				// Service was already unregistered, probably because the bundle
 				// was stopped.
 				if (log.isInfoEnabled()) {
@@ -203,7 +206,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 	}
 
 	private Properties mergeServiceProperties(String beanName) {
-		Properties p = resolver.getServiceProperties();
+		Properties p = resolver.getServiceProperties(beanName);
 		if (serviceProperties != null) {
 			p.putAll(serviceProperties);
 		}
@@ -219,7 +222,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 
 		// fallback to classname
 		if (intfs == null || intfs.length == 0)
-			intfs = new Class[] { bean.getClass() };
+			intfs = new Class[]{bean.getClass()};
 
 		publishService(intfs, bean, serviceProperties);
 	}
@@ -237,20 +240,20 @@ public class OsgiServiceExporter implements BeanFactoryAware, BeanNameAware, Ini
 		// Service registration optionally proxied to avoid eager creation
 		ServiceRegistration s;
 
-		// TODO: rework this (bean name is unknown)
-//		if (beanFactory.containsBean("&" + beanName) || (beanFactory instanceof BeanDefinitionRegistry)
-//				&& ((BeanDefinitionRegistry) beanFactory).getBeanDefinition(beanName).isLazyInit()) {
-//			s = bundleContext.registerService(names, new BeanServiceFactory(beanName), serviceProperties);
-//		}
-//		else 
-		{
+		if (!targetBeanName.equals(getClass().getName()) &&
+				(beanFactory.containsBean(BeanFactory.FACTORY_BEAN_PREFIX + targetBeanName)
+						|| (beanFactory instanceof BeanDefinitionRegistry)
+						&& ((BeanDefinitionRegistry) beanFactory).getBeanDefinition(targetBeanName).isLazyInit())) {
+			s = bundleContext.registerService(names, new BeanServiceFactory(targetBeanName), serviceProperties);
+		} else {
 			s = bundleContext.registerService(names, bean, serviceProperties);
 		}
 		this.publishedServices.add(s);
 		return s;
 	}
 
-	private class BeanServiceFactory implements ServiceFactory {
+	private class BeanServiceFactory implements ServiceFactory
+	{
 		private String beanName;
 
 		public BeanServiceFactory(String beanName) {

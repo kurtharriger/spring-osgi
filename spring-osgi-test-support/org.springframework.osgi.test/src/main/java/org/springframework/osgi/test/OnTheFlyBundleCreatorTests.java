@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -32,6 +33,8 @@ import java.util.zip.ZipEntry;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.StringUtils;
@@ -67,6 +70,18 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
 	 * @return the root path
 	 */
 	protected String getRootPath() {
+		// load file using absolute path. This seems to be necessary in IntelliJ
+		try {
+			ResourceLoader fileLoader = new DefaultResourceLoader();
+			Resource res = fileLoader.getResource(getClass().getName().replace('.', '/').concat(".class"));
+			String fileLocation = "file://" + res.getFile().getAbsolutePath();
+			fileLocation = fileLocation.substring(0, fileLocation.indexOf("test-classes")) + "test-classes";
+			if (res.exists()) {
+				return fileLocation;
+			}
+		}
+		catch (IOException e) {
+		}
 		return "file:./target/test-classes";
 	}
 

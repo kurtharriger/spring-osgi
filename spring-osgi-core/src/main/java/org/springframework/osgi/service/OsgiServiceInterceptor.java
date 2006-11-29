@@ -19,12 +19,8 @@ package org.springframework.osgi.service;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.aop.MethodBeforeAdvice; 
+import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.aop.target.HotSwappableTargetSource;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.BundleContext;
 
 /**
  * @author Adrian Colyer
@@ -32,18 +28,17 @@ import org.osgi.framework.BundleContext;
  * @since 2.0
  */
 public class OsgiServiceInterceptor implements MethodBeforeAdvice {
-    private final Object unavailableService;
-    private final HotSwappableTargetSource targetSource;
+	private final Object unavailableService;
+	private final HotSwappableTargetSource targetSource;
 	private final Class serviceType;
 	private int maxRetries = OsgiServiceProxyFactoryBean.DEFAULT_MAX_RETRIES;
 	private long retryIntervalMillis = OsgiServiceProxyFactoryBean.DEFAULT_MILLIS_BETWEEN_RETRIES;
 
-    public OsgiServiceInterceptor(HotSwappableTargetSource targetSource, Class serviceType, Object unavailableService) {
+	public OsgiServiceInterceptor(HotSwappableTargetSource targetSource, Class serviceType, Object unavailableService) {
 		this.targetSource = targetSource;
 		this.serviceType = serviceType;
-        this.unavailableService = unavailableService;
-    }
-
+		this.unavailableService = unavailableService;
+	}
 
 	/**
 	 * The maximum number of times that we should attempt to rebind to a
@@ -69,17 +64,17 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice {
 	 * @see org.springframework.aop.MethodBeforeAdvice#before(java.lang.reflect.Method, java.lang.Object[], java.lang.Object)
 	 */
 	public synchronized void before(Method method, Object[] args, Object target) throws Throwable {
-        int numAttempts = 0;
-        while (targetSource.getTarget() == unavailableService && (numAttempts++ < this.maxRetries)) {
-            Thread.sleep(this.retryIntervalMillis);
-        }
-        if (targetSource.getTarget() == unavailableService) {
-            // no luck!
-            throw new ServiceUnavailableException(
-                    "The target OSGi service of type '" + "was unregistered " +
-                    "and no suitable replacement was found after retrying " +
-                    this.maxRetries + " times.",
-                    this.serviceType, null);
-        } 
-    }
+		int numAttempts = 0;
+		while (targetSource.getTarget() == unavailableService && (numAttempts++ < this.maxRetries)) {
+			Thread.sleep(this.retryIntervalMillis);
+		}
+		if (targetSource.getTarget() == unavailableService) {
+			// no luck!
+			throw new ServiceUnavailableException(
+				"The target OSGi service of type '" + "was unregistered " +
+					"and no suitable replacement was found after retrying " +
+					this.maxRetries + " times.",
+				this.serviceType, null);
+		}
+	}
 }

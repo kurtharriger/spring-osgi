@@ -26,7 +26,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.OsgiServiceExporter;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -45,10 +44,10 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 	public static final String PROPS_ID = "service-properties";
 	public static final String REF = "ref";
 
-	
+
 	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateId()
-	 */
+		 * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateId()
+		 */
 	protected boolean shouldGenerateId() {
 		return true;
 	}
@@ -100,10 +99,10 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 					// check shortcut
 					if (element.hasAttribute(INTERFACE)) {
 						parserContext.getReaderContext().error(
-								"either 'interface' attribute or <intefaces> element can be specified", element);
+							"either 'interface' attribute or <intefaces> element can be specified", element);
 					}
 					Set interfaces = parserContext.getDelegate().parseSetElement(subElement,
-							builder.getBeanDefinition());
+						builder.getBeanDefinition());
 					builder.addPropertyValue(INTERFACES_ID, interfaces);
 				}
 
@@ -116,8 +115,8 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 				else {
 					if (element.hasAttribute(REF))
 						parserContext.getReaderContext().error(
-								"nested bean definition/reference cannot be used when attribute 'ref' is specified",
-								element);
+							"nested bean definition/reference cannot be used when attribute 'ref' is specified",
+							element);
 					target = parserContext.getDelegate().parsePropertySubElement(subElement, builder.getBeanDefinition());
 				}
 			}
@@ -125,6 +124,9 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 
 		builder.addPropertyValue("target", target);
+		if (target instanceof RuntimeBeanReference) {
+			builder.addPropertyValue("targetBeanName", ((RuntimeBeanReference)target).getBeanName());
+		}
 		return builder.getBeanDefinition();
 	}
 }
