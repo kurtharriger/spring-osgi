@@ -43,6 +43,7 @@ public class FileSystemAccessTest extends ConfigurableBundleCreatorTests {
 		// try loading the file using OsgiBundleResourceLoader
 		Resource osgiResource = getResourceLoader().getResource(fileLocation);
 		// check existence of the same file when loading through the OsgiBundleRL
-		assertFalse(osgiResource.exists());
+		// NOTE andyp -- we want this to work!!
+		assertTrue(osgiResource.exists());
 	}
 }

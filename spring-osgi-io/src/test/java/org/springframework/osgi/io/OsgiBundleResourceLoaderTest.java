@@ -48,7 +48,7 @@ public class OsgiBundleResourceLoaderTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResourceLoader#getResource(java.lang.String)}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResourceLoader#getResource(java.lang.String)}.
 	 */
 	public void testGetClasspathResource() throws Exception {
 		String res = "foo.txt";

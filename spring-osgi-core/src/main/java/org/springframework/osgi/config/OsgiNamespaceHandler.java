@@ -16,7 +16,6 @@
  */
 package org.springframework.osgi.config;
 
-import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.osgi.context.BundleFactoryBean;
 import org.w3c.dom.Element;
@@ -40,11 +39,7 @@ public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
 		
 		registerBeanDefinitionParser("config", new OsgiConfigDefinitionParser());
 
-		registerBeanDefinitionParser("bundle", new DependentAbstractSingleBeanDefinitionParser() {
-			protected Class getBeanClass(Element element) {
-				return BundleFactoryBean.class;
-			}
-		});
+		registerBeanDefinitionParser("bundle", new BundleBeanDefinitionParser());
 
 		registerBeanDefinitionParser("virtual-bundle", new VirtualBundleBeanDefinitionParser());
 	}

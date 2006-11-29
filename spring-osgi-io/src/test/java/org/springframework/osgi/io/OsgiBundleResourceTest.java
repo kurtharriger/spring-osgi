@@ -16,6 +16,7 @@
 package org.springframework.osgi.io;
 
 import java.io.InputStream;
+import java.io.File;
 import java.net.URL;
 
 import junit.framework.TestCase;
@@ -48,7 +49,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#hashCode()}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#hashCode()}.
 	 */
 	public void testHashCode() {
 		assertEquals(path.hashCode(), resource.hashCode());
@@ -56,7 +57,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#OsgiBundleResource(org.osgi.framework.Bundle, java.lang.String)}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#OsgiBundleResource(org.osgi.framework.Bundle, java.lang.String)}.
 	 */
 	public void testOsgiBundleResource() {
 		assertSame(bundle, resource.getBundle());
@@ -65,7 +66,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#getPath()}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#getPath()}.
 	 */
 	public void testGetPath() {
 		assertEquals(path, resource.getPath());
@@ -73,7 +74,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#getBundle()}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#getBundle()}.
 	 */
 	public void testGetBundle() {
 		assertSame(bundle, resource.getBundle());
@@ -81,7 +82,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#getInputStream()}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#getInputStream()}.
 	 */
 	public void testGetInputStream() throws Exception {
 		InputStream stream = resource.getInputStream();
@@ -91,7 +92,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#getURL()}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#getURL()}.
 	 */
 	public void testGetURL() throws Exception {
 		assertNotNull(resource.getURL());
@@ -104,11 +105,24 @@ public class OsgiBundleResourceTest extends TestCase {
 		catch (Exception ex) {
 			// expected
 		}
+
+    File tmp = File.createTempFile("foo", "bar");
+    resource = new OsgiBundleResource(bundle, "file:" + tmp.toString());
+    assertNotNull(resource.getURL());
+
+    resource = new OsgiBundleResource(bundle, "file:foo" + tmp.toString());
+    try {
+      resource.getURL();
+      fail("should have thrown exception");
+    }
+    catch (Exception ex) {
+      // expected
+    }
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#getResourceFromBundle(java.lang.String)}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#getResourceFromBundle(java.lang.String)}.
 	 */
 	public void testGetResourceFromBundle() throws Exception {
 		MockControl control = MockControl.createControl(Bundle.class);
@@ -128,7 +142,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#getResourceFromBundleClasspath(java.lang.String)}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#getResourceFromBundleClasspath(java.lang.String)}.
 	 */
 	public void testGetResourceFromBundleClasspath() throws Exception {
 		MockControl control = MockControl.createControl(Bundle.class);
@@ -148,7 +162,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#isRelativePath(java.lang.String)}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#isRelativePath(java.lang.String)}.
 	 */
 	public void testIsRelativePath() {
 		assertTrue(resource.isRelativePath("foo"));
@@ -158,7 +172,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#createRelative(java.lang.String)}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#createRelative(java.lang.String)}.
 	 */
 	public void testCreateRelativeString() {
 		String location = "foo";
@@ -169,7 +183,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#getFilename()}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#getFilename()}.
 	 */
 	public void testGetFilename() {
 		assertNotNull(resource.getFilename());
@@ -177,7 +191,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#getDescription()}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#getDescription()}.
 	 */
 	public void testGetDescription() {
 		assertNotNull(resource.getDescription());
@@ -185,7 +199,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.context.OsgiBundleResource#equals(java.lang.Object)}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#equals(java.lang.Object)}.
 	 */
 	public void testEqualsObject() {
 		assertEquals(resource, new OsgiBundleResource(bundle, path));

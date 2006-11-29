@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  * not searched.
  * 
  * @see org.osgi.framework.Bundle
- * @see org.springframework.osgi.context.OsgiBundleResource
+ * @see org.springframework.osgi.io.OsgiBundleResource
  * 
  * @author Adrian Colyer
  * @author Costin Leau

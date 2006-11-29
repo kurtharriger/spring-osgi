@@ -6,7 +6,7 @@ Bundle-SymbolicName: org.springframework.dao
 Bundle-Name: org.springframework.dao
 Bundle-Version: 2.0
 Bundle-Vendor: Spring Framework
-Import-Package: javax.transaction,
+Import-Package: javax.transaction;version=1.0.1;resolution:=optional,
    org.aopalliance.intercept,
    org.apache.commons.logging,
    org.objectweb.jotm;resolution:=optional,

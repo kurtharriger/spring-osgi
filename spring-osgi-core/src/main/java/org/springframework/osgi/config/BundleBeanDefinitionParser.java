@@ -19,39 +19,29 @@ package org.springframework.osgi.config;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.core.Conventions;
+import org.springframework.osgi.context.BundleFactoryBean;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 
 /**
  * AbstractSingleBeanDefinitionParser that supports the "depends-on" attribute.
  *
  * @author Andy Piper
  */
-public abstract class DependentAbstractSingleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser
-{
+public class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	public static final String LAZY_INIT = "lazy-init";
 
 	protected void doParse(Element element, BeanDefinitionBuilder builder) {
+		ParserUtils.parseCustomAttributes(element, builder, new ParserUtils.AttributeCallback() {
 
-		NamedNodeMap attributes = element.getAttributes();
-		for (int x = 0; x < attributes.getLength(); x++) {
-			Attr attribute = (Attr) attributes.item(x);
-			String name = attribute.getLocalName();
-
-//			if (ID_ATTRIBUTE.equals(name)) {
-//				continue;
-//			} else if (ParserUtils.DEPENDS_ON.equals(name)) {
-//				ParserUtils.parseDependsOn(attribute,  builder);
-//			} else if (LAZY_INIT.equals(name)) {
-//				builder.setLazyInit(Boolean.getBoolean(attribute.getValue()));
-//			} else if (!doParseAttribute(attribute, builder)) {
-//				builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
-//			}
-		}
+			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
+				builder.addPropertyValue(Conventions.attributeNameToPropertyName(attribute.getLocalName()),
+					attribute.getValue());
+			}
+		});
 	}
 
-	protected boolean doParseAttribute(Attr attribute, BeanDefinitionBuilder builder) {
-		return false;
+	protected Class getBeanClass(Element element) {
+		return BundleFactoryBean.class;
 	}
 }

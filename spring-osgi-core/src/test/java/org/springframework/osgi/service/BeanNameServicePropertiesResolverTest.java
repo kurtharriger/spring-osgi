@@ -66,14 +66,15 @@ public class BeanNameServicePropertiesResolverTest extends TestCase {
 		
 		BeanNameServicePropertiesResolver resolver = new BeanNameServicePropertiesResolver();
 		resolver.setBundleContext(mockContext);
-		Properties ret = resolver.getServiceProperties();
+		Properties ret = resolver.getServiceProperties("myBean");
 		
 		bundleControl.verify();
 		bundleContextControl.verify();
 		
-		assertEquals("2 properties",2,ret.size()); 
+		assertEquals("3 properties",3,ret.size());
 		assertEquals("symbolic-name",ret.get("Bundle-SymbolicName"));
 		assertEquals("1.0.0",ret.get("Bundle-Version"));
+		assertEquals("myBean",ret.get("org.springframework.osgi.beanname"));
 	}
 	
 }

@@ -114,7 +114,7 @@ public class OsgiServiceExporterTest extends TestCase {
 		//Object thisBean = new Object();
 		//this.beanFactoryControl.setReturnValue(thisBean);
 
-		resolver.getServiceProperties();
+		resolver.getServiceProperties(beanName);
 		mc.setReturnValue(new Properties());
 
 		this.bundleContext.registerService((String[]) null, null, null);

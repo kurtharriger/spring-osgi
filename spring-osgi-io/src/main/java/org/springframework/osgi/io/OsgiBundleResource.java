@@ -18,8 +18,10 @@ package org.springframework.osgi.io;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.MalformedURLException;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.AbstractResource;
@@ -28,6 +30,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.util.ResourceUtils;
 
 /**
  * Resource implementation for OSGi environments. Lazy evaluation of the
@@ -44,169 +47,189 @@ import org.springframework.util.StringUtils;
  */
 public class OsgiBundleResource extends AbstractResource {
 
-	public static final String BUNDLE_URL_PREFIX = "bundle:";
-	public static final String BUNDLE_URL_URL_PREFIX = "bundle-url:";
-	private static final char PREFIX_SEPARATOR = ':';
-	private static final String ABSOLUTE_PATH_PREFIX = "/";
+  public static final String BUNDLE_URL_PREFIX = "bundle:";
+  public static final String BUNDLE_URL_URL_PREFIX = "bundle-url:";
+  private static final char PREFIX_SEPARATOR = ':';
+  private static final String ABSOLUTE_PATH_PREFIX = "/";
 
-	private final Bundle bundle;
-	private final String path;
-	
-	public OsgiBundleResource(Bundle bundle, String path) {
-		Assert.notNull(bundle, "Bundle must not be null");
-		this.bundle = bundle;
+  private final Bundle bundle;
+  private final String path;
 
-		// check path
-		Assert.notNull(path, "Path must not be null");
+  public OsgiBundleResource(Bundle bundle, String path) {
+    Assert.notNull(bundle, "Bundle must not be null");
+    this.bundle = bundle;
 
-		this.path = StringUtils.cleanPath(path);
-	}
+    // check path
+    Assert.notNull(path, "Path must not be null");
 
-	/**
-	 * Return the path for this resource.
-	 */
-	public final String getPath() {
-		return path;
-	}
+    this.path = StringUtils.cleanPath(path);
+  }
 
-	/**
-	 * Return the bundle for this resource.
-	 */
-	public final Bundle getBundle() {
-		return bundle;
-	}
+  /**
+   * Return the path for this resource.
+   */
+  public final String getPath() {
+    return path;
+  }
 
-	/**
-	 * This implementation opens an InputStream for the given URL. It sets the
-	 * "UseCaches" flag to <code>false</code>, mainly to avoid jar file
-	 * locking on Windows.
-	 * 
-	 * @see java.net.URL#openConnection()
-	 * @see java.net.URLConnection#setUseCaches(boolean)
-	 * @see java.net.URLConnection#getInputStream()
-	 */
-	public InputStream getInputStream() throws IOException {
-		URLConnection con = getURL().openConnection();
-		con.setUseCaches(false);
-		return con.getInputStream();
-	}
+  /**
+   * Return the bundle for this resource.
+   */
+  public final Bundle getBundle() {
+    return bundle;
+  }
 
-	/**
-	 * This implementation returns a URL for the underlying bundle resource.
-	 * 
-	 * @see org.osgi.framework.Bundle#getEntry(String)
-	 * @see org.osgi.framework.Bundle#getResource(String)
-	 */
-	public URL getURL() throws IOException {
-		URL url = null;
+  /**
+   * This implementation opens an InputStream for the given URL. It sets the
+   * "UseCaches" flag to <code>false</code>, mainly to avoid jar file
+   * locking on Windows.
+   *
+   * @see java.net.URL#openConnection()
+   * @see java.net.URLConnection#setUseCaches(boolean)
+   * @see java.net.URLConnection#getInputStream()
+   */
+  public InputStream getInputStream() throws IOException {
+    URLConnection con = getURL().openConnection();
+    con.setUseCaches(false);
+    return con.getInputStream();
+  }
 
-		if (this.path.startsWith(BUNDLE_URL_PREFIX)) {
-			url = getResourceFromBundle(this.path.substring(BUNDLE_URL_PREFIX.length()));
-		}
-		else if (this.path.startsWith(BUNDLE_URL_URL_PREFIX)) {
-			url = new URL(this.path.substring(BUNDLE_URL_URL_PREFIX.length()));
-		}
-		else if (this.path.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)) {
-			url = getResourceFromBundleClasspath(this.path.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length()));
-		}
+  /**
+   * This implementation returns a URL for the underlying bundle resource.
+   *
+   * @see org.osgi.framework.Bundle#getEntry(String)
+   * @see org.osgi.framework.Bundle#getResource(String)
+   */
+  public URL getURL() throws IOException {
+    URL url = null;
 
-		// Costin: default fallback - take from resource classpath
-		// TODO: should it matter if the path is absolute or not?
-		else {
-			url = getResourceFromBundleClasspath(this.path);
-		}
+    if (this.path.startsWith(BUNDLE_URL_PREFIX)) {
+      url = getResourceFromBundle(this.path.substring(BUNDLE_URL_PREFIX.length()));
+    }
+    else if (this.path.startsWith(BUNDLE_URL_URL_PREFIX)) {
+      url = new URL(this.path.substring(BUNDLE_URL_URL_PREFIX.length()));
+    }
+    else if (this.path.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)) {
+      url = getResourceFromBundleClasspath(this.path.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length()));
+    }
+    else if (this.path.startsWith(ResourceUtils.FILE_URL_PREFIX)) {
+      url = getResourceFromFilesystem(this.path.substring(ResourceUtils.FILE_URL_PREFIX.length()));
+    }
+    // Costin: default fallback - take from resource classpath
+    // TODO: should it matter if the path is absolute or not?
+    else {
+      url = getResourceFromBundleClasspath(this.path);
+    }
 
-		if (url == null) {
-			throw new FileNotFoundException(getDescription() + " cannot be resolved to URL because it does not exist");
-		}
-		return url;
-	}
+    if (url == null) {
+      throw new FileNotFoundException(getDescription() + " cannot be resolved to URL because it does not exist");
+    }
+    return url;
+  }
 
-	/**
-	 * Resolves a resource from *this bundle only*. Only the bundle and its
-	 * attached fragments are searched for the given resource.
-	 * 
-	 * @param bundleRelativePath
-	 * @return a URL to the returned resource or null if none is found
-	 * 
-	 * @see org.osgi.framework.Bundle#getEntry(String)
-	 */
-	protected URL getResourceFromBundle(String bundleRelativePath) {
-		return bundle.getEntry(bundleRelativePath);
-	}
+  /**
+   * Resolves a resource from the filesystem.
+   *
+   * @param fileName
+   * @return a URL to the returned resource or null if none is found
+   */
+  protected URL getResourceFromFilesystem(String fileName) {
+    File f = new File(fileName);
+    if (!f.exists()) {
+      return null;
+    }
+    try {
+      return f.toURL();
+    } catch (MalformedURLException e) {
+      return null;
+    }
+  }
 
-	/**
-	 * Resolves a resource from the bundle's classpath. This will find resources
-	 * in this bundle and also in imported packages from other bundles.
-	 * 
-	 * @param bundleRelativePath
-	 * @return a URL to the returned resource or null if none is found
-	 * 
-	 * @see org.osgi.framework.Bundle#getResource(String)
-	 */
-	protected URL getResourceFromBundleClasspath(String bundleRelativePath) {
-		return bundle.getResource(bundleRelativePath);
-	}
+  /**
+   * Resolves a resource from *this bundle only*. Only the bundle and its
+   * attached fragments are searched for the given resource.
+   *
+   * @param bundleRelativePath
+   * @return a URL to the returned resource or null if none is found
+   *
+   * @see org.osgi.framework.Bundle#getEntry(String)
+   */
+  protected URL getResourceFromBundle(String bundleRelativePath) {
+    return bundle.getEntry(bundleRelativePath);
+  }
 
-	/**
-	 * Determine if the given path is relative or absolute.
-	 * 
-	 * @param locationPath
-	 * @return
-	 */
-	protected boolean isRelativePath(String locationPath) {
-		return ((locationPath.indexOf(PREFIX_SEPARATOR) == -1) && !locationPath.startsWith(ABSOLUTE_PATH_PREFIX));
-	}
+  /**
+   * Resolves a resource from the bundle's classpath. This will find resources
+   * in this bundle and also in imported packages from other bundles.
+   *
+   * @param bundleRelativePath
+   * @return a URL to the returned resource or null if none is found
+   *
+   * @see org.osgi.framework.Bundle#getResource(String)
+   */
+  protected URL getResourceFromBundleClasspath(String bundleRelativePath) {
+    return bundle.getResource(bundleRelativePath);
+  }
 
-	/**
-	 * This implementation creates a OsgiBundleResource, applying the given path
-	 * relative to the path of the underlying resource of this descriptor.
-	 * 
-	 * @see org.springframework.util.StringUtils#applyRelativePath(String,
-	 *      String)
-	 */
-	public Resource createRelative(String relativePath) {
-		String pathToUse = StringUtils.applyRelativePath(this.path, relativePath);
-		return new OsgiBundleResource(this.bundle, pathToUse);
-	}
+  /**
+   * Determine if the given path is relative or absolute.
+   *
+   * @param locationPath
+   * @return
+   */
+  protected boolean isRelativePath(String locationPath) {
+    return ((locationPath.indexOf(PREFIX_SEPARATOR) == -1) && !locationPath.startsWith(ABSOLUTE_PATH_PREFIX));
+  }
 
-	/**
-	 * This implementation returns the name of the file that this bundle path
-	 * resource refers to.
-	 * 
-	 * @see org.springframework.util.StringUtils#getFilename(String)
-	 */
-	public String getFilename() {
-		return StringUtils.getFilename(this.path);
-	}
+  /**
+   * This implementation creates a OsgiBundleResource, applying the given path
+   * relative to the path of the underlying resource of this descriptor.
+   *
+   * @see org.springframework.util.StringUtils#applyRelativePath(String,
+   *      String)
+   */
+  public Resource createRelative(String relativePath) {
+    String pathToUse = StringUtils.applyRelativePath(this.path, relativePath);
+    return new OsgiBundleResource(this.bundle, pathToUse);
+  }
 
-	/**
-	 * This implementation returns a description that includes the bundle
-	 * location.
-	 */
-	public String getDescription() {
-		return "OSGi bundle resource [" + this.path + "]";
-	}
+  /**
+   * This implementation returns the name of the file that this bundle path
+   * resource refers to.
+   *
+   * @see org.springframework.util.StringUtils#getFilename(String)
+   */
+  public String getFilename() {
+    return StringUtils.getFilename(this.path);
+  }
 
-	/**
-	 * This implementation compares the underlying bundle and path locations.
-	 */
-	public boolean equals(Object obj) {
-		if (obj == this) {
-			return true;
-		}
-		if (obj instanceof OsgiBundleResource) {
-			OsgiBundleResource otherRes = (OsgiBundleResource) obj;
-			return (this.path.equals(otherRes.path) && ObjectUtils.nullSafeEquals(this.bundle, otherRes.bundle));
-		}
-		return false;
-	}
+  /**
+   * This implementation returns a description that includes the bundle
+   * location.
+   */
+  public String getDescription() {
+    return "OSGi bundle resource [" + this.path + "]";
+  }
 
-	/**
-	 * This implementation returns the hash code of the underlying class path
-	 * location.
-	 */
-	public int hashCode() {
-		return this.path.hashCode();
-	}
+  /**
+   * This implementation compares the underlying bundle and path locations.
+   */
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj instanceof OsgiBundleResource) {
+      OsgiBundleResource otherRes = (OsgiBundleResource) obj;
+      return (this.path.equals(otherRes.path) && ObjectUtils.nullSafeEquals(this.bundle, otherRes.bundle));
+    }
+    return false;
+  }
+
+  /**
+   * This implementation returns the hash code of the underlying class path
+   * location.
+   */
+  public int hashCode() {
+    return this.path.hashCode();
+  }
 }

@@ -62,6 +62,9 @@ public class LifecycleTest extends ConfigurableBundleCreatorTests {
         }
         assertNotNull("Could not find the test bundle", testBundle);
         testBundle.stop();
+	    while (testBundle.getState() == Bundle.STOPPING) {
+            Thread.sleep(10);
+        }
         assertEquals("Guinea pig didn't shutdown", "true",
                      System.getProperty("org.springframework.osgi.test.lifecycle.GuineaPig.close"));
     }
