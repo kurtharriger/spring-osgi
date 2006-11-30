@@ -16,7 +16,6 @@
  */
 package org.springframework.osgi.context;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -33,11 +32,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.Constants;
 import org.osgi.framework.SynchronousBundleListener;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.xml.PluggableSchemaResolver;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.osgi.context.support.AbstractRefreshableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.DefaultOsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
@@ -50,19 +46,18 @@ import org.springframework.util.StringUtils;
  * Bootstrap listener for Spring applications inside an OSGi environment. The
  * listener looks in well known locations for Spring-OSGi specific information
  * and, based on it, publishes the application context inside OSGi.
- * 
+ *
  * @author Bill Gallagher
  * @author Andy Piper
  * @author Hal Hildebrand
  */
-public class ContextLoaderListener implements BundleActivator, SynchronousBundleListener {
+public class ContextLoaderListener implements BundleActivator, SynchronousBundleListener
+{
 	// The standard for META-INF header keys excludes ".", so these constants
 	// must use "-"
 	private static final String CONTEXT_LOCATION_HEADER = "org-springframework-context";
 	private static final String CONTEXT_LOCATION_DELIMITERS = ", ";
 	private static final String SPRING_CONTEXT_DIRECTORY = "/META-INF/spring/";
-	private static final String DEFAULT_GLOBAL_CONFIG = "spring.xml";
-	private static final String GLOBAL_CONFIG_PROP = "org.springframework.osgi.config";
 	private static final String SPRING_HANDLER_MAPPINGS_LOCATION = "META-INF/spring.handlers";
 	// TODO - HSH: Needs review. Hate using a static, but the
 	// OsgiWebApplicationContext seems to require it
@@ -70,23 +65,12 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 	private static final Log log = LogFactory.getLog(ContextLoaderListener.class);
 
-	private static class ContextEntry {
-		public ContextEntry(String config) {
-			this.config = new File(config);
-		}
-
-		private AbstractRefreshableOsgiBundleApplicationContext context;
-		private long lastModified;
-		private File config;
-	}
-
-	private ContextEntry[] contexts;
 	private long bundleId;
 
 	private OsgiBundleXmlApplicationContextFactory contextFactory = new DefaultOsgiBundleXmlApplicationContextFactory();
 
 	private Map managedBundles = new HashMap();
-	
+
 	// required to work around knopflerfish getResource bug...
 	private boolean isKnopflerfish = false;
 
@@ -96,21 +80,11 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 	// Required by the BundleActivator contract
 	public ContextLoaderListener() {
-		// load the 'watched' Spring XML file locations
-		String config = System.getProperty(GLOBAL_CONFIG_PROP);
-		if (config == null) {
-			config = DEFAULT_GLOBAL_CONFIG;
-		}
-		String[] files = StringUtils.tokenizeToStringArray(config, ",");
-		contexts = new ContextEntry[files.length];
-		for (int i = 0; i < files.length; i++) {
-			contexts[i] = new ContextEntry(files[i]);
-		}
 	}
 
 	public void start(BundleContext context) throws Exception {
 		this.isKnopflerfish = OsgiPlatformDetector.isKnopflerfish(context);
-		
+
 		// Collect all previously resolved bundles which have namespace plugins
 		Bundle[] previousBundles = context.getBundles();
 		for (int i = 0; i < previousBundles.length; i++) {
@@ -120,31 +94,9 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		bundleId = context.getBundle().getBundleId();
 
 		context.addBundleListener(this);
-
-		ApplicationContext parent = null;
-		for (int i = 0; i < contexts.length; i++) {
-			contexts[i].lastModified = contexts[i].config.lastModified();
-			if (contexts[i].config.exists()) {
-				contexts[i].context = contextFactory.createApplicationContextWithBundleContext(parent, context,
-						new String[] { contexts[i].config.toURL().toString() }, plugins, false);
-				parent = contexts[i].context;
-			}
-		}
-
-		// TODO: is this really necessary?  - the bundle is unpacked inside the OSGi framework
-		// and the file isn't actually accessed. It's likely that in case of an update
-		// the bundle will be stopped and then started again.
-		Thread updateThread = new UpdateThread();
-		updateThread.setDaemon(true);
-		updateThread.start();
 	}
 
 	public void stop(BundleContext context) throws Exception {
-		for (int i = 0; i < contexts.length; i++) {
-			if (contexts[i].context != null) {
-				contexts[i].context.close();
-			}
-		}
 	}
 
 	public void bundleChanged(BundleEvent event) {
@@ -153,28 +105,28 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		}
 
 		switch (event.getType()) {
-		case BundleEvent.STARTED:
-			startBundle(event.getBundle());
-			break;
-		case BundleEvent.STOPPING:
-			stopBundle(event.getBundle());
-			break;
-		case BundleEvent.RESOLVED:
-			resolveBundle(event.getBundle());
-			break;
-		case BundleEvent.UNRESOLVED:
-			unresolveBundle(event.getBundle());
-			break;
+			case BundleEvent.STARTED:
+				startBundle(event.getBundle());
+				break;
+			case BundleEvent.STOPPING:
+				stopBundle(event.getBundle());
+				break;
+			case BundleEvent.RESOLVED:
+				resolveBundle(event.getBundle());
+				break;
+			case BundleEvent.UNRESOLVED:
+				unresolveBundle(event.getBundle());
+				break;
 		}
 	}
 
 	private void startBundle(Bundle bundle) {
 		String[] applicationContextLocations = getApplicationContextLocations(bundle);
-        if (applicationContextLocations == null) {
-            return; // Nothing to do...
-        }
+		if (applicationContextLocations == null) {
+			return; // Nothing to do...
+		}
 
-        BundleContext bundleContext = OsgiResourceUtils.getBundleContext(bundle);
+		BundleContext bundleContext = OsgiResourceUtils.getBundleContext(bundle);
 		if (bundleContext == null) {
 			log.error("Could not resolve BundleContext for bundle [" + bundle + "]");
 			return;
@@ -184,10 +136,10 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		try {
 			if (log.isInfoEnabled()) {
 				log.info("Starting bundle ["
-                         + bundle.getHeaders().get(Constants.BUNDLE_NAME)
-                         + "] with configuration ["
-                         + StringUtils.arrayToCommaDelimitedString(applicationContextLocations)
-                         + "]");
+						+ bundle.getHeaders().get(Constants.BUNDLE_NAME)
+						+ "] with configuration ["
+						+ StringUtils.arrayToCommaDelimitedString(applicationContextLocations)
+						+ "]");
 			}
 			ConfigurableApplicationContext ctx = contextFactory.createApplicationContextWithBundleContext(null,
 					bundleContext, applicationContextLocations, plugins, true);
@@ -213,9 +165,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			if (bundle.getEntry(SPRING_HANDLER_MAPPINGS_LOCATION) != null
 					|| bundle.getEntry(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
 				plugins.addHandler(bundle);
-			}			
-		}
-		else {
+			}
+		} else {
 			if (bundle.getResource(SPRING_HANDLER_MAPPINGS_LOCATION) != null
 					|| bundle.getResource(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
 				plugins.addHandler(bundle);
@@ -248,12 +199,10 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			}
 			if (ret.isEmpty()) {
 				return null;
-			}
-			else {
+			} else {
 				return (String[]) ret.toArray();
 			}
-		}
-		else {
+		} else {
 			List resourceList = new ArrayList();
 			Enumeration resources = bundle.findEntries(SPRING_CONTEXT_DIRECTORY, "*.xml", false);
 			if (resources != null) {
@@ -264,35 +213,9 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			}
 			if (resourceList.isEmpty()) {
 				return null;
-			}
-			else {
+			} else {
 				String[] ret = new String[resourceList.size()];
 				return (String[]) resourceList.toArray(ret);
-				}
-		}
-	}
-
-	private class UpdateThread extends Thread {
-		private static final int SLEEP_TIME = 500;
-
-		public void run() {
-			while (true) {
-				for (int i = 0; i < contexts.length; i++) {
-					if (contexts[i].config.exists() && (contexts[i].config.lastModified() != contexts[i].lastModified)) {
-						contexts[i].lastModified = contexts[i].config.lastModified();
-						try {
-							contexts[i].context.refresh();
-						}
-						catch (BeansException be) {
-							log.error("Error updating configuration from spring.xml", be);
-						}
-					}
-				}
-				try {
-					Thread.sleep(SLEEP_TIME);
-				}
-				catch (InterruptedException ignore) {
-				}
 			}
 		}
 	}

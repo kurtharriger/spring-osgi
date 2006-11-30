@@ -21,7 +21,7 @@
 				</xsd:sequence>
 				<xsd:attribute name="interface" use="required" type="xsd:string"/>
 				<xsd:attribute name="filter" use="optional" type="xsd:string"/>
-				<xsd:attribute name="timeout" use="optional" type="xsd:int" default="3000"/>
+				<xsd:attribute name="timeout" use="optional" type="xsd:int" default="0"/>
 				<xsd:attribute name="cardinality" use="optional" type="Tcardinality" default="1..1"/>
 				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
 				<xsd:attribute name="bean-name" type="xsd:string" use="optional"/>

@@ -9,6 +9,6 @@
         <property name="reference" ref="simpleServiceOsgi"/>
     </bean>
 
-    <osgi:reference id="simpleServiceOsgi" interface="org.springframework.osgi.samples.simpleservice.MyService"/>
+    <osgi:reference id="simpleServiceOsgi" timeout="3000" interface="org.springframework.osgi.samples.simpleservice.MyService"/>
 
 </beans>
