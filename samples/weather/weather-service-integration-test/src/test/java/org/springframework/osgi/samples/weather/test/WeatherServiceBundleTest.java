@@ -16,6 +16,7 @@
 package org.springframework.osgi.samples.weather.test;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -98,7 +99,7 @@ public class WeatherServiceBundleTest extends ConfigurableBundleCreatorTests {
         try {
             WeatherService weather = (WeatherService) context.getService(ref);
             assertNotNull("Cannot find the service", weather);
-            assertEquals(new Double(25.0), weather.getHistoricalHigh(new Date()));
+            assertEquals(new Double(15.0), weather.getHistoricalHigh(new GregorianCalendar(2004, 0, 1).getTime()));
         } finally {
             context.ungetService(ref);
         }

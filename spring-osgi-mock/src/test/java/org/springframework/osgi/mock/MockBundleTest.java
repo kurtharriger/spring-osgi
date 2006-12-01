@@ -141,7 +141,7 @@ public class MockBundleTest extends TestCase {
 	 * {@link org.springframework.osgi.mock.MockBundle#getEntry(java.lang.String)}.
 	 */
 	public void testGetEntry() throws Exception {
-		assertNotNull(mock.getEntry(MockBundleTest.class.getPackage().getName().replace(".", "/")
+		assertNotNull(mock.getEntry(MockBundleTest.class.getPackage().getName().replace('.', '/')
 				+ "/MockBundleTest.class"));
 	}
 
@@ -199,7 +199,7 @@ public class MockBundleTest extends TestCase {
 	 * {@link org.springframework.osgi.mock.MockBundle#getResource(java.lang.String)}.
 	 */
 	public void testGetResource() {
-		assertNotNull(mock.getResource(MockBundleTest.class.getPackage().getName().replace(".", "/")
+		assertNotNull(mock.getResource(MockBundleTest.class.getPackage().getName().replace('.', '/')
 				+ "/MockBundleTest.class"));
 	}
 
@@ -208,7 +208,7 @@ public class MockBundleTest extends TestCase {
 	 * {@link org.springframework.osgi.mock.MockBundle#getResources(java.lang.String)}.
 	 */
 	public void testGetResources() throws Exception {
-		assertNotNull(mock.getResources(MockBundleTest.class.getPackage().getName().replace(".", "/")));
+		assertNotNull(mock.getResources(MockBundleTest.class.getPackage().getName().replace('.', '/')));
 	}
 
 	/**
