@@ -16,6 +16,7 @@
     <base.spring.version>2.0.1</base.spring.version>
   </properties>
   <modules>
+    <module>spring-bundle-classpath</module>
     <module>spring-aop</module>
     <module>spring-aspects</module>
     <module>spring-beans</module>

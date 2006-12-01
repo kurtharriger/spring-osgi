@@ -4,7 +4,7 @@ Spring-Version: 2.1
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.springframework.osgi
 Bundle-Name: org.springframework.osgi
-Bundle-Version: 2.0
+Bundle-Version: 1.0
 Bundle-Vendor: Spring Framework
 Import-Package: org.apache.commons.logging,
    org.osgi.framework,
@@ -24,17 +24,17 @@ Import-Package: org.apache.commons.logging,
    org.springframework.core;version=2.1.0,
    org.springframework.core.io;version=2.1.0,
    org.springframework.core.io.support;version=2.1.0,
-   org.springframework.osgi.io,
+   org.springframework.osgi.io;version=1.0.0,
    org.springframework.util;version=2.1.0,
    org.springframework.util.xml;version=2.1.0,
    org.springframework.web.context;version=2.1.0;resolution:=optional,
    org.springframework.web.context.support;version=2.1.0;resolution:=optional,
    org.aopalliance.aop
-Export-Package: org.springframework.osgi.bundle.support;version=2.1.0,
-   org.springframework.osgi.config;version=2.1.0,
-   org.springframework.osgi.context;version=2.1.0,
-   org.springframework.osgi.context.support;version=2.1.0,
-   org.springframework.osgi.service;version=2.1.0
+Export-Package: org.springframework.osgi.bundle.support;version=1.0.0,
+   org.springframework.osgi.config;version=1.0.0,
+   org.springframework.osgi.context;version=1.0.0,
+   org.springframework.osgi.context.support;version=1.0.0,
+   org.springframework.osgi.service;version=1.0.0
 DynamicImport-Package: org.springframework.web.context;version=2.1.0,
    org.springframework.web.context.support;version=2.1.0,
    org.w3c.dom,
