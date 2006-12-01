@@ -4,6 +4,6 @@ Bundle-SymbolicName: org.springframework.osgi.samples.weather-service-test
 Bundle-Name: weather-service-test
 Bundle-Vendor: Spring Framework
 Export-Package: org.springframework.osgi.samples.weather.test,junit.framework
-Import-Package: org.springframework.osgi.samples.weather.service,org.springframework.osgi.service;version=2.1.0
+Import-Package: org.springframework.osgi.samples.weather.service,org.springframework.osgi.service
 Bundle-ClassPath: .,
  target/classes/

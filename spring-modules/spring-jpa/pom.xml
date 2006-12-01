@@ -1,48 +1,54 @@
 <?xml version="1.0"?>
 <project>
-  <parent>
-    <artifactId>spring-modules</artifactId>
-    <groupId>org.springframework.osgi</groupId>
-    <version>2.1-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>spring-modules</artifactId>
+		<groupId>org.springframework.osgi</groupId>
+		<version>2.1-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.springframework.osgi</groupId>
-  <artifactId>spring-jpa</artifactId>
-  <packaging>osgi-bundle</packaging>
-  <name>Spring JPA module (OSGi version)</name>
-  <version>2.1-SNAPSHOT</version>
-  <url>http://www.springframework.org</url>
+	<groupId>org.springframework.osgi</groupId>
+	<artifactId>spring-jpa</artifactId>
+	<packaging>osgi-bundle</packaging>
+	<name>Spring JPA module (OSGi version)</name>
+	<version>2.1-SNAPSHOT</version>
+	<url>http://www.springframework.org</url>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>dependency-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>${project.artifactId}</artifactId>
-                  <version>${base.spring.version}</version>
-                  <type>jar</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>
-                ${project.build.directory}/classes
-              </outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-  
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>dependency-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.springframework</groupId>
+									<artifactId>${project.artifactId}</artifactId>
+									<version>${base.spring.version}</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.springframework.osgi</groupId>
+									<artifactId>spring-bundle-classpath</artifactId>
+									<version>1.0</version>
+									<type>jar</type>
+								</artifactItem>								
+							</artifactItems>
+							<outputDirectory>
+								${project.build.directory}/classes
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>

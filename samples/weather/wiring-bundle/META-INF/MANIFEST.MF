@@ -2,11 +2,11 @@ Bundle-Version: 1.0
 Bundle-SymbolicName: org.springframework.osgi.samples.wiring-bundle
 Bundle-Name: wiring-bundle
 Bundle-Vendor: Spring Framework
-Import-Package: org.springframework.osgi.bundle.support;version=2.1.0,
-   org.springframework.osgi.config;version=2.1.0,
-   org.springframework.osgi.context;version=2.1.0,
-   org.springframework.osgi.context.support;version=2.1.0,
-   org.springframework.osgi.service;version=2.1.0,
+Import-Package: org.springframework.osgi.bundle.support,
+   org.springframework.osgi.config,
+   org.springframework.osgi.context,
+   org.springframework.osgi.context.support,
+   org.springframework.osgi.service,
    org.springframework.jmx.export;version=2.1.0
 DynamicImport-Package: *
 Bundle-ClassPath: .,
