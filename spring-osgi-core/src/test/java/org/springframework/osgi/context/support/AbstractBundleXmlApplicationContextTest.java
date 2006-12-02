@@ -124,23 +124,4 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 		createContext();
 		assertEquals(title + "-springApplicationContext", xmlContext.getServiceName());
 	}
-
-	public void testGetParentApplicationContext() throws Exception {
-		String filter = "(org-springframework-context-service-name=goo)";
-		ServiceReference servRef = (ServiceReference) MockControl.createControl(ServiceReference.class).getMock();
-
-		ApplicationContext parentCtx = new GenericApplicationContext();
-		bundleCtxCtrl.expectAndReturn(context.getServiceReferences(ApplicationContext.class.getName(), filter),
-				new ServiceReference[] { servRef });
-		bundleCtxCtrl.expectAndReturn(context.getService(servRef), parentCtx);
-
-		bundleCtxCtrl.replay();
-		bundleCtrl.replay();
-
-		createContext();
-		assertNull(xmlContext.getParentApplicationContext(context));
-
-		dictionary.put(AbstractBundleXmlApplicationContext.PARENT_CONTEXT_SERVICE_NAME_HEADER, "goo");
-		assertSame(parentCtx, xmlContext.getParentApplicationContext(context));
-	}
 }

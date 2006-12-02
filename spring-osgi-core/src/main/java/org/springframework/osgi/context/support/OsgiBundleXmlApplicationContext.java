@@ -18,7 +18,6 @@
 package org.springframework.osgi.context.support;
 
 import org.osgi.framework.BundleContext;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Application context backed by an OSGi bundle. Will use the bundle classpath
@@ -33,16 +32,10 @@ import org.springframework.context.ApplicationContext;
  * manifest header in the bundle manifest. For example: <p/> <code>
  * org.springframework.context.service.name=myApplicationContextService
  * </code>
- * <p/> TODO: provide means to access OSGi services etc. through this
- * application context?
+ * <p/> TODO: provide means to access OSGi services etc. through this application context?
  * 
- * TODO: think about whether restricting config files to bundle: is the right
- * thing to do
- * 
- * TODO: listen to parent application context service, automatically rebind and
- * refresh if
- * 
- * 
+ * TODO: think about whether restricting config files to bundle: is the right thing to do
+ *  
  * TODO: it goes away and comes back
  * 
  * @author Adrian Colyer
@@ -67,14 +60,4 @@ public class OsgiBundleXmlApplicationContext extends AbstractBundleXmlApplicatio
 		publishContextAsOsgiService();
 		refresh();
 	}
-
-	public OsgiBundleXmlApplicationContext(ApplicationContext parent, BundleContext context, String[] configLocations,
-			ClassLoader classLoader, NamespacePlugins plugins) {
-		super(parent, context, configLocations, classLoader, plugins);
-
-		publishContextAsOsgiService();
-
-		refresh();
-	}
-
 }

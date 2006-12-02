@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>spring-osgi-integration-test-bundles</artifactId>
+        <groupId>org.springframework.osgi</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.springframework.osgi</groupId>
+    <artifactId>org.springframework.osgi.test.simple.service3</artifactId>
+    <packaging>osgi-bundle</packaging>
+    <name>Simple service test bundle 3</name>
+    <description>An OSGi bundle that provides yet another simple service</description>
+    <version>1.0-SNAPSHOT</version>
+    <url>http://www.springframework.org/osgi</url>
+</project>
+

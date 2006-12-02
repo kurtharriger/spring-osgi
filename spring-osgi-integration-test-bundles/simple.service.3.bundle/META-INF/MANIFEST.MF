@@ -1,0 +1,7 @@
+Bundle-Version: 1.0
+Bundle-SymbolicName: org.springframework.osgi.test.simpleservice3
+Bundle-Name: Simple-Service-2
+Bundle-Vendor: Spring Framework
+Import-Package: org.springframework.osgi.test.simpleservice2, org.springframework.osgi.test.simpleservice2.impl 
+Bundle-ClassPath: .,
+ target/classes/

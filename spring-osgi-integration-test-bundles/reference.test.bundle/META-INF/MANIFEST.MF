@@ -2,5 +2,5 @@ Bundle-Name: org.springframework.osgi.test.reference.proxy
 Bundle-SymbolicName: org.springframework.osgi.test.reference.proxy
 Bundle-Version: 1.0
 Bundle-ClassPath: .
-Import-Package: org.springframework.osgi.samples.simpleservice
+Import-Package: org.springframework.osgi.test.simpleservice
 Export-Package: org.springframework.osgi.test.reference.proxy

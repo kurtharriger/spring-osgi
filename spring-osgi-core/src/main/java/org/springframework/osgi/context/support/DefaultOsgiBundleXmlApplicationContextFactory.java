@@ -18,7 +18,6 @@
 package org.springframework.osgi.context.support;
 
 import org.osgi.framework.BundleContext;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Default implementation of OsgiBundleXmlApplicationContextFactory
@@ -34,9 +33,10 @@ public class DefaultOsgiBundleXmlApplicationContextFactory implements OsgiBundle
 		return new OsgiBundleXmlApplicationContext(aBundleContext, configLocations, plugins);
 	}
 
-	public AbstractBundleXmlApplicationContext createApplicationContextWithBundleContext(ApplicationContext parent,
-			BundleContext aBundleContext, String[] configLocations, NamespacePlugins plugins,
-			boolean waitForDependencies) {
+	public AbstractBundleXmlApplicationContext createApplicationContextWithBundleContext(BundleContext aBundleContext,
+                                                                                         String[] configLocations,
+                                                                                         NamespacePlugins plugins,
+                                                                                         boolean waitForDependencies) {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		BundleContext bc = LocalBundleContext.getContext();
 		try {
@@ -45,11 +45,11 @@ public class DefaultOsgiBundleXmlApplicationContextFactory implements OsgiBundle
 			LocalBundleContext.setContext(aBundleContext);
 
 			if (waitForDependencies) {
-				return new ServiceDependentBundleXmlApplicationContext(parent, aBundleContext, configLocations, cl,
-						plugins);
+				return new ServiceDependentBundleXmlApplicationContext(aBundleContext, configLocations, cl,
+						                                               plugins);
 			}
 			else {
-				return new OsgiBundleXmlApplicationContext(parent, aBundleContext, configLocations, cl, plugins);
+				return new OsgiBundleXmlApplicationContext(aBundleContext, configLocations, cl, plugins);
 			}
 
 		}

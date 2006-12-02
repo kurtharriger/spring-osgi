@@ -43,7 +43,7 @@ public class OsgiBundleXmlApplicationContextFactoryBean implements FactoryBean, 
 	private Resource configLocation;
 
 	public Object getObject() throws Exception {
-		return contextFactory.createApplicationContextWithBundleContext(parent, context,
+		return contextFactory.createApplicationContextWithBundleContext(context,
 			new String[]{configLocation.getURL().toString()}, ContextLoaderListener.plugins(), false);
 	}
 

@@ -15,11 +15,15 @@
   <dependencies>
   </dependencies>
   <modules>
+    <module>simple.service.bundle</module>
+    <module>simple.service.2.bundle</module>
+    <module>simple.service.3.bundle</module>
     <module>trivial.bundle</module>
     <module>trivial.test.bundle</module>
     <module>lifecycle.test.bundle</module>
     <module>service.listener.bundle</module>
     <module>reference.test.bundle</module>
+    <module>dependency.test.bundle</module>
   </modules>
   <reporting>
    <excludeDefaults>true</excludeDefaults>

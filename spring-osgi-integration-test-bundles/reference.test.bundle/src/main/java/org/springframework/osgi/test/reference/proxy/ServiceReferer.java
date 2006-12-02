@@ -1,6 +1,6 @@
 package org.springframework.osgi.test.reference.proxy;
 
-import org.springframework.osgi.samples.simpleservice.MyService;
+import org.springframework.osgi.test.simpleservice.MyService;
 
 /**
  * @author Hal Hildebrand

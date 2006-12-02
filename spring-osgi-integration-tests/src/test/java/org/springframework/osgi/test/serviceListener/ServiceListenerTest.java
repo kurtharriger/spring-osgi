@@ -26,7 +26,7 @@ public class ServiceListenerTest extends ConfigurableBundleCreatorTests {
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
 				localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
-                localMavenArtifact("org.springframework.osgi.samples", "simple-service-bundle",
+                localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
                                    "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.service.listener",
                                    "1.0-SNAPSHOT")
@@ -37,7 +37,7 @@ public class ServiceListenerTest extends ConfigurableBundleCreatorTests {
         assertEquals("Expected initial binding of service", 1, MyListener.BOUND_COUNT);
         assertEquals("Unexpected initial unbinding of service", 0, MyListener.UNBOUND_COUNT);
 
-        Bundle simpleServiceBundle = findBundleBySymbolicName("org.springframework.osgi.samples.simpleservice");
+        Bundle simpleServiceBundle = findBundleBySymbolicName("org.springframework.osgi.test.simpleservice");
 
         assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
 
