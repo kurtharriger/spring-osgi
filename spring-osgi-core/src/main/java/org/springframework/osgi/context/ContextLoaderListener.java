@@ -141,8 +141,11 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 						+ StringUtils.arrayToCommaDelimitedString(applicationContextLocations)
 						+ "]");
 			}
-			ConfigurableApplicationContext ctx = contextFactory.createApplicationContextWithBundleContext(null,
-					bundleContext, applicationContextLocations, plugins, true);
+			ConfigurableApplicationContext ctx =
+                    contextFactory.createApplicationContextWithBundleContext(bundleContext,
+                                                                             applicationContextLocations,
+                                                                             plugins,
+                                                                             true);
 			managedBundles.put(bundle, ctx);
 		}
 		catch (Throwable thr) {

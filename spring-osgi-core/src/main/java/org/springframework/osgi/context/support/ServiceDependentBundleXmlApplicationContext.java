@@ -21,76 +21,37 @@ import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
+import org.osgi.framework.*;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
 
 /**
  * An AbstractBundleXmlApplicationContext which delays initialization until all of its
  * osgi:reference targets are complete.
- * <p/>
- * TODO deal with service filtering.
+ * <p/> 
  *
  * @author Andy Piper
+ * @author Hal Hildebrand
  */
 public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleXmlApplicationContext
-		implements ServiceListener
-{
+		implements ServiceListener {
 	private HashSet dependencies = new HashSet();
-	private HashSet unsatisfiedDependencies = new HashSet();
+    private HashSet unsatisfiedDependencies = new HashSet();
 	private Log log = LogFactory.getLog(ServiceDependentBundleXmlApplicationContext.class);
 	private ClassLoader savedCcl;
 
-	public ServiceDependentBundleXmlApplicationContext(ApplicationContext parent, BundleContext context,
+	public ServiceDependentBundleXmlApplicationContext(BundleContext context,
                                                        String[] configLocations, ClassLoader classLoader,
                                                        NamespacePlugins plugins) {
-		super(parent, context, configLocations, classLoader, plugins);
+		super(context, configLocations, classLoader, plugins);
 
 		refreshBeanFactory();
-		// Listen for services so that we can determine when we are ready for activation.
-		dependencies = findServiceDependencies();
-		// Check to see if we have a dependent parent context.
-		if (parent == null) {
-			String parentContextServiceName = (String)context.getBundle().getHeaders().get(PARENT_CONTEXT_SERVICE_NAME_HEADER);
-			if (parentContextServiceName != null) {
-				dependencies.add(parentContextServiceName);
-			}
-		}
-	   // If we have dependencies then set up an appropriate filter.
-		if (!dependencies.isEmpty()) {
-			// Create a super-filter matching all our required classes.
-			StringBuffer filterString = new StringBuffer();
-			if (dependencies.size() > 1) {
-				filterString.append("(&");
-			}
-			for (Iterator i = dependencies.iterator(); i.hasNext();) {
-				String clazz = (String) i.next();
-				filterString.append("(").append(Constants.OBJECTCLASS).append("=").append(clazz).append(")");
-			}
-			if (dependencies.size() > 1) {
-				filterString.append(")");
-			}
-			if (log.isInfoEnabled()) {
-				log.info("Service dependencies exist, registering listener with filter ["
-						+ filterString.toString() + "]");
-			}
-			// Add a service listener before checking for satisfied dependencies, to avoid missing
-			// any important events.
-			try {
-				getBundleContext().addServiceListener(this, filterString.toString());
-			} catch (InvalidSyntaxException e) {
-				throw new IllegalArgumentException("Bad filter: [" + filterString.toString() + "]", e);
-			}
-		}
 
-		if (!hasUnsatisifiedServiceDependencies()) {
+        // Listen for services so that we can determine when we are ready for activation.
+		findServiceDependencies();
+
+        if (!hasUnsatisifiedServiceDependencies()) {
 			if (log.isInfoEnabled()) {
 				log.info("Services already satisfied, completing initialization for " + getDisplayName());
 			}
@@ -99,11 +60,22 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 			refresh();
 			publishContextAsOsgiService();
 		} else {
-			savedCcl = Thread.currentThread().getContextClassLoader();
-		}
-	}
+            savedCcl = Thread.currentThread().getContextClassLoader();
+            registerListener();
+        }
+    }
 
-	/**
+    public void close() {
+        super.close();
+        try {
+			getBundleContext().removeServiceListener(this);
+        } catch (IllegalStateException e) {
+			logger.warn("exception thrown while removing service listener " + e);
+        }
+
+    }
+
+    /**
 	 * Complete the initialization of this context now that we know all services
 	 * are available.
 	 */
@@ -114,11 +86,7 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 			Thread.currentThread().setContextClassLoader(savedCcl);
 			LocalBundleContext.setContext(getBundleContext());
 			dependencies.clear();
-			getBundleContext().removeServiceListener(this);
-			// Parent will be in our dependencies if it exist.
-			if (getParent() == null) {
-				setParent(getParentApplicationContext(getBundleContext()));
-			}
+			getBundleContext().removeServiceListener(this); 
 			// Build the bean definitions.
 			refresh();
 			publishContextAsOsgiService();
@@ -130,95 +98,135 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 	}
 
 	protected synchronized boolean hasUnsatisifiedServiceDependencies() {
-		boolean unsatisfiedServices = false;
-		for (Iterator i = dependencies.iterator(); i.hasNext();) {
-			String filter = null;
-			String clazz = (String) i.next();
-			try {
-				ServiceReference[] serviceReferences =
-						getBundleContext().getServiceReferences(clazz, filter);
-				if (serviceReferences == null || serviceReferences.length == 0) {
-					unsatisfiedDependencies.add(clazz);
-					unsatisfiedServices = true;
-				}
-			} catch (InvalidSyntaxException e) {
-				throw new IllegalArgumentException("Bad filter definition [" + filter +
-						"] for bean [" + clazz + "]");
-			}
-		}
-		return unsatisfiedServices;
+        boolean unsatisfiedServices = false;
+        for (Iterator i = dependencies.iterator(); i.hasNext();) {
+            Dependency dependency = (Dependency) i.next();
+            if (!dependency.isSatisfied()) {
+                unsatisfiedDependencies.add(dependency);
+                unsatisfiedServices = true;
+            }
+        }
+        return unsatisfiedServices;
 	}
 
 	/**
 	 * Look for osgi:reference's in this config.
 	 * Deals with top level references as well as embedded references.
 	 *
-	 * @return the list of dependant references.
 	 */
-	protected HashSet findServiceDependencies() {
+	protected void findServiceDependencies() {
 		// Get bean types, but do not instantiate lazy singletons or templates
 		String[] beans = getBeanFactory().getBeanDefinitionNames();
-		HashSet dependencies = new HashSet();
+		HashSet d = new HashSet();
 
 		for (int i = 0; i < beans.length; i++) {
 			BeanDefinition bean = getBeanFactory().getBeanDefinition(beans[i]);
-			if (!addBeanDependency(bean, dependencies)) {
+			if (!addBeanDependency(bean, d)) {
 				// Check values for embedded references.
 				PropertyValue[] values = bean.getPropertyValues().getPropertyValues();
 				for (int p = 0; p < values.length; p++) {
 					if (values[p].getValue() instanceof BeanDefinition) {
-						addBeanDependency((BeanDefinition) values[p].getValue(), dependencies);
+						addBeanDependency((BeanDefinition) values[p].getValue(), d);
 					}
 				}
 			}
 		}
-		return dependencies;
+		dependencies = d;
 	}
 
 	private boolean addBeanDependency(BeanDefinition bean, HashSet dependencies) {
 		if (bean.getBeanClassName().equals(OsgiServiceProxyFactoryBean.class.getName())) {
-			PropertyValue service = bean.getPropertyValues().getPropertyValue
-					(OsgiServiceProxyFactoryBean.INTERFACE_ATTRIBUTE);
+			PropertyValue service =
+                    bean.getPropertyValues().getPropertyValue(OsgiServiceProxyFactoryBean.INTERFACE_ATTRIBUTE);
 			if (service == null) {
 				throw new IllegalStateException("No interface specified for bean [" + bean + "]");
 			}
-			dependencies.add(service.getValue());
-			PropertyValue filter = bean.getPropertyValues().getPropertyValue
-					(OsgiServiceProxyFactoryBean.FILTER_ATTRIBUTE);
-			return true;
+			PropertyValue serviceFilter =
+                    bean.getPropertyValues().getPropertyValue(OsgiServiceProxyFactoryBean.FILTER_ATTRIBUTE);
+            String clazz = (String) service.getValue();
+            String query =  serviceFilter != null ? (String) serviceFilter.getValue() : null;
+            Filter filter = getFilter(clazz, query);
+            dependencies.add(new Dependency(filter, clazz));
+            return true;
 		}
 		return false;
 	}
 
-	/**
+    private Filter getFilter (String serviceInterface, String serviceFilter) {
+		StringBuffer sb = new StringBuffer();
+		boolean andFilterWithInterfaceName = serviceFilter != null;
+		if (andFilterWithInterfaceName) {
+            sb.append("(&");
+		}
+		if (serviceFilter != null) {
+			sb.append(serviceFilter);
+		}
+		sb.append("(");
+		sb.append(Constants.OBJECTCLASS);
+		sb.append("=");
+		sb.append(serviceInterface);
+		sb.append(")");
+
+        if (andFilterWithInterfaceName) {
+			sb.append(")");
+		}
+        try {
+            return FrameworkUtil.createFilter(sb.toString());
+        } catch (InvalidSyntaxException e) {
+            throw new IllegalArgumentException("Filter string '"
+                                               + serviceFilter
+                                               + "' set on OsgiServiceProxyFactoryBean has invalid syntax: "
+                                               + e.getMessage(), e);
+        }
+    }
+
+    private void registerListener() {
+        StringBuffer sb = new StringBuffer(100 * unsatisfiedDependencies.size());
+        sb.append("(|");
+        for (Iterator i = unsatisfiedDependencies.iterator(); i.hasNext();) {
+            ((Dependency) i.next()).appendTo(sb);
+        }
+        sb.append(')');
+        String filter = sb.toString();
+        if (log.isInfoEnabled()) {
+            log.info(getDisplayName() + " registering filter: " + filter);
+        }
+        try {
+            getBundleContext().addServiceListener(this, filter);
+        } catch (InvalidSyntaxException e) {
+            throw new IllegalStateException("Filter string '"
+                                            + filter
+                                            + "' has invalid syntax: "
+                                            + e.getMessage(), e);
+        }
+    }
+
+    /**
 	 * Process serviceChanged events, completing context initialization if all
 	 * the required dependencies are satisfied.
 	 *
 	 * @param serviceEvent
 	 */
 	public synchronized void serviceChanged(ServiceEvent serviceEvent) {
-		if (dependencies.isEmpty()) { // already completed.
+        if (unsatisfiedDependencies.isEmpty()) { // already completed.
 			return;
 		}
-		String[] classes = (String[]) serviceEvent.getServiceReference()
-				.getProperty(Constants.OBJECTCLASS);
-		switch (serviceEvent.getType()) {
-			case ServiceEvent.REGISTERED:
-				for (int i = 0; i < classes.length; i++) {
-					// FIXME andyp -- deal with service filtering here
-					unsatisfiedDependencies.remove(classes[i]);
-				}
-				break;
-			case ServiceEvent.UNREGISTERING:
-				for (int i = 0; i < classes.length; i++) {
-					if (dependencies.contains(classes[i])) {
-						unsatisfiedDependencies.add(classes[i]);
-					}
-				}
-				break;
-			default: // do nothing
-				break;
-		}
+        for (Iterator i = dependencies.iterator(); i.hasNext();) {
+            Dependency dependency = (Dependency) i.next();
+            if (dependency.matches(serviceEvent)) {
+                switch (serviceEvent.getType()) {
+                    case ServiceEvent.MODIFIED:
+                    case ServiceEvent.REGISTERED:
+                        unsatisfiedDependencies.remove(dependency);
+                        break;
+                    case ServiceEvent.UNREGISTERING:
+                        unsatisfiedDependencies.add(dependency);
+                        break;
+                    default: // do nothing
+                        break;
+                }
+            }
+        }
 		// Good to go!
 		if (unsatisfiedDependencies.isEmpty()) {
 			if (log.isInfoEnabled()) {
@@ -226,12 +234,47 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 			}
 			completeContextInitialization();
 			notifyAll();
-		}
-		// Don't check for the inverse case - we assume that the OsgiProxyFactoryBean will cope with
-		// missing services.
+		}else {
+            registerListener();  // re-register with the new filter
+        }
 	}
 
 	public synchronized boolean isAvailable() {
 		return unsatisfiedDependencies.isEmpty();
 	}
+
+    private class Dependency {
+        private final Filter filter;
+        private final String clazz;
+
+        private Dependency(Filter filter, String clazz) {
+            this.filter = filter;
+            this.clazz = clazz;
+        }
+
+        public boolean matches(ServiceEvent event) {
+            return filter.match(event.getServiceReference());
+        }
+
+        public boolean isSatisfied() {
+            ServiceReference[] refs;
+            try {
+                refs = getBundleContext().getServiceReferences(clazz, filter.toString());
+            } catch (InvalidSyntaxException e) {
+                throw new IllegalStateException("Filter string '"
+                                                + filter.toString()
+                                                + "' has invalid syntax: "
+                                                + e.getMessage(), e);
+            }
+            return refs != null && refs.length != 0;
+        }
+
+        public String toString() {
+            return "Dependency on [" + filter + "]";
+        }
+
+        public void appendTo(StringBuffer sb) {
+            sb.append(filter);
+        }
+    }
 }

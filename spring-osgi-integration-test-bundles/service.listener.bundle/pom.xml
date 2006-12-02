@@ -38,8 +38,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.osgi.samples</groupId>
-            <artifactId>simple-service-bundle</artifactId>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>org.springframework.osgi.test.simple.service</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>

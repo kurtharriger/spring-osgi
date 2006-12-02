@@ -45,15 +45,15 @@ public interface OsgiBundleXmlApplicationContextFactory {
 	/**
 	 * Create an OsgiBundleXmlApplicationContext in the context of a Bundle Context ClassLoader
 	 *
-	 * @param parent
 	 * @param aBundleContext  the OSGi BundleContext for the bundle
 	 * @param configLocations location paths for the context config files
      * @param plugins the Spring namespace plugins
 	 * @param waitForDependencies
 	 * @return OsgiBundleXmlApplicationContext
 	 */
-	AbstractBundleXmlApplicationContext createApplicationContextWithBundleContext(ApplicationContext parent, BundleContext aBundleContext,
-	                                                                              String[] configLocations,
-                                                                                  NamespacePlugins plugins,
-                                                                                  boolean waitForDependencies);;
+	AbstractBundleXmlApplicationContext createApplicationContextWithBundleContext(
+            BundleContext aBundleContext,
+            String[] configLocations,
+            NamespacePlugins plugins,
+            boolean waitForDependencies);
 }

@@ -19,7 +19,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -64,6 +63,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  * @author Adrian Colyer
+ * @author Hal Hildebrand
  * 
  */
 public abstract class AbstractRefreshableOsgiBundleApplicationContext extends AbstractRefreshableApplicationContext
@@ -82,11 +82,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	private OsgiBundleResourceLoader osgiResourceLoader;
 
 	public AbstractRefreshableOsgiBundleApplicationContext() {
-		this(null);
-	}
-
-	public AbstractRefreshableOsgiBundleApplicationContext(ApplicationContext parent) {
-		super(parent);
+		super(null);
 		setDisplayName("Root OsgiBundleApplicationContext");
 	}
 

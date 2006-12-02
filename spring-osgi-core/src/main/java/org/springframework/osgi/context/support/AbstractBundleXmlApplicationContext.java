@@ -23,14 +23,12 @@ import java.util.Properties;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.service.OsgiServiceUtils;
+import org.springframework.context.ApplicationContext; 
 
 /**
  * Application context backed by an OSGi bundle. Will use the bundle classpath
@@ -69,25 +67,13 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 	private NamespacePlugins namespacePlugins;
 
 	public AbstractBundleXmlApplicationContext(BundleContext context, String[] configLocations) {
-		this(null, context, configLocations);
+		this(context, configLocations, null, null);
 	}
 
-	public AbstractBundleXmlApplicationContext(BundleContext context, String[] configLocations,
-			ClassLoader classLoader, NamespacePlugins namespacePlugins) {
-		this(null, context, configLocations, classLoader, namespacePlugins);
-	}
-
-	public AbstractBundleXmlApplicationContext(ApplicationContext parent, BundleContext context,
-			String[] configLocations) {
-		this(parent, context, configLocations, null, null);
-	}
-
-	public AbstractBundleXmlApplicationContext(ApplicationContext parent, BundleContext context,
-			String[] configLocations, ClassLoader classLoader, NamespacePlugins namespacePlugins) {
-		super(parent);
-
-		if (parent == null)
-			setParent(getParentApplicationContext(context));
+	public AbstractBundleXmlApplicationContext(BundleContext context,
+                                               String[] configLocations, ClassLoader classLoader,
+                                               NamespacePlugins namespacePlugins) {
+		super();
 
 		setBundleContext(context);
 		setConfigLocations(configLocations);
@@ -210,35 +196,5 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 
 	public boolean isAvailable() {
 		return true;
-	}
-
-	protected String createParentContextFilter(String parentContextServiceName) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("(");
-		buffer.append(APPLICATION_CONTEXT_SERVICE_NAME_HEADER);
-		buffer.append("=");
-		buffer.append(parentContextServiceName);
-		buffer.append(")");
-		return buffer.toString();
-	}
-
-	protected ApplicationContext getParentApplicationContext(BundleContext context) {
-		String parentContextServiceName = (String) context.getBundle().getHeaders().get(
-				PARENT_CONTEXT_SERVICE_NAME_HEADER);
-
-		if (parentContextServiceName == null) {
-			return null;
-		}
-		else {
-			// try to find the service
-			String filter = createParentContextFilter(parentContextServiceName);
-			ServiceReference ref = OsgiServiceUtils.getService(context, ApplicationContext.class, filter);
-			ApplicationContext parent = (ApplicationContext) context.getService(ref);
-			// TODO: register as service listener..., probably in a proxy to the
-			// app context
-			// that we create here and return instead.
-
-			return parent;
-		}
-	}
+	} 
 }

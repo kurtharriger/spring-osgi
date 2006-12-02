@@ -1,6 +1,7 @@
 package org.springframework.osgi.test.service.listener;
 
-import org.springframework.osgi.samples.simpleservice.MyService;
+import org.springframework.osgi.test.simpleservice.MyService;
+
 
 /**
  * @author Hal Hildebrand
@@ -13,13 +14,14 @@ public class MyListener {
 
 
     public void serviceAvailable(MyService simpleService) {
-        BOUND_COUNT++; 
+        BOUND_COUNT++;
     }
 
 
     public void serviceUnavailable(MyService simpleService) {
         UNBOUND_COUNT++;
     }
+
 
     public void setSimpleService(MyService simpleService) {
         // Dummy used to force initialization of osgi service reference to simple service
