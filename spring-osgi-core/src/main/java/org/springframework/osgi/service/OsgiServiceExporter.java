@@ -235,7 +235,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 		}
 
 		if (log.isInfoEnabled()) {
-			log.info("Publishing service [" + Arrays.toString(names) + "]");
+			log.info("Publishing service [" + Arrays.asList(names).toString() + "]");
 		}
 		// Service registration optionally proxied to avoid eager creation
 		ServiceRegistration s;
@@ -314,7 +314,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 		if (classloaderManagementOption == null)
 			throw new IllegalArgumentException("non-null argument required");
 
-		this.contextClassloader = CL_OPTIONS.asNumber(classloaderManagementOption.replace("-", "_")).intValue();
+		this.contextClassloader = CL_OPTIONS.asNumber(classloaderManagementOption.replace('-', '_')).intValue();
 	}
 
 	/**

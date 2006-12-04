@@ -186,9 +186,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 				FrameworkUtil.createFilter(getFilterStringForServiceLookup());
 			}
 			catch (InvalidSyntaxException ex) {
-				throw new IllegalArgumentException("Filter string '" + getFilter()
+				throw (IllegalArgumentException)new IllegalArgumentException("Filter string '" + getFilter()
 					+ "' set on OsgiServiceProxyFactoryBean has invalid syntax: "
-					+ ex.getMessage(), ex);
+					+ ex.getMessage()).initCause(ex);
 			}
 		}
 		if (this.applicationContext == null) {
@@ -366,7 +366,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 			throw new IllegalArgumentException("non-null argument required");
 		}
 
-		this.contextClassloader = REFERENCE_CL_OPTIONS.asNumber(classLoaderManagementOption.replace("-", "_"))
+		this.contextClassloader = REFERENCE_CL_OPTIONS.asNumber(classLoaderManagementOption.replace('-', '_'))
 			.intValue();
 	}
 
@@ -493,7 +493,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		sb.append("(");
 		sb.append(OBJECTCLASS);
 		sb.append("=");
-		sb.append(getInterface().getCanonicalName());
+		sb.append(getInterface().getName());
 		sb.append(")");
 
 		if (getBeanName() != null) {
@@ -617,7 +617,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 				filter = FrameworkUtil.createFilter(getFilterStringForServiceLookup());
 			}
 			catch (InvalidSyntaxException e) {
-				throw new IllegalStateException("Invalid syntax for filter: " + getFilterStringForServiceLookup(), e);
+				throw (IllegalStateException)new IllegalStateException("Invalid syntax for filter: " + getFilterStringForServiceLookup()).initCause(e);
 			}
 		}
 

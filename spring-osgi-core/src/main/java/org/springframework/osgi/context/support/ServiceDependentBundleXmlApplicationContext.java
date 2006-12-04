@@ -173,10 +173,10 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
         try {
             return FrameworkUtil.createFilter(sb.toString());
         } catch (InvalidSyntaxException e) {
-            throw new IllegalArgumentException("Filter string '"
+            throw (IllegalStateException)new IllegalArgumentException("Filter string '"
                                                + serviceFilter
                                                + "' set on OsgiServiceProxyFactoryBean has invalid syntax: "
-                                               + e.getMessage(), e);
+                                               + e.getMessage()).initCause(e);
         }
     }
 
@@ -194,10 +194,10 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
         try {
             getBundleContext().addServiceListener(this, filter);
         } catch (InvalidSyntaxException e) {
-            throw new IllegalStateException("Filter string '"
+            throw (IllegalStateException)new IllegalStateException("Filter string '"
                                             + filter
                                             + "' has invalid syntax: "
-                                            + e.getMessage(), e);
+                                            + e.getMessage()).initCause(e);
         }
     }
 
@@ -261,10 +261,10 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
             try {
                 refs = getBundleContext().getServiceReferences(clazz, filter.toString());
             } catch (InvalidSyntaxException e) {
-                throw new IllegalStateException("Filter string '"
+                throw (IllegalStateException)new IllegalStateException("Filter string '"
                                                 + filter.toString()
                                                 + "' has invalid syntax: "
-                                                + e.getMessage(), e);
+                                                + e.getMessage()).initCause(e);
             }
             return refs != null && refs.length != 0;
         }
