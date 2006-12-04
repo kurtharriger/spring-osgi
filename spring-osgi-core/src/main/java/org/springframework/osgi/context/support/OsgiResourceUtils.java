@@ -95,7 +95,7 @@ public class OsgiResourceUtils
         f.setAccessible(true);
         return (BundleContext) f.get(bundle);
       } catch (IllegalAccessException e) {
-        throw new IllegalStateException("Exception retrieving bundle context", e);
+        throw (IllegalStateException)new IllegalStateException("Exception retrieving bundle context").initCause(e);
       }
     }
   }

@@ -104,10 +104,10 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		String filter = "(beanName=myBean)";
 		this.serviceFactoryBean.setFilter(filter);
 		String fullFilter
-			= "(&(beanName=myBean)(objectClass=org.springframework.osgi.service.OsgiServiceProxyFactoryBeanTest.MyServiceInterface))";
+			= "(&(beanName=myBean)(objectClass=org.springframework.osgi.service.OsgiServiceProxyFactoryBeanTest$MyServiceInterface))";
 		this.bundleContext.addServiceListener(new MockServiceListener(), fullFilter);
 		this.mockControl.setMatcher(new AddServiceListenerMatcher());
-		this.bundleContext.getServiceReferences(MyServiceInterface.class.getCanonicalName(), fullFilter);
+		this.bundleContext.getServiceReferences(MyServiceInterface.class.getName(), fullFilter);
 		this.mockControl.setMatcher(MockControl.EQUALS_MATCHER);
 		ServiceReference ref = getServiceReference();
 		this.mockControl.setReturnValue(new ServiceReference[]{ref});
@@ -137,10 +137,10 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		this.serviceFactoryBean.setBeanName("myBean");
 		this.serviceFactoryBean.setContextClassloader("client");
 		String fullFilter
-			= "(&(objectClass=org.springframework.osgi.service.OsgiServiceProxyFactoryBeanTest.MyServiceInterface)(org.springframework.osgi.beanname=myBean))";
+			= "(&(objectClass=org.springframework.osgi.service.OsgiServiceProxyFactoryBeanTest$MyServiceInterface)(org.springframework.osgi.beanname=myBean))";
 		this.bundleContext.addServiceListener(new MockServiceListener(), fullFilter);
 		this.mockControl.setMatcher(new AddServiceListenerMatcher());
-		this.bundleContext.getServiceReferences(MyServiceInterface.class.getCanonicalName(), fullFilter);
+		this.bundleContext.getServiceReferences(MyServiceInterface.class.getName(), fullFilter);
 		this.mockControl.setMatcher(MockControl.EQUALS_MATCHER);
 		ServiceReference ref = getServiceReference();
 		this.mockControl.setReturnValue(new ServiceReference[]{ref});
@@ -174,10 +174,10 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		this.serviceFactoryBean.setBeanName("myBean");
 		this.serviceFactoryBean.setContextClassloader("service-provider");
 		String fullFilter
-			= "(&(objectClass=org.springframework.osgi.service.OsgiServiceProxyFactoryBeanTest.MyServiceInterface)(org.springframework.osgi.beanname=myBean))";
+			= "(&(objectClass=org.springframework.osgi.service.OsgiServiceProxyFactoryBeanTest$MyServiceInterface)(org.springframework.osgi.beanname=myBean))";
 		this.bundleContext.addServiceListener(new MockServiceListener(), fullFilter);
 		this.mockControl.setMatcher(new AddServiceListenerMatcher());
-		this.bundleContext.getServiceReferences(MyServiceInterface.class.getCanonicalName(), fullFilter);
+		this.bundleContext.getServiceReferences(MyServiceInterface.class.getName(), fullFilter);
 		this.mockControl.setMatcher(MockControl.EQUALS_MATCHER);
 		MockControl refctrl = MockControl.createNiceControl(ServiceReference.class);
 		ServiceReference ref = (ServiceReference) refctrl.getMock();

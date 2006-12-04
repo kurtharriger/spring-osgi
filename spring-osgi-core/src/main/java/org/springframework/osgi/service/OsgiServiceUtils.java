@@ -51,7 +51,7 @@ public class OsgiServiceUtils {
         Assert.notNull(serviceClass, "serviceClass cannot be null");
         try {
 			ServiceReference[] serviceReferences = 
-				context.getServiceReferences(serviceClass.getCanonicalName(),filter);
+				context.getServiceReferences(serviceClass.getName(),filter);
 			if (serviceReferences == null || serviceReferences.length == 0) {
 				throw new NoSuchServiceException(
 						"A service of type '" + serviceClass.getName() + "' matching filter '" +
@@ -70,7 +70,7 @@ public class OsgiServiceUtils {
 			}
 		}
 		catch (InvalidSyntaxException ex) {
-			throw new IllegalArgumentException(ex.getMessage(),ex);
+			throw (IllegalArgumentException)new IllegalArgumentException(ex.getMessage()).initCause(ex);
 		}
 	}
 	
@@ -94,7 +94,7 @@ public class OsgiServiceUtils {
 			return serviceReferences;
 		}
 		catch (InvalidSyntaxException ex) {
-			throw new IllegalArgumentException(ex.getMessage(),ex);
+			throw (IllegalArgumentException)new IllegalArgumentException(ex.getMessage()).initCause(ex);
 		}
 	}
 	
@@ -118,7 +118,7 @@ public class OsgiServiceUtils {
       return serviceReferences;
     }
     catch (InvalidSyntaxException ex) {
-      throw new IllegalArgumentException(ex.getMessage(),ex);
+      throw (IllegalArgumentException)new IllegalArgumentException(ex.getMessage()).initCause(ex);
     }
   }
 }
