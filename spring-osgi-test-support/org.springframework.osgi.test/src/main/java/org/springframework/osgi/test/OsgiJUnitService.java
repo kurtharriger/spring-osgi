@@ -91,7 +91,10 @@ public class OsgiJUnitService implements BundleActivator, TestRunner {
 			executeTest(test);
 		}
 		catch (Exception ex) {
-			throw new RuntimeException("cannot execute test:" + ex);
+		        if (ex instanceof RuntimeException) {
+			    throw (RuntimeException) ex;
+		        }
+			throw new RuntimeException("cannot execute test:" + ex, ex);
 		}
 	}
 
@@ -148,7 +151,10 @@ public class OsgiJUnitService implements BundleActivator, TestRunner {
 		}
 		// reflection exceptions
 		catch (Exception ex) {
-			throw new RuntimeException("test execution failed;" + ex);
+		        if (ex instanceof RuntimeException) {
+			    throw (RuntimeException) ex;
+		        }
+			throw new RuntimeException("test execution failed;" + ex, ex);
 		}
 		return result;
 	}
