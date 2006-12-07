@@ -351,6 +351,7 @@ limitations under the License.
         scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2-snapshots
       </url>
     </snapshotRepository>
+    <!-- Until the permission issue gets fixed
     <site>
       <id>static.springframework.org</id>
       <name>SpringFramework.org</name>
@@ -358,6 +359,7 @@ limitations under the License.
         scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2/spring-osgi/
       </url>
     </site>
+    -->
   </distributionManagement>
 
 
