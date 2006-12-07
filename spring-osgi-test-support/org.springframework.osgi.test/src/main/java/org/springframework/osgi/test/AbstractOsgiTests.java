@@ -172,8 +172,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		try {
 			File found = new MavenPackagedArtifactFinder(artifactId, version).findPackagedArtifact(new File("."));
 			String path = found.toURL().toExternalForm();
-			System.out.println("found local maven artifact " + path + " for " + artifactId + "|" + version);
-			return path;
+            if (log.isDebugEnabled()) {
+                log.debug("found local maven artifact " + path + " for " + artifactId + "|" + version);
+            }
+            return path;
 		}
 		catch (IOException ioEx) {
 			throw new IllegalStateException("Artifact " + artifactId + "-" + version + ".jar" + " could not be found",
