@@ -25,6 +25,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -73,7 +74,12 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
         synchronized (plugins) {
             for (Iterator i = plugins.values().iterator(); i.hasNext();) {
-                InputSource is = ((Plugin) i.next()).resolveEntity(publicId, systemId);
+                InputSource is = null;
+                try {
+                    is = ((Plugin) i.next()).resolveEntity(publicId, systemId);
+                } catch (FileNotFoundException e) {
+                    // ignore
+                }
                 if (is != null) {
                     return is;
                 }
