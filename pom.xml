@@ -142,8 +142,7 @@ limitations under the License.
   <!-- =================================================== -->
 
   <!-- modules for Spring-OSGi -->
-  <modules>
-    <module>spring-bundle-classpath</module>
+  <modules> 
     <module>spring-modules</module>
     <module>spring-osgi-mock</module>    
 	<module>spring-osgi-io</module>    
@@ -355,13 +354,8 @@ limitations under the License.
       <id>static.springframework.org</id>
       <name>SpringFramework.org</name>
       <url>
-        file:tmp-site
-      </url>
-      <!--
-      <url>
         scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2/spring-osgi/
       </url>
-      -->
     </site>
   </distributionManagement>
 

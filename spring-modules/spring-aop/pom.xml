@@ -34,12 +34,6 @@
 									<version>${base.spring.version}</version>
 									<type>jar</type>
 								</artifactItem>
-								<artifactItem>
-									<groupId>org.springframework.osgi</groupId>
-									<artifactId>spring-bundle-classpath</artifactId>
-									<version>1.0</version>
-									<type>jar</type>
-								</artifactItem>
 							</artifactItems>
 							<outputDirectory>
 								${project.build.directory}/classes
