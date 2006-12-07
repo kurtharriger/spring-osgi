@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>spring-osgi-integration-test-bundles</artifactId>
+        <groupId>org.springframework.osgi</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.springframework.osgi</groupId>
+    <artifactId>org.springframework.osgi.test.cardinality0to1</artifactId>
+    <packaging>osgi-bundle</packaging>
+    <name>Spring context service reference cardinality 0..1 bundle</name>
+    <description>An OSGi bundle that tests the service reference cardinality value {0..1}</description>
+    <version>1.0-SNAPSHOT</version>
+    <url>http://www.springframework.org/osgi</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>org.springframework.osgi.test.simple.service</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>
+
