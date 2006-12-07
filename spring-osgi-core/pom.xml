@@ -73,12 +73,7 @@
       <artifactId>osgi_R4_compendium</artifactId>
       <version>1.0</version>
       <scope>provided</scope>
-    </dependency>
-	<dependency>
-		  <groupId>org.springframework.osgi</groupId>
-		  <artifactId>spring-bundle-classpath</artifactId>
-		  <version>1.0</version>
-	</dependency>
+    </dependency> 
     
     <dependency>
       <groupId>junit</groupId>
