@@ -355,8 +355,13 @@ limitations under the License.
       <id>static.springframework.org</id>
       <name>SpringFramework.org</name>
       <url>
+        file://./tmp-site
+      </url>
+      <!--
+      <url>
         scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2/spring-osgi/
       </url>
+      -->
     </site>
   </distributionManagement>
 
