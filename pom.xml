@@ -355,7 +355,7 @@ limitations under the License.
       <id>static.springframework.org</id>
       <name>SpringFramework.org</name>
       <url>
-        file://./tmp-site
+        file:tmp-site
       </url>
       <!--
       <url>
