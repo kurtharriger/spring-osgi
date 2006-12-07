@@ -143,6 +143,7 @@ limitations under the License.
 
   <!-- modules for Spring-OSGi -->
   <modules>
+    <module>spring-bundle-classpath</module>
     <module>spring-modules</module>
     <module>spring-osgi-mock</module>    
 	<module>spring-osgi-io</module>    

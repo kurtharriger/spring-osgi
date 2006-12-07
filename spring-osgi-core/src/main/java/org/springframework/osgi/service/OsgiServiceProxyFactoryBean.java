@@ -63,6 +63,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	public static final int DEFAULT_MAX_RETRIES = 3;
 	public static final String FILTER_ATTRIBUTE = "filter";
 	public static final String INTERFACE_ATTRIBUTE = "interface";
+	public static final String CARDINALITY_ATTRIBUTE = "cardinality";
 
 	/**
 	 * Reference classloading options costants.
@@ -80,12 +81,12 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 *
 	 * @author Costin Leau
 	 */
-	protected class Cardinality {
+	public class Cardinality {
 		public static final int C_0__1 = 0;
 		public static final int C_0__N = 1;
 		public static final int C_1__1 = 2;
 		public static final int C_1__N = 3;
-	}
+    }
 
 	/**
 	 * Logger, available to subclasses.
@@ -95,7 +96,6 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	private BundleContext bundleContext;
 	private boolean retryOnUnregisteredService = true;
 	private int retryTimes = DEFAULT_MAX_RETRIES;
-	private boolean broadcast = false;
 	private String resultSummarizer;
 
 	private int cardinality;
@@ -136,7 +136,22 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	public static final String OBJECTCLASS = "objectClass";
 
 
-	/*
+    public static int translateCardinality(String cardinality) {
+        return CARDINALITY.asNumber("C_".concat(cardinality.replace('.', '_'))).intValue();
+    }
+
+
+    public static boolean atLeastOneRequired(int c) {
+        return Cardinality.C_1__1 == c || Cardinality.C_1__N == c;
+    }
+
+
+    public static boolean moreThanOneExpected(int c) {
+        return Cardinality.C_0__N == c || Cardinality.C_1__N == c;
+    }
+
+
+    /*
 	 * (non-Javadoc)
 	 *
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
@@ -200,16 +215,29 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 				+ "' which does not extend DefaultResourceLoader");
 		}
 
-		constructProxy();
-		bind();
-		bundleContext.addServiceListener(listener, getFilterStringForServiceLookup());
+		if (constructProxy()) {
+		    bind();
+        }
+        bundleContext.addServiceListener(listener, getFilterStringForServiceLookup());
 	}
 
-	protected void constructProxy() throws Exception {
+	protected boolean constructProxy() throws Exception {
 		Object service = null;
 		ServiceReference reference = null;
 		final Class serviceInterface = getInterface();
 		final String filter = getFilterStringForServiceLookup();
+        boolean serviceAvailable = true;
+
+        // Create the object which stands in for the actual service when the service is unavailable
+		InvocationHandler unavailableServiceHandler = new InvocationHandler() {
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				throw new ServiceUnavailableException("Service is currently unavailable", serviceInterface, filter);
+			}
+		};
+
+		Object unavailableService = Proxy.newProxyInstance(serviceInterface.getClassLoader(),
+			                                               new Class[]{serviceInterface},
+			                                               unavailableServiceHandler);
 
 		// Lookup the initial service
 		for (int i = 0; i < retryTimes; i++) {
@@ -219,8 +247,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 					getFilterStringForServiceLookup());
 
 				if (logger.isDebugEnabled()) {
-					logger.debug("Resolved service reference: [" + reference + "] after "
-						+ (i + 1) + " attempts");
+                    logger.debug("Resolved service reference: [" + reference + "] after "
+                                 + (i + 1) + " attempts");
 				}
 			}
 			catch (NoSuchServiceException nsse) {
@@ -238,22 +266,18 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 			}
 		}
 		if (service == null) {
-			throw new NoSuchServiceException(
-					"The service of type '" + getInterface().getName() + "' matching filter '" +
-					getFilterStringForServiceLookup() + "' was not available.",
-					getInterface(), filter);
-		}
-
-		// Create the object which stands in for the actual service when the service is unavailable
-		InvocationHandler unavailableServiceHandler = new InvocationHandler() {
-			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				throw new ServiceUnavailableException("Service is currently unavailable", serviceInterface, filter);
-			}
-		};
-
-		Object unavailableService = Proxy.newProxyInstance(serviceInterface.getClassLoader(),
-			new Class[]{serviceInterface},
-			unavailableServiceHandler);
+            if (atLeastOneRequired(cardinality)) {
+                throw new NoSuchServiceException("The service of type '" +
+                                                 getInterface().getName() +
+                                                 "' matching filter '" +
+                                                 getFilterStringForServiceLookup() +
+                                                 "' was not available.",
+                                                 getInterface(), filter);
+            } else {
+                service = unavailableService;
+                serviceAvailable = false;
+            }
+        }
 
 		// Our listener to handle the service lifecycle
 		listener = new Listener(unavailableService);
@@ -290,7 +314,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		pf.addAdvice(new LocalBundleContext(bundleContext.getBundle()));
 
 		proxy = pf.getProxy(applicationContext.getClassLoader());
-	}
+        return serviceAvailable;
+    }
 
 
 	/**
@@ -338,9 +363,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		// a. C_ is appended to the string
 		// b. . -> _
 
-		if (cardinality != null) {
+        if (cardinality != null) {
 			try {
-				this.cardinality = CARDINALITY.asNumber("C_".concat(cardinality.replace('.', '_'))).intValue();
+				this.cardinality = translateCardinality(cardinality);
 				return;
 			}
 			catch (ConstantException ex) {
@@ -351,7 +376,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		throw new IllegalArgumentException("invalid constant, " + cardinality);
 	}
 
-	// public void setContextClassloader(int options) {
+    // public void setContextClassloader(int options) {
 	// if (!REFERENCE_CL_OPTIONS.getValues(null).contains(new Integer(options)))
 	// throw new IllegalArgumentException("only reference classloader options
 	// allowed");

@@ -1,0 +1,8 @@
+Bundle-Version: 1.0
+Bundle-SymbolicName: org.springframework.osgi.test.cardinality.0to1
+Bundle-Name: Cardinality 0..1
+Bundle-Vendor: Spring Framework
+Import-Package: org.springframework.osgi.test.simpleservice2
+Export-Package: org.springframework.osgi.test.cardinality0to1.test
+Bundle-ClassPath: .,
+ target/classes/

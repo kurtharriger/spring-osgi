@@ -146,7 +146,10 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
             String clazz = (String) service.getValue();
             String query =  serviceFilter != null ? (String) serviceFilter.getValue() : null;
             Filter filter = getFilter(clazz, query);
-            dependencies.add(new Dependency(filter, clazz));
+            PropertyValue cardinality =
+                    bean.getPropertyValues().getPropertyValue(OsgiServiceProxyFactoryBean.CARDINALITY_ATTRIBUTE);
+            int cardinalityValue = OsgiServiceProxyFactoryBean.translateCardinality((String) cardinality.getValue()); 
+            dependencies.add(new Dependency(filter, clazz, cardinalityValue));
             return true;
 		}
 		return false;
@@ -181,12 +184,17 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
     }
 
     private void registerListener() {
+        boolean multiple = unsatisfiedDependencies.size() > 1;
         StringBuffer sb = new StringBuffer(100 * unsatisfiedDependencies.size());
-        sb.append("(|");
+        if (multiple) {
+            sb.append("(|");
+        }
         for (Iterator i = unsatisfiedDependencies.iterator(); i.hasNext();) {
             ((Dependency) i.next()).appendTo(sb);
         }
-        sb.append(')');
+        if (multiple) {
+            sb.append(')');
+        }
         String filter = sb.toString();
         if (log.isInfoEnabled()) {
             log.info(getDisplayName() + " registering filter: " + filter);
@@ -246,10 +254,12 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
     private class Dependency {
         private final Filter filter;
         private final String clazz;
+        private final int cardinality;
 
-        private Dependency(Filter filter, String clazz) {
+        private Dependency(Filter filter, String clazz, int cardinality) {
             this.filter = filter;
             this.clazz = clazz;
+            this.cardinality = cardinality;
         }
 
         public boolean matches(ServiceEvent event) {
@@ -266,7 +276,8 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
                                                 + "' has invalid syntax: "
                                                 + e.getMessage()).initCause(e);
             }
-            return refs != null && refs.length != 0;
+            return !OsgiServiceProxyFactoryBean.atLeastOneRequired(cardinality) ||
+                   (refs != null && refs.length != 0);
         }
 
         public String toString() {
