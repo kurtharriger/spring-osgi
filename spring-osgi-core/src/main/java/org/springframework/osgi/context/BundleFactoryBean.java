@@ -25,7 +25,6 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.service.startlevel.StartLevel;
-import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -45,7 +44,7 @@ import org.springframework.util.Assert;
  * @author Andy Piper
  */
 public class BundleFactoryBean implements FactoryBean, BundleContextAware,
-		SynchronousBundleListener, InitializingBean, DisposableBean, BeanNameAware
+		SynchronousBundleListener, InitializingBean, DisposableBean
 {
 	private Resource bundleUrl;
 	private Bundle bundle;
@@ -56,7 +55,6 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 	private String symbolicName;
 	private static Log log = LogFactory.getLog(BundleFactoryBean.class);
 	private boolean pushBundleAsContextClassLoader = false;
-	private String beanName;
 
 	public BundleFactoryBean() {
 	}
@@ -244,7 +242,4 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 		this.classloader = classloader;
 	}
 
-	public void setBeanName(String name) {
-		this.beanName = name;
-	}
 }
