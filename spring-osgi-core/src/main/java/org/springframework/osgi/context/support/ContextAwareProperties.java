@@ -31,6 +31,9 @@ import org.osgi.framework.BundleContext;
  */
 public class ContextAwareProperties extends Properties implements InitializingBean, BeanPostProcessor
 {
+
+	private static final long serialVersionUID = 4219438743834974209L;
+
 	private HashMap contextToPropMap = new HashMap();
 
   public ContextAwareProperties() {
