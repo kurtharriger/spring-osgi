@@ -18,7 +18,6 @@
 package org.springframework.osgi.context.support;
 
 import org.osgi.framework.BundleContext;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Factory interface for the creation of OsgiBundleXmlApplicationContext.
