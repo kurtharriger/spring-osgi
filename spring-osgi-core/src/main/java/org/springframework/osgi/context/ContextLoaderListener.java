@@ -36,8 +36,7 @@ import org.springframework.beans.factory.xml.PluggableSchemaResolver;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.support.DefaultOsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.NamespacePlugins;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
-import org.springframework.osgi.context.support.OsgiPlatformDetector;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory; 
 import org.springframework.osgi.context.support.OsgiResourceUtils;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.util.StringUtils;
@@ -71,9 +70,6 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 	private Map managedBundles = new HashMap();
 
-	// required to work around knopflerfish getResource bug...
-	private boolean isKnopflerfish = false;
-
 	public static NamespacePlugins plugins() {
 		return plugins;
 	}
@@ -83,7 +79,6 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 	public void start(BundleContext context) throws Exception {
-		this.isKnopflerfish = OsgiPlatformDetector.isKnopflerfish(context);
 
 		// Collect all previously resolved bundles which have namespace plugins
 		Bundle[] previousBundles = context.getBundles();
@@ -165,21 +160,11 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
             return;  // Do not resolve namespace and entity handlers from the system bundle
         }
 
-        if (isKnopflerfish) {
-			// knopflerfish (2.0.0) has a bug #1581187 which gives a classcast exception if you call getResource
-			// from outside of the bundle, yet getResource works bettor on equinox....
-			// see http://sourceforge.net/tracker/index.php?func=detail&aid=1581187&group_id=82798&atid=567241
-			if (bundle.getEntry(SPRING_HANDLER_MAPPINGS_LOCATION) != null
-					|| bundle.getEntry(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
-				plugins.addHandler(bundle);
-			}
-		} else {
-			if (bundle.getResource(SPRING_HANDLER_MAPPINGS_LOCATION) != null
-					|| bundle.getResource(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
-				plugins.addHandler(bundle);
-			}
-		}
-	}
+        if (bundle.getEntry(SPRING_HANDLER_MAPPINGS_LOCATION) != null
+            || bundle.getEntry(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
+            plugins.addHandler(bundle);
+        }
+    }
 
 	private void unresolveBundle(Bundle bundle) {
 		plugins.removeHandler(bundle);
