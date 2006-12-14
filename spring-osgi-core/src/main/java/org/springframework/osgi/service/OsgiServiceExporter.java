@@ -94,7 +94,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 
 	private static final Constants CL_OPTIONS = new Constants(ClassLoaderOptions.class);
 
-	private int contextClassloader;
+	private int contextClassloaderManagementStrategy;
 	private Object target;
 
 	/*
@@ -181,7 +181,21 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 		Assert.notNull(resolver, "required property 'resolver' was set to a null value");
 		Assert.notNull(target, "required property 'target' has not been set");
 
-		publishService(target, mergeServiceProperties(targetBeanName));
+		Object serviceBackingObject = target;
+		if (this.contextClassloaderManagementStrategy == ClassLoaderOptions.SERVICE_PROVIDER) {
+			serviceBackingObject = wrapWithClassLoaderManagingProxy(target);
+		}
+		publishService(serviceBackingObject, mergeServiceProperties(targetBeanName));
+	}
+
+	/**
+	 * Proxy the target object with a proxy that manages the context classloader
+	 * @param target2
+	 * @return
+	 */
+	private Object wrapWithClassLoaderManagingProxy(Object toBeProxied) {
+		// TODO implement wrapping, take into account that toBeProxied may *already* be advised...
+		return toBeProxied;
 	}
 
 	/*
@@ -297,24 +311,18 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 		}
 	}
 
-	// /**
-	// * @param contextClassloader The contextClassloader to set.
-	// */
-	// private void setContextClassloader(int contextClassloader) {
-	// if (!CL_OPTIONS.getValues(null).contains(new
-	// Integer(contextClassloader)))
-	// throw new IllegalArgumentException("illegal constant:" +
-	// contextClassloader);
-	//
-	// this.contextClassloader = contextClassloader;
-	// }
 
+	/**
+	 * Set the context classloader management strategy to use when invoking operations
+	 * on the exposed target bean
+	 * @param classloaderManagementOption
+	 */
 	public void setContextClassloader(String classloaderManagementOption) {
 		// transform "-" into "_" (for service-provider)
 		if (classloaderManagementOption == null)
 			throw new IllegalArgumentException("non-null argument required");
 
-		this.contextClassloader = CL_OPTIONS.asNumber(classloaderManagementOption.replace('-', '_')).intValue();
+		this.contextClassloaderManagementStrategy = CL_OPTIONS.asNumber(classloaderManagementOption.replace('-', '_')).intValue();
 	}
 
 	/**
