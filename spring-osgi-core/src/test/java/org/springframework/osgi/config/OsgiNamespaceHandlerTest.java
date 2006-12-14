@@ -22,7 +22,6 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -44,13 +43,11 @@ public class OsgiNamespaceHandlerTest extends TestCase {
 
 	private GenericApplicationContext appContext;
 	private BundleContext bundleContext;
-	private Bundle bundle;
 
 	ServiceReference mockReference;
 
 	protected void setUp() throws Exception {
 		bundleContext = new MockBundleContext();
-		bundle = bundleContext.getBundle();
 
 		appContext = new GenericApplicationContext();
 		appContext.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));

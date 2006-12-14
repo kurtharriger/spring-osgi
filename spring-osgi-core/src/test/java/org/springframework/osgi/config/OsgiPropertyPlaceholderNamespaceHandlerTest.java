@@ -23,7 +23,6 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
@@ -44,11 +43,9 @@ public class OsgiPropertyPlaceholderNamespaceHandlerTest extends TestCase {
 
 	private GenericApplicationContext appContext;
 	private BundleContext bundleContext;
-	private Bundle bundle;
 	private MockControl adminControl;
 	private ConfigurationAdmin admin;
 	private Dictionary config;
-	private ServiceReference mockReference;
 
 	protected void setUp() throws Exception {
 
@@ -71,7 +68,6 @@ public class OsgiPropertyPlaceholderNamespaceHandlerTest extends TestCase {
 				return admin;
 			}
 		};
-		bundle = bundleContext.getBundle();
 
 		appContext = new GenericApplicationContext();
 		appContext.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
