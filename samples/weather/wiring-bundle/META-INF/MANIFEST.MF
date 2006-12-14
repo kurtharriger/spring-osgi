@@ -1,5 +1,5 @@
 Bundle-Version: 1.0
-Bundle-SymbolicName: org.springframework.osgi.samples.wiring-bundle
+Bundle-SymbolicName: org.springframework.osgi.samples.wiring.bundle
 Bundle-Name: wiring-bundle
 Bundle-Vendor: Spring Framework
 Import-Package: org.springframework.osgi.bundle.support,
