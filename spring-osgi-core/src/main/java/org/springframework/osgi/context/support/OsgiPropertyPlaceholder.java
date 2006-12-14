@@ -16,17 +16,10 @@
 package org.springframework.osgi.context.support;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -46,108 +39,6 @@ import org.springframework.util.Assert;
  */
 public class OsgiPropertyPlaceholder extends PropertyPlaceholderConfigurer implements BundleContextAware,
 		InitializingBean {
-
-	/**
-	 * Map wrapper around a Dictionary.
-	 * 
-	 * TODO: is this class really needed? The dictionary is not updated so
-	 * delegation doesn't add any value.
-	 * 
-	 * @author Costin Leau
-	 * 
-	 */
-	private class DictionaryMapWrapper implements Map {
-		private Dictionary dictionary;
-
-		public DictionaryMapWrapper(Dictionary dict) {
-			this.dictionary = dict;
-		}
-
-		public void clear() {
-			throw new UnsupportedOperationException("not supported");
-		}
-
-		public boolean containsKey(Object key) {
-			return (dictionary.get(key) == null);
-		}
-
-		public boolean containsValue(Object value) {
-			throw new UnsupportedOperationException("not supported");
-		}
-
-		public Set entrySet() {
-			final Enumeration keysEnum = dictionary.keys();
-			Set keys = new HashSet();
-			while (keysEnum.hasMoreElements()) {
-				keys.add(new Map.Entry() {
-
-					private Object key = keysEnum.nextElement();
-					private Object value = dictionary.get(key);
-
-					public Object getKey() {
-						return key;
-					}
-
-					public Object getValue() {
-						return value;
-					}
-
-					public Object setValue(Object value) {
-						Object oldValue = this.value;
-						this.value = value;
-						return oldValue;
-					}
-				});
-			}
-			return keys;
-		}
-
-		public Object get(Object key) {
-			return dictionary.get(key);
-		}
-
-		public boolean isEmpty() {
-			return dictionary.isEmpty();
-		}
-
-		public Set keySet() {
-			Enumeration keysEnum = dictionary.keys();
-			Set keys = new HashSet();
-			while (keysEnum.hasMoreElements())
-				keys.add(keysEnum.nextElement());
-
-			return keys;
-		}
-
-		public Object put(Object key, Object value) {
-			return dictionary.put(key, value);
-		}
-
-		public void putAll(Map t) {
-			for (Iterator iter = t.entrySet().iterator(); iter.hasNext();) {
-				Map.Entry entry = (Map.Entry) iter.next();
-				dictionary.put(entry.getKey(), entry.getValue());
-			}
-		}
-
-		public Object remove(Object key) {
-			return dictionary.remove(key);
-		}
-
-		public int size() {
-			return dictionary.size();
-		}
-
-		public Collection values() {
-			Enumeration valueEnum = dictionary.elements();
-			List values = new ArrayList();
-			while (valueEnum.hasMoreElements())
-				values.add(valueEnum.nextElement());
-
-			return values;
-		}
-
-	}
 
 	private String persistentId;
 	private BundleContext bundleContext;
