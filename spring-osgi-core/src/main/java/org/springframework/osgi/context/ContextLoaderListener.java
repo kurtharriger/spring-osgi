@@ -161,7 +161,11 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 	private void resolveBundle(Bundle bundle) {
-		if (isKnopflerfish) {
+        if (Constants.SYSTEM_BUNDLE_SYMBOLICNAME.equals(bundle.getSymbolicName())) {
+            return;  // Do not resolve namespace and entity handlers from the system bundle
+        }
+
+        if (isKnopflerfish) {
 			// knopflerfish (2.0.0) has a bug #1581187 which gives a classcast exception if you call getResource
 			// from outside of the bundle, yet getResource works bettor on equinox....
 			// see http://sourceforge.net/tracker/index.php?func=detail&aid=1581187&group_id=82798&atid=567241
