@@ -15,7 +15,6 @@
  */
 package org.springframework.osgi.samples.weather.test;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.osgi.framework.BundleContext;
