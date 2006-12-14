@@ -2,11 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
-	<classpathentry output="target/test-classes" kind="src" path="src/test/java"/>
-	<classpathentry output="target/test-classes" kind="src" path="src/test/resources"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.springframework.osgi.test"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Simple Service Sample bundle"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Weather Sample Service Bundle"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
