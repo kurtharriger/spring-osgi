@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>lifecycle.test.bundle</name>
+	<name>Application Context Lifecycle Integration Tests</name>
 	<comment></comment>
 	<projects>
 	</projects>
