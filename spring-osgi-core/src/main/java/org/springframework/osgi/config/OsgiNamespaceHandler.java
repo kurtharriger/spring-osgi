@@ -17,8 +17,6 @@
 package org.springframework.osgi.config;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
-import org.springframework.osgi.context.BundleFactoryBean;
-import org.w3c.dom.Element;
 
 /**
  * @author Hal Hildebrand

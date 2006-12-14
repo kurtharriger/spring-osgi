@@ -20,7 +20,6 @@ import java.util.StringTokenizer;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
-import org.springframework.core.Conventions;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
