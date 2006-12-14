@@ -19,12 +19,8 @@
 package org.springframework.osgi.context;
 
 import org.osgi.framework.BundleContext;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.support.AbstractBundleXmlApplicationContext;
 import org.springframework.osgi.context.support.DefaultOsgiBundleXmlApplicationContextFactory;
@@ -35,11 +31,9 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextF
  * @since 2.1
  */
 public class OsgiBundleXmlApplicationContextFactoryBean implements FactoryBean, BundleContextAware,
-	BeanNameAware, ApplicationContextAware, InitializingBean {
+	InitializingBean {
 	private BundleContext context;
-	private ApplicationContext parent;
 	private OsgiBundleXmlApplicationContextFactory contextFactory = new DefaultOsgiBundleXmlApplicationContextFactory();
-	private String name;
 	private Resource configLocation;
 
 	public Object getObject() throws Exception {
@@ -59,16 +53,8 @@ public class OsgiBundleXmlApplicationContextFactoryBean implements FactoryBean, 
 		this.context = context;
 	}
 
-	public void setBeanName(String name) {
-		this.name = name;
-	}
-
 	public void setConfigLocation(Resource configLocation) {
 		this.configLocation = configLocation;
-	}
-
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		parent = applicationContext;
 	}
 
 	public void afterPropertiesSet() throws Exception {
