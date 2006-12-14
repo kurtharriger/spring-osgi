@@ -13,8 +13,8 @@ import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
  */
 public class DependencyTest extends ConfigurableBundleCreatorTests {
     private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.test.dependencies.Dependent";
-    private static final String SERVICE_2_FILTER = "(service=2)";
-    private static final String SERVICE_3_FILTER = "(service=3)";
+    //private static final String SERVICE_2_FILTER = "(service=2)";
+    //private static final String SERVICE_3_FILTER = "(service=3)";
 
 
     protected String getManifestLocation() {
