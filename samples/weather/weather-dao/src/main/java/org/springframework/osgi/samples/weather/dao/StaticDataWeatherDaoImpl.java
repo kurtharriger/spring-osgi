@@ -16,6 +16,7 @@
  */
 package org.springframework.osgi.samples.weather.dao;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -31,8 +32,10 @@ public class StaticDataWeatherDaoImpl implements WeatherDao {
     WeatherData wd = new WeatherData();
     wd.setDate((Date) date.clone());
     // some bogus values
-    wd.setLow(date.getMonth() + 5);
-    wd.setHigh(date.getMonth() + 15);
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(date);
+    wd.setLow(calendar.get(Calendar.MONTH) + 5);
+    wd.setHigh(calendar.get(Calendar.MONTH) + 15);
     return wd;
   }
 
