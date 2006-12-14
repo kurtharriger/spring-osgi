@@ -1,5 +1,5 @@
 <projectDescription>
-  <name>Simple Service Sample - OSGi Integration Tests</name>
+  <name>Weather Sample - OSGi Integration Tests</name>
   <projects/>
   <buildSpec>
     <buildCommand>
