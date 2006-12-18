@@ -40,7 +40,7 @@ public class DefaultOsgiBundleXmlApplicationContextFactory implements OsgiBundle
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		BundleContext bc = LocalBundleContext.getContext();
 		try {
-			ClassLoader cl = new BundleDelegatingClassLoader(aBundleContext.getBundle());
+			ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundleContext.getBundle());
 			Thread.currentThread().setContextClassLoader(cl);
 			LocalBundleContext.setContext(aBundleContext);
 

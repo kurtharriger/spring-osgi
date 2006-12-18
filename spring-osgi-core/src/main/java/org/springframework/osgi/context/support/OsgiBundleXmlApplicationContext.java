@@ -51,7 +51,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractBundleXmlApplicatio
 
 	public OsgiBundleXmlApplicationContext(BundleContext aBundleContext, String[] configLocations,
 			NamespacePlugins plugins) {
-		this(aBundleContext, configLocations, new BundleDelegatingClassLoader(aBundleContext.getBundle()), plugins);
+		this(aBundleContext, configLocations, BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundleContext.getBundle()), plugins);
 	}
 
 	public OsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations, ClassLoader classLoader,

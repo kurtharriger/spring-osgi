@@ -18,6 +18,8 @@ package org.springframework.osgi.context.support;
 
 import java.io.IOException;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
@@ -50,11 +52,26 @@ public class BundleDelegatingClassLoader extends ClassLoader
 	private Bundle backingBundle;
 	private static Log log = LogFactory.getLog("BundleDelegatingClassLoader");
 	private static boolean DEBUG = Boolean.getBoolean("org.springframework.osgi.DebugClassLoading");
-	public BundleDelegatingClassLoader(Bundle aBundle) {
+
+	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle aBundle) {
+		return (BundleDelegatingClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
+			public Object run() {
+				return new BundleDelegatingClassLoader(aBundle);
+			}});
+	}
+	
+	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle aBundle, final ClassLoader parent) {
+		return (BundleDelegatingClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
+			public Object run() {
+				return new BundleDelegatingClassLoader(aBundle, parent);
+			}});
+	}
+	
+	private BundleDelegatingClassLoader(Bundle aBundle) {
 		this(aBundle, Advised.class.getClassLoader());
 	}
 
-	public BundleDelegatingClassLoader(Bundle aBundle, ClassLoader parentClassLoader) {
+	private BundleDelegatingClassLoader(Bundle aBundle, ClassLoader parentClassLoader) {
 		super(parentClassLoader);
 		this.backingBundle = aBundle;
 		this.parent = parentClassLoader;

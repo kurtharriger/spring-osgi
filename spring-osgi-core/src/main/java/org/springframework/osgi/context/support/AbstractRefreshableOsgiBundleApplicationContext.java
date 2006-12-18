@@ -111,11 +111,22 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	}
 
 	public void setConfigLocations(String[] configLocations) {
-		this.configLocations = configLocations;
+		this.configLocations = defensiveCopyOf(configLocations);
 	}
 
 	protected String[] getConfigLocations() {
-		return this.configLocations;
+		return defensiveCopyOf(this.configLocations);
+	}
+	
+	private String[] defensiveCopyOf(String[] original) {
+		if (null == original) {
+			return new String[0];
+		}
+		else {
+			String[] ret = new String[original.length];
+			System.arraycopy(original,0,ret,0,original.length);
+			return ret;
+		}
 	}
 
 	/**
@@ -187,7 +198,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 * @return
 	 */
 	protected ClassLoader createBundleClassLoader(Bundle bundle) {
-		return new BundleDelegatingClassLoader(bundle);
+		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 	}
 
 	/**
