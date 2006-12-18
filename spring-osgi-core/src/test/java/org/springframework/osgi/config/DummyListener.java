@@ -23,8 +23,8 @@ import org.springframework.osgi.service.TargetSourceLifecycleListener;
  */
 public class DummyListener implements TargetSourceLifecycleListener {
 
-	public static int BIND_CALLS = 0;
-	public static int UNBIND_CALLS = 0;
+	static int BIND_CALLS = 0;
+	static int UNBIND_CALLS = 0;
 
 	/*
 	 * (non-Javadoc)
