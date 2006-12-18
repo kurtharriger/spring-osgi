@@ -48,7 +48,7 @@ public class MockBundle implements Bundle {
 	private Dictionary defaultHeaders = new Hashtable(0);
 	private final String SYMBOLIC_NAME = "Mock-Bundle_" + System.currentTimeMillis();
 
-	private class EmptyEnumeration implements Enumeration {
+	private static class EmptyEnumeration implements Enumeration {
 		public boolean hasMoreElements() {
 			return false;
 		}
@@ -275,6 +275,12 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#update(java.io.InputStream)
 	 */
 	public void update(InputStream in) throws BundleException {
+	}
+	
+	// chiefly here so that compilers/find-bugs don't complain about the
+	// "unused" bundleContext field.
+	public BundleContext getBundleContext() {
+		return this.bundleContext;
 	}
 
 }
