@@ -84,7 +84,7 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 
 		ClassLoader loader = context.getClassLoader();
 		assertTrue(loader instanceof BundleDelegatingClassLoader);
-		assertEquals(new BundleDelegatingClassLoader(bundle), loader);
+		assertEquals(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle), loader);
 
 		// do some resource loading
 		assertEquals(bundleResource, context.getResource(location));

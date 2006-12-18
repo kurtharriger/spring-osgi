@@ -36,7 +36,7 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 	protected void setUp() throws Exception {
 		bundleCtrl = MockControl.createStrictControl(Bundle.class);
 		bundle = (Bundle) bundleCtrl.getMock();
-		classLoader = new BundleDelegatingClassLoader(bundle);
+		classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 		bundleCtrl.reset();
 	}
 
@@ -52,7 +52,7 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 
 		assertFalse(classLoader.equals(new Object()));
 		assertEquals(classLoader, classLoader);
-		assertTrue(classLoader.equals(new BundleDelegatingClassLoader(bundle)));
+		assertTrue(classLoader.equals(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle)));
 
 		//assertEquals(bundle.hashCode(), classLoader.hashCode());
 	}

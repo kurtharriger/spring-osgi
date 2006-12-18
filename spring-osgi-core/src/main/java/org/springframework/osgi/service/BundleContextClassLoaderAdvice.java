@@ -36,7 +36,7 @@ public class BundleContextClassLoaderAdvice implements MethodBeforeAdvice, After
 	private ClassLoader bundleContextClassLoader;
 
 	public BundleContextClassLoaderAdvice(Bundle bundle) {
-		bundleContextClassLoader = new BundleDelegatingClassLoader(bundle);
+		bundleContextClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 	}
 
 	public synchronized void before(Method method, Object[] args, Object target) throws Throwable {

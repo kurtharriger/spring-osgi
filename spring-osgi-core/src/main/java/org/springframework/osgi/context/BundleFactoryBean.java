@@ -69,7 +69,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 
 		if (bundle == null) {
 			bundle = bundleContext.installBundle(bundleUrl.getURL().toString());
-			classloader = new BundleDelegatingClassLoader(bundle);
+			classloader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 			bundleContext.addBundleListener(this);
 		}
 		// Set the start level
@@ -111,11 +111,11 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 		return bundleContext;
 	}
 
-	public void setState(String level) {
+	public synchronized void setState(String level) {
 		state = level;
 	}
 
-	public String getState() {
+	public synchronized String getState() {
 		return state;
 	}
 

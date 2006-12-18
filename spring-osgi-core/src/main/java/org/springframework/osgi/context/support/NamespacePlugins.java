@@ -42,7 +42,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
     public void addHandler(Bundle bundle) {
         synchronized (plugins) {
             //noinspection unchecked
-            plugins.put(bundle, new Plugin(new BundleDelegatingClassLoader(bundle)));
+            plugins.put(bundle, new Plugin(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle)));
         }
     }
 
@@ -89,7 +89,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
     }
 
 
-    private class Plugin implements NamespaceHandlerResolver, EntityResolver {
+    private static class Plugin implements NamespaceHandlerResolver, EntityResolver {
         private final NamespaceHandlerResolver namespace;
         private final EntityResolver entity;
 
