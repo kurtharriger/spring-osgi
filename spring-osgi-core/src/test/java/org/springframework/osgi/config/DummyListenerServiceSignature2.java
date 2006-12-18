@@ -6,8 +6,8 @@ package org.springframework.osgi.config;
  *         Time: 12:35:01 PM
  */
 public class DummyListenerServiceSignature2 {
-    public static int BIND_CALLS = 0;
-    public static int UNBIND_CALLS = 0;
+    static int BIND_CALLS = 0;
+    static int UNBIND_CALLS = 0;
 
 
     public void register(Cloneable service) {
