@@ -109,11 +109,12 @@ class MavenBundleManager
 			// REVIEW andyp -- this could be more efficient
 			ByteArrayOutputStream baos =
 					new ByteArrayOutputStream();
-			BufferedInputStream bis =
-					new BufferedInputStream(jin);
+			BufferedInputStream bis = new BufferedInputStream(jin);
 			int i;
 			while ((i = bis.read()) != -1)
 				baos.write(i);
+			//bis.close();  must NOT close this stream, doing so causes trouble processing rest
+			//              of the entries           
 			byte[] b = baos.toByteArray();
 			jarOut.write(b, 0, b.length);
 			jin.closeEntry();
@@ -251,10 +252,11 @@ class MavenBundleManager
 	private static StringBuffer createExportList(URL jarPath) throws IOException {
 		Set packages = new HashSet();
 		InputStream in = null;
+		JarInputStream jarIn = null;
 		try {
 			// FIXME andyp -- don't retrieve the jar twice
 			in = jarPath.openStream();
-			JarInputStream jarIn = new JarInputStream(in);
+			jarIn = new JarInputStream(in);
 			for (JarEntry jarEntry = jarIn.getNextJarEntry(); jarEntry != null; jarEntry = jarIn.getNextJarEntry()) {
 				String packageName = jarEntry.getName();
 				if (!jarEntry.isDirectory()) {
@@ -270,7 +272,10 @@ class MavenBundleManager
 				}
 			}
 		} finally {
-			if (in != null) {
+			if (jarIn != null) {
+				try {jarIn.close(); } catch(IOException e) {}
+			}
+			else if (in != null) {
 				try {
 					in.close();
 				} catch (IOException e) {
