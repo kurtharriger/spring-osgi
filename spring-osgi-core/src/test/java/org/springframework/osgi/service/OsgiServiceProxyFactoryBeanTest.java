@@ -240,12 +240,12 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		}
 	}
 
-	private class MockServiceListener implements AllServiceListener {
+	private static class MockServiceListener implements AllServiceListener {
 		public void serviceChanged(ServiceEvent serviceEvent) {
 		}
 	}
 
-	private class AddServiceListenerMatcher implements ArgumentsMatcher {
+	private static class AddServiceListenerMatcher implements ArgumentsMatcher {
 
 		public boolean matches(Object[] objects, Object[] objects1) {
 			return objects1[0] instanceof ServiceListener
