@@ -70,7 +70,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 *
 	 * @author Costin Leau
 	 */
-	protected class ReferenceClassLoadingOptions {
+	protected static class ReferenceClassLoadingOptions {
 		public static final int CLIENT = 0;
 		public static final int SERVICE_PROVIDER = 1;
 		public static final int UNMANAGED = 2;
@@ -81,7 +81,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 *
 	 * @author Costin Leau
 	 */
-	public class Cardinality {
+	public static class Cardinality {
 		public static final int C_0__1 = 0;
 		public static final int C_0__N = 1;
 		public static final int C_1__1 = 2;
@@ -592,7 +592,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @return Returns the listeners.
 	 */
 	public TargetSourceLifecycleListener[] getListeners() {
-		return listeners;
+		return defensiveCopyOf(this.listeners);
 	}
 
 
@@ -600,9 +600,19 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @param listeners The listeners to set.
 	 */
 	public void setListeners(TargetSourceLifecycleListener[] listeners) {
-		this.listeners = listeners;
+		this.listeners = defensiveCopyOf(listeners);
 	}
 
+	private TargetSourceLifecycleListener[] defensiveCopyOf(TargetSourceLifecycleListener[] original) {
+		if (null == original) {
+			return new TargetSourceLifecycleListener[0];
+		}
+		else {
+			TargetSourceLifecycleListener[] copy = new TargetSourceLifecycleListener[original.length];
+			System.arraycopy(original,0,copy,0,original.length);
+			return copy;
+		}
+	}
 
 	public void setId(String id) {
 		this.id = id;

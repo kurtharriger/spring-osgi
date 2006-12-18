@@ -70,7 +70,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 	 *
 	 * @author Costin Leau
 	 */
-	protected class ClassLoaderOptions
+	protected static class ClassLoaderOptions
 	{
 		public static final int UNMANAGED = 0;
 		public static final int SERVICE_PROVIDER = 1;
@@ -139,11 +139,22 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 	}
 
 	public Class[] getInterfaces() {
-		return interfaces;
+		return defensiveCopyOf(this.interfaces);
 	}
 
-	public void setInterfaces(Class[] serviceInterface) {
-		this.interfaces = serviceInterface;
+	public void setInterfaces(Class[] serviceInterfaces) {
+		this.interfaces = defensiveCopyOf(serviceInterfaces);
+	}
+	
+	private Class[] defensiveCopyOf(Class[] original) {
+		if (null == original) {
+			return new Class[0];
+		}
+		else {
+			Class[] copy = new Class[original.length];
+			System.arraycopy(original,0,copy,0,original.length);
+			return copy;
+		}
 	}
 
 	public String getActivationMethod() {
