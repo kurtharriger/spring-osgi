@@ -16,17 +16,11 @@
 package org.springframework.osgi.test;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import junit.framework.TestCase;
-
-import org.springframework.util.ReflectionUtils;
 
 /**
  * Test JUnit stream corruption; basically test that the stream size is suitable
@@ -99,7 +93,7 @@ public class StreamCorruption extends TestCase {
 			}
 		}
 		catch (Throwable ex3) {
-			Exception ex = new Exception("foo-bar",
+			new Exception("foo-bar",
 					new Exception(new Exception(new Exception(new Exception(new RuntimeException(new RuntimeException(
 							new ClassNotFoundException("boo", new RuntimeException(ex3)))))))).fillInStackTrace());
 
@@ -126,15 +120,15 @@ public class StreamCorruption extends TestCase {
 		method.invoke(obj, null);
 	}
 
-	private Object readField(Object obj, String name) throws Exception {
-		Field field = obj.getClass().getDeclaredField(name);
-		field.setAccessible(true);
-		return field.get(obj);
-	}
-
-	private void writeField(Object obj, String name, Object value) throws Exception {
-		Field field = obj.getClass().getDeclaredField(name);
-		field.setAccessible(true);
-		field.set(obj, value);
-	}
+//	private Object readField(Object obj, String name) throws Exception {
+//		Field field = obj.getClass().getDeclaredField(name);
+//		field.setAccessible(true);
+//		return field.get(obj);
+//	}
+//
+//	private void writeField(Object obj, String name, Object value) throws Exception {
+//		Field field = obj.getClass().getDeclaredField(name);
+//		field.setAccessible(true);
+//		field.set(obj, value);
+//	}
 }
