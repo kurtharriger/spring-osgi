@@ -17,7 +17,6 @@
  */
 package org.springframework.osgi.bundle.support;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -48,6 +47,10 @@ import org.springframework.util.StringUtils;
 /* package */
 class MavenBundleManager
 {
+	
+	private static final int NO_MORE_DATA = -1;
+	private static final int DEFAULT_BUFFER_SIZE = 4096;
+	
 	private final BundleContext bundleContext;
 	private final URL localRepository;
 
@@ -103,18 +106,17 @@ class MavenBundleManager
 		// create a jar in memory for the manifest
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		JarOutputStream jarOut = new JarOutputStream(out, manifest);
+		byte[] entryDataBuffer = new byte[DEFAULT_BUFFER_SIZE];
 		// Copy entries from the real jar to our virtual jar
 		for (JarEntry ze = jin.getNextJarEntry(); ze != null; ze = jin.getNextJarEntry()) {
 			jarOut.putNextEntry(ze);
-			// REVIEW andyp -- this could be more efficient
 			ByteArrayOutputStream baos =
-					new ByteArrayOutputStream();
-			BufferedInputStream bis = new BufferedInputStream(jin);
-			int i;
-			while ((i = bis.read()) != -1)
-				baos.write(i);
-			//bis.close();  must NOT close this stream, doing so causes trouble processing rest
-			//              of the entries           
+				new ByteArrayOutputStream();
+			int bytesRead = NO_MORE_DATA;
+			while( (bytesRead = jin.read(entryDataBuffer)) != NO_MORE_DATA) {
+				baos.write(entryDataBuffer, 0, bytesRead);
+			}
+			baos.close();
 			byte[] b = baos.toByteArray();
 			jarOut.write(b, 0, b.length);
 			jin.closeEntry();
@@ -122,6 +124,7 @@ class MavenBundleManager
 		}
 		jarOut.close();
 		out.close();
+		jin.close();
 		in.close();
 		ByteArrayInputStream bin = new ByteArrayInputStream(out.toByteArray());
 
