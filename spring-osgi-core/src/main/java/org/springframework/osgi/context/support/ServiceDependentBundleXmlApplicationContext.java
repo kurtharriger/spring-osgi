@@ -183,10 +183,13 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 		try {
 			return FrameworkUtil.createFilter(sb.toString());
 		} catch (InvalidSyntaxException e) {
-			throw (IllegalStateException) new IllegalArgumentException("Filter string '"
+			IllegalArgumentException illArgEx = 
+			  new IllegalArgumentException("Filter string '"
 				+ serviceFilter
 				+ "' set on OsgiServiceProxyFactoryBean has invalid syntax: "
-				+ e.getMessage()).initCause(e);
+				+ e.getMessage());
+			illArgEx.initCause(e);
+			throw illArgEx;
 		}
 	}
 
