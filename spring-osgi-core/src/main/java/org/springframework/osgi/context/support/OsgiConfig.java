@@ -139,8 +139,11 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 					bean.getClass().getMethod(updateMethod, new Class[]{String.class, Map.class});
 				}
 				catch (NoSuchMethodException e) {
-					throw (IllegalStateException)new IllegalArgumentException("Invalid or missing update method for bean " + reference
-						+ "; requires signature (java.lang.String, java.util.Map)").initCause(e);
+					IllegalArgumentException illArgEx = 
+					   new IllegalArgumentException("Invalid or missing update method for bean " + reference
+						  + "; requires signature (java.lang.String, java.util.Map)");
+					illArgEx.initCause(e);
+					throw illArgEx;
 				}
 			}
 			else {
@@ -148,8 +151,11 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 					bean.getClass().getMethod(updateMethod, new Class[]{Map.class});
 				}
 				catch (NoSuchMethodException e) {
-					throw (IllegalStateException) new IllegalArgumentException("Invalid or missing update method for bean " + reference
-						+ "; requires signature (java.util.Map)").initCause(e);
+					IllegalArgumentException illArgEx = 
+					  new IllegalArgumentException("Invalid or missing update method for bean " + reference
+						+ "; requires signature (java.util.Map)");
+					illArgEx.initCause(e);
+					throw illArgEx;
 				}
 			}
 			if (deletedMethod != null) {
@@ -157,8 +163,11 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 					bean.getClass().getMethod(deletedMethod, new Class[]{String.class});
 				}
 				catch (NoSuchMethodException e) {
-					throw (IllegalStateException)new IllegalArgumentException("Invalid or missing deleted method for bean " + reference
-						+ "; requires signature (java.lang.String)").initCause(e);
+					IllegalArgumentException illArgEx = 
+					  new IllegalArgumentException("Invalid or missing deleted method for bean " + reference
+						+ "; requires signature (java.lang.String)");
+					illArgEx.initCause(e);
+					throw illArgEx;
 				}
 			}
 		}
