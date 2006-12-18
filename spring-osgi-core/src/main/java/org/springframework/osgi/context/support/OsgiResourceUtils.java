@@ -74,12 +74,12 @@ public class OsgiResourceUtils
   public static BundleContext getBundleContext(Bundle bundle) {
     if (bundle == null) return null;
     try {
-// Retrieve bundle context from Equinox
+      // Retrieve bundle context from Equinox
       Method m = bundle.getClass().getDeclaredMethod("getContext", new Class[0]);
       m.setAccessible(true);
       return (BundleContext) m.invoke(bundle, new Object[0]);
-    } catch (Exception exc) {
-// Retrieve bundle context from Knopflerfish
+    } catch (Throwable t) {
+      // Retrieve bundle context from Knopflerfish
       try {
         Field[] fields = bundle.getClass().getDeclaredFields();
         Field f = null;
