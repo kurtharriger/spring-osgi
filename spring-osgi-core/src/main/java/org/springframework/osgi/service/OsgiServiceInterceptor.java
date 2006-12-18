@@ -63,7 +63,7 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice {
 	/* (non-Javadoc)
 	 * @see org.springframework.aop.MethodBeforeAdvice#before(java.lang.reflect.Method, java.lang.Object[], java.lang.Object)
 	 */
-	public synchronized void before(Method method, Object[] args, Object target) throws Throwable {
+	public void before(Method method, Object[] args, Object target) throws Throwable {
 		int numAttempts = 0;
 		while (targetSource.getTarget() == unavailableService && (numAttempts++ < this.maxRetries)) {
 			Thread.sleep(this.retryIntervalMillis);
