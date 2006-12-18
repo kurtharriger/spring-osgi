@@ -207,7 +207,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			if (ret.isEmpty()) {
 				return null;
 			} else {
-				return (String[]) ret.toArray();
+				return (String[]) ret.toArray(new String[ret.size()]);
 			}
 		} else {
 			List resourceList = new ArrayList();
