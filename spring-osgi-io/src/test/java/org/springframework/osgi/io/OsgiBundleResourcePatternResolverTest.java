@@ -90,5 +90,6 @@ public class OsgiBundleResourcePatternResolverTest extends TestCase {
 
 		// TODO: need a functional test here
 		res = resolver.getResources("bundle:org/springframework/osgi/io/OsgiBundleResourcePatternResolverT*");
+		assertNotNull(res);
 	}
 }
