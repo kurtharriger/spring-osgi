@@ -61,10 +61,10 @@ class VirtualBundleBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		if (e != null) {
 			builder.addPropertyValue("imports", extractPackageSet(e));
 		}
-		e = DomUtils.getChildElementByTagName(element, "dynamic-imports");
-		if (e != null) {
-			// builder.addPropertyValue("dynamicImports", extractPackageSet(e));
-		}
+//		e = DomUtils.getChildElementByTagName(element, "dynamic-imports");
+//		if (e != null) {
+//			// builder.addPropertyValue("dynamicImports", extractPackageSet(e));
+//		}
 
 		return builder.getBeanDefinition();
 	}
