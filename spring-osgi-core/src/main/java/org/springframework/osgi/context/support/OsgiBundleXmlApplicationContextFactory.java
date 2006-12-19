@@ -34,25 +34,25 @@ public interface OsgiBundleXmlApplicationContextFactory {
 	 * 
 	 * @param aBundleContext  the OSGi BundleContext for the bundle
 	 * @param configLocations location paths for the context config files
-     * @param plugins the Spring namespace plugins
+     * @param resolver the Spring namespace plugins
 	 * @return OsgiBundleXmlApplicationContext
 	 */
 	AbstractBundleXmlApplicationContext createApplicationContext(BundleContext aBundleContext,
                                                                  String[] configLocations,
-                                                                 NamespacePlugins plugins);
+                                                                 OsgiBundleNamespaceHandlerAndEntityResolver resolver);
 	
 	/**
 	 * Create an OsgiBundleXmlApplicationContext in the context of a Bundle Context ClassLoader
 	 *
 	 * @param aBundleContext  the OSGi BundleContext for the bundle
 	 * @param configLocations location paths for the context config files
-     * @param plugins the Spring namespace plugins
+     * @param resolver the Spring namespace plugins
 	 * @param waitForDependencies
 	 * @return OsgiBundleXmlApplicationContext
 	 */
 	AbstractBundleXmlApplicationContext createApplicationContextWithBundleContext(
             BundleContext aBundleContext,
             String[] configLocations,
-            NamespacePlugins plugins,
+            OsgiBundleNamespaceHandlerAndEntityResolver resolver,
             boolean waitForDependencies);
 }

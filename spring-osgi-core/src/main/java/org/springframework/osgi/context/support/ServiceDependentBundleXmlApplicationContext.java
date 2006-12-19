@@ -51,8 +51,8 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 
 	public ServiceDependentBundleXmlApplicationContext(BundleContext context,
 	                                                   String[] configLocations, ClassLoader classLoader,
-	                                                   NamespacePlugins plugins) {
-		super(context, configLocations, classLoader, plugins);
+	                                                   OsgiBundleNamespaceHandlerAndEntityResolver resolver) {
+		super(context, configLocations, classLoader, resolver);
 
 		refreshBeanFactory();
 

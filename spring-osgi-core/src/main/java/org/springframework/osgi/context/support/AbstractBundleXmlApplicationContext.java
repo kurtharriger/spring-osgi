@@ -64,7 +64,7 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 	/** Used for publishing the app context * */
 	private ServiceRegistration serviceRegistration;
 
-	private NamespacePlugins namespacePlugins;
+	private OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver;
 
 	public AbstractBundleXmlApplicationContext(BundleContext context, String[] configLocations) {
 		this(context, configLocations, null, null);
@@ -72,7 +72,7 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 
 	public AbstractBundleXmlApplicationContext(BundleContext context,
                                                String[] configLocations, ClassLoader classLoader,
-                                               NamespacePlugins namespacePlugins) {
+                                               OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
 		super();
 
 		setBundleContext(context);
@@ -83,7 +83,7 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 		this.setDisplayName("AbstractBundleXmlApplicationContext(bundle=" + getBundleName() + ", config="
 				+ getConfigName() + ")");
 
-		this.namespacePlugins = namespacePlugins;
+		this.namespaceResolver = namespaceResolver;
 	}
 
 	private String getConfigName() {
@@ -128,8 +128,8 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 	 * by the bundle.
 	 */
 	protected void initBeanDefinitionReader(XmlBeanDefinitionReader beanDefinitionReader) {
-		beanDefinitionReader.setEntityResolver(namespacePlugins);
-		beanDefinitionReader.setNamespaceHandlerResolver(namespacePlugins);
+		beanDefinitionReader.setEntityResolver(namespaceResolver);
+		beanDefinitionReader.setNamespaceHandlerResolver(namespaceResolver);
 	}
 
 	/**

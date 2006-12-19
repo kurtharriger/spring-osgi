@@ -29,13 +29,13 @@ import org.osgi.framework.BundleContext;
  */
 public class DefaultOsgiBundleXmlApplicationContextFactory implements OsgiBundleXmlApplicationContextFactory {
 	public AbstractBundleXmlApplicationContext createApplicationContext(BundleContext aBundleContext,
-			String[] configLocations, NamespacePlugins plugins) {
-		return new OsgiBundleXmlApplicationContext(aBundleContext, configLocations, plugins);
+			String[] configLocations, OsgiBundleNamespaceHandlerAndEntityResolver resolver) {
+		return new OsgiBundleXmlApplicationContext(aBundleContext, configLocations, resolver);
 	}
 
 	public AbstractBundleXmlApplicationContext createApplicationContextWithBundleContext(BundleContext aBundleContext,
                                                                                          String[] configLocations,
-                                                                                         NamespacePlugins plugins,
+                                                                                         OsgiBundleNamespaceHandlerAndEntityResolver resolver,
                                                                                          boolean waitForDependencies) {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		BundleContext bc = LocalBundleContext.getContext();
@@ -46,10 +46,10 @@ public class DefaultOsgiBundleXmlApplicationContextFactory implements OsgiBundle
 
 			if (waitForDependencies) {
 				return new ServiceDependentBundleXmlApplicationContext(aBundleContext, configLocations, cl,
-						                                               plugins);
+						                                               resolver);
 			}
 			else {
-				return new OsgiBundleXmlApplicationContext(aBundleContext, configLocations, cl, plugins);
+				return new OsgiBundleXmlApplicationContext(aBundleContext, configLocations, cl, resolver);
 			}
 
 		}
