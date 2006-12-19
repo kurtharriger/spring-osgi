@@ -50,9 +50,20 @@ import org.springframework.util.StringUtils;
  * @author Bill Gallagher
  * @author Andy Piper
  * @author Hal Hildebrand
+ * 
+ * @deprecated see org.springframework.osgi.extender bundle instead
  */
 public class ContextLoaderListener implements BundleActivator, SynchronousBundleListener
 {
+	
+	// *****************************************************************************
+	// This class is soon to be deprecated in favour of org.springframework.osgi.extender
+	// bundle (as per specification). For changes to listener function, please work in the
+	// extender bundle instead.
+	// AMC - Dec-19-2006
+	// ******************************************************************************
+	
+	
 	// The standard for META-INF header keys excludes ".", so these constants
 	// must use "-"
 	private static final String CONTEXT_LOCATION_HEADER = "org-springframework-context";
