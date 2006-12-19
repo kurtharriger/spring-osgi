@@ -39,6 +39,7 @@ public class MockBundle implements Bundle {
 
 	private String location;
 	private Dictionary headers;
+	private long bundleId = 0;
 
 	// required for introspection by util classes (should be removed)	
 	private BundleContext bundleContext;
@@ -107,9 +108,13 @@ public class MockBundle implements Bundle {
 	 * @see org.osgi.framework.Bundle#getBundleId()
 	 */
 	public long getBundleId() {
-		return 0;
+		return this.bundleId;
 	}
 
+	public void setBundleId(long bundleId) {
+		this.bundleId = bundleId;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -279,7 +284,8 @@ public class MockBundle implements Bundle {
 	
 	// chiefly here so that compilers/find-bugs don't complain about the
 	// "unused" bundleContext field.
-	public BundleContext getBundleContext() {
+	// also enables OsgiResoureUtils.getBundleContext to find the context via reflection
+	public BundleContext getContext() {
 		return this.bundleContext;
 	}
 
