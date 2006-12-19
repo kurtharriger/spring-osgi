@@ -7,10 +7,13 @@ Import-Package: org.apache.commons.logging,
    org.osgi.framework,
    org.osgi.service.startlevel,
    org.osgi.service.cm;version=1.2;resolution:=optional,
+   org.springframework.aop.framework,
    org.springframework.beans.factory,
+   org.springframework.beans.factory.config,
    org.springframework.beans.factory.xml,
    org.springframework.context,
    org.springframework.context.support,
+   org.springframework.core.io,
    org.springframework.core.task,
    org.springframework.util
 Require-Bundle: org.springframework.osgi,org.springframework.osgi.io
