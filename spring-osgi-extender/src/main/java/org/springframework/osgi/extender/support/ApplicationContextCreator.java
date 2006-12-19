@@ -15,11 +15,6 @@
  */
 package org.springframework.osgi.extender.support;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -29,7 +24,6 @@ import org.osgi.framework.BundleContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.OsgiResourceUtils;
-import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.util.StringUtils;
 
 /**
@@ -39,11 +33,6 @@ import org.springframework.util.StringUtils;
  */
 public class ApplicationContextCreator implements Runnable {
 
-	private static final String CONTEXT_LOCATION_HEADER = "Spring-Context";
-	private static final String CONTEXT_LOCATION_DELIMITERS = ", ";
-	private static final String DONT_WAIT_FOR_DEPENDENCIES_DIRECTIVE = ";wait-for-dependencies:=false";
-	private static final String SPRING_CONTEXT_DIRECTORY = "/META-INF/spring/";
-	
 	private static final Log log = LogFactory.getLog(ApplicationContextCreator.class);
 
 	private final Bundle bundle;
@@ -78,10 +67,10 @@ public class ApplicationContextCreator implements Runnable {
 	public void run() {
 		ConfigurableApplicationContext applicationContext = null;
 		Long bundleKey = Long.valueOf(this.bundle.getBundleId());
-
-		String[] applicationContextLocations = getApplicationContextLocations(bundle);
-		if (applicationContextLocations == null) {
-			return; // Nothing to do...
+		
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
+		if (!config.isSpringPoweredBundle()) {
+			return;
 		}
 
 		BundleContext bundleContext = OsgiResourceUtils.getBundleContext(bundle);
@@ -94,12 +83,15 @@ public class ApplicationContextCreator implements Runnable {
 			if (log.isInfoEnabled()) {
 				log.info("Starting bundle [" + bundle.getSymbolicName() 
 						+ "] with configuration ["
-						+ StringUtils.arrayToCommaDelimitedString(applicationContextLocations) + "]");
+						+ StringUtils.arrayToCommaDelimitedString(config.getConfigurationLocations()) + "]");
 			}
 			
 			// create app context, the beans are not yet created at this point
-			applicationContext = this.contextFactory.createApplicationContextWithBundleContext(bundleContext,
-					applicationContextLocations, this.namespacePlugins, waitForDependencies());
+			applicationContext = this.contextFactory.createApplicationContextWithBundleContext(
+					bundleContext,
+					config.getConfigurationLocations(), 
+					this.namespacePlugins, 
+					config.waitForDependencies());
 
 			synchronized (this.contextsPendingInitializationMap) {
 				// creating the beans may take a long time (possible 'forever') if the
@@ -139,68 +131,5 @@ public class ApplicationContextCreator implements Runnable {
 			}
 		}
 	}
-
-	/**
-	 * Determine whether or not to wait for dependencies when starting the application
-	 * context. We wait unless the Spring-Context manifest entry is present, and this
-	 * entry contains the "wait-for-dependencies:=false" directive.
-	 * @return
-	 */
-	private boolean waitForDependencies() {
-		String contextLocationsHeader = getSpringContextHeader(bundle);
-		if (contextLocationsHeader != null) {
-			if (contextLocationsHeader.indexOf(DONT_WAIT_FOR_DEPENDENCIES_DIRECTIVE) != -1) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Retrieves the list of xml resources which compose the application
-	 * context. <p/> The org.springframework.context manifest header attribute,
-	 * if present, is parsed to create an ordered list of resource names in the
-	 * spring context directory for creating the application context <p/> If the
-	 * org.springframework.context header is not present, the entire list of xml
-	 * resources in the spring context directory will be returned.
-	 */
-	protected String[] getApplicationContextLocations(Bundle bundle) {
-		String contextLocationsHeader = getSpringContextHeader(bundle);
-		if (contextLocationsHeader != null) {
-			String[] locs = StringUtils.tokenizeToStringArray(contextLocationsHeader, CONTEXT_LOCATION_DELIMITERS);
-			List ret = new ArrayList();
-			for (int i = 0; i < locs.length; i++) {
-				if (bundle.getEntry(locs[i]) != null) {
-					ret.add(OsgiBundleResource.BUNDLE_URL_PREFIX + SPRING_CONTEXT_DIRECTORY + locs[i]);
-				}
-			}
-			if (ret.isEmpty()) {
-				return null;
-			} else {
-				return (String[]) ret.toArray(new String[ret.size()]);
-			}
-		} else {
-			List resourceList = new ArrayList();
-			Enumeration resources = bundle.findEntries(SPRING_CONTEXT_DIRECTORY, "*.xml", false);
-			if (resources != null) {
-				while (resources.hasMoreElements()) {
-					URL resourceURL = (URL) resources.nextElement();
-					resourceList.add(OsgiBundleResource.BUNDLE_URL_URL_PREFIX + resourceURL.toExternalForm());
-				}
-			}
-			if (resourceList.isEmpty()) {
-				return null;
-			} else {
-				String[] ret = new String[resourceList.size()];
-				return (String[]) resourceList.toArray(ret);
-			}
-		}
-	}
-
-	private String getSpringContextHeader(Bundle bundle) {
-		Dictionary manifestHeaders = bundle.getHeaders();
-		return (String) manifestHeaders.get(CONTEXT_LOCATION_HEADER);
-	}
-
 
 }
