@@ -35,7 +35,7 @@ import java.util.Map;
  *         Date: Aug 23, 2006
  *         Time: 8:32:49 PM
  */
-public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolver {
+public class NamespacePlugins implements OsgiBundleNamespaceHandlerAndEntityResolver {
     private final Map plugins = new HashMap();
 
 

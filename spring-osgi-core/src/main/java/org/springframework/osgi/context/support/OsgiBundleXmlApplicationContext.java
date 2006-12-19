@@ -50,13 +50,13 @@ public class OsgiBundleXmlApplicationContext extends AbstractBundleXmlApplicatio
 	}
 
 	public OsgiBundleXmlApplicationContext(BundleContext aBundleContext, String[] configLocations,
-			NamespacePlugins plugins) {
-		this(aBundleContext, configLocations, BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundleContext.getBundle()), plugins);
+			OsgiBundleNamespaceHandlerAndEntityResolver resolver) {
+		this(aBundleContext, configLocations, BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundleContext.getBundle()), resolver);
 	}
 
 	public OsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations, ClassLoader classLoader,
-			NamespacePlugins namespacePlugins) {
-		super(context, configLocations, classLoader, namespacePlugins);
+			OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
+		super(context, configLocations, classLoader, namespaceResolver);
 		publishContextAsOsgiService();
 		refresh();
 	}
