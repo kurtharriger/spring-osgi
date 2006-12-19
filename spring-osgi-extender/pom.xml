@@ -1,51 +1,56 @@
 <?xml version="1.0"?>
 <project>
-  <parent>
-    <artifactId>spring-osgi</artifactId>
-    <groupId>org.springframework.osgi</groupId>
-    <version>1.0-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.springframework.osgi</groupId>
-  <artifactId>spring-osgi-extender</artifactId>
-  <packaging>osgi-bundle</packaging>
-  <name>org.springframework.osgi.extender bundle</name>
-  <version>1.0-SNAPSHOT</version>
-  <url>http://www.springframework.org/osgi</url>
-  <dependencies>
-  </dependencies>
+	<parent>
+		<artifactId>spring-osgi</artifactId>
+		<groupId>org.springframework.osgi</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.osgi</groupId>
+	<artifactId>spring-osgi-extender</artifactId>
+	<packaging>osgi-bundle</packaging>
+	<name>org.springframework.osgi.extender bundle</name>
+	<version>1.0-SNAPSHOT</version>
+	<url>http://www.springframework.org/osgi</url>
 
-<!--
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix.plugins</groupId>
-        <artifactId>maven-osgi-plugin</artifactId>
-        <configuration>
-          <bundleName>Spring-Extender</bundleName>
-          <bundleSymbolicName>org.springframework.osgi.extender</bundleSymbolicName>
-          <bundleDescription>Spring OSGi Extender - automatically
-      creates application context on activation for bundles with Spring resources</bundleDescription>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
--->
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-osgi-io</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-osgi-core</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>2.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>2.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>2.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
-  <!-- disable reporting for this project until it has some real content! -->
-  <reporting>
-   <excludeDefaults>true</excludeDefaults>
-   <!-- the above doesn't work, so we spell it out in full below -->
-   <plugins>
-     <plugin>
-       <groupId>org.apache.maven.plugins</groupId>
-       <artifactId>maven-project-info-reports-plugin</artifactId>
-       <inherited>true</inherited>
-       <reportSets>
-        <reportSet></reportSet>
-       </reportSets>
-     </plugin>   
-   </plugins>
-  </reporting>
 
 </project>
