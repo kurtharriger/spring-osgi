@@ -31,6 +31,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -41,6 +44,11 @@ import org.springframework.osgi.test.platform.FelixPlatform;
 import org.springframework.osgi.test.platform.KnopflerfishPlatform;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.util.Assert;
+
+import edu.emory.mathcs.backport.java.util.concurrent.BrokenBarrierException;
+import edu.emory.mathcs.backport.java.util.concurrent.CyclicBarrier;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
 
 /**
  * 
@@ -112,6 +120,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		return localMavenArtifact("org.springframework.osgi", "junit.osgi", "3.8.1-SNAPSHOT");
 	}
 
+	private String getUtilConcurrentLibUrl() {
+		return localMavenArtifact("org.springframework.osgi", "backport-util-concurrent", "3.0-SNAPSHOT");
+	}
+	
 	/**
 	 * Find a local maven artifact. First tries to find the resource as a
 	 * packaged artifact produced by a local maven build, and if that fails will
@@ -199,7 +211,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 */
 	protected String[] getMandatoryBundles() {
 		return new String[] { getJUnitLibUrl(), getLog4jLibUrl(), getCommonsLoggingLibUrl(), getSpringCoreBundleUrl(),
-				getSpringOSGiIoBundleUrl(), getSpringOSGiTestBundleUrl() };
+				getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(), getSpringOSGiTestBundleUrl() };
 	}
 
 	public AbstractOsgiTests() {
@@ -580,6 +592,22 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	public BundleContext getBundleContext() {
 		return bundleContext;
 	}
+	
+	public void waitOnContextCreation(String forBundleWithSymbolicName) {
+		// use a barrier to ensure we don't proceed until context is published
+		final CyclicBarrier barrier = new CyclicBarrier(2);
+		
+		Thread waitThread = new Thread(new ApplicationContextWaiter(barrier,bundleContext, forBundleWithSymbolicName));
+		waitThread.start();
+		
+		try {
+			barrier.await(5L,TimeUnit.SECONDS);
+		}
+		catch (Throwable timeout) {
+			throw new RuntimeException("Gave up waiting for application context for '" 
+					+ forBundleWithSymbolicName + "' to be created");			
+		}		
+	}
 
 
     public Bundle findBundleByLocation(String bundleLocation) {
@@ -601,5 +629,53 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
             }
         }
         return null;
+    }
+    
+    private static class ApplicationContextWaiter implements Runnable, ServiceListener {
+
+    	private final String symbolicName;
+    	private final CyclicBarrier barrier;
+    	private final BundleContext context;
+    	
+    	public ApplicationContextWaiter(CyclicBarrier barrier, BundleContext context, String bundleSymbolicName) {
+    		this.symbolicName = bundleSymbolicName;
+    		this.barrier = barrier;
+    		this.context = context;
+    	}
+    	
+		public void run() {
+			String filter = "(org.springframework.context.service.name=" + symbolicName + ")"; 
+			try {
+				context.addServiceListener(this,filter);
+				// now look and see if the service was already registered before we even got here...
+				if (this.context.getServiceReferences("org.springframework.context.ApplicationContext",
+						filter) != null ) {
+					returnControl();
+				}			}
+			catch (InvalidSyntaxException badSyntaxEx) {
+				throw new IllegalStateException("OSGi runtime rejected filter '" + filter + "'");
+			}
+		}
+
+		public void serviceChanged(ServiceEvent event) {
+			if (event.getType() == ServiceEvent.REGISTERED) {
+				// our wait is over...
+				this.context.removeServiceListener(this);
+				returnControl();
+			}
+		}
+
+		private void returnControl() {
+			try {
+				this.barrier.await();
+			}
+			catch (BrokenBarrierException ex) {
+				return;
+			}
+			catch (InterruptedException intEx) {
+				return;
+			}
+		}
+    	
     }
 }
