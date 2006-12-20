@@ -94,7 +94,7 @@ public class ContextLoaderListenerTest extends TestCase {
 		
 		MockBundle eventBundle = new MockBundle();
 		eventBundle.setBundleId(1);
-		BundleEvent event = new BundleEvent(BundleEvent.STOPPING,eventBundle);
+		BundleEvent event = new BundleEvent(BundleEvent.STARTED,eventBundle);
 		
 		try {
 			this.listener.bundleChanged(event);
