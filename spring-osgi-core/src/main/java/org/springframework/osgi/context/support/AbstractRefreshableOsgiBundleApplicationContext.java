@@ -19,6 +19,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -118,6 +119,30 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		return defensiveCopyOf(this.configLocations);
 	}
 	
+	protected boolean inActiveBundleState() {
+		int state = getBundle().getState();
+		return (state == Bundle.ACTIVE || state == Bundle.STARTING);
+	}
+	
+	protected String bundleStateName() {
+		int state = getBundle().getState();
+		switch (state) {
+		case Bundle.ACTIVE:
+			return "ACTIVE";
+		case Bundle.INSTALLED:
+			return "INSTALLED";
+		case Bundle.RESOLVED:
+			return "RESOLVED";
+		case Bundle.STARTING:
+			return "STARTING";
+		case Bundle.STOPPING:
+			return "STOPPING";
+		case Bundle.UNINSTALLED:
+			return "UNINSTALLED";
+		default:
+			return "IN UNKNOWN STATE";
+		}
+	}
 	private String[] defensiveCopyOf(String[] original) {
 		if (null == original) {
 			return new String[0];
@@ -131,6 +156,8 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 
 	/**
 	 * Sets a default config location if no explicit config location specified.
+	 * Synchronization required to cope with dynamic nature of OSGi which may
+	 * attempt to close this bundle during the refresh!
 	 * 
 	 * @see #getDefaultConfigLocations
 	 * @see #setConfigLocations
@@ -139,9 +166,21 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		if (this.configLocations == null || this.configLocations.length == 0) {
 			setConfigLocations(getDefaultConfigLocations());
 		}
-		super.refresh();
+		synchronized (this) {
+			if (!inActiveBundleState()) {
+				throw new ApplicationContextException("Unable to refresh application context: bundle is " + 
+											bundleStateName());
+			}
+			super.refresh();
+		}
 	}
 
+	// synchronization required around close as after this, the BundleContext is
+	// invalid - cannot allow close to happen on a separate thread during refresh!
+	public synchronized void close() {
+		super.close();
+	}
+	
 	/**
 	 * Return the default config locations to use, for the case where no
 	 * explicit config locations have been specified.

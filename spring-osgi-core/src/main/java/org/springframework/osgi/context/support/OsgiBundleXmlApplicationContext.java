@@ -58,6 +58,9 @@ public class OsgiBundleXmlApplicationContext extends AbstractBundleXmlApplicatio
 			OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
 		super(context, configLocations, classLoader, namespaceResolver);
 		publishContextAsOsgiService();
-		refresh();
+		// don't refresh in constructor as refresh may take a long time when waiting for
+		// service dependencies, and we want to return the "in-progress" context object so we can
+		// stop the bundle at any point...
+		//refresh();
 	}
 }

@@ -19,11 +19,16 @@
 package org.springframework.osgi.context;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.support.AbstractBundleXmlApplicationContext;
 import org.springframework.osgi.context.support.DefaultOsgiBundleXmlApplicationContextFactory;
+import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
 
 /**
@@ -31,14 +36,18 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextF
  * @since 2.1
  */
 public class OsgiBundleXmlApplicationContextFactoryBean implements FactoryBean, BundleContextAware,
-	InitializingBean {
+	InitializingBean, DisposableBean {
 	private BundleContext context;
 	private OsgiBundleXmlApplicationContextFactory contextFactory = new DefaultOsgiBundleXmlApplicationContextFactory();
 	private Resource configLocation;
+	private ServiceReference resolverServiceReference;
+	private OsgiBundleNamespaceHandlerAndEntityResolver resolver;
 
 	public Object getObject() throws Exception {
-		return contextFactory.createApplicationContextWithBundleContext(context,
-			new String[]{configLocation.getURL().toString()}, ContextLoaderListener.plugins(), false);
+		ConfigurableApplicationContext appContext = contextFactory.createApplicationContextWithBundleContext(context,
+			new String[]{configLocation.getURL().toString()}, resolver, false);
+		appContext.refresh();
+		return appContext;
 	}
 
 	public Class getObjectType() {
@@ -58,6 +67,21 @@ public class OsgiBundleXmlApplicationContextFactoryBean implements FactoryBean, 
 	}
 
 	public void afterPropertiesSet() throws Exception {
+		if (this.context == null) {
+			throw new IllegalStateException("Required property bundle context has not been set");
+		}
+		this.resolverServiceReference = this.context.getServiceReference(OsgiBundleNamespaceHandlerAndEntityResolver.class.getName());
+		if (this.resolverServiceReference == null) {
+			throw new BeanCreationException("Required Namespace Handler and Entity Resolver OSGi service could not be found," + 
+					 " perhaps the org.springframework.osgi.extender bundle has not been installed and started?");
+		}
+		this.resolver = (OsgiBundleNamespaceHandlerAndEntityResolver) this.context.getService(this.resolverServiceReference);
 		getObject();
+	}
+
+	public void destroy() throws Exception {
+		if (this.resolverServiceReference != null) {
+			this.context.ungetService(this.resolverServiceReference);
+		}		
 	}
 }

@@ -18,13 +18,14 @@ package org.springframework.osgi.context.support;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.context.ContextLoaderListener;
 import org.springframework.util.Assert;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
@@ -45,6 +46,8 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 public class OsgiWebApplicationContext extends XmlWebApplicationContext implements ConfigurableWebApplicationContext {
 	private Bundle osgiBundle;
 	private BundleContext osgiBundleContext;
+	private ServiceReference resolverServiceReference;
+	private OsgiBundleNamespaceHandlerAndEntityResolver resolver;
 
 	public OsgiWebApplicationContext() {
 		this.osgiBundleContext = LocalBundleContext.getContext();
@@ -53,6 +56,17 @@ public class OsgiWebApplicationContext extends XmlWebApplicationContext implemen
 					+ "]");
 		}
 		this.osgiBundle = this.osgiBundleContext.getBundle();
+		getResolver();
+	}
+
+	private void getResolver() {
+		this.resolverServiceReference = this.osgiBundleContext.getServiceReference(OsgiBundleNamespaceHandlerAndEntityResolver.class.getName());
+		if (this.resolverServiceReference == null) {
+			throw new ApplicationContextException(
+					"Required Namespace Handler and Entity Resolver service is not available - " +
+					"perhaps the org.springframework.osgi.extender bundle is not installed and started?");
+		}
+		this.resolver = (OsgiBundleNamespaceHandlerAndEntityResolver) this.osgiBundleContext.getService(resolverServiceReference);
 	}
 
 	/**
@@ -76,8 +90,8 @@ public class OsgiWebApplicationContext extends XmlWebApplicationContext implemen
 	protected void initBeanDefinitionReader(XmlBeanDefinitionReader beanDefinitionReader) {
 		// TODO - HSH: Needs Review. Don't like using a static to pass the
 		// plugins, but may be the only practical mechanism
-		beanDefinitionReader.setEntityResolver(ContextLoaderListener.plugins());
-		beanDefinitionReader.setNamespaceHandlerResolver(ContextLoaderListener.plugins());
+		beanDefinitionReader.setEntityResolver(this.resolver);
+		beanDefinitionReader.setNamespaceHandlerResolver(this.resolver);
 	}
 
 	/**
@@ -108,5 +122,14 @@ public class OsgiWebApplicationContext extends XmlWebApplicationContext implemen
 		super.postProcessBeanFactory(beanFactory);
 		beanFactory.addBeanPostProcessor(new BundleContextAwareProcessor(this.osgiBundleContext));
 		beanFactory.ignoreDependencyInterface(BundleContextAware.class);
+	}
+	
+	public void close() {
+		if (this.resolverServiceReference != null) {
+			this.osgiBundleContext.ungetService(this.resolverServiceReference);
+		}
+		this.resolver = null;
+		this.resolverServiceReference = null;
+		super.close();
 	}
 }
