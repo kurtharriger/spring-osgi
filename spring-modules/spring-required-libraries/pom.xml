@@ -42,6 +42,7 @@
     <module>struts.osgi</module>
     <module>commons-beanutils.osgi</module>
     <module>portlet-api.osgi</module>
+    <module>backport-util-concurrent</module>
   </modules>
   <reporting>
    <excludeDefaults>true</excludeDefaults>
