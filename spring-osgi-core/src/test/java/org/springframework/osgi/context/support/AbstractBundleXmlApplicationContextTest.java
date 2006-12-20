@@ -48,11 +48,9 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 		bundleCtxCtrl.expectAndReturn(context.getBundle(), bundle, MockControl.ONE_OR_MORE);
 
 		dictionary = new Hashtable();
-		dictionary.put(AbstractBundleXmlApplicationContext.APPLICATION_CONTEXT_SERVICE_NAME_HEADER, "Shadow Play");
 
 		// allow headers to be taken multiple times
 		bundleCtrl.expectAndReturn(bundle.getHeaders(), dictionary, MockControl.ONE_OR_MORE);
-
 	}
 
 	private void createContext() {
@@ -98,27 +96,15 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 	}
 
 	public void testGetServiceName() {
+		String symbolicName = "symbolic";
+		//bundleCtrl.reset();
+		bundleCtrl.expectAndReturn(bundle.getSymbolicName(), symbolicName, MockControl.ONE_OR_MORE);
 		bundleCtxCtrl.replay();
 		bundleCtrl.replay();
 
-		// use defaults
-		String title = "Shadow Play";
-		dictionary.put(AbstractBundleXmlApplicationContext.APPLICATION_CONTEXT_SERVICE_NAME_HEADER, title);
-
 		createContext();
-		assertEquals(title, xmlContext.getServiceName());
+		assertEquals(symbolicName, xmlContext.getServiceName());
 
 	}
 
-	public void testGetServiceNameFallbackMechanism() {
-		bundleCtxCtrl.replay();
-		bundleCtrl.replay();
-
-		String title = "Enchantment";
-		dictionary.put(Constants.BUNDLE_NAME, title);
-		dictionary.remove(AbstractBundleXmlApplicationContext.APPLICATION_CONTEXT_SERVICE_NAME_HEADER);
-
-		createContext();
-		assertEquals(title + "-springApplicationContext", xmlContext.getServiceName());
-	}
 }

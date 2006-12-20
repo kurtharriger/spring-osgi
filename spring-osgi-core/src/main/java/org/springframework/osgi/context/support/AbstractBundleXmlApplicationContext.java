@@ -55,11 +55,7 @@ import org.springframework.context.ApplicationContext;
  */
 public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgiBundleApplicationContext {
 	public static final String BUNDLE_URL_PREFIX = "bundle:";
-	public static final String APPLICATION_CONTEXT_SERVICE_NAME_HEADER = "org-springframework-context-service-name";
-	public static final String NAMESPACE_HANDLER_RESOLVERS_HEADER = "Spring-Namespaces";
-	public static final String PARENT_CONTEXT_SERVICE_NAME_HEADER = "SpringParentContext";
-
-	private static final String APPLICATION_CONTEXT_SERVICE_POSTFIX = "-springApplicationContext";
+	public static final String APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME = "org.springframework.context.service.name";
 
 	/** Used for publishing the app context * */
 	private ServiceRegistration serviceRegistration;
@@ -166,18 +162,16 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 	 * the bundle symbolic name.
 	 */
 	protected String getServiceName() {
-		String userSpecifiedName = (String) getBundle().getHeaders().get(APPLICATION_CONTEXT_SERVICE_NAME_HEADER);
-		if (userSpecifiedName != null) {
-			return userSpecifiedName;
-		}
-		else {
-			return getBundleName() + APPLICATION_CONTEXT_SERVICE_POSTFIX;
-		}
+		return getBundle().getSymbolicName();
 	}
 
 	protected void publishContextAsOsgiService() {
 		Dictionary serviceProperties = new Properties();
-		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_NAME_HEADER, getServiceName());
+		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getServiceName());
+		if (logger.isInfoEnabled()) {
+			logger.info("Publishing application context with properties (" + 
+					APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getServiceName() + ")");
+		}
 		this.serviceRegistration = getBundleContext().registerService(
 				new String[] { ApplicationContext.class.getName() }, this, serviceProperties);
 	}

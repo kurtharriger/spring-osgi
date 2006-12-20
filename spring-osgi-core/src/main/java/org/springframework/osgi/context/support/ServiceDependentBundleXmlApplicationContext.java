@@ -29,8 +29,10 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
 import org.springframework.util.ObjectUtils;
 
@@ -54,26 +56,41 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 	                                                   OsgiBundleNamespaceHandlerAndEntityResolver resolver) {
 		super(context, configLocations, classLoader, resolver);
 
-		refreshBeanFactory();
-
+		savedCcl = Thread.currentThread().getContextClassLoader();
+	
+		synchronized (this) {
+			if (!inActiveBundleState()) {
+				throw new ApplicationContextException("Unable to refresh application context: bundle is " + 
+											bundleStateName());
+			}
+			refreshBeanFactory();
+		}
+		
 		// Listen for services so that we can determine when we are ready for activation.
 		findServiceDependencies();
-
+	}
+	
+	
+	
+	public synchronized void refresh() throws BeansException {
+		if (!inActiveBundleState()) {
+			throw new ApplicationContextException("Unable to refresh application context: bundle is " + 
+										bundleStateName());
+		}
 		if (!hasUnsatisifiedServiceDependencies()) {
 			if (log.isInfoEnabled()) {
 				log.info("Services already satisfied, completing initialization for " + getDisplayName());
 			}
 			dependencies.clear();
 			getBundleContext().removeServiceListener(this);
-			refresh();
+			super.refresh();
 			publishContextAsOsgiService();
 		} else {
-			savedCcl = Thread.currentThread().getContextClassLoader();
 			registerListener();
 		}
 	}
 
-	public void close() {
+	public synchronized void close() {
 		super.close();
 		try {
 			getBundleContext().removeServiceListener(this);
@@ -83,11 +100,16 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 
 	}
 
+	
 	/**
 	 * Complete the initialization of this context now that we know all services
 	 * are available.
 	 */
 	protected void completeContextInitialization() {
+		if (!inActiveBundleState()) {
+			throw new ApplicationContextException("Unable to complete application context initialisation: bundle is " + 
+										bundleStateName());
+		}
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		BundleContext bc = LocalBundleContext.getContext();
 		try {
@@ -96,10 +118,17 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 			dependencies.clear();
 			getBundleContext().removeServiceListener(this);
 			// Build the bean definitions.
-			refresh();
+			super.refresh();
 			publishContextAsOsgiService();
 
-		} finally {
+		} catch (RuntimeException ex) {
+			if (log.isErrorEnabled()) {
+				log.error("Unable to complete application context initializition for '" + 
+						getBundle().getSymbolicName() + "'",ex);
+			}
+			throw ex;
+		}
+		finally {
 			LocalBundleContext.setContext(bc);
 			Thread.currentThread().setContextClassLoader(ccl);
 		}
