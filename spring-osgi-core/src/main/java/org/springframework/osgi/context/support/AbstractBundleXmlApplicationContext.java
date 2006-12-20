@@ -56,6 +56,8 @@ import org.springframework.context.ApplicationContext;
 public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgiBundleApplicationContext {
 	public static final String BUNDLE_URL_PREFIX = "bundle:";
 	public static final String APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME = "org.springframework.context.service.name";
+	private static final String SERVICE_CONTEXT_HEADER = "Spring-Context";
+	private static final String DONT_PUBLISH_DIRECTIVE = ";publish-context:=false";
 
 	/** Used for publishing the app context * */
 	private ServiceRegistration serviceRegistration;
@@ -166,6 +168,9 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 	}
 
 	protected void publishContextAsOsgiService() {
+		if (!shouldPublishContext()) {
+			return;
+		}
 		Dictionary serviceProperties = new Properties();
 		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getServiceName());
 		if (logger.isInfoEnabled()) {
@@ -174,6 +179,21 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 		}
 		this.serviceRegistration = getBundleContext().registerService(
 				new String[] { ApplicationContext.class.getName() }, this, serviceProperties);
+	}
+	
+	/**
+	 * Context should be published unless the Spring-Context header is present and it contains
+	 * the directive "publish-context:=false"
+	 * @return
+	 */
+	private boolean shouldPublishContext() {
+		String header = (String) getBundle().getHeaders().get(SERVICE_CONTEXT_HEADER);
+		if (header != null) {
+			if (header.indexOf(DONT_PUBLISH_DIRECTIVE) != -1) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public void close() {
