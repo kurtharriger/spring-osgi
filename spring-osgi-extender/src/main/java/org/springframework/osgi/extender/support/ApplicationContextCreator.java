@@ -22,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.OsgiResourceUtils;
 import org.springframework.util.StringUtils;
@@ -65,6 +67,7 @@ public class ApplicationContextCreator implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
+		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		ConfigurableApplicationContext applicationContext = null;
 		Long bundleKey = Long.valueOf(this.bundle.getBundleId());
 		
@@ -86,6 +89,10 @@ public class ApplicationContextCreator implements Runnable {
 						+ StringUtils.arrayToCommaDelimitedString(config.getConfigurationLocations()) + "]");
 			}
 			
+			ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
+			Thread.currentThread().setContextClassLoader(cl);
+			LocalBundleContext.setContext(bundleContext);
+				
 			// create app context, the beans are not yet created at this point
 			applicationContext = this.contextFactory.createApplicationContextWithBundleContext(
 					bundleContext,
@@ -129,6 +136,9 @@ public class ApplicationContextCreator implements Runnable {
 					this.applicationContextMap.remove(bundleKey);
 				}
 			}
+		}
+		finally {
+			Thread.currentThread().setContextClassLoader(ccl);
 		}
 	}
 
