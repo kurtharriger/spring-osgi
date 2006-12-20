@@ -26,6 +26,7 @@ public class ReferenceProxyTest extends ConfigurableBundleCreatorTests {
                 localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
+                localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
@@ -36,6 +37,8 @@ public class ReferenceProxyTest extends ConfigurableBundleCreatorTests {
     }
 
     public void testReferenceProxyLifecycle() throws Exception {
+    	waitOnContextCreation("org.springframework.osgi.test.simpleservice");
+    	waitOnContextCreation("org.springframework.osgi.test.reference.proxy");
         MyService reference = ServiceReferer.serviceReference;
         assertNotNull(reference.stringValue());
 
@@ -62,10 +65,7 @@ public class ReferenceProxyTest extends ConfigurableBundleCreatorTests {
         System.out.println("starting bundle");
         simpleServiceBundle.start();
 
-        while (simpleServiceBundle.getState() != Bundle.ACTIVE) {
-            System.out.println("waiting for bundle to start");
-            Thread.sleep(10);
-        }
+    	waitOnContextCreation("org.springframework.osgi.test.simpleservice");
 
         System.out.println("bundle started");
         //Service should be running

@@ -30,6 +30,7 @@ public class DependencyTest extends ConfigurableBundleCreatorTests {
                 localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
+                localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
@@ -42,7 +43,8 @@ public class DependencyTest extends ConfigurableBundleCreatorTests {
 
     public void testDependencies() throws Exception {
         BundleContext bundleContext = getBundleContext();
-
+        waitOnContextCreation("org.springframework.osgi.test.simpleservice");
+        
         Bundle simpleService2Bundle = bundleContext.installBundle(
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service2",
                                    "1.0-SNAPSHOT"));
@@ -74,7 +76,7 @@ public class DependencyTest extends ConfigurableBundleCreatorTests {
         startFirstDependency(simpleService2Bundle);
         
         // Context switch to allow service to start up...
-        Thread.sleep(1000);
+       	waitOnContextCreation("org.springframework.osgi.test.dependencies");
 
         dependentRef = bundleContext.getServiceReference(DEPENDENT_CLASS_NAME);
 
@@ -91,10 +93,8 @@ public class DependencyTest extends ConfigurableBundleCreatorTests {
         System.out.println("Starting first dependency");
         simpleService2Bundle.start();
 
-        while (simpleService2Bundle.getState() != Bundle.ACTIVE) {
-            System.out.println("Waiting for first dependency to start");
-            Thread.sleep(10);
-        }
+       	waitOnContextCreation("org.springframework.osgi.test.simpleservice2");
+
         System.out.println("First dependency started");
     }
 
@@ -102,11 +102,9 @@ public class DependencyTest extends ConfigurableBundleCreatorTests {
     private void startSecondDependency(Bundle simpleService3Bundle) throws BundleException, InterruptedException {
         System.out.println("Starting second dependency");
         simpleService3Bundle.start();
+        
+        waitOnContextCreation("org.springframework.osgi.test.simpleservice3");
 
-        while (simpleService3Bundle.getState() != Bundle.ACTIVE) {
-            System.out.println("Waiting for second dependency to start");
-            Thread.sleep(10);
-        }
         System.out.println("Second dependency started");
     }
 }
