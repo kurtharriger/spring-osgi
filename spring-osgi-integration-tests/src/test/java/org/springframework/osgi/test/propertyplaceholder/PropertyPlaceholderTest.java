@@ -69,6 +69,7 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 
 		ctx = new OsgiBundleXmlApplicationContext(getBundleContext(),
 				new String[] { "org/springframework/osgi/test/propertyplaceholder/placeholder.xml" });
+		ctx.refresh();
 	}
 
 	public void onTearDown() throws Exception {

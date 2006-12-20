@@ -27,6 +27,7 @@ public class Cardinality0to1Test extends ConfigurableBundleCreatorTests {
                 localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
+                localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
@@ -38,7 +39,8 @@ public class Cardinality0to1Test extends ConfigurableBundleCreatorTests {
 
 
     public void test0to1Cardinality() throws Exception {
-        Thread.sleep(10); // allow test bundle to actually be started...
+        waitOnContextCreation("org.springframework.osgi.test.simpleservice");
+        waitOnContextCreation("org.springframework.osgi.test.cardinality.0to1");
         BundleContext bundleContext = getBundleContext();
 
         Bundle simpleService2Bundle = bundleContext.installBundle(
@@ -77,10 +79,8 @@ public class Cardinality0to1Test extends ConfigurableBundleCreatorTests {
         System.out.println("Starting dependency");
         simpleService2Bundle.start();
 
-        while (simpleService2Bundle.getState() != Bundle.ACTIVE) {
-            System.out.println("Waiting for dependency to start");
-            Thread.sleep(10);
-        }
+        waitOnContextCreation("org.springframework.osgi.test.simpleservice2");
+
         System.out.println("Dependency started");
     }
 }

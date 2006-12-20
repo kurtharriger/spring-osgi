@@ -34,12 +34,13 @@ public class LifecycleTest extends ConfigurableBundleCreatorTests {
         return new String[]{
                 localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
+				localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
                 localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
+                localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.lifecycle", "1.0-SNAPSHOT")
 
         };
@@ -47,6 +48,7 @@ public class LifecycleTest extends ConfigurableBundleCreatorTests {
 
 
     public void testLifecycle() throws Exception {
+    	waitOnContextCreation("org.springframework.osgi.test.lifecycle");
         assertNotSame("Guinea pig has already been shutdown", "true",
                       System.getProperty("org.springframework.osgi.test.lifecycle.GuineaPig.close"));
 
