@@ -68,6 +68,7 @@ public class SimpleServiceBundleTest extends ConfigurableBundleCreatorTests {
 			localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-beans","2.1-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-osgi-core","1.0-SNAPSHOT"),
+			localMavenArtifact("org.springframework.osgi", "spring-osgi-extender","1.0-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-aop","2.1-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "simple-service-bundle","1.0-SNAPSHOT")
 		};
@@ -92,6 +93,7 @@ public class SimpleServiceBundleTest extends ConfigurableBundleCreatorTests {
 	 * 
 	 */
 	public void testSimpleServiceExported() {
+		waitOnContextCreation("org.springframework.osgi.samples.simpleservice");
 		BundleContext context = getBundleContext();
         ServiceReference ref = context.getServiceReference(MyService.class.getName());
         assertNotNull("Service Reference is null", ref);
