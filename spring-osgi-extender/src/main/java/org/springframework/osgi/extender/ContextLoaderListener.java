@@ -126,7 +126,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * Task executor used for kicking off background activity
 	 */
 	private TaskExecutor taskExecutor;
-	
+		
 	/*
 	 *  Required by the BundleActivator contract
 	 */
@@ -280,17 +280,16 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 	/**
-	 * Closing an application context is a potentially long-running activity
-	 * (certainly more than we want to do on the synchronous event callback). Kick
-	 * off a background activity to close the application context for the given 
-	 * bundle if needed.
+	 * Closing an application context is a potentially long-running activity, however,
+	 * we *have* to do it synchronously during the event process as the BundleContext
+	 * object is not valid once we return from this method.
 	 * 
 	 * @param bundle
 	 */
 	private void maybeCloseApplicationContextFor(Bundle bundle) {
 		ApplicationContextCloser contextCloser = 
 			new ApplicationContextCloser(bundle,this.managedBundles,this.applicationContextsBeingInitialized);
-		this.taskExecutor.execute(contextCloser);
+		contextCloser.run();
 	}
 
 	/**
