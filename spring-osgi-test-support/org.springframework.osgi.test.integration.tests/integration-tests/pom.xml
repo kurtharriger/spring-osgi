@@ -38,8 +38,20 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
-      <artifactId>commons-logging.osgi</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <artifactId>log4j.osgi</artifactId>
+      <version>1.2.13-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>slf4j-api.osgi</artifactId>
+      <version>1.1.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>jcl104-over-slf4j.osgi</artifactId>
+      <version>1.1.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

@@ -5,9 +5,9 @@ Bundle-SymbolicName: slf4j-api
 Bundle-Name: slf4j-api
 Bundle-Version: 1.1.0
 Bundle-Vendor: SLF4J.ORG
-Export-Package: org.slf4j, 
+Export-Package: org.slf4j;partial=true;mandatory:=partial,
   org.slf4j.spi,
-  org.slf4j.impl
+  org.slf4j.impl;partial=true;mandatory:=partial
 Bundle-ClassPath: .,
  target/classes/
 

@@ -15,26 +15,19 @@
  */
 package org.springframework.osgi.test;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
+import java.util.Enumeration; 
+import java.net.URL;
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
+import org.osgi.framework.*;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -48,7 +41,6 @@ import org.springframework.util.Assert;
 import edu.emory.mathcs.backport.java.util.concurrent.BrokenBarrierException;
 import edu.emory.mathcs.backport.java.util.concurrent.CyclicBarrier;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
 
 /**
  * 
@@ -67,9 +59,8 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	// the OSGi fixture
 	private static OsgiPlatform osgiPlatform;
 	private static BundleContext platformContext;
-	private static Bundle[] bundles;
 
-	// JUnit Service
+    // JUnit Service
 	private static Object service;
 	// JUnitService trigger
 	private static Method serviceTrigger;
@@ -96,35 +87,47 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 	protected final Log log = LogFactory.getLog(getClass());
 
-	private String getSpringOSGiTestBundleUrl() {
+	protected String getSpringOSGiTestBundleUrl() {
 		return localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test", "1.0-SNAPSHOT");
 	}
 
-	private String getSpringOSGiIoBundleUrl() {
+	protected String getSpringOSGiIoBundleUrl() {
 		return localMavenArtifact("org.springframework.osgi", "spring-osgi-io", "1.0-SNAPSHOT");
 	}
 
-	private String getSpringCoreBundleUrl() {
+	protected String getSpringCoreBundleUrl() {
 		return localMavenArtifact("org.springframework.osgi", "spring-core", "2.1-SNAPSHOT");
 	}
 
-	private String getLog4jLibUrl() {
+	protected String getLog4jLibUrl() {
 		return localMavenArtifact("org.springframework.osgi", "log4j.osgi", "1.2.13-SNAPSHOT");
 	}
 
-	private String getCommonsLoggingLibUrl() {
+	protected String getCommonsLoggingLibUrl() {
 		return localMavenArtifact("org.springframework.osgi", "commons-logging.osgi", "1.1-SNAPSHOT");
 	}
 
-	private String getJUnitLibUrl() {
+	protected String getJUnitLibUrl() {
 		return localMavenArtifact("org.springframework.osgi", "junit.osgi", "3.8.1-SNAPSHOT");
 	}
 
-	private String getUtilConcurrentLibUrl() {
+	protected String getUtilConcurrentLibUrl() {
 		return localMavenArtifact("org.springframework.osgi", "backport-util-concurrent", "3.0-SNAPSHOT");
 	}
-	
-	/**
+
+    protected String getSlf4jLog4j() {
+        return localMavenArtifact("org.springframework.osgi", "slf4j-log4j12.osgi", "1.1.0");
+    }
+
+    protected String getSlf4jApi() {
+        return localMavenArtifact("org.springframework.osgi", "slf4j-api.osgi", "1.1.0");
+    }
+
+    protected String getJclOverSlf4j() {
+        return localMavenArtifact("org.springframework.osgi", "jcl104-over-slf4j.osgi", "1.1.0");
+    }
+
+    /**
 	 * Find a local maven artifact. First tries to find the resource as a
 	 * packaged artifact produced by a local maven build, and if that fails will
 	 * search the local maven repository.
@@ -207,10 +210,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	/**
 	 * Mandator bundles (part of the test setup).
 	 * 
-	 * @return the array of mandatory bundle names
+	 * @return the array of mandatory bundle names (sans Log4J, which gets special handling
 	 */
 	protected String[] getMandatoryBundles() {
-		return new String[] { getJUnitLibUrl(), getLog4jLibUrl(), getCommonsLoggingLibUrl(), getSpringCoreBundleUrl(),
+		return new String[] { getCommonsLoggingLibUrl(), getJUnitLibUrl(), getSpringCoreBundleUrl(),
 				getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(), getSpringOSGiTestBundleUrl() };
 	}
 
@@ -361,8 +364,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			// install bundles (from the local system/classpath)
 			Resource[] bundleResources = createResources(allBundles);
 
-			bundles = new Bundle[bundleResources.length];
-			for (int i = 0; i < bundleResources.length; i++) {
+            initializeLog4J();
+
+            Bundle[] bundles = new Bundle[bundleResources.length];
+            for (int i = 0; i < bundleResources.length; i++) {
 				bundles[i] = installBundle(bundleResources[i]);
 			}
 
@@ -670,12 +675,76 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 				this.barrier.await();
 			}
 			catch (BrokenBarrierException ex) {
-				return;
+				// return;
 			}
 			catch (InterruptedException intEx) {
-				return;
+				// return;
 			}
 		}
-    	
+    }
+
+
+    /**
+     * Special handling of loading the log4j bundle such that log4j.properties can be set and
+     * initialized correctly without class loading issues.
+     */
+    protected void initializeLog4J() throws Exception {
+        DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource log4jProps = resourceLoader.getResource("classpath:log4j.properties");
+        
+        Bundle log4jBundle =  installBundle(resourceLoader.getResource(getLog4jLibUrl()));
+        log4jBundle.start();
+        Properties configProps = new Properties();
+        InputStream is;
+        try {
+            is = log4jProps.getInputStream(); 
+        } catch (FileNotFoundException e) {
+            return;
+        }
+        configProps.load(is);
+
+        ClassLoader previous = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(new BundleClassLoader(log4jBundle));
+            Class propConfigurator = log4jBundle.loadClass("org.apache.log4j.PropertyConfigurator");
+            Method configure = propConfigurator.getDeclaredMethod("configure", new Class[]{Properties.class});
+            configure.invoke(null, new Object[]{configProps});
+        } finally {
+            Thread.currentThread().setContextClassLoader(previous);
+        } 
+    }
+
+    private static class BundleClassLoader extends ClassLoader {
+        private Bundle bundle;
+
+
+        private BundleClassLoader(Bundle bundle) {
+            this.bundle = bundle; 
+        }
+
+
+        protected URL findResource(String name) {
+            return bundle.getResource(name);
+        }
+
+
+        protected Enumeration findResources(String name) throws IOException {
+            return bundle.getResources(name);
+        }
+
+
+        public URL getResource(String name) {
+            return findResource(name);
+        }
+
+
+        public Class loadClass(String name) throws ClassNotFoundException {
+            return findClass(name);
+        }
+
+
+        protected Class findClass(String name) throws ClassNotFoundException {
+            return bundle.loadClass(name);
+        }
     }
 }

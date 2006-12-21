@@ -44,16 +44,16 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.equinox</groupId>
+      <groupId>org.eclipse.osgi</groupId>
       <artifactId>org.eclipse.osgi</artifactId>
-      <version>3.2.0</version>
+      <version>3.2.1</version>
       <type>jar</type>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.knopflerfish</groupId>
       <artifactId>framework</artifactId>
-      <version>2.0.0</version>
+      <version>2.0.1</version>
       <type>jar</type>
       <scope>provided</scope>
     </dependency>

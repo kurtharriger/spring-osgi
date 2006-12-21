@@ -55,6 +55,7 @@ public class EquinoxPlatform implements OsgiPlatform {
 		System.setProperty("eclipse.ignoreApp", "true");
 		System.setProperty("osgi.clean", "true");
 		System.setProperty("osgi.noShutdown", "true");
+        System.setProperty("org.osgi.framework.bootdelegation", "javax.*,org.w3c.*,sun.*,org.xml.*,com.sun.*"); 
 		// System.setProperty("osgi.console", "");
 
 		// Equinox 3.1.x returns void - use of reflection is required
