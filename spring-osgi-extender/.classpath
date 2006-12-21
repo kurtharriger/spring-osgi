@@ -11,5 +11,11 @@
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-mock"/>
 	<classpathentry kind="var" path="M2_REPO/easymock/easymock/1.2_Java1.3/easymock-1.2_Java1.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.0/org.osgi.core-4.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-context/2.1-SNAPSHOT/spring-context-2.1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-core/2.1-SNAPSHOT/spring-core-2.1-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-beans/2.1-SNAPSHOT/spring-beans-2.1-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/commons-logging.osgi/1.1-SNAPSHOT/commons-logging.osgi-1.1-SNAPSHOT.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
