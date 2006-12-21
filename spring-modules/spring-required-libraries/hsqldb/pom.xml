@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<project>
+  <parent>
+    <artifactId>spring-framework-required-libraries</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.springframework.osgi</groupId>
+  <artifactId>hsqldb.osgi</artifactId>
+  <packaging>osgi-bundle</packaging>
+  <name>HSQLDB (OSGi version)</name>
+  <version>1.8.0.7</version>
+  <url>http:// www.springframework.org</url>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dependency-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>hsqldb</groupId>
+                  <artifactId>hsqldb</artifactId>
+                  <version>1.8.0.7</version>
+                  <type>jar</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>
+                ${project.build.directory}/classes
+              </outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.8.0.7</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+</project>
