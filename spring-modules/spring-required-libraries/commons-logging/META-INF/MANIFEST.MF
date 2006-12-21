@@ -6,7 +6,7 @@ Bundle-Name: commons-logging
 Bundle-Version: 1.1
 Bundle-Vendor: Apache Jakarta Commons
 Export-Package: org.apache.commons.logging
-Import-Package: com.sun.jdmk.com;resolution:=optional
+Import-Package: org.apache.log4j,com.sun.jdmk.com;resolution:=optional
 Bundle-ClassPath: .,
  target/classes/
 
