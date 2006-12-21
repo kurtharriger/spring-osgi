@@ -230,7 +230,7 @@ limitations under the License.
       </activation>
       <dependencies>
         <dependency>
-          <groupId>org.eclipse.equinox</groupId>
+          <groupId>org.eclipse.osgi</groupId>
           <artifactId>org.eclipse.osgi</artifactId>
           <version>3.2.0</version>
           <type>jar</type>
@@ -247,7 +247,7 @@ limitations under the License.
         <dependency>
           <groupId>org.knopflerfish</groupId>
           <artifactId>framework</artifactId>
-          <version>2.0.1.1</version>
+          <version>2.0.1</version>
           <type>jar</type>
           <scope>provided</scope>
         </dependency>
@@ -365,6 +365,11 @@ limitations under the License.
       <name>Apache M2 Incubator Repository</name>
       <url>http://people.apache.org/repo/m2-incubating-repository/</url>
     </repository>  
+    <repository>
+        <id>eclipse-repository</id>
+        <name>Eclipse Repository</name>
+        <url>http://repo1.maven.org/eclipse/</url>
+    </repository>
     <repository>
       <snapshots>
         <enabled>true</enabled>

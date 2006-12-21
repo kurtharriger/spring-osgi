@@ -32,7 +32,6 @@ public class DependencyTest extends ConfigurableBundleCreatorTests {
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
-                localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
                                    "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.dependencies",

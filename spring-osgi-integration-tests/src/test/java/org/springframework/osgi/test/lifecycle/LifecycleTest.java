@@ -33,8 +33,7 @@ public class LifecycleTest extends ConfigurableBundleCreatorTests {
     protected String[] getBundleLocations() {
         return new String[]{
                 localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
-                localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
-				localMavenArtifact("org.knopflerfish.bundles", "commons-logging_all", "2.0.0"),
+                localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"), 
                 localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
