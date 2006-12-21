@@ -1,0 +1,13 @@
+Implementation-Title: slf4j-api
+Implementation-Version: 1.1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: slf4j-api
+Bundle-Name: slf4j-api
+Bundle-Version: 1.1.0
+Bundle-Vendor: SLF4J.ORG
+Export-Package: org.sfl4j, 
+  org.slf4j.spi
+Bundle-ClassPath: .,
+ target/classes/
+
+
