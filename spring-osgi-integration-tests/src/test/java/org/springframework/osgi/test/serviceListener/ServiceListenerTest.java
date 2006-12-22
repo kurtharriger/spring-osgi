@@ -15,7 +15,6 @@ public class ServiceListenerTest extends ConfigurableBundleCreatorTests {
         return "classpath:org/springframework/osgi/test/serviceListener/ServiceListenerTest.MF";
     }
 
-
     protected String[] getBundleLocations() {
         return new String[]{
                 localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
