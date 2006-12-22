@@ -1,11 +1,11 @@
 Implementation-Title: slf4j-log4j12
 Implementation-Version: 1.1.0
 Bundle-ManifestVersion: 2
-Bundle-SymbolicName: slf4j-log4j12
+Bundle-SymbolicName: slf4j.log4j12
 Bundle-Name: slf4j-log4j12
 Bundle-Version: 1.1.0
 Bundle-Vendor: SLF4J.ORG
-Require-Bundle: slf4j-api;visibility:=reexport
+Require-Bundle: slf4j.api;visibility:=reexport
 Export-Package: org.slf4j, org.slf4j.impl
 Import-Package: org.apache.log4j,
   org.slf4j.spi,

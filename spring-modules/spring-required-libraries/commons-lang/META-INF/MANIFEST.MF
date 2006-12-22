@@ -1,7 +1,7 @@
 Implementation-Title: commons-lang
 Implementation-Version: 2.2
 Bundle-ManifestVersion: 2
-Bundle-SymbolicName: commons-lang
+Bundle-SymbolicName: commons.lang
 Bundle-Name: commons-lang
 Bundle-Version: 1.0
 Bundle-Vendor: Apache
