@@ -29,7 +29,6 @@ public class LifecycleTest extends ConfigurableBundleCreatorTests {
         return "classpath:org/springframework/osgi/test/lifecycle/MANIFEST.MF";
     }
 
-
     protected String[] getBundleLocations() {
         return new String[]{
                 localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
@@ -44,9 +43,10 @@ public class LifecycleTest extends ConfigurableBundleCreatorTests {
 
         };
     }
+    
+    
 
-
-    public void testLifecycle() throws Exception {
+	public void testLifecycle() throws Exception {
     	waitOnContextCreation("org.springframework.osgi.test.lifecycle");
         assertNotSame("Guinea pig has already been shutdown", "true",
                       System.getProperty("org.springframework.osgi.test.lifecycle.GuineaPig.close"));
