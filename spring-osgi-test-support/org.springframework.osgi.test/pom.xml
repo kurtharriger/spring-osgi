@@ -33,16 +33,29 @@
     </dependency>    
     <dependency>
       <groupId>org.springframework.osgi</groupId>
-      <artifactId>commons-logging.osgi</artifactId>
-      <version>1.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
       <artifactId>backport-util-concurrent</artifactId>
       <version>3.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>jcl104-over-slf4j.osgi</artifactId>
+      <version>1.1.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j-full</artifactId>
+      <version>1.1.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>log4j.osgi</artifactId>
+      <version>1.2.13-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency> 
+        
     <dependency>
       <groupId>org.eclipse.osgi</groupId>
       <artifactId>org.eclipse.osgi</artifactId>
@@ -59,19 +72,12 @@
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.framework</artifactId>
-      <version>0.8.0-SNAPSHOT</version>
-      <type>jar</type>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.main</artifactId>
-      <version>0.8.0-SNAPSHOT</version>
+      <version>0.8.0-incubator</version>
       <type>jar</type>
       <scope>provided</scope>
     </dependency>
-
+	
     
     <!-- for testing -->
     <dependency>
