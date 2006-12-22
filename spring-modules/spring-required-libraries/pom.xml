@@ -43,6 +43,9 @@
     <module>commons-beanutils.osgi</module>
     <module>portlet-api.osgi</module>
     <module>backport-util-concurrent</module>
+	<module>jcl104-over-slf4j</module>
+    <module>slf4j-api</module>
+	<module>slf4j-log4j12</module>    
   </modules>
   <reporting>
    <excludeDefaults>true</excludeDefaults>
