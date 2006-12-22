@@ -42,9 +42,10 @@
       <version>1.2.13-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
+    <!-- use unified jar between slf4j api and log4j since KF/Felix have dodgy Require-Bundle support -->
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>slf4j-api.osgi</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j-full</artifactId>
       <version>1.1.0</version>
       <scope>provided</scope>
     </dependency>

@@ -20,9 +20,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 
-
-
-
 /**
  * Test to check if loading of files outside of the OSGi world (directly from
  * the filesystem is possible).
