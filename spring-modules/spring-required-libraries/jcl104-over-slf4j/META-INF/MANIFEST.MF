@@ -1,7 +1,7 @@
 Implementation-Title: jcl104-over-slf4j
 Implementation-Version: 1.1.0
 Bundle-ManifestVersion: 2
-Bundle-SymbolicName: jcl104-over-slf4j
+Bundle-SymbolicName: jcl104.over.slf4j
 Bundle-Name: jcl104-over-slf4j
 Bundle-Version: 1.1.0
 Bundle-Vendor: SLF4J.ORG
