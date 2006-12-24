@@ -14,6 +14,7 @@ Import-Package: org.apache.commons.logging,
    org.springframework.beans.factory.xml,
    org.springframework.context,
    org.springframework.context.support,
+   org.springframework.core,   
    org.springframework.core.io,
    org.springframework.core.task,
    org.springframework.util
