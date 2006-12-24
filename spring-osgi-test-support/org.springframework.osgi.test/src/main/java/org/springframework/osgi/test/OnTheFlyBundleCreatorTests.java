@@ -241,7 +241,7 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
 		createJar();
 
 		if (log.isTraceEnabled())
-			log.trace("created jar " + dumpJarContent(new JarInputStream(new FileInputStream(tempFile))));
+			log.trace("created jar:\n" + dumpJarContent(new JarInputStream(new FileInputStream(tempFile))));
 
 		log.debug("installing bundle ");
 

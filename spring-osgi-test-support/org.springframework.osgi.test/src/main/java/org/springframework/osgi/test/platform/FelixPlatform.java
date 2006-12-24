@@ -146,5 +146,9 @@ public class FelixPlatform implements OsgiPlatform {
 	public void stop() throws Exception {
 		platform.shutdown();
 	}
+	
+	public String toString() {
+		return "Felix OSGi Platform";
+	}
 
 }
