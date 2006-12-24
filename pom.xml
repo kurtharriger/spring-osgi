@@ -239,6 +239,7 @@ limitations under the License.
       </dependencies>
       <properties>
         <osgi.test.platform>equinox</osgi.test.platform>
+        <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
     <profile>
@@ -247,13 +248,14 @@ limitations under the License.
         <dependency>
           <groupId>org.knopflerfish</groupId>
           <artifactId>framework</artifactId>
-          <version>2.0.1</version>
+          <version>2.0.1.1</version>
           <type>jar</type>
           <scope>provided</scope>
         </dependency>
       </dependencies>
       <properties>
         <osgi.test.platform>knopflerfish</osgi.test.platform>
+		<log4j.ignoreTCL>true</log4j.ignoreTCL>        
       </properties>
     </profile>
     <profile>
@@ -269,6 +271,7 @@ limitations under the License.
       </dependencies>
       <properties>
         <osgi.test.platform>felix</osgi.test.platform>
+		<log4j.ignoreTCL>true</log4j.ignoreTCL>        
         <!--
 		<org.osgi.vendor.framework>org.apache.felix.framework</org.osgi.vendor.framework>
 		-->
