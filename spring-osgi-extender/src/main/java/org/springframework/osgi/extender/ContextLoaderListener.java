@@ -298,6 +298,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * 
 	 * @param bundle
 	 */
+	//TODO: should this be into Namespace plugins?
+	//TODO: what about custom locations (outside of META-INF/spring)
 	private void maybeAddNamespaceHandlerFor(Bundle bundle) {
         if (Constants.SYSTEM_BUNDLE_SYMBOLICNAME.equals(bundle.getSymbolicName())) {
             return;  // Do not resolve namespace and entity handlers from the system bundle
