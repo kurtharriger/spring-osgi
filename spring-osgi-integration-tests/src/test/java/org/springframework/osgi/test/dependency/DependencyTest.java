@@ -106,4 +106,5 @@ public class DependencyTest extends ConfigurableBundleCreatorTests {
 
         System.out.println("Second dependency started");
     }
+
 }
