@@ -20,5 +20,8 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/aopalliance.osgi/1.0-SNAPSHOT/aopalliance.osgi-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/1.0-SNAPSHOT/spring-osgi-io-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j-full/1.1.0/slf4j-log4j-full-1.1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/jcl104-over-slf4j.osgi/1.1.0/jcl104-over-slf4j.osgi-1.1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.13-SNAPSHOT/log4j.osgi-1.2.13-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
