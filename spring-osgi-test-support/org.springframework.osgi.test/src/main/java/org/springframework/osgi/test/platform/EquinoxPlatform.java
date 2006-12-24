@@ -16,6 +16,9 @@
 package org.springframework.osgi.test.platform;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.osgi.framework.BundleContext;
@@ -33,6 +36,43 @@ public class EquinoxPlatform implements OsgiPlatform {
 	private String[] ARGS = new String[] { "-clean" };
 
 	private BundleContext context;
+
+	private List bootDelegation = new ArrayList();
+
+	public EquinoxPlatform() {
+		bootDelegation.add("javax.*");
+		bootDelegation.add("org.w3c.*");
+		bootDelegation.add("sun.*");
+		bootDelegation.add("org.xml.*");
+		bootDelegation.add("com.sun.*");
+	}
+
+	/**
+	 * List of boot delegation packages. See Equinox documentation for more
+	 * details.
+	 * 
+	 * @return the list containing the packages for boot delegation.
+	 */
+	public List getBootDelegation() {
+		return bootDelegation;
+	}
+
+	/**
+	 * Return a String representation for the boot delegation packages list.
+	 * 
+	 * @return
+	 */
+	private String getBootDelegationPackages() {
+		StringBuffer buf = new StringBuffer();
+
+		for (Iterator iter = bootDelegation.iterator(); iter.hasNext();) {
+			buf.append(((String)iter.next()).trim());
+			if (iter.hasNext())
+				buf.append(",");
+		}
+		
+		return buf.toString();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -55,7 +95,9 @@ public class EquinoxPlatform implements OsgiPlatform {
 		System.setProperty("eclipse.ignoreApp", "true");
 		System.setProperty("osgi.clean", "true");
 		System.setProperty("osgi.noShutdown", "true");
-        System.setProperty("org.osgi.framework.bootdelegation", "javax.*,org.w3c.*,sun.*,org.xml.*,com.sun.*"); 
+
+		// add bootDelegation packages for Equinox
+		System.setProperty("org.osgi.framework.bootdelegation", getBootDelegationPackages());
 		// System.setProperty("osgi.console", "");
 
 		// Equinox 3.1.x returns void - use of reflection is required
@@ -75,5 +117,11 @@ public class EquinoxPlatform implements OsgiPlatform {
 	public void stop() throws Exception {
 		EclipseStarter.shutdown();
 	}
+
+	public String toString() {
+		return "Equinox OSGi Platform";
+	}
+	
+	
 
 }

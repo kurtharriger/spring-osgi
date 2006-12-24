@@ -3,6 +3,7 @@ Bundle-Version: 1.0
 Bundle-SymbolicName: org.springframework.osgi.test
 Bundle-Activator: org.springframework.osgi.test.OsgiJUnitService
 Import-Package: junit.framework,
+  org.apache.commons.logging,
   org.springframework.osgi.io,
   edu.emory.mathcs.backport.java.util.concurrent
 DynamicImport-Package: javax.swing, javax.swing.border,

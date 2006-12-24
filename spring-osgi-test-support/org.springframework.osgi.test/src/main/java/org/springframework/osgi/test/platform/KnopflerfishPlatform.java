@@ -77,4 +77,8 @@ public class KnopflerfishPlatform implements OsgiPlatform {
 	public void stop() throws Exception {
 		framework.shutdown();
 	}
+	
+	public String toString() {
+		return "Knopflerfish OSGi Platform";
+	}
 }

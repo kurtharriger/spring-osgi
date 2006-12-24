@@ -19,7 +19,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
-import java.util.Enumeration; 
+import java.util.Enumeration;
 import java.net.URL;
 
 import junit.framework.TestCase;
@@ -58,14 +58,17 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 	// the OSGi fixture
 	private static OsgiPlatform osgiPlatform;
+
 	private static BundleContext platformContext;
 
-    // JUnit Service
+	// JUnit Service
 	private static Object service;
+
 	// JUnitService trigger
 	private static Method serviceTrigger;
 
 	private ObjectInputStream inputStream;
+
 	private ObjectOutputStream outputStream;
 
 	// the test results used by the triggering test runner
@@ -73,14 +76,16 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 	// The OSGi BundleContext
 	private BundleContext bundleContext;
-	
+
 	// OsgiResourceLoader
 	private ResourceLoader resourceLoader;
 
 	private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
 
 	public static final String EQUINOX_PLATFORM = "equinox";
+
 	public static final String KNOPFLERFISH_PLATFORM = "knopflerfish";
+
 	public static final String FELIX_PLATFORM = "felix";
 
 	public static final String OSGI_FRAMEWORK_SELECTOR = "org.springframework.osgi.test.framework";
@@ -99,14 +104,6 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		return localMavenArtifact("org.springframework.osgi", "spring-core", "2.1-SNAPSHOT");
 	}
 
-	protected String getLog4jLibUrl() {
-		return localMavenArtifact("org.springframework.osgi", "log4j.osgi", "1.2.13-SNAPSHOT");
-	}
-
-	protected String getCommonsLoggingLibUrl() {
-		return localMavenArtifact("org.springframework.osgi", "commons-logging.osgi", "1.1-SNAPSHOT");
-	}
-
 	protected String getJUnitLibUrl() {
 		return localMavenArtifact("org.springframework.osgi", "junit.osgi", "3.8.1-SNAPSHOT");
 	}
@@ -115,19 +112,20 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		return localMavenArtifact("org.springframework.osgi", "backport-util-concurrent", "3.0-SNAPSHOT");
 	}
 
-    protected String getSlf4jLog4j() {
-        return localMavenArtifact("org.springframework.osgi", "slf4j-log4j12.osgi", "1.1.0");
-    }
+	protected String getJclOverSlf4j() {
+		return localMavenArtifact("org.springframework.osgi", "jcl104-over-slf4j.osgi", "1.1.0");
+	}
 
-    protected String getSlf4jApi() {
-        return localMavenArtifact("org.springframework.osgi", "slf4j-api.osgi", "1.1.0");
-    }
+	protected String getSlf4jLog4j() {
+		return localMavenArtifact("org.slf4j", "slf4j-log4j-full", "1.1.0");
+	}
 
-    protected String getJclOverSlf4j() {
-        return localMavenArtifact("org.springframework.osgi", "jcl104-over-slf4j.osgi", "1.1.0");
-    }
+	protected String getLog4jLibUrl() {
+		System.setProperty("log4j.ignoreTCL", "true");
+		return localMavenArtifact("org.springframework.osgi", "log4j.osgi", "1.2.13-SNAPSHOT");
+	}
 
-    /**
+	/**
 	 * Find a local maven artifact. First tries to find the resource as a
 	 * packaged artifact produced by a local maven build, and if that fails will
 	 * search the local maven repository.
@@ -158,9 +156,9 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	protected String localMavenBundle(String groupId, String artifact, String version) {
 		// Check to see if the user has overridden the default maven home
 		String m2_home = System.getenv("M2_HOME");
-		if (m2_home == null || m2_home.length() == 0 || !new File(new File(m2_home), ".m2/repository").exists()) { 
-			m2_home = System.getProperty("user.home"); 
-        }
+		if (m2_home == null || m2_home.length() == 0 || !new File(new File(m2_home), ".m2/repository").exists()) {
+			m2_home = System.getProperty("user.home");
+		}
 		File repositoryHome = new File(new File(m2_home), ".m2/repository");
 		String location = groupId.replace('.', '/');
 		location += '/';
@@ -187,10 +185,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		try {
 			File found = new MavenPackagedArtifactFinder(artifactId, version).findPackagedArtifact(new File("."));
 			String path = found.toURL().toExternalForm();
-            if (log.isDebugEnabled()) {
-                log.debug("found local maven artifact " + path + " for " + artifactId + "|" + version);
-            }
-            return path;
+			if (log.isDebugEnabled()) {
+				log.debug("found local maven artifact " + path + " for " + artifactId + "|" + version);
+			}
+			return path;
 		}
 		catch (IOException ioEx) {
 			throw new IllegalStateException("Artifact " + artifactId + "-" + version + ".jar" + " could not be found",
@@ -210,11 +208,13 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	/**
 	 * Mandator bundles (part of the test setup).
 	 * 
-	 * @return the array of mandatory bundle names (sans Log4J, which gets special handling
+	 * @return the array of mandatory bundle names (sans Log4J, which gets
+	 * special handling
 	 */
 	protected String[] getMandatoryBundles() {
-		return new String[] { getCommonsLoggingLibUrl(), getJUnitLibUrl(), getSpringCoreBundleUrl(),
-				getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(), getSpringOSGiTestBundleUrl() };
+		return new String[] { getJclOverSlf4j(), getSlf4jLog4j(), getLog4jLibUrl(), getJUnitLibUrl(),
+				getSpringCoreBundleUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(),
+				getSpringOSGiTestBundleUrl() };
 	}
 
 	public AbstractOsgiTests() {
@@ -238,17 +238,14 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			platformName = platformName.toLowerCase();
 
 			if (platformName.contains(FELIX_PLATFORM)) {
-				log.info("Creating Felix Platform");
 				return new FelixPlatform();
 
 			}
 			if (platformName.contains(KNOPFLERFISH_PLATFORM)) {
-				log.info("Creating Knopflerfish Platform");
 				return new KnopflerfishPlatform();
 			}
 		}
 
-		log.info("Creating Equinox Platform");
 		return new EquinoxPlatform();
 	}
 
@@ -265,9 +262,30 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	}
 
 	/**
+	 * Logs the underlying OSGi information (which can be tricky).
+	 * 
+	 */
+	private void logPlatformInfo(BundleContext context) {
+		StringBuffer platformInfo = new StringBuffer();
+
+		// add platform information
+		platformInfo.append(osgiPlatform);
+		// get current bundle (it has to be the system bundle since we just
+		// bootstrapped the platform)
+		Bundle sysBundle = context.getBundle();
+
+		platformInfo.append(" [");
+		// Version
+		platformInfo.append(sysBundle.getHeaders().get(Constants.BUNDLE_VERSION));
+		platformInfo.append("]");
+		log.info(platformInfo + " started");
+	}
+
+	/**
 	 * Return the resource loader used by this test.
 	 * 
-	 * @return an OsgiBundleResourceLoader if the bundleContext was set or null otherwise.
+	 * @return an OsgiBundleResourceLoader if the bundleContext was set or null
+	 * otherwise.
 	 */
 	protected ResourceLoader getResourceLoader() {
 		return resourceLoader;
@@ -276,7 +294,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	private Resource[] createResources(String[] bundles) {
 		Resource[] res = new Resource[bundles.length];
 		ResourceLoader loader = new DefaultResourceLoader();
-		
+
 		for (int i = 0; i < bundles.length; i++) {
 			res[i] = loader.getResource(bundles[i]);
 		}
@@ -345,14 +363,16 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			// make sure the platform is closed properly
 			registerShutdownHook();
 
-			log.info("initializing OSGi platform...");
-
 			osgiPlatform = createPlatform();
 			// start platform
+			log.debug("about to start " + osgiPlatform);
 			osgiPlatform.start();
 			// platform context
 			platformContext = osgiPlatform.getBundleContext();
-			
+
+			// log platform name and version
+			logPlatformInfo(platformContext);
+
 			// merge bundles
 			String[] mandatoryBundles = getMandatoryBundles();
 			String[] optionalBundles = getBundleLocations();
@@ -364,10 +384,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			// install bundles (from the local system/classpath)
 			Resource[] bundleResources = createResources(allBundles);
 
-            initializeLog4J();
+			// initializeLog4J();
 
-            Bundle[] bundles = new Bundle[bundleResources.length];
-            for (int i = 0; i < bundleResources.length; i++) {
+			Bundle[] bundles = new Bundle[bundleResources.length];
+			for (int i = 0; i < bundleResources.length; i++) {
 				bundles[i] = installBundle(bundleResources[i]);
 			}
 
@@ -585,8 +605,9 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	}
 
 	/**
-	 * Set the bundle context to be used by this test. This method is called automatically by the test
-	 * infrastructure after the OSGi platform is being setup.
+	 * Set the bundle context to be used by this test. This method is called
+	 * automatically by the test infrastructure after the OSGi platform is being
+	 * setup.
 	 */
 	public final void setBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
@@ -597,66 +618,67 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	public BundleContext getBundleContext() {
 		return bundleContext;
 	}
-	
+
 	public void waitOnContextCreation(String forBundleWithSymbolicName) {
 		// use a barrier to ensure we don't proceed until context is published
 		final CyclicBarrier barrier = new CyclicBarrier(2);
-		
-		Thread waitThread = new Thread(new ApplicationContextWaiter(barrier,bundleContext, forBundleWithSymbolicName));
+
+		Thread waitThread = new Thread(new ApplicationContextWaiter(barrier, bundleContext, forBundleWithSymbolicName));
 		waitThread.start();
-		
+
 		try {
-			barrier.await(5L,TimeUnit.SECONDS);
+			barrier.await(5L, TimeUnit.SECONDS);
 		}
 		catch (Throwable timeout) {
-			throw new RuntimeException("Gave up waiting for application context for '" 
-					+ forBundleWithSymbolicName + "' to be created");			
-		}		
+			throw new RuntimeException("Gave up waiting for application context for '" + forBundleWithSymbolicName
+					+ "' to be created");
+		}
 	}
 
+	public Bundle findBundleByLocation(String bundleLocation) {
+		Bundle[] bundles = bundleContext.getBundles();
+		for (int i = 0; i < bundles.length; i++) {
+			if (bundles[i].getLocation().equals(bundleLocation)) {
+				return bundles[i];
+			}
+		}
+		return null;
+	}
 
-    public Bundle findBundleByLocation(String bundleLocation) {
-        Bundle[] bundles = bundleContext.getBundles();
-        for (int i = 0; i < bundles.length; i++) {
-            if (bundles[i].getLocation().equals(bundleLocation)) {
-                return bundles[i];
-            }
-        }
-        return null;
-    }
+	public Bundle findBundleBySymbolicName(String sybmolicName) {
+		Bundle[] bundles = bundleContext.getBundles();
+		for (int i = 0; i < bundles.length; i++) {
+			if (bundles[i].getSymbolicName().equals(sybmolicName)) {
+				return bundles[i];
+			}
+		}
+		return null;
+	}
 
+	private static class ApplicationContextWaiter implements Runnable, ServiceListener {
 
-    public Bundle findBundleBySymbolicName(String sybmolicName) {
-        Bundle[] bundles = bundleContext.getBundles();
-        for (int i = 0; i < bundles.length; i++) {
-            if (bundles[i].getSymbolicName().equals(sybmolicName)) {
-                return bundles[i];
-            }
-        }
-        return null;
-    }
-    
-    private static class ApplicationContextWaiter implements Runnable, ServiceListener {
+		private final String symbolicName;
 
-    	private final String symbolicName;
-    	private final CyclicBarrier barrier;
-    	private final BundleContext context;
-    	
-    	public ApplicationContextWaiter(CyclicBarrier barrier, BundleContext context, String bundleSymbolicName) {
-    		this.symbolicName = bundleSymbolicName;
-    		this.barrier = barrier;
-    		this.context = context;
-    	}
-    	
+		private final CyclicBarrier barrier;
+
+		private final BundleContext context;
+
+		public ApplicationContextWaiter(CyclicBarrier barrier, BundleContext context, String bundleSymbolicName) {
+			this.symbolicName = bundleSymbolicName;
+			this.barrier = barrier;
+			this.context = context;
+		}
+
 		public void run() {
-			String filter = "(org.springframework.context.service.name=" + symbolicName + ")"; 
+			String filter = "(org.springframework.context.service.name=" + symbolicName + ")";
 			try {
-				context.addServiceListener(this,filter);
-				// now look and see if the service was already registered before we even got here...
-				if (this.context.getServiceReferences("org.springframework.context.ApplicationContext",
-						filter) != null ) {
+				context.addServiceListener(this, filter);
+				// now look and see if the service was already registered before
+				// we even got here...
+				if (this.context.getServiceReferences("org.springframework.context.ApplicationContext", filter) != null) {
 					returnControl();
-				}			}
+				}
+			}
 			catch (InvalidSyntaxException badSyntaxEx) {
 				throw new IllegalStateException("OSGi runtime rejected filter '" + filter + "'");
 			}
@@ -681,70 +703,65 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 				// return;
 			}
 		}
-    }
+	}
 
+	/**
+	 * Special handling of loading the log4j bundle such that log4j.properties
+	 * can be set and initialized correctly without class loading issues.
+	 */
+	protected void initializeLog4J() throws Exception {
+		DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
+		Resource log4jProps = resourceLoader.getResource("classpath:log4j.properties");
 
-    /**
-     * Special handling of loading the log4j bundle such that log4j.properties can be set and
-     * initialized correctly without class loading issues.
-     */
-    protected void initializeLog4J() throws Exception {
-        DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource log4jProps = resourceLoader.getResource("classpath:log4j.properties");
-        
-        Bundle log4jBundle =  installBundle(resourceLoader.getResource(getLog4jLibUrl()));
-        log4jBundle.start();
-        Properties configProps = new Properties();
-        InputStream is;
-        try {
-            is = log4jProps.getInputStream(); 
-        } catch (FileNotFoundException e) {
-            return;
-        }
-        configProps.load(is);
+		Bundle log4jBundle = installBundle(resourceLoader.getResource(getLog4jLibUrl()));
+		log4jBundle.start();
+		Properties configProps = new Properties();
+		InputStream is;
+		try {
+			is = log4jProps.getInputStream();
+		}
+		catch (FileNotFoundException e) {
+			return;
+		}
+		configProps.load(is);
 
-        ClassLoader previous = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(new BundleClassLoader(log4jBundle));
-            Class propConfigurator = log4jBundle.loadClass("org.apache.log4j.PropertyConfigurator");
-            Method configure = propConfigurator.getDeclaredMethod("configure", new Class[]{Properties.class});
-            configure.invoke(null, new Object[]{configProps});
-        } finally {
-            Thread.currentThread().setContextClassLoader(previous);
-        } 
-    }
+		ClassLoader previous = Thread.currentThread().getContextClassLoader();
+		try {
+			Thread.currentThread().setContextClassLoader(new BundleClassLoader(log4jBundle));
+			Class propConfigurator = log4jBundle.loadClass("org.apache.log4j.PropertyConfigurator");
+			Method configure = propConfigurator.getDeclaredMethod("configure", new Class[] { Properties.class });
+			configure.invoke(null, new Object[] { configProps });
+		}
+		finally {
+			Thread.currentThread().setContextClassLoader(previous);
+		}
+	}
 
-    private static class BundleClassLoader extends ClassLoader {
-        private Bundle bundle;
+	private static class BundleClassLoader extends ClassLoader {
+		private Bundle bundle;
 
+		private BundleClassLoader(Bundle bundle) {
+			this.bundle = bundle;
+		}
 
-        private BundleClassLoader(Bundle bundle) {
-            this.bundle = bundle; 
-        }
+		protected URL findResource(String name) {
+			return bundle.getResource(name);
+		}
 
+		protected Enumeration findResources(String name) throws IOException {
+			return bundle.getResources(name);
+		}
 
-        protected URL findResource(String name) {
-            return bundle.getResource(name);
-        }
+		public URL getResource(String name) {
+			return findResource(name);
+		}
 
+		public Class loadClass(String name) throws ClassNotFoundException {
+			return findClass(name);
+		}
 
-        protected Enumeration findResources(String name) throws IOException {
-            return bundle.getResources(name);
-        }
-
-
-        public URL getResource(String name) {
-            return findResource(name);
-        }
-
-
-        public Class loadClass(String name) throws ClassNotFoundException {
-            return findClass(name);
-        }
-
-
-        protected Class findClass(String name) throws ClassNotFoundException {
-            return bundle.loadClass(name);
-        }
-    }
+		protected Class findClass(String name) throws ClassNotFoundException {
+			return bundle.loadClass(name);
+		}
+	}
 }
