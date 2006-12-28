@@ -23,8 +23,7 @@ import java.lang.reflect.Proxy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
+import org.osgi.framework.BundleContext; 
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
@@ -93,8 +92,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private BundleContext bundleContext;
-	private boolean retryOnUnregisteredService = true;
+	private BundleContext bundleContext; 
 	private int retryTimes = DEFAULT_MAX_RETRIES;
 	private String resultSummarizer;
 
@@ -129,7 +127,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	// Constructed object of this factory
 	private Object proxy;
 
-	private static final Constants CARDINALITY = new Constants(Cardinality.class);
+    private String filterStringForServiceLookup;
+
+    private static final Constants CARDINALITY = new Constants(Cardinality.class);
 
 	private static final Constants REFERENCE_CL_OPTIONS = new Constants(ReferenceClassLoadingOptions.class);
 
@@ -215,10 +215,11 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 				+ "' which does not extend DefaultResourceLoader");
 		}
 
-		if (constructProxy()) {
+        boolean serviceAvailable = constructProxy();
+        bundleContext.addServiceListener(listener, getFilterStringForServiceLookup());
+        if (serviceAvailable) {
 		    bind();
         }
-        bundleContext.addServiceListener(listener, getFilterStringForServiceLookup());
 	}
 
 	protected boolean constructProxy() throws Exception {
@@ -257,15 +258,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 				}
 			}
 			catch (NoSuchServiceException nsse) {
-				reference = null;
-				if (!retryOnUnregisteredService) {
-					throw nsse;
-				}
-			}
-			if (reference == null) {
 				Thread.sleep(retryDelayMs);
 			}
-			else {
+			if (reference != null) {
 				service = bundleContext.getService(reference);  // obviously only works for cardinality = 1
 				break;
 			}
@@ -456,25 +451,6 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 
 	/**
-	 * If the target OSGi service is unregistered, should we attempt to rebind
-	 * to a replacement? (For example, if the bundle providing the service is
-	 * stopped and then subsequently started again). <p/> By default retry
-	 * <em>will</em> be attempted. <p/> Changing this property after
-	 * initialization is complete has no effect.
-	 *
-	 * @param retryOnUnregisteredService The retryOnUnregisteredService to set.
-	 */
-	public void setRetryOnUnregisteredService(boolean retryOnUnregisteredService) {
-		this.retryOnUnregisteredService = retryOnUnregisteredService;
-	}
-
-
-	public boolean isRetryOnUnregisteredService() {
-		return retryOnUnregisteredService;
-	}
-
-
-	/**
 	 * How many times should we attempt to rebind to a target service if the
 	 * service we are currently using is unregistered. Default is 3 times. <p/>
 	 * Changing this property after initialization is complete has no effect.
@@ -512,7 +488,10 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	// build an osgi filter string to find the service we are
 	// looking for.
 	private String getFilterStringForServiceLookup() {
-		StringBuffer sb = new StringBuffer();
+        if (filterStringForServiceLookup != null) {
+            return filterStringForServiceLookup;
+        }
+        StringBuffer sb = new StringBuffer();
 		boolean andFilterWithInterfaceName = ((getFilter() != null) || (getBeanName() != null));
 		if (andFilterWithInterfaceName) {
 			sb.append("(&");
@@ -538,8 +517,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		}
 		String filter = sb.toString();
 		if (StringUtils.hasText(filter)) {
-			return filter;
-		}
+			filterStringForServiceLookup = filter;
+            return filterStringForServiceLookup;
+        }
 		else {
 			return null;
 		}
@@ -648,25 +628,15 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	protected class Listener implements ServiceListener {
 		private Object unavailableService;
 		private HotSwappableTargetSource targetSource;
-		private Filter filter;
 
 
 		protected Listener(Object unavailableService) {
 			this.unavailableService = unavailableService;
-			try {
-				filter = FrameworkUtil.createFilter(getFilterStringForServiceLookup());
-			}
-			catch (InvalidSyntaxException e) {
-				throw (IllegalStateException)new IllegalStateException("Invalid syntax for filter: " + getFilterStringForServiceLookup()).initCause(e);
-			}
 		}
 
 
 		public void serviceChanged(ServiceEvent serviceEvent) {
 			ServiceReference serviceReference = serviceEvent.getServiceReference();
-			if (!filter.match(serviceReference)) {
-				return;
-			}
 			switch (serviceEvent.getType()) {
 				case ServiceEvent.MODIFIED:
 				case ServiceEvent.REGISTERED:
