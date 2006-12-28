@@ -30,13 +30,11 @@ import org.springframework.aop.target.HotSwappableTargetSource;
 public class OsgiServiceInterceptor implements MethodBeforeAdvice {
 	private final Object unavailableService;
 	private final HotSwappableTargetSource targetSource;
-	private final Class serviceType;
 	private int maxRetries = OsgiServiceProxyFactoryBean.DEFAULT_MAX_RETRIES;
 	private long retryIntervalMillis = OsgiServiceProxyFactoryBean.DEFAULT_MILLIS_BETWEEN_RETRIES;
 
-	public OsgiServiceInterceptor(HotSwappableTargetSource targetSource, Class serviceType, Object unavailableService) {
+	public OsgiServiceInterceptor(HotSwappableTargetSource targetSource, Object unavailableService) {
 		this.targetSource = targetSource;
-		this.serviceType = serviceType;
 		this.unavailableService = unavailableService;
 	}
 
@@ -67,14 +65,6 @@ public class OsgiServiceInterceptor implements MethodBeforeAdvice {
 		int numAttempts = 0;
 		while (targetSource.getTarget() == unavailableService && (numAttempts++ < this.maxRetries)) {
 			Thread.sleep(this.retryIntervalMillis);
-		}
-		if (targetSource.getTarget() == unavailableService) {
-			// no luck!
-			throw new ServiceUnavailableException(
-				"The target OSGi service of type '" + "was unregistered " +
-					"and no suitable replacement was found after retrying " +
-					this.maxRetries + " times.",
-				this.serviceType, null);
 		}
 	}
 }

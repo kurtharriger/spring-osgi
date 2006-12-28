@@ -19,8 +19,9 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
-import java.util.Enumeration;
-import java.net.URL;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -91,8 +92,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	public static final String OSGI_FRAMEWORK_SELECTOR = "org.springframework.osgi.test.framework";
 
 	protected final Log log = LogFactory.getLog(getClass());
+    private static final String ORG_OSGI_FRAMEWORK_BOOTDELEGATION = "org.osgi.framework.bootdelegation";
 
-	protected String getSpringOSGiTestBundleUrl() {
+
+    protected String getSpringOSGiTestBundleUrl() {
 		return localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test", "1.0-SNAPSHOT");
 	}
 
@@ -112,11 +115,11 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		return localMavenArtifact("org.springframework.osgi", "backport-util-concurrent", "3.0-SNAPSHOT");
 	}
 
-	protected String getJclOverSlf4j() {
+	protected String getJclOverSlf4jUrl() {
 		return localMavenArtifact("org.springframework.osgi", "jcl104-over-slf4j.osgi", "1.1.0");
 	}
 
-	protected String getSlf4jLog4j() {
+	protected String getSlf4jLog4jUrl() {
 		return localMavenArtifact("org.slf4j", "slf4j-log4j-full", "1.1.0");
 	}
 
@@ -212,7 +215,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 * special handling
 	 */
 	protected String[] getMandatoryBundles() {
-		return new String[] { getJclOverSlf4j(), getSlf4jLog4j(), getLog4jLibUrl(), getJUnitLibUrl(),
+		return new String[] { getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(), getJUnitLibUrl(),
 				getSpringCoreBundleUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(),
 				getSpringOSGiTestBundleUrl() };
 	}
@@ -363,8 +366,11 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			// make sure the platform is closed properly
 			registerShutdownHook();
 
-			osgiPlatform = createPlatform();
-			// start platform
+            // add bootDelegation packages
+            System.setProperty(ORG_OSGI_FRAMEWORK_BOOTDELEGATION, getBootDelegationPackageString());
+
+            osgiPlatform = createPlatform();
+            // start platform
 			log.debug("about to start " + osgiPlatform);
 			osgiPlatform.start();
 			// platform context
@@ -427,7 +433,41 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		}
 	}
 
-	/**
+    /**
+     * Return a String representation for the boot delegation packages list.
+     *
+     * @return
+     */
+    private String getBootDelegationPackageString() {
+        StringBuffer buf = new StringBuffer();
+
+        for (Iterator iter = getBootDelegationPackages().iterator(); iter.hasNext();) {
+            buf.append(((String) iter.next()).trim());
+            if (iter.hasNext()) {
+                buf.append(",");
+            }
+        }
+
+        return buf.toString();
+    }
+
+
+    /**
+     *
+     * @return the list of packages the OSGi platform will delegate to the boot class path
+     *         Answer an empty list if none.
+     */
+    protected List getBootDelegationPackages() {
+        List defaults = new ArrayList();
+        defaults.add("javax.*");
+        defaults.add("org.w3c.*");
+        defaults.add("sun.*");
+        defaults.add("org.xml.*");
+        defaults.add("com.sun.*");
+        return defaults;
+    }
+
+    /**
 	 * Callback for processing the bundle context after the bundles have been
 	 * installed and started.
 	 * 
@@ -702,66 +742,6 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			catch (InterruptedException intEx) {
 				// return;
 			}
-		}
-	}
-
-	/**
-	 * Special handling of loading the log4j bundle such that log4j.properties
-	 * can be set and initialized correctly without class loading issues.
-	 */
-	protected void initializeLog4J() throws Exception {
-		DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
-		Resource log4jProps = resourceLoader.getResource("classpath:log4j.properties");
-
-		Bundle log4jBundle = installBundle(resourceLoader.getResource(getLog4jLibUrl()));
-		log4jBundle.start();
-		Properties configProps = new Properties();
-		InputStream is;
-		try {
-			is = log4jProps.getInputStream();
-		}
-		catch (FileNotFoundException e) {
-			return;
-		}
-		configProps.load(is);
-
-		ClassLoader previous = Thread.currentThread().getContextClassLoader();
-		try {
-			Thread.currentThread().setContextClassLoader(new BundleClassLoader(log4jBundle));
-			Class propConfigurator = log4jBundle.loadClass("org.apache.log4j.PropertyConfigurator");
-			Method configure = propConfigurator.getDeclaredMethod("configure", new Class[] { Properties.class });
-			configure.invoke(null, new Object[] { configProps });
-		}
-		finally {
-			Thread.currentThread().setContextClassLoader(previous);
-		}
-	}
-
-	private static class BundleClassLoader extends ClassLoader {
-		private Bundle bundle;
-
-		private BundleClassLoader(Bundle bundle) {
-			this.bundle = bundle;
-		}
-
-		protected URL findResource(String name) {
-			return bundle.getResource(name);
-		}
-
-		protected Enumeration findResources(String name) throws IOException {
-			return bundle.getResources(name);
-		}
-
-		public URL getResource(String name) {
-			return findResource(name);
-		}
-
-		public Class loadClass(String name) throws ClassNotFoundException {
-			return findClass(name);
-		}
-
-		protected Class findClass(String name) throws ClassNotFoundException {
-			return bundle.loadClass(name);
 		}
 	}
 }

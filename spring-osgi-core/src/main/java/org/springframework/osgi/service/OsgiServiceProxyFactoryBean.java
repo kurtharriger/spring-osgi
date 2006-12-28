@@ -231,7 +231,12 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
         // Create the object which stands in for the actual service when the service is unavailable
 		InvocationHandler unavailableServiceHandler = new InvocationHandler() {
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				throw new ServiceUnavailableException("Service is currently unavailable", serviceInterface, filter);
+                if (cardinality == Cardinality.C_0__1 || cardinality == Cardinality.C_0__N) {
+                    if (method.getReturnType().equals (Void.TYPE)) {
+                        return null;
+                    }
+                }
+                throw new ServiceUnavailableException("Service is currently unavailable", serviceInterface, filter);
 			}
 		};
 
@@ -290,8 +295,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 			pf.setInterfaces(new Class[]{getInterface()});
 		}
 		pf.setTargetSource(targetSource);
-		OsgiServiceInterceptor interceptor = new OsgiServiceInterceptor(targetSource, getInterface(),
-			unavailableService);
+		OsgiServiceInterceptor interceptor = new OsgiServiceInterceptor(targetSource,
+                                                                        unavailableService);
 
 		interceptor.setMaxRetries(this.timeout != 0 ? this.retryTimes : Integer.MAX_VALUE);
 		interceptor.setRetryIntervalMillis(this.retryDelayMs);

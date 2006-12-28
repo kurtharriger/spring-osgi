@@ -64,6 +64,8 @@ public class Cardinality0to1Test extends ConfigurableBundleCreatorTests {
             // expected
         }
 
+        MyListener.service.voidMethod();  //  Void methods should not raise exception when service not available
+
         startDependency(simpleService2Bundle);
 
         assertEquals("Expected initial binding of service", 1, MyListener.BOUND_COUNT);

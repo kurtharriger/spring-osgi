@@ -33,9 +33,7 @@ public class KnopflerfishPlatform implements OsgiPlatform {
 	/**
 	 * Not used at the moment
 	 */
-	// private String[] ARGS = new String[] { "-init", "-launch" };
-	
-	private Properties SYSTEM_PROPS = new Properties();
+	// private String[] ARGS = new String[] { "-init", "-launch" }; 
 
 	private BundleContext context;
 	private Framework framework;
@@ -55,15 +53,8 @@ public class KnopflerfishPlatform implements OsgiPlatform {
 	 * @see org.springframework.osgi.test.OsgiPlatform#start()
 	 */
 	public void start() throws Exception {
-		SYSTEM_PROPS.put("org.knopflerfish.framework.bundlestorage", "memory");
-		SYSTEM_PROPS.put("org.knopflerfish.startlevel.use", "true");
-        SYSTEM_PROPS.put("org.osgi.framework.bootdelegation", "javax.*,org.w3c.*,sun.*,org.xml.*,com.sun.*"); 
-
-        for (Iterator iter = SYSTEM_PROPS.entrySet().iterator(); iter.hasNext();) {
-			Map.Entry entry = (Map.Entry) iter.next();
-			System.setProperty((String) entry.getKey(), (String) entry.getValue());
-		}
-		
+		System.getProperties().put("org.knopflerfish.framework.bundlestorage", "memory");
+		System.getProperties().put("org.knopflerfish.startlevel.use", "true");
 		framework = new Framework(this);
 		framework.launch(0);
 		context = framework.getSystemBundleContext();
