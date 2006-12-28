@@ -5,51 +5,6 @@
     </formats>
     <moduleSets>
         <moduleSet>
-            <includes>
-                <include>org.springframework.osgi:aopalliance.osgi</include>
-                <include>org.springframework.osgi:asm.osgi</include>
-                <include>org.springframework.osgi:aspectjrt.osgi</include>
-                <include>org.springframework.osgi:cglib-nodep.osgi</include>
-                <include>org.springframework.osgi:commons-attributes.osgi</include>
-                <include>org.springframework.osgi:commons-beanutils.osgi</include>
-                <include>org.springframework.osgi:commons-collections.osgi</include>
-                <include>org.springframework.osgi:commons-logging.osgi</include>
-                <include>org.springframework.osgi:commons-pool.osgi</include>
-                <include>org.springframework.osgi:jsp-api.osgi</include>
-                <include>org.springframework.osgi:jstl.osgi</include>
-                <include>org.springframework.osgi:portlet-api.osgi</include>
-                <include>org.springframework.osgi:servletapi.osgi</include>
-                <include>org.springframework.osgi:spring-aop</include>
-                <include>org.springframework.osgi:spring-aspects</include>
-                <include>org.springframework.osgi:spring-beans</include>
-                <include>org.springframework.osgi:spring-context</include>
-                <include>org.springframework.osgi:spring-core</include>
-                <include>org.springframework.osgi:spring-dao</include>
-                <include>org.springframework.osgi:spring-framework-required-libraries</include>
-                <include>org.springframework.osgi:spring-hibernate2</include>
-                <include>org.springframework.osgi:spring-hibernate3</include>
-                <include>org.springframework.osgi:spring-ibatis</include>
-                <include>org.springframework.osgi:spring-jca</include>
-                <include>org.springframework.osgi:spring-jdbc</include>
-                <include>org.springframework.osgi:spring-jdo</include>
-                <include>org.springframework.osgi:spring-jms</include>
-                <include>org.springframework.osgi:spring-jmx</include>
-                <include>org.springframework.osgi:spring-jpa</include>
-                <include>org.springframework.osgi:spring-modules</include>
-                <include>org.springframework.osgi:spring-osgi</include>
-                <include>org.springframework.osgi:spring-osgi-core</include>
-                <include>org.springframework.osgi:spring-osgi-extender</include>
-                <include>org.springframework.osgi:spring-osgi-io</include>
-                <include>org.springframework.osgi:spring-osgi-test-support</include>
-                <include>org.springframework.osgi:spring-portlet</include>
-                <include>org.springframework.osgi:spring-remoting</include>
-                <include>org.springframework.osgi:spring-struts</include>
-                <include>org.springframework.osgi:spring-support</include>
-                <include>org.springframework.osgi:spring-toplink</include>
-                <include>org.springframework.osgi:spring-web</include>
-                <include>org.springframework.osgi:spring-webmvc</include>
-                <include>org.springframework.osgi:struts.osgi</include>
-            </includes>
             <binaries>
                 <outputDirectory>/</outputDirectory>
                 <includeDependencies>false</includeDependencies>

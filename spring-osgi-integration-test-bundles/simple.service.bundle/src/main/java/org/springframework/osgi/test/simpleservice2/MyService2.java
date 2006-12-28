@@ -9,4 +9,6 @@ public interface MyService2 {
 
 	String stringValue();
 
+    void voidMethod();
+
 }

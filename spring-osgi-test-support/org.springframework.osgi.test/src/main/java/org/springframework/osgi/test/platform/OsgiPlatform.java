@@ -43,5 +43,5 @@ public interface OsgiPlatform {
 	 * Get a hold of the bundle context of the returned platform.
 	 * @return
 	 */
-	public BundleContext getBundleContext();
+	public BundleContext getBundleContext(); 
 }

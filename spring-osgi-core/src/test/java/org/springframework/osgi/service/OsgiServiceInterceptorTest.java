@@ -56,8 +56,7 @@ public class OsgiServiceInterceptorTest extends TestCase {
 	private void createInterceptor() {
 		this.interceptor = new OsgiServiceInterceptor(
 			this.tgtSource,
-			SI.class,
-			new Object()
+            new Object()
 		);
 
 	}

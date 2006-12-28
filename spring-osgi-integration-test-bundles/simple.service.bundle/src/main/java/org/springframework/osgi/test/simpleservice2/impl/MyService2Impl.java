@@ -12,4 +12,8 @@ public class MyService2Impl implements MyService2 {
         return "Finklestein.  Bartholomew Finklestein";
     }
 
+    public void voidMethod() {
+        System.out.println("void method called"); 
+    }
+
 }
