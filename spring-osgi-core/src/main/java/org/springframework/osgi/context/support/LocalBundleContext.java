@@ -16,61 +16,55 @@
  */
 package org.springframework.osgi.context.support;
 
-import java.lang.reflect.Method;
-
-import org.osgi.framework.BundleContext;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
-import org.springframework.aop.AfterReturningAdvice;
-import org.springframework.aop.MethodBeforeAdvice;
-import org.springframework.aop.ThrowsAdvice;
+import org.osgi.framework.BundleContext;
 
 /**
- * ThreadLocal management of the BundleContext. This class also functions as advice for
- * temporarily pushing the thread-local context.
- *
+ * ThreadLocal management of the BundleContext. This class also functions as
+ * advice for temporarily pushing the thread-local context.
+ * 
  * @author Andy Piper
+ * @author Costin Leau
  */
-public class LocalBundleContext implements MethodBeforeAdvice, AfterReturningAdvice, ThrowsAdvice
-{
-  private final static InheritableThreadLocal contextLocal = new InheritableThreadLocal();
+//TODO: why is the setter static? The interceptor/static setup collides.
+public class LocalBundleContext implements MethodInterceptor {
 
-  private BundleContext context;
-  private BundleContext savedContext;
+	private final static InheritableThreadLocal contextLocal = new InheritableThreadLocal();
 
-  /**
-   * Set the local BundleContext to context.
-   *
-   * @param context
-   */
-  public static void setContext(BundleContext context) {
-    contextLocal.set(context);
-  }
+	private final BundleContext context;
 
-  /**
-   * Get the local bundle's BundleContext.
-   */
-  public static BundleContext getContext() {
-    return (BundleContext) contextLocal.get();
-  }
+	/**
+	 * Get the local bundle's BundleContext.
+	 */
+	public static BundleContext getContext() {
+		return (BundleContext) contextLocal.get();
+	}
 
-  public LocalBundleContext(BundleContext bundle) {
-    context = bundle;
-  }
+	public static void setContext(BundleContext bundle) {
+		contextLocal.set(bundle);
+	}
 
-  public LocalBundleContext(Bundle bundle) {
-    this(OsgiResourceUtils.getBundleContext(bundle));
-  }
+	public LocalBundleContext(BundleContext bundle) {
+		this.context = bundle;
+	}
 
-  public synchronized void before(Method method, Object[] args, Object target) throws Throwable {
-    this.savedContext = getContext();
-    setContext(context);
-  }
+	public LocalBundleContext(Bundle bundle) {
+		this(OsgiResourceUtils.getBundleContext(bundle));
+	}
 
-  public void afterReturning(Object o, Method method, Object[] objects, Object o1) throws Throwable {
-    setContext(savedContext);
-  }
+	public Object invoke(MethodInvocation invocation) throws Throwable {
+		// save the old context
+		Object oldContext = contextLocal.get();
 
-  public void afterThrowing(Throwable subclass) {
-    setContext(savedContext);
-  }
+		try {
+			contextLocal.set(context);
+			return invocation.proceed();
+		}
+		finally {
+			// restore old context
+			contextLocal.set(oldContext);
+		}
+	}
 }
