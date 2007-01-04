@@ -23,12 +23,14 @@ import java.util.Properties;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.ApplicationContext; 
+import org.springframework.context.ApplicationContext;
+import org.springframework.osgi.service.OsgiServiceUtils;
 
 /**
  * Application context backed by an OSGi bundle. Will use the bundle classpath
@@ -55,22 +57,25 @@ import org.springframework.context.ApplicationContext;
  */
 public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgiBundleApplicationContext {
 	public static final String BUNDLE_URL_PREFIX = "bundle:";
+
 	public static final String APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME = "org.springframework.context.service.name";
+
 	private static final String SERVICE_CONTEXT_HEADER = "Spring-Context";
+
 	private static final String DONT_PUBLISH_DIRECTIVE = ";publish-context:=false";
 
 	/** Used for publishing the app context * */
 	private ServiceRegistration serviceRegistration;
 
+	/** retrieved from the BundleContext * */
 	private OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver;
 
 	public AbstractBundleXmlApplicationContext(BundleContext context, String[] configLocations) {
 		this(context, configLocations, null, null);
 	}
 
-	public AbstractBundleXmlApplicationContext(BundleContext context,
-                                               String[] configLocations, ClassLoader classLoader,
-                                               OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
+	public AbstractBundleXmlApplicationContext(BundleContext context, String[] configLocations,
+			ClassLoader classLoader, OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
 		super();
 
 		setBundleContext(context);
@@ -109,12 +114,43 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 		// Configure the bean definition reader with this context's
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
-		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
+
+		// prefer the namespace pluing instead of ResourceEntityResolver
+		OsgiBundleNamespaceHandlerAndEntityResolver defaultHandlerResolver = lookupHandlerAndResolver();
+
+		if (defaultHandlerResolver != null) {
+			beanDefinitionReader.setEntityResolver(defaultHandlerResolver);
+			beanDefinitionReader.setNamespaceHandlerResolver(defaultHandlerResolver);
+		}
+		else {
+			// fallback to ResourceEntityResolver
+			beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
+		}
 
 		// Allow a subclass to provide custom initialization of the reader,
 		// then proceed with actually loading the bean definitions.
 		initBeanDefinitionReader(beanDefinitionReader);
 		loadBeanDefinitions(beanDefinitionReader);
+	}
+
+	/**
+	 * Lookup the NamespaceHnadler and entity resolver Service inside the OSGi
+	 * space.
+	 * 
+	 * @return
+	 */
+	protected OsgiBundleNamespaceHandlerAndEntityResolver lookupHandlerAndResolver() {
+		// TODO: add smart lookup proxy
+		ServiceReference reference = OsgiServiceUtils.getService(getBundleContext(),
+				OsgiBundleNamespaceHandlerAndEntityResolver.class, null);
+
+		OsgiBundleNamespaceHandlerAndEntityResolver resolver = (OsgiBundleNamespaceHandlerAndEntityResolver) getBundleContext()
+				.getService(reference);
+
+		if (logger.isDebugEnabled())
+			logger.debug("looking for NamespaceHandlerAndEntityResolver OSGi service.... found=" + resolver);
+
+		return resolver;
 	}
 
 	/**
@@ -126,8 +162,10 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 	 * by the bundle.
 	 */
 	protected void initBeanDefinitionReader(XmlBeanDefinitionReader beanDefinitionReader) {
-		beanDefinitionReader.setEntityResolver(namespaceResolver);
-		beanDefinitionReader.setNamespaceHandlerResolver(namespaceResolver);
+		if (namespaceResolver != null) {
+			beanDefinitionReader.setEntityResolver(namespaceResolver);
+			beanDefinitionReader.setNamespaceHandlerResolver(namespaceResolver);
+		}
 	}
 
 	/**
@@ -141,7 +179,7 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 	 * into Resource instances.
 	 * 
 	 * @throws org.springframework.beans.BeansException in case of bean
-	 *             registration errors
+	 * registration errors
 	 * @throws java.io.IOException if the required XML document isn't found
 	 * @see #refreshBeanFactory
 	 * @see #getConfigLocations
@@ -174,16 +212,16 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 		Dictionary serviceProperties = new Properties();
 		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getServiceName());
 		if (logger.isInfoEnabled()) {
-			logger.info("Publishing application context with properties (" + 
-					APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getServiceName() + ")");
+			logger.info("Publishing application context with properties (" + APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME
+					+ "=" + getServiceName() + ")");
 		}
 		this.serviceRegistration = getBundleContext().registerService(
 				new String[] { ApplicationContext.class.getName() }, this, serviceProperties);
 	}
-	
+
 	/**
-	 * Context should be published unless the Spring-Context header is present and it contains
-	 * the directive "publish-context:=false"
+	 * Context should be published unless the Spring-Context header is present
+	 * and it contains the directive "publish-context:=false"
 	 * @return
 	 */
 	private boolean shouldPublishContext() {
@@ -210,5 +248,5 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 
 	public boolean isAvailable() {
 		return true;
-	} 
+	}
 }

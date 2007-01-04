@@ -15,99 +15,153 @@
  */
 package org.springframework.osgi.context.support;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
+import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
-import org.springframework.beans.factory.xml.PluggableSchemaResolver;
+import org.springframework.core.CollectionFactory;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
+ * Spring schema handler/resolver for OSGi environments.
+ * 
  * @author Hal Hildebrand
- *         Date: Aug 23, 2006
- *         Time: 8:32:49 PM
+ * @author Costin Leau
+ * 
+ * Date: Aug 23, 2006 Time: 8:32:49 PM
  */
 public class NamespacePlugins implements OsgiBundleNamespaceHandlerAndEntityResolver {
-    private final Map plugins = new HashMap();
 
+	private static final Log log = LogFactory.getLog(NamespacePlugins.class);
 
-    public void addHandler(Bundle bundle) {
-        synchronized (plugins) {
-            //noinspection unchecked
-            plugins.put(bundle, new Plugin(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle)));
-        }
-    }
+	private final Map plugins = Collections.synchronizedMap(CollectionFactory.createLinkedMapIfPossible(5));
 
+	private String getBundleInfo(Bundle bundle) {
+		StringBuffer buf = new StringBuffer();
+		buf.append("bundle=[");
+		buf.append(bundle.getBundleId());
+		buf.append("|");
+		buf.append(bundle.getSymbolicName());
+		buf.append("]");
 
-    public void removeHandler(Bundle bundle) {
-        synchronized (plugins) {
-            plugins.remove(bundle);
-        }
-    }
+		return buf.toString();
+	}
 
+	public void addHandler(Bundle bundle) {
+		if (log.isDebugEnabled())
+			log.debug("adding as handler " + getBundleInfo(bundle));
 
-    public NamespaceHandler resolve(String namespaceUri) {
-        synchronized (plugins) {
-            for (Iterator i = plugins.values().iterator(); i.hasNext();) {
-                try {
-                    NamespaceHandler handler = ((Plugin) i.next()).resolve(namespaceUri);
-                    if (handler != null) {
-                        return handler;
-                    }
-                } catch (IllegalArgumentException e) {
-                    // This is thrown when the DefaultNamespaceHandlerResolver is unable to resolve the namespace
-                }
-            }
-            return null;
-        }
-    }
+		// noinspection unchecked
+		plugins.put(bundle, new Plugin(bundle));
+	}
 
+	/**
+	 * Returns true if a handler mapping was found for the given bundle
+	 * @param bundle
+	 * @return
+	 */
+	public boolean removeHandler(Bundle bundle) {
+		if (log.isDebugEnabled())
+			log.debug("removing handler " + getBundleInfo(bundle));
 
-    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-        synchronized (plugins) {
-            for (Iterator i = plugins.values().iterator(); i.hasNext();) {
-                InputSource is = null;
-                try {
-                    is = ((Plugin) i.next()).resolveEntity(publicId, systemId);
-                } catch (FileNotFoundException e) {
-                    // ignore
-                }
-                if (is != null) {
-                    return is;
-                }
-            }
-            return null;
-        }
-    }
+		return (plugins.remove(bundle) != null);
+	}
 
+	public NamespaceHandler resolve(String namespaceUri) {
+		boolean debug = log.isDebugEnabled();
 
-    private static class Plugin implements NamespaceHandlerResolver, EntityResolver {
-        private final NamespaceHandlerResolver namespace;
-        private final EntityResolver entity;
+		if (debug)
+			log.debug("trying to resolving namespace handler for " + namespaceUri);
 
+		for (Iterator i = plugins.values().iterator(); i.hasNext();) {
+			Plugin plugin = (Plugin) i.next();
+			try {
+				NamespaceHandler handler = plugin.resolve(namespaceUri);
+				if (handler != null) {
+					if (debug)
+						log.debug("namespace handler for " + namespaceUri + " found inside "
+								+ getBundleInfo(plugin.getBundle()));
+					return handler;
+				}
+			}
+			catch (IllegalArgumentException ex) {
+				if (debug)
+					log.debug("namespace handler for " + namespaceUri + " not found inside "
+							+ getBundleInfo(plugin.getBundle()));
 
-        private Plugin(ClassLoader loader) {
-            entity = new PluggableSchemaResolver(loader);
-            namespace = new DefaultNamespaceHandlerResolver(loader);
+			}
+		}
+		return null;
+	}
 
-        }
+	public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+		boolean debug = log.isDebugEnabled();
 
+		if (debug)
+			log.debug("trying to resolving entity for " + publicId + "|" + systemId);
 
-        public NamespaceHandler resolve(String namespaceUri) {
-            return namespace.resolve(namespaceUri);
-        }
+		if (systemId != null) {
+			for (Iterator i = plugins.values().iterator(); i.hasNext();) {
+				InputSource is = null;
+				Plugin plugin = (Plugin) i.next();
+				try {
+					is = plugin.resolveEntity(publicId, systemId);
+					if (is != null) {
+						if (debug)
+							log.debug("namespace handler for " + publicId + "|" + systemId + " found inside "
+									+ getBundleInfo(plugin.getBundle()));
+						return is;
+					}
 
+				}
+				catch (FileNotFoundException ex) {
+					if (debug)
+						log.debug("namespace handler for " + publicId + "|" + systemId + " not found inside "
+								+ getBundleInfo(plugin.getBundle()));
+				}
+			}
+		}
+		return null;
+	}
 
-        public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-            return entity.resolveEntity(publicId, systemId);
-        }
-    }
+	private static class Plugin implements NamespaceHandlerResolver, EntityResolver {
+		private final NamespaceHandlerResolver namespace;
+
+		private final EntityResolver entity;
+
+		private final Bundle bundle;
+
+		private Plugin(Bundle bundle) {
+			this.bundle = bundle;
+			ClassLoader loader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
+
+			entity = new DelegatingEntityResolver(loader);
+			namespace = new DefaultNamespaceHandlerResolver(loader);
+		}
+
+		public NamespaceHandler resolve(String namespaceUri) {
+			return namespace.resolve(namespaceUri);
+		}
+
+		public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+			return entity.resolveEntity(publicId, systemId);
+		}
+
+		public Bundle getBundle() {
+			return bundle;
+		}
+	}
 }
