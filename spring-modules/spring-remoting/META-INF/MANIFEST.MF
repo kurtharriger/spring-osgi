@@ -46,6 +46,9 @@ Export-Package: org.springframework.remoting;version=2.1,
    org.springframework.remoting.jaxrpc;version=2.1,
    org.springframework.remoting.jaxrpc.support;version=2.1,
    org.springframework.remoting.rmi;version=2.1,
-   org.springframework.remoting.support;version=2.1
+   org.springframework.remoting.support;version=2.1,
+   org.springframework.ejb.access;version=2.1,
+   org.springframework.ejb.config;version=2.1,
+   org.springframework.ejb.support;version=2.1  
 Bundle-ClassPath: .,
  target/classes/
