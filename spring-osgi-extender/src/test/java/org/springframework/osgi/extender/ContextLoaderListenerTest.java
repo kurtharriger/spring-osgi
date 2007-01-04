@@ -75,7 +75,7 @@ public class ContextLoaderListenerTest extends TestCase {
 		bundleContextControl.verify();
 	}
 	
-	public void testTaskExecutorCreation() throws Exception {
+	public void tstTaskExecutorCreation() throws Exception {
 		MockControl bundleContextControl = MockControl.createNiceControl(BundleContext.class);
 		BundleContext context = (BundleContext) bundleContextControl.getMock();
 		bundleContextControl.expectAndReturn(context.getBundle(), new MockBundle());

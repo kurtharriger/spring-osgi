@@ -18,12 +18,13 @@ package org.springframework.osgi.extender.support;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.context.support.AbstractBundleXmlApplicationContext;
+import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
-
-import junit.framework.TestCase;
 
 public class ApplicationContextCreatorTest extends TestCase {
 
