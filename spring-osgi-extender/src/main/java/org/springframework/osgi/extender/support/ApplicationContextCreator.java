@@ -24,6 +24,7 @@ import org.osgi.framework.BundleContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.context.support.LocalBundleContext;
+import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.OsgiResourceUtils;
 import org.springframework.util.StringUtils;

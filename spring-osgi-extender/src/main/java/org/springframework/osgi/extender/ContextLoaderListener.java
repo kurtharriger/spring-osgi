@@ -34,11 +34,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.support.DefaultOsgiBundleXmlApplicationContextFactory;
+import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.OsgiPlatformDetector;
 import org.springframework.osgi.extender.support.ApplicationContextCloser;
 import org.springframework.osgi.extender.support.ApplicationContextCreator;
-import org.springframework.osgi.extender.support.NamespacePlugins;
 import org.springframework.osgi.io.OsgiBundleResource;
 
 /**
@@ -382,7 +382,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 				else {
 					if (log.isErrorEnabled()) {
 						log.error("Bean 'taskExecutor' in META-INF/spring/extender.xml configuration file " +
-								  "is not an instance of org.springframework.core.task.TaskExecutor. " +
+								  "is not an instance of " + TaskExecutor.class.getName() + ". " +
 								  "Defaulting to SimpleAsyncTaskExecutor.");
 					}					
 				}
