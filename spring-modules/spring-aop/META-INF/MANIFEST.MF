@@ -9,6 +9,7 @@ Bundle-Vendor: Spring Framework
 Import-Package: com.jamonapi;resolution:=optional,
    net.sf.cglib.core;resolution:=optional,
    net.sf.cglib.proxy;resolution:=optional,
+   net.sf.cglib.reflect;resolution:=optional,
    net.sf.cglib.transform.impl;resolution:=optional,
    org.apache.commons.attributes;resolution:=optional,
    org.apache.commons.logging,
