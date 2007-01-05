@@ -659,7 +659,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		return bundleContext;
 	}
 
-	public void waitOnContextCreation(String forBundleWithSymbolicName) {
+	public void waitOnContextCreation(String forBundleWithSymbolicName, long timeout, TimeUnit unit) {
 		// use a barrier to ensure we don't proceed until context is published
 		final CyclicBarrier barrier = new CyclicBarrier(2);
 
@@ -667,13 +667,17 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		waitThread.start();
 
 		try {
-			barrier.await(5L, TimeUnit.SECONDS);
+			barrier.await(timeout, unit);
 		}
-		catch (Throwable timeout) {
+		catch (Throwable e) {
 			throw new RuntimeException("Gave up waiting for application context for '" + forBundleWithSymbolicName
 					+ "' to be created");
 		}
 	}
+
+	public void waitOnContextCreation(String forBundleWithSymbolicName) {
+        waitOnContextCreation(forBundleWithSymbolicName, 5L, TimeUnit.SECONDS);
+    }
 
 	public Bundle findBundleByLocation(String bundleLocation) {
 		Bundle[] bundles = bundleContext.getBundles();

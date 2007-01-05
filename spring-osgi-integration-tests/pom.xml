@@ -82,6 +82,12 @@
             <version>1.1.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>3.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Configuration Admin -->
         <dependency>
             <groupId>org.knopflerfish.bundles</groupId>
