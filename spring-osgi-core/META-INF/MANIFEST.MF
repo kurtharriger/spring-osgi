@@ -35,7 +35,9 @@ Export-Package: org.springframework.osgi.bundle.support;version=1.0.0,
    org.springframework.osgi.config;version=1.0.0,
    org.springframework.osgi.context;version=1.0.0,
    org.springframework.osgi.context.support;version=1.0.0,
-   org.springframework.osgi.service;version=1.0.0
+   org.springframework.osgi.service;version=1.0.0,
+   org.springframework.osgi.service.support;version=1.0.0,
+   org.springframework.osgi.service.support.cardinality;version=1.0.0
 DynamicImport-Package: org.springframework.web.context;version=2.1.0,
    org.springframework.web.context.support;version=2.1.0,
    org.w3c.dom,
