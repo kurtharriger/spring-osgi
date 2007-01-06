@@ -17,6 +17,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/jcl104-over-slf4j.osgi/1.1.0/jcl104-over-slf4j.osgi-1.1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j-full/1.1.0/slf4j-log4j-full-1.1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.13-SNAPSHOT/log4j.osgi-1.2.13-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.1/org.eclipse.osgi-3.2.1.jar" sourcepath="/EQUINOX_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.1/org.eclipse.osgi-3.2.1.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
