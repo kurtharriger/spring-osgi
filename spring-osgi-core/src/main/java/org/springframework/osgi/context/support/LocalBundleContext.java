@@ -28,7 +28,6 @@ import org.osgi.framework.BundleContext;
  * @author Andy Piper
  * @author Costin Leau
  */
-//TODO: why is the setter static? The interceptor/static setup collides.
 public class LocalBundleContext implements MethodInterceptor {
 
 	private final static InheritableThreadLocal contextLocal = new InheritableThreadLocal();
