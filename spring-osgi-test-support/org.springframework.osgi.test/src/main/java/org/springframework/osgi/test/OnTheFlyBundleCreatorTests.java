@@ -196,6 +196,8 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
 
 		// load manifest
 		// add it to the jar
+		if (log.isDebugEnabled())
+			log.debug("adding MANIFEST.MF from location " + getPatternResolver().getResource(getManifestLocation()));
 		JarOutputStream jarStream = new JarOutputStream(outputStream, getManifest());
 
 		Resource[][] resources = resolveResources();
