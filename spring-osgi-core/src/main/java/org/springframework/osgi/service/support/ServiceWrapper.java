@@ -28,14 +28,14 @@ import org.springframework.util.Assert;
  */
 public class ServiceWrapper {
 
-	private final ServiceReference reference;
+	private ServiceReference reference;
 
 	private final long serviceId;
 
 	private final String toString;
 
 	/** this should be determined in OSGi 4.1 directly from the Bundle * */
-	private final BundleContext context;
+	private BundleContext context;
 
 	public ServiceWrapper(ServiceReference ref, BundleContext bundleContext) {
 		Assert.notNull(ref, "not null service reference required");
@@ -49,12 +49,12 @@ public class ServiceWrapper {
 	}
 
 	public boolean isServiceAlive() {
-		return (reference.getBundle() != null);
+		return (reference == null || reference.getBundle() != null);
 	}
 
 	public boolean equals(Object obj) {
 		if (obj instanceof ServiceWrapper) {
-			return (reference == ((ServiceWrapper) obj).reference);
+			return (hashCode() == obj.hashCode());
 		}
 		return false;
 	}
@@ -90,4 +90,8 @@ public class ServiceWrapper {
 		return serviceId;
 	}
 
+	public void cleanup() {
+		this.context = null;
+		this.reference = null;
+	}
 }
