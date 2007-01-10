@@ -21,10 +21,10 @@ import org.aopalliance.aop.Advice;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.NoSuchServiceException;
-import org.springframework.osgi.service.support.cardinality.OsgiSingleCardinalityInterceptor;
+import org.springframework.osgi.service.support.ClassTargetSource;
+import org.springframework.osgi.service.support.cardinality.OsgiSingleServiceInterceptor;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 import org.springframework.util.ClassUtils;
 
@@ -56,30 +56,17 @@ public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
 		ProxyFactory factory = new ProxyFactory();
 		factory.setProxyTargetClass(true);
 		factory.setOptimize(true);
-		factory.setTargetSource(new TargetSource() {
-			public Class getTargetClass() {
-				return clazz;
-			}
-
-			public Object getTarget() throws Exception {
-				return null;
-			}
-
-			public boolean isStatic() {
-				return true;
-			}
-
-			public void releaseTarget(Object arg0) throws Exception {
-			}
-		});
+		factory.setTargetSource(new ClassTargetSource(clazz));
 
 		factory.addAdvice(cardinalityInterceptor);
+		factory.setFrozen(true);
+
 		return factory.getProxy(ProxyFactory.class.getClassLoader());
 	}
 
 	
 	private Advice createCardinalityAdvice(Class clazz, boolean mandatoryEnd) {
-		OsgiSingleCardinalityInterceptor interceptor = new OsgiSingleCardinalityInterceptor(mandatoryEnd);
+		OsgiSingleServiceInterceptor interceptor = new OsgiSingleServiceInterceptor(mandatoryEnd);
 		interceptor.setClass(clazz.getName());
 		interceptor.setContext(getBundleContext());
 		// fast retry
