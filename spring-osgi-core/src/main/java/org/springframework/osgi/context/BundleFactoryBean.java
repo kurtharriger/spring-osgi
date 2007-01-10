@@ -16,6 +16,9 @@
  */
 package org.springframework.osgi.context;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
@@ -28,8 +31,13 @@ import org.osgi.service.startlevel.StartLevel;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.util.Assert;
 
 /**
@@ -44,8 +52,7 @@ import org.springframework.util.Assert;
  * @author Andy Piper
  */
 public class BundleFactoryBean implements FactoryBean, BundleContextAware,
-		SynchronousBundleListener, InitializingBean, DisposableBean
-{
+	SynchronousBundleListener, InitializingBean, DisposableBean {
 	private Resource bundleUrl;
 	private Bundle bundle;
 	private BundleContext bundleContext;
@@ -55,6 +62,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 	private String symbolicName;
 	private static Log log = LogFactory.getLog(BundleFactoryBean.class);
 	private boolean pushBundleAsContextClassLoader = false;
+	private final Latch latch = new Latch();
 
 	public BundleFactoryBean() {
 	}
@@ -63,14 +71,18 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 		return getBundle();
 	}
 
-	public Bundle getBundle() throws Exception {
+	public synchronized Bundle getBundle() throws Exception {
 		Assert.notNull(bundleUrl, "location is required");
 		Assert.notNull(bundleContext, "BundleContext is required");
 
 		if (bundle == null) {
+			if (log.isInfoEnabled()) {
+				log.info("Loading bundle [" + bundleUrl.getURL());
+			}
 			bundle = bundleContext.installBundle(bundleUrl.getURL().toString());
 			classloader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 			bundleContext.addBundleListener(this);
+
 		}
 		// Set the start level
 		updateStartLevel(getStartLevel());
@@ -86,7 +98,6 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 	}
 
 	public void setLocation(Resource url) throws Exception {
-		System.out.println("URL set to:" + url);
 		bundleUrl = url;
 	}
 
@@ -157,31 +168,62 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 			Bundle b = getBundle();
 			if (state == null || state.equalsIgnoreCase("install")) {
 				// default is to install the bundle.
-			} else if (state.equalsIgnoreCase("start")) {
+			}
+			else if (state.equalsIgnoreCase("start")) {
 				// Don't try and start if we are not resolved.
 				// FIXME andyp -- this doesn't work as expected.
 				// if (b.getState() == Bundle.RESOLVED) {
 				b.start();
+				waitForContextCreation(b);
 				// }
-			} else if (state.equalsIgnoreCase("stop")) {
+			}
+			else if (state.equalsIgnoreCase("stop")) {
 				b.stop();
-			} else if (state.equalsIgnoreCase("uninstall")) {
+			}
+			else if (state.equalsIgnoreCase("uninstall")) {
 				b.uninstall();
-			} else if (state.equalsIgnoreCase("update")) {
+			}
+			else if (state.equalsIgnoreCase("update")) {
 				if ((b.getState() & (Bundle.RESOLVED | Bundle.ACTIVE)) != 0) {
 					b.update();
 				}
 			}
-		} catch (BundleException e) {
+		}
+		catch (BundleException e) {
 			// FIXME andyp -- convert to something spring-like
 			log.error(e.getMessage(), e);
 			throw e;
-		} finally {
+		}
+		finally {
 			if (pushBundleAsContextClassLoader) {
 				Thread.currentThread().setContextClassLoader(ccl);
 			}
 		}
 	}
+
+	private void waitForContextCreation(final Bundle b) throws Exception {
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(b);
+		// Wait for the Spring artifacts to be created
+		// We could make this configurable.
+		if (config.isSpringPoweredBundle()) {
+			ServiceReference sref = bundleContext.getServiceReference(ApplicationEventMulticaster.class.getName());
+			ApplicationEventMulticaster ctx = (ApplicationEventMulticaster) bundleContext.getService(sref);
+			Assert.notNull(ctx);
+			ctx.addApplicationListener(new ApplicationListener() {
+				public void onApplicationEvent(ApplicationEvent event) {
+					SpringBundleEvent ev = (SpringBundleEvent) event;
+					if (((Bundle) ev.getSource()).getBundleId() == b.getBundleId()) {
+						if (ev.getType() == BundleEvent.STARTED
+							|| ev.getType() == BundleEvent.STOPPED) {
+							latch.decr();
+						}
+					}
+				}
+			});
+			latch.await();
+		}
+	}
+
 
 	private void updateStartLevel(int level) {
 		if (level == 0 || bundle == null) return;
@@ -202,6 +244,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 		if (event.getBundle().getBundleId() == bundle.getBundleId()) {
 			switch (event.getType()) {
 				case BundleEvent.UNINSTALLED:
+					latch.reset();
 					bundle = null;
 					classloader = null;
 					bundleContext.removeBundleListener(this);
@@ -228,6 +271,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 		if (bundle != null) {
 			// System.out.println("destroy(" + bundle + ")");
 			bundle.uninstall();
+			latch.reset();
 			bundle = null;
 			classloader = null;
 			bundleContext.removeBundleListener(this);
@@ -242,4 +286,37 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 		this.classloader = classloader;
 	}
 
+	private class Latch {
+		private int count = 1;
+
+		synchronized void await() throws Exception {
+			while (count > 0) {
+				wait();
+			}
+		}
+
+		synchronized void decr() {
+			count--;
+			notifyAll();
+		}
+
+		synchronized void reset() {
+			count = 1;
+		}
+	}
+
+	/*
+	public static void dumpStacks() {
+		Map stacks = Thread.getAllStackTraces();
+		for (Iterator i = stacks.entrySet().iterator(); i.hasNext();) {
+			Map.Entry e = (Map.Entry) i.next();
+			System.out.println("");
+			System.out.println(e.getKey());
+			StackTraceElement[] se = (StackTraceElement[]) e.getValue();
+			for (int j = 0; j < se.length; j++) {
+				System.out.println(" " + se[j]);
+			}
+		}
+	}
+	*/
 }
