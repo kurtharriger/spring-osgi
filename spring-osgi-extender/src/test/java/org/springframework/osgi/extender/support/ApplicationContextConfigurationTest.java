@@ -19,7 +19,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import junit.framework.TestCase;
-import org.springframework.osgi.context.support.ApplicationContextConfiguration;
+//import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 
 
 /**
