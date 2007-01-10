@@ -59,6 +59,11 @@ public class ContextLoaderListenerTest extends TestCase {
 		context.registerService((String[])null, null, null);
 		bundleContextControl.setMatcher(MockControl.ALWAYS_MATCHER);
 		bundleContextControl.setReturnValue(null);
+
+		// register context service
+		context.registerService((String[])null, null, null);
+		bundleContextControl.setMatcher(MockControl.ALWAYS_MATCHER);
+		bundleContextControl.setReturnValue(null);
 		
 		// create task executor
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);

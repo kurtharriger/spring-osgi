@@ -20,13 +20,16 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleEvent;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.osgi.context.support.SpringBundleEvent;
 
 /**
  * Closes an application context created by the extender bundle.
  * The context may be fully initialized, or may still be in the process
  * of initializing (for example, waiting on service dependencies).
- * 
+ *
  * @author Adrian Colyer
  */
 public class ApplicationContextCloser implements Runnable {
@@ -36,20 +39,24 @@ public class ApplicationContextCloser implements Runnable {
 	private final Bundle bundle;
 	private final Map applicationContextMap;
 	private final Map contextsPendingInitializationMap;
+	private final ApplicationEventMulticaster mcast;
 
-	public ApplicationContextCloser(Bundle bundle, Map contextMap, Map initMap) {
+	public ApplicationContextCloser(Bundle bundle, Map contextMap,
+	                                Map initMap, ApplicationEventMulticaster mcast) {
 		this.bundle = bundle;
 		this.applicationContextMap = contextMap;
 		this.contextsPendingInitializationMap = initMap;
+		this.mcast = mcast;
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 */
+		  * @see java.lang.Runnable#run()
+		  */
 	public void run() {
 		ConfigurableApplicationContext appContext;
 		Long bundleKey = Long.valueOf(this.bundle.getBundleId());
-		
+
+		postEvent(BundleEvent.STOPPING);
 		// do not change locking order without also changing ApplicationContextCreator
 		synchronized (this.applicationContextMap) {
 			synchronized (this.contextsPendingInitializationMap) {
@@ -61,14 +68,18 @@ public class ApplicationContextCloser implements Runnable {
 				}
 			}
 		}
-		
+
 		if (appContext != null) {
 			if (log.isInfoEnabled()) {
-				log.info("Closing application context for bundle [" + 
-						bundle.getSymbolicName() + "]");
+				log.info("Closing application context for bundle [" +
+					bundle.getSymbolicName() + "]");
 			}
 			appContext.close();
 		}
+		postEvent(BundleEvent.STOPPED);
 	}
 
+	private void postEvent(int starting) {
+		mcast.multicastEvent(new SpringBundleEvent(starting, bundle));
+	}
 }

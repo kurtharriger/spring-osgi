@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -670,7 +671,8 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			barrier.await(timeout, unit);
 		}
 		catch (Throwable e) {
-			throw new RuntimeException("Gave up waiting for application context for '" + forBundleWithSymbolicName
+            // dumpStacks();
+            throw new RuntimeException("Gave up waiting for application context for '" + forBundleWithSymbolicName
 					+ "' to be created");
 		}
 	}
@@ -698,7 +700,20 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		}
 		return null;
 	}
-
+/*
+	public void dumpStacks() {
+		Map stacks = Thread.getAllStackTraces();
+		for (Iterator i = stacks.entrySet().iterator(); i.hasNext();) {
+			Map.Entry e = (Map.Entry)i.next();
+			System.out.println("");
+			System.out.println(e.getKey());
+			StackTraceElement[] se = (StackTraceElement[])e.getValue();
+			for (int j=0; j<se.length; j++) {
+				System.out.println(" " + se[j]);
+			}
+		}
+	}
+*/
 	private static class ApplicationContextWaiter implements Runnable, ServiceListener {
 
 		private final String symbolicName;

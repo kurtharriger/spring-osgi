@@ -38,7 +38,7 @@
 	<!-- Note that this is not a real bundle - we are creating it on the fly from a regular jar -->
 	<osgi:virtual-bundle id="weatherServiceBundle" depends-on="weatherDaoBundle"
 	                     location="file:${localRepository}/org/springframework/osgi/samples/weather-service/${pom.version}/weather-service-1.0-SNAPSHOT.jar"
-	                     state="start" version="1.0" group-id="org.springframework.osgi.samples.weather" artifact-id="weather-service">
+	                     state="start" version="1.0" group-id="org.springframework.osgi.samples.weather" artifact-id="service">
 		<osgi:imports>
 			<osgi:package name="org.springframework.osgi.samples.weather.dao" version="0.0"/>
 			<osgi:package name="org.springframework.osgi.config"/>

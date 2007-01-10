@@ -18,6 +18,7 @@
 package org.springframework.osgi.context.support;
 
 import org.osgi.framework.BundleContext;
+import org.springframework.beans.BeansException;
 
 /**
  * Application context backed by an OSGi bundle. Will use the bundle classpath
@@ -50,17 +51,21 @@ public class OsgiBundleXmlApplicationContext extends AbstractBundleXmlApplicatio
 	}
 
 	public OsgiBundleXmlApplicationContext(BundleContext aBundleContext, String[] configLocations,
-			OsgiBundleNamespaceHandlerAndEntityResolver resolver) {
+	                                       OsgiBundleNamespaceHandlerAndEntityResolver resolver) {
 		this(aBundleContext, configLocations, BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundleContext.getBundle()), resolver);
 	}
 
 	public OsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations, ClassLoader classLoader,
-			OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
+	                                       OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
 		super(context, configLocations, classLoader, namespaceResolver);
-		publishContextAsOsgiService();
 		// don't refresh in constructor as refresh may take a long time when waiting for
 		// service dependencies, and we want to return the "in-progress" context object so we can
 		// stop the bundle at any point...
-		//refresh();
+	}
+
+	public void refresh() throws BeansException {
+		super.refresh();
+		// Only publish the context once the beans are created.
+		publishContextAsOsgiService();
 	}
 }

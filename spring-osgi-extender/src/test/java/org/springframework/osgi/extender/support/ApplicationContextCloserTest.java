@@ -18,52 +18,78 @@ package org.springframework.osgi.extender.support;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.easymock.MockControl;
-import org.springframework.osgi.mock.MockBundle;
-import org.springframework.context.ConfigurableApplicationContext;
-
 import junit.framework.TestCase;
+import org.easymock.MockControl;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
+import org.springframework.osgi.mock.MockBundle;
+import org.springframework.osgi.context.support.SpringBundleEvent;
 
 /**
  * @author Adrian Colyer
- *
  */
 public class ApplicationContextCloserTest extends TestCase {
 
 	private ApplicationContextCloser closer;
 	private Map initMap;
 	private Map contextMap;
-	
+	private final ApplicationEventMulticaster mcast = new SimpleApplicationEventMulticaster();
+	private final Bundle bundle = new MockBundle();
+
 	protected void setUp() throws Exception {
 		this.contextMap = new HashMap();
 		this.initMap = new HashMap();
-		this.closer = new ApplicationContextCloser(new MockBundle(),contextMap,initMap);
+		this.closer = new ApplicationContextCloser(bundle, contextMap, initMap, mcast);
 		super.setUp();
 	}
-	
+
 	public void testCloseWithNoContexts() {
 		this.closer.run();
 		// nothing we can really verify :(
 	}
-	
+
 	public void testCloseWithFullContext() {
 		MockControl control = MockControl.createControl(ConfigurableApplicationContext.class);
 		ConfigurableApplicationContext mockContext = (ConfigurableApplicationContext) control.getMock();
 		mockContext.close();
 		control.replay();
-		this.contextMap.put(new Long(0),mockContext);
+		this.contextMap.put(new Long(0), mockContext);
 		this.closer.run();
 		control.verify();
 	}
-	
+
 	public void testCloseWithInitializingContext() {
 		MockControl control = MockControl.createControl(ConfigurableApplicationContext.class);
 		ConfigurableApplicationContext mockContext = (ConfigurableApplicationContext) control.getMock();
 		mockContext.close();
 		control.replay();
-		this.initMap.put(new Long(0),mockContext);
+		this.initMap.put(new Long(0), mockContext);
 		this.closer.run();
-		control.verify();		
+		control.verify();
 	}
-	
+
+	public void testCloseEvent() {
+		MockControl control = MockControl.createControl(ConfigurableApplicationContext.class);
+		ConfigurableApplicationContext mockContext = (ConfigurableApplicationContext) control.getMock();
+		mockContext.close();
+		MockControl mockListener = MockControl.createControl(ApplicationListener.class);
+		ApplicationListener listener = (ApplicationListener) mockListener.getMock();
+		mcast.addApplicationListener(listener);
+
+		control.replay();
+		listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STOPPING, bundle));
+		listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STOPPED, bundle));
+		mockListener.replay();
+
+		this.initMap.put(new Long(0), mockContext);
+		this.closer.run();
+		control.verify();
+		mockListener.verify();
+		mcast.removeAllListeners();
+	}
+
 }
