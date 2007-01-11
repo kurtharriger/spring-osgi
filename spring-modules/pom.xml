@@ -13,7 +13,7 @@
   <version>2.1-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   <properties>
-    <base.spring.version>2.0.1</base.spring.version>
+    <base.spring.version>2.0.2</base.spring.version>
   </properties>
   <modules>
     <module>spring-aop</module>
