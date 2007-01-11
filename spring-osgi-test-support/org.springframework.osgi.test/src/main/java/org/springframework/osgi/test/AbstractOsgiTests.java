@@ -700,7 +700,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		}
 		return null;
 	}
-/*
+   /*
 	public void dumpStacks() {
 		Map stacks = Thread.getAllStackTraces();
 		for (Iterator i = stacks.entrySet().iterator(); i.hasNext();) {
@@ -713,7 +713,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			}
 		}
 	}
-*/
+   */
 	private static class ApplicationContextWaiter implements Runnable, ServiceListener {
 
 		private final String symbolicName;
@@ -746,12 +746,12 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		public void serviceChanged(ServiceEvent event) {
 			if (event.getType() == ServiceEvent.REGISTERED) {
 				// our wait is over...
-				this.context.removeServiceListener(this);
 				returnControl();
 			}
 		}
 
 		private void returnControl() {
+			this.context.removeServiceListener(this);
 			try {
 				this.barrier.await();
 			}
