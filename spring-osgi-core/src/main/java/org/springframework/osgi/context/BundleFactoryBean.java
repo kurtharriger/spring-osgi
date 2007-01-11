@@ -35,7 +35,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
-//import org.springframework.osgi.context.support.ApplicationContextConfiguration;
+import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.util.Assert;
@@ -202,11 +202,10 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 	}
 
 	private void waitForContextCreation(final Bundle b) throws Exception {
-		//ApplicationContextConfiguration config = new ApplicationContextConfiguration(b);
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(b);
 		// Wait for the Spring artifacts to be created
 		// We could make this configurable.
-		//if (config.isSpringPoweredBundle()) {
-		if (true) {
+		if (config.isSpringPoweredBundle()) {
 			ServiceReference sref = bundleContext.getServiceReference(ApplicationEventMulticaster.class.getName());
 			ApplicationEventMulticaster ctx = (ApplicationEventMulticaster) bundleContext.getService(sref);
 			Assert.notNull(ctx);

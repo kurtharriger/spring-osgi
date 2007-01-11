@@ -24,13 +24,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ApplicationEventMulticaster;
-//import org.springframework.osgi.context.support.ApplicationContextConfiguration;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.context.support.LocalBundleContext;
-import org.springframework.osgi.context.support.NamespacePlugins;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
-import org.springframework.osgi.context.support.OsgiResourceUtils;
-import org.springframework.osgi.context.support.SpringBundleEvent;
+import org.springframework.osgi.context.support.*;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
