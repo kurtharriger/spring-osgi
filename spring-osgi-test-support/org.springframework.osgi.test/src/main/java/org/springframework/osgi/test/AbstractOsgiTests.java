@@ -158,13 +158,10 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 * @return the String representing the URL location of this bundle
 	 */
 	protected String localMavenBundle(String groupId, String artifact, String version) {
-		// Check to see if the user has overridden the default maven home
-		String m2_home = System.getenv("M2_HOME");
-		if (m2_home == null || m2_home.length() == 0 || !new File(new File(m2_home), ".m2/repository").exists()) {
-			m2_home = System.getProperty("user.home");
-		}
-		File repositoryHome = new File(new File(m2_home), ".m2/repository");
-		String location = groupId.replace('.', '/');
+        String defaultHome = new File(new File(System.getProperty("user.home")), ".m2/repository").getAbsolutePath();
+        File repositoryHome = new File(System.getProperty("localRepository", defaultHome));
+        
+        String location = groupId.replace('.', '/');
 		location += '/';
 		location += artifact;
 		location += '/';
