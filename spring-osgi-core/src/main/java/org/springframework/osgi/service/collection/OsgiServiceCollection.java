@@ -190,7 +190,8 @@ public class OsgiServiceCollection extends AbstractCollection {
 		}
 		
 		factory.addAdvice(new OsgiServiceStaticInterceptor(new ServiceWrapper(ref, context)));
-		factory.setOptimize(true);
+		// TODO: why not add these?
+		//factory.setOptimize(true);
 		//factory.setFrozen(true);
 		
 		return factory.getProxy(BundleDelegatingClassLoader.createBundleClassLoaderFor(ref.getBundle(), ProxyFactory.class.getClassLoader()));
