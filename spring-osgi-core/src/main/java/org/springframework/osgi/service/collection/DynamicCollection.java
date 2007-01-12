@@ -32,10 +32,10 @@ import java.util.NoSuchElementException;
  */
 public class DynamicCollection extends AbstractCollection {
 
-	private class DynamicIterator implements Iterator {
-		int cursor = 0;
+	protected class DynamicIterator implements Iterator {
+		protected int cursor = 0;
 
-		private boolean removalAllowed = false;
+		protected boolean removalAllowed = false;
 
 		public int getCursor() {
 			return cursor;
@@ -59,6 +59,10 @@ public class DynamicCollection extends AbstractCollection {
 			if (removalAllowed && (cursor > 0) && ((cursor - 1) < storage.size())) {
 				removalAllowed = false;
 				Object obj = storage.get(cursor - 1);
+
+				// FIXME: this fails if the object is added twice to the
+				// collection since the first occurance will be deleted no
+				// matter if the index points to another one.
 				DynamicCollection.this.remove(obj);
 			}
 			else
@@ -68,10 +72,10 @@ public class DynamicCollection extends AbstractCollection {
 	}
 
 	/** actual collection storage * */
-	private final List storage;
+	protected final List storage;
 
 	/** list of weak references to the actual iterators * */
-	private final List iterators;
+	protected final List iterators;
 
 	public DynamicCollection() {
 		this(16);
@@ -100,20 +104,20 @@ public class DynamicCollection extends AbstractCollection {
 		return storage.size();
 	}
 
-	public boolean add(Object arg0) {
-		return storage.add(arg0);
+	public boolean add(Object o) {
+		return storage.add(o);
 	}
 
-	public boolean addAll(Collection arg0) {
-		return storage.addAll(arg0);
+	public boolean addAll(Collection c) {
+		return storage.addAll(c);
 	}
 
 	public boolean contains(Object o) {
 		return storage.contains(o);
 	}
 
-	public boolean containsAll(Collection arg0) {
-		return storage.containsAll(arg0);
+	public boolean containsAll(Collection c) {
+		return storage.containsAll(c);
 	}
 
 	public boolean isEmpty() {
@@ -128,16 +132,19 @@ public class DynamicCollection extends AbstractCollection {
 				// update iterators
 				int i = 0;
 				do {
-					WeakReference ref = (WeakReference) iterators.get(i);
-					DynamicIterator iter = (DynamicIterator) ref.get();
-					if (iter == null) {
-						iterators.remove(i);
-					}
-					else {
-						// back the cursor
-						if (pos < iter.cursor)
-							iter.cursor--;
-						i++;
+					if (!iterators.isEmpty()) {
+						WeakReference ref = (WeakReference) iterators.get(i);
+						DynamicIterator iter = (DynamicIterator) ref.get();
+						// clean reference
+						if (iter == null) {
+							iterators.remove(i);
+						}
+						else {
+							// back the cursor
+							if (pos < iter.cursor)
+								iter.cursor--;
+							i++;
+						}
 					}
 				} while (i < iterators.size());
 				return true;
@@ -150,8 +157,8 @@ public class DynamicCollection extends AbstractCollection {
 		return storage.toArray();
 	}
 
-	public Object[] toArray(Object[] arg0) {
-		return storage.toArray(arg0);
+	public Object[] toArray(Object[] array) {
+		return storage.toArray(array);
 	}
 
 	public String toString() {
