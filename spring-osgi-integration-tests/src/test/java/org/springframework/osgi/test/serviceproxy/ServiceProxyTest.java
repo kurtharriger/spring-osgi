@@ -24,7 +24,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.NoSuchServiceException;
 import org.springframework.osgi.service.support.ClassTargetSource;
-import org.springframework.osgi.service.support.cardinality.OsgiSingleServiceInterceptor;
+import org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 import org.springframework.util.ClassUtils;
 
@@ -65,10 +65,10 @@ public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
 	}
 
 	
-	private Advice createCardinalityAdvice(Class clazz, boolean mandatoryEnd) {
-		OsgiSingleServiceInterceptor interceptor = new OsgiSingleServiceInterceptor(mandatoryEnd);
+	private Advice createCardinalityAdvice(Class clazz) {
+		OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor();
 		interceptor.setClass(clazz.getName());
-		interceptor.setContext(getBundleContext());
+		interceptor.setBundleContext(getBundleContext());
 		// fast retry
 		interceptor.getRetryTemplate().setWaitTime(1);
 		return interceptor;
@@ -82,7 +82,7 @@ public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
 		assertTrue(ClassUtils.isPresent("net.sf.cglib.proxy.Enhancer"));
 	}
 
-	public void testMandatoryEndProxy() throws Exception {
+	public void testDynamicEndProxy() throws Exception {
 		long time = 123456;
 		Date date = new Date(time);
 		ServiceRegistration reg = publishService(date);
@@ -91,7 +91,7 @@ public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
 		try {
 			ServiceReference ref = ctx.getServiceReference(Date.class.getName());
 			assertNotNull(ref);
-			Date proxy = (Date) createProxy(Date.class, createCardinalityAdvice(Date.class, true));
+			Date proxy = (Date) createProxy(Date.class, createCardinalityAdvice(Date.class));
 			assertEquals(time, proxy.getTime());
 			// take down service
 			reg.unregister();
@@ -104,46 +104,6 @@ public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
 			}
 			catch (NoSuchServiceException nsse) {
 				// service failed
-			}
-
-			// rebind the service
-			reg = publishService(date);
-			// retest the service
-			assertEquals(time, proxy.getTime());
-		}
-		finally {
-			if (reg != null)
-				try {
-					reg.unregister();
-				}
-				catch (Exception ex) {
-					// ignore
-				}
-		}
-	}
-
-	public void testOptionalEndProxy() throws Exception {
-		long time = 123456;
-		Date date = new Date(time);
-		ServiceRegistration reg = publishService(date);
-		BundleContext ctx = getBundleContext();
-
-		try {
-			ServiceReference ref = ctx.getServiceReference(Date.class.getName());
-			assertNotNull(ref);
-			Date proxy = (Date) createProxy(Date.class, createCardinalityAdvice(Date.class, false));
-			assertEquals(time, proxy.getTime());
-			// take down service
-			reg.unregister();
-			// reference is invalid
-			assertNull(ref.getBundle());
-
-			try {
-				// will return default value
-				assertEquals(0, proxy.getTime());
-			}
-			catch (NoSuchServiceException nsse) {
-				fail("should have returned null and not throw an exception");
 			}
 
 			// rebind the service
