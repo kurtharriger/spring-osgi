@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context.support.collections;
+package org.springframework.osgi.service.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
-
-import org.springframework.osgi.service.collection.DynamicCollection;
 
 public class DynamicCollectionTest extends TestCase {
 
