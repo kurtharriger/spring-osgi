@@ -21,7 +21,7 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.service.support.collection.DynamicCollection;
+import org.springframework.osgi.service.collection.DynamicCollection;
 
 public class DynamicCollectionTest extends TestCase {
 
