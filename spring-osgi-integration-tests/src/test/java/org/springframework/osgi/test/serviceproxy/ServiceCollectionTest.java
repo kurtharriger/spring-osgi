@@ -21,7 +21,7 @@ import java.util.Iterator;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.support.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 
 /**
@@ -90,7 +90,6 @@ public class ServiceCollectionTest extends ConfigurableBundleCreatorTests {
 			}
 			Object myService = iter.next();
 			// be sure to use classes loaded by the same CL
-			System.out.println(myService);
 			assertTrue(myService instanceof Date);
 			assertEquals(time, ((Date) myService).getTime());
 		}
