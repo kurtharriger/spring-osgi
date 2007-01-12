@@ -20,6 +20,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
@@ -30,7 +31,8 @@ import org.osgi.framework.ServiceRegistration;
 public class MockServiceReference implements ServiceReference {
 
 	private Bundle bundle;
-//	private ServiceRegistration registration;
+
+	// private ServiceRegistration registration;
 	private Dictionary properties;
 
 	public MockServiceReference() {
@@ -47,8 +49,21 @@ public class MockServiceReference implements ServiceReference {
 
 	public MockServiceReference(Bundle bundle, Dictionary properties, ServiceRegistration registration) {
 		this.bundle = (bundle == null ? new MockBundle() : bundle);
-//		this.registration = (registration == null ? new MockServiceRegistration() : registration);
+		// this.registration = (registration == null ? new
+		// MockServiceRegistration() :
+		// registration);
 		this.properties = (properties == null ? new Hashtable() : properties);
+		addMandatoryProperties(this.properties);
+	}
+
+	private void addMandatoryProperties(Dictionary dict) {
+		// add mandatory properties
+		if (dict.get(Constants.SERVICE_ID) == null)
+			dict.put(Constants.SERVICE_ID, new Long(System.currentTimeMillis()));
+
+		if (dict.get(Constants.OBJECTCLASS) == null)
+			dict.put(Constants.OBJECTCLASS, new String[] { Object.class.getName() });
+
 	}
 
 	/*
@@ -98,7 +113,7 @@ public class MockServiceReference implements ServiceReference {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.osgi.framework.ServiceReference#isAssignableTo(org.osgi.framework.Bundle,
-	 *      java.lang.String)
+	 * java.lang.String)
 	 */
 	public boolean isAssignableTo(Bundle bundle, String className) {
 		return false;
@@ -114,7 +129,12 @@ public class MockServiceReference implements ServiceReference {
 		 * props.get(key)); }
 		 */
 
-		if (properties != null)
+		if (properties != null) {
+			// copy mandatory properties
+			properties.put(Constants.SERVICE_ID, this.properties.get(Constants.SERVICE_ID));
+			properties.put(Constants.OBJECTCLASS, this.properties.get(Constants.OBJECTCLASS));
+			
 			this.properties = properties;
+		}
 	}
 }
