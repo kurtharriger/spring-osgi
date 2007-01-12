@@ -35,7 +35,7 @@ import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.support.ClassTargetSource;
 import org.springframework.osgi.service.support.ServiceWrapper;
-import org.springframework.osgi.service.support.cardinality.OsgiServiceProxyInterceptor;
+import org.springframework.osgi.service.support.cardinality.OsgiServiceStaticInterceptor;
 
 /**
  * Dynamic collection - allows iterating while being shrunk/expanded. It is
@@ -74,8 +74,7 @@ public class OsgiServiceCollection extends AbstractCollection {
 				break;
 			case (ServiceEvent.MODIFIED):
 				// same as ServiceEvent.REGISTERED
-
-				synchronized (serviceReferences) {
+			synchronized (serviceReferences) {
 					if (!serviceReferences.containsKey(serviceId)) {
 						serviceReferences.put(serviceId, createServiceProxy(ref));
 						serviceIDs.add(serviceId);
@@ -101,10 +100,10 @@ public class OsgiServiceCollection extends AbstractCollection {
 	// map of services
 	// the service id is used for lookup while the service wrapper is used for
 	// values
-	private final Map serviceReferences = Collections.synchronizedMap(CollectionFactory.createLinkedMapIfPossible(8));
+	protected final Map serviceReferences = Collections.synchronizedMap(CollectionFactory.createLinkedMapIfPossible(8));
 
 	/** list binding the service IDs to the map of service proxies * */
-	private final Collection serviceIDs = new DynamicCollection();
+	protected final Collection serviceIDs = new DynamicCollection();
 
 	private final String clazz;
 
@@ -190,8 +189,8 @@ public class OsgiServiceCollection extends AbstractCollection {
 			factory.setTargetSource(new ClassTargetSource(proxyClass));
 		}
 		
-		factory.addAdvice(new OsgiServiceProxyInterceptor(new ServiceWrapper(ref, context)));
-		//factory.setOptimize(true);
+		factory.addAdvice(new OsgiServiceStaticInterceptor(new ServiceWrapper(ref, context)));
+		factory.setOptimize(true);
 		//factory.setFrozen(true);
 		
 		return factory.getProxy(BundleDelegatingClassLoader.createBundleClassLoaderFor(ref.getBundle(), ProxyFactory.class.getClassLoader()));
