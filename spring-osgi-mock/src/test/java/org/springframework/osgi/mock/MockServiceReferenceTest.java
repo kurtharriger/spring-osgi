@@ -15,12 +15,14 @@
  */
 package org.springframework.osgi.mock;
 
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
 import junit.framework.TestCase;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Constants;
 
 /**
  * @author Costin Leau
@@ -125,5 +127,31 @@ public class MockServiceReferenceTest extends TestCase {
 		mock.setProperties(props);
 		assertSame(value, mock.getProperty(key));
 	}
-	
+
+	public void testMandatoryProperties() {
+		Object serviceId = mock.getProperty(Constants.SERVICE_ID);
+		assertNotNull(serviceId);
+		assertTrue(serviceId instanceof Long);
+		Object objectClass = mock.getProperty(Constants.OBJECTCLASS);
+		assertNotNull(objectClass);
+		assertTrue(objectClass instanceof String[]);
+	}
+
+	public void testMandatoryPropertiesDontChange() {
+		Object serviceId = mock.getProperty(Constants.SERVICE_ID);
+		Object objectClass = mock.getProperty(Constants.OBJECTCLASS);
+
+		mock.setProperties(new Hashtable());
+		assertSame(serviceId, mock.getProperty(Constants.SERVICE_ID));
+		assertSame(objectClass, mock.getProperty(Constants.OBJECTCLASS));
+
+		Dictionary anotherDict = new Hashtable();
+		anotherDict.put(Constants.SERVICE_ID, new Long(1234));
+		anotherDict.put(Constants.OBJECTCLASS, new String[] { Date.class.getName() });
+		mock.setProperties(anotherDict);
+
+		assertSame(serviceId, mock.getProperty(Constants.SERVICE_ID));
+		assertSame(objectClass, mock.getProperty(Constants.OBJECTCLASS));
+	}
+
 }
