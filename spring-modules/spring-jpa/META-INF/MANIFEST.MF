@@ -36,11 +36,11 @@ Import-Package: javax.persistence,
    org.springframework.transaction.support;version=2.1,
    org.springframework.util;version=2.1,
    org.springframework.util.xml;version=2.1,
-   org.springframework.web.context;version=2.1,
-   org.springframework.web.context.support;version=2.1,
-   org.springframework.web.filter;version=2.1,
-   org.springframework.web.portlet.handler;version=2.1,
-   org.springframework.web.servlet.handler;version=2.1
+   org.springframework.web.context;version=2.1;resolution:=optional,
+   org.springframework.web.context.support;version=2.1;resolution:=optional,
+   org.springframework.web.filter;version=2.1;resolution:=optional,
+   org.springframework.web.portlet.handler;version=2.1;resolution:=optional,
+   org.springframework.web.servlet.handler;version=2.1;resolution:=optional
 Export-Package: org.springframework.orm.jpa;version=2.1,
    org.springframework.orm.jpa.support;version=2.1,
    org.springframework.orm.jpa.vendor;version=2.1
