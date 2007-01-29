@@ -1,6 +1,7 @@
 Bundle-Name: Spring-Extender
 Bundle-SymbolicName: org.springframework.osgi.extender
 Bundle-Version: 1.0
+Bundle-ManifestVersion: 2
 Bundle-Vendor: Spring Framework
 Bundle-Activator: org.springframework.osgi.extender.ContextLoaderListener
 Import-Package: org.apache.commons.logging,
