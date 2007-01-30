@@ -140,11 +140,26 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 * @return the String representing the URL location of this bundle
 	 */
 	protected String localMavenArtifact(String groupId, String artifactId, String version) {
+		return localMavenArtifact(groupId, artifactId, version, "jar");
+	}
+
+	/**
+	 * Find a local maven artifact. First tries to find the resource as a
+	 * packaged artifact produced by a local maven build, and if that fails will
+	 * search the local maven repository.
+	 *
+	 * @param groupId - the groupId of the organization supplying the bundle
+	 * @param artifactId - the artifact id of the bundle
+	 * @param version - the version of the bundle
+     * @param type - the extension type of the artifact
+	 * @return the String representing the URL location of this bundle
+	 */
+	protected String localMavenArtifact(String groupId, String artifactId, String version, String type) {
 		try {
-			return localMavenBuildArtifact(artifactId, version);
+			return localMavenBuildArtifact(artifactId, version, type);
 		}
 		catch (IllegalStateException illStateEx) {
-			return localMavenBundle(groupId, artifactId, version);
+			return localMavenBundle(groupId, artifactId, version, type);
 		}
 	}
 
@@ -157,7 +172,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 * @param version - the version of the bundle
 	 * @return the String representing the URL location of this bundle
 	 */
-	protected String localMavenBundle(String groupId, String artifact, String version) {
+	protected String localMavenBundle(String groupId, String artifact, String version, String type) {
         String defaultHome = new File(new File(System.getProperty("user.home")), ".m2/repository").getAbsolutePath();
         File repositoryHome = new File(System.getProperty("localRepository", defaultHome));
         
@@ -170,8 +185,9 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		location += artifact;
 		location += '-';
 		location += version;
-		location += ".jar";
-		return "file:" + new File(repositoryHome, location).getAbsolutePath();
+		location += ".";
+        location += type;
+        return "file:" + new File(repositoryHome, location).getAbsolutePath();
 	}
 
 	/**
@@ -180,11 +196,12 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	 * 
 	 * @param artifactId
 	 * @param version
+     * @param type
 	 * @return a String representing the URL location of this bundle
 	 */
-	protected String localMavenBuildArtifact(String artifactId, String version) {
+	protected String localMavenBuildArtifact(String artifactId, String version, String type) {
 		try {
-			File found = new MavenPackagedArtifactFinder(artifactId, version).findPackagedArtifact(new File("."));
+			File found = new MavenPackagedArtifactFinder(artifactId, version, type).findPackagedArtifact(new File("."));
 			String path = found.toURL().toExternalForm();
 			if (log.isDebugEnabled()) {
 				log.debug("found local maven artifact " + path + " for " + artifactId + "|" + version);
@@ -192,7 +209,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			return path;
 		}
 		catch (IOException ioEx) {
-			throw new IllegalStateException("Artifact " + artifactId + "-" + version + ".jar" + " could not be found",
+			throw new IllegalStateException("Artifact " + artifactId + "-" + version + "." + type + " could not be found",
 					ioEx);
 		}
 	}

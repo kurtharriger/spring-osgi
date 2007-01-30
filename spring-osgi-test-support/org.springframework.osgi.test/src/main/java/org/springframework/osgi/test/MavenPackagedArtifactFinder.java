@@ -39,8 +39,9 @@ public class MavenPackagedArtifactFinder {
 	
 	public MavenPackagedArtifactFinder(
 			String artifactId,
-			String version) {
-		this.artifactName = artifactId + "-" + version + ".jar";
+			String version,
+            String type) {
+		this.artifactName = artifactId + "-" + version + "." + type;
 	}
 	
 	File findPackagedArtifact(File startingDirectory) throws IOException {
