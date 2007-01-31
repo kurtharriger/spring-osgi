@@ -52,12 +52,12 @@ public abstract class LazyCollection implements Collection {
 	 */
 	public abstract Collection createCollection();
 
-	public boolean add(Object arg0) {
-		return getCollection().add(arg0);
+	public boolean add(Object o) {
+		return getCollection().add(o);
 	}
 
-	public boolean addAll(Collection arg0) {
-		return getCollection().addAll(arg0);
+	public boolean addAll(Collection c) {
+		return getCollection().addAll(c);
 	}
 
 	public void clear() {
@@ -68,8 +68,8 @@ public abstract class LazyCollection implements Collection {
 		return getCollection().contains(o);
 	}
 
-	public boolean containsAll(Collection arg0) {
-		return getCollection().containsAll(arg0);
+	public boolean containsAll(Collection c) {
+		return getCollection().containsAll(c);
 	}
 
 	public boolean isEmpty() {
@@ -84,12 +84,12 @@ public abstract class LazyCollection implements Collection {
 		return getCollection().remove(o);
 	}
 
-	public boolean removeAll(Collection arg0) {
-		return getCollection().removeAll(arg0);
+	public boolean removeAll(Collection c) {
+		return getCollection().removeAll(c);
 	}
 
-	public boolean retainAll(Collection arg0) {
-		return getCollection().retainAll(arg0);
+	public boolean retainAll(Collection c) {
+		return getCollection().retainAll(c);
 	}
 
 	public int size() {

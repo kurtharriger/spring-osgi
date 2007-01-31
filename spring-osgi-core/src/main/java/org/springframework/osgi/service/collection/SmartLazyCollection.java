@@ -47,10 +47,10 @@ public abstract class SmartLazyCollection extends LazyCollection {
 		return super.contains(o);
 	}
 
-	public boolean containsAll(Collection arg0) {
+	public boolean containsAll(Collection c) {
 		if (!isCreated())
 			return false;
-		return super.containsAll(arg0);
+		return super.containsAll(c);
 	}
 
 	public boolean isEmpty() {
@@ -65,10 +65,10 @@ public abstract class SmartLazyCollection extends LazyCollection {
 		return super.remove(o);
 	}
 
-	public boolean removeAll(Collection arg0) {
+	public boolean removeAll(Collection c) {
 		if (!isCreated())
 			return false;
-		return super.removeAll(arg0);
+		return super.removeAll(c);
 	}
 
 	public int size() {
