@@ -96,29 +96,24 @@
         
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>clean</id>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
   <reporting>
     <plugins>
        <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
+       </plugin>
+       
+       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
       </plugin>
+       <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-clover-plugin</artifactId>
+		<configuration>
+			<licenseFile>${user.home}/clover/clover.license</licenseFile>
+		</configuration>
+	   </plugin>
     </plugins>
   </reporting>
 

@@ -15,10 +15,6 @@
  */
 package org.springframework.osgi.test.platform;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-
 import org.knopflerfish.framework.Framework;
 import org.osgi.framework.BundleContext;
 
@@ -55,6 +51,7 @@ public class KnopflerfishPlatform implements OsgiPlatform {
 	public void start() throws Exception {
 		System.getProperties().put("org.knopflerfish.framework.bundlestorage", "memory");
 		System.getProperties().put("org.knopflerfish.startlevel.use", "true");
+		System.getProperties().put("org.knopflerfish.osgi.setcontextclassloader", "true");
 		framework = new Framework(this);
 		framework.launch(0);
 		context = framework.getSystemBundleContext();
