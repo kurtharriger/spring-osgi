@@ -19,6 +19,7 @@ import org.springframework.aop.TargetSource;
 
 /**
  * Empty TargetSource implementation for class based proxies.
+ * (will be removed once Spring 2.0.3 is out)
  * 
  * @author Costin Leau
  * 
