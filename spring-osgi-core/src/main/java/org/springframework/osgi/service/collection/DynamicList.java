@@ -17,25 +17,22 @@ package org.springframework.osgi.service.collection;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-import org.springframework.osgi.service.collection.DynamicCollection.DynamicIterator;
-
 /**
- * Subclass offering a List view for a DynamicCollection. This allows not just
- * forward, but also backwards iteration through <code>ListIterator</list>.
+ * Subclass offering a List extension for a DynamicCollection. This allows not
+ * just forward, but also backwards iteration through the
+ * <code>ListIterator</list>.
  * 
- * <strong>Note</strong>: some list write operations are not allowed at the moment.
  * @author Costin Leau
  *
  */
 public class DynamicList extends DynamicCollection implements List {
 
 	/**
-	 * List iterator. Piggybacks on the iterator returns by the superclass.
+	 * List iterator.
 	 * 
 	 * @author Costin Leau
 	 * 
@@ -47,19 +44,12 @@ public class DynamicList extends DynamicCollection implements List {
 		}
 
 		public void add(Object o) {
+			removalAllowed = false;
 			DynamicList.this.add(cursor, o);
-		}
-
-		public boolean hasNext() {
-			return super.hasNext();
 		}
 
 		public boolean hasPrevious() {
 			return (cursor - 1 >= 0);
-		}
-
-		public Object next() {
-			return super.next();
 		}
 
 		public int nextIndex() {
@@ -67,8 +57,8 @@ public class DynamicList extends DynamicCollection implements List {
 		}
 
 		public Object previous() {
+			removalAllowed = true;
 			if (hasPrevious()) {
-				removalAllowed = true;
 				return storage.get(--cursor);
 			}
 
@@ -79,22 +69,21 @@ public class DynamicList extends DynamicCollection implements List {
 			return (cursor - 1);
 		}
 
-		public void remove() {
-			DynamicList.this.remove(cursor);
-		}
-
 		public void set(Object o) {
-			storage.set(cursor, o);
+			if (!removalAllowed)
+				throw new IllegalStateException();
+			
+			storage.set(cursor - 1, o);
 		}
 
 	}
 
 	public void add(int index, Object o) {
-		throw new UnsupportedOperationException();
+		storage.add(index, o);
 	}
 
 	public boolean addAll(int index, Collection c) {
-		throw new UnsupportedOperationException();
+		return storage.addAll(index, c);
 	}
 
 	public Object get(int index) {
@@ -120,7 +109,7 @@ public class DynamicList extends DynamicCollection implements List {
 	}
 
 	public Object remove(int index) {
-		throw new UnsupportedOperationException();
+		return super.remove(index);
 	}
 
 	public Object set(int index, Object o) {

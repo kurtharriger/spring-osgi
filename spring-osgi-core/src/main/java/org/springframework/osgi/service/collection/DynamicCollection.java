@@ -33,21 +33,21 @@ import java.util.NoSuchElementException;
 public class DynamicCollection extends AbstractCollection {
 
 	protected class DynamicIterator implements Iterator {
+		/**
+		 * cursor pointing to the element that has to be returned by next()
+		 * method
+		 */
 		protected int cursor = 0;
 
 		protected boolean removalAllowed = false;
-
-		public int getCursor() {
-			return cursor;
-		}
 
 		public boolean hasNext() {
 			return (cursor < storage.size());
 		}
 
 		public Object next() {
+			removalAllowed = true;
 			if (hasNext()) {
-				removalAllowed = true;
 				return storage.get(cursor++);
 			}
 
@@ -56,14 +56,9 @@ public class DynamicCollection extends AbstractCollection {
 
 		public void remove() {
 			// make sure the cursor is valid
-			if (removalAllowed && (cursor > 0) && ((cursor - 1) < storage.size())) {
+			if (removalAllowed) {
 				removalAllowed = false;
-				Object obj = storage.get(cursor - 1);
-
-				// FIXME: this fails if the object is added twice to the
-				// collection since the first occurance will be deleted no
-				// matter if the index points to another one.
-				DynamicCollection.this.remove(obj);
+				DynamicCollection.this.remove(cursor - 1);
 			}
 			else
 				throw new IllegalStateException();
@@ -92,6 +87,7 @@ public class DynamicCollection extends AbstractCollection {
 	 */
 	public Iterator iterator() {
 		Iterator iter = new DynamicIterator();
+		// TODO: does this has to be synchronized also (when updating the iterators and removing GC'ed ones)?
 		iterators.add(new WeakReference(iter));
 		return iter;
 	}
@@ -125,32 +121,43 @@ public class DynamicCollection extends AbstractCollection {
 	}
 
 	public boolean remove(Object o) {
+		int index = storage.indexOf(o);
+
+		if (index == -1)
+			return false;
+
+		remove(storage.indexOf(o));
+		return true;
+	}
+
+	// remove an object from the list using the given index
+	// this is required for cases where the underlying storage (a list) might
+	// contain
+	// duplicates.
+	protected Object remove(int index) {
+		Object o = null;
 		synchronized (storage) {
-			int pos = storage.indexOf(o);
-			if (pos >= 0) {
-				storage.remove(o);
-				// update iterators
-				int i = 0;
-				do {
-					if (!iterators.isEmpty()) {
-						WeakReference ref = (WeakReference) iterators.get(i);
-						DynamicIterator iter = (DynamicIterator) ref.get();
-						// clean reference
-						if (iter == null) {
-							iterators.remove(i);
-						}
-						else {
-							// back the cursor
-							if (pos < iter.cursor)
-								iter.cursor--;
-							i++;
-						}
+			o = storage.remove(index);
+			// update iterators
+			int i = 0;
+			do {
+				if (!iterators.isEmpty()) {
+					WeakReference ref = (WeakReference) iterators.get(i);
+					DynamicIterator iter = (DynamicIterator) ref.get();
+					// clean iterators reference
+					if (iter == null) {
+						iterators.remove(i);
 					}
-				} while (i < iterators.size());
-				return true;
-			}
+					else {
+						// back the cursor
+						if (index < iter.cursor)
+							iter.cursor--;
+						i++;
+					}
+				}
+			} while (i < iterators.size());
 		}
-		return false;
+		return o;
 	}
 
 	public Object[] toArray() {
