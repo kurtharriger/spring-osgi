@@ -202,9 +202,10 @@ public class OsgiServiceCollection implements Collection {
 			// now get the already registered services and call the listener
 			// (the listener can handle duplicates)
 			ServiceReference[] alreadyRegistered = context.getServiceReferences(null, filter);
-			for (int i = 0; i < alreadyRegistered.length; i++) {
-				listener.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, alreadyRegistered[i]));
-			}
+			if (alreadyRegistered != null)
+				for (int i = 0; i < alreadyRegistered.length; i++) {
+					listener.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, alreadyRegistered[i]));
+				}
 		}
 		catch (InvalidSyntaxException isex) {
 			throw new IllegalArgumentException("invalid filter", isex);
