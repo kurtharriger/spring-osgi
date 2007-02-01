@@ -21,8 +21,10 @@ import java.util.Iterator;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.aop.framework.DefaultAopProxyFactory;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Costin Leau
@@ -44,12 +46,20 @@ public class ServiceCollectionTest extends ConfigurableBundleCreatorTests {
 		return "org/springframework/osgi/test/serviceproxy/ServiceCollectionTest.MF";
 	}
 
-	private ServiceRegistration publishService(Object obj) throws Exception {
+	protected ServiceRegistration publishService(Object obj) throws Exception {
 		return getBundleContext().registerService(obj.getClass().getName(), obj, null);
 	}
 
+	public void testCGLIBAvailable() throws Exception {
+		assertTrue(ClassUtils.isPresent("net.sf.cglib.proxy.Enhancer", DefaultAopProxyFactory.class.getClassLoader()));
+	}
+
+	protected Collection createCollection() {
+		return new OsgiServiceCollection(null, null, getBundleContext());
+	}
+
 	public void testCollectionListener() throws Exception {
-		Collection collection = new OsgiServiceCollection(null, null, getBundleContext());
+		Collection collection = createCollection();
 
 		ServiceReference[] refs = getBundleContext().getServiceReferences(null, null);
 
@@ -70,12 +80,12 @@ public class ServiceCollectionTest extends ConfigurableBundleCreatorTests {
 	}
 
 	public void testCollectionContent() throws Exception {
-		Collection collection = new OsgiServiceCollection(null, null, getBundleContext());
+		Collection collection = createCollection();
 		ServiceReference[] refs = getBundleContext().getServiceReferences(null, null);
 
 		assertEquals(refs.length, collection.size());
 		int size = collection.size();
-		
+
 		// register a service
 		long time = 123456;
 		Date date = new Date(time);
@@ -98,7 +108,6 @@ public class ServiceCollectionTest extends ConfigurableBundleCreatorTests {
 		}
 
 		assertEquals(size, collection.size());
-
 	}
 
 }
