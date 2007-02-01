@@ -33,6 +33,21 @@ public class RetryTemplate {
 
 	private int retryNumbers = DEFAULT_RETRY_NUMBER;
 
+	public RetryTemplate() {
+	}
+
+	public RetryTemplate(int retryNumbers, long waitTime) {
+		Assert.isTrue(retryNumbers >= 0, "retryNumbers must be positive");
+		Assert.isTrue(waitTime > 0, "waitTime must be positive");
+
+		this.retryNumbers = retryNumbers;
+		this.waitTime = waitTime;
+	}
+
+	public RetryTemplate(RetryTemplate template) {
+		this(template.getRetryNumbers(), template.getWaitTime());
+	}
+
 	public Object execute(RetryCallback callback) {
 		Assert.notNull(callback, "callback is required");
 
@@ -70,5 +85,5 @@ public class RetryTemplate {
 	public void setWaitTime(long waitTime) {
 		this.waitTime = waitTime;
 	}
-
+	
 }
