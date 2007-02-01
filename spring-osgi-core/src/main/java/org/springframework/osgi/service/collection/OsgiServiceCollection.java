@@ -15,7 +15,6 @@
  */
 package org.springframework.osgi.service.collection;
 
-import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,13 +37,16 @@ import org.springframework.osgi.service.support.ServiceWrapper;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceStaticInterceptor;
 
 /**
- * Dynamic collection - allows iterating while being shrunk/expanded. It is
- * <strong>not</strong> synchronized.
+ * OSGi service dynamic collection - allows iterating while the underlying
+ * storage is being shrunk/expanded. This collection is read-only - its content
+ * is being retrieved dynamically from the OSGi platform.
+ * 
+ * <strong>Note</strong>:It is <strong>not</strong> synchronized.
  * 
  * @author Costin Leau
  * 
  */
-public class OsgiServiceCollection extends AbstractCollection {
+public class OsgiServiceCollection implements Collection {
 
 	/**
 	 * Listener tracking the OSGi services
@@ -61,7 +63,7 @@ public class OsgiServiceCollection extends AbstractCollection {
 			switch (event.getType()) {
 
 			case (ServiceEvent.REGISTERED):
-				// be cautious
+				// be cautious!
 
 				// add only if needed to not create a new service proxy for
 				// nothing
@@ -74,7 +76,7 @@ public class OsgiServiceCollection extends AbstractCollection {
 				break;
 			case (ServiceEvent.MODIFIED):
 				// same as ServiceEvent.REGISTERED
-			synchronized (serviceReferences) {
+				synchronized (serviceReferences) {
 					if (!serviceReferences.containsKey(serviceId)) {
 						serviceReferences.put(serviceId, createServiceProxy(ref));
 						serviceIDs.add(serviceId);
@@ -100,10 +102,10 @@ public class OsgiServiceCollection extends AbstractCollection {
 	// map of services
 	// the service id is used for lookup while the service wrapper is used for
 	// values
-	protected final Map serviceReferences = Collections.synchronizedMap(CollectionFactory.createLinkedMapIfPossible(8));
+	protected final Map serviceReferences = CollectionFactory.createLinkedMapIfPossible(8);
 
 	/** list binding the service IDs to the map of service proxies * */
-	protected final Collection serviceIDs = new DynamicCollection();
+	protected final Collection serviceIDs = createInternalDynamicStorage();
 
 	private final String clazz;
 
@@ -122,35 +124,19 @@ public class OsgiServiceCollection extends AbstractCollection {
 		addListener(context, filter);
 	}
 
-	public Iterator iterator() {
-		// use the service map not just the map of indexes
-		return new Iterator() {
-			// dynamic iterator
-			private Iterator iter = serviceIDs.iterator();
-
-			public boolean hasNext() {
-				return iter.hasNext();
-			}
-
-			public Object next() {
-				// extract the service proxy from the map
-				return serviceReferences.get(iter.next());
-			}
-
-			public void remove() {
-				iter.remove();
-			}
-		};
-	}
-
-	public int size() {
-		return serviceIDs.size();
+	/**
+	 * Create the dynamic storage used internally.
+	 * 
+	 * @return
+	 */
+	protected Collection createInternalDynamicStorage() {
+		return new DynamicCollection();
 	}
 
 	/**
-	 * Create a service proxy over the service reference.
-	 * The proxy purpose is to transparently decouple the client from holding
-	 * a strong reference to the service (which might go away).
+	 * Create a service proxy over the service reference. The proxy purpose is
+	 * to transparently decouple the client from holding a strong reference to
+	 * the service (which might go away).
 	 * 
 	 * @param ref
 	 * @return
@@ -167,7 +153,7 @@ public class OsgiServiceCollection extends AbstractCollection {
 			Bundle loader = ref.getBundle();
 			try {
 				Class clazz = loader.loadClass(classes[i]);
-				// TODO: discover lower class if multiple class names are used
+				// FIXME: discover lower class if multiple class names are used
 				// (basically detect the lowest subclass)
 				if (clazz.isInterface())
 					intfs.add(clazz);
@@ -188,17 +174,18 @@ public class OsgiServiceCollection extends AbstractCollection {
 			factory.setProxyTargetClass(true);
 			factory.setTargetSource(new ClassTargetSource(proxyClass));
 		}
-		
+
 		factory.addAdvice(new OsgiServiceStaticInterceptor(new ServiceWrapper(ref, context)));
 		// TODO: why not add these?
-		//factory.setOptimize(true);
-		//factory.setFrozen(true);
-		
-		return factory.getProxy(BundleDelegatingClassLoader.createBundleClassLoaderFor(ref.getBundle(), ProxyFactory.class.getClassLoader()));
+		// factory.setOptimize(true);
+		// factory.setFrozen(true);
+
+		return factory.getProxy(BundleDelegatingClassLoader.createBundleClassLoaderFor(ref.getBundle(),
+				ProxyFactory.class.getClassLoader()));
 	}
 
 	private void invalidateProxy(Object proxy) {
-		//TODO: add proxy invalidation
+		// TODO: add proxy invalidation
 	}
 
 	/**
@@ -223,8 +210,32 @@ public class OsgiServiceCollection extends AbstractCollection {
 			throw new IllegalArgumentException("invalid filter", isex);
 		}
 	}
-	
-	
+
+	public Iterator iterator() {
+		// use the service map not just the map of indexes
+		return new Iterator() {
+			// dynamic iterator
+			private final Iterator iter = serviceIDs.iterator();
+
+			public boolean hasNext() {
+				return iter.hasNext();
+			}
+
+			public Object next() {
+				// extract the service proxy from the map
+				return serviceReferences.get(iter.next());
+			}
+
+			public void remove() {
+				// write operations disabled
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+
+	public int size() {
+		return serviceIDs.size();
+	}
 
 	public String toString() {
 		return serviceReferences.values().toString();
@@ -235,7 +246,7 @@ public class OsgiServiceCollection extends AbstractCollection {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean removeAll(Collection arg0) {
+	public boolean removeAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -243,7 +254,7 @@ public class OsgiServiceCollection extends AbstractCollection {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean addAll(Collection arg0) {
+	public boolean addAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -251,8 +262,28 @@ public class OsgiServiceCollection extends AbstractCollection {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean retainAll(Collection arg0) {
+	public boolean retainAll(Collection c) {
 		throw new UnsupportedOperationException();
+	}
+
+	public boolean contains(Object o) {
+		return serviceReferences.containsValue(o);
+	}
+
+	public boolean containsAll(Collection c) {
+		return serviceReferences.values().containsAll(c);
+	}
+
+	public boolean isEmpty() {
+		return size() == 0;
+	}
+
+	public Object[] toArray() {
+		return serviceReferences.values().toArray();
+	}
+
+	public Object[] toArray(Object[] array) {
+		return serviceReferences.values().toArray(array);
 	}
 
 }
