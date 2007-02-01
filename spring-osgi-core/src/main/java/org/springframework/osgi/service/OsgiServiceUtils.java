@@ -127,9 +127,10 @@ public class OsgiServiceUtils {
 		"RESOLVED",
 		"UNRESOLVED",
 		"STARTING",
-		"STOPPING"
+		"STOPPING",
+		"LAZY_ACTIVATION"// new in r4.1
 	};
-	public final static int NUM_CODES = 9;
+	public final static int NUM_CODES = 10;
 
 	/**
 	 * Convert event codes to a printable String
