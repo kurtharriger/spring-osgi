@@ -72,7 +72,7 @@ public class DynamicList extends DynamicCollection implements List {
 		public void set(Object o) {
 			if (!removalAllowed)
 				throw new IllegalStateException();
-			
+
 			storage.set(cursor - 1, o);
 		}
 
@@ -116,6 +116,8 @@ public class DynamicList extends DynamicCollection implements List {
 		return storage.set(index, o);
 	}
 
+	// TODO: test behavior to see if the returned list properly behaves under
+	// dynamic circumstances
 	public List subList(int fromIndex, int toIndex) {
 		return storage.subList(fromIndex, toIndex);
 	}
