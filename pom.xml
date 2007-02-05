@@ -191,6 +191,10 @@ limitations under the License.
               <name>org.springframework.osgi.test.framework</name>
               <value>${osgi.test.platform}</value>
             </property>
+            <property>
+				<name>net.sourceforge.cobertura.datafile</name>
+				<value>${basedir}/target/cobertura/cobertura.ser</value>
+			</property>
             <!--
             <property>
               <name>org.osgi.vendor.framework</name>
@@ -206,6 +210,7 @@ limitations under the License.
           <configuration>
             <source>1.4</source>
             <target>1.4</target>
+            <debug>true</debug>
           </configuration>
       </plugin>
       <plugin>
@@ -255,7 +260,8 @@ limitations under the License.
       </dependencies>
       <properties>
         <osgi.test.platform>knopflerfish</osgi.test.platform>
-		<log4j.ignoreTCL>true</log4j.ignoreTCL>        
+		<log4j.ignoreTCL>true</log4j.ignoreTCL>
+		<org.knopflerfish.osgi.setcontextclassloader>true</org.knopflerfish.osgi.setcontextclassloader>        
       </properties>
     </profile>
     <profile>
