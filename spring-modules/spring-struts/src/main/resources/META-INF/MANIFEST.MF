@@ -1,0 +1,29 @@
+Implementation-Title: Spring Framework
+Implementation-Version: ${spring.version}
+Spring-Version: ${spring.version}
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.struts
+Bundle-Name: org.springframework.struts
+Bundle-Version: ${spring.bundle.version}
+Bundle-Vendor: Spring Framework
+Import-Package: javax.servlet,
+   javax.servlet.http,
+   org.apache.commons.beanutils,
+   org.apache.commons.logging,
+   org.apache.struts.action,
+   org.apache.struts.actions,
+   org.apache.struts.config,
+   org.apache.struts.tiles,
+   org.apache.struts.util,
+   org.springframework.beans;version=${spring.version},
+   org.springframework.beans.factory.config;version=${spring.version},
+   org.springframework.context;version=${spring.version},
+   org.springframework.context.support;version=${spring.version},
+   org.springframework.util;version=${spring.version},
+   org.springframework.validation;version=${spring.version},
+   org.springframework.web.context;version=${spring.version},
+   org.springframework.web.context.support;version=${spring.version},
+   org.springframework.web.util;version=${spring.version}
+Export-Package: org.springframework.web.struts;version=${spring.version}
+Bundle-ClassPath: .,
+ target/classes/

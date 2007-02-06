@@ -1,8 +1,0 @@
-Bundle-Name: org.springframework.osgi.test.lifecycle
-Bundle-SymbolicName: org.springframework.osgi.test.lifecycle
-Bundle-Version: 2.0
-Bundle-ClassPath: . 
-Import-Package: org.springframework.beans.factory;specification-version="2.1.0",
- org.springframework.osgi.context;specification-version="1.0.0",
- org.osgi.framework
-  

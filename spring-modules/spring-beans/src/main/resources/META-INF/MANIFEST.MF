@@ -1,0 +1,33 @@
+Implementation-Title: Spring Framework
+Implementation-Version: ${spring.version}
+Spring-Version: ${spring.version}
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.beans
+Bundle-Name: org.springframework.beans
+Bundle-Version: ${spring.bundle.version}
+Bundle-Vendor: Spring Framework
+Import-Package: net.sf.cglib.proxy;resolution:=optional,
+   org.apache.commons.logging,
+   org.springframework.core;version=${spring.version},
+   org.springframework.core.annotation;version=${spring.version},
+   org.springframework.core.io;version=${spring.version},
+   org.springframework.core.io.support;version=${spring.version},
+   org.springframework.util;version=${spring.version},
+   org.springframework.util.xml;version=${spring.version}
+DynamicImport-Package: org.xml.sax,
+   javax.xml.parsers,
+   org.w3c.dom
+Export-Package: org.springframework.beans;version=${spring.version},
+   org.springframework.beans.annotation;version=${spring.version},
+   org.springframework.beans.factory;version=${spring.version},
+   org.springframework.beans.factory.access;version=${spring.version},
+   org.springframework.beans.factory.annotation;version=${spring.version},
+   org.springframework.beans.factory.wiring;version=${spring.version},
+   org.springframework.beans.factory.config;version=${spring.version},
+   org.springframework.beans.factory.support;version=${spring.version},
+   org.springframework.beans.factory.xml;version=${spring.version},
+   org.springframework.beans.factory.parsing;version=${spring.version},
+   org.springframework.beans.propertyeditors;version=${spring.version},
+   org.springframework.beans.support;version=${spring.version}
+Bundle-ClassPath: .,
+ target/classes/

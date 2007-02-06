@@ -24,13 +24,22 @@
 	<build>
 		<resources>
 			<resource>
+				<!-- Bug MRESOURCES-35 means we can't use absolute paths -->
+				<!-- Bug in eclipse means we have to put META-INF in ${basedir} -->
+				<targetPath>../../META-INF</targetPath>
+				<filtering>true</filtering>
+				<includes>
+					<include>MANIFEST.MF</include>
+				</includes>
+				<directory>src/main/resources/META-INF</directory>
+			</resource>
+			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
 	</build>
-	<properties>
-	<!-- Not sure why this is necessary, but it seems to be -->
-	<localRepository>${user.home}/.m2/repository</localRepository>
-	</properties>
+	<!--properties>
+		<localRepository>${user.home}/.m2/repository</localRepository>
+	</properties-->
 </project>
