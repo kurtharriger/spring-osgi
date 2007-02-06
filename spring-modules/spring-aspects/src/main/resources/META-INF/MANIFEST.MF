@@ -1,0 +1,19 @@
+Implementation-Title: Spring Framework
+Implementation-Version: ${spring.version}
+Spring-Version: ${spring.version}
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.aspects
+Bundle-Name: org.springframework.aspects
+Bundle-Version: ${spring.bundle.version}
+Bundle-Vendor: Spring Framework
+Import-Package: org.aspectj.lang.annotation,
+  org.aspectj.lang.reflect,
+  org.springframework.beans.factory.wiring,
+  org.springframework.beans.factory.annotation,
+  org.springframework.transaction.interceptor,
+  org.springframework.transaction.annotation
+Export-Package: org.springframework.beans.factory.aspectj,
+  org.springframework.transaction.aspectj
+Bundle-ClassPath: .,
+ target/classes/
+

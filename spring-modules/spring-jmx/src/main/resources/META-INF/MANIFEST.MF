@@ -1,0 +1,37 @@
+Implementation-Title: Spring Framework
+Implementation-Version: ${spring.version}
+Spring-Version: ${spring.version}
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.jmx
+Bundle-Name: org.springframework.jmx
+Bundle-Version: ${spring.bundle.version}
+Bundle-Vendor: Spring Framework
+Import-Package: org.aopalliance.intercept,
+   org.apache.commons.logging,
+   org.springframework.aop;version=${spring.version},
+   org.springframework.aop.framework;version=${spring.version},
+   org.springframework.aop.support;version=${spring.version},
+   org.springframework.aop.target;version=${spring.version},
+   org.springframework.beans;version=${spring.version},
+   org.springframework.beans.annotation;version=${spring.version},
+   org.springframework.beans.factory;version=${spring.version},
+   org.springframework.beans.factory.config;version=${spring.version},
+   org.springframework.core;version=${spring.version},
+   org.springframework.core.annotation;version=${spring.version},
+   org.springframework.core.io;version=${spring.version},
+   org.springframework.core.io.support;version=${spring.version},
+   org.springframework.jndi;version=${spring.version},
+   org.springframework.metadata;version=${spring.version},
+   org.springframework.util;version=${spring.version}
+Export-Package: org.springframework.jmx;version=${spring.version},
+   org.springframework.jmx.access;version=${spring.version},
+   org.springframework.jmx.export;version=${spring.version},
+   org.springframework.jmx.export.annotation;version=${spring.version},
+   org.springframework.jmx.export.assembler;version=${spring.version},
+   org.springframework.jmx.export.metadata;version=${spring.version},
+   org.springframework.jmx.export.naming;version=${spring.version},
+   org.springframework.jmx.export.notification;version=${spring.version},
+   org.springframework.jmx.support;version=${spring.version}
+DynamicImport-Package: weblogic.management
+Bundle-ClassPath: .,
+ target/classes/

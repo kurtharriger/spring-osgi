@@ -95,6 +95,16 @@
 
 
   <build>
+	 <resources>
+      <resource>
+        <targetPath>../test-classes/org/springframework/osgi/samples/weather/test</targetPath>
+        <filtering>true</filtering>
+        <includes>
+          <include>MANIFEST.MF</include>
+        </includes>
+        <directory>src/test/resources/org/springframework/osgi/samples/weather/test</directory>
+      </resource>
+    </resources>
     <plugins>
       <!-- run tests during the integration-test phase, not
            the normal test phase -->

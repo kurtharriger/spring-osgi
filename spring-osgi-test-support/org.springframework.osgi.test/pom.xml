@@ -95,6 +95,16 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <targetPath>org/springframework/osgi/test</targetPath>
+        <filtering>true</filtering>
+        <includes>
+          <include>MANIFEST.MF</include>
+        </includes>
+        <directory>src/main/resources/org/springframework/osgi/test</directory>
+      </resource>
+    </resources>
     <plugins>
         
         <!-- required since starting multiple osgi platforms inside the same VM might is not recommended -->

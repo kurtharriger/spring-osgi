@@ -12,9 +12,6 @@
   <name>Spring Framework jars packaged as OSGi bundles</name>
   <version>2.1-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
-  <properties>
-    <base.spring.version>2.0.2</base.spring.version>
-  </properties>
   <modules>
     <module>spring-aop</module>
     <module>spring-aspects</module>
@@ -41,6 +38,40 @@
     <module>spring-webmvc</module>
     <module>spring-required-libraries</module>
   </modules>
+
+ <build>
+    <resources>
+      <resource>
+        <!-- Bug MRESOURCES-35 means we can't use absolute paths -->
+        <!-- Bug in eclipse means we have to put META-INF in ${basedir} -->
+        <targetPath>../../META-INF</targetPath>
+        <filtering>true</filtering>
+        <includes>
+          <include>MANIFEST.MF</include>
+        </includes>
+        <directory>src/main/resources/META-INF</directory>
+      </resource>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+
+    <!-- There is a bug in maven which prevents correct inheritance beyond one-layer
+     Deep. We therefore have to reconfigure the plugin here -->
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix.plugins</groupId>
+        <artifactId>maven-osgi-plugin</artifactId>
+        <extensions>true</extensions>
+        <version>0.8.0-SNAPSHOT</version>
+        <configuration>
+          <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+        </configuration>
+      </plugin>
+    </plugins>
+ </build>
+
   <reporting>
    <excludeDefaults>true</excludeDefaults>
    <!-- the above doesn't work, so we spell it out in full below -->

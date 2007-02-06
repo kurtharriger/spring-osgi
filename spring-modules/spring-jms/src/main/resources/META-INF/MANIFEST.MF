@@ -1,0 +1,34 @@
+Implementation-Title: Spring Framework
+Implementation-Version: ${spring.version}
+Spring-Version: ${spring.version}
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.jms
+Bundle-Name: org.springframework.jms
+Bundle-Version: ${spring.bundle.version}
+Bundle-Vendor: Spring Framework
+Import-Package: javax.jms,
+   org.apache.commons.logging,
+   org.apache.commons.pool,
+   org.apache.commons.pool.impl,
+   org.springframework.beans.factory;version=${spring.version},
+   org.springframework.context;version=${spring.version},
+   org.springframework.core;version=${spring.version},
+   org.springframework.core.task;version=${spring.version},
+   org.springframework.jndi;version=${spring.version},
+   org.springframework.scheduling;version=${spring.version},
+   org.springframework.scheduling.timer;version=${spring.version},
+   org.springframework.transaction;version=${spring.version},
+   org.springframework.transaction.support;version=${spring.version},
+   org.springframework.util;version=${spring.version}
+Export-Package: org.springframework.jms;version=${spring.version},
+   org.springframework.jms.connection;version=${spring.version},
+   org.springframework.jms.core;version=${spring.version},
+   org.springframework.jms.core.support;version=${spring.version},
+   org.springframework.jms.listener;version=${spring.version},
+   org.springframework.jms.listener.adapter;version=${spring.version},
+   org.springframework.jms.listener.serversession;version=${spring.version},
+   org.springframework.jms.support;version=${spring.version},
+   org.springframework.jms.support.converter;version=${spring.version},
+   org.springframework.jms.support.destination;version=${spring.version}
+Bundle-ClassPath: .,
+ target/classes/

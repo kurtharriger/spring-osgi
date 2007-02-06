@@ -1,0 +1,34 @@
+Implementation-Title: Spring Framework
+Implementation-Version: ${spring.version}
+Spring-Version: ${spring.version}
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.jdo
+Bundle-Name: org.springframework.jdo
+Bundle-Version: ${spring.bundle.version}
+Bundle-Vendor: Spring Framework
+Import-Package: javax.jdo,
+   javax.portlet;resolution:=optional,
+   javax.servlet;resolution:=optional,
+   javax.servlet.http;resolution:=optional,
+   org.aopalliance.intercept,
+   org.apache.commons.logging,
+   org.springframework.beans.factory;version=${spring.version},
+   org.springframework.core.io;version=${spring.version},
+   org.springframework.core.io.support;version=${spring.version},
+   org.springframework.dao;version=${spring.version},
+   org.springframework.dao.support;version=${spring.version},
+   org.springframework.jdbc.datasource;version=${spring.version},
+   org.springframework.jdbc.support;version=${spring.version},
+   org.springframework.orm;version=${spring.version},
+   org.springframework.transaction;version=${spring.version},
+   org.springframework.transaction.support;version=${spring.version},
+   org.springframework.util;version=${spring.version},
+   org.springframework.web.context;version=${spring.version},
+   org.springframework.web.context.support;version=${spring.version},
+   org.springframework.web.filter;version=${spring.version},
+   org.springframework.web.portlet.handler;version=${spring.version},
+   org.springframework.web.servlet.handler;version=${spring.version}
+Export-Package: org.springframework.orm.jdo;version=${spring.version},
+   org.springframework.orm.jdo.support;version=${spring.version}
+Bundle-ClassPath: .,
+ target/classes/
