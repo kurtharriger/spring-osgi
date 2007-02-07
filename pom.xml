@@ -20,11 +20,17 @@
   <properties>
     <!-- Spring dist version for turning into OSGi bundles -->
     <base.spring.version>2.0.2</base.spring.version>
-    <!--- Spring packages exported version -->
+    <!-- Spring version declaration in bundles -->
     <spring.version>2.0.2</spring.version>
-    <spring.bundle.version>2.0.2</spring.bundle.version>
+    <!--- Spring packages exported version -->
+    <spring.export.version>2.1.0.SNAPSHOT-202</spring.export.version>
+    <!--- Spring packages imported version -->
+    <spring.import.version>2.1.0</spring.import.version>
+    <spring.bundle.version>2.1.0.SNAPSHOT-202</spring.bundle.version>
+    <!--- Spring OSGi packages imported version -->
+    <spring.osgi.import.version>1.0.0.SNAPSHOT-6062</spring.osgi.import.version>
     <!--- Spring OSGi packages exported version -->
-    <spring.osgi.version>1.0.0.SNAPSHOT-6062</spring.osgi.version>
+    <spring.osgi.export.version>1.0.0.SNAPSHOT-6062</spring.osgi.export.version>
     <spring.osgi.bundle.version>1.0.0.SNAPSHOT-6062</spring.osgi.bundle.version>
      <!-- Convenience for seeing the svn change #, but contains whitespace -->
     <project.svn.revision>$Rev$</project.svn.revision>

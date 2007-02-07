@@ -20,16 +20,16 @@ Import-Package: oracle.toplink.exceptions,
    oracle.toplink.tools.sessionmanagement,
    org.aopalliance.intercept,
    org.apache.commons.logging,
-   org.springframework.beans.factory;version=${spring.version},
-   org.springframework.dao;version=${spring.version},
-   org.springframework.dao.support;version=${spring.version},
-   org.springframework.jdbc.datasource;version=${spring.version},
-   org.springframework.jdbc.support;version=${spring.version},
-   org.springframework.orm;version=${spring.version},
-   org.springframework.transaction;version=${spring.version},
-   org.springframework.transaction.support;version=${spring.version},
-   org.springframework.util;version=${spring.version}
-Export-Package: org.springframework.orm.toplink;version=${spring.version}
-   org.springframework.orm.toplink.support;version=${spring.version} 
+   org.springframework.beans.factory;version="${spring.import.version}",
+   org.springframework.dao;version="${spring.import.version}",
+   org.springframework.dao.support;version="${spring.import.version}",
+   org.springframework.jdbc.datasource;version="${spring.import.version}",
+   org.springframework.jdbc.support;version="${spring.import.version}",
+   org.springframework.orm;version="${spring.import.version}",
+   org.springframework.transaction;version="${spring.import.version}",
+   org.springframework.transaction.support;version="${spring.import.version}",
+   org.springframework.util;version="${spring.import.version}"
+Export-Package: org.springframework.orm.toplink;version="${spring.export.version}"
+   org.springframework.orm.toplink.support;version="${spring.export.version}" 
 Bundle-ClassPath: .,
  target/classes/
