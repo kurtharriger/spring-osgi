@@ -1,2 +1,1 @@
 http\://www.springframework.org/schema/osgi=org.springframework.osgi.config.OsgiNamespaceHandler
-http\://www.springframework.org/schema/testme=org.springframework.osgi.context.support.TestHandler
