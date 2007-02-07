@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.OsgiServiceProxFactoryBean;
+import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 
 /**
@@ -31,7 +31,7 @@ import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
  */
 public class ServiceProxyFactoryBeanTest extends ConfigurableBundleCreatorTests {
 
-	private OsgiServiceProxFactoryBean fb;
+	private OsgiServiceProxyFactoryBean fb;
 
 	protected String[] getBundleLocations() {
 		return new String[] { localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
@@ -48,11 +48,11 @@ public class ServiceProxyFactoryBeanTest extends ConfigurableBundleCreatorTests 
 	}
 
 	public void onSetUp() throws Exception {
-		fb = new OsgiServiceProxFactoryBean();
+		fb = new OsgiServiceProxyFactoryBean();
 		fb.setBundleContext(getBundleContext());
 		// execute retries fast
 		fb.setRetryTimes(1);
-		fb.setRetryDelayMs(1);
+		fb.setTimeout(1);
 	}
 
 	public void onTearDown() throws Exception {

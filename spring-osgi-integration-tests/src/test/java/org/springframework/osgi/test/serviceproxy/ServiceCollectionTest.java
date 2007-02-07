@@ -22,6 +22,7 @@ import java.util.Iterator;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
+import org.springframework.osgi.service.OsgiServiceProxyFactoryBean.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 import org.springframework.util.ClassUtils;
@@ -56,7 +57,7 @@ public class ServiceCollectionTest extends ConfigurableBundleCreatorTests {
 	}
 
 	protected Collection createCollection() {
-		return new OsgiServiceCollection(null, null, getBundleContext());
+		return new OsgiServiceCollection(null, null, getBundleContext(), ReferenceClassLoadingOptions.UNMANAGED);
 	}
 
 	public void testCollectionListener() throws Exception {
