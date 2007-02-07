@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.springframework.osgi.service.OsgiServiceProxyFactoryBean.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.collection.OsgiServiceList;
 
 /**
@@ -28,7 +29,7 @@ import org.springframework.osgi.service.collection.OsgiServiceList;
 public class ServiceListTest extends ServiceCollectionTest {
 
 	protected Collection createCollection() {
-		return new OsgiServiceList(null, null, getBundleContext());
+		return new OsgiServiceList(null, null, getBundleContext(), ReferenceClassLoadingOptions.UNMANAGED);
 	}
 
 	public void testListContent() throws Exception {

@@ -28,7 +28,6 @@ public class Cardinality0to1Test extends ConfigurableBundleCreatorTests {
                 localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
-                localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"), 
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
                                    "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.cardinality0to1",
@@ -64,15 +63,15 @@ public class Cardinality0to1Test extends ConfigurableBundleCreatorTests {
             // expected
         }
 
-        MyListener.service.voidMethod();  //  Void methods should not raise exception when service not available
-
         startDependency(simpleService2Bundle);
+
 
         assertEquals("Expected initial binding of service", 1, MyListener.BOUND_COUNT);
         assertEquals("Unexpected initial unbinding of service", 0, MyListener.UNBOUND_COUNT);
         assertNotNull("Service reference should be not null", MyListener.service);
 
         assertNotNull(MyListener.service.stringValue());
+        
     }
 
 

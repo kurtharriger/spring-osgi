@@ -23,6 +23,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.NoSuchServiceException;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.support.ClassTargetSource;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
@@ -66,11 +67,11 @@ public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
 
 	
 	private Advice createCardinalityAdvice(Class clazz) {
-		OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor();
+		OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(getBundleContext(), 2);
 		interceptor.setClass(clazz.getName());
-		interceptor.setBundleContext(getBundleContext());
 		// fast retry
 		interceptor.getRetryTemplate().setWaitTime(1);
+		interceptor.afterPropertiesSet();
 		return interceptor;
 
 	}
@@ -102,7 +103,7 @@ public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
 				proxy.getTime();
 				fail("should have thrown exception");
 			}
-			catch (NoSuchServiceException nsse) {
+			catch (ServiceUnavailableException sue) {
 				// service failed
 			}
 
