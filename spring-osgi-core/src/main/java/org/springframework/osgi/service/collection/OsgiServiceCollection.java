@@ -118,13 +118,13 @@ public class OsgiServiceCollection implements Collection {
 
 		private void callListenersBind(ServiceReference reference) {
 			for (int i = 0; i < listeners.length; i++) {
-				listeners[i].bind(null, reference);
+				listeners[i].bind(null, context.getService(reference));
 			}
 		}
 
 		private void callListenersUnbind(ServiceReference reference) {
 			for (int i = 0; i < listeners.length; i++) {
-				listeners[i].unbind(null, reference);
+				listeners[i].unbind(null, context.getService(reference));
 			}
 		}
 	}
