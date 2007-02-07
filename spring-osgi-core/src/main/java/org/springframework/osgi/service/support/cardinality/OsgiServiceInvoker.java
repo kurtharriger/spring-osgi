@@ -21,6 +21,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Base around interceptor for OSGi service invokers.
  * 
@@ -43,8 +45,12 @@ public abstract class OsgiServiceInvoker implements MethodInterceptor {
 	 */
 	protected Object doInvoke(Object service, MethodInvocation invocation) throws Throwable {
 		Assert.notNull(service, "service should not be null!");
-		return invocation.getMethod().invoke(service, invocation.getArguments());
-	}
+        try {
+            return invocation.getMethod().invoke(service, invocation.getArguments());
+        } catch (InvocationTargetException e) {
+            throw e.getTargetException();
+        }
+    }
 
 	/**
 	 * Determine the target object to execute the invocation upon.
