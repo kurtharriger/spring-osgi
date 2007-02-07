@@ -22,6 +22,22 @@
 		</dependency>
 	</dependencies>
 	<build>
+  <plugins>
+    <plugin>
+      <artifactId>maven-clean-plugin</artifactId>
+      <configuration>
+        <filesets>
+          <fileset>
+            <directory>META-INF</directory>
+            <includes>
+              <include>MANIFEST.MF</include>
+            </includes>
+            <followSymlinks>false</followSymlinks>
+          </fileset>
+        </filesets>
+      </configuration>
+    </plugin>
+    </plugins>
 		<resources>
 			<resource>
 				<!-- Bug MRESOURCES-35 means we can't use absolute paths -->

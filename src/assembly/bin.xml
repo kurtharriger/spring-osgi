@@ -5,11 +5,17 @@
     </formats>
     <moduleSets>
         <moduleSet>
+<excludes>
+<exclude>org.springframework.osgi.samples:samples</exclude>
+</excludes>
             <binaries>
                 <outputDirectory>/</outputDirectory>
                 <includeDependencies>false</includeDependencies>
                 <unpack>false</unpack>
             </binaries>
+            <sources>
+               <outputDirectory>sources/${artifactId}</outputDirectory>
+            </sources>
         </moduleSet>
     </moduleSets>
 </assembly>

@@ -15,15 +15,15 @@ Import-Package: javax.servlet,
    org.apache.struts.config,
    org.apache.struts.tiles,
    org.apache.struts.util,
-   org.springframework.beans;version=${spring.version},
-   org.springframework.beans.factory.config;version=${spring.version},
-   org.springframework.context;version=${spring.version},
-   org.springframework.context.support;version=${spring.version},
-   org.springframework.util;version=${spring.version},
-   org.springframework.validation;version=${spring.version},
-   org.springframework.web.context;version=${spring.version},
-   org.springframework.web.context.support;version=${spring.version},
-   org.springframework.web.util;version=${spring.version}
-Export-Package: org.springframework.web.struts;version=${spring.version}
+   org.springframework.beans;version="${spring.import.version}",
+   org.springframework.beans.factory.config;version="${spring.import.version}",
+   org.springframework.context;version="${spring.import.version}",
+   org.springframework.context.support;version="${spring.import.version}",
+   org.springframework.util;version="${spring.import.version}",
+   org.springframework.validation;version="${spring.import.version}",
+   org.springframework.web.context;version="${spring.import.version}",
+   org.springframework.web.context.support;version="${spring.import.version}",
+   org.springframework.web.util;version="${spring.import.version}"
+Export-Package: org.springframework.web.struts;version="${spring.export.version}"
 Bundle-ClassPath: .,
  target/classes/

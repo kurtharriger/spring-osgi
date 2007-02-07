@@ -95,7 +95,24 @@
     </dependency>
         
   </dependencies>
-
+<build>
+  <plugins>
+    <plugin>
+      <artifactId>maven-clean-plugin</artifactId>
+      <configuration>
+        <filesets>
+          <fileset>
+            <directory>META-INF</directory>
+            <includes>
+              <include>MANIFEST.MF</include>
+            </includes>
+            <followSymlinks>false</followSymlinks>
+          </fileset>
+        </filesets>
+      </configuration>
+    </plugin>
+    </plugins>
+</build>
   <reporting>
     <plugins>
        <plugin>
