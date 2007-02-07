@@ -16,12 +16,15 @@
 package org.springframework.osgi.service;
 
 /**
+ * Listener tracking binding and unbinding of OSGi services used as normal
+ * object references inside Spring OSGi.
+ * 
  * @author Costin Leau
- *
+ * 
  */
 public interface TargetSourceLifecycleListener {
 
 	public void bind(String serviceBeanName, Object service);
-	
+
 	public void unbind(String serviceBeanName, Object service);
 }

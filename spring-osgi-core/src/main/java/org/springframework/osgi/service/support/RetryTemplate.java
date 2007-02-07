@@ -38,7 +38,7 @@ public class RetryTemplate {
 
 	public RetryTemplate(int retryNumbers, long waitTime) {
 		Assert.isTrue(retryNumbers >= 0, "retryNumbers must be positive");
-		Assert.isTrue(waitTime > 0, "waitTime must be positive");
+		Assert.isTrue(waitTime >= 0, "waitTime must be positive");
 
 		this.retryNumbers = retryNumbers;
 		this.waitTime = waitTime;

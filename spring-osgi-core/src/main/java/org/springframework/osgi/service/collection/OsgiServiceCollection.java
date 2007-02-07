@@ -17,7 +17,6 @@ package org.springframework.osgi.service.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +29,14 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
+import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.support.ClassTargetSource;
-import org.springframework.osgi.service.support.ServiceWrapper;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceStaticInterceptor;
+import org.springframework.util.Assert;
 
 /**
  * OSGi service dynamic collection - allows iterating while the underlying
@@ -49,7 +51,7 @@ import org.springframework.osgi.service.support.cardinality.OsgiServiceStaticInt
 public class OsgiServiceCollection implements Collection {
 
 	/**
-	 * Listener tracking the OSGi services
+	 * Listener tracking the OSGi services which form the dynamic collection.
 	 * 
 	 * @author Costin Leau
 	 * 
@@ -59,6 +61,7 @@ public class OsgiServiceCollection implements Collection {
 		public void serviceChanged(ServiceEvent event) {
 			ServiceReference ref = event.getServiceReference();
 			Long serviceId = (Long) ref.getProperty(Constants.SERVICE_ID);
+			boolean found = false;
 
 			switch (event.getType()) {
 
@@ -69,27 +72,43 @@ public class OsgiServiceCollection implements Collection {
 				// nothing
 				synchronized (serviceReferences) {
 					if (!serviceReferences.containsKey(serviceId)) {
+						found = true;
 						serviceReferences.put(serviceId, createServiceProxy(ref));
 						serviceIDs.add(serviceId);
+						// call listener
 					}
 				}
+				// inform listeners
+				if (found)
+					callListenersBind(ref);
+
 				break;
 			case (ServiceEvent.MODIFIED):
 				// same as ServiceEvent.REGISTERED
 				synchronized (serviceReferences) {
 					if (!serviceReferences.containsKey(serviceId)) {
+						found = true;
 						serviceReferences.put(serviceId, createServiceProxy(ref));
 						serviceIDs.add(serviceId);
 					}
 				}
+				// inform listeners
+				if (found)
+					callListenersBind(ref);
+
 				break;
 			case (ServiceEvent.UNREGISTERING):
 				synchronized (serviceReferences) {
 					// remove servce
 					Object proxy = serviceReferences.remove(serviceId);
-					invalidateProxy(proxy);
-					serviceIDs.remove(serviceId);
+					found = serviceIDs.remove(serviceId);
+					if (proxy != null) {
+						invalidateProxy(proxy);
+					}
 				}
+
+				if (found)
+					callListenersUnbind(ref);
 				break;
 
 			default:
@@ -97,6 +116,17 @@ public class OsgiServiceCollection implements Collection {
 			}
 		}
 
+		private void callListenersBind(ServiceReference reference) {
+			for (int i = 0; i < listeners.length; i++) {
+				listeners[i].bind(null, reference);
+			}
+		}
+
+		private void callListenersUnbind(ServiceReference reference) {
+			for (int i = 0; i < listeners.length; i++) {
+				listeners[i].unbind(null, reference);
+			}
+		}
 	}
 
 	// map of services
@@ -113,10 +143,20 @@ public class OsgiServiceCollection implements Collection {
 
 	private final BundleContext context;
 
-	public OsgiServiceCollection(String clazz, String filter, BundleContext context) {
+	private int contextClassLoader;
+
+	// advices to be applied when creating service proxy
+	private Object[] interceptors = new Object[0];
+
+	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
+
+	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
+
+	public OsgiServiceCollection(String clazz, String filter, BundleContext context, int contextClassLoader) {
 		this.clazz = clazz;
 		this.filter = filter;
 		this.context = context;
+		this.contextClassLoader = contextClassLoader;
 
 		// TODO: add lazy behavior (register the listener only if the
 		// collection is actually used)
@@ -162,7 +202,7 @@ public class OsgiServiceCollection implements Collection {
 				}
 			}
 			catch (ClassNotFoundException cnfex) {
-				throw new IllegalArgumentException("cannot create proxy", cnfex);
+				throw (RuntimeException) new IllegalArgumentException("cannot create proxy").initCause(cnfex);
 			}
 		}
 
@@ -175,7 +215,14 @@ public class OsgiServiceCollection implements Collection {
 			factory.setTargetSource(new ClassTargetSource(proxyClass));
 		}
 
-		factory.addAdvice(new OsgiServiceStaticInterceptor(new ServiceWrapper(ref, context)));
+		// add the interceptors
+		if (this.interceptors != null) {
+			for (int i = 0; i < this.interceptors.length; i++) {
+				factory.addAdvisor(this.advisorAdapterRegistry.wrap(this.interceptors[i]));
+			}
+		}
+
+		factory.addAdvice(new OsgiServiceStaticInterceptor(context, ref, contextClassLoader));
 		// TODO: why not add these?
 		// factory.setOptimize(true);
 		// factory.setFrozen(true);
@@ -208,12 +255,12 @@ public class OsgiServiceCollection implements Collection {
 				}
 		}
 		catch (InvalidSyntaxException isex) {
-			throw new IllegalArgumentException("invalid filter", isex);
+			throw (RuntimeException) new IllegalArgumentException("invalid filter").initCause(isex);
 		}
 	}
 
 	public Iterator iterator() {
-		// use the service map not just the map of indexes
+		// use the service map not just the list of indexes
 		return new Iterator() {
 			// dynamic iterator
 			private final Iterator iter = serviceIDs.iterator();
@@ -285,6 +332,32 @@ public class OsgiServiceCollection implements Collection {
 
 	public Object[] toArray(Object[] array) {
 		return serviceReferences.values().toArray(array);
+	}
+
+	/**
+	 * @return Returns the interceptors.
+	 */
+	public Object[] getInterceptors() {
+		return interceptors;
+	}
+
+	/**
+	 * The optional interceptors used when proxying each service. These will
+	 * always be added before the OsgiServiceStaticInterceptor.
+	 * 
+	 * @param interceptors The interceptors to set.
+	 */
+	public void setInterceptors(Object[] interceptors) {
+		Assert.notNull(interceptors, "argument should not be null");
+		this.interceptors = interceptors;
+	}
+
+	/**
+	 * @param listeners The listeners to set.
+	 */
+	public void setListeners(TargetSourceLifecycleListener[] listeners) {
+		Assert.notNull(listeners, "argument should not be null");
+		this.listeners = listeners;
 	}
 
 }

@@ -23,11 +23,14 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
+import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.OsgiServiceExporter;
 import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
@@ -41,10 +44,16 @@ import org.springframework.osgi.service.TargetSourceLifecycleListener;
 public class OsgiNamespaceHandlerTest extends TestCase {
 
 	private GenericApplicationContext appContext;
+
 	private BundleContext bundleContext;
 
 	protected void setUp() throws Exception {
-		bundleContext = new MockBundleContext();
+		bundleContext = new MockBundleContext() {
+
+			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+				return new ServiceReference[] { new MockServiceReference(new String[] { Cloneable.class.getName() }) };
+			}
+		};
 
 		appContext = new GenericApplicationContext();
 		appContext.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
@@ -75,28 +84,28 @@ public class OsgiNamespaceHandlerTest extends TestCase {
 		assertNotNull(listeners);
 		assertEquals(5, listeners.length);
 
-		assertEquals(8, DummyListener.BIND_CALLS);
+		assertEquals(0, DummyListener.BIND_CALLS);
 		assertEquals(0, DummyListener.UNBIND_CALLS);
 
 		listeners[1].bind(null, null);
 
-		assertEquals(10, DummyListener.BIND_CALLS);
+		assertEquals(2, DummyListener.BIND_CALLS);
 
 		listeners[1].unbind(null, null);
 		assertEquals(2, DummyListener.UNBIND_CALLS);
 
-        listeners[3].bind(null, null);
-        assertEquals(3, DummyListenerServiceSignature.BIND_CALLS);
+		listeners[3].bind(null, null);
+		assertEquals(1, DummyListenerServiceSignature.BIND_CALLS);
 
-        listeners[3].unbind(null, null);
-        assertEquals(1, DummyListenerServiceSignature.UNBIND_CALLS);
+		listeners[3].unbind(null, null);
+		assertEquals(1, DummyListenerServiceSignature.UNBIND_CALLS);
 
-        listeners[4].bind(null, null);
-        assertEquals(3, DummyListenerServiceSignature2.BIND_CALLS);
+		listeners[4].bind(null, null);
+		assertEquals(1, DummyListenerServiceSignature2.BIND_CALLS);
 
-        listeners[4].unbind(null, null);
-        assertEquals(1, DummyListenerServiceSignature2.UNBIND_CALLS);
-    }
+		listeners[4].unbind(null, null);
+		assertEquals(1, DummyListenerServiceSignature2.UNBIND_CALLS);
+	}
 
 	public void testSimpleService() throws Exception {
 		Object bean = appContext.getBean(OsgiServiceExporter.class.getName());

@@ -25,6 +25,7 @@ import org.osgi.framework.BundleContext;
  * ThreadLocal management of the BundleContext. This class also functions as
  * advice for temporarily pushing the thread-local context.
  * 
+ * <strong>Note</strong>: this is a stateful component.
  * @author Andy Piper
  * @author Costin Leau
  */

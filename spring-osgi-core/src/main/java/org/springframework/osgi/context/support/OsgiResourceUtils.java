@@ -70,7 +70,7 @@ public class OsgiResourceUtils
     }
   }
 
-  // FIXME: Ugly hack - should be standardized somehow
+  // FIXME: Ugly hack - should be standardized somehow (it is in OSGi 4.1)
   public static BundleContext getBundleContext(Bundle bundle) {
     if (bundle == null) return null;
     try {

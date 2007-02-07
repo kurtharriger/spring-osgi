@@ -15,12 +15,18 @@
  */
 package org.springframework.osgi.service.support.cardinality;
 
-import org.aopalliance.intercept.MethodInvocation;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.NoSuchServiceException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.support.DefaultRetryCallback;
+import org.springframework.osgi.service.support.RetryTemplate;
 import org.springframework.osgi.service.support.ServiceWrapper;
-import org.springframework.util.Assert;
 
 /**
  * Interceptor adding dynamic behavior for unary service (..1 cardinality). It
@@ -28,61 +34,213 @@ import org.springframework.util.Assert;
  * the service is down or unavailable. Will dynamically rebound a new service,
  * if one is available with a higher service ranking.
  * 
+ * <strong>Note</strong>: this is a stateful interceptor and should not be
+ * shared.
  * 
  * @author Costin Leau
  * 
  */
-public class OsgiServiceDynamicInterceptor extends AbstractOsgiServiceDynamicInterceptor {
+public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker implements InitializingBean{
 
 	private ServiceWrapper wrapper;
 
-	protected ServiceWrapper lookupService() {
+	protected RetryTemplate retryTemplate = new RetryTemplate();
 
-		return (ServiceWrapper) retryTemplate.execute(new DefaultRetryCallback() {
-			public Object doWithRetry() {
-				ServiceReference ref = context.getServiceReference(clazz);
-				return (ref != null ? new ServiceWrapper(ref, context) : null);
-			}
-		});
+	protected String clazz;
+
+	protected String filter;
+
+	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
+
+	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader) {
+		super(context, null, contextClassLoader);
 	}
 
-	protected Object doInvoke(Object service, MethodInvocation invocation) throws Throwable {
-		Assert.notNull(service, "service should not be null!");
-		return invocation.getMethod().invoke(service, invocation.getArguments());
+	private class Listener implements ServiceListener {
+
+		public void serviceChanged(ServiceEvent event) {
+			ServiceReference ref = event.getServiceReference();
+			
+			log.debug("got event for service " + ref);
+			
+			// service id
+			long serviceId = ((Long) ref.getProperty(Constants.SERVICE_ID)).longValue();
+			// service ranking
+			Integer rank = (Integer) ref.getProperty(Constants.SERVICE_RANKING);
+			int ranking = (rank == null ? 0: rank.intValue());
+
+			switch (event.getType()) {
+
+			case (ServiceEvent.REGISTERED):
+				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
+					// inform listeners
+					callListenersBind(ref);
+				}
+
+				break;
+			case (ServiceEvent.MODIFIED):
+				// same as ServiceEvent.REGISTERED
+				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
+					// inform listeners
+					callListenersBind(ref);
+				}
+
+				break;
+			case (ServiceEvent.UNREGISTERING):
+				boolean updated = false;
+
+				synchronized (OsgiServiceDynamicInterceptor.class) {
+					// remove service
+					if (wrapper != null) {
+						if (serviceId == wrapper.getServiceId()) {
+							updated = true;
+							wrapper.cleanup();
+							wrapper = null;
+						}
+					}
+				}
+
+				if (updated)
+					callListenersUnbind(ref);
+				break;
+
+			default:
+				throw new IllegalArgumentException("unsupported event type");
+			}
+		}
+
+		private void callListenersBind(ServiceReference reference) {
+			boolean debug = log.isDebugEnabled();
+			for (int i = 0; i < listeners.length; i++) {
+				if (debug)
+					log.debug("calling bind on " + listeners[i] + " w/ reference " + reference);
+				listeners[i].bind(null, context.getService(reference));
+			}
+		}
+
+		private void callListenersUnbind(ServiceReference reference) {
+			boolean debug = log.isDebugEnabled();
+
+			for (int i = 0; i < listeners.length; i++) {
+				if (debug)
+					log.debug("calling unbind on " + listeners[i] + " w/ reference " + reference);
+				listeners[i].unbind(null, context.getService(reference));
+			}
+		}
+
+		private boolean updateWrapperIfNecessary(ServiceReference ref, long serviceId,
+				int serviceRanking) {
+
+			boolean updated = false;
+			synchronized (OsgiServiceDynamicInterceptor.class) {
+				if (wrapper != null) {
+					// we have a new service
+					if (serviceRanking > wrapper.getServiceRanking()) {
+						updated = true;
+						wrapper = new ServiceWrapper(ref, context);
+					}
+					// if equality, use the service id
+					if (serviceRanking == wrapper.getServiceRanking()) {
+						if (serviceId < wrapper.getServiceId()) {
+							updated = true;
+							wrapper = new ServiceWrapper(ref, context);
+						}
+					}
+				}
+				else {
+					wrapper = new ServiceWrapper(ref, context);
+					updated = true;
+				}
+
+				return updated;
+			}
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+	 * @see org.springframework.osgi.service.support.cardinality.OsgiServiceInvoker#getTarget()
 	 */
-	public Object invoke(MethodInvocation invocation) throws Throwable {
+	protected Object getTarget() throws Throwable {
 		Object target = null;
 
-		// check if we already have a reference
-		// if (wrapper != null && wrapper.isServiceAlive()) {
-		// target = wrapper.getService();
-		// }
+		if (wrapper == null || !wrapper.isServiceAlive())
+			lookupService();
 
-		// TODO: [C] on each invocation the service is being looked up.
-		// This can be potentially inefficient when the platform contains a lot
-		// of services
-		// A listener based mecahnism to do sorting based on service ranking
-		// should be used
-		// to cache the service and retry the lookup only if the service is
-		// down.
-
-		// lookup again for a new service
-		if (target == null) {
-			wrapper = lookupService();
-			if (wrapper != null)
-				target = wrapper.getService();
-		}
-
+		target = (wrapper != null ? wrapper.getService() : null);
+		
 		// nothing found
 		if (target == null) {
-			throw new NoSuchServiceException("could not find service", null, null);
+			throw new ServiceUnavailableException("could not find service", null, null);
 		}
 
-		return doInvoke(target, invocation);
+		return target;
 	}
+
+	// TODO: do nothing since we catch the events anyway
+	protected ServiceWrapper lookupService() {
+		return (ServiceWrapper) retryTemplate.execute(new DefaultRetryCallback() {
+			public Object doWithRetry() {
+				// ServiceReference ref = context.getServiceReference(clazz);
+				// return (ref != null ? new ServiceWrapper(ref, context) :
+				// null);
+				return null;
+			}
+		});
+	}
+
+	
+	public void afterPropertiesSet(){
+		addListener(context, filter);
+
+	}
+
+	/**
+	 * Add the service listener to context and register also already
+	 * @param context
+	 * @param filter
+	 */
+	private void addListener(BundleContext context, String filter) {
+		try {
+			ServiceListener listener = new Listener();
+			// add listener
+			context.addServiceListener(listener, filter);
+
+			// now get the already registered services and call the listener
+			// (the listener can handle duplicates)
+			ServiceReference[] alreadyRegistered = context.getServiceReferences(clazz, filter);
+			if (alreadyRegistered != null)
+				for (int i = 0; i < alreadyRegistered.length; i++) {
+					listener.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, alreadyRegistered[i]));
+				}
+		}
+		catch (InvalidSyntaxException isex) {
+			throw (RuntimeException) new IllegalArgumentException("invalid filter").initCause(isex);
+		}
+	}
+
+	public void setClass(String clazz) {
+		this.clazz = clazz;
+	}
+
+	public void setFilter(String filter) {
+		this.filter = filter;
+	}
+
+	public void setRetryTemplate(RetryTemplate retryTemplate) {
+		this.retryTemplate = retryTemplate;
+	}
+
+	public RetryTemplate getRetryTemplate() {
+		return retryTemplate;
+	}
+
+	public TargetSourceLifecycleListener[] getListeners() {
+		return listeners;
+	}
+
+	public void setListeners(TargetSourceLifecycleListener[] listeners) {
+		this.listeners = listeners;
+	}
+
 }
