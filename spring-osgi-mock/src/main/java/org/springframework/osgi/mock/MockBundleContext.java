@@ -80,6 +80,12 @@ public class MockBundleContext implements BundleContext {
 	 * @see org.osgi.framework.BundleContext#addServiceListener(org.osgi.framework.ServiceListener)
 	 */
 	public void addServiceListener(ServiceListener listener) {
+		try {
+			addServiceListener(listener, null);
+		}
+		catch (InvalidSyntaxException ex) {
+			throw new IllegalStateException("exception should not occur");
+		}		
 	}
 
 	/*
