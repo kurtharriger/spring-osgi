@@ -22,6 +22,7 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.osgi.service.OsgiServiceUtils;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.support.DefaultRetryCallback;
@@ -40,7 +41,7 @@ import org.springframework.osgi.service.support.ServiceWrapper;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker implements InitializingBean{
+public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker implements InitializingBean {
 
 	private ServiceWrapper wrapper;
 
@@ -60,14 +61,12 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 		public void serviceChanged(ServiceEvent event) {
 			ServiceReference ref = event.getServiceReference();
-			
-			log.debug("got event for service " + ref);
-			
+
 			// service id
 			long serviceId = ((Long) ref.getProperty(Constants.SERVICE_ID)).longValue();
 			// service ranking
 			Integer rank = (Integer) ref.getProperty(Constants.SERVICE_RANKING);
-			int ranking = (rank == null ? 0: rank.intValue());
+			int ranking = (rank == null ? 0 : rank.intValue());
 
 			switch (event.getType()) {
 
@@ -102,8 +101,20 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 				if (updated)
 					callListenersUnbind(ref);
-				break;
+				try {
+					ServiceReference refs[] = context.getServiceReferences(clazz, filter);
 
+					// FIXME: place the discovery process into one class
+					// quick hack: just pick the first one
+					if (refs != null && refs.length > 0) {
+						serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, refs[0]));
+					}
+				}
+				catch (InvalidSyntaxException ise) {
+					throw new IllegalArgumentException("invalid filter");
+				}
+				
+				break;
 			default:
 				throw new IllegalArgumentException("unsupported event type");
 			}
@@ -128,8 +139,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 			}
 		}
 
-		private boolean updateWrapperIfNecessary(ServiceReference ref, long serviceId,
-				int serviceRanking) {
+		private boolean updateWrapperIfNecessary(ServiceReference ref, long serviceId, int serviceRanking) {
 
 			boolean updated = false;
 			synchronized (OsgiServiceDynamicInterceptor.class) {
@@ -168,7 +178,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 			lookupService();
 
 		target = (wrapper != null ? wrapper.getService() : null);
-		
+
 		// nothing found
 		if (target == null) {
 			throw new ServiceUnavailableException("could not find service", null, null);
@@ -189,8 +199,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 		});
 	}
 
-	
-	public void afterPropertiesSet(){
+	public void afterPropertiesSet() {
 		addListener(context, filter);
 
 	}

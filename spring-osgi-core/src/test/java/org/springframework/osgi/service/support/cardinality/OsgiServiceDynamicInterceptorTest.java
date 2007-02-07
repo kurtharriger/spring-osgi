@@ -22,10 +22,14 @@ import junit.framework.TestCase;
 import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.service.OsgiServiceProxyFactoryBean.ReferenceClassLoadingOptions;
 
 /**
  * @author Costin Leau
@@ -35,17 +39,31 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	private OsgiServiceDynamicInterceptor interceptor;
 
-	private ServiceReference reference;
+	private ServiceReference reference, ref2, ref3;
 
-	private Object service;
+	private Object service, serv2, serv3;
+
+	private String serv2Filter;
+
+	private ServiceListener listener;
 
 	protected void setUp() throws Exception {
 		service = new Object();
+		serv2 = new Object();
+		serv3 = new Object();
+
 		reference = new MockServiceReference();
+		ref2 = new MockServiceReference();
+		ref3 = new MockServiceReference();
+
+		serv2Filter = "serv2";
 
 		BundleContext ctx = new MockBundleContext() {
 
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+				if (serv2Filter.equals(filter))
+					return new ServiceReference[] { ref2 };
+				
 				return new ServiceReference[] { reference };
 			}
 
@@ -53,13 +71,24 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 				if (reference == ref) {
 					return service;
 				}
+				if (ref2 == ref) {
+					return serv2;
+				}
+
+				if (ref3 == ref) {
+					return serv3;
+				}
+
 				// simulate a non available service
 				return null;
 			}
 
+			public void addServiceListener(ServiceListener list, String filter) throws InvalidSyntaxException {
+				listener = list;
+			}
 		};
 
-		interceptor = new OsgiServiceDynamicInterceptor(ctx, 2);
+		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED);
 		interceptor.getRetryTemplate().setRetryNumbers(3);
 		interceptor.getRetryTemplate().setWaitTime(1);
 		interceptor.afterPropertiesSet();
@@ -68,6 +97,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 	protected void tearDown() throws Exception {
 		service = null;
 		interceptor = null;
+		listener = null;
 	}
 
 	/**
@@ -125,6 +155,52 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		reference = oldRef;
 
 		assertEquals(new Integer(service.hashCode()), interceptor.invoke(invocation));
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor#getTarget()}.
+	 */
+	public void testGetTarget() throws Throwable {
+		// add service
+		ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, reference);
+		listener.serviceChanged(event);
+
+		Object target = interceptor.getTarget();
+		assertSame("target not properly discovered", service, target);
+	}
+
+	public void testGetTargetWhenMultipleServicesAreAvailable() throws Throwable {
+		// add service
+		ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, reference);
+		listener.serviceChanged(event);
+
+		event = new ServiceEvent(ServiceEvent.REGISTERED, ref2);
+		listener.serviceChanged(event);
+
+		Object target = interceptor.getTarget();
+		assertSame("target not properly discovered", service, target);
+
+		interceptor.setFilter(serv2Filter);
+		event = new ServiceEvent(ServiceEvent.UNREGISTERING, reference);
+		listener.serviceChanged(event);
+
+		try {
+			target = interceptor.getTarget();
+		}
+		catch (ServiceUnavailableException sue) {
+			fail("target not rebound after service is down");
+		}
+
+		assertSame("wrong service rebound", serv2, target);
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor#afterPropertiesSet()}.
+	 */
+	public void testAfterPropertiesSet() {
+		assertNotNull("should have initialized listener", listener);
 	}
 
 }

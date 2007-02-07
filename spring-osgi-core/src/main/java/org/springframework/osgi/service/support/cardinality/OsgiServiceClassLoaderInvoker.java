@@ -51,8 +51,10 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 		// if the reference is not needed create the classloader once and just
 		// reuse it
 		canCacheClassLoader = !(contextClassLoader == ReferenceClassLoadingOptions.SERVICE_PROVIDER);
-		if (canCacheClassLoader)
+		if (canCacheClassLoader) {
 			this.tccl = determineClassLoader(context, null, contextClassLoader);
+		}
+
 	}
 
 	protected ClassLoader determineClassLoader(BundleContext context, ServiceReference reference, int contextClassLoader) {
@@ -86,8 +88,11 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 			tccl = determineClassLoader(context, serviceReference, contextClassLoader);
 
 		ClassLoader oldCL = null;
-		if (tccl != null) {
-			if (log.isTraceEnabled())
+		boolean trace = log.isTraceEnabled();
+		
+		// if it's unmanaged
+		if ((tccl != null && canCacheClassLoader) || !canCacheClassLoader) {
+			if (trace)
 				log.trace("temporary setting thread context classloader to " + tccl);
 			try {
 				oldCL = Thread.currentThread().getContextClassLoader();
@@ -96,7 +101,7 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 				return super.doInvoke(service, invocation);
 			}
 			finally {
-				if (log.isTraceEnabled())
+				if (trace)
 					log.trace("reverting original thread context classloader: " + tccl);
 				Thread.currentThread().setContextClassLoader(oldCL);
 			}
