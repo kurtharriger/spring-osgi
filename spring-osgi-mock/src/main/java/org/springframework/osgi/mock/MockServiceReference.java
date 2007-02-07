@@ -35,6 +35,8 @@ public class MockServiceReference implements ServiceReference {
 	// private ServiceRegistration registration;
 	private Dictionary properties;
 
+	private String[] objectClass = new String[] { Object.class.getName() };
+
 	public MockServiceReference() {
 		this(null, null, null);
 	}
@@ -43,16 +45,31 @@ public class MockServiceReference implements ServiceReference {
 		this(bundle, null, null);
 	}
 
+	public MockServiceReference(String[] classes) {
+		this(null, null, null, classes);
+
+	}
+
+	public MockServiceReference(Bundle bundle, String[] classes) {
+		this(bundle, null, null, classes);
+	}
+
 	public MockServiceReference(ServiceRegistration registration) {
 		this(null, null, registration);
 	}
 
 	public MockServiceReference(Bundle bundle, Dictionary properties, ServiceRegistration registration) {
+		this(bundle, properties, registration, null);
+	}
+
+	public MockServiceReference(Bundle bundle, Dictionary properties, ServiceRegistration registration, String[] classes) {
 		this.bundle = (bundle == null ? new MockBundle() : bundle);
 		// this.registration = (registration == null ? new
 		// MockServiceRegistration() :
 		// registration);
 		this.properties = (properties == null ? new Hashtable() : properties);
+		if (classes != null && classes.length > 0)
+			this.objectClass = classes;
 		addMandatoryProperties(this.properties);
 	}
 
@@ -62,7 +79,10 @@ public class MockServiceReference implements ServiceReference {
 			dict.put(Constants.SERVICE_ID, new Long(System.currentTimeMillis()));
 
 		if (dict.get(Constants.OBJECTCLASS) == null)
-			dict.put(Constants.OBJECTCLASS, new String[] { Object.class.getName() });
+			dict.put(Constants.OBJECTCLASS, objectClass);
+
+		if (dict.get(Constants.SERVICE_RANKING) == null)
+			dict.put(Constants.SERVICE_RANKING, new Integer(0));
 
 	}
 
@@ -133,6 +153,7 @@ public class MockServiceReference implements ServiceReference {
 			// copy mandatory properties
 			properties.put(Constants.SERVICE_ID, this.properties.get(Constants.SERVICE_ID));
 			properties.put(Constants.OBJECTCLASS, this.properties.get(Constants.OBJECTCLASS));
+			properties.put(Constants.SERVICE_RANKING, this.properties.get(Constants.SERVICE_RANKING));
 			
 			this.properties = properties;
 		}

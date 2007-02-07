@@ -33,8 +33,11 @@ public class MockServiceRegistration implements ServiceRegistration {
 	}
 
 	public MockServiceRegistration(Dictionary props) {
-		reference = new MockServiceReference(this);
-		setProperties(props);
+		this(null, props);
+	}
+
+	public MockServiceRegistration(String[] clazz, Dictionary props) {
+		reference = new MockServiceReference(null, props, this, clazz);
 	}
 
 	/*

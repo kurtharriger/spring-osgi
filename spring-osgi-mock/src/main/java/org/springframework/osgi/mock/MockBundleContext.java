@@ -40,6 +40,7 @@ public class MockBundleContext implements BundleContext {
 	public static final Properties DEFAULT_PROPERTIES = new DefaultBundleContextProperties();
 
 	private Bundle bundle;
+
 	private Properties properties;
 
 	public MockBundleContext() {
@@ -85,7 +86,7 @@ public class MockBundleContext implements BundleContext {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.osgi.framework.BundleContext#addServiceListener(org.osgi.framework.ServiceListener,
-	 *      java.lang.String)
+	 * java.lang.String)
 	 */
 	public void addServiceListener(ServiceListener listener, String filter) throws InvalidSyntaxException {
 	}
@@ -103,7 +104,7 @@ public class MockBundleContext implements BundleContext {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.osgi.framework.BundleContext#getAllServiceReferences(java.lang.String,
-	 *      java.lang.String)
+	 * java.lang.String)
 	 */
 	public ServiceReference[] getAllServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 		return new ServiceReference[] {};
@@ -169,17 +170,17 @@ public class MockBundleContext implements BundleContext {
 	 * @see org.osgi.framework.BundleContext#getServiceReference(java.lang.String)
 	 */
 	public ServiceReference getServiceReference(String clazz) {
-		return new MockServiceReference(getBundle());
+		return new MockServiceReference(getBundle(), new String[] { clazz });
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.osgi.framework.BundleContext#getServiceReferences(java.lang.String,
-	 *      java.lang.String)
+	 * java.lang.String)
 	 */
 	public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
-		return new ServiceReference[] { new MockServiceReference(getBundle()) };
+		return new ServiceReference[] { new MockServiceReference(getBundle(), new String[] { clazz }) };
 	}
 
 	/*
@@ -195,7 +196,7 @@ public class MockBundleContext implements BundleContext {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.osgi.framework.BundleContext#installBundle(java.lang.String,
-	 *      java.io.InputStream)
+	 * java.io.InputStream)
 	 */
 	public Bundle installBundle(String location, InputStream input) throws BundleException {
 		return new MockBundle(location);
@@ -205,20 +206,20 @@ public class MockBundleContext implements BundleContext {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.osgi.framework.BundleContext#registerService(java.lang.String[],
-	 *      java.lang.Object, java.util.Dictionary)
+	 * java.lang.Object, java.util.Dictionary)
 	 */
 	public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
-		return new MockServiceRegistration();
+		return new MockServiceRegistration(properties);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.osgi.framework.BundleContext#registerService(java.lang.String,
-	 *      java.lang.Object, java.util.Dictionary)
+	 * java.lang.Object, java.util.Dictionary)
 	 */
 	public ServiceRegistration registerService(String clazz, Object service, Dictionary properties) {
-		return new MockServiceRegistration();
+		return registerService(new String[] { clazz }, service, properties);
 	}
 
 	/*
