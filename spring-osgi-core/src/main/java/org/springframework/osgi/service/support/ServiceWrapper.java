@@ -18,6 +18,7 @@ package org.springframework.osgi.service.support;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.context.support.OsgiResourceUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -31,11 +32,17 @@ public class ServiceWrapper {
 	private ServiceReference reference;
 
 	private final long serviceId;
+	
+	private final int serviceRanking;
 
 	private final String toString;
 
 	/** this should be determined in OSGi 4.1 directly from the Bundle * */
 	private BundleContext context;
+
+	public ServiceWrapper(ServiceReference ref) {
+		this(ref, OsgiResourceUtils.getBundleContext(ref.getBundle()));
+	}
 
 	public ServiceWrapper(ServiceReference ref, BundleContext bundleContext) {
 		Assert.notNull(ref, "not null service reference required");
@@ -45,6 +52,9 @@ public class ServiceWrapper {
 		this.context = bundleContext;
 
 		serviceId = ((Long) ref.getProperty(Constants.SERVICE_ID)).longValue();
+		Integer rank = (Integer) ref.getProperty(Constants.SERVICE_RANKING);
+		serviceRanking = (rank == null ? 0 : rank.intValue());
+		
 		toString = "ServiceWrapper[serviceId=" + serviceId + "|ref=" + reference + "]";
 	}
 
@@ -88,6 +98,10 @@ public class ServiceWrapper {
 
 	public long getServiceId() {
 		return serviceId;
+	}
+	
+	public int getServiceRanking() {
+		return serviceRanking;
 	}
 
 	public void cleanup() {

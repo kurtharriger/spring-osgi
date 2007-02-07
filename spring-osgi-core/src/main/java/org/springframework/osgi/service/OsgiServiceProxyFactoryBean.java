@@ -12,55 +12,41 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Created on 23-Jan-2006 by Adrian Colyer
  */
 package org.springframework.osgi.service;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.aop.target.HotSwappableTargetSource;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.ConstantException;
 import org.springframework.core.Constants;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.LocalBundleContext;
+import org.springframework.osgi.service.collection.OsgiServiceList;
+import org.springframework.osgi.service.support.ClassTargetSource;
+import org.springframework.osgi.service.support.RetryTemplate;
+import org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory bean for OSGi services. Returns a proxy implementing the service
- * interface. This allows Spring to manage service lifecycle events (such as the
- * bundle providing the service being stopped and restarted) and transparently
- * rebind to a new service instance if one is available.
+ * Factory bean for OSGi services. Returns a dynamic proxy which handles the
+ * lookup, retrieval and can cope with the dynamic nature of the OSGi platform.
  * 
+ * @author Costin Leau
  * @author Adrian Colyer
  * @author Hal Hildebrand
- * @since 2.0
+ * 
  */
-public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean, BundleContextAware,
-		ApplicationContextAware {
-
-	public static final long DEFAULT_MILLIS_BETWEEN_RETRIES = 1000;
-
-	public static final int DEFAULT_MAX_RETRIES = 3;
+public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean, BundleContextAware {
 
 	public static final String FILTER_ATTRIBUTE = "filter";
 
@@ -73,7 +59,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * 
 	 * @author Costin Leau
 	 */
-	protected static class ReferenceClassLoadingOptions {
+	public abstract static class ReferenceClassLoadingOptions {
 		public static final int CLIENT = 0;
 
 		public static final int SERVICE_PROVIDER = 1;
@@ -86,7 +72,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * 
 	 * @author Costin Leau
 	 */
-	protected static class Cardinality {
+	public abstract static class Cardinality {
 		public static final int C_0__1 = 0;
 
 		public static final int C_0__N = 1;
@@ -98,19 +84,19 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 	private static final Log logger = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
+	private static final Constants CARDINALITY = new Constants(Cardinality.class);
+
+	private static final Constants REFERENCE_CL_OPTIONS = new Constants(ReferenceClassLoadingOptions.class);
+
+	public static final String OBJECTCLASS = "objectClass";
+
 	private BundleContext bundleContext;
 
-	private int retryTimes = DEFAULT_MAX_RETRIES;
+	private RetryTemplate retryTemplate = new RetryTemplate();
 
-	private int cardinality;
+	private int cardinality = Cardinality.C_1__1;
 
-	private int contextClassloader;
-
-	private long timeout;
-
-	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
-
-	private long retryDelayMs = DEFAULT_MILLIS_BETWEEN_RETRIES;
+	private int contextClassloader = ReferenceClassLoadingOptions.CLIENT;
 
 	// not required to be an interface, but usually should be...
 	private Class serviceType;
@@ -118,30 +104,24 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	// filter used to narrow service matches, may be null
 	private String filter;
 
-	// if looking for a bean published as a service, this is the name we're
-	// after
-	private String beanName;
-
-	// reference to our app context (we need the classloader for proxying...)
-	private ApplicationContext applicationContext;
-
-	private Listener listener;
-
-	private String id;
-
 	// Constructed object of this factory
 	private Object proxy;
 
+	// Cumulated filter string between the specified classes/interfaces and the
+	// given filter
 	private String filterStringForServiceLookup;
 
-	private static final Constants CARDINALITY = new Constants(Cardinality.class);
+	// service lifecycle listener
+	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
 
-	private static final Constants REFERENCE_CL_OPTIONS = new Constants(ReferenceClassLoadingOptions.class);
-
-	public static final String OBJECTCLASS = "objectClass";
+	private String serviceBeanName;
 
 	public static int translateCardinality(String cardinality) {
 		return CARDINALITY.asNumber("C_".concat(cardinality.replace('.', '_'))).intValue();
+	}
+
+	public static boolean atMostOneExpected(int c) {
+		return Cardinality.C_0__1 == c || Cardinality.C_1__1 == c;
 	}
 
 	public static boolean atLeastOneRequired(int c) {
@@ -168,6 +148,13 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 */
 	public Class getObjectType() {
 		// TODO: return a class that returns all required interfaces
+		if (proxy != null)
+			return proxy.getClass();
+
+		// TODO: clarify the Collection/List/Set contract
+		if (moreThanOneExpected(cardinality))
+			return List.class;
+
 		return getInterface();
 	}
 
@@ -189,7 +176,82 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
 		Assert.notNull(getInterface(), "Required serviceType property was not set");
 
-		if (getFilter() != null) {
+		// validate and create the filter
+		createFilter();
+
+		if (atMostOneExpected(cardinality))
+			proxy = createSingleServiceProxy();
+		else
+			proxy = createMultiServiceCollection(getInterface(), filterStringForServiceLookup);
+	}
+
+	protected Object createSingleServiceProxy() throws Exception {
+
+		ProxyFactory factory = new ProxyFactory();
+
+		// mold the proxy
+		configureFactoryForClass(factory, getInterface());
+
+		// TODO: the same advices should be available for the multi case/service
+		// collection
+		// add advices
+		//
+
+		// TCCL support
+		// addContextClassLoaderSupport(factory, reference);
+
+		// Bundle Ctx
+		addLocalBundleContextSupport(factory);
+
+		// dynamic retry interceptor
+		addOsgiRetryInterceptor(factory, getInterface(), filterStringForServiceLookup, listeners);
+
+		// TODO: should these be enabled ?
+		// factory.setFrozen(true);
+		// factory.setOptimize(true);
+		// factory.setOpaque(true);
+
+		return factory.getProxy(ProxyFactory.class.getClassLoader());
+	}
+
+	protected Object createMultiServiceCollection(Class clazz, String filter) {
+		return new OsgiServiceList(clazz.getName(), filter, bundleContext, contextClassloader);
+	}
+
+	protected void addOsgiRetryInterceptor(ProxyFactory factory, Class clazz, String filter,
+			TargetSourceLifecycleListener[] listeners) {
+		OsgiServiceDynamicInterceptor lookupAdvice = new OsgiServiceDynamicInterceptor(bundleContext,
+				contextClassloader);
+		lookupAdvice.setListeners(listeners);
+		lookupAdvice.setClass(clazz.getName());
+		lookupAdvice.setFilter(filter);
+		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
+
+		lookupAdvice.afterPropertiesSet();
+
+		factory.addAdvice(lookupAdvice);
+	}
+
+	/**
+	 * Based on the given class, use JDK Proxy or CGLIB instrumentation when
+	 * generating the proxy.
+	 * 
+	 * @param factory
+	 * @param clazz
+	 */
+	protected void configureFactoryForClass(ProxyFactory factory, Class clazz) {
+		if (clazz.isInterface()) {
+			factory.setInterfaces(new Class[] { clazz });
+		}
+		else {
+			factory.setTargetSource(new ClassTargetSource(clazz));
+			factory.setProxyTargetClass(true);
+		}
+	}
+
+	protected void createFilter() {
+		// if (getFilter() != null)
+		{
 			// this call forces parsing of the filter string to generate an
 			// exception right
 			// now if it is not well-formed
@@ -201,114 +263,17 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 						+ "' set on OsgiServiceProxyFactoryBean has invalid syntax: " + ex.getMessage()).initCause(ex);
 			}
 		}
-		Assert.notNull(this.applicationContext, "Required applicationContext property was not set");
-
-		// TODO: Costin: why is this check necessary?
-		if (!(this.applicationContext instanceof DefaultResourceLoader)) {
-			throw new IllegalArgumentException("ApplicationContext does not provide access to classloader, "
-					+ "provided type was : '" + this.applicationContext.getClass().getName()
-					+ "' which does not extend DefaultResourceLoader");
-		}
-
-		boolean serviceAvailable = constructProxy();
-		bundleContext.addServiceListener(listener, getFilterStringForServiceLookup());
-		if (serviceAvailable) {
-			bind();
-		}
 	}
 
-	protected boolean constructProxy() throws Exception {
-		Object service = null;
-		ServiceReference reference = null;
-		final Class serviceInterface = getInterface();
-		final String filter = getFilterStringForServiceLookup();
-		boolean serviceAvailable = true;
-
-		// Create the object which stands in for the actual service when the
-		// service is unavailable
-		InvocationHandler unavailableServiceHandler = new InvocationHandler() {
-			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				if (cardinality == Cardinality.C_0__1 || cardinality == Cardinality.C_0__N) {
-					if (method.getReturnType().equals(Void.TYPE)) {
-						return null;
-					}
-				}
-				throw new ServiceUnavailableException("Service is currently unavailable", serviceInterface, filter);
-			}
-		};
-
-		Object unavailableService = Proxy.newProxyInstance(serviceInterface.getClassLoader(),
-				new Class[] { serviceInterface }, unavailableServiceHandler);
-
-		// Lookup the initial service
-		for (int i = 0; i < retryTimes; i++) {
-			try {
-				reference = OsgiServiceUtils.getService(this.bundleContext, getInterface(),
-						getFilterStringForServiceLookup());
-
-				if (logger.isDebugEnabled()) {
-					logger.debug("Resolved service reference: [" + reference + "] after " + (i + 1) + " attempts");
-				}
-			}
-			catch (NoSuchServiceException nsse) {
-				Thread.sleep(retryDelayMs);
-			}
-			if (reference != null) {
-				service = bundleContext.getService(reference); // obviously
-																// only works
-																// for
-																// cardinality =
-																// 1
-				break;
-			}
-		}
-		if (service == null) {
-			if (atLeastOneRequired(cardinality)) {
-				throw new NoSuchServiceException("The service of type '" + getInterface().getName()
-						+ "' matching filter '" + getFilterStringForServiceLookup() + "' was not available.",
-						getInterface(), filter);
-			}
-			else {
-				service = unavailableService;
-				serviceAvailable = false;
-			}
-		}
-
-		// Our listener to handle the service lifecycle
-		listener = new Listener(unavailableService);
-
-		HotSwappableTargetSource targetSource = new HotSwappableTargetSource(service);
-		listener.setTargetSource(targetSource);
-
-		ProxyFactory pf = new ProxyFactory();
-		if (getInterface().isInterface()) {
-			pf.setInterfaces(new Class[] { getInterface() });
-		}
-		pf.setTargetSource(targetSource);
-		OsgiServiceInterceptor interceptor = new OsgiServiceInterceptor(targetSource, unavailableService);
-
-		interceptor.setMaxRetries(this.timeout != 0 ? this.retryTimes : Integer.MAX_VALUE);
-		interceptor.setRetryIntervalMillis(this.retryDelayMs);
-
-		pf.addAdvice(interceptor);
-
-		// Context classloader support.
-		switch (contextClassloader) {
-		case ReferenceClassLoadingOptions.CLIENT:
-			pf.addAdvice(new BundleContextClassLoaderAdvice(bundleContext.getBundle()));
-			break;
-		case ReferenceClassLoadingOptions.SERVICE_PROVIDER:
-			pf.addAdvice(new BundleContextClassLoaderAdvice(reference.getBundle()));
-			break;
-		case ReferenceClassLoadingOptions.UNMANAGED:
-			break;
-		}
-
+	/**
+	 * Add the local bundle context support.
+	 * 
+	 * @param factory
+	 */
+	protected void addLocalBundleContextSupport(ProxyFactory factory) {
+		// TODO: make this customizable
 		// Add advice for pushing the bundle context
-		pf.addAdvice(new LocalBundleContext(bundleContext.getBundle()));
-
-		proxy = pf.getProxy(applicationContext.getClassLoader());
-		return serviceAvailable;
+		factory.addAdvice(new LocalBundleContext(bundleContext.getBundle()));
 	}
 
 	/**
@@ -349,14 +314,6 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		throw new IllegalArgumentException("invalid constant, " + cardinality);
 	}
 
-	// public void setContextClassloader(int options) {
-	// if (!REFERENCE_CL_OPTIONS.getValues(null).contains(new Integer(options)))
-	// throw new IllegalArgumentException("only reference classloader options
-	// allowed");
-	//
-	// this.contextClassloader = options;
-	// }
-
 	public void setContextClassloader(String classLoaderManagementOption) {
 		// transform "-" into "_" (for service-provider)
 		Assert.notNull(classLoaderManagementOption, "non-null argument required");
@@ -373,31 +330,6 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		this.bundleContext = context;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
-	 */
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.applicationContext = applicationContext;
-	}
-
-	/**
-	 * @return Returns the beanName.
-	 */
-	public String getBeanName() {
-		return this.beanName;
-	}
-
-	/**
-	 * To find a bean published as a service by the OsgiServiceExporter, simply
-	 * set this property. You may specify additional filtering criteria if
-	 * needed (using the filter property) but this is not required.
-	 */
-	public void setBeanName(String beanName) {
-		this.beanName = beanName;
-	}
-
 	/**
 	 * How many times should we attempt to rebind to a target service if the
 	 * service we are currently using is unregistered. Default is 3 times. <p/>
@@ -406,26 +338,25 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @param maxRetries The maxRetries to set.
 	 */
 	public void setRetryTimes(int maxRetries) {
-		this.retryTimes = maxRetries;
+		this.retryTemplate.setRetryNumbers(maxRetries);
 	}
 
 	public int getRetryTimes() {
-		return retryTimes;
+		return this.retryTemplate.getRetryNumbers();
 	}
 
 	/**
 	 * How long should we wait between failed attempts at rebinding to a service
-	 * that has been unregistered. <p/> Changing this property after
-	 * initialization is complete has no effect.
+	 * that has been unregistered. <p/>
 	 * 
 	 * @param millisBetweenRetries The millisBetweenRetries to set.
 	 */
-	public void setRetryDelayMs(long millisBetweenRetries) {
-		this.retryDelayMs = millisBetweenRetries;
+	public void setTimeout(long millisBetweenRetries) {
+		this.retryTemplate.setWaitTime(millisBetweenRetries);
 	}
 
-	public long getRetryDelayMs() {
-		return retryDelayMs;
+	public long getTimeout() {
+		return this.retryTemplate.getWaitTime();
 	}
 
 	// this is as nasty as dynamic sql generation.
@@ -436,7 +367,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 			return filterStringForServiceLookup;
 		}
 		StringBuffer sb = new StringBuffer();
-		boolean andFilterWithInterfaceName = ((getFilter() != null) || (getBeanName() != null));
+		boolean andFilterWithInterfaceName = (getFilter() != null) || (getServiceBeanName() != null);
 		if (andFilterWithInterfaceName) {
 			sb.append("(&");
 		}
@@ -449,19 +380,21 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		sb.append(getInterface().getName());
 		sb.append(")");
 
-		if (getBeanName() != null) {
+		if (getServiceBeanName() != null) {
 			sb.append("(");
 			sb.append(BeanNameServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY);
 			sb.append("=");
-			sb.append(getBeanName());
+			sb.append(getServiceBeanName());
 			sb.append(")");
 		}
+
 		if (andFilterWithInterfaceName) {
 			sb.append(")");
 		}
-		String filter = sb.toString();
-		if (StringUtils.hasText(filter)) {
-			filterStringForServiceLookup = filter;
+
+		String completeFilter = sb.toString();
+		if (StringUtils.hasText(completeFilter)) {
+			filterStringForServiceLookup = completeFilter;
 			return filterStringForServiceLookup;
 		}
 		else {
@@ -475,10 +408,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
-		if (listener != null) {
-			bundleContext.removeServiceListener(listener);
-		}
-		unbind();
+		// FIXME: add destroy behavior
 	}
 
 	/**
@@ -496,101 +426,40 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	}
 
 	/**
-	 * @return Returns the timeout.
-	 */
-	public long getTimeout() {
-		return timeout;
-	}
-
-	/**
-	 * @param timeout The timeout to set.
-	 */
-	public void setTimeout(long timeout) {
-		this.timeout = timeout;
-		// This is kind of a hack
-		if (timeout > 0)
-			setRetryTimes((int) (timeout / getRetryDelayMs()));
-	}
-
-	/**
 	 * @return Returns the listeners.
 	 */
 	public TargetSourceLifecycleListener[] getListeners() {
-		return defensiveCopyOf(this.listeners);
+		return listeners;
 	}
 
 	/**
 	 * @param listeners The listeners to set.
 	 */
 	public void setListeners(TargetSourceLifecycleListener[] listeners) {
-		this.listeners = defensiveCopyOf(listeners);
+		this.listeners = listeners;
 	}
 
-	private TargetSourceLifecycleListener[] defensiveCopyOf(TargetSourceLifecycleListener[] original) {
-		if (null == original) {
-			return new TargetSourceLifecycleListener[0];
-		}
-		else {
-			TargetSourceLifecycleListener[] copy = new TargetSourceLifecycleListener[original.length];
-			System.arraycopy(original, 0, copy, 0, original.length);
-			return copy;
-		}
+	/**
+	 * @return Returns the serviceBeanName.
+	 */
+	public String getServiceBeanName() {
+		return serviceBeanName;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	/**
+	 * To find a bean published as a service by the OsgiServiceExporter, simply
+	 * set this property. You may specify additional filtering criteria if
+	 * needed (using the filter property) but this is not required.
+	 * 
+	 * @param serviceBeanName The serviceBeanName to set.
+	 */
+	public void setServiceBeanName(String serviceBeanName) {
+		this.serviceBeanName = serviceBeanName;
 	}
 
-	protected void bind() {
-		for (int i = 0; i < listeners.length; i++) {
-			try {
-				listeners[i].bind(id, proxy);
-			}
-			catch (Throwable e) {
-				logger.error("Exception in listener when binding service", e);
-			}
-		}
+	// FIXME: this should be removed - bean-name-> service-bean-name
+	public void setBeanName(String beanName) {
+		setServiceBeanName(beanName);
 	}
 
-	protected void unbind() {
-		for (int i = 0; i < listeners.length; i++) {
-			try {
-				listeners[i].unbind(id, proxy);
-			}
-			catch (Throwable e) {
-				logger.error("Exception in listener when binding service", e);
-			}
-		}
-	}
-
-	protected class Listener implements ServiceListener {
-		private Object unavailableService;
-
-		private HotSwappableTargetSource targetSource;
-
-		protected Listener(Object unavailableService) {
-			this.unavailableService = unavailableService;
-		}
-
-		public void serviceChanged(ServiceEvent serviceEvent) {
-			ServiceReference serviceReference = serviceEvent.getServiceReference();
-			switch (serviceEvent.getType()) {
-			case ServiceEvent.MODIFIED:
-			case ServiceEvent.REGISTERED:
-				Object service = bundleContext.getService(serviceReference);
-				targetSource.swap(service);
-				bind();
-				break;
-			case ServiceEvent.UNREGISTERING:
-				unbind();
-				targetSource.swap(unavailableService);
-				break;
-			default:
-			}
-		}
-
-		public void setTargetSource(HotSwappableTargetSource targetSource) {
-			this.targetSource = targetSource;
-		}
-	}
 }

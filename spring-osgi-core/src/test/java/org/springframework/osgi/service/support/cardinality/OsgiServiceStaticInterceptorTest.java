@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
 import junit.framework.TestCase;
 
 import org.aopalliance.intercept.MethodInvocation;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.osgi.mock.MockBundleContext;
@@ -36,18 +38,24 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 
 	private ServiceWrapper wrapper;
 
+	private ServiceReference reference;
+
 	private Object service;
 
 	protected void setUp() throws Exception {
 		service = new Object();
 
-		wrapper = new ServiceWrapper(new MockServiceReference(), new MockBundleContext() {
+		reference = new MockServiceReference();
 
+		BundleContext ctx = new MockBundleContext() {
 			public Object getService(ServiceReference reference) {
 				return service;
 			}
-		});
-		interceptor = new OsgiServiceStaticInterceptor(wrapper);
+		};
+
+		wrapper = new ServiceWrapper(reference, ctx);
+
+		interceptor = new OsgiServiceStaticInterceptor(ctx, reference, 2);
 	}
 
 	protected void tearDown() throws Exception {
@@ -58,7 +66,7 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 
 	public void testNullWrapper() throws Exception {
 		try {
-			interceptor = new OsgiServiceStaticInterceptor(null);
+			interceptor = new OsgiServiceStaticInterceptor(null, null, 0);
 			fail("expected exception");
 		}
 		catch (RuntimeException ex) {
@@ -76,14 +84,14 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 
 	public void testInvocationWhenServiceNA() throws Throwable {
 		// service n/a
-		wrapper = new ServiceWrapper(new MockServiceReference(), new MockBundleContext()) {
-			public boolean isServiceAlive() {
-				return false;
+		ServiceReference reference = new MockServiceReference() {
+			public Bundle getBundle() {
+				return null;
 			}
 		};
 
-		interceptor = new OsgiServiceStaticInterceptor(wrapper);
-		
+		interceptor = new OsgiServiceStaticInterceptor(new MockBundleContext(), reference, 2);
+
 		Object target = new Object();
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);
 

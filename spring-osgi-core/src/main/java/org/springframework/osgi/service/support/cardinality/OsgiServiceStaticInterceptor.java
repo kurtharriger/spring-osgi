@@ -15,8 +15,8 @@
  */
 package org.springframework.osgi.service.support.cardinality;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.service.support.ServiceWrapper;
 import org.springframework.util.Assert;
 
@@ -28,33 +28,26 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceStaticInterceptor implements MethodInterceptor {
+public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker {
 
 	private ServiceWrapper wrapper;
 
-	public OsgiServiceStaticInterceptor(ServiceWrapper wrapper) {
-		Assert.notNull(wrapper, "a not null service wrapper is required");
-		this.wrapper = wrapper;
+	public OsgiServiceStaticInterceptor(BundleContext context, ServiceReference reference, int contextClassLoader) {
+		super(context, reference, contextClassLoader);
+		Assert.notNull(reference, "a not null service reference is required");
+		this.wrapper = new ServiceWrapper(reference, context);
 	}
 
-	protected Object doInvoke(Object service, MethodInvocation invocation) throws Throwable {
-		Assert.notNull(service, "service should not be null!");
-		return invocation.getMethod().invoke(service, invocation.getArguments());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+	/* (non-Javadoc)
+	 * @see org.springframework.osgi.service.support.cardinality.OsgiServiceInvoker#getTarget()
 	 */
-	public Object invoke(MethodInvocation invocation) throws Throwable {
-
+	protected Object getTarget() throws Throwable {
 		// service has died, clean up
 		if (!wrapper.isServiceAlive()) {
 			wrapper.cleanup();
 			throw new RuntimeException("service n/a");
 		}
-
-		return doInvoke(wrapper.getService(), invocation);
+		
+		return wrapper.getService();
 	}
-
 }

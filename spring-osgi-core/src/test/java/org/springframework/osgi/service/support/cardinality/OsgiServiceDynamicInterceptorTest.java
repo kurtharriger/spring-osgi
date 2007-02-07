@@ -20,11 +20,12 @@ import java.lang.reflect.Method;
 import junit.framework.TestCase;
 
 import org.aopalliance.intercept.MethodInvocation;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.support.ServiceWrapper;
 
 /**
  * @author Costin Leau
@@ -42,20 +43,26 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		service = new Object();
 		reference = new MockServiceReference();
 
-		interceptor = new OsgiServiceDynamicInterceptor();
-		interceptor.setBundleContext(new MockBundleContext() {
+		BundleContext ctx = new MockBundleContext() {
 
-			public ServiceReference getServiceReference(String clazz) {
-				return reference;
+			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+				return new ServiceReference[] { reference };
 			}
 
-			public Object getService(ServiceReference reference) {
-				return service;
+			public Object getService(ServiceReference ref) {
+				if (reference == ref) {
+					return service;
+				}
+				// simulate a non available service
+				return null;
 			}
 
-		});
+		};
+
+		interceptor = new OsgiServiceDynamicInterceptor(ctx, 2);
 		interceptor.getRetryTemplate().setRetryNumbers(3);
 		interceptor.getRetryTemplate().setWaitTime(1);
+		interceptor.afterPropertiesSet();
 	}
 
 	protected void tearDown() throws Exception {
@@ -68,7 +75,6 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor#OsgiServiceDynamicInterceptor()}.
 	 */
 	public void testOsgiServiceDynamicInterceptor() {
-		interceptor = new OsgiServiceDynamicInterceptor();
 		assertNotNull(interceptor.getRetryTemplate());
 	}
 
@@ -76,9 +82,9 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor#lookupService()}.
 	 */
-	public void testLookupService() {
-		ServiceWrapper wrapper = interceptor.lookupService();
-		assertSame(reference, wrapper.getReference());
+	public void testLookupService() throws Throwable {
+		Object serv = interceptor.getTarget();
+		assertSame(service, serv);
 	}
 
 	/**
@@ -99,14 +105,14 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 	 */
 	public void testInvocationWhenServiceNA() throws Throwable {
 		// service n/a
-		
+
 		Object target = new Object();
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);
 
 		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), target, m, new Object[0], null, null);
 		ServiceReference oldRef = reference;
 		reference = null;
-		
+
 		try {
 			interceptor.invoke(invocation);
 			fail("should have thrown exception");
@@ -114,10 +120,10 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		catch (RuntimeException ex) {
 			// expected
 		}
-		
+
 		// service is up
 		reference = oldRef;
-		
+
 		assertEquals(new Integer(service.hashCode()), interceptor.invoke(invocation));
 	}
 
