@@ -39,10 +39,12 @@ Import-Package: com.jamonapi;resolution:=optional,
 Export-Package: org.springframework.aop;version=${spring.version},
    org.springframework.aop.config;version=${spring.version},
    org.springframework.aop.framework;version=${spring.version},
+   org.springframework.aop.framework.adapter;version=${spring.version},
    org.springframework.aop.support;version=${spring.version},
    org.springframework.aop.target;version=${spring.version},
    org.springframework.aop.target.dynamic;version=${spring.version},
    org.springframework.metadata;version=${spring.version}
+DynamicImport-Package: *   
 Bundle-ClassPath: .,
  target/classes/
 
