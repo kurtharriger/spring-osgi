@@ -31,12 +31,11 @@ import java.lang.reflect.InvocationTargetException;
  */
 public abstract class OsgiServiceInvoker implements MethodInterceptor {
 
-	
 	protected final Log log = LogFactory.getLog(getClass());
-	
+
 	/**
-	 * Actual invocation - the class is being executed on a different object then
-	 * the one exposed in the invocation object.
+	 * Actual invocation - the class is being executed on a different object
+	 * then the one exposed in the invocation object.
 	 * 
 	 * @param service
 	 * @param invocation
@@ -45,12 +44,13 @@ public abstract class OsgiServiceInvoker implements MethodInterceptor {
 	 */
 	protected Object doInvoke(Object service, MethodInvocation invocation) throws Throwable {
 		Assert.notNull(service, "service should not be null!");
-        try {
-            return invocation.getMethod().invoke(service, invocation.getArguments());
-        } catch (InvocationTargetException e) {
-            throw e.getTargetException();
-        }
-    }
+		try {
+			return invocation.getMethod().invoke(service, invocation.getArguments());
+		}
+		catch (InvocationTargetException ex) {
+			throw ex.getTargetException();
+		}
+	}
 
 	/**
 	 * Determine the target object to execute the invocation upon.
