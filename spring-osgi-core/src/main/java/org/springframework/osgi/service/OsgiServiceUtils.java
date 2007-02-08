@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * @author Adrian Colyer
  * @since 2.0
  */
-public class OsgiServiceUtils {
+public abstract class OsgiServiceUtils {
 
 	/**
 	 * Find the single OSGi service of the given type and matching the given filter.
@@ -130,7 +130,7 @@ public class OsgiServiceUtils {
 		"STOPPING",
 		"LAZY_ACTIVATION"// new in r4.1
 	};
-	public final static int NUM_CODES = 10;
+	public final static int NUM_CODES = EVENT_CODES.length;
 
 	/**
 	 * Convert event codes to a printable String
