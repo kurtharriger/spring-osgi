@@ -29,7 +29,7 @@ Import-Package: oracle.toplink.exceptions,
    org.springframework.transaction;version="${spring.import.version}",
    org.springframework.transaction.support;version="${spring.import.version}",
    org.springframework.util;version="${spring.import.version}"
-Export-Package: org.springframework.orm.toplink;version="${spring.export.version}"
+Export-Package: org.springframework.orm.toplink;version="${spring.export.version}",
    org.springframework.orm.toplink.support;version="${spring.export.version}" 
 Bundle-ClassPath: .,
  target/classes/
