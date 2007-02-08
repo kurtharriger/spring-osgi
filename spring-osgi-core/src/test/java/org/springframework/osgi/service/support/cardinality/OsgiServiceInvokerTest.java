@@ -62,4 +62,17 @@ public class OsgiServiceInvokerTest extends TestCase {
 		Object result = invoker.invoke(invocation);
 		assertEquals("different target invoked", new Integer(target.hashCode()), result);
 	}
+
+	public void testExceptionUnwrapping() throws Throwable {
+		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), new Object(), Integer.class
+				.getMethod("parseInt", new Class[] { String.class }), new Object[] { "invalid number" }, null, null);
+
+		try {
+			invoker.invoke(invocation);
+			fail("should have thrown exception" + NumberFormatException.class);
+		}
+		catch (NumberFormatException nfe) {
+			// expected
+		}
+	}
 }
