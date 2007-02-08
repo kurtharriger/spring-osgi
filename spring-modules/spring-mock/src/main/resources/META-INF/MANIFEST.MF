@@ -4,7 +4,7 @@ Spring-Version: ${spring.version}
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.springframework.mock
 Bundle-Name: org.springframework.mock
-Bundle-Version: ${spring.bundle.version}.0
+Bundle-Version: ${spring.bundle.version}
 Bundle-Vendor: Spring Framework
 Import-Package: javax.naming;resolution:=optional,
   javax.naming.spi;resolution:=optional,
