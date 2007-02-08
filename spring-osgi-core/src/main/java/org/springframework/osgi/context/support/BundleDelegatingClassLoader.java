@@ -147,7 +147,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 			return;
 		}
 		Version iversion = hasImport(backingBundle, packageName);
-		if (iversion != null) {
+		if (iversion != null && context != null) {
 			log.debug("Class is correctly imported as version [" + iversion + "], checking providing bundles");
 			Bundle[] bundles = context.getBundles();
 			for (int i = 0; i < bundles.length; i++) {
