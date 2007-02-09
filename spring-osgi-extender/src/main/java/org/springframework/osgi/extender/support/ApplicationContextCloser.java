@@ -40,12 +40,14 @@ public class ApplicationContextCloser implements Runnable {
 	private final Map applicationContextMap;
 	private final Map contextsPendingInitializationMap;
 	private final ApplicationEventMulticaster mcast;
+	private final Map pendingRegistrationTasksMap;
 
 	public ApplicationContextCloser(Bundle bundle, Map contextMap,
-	                                Map initMap, ApplicationEventMulticaster mcast) {
+	                                Map initMap, Map pendingRegistrationTasks, ApplicationEventMulticaster mcast) {
 		this.bundle = bundle;
 		this.applicationContextMap = contextMap;
 		this.contextsPendingInitializationMap = initMap;
+		this.pendingRegistrationTasksMap = pendingRegistrationTasks;
 		this.mcast = mcast;
 	}
 
@@ -56,6 +58,12 @@ public class ApplicationContextCloser implements Runnable {
 		ConfigurableApplicationContext appContext;
 		Long bundleKey = Long.valueOf(this.bundle.getBundleId());
 
+		// Check for tasks that have not run yet
+		synchronized(pendingRegistrationTasksMap) {
+			if (pendingRegistrationTasksMap.remove(bundleKey) != null) {
+				return;
+			}
+		}
 		postEvent(BundleEvent.STOPPING);
 		// do not change locking order without also changing ApplicationContextCreator
 		synchronized (this.applicationContextMap) {

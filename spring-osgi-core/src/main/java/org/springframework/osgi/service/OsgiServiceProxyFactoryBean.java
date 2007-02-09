@@ -195,15 +195,11 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		// TODO: the same advices should be available for the multi case/service
 		// collection
 		// add advices
-		//
-
-		// TCCL support
-		// addContextClassLoaderSupport(factory, reference);
 
 		// Bundle Ctx
 		addLocalBundleContextSupport(factory);
 
-		// dynamic retry interceptor
+		// dynamic retry interceptor / context classloader
 		addOsgiRetryInterceptor(factory, getInterface(), filterStringForServiceLookup, listeners);
 
 		// TODO: should these be enabled ?

@@ -29,6 +29,7 @@ import org.springframework.osgi.context.support.AbstractBundleXmlApplicationCont
 import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.SpringBundleEvent;
+import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 
 public class ApplicationContextCreatorTest extends TestCase {
 
@@ -37,13 +38,14 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	private final Map contextMap = new HashMap();
 	private final Map initMap = new HashMap();
+	private final Map pendingRegistrationTasks = new HashMap();
 	private NamespacePlugins namespacePlugins = new NamespacePlugins();
 	private final ApplicationEventMulticaster mcast = new SimpleApplicationEventMulticaster();
 
 	public void testNoContextCreatedIfNotSpringPowered() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(null);
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, null, namespacePlugins, mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, null, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
 		creator.run(); // will NPE if not detecting that this bundle is not spring-powered!
 	}
 
@@ -68,7 +70,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 		control.replay();
 
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, factory, namespacePlugins, mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
 		creator.run();
 
 		control.verify();
@@ -90,7 +92,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 		control.replay();
 
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, factory, namespacePlugins, mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
 		creator.run();
 
 		control.verify();
@@ -123,7 +125,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 		control.replay();
 
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, factory, namespacePlugins, mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
 
 		try {
 			creator.run();
@@ -167,7 +169,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STARTED, aBundle));
 		mockListener.replay();
 
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, factory, namespacePlugins, mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
 		creator.run();
 
 		control.verify();
@@ -203,7 +205,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STOPPED, aBundle));
 		mockListener.replay();
 
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, factory, namespacePlugins, mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
 		creator.run();
 
 		control.verify();

@@ -39,11 +39,12 @@ public class ApplicationContextCloserTest extends TestCase {
 	private Map contextMap;
 	private final ApplicationEventMulticaster mcast = new SimpleApplicationEventMulticaster();
 	private final Bundle bundle = new MockBundle();
+	private Map pendingRegistrationTasks = new HashMap();
 
 	protected void setUp() throws Exception {
 		this.contextMap = new HashMap();
 		this.initMap = new HashMap();
-		this.closer = new ApplicationContextCloser(bundle, contextMap, initMap, mcast);
+		this.closer = new ApplicationContextCloser(bundle, contextMap, initMap, pendingRegistrationTasks, mcast);
 		super.setUp();
 	}
 

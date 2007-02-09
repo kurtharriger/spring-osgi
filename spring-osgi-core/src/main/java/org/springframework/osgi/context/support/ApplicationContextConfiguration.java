@@ -41,12 +41,14 @@ public class ApplicationContextConfiguration {
     private static final String CONTEXT_LOCATION_HEADER = "Spring-Context";
     private static final String CONTEXT_LOCATION_DELIMITERS = ", ";
     private static final String DONT_WAIT_FOR_DEPENDENCIES_DIRECTIVE = ";wait-for-dependencies:=false";
+	private static final String CREATE_ASYNCHRONOUSLY_DIRECTIVE = ";create-asynchronously:=false";
     private static final String SPRING_CONTEXT_DIRECTORY = "/META-INF/spring/";
 
     private static final Log log = LogFactory.getLog(ApplicationContextConfiguration.class);
 
     private final Bundle bundle;
     private boolean waitForDependencies = true;
+	private boolean asyncCreation = true;
     private String[] configurationLocations = null;
     private boolean isSpringPoweredBundle = true;
 
@@ -69,6 +71,14 @@ public class ApplicationContextConfiguration {
      */
     public boolean waitForDependencies() {
         return this.waitForDependencies;
+    }
+
+	/**
+     * Should the application context wait for all non-optional service
+     * references to be satisfied before starting?
+     */
+    public boolean createAsynchronously() {
+        return this.asyncCreation;
     }
 
     /**
@@ -96,7 +106,11 @@ public class ApplicationContextConfiguration {
             this.configurationLocations = findSpringResourcesInMetaInf();
         }
         else {
-            if (springContextHeader.indexOf(DONT_WAIT_FOR_DEPENDENCIES_DIRECTIVE) != -1) {
+	        if (springContextHeader.indexOf(CREATE_ASYNCHRONOUSLY_DIRECTIVE) != -1) {
+	            this.asyncCreation = false;
+		        this.waitForDependencies = false;
+	        }
+            else if (springContextHeader.indexOf(DONT_WAIT_FOR_DEPENDENCIES_DIRECTIVE) != -1) {
                 this.waitForDependencies = false;
             }
             populateConfigLocationsFromContextHeader(springContextHeader);
