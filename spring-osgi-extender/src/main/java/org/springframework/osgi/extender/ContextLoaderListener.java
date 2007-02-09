@@ -43,6 +43,7 @@ import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.OsgiPlatformDetector;
 import org.springframework.osgi.context.support.SpringBundleEvent;
+import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.extender.support.ApplicationContextCloser;
 import org.springframework.osgi.extender.support.ApplicationContextCreator;
 import org.springframework.osgi.io.OsgiBundleResource;
@@ -113,6 +114,12 @@ public class ContextLoaderListener implements BundleActivator,
 	private Map applicationContextsBeingInitialized;
 
 	/**
+	 * ApplicationContextCreator tasks that are in process. Keys are bundle ids, values are
+	 * ApplicationContextCreator instances.
+	 */
+	private Map pendingRegistrationTasks;
+
+	/**
 	 * ServiceRegistration object returned by OSGi when registering the NamespacePlugins
 	 * instance as a service
 	 */
@@ -176,6 +183,7 @@ public class ContextLoaderListener implements BundleActivator,
 		this.bundleId = context.getBundle().getBundleId();
 		this.managedBundles = new HashMap();
 		this.applicationContextsBeingInitialized = new HashMap();
+		this.pendingRegistrationTasks = new HashMap();
 		this.namespacePlugins = new NamespacePlugins();
 		this.contextFactory = new DefaultOsgiBundleXmlApplicationContextFactory();
 		this.context = context;
@@ -214,6 +222,7 @@ public class ContextLoaderListener implements BundleActivator,
 		unregisterResolverService();
 		this.managedBundles = null;
 		this.applicationContextsBeingInitialized = null;
+		this.pendingRegistrationTasks = null;
 		this.contextFactory = null;
 		this.namespacePlugins = null;
 		this.taskExecutor = null;
@@ -321,15 +330,23 @@ public class ContextLoaderListener implements BundleActivator,
 	 * @param bundle
 	 */
 	private void maybeCreateApplicationContextFor(Bundle bundle) {
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
 		ApplicationContextCreator contextCreator =
 			new ApplicationContextCreator(
 				bundle,
 				this.managedBundles,
 				this.applicationContextsBeingInitialized,
+				this.pendingRegistrationTasks,
 				this.contextFactory,
 				this.namespacePlugins,
+				config,
 				this);
-		this.taskExecutor.execute(contextCreator);
+		if (config.createAsynchronously()) {
+			this.taskExecutor.execute(contextCreator);
+		}
+		else {
+			contextCreator.run();
+		}
 	}
 
 	/**
@@ -344,6 +361,7 @@ public class ContextLoaderListener implements BundleActivator,
 			new ApplicationContextCloser(bundle,
 				this.managedBundles,
 				this.applicationContextsBeingInitialized,
+				this.pendingRegistrationTasks,
 				this);
 		contextCloser.run();
 	}

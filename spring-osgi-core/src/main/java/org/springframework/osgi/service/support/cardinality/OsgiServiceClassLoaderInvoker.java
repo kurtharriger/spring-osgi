@@ -47,6 +47,7 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 	public OsgiServiceClassLoaderInvoker(BundleContext context, ServiceReference reference, int contextClassLoader) {
 		this.context = context;
 		this.serviceReference = reference;
+		this.contextClassLoader = contextClassLoader;
 
 		// if the reference is not needed create the classloader once and just
 		// reuse it
@@ -106,8 +107,8 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 				Thread.currentThread().setContextClassLoader(oldCL);
 			}
 		}
-
-		return super.doInvoke(service, invocation);
-
+		else {
+			return super.doInvoke(service, invocation);
+		}
 	}
 }

@@ -40,9 +40,11 @@ public class ApplicationContextCreator implements Runnable {
 	private final Bundle bundle;
 	private final Map applicationContextMap;
 	private final Map contextsPendingInitializationMap;
+	private final Map pendingRegistrationTasksMap;
 	private final OsgiBundleXmlApplicationContextFactory contextFactory;
 	private final NamespacePlugins namespacePlugins;
 	private final ApplicationEventMulticaster mcast;
+	private final ApplicationContextConfiguration config;
 	private Throwable creationTrace;
 
 	/**
@@ -51,23 +53,32 @@ public class ApplicationContextCreator implements Runnable {
 	 *
 	 * @param forBundle
 	 * @param applicationContextMap
+	 * @param pendingRegistrationTasks
 	 */
 	public ApplicationContextCreator(
 		Bundle forBundle,
 		Map applicationContextMap,
 		Map contextsPendingInitializationMap,
+		Map pendingRegistrationTasks,
 		OsgiBundleXmlApplicationContextFactory contextFactory,
 		NamespacePlugins namespacePlugins,
+	    ApplicationContextConfiguration config,
 		ApplicationEventMulticaster mcast) {
 		this.bundle = forBundle;
 		this.applicationContextMap = applicationContextMap;
 		this.contextsPendingInitializationMap = contextsPendingInitializationMap;
 		this.contextFactory = contextFactory;
 		this.namespacePlugins = namespacePlugins;
+		this.pendingRegistrationTasksMap = pendingRegistrationTasks;
+		this.config = config;
 		this.mcast = mcast;
 		// Do some sanity checking.
 		Assert.notNull(mcast);
 		Long bundleKey = Long.valueOf(this.bundle.getBundleId());
+		synchronized(pendingRegistrationTasksMap){
+			Assert.isTrue(!pendingRegistrationTasksMap.containsKey(bundleKey), "Duplicate context created!");
+			pendingRegistrationTasksMap.put(bundleKey, this);
+		}
 		synchronized (this.applicationContextMap) {
 			synchronized (this.contextsPendingInitializationMap) {
 				Assert.isTrue(!contextsPendingInitializationMap.containsKey(bundleKey), "Duplicate context created!");
@@ -86,19 +97,26 @@ public class ApplicationContextCreator implements Runnable {
 		 */
 	public void run() {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-		ConfigurableApplicationContext applicationContext = null;
+		ConfigurableApplicationContext applicationContext;
 		Long bundleKey = Long.valueOf(this.bundle.getBundleId());
 
-		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
 		if (!config.isSpringPoweredBundle()) {
 			return;
+		}
+
+		synchronized(pendingRegistrationTasksMap) {
+			if (pendingRegistrationTasksMap.remove(bundleKey) == null) {
+				log.warn("Context creation aborted");
+				return;
+			}
 		}
 
 		postEvent(BundleEvent.STARTING);
 
 		BundleContext bundleContext = OsgiResourceUtils.getBundleContext(bundle);
 		if (bundleContext == null) {
-			log.error("Could not resolve BundleContext for bundle [" + bundle + "]");
+			log.error("Could not start ApplicationContext from [" + config.getConfigurationLocations()[0]
+				+ "]: failed to resolve BundleContext for bundle [" + bundle + "]");
 			return;
 		}
 
