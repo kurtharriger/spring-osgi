@@ -16,9 +16,9 @@
 package org.springframework.osgi.service.support;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.context.support.OsgiResourceUtils;
+import org.springframework.osgi.service.OsgiServiceReferenceUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -32,7 +32,7 @@ public class ServiceWrapper {
 	private ServiceReference reference;
 
 	private final long serviceId;
-	
+
 	private final int serviceRanking;
 
 	private final String toString;
@@ -51,10 +51,10 @@ public class ServiceWrapper {
 		reference = ref;
 		this.context = bundleContext;
 
-		serviceId = ((Long) ref.getProperty(Constants.SERVICE_ID)).longValue();
-		Integer rank = (Integer) ref.getProperty(Constants.SERVICE_RANKING);
-		serviceRanking = (rank == null ? 0 : rank.intValue());
-		
+		serviceId = OsgiServiceReferenceUtils.getServiceId(ref);
+
+		serviceRanking = OsgiServiceReferenceUtils.getServiceRanking(ref);
+
 		toString = "ServiceWrapper[serviceId=" + serviceId + "|ref=" + reference + "]";
 	}
 
@@ -99,7 +99,7 @@ public class ServiceWrapper {
 	public long getServiceId() {
 		return serviceId;
 	}
-	
+
 	public int getServiceRanking() {
 		return serviceRanking;
 	}

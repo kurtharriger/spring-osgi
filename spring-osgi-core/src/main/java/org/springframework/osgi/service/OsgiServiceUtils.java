@@ -95,7 +95,7 @@ public abstract class OsgiServiceUtils {
 			throw (IllegalArgumentException) new IllegalArgumentException(ex.getMessage()).initCause(ex);
 		}
 	}
-
+	
 	/**
 	 * Return all of the service references for services of the given type and matching
 	 * the given filter. Returned services may use interface versions that are

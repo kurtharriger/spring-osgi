@@ -176,8 +176,8 @@ public abstract class OsgiFilterUtils {
 		try {
 			return FrameworkUtil.createFilter(filter);
 		}
-		catch (InvalidSyntaxException ex) {
-			throw (RuntimeException) new IllegalArgumentException("invalid filter").initCause(ex);
+		catch (InvalidSyntaxException ise) {
+			throw (RuntimeException) new IllegalArgumentException("invalid filter: " + ise.getFilter()).initCause(ise);
 		}
 	}
 }
