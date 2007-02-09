@@ -81,7 +81,8 @@ public class MockServiceReference implements ServiceReference {
 		if (dict.get(Constants.OBJECTCLASS) == null)
 			dict.put(Constants.OBJECTCLASS, objectClass);
 
-		if (dict.get(Constants.SERVICE_RANKING) == null)
+		Object ranking = dict.get(Constants.SERVICE_RANKING);
+		if (ranking == null || !(ranking instanceof Integer))
 			dict.put(Constants.SERVICE_RANKING, new Integer(0));
 
 	}
@@ -153,8 +154,10 @@ public class MockServiceReference implements ServiceReference {
 			// copy mandatory properties
 			properties.put(Constants.SERVICE_ID, this.properties.get(Constants.SERVICE_ID));
 			properties.put(Constants.OBJECTCLASS, this.properties.get(Constants.OBJECTCLASS));
-			properties.put(Constants.SERVICE_RANKING, this.properties.get(Constants.SERVICE_RANKING));
-			
+			// optional property
+			if (properties.get(Constants.SERVICE_RANKING) == null)
+				properties.put(Constants.SERVICE_RANKING, this.properties.get(Constants.SERVICE_RANKING));
+
 			this.properties = properties;
 		}
 	}
