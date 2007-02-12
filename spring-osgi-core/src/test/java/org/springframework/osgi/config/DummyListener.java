@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.config;
 
+import java.util.Dictionary;
+
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 
 /**
@@ -32,7 +34,7 @@ public class DummyListener implements TargetSourceLifecycleListener {
 	 * @see org.springframework.osgi.service.TargetSourceLifecycleListener#bind(java.lang.String,
 	 *      java.lang.Object)
 	 */
-	public void bind(String serviceBeanName, Object service) {
+	public void bind(Object service, Dictionary props) {
 		BIND_CALLS++;
 	}
 
@@ -42,7 +44,7 @@ public class DummyListener implements TargetSourceLifecycleListener {
 	 * @see org.springframework.osgi.service.TargetSourceLifecycleListener#unbind(java.lang.String,
 	 *      java.lang.Object)
 	 */
-	public void unbind(String serviceBeanName, Object service) {
+	public void unbind(Object service, Dictionary props) {
 		UNBIND_CALLS++;
 	}
 

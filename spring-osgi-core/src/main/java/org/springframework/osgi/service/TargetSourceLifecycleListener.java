@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.service;
 
+import java.util.Dictionary;
+
 /**
  * Listener tracking binding and unbinding of OSGi services used as normal
  * object references inside Spring OSGi.
@@ -24,7 +26,21 @@ package org.springframework.osgi.service;
  */
 public interface TargetSourceLifecycleListener {
 
-	public void bind(String serviceBeanName, Object service);
+	/**
+	 * Called when a service is being binded inside the proxy (be it single or
+	 * multi value).
+	 * 
+	 * @param service the OSGi service instance
+	 * @param properties the service properties
+	 */
+	public void bind(Object service, Dictionary properties) throws Exception;
 
-	public void unbind(String serviceBeanName, Object service);
+	/**
+	 * Called when a service is being unbinded inside the proxy (be it single or
+	 * multi value).
+	 * 
+	 * @param service the OSGi service instance
+	 * @param properties the service properties
+	 */
+	public void unbind(Object service, Dictionary properties) throws Exception;
 }

@@ -1,5 +1,7 @@
 package org.springframework.osgi.config;
 
+import java.util.Dictionary;
+
 /**
  * @author Hal Hildebrand
  *         Date: Nov 13, 2006
@@ -10,12 +12,12 @@ public class DummyListenerServiceSignature {
     static int UNBIND_CALLS = 0;
 
 
-    public void register(String serviceBeanName, Cloneable service) {
+    public void register(Cloneable service, Dictionary props) {
         BIND_CALLS++;
     }
 
 
-    public void deregister(String serviceBeanName, Cloneable service) {
+    public void deregister(Cloneable service, Dictionary props) {
         UNBIND_CALLS++;
     }
 }
