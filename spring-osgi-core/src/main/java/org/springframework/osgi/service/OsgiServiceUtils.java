@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
 
 /**
  * Utility class offering easy access to OSGi services
- * 
+ *
  * @author Adrian Colyer
  * @since 2.0
  */
@@ -35,7 +35,7 @@ public abstract class OsgiServiceUtils {
 	 * filter. Throws an NoSuchServiceException if there are no matching
 	 * services, or AmbiguousServiceReferenceException if there are more than
 	 * one candidate matches.
-	 * 
+	 *
 	 * @param context
 	 * @param serviceClass
 	 * @param filter
@@ -74,7 +74,7 @@ public abstract class OsgiServiceUtils {
 	 * Return all of the service references for services of the given type and
 	 * matching the given filter. Returned service references must be compatible
 	 * with the given context.
-	 * 
+	 *
 	 * @param context
 	 * @param serviceClass
 	 * @param filter
@@ -96,7 +96,7 @@ public abstract class OsgiServiceUtils {
 	 * Return all of the service references for services of the given type and
 	 * matching the given filter. Returned services may use interface versions
 	 * that are incompatible with the given context.
-	 * 
+	 *
 	 * @param context
 	 * @param serviceClass
 	 * @param filter
@@ -117,18 +117,7 @@ public abstract class OsgiServiceUtils {
 	public static Object getService(BundleContext context, ServiceReference reference) {
 		Assert.notNull(context);
 		Assert.notNull(reference);
-
-		try {
-			return context.getService(reference);
-		}
-		finally {
-			try {
-				context.ungetService(reference);
-			}
-			catch (IllegalStateException isex) {
-				// do nothing
-			}
-		}
+	    return context.getService(reference); 
 	}
 
 	public final static String[] EVENT_CODES = { "INSTALLED", "STARTED", "STOPPED", "UPDATED", "UNINSTALLED",
@@ -141,7 +130,7 @@ public abstract class OsgiServiceUtils {
 
 	/**
 	 * Convert event codes to a printable String
-	 * 
+	 *
 	 * @param type
 	 */
 	public static String eventToString(int type) {
