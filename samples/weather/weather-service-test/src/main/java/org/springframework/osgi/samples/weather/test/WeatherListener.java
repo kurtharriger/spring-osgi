@@ -17,16 +17,17 @@
 package org.springframework.osgi.samples.weather.test;
 
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import java.util.Dictionary;
 
 /**
  */
 public class WeatherListener implements TargetSourceLifecycleListener
 {
-  public void bind(String service, Object obj) {
-    System.out.println("BOUND: " + service);
+  public void bind(Object obj, Dictionary properties) {
+    System.out.println("BOUND: " + obj);
   }
 
-  public void unbind(String service, Object obj) {
-    System.out.println("REBOUND: " + service);
+  public void unbind(Object obj, Dictionary properties) {
+    System.out.println("REBOUND: " + obj);
   }
 }
