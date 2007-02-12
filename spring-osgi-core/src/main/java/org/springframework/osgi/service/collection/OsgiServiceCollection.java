@@ -33,6 +33,7 @@ import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.service.OsgiBindingUtils;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.support.ClassTargetSource;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceStaticInterceptor;
@@ -80,7 +81,7 @@ public class OsgiServiceCollection implements Collection {
 				}
 				// inform listeners
 				if (found)
-					callListenersBind(ref);
+					OsgiBindingUtils.callListenersBind(context, ref, listeners);
 
 				break;
 			case (ServiceEvent.MODIFIED):
@@ -94,7 +95,7 @@ public class OsgiServiceCollection implements Collection {
 				}
 				// inform listeners
 				if (found)
-					callListenersBind(ref);
+					OsgiBindingUtils.callListenersBind(context, ref, listeners);
 
 				break;
 			case (ServiceEvent.UNREGISTERING):
@@ -108,23 +109,11 @@ public class OsgiServiceCollection implements Collection {
 				}
 
 				if (found)
-					callListenersUnbind(ref);
+					OsgiBindingUtils.callListenersUnbind(context, ref, listeners);
 				break;
 
 			default:
 				throw new IllegalArgumentException("unsupported event type");
-			}
-		}
-
-		private void callListenersBind(ServiceReference reference) {
-			for (int i = 0; i < listeners.length; i++) {
-				listeners[i].bind(null, context.getService(reference));
-			}
-		}
-
-		private void callListenersUnbind(ServiceReference reference) {
-			for (int i = 0; i < listeners.length; i++) {
-				listeners[i].unbind(null, context.getService(reference));
 			}
 		}
 	}

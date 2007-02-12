@@ -68,163 +68,7 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	public static final String INTERFACE_NAME = "interfaceName";
 
-	/**
-	 * TargetSourceLifecycleListener wrapper for custom beans, useful when
-	 * custom methods are being used.
-	 * 
-	 * @author Costin Leau
-	 */
-	static class ServiceListenerWrapper implements TargetSourceLifecycleListener, InitializingBean,
-			BeanClassLoaderAware {
-		private Method bind, unbind;
 
-		private String bindMethod, unbindMethod;
-
-		private final Class[] METHODS_ARGS = new Class[] { String.class, Object.class };
-
-		private final Class[] METHODS_ARGS2 = new Class[] { Object.class };
-
-		private Object target;
-
-		private String interfaceName;
-
-		private Class interfaceClass;
-
-		private ClassLoader classLoader;
-
-		private boolean isLifecycleListener;
-
-		public ServiceListenerWrapper(Object object) {
-			this.target = object;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-		 */
-		public void afterPropertiesSet() throws Exception {
-			Assert.notNull(target, "target property required");
-			Assert.notNull(interfaceName, "interface property required");
-
-			interfaceClass = classLoader.loadClass(interfaceName);
-
-			isLifecycleListener = target instanceof TargetSourceLifecycleListener;
-
-			bind = determineCustomMethod(bindMethod);
-			unbind = determineCustomMethod(unbindMethod);
-
-			if (!isLifecycleListener && (bind == null || unbind == null))
-				throw new IllegalArgumentException("target object needs to implement "
-						+ TargetSourceLifecycleListener.class + " or custom bind/unbind methods have to be specified");
-		}
-
-		/**
-		 * Determine a custom method (if specified) on the given object. If the
-		 * methodName is not null and no method is found, an exception is
-		 * thrown.
-		 * 
-		 * @param methodName
-		 * @return
-		 */
-		private Method determineCustomMethod(String methodName) {
-			if (methodName == null) {
-				return null;
-			}
-
-			Method method;
-			method = ReflectionUtils.findMethod(target.getClass(), methodName, new Class[] { String.class,
-					interfaceClass });
-			if (method != null) {
-				return method;
-			}
-
-			method = ReflectionUtils.findMethod(target.getClass(), methodName, new Class[] { interfaceClass });
-			if (method != null) {
-				return method;
-			}
-
-			method = ReflectionUtils.findMethod(target.getClass(), methodName, METHODS_ARGS);
-			if (method != null) {
-				return method;
-			}
-
-			method = ReflectionUtils.findMethod(target.getClass(), methodName, METHODS_ARGS2);
-			if (method != null) {
-				return method;
-			}
-
-			throw new IllegalArgumentException("incorrect custom method specified " + methodName + " on class "
-					+ target.getClass());
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.springframework.osgi.service.TargetSourceLifecycleListener#bind(java.lang.String,
-		 * java.lang.Object)
-		 */
-		public void bind(String serviceBeanName, Object service) {
-			// first call interface method (if it exists)
-			if (isLifecycleListener)
-				((TargetSourceLifecycleListener) target).bind(serviceBeanName, service);
-
-			if (bind == null) {
-				return;
-			}
-			try {
-				ReflectionUtils.invokeMethod(bind, target, new Object[] { serviceBeanName, service });
-			}
-			catch (IllegalArgumentException ex) {
-				ReflectionUtils.invokeMethod(bind, target, new Object[] { service });
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.springframework.osgi.service.TargetSourceLifecycleListener#unbind(java.lang.String,
-		 * java.lang.Object)
-		 */
-		public void unbind(String serviceBeanName, Object service) {
-			// first call interface method (if it exists)
-			if (isLifecycleListener)
-				((TargetSourceLifecycleListener) target).unbind(serviceBeanName, service);
-
-			if (unbind == null) {
-				return;
-			}
-			try {
-				ReflectionUtils.invokeMethod(unbind, target, new Object[] { serviceBeanName, service });
-			}
-			catch (IllegalArgumentException e) {
-				ReflectionUtils.invokeMethod(unbind, target, new Object[] { service });
-			}
-
-		}
-
-		/**
-		 * @param bindMethod The bindMethod to set.
-		 */
-		public void setBindMethod(String bindMethod) {
-			this.bindMethod = bindMethod;
-		}
-
-		/**
-		 * @param unbindMethod The unbindMethod to set.
-		 */
-		public void setUnbindMethod(String unbindMethod) {
-			this.unbindMethod = unbindMethod;
-		}
-
-		public void setInterfaceName(String interfaceName) {
-			this.interfaceName = interfaceName;
-		}
-
-		public void setBeanClassLoader(ClassLoader classLoader) {
-			this.classLoader = classLoader;
-		}
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -244,7 +88,6 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	 */
 	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		AbstractBeanDefinition def = builder.getBeanDefinition();
-		String interfaceName = element.getAttribute(INTERFACE);
 
 		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
 
@@ -308,10 +151,9 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 				else
 					vals.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
 			}
-			vals.addPropertyValue(INTERFACE_NAME, interfaceName);
 
 			// create serviceListener wrapper
-			RootBeanDefinition wrapperDef = new RootBeanDefinition(ServiceListenerWrapper.class);
+			RootBeanDefinition wrapperDef = new RootBeanDefinition(TargetSourceLifecycleListenerWrapper.class);
 
 			ConstructorArgumentValues cav = new ConstructorArgumentValues();
 			cav.addIndexedArgumentValue(0, target);

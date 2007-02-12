@@ -22,6 +22,8 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.osgi.service.OsgiBindingUtils;
+import org.springframework.osgi.service.OsgiServiceReferenceUtils;
 import org.springframework.osgi.service.OsgiServiceUtils;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
@@ -73,7 +75,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 			case (ServiceEvent.REGISTERED):
 				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
 					// inform listeners
-					callListenersBind(ref);
+					OsgiBindingUtils.callListenersBind(context, ref, listeners);
 				}
 
 				break;
@@ -81,7 +83,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 				// same as ServiceEvent.REGISTERED
 				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
 					// inform listeners
-					callListenersBind(ref);
+					OsgiBindingUtils.callListenersBind(context, ref, listeners);
 				}
 
 				break;
@@ -100,7 +102,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 				}
 
 				if (updated)
-					callListenersUnbind(ref);
+					OsgiBindingUtils.callListenersUnbind(context, ref, listeners);
 				try {
 					ServiceReference refs[] = context.getServiceReferences(clazz, filter);
 
@@ -113,29 +115,10 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 				catch (InvalidSyntaxException ise) {
 					throw new IllegalArgumentException("invalid filter");
 				}
-				
+
 				break;
 			default:
 				throw new IllegalArgumentException("unsupported event type");
-			}
-		}
-
-		private void callListenersBind(ServiceReference reference) {
-			boolean debug = log.isDebugEnabled();
-			for (int i = 0; i < listeners.length; i++) {
-				if (debug)
-					log.debug("calling bind on " + listeners[i] + " w/ reference " + reference);
-				listeners[i].bind(null, context.getService(reference));
-			}
-		}
-
-		private void callListenersUnbind(ServiceReference reference) {
-			boolean debug = log.isDebugEnabled();
-
-			for (int i = 0; i < listeners.length; i++) {
-				if (debug)
-					log.debug("calling unbind on " + listeners[i] + " w/ reference " + reference);
-				listeners[i].unbind(null, context.getService(reference));
 			}
 		}
 

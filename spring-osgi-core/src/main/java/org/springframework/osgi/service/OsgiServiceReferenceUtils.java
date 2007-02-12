@@ -15,6 +15,10 @@
  */
 package org.springframework.osgi.service;
 
+import java.util.Collections;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
@@ -47,10 +51,10 @@ public abstract class OsgiServiceReferenceUtils {
 
 		// pick one service
 		ServiceReference winningReference = (refs.length > 0 ? refs[0] : null);
-		
+
 		if (winningReference == null)
 			return null;
-		
+
 		long winningId = getServiceId(winningReference);
 		int winningRanking = getServiceRanking(winningReference);
 
@@ -134,5 +138,26 @@ public abstract class OsgiServiceReferenceUtils {
 		// if the property is not supplied or of incorrect type, use a
 		// default
 		return ((ranking != null && ranking instanceof Integer) ? ((Integer) ranking).intValue() : 0);
+	}
+
+	/**
+	 * Return a dictionary containing the properties available for the given
+	 * service reference.
+	 * 
+	 * @param reference service reference
+	 * @return dictionary containing the service reference properties
+	 */
+	public static Dictionary getServiceProperties(ServiceReference reference) {
+		Assert.notNull(reference);
+		String[] keys = reference.getPropertyKeys();
+
+		Dictionary dict = new Hashtable(keys.length);
+
+		for (int i = 0; i < keys.length; i++) {
+			dict.put(keys[i], reference.getProperty(keys[i]));
+		}
+
+		// TODO: maybe return a read-only dictionary since we offer just a read-view
+		return dict;
 	}
 }
