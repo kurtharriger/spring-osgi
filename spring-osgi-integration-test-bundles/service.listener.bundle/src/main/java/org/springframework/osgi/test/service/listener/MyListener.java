@@ -1,6 +1,7 @@
 package org.springframework.osgi.test.service.listener;
 
 import org.springframework.osgi.test.simpleservice.MyService;
+import java.util.Dictionary;
 
 
 /**
@@ -13,12 +14,12 @@ public class MyListener {
     public static int UNBOUND_COUNT = 0;
 
 
-    public void serviceAvailable(MyService simpleService) {
+    public void serviceAvailable(MyService simpleService, Dictionary props) {
         BOUND_COUNT++;
     }
 
 
-    public void serviceUnavailable(MyService simpleService) {
+    public void serviceUnavailable(MyService simpleService, Dictionary props) {
         UNBOUND_COUNT++;
     }
 

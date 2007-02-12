@@ -1,6 +1,7 @@
 package org.springframework.osgi.test.cardinality0to1.test;
 
 import org.springframework.osgi.test.simpleservice2.MyService2;
+import java.util.Dictionary;
 
 /**
  * @author Hal Hildebrand
@@ -13,12 +14,12 @@ public class MyListener {
     public static MyService2 service;
 
 
-    public void serviceAvailable(MyService2 simpleService) {
+    public void serviceAvailable(MyService2 simpleService, Dictionary properties) {
         BOUND_COUNT++;
     }
 
 
-    public void serviceUnavailable(MyService2 simpleService) {
+    public void serviceUnavailable(MyService2 simpleService, Dictionary properties) {
         UNBOUND_COUNT++;
     }
 
