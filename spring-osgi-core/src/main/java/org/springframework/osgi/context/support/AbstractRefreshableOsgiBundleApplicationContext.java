@@ -115,7 +115,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		this.configLocations = defensiveCopyOf(configLocations);
 	}
 
-	protected String[] getConfigLocations() {
+	public String[] getConfigLocations() {
 		return defensiveCopyOf(this.configLocations);
 	}
 	
