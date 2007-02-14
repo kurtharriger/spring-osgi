@@ -44,6 +44,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+
 /**
  * A bean that transparently publishes other beans in the same application
  * context as OSGi services. <p/> The service properties used when publishing
@@ -59,7 +60,9 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * @author Hal Hildebrand
  * @author Andy Piper
- * @since 2.0
+ * @author Alin Dreghiciu
+ * 
+ * @since 1.0
  */
 public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, DisposableBean,
 		BundleContextAware
@@ -280,6 +283,10 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 	private class BeanServiceFactory implements ServiceFactory
 	{
 		private String beanName;
+		/** The service factory if the target bean is a service factory 
+		 * otherwise null. 
+		 */
+		private ServiceFactory serviceFactory;
 
 		public BeanServiceFactory(String beanName) {
 			this.beanName = beanName;
@@ -287,7 +294,21 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 
 		// TODO: reworks this
 		public Object getService(Bundle bundle, ServiceRegistration serviceRegistration) {
-			Object bean = beanFactory.getBean(beanName);
+			Object bean = null;
+			// if we are not dealing with a service factory (yet) get the bean 
+			// from the bean factory.
+			if (serviceFactory == null) {
+				bean = beanFactory.getBean(beanName);
+				// if we are dealing with a service factory then store the
+				// service factory
+				if (bean != null && bean instanceof ServiceFactory) {
+					serviceFactory = (ServiceFactory) bean;
+				}				
+			}
+			// if we are dealing with a service factory and act as a proxy 
+			if (serviceFactory != null) {
+				bean = serviceFactory.getService(bundle, serviceRegistration);
+			}
 			if (StringUtils.hasText(activationMethod)) {
 				Method m = BeanUtils.resolveSignature(activationMethod, beanFactory.getType(beanName));
 				try {
@@ -319,6 +340,10 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 			// ((ServiceDeactivationLifecycleListener)
 			// bean).deactivate(serviceRegistration.getClass());
 			// }
+			// if we are dealing with a service factory then act as a proxy
+			if (serviceFactory != null) {
+				serviceFactory.ungetService(bundle, serviceRegistration, bean);
+			}			
 		}
 	}
 

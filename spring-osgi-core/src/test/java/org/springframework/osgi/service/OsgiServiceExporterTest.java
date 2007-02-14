@@ -20,16 +20,22 @@ package org.springframework.osgi.service;
 import java.util.Properties;
 
 import junit.framework.TestCase;
+ 
+import org.easymock.ArgumentsMatcher;
 import org.easymock.MockControl;
 import org.easymock.internal.AlwaysMatcher;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
  * @author Adrian Colyer
  * @author Hal Hildebrand
- * @since 2.0
+ * @author Alin Dreghiciu
+ * @since 1.0
  */
 public class OsgiServiceExporterTest extends TestCase {
 
@@ -147,6 +153,132 @@ public class OsgiServiceExporterTest extends TestCase {
 		ServiceRegistration ret = (ServiceRegistration) this.mockServiceRegistrationControl.getMock();
 		ret.unregister(); // for destroy test..
 		return ret;
+	}
+	
+	/**
+	 * Test published service in case of a bean target service that is an 
+	 * ServiceFactory and the bean is lazy initialized.
+	 */
+	public void testPublishServiceFactory() throws Exception {
+		exporter.setBundleContext(bundleContext);
+		// configure a BeanDefinitionRegistry Bean Factory
+		MockControl registryCtrl = MockControl.createControl(MockBeanDefinitionRegistry.class);
+		MockBeanDefinitionRegistry registry = (MockBeanDefinitionRegistry) registryCtrl.getMock();
+		exporter.setBeanFactory(registry);
+		// configure a BeanDefinition
+		MockControl beanDefCtrl = MockControl.createControl(BeanDefinition.class);
+		BeanDefinition beanDef = (BeanDefinition) beanDefCtrl.getMock();		
+		// configure a mock property resolver
+		MockControl resolverCtrl = MockControl.createControl(OsgiServicePropertiesResolver.class);
+		OsgiServicePropertiesResolver resolver = (OsgiServicePropertiesResolver) resolverCtrl.getMock();
+		exporter.setResolver(resolver);
+		// configure a mock ServiceFactory
+		MockControl targetCtrl = MockControl.createControl(ServiceFactory.class);
+		ServiceFactory target = (ServiceFactory) targetCtrl.getMock();
+		exporter.setTarget(target);
+		// a dummy target service		
+		String targetService = "targetService";
+		// configure target bean name
+		String beanName = "testServiceFactory";
+		exporter.setTargetBeanName(beanName);
+		// configure a mock ServiceRegistration
+		MockControl registrationCtrl = MockControl.createControl(ServiceRegistration.class);
+		ServiceRegistration registration = (ServiceRegistration) registrationCtrl.getMock();		
+		
+		// expected scenario
+		registry.containsBean(BeanFactory.FACTORY_BEAN_PREFIX + beanName);
+		registryCtrl.setReturnValue(false);
+		registry.getBeanDefinition(beanName);
+		registryCtrl.setReturnValue(beanDef);
+		registry.getBean(beanName);
+		registryCtrl.setReturnValue(target);
+		beanDef.isLazyInit();
+		beanDefCtrl.setReturnValue(true);
+		resolver.getServiceProperties(beanName);
+		resolverCtrl.setReturnValue(new Properties());
+		
+		bundleContext.registerService((String[]) null, null, null);
+		RegisterServiceMatcher matcher = new RegisterServiceMatcher();
+		bundleContextControl.setMatcher(matcher);
+		bundleContextControl.setReturnValue(registration);
+		target.getService(null, null);
+		targetCtrl.setReturnValue(targetService);
+		target.ungetService(null, null, targetService);
+		
+		bundleContextControl.replay();
+		registryCtrl.replay();
+		beanDefCtrl.replay();
+		resolverCtrl.replay();
+		targetCtrl.replay();
+		registrationCtrl.replay();
+		
+		// play scenario
+		// service registration
+		exporter.afterPropertiesSet();
+		assertNotNull("Registered service", matcher.serviceFactory);
+		// parameters does not matter for now
+		Object actualService = matcher.serviceFactory.getService(null, null);
+		// we expect a dummy string as a service
+		assertEquals(targetService, actualService);
+		// and unregister silently 
+		matcher.serviceFactory.ungetService(null, null, actualService);
+		
+		// verify scenario
+		this.bundleContextControl.verify();
+		registryCtrl.verify();
+		beanDefCtrl.verify();
+		resolverCtrl.verify();
+		targetCtrl.verify();
+		registrationCtrl.verify();
+	}	
+	
+	/**
+	 * Mock interface for an bean definition registry bean factory.
+	 * @author Alin Dreghiciu
+	 */
+	private interface MockBeanDefinitionRegistry
+		extends BeanFactory, BeanDefinitionRegistry {
+	}
+	
+	/**
+	 * Specific mather for service registration.
+	 * It grabs the service registration to allow the test to call the actual
+	 * service get. 
+	 * 
+	 * @author Alin Dreghiciu
+	 */
+	private static class RegisterServiceMatcher implements ArgumentsMatcher {
+		
+		public ServiceFactory serviceFactory; 
+
+		public boolean matches(Object[] expected, Object[] actual) {
+			if (actual != null 
+				&& actual.length == 3
+				&& actual[1] != null
+				&& actual[1] instanceof ServiceFactory) {
+				serviceFactory = (ServiceFactory) actual[1];
+				return true;
+			}
+			return false;
+		}
+
+		public String toString(Object[] arguments) {
+			if (arguments == null)
+			    arguments = new Object[0];
+			StringBuffer result = new StringBuffer();
+			for (int i = 0; i < arguments.length; i++) {
+			    if (i > 0)
+				result.append(", ");
+			    result.append(argumentToString(arguments[i]));
+			}
+			return result.toString();
+		}
+		
+	    private String argumentToString(Object argument) {
+	    	if (argument instanceof String)
+	    	    return "\"" + argument + "\"";
+	    	return "" + argument;
+	    }		
 	}
 
 }
