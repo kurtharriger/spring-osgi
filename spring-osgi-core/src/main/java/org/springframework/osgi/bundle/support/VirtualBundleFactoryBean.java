@@ -18,11 +18,12 @@ package org.springframework.osgi.bundle.support;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Set;
 import java.util.Collections;
+import java.util.Set;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.context.BundleFactoryBean;
+import org.springframework.util.Assert;
 
 /**
  * BundleFactoryBean that creates bundles on the fly from regular jar files or
@@ -35,16 +36,16 @@ import org.springframework.osgi.context.BundleFactoryBean;
  * @author Andy Piper
  */
 // FIXME andyp -- this class is looking a lot like Project, maybe the two should be merged
-public class VirtualBundleFactoryBean extends BundleFactoryBean
-{
+public class VirtualBundleFactoryBean extends BundleFactoryBean {
   private String artifactId;
-  private String groupId;
-  private String version;
+  private String groupId = "org.example.group";
+
+  private String version = "1.0";
   private Set/*<String>*/ exports = Collections.EMPTY_SET;
   private Set/*<String>*/ imports = Collections.EMPTY_SET;
 
-	public VirtualBundleFactoryBean() {
-	}
+  public VirtualBundleFactoryBean() {
+  }
 
   public Bundle getBundle() throws Exception {
     URL url = null;
@@ -56,7 +57,7 @@ public class VirtualBundleFactoryBean extends BundleFactoryBean
     }
     else {
       project = new Project(groupId, artifactId, version, "jar", getLocation().getURL().toString(),
-          Collections.EMPTY_SET, exports, imports);
+        Collections.EMPTY_SET, exports, imports);
       url = getLocation().getURL();
     }
     return new MavenBundleManager(getBundleContext(), url).installBundle(project);
@@ -106,6 +107,11 @@ public class VirtualBundleFactoryBean extends BundleFactoryBean
       this.imports = Collections.EMPTY_SET;
     else
       this.imports = imports;
+  }
+
+  public synchronized void afterPropertiesSet() throws Exception {
+    Assert.notNull(artifactId, "artifactId not supplied");
+    super.afterPropertiesSet();
   }
 
   private String getLocalRepository() {

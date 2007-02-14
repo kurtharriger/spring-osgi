@@ -202,7 +202,11 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 	 * the bundle symbolic name.
 	 */
 	protected String getServiceName() {
-		return getBundle().getSymbolicName();
+		String name = getBundle().getSymbolicName();
+		if (name == null) {
+			name = Long.toString(System.identityHashCode(this));
+		}
+		return name;
 	}
 
 	protected void publishContextAsOsgiService() {

@@ -121,16 +121,17 @@ public class NamespacePlugins implements OsgiBundleNamespaceHandlerAndEntityReso
 					is = plugin.resolveEntity(publicId, systemId);
 					if (is != null) {
 						if (debug)
-							log.debug("namespace handler for " + publicId + "|" + systemId + " found inside "
+							log.debug("XML schema for " + publicId + "|" + systemId + " found inside "
 									+ getBundleInfo(plugin.getBundle()));
 						return is;
 					}
 
 				}
+				// REVIEW andyp -- seems like we should just throw here.
 				catch (FileNotFoundException ex) {
-					if (debug)
-						log.debug("namespace handler for " + publicId + "|" + systemId + " not found inside "
-								+ getBundleInfo(plugin.getBundle()));
+					if (log.isErrorEnabled())
+						log.error("XML schema for " + publicId + "|" + systemId + " not found inside "
+									+ getBundleInfo(plugin.getBundle()), ex);
 				}
 			}
 		}
