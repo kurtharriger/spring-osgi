@@ -45,6 +45,8 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	private String serv2Filter;
 
+	private String nullFilter;
+
 	private ServiceListener listener;
 
 	protected void setUp() throws Exception {
@@ -57,13 +59,16 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		ref3 = new MockServiceReference();
 
 		serv2Filter = "serv2";
+		nullFilter = "null";
 
 		BundleContext ctx = new MockBundleContext() {
 
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 				if (serv2Filter.equals(filter))
 					return new ServiceReference[] { ref2 };
-				
+				else if (nullFilter.equals(filter)) {
+					return null;
+				}
 				return new ServiceReference[] { reference };
 			}
 
@@ -147,7 +152,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 			interceptor.invoke(invocation);
 			fail("should have thrown exception");
 		}
-		catch (RuntimeException ex) {
+		catch (ServiceUnavailableException ex) {
 			// expected
 		}
 
@@ -155,6 +160,35 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		reference = oldRef;
 
 		assertEquals(new Integer(service.hashCode()), interceptor.invoke(invocation));
+	}
+
+	public void testInvocationTimeoutWhenServiceNA() throws Throwable {
+		// service n/a
+
+		Object target = new Object();
+		Method m = target.getClass().getDeclaredMethod("hashCode", null);
+
+		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), target, m, new Object[0], null, null);
+		interceptor.setFilter(nullFilter);
+		ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING, reference);
+		listener.serviceChanged(event);
+		interceptor.getRetryTemplate().setRetryNumbers(3);
+		interceptor.getRetryTemplate().setWaitTime(1000);
+		long now = System.currentTimeMillis();
+		try {
+			interceptor.invoke(invocation);
+			fail("should have thrown exception");
+		}
+		catch (ServiceUnavailableException ex) {
+			// expected
+		}
+
+		// service is up
+		interceptor.getRetryTemplate().setRetryNumbers(3);
+		interceptor.getRetryTemplate().setWaitTime(1);
+
+		assertTrue("Call did not block for 3000ms, actually blocked for " + (System.currentTimeMillis() - now) + "ms",
+			(System.currentTimeMillis() - now) >= 3000);
 	}
 
 	/**

@@ -18,6 +18,7 @@ package org.springframework.osgi.service.support.cardinality;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.service.support.ServiceWrapper;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.util.Assert;
 
 /**
@@ -45,7 +46,7 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 		// service has died, clean up
 		if (!wrapper.isServiceAlive()) {
 			wrapper.cleanup();
-			throw new RuntimeException("service n/a");
+			throw new ServiceUnavailableException("Service n/a", wrapper.getClass(), null);
 		}
 		
 		return wrapper.getService();

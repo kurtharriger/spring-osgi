@@ -19,9 +19,8 @@ import org.springframework.util.Assert;
 
 /**
  * Simple retry template.
- * 
+ *
  * @author Costin Leau
- * 
  */
 public class RetryTemplate {
 
@@ -48,26 +47,33 @@ public class RetryTemplate {
 		this(template.getRetryNumbers(), template.getWaitTime());
 	}
 
-	public Object execute(RetryCallback callback) {
+	public Object execute(RetryCallback callback, Object notificationLock) {
 		Assert.notNull(callback, "callback is required");
 
 		int count = 0;
-		do {
-			Object result = callback.doWithRetry();
-			if (callback.isComplete(result))
-				return result;
+		synchronized (notificationLock) {
+			do {
+				Object result = callback.doWithRetry();
+				if (callback.isComplete(result))
+					return result;
 
-			// task is not complete - retry
-			count++;
-			try {
-				Thread.sleep(waitTime);
+				// task is not complete - retry
+				count++;
+				// Do NOT use Thread.sleep() here - it does not release locks.
+				try {
+					notificationLock.wait(waitTime);
+				}
+				catch (InterruptedException ex) {
+					throw new RuntimeException("retry failed; interrupted while sleeping", ex);
+				}
 			}
-			catch (InterruptedException ex) {
-				throw new RuntimeException("retry failed; interrupted while sleeping", ex);
-			}
-		} while (count < retryNumbers);
-
+			while (count < retryNumbers);
+		}
 		return null;
+	}
+
+	public Object execute(RetryCallback callback) {
+		return execute(callback, this);
 	}
 
 	public int getRetryNumbers() {
@@ -85,5 +91,5 @@ public class RetryTemplate {
 	public void setWaitTime(long waitTime) {
 		this.waitTime = waitTime;
 	}
-	
+
 }
