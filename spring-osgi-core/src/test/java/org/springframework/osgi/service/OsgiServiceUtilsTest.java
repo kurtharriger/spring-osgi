@@ -174,7 +174,7 @@ public class OsgiServiceUtilsTest extends TestCase {
 	public void tstProxyCreation() throws Exception {
 		ProxyFactory pf = new ProxyFactory();
 		pf.setInterfaces(new Class[] { Serializable.class, Comparable.class });
-		pf.setTargetClass(Number.class);
+		//pf.setTargetClass(Number.class);
 		pf.setProxyTargetClass(true);
 		Object proxy = pf.getProxy();
 		System.out.println(Arrays.toString(ClassUtils.getAllInterfaces(proxy)));
