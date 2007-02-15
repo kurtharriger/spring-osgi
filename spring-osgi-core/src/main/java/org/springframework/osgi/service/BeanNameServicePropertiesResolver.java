@@ -36,7 +36,7 @@ import org.springframework.util.StringUtils;
  * </ul>
  * 
  * @see OsgiServicePropertiesResolver
- * @see OsgiServiceExporter
+ * @see OsgiServiceFactoryBean
  * 
  * @author Adrian Colyer
  * @author Hal Hildebrand

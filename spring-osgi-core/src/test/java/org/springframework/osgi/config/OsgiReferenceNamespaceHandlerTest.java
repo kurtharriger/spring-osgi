@@ -31,7 +31,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.OsgiServiceExporter;
+import org.springframework.osgi.service.OsgiServiceFactoryBean;
 import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 

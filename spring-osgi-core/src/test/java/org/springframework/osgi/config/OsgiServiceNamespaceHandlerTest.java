@@ -36,7 +36,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.OsgiServiceExporter;
+import org.springframework.osgi.mock.MockServiceRegistration;
+import org.springframework.osgi.service.OsgiServiceFactoryBean;
 
 /**
  * Integration test for osgi:service namespace handler.
@@ -52,10 +53,14 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 
 	private final List services = new ArrayList();
 
+	private ServiceRegistration registration;
+
 	protected void setUp() throws Exception {
 
 		services.clear();
-
+		
+		registration = new MockServiceRegistration();
+		
 		bundleContext = new MockBundleContext() {
 
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
@@ -64,7 +69,7 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 
 			public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
 				services.add(service);
-				return super.registerService(clazzes, service, properties);
+				return registration;
 			}
 		};
 
@@ -86,17 +91,17 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 	}
 
 	public void testSimpleService() throws Exception {
-		Object bean = appContext.getBean(OsgiServiceExporter.class.getName());
-		assertSame(OsgiServiceExporter.class, bean.getClass());
-		OsgiServiceExporter exporter = (OsgiServiceExporter) bean;
+		Object bean = appContext.getBean("&" + OsgiServiceFactoryBean.class.getName());
+		assertSame(OsgiServiceFactoryBean.class, bean.getClass());
+		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) bean;
 		assertTrue(Arrays.equals(new Class[] { Serializable.class }, exporter.getInterfaces()));
-		
+
 		assertSame(appContext.getBean("string"), getServiceAtIndex(0));
 	}
 
 	public void testBiggerService() throws Exception {
-		OsgiServiceExporter exporter = (OsgiServiceExporter) appContext.getBean(OsgiServiceExporter.class.getName()
-				+ "#1");
+		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) appContext.getBean("&"
+				+ OsgiServiceFactoryBean.class.getName() + "#1");
 
 		assertTrue(Arrays.equals(new Class[] { Serializable.class, Cloneable.class }, exporter.getInterfaces()));
 		Properties prop = new Properties();
@@ -108,11 +113,16 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 	}
 
 	public void testNestedService() throws Exception {
-		OsgiServiceExporter exporter = (OsgiServiceExporter) appContext.getBean(OsgiServiceExporter.class.getName()
-				+ "#2");
+		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) appContext.getBean("&nestedService");
 		assertTrue(Arrays.equals(new Class[] { Object.class }, exporter.getInterfaces()));
 
 		Object service = getServiceAtIndex(2);
 		assertSame(HashMap.class, service.getClass());
+	}
+
+	public void testServiceExporterFactoryBean() throws Exception {
+		Object bean = appContext.getBean("nestedService");
+		assertTrue(bean instanceof ServiceRegistration);
+		assertSame(registration, bean);
 	}
 }

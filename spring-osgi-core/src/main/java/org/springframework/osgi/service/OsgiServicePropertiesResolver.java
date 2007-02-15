@@ -24,7 +24,7 @@ import java.util.Properties;
  * the properties that a bean exposed as a service will be published with. 
  * It is used as a collaborator of OsgiServiceExporter.
  * 
- * @see OsgiServiceExporter
+ * @see OsgiServiceFactoryBean
  * @see BeanNameServicePropertiesResolver
  * 
  * @author Adrian Colyer
