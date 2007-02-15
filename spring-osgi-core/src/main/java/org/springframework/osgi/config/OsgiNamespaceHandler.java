@@ -19,8 +19,11 @@ package org.springframework.osgi.config;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
+ * Namespace handler for Osgi definitions.
+ * 
  * @author Hal Hildebrand
  * @author Andy Piper
+ * @author Costin Leau
  */
 public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
 	/*

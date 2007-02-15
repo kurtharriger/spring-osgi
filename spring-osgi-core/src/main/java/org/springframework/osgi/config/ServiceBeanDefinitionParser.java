@@ -32,26 +32,32 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * BeanDefinitionParser for service element found in the osgi namespace.
+ * 
+ * @author Costin Leau
  * @author Hal Hildebrand
  * @author Andy Piper
- * @author Costin Leau
  */
 public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 	public static final String ACTIVATION_ID = "activation-method";
+
 	public static final String DEACTIVATION_ID = "deactivation-method";
+
 	public static final String INTERFACES_ID = "interfaces";
+
 	public static final String INTERFACE = "interface";
+
 	public static final String PROPS_ID = "service-properties";
+
 	public static final String REF = "ref";
 
-
-	/* (non-Javadoc)
-		 * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateId()
-		 */
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateId()
+	 */
 	protected boolean shouldGenerateId() {
 		return true;
 	}
-
 
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(OsgiServiceExporter.class);
@@ -63,7 +69,7 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 			 * (non-Javadoc)
 			 * 
 			 * @see org.springframework.osgi.config.ParserUtils.AttributeCallback#process(org.w3c.dom.Element,
-			 *      org.w3c.dom.Attr)
+			 * org.w3c.dom.Attr)
 			 */
 			public void process(Element parent, Attr attribute, BeanDefinitionBuilder bldr) {
 				String name = attribute.getLocalName();
@@ -99,10 +105,10 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 					// check shortcut
 					if (element.hasAttribute(INTERFACE)) {
 						parserContext.getReaderContext().error(
-							"either 'interface' attribute or <intefaces> element can be specified", element);
+								"either 'interface' attribute or <intefaces> element can be specified", element);
 					}
 					Set interfaces = parserContext.getDelegate().parseSetElement(subElement,
-						builder.getBeanDefinition());
+							builder.getBeanDefinition());
 					builder.addPropertyValue(INTERFACES_ID, interfaces);
 				}
 
@@ -111,21 +117,25 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 					Properties props = parserContext.getDelegate().parsePropsElement(subElement);
 					builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
 				}
-				// nested bean declaration
+				// nested bean reference/declaration
 				else {
 					if (element.hasAttribute(REF))
 						parserContext.getReaderContext().error(
-							"nested bean definition/reference cannot be used when attribute 'ref' is specified",
-							element);
-					target = parserContext.getDelegate().parsePropertySubElement(subElement, builder.getBeanDefinition());
+								"nested bean definition/reference cannot be used when attribute 'ref' is specified",
+								element);
+					target = parserContext.getDelegate().parsePropertySubElement(subElement,
+							builder.getBeanDefinition());
 				}
 			}
 		}
 
-
-		builder.addPropertyValue("target", target);
+		// do we have a bean reference ?
 		if (target instanceof RuntimeBeanReference) {
-			builder.addPropertyValue("targetBeanName", ((RuntimeBeanReference)target).getBeanName());
+			builder.addPropertyValue("targetBeanName", ((RuntimeBeanReference) target).getBeanName());
+		}
+		// or a nested bean?
+		else {
+			builder.addPropertyValue("target", target);
 		}
 		return builder.getBeanDefinition();
 	}

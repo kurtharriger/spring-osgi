@@ -36,12 +36,12 @@ import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 
 /**
- * UnitTest for OSGi namespace handler
+ * Integration test for osgi:reference namespace handler.
  * 
  * @author Costin Leau
  * 
  */
-public class OsgiNamespaceHandlerTest extends TestCase {
+public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 
 	private GenericApplicationContext appContext;
 
@@ -60,7 +60,7 @@ public class OsgiNamespaceHandlerTest extends TestCase {
 
 		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
 		// reader.setEventListener(this.listener);
-		reader.loadBeanDefinitions(new ClassPathResource("osgiNamespaceHandlerTests.xml", getClass()));
+		reader.loadBeanDefinitions(new ClassPathResource("osgiReferenceNamespaceHandlerTests.xml", getClass()));
 		appContext.refresh();
 	}
 
@@ -107,23 +107,5 @@ public class OsgiNamespaceHandlerTest extends TestCase {
 		assertEquals(1, DummyListenerServiceSignature2.UNBIND_CALLS);
 	}
 
-	public void testSimpleService() throws Exception {
-		Object bean = appContext.getBean(OsgiServiceExporter.class.getName());
-		assertSame(OsgiServiceExporter.class, bean.getClass());
-		OsgiServiceExporter exporter = (OsgiServiceExporter) bean;
-		assertTrue(Arrays.equals(new Class[] { Serializable.class }, exporter.getInterfaces()));
-		assertEquals(appContext.getBean("string"), exporter.getTarget());
-	}
 
-	public void testFullService() throws Exception {
-		OsgiServiceExporter exporter = (OsgiServiceExporter) appContext.getBean(OsgiServiceExporter.class.getName()
-				+ "#1");
-		assertEquals(appContext.getBean("string"), exporter.getTarget());
-
-		assertTrue(Arrays.equals(new Class[] { Serializable.class, Cloneable.class }, exporter.getInterfaces()));
-		Properties prop = new Properties();
-		prop.setProperty("foo", "bar");
-		prop.setProperty("white", "horse");
-		assertEquals(prop, exporter.getServiceProperties());
-	}
 }

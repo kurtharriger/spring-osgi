@@ -20,7 +20,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.context.support.OsgiResourceUtils;
-import org.springframework.osgi.service.OsgiServiceProxyFactoryBean.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 
 /**
  * Add the context classloader handling.

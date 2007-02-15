@@ -33,6 +33,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContextException;
+import org.springframework.osgi.service.CardinalityOptions;
 import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
 import org.springframework.util.ObjectUtils;
 
@@ -184,7 +185,7 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 			Filter filter = getFilter(clazz, query);
 			PropertyValue cardinality =
 				bean.getPropertyValues().getPropertyValue(OsgiServiceProxyFactoryBean.CARDINALITY_ATTRIBUTE);
-			int cardinalityValue = OsgiServiceProxyFactoryBean.translateCardinality((String) cardinality.getValue());
+			int cardinalityValue = CardinalityOptions.asInt((String) cardinality.getValue());
 			dependencies.add(new Dependency(filter, clazz, cardinalityValue));
 			return true;
 		}
@@ -315,7 +316,7 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 					+ "' has invalid syntax: "
 					+ e.getMessage()).initCause(e);
 			}
-			return !OsgiServiceProxyFactoryBean.atLeastOneRequired(cardinality) ||
+			return !CardinalityOptions.atLeastOneRequired(cardinality) ||
 				(refs != null && refs.length != 0);
 		}
 

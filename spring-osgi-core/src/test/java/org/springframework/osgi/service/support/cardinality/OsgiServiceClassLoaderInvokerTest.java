@@ -30,7 +30,7 @@ import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.OsgiServiceProxyFactoryBean.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 
 /**
  * @author Costin Leau

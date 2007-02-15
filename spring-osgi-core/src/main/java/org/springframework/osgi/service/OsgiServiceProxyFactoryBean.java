@@ -26,8 +26,6 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.ConstantException;
-import org.springframework.core.Constants;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.service.collection.OsgiServiceList;
@@ -48,45 +46,13 @@ import org.springframework.util.StringUtils;
  */
 public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean, BundleContextAware {
 
+	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
+
 	public static final String FILTER_ATTRIBUTE = "filter";
 
 	public static final String INTERFACE_ATTRIBUTE = "interface";
 
 	public static final String CARDINALITY_ATTRIBUTE = "cardinality";
-
-	/**
-	 * Reference classloading options costants.
-	 * 
-	 * @author Costin Leau
-	 */
-	public abstract static class ReferenceClassLoadingOptions {
-		public static final int CLIENT = 0;
-
-		public static final int SERVICE_PROVIDER = 1;
-
-		public static final int UNMANAGED = 2;
-	}
-
-	/**
-	 * Cardinality constants.
-	 * 
-	 * @author Costin Leau
-	 */
-	public abstract static class Cardinality {
-		public static final int C_0__1 = 0;
-
-		public static final int C_0__N = 1;
-
-		public static final int C_1__1 = 2;
-
-		public static final int C_1__N = 3;
-	}
-
-	private static final Log logger = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
-
-	private static final Constants CARDINALITY = new Constants(Cardinality.class);
-
-	private static final Constants REFERENCE_CL_OPTIONS = new Constants(ReferenceClassLoadingOptions.class);
 
 	public static final String OBJECTCLASS = "objectClass";
 
@@ -94,7 +60,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 	private RetryTemplate retryTemplate = new RetryTemplate();
 
-	private int cardinality = Cardinality.C_1__1;
+	private int cardinality = CardinalityOptions.C_1__1;
 
 	private int contextClassloader = ReferenceClassLoadingOptions.CLIENT;
 
@@ -116,22 +82,6 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 	private String serviceBeanName;
 
-	public static int translateCardinality(String cardinality) {
-		return CARDINALITY.asNumber("C_".concat(cardinality.replace('.', '_'))).intValue();
-	}
-
-	public static boolean atMostOneExpected(int c) {
-		return Cardinality.C_0__1 == c || Cardinality.C_1__1 == c;
-	}
-
-	public static boolean atLeastOneRequired(int c) {
-		return Cardinality.C_1__1 == c || Cardinality.C_1__N == c;
-	}
-
-	public static boolean moreThanOneExpected(int c) {
-		return Cardinality.C_0__N == c || Cardinality.C_1__N == c;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -152,7 +102,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 			return proxy.getClass();
 
 		// TODO: clarify the Collection/List/Set contract
-		if (moreThanOneExpected(cardinality))
+		if (CardinalityOptions.moreThanOneExpected(cardinality))
 			return List.class;
 
 		return getInterface();
@@ -179,13 +129,15 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		// validate and create the filter
 		createFilter();
 
-		if (atMostOneExpected(cardinality))
+		if (CardinalityOptions.atMostOneExpected(cardinality))
 			proxy = createSingleServiceProxy();
 		else
 			proxy = createMultiServiceCollection(getInterface(), filterStringForServiceLookup);
 	}
 
 	protected Object createSingleServiceProxy() throws Exception {
+		if (log.isDebugEnabled())
+			log.debug("creating a singleService proxy");
 
 		ProxyFactory factory = new ProxyFactory();
 
@@ -211,6 +163,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	}
 
 	protected Object createMultiServiceCollection(Class clazz, String filter) {
+		if (log.isDebugEnabled())
+			log.debug("creating a multi-value/collection proxy");
+
 		return new OsgiServiceList(clazz.getName(), filter, bundleContext, contextClassloader);
 	}
 
@@ -293,28 +248,11 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @param cardinality
 	 */
 	public void setCardinality(String cardinality) {
-		// transform string to the constant representation
-		// a. C_ is appended to the string
-		// b. . -> _
-
-		if (cardinality != null) {
-			try {
-				this.cardinality = translateCardinality(cardinality);
-				return;
-			}
-			catch (ConstantException ex) {
-				// catch exception to not confuse the user with a different
-				// constant name(will be handled afterwards)
-			}
-		}
-		throw new IllegalArgumentException("invalid constant, " + cardinality);
+		this.cardinality = CardinalityOptions.asInt(cardinality);
 	}
 
 	public void setContextClassloader(String classLoaderManagementOption) {
-		// transform "-" into "_" (for service-provider)
-		Assert.notNull(classLoaderManagementOption, "non-null argument required");
-		String option = classLoaderManagementOption.replace('-', '_');
-		this.contextClassloader = REFERENCE_CL_OPTIONS.asNumber(option).intValue();
+		this.contextClassloader = ReferenceClassLoadingOptions.getFromString(classLoaderManagementOption);
 	}
 
 	/*

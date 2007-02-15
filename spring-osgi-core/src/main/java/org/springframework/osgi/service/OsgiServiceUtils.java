@@ -17,14 +17,19 @@
  */
 package org.springframework.osgi.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Utility class offering easy access to OSGi services
- *
+ * 
  * @author Adrian Colyer
  * @since 2.0
  */
@@ -35,7 +40,7 @@ public abstract class OsgiServiceUtils {
 	 * filter. Throws an NoSuchServiceException if there are no matching
 	 * services, or AmbiguousServiceReferenceException if there are more than
 	 * one candidate matches.
-	 *
+	 * 
 	 * @param context
 	 * @param serviceClass
 	 * @param filter
@@ -74,7 +79,7 @@ public abstract class OsgiServiceUtils {
 	 * Return all of the service references for services of the given type and
 	 * matching the given filter. Returned service references must be compatible
 	 * with the given context.
-	 *
+	 * 
 	 * @param context
 	 * @param serviceClass
 	 * @param filter
@@ -96,7 +101,7 @@ public abstract class OsgiServiceUtils {
 	 * Return all of the service references for services of the given type and
 	 * matching the given filter. Returned services may use interface versions
 	 * that are incompatible with the given context.
-	 *
+	 * 
 	 * @param context
 	 * @param serviceClass
 	 * @param filter
@@ -117,7 +122,18 @@ public abstract class OsgiServiceUtils {
 	public static Object getService(BundleContext context, ServiceReference reference) {
 		Assert.notNull(context);
 		Assert.notNull(reference);
-	    return context.getService(reference); 
+
+		try {
+			return context.getService(reference);
+		}
+		finally {
+			try {
+				context.ungetService(reference);
+			}
+			catch (IllegalStateException isex) {
+				// do nothing
+			}
+		}
 	}
 
 	public final static String[] EVENT_CODES = { "INSTALLED", "STARTED", "STOPPED", "UPDATED", "UNINSTALLED",
@@ -130,7 +146,7 @@ public abstract class OsgiServiceUtils {
 
 	/**
 	 * Convert event codes to a printable String
-	 *
+	 * 
 	 * @param type
 	 */
 	public static String eventToString(int type) {
@@ -142,4 +158,42 @@ public abstract class OsgiServiceUtils {
 		Assert.state(i < NUM_CODES);
 		return EVENT_CODES[i];
 	}
+
+	public static Class[] determineProxySignature(Class[] classes) {
+		if (ObjectUtils.isEmpty(classes))
+			return new Class[0];
+
+		List clazz = new ArrayList(classes.length);
+		Collections.addAll(clazz, classes);
+
+		// remove null elements
+		while (clazz.remove(null)) {
+		}
+
+		// only one class is allowed
+		// there can be multiple interfaces
+		// if an interface or class is a parent of an class
+		// it will be removed
+
+		boolean dirty;
+		do {
+			dirty = false;
+			for (int i = 0; i < clazz.size(); i++) {
+				Class currentClass = (Class) clazz.get(i);
+				for (int j = 0; j < clazz.size(); j++) {
+					if (i != j) {
+						if (currentClass.isAssignableFrom((Class) clazz.get(j))) {
+							clazz.remove(i);
+							i--;
+							dirty = true;
+							break;
+						}
+					}
+				}
+			}
+		} while (dirty);
+
+		return (Class[]) clazz.toArray(new Class[clazz.size()]);
+	}
+
 }

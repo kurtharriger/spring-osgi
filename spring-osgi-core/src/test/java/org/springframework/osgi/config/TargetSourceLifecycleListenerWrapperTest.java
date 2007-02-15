@@ -374,4 +374,8 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 		listener.bind(service, null);
 		assertEquals(4, JustListener.BIND_CALLS);
 	}
+
+	public void testListenerWithOverloadedTypesAndMultipleParameters() throws Exception {
+
+	}
 }
