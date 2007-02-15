@@ -128,7 +128,7 @@ public abstract class OsgiServiceUtils {
 		}
 		finally {
 			try {
-				context.ungetService(reference);
+				//context.ungetService(reference);
 			}
 			catch (IllegalStateException isex) {
 				// do nothing
