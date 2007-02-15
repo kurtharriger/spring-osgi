@@ -27,6 +27,7 @@ import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.support.ServiceWrapper;
+import org.springframework.osgi.service.ServiceUnavailableException;
 
 /**
  * @author Costin Leau
@@ -100,7 +101,7 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 			interceptor.invoke(invocation);
 			fail("should have thrown exception");
 		}
-		catch (RuntimeException ex) {
+		catch (ServiceUnavailableException ex) {
 			// expected
 		}
 	}

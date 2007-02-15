@@ -23,8 +23,6 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.OsgiBindingUtils;
-import org.springframework.osgi.service.OsgiServiceReferenceUtils;
-import org.springframework.osgi.service.OsgiServiceUtils;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.support.DefaultRetryCallback;
@@ -36,12 +34,11 @@ import org.springframework.osgi.service.support.ServiceWrapper;
  * will look for a service using the given class and filter name, retrying if
  * the service is down or unavailable. Will dynamically rebound a new service,
  * if one is available with a higher service ranking.
- * 
+ * <p/>
  * <strong>Note</strong>: this is a stateful interceptor and should not be
  * shared.
- * 
+ *
  * @author Costin Leau
- * 
  */
 public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker implements InitializingBean {
 
@@ -72,60 +69,59 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 			switch (event.getType()) {
 
-			case (ServiceEvent.REGISTERED):
-				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
-					// inform listeners
-					OsgiBindingUtils.callListenersBind(context, ref, listeners);
-				}
+				case (ServiceEvent.REGISTERED):
+					if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
+						// inform listeners
+						OsgiBindingUtils.callListenersBind(context, ref, listeners);
+					}
 
-				break;
-			case (ServiceEvent.MODIFIED):
-				// same as ServiceEvent.REGISTERED
-				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
-					// inform listeners
-					OsgiBindingUtils.callListenersBind(context, ref, listeners);
-				}
+					break;
+				case (ServiceEvent.MODIFIED):
+					// same as ServiceEvent.REGISTERED
+					if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
+						// inform listeners
+						OsgiBindingUtils.callListenersBind(context, ref, listeners);
+					}
 
-				break;
-			case (ServiceEvent.UNREGISTERING):
-				boolean updated = false;
+					break;
+				case (ServiceEvent.UNREGISTERING):
+					boolean updated = false;
 
-				synchronized (OsgiServiceDynamicInterceptor.class) {
-					// remove service
-					if (wrapper != null) {
-						if (serviceId == wrapper.getServiceId()) {
-							updated = true;
-							wrapper.cleanup();
-							wrapper = null;
+					synchronized (OsgiServiceDynamicInterceptor.this) {
+						// remove service
+						if (wrapper != null) {
+							if (serviceId == wrapper.getServiceId()) {
+								updated = true;
+								wrapper.cleanup();
+								wrapper = null;
+							}
 						}
 					}
-				}
 
-				if (updated)
-					OsgiBindingUtils.callListenersUnbind(context, ref, listeners);
-				try {
-					ServiceReference refs[] = context.getServiceReferences(clazz, filter);
+					if (updated)
+						OsgiBindingUtils.callListenersUnbind(context, ref, listeners);
+					try {
+						ServiceReference refs[] = context.getServiceReferences(clazz, filter);
 
-					// FIXME: place the discovery process into one class
-					// quick hack: just pick the first one
-					if (refs != null && refs.length > 0) {
-						serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, refs[0]));
+						// FIXME: place the discovery process into one class
+						// quick hack: just pick the first one
+						if (refs != null && refs.length > 0) {
+							serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, refs[0]));
+						}
 					}
-				}
-				catch (InvalidSyntaxException ise) {
-					throw new IllegalArgumentException("invalid filter");
-				}
+					catch (InvalidSyntaxException ise) {
+						throw new IllegalArgumentException("invalid filter");
+					}
 
-				break;
-			default:
-				throw new IllegalArgumentException("unsupported event type");
+					break;
+				default:
+					throw new IllegalArgumentException("unsupported event type");
 			}
 		}
 
 		private boolean updateWrapperIfNecessary(ServiceReference ref, long serviceId, int serviceRanking) {
-
 			boolean updated = false;
-			synchronized (OsgiServiceDynamicInterceptor.class) {
+			synchronized (OsgiServiceDynamicInterceptor.this) {
 				if (wrapper != null) {
 					// we have a new service
 					if (serviceRanking > wrapper.getServiceRanking()) {
@@ -144,7 +140,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 					wrapper = new ServiceWrapper(ref, context);
 					updated = true;
 				}
-
+				OsgiServiceDynamicInterceptor.this.notifyAll();
 				return updated;
 			}
 		}
@@ -170,16 +166,12 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 		return target;
 	}
 
-	// TODO: do nothing since we catch the events anyway
-	protected ServiceWrapper lookupService() {
+	protected synchronized ServiceWrapper lookupService() {
 		return (ServiceWrapper) retryTemplate.execute(new DefaultRetryCallback() {
 			public Object doWithRetry() {
-				// ServiceReference ref = context.getServiceReference(clazz);
-				// return (ref != null ? new ServiceWrapper(ref, context) :
-				// null);
-				return null;
+				return (wrapper != null && wrapper.isServiceAlive()) ? wrapper : null;
 			}
-		});
+		}, this);
 	}
 
 	public void afterPropertiesSet() {
@@ -189,6 +181,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 	/**
 	 * Add the service listener to context and register also already
+	 *
 	 * @param context
 	 * @param filter
 	 */
