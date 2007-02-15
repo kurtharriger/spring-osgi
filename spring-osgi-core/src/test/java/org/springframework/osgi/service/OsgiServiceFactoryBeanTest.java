@@ -39,9 +39,9 @@ import org.springframework.osgi.mock.MockServiceRegistration;
 /**
  * @author Costin Leau
  */
-public class OsgiServiceExporterTest extends TestCase {
+public class OsgiServiceFactoryBeanTest extends TestCase {
 
-	private OsgiServiceExporter exporter;
+	private OsgiServiceFactoryBean exporter;
 
 	private BeanFactory beanFactory;
 
@@ -54,7 +54,7 @@ public class OsgiServiceExporterTest extends TestCase {
 	private BundleContext ctx;
 
 	protected void setUp() throws Exception {
-		exporter = new OsgiServiceExporter();
+		exporter = new OsgiServiceFactoryBean();
 		beanFactoryControl = MockControl.createControl(BeanFactory.class);
 		beanFactory = (BeanFactory) this.beanFactoryControl.getMock();
 		bundleContext = new MockBundleContext();
@@ -132,14 +132,14 @@ public class OsgiServiceExporterTest extends TestCase {
 	}
 
 	public void testAutoDetectClassesForPublishingDisabled() throws Exception {
-		exporter.setAutoExportNumber(OsgiServiceExporter.AUTO_EXPORT_DISABLED);
+		exporter.setAutoExportNumber(OsgiServiceFactoryBean.AUTO_EXPORT_DISABLED);
 		Class[] clazz = exporter.autoDetectClassesForPublishing(Integer.class);
 		assertNotNull(clazz);
 		assertEquals(0, clazz.length);
 	}
 
 	public void testAutoDetectClassesForPublishingInterfaces() throws Exception {
-		exporter.setAutoExportNumber(OsgiServiceExporter.AUTO_EXPORT_INTERFACES);
+		exporter.setAutoExportNumber(OsgiServiceFactoryBean.AUTO_EXPORT_INTERFACES);
 		Class[] clazz = exporter.autoDetectClassesForPublishing(HashMap.class);
 		Class[] expected = new Class[] { Cloneable.class, Serializable.class, Map.class };
 
@@ -147,14 +147,14 @@ public class OsgiServiceExporterTest extends TestCase {
 	}
 
 	public void testAutoDetectClassesForPublishingClassHierarchy() throws Exception {
-		exporter.setAutoExportNumber(OsgiServiceExporter.AUTO_EXPORT_CLASS_HIERARCHY);
+		exporter.setAutoExportNumber(OsgiServiceFactoryBean.AUTO_EXPORT_CLASS_HIERARCHY);
 		Class[] clazz = exporter.autoDetectClassesForPublishing(HashMap.class);
 		Class[] expected = new Class[] { HashMap.class, AbstractMap.class };
 		assertTrue(compareArrays(expected, clazz));
 	}
 
 	public void testAutoDetectClassesForPublishingAll() throws Exception {
-		exporter.setAutoExportNumber(OsgiServiceExporter.AUTO_EXPORT_ALL);
+		exporter.setAutoExportNumber(OsgiServiceFactoryBean.AUTO_EXPORT_ALL);
 		Class[] clazz = exporter.autoDetectClassesForPublishing(HashMap.class);
 		Class[] expected = new Class[] { Map.class, Cloneable.class, Serializable.class, HashMap.class,
 				AbstractMap.class };
@@ -301,7 +301,7 @@ public class OsgiServiceExporterTest extends TestCase {
 		assertSame(service, factory[0].getService(null, null));
 		beanFactoryControl.verify();
 	}
-
+	
 	private boolean compareArrays(Object[] a, Object[] b) {
 		if (a.length != b.length)
 			return false;
@@ -319,4 +319,5 @@ public class OsgiServiceExporterTest extends TestCase {
 		}
 		return true;
 	}
+	
 }

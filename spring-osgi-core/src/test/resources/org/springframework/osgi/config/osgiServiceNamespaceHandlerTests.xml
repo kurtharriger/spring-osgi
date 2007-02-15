@@ -34,7 +34,7 @@
 	</osgi:service>
 
 	<!-- service -->
-	<osgi:service auto-export="interfaces">
+	<osgi:service id="nestedService" auto-export="interfaces">
 		<osgi:interfaces>
 			<value>java.lang.Object</value>
 		</osgi:interfaces>

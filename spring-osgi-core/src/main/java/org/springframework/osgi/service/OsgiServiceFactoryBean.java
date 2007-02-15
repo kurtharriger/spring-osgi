@@ -34,6 +34,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.Constants;
@@ -45,10 +46,11 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * A bean that transparently publishes other beans in the same application
- * context as OSGi services. <p/> The service properties used when publishing
- * the service are determined by the OsgiServicePropertiesResolver. The default
- * implementation uses
+ * FactoryBean that transparently publishes other beans in the same application
+ * context as OSGi services returning the ServiceRegistration for the given object.
+ * 
+ * <p/> The service properties used when publishing the service are determined
+ * by the OsgiServicePropertiesResolver. The default implementation uses
  * <ul>
  * <li>BundleSymbolicName=&lt;bundle symbolic name&gt;</li>
  * <li>BundleVersion=&lt;bundle version&gt;</li>
@@ -62,7 +64,8 @@ import org.springframework.util.StringUtils;
  * 
  * @since 1.0
  */
-public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, DisposableBean, BundleContextAware {
+public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBean, DisposableBean, BundleContextAware,
+		FactoryBean {
 
 	/**
 	 * ServiceFactory used for posting the bean instantiation until it is first
@@ -114,7 +117,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 		}
 	}
 
-	private static final Log log = LogFactory.getLog(OsgiServiceExporter.class);
+	private static final Log log = LogFactory.getLog(OsgiServiceFactoryBean.class);
 
 	public static final int AUTO_EXPORT_DISABLED = 0;
 
@@ -126,7 +129,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 
 	private static final String AUTO_EXPORT_PREFIX = "AUTO_EXPORT_";
 
-	private static final Constants EXPORTING_OPTIONS = new Constants(OsgiServiceExporter.class);
+	private static final Constants EXPORTING_OPTIONS = new Constants(OsgiServiceFactoryBean.class);
 
 	private BundleContext bundleContext;
 
@@ -134,7 +137,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 
 	private BeanFactory beanFactory;
 
-	private ServiceRegistration publishedService;
+	private ServiceRegistration serviceRegistration;
 
 	private Properties serviceProperties;
 
@@ -185,7 +188,8 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 		if (interfaces == null)
 			interfaces = new Class[0];
 
-		// determine serviceClass (can still be null if using a FactoryBean which doesn't declare its product type)
+		// determine serviceClass (can still be null if using a FactoryBean
+		// which doesn't declare its product type)
 		Class serviceClass = (target != null ? target.getClass() : beanFactory.getType(targetBeanName));
 
 		if (this.contextClassloaderManagementStrategy == ExportClassLoadingOptions.SERVICE_PROVIDER) {
@@ -206,7 +210,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 	 * @return
 	 */
 	private Object wrapWithClassLoaderManagingProxy(Class serviceType, Class[] interfaces) {
-		
+
 		// TODO implement wrapping, take into account that toBeProxied may
 		// *already* be advised...
 		return new Object();
@@ -290,7 +294,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 
 		Class[] publishingClasses = (Class[]) classes.toArray(new Class[classes.size()]);
 
-		publishedService = registerService(publishingClasses, serviceProperties);
+		serviceRegistration = registerService(publishingClasses, serviceProperties);
 	}
 
 	/**
@@ -336,6 +340,18 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 
 	}
 
+	public Object getObject() throws Exception {
+		return serviceRegistration;
+	}
+
+	public Class getObjectType() {
+		return (serviceRegistration != null ? serviceRegistration.getClass() : ServiceRegistration.class);
+	}
+
+	public boolean isSingleton() {
+		return true;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -343,7 +359,7 @@ public class OsgiServiceExporter implements BeanFactoryAware, InitializingBean, 
 	 */
 	public void destroy() {
 		// stop published service
-		unregisterService(publishedService);
+		unregisterService(serviceRegistration);
 	}
 
 	/**
