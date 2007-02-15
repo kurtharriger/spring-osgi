@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd		
+		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+	<!-- osgi:reference -->
+
+
+	<bean name="string" class="java.lang.String">
+		<constructor-arg value="string bean"/>
+	</bean>
+
+
+	<!-- osgi:service -->
+
+	<osgi:service interface="java.io.Serializable" lazy-init="true"
+		ref="string" />
+
+	<osgi:service context-classloader="service-provider">
+		<osgi:interfaces>
+			<value>java.io.Serializable</value>
+			<value>java.lang.Cloneable</value>
+		</osgi:interfaces>
+		<osgi:service-properties>
+			<prop key="foo">bar</prop>
+			<prop key="white">horse</prop>
+		</osgi:service-properties>
+		<ref local="string" />
+	</osgi:service>
+
+	<!-- service -->
+	<osgi:service auto-export="interfaces">
+		<osgi:interfaces>
+			<value>java.lang.Object</value>
+		</osgi:interfaces>
+		<bean class="java.util.HashMap"/>
+	</osgi:service>
+</beans>

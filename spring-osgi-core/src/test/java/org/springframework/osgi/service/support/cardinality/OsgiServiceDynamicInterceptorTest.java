@@ -28,8 +28,8 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.OsgiServiceProxyFactoryBean.ReferenceClassLoadingOptions;
 
 /**
  * @author Costin Leau

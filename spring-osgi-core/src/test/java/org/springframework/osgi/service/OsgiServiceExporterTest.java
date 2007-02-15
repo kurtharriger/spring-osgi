@@ -17,268 +17,306 @@
  */
 package org.springframework.osgi.service;
 
+import java.io.Serializable;
+import java.util.AbstractMap;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import junit.framework.TestCase;
- 
-import org.easymock.ArgumentsMatcher;
+
 import org.easymock.MockControl;
-import org.easymock.internal.AlwaysMatcher;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.osgi.mock.MockBundleContext;
+import org.springframework.osgi.mock.MockServiceRegistration;
 
 /**
- * @author Adrian Colyer
- * @author Hal Hildebrand
- * @author Alin Dreghiciu
- * @since 1.0
+ * @author Costin Leau
  */
 public class OsgiServiceExporterTest extends TestCase {
 
-	private OsgiServiceExporter exporter = new OsgiServiceExporter();
+	private OsgiServiceExporter exporter;
+
 	private BeanFactory beanFactory;
+
 	private MockControl beanFactoryControl;
+
 	private BundleContext bundleContext;
-	private MockControl bundleContextControl;
-	private MockControl mockServiceRegistrationControl;
+
+	private MockControl ctxCtrl;
+
+	private BundleContext ctx;
 
 	protected void setUp() throws Exception {
-		this.beanFactoryControl = MockControl.createControl(BeanFactory.class);
-		this.beanFactory = (BeanFactory) this.beanFactoryControl.getMock();
-		this.bundleContextControl = MockControl.createControl(BundleContext.class);
-		this.bundleContext = (BundleContext) this.bundleContextControl.getMock();
-	}
+		exporter = new OsgiServiceExporter();
+		beanFactoryControl = MockControl.createControl(BeanFactory.class);
+		beanFactory = (BeanFactory) this.beanFactoryControl.getMock();
+		bundleContext = new MockBundleContext();
+		ctxCtrl = MockControl.createControl(BundleContext.class);
+		ctx = (BundleContext) ctxCtrl.getMock();
 
-	public void testAfterPropertiesSetNoBeans() throws Exception {
-		this.exporter.setBeanFactory(this.beanFactory);
-		this.exporter.setBundleContext(this.bundleContext);
-		this.bundleContextControl.replay();
-		this.beanFactoryControl.replay();
-		try {
-			this.exporter.afterPropertiesSet();
-			fail("Expecting IllegalArgumentException");
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	public void testAfterPropertiesSetNoBundleContext() throws Exception {
-		this.exporter.setBeanFactory(this.beanFactory);
-		try {
-			this.exporter.afterPropertiesSet();
-			fail("Expecting IllegalArgumentException");
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	public void testAfterPropertiesSetNoResolver() throws Exception {
-		this.exporter.setBeanFactory(this.beanFactory);
-		this.exporter.setBundleContext(this.bundleContext);
-		this.exporter.setResolver(null);
-		try {
-			this.exporter.afterPropertiesSet();
-			fail("Expecting IllegalArgumentException");
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	public void testAfterPropertiesSetNoBeanFactory() throws Exception {
-		try {
-			this.exporter.afterPropertiesSet();
-			fail("Expecting IllegalArgumentException");
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	// TODO: redo
-	public void tstPublish() throws Exception {
-		this.exporter.setBeanFactory(this.beanFactory);
-		this.exporter.setBundleContext(this.bundleContext);
-		MockControl mc = MockControl.createControl(OsgiServicePropertiesResolver.class);
-		OsgiServicePropertiesResolver resolver = (OsgiServicePropertiesResolver) mc.getMock();
-		this.exporter.setResolver(resolver);
-		Object target = new Object();
-		this.exporter.setTarget(target);
-
-		String beanName = OsgiServiceExporter.class.getName();
-		// set expectations on afterProperties
-		this.beanFactory.containsBean("&" + beanName);
-		this.beanFactoryControl.setReturnValue(false);
-		
-		//this.beanFactory.getBean(beanName);
-		//Object thisBean = new Object();
-		//this.beanFactoryControl.setReturnValue(thisBean);
-
-		resolver.getServiceProperties(beanName);
-		mc.setReturnValue(new Properties());
-
-		this.bundleContext.registerService((String[]) null, null, null);
-		this.bundleContextControl.setMatcher(new AlwaysMatcher());
-		this.bundleContextControl.setReturnValue(getServiceRegistration());
-
-		this.bundleContextControl.replay();
-		this.beanFactoryControl.replay();
-		mc.replay();
-
-		// do the work
-		this.exporter.afterPropertiesSet();
-
-		// verify
-		this.bundleContextControl.verify();
-		this.beanFactoryControl.verify();
-		mc.verify();
-	}
-
-	// TODO: fix
-	public void tstDestroy() throws Exception {
-		tstPublish();
-		this.mockServiceRegistrationControl.replay();
-		this.exporter.destroy();
-		this.mockServiceRegistrationControl.verify();
-	}
-
-	private ServiceRegistration getServiceRegistration() {
-		this.mockServiceRegistrationControl = MockControl.createControl(ServiceRegistration.class);
-		ServiceRegistration ret = (ServiceRegistration) this.mockServiceRegistrationControl.getMock();
-		ret.unregister(); // for destroy test..
-		return ret;
-	}
-	
-	/**
-	 * Test published service in case of a bean target service that is an 
-	 * ServiceFactory and the bean is lazy initialized.
-	 */
-	public void testPublishServiceFactory() throws Exception {
+		exporter.setBeanFactory(beanFactory);
 		exporter.setBundleContext(bundleContext);
-		// configure a BeanDefinitionRegistry Bean Factory
-		MockControl registryCtrl = MockControl.createControl(MockBeanDefinitionRegistry.class);
-		MockBeanDefinitionRegistry registry = (MockBeanDefinitionRegistry) registryCtrl.getMock();
-		exporter.setBeanFactory(registry);
-		// configure a BeanDefinition
-		MockControl beanDefCtrl = MockControl.createControl(BeanDefinition.class);
-		BeanDefinition beanDef = (BeanDefinition) beanDefCtrl.getMock();		
-		// configure a mock property resolver
-		MockControl resolverCtrl = MockControl.createControl(OsgiServicePropertiesResolver.class);
-		OsgiServicePropertiesResolver resolver = (OsgiServicePropertiesResolver) resolverCtrl.getMock();
-		exporter.setResolver(resolver);
-		// configure a mock ServiceFactory
-		MockControl targetCtrl = MockControl.createControl(ServiceFactory.class);
-		ServiceFactory target = (ServiceFactory) targetCtrl.getMock();
-		exporter.setTarget(target);
-		// a dummy target service		
-		String targetService = "targetService";
-		// configure target bean name
-		String beanName = "testServiceFactory";
-		exporter.setTargetBeanName(beanName);
-		// configure a mock ServiceRegistration
-		MockControl registrationCtrl = MockControl.createControl(ServiceRegistration.class);
-		ServiceRegistration registration = (ServiceRegistration) registrationCtrl.getMock();		
-		
-		// expected scenario
-		registry.containsBean(BeanFactory.FACTORY_BEAN_PREFIX + beanName);
-		registryCtrl.setReturnValue(false);
-		registry.getBeanDefinition(beanName);
-		registryCtrl.setReturnValue(beanDef);
-		registry.getBean(beanName);
-		registryCtrl.setReturnValue(target);
-		beanDef.isLazyInit();
-		beanDefCtrl.setReturnValue(true);
-		resolver.getServiceProperties(beanName);
-		resolverCtrl.setReturnValue(new Properties());
-		
-		bundleContext.registerService((String[]) null, null, null);
-		RegisterServiceMatcher matcher = new RegisterServiceMatcher();
-		bundleContextControl.setMatcher(matcher);
-		bundleContextControl.setReturnValue(registration);
-		target.getService(null, null);
-		targetCtrl.setReturnValue(targetService);
-		target.ungetService(null, null, targetService);
-		
-		bundleContextControl.replay();
-		registryCtrl.replay();
-		beanDefCtrl.replay();
-		resolverCtrl.replay();
-		targetCtrl.replay();
-		registrationCtrl.replay();
-		
-		// play scenario
-		// service registration
+	}
+
+	protected void tearDown() throws Exception {
+		exporter = null;
+		bundleContext = null;
+		ctxCtrl = null;
+		ctx = null;
+	}
+
+	public void testInitWithoutBundleContext() throws Exception {
+		exporter.setBundleContext(null);
+		exporter.setTarget(new Object());
+
+		try {
+			this.exporter.afterPropertiesSet();
+			fail("Expecting IllegalArgumentException");
+		}
+		catch (IllegalArgumentException ex) {
+			// expected
+		}
+	}
+
+	public void testInitWithoutBeanFactory() throws Exception {
+		exporter.setBeanFactory(null);
+		exporter.setTarget(new Object());
+
+		try {
+			this.exporter.afterPropertiesSet();
+			fail("Expecting IllegalArgumentException");
+		}
+		catch (IllegalArgumentException ex) {
+			// expected
+		}
+	}
+
+	public void testInitWithoutTargetOrTargetReference() throws Exception {
+		try {
+			this.exporter.afterPropertiesSet();
+			fail("Expecting IllegalArgumentException");
+		}
+		catch (IllegalArgumentException ex) {
+			// expected
+		}
+	}
+
+	public void testInitWithTargetAndTargetRerefence() throws Exception {
+		exporter.setTarget(new Object());
+		exporter.setTargetBeanName("costin");
+
+		try {
+			this.exporter.afterPropertiesSet();
+			fail("Expecting IllegalArgumentException");
+		}
+		catch (IllegalArgumentException ex) {
+			// expected
+		}
+	}
+
+	public void testInitWithOnlyJustTargetOrTargetReference() throws Exception {
+		exporter.setTarget(new Object());
+
 		exporter.afterPropertiesSet();
-		assertNotNull("Registered service", matcher.serviceFactory);
-		// parameters does not matter for now
-		Object actualService = matcher.serviceFactory.getService(null, null);
-		// we expect a dummy string as a service
-		assertEquals(targetService, actualService);
-		// and unregister silently 
-		matcher.serviceFactory.ungetService(null, null, actualService);
 		
-		// verify scenario
-		this.bundleContextControl.verify();
-		registryCtrl.verify();
-		beanDefCtrl.verify();
-		resolverCtrl.verify();
-		targetCtrl.verify();
-		registrationCtrl.verify();
-	}	
-	
-	/**
-	 * Mock interface for an bean definition registry bean factory.
-	 * @author Alin Dreghiciu
-	 */
-	private interface MockBeanDefinitionRegistry
-		extends BeanFactory, BeanDefinitionRegistry {
+		exporter.setTarget(null);
+		exporter.setTargetBeanName("costin");
+		exporter.afterPropertiesSet();
 	}
-	
-	/**
-	 * Specific mather for service registration.
-	 * It grabs the service registration to allow the test to call the actual
-	 * service get. 
-	 * 
-	 * @author Alin Dreghiciu
-	 */
-	private static class RegisterServiceMatcher implements ArgumentsMatcher {
-		
-		public ServiceFactory serviceFactory; 
 
-		public boolean matches(Object[] expected, Object[] actual) {
-			if (actual != null 
-				&& actual.length == 3
-				&& actual[1] != null
-				&& actual[1] instanceof ServiceFactory) {
-				serviceFactory = (ServiceFactory) actual[1];
-				return true;
+	public void testAutoDetectClassesForPublishingDisabled() throws Exception {
+		exporter.setAutoExportNumber(OsgiServiceExporter.AUTO_EXPORT_DISABLED);
+		Class[] clazz = exporter.autoDetectClassesForPublishing(Integer.class);
+		assertNotNull(clazz);
+		assertEquals(0, clazz.length);
+	}
+
+	public void testAutoDetectClassesForPublishingInterfaces() throws Exception {
+		exporter.setAutoExportNumber(OsgiServiceExporter.AUTO_EXPORT_INTERFACES);
+		Class[] clazz = exporter.autoDetectClassesForPublishing(HashMap.class);
+		Class[] expected = new Class[] { Cloneable.class, Serializable.class, Map.class };
+
+		assertTrue(compareArrays(expected, clazz));
+	}
+
+	public void testAutoDetectClassesForPublishingClassHierarchy() throws Exception {
+		exporter.setAutoExportNumber(OsgiServiceExporter.AUTO_EXPORT_CLASS_HIERARCHY);
+		Class[] clazz = exporter.autoDetectClassesForPublishing(HashMap.class);
+		Class[] expected = new Class[] { HashMap.class, AbstractMap.class };
+		assertTrue(compareArrays(expected, clazz));
+	}
+
+	public void testAutoDetectClassesForPublishingAll() throws Exception {
+		exporter.setAutoExportNumber(OsgiServiceExporter.AUTO_EXPORT_ALL);
+		Class[] clazz = exporter.autoDetectClassesForPublishing(HashMap.class);
+		Class[] expected = new Class[] { Map.class, Cloneable.class, Serializable.class, HashMap.class,
+				AbstractMap.class };
+		assertTrue(compareArrays(expected, clazz));
+	}
+
+	public void testRegisterService() throws Exception {
+		Class[] clazz = new Class[] { Serializable.class, HashMap.class, Cloneable.class, Map.class,
+				LinkedHashMap.class };
+
+		String[] names = new String[clazz.length];
+
+		for (int i = 0; i < clazz.length; i++) {
+			names[i] = clazz[i].getName();
+		}
+
+		Object bean = new Object();
+		final Properties props = new Properties();
+		final ServiceRegistration reg = new MockServiceRegistration();
+
+		exporter.setBundleContext(new MockBundleContext() {
+
+			public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
+				assertTrue(service instanceof ServiceFactory);
+				assertSame(props, properties);
+				return reg;
 			}
+		});
+		assertSame(reg, exporter.registerService(clazz, props));
+	}
+
+	public void testUnregisterWithNullServiceReg() throws Exception {
+		exporter.unregisterService(null);
+	}
+
+	public void testUnregisterService() throws Exception {
+		MockControl ctrl = MockControl.createControl(ServiceRegistration.class);
+		ServiceRegistration reg = (ServiceRegistration) ctrl.getMock();
+
+		reg.unregister();
+		ctrl.replay();
+		exporter.unregisterService(reg);
+		ctrl.verify();
+	}
+
+	public void testUnregisterServiceAlreadyUnregistered() throws Exception {
+		MockControl ctrl = MockControl.createControl(ServiceRegistration.class);
+		ServiceRegistration reg = (ServiceRegistration) ctrl.getMock();
+
+		reg.unregister();
+		ctrl.setDefaultThrowable(new IllegalStateException());
+		ctrl.replay();
+		exporter.unregisterService(reg);
+		ctrl.verify();
+	}
+
+	public void testLazyBeanServiceWithUsualBean() throws Exception {
+		final ServiceRegistration reg = new MockServiceRegistration();
+		final ServiceFactory[] factory = new ServiceFactory[1];
+
+		Object service = new Object();
+
+		BundleContext ctx = new MockBundleContext() {
+			public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
+				assertTrue(service instanceof ServiceFactory);
+				factory[0] = (ServiceFactory) service;
+				return reg;
+			}
+		};
+
+		exporter.setBundleContext(ctx);
+
+		String beanName = "fooBar";
+		exporter.setTargetBeanName(beanName);
+		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
+
+		beanFactoryControl.replay();
+		exporter.registerService(new Class[] { service.getClass() }, new Properties());
+
+		assertSame(service, factory[0].getService(null, null));
+		beanFactoryControl.verify();
+	}
+
+	public void testLazyBeanServiceWithServiceFactoryBean() throws Exception {
+		final ServiceRegistration reg = new MockServiceRegistration();
+		final ServiceFactory[] factory = new ServiceFactory[1];
+
+		final Object actualService = new Object();
+		Object service = new ServiceFactory() {
+
+			public Object getService(Bundle arg0, ServiceRegistration arg1) {
+				return actualService;
+			}
+
+			public void ungetService(Bundle arg0, ServiceRegistration arg1, Object arg2) {
+			}
+
+		};
+
+		BundleContext ctx = new MockBundleContext() {
+			public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
+				assertTrue(service instanceof ServiceFactory);
+				factory[0] = (ServiceFactory) service;
+				return reg;
+			}
+		};
+
+		exporter.setBundleContext(ctx);
+		exporter.setBeanFactory(beanFactory);
+
+		String beanName = "fooBar";
+		exporter.setTargetBeanName(beanName);
+		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
+
+		beanFactoryControl.replay();
+		exporter.registerService(new Class[] { actualService.getClass() }, new Properties());
+		assertSame(actualService, factory[0].getService(null, null));
+		beanFactoryControl.verify();
+	}
+
+	public void testLazyBeanServiceWithTargetObjectSet() throws Exception {
+		final ServiceRegistration reg = new MockServiceRegistration();
+		final ServiceFactory[] factory = new ServiceFactory[1];
+
+		Object service = new Object();
+
+		BundleContext ctx = new MockBundleContext() {
+			public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
+				assertTrue(service instanceof ServiceFactory);
+				factory[0] = (ServiceFactory) service;
+				return reg;
+			}
+		};
+
+		exporter.setBundleContext(ctx);
+		exporter.setBeanFactory(beanFactory);
+
+		// give an actual target object not a target reference
+		exporter.setTarget(service);
+
+		beanFactoryControl.replay();
+		exporter.registerService(new Class[] { service.getClass() }, new Properties());
+
+		assertSame(service, factory[0].getService(null, null));
+		beanFactoryControl.verify();
+	}
+
+	private boolean compareArrays(Object[] a, Object[] b) {
+		if (a.length != b.length)
 			return false;
-		}
 
-		public String toString(Object[] arguments) {
-			if (arguments == null)
-			    arguments = new Object[0];
-			StringBuffer result = new StringBuffer();
-			for (int i = 0; i < arguments.length; i++) {
-			    if (i > 0)
-				result.append(", ");
-			    result.append(argumentToString(arguments[i]));
+		for (int i = 0; i < a.length; i++) {
+			boolean found = false;
+			for (int j = 0; j < b.length; j++) {
+				if (a[i].equals(b[j])) {
+					found = true;
+					break;
+				}
 			}
-			return result.toString();
+			if (!found)
+				return false;
 		}
-		
-	    private String argumentToString(Object argument) {
-	    	if (argument instanceof String)
-	    	    return "\"" + argument + "\"";
-	    	return "" + argument;
-	    }		
+		return true;
 	}
-
 }

@@ -40,7 +40,6 @@ import org.springframework.util.StringUtils;
  * 
  * @author Adrian Colyer
  * @author Hal Hildebrand
- * @since 2.0
  */
 public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesResolver, BundleContextAware,
 		InitializingBean {
