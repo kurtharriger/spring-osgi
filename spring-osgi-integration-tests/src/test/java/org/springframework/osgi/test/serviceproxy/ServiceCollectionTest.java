@@ -21,11 +21,9 @@ import java.util.Iterator;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.aop.framework.DefaultAopProxyFactory;
-import org.springframework.osgi.service.OsgiServiceProxyFactoryBean.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
-import org.springframework.util.ClassUtils;
 
 /**
  * @author Costin Leau
@@ -53,7 +51,8 @@ public class ServiceCollectionTest extends ConfigurableBundleCreatorTests {
 
 	public void testCGLIBAvailable() throws Exception {
 		// waiting for Spring 2.0.3 before enabling this test
-		//assertTrue(ClassUtils.isPresent("net.sf.cglib.proxy.Enhancer", DefaultAopProxyFactory.class.getClassLoader()));
+		// assertTrue(ClassUtils.isPresent("net.sf.cglib.proxy.Enhancer",
+		// DefaultAopProxyFactory.class.getClassLoader()));
 	}
 
 	protected Collection createCollection() {

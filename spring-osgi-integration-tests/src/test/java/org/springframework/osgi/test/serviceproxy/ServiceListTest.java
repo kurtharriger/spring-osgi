@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.springframework.osgi.service.OsgiServiceProxyFactoryBean.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.collection.OsgiServiceList;
 
 /**
