@@ -28,10 +28,10 @@
     <spring.import.version>2.1.0</spring.import.version>
     <spring.bundle.version>2.1.0.SNAPSHOT-202-2</spring.bundle.version>
     <!--- Spring OSGi packages imported version -->
-    <spring.osgi.import.version>1.0.0.SNAPSHOT-6085</spring.osgi.import.version>
+    <spring.osgi.import.version>1.0.0.SNAPSHOT-6128</spring.osgi.import.version>
     <!--- Spring OSGi packages exported version -->
-    <spring.osgi.export.version>1.0.0.SNAPSHOT-6085</spring.osgi.export.version>
-    <spring.osgi.bundle.version>1.0.0.SNAPSHOT-6085</spring.osgi.bundle.version>
+    <spring.osgi.export.version>1.0.0.SNAPSHOT-6128</spring.osgi.export.version>
+    <spring.osgi.bundle.version>1.0.0.SNAPSHOT-6128</spring.osgi.bundle.version>
      <!-- Convenience for seeing the svn change #, but contains whitespace -->
     <project.svn.revision>$Rev$</project.svn.revision>
   </properties>
