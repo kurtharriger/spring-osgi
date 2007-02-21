@@ -74,7 +74,7 @@ public class ApplicationContextCreator implements Runnable {
 		this.mcast = mcast;
 		// Do some sanity checking.
 		Assert.notNull(mcast);
-		Long bundleKey = Long.valueOf(this.bundle.getBundleId());
+		Long bundleKey = new Long(this.bundle.getBundleId());
 		synchronized(pendingRegistrationTasksMap){
 			Assert.isTrue(!pendingRegistrationTasksMap.containsKey(bundleKey), "Duplicate context created!");
 			pendingRegistrationTasksMap.put(bundleKey, this);
@@ -98,7 +98,7 @@ public class ApplicationContextCreator implements Runnable {
 	public void run() {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		ConfigurableApplicationContext applicationContext;
-		Long bundleKey = Long.valueOf(this.bundle.getBundleId());
+		Long bundleKey = new Long(this.bundle.getBundleId());
 
 		if (!config.isSpringPoweredBundle()) {
 			return;

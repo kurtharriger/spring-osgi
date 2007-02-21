@@ -56,7 +56,7 @@ public class ApplicationContextCloser implements Runnable {
 		  */
 	public void run() {
 		ConfigurableApplicationContext appContext;
-		Long bundleKey = Long.valueOf(this.bundle.getBundleId());
+		Long bundleKey = new Long(this.bundle.getBundleId());
 
 		// Check for tasks that have not run yet
 		synchronized(pendingRegistrationTasksMap) {
