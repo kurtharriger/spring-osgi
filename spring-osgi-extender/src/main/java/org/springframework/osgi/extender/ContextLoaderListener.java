@@ -474,7 +474,7 @@ public class ContextLoaderListener implements BundleActivator,
 	}
 
 	public int getBundleState(Bundle bundle) {
-		Long bundleKey = Long.valueOf(bundle.getBundleId());
+		Long bundleKey = new Long(bundle.getBundleId());
 		synchronized (managedBundles) {
 			synchronized (applicationContextsBeingInitialized) {
 				if (applicationContextsBeingInitialized.containsKey(bundleKey)) {
