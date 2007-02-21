@@ -25,6 +25,10 @@
     <module>reference.test.bundle</module>
     <module>dependency.test.bundle</module>
     <module>cardinality.0to1.bundle</module>
+	<module>scoped.a.bundle</module>    
+	<module>scoped.b.bundle</module>    
+	<module>scoped.common.bundle</module>    
+	
   </modules>
 
  <build>
