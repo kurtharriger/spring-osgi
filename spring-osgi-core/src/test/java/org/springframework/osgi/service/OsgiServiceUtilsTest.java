@@ -29,6 +29,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Adrian Colyer
@@ -177,7 +178,7 @@ public class OsgiServiceUtilsTest extends TestCase {
 		//pf.setTargetClass(Number.class);
 		pf.setProxyTargetClass(true);
 		Object proxy = pf.getProxy();
-		System.out.println(Arrays.toString(ClassUtils.getAllInterfaces(proxy)));
+		System.out.println(ObjectUtils.nullSafeToString(ClassUtils.getAllInterfaces(proxy)));
 		assertTrue(proxy instanceof Number);
 	}
 }

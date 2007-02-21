@@ -19,12 +19,14 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.Scope;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.OsgiBundleScope;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
@@ -54,6 +56,9 @@ import org.springframework.util.StringUtils;
  * class registers the <code>BundleContextAwareProcessor</code> for processing
  * beans that implement the <code>BundleContextAware</code> interface.
  * 
+ * <p>
+ * This application context offers the OSGi-specific, "bundle" scope. See
+ * {@link org.springframework.osgi.context.OsgiBundleScope}.
  * 
  * <p>
  * Note that OsgiApplicationContext implementations are generally supposed to
@@ -79,7 +84,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	/** Path to configuration files * */
 	private String[] configLocations;
 
-	/** Internal ResourceLoader implementation used for delegation * */
+	/** Internal ResourceLoader implementation used for delegation */
 	private OsgiBundleResourceLoader osgiResourceLoader;
 
 	public AbstractRefreshableOsgiBundleApplicationContext() {
@@ -118,12 +123,12 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	public String[] getConfigLocations() {
 		return defensiveCopyOf(this.configLocations);
 	}
-	
+
 	protected boolean inActiveBundleState() {
 		int state = getBundle().getState();
 		return (state == Bundle.ACTIVE || state == Bundle.STARTING);
 	}
-	
+
 	protected String bundleStateName() {
 		int state = getBundle().getState();
 		switch (state) {
@@ -143,13 +148,14 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 			return "IN UNKNOWN STATE";
 		}
 	}
+
 	private String[] defensiveCopyOf(String[] original) {
 		if (null == original) {
 			return new String[0];
 		}
 		else {
 			String[] ret = new String[original.length];
-			System.arraycopy(original,0,ret,0,original.length);
+			System.arraycopy(original, 0, ret, 0, original.length);
 			return ret;
 		}
 	}
@@ -163,24 +169,54 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 * @see #setConfigLocations
 	 */
 	public void refresh() throws BeansException {
+
+		// TODO: should imported beans
 		if (this.configLocations == null || this.configLocations.length == 0) {
 			setConfigLocations(getDefaultConfigLocations());
 		}
 		synchronized (this) {
 			if (!inActiveBundleState()) {
-				throw new ApplicationContextException("Unable to refresh application context: bundle is " + 
-											bundleStateName());
+				throw new ApplicationContextException("Unable to refresh application context: bundle is "
+						+ bundleStateName());
 			}
 			super.refresh();
 		}
 	}
 
 	// synchronization required around close as after this, the BundleContext is
-	// invalid - cannot allow close to happen on a separate thread during refresh!
+	// invalid - cannot allow close to happen on a separate thread during
+	// refresh!
 	public synchronized void close() {
+		try {
+			cleanOsgiBundleScope();
+		}
+		catch (Exception ex) {
+			logger.info("got exception when closing", ex);
+		}
+
+		// call super class
 		super.close();
 	}
-	
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.context.support.AbstractApplicationContext#onRefresh()
+	 */
+	protected void onRefresh() throws BeansException {
+		cleanOsgiBundleScope();
+		// register 'bundle' scope
+		getBeanFactory().registerScope(OsgiBundleScope.SCOPE_NAME, new OsgiBundleScope());
+		super.onRefresh();
+	}
+
+	protected void cleanOsgiBundleScope() {
+		Scope scope = getBeanFactory().getRegisteredScope(OsgiBundleScope.SCOPE_NAME);
+		if (scope != null && scope instanceof OsgiBundleScope)
+			((OsgiBundleScope) scope).destroy();
+
+	}
+
 	/**
 	 * Return the default config locations to use, for the case where no
 	 * explicit config locations have been specified.
@@ -251,5 +287,4 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		sb.append("]");
 		return sb.toString();
 	}
-
 }

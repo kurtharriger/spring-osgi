@@ -115,7 +115,7 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		dict.put(Constants.OBJECTCLASS, new String[] { Serializable.class.getName() });
 		ref.setProperties(dict);
 
-		this.serviceFactoryBean.afterPropertiesSet();
+		serviceFactoryBean.afterPropertiesSet();
 
 		Object proxy = serviceFactoryBean.getObject();
 		assertTrue(proxy instanceof Serializable);
