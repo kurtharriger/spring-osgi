@@ -85,11 +85,11 @@ public class StreamCorruption extends TestCase {
 					throw new IllegalArgumentException("root cause").fillInStackTrace();
 				}
 				catch (Throwable ex1) {
-					throw new UnsupportedOperationException(ex1).fillInStackTrace();
+					throw new UnsupportedOperationException().initCause(ex1).fillInStackTrace();
 				}
 			}
 			catch (Throwable ex2) {
-				throw new UnsupportedOperationException(ex2).fillInStackTrace();
+				throw new UnsupportedOperationException().initCause(ex2).fillInStackTrace();
 			}
 		}
 		catch (Throwable ex3) {
