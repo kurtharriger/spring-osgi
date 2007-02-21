@@ -98,7 +98,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		control.verify();
 		assertTrue("context was refreshed", context.isRefreshed);
 
-		Long key = Long.valueOf(0);
+		Long key = new Long(0);
 		assertFalse(initMap.containsKey(key));
 		assertTrue(contextMap.containsKey(key));
 		assertEquals("context should be in map under bundle id key", context, contextMap.get(key));
@@ -136,7 +136,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 		control.verify();
 
-		Long key = Long.valueOf(0);
+		Long key = new Long(0);
 		assertFalse("failed context not in init map", initMap.containsKey(key));
 		assertFalse("failed context not in context map", contextMap.containsKey(key));
 	}
@@ -222,7 +222,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		}
 
 		public void refresh() {
-			Long key = Long.valueOf(0);
+			Long key = new Long(0);
 			assertTrue("pending map contains this context", initMap.containsKey(key));
 			assertEquals("pending map contains this context under bundle id", this, initMap.get(key));
 			assertFalse("completed map does not contain this context", contextMap.containsKey(key));
