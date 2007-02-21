@@ -164,7 +164,9 @@ public abstract class OsgiServiceUtils {
 			return new Class[0];
 
 		List clazz = new ArrayList(classes.length);
-		Collections.addAll(clazz, classes);
+		for (int i = 0; i < classes.length; i++) {
+			clazz.add(classes[i]);
+		}
 
 		// remove null elements
 		while (clazz.remove(null)) {

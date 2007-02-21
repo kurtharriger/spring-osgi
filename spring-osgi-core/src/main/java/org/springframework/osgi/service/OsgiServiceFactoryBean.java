@@ -19,7 +19,6 @@ package org.springframework.osgi.service;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 
@@ -36,9 +35,12 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.Constants;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.context.OsgiBundleScope;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -47,7 +49,8 @@ import org.springframework.util.StringUtils;
 
 /**
  * FactoryBean that transparently publishes other beans in the same application
- * context as OSGi services returning the ServiceRegistration for the given object.
+ * context as OSGi services returning the ServiceRegistration for the given
+ * object.
  * 
  * <p/> The service properties used when publishing the service are determined
  * by the OsgiServicePropertiesResolver. The default implementation uses
@@ -117,6 +120,58 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		}
 	}
 
+	/**
+	 * Decorating {@link org.osgi.framework.ServiceFactory} used for supporting
+	 * 'bundle' scoped beans.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	private class BundleScopeServiceFactory implements ServiceFactory {
+		private ServiceFactory decoratedServiceFactory;
+
+		private Runnable destructionCallback;
+
+		public BundleScopeServiceFactory(ServiceFactory serviceFactory) {
+			Assert.notNull(serviceFactory);
+			this.decoratedServiceFactory = serviceFactory;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.osgi.framework.ServiceFactory#getService(org.osgi.framework.Bundle,
+		 * org.osgi.framework.ServiceRegistration)
+		 */
+		public Object getService(Bundle bundle, ServiceRegistration registration) {
+			// inform OsgiBundleScope (just place a boolean)
+			OsgiBundleScope.CALLING_BUNDLE.set(Boolean.TRUE);
+			try {
+				Object obj = decoratedServiceFactory.getService(bundle, registration);
+				// retrieve destructionCallback if any 
+				Object callback = OsgiBundleScope.CALLING_BUNDLE.get();
+				if (callback != null && callback instanceof Runnable)
+					this.destructionCallback = (Runnable) callback;
+				return obj;
+			}
+			finally {
+				// clean ThreadLocal
+				OsgiBundleScope.CALLING_BUNDLE.set(null);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.osgi.framework.ServiceFactory#ungetService(org.osgi.framework.Bundle,
+		 * org.osgi.framework.ServiceRegistration, java.lang.Object)
+		 */
+		public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
+			decoratedServiceFactory.ungetService(bundle, registration, service);
+			if (destructionCallback != null)
+				destructionCallback.run();
+		}
+
+	}
+
 	private static final Log log = LogFactory.getLog(OsgiServiceFactoryBean.class);
 
 	public static final int AUTO_EXPORT_DISABLED = 0;
@@ -156,17 +211,6 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 	private Object target;
 
-	private Class[] defensiveCopyOf(Class[] original) {
-		if (null == original) {
-			return new Class[0];
-		}
-		else {
-			Class[] copy = new Class[original.length];
-			System.arraycopy(original, 0, copy, 0, original.length);
-			return copy;
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -199,6 +243,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 		// if we have a nested bean / non-Spring managed object
 		String beanName = (targetBeanName == null ? ObjectUtils.getIdentityHexString(target) : targetBeanName);
+
 		publishService(serviceClass, mergeServiceProperties(beanName));
 	}
 
@@ -268,7 +313,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 				if (log.isDebugEnabled())
 					log.debug("autodetect mode [" + autoExportMode + "] discovered on class [" + clazz + "] classes "
-							+ Arrays.toString(classes));
+							+ ObjectUtils.nullSafeToString(classes));
 			}
 		}
 
@@ -289,8 +334,13 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 		// filter duplicates
 		Set classes = CollectionFactory.createLinkedSetIfPossible(intfs.length + autoDetectedClasses.length);
-		Collections.addAll(classes, intfs);
-		Collections.addAll(classes, autoDetectedClasses);
+		for (int i = 0; i < intfs.length; i++) {
+			classes.add(intfs[i]);
+		}
+
+		for (int i = 0; i < autoDetectedClasses.length; i++) {
+			classes.add(autoDetectedClasses[i]);
+		}
 
 		Class[] publishingClasses = (Class[]) classes.toArray(new Class[classes.size()]);
 
@@ -315,9 +365,32 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		// sort the names in alphabetical order (eases debugging)
 		Arrays.sort(names);
 
-		log.info("Publishing service under classes [" + Arrays.toString(names) + "]");
+		log.info("Publishing service under classes [" + ObjectUtils.nullSafeToString(names) + "]");
 
-		return bundleContext.registerService(names, new LazyBeanServiceFactory(), serviceProperties);
+		ServiceFactory serviceFactory = new LazyBeanServiceFactory();
+
+		if (isBeanBundleScoped())
+			serviceFactory = new BundleScopeServiceFactory(serviceFactory);
+
+		return bundleContext.registerService(names, serviceFactory, serviceProperties);
+	}
+
+	protected boolean isBeanBundleScoped() {
+		boolean bundleScoped = false;
+		// if we do have a bundle scope, use ServiceFactory decoration
+		if (targetBeanName != null) {
+			if (beanFactory instanceof ListableBeanFactory) {
+				String beanScope = ((ConfigurableListableBeanFactory) beanFactory).getBeanDefinition(targetBeanName)
+						.getScope();
+				bundleScoped = OsgiBundleScope.SCOPE_NAME.equals(beanScope);
+			}
+			else
+				// if for some reason, the passed in BeanFactory can't be
+				// queried for scopes and we do
+				// have a bean reference, apply scoped decoration.
+				bundleScoped = true;
+		}
+		return bundleScoped;
 	}
 
 	/**
@@ -473,10 +546,10 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	}
 
 	public Class[] getInterfaces() {
-		return defensiveCopyOf(this.interfaces);
+		return (Class[]) interfaces.clone();
 	}
 
 	public void setInterfaces(Class[] serviceInterfaces) {
-		this.interfaces = defensiveCopyOf(serviceInterfaces);
+		this.interfaces = (Class[]) serviceInterfaces.clone();
 	}
 }

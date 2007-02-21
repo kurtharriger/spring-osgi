@@ -28,6 +28,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.LocalBundleContext;
+import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.collection.OsgiServiceList;
 import org.springframework.osgi.service.support.ClassTargetSource;
 import org.springframework.osgi.service.support.RetryTemplate;
@@ -166,7 +167,10 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		if (log.isDebugEnabled())
 			log.debug("creating a multi-value/collection proxy");
 
-		return new OsgiServiceList(clazz.getName(), filter, bundleContext, contextClassloader);
+		OsgiServiceCollection collection = new OsgiServiceList(clazz.getName(), filter, bundleContext,
+				contextClassloader);
+
+		return collection;
 	}
 
 	protected void addOsgiRetryInterceptor(ProxyFactory factory, Class clazz, String filter,
