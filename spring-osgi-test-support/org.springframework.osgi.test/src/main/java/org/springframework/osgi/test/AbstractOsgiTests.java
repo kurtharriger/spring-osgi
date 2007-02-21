@@ -209,8 +209,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			return path;
 		}
 		catch (IOException ioEx) {
-			throw new IllegalStateException("Artifact " + artifactId + "-" + version + "." + type + " could not be found",
-					ioEx);
+			throw (RuntimeException) new IllegalStateException("Artifact " + artifactId + "-" + version + "." + type + " could not be found").initCause(ioEx);
 		}
 	}
 
@@ -255,11 +254,11 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		if (platformName != null) {
 			platformName = platformName.toLowerCase();
 
-			if (platformName.contains(FELIX_PLATFORM)) {
+			if (platformName.indexOf(FELIX_PLATFORM) > -1) {
 				return new FelixPlatform();
 
 			}
-			if (platformName.contains(KNOPFLERFISH_PLATFORM)) {
+			if (platformName.indexOf(KNOPFLERFISH_PLATFORM) > -1) {
 				return new KnopflerfishPlatform();
 			}
 		}

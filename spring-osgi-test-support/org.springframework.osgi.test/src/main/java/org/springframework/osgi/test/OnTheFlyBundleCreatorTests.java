@@ -37,6 +37,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -252,7 +253,7 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
 		// install & start
 		Bundle bundle;
 		try {
-			bundle = context.installBundle("[onTheFly-test-bundle]" + getClass().getSimpleName() + "[" + hashCode()
+			bundle = context.installBundle("[onTheFly-test-bundle]" + ClassUtils.getShortName(getClass()) + "[" + hashCode()
 					+ "]", stream);
 		}
 		finally {
