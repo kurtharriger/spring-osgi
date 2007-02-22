@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.test.platform;
 
+import java.util.Properties;
+
 import junit.framework.TestCase;
 
 import org.osgi.framework.BundleContext;
@@ -46,6 +48,12 @@ public abstract class AbstractOsgiPlatformTest extends TestCase {
 	 */
 	protected void tearDown() throws Exception {
 		platform.stop();
+	}
+
+	public void testGetConfigurationProperties() {
+		Properties configuration = platform.getConfigurationProperties();
+		assertNotNull(configuration);
+		assertFalse(configuration.isEmpty());
 	}
 
 	/**
