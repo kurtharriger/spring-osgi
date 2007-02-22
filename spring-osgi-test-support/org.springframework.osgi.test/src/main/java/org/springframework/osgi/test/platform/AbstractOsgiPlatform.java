@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,42 +17,30 @@ package org.springframework.osgi.test.platform;
 
 import java.util.Properties;
 
-import org.osgi.framework.BundleContext;
-
 /**
- * Lifecycle contract for the OSGi platform.
+ * Base class for OsgiPlatform classes.
  * 
  * @author Costin Leau
  * 
  */
-public interface OsgiPlatform {
+public abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
 	/**
-	 * Start the OSGi platform.
-	 * 
-	 * @throws Exception
+	 * Subclasses should override this field.
 	 */
-	void start() throws Exception;
+	protected String toString = getClass().getName();
 
-	/**
-	 * Stop the OSGi platform.
-	 * 
-	 * @throws Exception
-	 */
-	void stop() throws Exception;
+	protected Properties configurationProperties = new Properties();
 
-	/**
-	 * Return the {@link java.util.Properties} object used
-	 * for configuring the underlying OSGi implementation before
-	 * starting it.
-	 *  
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.osgi.test.platform.OsgiPlatform#getConfigurationProperties()
 	 */
-	Properties getConfigurationProperties();
-	
-	/**
-	 * Get a hold of the bundle context of the returned platform.
-	 * @return
-	 */
-	BundleContext getBundleContext();
+	public Properties getConfigurationProperties() {
+		return configurationProperties;
+	}
+
+	public String toString() {
+		return toString;
+	}
 }

@@ -15,6 +15,10 @@
  */
 package org.springframework.osgi.test.platform;
 
+import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.knopflerfish.framework.Framework;
 import org.osgi.framework.BundleContext;
 
@@ -24,15 +28,24 @@ import org.osgi.framework.BundleContext;
  * @author Costin Leau
  * 
  */
-public class KnopflerfishPlatform implements OsgiPlatform {
+public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 
-	/**
-	 * Not used at the moment
-	 */
-	// private String[] ARGS = new String[] { "-init", "-launch" }; 
-
+	private static final Log log = LogFactory.getLog(KnopflerfishPlatform.class);
+	
 	private BundleContext context;
+
 	private Framework framework;
+
+	public KnopflerfishPlatform() {
+		toString = "Knopflerfish OSGi Platform";
+		
+		// default properties
+		Properties props = getConfigurationProperties();
+		props.setProperty("org.knopflerfish.framework.bundlestorage", "memory");
+		props.setProperty("org.knopflerfish.startlevel.use", "true");
+		props.setProperty("org.knopflerfish.osgi.setcontextclassloader", "true");
+
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -49,9 +62,9 @@ public class KnopflerfishPlatform implements OsgiPlatform {
 	 * @see org.springframework.osgi.test.OsgiPlatform#start()
 	 */
 	public void start() throws Exception {
-		System.getProperties().put("org.knopflerfish.framework.bundlestorage", "memory");
-		System.getProperties().put("org.knopflerfish.startlevel.use", "true");
-		System.getProperties().put("org.knopflerfish.osgi.setcontextclassloader", "true");
+		// copy configuration properties to sys properties
+		System.getProperties().putAll(getConfigurationProperties());
+		
 		framework = new Framework(this);
 		framework.launch(0);
 		context = framework.getSystemBundleContext();
@@ -64,9 +77,5 @@ public class KnopflerfishPlatform implements OsgiPlatform {
 	 */
 	public void stop() throws Exception {
 		framework.shutdown();
-	}
-	
-	public String toString() {
-		return "Knopflerfish OSGi Platform";
 	}
 }
