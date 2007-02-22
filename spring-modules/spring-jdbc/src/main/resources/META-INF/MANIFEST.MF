@@ -37,6 +37,6 @@ Export-Package: org.springframework.jdbc;version="${spring.export.version}",
    org.springframework.jdbc.support.nativejdbc;version="${spring.export.version}",
    org.springframework.jdbc.support.rowset;version="${spring.export.version}",
    org.springframework.orm;version="${spring.export.version}"
-DynamicImport-Package: weblogic.jdbc.extensions
+DynamicImport-Package: weblogic.jdbc.extensions, *
 Bundle-ClassPath: .,
  target/classes/
