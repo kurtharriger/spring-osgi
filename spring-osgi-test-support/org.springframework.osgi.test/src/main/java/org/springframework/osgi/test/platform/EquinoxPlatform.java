@@ -16,30 +16,40 @@
 package org.springframework.osgi.test.platform;
 
 import java.lang.reflect.Field;
+import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.osgi.framework.BundleContext;
 
 /**
- * Equinox (3.1.x and 3.2.x) OSGi platform.
+ * Equinox (3.2.x) OSGi platform.
  * 
  * @author Costin Leau
  * 
  */
-public class EquinoxPlatform implements OsgiPlatform{
+public class EquinoxPlatform extends AbstractOsgiPlatform {
 
-	/**
-	 */
-	private String[] ARGS = new String[] { "-clean" };
-
+	private static final Log log = LogFactory.getLog(EquinoxPlatform.class);
+	
 	private BundleContext context;
 
+	public EquinoxPlatform() {
+		toString = "Equinox OSGi Platform";
+		
+		// default properties
+		Properties props = getConfigurationProperties();
+		props.setProperty("eclipse.ignoreApp", "true");
+		props.setProperty("osgi.clean", "true");
+		props.setProperty("osgi.noShutdown", "true");
+	}
 
-    /*
-      * (non-Javadoc)
-      *
-      * @see org.springframework.osgi.test.OsgiPlatform#getBundleContext()
-      */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.osgi.test.OsgiPlatform#getBundleContext()
+	 */
 	public BundleContext getBundleContext() {
 		return context;
 	}
@@ -51,16 +61,12 @@ public class EquinoxPlatform implements OsgiPlatform{
 	 */
 	public void start() throws Exception {
 
-		// passed the configuration option as System properties then arguments
-		// (there is no dependency on the main class).
-		System.setProperty("eclipse.ignoreApp", "true");
-		System.setProperty("osgi.clean", "true");
-		System.setProperty("osgi.noShutdown", "true"); 
-		// System.setProperty("osgi.console", "");
-
+		// copy configuration properties to sys properties
+		System.getProperties().putAll(getConfigurationProperties());
+		
 		// Equinox 3.1.x returns void - use of reflection is required
 		// use main since in 3.1.x it sets up some system properties
-		EclipseStarter.main(ARGS);
+		EclipseStarter.main(new String[0]);
 
 		Field field = EclipseStarter.class.getDeclaredField("context");
 		field.setAccessible(true);
@@ -75,11 +81,5 @@ public class EquinoxPlatform implements OsgiPlatform{
 	public void stop() throws Exception {
 		EclipseStarter.shutdown();
 	}
-
-	public String toString() {
-		return "Equinox OSGi Platform";
-	}
-	
-	
 
 }

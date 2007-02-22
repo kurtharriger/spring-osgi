@@ -36,13 +36,25 @@ import org.springframework.core.io.Resource;
  * @author Costin Leau
  * 
  */
-public class FelixPlatform implements OsgiPlatform {
+public class FelixPlatform extends AbstractOsgiPlatform {
 
-	protected final Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(FelixPlatform.class);
 
 	private BundleContext context;
+
 	private Felix platform;
+
 	private File felixCacheDir;
+
+	public FelixPlatform() {
+		toString = "Felix OSGi Platform";
+		
+		// load Felix configuration
+		Properties props = getConfigurationProperties();
+		props.putAll(getFelixConfiguration());
+		props.putAll(getLocalConfiguration());
+	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -75,7 +87,7 @@ public class FelixPlatform implements OsgiPlatform {
 				log.warn("Could not create temporary directory for Felix, using default", ex);
 			}
 		}
-		
+
 		// specify a cache profile
 		props.setProperty("felix.cache.profile", "spring.osgi.junit.test");
 		// embedded use
@@ -96,12 +108,20 @@ public class FelixPlatform implements OsgiPlatform {
 	 * 
 	 * @return
 	 */
-	protected Properties getFelixConfiguration() throws Exception {
+	protected Properties getFelixConfiguration() {
 		// a naive solution since there can be multiple config.properties in the
 		// classpath
 		Resource resource = new ClassPathResource("config.properties");
+
+		String urlForm = null;
+		try {
+			urlForm = resource.getURL().toExternalForm();
+		}
+		catch (IOException ex) {
+			throw new RuntimeException("cannot get URL form for " + resource);
+		}
 		// used with Main
-		System.getProperties().setProperty("felix.config.properties", resource.getURL().toExternalForm());
+		System.getProperties().setProperty("felix.config.properties", urlForm);
 
 		// load config.properties (use Felix's Main for resolving placeholders)
 		return Main.loadConfigProperties();
@@ -114,18 +134,8 @@ public class FelixPlatform implements OsgiPlatform {
 	 */
 	public void start() throws Exception {
 
-		Properties configProp = getFelixConfiguration();
-
-		// add local settings
-		configProp.putAll(getLocalConfiguration());
-
-		// Main.main(new String[] {});
-		// Field getFelix = Main.class.getDeclaredField("m_felix");
-		// getFelix.setAccessible(true);
-		// platform = (Felix) getFelix.get(null);
-
 		platform = new Felix();
-		platform.start(new MutablePropertyResolverImpl(configProp), null);
+		platform.start(new MutablePropertyResolverImpl(getConfigurationProperties()), null);
 
 		Method getBundle = Felix.class.getDeclaredMethod("getBundle", new Class[] { long.class });
 		getBundle.setAccessible(true);
@@ -145,10 +155,6 @@ public class FelixPlatform implements OsgiPlatform {
 	 */
 	public void stop() throws Exception {
 		platform.shutdown();
-	}
-	
-	public String toString() {
-		return "Felix OSGi Platform";
 	}
 
 }
