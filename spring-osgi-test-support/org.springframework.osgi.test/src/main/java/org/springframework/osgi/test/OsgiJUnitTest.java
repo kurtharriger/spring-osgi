@@ -16,10 +16,11 @@
 package org.springframework.osgi.test;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Bundle;
 
 /**
- * JUnit contract for OSGi environments.
+ * JUnit contract for OSGi environments. It wraps some of TestCase methods as well
+ * as adds some to allow flexible access to the test instance by the TestRunnerService
+ * implementation.
  * 
  * @author Costin Leau
  * 
@@ -29,60 +30,52 @@ public interface OsgiJUnitTest {
     /**
      * Lookup marker for "to-OSGi" communication channel.
      */
-    public static final String FOR_OSGI = OsgiJUnitTest.class.getName() + "-osgi[in]";
+     static final String FOR_OSGI = OsgiJUnitTest.class.getName() + "-osgi[in]";
     /**
      * Lookup marker for "from-OSGi" communication channel.
      */
-    public static final String FROM_OSGI = OsgiJUnitTest.class.getName() + "-osgi[out]";
+     static final String FROM_OSGI = OsgiJUnitTest.class.getName() + "-osgi[out]";
 
     /**
      * Lookup marker for the test suite that is executed inside the OSGi
      * container.
      */
-    public static final String OSGI_TEST = OsgiJUnitTest.class.getName() + "-test";
+     static final String OSGI_TEST = OsgiJUnitTest.class.getName() + "-test";
 
     /**
-     * Replacement for the 'traditional' setUp.
+     * Replacement for the 'traditional' setUp. Called by TestRunnerService. 
      *
      * @see junit.framework.TestCase#setUp
      * @throws Exception
      */
-    public void onSetUp() throws Exception;
+     void osgiSetUp() throws Exception;
 
     /**
-     * Replacement for the 'traditional' tearDown.
+     * Replacement for the 'traditional' tearDown. Called by TestRunnerService.
      *
      * @see junit.framework.TestCase#tearDown
      * @throws Exception
      */
-    public void onTearDown() throws Exception;
+     void osgiTearDown() throws Exception;
 
     /**
-     * Replacement for the 'traditional' runTest.
+     * Replacement for the 'traditional' runTest. Called by TestRunnerService.
      * @throws Throwable
      */
-    public void osgiRunTest() throws Throwable;
+     void osgiRunTest() throws Throwable;
 
-    public void setName(String name);
+     /**
+      * TestCase method added to the interface for usage
+      * by the OSGi test runner service.
+      *  
+      * @param name
+      */
+     void setName(String name);
 
 
     /**
      * Provides the OSGi bundle context to the test
      * @param bundleContext
      */
-    public void setBundleContext(BundleContext bundleContext);
-
-
-    /**
-     * Find a bundle by the bundle's location.
-     * @return the bundle matching the location or null if not found
-     */
-    public Bundle findBundleByLocation(String bundleLocation);
-
-
-    /**
-     * Find a bundle by the bundle's symbolic name
-     * @return the bundle matching the symbolic name or null if not found
-     */
-    public Bundle findBundleBySymbolicName(String bundleSymbolicName);
+     void setBundleContext(BundleContext bundleContext);
 }

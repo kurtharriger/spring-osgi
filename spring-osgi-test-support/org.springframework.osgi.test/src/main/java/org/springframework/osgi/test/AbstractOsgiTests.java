@@ -15,45 +15,42 @@
  */
 package org.springframework.osgi.test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 
-import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.*;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
-import org.springframework.osgi.test.platform.EquinoxPlatform;
-import org.springframework.osgi.test.platform.FelixPlatform;
-import org.springframework.osgi.test.platform.KnopflerfishPlatform;
 import org.springframework.osgi.test.platform.OsgiPlatform;
+import org.springframework.osgi.test.support.ConfigurableByteArrayOutputStream;
 import org.springframework.util.Assert;
-
-import edu.emory.mathcs.backport.java.util.concurrent.BrokenBarrierException;
-import edu.emory.mathcs.backport.java.util.concurrent.CyclicBarrier;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * 
- * Base teste for OSGi environments. It will start the OSGi platform, install
- * the given bundles and then delegate the execution to a test copy which
- * executes inside OSGi.
+ * Base test for OSGi environments. Takes care of starting the OSGi platform,
+ * installing the given bundles and delegating the test execution to a copy
+ * which runs inside OSGi.
  * 
  * @author Costin Leau
  * 
  */
-public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTest {
+public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInjectionTests implements OsgiJUnitTest {
 
 	// JVM shutdown hook
 	private static Thread shutdownHook;
@@ -61,6 +58,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	// the OSGi fixture
 	private static OsgiPlatform osgiPlatform;
 
+	// OsgiPlatform bundle context
 	private static BundleContext platformContext;
 
 	// JUnit Service
@@ -69,6 +67,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	// JUnitService trigger
 	private static Method serviceTrigger;
 
+	// streams for communicating with the OSGi realm.
 	private ObjectInputStream inputStream;
 
 	private ObjectOutputStream outputStream;
@@ -76,7 +75,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	// the test results used by the triggering test runner
 	private TestResult originalResult;
 
-	// The OSGi BundleContext
+	// The OSGi BundleContext (when executing the test as a bundle inside OSGi)
 	private BundleContext bundleContext;
 
 	// OsgiResourceLoader
@@ -84,133 +83,18 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 	private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
 
-	public static final String EQUINOX_PLATFORM = "equinox";
-
-	public static final String KNOPFLERFISH_PLATFORM = "knopflerfish";
-
-	public static final String FELIX_PLATFORM = "felix";
-
-	public static final String OSGI_FRAMEWORK_SELECTOR = "org.springframework.osgi.test.framework";
-
 	protected final Log log = LogFactory.getLog(getClass());
-    private static final String ORG_OSGI_FRAMEWORK_BOOTDELEGATION = "org.osgi.framework.bootdelegation";
 
-
-    protected String getSpringOSGiTestBundleUrl() {
-		return localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test", "1.0-SNAPSHOT");
+	public AbstractOsgiTests() {
+		super();
 	}
 
-	protected String getSpringOSGiIoBundleUrl() {
-		return localMavenArtifact("org.springframework.osgi", "spring-osgi-io", "1.0-SNAPSHOT");
+	public AbstractOsgiTests(String name) {
+		super(name);
 	}
 
-	protected String getSpringCoreBundleUrl() {
-		return localMavenArtifact("org.springframework.osgi", "spring-core", "2.1-SNAPSHOT");
-	}
-
-	protected String getJUnitLibUrl() {
-		return localMavenArtifact("org.springframework.osgi", "junit.osgi", "3.8.1-SNAPSHOT");
-	}
-
-	protected String getUtilConcurrentLibUrl() {
-		return localMavenArtifact("org.springframework.osgi", "backport-util-concurrent", "3.0-SNAPSHOT");
-	}
-
-	protected String getJclOverSlf4jUrl() {
-		return localMavenArtifact("org.springframework.osgi", "jcl104-over-slf4j.osgi", "1.1.0");
-	}
-
-	protected String getSlf4jLog4jUrl() {
-		return localMavenArtifact("org.slf4j", "slf4j-log4j-full", "1.1.0");
-	}
-
-	protected String getLog4jLibUrl() {
-		System.setProperty("log4j.ignoreTCL", "true");
-		return localMavenArtifact("org.springframework.osgi", "log4j.osgi", "1.2.13-SNAPSHOT");
-	}
-
-	/**
-	 * Find a local maven artifact. First tries to find the resource as a
-	 * packaged artifact produced by a local maven build, and if that fails will
-	 * search the local maven repository.
-	 * 
-	 * @param groupId - the groupId of the organization supplying the bundle
-	 * @param artifactId - the artifact id of the bundle
-	 * @param version - the version of the bundle
-	 * @return the String representing the URL location of this bundle
-	 */
-	protected String localMavenArtifact(String groupId, String artifactId, String version) {
-		return localMavenArtifact(groupId, artifactId, version, "jar");
-	}
-
-	/**
-	 * Find a local maven artifact. First tries to find the resource as a
-	 * packaged artifact produced by a local maven build, and if that fails will
-	 * search the local maven repository.
-	 *
-	 * @param groupId - the groupId of the organization supplying the bundle
-	 * @param artifactId - the artifact id of the bundle
-	 * @param version - the version of the bundle
-     * @param type - the extension type of the artifact
-	 * @return the String representing the URL location of this bundle
-	 */
-	protected String localMavenArtifact(String groupId, String artifactId, String version, String type) {
-		try {
-			return localMavenBuildArtifact(artifactId, version, type);
-		}
-		catch (IllegalStateException illStateEx) {
-			return localMavenBundle(groupId, artifactId, version, type);
-		}
-	}
-
-	/**
-	 * Answer the url string of the indicated bundle in the local Maven
-	 * repository
-	 * 
-	 * @param groupId - the groupId of the organization supplying the bundle
-	 * @param artifact - the artifact id of the bundle
-	 * @param version - the version of the bundle
-	 * @return the String representing the URL location of this bundle
-	 */
-	protected String localMavenBundle(String groupId, String artifact, String version, String type) {
-        String defaultHome = new File(new File(System.getProperty("user.home")), ".m2/repository").getAbsolutePath();
-        File repositoryHome = new File(System.getProperty("localRepository", defaultHome));
-        
-        String location = groupId.replace('.', '/');
-		location += '/';
-		location += artifact;
-		location += '/';
-		location += version;
-		location += '/';
-		location += artifact;
-		location += '-';
-		location += version;
-		location += ".";
-        location += type;
-        return "file:" + new File(repositoryHome, location).getAbsolutePath();
-	}
-
-	/**
-	 * Find a local maven artifact in the current build tree. This searches for
-	 * resources produced by the package phase of a maven build.
-	 * 
-	 * @param artifactId
-	 * @param version
-     * @param type
-	 * @return a String representing the URL location of this bundle
-	 */
-	protected String localMavenBuildArtifact(String artifactId, String version, String type) {
-		try {
-			File found = new MavenPackagedArtifactFinder(artifactId, version, type).findPackagedArtifact(new File("."));
-			String path = found.toURL().toExternalForm();
-			if (log.isDebugEnabled()) {
-				log.debug("found local maven artifact " + path + " for " + artifactId + "|" + version);
-			}
-			return path;
-		}
-		catch (IOException ioEx) {
-			throw (RuntimeException) new IllegalStateException("Artifact " + artifactId + "-" + version + "." + type + " could not be found").initCause(ioEx);
-		}
+	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
+		return new OsgiBundleXmlApplicationContext(getBundleContext(), locations);
 	}
 
 	/**
@@ -225,78 +109,9 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	/**
 	 * Mandator bundles (part of the test setup).
 	 * 
-	 * @return the array of mandatory bundle names (sans Log4J, which gets
-	 * special handling
+	 * @return the array of mandatory bundle names.
 	 */
-	protected String[] getMandatoryBundles() {
-		return new String[] { getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(), getJUnitLibUrl(),
-				getSpringCoreBundleUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(),
-				getSpringOSGiTestBundleUrl() };
-	}
-
-	public AbstractOsgiTests() {
-		super();
-	}
-
-	public AbstractOsgiTests(String name) {
-		super(name);
-	}
-
-	/**
-	 * OSGi platform creation. The chooseOsgiPlatform method is called to
-	 * determine what platform will be used by the test - if an invalid/null
-	 * String is returned, Equinox will be used by default.
-	 * 
-	 * @return the OSGi platform
-	 */
-	protected OsgiPlatform createPlatform() {
-		String platformName = getPlatformName();
-		if (platformName != null) {
-			platformName = platformName.toLowerCase();
-
-			if (platformName.indexOf(FELIX_PLATFORM) > -1) {
-				return new FelixPlatform();
-
-			}
-			if (platformName.indexOf(KNOPFLERFISH_PLATFORM) > -1) {
-				return new KnopflerfishPlatform();
-			}
-		}
-
-		return new EquinoxPlatform();
-	}
-
-	/**
-	 * Indicate what OSGi platform to be used by the test suite. By default, the
-	 * 'spring.osgi.test.framework' is used.
-	 * 
-	 * @return platform
-	 */
-	protected String getPlatformName() {
-		String systemProperty = System.getProperty(OSGI_FRAMEWORK_SELECTOR);
-
-		return (systemProperty == null ? EQUINOX_PLATFORM : systemProperty);
-	}
-
-	/**
-	 * Logs the underlying OSGi information (which can be tricky).
-	 * 
-	 */
-	private void logPlatformInfo(BundleContext context) {
-		StringBuffer platformInfo = new StringBuffer();
-
-		// add platform information
-		platformInfo.append(osgiPlatform);
-		// get current bundle (it has to be the system bundle since we just
-		// bootstrapped the platform)
-		Bundle sysBundle = context.getBundle();
-
-		platformInfo.append(" [");
-		// Version
-		platformInfo.append(sysBundle.getHeaders().get(Constants.BUNDLE_VERSION));
-		platformInfo.append("]");
-		log.info(platformInfo + " started");
-	}
+	protected abstract String[] getMandatoryBundles();
 
 	/**
 	 * Return the resource loader used by this test.
@@ -308,36 +123,121 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		return resourceLoader;
 	}
 
-	private Resource[] createResources(String[] bundles) {
-		Resource[] res = new Resource[bundles.length];
-		ResourceLoader loader = new DefaultResourceLoader();
-
-		for (int i = 0; i < bundles.length; i++) {
-			res[i] = loader.getResource(bundles[i]);
-		}
-		return res;
-	}
-
-	private void invokeOSGiTestExecution() throws Exception {
-		try {
-			serviceTrigger.invoke(service, null);
-		}
-		catch (InvocationTargetException ex) {
-			Throwable th = ex.getCause();
-			if (th instanceof Exception)
-				throw ((Exception) th);
-			else
-				throw ((Error) th);
-		}
+	/**
+	 * Return the bundleContext for the bundle in which this test is running.
+	 * 
+	 * @return
+	 */
+	protected BundleContext getBundleContext() {
+		return bundleContext;
 	}
 
 	/**
-	 * Customized setUp - the OSGi platform will be started (if needed) and
-	 * cached for the test suite execution.
+	 * Create (and configure) the OSGi platform.
 	 * 
-	 * @see junit.framework.TestCase#setUp()
+	 * @return OSGi platform.
 	 */
-	protected final void setUp() throws Exception {
+	protected abstract OsgiPlatform createPlatform();
+
+	/**
+	 * Callback hook invoked <b>before</b> preparing the OSGi environment for
+	 * test execution.
+	 * 
+	 * Normally, this method is called only one during the lifecycle of a test
+	 * suite.
+	 * 
+	 * @throws Exception
+	 */
+	protected void beforeOsgiSetup() throws Exception {
+
+	}
+
+	/**
+	 * Callback hook invoked <b>after</b> preparing the OSGi environment for
+	 * test execution but <b>before</b> any test is executed.
+	 * 
+	 * Normally, this method is called only one during the lifecycle of a test
+	 * suite.
+	 * @throws Exception
+	 */
+	protected void afterOsgiSetup() throws Exception {
+
+	}
+
+	/**
+	 * Callback for processing the bundle context after the bundles have been
+	 * installed and started.
+	 * 
+	 * @param context
+	 */
+	protected void postProcessBundleContext(BundleContext context) throws Exception {
+	}
+
+	//
+	// JUnit overriden methods.
+	//
+
+	/**
+	 * Replacement run method.
+	 * Get a hold of the TestRunner used for running this test so it can populate it
+	 * with the results retrieved from OSGi.
+	 */
+	public final void run(TestResult result) {
+		// get a hold of the test result
+		this.originalResult = result;
+		super.run(result);
+	}
+
+	public void runBare() throws Throwable {
+		prepareTestExecution();
+		try {
+			// invoke OSGi test run
+			invokeOSGiTestExecution();
+		}
+		finally {
+			readTestResult();
+			completeTestExecution();
+		}
+	}
+
+	//
+	// OsgiJUnitTest execution hooks.
+	//
+
+	/**
+	 * the setUp version for the OSGi environment.
+	 * 
+	 * @throws Exception
+	 */
+	public final void osgiSetUp() throws Exception {
+		// call the normal onSetUp
+		setUp();
+	}
+
+	public final void osgiTearDown() throws Exception {
+		// call the normal tearDown
+		tearDown();
+	}
+
+	/**
+	 * Actual test execution (delegates to the superclass implementation).
+	 * 
+	 * @throws Throwable
+	 */
+	public final void osgiRunTest() throws Throwable {
+		super.runTest();
+	}
+
+	//
+	// Delegation methods for OSGi execution.
+	//
+
+	/**
+	 * Prepare test execution - the OSGi platform will be started (if needed)
+	 * and cached for the test suite execution.
+	 * 
+	 */
+	private void prepareTestExecution() throws Exception {
 
 		if (getName() == null)
 			throw new IllegalArgumentException("no test specified");
@@ -363,10 +263,40 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		outputStream.writeUTF(getName());
 		outputStream.flush();
 
-		// invoke OSGi test run
-		invokeOSGiTestExecution();
-
 	}
+
+	/**
+	 * Delegate the test execution to the OSGi copy.
+	 * 
+	 * @throws Exception
+	 */
+	private void invokeOSGiTestExecution() throws Exception {
+		try {
+			serviceTrigger.invoke(service, null);
+		}
+		catch (InvocationTargetException ex) {
+			Throwable th = ex.getCause();
+			if (th instanceof Exception)
+				throw ((Exception) th);
+			else
+				throw ((Error) th);
+		}
+	}
+
+	/**
+	 * Finish the test execution - read back the result from the OSGi copy and
+	 * closes up the streams.
+	 * 
+	 * @throws Exception
+	 */
+	private void completeTestExecution() throws Exception {
+		TestUtils.closeStream(inputStream);
+		TestUtils.closeStream(outputStream);
+	}
+
+	//
+	// OSGi testing infrastructure setup.
+	//
 
 	/**
 	 * Start the OSGi platform and install/start the bundles (happens once for
@@ -380,11 +310,11 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			// make sure the platform is closed properly
 			registerShutdownHook();
 
-            // add bootDelegation packages
-            System.setProperty(ORG_OSGI_FRAMEWORK_BOOTDELEGATION, getBootDelegationPackageString());
+			// hook before the OSGi platform is initialized
+			beforeOsgiSetup();
 
-            osgiPlatform = createPlatform();
-            // start platform
+			osgiPlatform = createPlatform();
+			// start platform
 			log.debug("about to start " + osgiPlatform);
 			osgiPlatform.start();
 			// platform context
@@ -403,8 +333,6 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 
 			// install bundles (from the local system/classpath)
 			Resource[] bundleResources = createResources(allBundles);
-
-			// initializeLog4J();
 
 			Bundle[] bundles = new Bundle[bundleResources.length];
 			for (int i = 0; i < bundleResources.length; i++) {
@@ -425,69 +353,47 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			}
 			postProcessBundleContext(platformContext);
 
-			// get JUnit test service reference
-			// this is a loose reference - update it if the Activator class is
-			// changed.
-			ServiceReference reference = platformContext.getServiceReference(ACTIVATOR_REFERENCE);
-			if (reference == null)
-				throw new IllegalStateException("no OSGi service reference found at " + ACTIVATOR_REFERENCE);
+			initializeServiceRunnerInvocationMethods();
 
-			service = platformContext.getService(reference);
-			if (service == null) {
-				throw new IllegalStateException("no service found for reference: " + reference);
-			}
-
-			serviceTrigger = service.getClass().getDeclaredMethod("executeTest", null);
-			if (serviceTrigger == null) {
-				throw new IllegalStateException("no executeTest() method found on: " + service.getClass());
-			}
-
-			onSetUpBeforeOsgi();
+			// hook after the OSGi platform has been setup
+			afterOsgiSetup();
 
 		}
 	}
 
-    /**
-     * Return a String representation for the boot delegation packages list.
-     *
-     * @return
-     */
-    private String getBootDelegationPackageString() {
-        StringBuffer buf = new StringBuffer();
-
-        for (Iterator iter = getBootDelegationPackages().iterator(); iter.hasNext();) {
-            buf.append(((String) iter.next()).trim());
-            if (iter.hasNext()) {
-                buf.append(",");
-            }
-        }
-
-        return buf.toString();
-    }
-
-
-    /**
-     *
-     * @return the list of packages the OSGi platform will delegate to the boot class path
-     *         Answer an empty list if none.
-     */
-    protected List getBootDelegationPackages() {
-        List defaults = new ArrayList();
-        defaults.add("javax.*");
-        defaults.add("org.w3c.*");
-        defaults.add("sun.*");
-        defaults.add("org.xml.*");
-        defaults.add("com.sun.*");
-        return defaults;
-    }
-
-    /**
-	 * Callback for processing the bundle context after the bundles have been
-	 * installed and started.
+	/**
+	 * Log the underlying OSGi information (which can be tricky).
 	 * 
-	 * @param context
 	 */
-	protected void postProcessBundleContext(BundleContext context) throws Exception {
+	private void logPlatformInfo(BundleContext context) {
+		StringBuffer platformInfo = new StringBuffer();
+
+		// add platform information
+		platformInfo.append(osgiPlatform);
+		// get current bundle (it has to be the system bundle since we just
+		// bootstrapped the platform)
+		Bundle sysBundle = context.getBundle();
+
+		platformInfo.append(" [");
+		// Version
+		platformInfo.append(sysBundle.getHeaders().get(Constants.BUNDLE_VERSION));
+		platformInfo.append("]");
+		log.info(platformInfo + " started");
+	}
+
+	/**
+	 * Create Resource objects from Strings.
+	 * @param bundles
+	 * @return
+	 */
+	private Resource[] createResources(String[] bundles) {
+		Resource[] res = new Resource[bundles.length];
+		ResourceLoader loader = new DefaultResourceLoader();
+
+		for (int i = 0; i < bundles.length; i++) {
+			res[i] = loader.getResource(bundles[i]);
+		}
+		return res;
 	}
 
 	/**
@@ -505,36 +411,34 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 	}
 
 	/**
-	 * Hook for adding behavior after the OSGi platform has been started (is
-	 * this really needed).
-	 * 
-	 */
-	protected void onSetUpBeforeOsgi() {
-	}
-
-	/**
-	 * the setUp version for the OSGi environment.
+	 * Determine through reflection the methods used for invoking the
+	 * TestRunnerService.
 	 * 
 	 * @throws Exception
 	 */
-	public void onSetUp() throws Exception {
-	}
+	private void initializeServiceRunnerInvocationMethods() throws Exception {
+		// get JUnit test service reference
+		// this is a loose reference - update it if the JUnitTestActivator
+		// class is
+		// changed.
+		ServiceReference reference = platformContext.getServiceReference(ACTIVATOR_REFERENCE);
+		if (reference == null)
+			throw new IllegalStateException("no OSGi service reference found at " + ACTIVATOR_REFERENCE);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	public final void tearDown() throws Exception {
-		cleanupStreams();
-		onTearDown();
-	}
+		service = platformContext.getService(reference);
+		if (service == null) {
+			throw new IllegalStateException("no service found for reference: " + reference);
+		}
 
-	public void onTearDown() throws Exception {
+		serviceTrigger = service.getClass().getDeclaredMethod("executeTest", null);
+		if (serviceTrigger == null) {
+			throw new IllegalStateException("no executeTest() method found on: " + service.getClass());
+		}
+
 	}
 
 	private void readTestResult() {
-		// finish stream creation (to avoid circullar dependencies)
+		// finish stream creation (to avoid circular dependencies)
 		createInStream();
 
 		log.debug("reading OSGi results for test [" + getName() + "]");
@@ -544,6 +448,9 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		log.debug("test[" + getName() + "]'s result read");
 	}
 
+	/**
+	 * Special shutdown hook.
+	 */
 	private void registerShutdownHook() {
 		if (shutdownHook == null) {
 			// No shutdown hook registered yet.
@@ -556,8 +463,12 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		}
 	}
 
+	/**
+	 * Cleanup for the test suite.
+	 */
 	private void shutdownTest() {
-		cleanupStreams();
+		TestUtils.closeStream(inputStream);
+		TestUtils.closeStream(outputStream);
 
 		log.info("shutting down OSGi platform");
 		if (osgiPlatform != null) {
@@ -599,24 +510,9 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		log.debug("OSGi streams setup");
 	}
 
-	private void cleanupStreams() {
-		try {
-			if (inputStream != null)
-				inputStream.close();
-		}
-		catch (IOException e) {
-			// swallow
-		}
-
-		try {
-			if (outputStream != null)
-				outputStream.close();
-		}
-		catch (IOException e) {
-			// swallow
-		}
-	}
-
+	/**
+	 * Utility method for creating the input communication stream.
+	 */
 	private void createInStream() {
 		try {
 			byte[] inputSource = (byte[]) System.getProperties().get(OsgiJUnitTest.FROM_OSGI);
@@ -626,36 +522,6 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 			throw new RuntimeException("cannot open streams " + ex);
 		}
 
-	}
-
-	/**
-	 * Change the normal test execution by adding result retrieval from OSGi
-	 * realm.
-	 * 
-	 * @see junit.framework.TestCase#run()
-	 */
-	public final void runTest() throws Throwable {
-		readTestResult();
-	}
-
-	/**
-	 * Actual test execution (delegates to the TestCase implementation).
-	 * 
-	 * @throws Throwable
-	 */
-	public final void osgiRunTest() throws Throwable {
-		super.runTest();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#run(junit.framework.TestResult)
-	 */
-	public final void run(TestResult result) {
-		// get a hold of the test result
-		this.originalResult = result;
-		super.run(result);
 	}
 
 	/**
@@ -669,111 +535,7 @@ public abstract class AbstractOsgiTests extends TestCase implements OsgiJUnitTes
 		this.resourceLoader = new OsgiBundleResourceLoader(bundleContext.getBundle());
 	}
 
-	public BundleContext getBundleContext() {
-		return bundleContext;
-	}
-
-	public void waitOnContextCreation(String forBundleWithSymbolicName, long timeout, TimeUnit unit) {
-		// use a barrier to ensure we don't proceed until context is published
-		final CyclicBarrier barrier = new CyclicBarrier(2);
-
-		Thread waitThread = new Thread(new ApplicationContextWaiter(barrier, bundleContext, forBundleWithSymbolicName));
-		waitThread.start();
-
-		try {
-			barrier.await(timeout, unit);
-		}
-		catch (Throwable e) {
-            // dumpStacks();
-            throw new RuntimeException("Gave up waiting for application context for '" + forBundleWithSymbolicName
-					+ "' to be created");
-		}
-	}
-
-	public void waitOnContextCreation(String forBundleWithSymbolicName) {
-        waitOnContextCreation(forBundleWithSymbolicName, 5L, TimeUnit.SECONDS);
-    }
-
-	public Bundle findBundleByLocation(String bundleLocation) {
-		Bundle[] bundles = bundleContext.getBundles();
-		for (int i = 0; i < bundles.length; i++) {
-			if (bundles[i].getLocation().equals(bundleLocation)) {
-				return bundles[i];
-			}
-		}
-		return null;
-	}
-
-	public Bundle findBundleBySymbolicName(String sybmolicName) {
-		Bundle[] bundles = bundleContext.getBundles();
-		for (int i = 0; i < bundles.length; i++) {
-			if (bundles[i].getSymbolicName().equals(sybmolicName)) {
-				return bundles[i];
-			}
-		}
-		return null;
-	}
-   /*
-	public void dumpStacks() {
-		Map stacks = Thread.getAllStackTraces();
-		for (Iterator i = stacks.entrySet().iterator(); i.hasNext();) {
-			Map.Entry e = (Map.Entry)i.next();
-			System.out.println("");
-			System.out.println(e.getKey());
-			StackTraceElement[] se = (StackTraceElement[])e.getValue();
-			for (int j=0; j<se.length; j++) {
-				System.out.println(" " + se[j]);
-			}
-		}
-	}
-   */
-	private static class ApplicationContextWaiter implements Runnable, ServiceListener {
-
-		private final String symbolicName;
-
-		private final CyclicBarrier barrier;
-
-		private final BundleContext context;
-
-		public ApplicationContextWaiter(CyclicBarrier barrier, BundleContext context, String bundleSymbolicName) {
-			this.symbolicName = bundleSymbolicName;
-			this.barrier = barrier;
-			this.context = context;
-		}
-
-		public void run() {
-			String filter = "(org.springframework.context.service.name=" + symbolicName + ")";
-			try {
-				context.addServiceListener(this, filter);
-				// now look and see if the service was already registered before
-				// we even got here...
-				if (this.context.getServiceReferences("org.springframework.context.ApplicationContext", filter) != null) {
-					returnControl();
-				}
-			}
-			catch (InvalidSyntaxException badSyntaxEx) {
-				throw new IllegalStateException("OSGi runtime rejected filter '" + filter + "'");
-			}
-		}
-
-		public void serviceChanged(ServiceEvent event) {
-			if (event.getType() == ServiceEvent.REGISTERED) {
-				// our wait is over...
-				returnControl();
-			}
-		}
-
-		private void returnControl() {
-			this.context.removeServiceListener(this);
-			try {
-				this.barrier.await();
-			}
-			catch (BrokenBarrierException ex) {
-				// return;
-			}
-			catch (InterruptedException intEx) {
-				// return;
-			}
-		}
+	public void setName(String name) {
+		super.setName(name);
 	}
 }

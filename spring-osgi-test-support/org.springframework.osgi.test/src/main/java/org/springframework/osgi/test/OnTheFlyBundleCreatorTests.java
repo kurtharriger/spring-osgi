@@ -51,9 +51,10 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
+public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManagerTests {
 
 	File tempFile;
+
 	// temporary buffer for reading various classes and then writing them to the
 	// file
 	private byte[] readWriteJarBuffer = new byte[1024];
@@ -253,8 +254,8 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractOsgiTests {
 		// install & start
 		Bundle bundle;
 		try {
-			bundle = context.installBundle("[onTheFly-test-bundle]" + ClassUtils.getShortName(getClass()) + "[" + hashCode()
-					+ "]", stream);
+			bundle = context.installBundle("[onTheFly-test-bundle]" + ClassUtils.getShortName(getClass()) + "["
+					+ hashCode() + "]", stream);
 		}
 		finally {
 			stream.close();
