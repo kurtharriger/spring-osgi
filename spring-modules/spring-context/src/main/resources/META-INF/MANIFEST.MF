@@ -6,12 +6,12 @@ Bundle-SymbolicName: org.springframework.context
 Bundle-Name: org.springframework.context
 Bundle-Version: ${spring.bundle.version}
 Bundle-Vendor: Spring Framework
-Import-Package: org.aopalliance.intercept,
+Import-Package: org.aopalliance.intercept;resolution:=optional,
    org.apache.catalina.loader;resolution:=optional,
    org.apache.commons.logging,
    org.aspectj.weaver.loadtime;resolution:=optional,
-   org.springframework.aop;version="${spring.import.version}",
-   org.springframework.aop.framework;version="${spring.import.version}",
+   org.springframework.aop;resolution:=optional;version="${spring.import.version}",
+   org.springframework.aop.framework;resolution:=optional;version="${spring.import.version}",
    org.springframework.beans;version="${spring.import.version}",
    org.springframework.beans.factory;version="${spring.import.version}",
    org.springframework.beans.factory.access;version="${spring.import.version}",
