@@ -8,7 +8,6 @@ Import-Package: junit.framework,
  org.springframework.aop,
  org.springframework.core.io,
  org.springframework.osgi.test,
- org.springframework.osgi.test.runner,
  org.springframework.osgi.service,
  org.springframework.osgi.test.simpleservice2,
  org.springframework.osgi.test.cardinality0to1.test 
