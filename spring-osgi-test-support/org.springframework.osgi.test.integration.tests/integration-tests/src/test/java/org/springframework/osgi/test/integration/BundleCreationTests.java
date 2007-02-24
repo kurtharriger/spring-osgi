@@ -21,7 +21,7 @@ import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
  * Test to check if the testcase is properly packaged in a bundle jar and deploy
  * on the OSGi platform.
  * 
- * Note: this test case not intended to be run in isolation!
+ * Note: this test case is not intended to be run in isolation!
  * 
  * @author Costin Leau
  * 
@@ -34,18 +34,15 @@ public class BundleCreationTests extends ConfigurableBundleCreatorTests {
 	 * @see org.springframework.osgi.test.OsgiTest#getBundles()
 	 */
 	protected String[] getBundleLocations() {
-
 		// no test bundle is included
 		return new String[] {};
 	}
 
 	public void testAssertionPass() {
-		System.out.println("*** test is running ***");
 		assertTrue(true);
 	}
 
 	public void testAssertionFailure() {
-		System.out.println("*** test is running ***");
 		assertTrue(false);
 	}
 
@@ -55,5 +52,9 @@ public class BundleCreationTests extends ConfigurableBundleCreatorTests {
 
 	public void testException() {
 		throw new RuntimeException("this is an exception");
+	}
+
+	public void testError() {
+		throw new Error("this is an error");
 	}
 }
