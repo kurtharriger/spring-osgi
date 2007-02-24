@@ -65,7 +65,7 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 				localMavenArtifact("org.knopflerfish.bundles", "cm_all", "2.0.0") };
 	}
 
-	public void onSetUp() throws Exception {
+	protected void onSetUp() throws Exception {
 		prepareConfiguration();
 
 		ctx = new OsgiBundleXmlApplicationContext(getBundleContext(),
@@ -73,7 +73,7 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 		ctx.refresh();
 	}
 
-	public void onTearDown() throws Exception {
+	protected void onTearDown() throws Exception {
 		if (ctx != null)
 			ctx.close();
 	}

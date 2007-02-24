@@ -47,7 +47,7 @@ public class ServiceProxyFactoryBeanTest extends ConfigurableBundleCreatorTests 
 		return "org/springframework/osgi/test/serviceProxyFactoryBean/ServiceProxyFactoryBeanTest.MF";
 	}
 
-	public void onSetUp() throws Exception {
+	protected void onSetUp() throws Exception {
 		fb = new OsgiServiceProxyFactoryBean();
 		fb.setBundleContext(getBundleContext());
 		// execute retries fast
@@ -55,7 +55,7 @@ public class ServiceProxyFactoryBeanTest extends ConfigurableBundleCreatorTests 
 		fb.setTimeout(1);
 	}
 
-	public void onTearDown() throws Exception {
+	protected void onTearDown() throws Exception {
 		fb = null;
 	}
 
