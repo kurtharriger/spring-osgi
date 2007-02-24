@@ -26,7 +26,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.test.runner.TestRunner;
 
 public class JUnitTestActivatorTest extends TestCase {
 
@@ -37,10 +36,10 @@ public class JUnitTestActivatorTest extends TestCase {
 	public static class TestExample implements OsgiJUnitTest {
 		private static BundleContext context;
 
-		public void onSetUp() throws Exception {
+		public void osgiSetUp() throws Exception {
 		}
 
-		public void onTearDown() throws Exception {
+		public void osgiTearDown() throws Exception {
 		}
 
 		public void osgiRunTest() throws Throwable {
@@ -82,12 +81,12 @@ public class JUnitTestActivatorTest extends TestCase {
 		MockControl ctxCtrl = MockControl.createControl(BundleContext.class);
 		BundleContext ctx = (BundleContext) ctxCtrl.getMock();
 
-		MockControl servCtrl = MockControl.createControl(TestRunner.class);
-		TestRunner runner = (TestRunner) servCtrl.getMock();
+		MockControl servCtrl = MockControl.createControl(TestRunnerService.class);
+		TestRunnerService runner = (TestRunnerService) servCtrl.getMock();
 
 		ServiceReference ref = new MockServiceReference();
 
-		ctxCtrl.expectAndReturn(ctx.getServiceReference(TestRunner.class.getName()), ref);
+		ctxCtrl.expectAndReturn(ctx.getServiceReference(TestRunnerService.class.getName()), ref);
 		ctxCtrl.expectAndReturn(ctx.getService(ref), runner);
 
 		ctx.registerService((String) null, null, null);
@@ -128,8 +127,8 @@ public class JUnitTestActivatorTest extends TestCase {
 	public void testLoadTest() throws Exception {
 		BundleContext ctx = new MockBundleContext();
 
-		MockControl servCtrl = MockControl.createControl(TestRunner.class);
-		TestRunner runner = (TestRunner) servCtrl.getMock();
+		MockControl servCtrl = MockControl.createControl(TestRunnerService.class);
+		TestRunnerService runner = (TestRunnerService) servCtrl.getMock();
 
 		try {
 			activator.executeTest();

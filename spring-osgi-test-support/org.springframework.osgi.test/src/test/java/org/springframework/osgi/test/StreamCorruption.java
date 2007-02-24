@@ -20,6 +20,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 
+import org.springframework.osgi.test.support.ConfigurableByteArrayOutputStream;
+
 import junit.framework.TestCase;
 
 /**
@@ -41,7 +43,7 @@ public class StreamCorruption extends TestCase {
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
-		osgiTest = new AbstractOsgiTests() {
+		osgiTest = new AbstractDependencyManagerTests() {
 		};
 
 		// call AbstractOsgiTest to setup the streams

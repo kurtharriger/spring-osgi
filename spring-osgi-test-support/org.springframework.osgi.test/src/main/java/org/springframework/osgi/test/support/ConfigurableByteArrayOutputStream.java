@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.runner;
+package org.springframework.osgi.test.support;
 
-import org.springframework.osgi.test.OsgiJUnitTest;
-
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author Costin Leau
  * 
  */
-public interface TestRunner {
+public class ConfigurableByteArrayOutputStream extends ByteArrayOutputStream {
 
-	public void runTest(OsgiJUnitTest test);
+	public ConfigurableByteArrayOutputStream() {
+		super();
+	}
+
+	public ConfigurableByteArrayOutputStream(int size) {
+		super(size);
+	}
+
+	public ConfigurableByteArrayOutputStream(byte[] bufferToUse) {
+		this.buf = bufferToUse;
+	}
 }

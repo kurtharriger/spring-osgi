@@ -102,20 +102,22 @@ public abstract class TestUtils {
 	}
 
 	public static void closeStream(InputStream stream) {
-		try {
-			stream.close();
-		}
-		catch (IOException ex) {
-			// ignore
-		}
+		if (stream != null)
+			try {
+				stream.close();
+			}
+			catch (IOException ex) {
+				// ignore
+			}
 	}
 
 	public static void closeStream(OutputStream stream) {
-		try {
-			stream.close();
-		}
-		catch (IOException ex) {
-			// ignore
-		}
+		if (stream != null)
+			try {
+				stream.close();
+			}
+			catch (IOException ex) {
+				// ignore
+			}
 	}
 }

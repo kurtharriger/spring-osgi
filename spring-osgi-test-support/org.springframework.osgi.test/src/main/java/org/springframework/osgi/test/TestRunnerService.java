@@ -15,23 +15,13 @@
  */
 package org.springframework.osgi.test;
 
-import java.io.ByteArrayOutputStream;
-
 /**
+ * Service contract for running OSGified JUnit test cases. 
+ * 
  * @author Costin Leau
  * 
  */
-public class ConfigurableByteArrayOutputStream extends ByteArrayOutputStream {
+public interface TestRunnerService {
 
-	public ConfigurableByteArrayOutputStream() {
-		super();
-	}
-
-	public ConfigurableByteArrayOutputStream(int size) {
-		super(size);
-	}
-
-	public ConfigurableByteArrayOutputStream(byte[] bufferToUse) {
-		this.buf = bufferToUse;
-	}
+	public void runTest(OsgiJUnitTest test);
 }

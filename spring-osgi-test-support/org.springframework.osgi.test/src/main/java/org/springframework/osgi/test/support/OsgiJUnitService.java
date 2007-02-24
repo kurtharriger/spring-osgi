@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test;
+package org.springframework.osgi.test.support;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Hashtable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 import junit.framework.Protectable;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.test.runner.TestRunner;
+import org.springframework.osgi.test.OsgiJUnitTest;
+import org.springframework.osgi.test.TestRunnerService;
+import org.springframework.osgi.test.TestUtils;
 
 /**
  * OSGi service for executing JUnit tests.
@@ -36,9 +36,7 @@ import org.springframework.osgi.test.runner.TestRunner;
  * @author Costin Leau
  * 
  */
-public class OsgiJUnitService implements BundleActivator, TestRunner {
-
-	private ServiceRegistration registration;
+public class OsgiJUnitService implements TestRunnerService {
 
 	/**
 	 * Write the test result.
@@ -49,15 +47,6 @@ public class OsgiJUnitService implements BundleActivator, TestRunner {
 	 * Read the test name to execute.
 	 */
 	private ObjectInputStream inStream;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext bc) throws Exception {
-		registration = bc.registerService(TestRunner.class.getName(), this, new Hashtable());
-	}
 
 	protected void setupStreams() throws Exception {
 		Properties props = System.getProperties();
@@ -74,26 +63,17 @@ public class OsgiJUnitService implements BundleActivator, TestRunner {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext bc) throws Exception {
-		registration.unregister();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.springframework.osgi.test.TestRunner#runTest(junit.framework.Test,
-	 *      junit.framework.TestResult)
+	 * junit.framework.TestResult)
 	 */
 	public void runTest(OsgiJUnitTest test) {
 		try {
 			executeTest(test);
 		}
 		catch (Exception ex) {
-		        if (ex instanceof RuntimeException) {
-			    throw (RuntimeException) ex;
-		        }
+			if (ex instanceof RuntimeException) {
+				throw (RuntimeException) ex;
+			}
 			throw new RuntimeException("cannot execute test:" + ex, ex);
 		}
 	}
@@ -126,17 +106,17 @@ public class OsgiJUnitService implements BundleActivator, TestRunner {
 	 * Run fixture setup, test from the given test case and fixture teardown.
 	 * 
 	 * @param testCase
-	 * @param testName 
+	 * @param testName
 	 */
 	protected TestResult runTest(final OsgiJUnitTest testCase, String testName) {
 		final TestResult result = new TestResult();
 		testCase.setName(testName);
 
 		try {
-			testCase.onSetUp();
+			testCase.osgiSetUp();
 
 			try {
-				// use TestResult method to bypass the onSetup/tearDown methods
+				// use TestResult method to bypass the setUp/tearDown methods
 				result.runProtected((TestCase) testCase, new Protectable() {
 
 					public void protect() throws Throwable {
@@ -146,14 +126,18 @@ public class OsgiJUnitService implements BundleActivator, TestRunner {
 				});
 			}
 			finally {
-				testCase.onTearDown();
+				testCase.osgiTearDown();
 			}
 		}
 		// reflection exceptions
-		catch (Exception ex) {
-		        if (ex instanceof RuntimeException) {
-			    throw (RuntimeException) ex;
-		        }
+		catch (Throwable ex) {
+			if (ex instanceof RuntimeException) {
+				throw (RuntimeException) ex;
+			}
+			if (ex instanceof Error) {
+				throw (Error) ex;
+			}
+
 			throw new RuntimeException("test execution failed;" + ex, ex);
 		}
 		return result;

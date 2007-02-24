@@ -21,7 +21,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.test.runner.TestRunner;
 
 /**
  * Test bundle activator - looks for a predefined JUnit test runner and triggers
@@ -35,7 +34,7 @@ public class JUnitTestActivator implements BundleActivator {
 	private BundleContext context;
 	private ServiceReference reference;
 	private ServiceRegistration registration;
-	private TestRunner service;
+	private TestRunnerService service;
 
 	/*
 	 * (non-Javadoc)
@@ -45,19 +44,27 @@ public class JUnitTestActivator implements BundleActivator {
 	public void start(BundleContext bc) throws Exception {
 		this.context = bc;
 
-		reference = context.getServiceReference(TestRunner.class.getName());
+		reference = context.getServiceReference(TestRunnerService.class.getName());
 		if (reference == null)
-			throw new IllegalArgumentException("cannot find service at " + TestRunner.class.getName());
-		service = (TestRunner) context.getService(reference);
+			throw new IllegalArgumentException("cannot find service at " + TestRunnerService.class.getName());
+		service = (TestRunnerService) context.getService(reference);
 
 		registration = context.registerService(JUnitTestActivator.class.getName(), this, new Hashtable());
 
 	}
 
+	/**
+	 * Start executing an instance of OSGiJUnitTest on the TestRunnerService. 
+	 */
 	public void executeTest() {
 		service.runTest(loadTest());
 	}
 
+	/**
+	 * Loads the test instance inside OSGi and prepares it for execution. 
+	 * 
+	 * @return
+	 */
 	private OsgiJUnitTest loadTest() {
 		String testClass = System.getProperty(OsgiJUnitTest.OSGI_TEST);
 		if (testClass == null)
