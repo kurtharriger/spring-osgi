@@ -1,7 +1,0 @@
-Bundle-Name: Basic-Test-Bundle
-Bundle-SymbolicName: org.springframework.osgi.test.integration.basic
-Bundle-Version: 1.0
-Export-Package: org.springframework.osgi.test.integration.basic
-Import-Package: junit.framework, org.springframework.osgi.test
-Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator
-Bundle-ClassPath: target/classes/,.
