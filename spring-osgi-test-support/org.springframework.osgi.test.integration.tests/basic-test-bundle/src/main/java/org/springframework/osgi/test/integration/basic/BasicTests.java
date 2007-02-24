@@ -15,12 +15,12 @@
  */
 package org.springframework.osgi.test.integration.basic;
 
-import org.springframework.osgi.test.AbstractOsgiTests;
+import org.springframework.osgi.test.AbstractDependencyManagerTests;
 
 /**
  * @author Costin Leau
  */
-public class BasicTests extends AbstractOsgiTests {
+public class BasicTests extends AbstractDependencyManagerTests {
 
     /*
       * (non-Javadoc)
@@ -35,13 +35,11 @@ public class BasicTests extends AbstractOsgiTests {
 
 
     public void testAssertionPass() {
-        System.out.println("*** test is running ***");
-        assertTrue(true);
+    	assertTrue(true);
     }
 
 
     public void testAssertionFailure() {
-        System.out.println("*** test is running ***");
         assertTrue(false);
     }
 
