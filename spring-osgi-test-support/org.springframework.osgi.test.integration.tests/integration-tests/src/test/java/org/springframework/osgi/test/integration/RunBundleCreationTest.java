@@ -15,56 +15,64 @@
  */
 package org.springframework.osgi.test.integration;
 
-import java.util.Enumeration;
-
 import junit.framework.TestCase;
-import junit.framework.TestFailure;
 import junit.framework.TestResult;
 
 /**
+ * Start executing the {@link RunBundleCreationTest} (which is an integration
+ * test) and tests failures and errors.
+ * 
  * @author Hal Hildebrand
- *         Date: Sep 25, 2006
- *         Time: 11:27:24 AM
+ * @author Costin Leau
  */
 public class RunBundleCreationTest extends TestCase {
-    public void testBundleCreation() throws Exception {
-        TestCase test = new BundleCreationTests();
-        TestResult result = new TestResult();
-        test.setName("testAssertionPass");
-        test.run(result);
-        test.setName("testAssertionFailure");
-        test.run(result);
-        test.setName("testFailure");
-        test.run(result);
-        test.setName("testException");
-        test.run(result);
 
-        assertEquals(4, result.runCount());
-        
-        if (result.errorCount() > 1) {
-        	// tell us what went wrong...
-        	Enumeration errors = result.errors();
-        	while (errors.hasMoreElements()) {
-        		TestFailure testFailure = (TestFailure) errors.nextElement();
-        		reportOn(testFailure);
-        	}
-        }
-        assertEquals(1, result.errorCount());
-        
-        if (result.failureCount() > 2) {
-        	// tell us what went wrong...
-        	Enumeration failures = result.failures();
-        	while (failures.hasMoreElements()) {
-        		TestFailure testFailure = (TestFailure) failures.nextElement();
-        		reportOn(testFailure);
-        	}
-        }
-        assertEquals(2, result.failureCount());
-    }
-    
-    private void reportOn(TestFailure aFailure) {
-    	System.err.println(aFailure.failedTest());
-    	System.err.println(aFailure.exceptionMessage());
-    	System.err.println(aFailure.trace());
-    }
+	private TestCase test;
+
+	private TestResult result;
+
+	protected void setUp() throws Exception {
+		test = new BundleCreationTests();
+		result = new TestResult();
+	}
+
+	public void testAssertionPass() {
+		executeTest("testAssertionPass");
+		assertEquals(0, result.errorCount());
+		assertEquals(0, result.failureCount());
+	}
+
+	public void testAssertionFailure() {
+		executeTest("testAssertionFailure");
+		assertEquals(0, result.errorCount());
+		assertEquals(1, result.failureCount());
+
+	}
+
+	public void testFailure() {
+		executeTest("testFailure");
+		assertEquals(0, result.errorCount());
+		assertEquals(1, result.failureCount());
+
+	}
+
+	public void testException() {
+		executeTest("testException");
+		assertEquals(1, result.errorCount());
+		assertEquals(0, result.failureCount());
+
+	}
+
+	public void testError() {
+		executeTest("testError");
+		assertEquals(1, result.errorCount());
+		assertEquals(0, result.failureCount());
+
+	}
+
+	private void executeTest(String testMethod) {
+		test.setName(testMethod);
+		test.run(result);
+		assertEquals(1, result.runCount());
+	}
 }

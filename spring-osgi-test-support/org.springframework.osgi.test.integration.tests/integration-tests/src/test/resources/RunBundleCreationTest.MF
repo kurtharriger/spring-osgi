@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-Name: Integration test for OSGi testing framework
+Bundle-SymbolicName: org.springframework.osgi.test.support.integration
+Bundle-Vendor: Spring Framework
+Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator
+Import-Package: junit.framework,
+  org.osgi.framework,
+  org.springframework.osgi.test,
+  org.springframework.beans,
+  org.springframework.beans.factory,  
+  org.springframework.context
