@@ -1,9 +1,10 @@
 Bundle-Name: Spring-OSGi-Test-Framework
 Bundle-Version: 1.0
 Bundle-SymbolicName: org.springframework.osgi.test
-Bundle-Activator: org.springframework.osgi.test.OsgiJUnitService
+Bundle-Activator: org.springframework.osgi.test.support.Activator
 Import-Package: junit.framework,
   org.apache.commons.logging,
+  org.springframework.test,
   org.springframework.osgi.io,
   edu.emory.mathcs.backport.java.util.concurrent
 DynamicImport-Package: javax.swing, javax.swing.border,
@@ -14,7 +15,6 @@ DynamicImport-Package: javax.swing, javax.swing.border,
   org.apache.felix.framework.util,
   org.apache.felix,main, *
 Export-Package: org.springframework.osgi.test,
-  org.springframework.osgi.test.platform,
-  org.springframework.osgi.test.runner
+  org.springframework.osgi.test.platform
 Bundle-ClassPath: target/classes/,.
 

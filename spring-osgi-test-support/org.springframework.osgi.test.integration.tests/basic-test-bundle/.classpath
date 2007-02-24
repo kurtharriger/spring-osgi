@@ -5,9 +5,10 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar" sourcepath="/JUNIT_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/equinox/org.eclipse.osgi/3.2.0/org.eclipse.osgi-3.2.0.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.springframework.osgi.test"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-test-support"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-mock/2.1-SNAPSHOT/spring-mock-2.1-SNAPSHOT.jar" sourcepath="/SPRING_MOCK_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-context/2.1-SNAPSHOT/spring-context-2.1-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
