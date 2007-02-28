@@ -16,7 +16,8 @@ Import-Package: net.sf.cglib.proxy;resolution:=optional,
    org.springframework.util.xml;version="${spring.import.version}"
 DynamicImport-Package: org.xml.sax,
    javax.xml.parsers,
-   org.w3c.dom
+   org.w3c.dom,
+   org.springframework.jndi
 Export-Package: org.springframework.beans;version="${spring.export.version}",
    org.springframework.beans.annotation;version="${spring.export.version}",
    org.springframework.beans.factory;version="${spring.export.version}",

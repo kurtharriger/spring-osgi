@@ -36,6 +36,6 @@ Export-Package: org.springframework.dao;version="${spring.export.version}",
    org.springframework.transaction.interceptor;version="${spring.export.version}",
    org.springframework.transaction.jta;version="${spring.export.version}",
    org.springframework.transaction.support;version="${spring.export.version}"
-DynamicImport-Package: weblogic.transaction   
+DynamicImport-Package: weblogic.transaction, org.aopalliance.aop   
 Bundle-ClassPath: .,
  target/classes/
