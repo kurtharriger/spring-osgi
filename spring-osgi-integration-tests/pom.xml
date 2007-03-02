@@ -66,6 +66,12 @@
             <version>1.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>log4j.osgi</artifactId>
+            <version>1.2.13-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.osgi</groupId>
@@ -98,6 +104,20 @@
             <scope>provided</scope>
         </dependency>
        
+       <dependency> 
+        <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.3.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+   <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>log4j.osgi</artifactId>
+      <version>1.2.13-SNAPSHOT</version>
+  </dependency>
+
+
         <!-- Configuration Admin -->
         <dependency>
             <groupId>org.knopflerfish.bundles</groupId>
