@@ -14,9 +14,9 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/jcl104-over-slf4j.osgi/1.1.0/jcl104-over-slf4j.osgi-1.1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j-full/1.1.0/slf4j-log4j-full-1.1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.13-SNAPSHOT/log4j.osgi-1.2.13-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.1/org.eclipse.osgi-3.2.1.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/0.8.0-incubator/org.apache.felix.main-0.8.0-incubator.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.4.2_14"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-mock/2.1-SNAPSHOT/spring-mock-2.1-SNAPSHOT.jar" sourcepath="/SPRING_MOCK_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-context/2.1-SNAPSHOT/spring-context-2.1-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-core"/>
