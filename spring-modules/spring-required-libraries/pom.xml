@@ -37,15 +37,12 @@
     <module>commons-logging</module>
     <module>commons-pool</module>
     <module>hsqldb</module>
-    <module>jcl104-over-slf4j</module>
     <module>jsp-api.osgi</module>
     <module>jstl.osgi</module>
     <module>junit</module>
     <module>log4j</module>
     <module>portlet-api.osgi</module>
     <module>servlet-api.osgi</module>
-    <module>slf4j-api</module>
-    <module>slf4j-log4j12</module>    
     <module>spring-osgi-required-bundle-archetype</module>
     <module>struts.osgi</module>
   </modules>
