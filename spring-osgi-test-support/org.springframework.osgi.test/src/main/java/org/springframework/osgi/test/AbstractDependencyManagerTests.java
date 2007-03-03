@@ -55,12 +55,16 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return localMavenArtifact("org.springframework.osgi", "backport-util-concurrent", "3.0-SNAPSHOT");
 	}
 
+	protected String getSlf4jApiUrl() {
+		return localMavenArtifact("org.slf4j", "slf4j-api", "1.3.0");
+	}
+
 	protected String getJclOverSlf4jUrl() {
-		return localMavenArtifact("org.springframework.osgi", "jcl104-over-slf4j.osgi", "1.1.0");
+		return localMavenArtifact("org.slf4j", "jcl104-over-slf4j", "1.3.0");
 	}
 
 	protected String getSlf4jLog4jUrl() {
-		return localMavenArtifact("org.slf4j", "slf4j-log4j-full", "1.1.0");
+		return localMavenArtifact("org.slf4j", "slf4j-log4j12", "1.3.0");
 	}
 
 	protected String getLog4jLibUrl() {
@@ -176,7 +180,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * special handling
 	 */
 	protected String[] getMandatoryBundles() {
-		return new String[] { getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(), getJUnitLibUrl(),
+		return new String[] { getJUnitLibUrl(), getSlf4jApiUrl(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(), 
 				getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
 				getSpringMockUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(), getSpringOSGiTestBundleUrl() };
 	}
