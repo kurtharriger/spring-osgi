@@ -6,6 +6,7 @@ Bundle-SymbolicName: org.springframework.jpa
 Bundle-Name: org.springframework.jpa
 Bundle-Version: ${spring.bundle.version}
 Bundle-Vendor: Spring Framework
+DynamicImport-Package: org.springframework.jndi
 Import-Package: javax.persistence,
    javax.persistence.spi,
    javax.portlet;resolution:=optional,
