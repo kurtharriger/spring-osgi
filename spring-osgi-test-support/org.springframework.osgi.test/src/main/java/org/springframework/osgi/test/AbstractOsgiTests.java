@@ -23,6 +23,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
+import junit.framework.Protectable;
+import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 import org.apache.commons.logging.Log;
@@ -32,7 +34,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
@@ -82,6 +83,13 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 	// OsgiResourceLoader
 	private ResourceLoader resourceLoader;
+
+	/**
+	 * Hook for JUnit infrastructures which can't reuse this class hierarchy.
+	 * This instance represents the test which will be executed by
+	 * AbstractOsgiTests & co.
+	 */
+	private TestCase osgiJUnitTest = this;
 
 	private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
 
@@ -190,11 +198,23 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	/**
 	 * Replacement run method. Get a hold of the TestRunner used for running
 	 * this test so it can populate it with the results retrieved from OSGi.
+	 * 
 	 */
 	public final void run(TestResult result) {
+
 		// get a hold of the test result
-		this.originalResult = result;
-		super.run(result);
+		originalResult = result;
+
+		// TODO: can this be actually improved (can we still reuse the testResult)
+		result.startTest(osgiJUnitTest);
+		result.runProtected(osgiJUnitTest, new Protectable() {
+			public void protect() throws Throwable {
+				AbstractOsgiTests.this.runBare();
+			}
+		});
+		result.endTest(osgiJUnitTest);
+
+		// super.run(result);
 	}
 
 	public void runBare() throws Throwable {
@@ -252,7 +272,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			throw new IllegalArgumentException("no test specified");
 
 		// write the testname into the System properties
-		System.getProperties().put(OsgiJUnitTest.OSGI_TEST, getClass().getName());
+		System.getProperties().put(OsgiJUnitTest.OSGI_TEST, osgiJUnitTest.getClass().getName());
 
 		// create streams first to avoid deadlocks in setting up the stream on
 		// the OSGi side
@@ -467,7 +487,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 		log.debug("reading OSGi results for test [" + getName() + "]");
 
-		TestUtils.receiveTestResult(this.originalResult, this, inputStream);
+		TestUtils.receiveTestResult(this.originalResult, osgiJUnitTest, inputStream);
 
 		log.debug("test[" + getName() + "]'s result read");
 	}
@@ -562,5 +582,15 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 	public void setName(String name) {
 		super.setName(name);
+	}
+
+	/**
+	 * Set the underlying OsgiJUnitTest used for the test delegation.
+	 * 
+	 * @param test
+	 */
+	public void setOsgiJUnitTest(OsgiJUnitTest test) {
+		Assert.isInstanceOf(TestCase.class, test);
+		this.osgiJUnitTest = (TestCase) test;
 	}
 }
