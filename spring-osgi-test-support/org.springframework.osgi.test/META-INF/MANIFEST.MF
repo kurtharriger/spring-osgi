@@ -15,6 +15,7 @@ DynamicImport-Package: javax.swing, javax.swing.border,
   org.apache.felix.framework.util,
   org.apache.felix,main, *
 Export-Package: org.springframework.osgi.test,
-  org.springframework.osgi.test.platform
+  org.springframework.osgi.test.platform,
+  org.springframework.osgi.test.util
 Bundle-ClassPath: target/classes/,.
 
