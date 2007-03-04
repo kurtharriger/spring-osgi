@@ -18,17 +18,18 @@ package org.springframework.osgi.test.support;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Properties;
 
 import junit.framework.Protectable;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.osgi.test.OsgiJUnitTest;
 import org.springframework.osgi.test.TestRunnerService;
-import org.springframework.osgi.test.TestUtils;
+import org.springframework.osgi.test.util.IOUtils;
+import org.springframework.osgi.test.util.TestUtils;
 
 /**
  * OSGi service for executing JUnit tests.
@@ -37,6 +38,8 @@ import org.springframework.osgi.test.TestUtils;
  * 
  */
 public class OsgiJUnitService implements TestRunnerService {
+
+	private static final Log log = LogFactory.getLog(OsgiJUnitService.class);
 
 	/**
 	 * Write the test result.
@@ -56,8 +59,12 @@ public class OsgiJUnitService implements TestRunnerService {
 		// write header
 		this.outStream.flush();
 
+		log.debug("opened writer to OSGi-outside");
+
 		byte[] inSource = (byte[]) props.get(OsgiJUnitTest.FOR_OSGI);
 		this.inStream = new ObjectInputStream(new ByteArrayInputStream(inSource));
+
+		log.debug("opened reader for OSGi");
 	}
 
 	/*
@@ -93,12 +100,13 @@ public class OsgiJUnitService implements TestRunnerService {
 			// execute the test
 			TestResult result = runTest(test, testName);
 
+			log.debug("sending test results from OSGi");
 			// write result back to the stream
 			TestUtils.sendTestResult(result, outStream);
 		}
 		finally {
-			TestUtils.closeStream(outStream);
-			TestUtils.closeStream(inStream);
+			IOUtils.closeStream(outStream);
+			IOUtils.closeStream(inStream);
 		}
 	}
 
@@ -109,6 +117,8 @@ public class OsgiJUnitService implements TestRunnerService {
 	 * @param testName
 	 */
 	protected TestResult runTest(final OsgiJUnitTest testCase, String testName) {
+
+		log.debug("running test [" + testName + "] on testCase " + testCase);
 		final TestResult result = new TestResult();
 		testCase.setName(testName);
 

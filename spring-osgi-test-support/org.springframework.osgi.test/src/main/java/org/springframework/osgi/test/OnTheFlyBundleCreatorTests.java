@@ -15,49 +15,36 @@
  */
 package org.springframework.osgi.test;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
-import java.util.jar.JarOutputStream;
+import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-import java.util.zip.ZipEntry;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+import org.osgi.framework.Constants;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.io.Resource;
+import org.springframework.osgi.test.util.JarCreator;
+import org.springframework.osgi.test.util.JarUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Enhanced subclass of AbstractOsgiTests which facilitates OSGi testing by
- * creating at runtime, on the fly, a jar using the indicated manifest and
- * resource patterns (by default all files found under the root path). Note that
- * more complex scenarios, dedicated packaging tools (such as ant scripts or
- * maven2) should be used.
- * <p>
+ * Enhanced subclass of {@link AbstractDependencyManagerTests} which facilitates
+ * OSGi testing by creating at runtime, on the fly, a jar using the indicated
+ * manifest and resource patterns (by default all files found under the root
+ * path).
+ * 
+ * <p/> Note that in more complex scenarios, dedicated packaging tools (such as
+ * ant scripts or maven2) should be used.
+ * 
  * 
  * @author Costin Leau
  * 
  */
 public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManagerTests {
 
-	File tempFile;
-
-	// temporary buffer for reading various classes and then writing them to the
-	// file
-	private byte[] readWriteJarBuffer = new byte[1024];
+	private JarCreator jarCreator = new JarCreator();
 
 	public OnTheFlyBundleCreatorTests() {
 	}
@@ -67,39 +54,19 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManag
 	}
 
 	/**
-	 * Resources' root path (the root path does not become part of the jar).
-	 * 
-	 * @return the root path
-	 */
-	protected String getRootPath() {
-		// load file using absolute path. This seems to be necessary in IntelliJ
-		try {
-			ResourceLoader fileLoader = new DefaultResourceLoader();
-			Resource res = fileLoader.getResource(getClass().getName().replace('.', '/').concat(".class"));
-			String fileLocation = "file://" + res.getFile().getAbsolutePath();
-			fileLocation = fileLocation.substring(0, fileLocation.indexOf("test-classes")) + "test-classes";
-			if (res.exists()) {
-				return fileLocation;
-			}
-		}
-		catch (IOException e) {
-		}
-		return "file:./target/test-classes";
-	}
-
-	/**
 	 * Patterns for identifying the resources added to the jar. The patterns are
 	 * added to the root path when performing the search.
 	 * 
 	 * @return the patterns
 	 */
 	protected String[] getBundleContentPattern() {
-		return new String[] { "/**/*.class" };
+		return JarCreator.DEFAULT_CONTENT_PATTERN;
 	}
 
 	/**
 	 * Return the location (in Spring resource style) of the manifest location
-	 * to be used.
+	 * to be used. If the manifest is created programatically, return a null
+	 * string and use {@link #getManifest()}.
 	 * 
 	 * @return the manifest location
 	 */
@@ -108,129 +75,65 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManag
 	}
 
 	/**
-	 * The pattern resolver used for loading resources.
+	 * Return the current test bundle manifest. By default, it tries to read the
+	 * manifest from the given location; in case the location is null, will
+	 * create a <code>Manifest</code> object containing default entries.
 	 * 
-	 * @return
+	 * Subclasses should override this method to enhance the returned Manifest.
+	 * 
+	 * @return Manifest used for this test suite.
+	 * 
+	 * @throws Exception
 	 */
-	protected ResourcePatternResolver getPatternResolver() {
-		return new PathMatchingResourcePatternResolver();
-	}
-
-	private String dumpJarContent(JarInputStream jis) throws Exception {
-		StringBuffer buffer = new StringBuffer();
-
-		try {
-			JarEntry entry;
-			while ((entry = jis.getNextJarEntry()) != null) {
-				buffer.append(entry.getName());
-				buffer.append("\n");
+	protected Manifest getManifest() {
+		String manifestLocation = getManifestLocation();
+		if (StringUtils.hasText(manifestLocation)) {
+			DefaultResourceLoader loader = new DefaultResourceLoader();
+			Resource res = loader.getResource(manifestLocation);
+			try {
+				return new Manifest(res.getInputStream());
 			}
-		}
-		finally {
-			jis.close();
-		}
-
-		return buffer.toString();
-	}
-
-	/**
-	 * Write a resource content to a jar.
-	 * 
-	 * @param res
-	 * @param entryName
-	 * @param jarStream
-	 * @throws Exception
-	 */
-	private void writeToJar(Resource res, String entryName, JarOutputStream jarStream) throws Exception {
-		// remove leading / if present.
-		if (entryName.charAt(0) == '/')
-			entryName = entryName.substring(1);
-
-		if (log.isDebugEnabled())
-			log.debug("adding resource " + res.toString() + " under name " + entryName);
-		jarStream.putNextEntry(new ZipEntry(entryName));
-		InputStream entryStream = res.getInputStream();
-
-		int numberOfBytes;
-
-		// read data into the buffer which is later on written to the jar.
-		while ((numberOfBytes = entryStream.read(readWriteJarBuffer)) != -1) {
-			jarStream.write(readWriteJarBuffer, 0, numberOfBytes);
-		}
-	}
-
-	/**
-	 * Transform the pattern and rootpath into actual resources.
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	private Resource[][] resolveResources() throws Exception {
-		ResourcePatternResolver resolver = getPatternResolver();
-
-		String[] patterns = getBundleContentPattern();
-		Resource[][] resources = new Resource[patterns.length][];
-
-		// transform Strings into Resources
-		for (int i = 0; i < patterns.length; i++) {
-			StringBuffer buffer = new StringBuffer(getRootPath());
-			buffer.append(patterns[i]);
-			resources[i] = resolver.getResources(buffer.toString());
-		}
-
-		return resources;
-	}
-
-	protected Manifest getManifest() throws Exception {
-		return new Manifest(getPatternResolver().getResource(getManifestLocation()).getInputStream());
-	}
-
-	/**
-	 * Actual jar creation.
-	 * 
-	 * @throws Exception
-	 */
-	private void createJar() throws Exception {
-		tempFile = File.createTempFile("spring.osgi", null);
-		tempFile.deleteOnExit();
-
-		OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
-
-		// load manifest
-		// add it to the jar
-		if (log.isDebugEnabled())
-			log.debug("adding MANIFEST.MF from location " + getPatternResolver().getResource(getManifestLocation()));
-		JarOutputStream jarStream = new JarOutputStream(outputStream, getManifest());
-
-		Resource[][] resources = resolveResources();
-		URL rootURL = new URL(getRootPath());
-		String rootPath = StringUtils.cleanPath(rootURL.getPath());
-
-		// add deps
-		for (int i = 0; i < resources.length; i++) {
-			for (int j = 0; j < resources[i].length; j++) {
-				// write the test
-				writeToJar(resources[i][j], determineRelativeName(rootPath, resources[i][j]), jarStream);
+			catch (IOException ex) {
+				throw new RuntimeException("cannot retrieve manifest from " + res);
 			}
 		}
 
-		jarStream.finish();
-		jarStream.closeEntry();
-		jarStream.close();
+		else {
+			return createDefaultManifest();
+		}
 	}
 
-	/**
-	 * Small utility method used for determining the file name by striping the
-	 * root path from the file full path.
-	 * 
-	 * @param rootPath
-	 * @param resource
-	 * @return
-	 * @throws Exception
-	 */
-	private String determineRelativeName(String rootPath, Resource resource) throws Exception {
-		String path = StringUtils.cleanPath(resource.getURL().toExternalForm());
-		return path.substring(path.indexOf(rootPath) + rootPath.length());
+	protected Manifest createDefaultManifest() {
+		Manifest manifest = new Manifest();
+		Attributes attrs = manifest.getMainAttributes();
+
+		// manifest versions
+		attrs.put(Attributes.Name.MANIFEST_VERSION, "1.0");
+		attrs.putValue(Constants.BUNDLE_MANIFESTVERSION, "2");
+
+		// name/description
+		attrs.putValue(Constants.BUNDLE_NAME, "Test Bundle[" + this + "]");
+		attrs.putValue(Constants.BUNDLE_SYMBOLICNAME, "Test Bundle[" + this + "]");
+		attrs.putValue(Constants.BUNDLE_DESCRIPTION, "on-the-fly test bundle");
+
+		// activator
+		attrs.putValue(Constants.BUNDLE_ACTIVATOR, JUnitTestActivator.class.getName());
+
+		// imported packages
+		attrs.putValue(Constants.IMPORT_PACKAGE, StringUtils
+				.arrayToCommaDelimitedString(getMandatoryPackageBundleImport()));
+
+		if (log.isDebugEnabled())
+			log.debug("created manifest:" + manifest.getMainAttributes().entrySet());
+		return manifest;
+	}
+
+	private String[] getMandatoryPackageBundleImport() {
+		return new String[] { "junit.framework", "org.osgi.framework;specification-version=\"1.3.0\"",
+				"org.springframework.core.io", "org.springframework.util", "org.springframework.osgi.test",
+				"org.springframework.osgi.test.platform", "org.springframework.osgi.context.support",
+				"org.springframework.beans", "org.springframework.beans.factory", "org.springframework.context",
+				"org.apache.commons.logging" };
 	}
 
 	/*
@@ -242,27 +145,23 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManag
 		log.debug("post processing: creating test bundle");
 
 		// create the actual jar
-		createJar();
+		Resource jar = jarCreator.createJar(getManifest());
 
 		if (log.isTraceEnabled())
-			log.trace("created jar:\n" + dumpJarContent(new JarInputStream(new FileInputStream(tempFile))));
+			log.trace("created jar:\n" + JarUtils.dumpJarContent(jar));
 
-		log.debug("installing bundle ");
+		installAndStartBundle(context, jar);
+	}
 
-		InputStream stream = new BufferedInputStream(new FileInputStream(tempFile));
-
+	private void installAndStartBundle(BundleContext context, Resource resource) throws Exception {
 		// install & start
 		Bundle bundle;
-		try {
-			bundle = context.installBundle("[onTheFly-test-bundle]" + ClassUtils.getShortName(getClass()) + "["
-					+ hashCode() + "]", stream);
-		}
-		finally {
-			stream.close();
-		}
+		bundle = context.installBundle("[onTheFly-test-bundle]" + ClassUtils.getShortName(getClass()) + "["
+				+ hashCode() + "]", resource.getInputStream());
 
-		log.debug("start bundle");
+		log.debug("test bundle succesfully installed");
 		bundle.start();
-		log.debug("test bundle succesfully installed and started");
+		log.debug("test bundle succesfully started");
+
 	}
 }

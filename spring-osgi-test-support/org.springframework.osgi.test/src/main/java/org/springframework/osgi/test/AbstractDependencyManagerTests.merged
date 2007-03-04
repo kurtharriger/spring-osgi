@@ -1,0 +1,155 @@
+/*
+ * Copyright 2002-2007 the original author or authors.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.osgi.test;
+
+import org.osgi.framework.Bundle;
+import org.springframework.core.io.Resource;
+
+/**
+ * Dependency manager layer - uses iternally an {@link ArtifactLocator} to
+ * retrieve the required dependencies for the running test.
+ * 
+ * @author Costin Leau
+ * 
+ */
+public abstract class AbstractDependencyManagerTests extends AbstractSynchronizedOsgiTests {
+
+	/**
+	 * Artifact locator (by default the Local Maven repo).
+	 */
+	protected ArtifactLocator locator = new LocalFileSystemMavenRepository();
+
+	public AbstractDependencyManagerTests() {
+		super();
+	}
+
+	public AbstractDependencyManagerTests(String name) {
+		super(name);
+	}
+
+	// FIXME: externalize them
+	protected Resource getSpringOSGiTestBundleUrl() {
+		return locator.locateArtifact("org.springframework.osgi", "org.springframework.osgi.test", "1.0-SNAPSHOT");
+	}
+
+	protected Resource getSpringOSGiIoBundleUrl() {
+		return locator.locateArtifact("org.springframework.osgi", "spring-osgi-io", "1.0-SNAPSHOT");
+	}
+
+	protected Resource getSpringCoreBundleUrl() {
+		return locator.locateArtifact("org.springframework.osgi", "spring-core", "2.1-SNAPSHOT");
+	}
+
+	protected Resource getJUnitLibUrl() {
+		return locator.locateArtifact("org.springframework.osgi", "junit.osgi", "3.8.1-SNAPSHOT");
+	}
+
+	protected Resource getUtilConcurrentLibUrl() {
+		return locator.locateArtifact("org.springframework.osgi", "backport-util-concurrent", "3.0-SNAPSHOT");
+	}
+
+<<<<<<< .mine
+	protected Resource getSlf4jApi() {
+		return locator.locateArtifact("org.slf4j", "slf4j-api", "1.3.0");
+=======
+	protected String getSlf4jApiUrl() {
+		return localMavenArtifact("org.slf4j", "slf4j-api", "1.3.0");
+	}
+
+	protected String getJclOverSlf4jUrl() {
+		return localMavenArtifact("org.slf4j", "jcl104-over-slf4j", "1.3.0");
+>>>>>>> .r6244
+	}
+
+<<<<<<< .mine
+	protected Resource getJclOverSlf4jUrl() {
+		return locator.locateArtifact("org.slf4j", "jcl104-over-slf4j", "1.3.0");
+=======
+	protected String getSlf4jLog4jUrl() {
+		return localMavenArtifact("org.slf4j", "slf4j-log4j12", "1.3.0");
+>>>>>>> .r6244
+	}
+
+	protected Resource getSlf4jLog4jUrl() {
+		return locator.locateArtifact("org.slf4j", "slf4j-log4j12", "1.3.0");
+	}
+
+	protected Resource getLog4jLibUrl() {
+		System.setProperty("log4j.ignoreTCL", "true");
+		return locator.locateArtifact("org.springframework.osgi", "log4j.osgi", "1.2.13-SNAPSHOT");
+	}
+
+	protected Resource getSpringMockUrl() {
+		return locator.locateArtifact("org.springframework.osgi", "spring-mock", "2.1-SNAPSHOT");
+	}
+
+	protected Resource getSpringContextUrl() {
+		return locator.locateArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT");
+	}
+
+	protected Resource getSpringBeansUrl() {
+		return locator.locateArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT");
+	}
+
+	protected Resource getAopAllianceUrl() {
+		return locator.locateArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT");
+	}
+
+	/**
+	 * Mandator bundles (part of the test setup).
+	 * 
+	 * @return the array of mandatory bundle names
+	 */
+<<<<<<< .mine
+	protected Resource[] getMandatoryBundles() {
+		return new Resource[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
+				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
+=======
+	protected String[] getMandatoryBundles() {
+		return new String[] { getJUnitLibUrl(), getSlf4jApiUrl(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(), 
+				getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
+>>>>>>> .r6244
+				getSpringMockUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(), getSpringOSGiTestBundleUrl() };
+	}
+
+	public Bundle findBundleByLocation(String bundleLocation) {
+		Bundle[] bundles = getBundleContext().getBundles();
+		for (int i = 0; i < bundles.length; i++) {
+			if (bundles[i].getLocation().equals(bundleLocation)) {
+				return bundles[i];
+			}
+		}
+		return null;
+	}
+
+	public Bundle findBundleBySymbolicName(String sybmolicName) {
+		Bundle[] bundles = getBundleContext().getBundles();
+		for (int i = 0; i < bundles.length; i++) {
+			if (bundles[i].getSymbolicName().equals(sybmolicName)) {
+				return bundles[i];
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param locator The locator to set.
+	 */
+	public void setLocator(ArtifactLocator locator) {
+		this.locator = locator;
+	}
+
+}

@@ -15,16 +15,24 @@
  */
 package org.springframework.osgi.test;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.osgi.framework.Bundle;
+import org.springframework.core.io.Resource;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
+ * Dependency manager layer - uses iternally an {@link ArtifactLocator} to
+ * retrieve the required dependencies for the running test.
+ * 
  * @author Costin Leau
  * 
  */
 public abstract class AbstractDependencyManagerTests extends AbstractSynchronizedOsgiTests {
+
+	/**
+	 * Artifact locator (by default the Local Maven repo).
+	 */
+	private ArtifactLocator locator = new LocalFileSystemMavenRepository();
 
 	public AbstractDependencyManagerTests() {
 		super();
@@ -36,152 +44,66 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 	// FIXME: externalize them
 	protected String getSpringOSGiTestBundleUrl() {
-		return localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test", "1.0-SNAPSHOT");
+		return "org.springframework.osgi,org.springframework.osgi.test,1.0-SNAPSHOT";
 	}
 
 	protected String getSpringOSGiIoBundleUrl() {
-		return localMavenArtifact("org.springframework.osgi", "spring-osgi-io", "1.0-SNAPSHOT");
+		return "org.springframework.osgi,spring-osgi-io,1.0-SNAPSHOT";
 	}
 
 	protected String getSpringCoreBundleUrl() {
-		return localMavenArtifact("org.springframework.osgi", "spring-core", "2.1-SNAPSHOT");
+		return "org.springframework.osgi,spring-core,2.1-SNAPSHOT";
 	}
 
 	protected String getJUnitLibUrl() {
-		return localMavenArtifact("org.springframework.osgi", "junit.osgi", "3.8.1-SNAPSHOT");
+		return "org.springframework.osgi,junit.osgi,3.8.1-SNAPSHOT";
 	}
 
 	protected String getUtilConcurrentLibUrl() {
-		return localMavenArtifact("org.springframework.osgi", "backport-util-concurrent", "3.0-SNAPSHOT");
+		return "org.springframework.osgi,backport-util-concurrent,3.0-SNAPSHOT";
 	}
 
-	protected String getSlf4jApiUrl() {
-		return localMavenArtifact("org.slf4j", "slf4j-api", "1.3.0");
+	protected String getSlf4jApi() {
+		return "org.slf4j,slf4j-api,1.3.0";
 	}
 
 	protected String getJclOverSlf4jUrl() {
-		return localMavenArtifact("org.slf4j", "jcl104-over-slf4j", "1.3.0");
+		return "org.slf4j,jcl104-over-slf4j,1.3.0";
 	}
 
 	protected String getSlf4jLog4jUrl() {
-		return localMavenArtifact("org.slf4j", "slf4j-log4j12", "1.3.0");
+		return "org.slf4j,slf4j-log4j12,1.3.0";
 	}
 
 	protected String getLog4jLibUrl() {
 		System.setProperty("log4j.ignoreTCL", "true");
-		return localMavenArtifact("org.springframework.osgi", "log4j.osgi", "1.2.13-SNAPSHOT");
+		return "org.springframework.osgi,log4j.osgi,1.2.13-SNAPSHOT";
 	}
 
 	protected String getSpringMockUrl() {
-		return localMavenArtifact("org.springframework.osgi", "spring-mock", "2.1-SNAPSHOT");
+		return "org.springframework.osgi,spring-mock,2.1-SNAPSHOT";
 	}
 
 	protected String getSpringContextUrl() {
-		return localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT");
+		return "org.springframework.osgi,spring-context,2.1-SNAPSHOT";
 	}
 
 	protected String getSpringBeansUrl() {
-		return localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT");
+		return "org.springframework.osgi,spring-beans,2.1-SNAPSHOT";
 	}
 
 	protected String getAopAllianceUrl() {
-		return localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT");
-	}
-
-	/**
-	 * Find a local maven artifact. First tries to find the resource as a
-	 * packaged artifact produced by a local maven build, and if that fails will
-	 * search the local maven repository.
-	 * 
-	 * @param groupId - the groupId of the organization supplying the bundle
-	 * @param artifactId - the artifact id of the bundle
-	 * @param version - the version of the bundle
-	 * @return the String representing the URL location of this bundle
-	 */
-	protected String localMavenArtifact(String groupId, String artifactId, String version) {
-		return localMavenArtifact(groupId, artifactId, version, "jar");
-	}
-
-	/**
-	 * Find a local maven artifact. First tries to find the resource as a
-	 * packaged artifact produced by a local maven build, and if that fails will
-	 * search the local maven repository.
-	 * 
-	 * @param groupId - the groupId of the organization supplying the bundle
-	 * @param artifactId - the artifact id of the bundle
-	 * @param version - the version of the bundle
-	 * @param type - the extension type of the artifact
-	 * @return the String representing the URL location of this bundle
-	 */
-	protected String localMavenArtifact(String groupId, String artifactId, String version, String type) {
-		try {
-			return localMavenBuildArtifact(artifactId, version, type);
-		}
-		catch (IllegalStateException illStateEx) {
-			return localMavenBundle(groupId, artifactId, version, type);
-		}
-	}
-
-	/**
-	 * Answer the url string of the indicated bundle in the local Maven
-	 * repository
-	 * 
-	 * @param groupId - the groupId of the organization supplying the bundle
-	 * @param artifact - the artifact id of the bundle
-	 * @param version - the version of the bundle
-	 * @return the String representing the URL location of this bundle
-	 */
-	protected String localMavenBundle(String groupId, String artifact, String version, String type) {
-		String defaultHome = new File(new File(System.getProperty("user.home")), ".m2/repository").getAbsolutePath();
-		File repositoryHome = new File(System.getProperty("localRepository", defaultHome));
-
-		String location = groupId.replace('.', '/');
-		location += '/';
-		location += artifact;
-		location += '/';
-		location += version;
-		location += '/';
-		location += artifact;
-		location += '-';
-		location += version;
-		location += ".";
-		location += type;
-		return "file:" + new File(repositoryHome, location).getAbsolutePath();
-	}
-
-	/**
-	 * Find a local maven artifact in the current build tree. This searches for
-	 * resources produced by the package phase of a maven build.
-	 * 
-	 * @param artifactId
-	 * @param version
-	 * @param type
-	 * @return a String representing the URL location of this bundle
-	 */
-	protected String localMavenBuildArtifact(String artifactId, String version, String type) {
-		try {
-			File found = new MavenPackagedArtifactFinder(artifactId, version, type).findPackagedArtifact(new File("."));
-			String path = found.toURL().toExternalForm();
-			if (log.isDebugEnabled()) {
-				log.debug("found local maven artifact " + path + " for " + artifactId + "|" + version);
-			}
-			return path;
-		}
-		catch (IOException ioEx) {
-			throw (RuntimeException) new IllegalStateException("Artifact " + artifactId + "-" + version + "." + type
-					+ " could not be found").initCause(ioEx);
-		}
+		return "org.springframework.osgi,aopalliance.osgi,1.0-SNAPSHOT";
 	}
 
 	/**
 	 * Mandator bundles (part of the test setup).
 	 * 
-	 * @return the array of mandatory bundle names (sans Log4J, which gets
-	 * special handling
+	 * @return the array of mandatory bundle names
 	 */
 	protected String[] getMandatoryBundles() {
-		return new String[] { getJUnitLibUrl(), getSlf4jApiUrl(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(), 
-				getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
+		return new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
+				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
 				getSpringMockUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(), getSpringOSGiTestBundleUrl() };
 	}
 
@@ -205,4 +127,48 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return null;
 	}
 
+	/**
+	 * Concrete implementation for locate Bundle. The given bundleId should be
+	 * in CSV format, specifying the artifact group, id, version and optionally
+	 * the type.
+	 * 
+	 */
+	protected Resource locateBundle(String bundleId) {
+		Assert.hasText(bundleId, "bundleId should not be empty");
+
+		// parse the String
+		String[] artifactId = StringUtils.commaDelimitedListToStringArray(bundleId);
+
+		Assert.isTrue(artifactId.length >= 3, "the CSV string " + bundleId + " contains too few values");
+		// TODO: add a smarter mechanism which can handle 1 or 2 values CSVs
+
+		return (artifactId.length == 3 ? locator.locateArtifact(artifactId[0], artifactId[1], artifactId[2]) : locator
+				.locateArtifact(artifactId[0], artifactId[1], artifactId[2], artifactId[3]));
+	}
+
+	/**
+	 * @param locator The locator to set.
+	 */
+	public void setLocator(ArtifactLocator locator) {
+		this.locator = locator;
+	}
+
+	/**
+	 * @return Returns the locator.
+	 */
+	public ArtifactLocator getLocator() {
+		return locator;
+	}
+
+	/**
+	 * Compatibility method - will be removed in the very near future.
+	 * 
+	 * @param groupId
+	 * @param artifactId
+	 * @param version
+	 * @return
+	 */
+	protected String localMavenArtifact(String groupId, String artifactId, String version) {
+		return groupId + "," + artifactId + "," + version;
+	}
 }

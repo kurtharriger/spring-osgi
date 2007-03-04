@@ -39,6 +39,8 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.test.support.ConfigurableByteArrayOutputStream;
+import org.springframework.osgi.test.util.IOUtils;
+import org.springframework.osgi.test.util.TestUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -102,8 +104,16 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * 
 	 * @return the array of bundles to install
 	 */
+	protected String[] getBundles() {
+		return new String[0];
+	}
+
+	/**
+	 * Legacy method - will be removed in future SVN revisions.
+	 * @return
+	 */
 	protected String[] getBundleLocations() {
-		return new String[] {};
+		return getBundles();
 	}
 
 	/**
@@ -178,9 +188,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	//
 
 	/**
-	 * Replacement run method.
-	 * Get a hold of the TestRunner used for running this test so it can populate it
-	 * with the results retrieved from OSGi.
+	 * Replacement run method. Get a hold of the TestRunner used for running
+	 * this test so it can populate it with the results retrieved from OSGi.
 	 */
 	public final void run(TestResult result) {
 		// get a hold of the test result
@@ -193,9 +202,9 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		try {
 			// invoke OSGi test run
 			invokeOSGiTestExecution();
+			readTestResult();
 		}
 		finally {
-			readTestResult();
 			completeTestExecution();
 		}
 	}
@@ -258,7 +267,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			throw e;
 		}
 
-		log.debug("writing test name to stream:" + getName());
+		log.debug("writing test name [" + getName() + "] to OSGi");
 		// write test name to OSGi
 		outputStream.writeUTF(getName());
 		outputStream.flush();
@@ -289,9 +298,9 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * 
 	 * @throws Exception
 	 */
-	private void completeTestExecution() throws Exception {
-		TestUtils.closeStream(inputStream);
-		TestUtils.closeStream(outputStream);
+	private void completeTestExecution() {
+		IOUtils.closeStream(inputStream);
+		IOUtils.closeStream(outputStream);
 	}
 
 	//
@@ -325,17 +334,17 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 			// merge bundles
 			String[] mandatoryBundles = getMandatoryBundles();
-			String[] optionalBundles = getBundleLocations();
+			String[] optionalBundles = getBundles();
 
 			String[] allBundles = new String[mandatoryBundles.length + optionalBundles.length];
 			System.arraycopy(mandatoryBundles, 0, allBundles, 0, mandatoryBundles.length);
 			System.arraycopy(optionalBundles, 0, allBundles, mandatoryBundles.length, optionalBundles.length);
 
 			// install bundles (from the local system/classpath)
-			Resource[] bundleResources = createResources(allBundles);
+			Resource[] bundleResources = locateBundles(allBundles);
 
-			Bundle[] bundles = new Bundle[bundleResources.length];
-			for (int i = 0; i < bundleResources.length; i++) {
+			Bundle[] bundles = new Bundle[allBundles.length];
+			for (int i = 0; i < allBundles.length; i++) {
 				bundles[i] = installBundle(bundleResources[i]);
 			}
 
@@ -382,19 +391,34 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Create Resource objects from Strings.
+	 * Load the bundles given as strings. Will delegate to
+	 * {@link #locateBundle(String)}.
+	 * 
 	 * @param bundles
 	 * @return
 	 */
-	private Resource[] createResources(String[] bundles) {
+	protected Resource[] locateBundles(String[] bundles) {
 		Resource[] res = new Resource[bundles.length];
-		ResourceLoader loader = new DefaultResourceLoader();
+		// ResourceLoader loader = new DefaultResourceLoader();
 
 		for (int i = 0; i < bundles.length; i++) {
-			res[i] = loader.getResource(bundles[i]);
+			// res[i] = loader.getResource(bundles[i]);
+			res[i] = locateBundle(bundles[i]);
 		}
 		return res;
 	}
+
+	/**
+	 * Locate (through a Resource) an OSGi bundle given by a String. Subclasses
+	 * should provide an implementation to this method.
+	 * 
+	 * Note that the String identifying the bundle can have arbitrary format
+	 * (such as Comma Separated Values) dependening on the strategy used.
+	 * 
+	 * @param bundleId
+	 * @return
+	 */
+	protected abstract Resource locateBundle(String bundleId);
 
 	/**
 	 * Install an OSGi bundle from the given location.
@@ -467,8 +491,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * Cleanup for the test suite.
 	 */
 	private void shutdownTest() {
-		TestUtils.closeStream(inputStream);
-		TestUtils.closeStream(outputStream);
+		IOUtils.closeStream(inputStream);
+		IOUtils.closeStream(outputStream);
 
 		log.info("shutting down OSGi platform");
 		if (osgiPlatform != null) {
@@ -504,10 +528,10 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 		// setup output stream to prevent blocking
 		outputStream = new ObjectOutputStream(new ConfigurableByteArrayOutputStream(inArray));
-		// flush header write away
+		// flush header right away
 		outputStream.flush();
 
-		log.debug("OSGi streams setup");
+		log.debug("opened writer to OSGi");
 	}
 
 	/**
@@ -517,9 +541,10 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		try {
 			byte[] inputSource = (byte[]) System.getProperties().get(OsgiJUnitTest.FROM_OSGI);
 			inputStream = new ObjectInputStream(new ByteArrayInputStream(inputSource));
+			log.debug("opened reader from OSGi");
 		}
 		catch (IOException ex) {
-			throw new RuntimeException("cannot open streams " + ex);
+			throw new RuntimeException("cannot open streams; it's likely the osgi test execution failed;" + ex);
 		}
 
 	}
