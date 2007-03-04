@@ -62,7 +62,7 @@ public class SimpleServiceBundleTest extends ConfigurableBundleCreatorTests {
 	 * test bundle are automatically included so do not need
 	 * to be specified here.
 	 */
-	protected String[] getBundleLocations() {
+	protected String[] getBundles() {
 		return new String[] {
 			localMavenArtifact("org.springframework.osgi", "aopalliance.osgi","1.0-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
@@ -70,7 +70,7 @@ public class SimpleServiceBundleTest extends ConfigurableBundleCreatorTests {
 			localMavenArtifact("org.springframework.osgi", "spring-osgi-core","1.0-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-osgi-extender","1.0-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-aop","2.1-SNAPSHOT"),
-			localMavenArtifact("org.springframework.osgi", "simple-service-bundle","1.0-SNAPSHOT")
+			localMavenArtifact("org.springframework.osgi.samples", "simple-service-bundle","1.0-SNAPSHOT")
 		};
 	}
 	

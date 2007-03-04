@@ -33,7 +33,7 @@ public class ServiceProxyFactoryBeanTest extends ConfigurableBundleCreatorTests 
 
 	private OsgiServiceProxyFactoryBean fb;
 
-	protected String[] getBundleLocations() {
+	protected String[] getBundles() {
 		return new String[] { localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),

@@ -22,7 +22,7 @@ public class DependencyTest extends ConfigurableBundleCreatorTests {
     }
 
 
-    protected String[] getBundleLocations() {
+    protected String[] getBundles() {
         return new String[]{
                 localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
@@ -45,11 +45,11 @@ public class DependencyTest extends ConfigurableBundleCreatorTests {
         waitOnContextCreation("org.springframework.osgi.test.simpleservice");
         
         Bundle simpleService2Bundle = bundleContext.installBundle(
-                localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service2",
-                                   "1.0-SNAPSHOT"));
+                getLocator().locateArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service2",
+                                   "1.0-SNAPSHOT").getURL().toExternalForm());
         Bundle simpleService3Bundle = bundleContext.installBundle(
-                localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service3",
-                                   "1.0-SNAPSHOT"));
+        		getLocator().locateArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service3",
+                                   "1.0-SNAPSHOT").getURL().toExternalForm());
 
         assertNotNull("Cannot find the simple service 2 bundle", simpleService2Bundle);
         assertNotNull("Cannot find the simple service 3 bundle", simpleService3Bundle);

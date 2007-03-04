@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-test-support"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.test.lifecycle/1.0-SNAPSHOT/org.springframework.osgi.test.lifecycle-1.0-SNAPSHOT.jar"/>
@@ -24,5 +23,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Bundle Scoped A Integration Test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Bundle Scoped B Integration Test"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-mock/2.1-SNAPSHOT/spring-mock-2.1-SNAPSHOT.jar" sourcepath="/SPRING_MOCK_SRC"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.4.2"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -19,7 +19,7 @@ public class Cardinality0to1Test extends ConfigurableBundleCreatorTests {
     }
 
 
-    protected String[] getBundleLocations() {
+    protected String[] getBundles() {
         return new String[]{
                 localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
@@ -42,8 +42,8 @@ public class Cardinality0to1Test extends ConfigurableBundleCreatorTests {
         BundleContext bundleContext = getBundleContext();
 
         Bundle simpleService2Bundle = bundleContext.installBundle(
-                localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service2",
-                                   "1.0-SNAPSHOT"));
+                getLocator().locateArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service2",
+                                   "1.0-SNAPSHOT").getURL().toExternalForm());
 
         assertNotNull("Cannot find the simple service 2 bundle", simpleService2Bundle);
 
