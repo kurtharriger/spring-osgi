@@ -2,14 +2,15 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
-	<classpathentry output="target/test-classes" kind="src" path="src/test/java"/>
-	<classpathentry output="target/test-classes" kind="src" path="src/test/resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.0/org.osgi.core-4.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.0.2/spring-context-2.0.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-mock/2.0.2/spring-mock-2.0.2.jar"/>	
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-mock/2.0.2/spring-mock-2.0.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-test-support"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Simple Service Sample bundle"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.4.2"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-core/2.1-SNAPSHOT/spring-core-2.1-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

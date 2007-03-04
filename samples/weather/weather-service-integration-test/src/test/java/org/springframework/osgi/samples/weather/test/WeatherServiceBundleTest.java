@@ -69,7 +69,6 @@ public class WeatherServiceBundleTest extends ConfigurableBundleCreatorTests {
 			localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-osgi-io", "1.0-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
-			localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "wiring-bundle", "1.0-SNAPSHOT")
 		};
 	}

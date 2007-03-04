@@ -52,7 +52,7 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 		return "classpath:org/springframework/osgi/test/propertyplaceholder/PropertyPlaceholder.MF";
 	}
 
-	protected String[] getBundleLocations() {
+	protected String[] getBundles() {
 		return new String[] { localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
@@ -76,6 +76,15 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 	protected void onTearDown() throws Exception {
 		if (ctx != null)
 			ctx.close();
+	}
+	
+	
+
+	/* (non-Javadoc)
+	 * @see org.springframework.osgi.test.ConfigurableBundleCreatorTests#getBundleContentPattern()
+	 */
+	protected String[] getBundleContentPattern() {
+		return super.getBundleContentPattern();
 	}
 
 	// add a default table into OSGi
