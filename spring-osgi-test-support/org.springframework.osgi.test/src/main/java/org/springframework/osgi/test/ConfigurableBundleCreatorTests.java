@@ -21,6 +21,7 @@ import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -117,7 +118,7 @@ public abstract class ConfigurableBundleCreatorTests extends OnTheFlyBundleCreat
 	 */
 	protected Properties getSettings() throws Exception {
 		Properties settings = new Properties(DEFAULT_SETTINGS);
-		settings.setProperty(ROOT_DIR, super.getRootPath());
+		//settings.setProperty(ROOT_DIR, getRootPath());
 		Resource resource = new ClassPathResource(getSettingsLocation());
 
 		if (resource.exists()) {
@@ -129,8 +130,7 @@ public abstract class ConfigurableBundleCreatorTests extends OnTheFlyBundleCreat
 				}
 			}
 			finally {
-				if (stream != null)
-					stream.close();
+				IOUtils.closeStream(stream);
 			}
 		}
 		else

@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test;
+package org.springframework.osgi.test.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -99,25 +97,5 @@ public abstract class TestUtils {
 		for (Iterator iter = failures.iterator(); iter.hasNext();) {
 			testResult.addFailure(test, (AssertionFailedError) iter.next());
 		}
-	}
-
-	public static void closeStream(InputStream stream) {
-		if (stream != null)
-			try {
-				stream.close();
-			}
-			catch (IOException ex) {
-				// ignore
-			}
-	}
-
-	public static void closeStream(OutputStream stream) {
-		if (stream != null)
-			try {
-				stream.close();
-			}
-			catch (IOException ex) {
-				// ignore
-			}
 	}
 }

@@ -17,6 +17,8 @@ package org.springframework.osgi.test;
 
 import java.util.Hashtable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -31,6 +33,8 @@ import org.osgi.framework.ServiceRegistration;
  */
 public class JUnitTestActivator implements BundleActivator {
 
+	private static final Log log = LogFactory.getLog(JUnitTestActivator.class);
+	
 	private BundleContext context;
 	private ServiceReference reference;
 	private ServiceRegistration registration;
@@ -79,6 +83,7 @@ public class JUnitTestActivator implements BundleActivator {
 
 		}
 		catch (Exception ex) {
+			log.error("failed to invoke test execution", ex);
 			throw new RuntimeException(ex);
 		}
 	}
