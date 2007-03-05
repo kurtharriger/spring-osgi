@@ -171,4 +171,17 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	protected String localMavenArtifact(String groupId, String artifactId, String version) {
 		return groupId + "," + artifactId + "," + version;
 	}
+
+	/**
+	 * Compatibility method - will be removed in the very near future.
+	 *
+	 * @param groupId
+	 * @param artifactId
+	 * @param version
+     * @param type
+	 * @return
+	 */
+	protected String localMavenArtifact(String groupId, String artifactId, String version, String type) {
+		return groupId + "," + artifactId + "," + version + "," + type;
+	}
 }
