@@ -82,4 +82,61 @@
       <scope>provided</scope>     
     </dependency>
   </dependencies>
+
+  <!-- ================================================ -->
+  <!--            Repository Configuration              -->
+  <!-- ================================================ -->
+
+  <repositories>
+    <repository>    
+      <id>apache.m2.incubator</id>
+      <name>Apache M2 Incubator Repository</name>
+      <url>http://people.apache.org/repo/m2-incubating-repository/</url>
+    </repository>  
+    <repository>
+        <id>eclipse-repository</id>
+        <name>Eclipse Repository</name>
+        <url>http://repo1.maven.org/eclipse/</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>apache-snapshots</id>
+      <name>Apache Snapshots</name>
+      <url>http://cvs.apache.org/maven-snapshot-repository</url>
+    </repository>
+    <repository>
+      <id>safehaus-repository</id>
+      <name>Safehaus Repository</name>
+      <url>http://m2.safehaus.org</url>
+    </repository>
+    <repository>
+      <id>spring-ext</id>
+      <name>Spring External Dependencies Repository</name>
+      <url>
+        https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+      </url>
+    </repository>
+
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>apache.snapshots</id>
+      <name>Apache Snapshots</name>
+      <url>http://cvs.apache.org/maven-snapshot-repository/</url>
+    </pluginRepository>
+    <pluginRepository>
+    	<snapshots>
+    	  <enabled>true</enabled>
+    	</snapshots>
+    	<id>codehaus-snapshot-repository</id>
+    	<name>Codehaus Snapshots Repository</name>
+    	<url>http://snapshots.repository.codehaus.org</url>
+    </pluginRepository>
+  </pluginRepositories>  
 </project>
