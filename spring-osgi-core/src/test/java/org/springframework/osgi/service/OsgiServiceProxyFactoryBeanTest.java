@@ -18,6 +18,7 @@
 package org.springframework.osgi.service;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -30,6 +31,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.collection.OsgiServiceCollection;
 
 /**
  * @author Adrian Colyer
@@ -109,7 +111,6 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		String filter = "(beanName=myBean)";
 		this.serviceFactoryBean.setFilter(filter);
 
-
 		MockServiceReference ref = new MockServiceReference();
 		Dictionary dict = new Hashtable();
 		dict.put(Constants.OBJECTCLASS, new String[] { Serializable.class.getName() });
@@ -142,5 +143,23 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		catch (Exception ex) {
 			// expected
 		}
+	}
+
+	public void testListenersSetOnCollection() throws Exception {
+		serviceFactoryBean.setBundleContext(this.bundleContext);
+		serviceFactoryBean.setInterface(TestCase.class);
+		serviceFactoryBean.setCardinality("1..N");
+
+		MockControl listenerControl = MockControl.createControl(TargetSourceLifecycleListener.class);
+		TargetSourceLifecycleListener listener = (TargetSourceLifecycleListener) listenerControl.getMock();
+
+		TargetSourceLifecycleListener[] listeners = { (TargetSourceLifecycleListener) MockControl.createControl(
+				TargetSourceLifecycleListener.class).getMock() };
+		serviceFactoryBean.setListeners(listeners);
+		serviceFactoryBean.afterPropertiesSet();
+
+		Field field = OsgiServiceCollection.class.getDeclaredField("listeners");
+		field.setAccessible(true);
+		assertSame(listeners, field.get(serviceFactoryBean.getObject()));
 	}
 }
