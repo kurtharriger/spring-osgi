@@ -6,9 +6,9 @@ Bundle-SymbolicName: org.springframework.hibernate3
 Bundle-Name: org.springframework.hibernate3
 Bundle-Version: ${spring.bundle.version}
 Bundle-Vendor: Spring Framework
-Import-Package: javax.portlet;resolution:=optional,
-   javax.servlet;resolution:=optional,
+Import-Package: javax.servlet;resolution:=optional,
    javax.servlet.http;resolution:=optional,
+   javax.transaction;resolution:=optional,
    org.aopalliance.intercept,
    org.apache.commons.logging,
    org.hibernate,
@@ -40,12 +40,11 @@ Import-Package: javax.portlet;resolution:=optional,
    org.springframework.orm;version="${spring.import.version}",
    org.springframework.transaction;version="${spring.import.version}",
    org.springframework.transaction.support;version="${spring.import.version}",
-   org.springframework.util;version="${spring.import.version}",
-   org.springframework.web.context;version="${spring.import.version}",
-   org.springframework.web.context.support;version="${spring.import.version}",
-   org.springframework.web.filter;version="${spring.import.version}",
-   org.springframework.web.portlet;version="${spring.import.version}",
-   org.springframework.web.servlet;version="${spring.import.version}"
+   org.springframework.util;version="${spring.import.version}";resolution:=optional,
+   org.springframework.web.context;version="${spring.import.version}";resolution:=optional,
+   org.springframework.web.context.support;version="${spring.import.version}";resolution:=optional,
+   org.springframework.web.filter;version="${spring.import.version}";resolution:=optional,
+   org.springframework.web.servlet;version="${spring.import.version}";resolution:=optional
 Export-Package: org.springframework.orm.hibernate3;version="${spring.export.version}",
    org.springframework.orm.hibernate3.annotation;version="${spring.export.version}",
    org.springframework.orm.hibernate3.support;version="${spring.export.version}"
