@@ -6,9 +6,9 @@ Bundle-SymbolicName: org.springframework.hibernate2
 Bundle-Name: org.springframework.hibernate2
 Bundle-Version: ${spring.bundle.version}
 Bundle-Vendor: Spring Framework
-Import-Package: javax.portlet;resolution:=optional,
-   javax.servlet;resolution:=optional,
+Import-Package: javax.servlet;resolution:=optional,
    javax.servlet.http;resolution:=optional,
+   javax.transaction;resolution:=optional,
    net.sf.hibernate,
    net.sf.hibernate.cfg,
    net.sf.hibernate.connection,
@@ -33,11 +33,10 @@ Import-Package: javax.portlet;resolution:=optional,
    org.springframework.transaction;version="${spring.import.version}",
    org.springframework.transaction.support;version="${spring.import.version}",
    org.springframework.util;version="${spring.import.version}",
-   org.springframework.web.context;version="${spring.import.version}",
-   org.springframework.web.context.support;version="${spring.import.version}",
-   org.springframework.web.filter;version="${spring.import.version}",
-   org.springframework.web.portlet;version="${spring.import.version}",
-   org.springframework.web.servlet;version="${spring.import.version}"
+   org.springframework.web.context;version="${spring.import.version}";resolution:=optional,
+   org.springframework.web.context.support;version="${spring.import.version}";resolution:=optional,
+   org.springframework.web.filter;version="${spring.import.version}";resolution:=optional,
+   org.springframework.web.servlet;version="${spring.import.version}";resolution:=optional
 Export-Package: org.springframework.orm.hibernate;version="${spring.export.version}",
    org.springframework.orm.hibernate.support;version="${spring.export.version}"
 Bundle-ClassPath: .,
