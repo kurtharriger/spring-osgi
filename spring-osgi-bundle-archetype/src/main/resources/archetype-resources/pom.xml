@@ -76,39 +76,6 @@
     </plugins>
   </build>
 
-  <repositories>
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>apache-snapshots</id>
-      <name>Apache Snapshots</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository</url>
-    </repository>
-    <repository>
-      <snapshots>
-         <enabled>true</enabled>
-      </snapshots>
-      <id>spring-ext</id>
-      <name>Spring External Dependencies Repository</name>
-      <url>
-        https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
-      </url>
-    </repository>
-  </repositories>
-
-  <!-- needed so that maven can find the maven-osgi-plugin -->
-  <pluginRepositories>
-    <pluginRepository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshots</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository/</url>
-    </pluginRepository>
-  </pluginRepositories>
-  
     <repositories>
     <repository>
       <snapshots>
