@@ -419,12 +419,14 @@ limitations under the License.
   <distributionManagement>
     <repository>
       <id>static.springframework.org</id>
+      <name>Spring Maven repo</name>
       <url>
         scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2
       </url>
     </repository>
     <snapshotRepository>
       <id>static.springframework.org</id>
+      <name>Spring Maven snapshots repo</name>
       <url>
         scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2-snapshots
       </url>
@@ -437,8 +439,6 @@ limitations under the License.
       </url>
     </site>
   </distributionManagement>
-
-
 
   <!-- ================================================ -->
   <!--            Repository Configuration              -->
