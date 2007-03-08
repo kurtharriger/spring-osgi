@@ -476,7 +476,7 @@ limitations under the License.
 
   </repositories>
 
-  <pluginRepositories>
+  <!--pluginRepositories>
     <pluginRepository>
       <snapshots>
         <enabled>true</enabled>
@@ -493,6 +493,6 @@ limitations under the License.
     	<name>Codehaus Snapshots Repository</name>
     	<url>http://snapshots.repository.codehaus.org</url>
     </pluginRepository>
-  </pluginRepositories>
+  </pluginRepositories-->
 
 </project>
