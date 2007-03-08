@@ -48,8 +48,8 @@
   </issueManagement>
 
   <ciManagement>
-    <system>continuum</system>
-    <url>https://build.springframework.org/continuum/servlet/continuum</url>
+    <system>bamboo</system>
+    <url>http://build.springframework.org:8085/browse/OSGI-TRUNK</url>
     <notifiers>
       <notifier>
         <type>mail</type>
@@ -419,14 +419,12 @@ limitations under the License.
   <distributionManagement>
     <repository>
       <id>static.springframework.org</id>
-      <name>Spring Maven repo</name>
       <url>
         scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2
       </url>
     </repository>
     <snapshotRepository>
       <id>static.springframework.org</id>
-      <name>Spring Maven snapshots repo</name>
       <url>
         scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2-snapshots
       </url>
