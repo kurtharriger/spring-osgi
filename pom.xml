@@ -455,14 +455,6 @@ limitations under the License.
         <url>http://repo1.maven.org/eclipse/</url>
     </repository>
     <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>apache-snapshots</id>
-      <name>Apache Snapshots</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository</url>
-    </repository>
-    <repository>
       <id>safehaus-repository</id>
       <name>Safehaus Repository</name>
       <url>http://m2.safehaus.org</url>
@@ -477,23 +469,14 @@ limitations under the License.
 
   </repositories>
 
-  <!--pluginRepositories>
+  <pluginRepositories>
     <pluginRepository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshots</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository/</url>
+      <id>spring-ext</id>
+      <name>Spring External Dependencies Repository</name>
+      <url>
+        https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+      </url>
     </pluginRepository>
-    <pluginRepository>
-    	<snapshots>
-    	  <enabled>true</enabled>
-    	</snapshots>
-    	<id>codehaus-snapshot-repository</id>
-    	<name>Codehaus Snapshots Repository</name>
-    	<url>http://snapshots.repository.codehaus.org</url>
-    </pluginRepository>
-  </pluginRepositories-->
+  </pluginRepositories>
 
 </project>
