@@ -34,11 +34,9 @@ import org.springframework.osgi.test.platform.OsgiPlatform;
  */
 public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 
-
 	public AbstractConfigurableOsgiTests() {
 		super();
 	}
-
 
 	public AbstractConfigurableOsgiTests(String name) {
 		super(name);
@@ -73,15 +71,15 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	private static final String ORG_OSGI_FRAMEWORK_BOOTDELEGATION = "org.osgi.framework.bootdelegation";
 
 	/**
-	 * OSGi platform creation. This method is used to determine and create
-	 * the OSGi platform used by the test suite (Equinox by default).
-	 * See {@link #getPlatformName()} for an easier alternative.
+	 * OSGi platform creation. This method is used to determine and create the
+	 * OSGi platform used by the test suite (Equinox by default). See
+	 * {@link #getPlatformName()} for an easier alternative.
 	 * 
 	 * @return the OSGi platform
 	 */
 	protected OsgiPlatform createPlatform() {
 		String platformName = getPlatformName();
-		
+
 		OsgiPlatform platform = null;
 		if (platformName != null) {
 			platformName = platformName.toLowerCase();
@@ -90,20 +88,21 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 				platform = new FelixPlatform();
 
 			}
-			if (platformName.indexOf(KNOPFLERFISH_PLATFORM) > -1) {
+			else if (platformName.indexOf(KNOPFLERFISH_PLATFORM) > -1) {
 				platform = new KnopflerfishPlatform();
 			}
 		}
-
-		platform = new EquinoxPlatform();
 		
+		if (platform == null)
+			platform = new EquinoxPlatform();
+
 		// add boot delegation
 		// TODO: why is this needed ?
-		platform.getConfigurationProperties().setProperty(ORG_OSGI_FRAMEWORK_BOOTDELEGATION, getBootDelegationPackageString());
-		
+		platform.getConfigurationProperties().setProperty(ORG_OSGI_FRAMEWORK_BOOTDELEGATION,
+				getBootDelegationPackageString());
+
 		return platform;
 	}
-
 
 	/**
 	 * Indicate what OSGi platform to be used by the test suite. By default,
