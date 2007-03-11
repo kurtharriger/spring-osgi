@@ -81,6 +81,8 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 			this.felixCacheDir.mkdir();
 			this.felixCacheDir.deleteOnExit();
 			props.setProperty("felix.cache.dir", this.felixCacheDir.getAbsolutePath());
+			if (log.isDebugEnabled())
+				log.debug("felix cache folder is " + felixCacheDir.getAbsolutePath());
 		}
 		catch (IOException ex) {
 			if (log.isWarnEnabled()) {
@@ -155,6 +157,8 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	 */
 	public void stop() throws Exception {
 		platform.shutdown();
+		// remove cache folder
+		felixCacheDir.delete();
 	}
 
 }
