@@ -18,6 +18,10 @@ package org.springframework.osgi.test.support;
 import java.io.ByteArrayOutputStream;
 
 /**
+ * Simple class which allows a specific buffer to be used as the underlying
+ * implementation. This makes it easy to manipulate directly the storage support
+ * (such as resizing the byte array or reading from it).
+ * 
  * @author Costin Leau
  * 
  */
@@ -33,5 +37,14 @@ public class ConfigurableByteArrayOutputStream extends ByteArrayOutputStream {
 
 	public ConfigurableByteArrayOutputStream(byte[] bufferToUse) {
 		this.buf = bufferToUse;
+	}
+
+	public ConfigurableByteArrayOutputStream(ConfigurableByteArrayOutputStream original) {
+		this.buf = (byte[]) original.buf.clone();
+		this.count = original.count;
+	}
+
+	public int getWrittenBytes() {
+		return count;
 	}
 }
