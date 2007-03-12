@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
 import org.springframework.core.io.Resource;
@@ -116,4 +117,46 @@ public abstract class JarUtils {
 		return numberOfBytes;
 	}
 
+	/**
+	 * Read the manifest for a given stream. The stream will be wrapped in a
+	 * JarInputStream and closed after the manifest was read.
+	 * 
+	 * @param stream
+	 * @return
+	 */
+	public static Manifest getManifest(InputStream stream) {
+		JarInputStream myStream = null;
+		Manifest man = null;
+		try {
+			myStream = new JarInputStream(stream);
+			return myStream.getManifest();
+		}
+		catch (IOException ioex) {
+			// just ignore it
+		}
+		finally {
+			IOUtils.closeStream(myStream);
+		}
+
+		// return (man != null ? man : new Manifest());
+		return null;
+	}
+
+	/**
+	 * Convenience method for reading a manifest from a given resource. Will
+	 * assume the resource points to a jar.
+	 * 
+	 * @param resource
+	 * @return
+	 */
+	public static Manifest getManifest(Resource resource) {
+		try {
+			return getManifest(resource.getInputStream());
+		}
+		catch (IOException ex) {
+			// ignore
+		}
+		return null;
+	}
+	
 }

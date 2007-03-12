@@ -52,15 +52,25 @@ public abstract class AbstractStorageTest extends TestCase {
 	public void testInitialInputStream() throws Exception {
 		InputStream in = storage.getInputStream();
 		try {
-			assertEquals(storage.getInputStream().read(), -1);
+			assertEquals(-1, in.read());
 		}
 		finally {
 			IOUtils.closeStream(in);
 		}
 	}
 
+	public void testIdenticalInputStreams() throws Exception {
+		assertTrue("streams not identical", compareStreams(storage.getInputStream(), storage.getInputStream()));
+	}
+
+	public void testIdenticalInputStreamsFromResource() throws Exception {
+		assertTrue("streams not identical", compareStreams(storage.getResource().getInputStream(), storage
+				.getResource().getInputStream()));
+	}
+
 	public void testReadWrite() throws Exception {
-		FileCopyUtils.copy(getSampleContentAsInputStream(), storage.getOutputStream());
+		int wrote = FileCopyUtils.copy(getSampleContentAsInputStream(), storage.getOutputStream());
+		System.out.println("wrote " + wrote + " bytes");
 		assertTrue("streams content is different", compareStreams(getSampleContentAsInputStream(), storage
 				.getInputStream()));
 	}
@@ -78,12 +88,17 @@ public abstract class AbstractStorageTest extends TestCase {
 	}
 
 	private boolean compareStreams(InputStream in1, InputStream in2) throws Exception {
+		int count = 0;
 		try {
 			int b;
 			while ((b = in1.read()) != -1) {
-				boolean same = (in2.read() == b);
-				if (!same)
+				count++;
+				int a = in2.read();
+				boolean same = (a == b);
+				if (!same) {
+					System.out.println("expected " + b + " but was " + a + ";problem occured after reading " + count + " bytes");
 					return false;
+				}
 			}
 			// check we have reached the end on both streams
 			return (in1.read() == in2.read());
