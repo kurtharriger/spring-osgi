@@ -117,11 +117,11 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	}
 
 	public void setConfigLocations(String[] configLocations) {
-		this.configLocations = defensiveCopyOf(configLocations);
+		this.configLocations = configLocations;
 	}
 
 	public String[] getConfigLocations() {
-		return defensiveCopyOf(this.configLocations);
+		return (String[]) this.configLocations.clone();
 	}
 
 	protected boolean inActiveBundleState() {
@@ -149,17 +149,6 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		}
 	}
 
-	private String[] defensiveCopyOf(String[] original) {
-		if (null == original) {
-			return new String[0];
-		}
-		else {
-			String[] ret = new String[original.length];
-			System.arraycopy(original, 0, ret, 0, original.length);
-			return ret;
-		}
-	}
-
 	/**
 	 * Sets a default config location if no explicit config location specified.
 	 * Synchronization required to cope with dynamic nature of OSGi which may
@@ -170,7 +159,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 */
 	public void refresh() throws BeansException {
 
-		// TODO: should imported beans
+		// TODO: should refresh imported beans
 		if (this.configLocations == null || this.configLocations.length == 0) {
 			setConfigLocations(getDefaultConfigLocations());
 		}
@@ -187,17 +176,24 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	// invalid - cannot allow close to happen on a separate thread during
 	// refresh!
 	public synchronized void close() {
+		// call super class
+		super.close();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.context.support.AbstractApplicationContext#destroyBeans()
+	 */
+	protected void destroyBeans() {
+		super.destroyBeans();
+
 		try {
 			cleanOsgiBundleScope();
 		}
 		catch (Exception ex) {
 			logger.info("got exception when closing", ex);
 		}
-
-		// call super class
-		super.close();
 	}
-
 
 	/*
 	 * (non-Javadoc)

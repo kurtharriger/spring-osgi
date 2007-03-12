@@ -35,7 +35,6 @@ import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.OsgiBindingUtils;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
-import org.springframework.osgi.service.support.ClassTargetSource;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceStaticInterceptor;
 import org.springframework.util.Assert;
 
@@ -201,7 +200,7 @@ public class OsgiServiceCollection implements Collection {
 
 		if (proxyClass != null) {
 			factory.setProxyTargetClass(true);
-			factory.setTargetSource(new ClassTargetSource(proxyClass));
+			factory.setTargetClass(proxyClass);
 		}
 
 		// add the interceptors

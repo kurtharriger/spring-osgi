@@ -18,17 +18,14 @@ package org.springframework.osgi.config;
 import java.util.Properties;
 import java.util.Set;
 
-import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.OsgiServiceFactoryBean;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -135,17 +132,12 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		return builder.getBeanDefinition();
 	}
 
-	// if the id is specified use it, otherwise generate one
-	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
-			throws BeanDefinitionStoreException {
-		String id = element.getAttribute(ID_ATTRIBUTE);
-		
-		if (StringUtils.hasText(id))
-			return id;
-		
-		else
-			return BeanDefinitionReaderUtils.generateBeanName(definition, parserContext.getRegistry(), parserContext
-					.isNested());
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateIdAsFallback()
+	 */
+	protected boolean shouldGenerateIdAsFallback() {
+		return true;
 	}
 
 }
