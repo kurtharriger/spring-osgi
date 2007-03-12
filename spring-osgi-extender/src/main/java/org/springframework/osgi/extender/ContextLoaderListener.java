@@ -303,7 +303,7 @@ public class ContextLoaderListener implements BundleActivator,
 		}
 
 		if (log.isInfoEnabled()) {
-			log.info("Processing bundle event [" + OsgiServiceUtils.eventToString(event.getType())
+			log.debug("Processing bundle event [" + OsgiServiceUtils.eventToString(event.getType())
 				+ "] for bundle [" + event.getBundle().getSymbolicName() + "]");
 		}
 		switch (event.getType()) {
@@ -330,7 +330,11 @@ public class ContextLoaderListener implements BundleActivator,
 	 * @param bundle
 	 */
 	private void maybeCreateApplicationContextFor(Bundle bundle) {
-		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
+        ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
+        if (!config.isSpringPoweredBundle()) {
+            // Avoid unnecessary thread creation for non-spring bundles
+            return;
+        }
 		ApplicationContextCreator contextCreator =
 			new ApplicationContextCreator(
 				bundle,
@@ -357,7 +361,13 @@ public class ContextLoaderListener implements BundleActivator,
 	 * @param bundle
 	 */
 	private void maybeCloseApplicationContextFor(Bundle bundle) {
-		ApplicationContextCloser contextCloser =
+        Long bundleId = new Long(bundle.getBundleId());
+        if (this.managedBundles.get(bundleId) == null &&
+                this.applicationContextsBeingInitialized.get(bundleId) == null) {
+            // Avoid unnecessary thread creation for non managed bundles
+            return;
+        }
+        ApplicationContextCloser contextCloser =
 			new ApplicationContextCloser(bundle,
 				this.managedBundles,
 				this.applicationContextsBeingInitialized,
