@@ -30,7 +30,6 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.collection.OsgiServiceList;
-import org.springframework.osgi.service.support.ClassTargetSource;
 import org.springframework.osgi.service.support.RetryTemplate;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor;
 import org.springframework.util.Assert;
@@ -200,7 +199,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 			factory.setInterfaces(new Class[] { clazz });
 		}
 		else {
-			factory.setTargetSource(new ClassTargetSource(clazz));
+			factory.setTargetClass(clazz);
 			factory.setProxyTargetClass(true);
 		}
 	}
