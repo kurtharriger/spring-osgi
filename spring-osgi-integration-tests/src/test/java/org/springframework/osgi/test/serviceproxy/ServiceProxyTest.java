@@ -22,9 +22,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.osgi.service.NoSuchServiceException;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.support.ClassTargetSource;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 import org.springframework.util.ClassUtils;
@@ -57,7 +55,7 @@ public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
 		ProxyFactory factory = new ProxyFactory();
 		factory.setProxyTargetClass(true);
 		factory.setOptimize(true);
-		factory.setTargetSource(new ClassTargetSource(clazz));
+		factory.setTargetClass(clazz);
 
 		factory.addAdvice(cardinalityInterceptor);
 		factory.setFrozen(true);
@@ -65,7 +63,6 @@ public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
 		return factory.getProxy(ProxyFactory.class.getClassLoader());
 	}
 
-	
 	private Advice createCardinalityAdvice(Class clazz) {
 		OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(getBundleContext(), 2);
 		interceptor.setClass(clazz.getName());
@@ -77,11 +74,9 @@ public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
 	}
 
 	public void testCglibLibraryVisibility() {
-		// waiting for Spring 2.0.3 before enabling this test
-		// check visibility on spring-core jar
 		// note that cglib is not declared inside this bundle but should be seen
 		// by spring-core (which contains the util classes)
-		//assertTrue(ClassUtils.isPresent("net.sf.cglib.proxy.Enhancer", ProxyFactory.class.getClassLoader()));
+		assertTrue(ClassUtils.isPresent("net.sf.cglib.proxy.Enhancer", ProxyFactory.class.getClassLoader()));
 	}
 
 	public void testDynamicEndProxy() throws Exception {
