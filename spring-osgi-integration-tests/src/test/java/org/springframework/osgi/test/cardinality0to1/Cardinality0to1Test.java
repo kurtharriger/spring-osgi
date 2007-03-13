@@ -15,7 +15,8 @@ import org.springframework.osgi.test.cardinality0to1.test.MyListener;
 public class Cardinality0to1Test extends ConfigurableBundleCreatorTests {
 
     protected String getManifestLocation() {
-        return "classpath:org/springframework/osgi/test/cardinality0to1/Cardinality0to1Test.MF";
+        //return "classpath:org/springframework/osgi/test/cardinality0to1/Cardinality0to1Test.MF";
+    	return null;
     }
 
 
