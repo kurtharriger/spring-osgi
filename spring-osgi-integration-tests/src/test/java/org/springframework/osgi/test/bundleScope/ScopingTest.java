@@ -33,8 +33,6 @@ public class ScopingTest extends ConfigurableBundleCreatorTests {
 				localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.scoped.bundle.common",
@@ -47,6 +45,7 @@ public class ScopingTest extends ConfigurableBundleCreatorTests {
 
 	protected String getManifestLocation() {
 		return "org/springframework/osgi/test/bundleScope/ScopingTest.MF";
+		//return null;
 	}
 
 	public void testEnvironmentValidity() throws Exception {
