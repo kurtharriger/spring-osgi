@@ -15,8 +15,6 @@
  */
 package org.springframework.osgi.test.util;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.jar.Attributes;
@@ -24,7 +22,6 @@ import java.util.jar.Manifest;
 
 import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**

@@ -62,7 +62,7 @@ public abstract class ConfigurableBundleCreatorTests extends OnTheFlyBundleCreat
 		DEFAULT_SETTINGS.setProperty(ROOT_DIR, "file:./target/test-classes");
 		DEFAULT_SETTINGS.setProperty(INCLUDE_PATTERNS, "/**/*.class");
 		DEFAULT_SETTINGS.setProperty(LIBS, "");
-		DEFAULT_SETTINGS.setProperty(MANIFEST, "classpath:/org/springframework/osgi/test/MANIFEST.MF");
+		DEFAULT_SETTINGS.setProperty(MANIFEST, "");
 	}
 
 	/**
