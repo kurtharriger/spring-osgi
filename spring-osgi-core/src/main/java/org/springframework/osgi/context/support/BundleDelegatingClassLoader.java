@@ -349,7 +349,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		Enumeration enm = this.backingBundle.getResources(name);
 
 		if (enm != null && enm.hasMoreElements() && log.isDebugEnabled())
-			log.debug("found resource " + name + " at " + enm);
+			log.debug("found resource " + name + " at " + this.backingBundle.getLocation());
 
 		return enm;
 	}
