@@ -22,6 +22,9 @@ import junit.framework.TestCase;
 import org.osgi.framework.BundleContext;
 
 /**
+ * This test might log exceptions since the OSGi platform may try to register
+ * an URLStreamFactory every time they start (during {@link #setName(String)}).
+ * 
  * @author Costin Leau
  * 
  */

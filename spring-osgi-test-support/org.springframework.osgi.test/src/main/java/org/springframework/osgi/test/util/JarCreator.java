@@ -94,7 +94,7 @@ public class JarCreator {
 
 		// load manifest
 		// add it to the jar
-		if (log.isDebugEnabled())
+		if (log.isDebugEnabled() && manifest != null)
 			log.debug("adding MANIFEST.MF [" + manifest.getMainAttributes().entrySet() + "]");
 
 		Resource[][] resources = resolveResources();
@@ -109,7 +109,7 @@ public class JarCreator {
 
 			// add a jar stream on top
 			jarStream = (manifest != null ? new JarOutputStream(outputStream, manifest) : new JarOutputStream(
-					outputStream, new Manifest()));
+					outputStream));
 
 			// add deps
 			for (int i = 0; i < resources.length; i++) {
@@ -122,13 +122,13 @@ public class JarCreator {
 		}
 		finally {
 			try {
-				jarStream.finish();
+				jarStream.closeEntry();
 			}
 			catch (Exception ex) {
 				// ignore
 			}
 			try {
-				jarStream.closeEntry();
+				jarStream.finish();
 			}
 			catch (Exception ex) {
 				// ignore

@@ -205,7 +205,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		// get a hold of the test result
 		originalResult = result;
 
-		// TODO: can this be actually improved (can we still reuse the testResult)
+		// TODO: can this be actually improved (can we still reuse the
+		// testResult)
 		result.startTest(osgiJUnitTest);
 		result.runProtected(osgiJUnitTest, new Protectable() {
 			public void protect() throws Throwable {
@@ -352,19 +353,11 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			// log platform name and version
 			logPlatformInfo(platformContext);
 
-			// merge bundles
-			String[] mandatoryBundles = getMandatoryBundles();
-			String[] optionalBundles = getBundles();
-
-			String[] allBundles = new String[mandatoryBundles.length + optionalBundles.length];
-			System.arraycopy(mandatoryBundles, 0, allBundles, 0, mandatoryBundles.length);
-			System.arraycopy(optionalBundles, 0, allBundles, mandatoryBundles.length, optionalBundles.length);
-
 			// install bundles (from the local system/classpath)
-			Resource[] bundleResources = locateBundles(allBundles);
+			Resource[] bundleResources = locateBundles();
 
-			Bundle[] bundles = new Bundle[allBundles.length];
-			for (int i = 0; i < allBundles.length; i++) {
+			Bundle[] bundles = new Bundle[bundleResources.length];
+			for (int i = 0; i < bundles.length; i++) {
 				bundles[i] = installBundle(bundleResources[i]);
 			}
 
@@ -426,6 +419,18 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			res[i] = locateBundle(bundles[i]);
 		}
 		return res;
+	}
+
+	protected Resource[] locateBundles() {
+		// merge bundles
+		String[] mandatoryBundles = getMandatoryBundles();
+		String[] optionalBundles = getBundles();
+
+		String[] allBundles = new String[mandatoryBundles.length + optionalBundles.length];
+		System.arraycopy(mandatoryBundles, 0, allBundles, 0, mandatoryBundles.length);
+		System.arraycopy(optionalBundles, 0, allBundles, mandatoryBundles.length, optionalBundles.length);
+
+		return locateBundles(allBundles);
 	}
 
 	/**

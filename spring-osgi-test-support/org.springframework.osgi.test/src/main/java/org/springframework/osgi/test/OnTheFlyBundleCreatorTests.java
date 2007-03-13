@@ -16,6 +16,8 @@
 package org.springframework.osgi.test;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -26,7 +28,11 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.util.JarCreator;
 import org.springframework.osgi.test.util.JarUtils;
+import org.springframework.osgi.test.util.ManifestUtils;
+import org.springframework.osgi.test.util.MemoryStorage;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -44,13 +50,20 @@ import org.springframework.util.StringUtils;
  */
 public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManagerTests {
 
-	private JarCreator jarCreator = new JarCreator();
+	private JarCreator jarCreator;
 
 	public OnTheFlyBundleCreatorTests() {
+		initializeJarCreator();
 	}
 
 	public OnTheFlyBundleCreatorTests(String testName) {
 		super(testName);
+		initializeJarCreator();
+	}
+
+	private void initializeJarCreator() {
+		jarCreator = new JarCreator();
+		jarCreator.setStorage(new MemoryStorage());
 	}
 
 	/**
@@ -66,16 +79,17 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManag
 	/**
 	 * Return the location (in Spring resource style) of the manifest location
 	 * to be used. If the manifest is created programatically, return a null
-	 * string and use {@link #getManifest()}.
+	 * string and use {@link #getManifest()} and
+	 * {@link #createDefaultManifest()}.
 	 * 
 	 * @return the manifest location
 	 */
 	protected String getManifestLocation() {
-		return "classpath:/org/springframework/osgi/test/MANIFEST.MF";
+		return null;
 	}
 
 	/**
-	 * Return the current test bundle manifest. By default, it tries to read the
+	 * Return the current test bundle manifest. The method tries to read the
 	 * manifest from the given location; in case the location is null, will
 	 * create a <code>Manifest</code> object containing default entries.
 	 * 
@@ -103,6 +117,11 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManag
 		}
 	}
 
+	/**
+	 * Create the default manifest in case none if found on the disk.
+	 * 
+	 * @return
+	 */
 	protected Manifest createDefaultManifest() {
 		Manifest manifest = new Manifest();
 		Attributes attrs = manifest.getMainAttributes();
@@ -119,19 +138,51 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManag
 		// activator
 		attrs.putValue(Constants.BUNDLE_ACTIVATOR, JUnitTestActivator.class.getName());
 
-		// imported packages
-		attrs.putValue(Constants.IMPORT_PACKAGE, StringUtils
-				.arrayToCommaDelimitedString(getMandatoryPackageBundleImport()));
+		// add Import-Package entry
+		addImportPackage(manifest);
 
 		if (log.isDebugEnabled())
 			log.debug("created manifest:" + manifest.getMainAttributes().entrySet());
 		return manifest;
 	}
 
+	private void addImportPackage(Manifest manifest) {
+		StringBuffer importPackages = new StringBuffer();
+
+		Set packages = new LinkedHashSet();
+		packages.add("org.osgi.framework;specification-version=\"1.3.0\"");
+
+		// mandatory bundles
+		String[] mandatoryBundlesExports = ManifestUtils.determineImportPackages(locateBundles(getMandatoryBundles()));
+
+		CollectionUtils.mergeArrayIntoCollection(mandatoryBundlesExports, packages);
+
+		if (log.isDebugEnabled())
+			log
+					.debug("Import package from mandatory bundles: "
+							+ ObjectUtils.nullSafeToString(mandatoryBundlesExports));
+
+		// importPackages.append(mandatoryBundlesExports);
+		// importPackages.append(StringUtils.arrayToCommaDelimitedString(getMandatoryPackageBundleImport()));
+
+		// optional/user-defined packages
+		String[] optionalBundlesExports = ManifestUtils.determineImportPackages(locateBundles(getBundles()));
+
+		if (log.isDebugEnabled())
+			log.debug("Import package from optional bundles: " + ObjectUtils.nullSafeToString(optionalBundlesExports));
+
+		// importPackages.append(optionalBundlesExports);
+
+		CollectionUtils.mergeArrayIntoCollection(optionalBundlesExports, packages);
+
+		manifest.getMainAttributes().putValue(Constants.IMPORT_PACKAGE,
+				StringUtils.collectionToCommaDelimitedString(packages));
+	}
+
 	private String[] getMandatoryPackageBundleImport() {
 		return new String[] { "junit.framework", "org.osgi.framework;specification-version=\"1.3.0\"",
 				"org.springframework.core.io", "org.springframework.util", "org.springframework.osgi.test",
-				"org.springframework.osgi.test.platform", "org.springframework.osgi.context.support",
+				"org.springframework.osgi.test.platform", "org.springframework.osgi.context.support;version=",
 				"org.springframework.beans", "org.springframework.beans.factory", "org.springframework.context",
 				"org.apache.commons.logging" };
 	}
@@ -155,8 +206,7 @@ public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManag
 
 	private void installAndStartBundle(BundleContext context, Resource resource) throws Exception {
 		// install & start
-		Bundle bundle;
-		bundle = context.installBundle("[onTheFly-test-bundle]" + ClassUtils.getShortName(getClass()) + "["
+		Bundle bundle = context.installBundle("[onTheFly-test-bundle]" + ClassUtils.getShortName(getClass()) + "["
 				+ hashCode() + "]", resource.getInputStream());
 
 		log.debug("test bundle succesfully installed");
