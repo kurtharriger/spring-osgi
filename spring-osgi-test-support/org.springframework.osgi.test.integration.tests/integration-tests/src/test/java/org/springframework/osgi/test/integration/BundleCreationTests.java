@@ -38,12 +38,6 @@ public class BundleCreationTests extends ConfigurableBundleCreatorTests {
 		return new String[] {};
 	}
 	
-	protected String getManifestLocation() {
-		return "/RunBundleCreationTest.MF";
-	}
-
-
-
 	public void testAssertionPass() {
 		assertTrue(true);
 	}
