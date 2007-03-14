@@ -64,8 +64,8 @@ public class DelegationToHierarchyTest extends TestCase implements OsgiJUnitTest
 		runTest();
 	}
 
-	public void setBundleContext(BundleContext bundleContext) {
-		osgiDelegate.setBundleContext(bundleContext);
+	public void injectBundleContext(BundleContext bundleContext) {
+		osgiDelegate.injectBundleContext(bundleContext);
 	}
 
 	public void testBundleContextIsAvailable() throws Exception {
@@ -84,7 +84,7 @@ public class DelegationToHierarchyTest extends TestCase implements OsgiJUnitTest
 	}
 
 	public void run(TestResult result) {
-		osgiDelegate.setOsgiJUnitTest(this);
+		osgiDelegate.injectOsgiJUnitTest(this);
 		osgiDelegate.setName(getName());
 		osgiDelegate.run(result);
 	}
