@@ -60,7 +60,6 @@ public class RunBundleCreationTest extends TestCase {
 		executeTest("testException");
 		assertEquals(1, result.errorCount());
 		assertEquals(0, result.failureCount());
-
 	}
 
 	public void testError() {
