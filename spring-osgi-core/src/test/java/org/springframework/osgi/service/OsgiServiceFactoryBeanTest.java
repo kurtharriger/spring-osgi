@@ -123,9 +123,9 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 	public void testInitWithOnlyJustTargetOrTargetReference() throws Exception {
 		exporter.setTarget(new Object());
-
+		exporter.setInterfaces(new Class[] { Object.class });
 		exporter.afterPropertiesSet();
-		
+
 		exporter.setTarget(null);
 		exporter.setTargetBeanName("costin");
 		exporter.afterPropertiesSet();
@@ -161,6 +161,26 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		assertTrue(compareArrays(expected, clazz));
 	}
 
+	public void testRegisterServiceWithNullClasses() throws Exception {
+		try {
+			exporter.registerService(null, new Properties());
+			fail("Expected to throw IllegalArgumentException");
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+
+	public void testRegisterServiceWOClasses() throws Exception {
+		try {
+			exporter.registerService(new Class[0], new Properties());
+			fail("Expected to throw IllegalArgumentException");
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+
 	public void testRegisterService() throws Exception {
 		Class[] clazz = new Class[] { Serializable.class, HashMap.class, Cloneable.class, Map.class,
 				LinkedHashMap.class };
@@ -171,7 +191,6 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 			names[i] = clazz[i].getName();
 		}
 
-		Object bean = new Object();
 		final Properties props = new Properties();
 		final ServiceRegistration reg = new MockServiceRegistration();
 
@@ -301,7 +320,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		assertSame(service, factory[0].getService(null, null));
 		beanFactoryControl.verify();
 	}
-	
+
 	private boolean compareArrays(Object[] a, Object[] b) {
 		if (a.length != b.length)
 			return false;
@@ -319,5 +338,5 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		}
 		return true;
 	}
-	
+
 }

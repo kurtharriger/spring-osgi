@@ -19,6 +19,7 @@ package org.springframework.osgi.service;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 
@@ -147,7 +148,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 			OsgiBundleScope.CALLING_BUNDLE.set(Boolean.TRUE);
 			try {
 				Object obj = decoratedServiceFactory.getService(bundle, registration);
-				// retrieve destructionCallback if any 
+				// retrieve destructionCallback if any
 				Object callback = OsgiBundleScope.CALLING_BUNDLE.get();
 				if (callback != null && callback instanceof Runnable)
 					this.destructionCallback = (Runnable) callback;
@@ -296,7 +297,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 				return classes;
 			}
 			else {
-				Set composingClasses = CollectionFactory.createLinkedSetIfPossible(16);
+				Set composingClasses = new LinkedHashSet();
 
 				if (isAutoExportModeEnabled(AUTO_EXPORT_INTERFACES))
 					composingClasses.addAll(ClassUtils.getAllInterfacesForClassAsSet(clazz));
@@ -356,6 +357,11 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 * @return
 	 */
 	protected ServiceRegistration registerService(Class[] classes, Properties serviceProperties) {
+		Assert
+				.notEmpty(
+						classes,
+						"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
+		
 		// create an array of classnames (used for registering the service)
 		String[] names = new String[classes.length];
 
@@ -546,10 +552,10 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	}
 
 	public Class[] getInterfaces() {
-		return (Class[]) interfaces.clone();
+		return interfaces;
 	}
 
 	public void setInterfaces(Class[] serviceInterfaces) {
-		this.interfaces = (Class[]) serviceInterfaces.clone();
+		this.interfaces = serviceInterfaces;
 	}
 }
