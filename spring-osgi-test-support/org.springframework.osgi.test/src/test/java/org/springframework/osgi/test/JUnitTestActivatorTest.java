@@ -45,7 +45,7 @@ public class JUnitTestActivatorTest extends TestCase {
 		public void osgiRunTest() throws Throwable {
 		}
 
-		public void setBundleContext(BundleContext bundleContext) {
+		public void injectBundleContext(BundleContext bundleContext) {
 			context = bundleContext;
 		}
 

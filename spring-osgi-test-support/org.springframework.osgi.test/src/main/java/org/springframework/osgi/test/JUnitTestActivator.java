@@ -78,7 +78,7 @@ public class JUnitTestActivator implements BundleActivator {
 			// use bundle to load the classes
 			Class clazz = context.getBundle().loadClass(testClass);
 			OsgiJUnitTest test = (OsgiJUnitTest) clazz.newInstance();
-			test.setBundleContext(context);
+			test.injectBundleContext(context);
 			return test;
 
 		}

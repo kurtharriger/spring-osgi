@@ -34,14 +34,15 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractOptionalDependencyInjectionTests extends AbstractDependencyInjectionSpringContextTests {
 
+	// by default don't (prevents accidental context creations between test runs)
+	private boolean shouldCreateContext = false;
+
 	private class DummyConfigurableListableBeanFactory implements InvocationHandler {
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			// don't do anything
 			return null;
 		}
 	}
-
-	protected static final String APP_CONTEXT_LOADING_DISABLED = "org.springframework.osgi.test.appCtx.disabled";
 
 	public AbstractOptionalDependencyInjectionTests() {
 		super();
@@ -60,7 +61,7 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 
 		if (ObjectUtils.isEmpty(locations)) {
 			logger.info("No application context location specified; disabling injection");
-			System.getProperties().put(APP_CONTEXT_LOADING_DISABLED, Boolean.TRUE.toString());
+			shouldCreateContext = false;
 			setAutowireMode(AUTOWIRE_NO);
 			setPopulateProtectedVariables(false);
 
@@ -72,6 +73,7 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 		}
 
 		else {
+			shouldCreateContext = true;
 			// TODO: the load Count is not changed (since it's not accessible)
 			if (logger.isInfoEnabled()) {
 				logger.info("Loading context for locations: " + StringUtils.arrayToCommaDelimitedString(locations));
@@ -82,10 +84,8 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 	}
 
 	protected void prepareTestInstance() throws Exception {
-		// skip injection
-		if (System.getProperty(APP_CONTEXT_LOADING_DISABLED)!= null)
-			return;
-		else
+		// create context (and apply autowiring) only if needed
+		if (shouldCreateContext)
 			super.prepareTestInstance();
 	}
 

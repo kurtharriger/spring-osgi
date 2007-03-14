@@ -21,6 +21,7 @@ import java.io.ObjectOutputStream;
 import java.util.Properties;
 
 import junit.framework.Protectable;
+import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
@@ -138,17 +139,12 @@ public class OsgiJUnitService implements TestRunnerService {
 			finally {
 				testCase.osgiTearDown();
 			}
-		}
-		// reflection exceptions
-		catch (Throwable ex) {
-			if (ex instanceof RuntimeException) {
-				throw (RuntimeException) ex;
-			}
-			if (ex instanceof Error) {
-				throw (Error) ex;
-			}
 
-			throw new RuntimeException("test execution failed;" + ex, ex);
+		}
+		// exceptions thrown by osgiSetUp/osgiTearDown
+		catch (Exception ex) {
+			log.error("test exception threw exception ", ex);
+			result.addError((Test) testCase, ex);
 		}
 		return result;
 	}
