@@ -51,6 +51,14 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return "org.springframework.osgi,spring-osgi-io,1.0-SNAPSHOT";
 	}
 
+	protected String getSpringOSGiCoreBundleUrl() {
+		return "org.springframework.osgi,spring-osgi-core,1.0-SNAPSHOT";
+	}
+
+	protected String getSpringOSGiExtenderBundleUrl() {
+		return "org.springframework.osgi,spring-osgi-extender,1.0-SNAPSHOT";
+	}
+
 	protected String getSpringCoreBundleUrl() {
 		return "org.springframework.osgi,spring-core,2.1-SNAPSHOT";
 	}
@@ -88,6 +96,11 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return "org.springframework.osgi,spring-context,2.1-SNAPSHOT";
 	}
 
+	protected String getSpringAopUrl() {
+		return "org.springframework.osgi,spring-aop,2.1-SNAPSHOT";
+
+	}
+
 	protected String getSpringBeansUrl() {
 		return "org.springframework.osgi,spring-beans,2.1-SNAPSHOT";
 	}
@@ -104,7 +117,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	protected String[] getMandatoryBundles() {
 		return new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
 				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
-				getSpringMockUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(), getSpringOSGiTestBundleUrl() };
+				getSpringMockUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(),
+				getSpringOSGiCoreBundleUrl(), getSpringAopUrl(), getAopAllianceUrl(), getSpringOSGiTestBundleUrl(),
+				getSpringOSGiExtenderBundleUrl() };
 	}
 
 	public Bundle findBundleByLocation(String bundleLocation) {
@@ -149,7 +164,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	/**
 	 * @param locator The locator to set.
 	 */
-	public void setLocator(ArtifactLocator locator) {
+	public void injectLocator(ArtifactLocator locator) {
 		this.locator = locator;
 	}
 
@@ -174,11 +189,11 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 	/**
 	 * Compatibility method - will be removed in the very near future.
-	 *
+	 * 
 	 * @param groupId
 	 * @param artifactId
 	 * @param version
-     * @param type
+	 * @param type
 	 * @return
 	 */
 	protected String localMavenArtifact(String groupId, String artifactId, String version, String type) {

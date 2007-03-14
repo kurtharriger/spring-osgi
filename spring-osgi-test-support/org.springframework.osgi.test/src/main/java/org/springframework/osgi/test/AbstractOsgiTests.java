@@ -104,7 +104,9 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
-		return new OsgiBundleXmlApplicationContext(getBundleContext(), locations);
+		ConfigurableApplicationContext context = new OsgiBundleXmlApplicationContext(getBundleContext(), locations);
+		context.refresh();
+		return context;
 	}
 
 	/**
@@ -579,7 +581,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * automatically by the test infrastructure after the OSGi platform is being
 	 * setup.
 	 */
-	public final void setBundleContext(BundleContext bundleContext) {
+	public final void injectBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 		// instantiate ResourceLoader
 		this.resourceLoader = new OsgiBundleResourceLoader(bundleContext.getBundle());
@@ -594,7 +596,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * 
 	 * @param test
 	 */
-	public void setOsgiJUnitTest(OsgiJUnitTest test) {
+	public void injectOsgiJUnitTest(OsgiJUnitTest test) {
 		Assert.isInstanceOf(TestCase.class, test);
 		this.osgiJUnitTest = (TestCase) test;
 	}

@@ -77,5 +77,5 @@ public interface OsgiJUnitTest {
      * Provides the OSGi bundle context to the test
      * @param bundleContext
      */
-     void setBundleContext(BundleContext bundleContext);
+     void injectBundleContext(BundleContext bundleContext);
 }
