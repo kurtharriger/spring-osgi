@@ -115,7 +115,7 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
 
-		// prefer the namespace pluing instead of ResourceEntityResolver
+		// prefer the namespace plugin instead of ResourceEntityResolver
 		OsgiBundleNamespaceHandlerAndEntityResolver defaultHandlerResolver = lookupHandlerAndResolver();
 
 		if (defaultHandlerResolver != null) {
@@ -140,7 +140,7 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 	 * @return
 	 */
 	protected OsgiBundleNamespaceHandlerAndEntityResolver lookupHandlerAndResolver() {
-		// TODO: add smart lookup proxy
+		// FIXME: add smart lookup proxy - if no service is available, an exception will be thrown
 		ServiceReference reference = OsgiServiceUtils.getService(getBundleContext(),
 				OsgiBundleNamespaceHandlerAndEntityResolver.class, null);
 

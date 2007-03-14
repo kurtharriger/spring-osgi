@@ -174,7 +174,7 @@ public abstract class OsgiServiceUtils {
 
 		// only one class is allowed
 		// there can be multiple interfaces
-		// if an interface or class is a parent of an class
+		// parents of classes inside the array are removed
 		// it will be removed
 
 		boolean dirty;
