@@ -73,7 +73,7 @@ public class ServiceProxyFactoryBeanTest extends ConfigurableBundleCreatorTests 
 		ServiceRegistration reg = publishService(date);
 
 		fb.setCardinality("1..1");
-		fb.setInterface(Date.class);
+		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 
 		try {
@@ -90,7 +90,7 @@ public class ServiceProxyFactoryBeanTest extends ConfigurableBundleCreatorTests 
 	public void testFactoryBeanForMultipleServices() throws Exception {
 
 		fb.setCardinality("0..N");
-		fb.setInterface(Number.class);
+		fb.setInterface(new Class[] { Number.class });
 		fb.afterPropertiesSet();
 
 		List registrations = new ArrayList(3);
@@ -107,13 +107,13 @@ public class ServiceProxyFactoryBeanTest extends ConfigurableBundleCreatorTests 
 			registrations.add(publishService(new Long(10), Number.class.getName()));
 			Object service = iter.next();
 			assertTrue(service instanceof Number);
-			assertEquals(10, ((Number)service).longValue());
-			
+			assertEquals(10, ((Number) service).longValue());
+
 			assertFalse(iter.hasNext());
 			registrations.add(publishService(new Integer(100), Number.class.getName()));
 			service = iter.next();
 			assertTrue(service instanceof Number);
-			assertEquals(100, ((Number)service).intValue());
+			assertEquals(100, ((Number) service).intValue());
 		}
 		finally {
 			for (int i = 0; i < registrations.size(); i++) {

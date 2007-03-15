@@ -12,4 +12,5 @@ Import-Package: junit.framework,
   org.springframework.beans.factory,  
   org.springframework.context,
   org.springframework.osgi.service,
+  org.springframework.osgi.util,
   org.osgi.service.cm
