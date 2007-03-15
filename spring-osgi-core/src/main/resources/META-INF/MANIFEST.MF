@@ -40,7 +40,8 @@ Export-Package: org.springframework.osgi.bundle.support;version="${spring.osgi.e
    org.springframework.osgi.service;version="${spring.osgi.export.version}",
    org.springframework.osgi.service.support;version="${spring.osgi.export.version}",
    org.springframework.osgi.service.collection;version="${spring.osgi.export.version}",
-   org.springframework.osgi.service.support.cardinality;version="${spring.osgi.export.version}"
+   org.springframework.osgi.service.support.cardinality;version="${spring.osgi.export.version}",
+   org.springframework.osgi.util;version="${spring.osgi.export.version}"
 DynamicImport-Package: org.springframework.web.context;version="${spring.import.version}",
    org.springframework.web.context.support;version="${spring.import.version}",
    org.w3c.dom,
