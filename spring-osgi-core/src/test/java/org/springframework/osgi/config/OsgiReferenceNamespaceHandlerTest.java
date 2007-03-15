@@ -17,8 +17,6 @@ package org.springframework.osgi.config;
 
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -31,7 +29,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.OsgiServiceFactoryBean;
 import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 
@@ -48,8 +45,18 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 	private BundleContext bundleContext;
 
 	protected void setUp() throws Exception {
-		bundleContext = new MockBundleContext() {
+		// reset counter just to be sure
+		DummyListener.BIND_CALLS = 0;
+		DummyListener.UNBIND_CALLS = 0;
 
+		DummyListenerServiceSignature.BIND_CALLS = 0;
+		DummyListenerServiceSignature.UNBIND_CALLS = 0;
+
+		DummyListenerServiceSignature2.BIND_CALLS = 0;
+		DummyListenerServiceSignature2.UNBIND_CALLS = 0;
+
+		bundleContext = new MockBundleContext() {
+			// service reference already registered
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 				return new ServiceReference[] { new MockServiceReference(new String[] { Cloneable.class.getName() }) };
 			}
@@ -84,12 +91,12 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 		assertNotNull(listeners);
 		assertEquals(5, listeners.length);
 
-		assertEquals(0, DummyListener.BIND_CALLS);
+		assertEquals("already registered service should have been discovered", 4, DummyListener.BIND_CALLS);
 		assertEquals(0, DummyListener.UNBIND_CALLS);
 
 		listeners[1].bind(null, null);
 
-		assertEquals(2, DummyListener.BIND_CALLS);
+		assertEquals(6, DummyListener.BIND_CALLS);
 
 		listeners[1].unbind(null, null);
 		assertEquals(2, DummyListener.UNBIND_CALLS);
@@ -106,6 +113,4 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 		listeners[4].unbind(null, null);
 		assertEquals(1, DummyListenerServiceSignature2.UNBIND_CALLS);
 	}
-
-
 }

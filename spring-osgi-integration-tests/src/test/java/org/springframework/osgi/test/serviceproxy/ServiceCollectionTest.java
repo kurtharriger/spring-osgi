@@ -52,11 +52,15 @@ public class ServiceCollectionTest extends ConfigurableBundleCreatorTests {
 	}
 
 	public void testCGLIBAvailable() throws Exception {
-		 assertTrue(ClassUtils.isPresent("net.sf.cglib.proxy.Enhancer", DefaultAopProxyFactory.class.getClassLoader()));
+		assertTrue(ClassUtils.isPresent("net.sf.cglib.proxy.Enhancer", DefaultAopProxyFactory.class.getClassLoader()));
 	}
 
 	protected Collection createCollection() {
-		return new OsgiServiceCollection(null, null, getBundleContext(), ReferenceClassLoadingOptions.UNMANAGED);
+		OsgiServiceCollection collection = new OsgiServiceCollection(null, null, getBundleContext());
+		collection.setContextClassLoader(ReferenceClassLoadingOptions.UNMANAGED);
+		collection.afterPropertiesSet();
+		
+		return collection;
 	}
 
 	public void testCollectionListener() throws Exception {

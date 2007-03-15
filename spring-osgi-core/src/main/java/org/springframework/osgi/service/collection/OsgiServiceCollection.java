@@ -31,12 +31,15 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.OsgiBindingUtils;
+import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceStaticInterceptor;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * OSGi service dynamic collection - allows iterating while the underlying
@@ -48,7 +51,7 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceCollection implements Collection {
+public class OsgiServiceCollection implements Collection, InitializingBean {
 
 	/**
 	 * Listener tracking the OSGi services which form the dynamic collection.
@@ -131,7 +134,7 @@ public class OsgiServiceCollection implements Collection {
 
 	private final BundleContext context;
 
-	private int contextClassLoader;
+	private int contextClassLoader = ReferenceClassLoadingOptions.CLIENT;
 
 	// advices to be applied when creating service proxy
 	private Object[] interceptors = new Object[0];
@@ -140,15 +143,18 @@ public class OsgiServiceCollection implements Collection {
 
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
 
-	public OsgiServiceCollection(String clazz, String filter, BundleContext context, int contextClassLoader) {
+	public OsgiServiceCollection(String clazz, String filter, BundleContext context) {
 		this.clazz = clazz;
 		this.filter = filter;
 		this.context = context;
-		this.contextClassLoader = contextClassLoader;
+	}
 
-		// TODO: add lazy behavior (register the listener only if the
-		// collection is actually used)
-		// add listener using the filter
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() {
+		// add a listener only if needed
 		addListener(context, filter);
 	}
 
@@ -348,4 +354,10 @@ public class OsgiServiceCollection implements Collection {
 		this.listeners = listeners;
 	}
 
+	/**
+	 * @param contextClassLoader The contextClassLoader to set.
+	 */
+	public void setContextClassLoader(int contextClassLoader) {
+		this.contextClassLoader = contextClassLoader;
+	}
 }

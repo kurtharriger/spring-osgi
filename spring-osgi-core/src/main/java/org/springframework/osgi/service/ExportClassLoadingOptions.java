@@ -15,7 +15,6 @@
  */
 package org.springframework.osgi.service;
 
-import org.springframework.core.ConstantException;
 import org.springframework.core.Constants;
 import org.springframework.util.Assert;
 
