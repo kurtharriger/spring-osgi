@@ -23,7 +23,7 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
-import org.springframework.osgi.service.OsgiServiceUtils;
+import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 
 /**
@@ -44,8 +44,8 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 	static {
 		DICT.put("foo", "bar");
 		DICT.put("white", "horse");
-        // This is needed when running under KF
-        System.setProperty("com.gatespace.bundle.cm.store", System.getProperty("user.dir"));
+		// This is needed when running under KF
+		System.setProperty("com.gatespace.bundle.cm.store", System.getProperty("user.dir"));
 	}
 
 	protected String getManifestLocation() {
@@ -77,10 +77,9 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 		if (ctx != null)
 			ctx.close();
 	}
-	
-	
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.osgi.test.ConfigurableBundleCreatorTests#getBundleContentPattern()
 	 */
 	protected String[] getBundleContentPattern() {

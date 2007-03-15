@@ -16,7 +16,7 @@
 package org.springframework.osgi.test.bundleScope;
 
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.OsgiServiceReferenceUtils;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.scope.common.ScopeTestService;
 

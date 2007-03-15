@@ -56,10 +56,10 @@ public class ServiceCollectionTest extends ConfigurableBundleCreatorTests {
 	}
 
 	protected Collection createCollection() {
-		OsgiServiceCollection collection = new OsgiServiceCollection(null, null, getBundleContext());
+		OsgiServiceCollection collection = new OsgiServiceCollection(null, getBundleContext());
 		collection.setContextClassLoader(ReferenceClassLoadingOptions.UNMANAGED);
 		collection.afterPropertiesSet();
-		
+
 		return collection;
 	}
 
