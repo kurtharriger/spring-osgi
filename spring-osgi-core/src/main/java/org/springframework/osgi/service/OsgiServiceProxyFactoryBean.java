@@ -20,8 +20,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.Filter;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
@@ -32,7 +31,10 @@ import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.collection.OsgiServiceList;
 import org.springframework.osgi.service.support.RetryTemplate;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor;
+import org.springframework.osgi.util.OsgiFilterUtils;
+import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -65,7 +67,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	private int contextClassloader = ReferenceClassLoadingOptions.CLIENT;
 
 	// not required to be an interface, but usually should be...
-	private Class serviceType;
+	private Class[] serviceTypes;
 
 	// filter used to narrow service matches, may be null
 	private String filter;
@@ -75,7 +77,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 	// Cumulated filter string between the specified classes/interfaces and the
 	// given filter
-	private String filterStringForServiceLookup;
+	private Filter unifiedFilter;
 
 	// service lifecycle listener
 	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
@@ -97,15 +99,23 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
 	public Class getObjectType() {
-		// TODO: return a class that returns all required interfaces
-		if (proxy != null)
-			return proxy.getClass();
+		if (this.proxy != null) {
+			return this.proxy.getClass();
+		}
 
 		// TODO: clarify the Collection/List/Set contract
 		if (CardinalityOptions.moreThanOneExpected(cardinality))
 			return List.class;
 
-		return getInterface();
+		if (serviceTypes != null && serviceTypes.length == 1) {
+			return serviceTypes[0];
+		}
+
+		// normally this is returned, only if multiple interfaces are specified
+		// but
+		// the proxy hasn't been created yet.
+
+		return null;
 	}
 
 	/*
@@ -124,15 +134,41 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
-		Assert.notNull(getInterface(), "Required serviceType property was not set");
+		Assert.notNull(serviceTypes, "Required serviceTypes property was not set");
 
-		// validate and create the filter
-		createFilter();
+		// clean up parent classes
+		serviceTypes = OsgiServiceUtils.removeParents(serviceTypes);
+		// validate specified classes
+		Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
+			"more then one concrete class specified; cannot create proxy");
+
+		String cumulatedFilter = OsgiFilterUtils.unifyFilter(serviceTypes, filter);
+
+		if (log.isDebugEnabled())
+			log.debug("unified classes=" + ObjectUtils.nullSafeToString(serviceTypes) + " and filter=[" + filter
+					+ "]  in=[" + cumulatedFilter + "]");
+
+		// concatenate the classes and filter
+		unifiedFilter = OsgiFilterUtils.createFilter(cumulatedFilter);
 
 		if (CardinalityOptions.atMostOneExpected(cardinality))
 			proxy = createSingleServiceProxy();
 		else
-			proxy = createMultiServiceCollection(getInterface(), filterStringForServiceLookup);
+			proxy = createMultiServiceCollection(unifiedFilter);
+	}
+
+	protected boolean doesContainMultipleConcreteClasses(Class[] classes) {
+		boolean concreteClassFound = false;
+		// check if is more then one class specified
+		for (int i = 0; i < serviceTypes.length; i++) {
+			if (!serviceTypes[i].isInterface()) {
+				if (concreteClassFound)
+					return false;
+				else
+					concreteClassFound = true;
+			}
+		}
+		return true;
 	}
 
 	protected Object createSingleServiceProxy() throws Exception {
@@ -142,17 +178,16 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		ProxyFactory factory = new ProxyFactory();
 
 		// mold the proxy
-		configureFactoryForClass(factory, getInterface());
+		configureFactoryForClass(factory, serviceTypes);
 
 		// TODO: the same advices should be available for the multi case/service
 		// collection
-		// add advices
 
 		// Bundle Ctx
 		addLocalBundleContextSupport(factory);
 
 		// dynamic retry interceptor / context classloader
-		addOsgiRetryInterceptor(factory, getInterface(), filterStringForServiceLookup, listeners);
+		addOsgiRetryInterceptor(factory, unifiedFilter, listeners);
 
 		// TODO: should these be enabled ?
 		// factory.setFrozen(true);
@@ -162,11 +197,11 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		return factory.getProxy(ProxyFactory.class.getClassLoader());
 	}
 
-	protected Object createMultiServiceCollection(Class clazz, String filter) {
+	protected Object createMultiServiceCollection(Filter filter) {
 		if (log.isDebugEnabled())
 			log.debug("creating a multi-value/collection proxy");
 
-		OsgiServiceCollection collection = new OsgiServiceList(clazz.getName(), filter, bundleContext);
+		OsgiServiceCollection collection = new OsgiServiceList(filter, bundleContext);
 
 		collection.setListeners(listeners);
 		collection.setContextClassLoader(contextClassloader);
@@ -175,12 +210,11 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		return collection;
 	}
 
-	protected void addOsgiRetryInterceptor(ProxyFactory factory, Class clazz, String filter,
+	protected void addOsgiRetryInterceptor(ProxyFactory factory, Filter filter,
 			TargetSourceLifecycleListener[] listeners) {
 		OsgiServiceDynamicInterceptor lookupAdvice = new OsgiServiceDynamicInterceptor(bundleContext,
 				contextClassloader);
 		lookupAdvice.setListeners(listeners);
-		lookupAdvice.setClass(clazz.getName());
 		lookupAdvice.setFilter(filter);
 		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
 
@@ -194,30 +228,18 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * generating the proxy.
 	 * 
 	 * @param factory
-	 * @param clazz
+	 * @param classes
 	 */
-	protected void configureFactoryForClass(ProxyFactory factory, Class clazz) {
-		if (clazz.isInterface()) {
-			factory.setInterfaces(new Class[] { clazz });
-		}
-		else {
-			factory.setTargetClass(clazz);
-			factory.setProxyTargetClass(true);
-		}
-	}
+	protected void configureFactoryForClass(ProxyFactory factory, Class[] classes) {
+		for (int i = 0; i < classes.length; i++) {
+			Class clazz = classes[i];
 
-	protected void createFilter() {
-		// if (getFilter() != null)
-		{
-			// this call forces parsing of the filter string to generate an
-			// exception right
-			// now if it is not well-formed
-			try {
-				FrameworkUtil.createFilter(getFilterStringForServiceLookup());
+			if (clazz.isInterface()) {
+				factory.addInterface(clazz);
 			}
-			catch (InvalidSyntaxException ex) {
-				throw (IllegalArgumentException) new IllegalArgumentException("Filter string '" + getFilter()
-						+ "' set on OsgiServiceProxyFactoryBean has invalid syntax: " + ex.getMessage()).initCause(ex);
+			else {
+				factory.setTargetClass(clazz);
+				factory.setProxyTargetClass(true);
 			}
 		}
 	}
@@ -236,15 +258,16 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	/**
 	 * @return Returns the serviceType.
 	 */
-	public Class getInterface() {
-		return this.serviceType;
+	public Class[] getInterface() {
+		return this.serviceTypes;
 	}
 
 	/**
 	 * The type that the OSGi service was registered with
 	 */
-	public void setInterface(Class serviceType) {
-		this.serviceType = serviceType;
+	//TODO: normally the noum should be plural, not singular (which means changing the spring-osgi.xsd a bit)
+	public void setInterface(Class[] serviceType) {
+		this.serviceTypes = serviceType;
 	}
 
 	/**
@@ -302,9 +325,12 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	// this is as nasty as dynamic sql generation.
 	// build an osgi filter string to find the service we are
 	// looking for.
-	private String getFilterStringForServiceLookup() {
-		if (filterStringForServiceLookup != null) {
-			return filterStringForServiceLookup;
+
+	// FIXME: add bean name property to filter queries (this method has to be
+	// removed)
+	private String getUnifiedFilter() {
+		if (unifiedFilter != null) {
+			// return unifiedFilter;
 		}
 		StringBuffer sb = new StringBuffer();
 		boolean andFilterWithInterfaceName = (getFilter() != null) || (getServiceBeanName() != null);
@@ -317,7 +343,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		sb.append("(");
 		sb.append(OBJECTCLASS);
 		sb.append("=");
-		sb.append(getInterface().getName());
+
+		// sb.append(getInterfaces().getName());
 		sb.append(")");
 
 		if (getServiceBeanName() != null) {
@@ -334,12 +361,13 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 		String completeFilter = sb.toString();
 		if (StringUtils.hasText(completeFilter)) {
-			filterStringForServiceLookup = completeFilter;
-			return filterStringForServiceLookup;
+			// unifiedFilter = completeFilter;
+			// return unifiedFilter;
 		}
 		else {
 			return null;
 		}
+		return null;
 	}
 
 	/*

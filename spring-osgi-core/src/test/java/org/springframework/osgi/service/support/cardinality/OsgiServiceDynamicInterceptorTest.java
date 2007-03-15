@@ -27,6 +27,7 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.osgi.mock.MockBundleContext;
+import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.ServiceUnavailableException;
@@ -61,6 +62,11 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		serv2Filter = "serv2";
 		nullFilter = "null";
 
+		// special mock context
+		// 1. will return no service for the null Filter ("null")
+		// 2. will return ref2 for filter serv2Filter
+		
+		// the same goes with getService
 		BundleContext ctx = new MockBundleContext() {
 
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
@@ -96,6 +102,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED);
 		interceptor.getRetryTemplate().setRetryNumbers(3);
 		interceptor.getRetryTemplate().setWaitTime(1);
+		interceptor.setFilter(new MockFilter());
 		interceptor.afterPropertiesSet();
 	}
 
@@ -169,7 +176,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);
 
 		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), target, m, new Object[0], null, null);
-		interceptor.setFilter(nullFilter);
+		interceptor.setFilter(new MockFilter(nullFilter));
 		ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING, reference);
 		listener.serviceChanged(event);
 		interceptor.getRetryTemplate().setRetryNumbers(3);
@@ -215,7 +222,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		Object target = interceptor.getTarget();
 		assertSame("target not properly discovered", service, target);
 
-		interceptor.setFilter(serv2Filter);
+		interceptor.setFilter(new MockFilter(serv2Filter));
 		event = new ServiceEvent(ServiceEvent.UNREGISTERING, reference);
 		listener.serviceChanged(event);
 

@@ -17,24 +17,29 @@ package org.springframework.osgi.service.support.cardinality;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.service.OsgiBindingUtils;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.support.DefaultRetryCallback;
 import org.springframework.osgi.service.support.RetryTemplate;
 import org.springframework.osgi.service.support.ServiceWrapper;
+import org.springframework.osgi.util.OsgiListenerUtils;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
  * Interceptor adding dynamic behavior for unary service (..1 cardinality). It
- * will look for a service using the given class and filter name, retrying if
- * the service is down or unavailable. Will dynamically rebound a new service,
- * if one is available with a higher service ranking. <p/> <strong>Note</strong>:
- * this is a stateful interceptor and should not be shared.
+ * will look for a service using the given filter, retrying if the service is
+ * down or unavailable. Will dynamically rebound a new service, if one is
+ * available with a higher service ranking.
+ * 
+ * <p/>
+ * 
+ * <strong>Note</strong>: this is a stateful interceptor and should not be
+ * shared.
  * 
  * @author Costin Leau
  */
@@ -44,9 +49,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 	protected RetryTemplate retryTemplate = new RetryTemplate();
 
-	protected String clazz;
-
-	protected String filter;
+	protected Filter filter;
 
 	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
 
@@ -70,7 +73,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 			case (ServiceEvent.REGISTERED):
 				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
 					// inform listeners
-					OsgiBindingUtils.callListenersBind(context, ref, listeners);
+					OsgiListenerUtils.callListenersBind(context, ref, listeners);
 				}
 
 				break;
@@ -78,7 +81,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 				// same as ServiceEvent.REGISTERED
 				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
 					// inform listeners
-					OsgiBindingUtils.callListenersBind(context, ref, listeners);
+					OsgiListenerUtils.callListenersBind(context, ref, listeners);
 				}
 
 				break;
@@ -106,19 +109,15 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 				}
 
 				if (updated)
-					OsgiBindingUtils.callListenersUnbind(context, ref, listeners);
-				try {
-					ServiceReference refs[] = context.getServiceReferences(clazz, filter);
+					OsgiListenerUtils.callListenersUnbind(context, ref, listeners);
 
-					// FIXME: place the discovery process into one class
-					// quick hack: just pick the first one
-					if (refs != null && refs.length > 0) {
-						serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, refs[0]));
-					}
-				}
-				catch (InvalidSyntaxException ise) {
-					throw new IllegalArgumentException("invalid filter");
-				}
+				// discover the new reference
+				ServiceReference newReference = OsgiServiceReferenceUtils.getServiceReference(context,
+					filter.toString());
+
+				if (newReference != null)
+					// update the listeners
+					serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, newReference));
 
 				break;
 			default:
@@ -195,42 +194,12 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 	}
 
 	public void afterPropertiesSet() {
-		addListener(context, filter);
-
-	}
-
-	/**
-	 * Add the service listener to context and register also already
-	 * 
-	 * @param context
-	 * @param filter
-	 */
-	private void addListener(BundleContext context, String filter) {
 		if (log.isDebugEnabled())
 			log.debug("adding osgi listener for services matching [" + filter + "]");
-		try {
-			ServiceListener listener = new Listener();
-			// add listener
-			context.addServiceListener(listener, filter);
-
-			// now get the already registered services and call the listener
-			// (the listener can handle duplicates)
-			ServiceReference[] alreadyRegistered = context.getServiceReferences(clazz, filter);
-			if (alreadyRegistered != null)
-				for (int i = 0; i < alreadyRegistered.length; i++) {
-					listener.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, alreadyRegistered[i]));
-				}
-		}
-		catch (InvalidSyntaxException isex) {
-			throw (RuntimeException) new IllegalArgumentException("invalid filter").initCause(isex);
-		}
+		OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
 	}
 
-	public void setClass(String clazz) {
-		this.clazz = clazz;
-	}
-
-	public void setFilter(String filter) {
+	public void setFilter(Filter filter) {
 		this.filter = filter;
 	}
 

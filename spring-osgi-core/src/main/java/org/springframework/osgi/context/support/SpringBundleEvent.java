@@ -19,7 +19,7 @@
 package org.springframework.osgi.context.support;
 
 import org.springframework.context.ApplicationEvent;
-import org.springframework.osgi.service.OsgiServiceUtils;
+import org.springframework.osgi.util.OsgiServiceUtils;
 import org.osgi.framework.Bundle;
 
 /**

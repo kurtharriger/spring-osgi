@@ -15,15 +15,16 @@
  *
  * Created on 25-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.service;
+package org.springframework.osgi.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.service.AmbiguousServiceReferenceException;
+import org.springframework.osgi.service.NoSuchServiceException;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -128,7 +129,7 @@ public abstract class OsgiServiceUtils {
 		}
 		finally {
 			try {
-				//context.ungetService(reference);
+				// context.ungetService(reference);
 			}
 			catch (IllegalStateException isex) {
 				// do nothing
@@ -159,7 +160,13 @@ public abstract class OsgiServiceUtils {
 		return EVENT_CODES[i];
 	}
 
-	public static Class[] determineProxySignature(Class[] classes) {
+	/**
+	 * Parse the given class array and eliminate parents of existing classes.
+	 * 
+	 * @param classes
+	 * @return
+	 */
+	public static Class[] removeParents(Class[] classes) {
 		if (ObjectUtils.isEmpty(classes))
 			return new Class[0];
 

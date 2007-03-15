@@ -73,30 +73,25 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 			fail("should have throw IllegalArgumentException since service type was not set");
 		}
 		catch (IllegalArgumentException ex) {
-			assertEquals("Required serviceType property was not set", ex.getMessage());
+			// expected
 		}
 	}
 
 	public void testAfterPropertiesSetBadFilter() throws Exception {
 		this.serviceFactoryBean.setBundleContext(this.bundleContext);
-		this.serviceFactoryBean.setInterface(ApplicationContext.class);
+		this.serviceFactoryBean.setInterface(new Class[] { ApplicationContext.class });
 		this.serviceFactoryBean.setFilter("this is not a valid filter expression");
 		try {
 			this.serviceFactoryBean.afterPropertiesSet();
 			fail("should have throw IllegalArgumentException since filter has invalid syntax");
 		}
 		catch (IllegalArgumentException ex) {
-			assertTrue(
-					"message should say that filter string blah is not valid",
-					ex
-							.getMessage()
-							.startsWith(
-									"Filter string 'this is not a valid filter expression' set on OsgiServiceProxyFactoryBean has invalid syntax:"));
+			// expected
 		}
 	}
 
 	public void testGetObjectType() {
-		this.serviceFactoryBean.setInterface(ApplicationContext.class);
+		this.serviceFactoryBean.setInterface(new Class[] { ApplicationContext.class });
 		assertEquals(ApplicationContext.class, this.serviceFactoryBean.getObjectType());
 	}
 
@@ -107,7 +102,7 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 	// finds the service.
 	public void testGetObjectWithFilterOnly() throws Exception {
 		this.serviceFactoryBean.setBundleContext(new MockBundleContext());
-		this.serviceFactoryBean.setInterface(Serializable.class);
+		this.serviceFactoryBean.setInterface(new Class[] { Serializable.class });
 		String filter = "(beanName=myBean)";
 		this.serviceFactoryBean.setFilter(filter);
 
@@ -147,14 +142,11 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 
 	public void testListenersSetOnCollection() throws Exception {
 		serviceFactoryBean.setBundleContext(this.bundleContext);
-		serviceFactoryBean.setInterface(TestCase.class);
+		serviceFactoryBean.setInterface(new Class[] { TestCase.class });
 		serviceFactoryBean.setCardinality("1..N");
 
-		MockControl listenerControl = MockControl.createControl(TargetSourceLifecycleListener.class);
-		TargetSourceLifecycleListener listener = (TargetSourceLifecycleListener) listenerControl.getMock();
-
 		TargetSourceLifecycleListener[] listeners = { (TargetSourceLifecycleListener) MockControl.createControl(
-				TargetSourceLifecycleListener.class).getMock() };
+			TargetSourceLifecycleListener.class).getMock() };
 		serviceFactoryBean.setListeners(listeners);
 		serviceFactoryBean.afterPropertiesSet();
 

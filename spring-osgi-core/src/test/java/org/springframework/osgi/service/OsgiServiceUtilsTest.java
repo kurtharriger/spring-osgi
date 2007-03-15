@@ -28,6 +28,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -152,7 +153,7 @@ public class OsgiServiceUtilsTest extends TestCase {
 	public void testSimpleClassDetermination() throws Exception {
 		Class[] classes = new Class[] { Object.class, Serializable.class, Cloneable.class };
 		Class[] expected = new Class[] { Serializable.class, Cloneable.class };
-		Class[] clazz = OsgiServiceUtils.determineProxySignature(classes);
+		Class[] clazz = OsgiServiceUtils.removeParents(classes);
 
 		assertTrue(Arrays.equals(expected, clazz));
 	}
@@ -160,7 +161,7 @@ public class OsgiServiceUtilsTest extends TestCase {
 	public void testIntefacesAlreadyContainedInTheSpecifiedClass() throws Exception {
 		Class[] classes = new Class[] { Serializable.class, Number.class, Comparable.class, Object.class };
 		Class[] expected = new Class[] { Number.class, Comparable.class };
-		Class[] clazz = OsgiServiceUtils.determineProxySignature(classes);
+		Class[] clazz = OsgiServiceUtils.removeParents(classes);
 		assertTrue(Arrays.equals(expected, clazz));
 	}
 
@@ -168,7 +169,7 @@ public class OsgiServiceUtilsTest extends TestCase {
 		Class[] classes = new Class[] { Serializable.class, Number.class, Comparable.class, Object.class, Long.class,
 				Integer.class };
 		Class[] expected = new Class[] { Long.class, Integer.class };
-		Class[] clazz = OsgiServiceUtils.determineProxySignature(classes);
+		Class[] clazz = OsgiServiceUtils.removeParents(classes);
 		assertTrue(Arrays.equals(expected, clazz));
 	}
 
