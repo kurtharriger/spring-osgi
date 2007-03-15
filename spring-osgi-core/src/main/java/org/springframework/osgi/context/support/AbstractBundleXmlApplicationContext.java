@@ -199,7 +199,7 @@ public class AbstractBundleXmlApplicationContext extends AbstractRefreshableOsgi
 	 * The name we will use when publishing this application context as an OSGi
 	 * service. If the APPLICATION_CONTEXT_SERVICE_NAME_HEADER manifest header
 	 * is present, we use the user given name, otherwise we derive a name from
-	 * the bundle symbolic name.
+	 * the bundle symbolic name. Failing that the name "bundle:<bundleid>" is used.
 	 */
 	protected String getServiceName() {
 		String name = getBundle().getSymbolicName();

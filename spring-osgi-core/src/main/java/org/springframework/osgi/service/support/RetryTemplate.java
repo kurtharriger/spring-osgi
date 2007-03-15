@@ -49,6 +49,7 @@ public class RetryTemplate {
 
 	public Object execute(RetryCallback callback, Object notificationLock) {
 		Assert.notNull(callback, "callback is required");
+		Assert.notNull(notificationLock, "notificationLock is required");
 
 		int count = 0;
 		synchronized (notificationLock) {
