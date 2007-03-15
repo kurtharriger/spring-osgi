@@ -29,7 +29,10 @@ import org.springframework.osgi.service.collection.OsgiServiceList;
 public class ServiceListTest extends ServiceCollectionTest {
 
 	protected Collection createCollection() {
-		return new OsgiServiceList(null, null, getBundleContext(), ReferenceClassLoadingOptions.UNMANAGED);
+		OsgiServiceList col = new OsgiServiceList(null, null, getBundleContext());
+		col.setContextClassLoader(ReferenceClassLoadingOptions.UNMANAGED);
+		col.afterPropertiesSet();
+		return col;
 	}
 
 	public void testListContent() throws Exception {

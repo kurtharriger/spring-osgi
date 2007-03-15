@@ -35,8 +35,8 @@ public class OsgiServiceList extends OsgiServiceCollection implements List {
 
 	private final List storage = (List) serviceIDs;
 
-	public OsgiServiceList(String clazz, String filter, BundleContext context, int contextClassLoader) {
-		super(clazz, filter, context, contextClassLoader);
+	public OsgiServiceList(String clazz, String filter, BundleContext context) {
+		super(clazz, filter, context);
 	}
 
 	protected Collection createInternalDynamicStorage() {
@@ -68,7 +68,7 @@ public class OsgiServiceList extends OsgiServiceCollection implements List {
 
 			// dynamic iterator
 			private final ListIterator iter = storage.listIterator(index);
-			
+
 			public void add(Object o) {
 				throw new UnsupportedOperationException();
 			}

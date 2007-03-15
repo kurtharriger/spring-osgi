@@ -166,10 +166,12 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		if (log.isDebugEnabled())
 			log.debug("creating a multi-value/collection proxy");
 
-		OsgiServiceCollection collection = new OsgiServiceList(clazz.getName(), filter, bundleContext,
-				contextClassloader);
+		OsgiServiceCollection collection = new OsgiServiceList(clazz.getName(), filter, bundleContext);
 
 		collection.setListeners(listeners);
+		collection.setContextClassLoader(contextClassloader);
+		// setup done
+		collection.afterPropertiesSet();
 		return collection;
 	}
 
