@@ -26,6 +26,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.util.OsgiFilterUtils;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
  * @author Costin Leau
@@ -82,7 +84,7 @@ public class OsgiServiceReferenceUtilsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.OsgiServiceReferenceUtils#getServiceReference(org.osgi.framework.BundleContext, java.lang.String[])}.
+	 * {@link org.springframework.osgi.util.OsgiServiceReferenceUtils#getServiceReference(org.osgi.framework.BundleContext, java.lang.String[])}.
 	 */
 	public void testServiceSortingAlgorithm() throws Exception {
 		String filter = OsgiFilterUtils.unifyFilter(classes, null);
@@ -96,7 +98,7 @@ public class OsgiServiceReferenceUtilsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.OsgiServiceReferenceUtils#getServiceReference(org.osgi.framework.BundleContext, java.lang.String, java.lang.String)}.
+	 * {@link org.springframework.osgi.util.OsgiServiceReferenceUtils#getServiceReference(org.osgi.framework.BundleContext, java.lang.String, java.lang.String)}.
 	 */
 	public void testGetServiceReferenceBundleContextStringString() throws Exception {
 
@@ -112,7 +114,7 @@ public class OsgiServiceReferenceUtilsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.OsgiServiceReferenceUtils#getServiceReference(org.osgi.framework.BundleContext, java.lang.String[], java.lang.String)}.
+	 * {@link org.springframework.osgi.util.OsgiServiceReferenceUtils#getServiceReference(org.osgi.framework.BundleContext, java.lang.String[], java.lang.String)}.
 	 */
 	public void testGetServiceReferenceBundleContextStringArrayString() throws Exception {
 		String smallFilter = "(cn=John)";
@@ -128,7 +130,7 @@ public class OsgiServiceReferenceUtilsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.OsgiServiceReferenceUtils#getServiceReference(org.osgi.framework.BundleContext, java.lang.String)}.
+	 * {@link org.springframework.osgi.util.OsgiServiceReferenceUtils#getServiceReference(org.osgi.framework.BundleContext, java.lang.String)}.
 	 */
 	public void testAlwaysGetAnArrayOfServiceReferences() throws Exception {
 		ctrl.expectAndReturn(context.getServiceReferences(Object.class.getName(), null), null);
@@ -141,7 +143,7 @@ public class OsgiServiceReferenceUtilsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.OsgiServiceReferenceUtils#getServiceId(org.osgi.framework.ServiceReference)}.
+	 * {@link org.springframework.osgi.util.OsgiServiceReferenceUtils#getServiceId(org.osgi.framework.ServiceReference)}.
 	 */
 	public void testGetServiceId() {
 		long id = 12345;
@@ -153,7 +155,7 @@ public class OsgiServiceReferenceUtilsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.OsgiServiceReferenceUtils#getServiceRanking(org.osgi.framework.ServiceReference)}.
+	 * {@link org.springframework.osgi.util.OsgiServiceReferenceUtils#getServiceRanking(org.osgi.framework.ServiceReference)}.
 	 */
 	public void testGetServiceRankingAvailable() {
 		int ranking = 12345;

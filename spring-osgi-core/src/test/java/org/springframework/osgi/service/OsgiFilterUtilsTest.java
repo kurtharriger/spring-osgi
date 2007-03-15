@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
+import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
  * @author Costin Leau

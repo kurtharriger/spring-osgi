@@ -30,7 +30,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.service.OsgiServiceUtils;
+import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
  * Application context backed by an OSGi bundle. Will use the bundle classpath

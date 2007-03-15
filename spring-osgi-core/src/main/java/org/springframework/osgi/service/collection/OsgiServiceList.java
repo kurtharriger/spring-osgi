@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 
 /**
  * OSGi service dynamic collection - allows iterating while the underlying
@@ -35,8 +36,8 @@ public class OsgiServiceList extends OsgiServiceCollection implements List {
 
 	private final List storage = (List) serviceIDs;
 
-	public OsgiServiceList(String clazz, String filter, BundleContext context) {
-		super(clazz, filter, context);
+	public OsgiServiceList(Filter filter, BundleContext context) {
+		super(filter, context);
 	}
 
 	protected Collection createInternalDynamicStorage() {

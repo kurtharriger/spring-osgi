@@ -18,13 +18,16 @@ package org.springframework.osgi.service.collection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
@@ -32,14 +35,12 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.OsgiBindingUtils;
 import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceStaticInterceptor;
+import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 
 /**
  * OSGi service dynamic collection - allows iterating while the underlying
@@ -83,7 +84,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 				}
 				// inform listeners
 				if (found)
-					OsgiBindingUtils.callListenersBind(context, ref, listeners);
+					OsgiListenerUtils.callListenersBind(context, ref, listeners);
 
 				break;
 			case (ServiceEvent.MODIFIED):
@@ -97,7 +98,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 				}
 				// inform listeners
 				if (found)
-					OsgiBindingUtils.callListenersBind(context, ref, listeners);
+					OsgiListenerUtils.callListenersBind(context, ref, listeners);
 
 				break;
 			case (ServiceEvent.UNREGISTERING):
@@ -111,7 +112,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 				}
 
 				if (found)
-					OsgiBindingUtils.callListenersUnbind(context, ref, listeners);
+					OsgiListenerUtils.callListenersUnbind(context, ref, listeners);
 				break;
 
 			default:
@@ -120,17 +121,17 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 		}
 	}
 
+	private static final Log log = LogFactory.getLog(OsgiServiceCollection.class);
+
 	// map of services
 	// the service id is used for lookup while the service wrapper is used for
 	// values
-	protected final Map serviceReferences = CollectionFactory.createLinkedMapIfPossible(8);
+	protected final Map serviceReferences = new LinkedHashMap(8);
 
 	/** list binding the service IDs to the map of service proxies * */
 	protected final Collection serviceIDs = createInternalDynamicStorage();
 
-	private final String clazz;
-
-	private final String filter;
+	private final Filter filter;
 
 	private final BundleContext context;
 
@@ -143,8 +144,9 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
 
-	public OsgiServiceCollection(String clazz, String filter, BundleContext context) {
-		this.clazz = clazz;
+	public OsgiServiceCollection(Filter filter, BundleContext context) {
+		Assert.notNull(context, "context is required");
+
 		this.filter = filter;
 		this.context = context;
 	}
@@ -154,8 +156,9 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() {
-		// add a listener only if needed
-		addListener(context, filter);
+		if (log.isDebugEnabled())
+			log.debug("adding osgi listener for services matching [" + filter + "]");
+		OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
 	}
 
 	/**
@@ -222,35 +225,11 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 		// factory.setFrozen(true);
 
 		return factory.getProxy(BundleDelegatingClassLoader.createBundleClassLoaderFor(ref.getBundle(),
-				ProxyFactory.class.getClassLoader()));
+			ProxyFactory.class.getClassLoader()));
 	}
 
 	private void invalidateProxy(Object proxy) {
 		// TODO: add proxy invalidation
-	}
-
-	/**
-	 * Add the service listener to context and register also already
-	 * @param context
-	 * @param filter
-	 */
-	private void addListener(BundleContext context, String filter) {
-		try {
-			ServiceListener listener = new Listener();
-			// add listener
-			context.addServiceListener(listener, filter);
-
-			// now get the already registered services and call the listener
-			// (the listener can handle duplicates)
-			ServiceReference[] alreadyRegistered = context.getServiceReferences(null, filter);
-			if (alreadyRegistered != null)
-				for (int i = 0; i < alreadyRegistered.length; i++) {
-					listener.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, alreadyRegistered[i]));
-				}
-		}
-		catch (InvalidSyntaxException isex) {
-			throw (RuntimeException) new IllegalArgumentException("invalid filter").initCause(isex);
-		}
 	}
 
 	public Iterator iterator() {

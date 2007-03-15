@@ -21,6 +21,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.context.support.OsgiResourceUtils;
 import org.springframework.osgi.service.ReferenceClassLoadingOptions;
+import org.springframework.util.Assert;
 
 /**
  * Add the context classloader handling.
@@ -34,8 +35,9 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 
 	private boolean canCacheClassLoader = false;
 
-	protected BundleContext context;
+	protected final BundleContext context;
 
+	// TODO: specify a default
 	private int contextClassLoader;
 
 	private ServiceReference serviceReference;
@@ -45,6 +47,8 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 	}
 
 	public OsgiServiceClassLoaderInvoker(BundleContext context, ServiceReference reference, int contextClassLoader) {
+		Assert.notNull(context);
+
 		this.context = context;
 		this.serviceReference = reference;
 		this.contextClassLoader = contextClassLoader;
@@ -90,7 +94,7 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 
 		ClassLoader oldCL = null;
 		boolean trace = log.isTraceEnabled();
-		
+
 		// if it's unmanaged
 		if ((tccl != null && canCacheClassLoader) || !canCacheClassLoader) {
 			if (trace)

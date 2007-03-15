@@ -17,6 +17,8 @@
  */
 package org.springframework.osgi.service;
 
+import org.springframework.osgi.util.OsgiServiceUtils;
+
 /**
  * @author Adrian Colyer
  * @since 2.0

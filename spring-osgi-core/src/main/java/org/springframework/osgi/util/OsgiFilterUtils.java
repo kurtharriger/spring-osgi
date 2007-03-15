@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service;
+package org.springframework.osgi.util;
 
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -32,6 +33,8 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
+
+// TODO: add generic capability to add other items beside classes (such as BEAN_NAME_PROPERTY_KEY)
 public abstract class OsgiFilterUtils {
 
 	private static final char FILTER_BEGIN = '(';
@@ -43,7 +46,7 @@ public abstract class OsgiFilterUtils {
 	private static final String OBJECT_CLASS_GROUP = FILTER_BEGIN + Constants.OBJECTCLASS + "=";
 
 	/**
-	 * Adds the given class as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
+	 * Add the given class as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
 	 * constraint to the given filter. At least one parameter must be valid
 	 * (non-null).
 	 * 
@@ -57,7 +60,43 @@ public abstract class OsgiFilterUtils {
 	}
 
 	/**
-	 * Adds the given classese as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
+	 * Add the given class to the given filter. At least one parameter must be
+	 * valid.
+	 * 
+	 * @see #unifyFilter(String, String)
+	 * @param clazz
+	 * @param filter
+	 * @return
+	 */
+	public static String unifyFilter(Class clazz, String filter) {
+		if (clazz != null)
+			return unifyFilter(clazz.getName(), filter);
+		return unifyFilter((String) null, filter);
+	}
+
+	/**
+	 * Add the given classes to the given filter. At least one parameter must be
+	 * valid.
+	 * 
+	 * @see #unifyFilter(String[], String)
+	 * @param classes
+	 * @param filter
+	 * @return
+	 */
+	public static String unifyFilter(Class[] classes, String filter) {
+		if (ObjectUtils.isEmpty(classes))
+			return unifyFilter(new String[0], filter);
+
+		String classNames[] = new String[classes.length];
+		for (int i = 0; i < classNames.length; i++) {
+			if (classes[i] != null)
+				classNames[i] = classes[i].getName();
+		}
+		return unifyFilter(classNames, filter);
+	}
+
+	/**
+	 * Add the given classese as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
 	 * constraint to the given filter. At least one parameter must be valid
 	 * (non-null).
 	 * 
@@ -164,7 +203,7 @@ public abstract class OsgiFilterUtils {
 	}
 
 	/**
-	 * Creates an OSGi filter from the given String. Translates the
+	 * Create an OSGi filter from the given String. Translates the
 	 * {@link InvalidSyntaxException} checked exception into an unchecked
 	 * {@link IllegalArgumentException}.
 	 * 

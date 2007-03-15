@@ -76,7 +76,9 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 
 		assertTrue(factoryBean instanceof OsgiServiceProxyFactoryBean);
 		OsgiServiceProxyFactoryBean proxyFactory = (OsgiServiceProxyFactoryBean) factoryBean;
-		assertSame(Serializable.class, proxyFactory.getInterface());
+		Class[] intfs = proxyFactory.getInterface();
+		assertEquals(1, intfs.length);
+		assertSame(Serializable.class, intfs[0]);
 
 		// get the factory product
 		Object bean = appContext.getBean("serializable");
