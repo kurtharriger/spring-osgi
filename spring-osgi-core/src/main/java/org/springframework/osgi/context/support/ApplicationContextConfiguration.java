@@ -159,13 +159,13 @@ public class ApplicationContextConfiguration {
                 addMetaInfResources = true;
             }
             else {
-                if (bundle.getEntry(contextEntries[i]) != null) {
-                    configLocationPaths.add(OsgiBundleResource.BUNDLE_URL_PREFIX  + contextEntries[i]);
+                if (bundle.getEntry(path) != null) {
+                    configLocationPaths.add(OsgiBundleResource.BUNDLE_URL_PREFIX  + path);
                 }
                 else {
                     if (log.isWarnEnabled()) {
                         log.warn("Spring-Context manifest entry for bundle '" + this.bundle.getSymbolicName() +
-                                "' contained path '" + contextEntries[i] + "' but no corresponding " +
+                                "' contained path '" + path + "' but no corresponding " +
                                 "resource was found in the bundle, ignoring");
                     }
                 }
