@@ -47,7 +47,7 @@ import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.extender.support.ApplicationContextCloser;
 import org.springframework.osgi.extender.support.ApplicationContextCreator;
 import org.springframework.osgi.io.OsgiBundleResource;
-import org.springframework.osgi.service.OsgiServiceUtils;
+import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
  * Osgi Extender that listens to bundle events and manages the creation and destruction
