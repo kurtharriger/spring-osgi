@@ -15,7 +15,7 @@
  */
 package org.springframework.osgi.test.integration;
 
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * Test to check if the testcase is properly packaged in a bundle jar and deploy
@@ -26,7 +26,7 @@ import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
  * @author Costin Leau
  * 
  */
-public class BundleCreationTests extends ConfigurableBundleCreatorTests {
+public class BundleCreationTests extends AbstractConfigurableBundleCreatorTests {
 
 	/*
 	 * (non-Javadoc)

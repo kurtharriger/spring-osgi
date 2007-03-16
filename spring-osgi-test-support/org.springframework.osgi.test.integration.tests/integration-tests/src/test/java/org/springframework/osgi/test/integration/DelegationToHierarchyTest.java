@@ -26,7 +26,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.osgi.test.AbstractOsgiTests;
 import org.springframework.osgi.test.JUnitTestActivator;
-import org.springframework.osgi.test.OnTheFlyBundleCreatorTests;
+import org.springframework.osgi.test.AbstractOnTheFlyBundleCreatorTests;
 import org.springframework.osgi.test.OsgiJUnitTest;
 
 /**
@@ -38,7 +38,7 @@ import org.springframework.osgi.test.OsgiJUnitTest;
  */
 public class DelegationToHierarchyTest extends TestCase implements OsgiJUnitTest {
 
-	private AbstractOsgiTests osgiDelegate = new OnTheFlyBundleCreatorTests() {
+	private AbstractOsgiTests osgiDelegate = new AbstractOnTheFlyBundleCreatorTests() {
 		protected Manifest getManifest() {
 			Manifest manifest = new Manifest();
 			Attributes attributes = manifest.getMainAttributes();
