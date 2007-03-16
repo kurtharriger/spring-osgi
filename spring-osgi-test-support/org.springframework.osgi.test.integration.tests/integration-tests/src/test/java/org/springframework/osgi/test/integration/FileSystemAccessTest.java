@@ -18,7 +18,7 @@ package org.springframework.osgi.test.integration;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * Test to check if loading of files outside of the OSGi world (directly from
@@ -27,7 +27,7 @@ import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
  * @author Costin Leau
  * 
  */
-public class FileSystemAccessTest extends ConfigurableBundleCreatorTests {
+public class FileSystemAccessTest extends AbstractConfigurableBundleCreatorTests {
 
 	public void testFileOutsideOSGi() throws Exception {
 		// load file using absolute path
