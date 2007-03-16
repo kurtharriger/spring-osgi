@@ -22,8 +22,8 @@ import java.util.Iterator;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
-import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.util.ClassUtils;
 
@@ -44,7 +44,9 @@ public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTest
 	}
 
 	protected String getManifestLocation() {
-		return "org/springframework/osgi/test/serviceproxy/ServiceCollectionTest.MF";
+		// return
+		// "org/springframework/osgi/test/serviceproxy/ServiceCollectionTest.MF";
+		return null;
 	}
 
 	protected ServiceRegistration publishService(Object obj) throws Exception {

@@ -10,7 +10,8 @@ import org.springframework.osgi.test.service.listener.MyListener;
 public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String getManifestLocation() {
-		return "classpath:org/springframework/osgi/test/serviceListener/ServiceListenerTest.MF";
+		//return "classpath:org/springframework/osgi/test/serviceListener/ServiceListenerTest.MF";
+		return null;
 	}
 
 	protected String[] getBundles() {

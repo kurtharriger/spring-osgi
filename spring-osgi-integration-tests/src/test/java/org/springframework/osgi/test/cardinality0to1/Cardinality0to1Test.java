@@ -3,7 +3,7 @@ package org.springframework.osgi.test.cardinality0to1;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.cardinality0to1.test.MyListener;
 

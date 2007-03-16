@@ -22,8 +22,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor;
+import org.springframework.osgi.ServiceUnavailableException;
+import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.ClassUtils;
@@ -45,7 +45,8 @@ public class ServiceProxyTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	protected String getManifestLocation() {
-		return "org/springframework/osgi/test/serviceproxy/ServiceProxyTest.MF";
+		//return "org/springframework/osgi/test/serviceproxy/ServiceProxyTest.MF";
+		return null;
 	}
 
 	private ServiceRegistration publishService(Object obj) throws Exception {
