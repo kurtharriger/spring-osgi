@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.context.BundleFactoryBean;
+import org.springframework.osgi.context.support.BundleFactoryBean;
 import org.springframework.util.Assert;
 
 /**

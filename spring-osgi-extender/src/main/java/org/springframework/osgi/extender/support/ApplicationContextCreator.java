@@ -24,7 +24,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ApplicationEventMulticaster;
-import org.springframework.osgi.context.support.*;
+import org.springframework.osgi.context.support.ApplicationContextConfiguration;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.context.support.LocalBundleContext;
+import org.springframework.osgi.context.support.NamespacePlugins;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
+import org.springframework.osgi.context.support.SpringBundleEvent;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -113,7 +119,7 @@ public class ApplicationContextCreator implements Runnable {
 
 		postEvent(BundleEvent.STARTING);
 
-		BundleContext bundleContext = OsgiResourceUtils.getBundleContext(bundle);
+		BundleContext bundleContext = OsgiBundleUtils.getBundleContext(bundle);
 		if (bundleContext == null) {
 			log.error("Could not start ApplicationContext from [" + config.getConfigurationLocations()[0]
 				+ "]: failed to resolve BundleContext for bundle [" + bundle + "]");

@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.support.cardinality;
+package org.springframework.osgi.service.interceptor;
 
 import junit.framework.TestCase;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
+import org.springframework.osgi.service.interceptor.OsgiServiceInvoker;
 
 /**
  * @author Costin Leau
@@ -54,7 +55,7 @@ public class OsgiServiceInvokerTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceInvoker#invoke(org.aopalliance.intercept.MethodInvocation)}.
+	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceInvoker#invoke(org.aopalliance.intercept.MethodInvocation)}.
 	 */
 	public void testInvoke() throws Throwable {
 		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), new Object(), Object.class

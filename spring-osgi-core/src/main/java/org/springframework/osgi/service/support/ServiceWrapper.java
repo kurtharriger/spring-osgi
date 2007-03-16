@@ -17,7 +17,7 @@ package org.springframework.osgi.service.support;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.context.support.OsgiResourceUtils;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.Assert;
 
@@ -41,7 +41,7 @@ public class ServiceWrapper {
 	private BundleContext context;
 
 	public ServiceWrapper(ServiceReference ref) {
-		this(ref, OsgiResourceUtils.getBundleContext(ref.getBundle()));
+		this(ref, OsgiBundleUtils.getBundleContext(ref.getBundle()));
 	}
 
 	public ServiceWrapper(ServiceReference ref, BundleContext bundleContext) {

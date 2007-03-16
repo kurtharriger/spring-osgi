@@ -36,41 +36,6 @@ import org.springframework.util.Assert;
  */
 public abstract class OsgiListenerUtils {
 
-	private static final Log log = LogFactory.getLog(OsgiListenerUtils.class);
-
-	public static void callListenersBind(BundleContext context, ServiceReference reference,
-			TargetSourceLifecycleListener[] listeners) {
-		boolean debug = log.isDebugEnabled();
-		Object service = OsgiServiceUtils.getService(context, reference);
-		for (int i = 0; i < listeners.length; i++) {
-			{
-				if (debug)
-					log.debug("calling bind on " + listeners[i] + " w/ reference " + reference);
-				try {
-					listeners[i].bind(service, OsgiServiceReferenceUtils.getServiceProperties(reference));
-				}
-				catch (Exception ex) {
-					log.warn("bind method on listener " + listeners[i] + " threw exception ", ex);
-				}
-			}
-		}
-	}
-
-	public static void callListenersUnbind(BundleContext context, ServiceReference reference,
-			TargetSourceLifecycleListener[] listeners) {
-		boolean debug = log.isDebugEnabled();
-		Object service = OsgiServiceUtils.getService(context, reference);
-		for (int i = 0; i < listeners.length; i++) {
-			if (debug)
-				log.debug("calling unbind on " + listeners[i] + " w/ reference " + reference);
-			try {
-				listeners[i].unbind(service, OsgiServiceReferenceUtils.getServiceProperties(reference));
-			}
-			catch (Exception ex) {
-				log.warn("unbind method on listener " + listeners[i] + " threw exception ", ex);
-			}
-		}
-	}
 
 	public static void addServiceListener(BundleContext context, ServiceListener listener, Filter filter) {
 		String toStringFilter = (filter == null ? null : filter.toString());
@@ -99,5 +64,4 @@ public abstract class OsgiListenerUtils {
 			}
 		}
 	}
-
 }

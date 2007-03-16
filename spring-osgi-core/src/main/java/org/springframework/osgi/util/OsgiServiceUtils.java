@@ -23,8 +23,8 @@ import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.AmbiguousServiceReferenceException;
-import org.springframework.osgi.service.NoSuchServiceException;
+import org.springframework.osgi.AmbiguousServiceReferenceException;
+import org.springframework.osgi.NoSuchServiceException;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 

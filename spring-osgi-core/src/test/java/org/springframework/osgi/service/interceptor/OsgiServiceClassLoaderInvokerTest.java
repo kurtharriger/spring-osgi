@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.support.cardinality;
+package org.springframework.osgi.service.interceptor;
 
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -30,7 +30,8 @@ import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.interceptor.OsgiServiceClassLoaderInvoker;
 
 /**
  * @author Costin Leau
@@ -103,7 +104,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceClassLoaderInvoker#doInvoke(java.lang.Object, org.aopalliance.intercept.MethodInvocation)}.
+	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceClassLoaderInvoker#doInvoke(java.lang.Object, org.aopalliance.intercept.MethodInvocation)}.
 	 */
 	public void testDoInvokeWithClientTCCL() throws Throwable {
 
@@ -179,7 +180,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceClassLoaderInvoker#determineClassLoader(org.osgi.framework.BundleContext, org.osgi.framework.ServiceReference, int)}.
+	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceClassLoaderInvoker#determineClassLoader(org.osgi.framework.BundleContext, org.osgi.framework.ServiceReference, int)}.
 	 */
 	public void testDetermineClassLoader() {
 		ClassLoader loader = null;

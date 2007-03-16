@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.support.cardinality;
+package org.springframework.osgi.service.interceptor;
 
 import java.lang.reflect.Method;
 
@@ -24,10 +24,11 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
+import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.interceptor.OsgiServiceStaticInterceptor;
 import org.springframework.osgi.service.support.ServiceWrapper;
-import org.springframework.osgi.service.ServiceUnavailableException;
 
 /**
  * @author Costin Leau

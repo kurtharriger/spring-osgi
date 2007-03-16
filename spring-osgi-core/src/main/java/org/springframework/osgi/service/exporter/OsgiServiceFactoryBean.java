@@ -15,7 +15,7 @@
  *
  * Created on 23-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.service;
+package org.springframework.osgi.service.exporter;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -42,6 +42,8 @@ import org.springframework.core.CollectionFactory;
 import org.springframework.core.Constants;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.OsgiBundleScope;
+import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
+import org.springframework.osgi.service.OsgiServicePropertiesResolver;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;

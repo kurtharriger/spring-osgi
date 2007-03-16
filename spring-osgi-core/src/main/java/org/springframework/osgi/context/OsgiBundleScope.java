@@ -44,7 +44,7 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 
 	/**
 	 * Used by
-	 * {@link org.springframework.osgi.service.OsgiServiceProxyFactoryBean} to
+	 * {@link org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean} to
 	 * indicate that a new bean has been requested. If set, it will contain an
 	 * array of size 2 which will be populated by this call with the newly
 	 * created bean and its destruction callback (if any).

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service;
+package org.springframework.osgi.service.importer;
 
 import java.util.List;
 
@@ -27,10 +27,13 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.LocalBundleContext;
+import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
+import org.springframework.osgi.service.CardinalityOptions;
+import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.collection.OsgiServiceList;
+import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.service.support.RetryTemplate;
-import org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;

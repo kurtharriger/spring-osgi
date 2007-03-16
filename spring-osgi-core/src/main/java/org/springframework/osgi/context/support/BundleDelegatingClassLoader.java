@@ -33,6 +33,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 import org.springframework.aop.framework.Advised;
+import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
  * ClassLoader backed by an OSGi bundle. Will use the Bundle class loading.
@@ -139,7 +140,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		String bname = dict.get(Constants.BUNDLE_NAME) + "(" + dict.get(Constants.BUNDLE_SYMBOLICNAME) + ")";
 		log.debug("Could not find class [" + name + "] required by [" + bname + "] scanning available bundles");
 
-		BundleContext context = OsgiResourceUtils.getBundleContext(backingBundle);
+		BundleContext context = OsgiBundleUtils.getBundleContext(backingBundle);
 		String packageName = name.substring(0, name.lastIndexOf('.'));
 		// Reject global packages
 		if (name.indexOf('.') < 0) {

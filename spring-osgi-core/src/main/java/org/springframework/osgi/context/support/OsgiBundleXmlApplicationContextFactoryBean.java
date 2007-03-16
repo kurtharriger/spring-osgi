@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.springframework.osgi.context;
+package org.springframework.osgi.context.support;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -26,10 +26,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.context.support.AbstractBundleXmlApplicationContext;
-import org.springframework.osgi.context.support.DefaultOsgiBundleXmlApplicationContextFactory;
-import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
+import org.springframework.osgi.context.BundleContextAware;
 
 /**
  * @author Andy Piper

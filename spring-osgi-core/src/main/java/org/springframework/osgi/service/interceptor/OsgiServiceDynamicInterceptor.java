@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.support.cardinality;
+package org.springframework.osgi.service.interceptor;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -22,11 +22,12 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.support.DefaultRetryCallback;
 import org.springframework.osgi.service.support.RetryTemplate;
 import org.springframework.osgi.service.support.ServiceWrapper;
+import org.springframework.osgi.service.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
@@ -73,7 +74,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 			case (ServiceEvent.REGISTERED):
 				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
 					// inform listeners
-					OsgiListenerUtils.callListenersBind(context, ref, listeners);
+					OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
 				}
 
 				break;
@@ -81,7 +82,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 				// same as ServiceEvent.REGISTERED
 				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
 					// inform listeners
-					OsgiListenerUtils.callListenersBind(context, ref, listeners);
+					OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
 				}
 
 				break;
@@ -109,7 +110,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 				}
 
 				if (updated)
-					OsgiListenerUtils.callListenersUnbind(context, ref, listeners);
+					OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
 
 				// discover the new reference
 				ServiceReference newReference = OsgiServiceReferenceUtils.getServiceReference(context,
@@ -167,7 +168,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.support.cardinality.OsgiServiceInvoker#getTarget()
+	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#getTarget()
 	 */
 	protected Object getTarget() throws Throwable {
 		Object target = null;

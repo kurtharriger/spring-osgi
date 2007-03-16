@@ -19,6 +19,8 @@ package org.springframework.osgi.service;
 
 import java.util.Properties;
 
+import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
+
 /**
  * An OsgiServicePropertiesResolver is responsible for providing
  * the properties that a bean exposed as a service will be published with. 

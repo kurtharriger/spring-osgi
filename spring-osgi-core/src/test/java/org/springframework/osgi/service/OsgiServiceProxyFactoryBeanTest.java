@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 
 /**
  * @author Adrian Colyer

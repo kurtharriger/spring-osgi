@@ -23,6 +23,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
