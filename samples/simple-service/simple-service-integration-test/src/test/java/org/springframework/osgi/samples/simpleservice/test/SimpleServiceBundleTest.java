@@ -18,7 +18,7 @@ package org.springframework.osgi.samples.simpleservice.test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.samples.simpleservice.MyService;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * Starts up an OSGi environment (equinox, knopflerfish, or 
@@ -34,7 +34,7 @@ import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
  * 
  * @author Adrian Colyer
  */
-public class SimpleServiceBundleTest extends ConfigurableBundleCreatorTests {
+public class SimpleServiceBundleTest extends AbstractConfigurableBundleCreatorTests {
 
 	/**
 	 * The manifest to use for the "virtual bundle" created
@@ -65,11 +65,11 @@ public class SimpleServiceBundleTest extends ConfigurableBundleCreatorTests {
 	protected String[] getBundles() {
 		return new String[] {
 			localMavenArtifact("org.springframework.osgi", "aopalliance.osgi","1.0-SNAPSHOT"),
+			localMavenArtifact("org.springframework.osgi", "spring-aop","2.1-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-beans","2.1-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-osgi-core","1.0-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi", "spring-osgi-extender","1.0-SNAPSHOT"),
-			localMavenArtifact("org.springframework.osgi", "spring-aop","2.1-SNAPSHOT"),
 			localMavenArtifact("org.springframework.osgi.samples", "simple-service-bundle","1.0-SNAPSHOT")
 		};
 	}
