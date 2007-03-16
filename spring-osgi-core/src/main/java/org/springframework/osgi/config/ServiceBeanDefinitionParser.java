@@ -25,7 +25,7 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.config.ParserUtils.AttributeCallback;
-import org.springframework.osgi.service.OsgiServiceFactoryBean;
+import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

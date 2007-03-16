@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.support.cardinality;
+package org.springframework.osgi.service.interceptor;
 
 import java.lang.reflect.Method;
 
@@ -26,11 +26,12 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
+import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.ReferenceClassLoadingOptions;
-import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
 
 /**
  * @author Costin Leau
@@ -114,7 +115,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor#OsgiServiceDynamicInterceptor()}.
+	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#OsgiServiceDynamicInterceptor()}.
 	 */
 	public void testOsgiServiceDynamicInterceptor() {
 		assertNotNull(interceptor.getRetryTemplate());
@@ -122,7 +123,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor#lookupService()}.
+	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#lookupService()}.
 	 */
 	public void testLookupService() throws Throwable {
 		Object serv = interceptor.getTarget();
@@ -131,7 +132,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor#doInvoke(java.lang.Object, org.aopalliance.intercept.MethodInvocation)}.
+	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#doInvoke(java.lang.Object, org.aopalliance.intercept.MethodInvocation)}.
 	 */
 	public void testDoInvoke() throws Throwable {
 		Object target = new Object();
@@ -143,7 +144,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)}.
+	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)}.
 	 */
 	public void testInvocationWhenServiceNA() throws Throwable {
 		// service n/a
@@ -200,7 +201,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor#getTarget()}.
+	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#getTarget()}.
 	 */
 	public void testGetTarget() throws Throwable {
 		// add service
@@ -238,7 +239,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor#afterPropertiesSet()}.
+	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#afterPropertiesSet()}.
 	 */
 	public void testAfterPropertiesSet() {
 		assertNotNull("should have initialized listener", listener);

@@ -36,9 +36,10 @@ import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
-import org.springframework.osgi.service.support.cardinality.OsgiServiceStaticInterceptor;
+import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.interceptor.OsgiServiceStaticInterceptor;
+import org.springframework.osgi.service.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.util.Assert;
 
@@ -84,7 +85,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 				}
 				// inform listeners
 				if (found)
-					OsgiListenerUtils.callListenersBind(context, ref, listeners);
+					OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
 
 				break;
 			case (ServiceEvent.MODIFIED):
@@ -98,7 +99,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 				}
 				// inform listeners
 				if (found)
-					OsgiListenerUtils.callListenersBind(context, ref, listeners);
+					OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
 
 				break;
 			case (ServiceEvent.UNREGISTERING):
@@ -112,7 +113,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 				}
 
 				if (found)
-					OsgiListenerUtils.callListenersUnbind(context, ref, listeners);
+					OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
 				break;
 
 			default:

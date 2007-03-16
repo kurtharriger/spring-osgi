@@ -20,6 +20,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
  * ThreadLocal management of the BundleContext. This class also functions as
@@ -51,7 +52,7 @@ public class LocalBundleContext implements MethodInterceptor {
 	}
 
 	public LocalBundleContext(Bundle bundle) {
-		this(OsgiResourceUtils.getBundleContext(bundle));
+		this(OsgiBundleUtils.getBundleContext(bundle));
 	}
 
 	public Object invoke(MethodInvocation invocation) throws Throwable {

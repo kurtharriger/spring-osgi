@@ -34,7 +34,7 @@ import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.osgi.service.CardinalityOptions;
-import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.util.ObjectUtils;
 
 /**

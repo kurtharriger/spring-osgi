@@ -19,7 +19,7 @@ package org.springframework.osgi.config;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.core.Conventions;
-import org.springframework.osgi.context.BundleFactoryBean;
+import org.springframework.osgi.context.support.BundleFactoryBean;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 

@@ -13,24 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created on 26-Jan-2006 by Adrian Colyer
+ * Created on 25-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.service;
+package org.springframework.osgi;
 
 /**
- * Exception thrown when an OSGi service obtained via the OsgiServiceProxyFactoryBean
- * is unregistered and attempts to rebind to a suitable replacement have failed.
- * 
- * @see org.springframework.osgi.service.OsgiServiceProxyFactoryBean
  * @author Adrian Colyer
  * @since 2.0
  */
-public class ServiceUnavailableException extends OsgiServiceException {
-	
-	private static final long serialVersionUID = 6570972436894394720L;
+public class OsgiServiceException extends RuntimeException {
 
-	public ServiceUnavailableException(String message, Class serviceType, String filter) {
-		super(message,serviceType,filter);
+	private static final long serialVersionUID = -3159995579765199853L;
+
+	private Class serviceType;
+	private String filter;
+
+	public Class getServiceType() {
+		return serviceType;
 	}
-
+	
+	public String getFilter() {
+		return filter;
+	}
+	
+	public OsgiServiceException(String message, Class serviceType, String filter) {
+		super(message);
+		this.serviceType = serviceType;
+		this.filter = filter;
+	}
 }

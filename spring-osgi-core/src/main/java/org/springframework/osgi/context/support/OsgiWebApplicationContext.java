@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.util.Assert;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
@@ -45,12 +46,19 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 // TODO: use AbstractOsgiRefreshableApplicationContext
 public class OsgiWebApplicationContext extends XmlWebApplicationContext implements ConfigurableWebApplicationContext {
 	private Bundle osgiBundle;
+
 	private BundleContext osgiBundleContext;
+
 	private ServiceReference resolverServiceReference;
+
 	private OsgiBundleNamespaceHandlerAndEntityResolver resolver;
+
+	private ResourceLoader resourceLoader;
 
 	public OsgiWebApplicationContext() {
 		this.osgiBundleContext = LocalBundleContext.getContext();
+		this.resourceLoader = new OsgiBundleResourceLoader(osgiBundle);
+
 		if (osgiBundleContext == null) {
 			throw new IllegalStateException("No BundleContext available for [" + WebApplicationContext.class.getName()
 					+ "]");
@@ -63,8 +71,8 @@ public class OsgiWebApplicationContext extends XmlWebApplicationContext implemen
 		this.resolverServiceReference = this.osgiBundleContext.getServiceReference(OsgiBundleNamespaceHandlerAndEntityResolver.class.getName());
 		if (this.resolverServiceReference == null) {
 			throw new ApplicationContextException(
-					"Required Namespace Handler and Entity Resolver service is not available - " +
-					"perhaps the org.springframework.osgi.extender bundle is not installed and started?");
+					"Required Namespace Handler and Entity Resolver service is not available - "
+							+ "perhaps the org.springframework.osgi.extender bundle is not installed and started?");
 		}
 		this.resolver = (OsgiBundleNamespaceHandlerAndEntityResolver) this.osgiBundleContext.getService(resolverServiceReference);
 	}
@@ -99,18 +107,7 @@ public class OsgiWebApplicationContext extends XmlWebApplicationContext implemen
 	 * reference starting with "bundle:"
 	 */
 	public Resource getResource(String location) {
-		Assert.notNull(location, "location is required");
-		if (location.startsWith(AbstractBundleXmlApplicationContext.BUNDLE_URL_PREFIX)) {
-			return OsgiResourceUtils.getResourceFromBundle(
-					location.substring(AbstractBundleXmlApplicationContext.BUNDLE_URL_PREFIX.length()), osgiBundle);
-		}
-		else if (location.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)) {
-			return OsgiResourceUtils.getResourceFromBundleClasspath(
-					location.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length()), osgiBundle);
-		}
-		else {
-			return super.getResource(location);
-		}
+		return resourceLoader.getResource(location);
 	}
 
 	/*
@@ -123,7 +120,7 @@ public class OsgiWebApplicationContext extends XmlWebApplicationContext implemen
 		beanFactory.addBeanPostProcessor(new BundleContextAwareProcessor(this.osgiBundleContext));
 		beanFactory.ignoreDependencyInterface(BundleContextAware.class);
 	}
-	
+
 	public void close() {
 		if (this.resolverServiceReference != null) {
 			this.osgiBundleContext.ungetService(this.resolverServiceReference);

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.support.cardinality;
+package org.springframework.osgi.service.interceptor;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.service.support.ServiceWrapper;
-import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.util.Assert;
 
 /**
@@ -40,7 +40,7 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.osgi.service.support.cardinality.OsgiServiceInvoker#getTarget()
+	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#getTarget()
 	 */
 	protected Object getTarget() throws Throwable {
 		// service has died, clean up

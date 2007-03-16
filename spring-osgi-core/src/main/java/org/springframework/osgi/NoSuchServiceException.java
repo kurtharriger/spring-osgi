@@ -15,30 +15,23 @@
  *
  * Created on 25-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.service;
+package org.springframework.osgi;
+
+import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
  * @author Adrian Colyer
  * @since 2.0
+ * 
+ * @see OsgiServiceUtils
  */
-public class OsgiServiceException extends RuntimeException {
+public class NoSuchServiceException extends OsgiServiceException {
 
-	private static final long serialVersionUID = -3159995579765199853L;
+	private static final long serialVersionUID = -8124529821801537862L;
 
-	private Class serviceType;
-	private String filter;
-
-	public Class getServiceType() {
-		return serviceType;
+	public NoSuchServiceException(String message, Class serviceType, String filter) {
+		super(message,serviceType,filter);
 	}
 	
-	public String getFilter() {
-		return filter;
-	}
-	
-	public OsgiServiceException(String message, Class serviceType, String filter) {
-		super(message);
-		this.serviceType = serviceType;
-		this.filter = filter;
-	}
+
 }

@@ -15,7 +15,8 @@
  *
  * Created on 25-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.service;
+package org.springframework.osgi;
+
 
 /**
  * @author Adrian Colyer

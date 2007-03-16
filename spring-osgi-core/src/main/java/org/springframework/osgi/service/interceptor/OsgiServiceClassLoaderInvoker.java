@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.support.cardinality;
+package org.springframework.osgi.service.interceptor;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.context.support.OsgiResourceUtils;
-import org.springframework.osgi.service.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -43,7 +43,7 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 	private ServiceReference serviceReference;
 
 	public OsgiServiceClassLoaderInvoker(ServiceReference reference, int contextClassLoader) {
-		this(OsgiResourceUtils.getBundleContext(reference.getBundle()), reference, contextClassLoader);
+		this(OsgiBundleUtils.getBundleContext(reference.getBundle()), reference, contextClassLoader);
 	}
 
 	public OsgiServiceClassLoaderInvoker(BundleContext context, ServiceReference reference, int contextClassLoader) {
@@ -85,7 +85,7 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.support.cardinality.OsgiServiceInvoker#doInvoke(org.osgi.framework.ServiceReference,
+	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#doInvoke(org.osgi.framework.ServiceReference,
 	 * org.aopalliance.intercept.MethodInvocation)
 	 */
 	protected Object doInvoke(Object service, MethodInvocation invocation) throws Throwable {

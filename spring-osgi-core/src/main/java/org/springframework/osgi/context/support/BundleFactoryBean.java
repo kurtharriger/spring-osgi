@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.springframework.osgi.context;
+package org.springframework.osgi.context.support;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -35,9 +35,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.context.support.ApplicationContextConfiguration;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.context.support.SpringBundleEvent;
+import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.util.Assert;
 
 /**
