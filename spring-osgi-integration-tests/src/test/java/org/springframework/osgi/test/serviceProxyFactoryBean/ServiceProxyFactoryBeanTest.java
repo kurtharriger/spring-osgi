@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
@@ -44,7 +44,8 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 	}
 
 	protected String getManifestLocation() {
-		return "org/springframework/osgi/test/serviceProxyFactoryBean/ServiceProxyFactoryBeanTest.MF";
+		//return "org/springframework/osgi/test/serviceProxyFactoryBean/ServiceProxyFactoryBeanTest.MF";
+		return null;
 	}
 
 	protected void onSetUp() throws Exception {

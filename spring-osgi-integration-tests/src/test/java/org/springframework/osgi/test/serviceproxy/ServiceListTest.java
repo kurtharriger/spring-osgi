@@ -19,8 +19,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.collection.OsgiServiceList;
+import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 
 /**
  * @author Costin Leau
