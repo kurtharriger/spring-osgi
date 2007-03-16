@@ -26,10 +26,10 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.test.storage.MemoryStorage;
 import org.springframework.osgi.test.util.JarCreator;
 import org.springframework.osgi.test.util.JarUtils;
 import org.springframework.osgi.test.util.ManifestUtils;
-import org.springframework.osgi.test.util.MemoryStorage;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -48,15 +48,15 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-public abstract class OnTheFlyBundleCreatorTests extends AbstractDependencyManagerTests {
+public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDependencyManagerTests {
 
 	private JarCreator jarCreator;
 
-	public OnTheFlyBundleCreatorTests() {
+	public AbstractOnTheFlyBundleCreatorTests() {
 		initializeJarCreator();
 	}
 
-	public OnTheFlyBundleCreatorTests(String testName) {
+	public AbstractOnTheFlyBundleCreatorTests(String testName) {
 		super(testName);
 		initializeJarCreator();
 	}

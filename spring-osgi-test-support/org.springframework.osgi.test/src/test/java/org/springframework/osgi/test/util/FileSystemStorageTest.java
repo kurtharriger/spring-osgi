@@ -18,6 +18,8 @@ package org.springframework.osgi.test.util;
 import java.io.File;
 
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.test.storage.FileSystemStorage;
+import org.springframework.osgi.test.storage.Storage;
 
 /**
  * @author Costin Leau

@@ -24,10 +24,10 @@ import java.util.jar.Manifest;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.test.util.FileSystemStorage;
+import org.springframework.osgi.test.storage.FileSystemStorage;
+import org.springframework.osgi.test.storage.Storage;
 import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.osgi.test.util.JarCreator;
-import org.springframework.osgi.test.util.Storage;
 
 /**
  * @author Costin Leau

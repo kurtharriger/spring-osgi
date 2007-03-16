@@ -28,6 +28,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.osgi.test.storage.FileSystemStorage;
+import org.springframework.osgi.test.storage.Storage;
 import org.springframework.util.StringUtils;
 
 /**

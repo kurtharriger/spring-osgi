@@ -20,7 +20,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 
-import org.springframework.osgi.test.support.ConfigurableByteArrayOutputStream;
+import org.springframework.osgi.test.util.ConfigurableByteArrayOutputStream;
 
 import junit.framework.TestCase;
 

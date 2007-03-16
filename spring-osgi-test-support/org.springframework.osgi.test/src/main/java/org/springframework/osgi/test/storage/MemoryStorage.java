@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.util;
+package org.springframework.osgi.test.storage;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.support.ConfigurableByteArrayOutputStream;
 
 /**
  * Memory based storage. This class writes the information to a byte array.
@@ -31,14 +31,14 @@ import org.springframework.osgi.test.support.ConfigurableByteArrayOutputStream;
  */
 public class MemoryStorage implements Storage {
 
-	private ConfigurableByteArrayOutputStream buffer = new ConfigurableByteArrayOutputStream();
+	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.osgi.test.util.Storage#dispose()
 	 */
 	public void dispose() {
-		buffer = new ConfigurableByteArrayOutputStream(0);
+		buffer = new ByteArrayOutputStream(0);
 	}
 
 	/*
