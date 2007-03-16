@@ -24,7 +24,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.util.OsgiServiceUtils;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * 
@@ -33,7 +33,7 @@ import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
  * @author Costin Leau
  * 
  */
-public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
+public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTests {
 
 	private final static String ID = "PropertyPlaceholderTest-123";
 
@@ -80,7 +80,7 @@ public class PropertyPlaceholderTest extends ConfigurableBundleCreatorTests {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.osgi.test.ConfigurableBundleCreatorTests#getBundleContentPattern()
+	 * @see org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests#getBundleContentPattern()
 	 */
 	protected String[] getBundleContentPattern() {
 		return super.getBundleContentPattern();

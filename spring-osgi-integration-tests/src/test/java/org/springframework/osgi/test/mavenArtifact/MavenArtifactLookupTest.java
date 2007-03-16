@@ -1,6 +1,6 @@
 package org.springframework.osgi.test.mavenArtifact;
 
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.cardinality0to1.test.MyListener;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.osgi.framework.BundleContext;
@@ -18,7 +18,7 @@ import org.osgi.framework.BundleException;
  * explicity using the type of the artifact - a property of the artifact resolution that we need to
  * preserve.
  */
-public class MavenArtifactLookupTest  extends ConfigurableBundleCreatorTests {
+public class MavenArtifactLookupTest  extends AbstractConfigurableBundleCreatorTests {
 
     protected String getManifestLocation() {
         return "classpath:org/springframework/osgi/test/mavenArtifact/MavenArtifactLookupTest.MF";

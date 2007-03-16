@@ -23,13 +23,13 @@ import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.service.OsgiServiceProxyFactoryBean;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * @author Costin Leau
  * 
  */
-public class ServiceProxyFactoryBeanTest extends ConfigurableBundleCreatorTests {
+public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreatorTests {
 
 	private OsgiServiceProxyFactoryBean fb;
 

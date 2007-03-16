@@ -4,14 +4,14 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.BundleException;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * @author Hal Hildebrand
  *         Date: Dec 1, 2006
  *         Time: 3:56:43 PM
  */
-public class DependencyTest extends ConfigurableBundleCreatorTests {
+public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
     private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.test.dependencies.Dependent";
     //private static final String SERVICE_2_FILTER = "(service=2)";
     //private static final String SERVICE_3_FILTER = "(service=3)";
