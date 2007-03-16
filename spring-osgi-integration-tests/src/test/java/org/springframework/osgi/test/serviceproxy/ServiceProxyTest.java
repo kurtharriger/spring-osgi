@@ -24,7 +24,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.support.cardinality.OsgiServiceDynamicInterceptor;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.ClassUtils;
 
@@ -32,7 +32,7 @@ import org.springframework.util.ClassUtils;
  * @author Costin Leau
  * 
  */
-public class ServiceProxyTest extends ConfigurableBundleCreatorTests {
+public class ServiceProxyTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getBundles() {
 		return new String[] { localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),

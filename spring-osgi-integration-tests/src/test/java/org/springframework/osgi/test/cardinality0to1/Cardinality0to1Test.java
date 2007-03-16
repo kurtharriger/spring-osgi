@@ -4,7 +4,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.cardinality0to1.test.MyListener;
 
 /**
@@ -12,7 +12,7 @@ import org.springframework.osgi.test.cardinality0to1.test.MyListener;
  *         Date: Dec 6, 2006
  *         Time: 6:04:42 PM
  */
-public class Cardinality0to1Test extends ConfigurableBundleCreatorTests {
+public class Cardinality0to1Test extends AbstractConfigurableBundleCreatorTests {
 
     protected String getManifestLocation() {
         //return "classpath:org/springframework/osgi/test/cardinality0to1/Cardinality0to1Test.MF";

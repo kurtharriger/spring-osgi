@@ -16,14 +16,14 @@
 package org.springframework.osgi.test.lifecycle;
 
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * @author Hal Hildebrand
  *         Date: Oct 15, 2006
  *         Time: 5:51:36 PM
  */
-public class LifecycleTest extends ConfigurableBundleCreatorTests {
+public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
 
     protected String getManifestLocation() {
         return "classpath:org/springframework/osgi/test/lifecycle/MANIFEST.MF";

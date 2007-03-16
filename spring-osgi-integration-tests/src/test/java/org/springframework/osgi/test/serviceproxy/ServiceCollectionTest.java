@@ -24,14 +24,14 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
 import org.springframework.osgi.service.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.util.ClassUtils;
 
 /**
  * @author Costin Leau
  * 
  */
-public class ServiceCollectionTest extends ConfigurableBundleCreatorTests {
+public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getBundles() {
 		return new String[] { localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),

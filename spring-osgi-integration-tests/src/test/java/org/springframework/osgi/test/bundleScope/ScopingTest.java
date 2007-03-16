@@ -17,7 +17,7 @@ package org.springframework.osgi.test.bundleScope;
 
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.scope.common.ScopeTestService;
 
 /**
@@ -26,7 +26,7 @@ import org.springframework.osgi.test.scope.common.ScopeTestService;
  * @author Costin Leau
  * 
  */
-public class ScopingTest extends ConfigurableBundleCreatorTests {
+public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getBundles() {
 		return new String[] {

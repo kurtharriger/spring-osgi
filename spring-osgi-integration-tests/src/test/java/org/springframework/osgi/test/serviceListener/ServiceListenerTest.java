@@ -1,13 +1,13 @@
 package org.springframework.osgi.test.serviceListener;
 
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.service.listener.MyListener;
 
 /**
  * @author Hal Hildebrand Date: Nov 14, 2006 Time: 8:18:15 AM
  */
-public class ServiceListenerTest extends ConfigurableBundleCreatorTests {
+public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String getManifestLocation() {
 		return "classpath:org/springframework/osgi/test/serviceListener/ServiceListenerTest.MF";

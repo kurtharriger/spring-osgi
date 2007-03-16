@@ -3,7 +3,7 @@ package org.springframework.osgi.test.referenceProxy;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.test.simpleservice.MyService;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.test.ConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.reference.proxy.ServiceReferer;
 
 /**
@@ -11,7 +11,7 @@ import org.springframework.osgi.test.reference.proxy.ServiceReferer;
  *         Date: Nov 25, 2006
  *         Time: 12:42:30 PM
  */
-public class ReferenceProxyTest extends ConfigurableBundleCreatorTests {
+public class ReferenceProxyTest extends AbstractConfigurableBundleCreatorTests {
 
     protected String getManifestLocation() {
         return "classpath:org/springframework/osgi/test/referenceProxy/ReferenceProxyTest.MF";
