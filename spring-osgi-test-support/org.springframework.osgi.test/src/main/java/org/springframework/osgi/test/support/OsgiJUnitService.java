@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.osgi.test.OsgiJUnitTest;
 import org.springframework.osgi.test.TestRunnerService;
+import org.springframework.osgi.test.util.ConfigurableByteArrayOutputStream;
 import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.osgi.test.util.TestUtils;
 

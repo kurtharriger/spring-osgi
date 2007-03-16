@@ -25,7 +25,7 @@ import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Subclass of OnTheFlyBundleCreatorTests which adds extra functionality for
+ * Subclass of AbstractOnTheFlyBundleCreatorTests which adds extra functionality for
  * configuring the jar creation. The created bundle (jar) can be configured by
  * indicating the locations for:
  * <ul>
@@ -49,7 +49,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-public abstract class ConfigurableBundleCreatorTests extends OnTheFlyBundleCreatorTests {
+public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnTheFlyBundleCreatorTests {
 
 	protected static final String ROOT_DIR = "root.dir";
 	protected static final String INCLUDE_PATTERNS = "include.patterns";

@@ -39,7 +39,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.test.platform.OsgiPlatform;
-import org.springframework.osgi.test.support.ConfigurableByteArrayOutputStream;
+import org.springframework.osgi.test.util.ConfigurableByteArrayOutputStream;
 import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.osgi.test.util.TestUtils;
 import org.springframework.util.Assert;

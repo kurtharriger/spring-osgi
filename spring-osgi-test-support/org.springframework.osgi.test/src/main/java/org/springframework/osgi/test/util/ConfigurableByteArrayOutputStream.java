@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.support;
+package org.springframework.osgi.test.util;
 
 import java.io.ByteArrayOutputStream;
 
@@ -35,16 +35,12 @@ public class ConfigurableByteArrayOutputStream extends ByteArrayOutputStream {
 		super(size);
 	}
 
+	/**
+	 * Extension added to the original class.
+	 * 
+	 * @param bufferToUse
+	 */
 	public ConfigurableByteArrayOutputStream(byte[] bufferToUse) {
 		this.buf = bufferToUse;
-	}
-
-	public ConfigurableByteArrayOutputStream(ConfigurableByteArrayOutputStream original) {
-		this.buf = (byte[]) original.buf.clone();
-		this.count = original.count;
-	}
-
-	public int getWrittenBytes() {
-		return count;
 	}
 }

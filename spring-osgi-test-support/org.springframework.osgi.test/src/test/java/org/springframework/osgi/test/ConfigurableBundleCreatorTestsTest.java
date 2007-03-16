@@ -22,17 +22,17 @@ import junit.framework.TestCase;
 import org.springframework.core.io.ClassPathResource;
 
 /**
- * Test Case for ConfigurableBundleCreatorTests.
+ * Test Case for AbstractConfigurableBundleCreatorTests.
  * 
  * @author Costin Leau
  * 
  */
 public class ConfigurableBundleCreatorTestsTest extends TestCase {
 
-	private ConfigurableBundleCreatorTests bundleCreator;
+	private AbstractConfigurableBundleCreatorTests bundleCreator;
 
 	protected void setUp() throws Exception {
-		bundleCreator = new ConfigurableBundleCreatorTests() {
+		bundleCreator = new AbstractConfigurableBundleCreatorTests() {
 		};
 	}
 
@@ -49,7 +49,7 @@ public class ConfigurableBundleCreatorTestsTest extends TestCase {
 	public void testDefaultJarSettings() throws Exception {
 
 		Properties defaultSettings = bundleCreator.getSettings();
-		ConfigurableBundleCreatorTests.jarSettings = defaultSettings;
+		AbstractConfigurableBundleCreatorTests.jarSettings = defaultSettings;
 		assertNotNull(defaultSettings);
 		assertNotNull(bundleCreator.getRootPath());
 		assertNotNull(bundleCreator.getBundleContentPattern());
@@ -62,10 +62,10 @@ public class ConfigurableBundleCreatorTestsTest extends TestCase {
 		Properties props = new Properties();
 		props.load(new ClassPathResource("org/springframework/osgi/test/ConfigurableBundleCreatorTestsTest$1-bundle.properties").getInputStream());
 
-		assertEquals(props.getProperty(ConfigurableBundleCreatorTests.INCLUDE_PATTERNS),
-				testSettings.getProperty(ConfigurableBundleCreatorTests.INCLUDE_PATTERNS));
-		assertEquals(props.getProperty(ConfigurableBundleCreatorTests.MANIFEST),
-				testSettings.getProperty(ConfigurableBundleCreatorTests.MANIFEST));
+		assertEquals(props.getProperty(AbstractConfigurableBundleCreatorTests.INCLUDE_PATTERNS),
+				testSettings.getProperty(AbstractConfigurableBundleCreatorTests.INCLUDE_PATTERNS));
+		assertEquals(props.getProperty(AbstractConfigurableBundleCreatorTests.MANIFEST),
+				testSettings.getProperty(AbstractConfigurableBundleCreatorTests.MANIFEST));
 	}
 
 	public void testJarCreation() throws Exception {

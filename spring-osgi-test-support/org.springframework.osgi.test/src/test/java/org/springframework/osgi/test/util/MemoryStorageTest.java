@@ -15,6 +15,9 @@
  */
 package org.springframework.osgi.test.util;
 
+import org.springframework.osgi.test.storage.MemoryStorage;
+import org.springframework.osgi.test.storage.Storage;
+
 /**
  * @author Costin Leau
  * 
