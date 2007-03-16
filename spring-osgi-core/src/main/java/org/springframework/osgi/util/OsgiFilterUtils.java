@@ -34,7 +34,8 @@ import org.springframework.util.StringUtils;
  * 
  */
 
-// TODO: add generic capability to add other items beside classes (such as BEAN_NAME_PROPERTY_KEY)
+// TODO: add generic capability to add other items beside classes (such as
+// BEAN_NAME_PROPERTY_KEY)
 public abstract class OsgiFilterUtils {
 
 	private static final char FILTER_BEGIN = '(';
@@ -43,7 +44,7 @@ public abstract class OsgiFilterUtils {
 
 	private static final String FILTER_AND_CONSTRAINT = "(&";
 
-	private static final String OBJECT_CLASS_GROUP = FILTER_BEGIN + Constants.OBJECTCLASS + "=";
+	private static final String EQUALS = "=";
 
 	/**
 	 * Add the given class as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
@@ -106,16 +107,31 @@ public abstract class OsgiFilterUtils {
 	 * constraint
 	 */
 	public static String unifyFilter(String[] classes, String filter) {
+		return unifyFilter(Constants.OBJECTCLASS, classes, filter);
+	}
+
+	/**
+	 * Concatenates the given strings with an 'and'(&amp;) constraint under the
+	 * given key to the given filter. At least one parameter must be valid
+	 * (non-null). At least the filter or the key and the items have to be not
+	 * null.
+	 * 
+	 * @param key the key under which the items are being concatenated
+	 * @param items an array of strings concatenated to the existing filter
+	 * @param filter an existing, valid filter
+	 * @return updated filter containg the new constraint
+	 */
+	public static String unifyFilter(String key, String[] items, String filter) {
 		boolean filterHasText = StringUtils.hasText(filter);
 
-		if (classes == null)
-			classes = new String[0];
+		if (items == null)
+			items = new String[0];
 
 		// number of valid (not-null) classes
-		int validClassNames = classes.length;
+		int validClassNames = items.length;
 
-		for (int i = 0; i < classes.length; i++) {
-			if (classes[i] == null)
+		for (int i = 0; i < items.length; i++) {
+			if (items[i] == null)
 				validClassNames--;
 		}
 
@@ -126,14 +142,16 @@ public abstract class OsgiFilterUtils {
 			else
 				throw new IllegalArgumentException("at least one parameter has to be not-null");
 
+		Assert.hasText(key, "key is required");
+
 		// do a simple filter check - starts with ( and ends with )
 		if (filterHasText && !(filter.charAt(0) == FILTER_BEGIN && filter.charAt(filter.length() - 1) == FILTER_END)) {
 			throw new IllegalArgumentException("invalid filter: " + filter);
 		}
 
 		// the classes will be added in a subfilter which does searching only
-		// after
-		// the objectClass
+		// after the key
+		// 
 		// i.e.
 		// (&(objectClass=java.lang.Object)(objectClass=java.lang.Cloneable))
 		//
@@ -159,12 +177,14 @@ public abstract class OsgiFilterUtils {
 		}
 
 		// parse the classes and add the classname under objectClass
-		for (int i = 0; i < classes.length; i++) {
-			if (classes[i] != null) {
+		for (int i = 0; i < items.length; i++) {
+			if (items[i] != null) {
 				// (objectClass=
-				buffer.append(OBJECT_CLASS_GROUP);
+				buffer.append(FILTER_BEGIN);
+				buffer.append(key);
+				buffer.append(EQUALS);
 				// <actual value>
-				buffer.append(classes[i]);
+				buffer.append(items[i]);
 				// )
 				buffer.append(FILTER_END);
 			}
@@ -184,6 +204,7 @@ public abstract class OsgiFilterUtils {
 		}
 
 		return buffer.toString();
+
 	}
 
 	/**

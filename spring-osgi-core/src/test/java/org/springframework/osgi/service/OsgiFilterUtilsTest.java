@@ -118,4 +118,56 @@ public class OsgiFilterUtilsTest extends TestCase {
 		// verify the filter using the matching against a dictionary
 		assertFalse(osgiFilter.matchCase(dictionary));
 	}
+
+	public void testNoKeyOrItemSpecified() {
+		try {
+			OsgiFilterUtils.unifyFilter(null, null, null);
+			fail("should have thrown exception");
+		}
+		catch (IllegalArgumentException ex) {
+			// expected
+		}
+	}
+
+	public void testNoKeySpecified() {
+		try {
+			OsgiFilterUtils.unifyFilter(null, new String[] { classes[0] }, null);
+			fail("should have thrown exception");
+		}
+		catch (IllegalArgumentException ex) {
+		}
+	}
+
+	public void testNoItemSpecified() {
+		try {
+			OsgiFilterUtils.unifyFilter(Constants.OBJECTCLASS, null, null);
+			fail("should have thrown exception");
+		}
+		catch (IllegalArgumentException ex) {
+		}
+	}
+
+	public void testNoKeyOrItemButFilterSpecified() {
+		String filter = OsgiFilterUtils.unifyFilter("beanName", new String[] { "myBean" }, null);
+		assertTrue(OsgiFilterUtils.isValidFilter(filter));
+	}
+
+	public void testAddItemsUnderMultipleKeys() {
+		String filterA = OsgiFilterUtils.unifyFilter("firstKey", new String[] { "A", "B", "valueA" }, "(c=*)");
+		String filterB = OsgiFilterUtils.unifyFilter("secondKey", new String[] { "X", "Y", "valueZ" }, filterA);
+		assertTrue(OsgiFilterUtils.isValidFilter(filterB));
+	}
+
+	public void testUnifyWhenNoItemIsSpecified() {
+		String fl = "(c=*)";
+		String filter = OsgiFilterUtils.unifyFilter("someKey", null, fl);
+		assertEquals(fl, filter);
+
+		filter = OsgiFilterUtils.unifyFilter("someKey", new String[0], fl);
+		assertEquals(fl, filter);
+
+		filter = OsgiFilterUtils.unifyFilter("someKey", new String[] { null }, fl);
+		assertEquals(fl, filter);
+
+	}
 }

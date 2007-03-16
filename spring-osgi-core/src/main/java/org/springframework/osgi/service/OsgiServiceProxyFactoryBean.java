@@ -35,7 +35,6 @@ import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * Factory bean for OSGi services. Returns a dynamic proxy which handles the
@@ -142,19 +141,37 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
 			"more then one concrete class specified; cannot create proxy");
 
-		String cumulatedFilter = OsgiFilterUtils.unifyFilter(serviceTypes, filter);
+		String filterWithClasses = OsgiFilterUtils.unifyFilter(serviceTypes, filter);
 
-		if (log.isDebugEnabled())
-			log.debug("unified classes=" + ObjectUtils.nullSafeToString(serviceTypes) + " and filter=[" + filter
-					+ "]  in=[" + cumulatedFilter + "]");
+		if (log.isTraceEnabled())
+			log.trace("unified classes=" + ObjectUtils.nullSafeToString(serviceTypes) + " and filter=[" + filter
+					+ "]  in=[" + filterWithClasses + "]");
 
-		// concatenate the classes and filter
-		unifiedFilter = OsgiFilterUtils.createFilter(cumulatedFilter);
+		// add the serviceBeanName constraint
+		String filterWithServiceBeanName = OsgiFilterUtils.unifyFilter(
+			BeanNameServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY.toString(), new String[] { serviceBeanName },
+			filterWithClasses);
+
+		if (log.isTraceEnabled())
+			log.trace("added serviceBeanName " + ObjectUtils.nullSafeToString(serviceBeanName) + " and filter=["
+					+ filterWithClasses + "]  in=[" + filterWithServiceBeanName + "]");
+
+		// create (which implies validation) the actual filter
+		unifiedFilter = OsgiFilterUtils.createFilter(filterWithServiceBeanName);
 
 		if (CardinalityOptions.atMostOneExpected(cardinality))
 			proxy = createSingleServiceProxy();
 		else
 			proxy = createMultiServiceCollection(unifiedFilter);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.beans.factory.DisposableBean#destroy()
+	 */
+	public void destroy() throws Exception {
+		// FIXME: add destroy behavior
 	}
 
 	protected boolean doesContainMultipleConcreteClasses(Class[] classes) {
@@ -265,7 +282,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	/**
 	 * The type that the OSGi service was registered with
 	 */
-	//TODO: normally the noum should be plural, not singular (which means changing the spring-osgi.xsd a bit)
+	// TODO: normally the noum should be plural, not singular (which means
+	// changing the spring-osgi.xsd a bit)
 	public void setInterface(Class[] serviceType) {
 		this.serviceTypes = serviceType;
 	}
@@ -304,10 +322,6 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		this.retryTemplate.setRetryNumbers(maxRetries);
 	}
 
-	public int getRetryTimes() {
-		return this.retryTemplate.getRetryNumbers();
-	}
-
 	/**
 	 * How long should we wait between failed attempts at rebinding to a service
 	 * that has been unregistered. <p/>
@@ -316,74 +330,6 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 */
 	public void setTimeout(long millisBetweenRetries) {
 		this.retryTemplate.setWaitTime(millisBetweenRetries);
-	}
-
-	public long getTimeout() {
-		return this.retryTemplate.getWaitTime();
-	}
-
-	// this is as nasty as dynamic sql generation.
-	// build an osgi filter string to find the service we are
-	// looking for.
-
-	// FIXME: add bean name property to filter queries (this method has to be
-	// removed)
-	private String getUnifiedFilter() {
-		if (unifiedFilter != null) {
-			// return unifiedFilter;
-		}
-		StringBuffer sb = new StringBuffer();
-		boolean andFilterWithInterfaceName = (getFilter() != null) || (getServiceBeanName() != null);
-		if (andFilterWithInterfaceName) {
-			sb.append("(&");
-		}
-		if (getFilter() != null) {
-			sb.append(getFilter());
-		}
-		sb.append("(");
-		sb.append(OBJECTCLASS);
-		sb.append("=");
-
-		// sb.append(getInterfaces().getName());
-		sb.append(")");
-
-		if (getServiceBeanName() != null) {
-			sb.append("(");
-			sb.append(BeanNameServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY);
-			sb.append("=");
-			sb.append(getServiceBeanName());
-			sb.append(")");
-		}
-
-		if (andFilterWithInterfaceName) {
-			sb.append(")");
-		}
-
-		String completeFilter = sb.toString();
-		if (StringUtils.hasText(completeFilter)) {
-			// unifiedFilter = completeFilter;
-			// return unifiedFilter;
-		}
-		else {
-			return null;
-		}
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 */
-	public void destroy() throws Exception {
-		// FIXME: add destroy behavior
-	}
-
-	/**
-	 * @return Returns the filter.
-	 */
-	public String getFilter() {
-		return filter;
 	}
 
 	/**
@@ -405,13 +351,6 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 */
 	public void setListeners(TargetSourceLifecycleListener[] listeners) {
 		this.listeners = listeners;
-	}
-
-	/**
-	 * @return Returns the serviceBeanName.
-	 */
-	public String getServiceBeanName() {
-		return serviceBeanName;
 	}
 
 	/**
