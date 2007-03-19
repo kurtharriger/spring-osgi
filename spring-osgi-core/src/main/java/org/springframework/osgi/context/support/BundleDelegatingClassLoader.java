@@ -40,8 +40,8 @@ import org.springframework.osgi.util.OsgiBundleUtils;
  * Contains facilities for tracing classloading behavior so that issues can be
  * easily resolved. Debugging can be enabled by setting the system property
  * <code>org.springframework.osgi.DebugClassLoading</code> to true.
- * 
- * 
+ *
+ *
  * @author Adrian Colyer
  * @author Andy Piper
  * @author Costin Leau
@@ -50,8 +50,8 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 public class BundleDelegatingClassLoader extends ClassLoader {
 	private ClassLoader parent;
 
+	private static final boolean DEBUG = Boolean.getBoolean("org.springframework.osgi.DebugClassLoading");
 	private Bundle backingBundle;
-
 	private static final Log log = LogFactory.getLog(BundleDelegatingClassLoader.class);
 
 	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle aBundle) {
@@ -113,14 +113,14 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 			}
 		}
 		catch (ClassNotFoundException cnfe) {
-			if (log.isDebugEnabled()) {
+			if (log.isDebugEnabled() || DEBUG) {
 				debugClassLoading(name, null);
 			}
 			throw cnfe;
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			// This is almost always an error
-			if (log.isDebugEnabled()) {
+			if (log.isWarnEnabled() || DEBUG) {
 				// This is caused by a dependent class failure,
 				// so make sure we search for the right one.
 				String cname = ncdfe.getMessage().replace('/', '.');
@@ -132,7 +132,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	/**
 	 * A best-guess attempt at figuring out why the class could not be found.
-	 * 
+	 *
 	 * @param name of the class we are trying to find.
 	 */
 	private synchronized void debugClassLoading(String name, String root) {

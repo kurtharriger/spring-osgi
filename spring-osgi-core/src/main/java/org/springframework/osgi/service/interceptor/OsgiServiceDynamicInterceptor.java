@@ -180,7 +180,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 		// nothing found
 		if (target == null) {
-			throw new ServiceUnavailableException("could not find service", null, null);
+			throw new ServiceUnavailableException("Could not find service [" + wrapper
+				+ "], filter [" + filter.toString() + "]", null, filter.toString());
 		}
 
 		return target;
