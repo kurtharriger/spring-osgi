@@ -133,15 +133,17 @@ public class ApplicationContextCreator implements Runnable {
 					+ StringUtils.arrayToCommaDelimitedString(config.getConfigurationLocations()) + "]");
 			}
 
-			ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
+			// The parent ClassLoader is this class so that imports present in the extender will be honored.
+			ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, getClass().getClassLoader());
 			Thread.currentThread().setContextClassLoader(cl);
 			LocalBundleContext.setContext(bundleContext);
 
 			// create app context, the beans are not yet created at this point
-			applicationContext = this.contextFactory.createApplicationContextWithBundleContext(
+			applicationContext = this.contextFactory.createApplicationContext(
 				bundleContext,
 				config.getConfigurationLocations(),
 				this.namespacePlugins,
+				cl,
 				config.waitForDependencies());
 
 			synchronized (this.contextsPendingInitializationMap) {
