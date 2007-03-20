@@ -30,6 +30,7 @@ import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextFactory;
 import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.osgi.context.support.ApplicationContextConfiguration;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 
 public class ApplicationContextCreatorTest extends TestCase {
 
@@ -51,13 +52,15 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	public void testConfigurationInfoIsTakenFromContextConfigurer() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
+		ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundle, getClass().getClassLoader());
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		MockControl control = MockControl.createControl(OsgiBundleXmlApplicationContextFactory.class);
 		OsgiBundleXmlApplicationContextFactory factory = (OsgiBundleXmlApplicationContextFactory) control.getMock();
-		factory.createApplicationContextWithBundleContext(
+		factory.createApplicationContext(
 			aBundle.getContext(),
 			new String[]{"bundle-url:file://META-INF/spring/context.xml", "bundle-url:file://META-INF/spring/context-two.xml"},
 			namespacePlugins,
+			cl,
 			true);
 		AbstractBundleXmlApplicationContext context =
 			new AbstractBundleXmlApplicationContext(aBundle.getContext(), META_INF_SPRING_CONTENT) {
@@ -78,13 +81,15 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	public void testContextIsPlacedIntoPendingMapPriorToRefreshAndMovedAfterwards() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
+		ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundle, getClass().getClassLoader());
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		MockControl control = MockControl.createControl(OsgiBundleXmlApplicationContextFactory.class);
 		OsgiBundleXmlApplicationContextFactory factory = (OsgiBundleXmlApplicationContextFactory) control.getMock();
-		factory.createApplicationContextWithBundleContext(
+		factory.createApplicationContext(
 			aBundle.getContext(),
 			new String[]{"bundle-url:file://META-INF/spring/context.xml", "bundle-url:file://META-INF/spring/context-two.xml"},
 			namespacePlugins,
+			cl,
 			true);
 		MapTestingBundleXmlApplicationContext context = new MapTestingBundleXmlApplicationContext(aBundle.getContext(), META_INF_SPRING_CONTENT);
 		control.setMatcher(MockControl.ARRAY_MATCHER);
@@ -106,13 +111,15 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	public void testContextIsRemovedFromMapsOnException() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
+		ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundle, getClass().getClassLoader());
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		MockControl control = MockControl.createControl(OsgiBundleXmlApplicationContextFactory.class);
 		OsgiBundleXmlApplicationContextFactory factory = (OsgiBundleXmlApplicationContextFactory) control.getMock();
-		factory.createApplicationContextWithBundleContext(
+		factory.createApplicationContext(
 			aBundle.getContext(),
 			new String[]{"bundle-url:file://META-INF/spring/context.xml", "bundle-url:file://META-INF/spring/context-two.xml"},
 			namespacePlugins,
+			cl,
 			true);
 		AbstractBundleXmlApplicationContext context =
 			new AbstractBundleXmlApplicationContext(aBundle.getContext(), META_INF_SPRING_CONTENT) {
@@ -143,16 +150,18 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	public void testCreationEvent() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
+		ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundle, getClass().getClassLoader());
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		MockControl control = MockControl.createControl(OsgiBundleXmlApplicationContextFactory.class);
 		MockControl mockListener = MockControl.createControl(ApplicationListener.class);
 		ApplicationListener listener = (ApplicationListener) mockListener.getMock();
 		mcast.addApplicationListener(listener);
 		OsgiBundleXmlApplicationContextFactory factory = (OsgiBundleXmlApplicationContextFactory) control.getMock();
-		factory.createApplicationContextWithBundleContext(
+		factory.createApplicationContext(
 			aBundle.getContext(),
 			new String[]{"bundle-url:file://META-INF/spring/context.xml", "bundle-url:file://META-INF/spring/context-two.xml"},
 			namespacePlugins,
+			cl,
 			true);
 
 		AbstractBundleXmlApplicationContext context =
@@ -179,16 +188,18 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	public void testCreationFailureEvent() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
+		ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundle, getClass().getClassLoader());
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		MockControl control = MockControl.createControl(OsgiBundleXmlApplicationContextFactory.class);
 		MockControl mockListener = MockControl.createControl(ApplicationListener.class);
 		ApplicationListener listener = (ApplicationListener) mockListener.getMock();
 		mcast.addApplicationListener(listener);
 		OsgiBundleXmlApplicationContextFactory factory = (OsgiBundleXmlApplicationContextFactory) control.getMock();
-		factory.createApplicationContextWithBundleContext(
+		factory.createApplicationContext(
 			aBundle.getContext(),
 			new String[]{"bundle-url:file://META-INF/spring/context.xml", "bundle-url:file://META-INF/spring/context-two.xml"},
 			namespacePlugins,
+			cl,
 			true);
 
 		AbstractBundleXmlApplicationContext context =

@@ -21,7 +21,7 @@ import org.osgi.framework.BundleContext;
 
 /**
  * Default implementation of OsgiBundleXmlApplicationContextFactory
- * 
+ *
  * @author Adrian Colyer
  * @author Andy Piper
  * @see OsgiBundleXmlApplicationContextFactory
@@ -29,14 +29,26 @@ import org.osgi.framework.BundleContext;
  */
 public class DefaultOsgiBundleXmlApplicationContextFactory implements OsgiBundleXmlApplicationContextFactory {
 	public AbstractBundleXmlApplicationContext createApplicationContext(BundleContext aBundleContext,
-			String[] configLocations, OsgiBundleNamespaceHandlerAndEntityResolver resolver) {
+	                                                                    String[] configLocations, OsgiBundleNamespaceHandlerAndEntityResolver resolver) {
 		return new OsgiBundleXmlApplicationContext(aBundleContext, configLocations, resolver);
 	}
 
+	public AbstractBundleXmlApplicationContext createApplicationContext(BundleContext aBundleContext,
+	                                                                    String[] configLocations, OsgiBundleNamespaceHandlerAndEntityResolver resolver,
+	                                                                    ClassLoader cl, boolean waitForDependencies) {
+		if (waitForDependencies) {
+			return new ServiceDependentBundleXmlApplicationContext(aBundleContext, configLocations, cl,
+				resolver);
+		}
+		else {
+			return new OsgiBundleXmlApplicationContext(aBundleContext, configLocations, cl, resolver);
+		}
+	}
+
 	public AbstractBundleXmlApplicationContext createApplicationContextWithBundleContext(BundleContext aBundleContext,
-                                                                                         String[] configLocations,
-                                                                                         OsgiBundleNamespaceHandlerAndEntityResolver resolver,
-                                                                                         boolean waitForDependencies) {
+	                                                                                     String[] configLocations,
+	                                                                                     OsgiBundleNamespaceHandlerAndEntityResolver resolver,
+	                                                                                     boolean waitForDependencies) {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		BundleContext bc = LocalBundleContext.getContext();
 		try {
@@ -44,14 +56,7 @@ public class DefaultOsgiBundleXmlApplicationContextFactory implements OsgiBundle
 			Thread.currentThread().setContextClassLoader(cl);
 			LocalBundleContext.setContext(aBundleContext);
 
-			if (waitForDependencies) {
-				return new ServiceDependentBundleXmlApplicationContext(aBundleContext, configLocations, cl,
-						                                               resolver);
-			}
-			else {
-				return new OsgiBundleXmlApplicationContext(aBundleContext, configLocations, cl, resolver);
-			}
-
+			return createApplicationContext(aBundleContext, configLocations, resolver, cl, waitForDependencies);
 		}
 		finally {
 			LocalBundleContext.setContext(bc);

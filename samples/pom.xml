@@ -14,9 +14,7 @@
   <url>http://www.springframework.org/osgi</url>
   <modules>
     <module>simple-service</module>
-    <!--
     <module>weather</module>
-    -->
   </modules>
 <build>
   <plugins>

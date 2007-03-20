@@ -55,4 +55,19 @@ public interface OsgiBundleXmlApplicationContextFactory {
             String[] configLocations,
             OsgiBundleNamespaceHandlerAndEntityResolver resolver,
             boolean waitForDependencies);
+
+	/**
+	 * Create an OsgiBundleXmlApplicationContext
+	 *
+	 * @param aBundleContext  the OSGi BundleContext for the bundle
+	 * @param configLocations location paths for the context config files
+     * @param resolver the Spring namespace plugins
+	 * @param cl the ClassLoader to use
+	 * @param waitForDependencies
+	 * @return OsgiBundleXmlApplicationContext
+	 */
+	AbstractBundleXmlApplicationContext createApplicationContext(BundleContext aBundleContext,
+	                                                                    String[] configLocations, OsgiBundleNamespaceHandlerAndEntityResolver resolver,
+	                                                                    ClassLoader cl, boolean waitForDependencies);
+
 }
