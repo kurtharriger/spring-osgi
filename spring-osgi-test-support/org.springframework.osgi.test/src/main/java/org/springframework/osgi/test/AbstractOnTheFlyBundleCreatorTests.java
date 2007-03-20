@@ -16,11 +16,14 @@
 package org.springframework.osgi.test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.depend.DependencyVisitor;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -29,7 +32,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.storage.MemoryStorage;
 import org.springframework.osgi.test.util.JarCreator;
 import org.springframework.osgi.test.util.JarUtils;
-import org.springframework.osgi.test.util.ManifestUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -147,36 +150,71 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	}
 
 	private void addImportPackage(Manifest manifest) {
-		StringBuffer importPackages = new StringBuffer();
+		String[] imports = determineImports(getClass());
+		Set packages = new LinkedHashSet(imports.length);
 
-		Set packages = new LinkedHashSet();
-		packages.add("org.osgi.framework;specification-version=\"1.3.0\"");
+		String currentPckg = ClassUtils.classPackageAsResourcePath(getClass()).replace('/', '.');
 
-		// mandatory bundles
-		String[] mandatoryBundlesExports = ManifestUtils.determineImportPackages(locateBundles(getMandatoryBundles()));
+		// eliminate 'special' packages (java.* and the class declaring package)
+		for (int i = 0; i < imports.length; i++) {
+			String pckg = imports[i];
 
-		CollectionUtils.mergeArrayIntoCollection(mandatoryBundlesExports, packages);
-
-		if (log.isDebugEnabled())
-			log
-					.debug("Import package from mandatory bundles: "
-							+ ObjectUtils.nullSafeToString(mandatoryBundlesExports));
-
-		// importPackages.append(mandatoryBundlesExports);
-		// importPackages.append(StringUtils.arrayToCommaDelimitedString(getMandatoryPackageBundleImport()));
-
-		// optional/user-defined packages
-		String[] optionalBundlesExports = ManifestUtils.determineImportPackages(locateBundles(getBundles()));
+			if (!(pckg.startsWith("java.") || pckg.equals(currentPckg)))
+				packages.add(imports[i]);
+		}
 
 		if (log.isDebugEnabled())
-			log.debug("Import package from optional bundles: " + ObjectUtils.nullSafeToString(optionalBundlesExports));
-
-		// importPackages.append(optionalBundlesExports);
-
-		CollectionUtils.mergeArrayIntoCollection(optionalBundlesExports, packages);
+			log.debug("found imports for " + packages);
 
 		manifest.getMainAttributes().putValue(Constants.IMPORT_PACKAGE,
-				StringUtils.collectionToCommaDelimitedString(packages));
+			StringUtils.collectionToCommaDelimitedString(packages));
+	}
+
+	/**
+	 * Determine imports by walking a class hierarchy until the current package
+	 * is found.
+	 * 
+	 * @return
+	 */
+	private String[] determineImports(Class clazz) {
+		Assert.notNull(clazz, "a not-null class is required");
+		String endPackage = ClassUtils.classPackageAsResourcePath(AbstractOnTheFlyBundleCreatorTests.class).replace(
+			'/', '.');
+
+		Set cumulatedPackages = new LinkedHashSet();
+
+		String clazzPackage = null;
+
+		do {
+			cumulatedPackages.addAll(determineImportsForClass(clazz));
+			clazzPackage = ClassUtils.classPackageAsResourcePath(clazz).replace('/', '.');
+			clazz = clazz.getSuperclass();
+		} while (!endPackage.equals(clazzPackage));
+
+		String[] packages = (String[]) cumulatedPackages.toArray(new String[cumulatedPackages.size()]);
+		// sort the array
+		Arrays.sort(packages);
+
+		for (int i = 0; i < packages.length; i++) {
+			packages[i] = packages[i].replace('/', '.');
+		}
+
+		return packages;
+	}
+
+	private Set determineImportsForClass(Class clazz) {
+		Assert.notNull(clazz, "a not-null class is required");
+		DependencyVisitor visitor = new DependencyVisitor();
+		ClassReader reader = null;
+		try {
+			reader = new ClassReader(clazz.getResourceAsStream(ClassUtils.getClassFileName(clazz)));
+		}
+		catch (Exception ex) {
+			throw (RuntimeException) new IllegalArgumentException("cannot read class " + clazz).initCause(ex);
+		}
+		reader.accept(visitor, false);
+
+		return visitor.getPackages();
 	}
 
 	private String[] getMandatoryPackageBundleImport() {

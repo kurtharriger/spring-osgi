@@ -109,6 +109,14 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return "org.springframework.osgi,aopalliance.osgi,1.0-SNAPSHOT";
 	}
 
+	protected String getAsmLibrary() {
+		return "org.springframework.osgi,asm.osgi,2.2.2-SNAPSHOT";
+	}
+
+	protected String getAsmDependency() {
+		return "org.objectweb.asm-depend,asm-depend,1.0-SNAPSHOT";
+	}
+
 	/**
 	 * Mandator bundles (part of the test setup).
 	 * 
@@ -119,7 +127,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
 				getSpringMockUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(),
 				getSpringOSGiCoreBundleUrl(), getSpringAopUrl(), getAopAllianceUrl(), getSpringOSGiTestBundleUrl(),
-				getSpringOSGiExtenderBundleUrl() };
+				getSpringOSGiExtenderBundleUrl(), getAsmLibrary(), getAsmDependency() };
 	}
 
 	public Bundle findBundleByLocation(String bundleLocation) {
@@ -132,10 +140,11 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return null;
 	}
 
-	public Bundle findBundleBySymbolicName(String sybmolicName) {
+	public Bundle findBundleBySymbolicName(String symbolicName) {
+		Assert.hasText(symbolicName, "a not-null/not-empty symbolicName is required");
 		Bundle[] bundles = getBundleContext().getBundles();
 		for (int i = 0; i < bundles.length; i++) {
-			if (bundles[i].getSymbolicName().equals(sybmolicName)) {
+			if (symbolicName.equals(bundles[i].getSymbolicName())) {
 				return bundles[i];
 			}
 		}
@@ -157,8 +166,8 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		Assert.isTrue(artifactId.length >= 3, "the CSV string " + bundleId + " contains too few values");
 		// TODO: add a smarter mechanism which can handle 1 or 2 values CSVs
 
-		return (artifactId.length == 3 ? locator.locateArtifact(artifactId[0], artifactId[1], artifactId[2]) : locator
-				.locateArtifact(artifactId[0], artifactId[1], artifactId[2], artifactId[3]));
+		return (artifactId.length == 3 ? locator.locateArtifact(artifactId[0], artifactId[1], artifactId[2])
+				: locator.locateArtifact(artifactId[0], artifactId[1], artifactId[2], artifactId[3]));
 	}
 
 	/**
