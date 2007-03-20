@@ -56,7 +56,7 @@ public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
         Bundle[] bundles = getBundleContext().getBundles();
         Bundle testBundle = null;
         for (int i = 0; i < bundles.length; i++) {
-            if (bundles[i].getSymbolicName().equals("org.springframework.osgi.test.lifecycle")) {
+            if ("org.springframework.osgi.test.lifecycle".equals(bundles[i].getSymbolicName())) {
                 testBundle = bundles[i];
                 break;
             }
