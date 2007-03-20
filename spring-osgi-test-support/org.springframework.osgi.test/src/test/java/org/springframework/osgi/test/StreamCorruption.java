@@ -48,6 +48,7 @@ public class StreamCorruption extends TestCase {
 
 		// call AbstractOsgiTest to setup the streams
 		invokeOsgiTestMethod(osgiTest, "setupStreams");
+		//osgiTest.setupStreams();
 	}
 
 	/*
@@ -74,7 +75,7 @@ public class StreamCorruption extends TestCase {
 			}
 		}
 		
-		invokeOsgiTestMethod(osgiTest, "cleanupStreams");
+		invokeOsgiTestMethod(osgiTest, "completeTestExecution");
 	}
 
 	public void testOutputStreamSize() throws Exception {

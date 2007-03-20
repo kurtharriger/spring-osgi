@@ -60,15 +60,13 @@ public class ConfigurableBundleCreatorTestsTest extends TestCase {
 		Properties testSettings = bundleCreator.getSettings();
 
 		Properties props = new Properties();
-		props.load(new ClassPathResource("org/springframework/osgi/test/ConfigurableBundleCreatorTestsTest$1-bundle.properties").getInputStream());
+		props.load(new ClassPathResource(
+				"org/springframework/osgi/test/ConfigurableBundleCreatorTestsTest$1-bundle.properties").getInputStream());
 
 		assertEquals(props.getProperty(AbstractConfigurableBundleCreatorTests.INCLUDE_PATTERNS),
-				testSettings.getProperty(AbstractConfigurableBundleCreatorTests.INCLUDE_PATTERNS));
+			testSettings.getProperty(AbstractConfigurableBundleCreatorTests.INCLUDE_PATTERNS));
 		assertEquals(props.getProperty(AbstractConfigurableBundleCreatorTests.MANIFEST),
-				testSettings.getProperty(AbstractConfigurableBundleCreatorTests.MANIFEST));
+			testSettings.getProperty(AbstractConfigurableBundleCreatorTests.MANIFEST));
 	}
 
-	public void testJarCreation() throws Exception {
-
-	}
 }
