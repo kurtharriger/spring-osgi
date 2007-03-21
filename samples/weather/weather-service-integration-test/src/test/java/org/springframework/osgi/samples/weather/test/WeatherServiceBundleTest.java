@@ -90,7 +90,7 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      * In a Spring bundle, using osgi:reference is a much
      * easier way to get a reference to a published service.
      */
-    public void testWeatherServiceExported() {
+    public void XtestWeatherServiceExported() {
         waitOnContextCreation("org.springframework.osgi.samples.weather.service");
         waitOnContextCreation("org.springframework.osgi.samples.wiring.bundle");
 
