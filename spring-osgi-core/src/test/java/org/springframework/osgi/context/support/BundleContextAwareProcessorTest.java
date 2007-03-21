@@ -54,7 +54,7 @@ public class BundleContextAwareProcessorTest extends TestCase{
 		BundleContextAwareProcessor bcaProcessor = new BundleContextAwareProcessor(null);
 		this.bundleContextAwareControl.replay();
 		try {
-			bcaProcessor.postProcessBeforeInitialization(this.mockAware, "aName");
+			bcaProcessor.postProcessAfterInstantiation(this.mockAware, "aName");
 			fail("should throw an IllegalStateException when no BundleContext available");
 		} 
 		catch(IllegalStateException ex) {
@@ -75,9 +75,9 @@ public class BundleContextAwareProcessorTest extends TestCase{
 		BundleContextAwareProcessor bcaProcessor = new BundleContextAwareProcessor(this.mockContext);
 		this.mockAware.setBundleContext(this.mockContext);
 		this.bundleContextAwareControl.replay();
-		Object ret = bcaProcessor.postProcessBeforeInitialization(this.mockAware, "aName");
+		boolean ret = bcaProcessor.postProcessAfterInstantiation(this.mockAware, "aName");
 		this.bundleContextAwareControl.verify();
-		assertSame("should return same bean instance",this.mockAware,ret);
+		assertTrue("should return true",ret);
 	}
 	
 	public void testAfterInitialization() {

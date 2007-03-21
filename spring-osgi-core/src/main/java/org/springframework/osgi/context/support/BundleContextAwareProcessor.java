@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.osgi.context.BundleContextAware;
 
 /**
@@ -32,7 +33,7 @@ import org.springframework.osgi.context.BundleContextAware;
  * @author Adrian Colyer
  * @since 2.0
  */
-public class BundleContextAwareProcessor implements BeanPostProcessor {
+public class BundleContextAwareProcessor extends InstantiationAwareBeanPostProcessorAdapter {
 
 	private BundleContext bundleContext;
 	
@@ -45,8 +46,7 @@ public class BundleContextAwareProcessor implements BeanPostProcessor {
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization(java.lang.Object, java.lang.String)
 	 */
-	public Object postProcessBeforeInitialization(Object bean, String beanName)
-			throws BeansException {
+	public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
 		if (bean instanceof BundleContextAware) {
 			if (this.bundleContext == null) {
 				throw new IllegalStateException("Cannot satisfy BundleContextAware for bean '" +
@@ -57,15 +57,6 @@ public class BundleContextAwareProcessor implements BeanPostProcessor {
 			}
 			((BundleContextAware) bean).setBundleContext(this.bundleContext);
 		}
-		return bean;
+		return true;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization(java.lang.Object, java.lang.String)
-	 */
-	public Object postProcessAfterInitialization(Object bean, String beanName)
-			throws BeansException {
-		return bean;
-	}
-
 }
