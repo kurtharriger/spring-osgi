@@ -113,10 +113,6 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return "org.springframework.osgi,asm.osgi,2.2.2-SNAPSHOT";
 	}
 
-	protected String getAsmDependency() {
-		return "org.objectweb.asm-depend,asm-depend,1.0-SNAPSHOT";
-	}
-
 	/**
 	 * Mandator bundles (part of the test setup).
 	 * 
@@ -127,7 +123,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
 				getSpringMockUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(),
 				getSpringOSGiCoreBundleUrl(), getSpringAopUrl(), getAopAllianceUrl(), getSpringOSGiTestBundleUrl(),
-				getSpringOSGiExtenderBundleUrl(), getAsmLibrary(), getAsmDependency() };
+				getSpringOSGiExtenderBundleUrl(), getAsmLibrary() };
 	}
 
 	public Bundle findBundleByLocation(String bundleLocation) {

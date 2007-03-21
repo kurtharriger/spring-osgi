@@ -23,19 +23,17 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.depend.DependencyVisitor;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.storage.MemoryStorage;
+import org.springframework.osgi.test.util.DependencyVisitor;
 import org.springframework.osgi.test.util.JarCreator;
 import org.springframework.osgi.test.util.JarUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
