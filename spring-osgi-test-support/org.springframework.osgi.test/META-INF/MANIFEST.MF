@@ -6,7 +6,9 @@ Import-Package: junit.framework,
   org.apache.commons.logging,
   org.springframework.test,
   org.springframework.osgi.io,
-  edu.emory.mathcs.backport.java.util.concurrent
+  edu.emory.mathcs.backport.java.util.concurrent,
+  org.objectweb.asm; version="[2,3)",
+  org.objectweb.asm.signature; version="[2,3)"
 DynamicImport-Package: javax.swing, javax.swing.border,
   javax.swing.event, javax.swing.text, javax.swing.tree,
   org.eclipse.core.runtime.adaptor,
