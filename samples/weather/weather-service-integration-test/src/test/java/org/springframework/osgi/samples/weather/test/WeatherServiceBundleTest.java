@@ -60,7 +60,7 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      * test bundle are automatically included so do not need
      * to be specified here.
      */
-    protected String[] getBundleLocations() {
+    protected String[] getBundles() {
         return new String[]{
             localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
             localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
@@ -69,6 +69,7 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
             localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
             localMavenArtifact("org.springframework.osgi", "spring-osgi-io", "1.0-SNAPSHOT"),
             localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
+            localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
             localMavenArtifact("org.springframework.osgi", "wiring-bundle", "1.0-SNAPSHOT")
         };
     }
@@ -90,7 +91,7 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      * In a Spring bundle, using osgi:reference is a much
      * easier way to get a reference to a published service.
      */
-    public void XtestWeatherServiceExported() {
+    public void testWeatherServiceExported() {
         waitOnContextCreation("org.springframework.osgi.samples.weather.service");
         waitOnContextCreation("org.springframework.osgi.samples.wiring.bundle");
 
