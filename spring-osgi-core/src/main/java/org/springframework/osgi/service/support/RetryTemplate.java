@@ -60,14 +60,16 @@ public class RetryTemplate {
 
 				// task is not complete - retry
 				count++;
-				// Do NOT use Thread.sleep() here - it does not release locks.
-				try {
-					notificationLock.wait(waitTime);
-				}
-				catch (InterruptedException ex) {
-					throw new RuntimeException("retry failed; interrupted while sleeping", ex);
-				}
-			}
+                if (waitTime != 0) {
+                    // Do NOT use Thread.sleep() here - it does not release locks.
+				    try {
+                        notificationLock.wait(waitTime);
+				    }
+				    catch (InterruptedException ex) {
+					    throw new RuntimeException("retry failed; interrupted while sleeping", ex);
+				    }
+                }
+            }
 			while (count < retryNumbers);
 		}
 		return null;
@@ -91,6 +93,6 @@ public class RetryTemplate {
 
 	public void setWaitTime(long waitTime) {
 		this.waitTime = waitTime;
-	}
+    }
 
 }
