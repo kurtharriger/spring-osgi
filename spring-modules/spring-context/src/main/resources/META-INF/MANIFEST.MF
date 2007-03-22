@@ -7,6 +7,8 @@ Bundle-Name: org.springframework.context
 Bundle-Version: ${spring.bundle.version}
 Bundle-Vendor: Spring Framework
 Import-Package: org.aopalliance.intercept;resolution:=optional,
+   commonj.timers;resolution:=optional,
+   commonj.work;resolution:=optional,
    org.apache.catalina.loader;resolution:=optional,
    org.apache.commons.logging,
    org.aspectj.weaver.loadtime;resolution:=optional,
@@ -36,6 +38,12 @@ Export-Package: org.springframework.context;version="${spring.export.version}",
    org.springframework.ui;version="${spring.export.version}",
    org.springframework.ui.context;version="${spring.export.version}",
    org.springframework.ui.context.support;version="${spring.export.version}",
-   org.springframework.validation;version="${spring.export.version}"
+   org.springframework.validation;version="${spring.export.version}",
+   org.springframework.scheduling;version="${spring.export.version}",
+   org.springframework.scheduling.commonj;version="${spring.export.version}",
+   org.springframework.scheduling.concurrent;version="${spring.export.version}",
+   org.springframework.scheduling.backportconcurrent;version="${spring.export.version}",
+   org.springframework.scheduling.support;version="${spring.export.version}",
+   org.springframework.scheduling.timer;version="${spring.export.version}"
 Bundle-ClassPath: .,
  target/classes/
