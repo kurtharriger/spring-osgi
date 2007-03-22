@@ -316,7 +316,10 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 					for (; parts.hasMoreTokens();) {
 						String modifier = parts.nextToken().trim();
 						if (modifier.startsWith("version")) {
-							version = Version.parseVersion(modifier.substring(modifier.indexOf("=") + 1).trim());
+                            String vstr = modifier.substring(modifier.indexOf("=") + 1).trim();
+                            if (vstr.startsWith("\"")) vstr = vstr.substring(1);
+                            if (vstr.endsWith("\"")) vstr = vstr.substring(0, vstr.length() - 2);
+                            version = Version.parseVersion(vstr);
 						}
 					}
 					return version;
