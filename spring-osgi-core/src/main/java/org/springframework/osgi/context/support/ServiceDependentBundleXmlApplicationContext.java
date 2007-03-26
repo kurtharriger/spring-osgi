@@ -31,9 +31,12 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContextException;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.service.CardinalityOptions;
+import org.springframework.osgi.service.support.RetryTemplate;
 import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.util.ObjectUtils;
 
@@ -51,81 +54,91 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 	private HashSet unsatisfiedDependencies = new HashSet();
 	private Log log = LogFactory.getLog(ServiceDependentBundleXmlApplicationContext.class);
 	private ClassLoader savedCcl;
+	private boolean closed = false;
+	private final TaskExecutor taskExecutor;
 
 	public ServiceDependentBundleXmlApplicationContext(BundleContext context,
 	                                                   String[] configLocations, ClassLoader classLoader,
-	                                                   OsgiBundleNamespaceHandlerAndEntityResolver resolver) {
+	                                                   OsgiBundleNamespaceHandlerAndEntityResolver resolver, TaskExecutor taskExecutor) {
 		super(context, configLocations, classLoader, resolver);
 
 		savedCcl = Thread.currentThread().getContextClassLoader();
-	
+		this.taskExecutor = taskExecutor;
+
 		synchronized (this) {
 			if (!inActiveBundleState()) {
-				throw new ApplicationContextException("Unable to refresh application context: bundle is " + 
-											bundleStateName());
+				throw new ApplicationContextException("Unable to refresh application context: bundle is " +
+					bundleStateName());
 			}
 			refreshBeanFactory();
 		}
-		
+
 		// Listen for services so that we can determine when we are ready for activation.
 		findServiceDependencies();
 	}
-	
-	
-	
+
+
 	public synchronized void refresh() throws BeansException {
-		if (!inActiveBundleState()) {
-			throw new ApplicationContextException("Unable to refresh application context: bundle is " + 
-										bundleStateName());
-		}
-		if (!hasUnsatisifiedServiceDependencies()) {
-			if (log.isInfoEnabled()) {
-				log.info("Services already satisfied, completing initialization for " + getDisplayName());
+		// refresh() needs to block in ApplicatonContextCreator.
+		while (hasUnsatisifiedServiceDependencies() && inActiveBundleState() && !closed) {
+			try {
+				wait(RetryTemplate.DEFAULT_WAIT_TIME * RetryTemplate.DEFAULT_RETRY_NUMBER);
 			}
-			dependencies.clear();
-			getBundleContext().removeServiceListener(this);
-			super.refresh();
-			publishContextAsOsgiService();
-		} else {
-			registerListener();
+			catch (InterruptedException e) {
+				throw new BeanCreationException("refresh() of [" + getDisplayName() + "] interrupted", e);
+			}
 		}
+		if (!inActiveBundleState() || closed) {
+			throw new ApplicationContextException("Unable to refresh application context: bundle is " +
+				bundleStateName());
+		}
+		if (log.isInfoEnabled()) {
+			log.info("Services already satisfied, completing initialization for " + getDisplayName());
+		}
+		dependencies.clear();
+		getBundleContext().removeServiceListener(this);
+		super.refresh();
+		publishContextAsOsgiService();
 	}
 
-	public synchronized void close() {
-		super.close();
+	public synchronized void onClose() {
+		closed = true;
 		try {
 			getBundleContext().removeServiceListener(this);
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			logger.warn("exception thrown while removing service listener " + e);
 		}
-
+		notifyAll();
 	}
 
-	
+
 	/**
 	 * Complete the initialization of this context now that we know all services
 	 * are available.
 	 */
-	protected void completeContextInitialization() {
+	protected synchronized void completeContextInitialization() {
 		if (!inActiveBundleState()) {
-			throw new ApplicationContextException("Unable to complete application context initialisation: bundle is " + 
-										bundleStateName());
+			throw new ApplicationContextException("Unable to complete application context initialisation: bundle is " +
+				bundleStateName());
 		}
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		BundleContext bc = LocalBundleContext.getContext();
 		try {
 			Thread.currentThread().setContextClassLoader(savedCcl);
 			LocalBundleContext.setContext(getBundleContext());
-			dependencies.clear();
-			getBundleContext().removeServiceListener(this);
+			if (log.isInfoEnabled()) {
+				log.info("Services satisfied, completing initialization asynchronously for " + getDisplayName());
+			}
 			// Build the bean definitions.
 			super.refresh();
 			publishContextAsOsgiService();
 
-		} catch (RuntimeException ex) {
+		}
+		catch (RuntimeException ex) {
 			if (log.isErrorEnabled()) {
-				log.error("Unable to complete application context initializition for '" + 
-						getBundle().getSymbolicName() + "'",ex);
+				log.error("Unable to complete application context initializition for '" +
+					getBundle().getSymbolicName() + "'", ex);
 			}
 			throw ex;
 		}
@@ -133,6 +146,7 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 			LocalBundleContext.setContext(bc);
 			Thread.currentThread().setContextClassLoader(ccl);
 		}
+		notifyAll();
 	}
 
 	protected synchronized boolean hasUnsatisifiedServiceDependencies() {
@@ -212,12 +226,13 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 		}
 		try {
 			return FrameworkUtil.createFilter(sb.toString());
-		} catch (InvalidSyntaxException e) {
-			IllegalArgumentException illArgEx = 
-			  new IllegalArgumentException("Filter string '"
-				+ serviceFilter
-				+ "' set on OsgiServiceProxyFactoryBean has invalid syntax: "
-				+ e.getMessage());
+		}
+		catch (InvalidSyntaxException e) {
+			IllegalArgumentException illArgEx =
+				new IllegalArgumentException("Filter string '"
+					+ serviceFilter
+					+ "' set on OsgiServiceProxyFactoryBean has invalid syntax: "
+					+ e.getMessage());
 			illArgEx.initCause(e);
 			throw illArgEx;
 		}
@@ -241,7 +256,8 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 		}
 		try {
 			getBundleContext().addServiceListener(this, filter);
-		} catch (InvalidSyntaxException e) {
+		}
+		catch (InvalidSyntaxException e) {
 			throw (IllegalStateException) new IllegalStateException("Filter string '"
 				+ filter
 				+ "' has invalid syntax: "
@@ -256,34 +272,64 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 	 * @param serviceEvent
 	 */
 	public synchronized void serviceChanged(ServiceEvent serviceEvent) {
-		if (unsatisfiedDependencies.isEmpty()) { // already completed.
-			return;
-		}
-		for (Iterator i = dependencies.iterator(); i.hasNext();) {
-			Dependency dependency = (Dependency) i.next();
-			if (dependency.matches(serviceEvent)) {
-				switch (serviceEvent.getType()) {
-					case ServiceEvent.MODIFIED:
-					case ServiceEvent.REGISTERED:
-						unsatisfiedDependencies.remove(dependency);
-						break;
-					case ServiceEvent.UNREGISTERING:
-						unsatisfiedDependencies.add(dependency);
-						break;
-					default: // do nothing
-						break;
+		try {
+			if (unsatisfiedDependencies.isEmpty()) { // already completed.
+				return;
+			}
+			for (Iterator i = dependencies.iterator(); i.hasNext();) {
+				Dependency dependency = (Dependency) i.next();
+				if (dependency.matches(serviceEvent)) {
+					switch (serviceEvent.getType()) {
+						case ServiceEvent.MODIFIED:
+						case ServiceEvent.REGISTERED:
+							unsatisfiedDependencies.remove(dependency);
+							break;
+						case ServiceEvent.UNREGISTERING:
+							unsatisfiedDependencies.add(dependency);
+							break;
+						default: // do nothing
+							break;
+					}
 				}
 			}
-		}
-		// Good to go!
-		if (unsatisfiedDependencies.isEmpty()) {
-			if (log.isInfoEnabled()) {
-				log.info("Services satisfied, completing initialization for " + getDisplayName());
+			// Good to go!
+			if (unsatisfiedDependencies.isEmpty()) {
+				if (log.isInfoEnabled()) {
+					log.info("Services satisfied, completing initialization for " + getDisplayName());
+				}
+				dependencies.clear();
+				getBundleContext().removeServiceListener(this);
+				// Service events are delivered synchronously so its important that we
+				// complete initialization in a different thread, otherwise the service registrar
+				// may deadlock.
+				taskExecutor.execute(new Runnable() {
+					public void run() {
+						try {
+							completeContextInitialization();
+						}
+						catch (Throwable t) {
+							if (log.isWarnEnabled()) {
+								log.warn("Error completing initialization for [" + getDisplayName() + "]", t);
+							}
+						}
+					}
+				});
 			}
-			completeContextInitialization();
-			notifyAll();
-		} else {
-			registerListener();  // re-register with the new filter
+			else {
+				registerListener();  // re-register with the new filter
+			}
+		}
+		catch (Error e) {
+			if (log.isErrorEnabled()) {
+				log.error("Error processing ServiceEvent for [" + getDisplayName() + "]", e);
+			}
+			throw e;
+		}
+		catch (RuntimeException re) {
+			if (log.isErrorEnabled()) {
+				log.error("Error processing ServiceEvent for [" + getDisplayName() + "]", re);
+			}
+			throw re;
 		}
 	}
 
@@ -310,7 +356,8 @@ public class ServiceDependentBundleXmlApplicationContext extends AbstractBundleX
 			ServiceReference[] refs;
 			try {
 				refs = getBundleContext().getServiceReferences(clazz, filter.toString());
-			} catch (InvalidSyntaxException e) {
+			}
+			catch (InvalidSyntaxException e) {
 				throw (IllegalStateException) new IllegalStateException("Filter string '"
 					+ filter.toString()
 					+ "' has invalid syntax: "

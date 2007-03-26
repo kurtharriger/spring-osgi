@@ -18,6 +18,7 @@
 package org.springframework.osgi.context.support;
 
 import org.osgi.framework.BundleContext;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * Default implementation of OsgiBundleXmlApplicationContextFactory
@@ -35,10 +36,10 @@ public class DefaultOsgiBundleXmlApplicationContextFactory implements OsgiBundle
 
 	public AbstractBundleXmlApplicationContext createApplicationContext(BundleContext aBundleContext,
 	                                                                    String[] configLocations, OsgiBundleNamespaceHandlerAndEntityResolver resolver,
-	                                                                    ClassLoader cl, boolean waitForDependencies) {
+	                                                                    ClassLoader cl, TaskExecutor taskExecutor, boolean waitForDependencies) {
 		if (waitForDependencies) {
 			return new ServiceDependentBundleXmlApplicationContext(aBundleContext, configLocations, cl,
-				resolver);
+				resolver, taskExecutor);
 		}
 		else {
 			return new OsgiBundleXmlApplicationContext(aBundleContext, configLocations, cl, resolver);
@@ -48,7 +49,7 @@ public class DefaultOsgiBundleXmlApplicationContextFactory implements OsgiBundle
 	public AbstractBundleXmlApplicationContext createApplicationContextWithBundleContext(BundleContext aBundleContext,
 	                                                                                     String[] configLocations,
 	                                                                                     OsgiBundleNamespaceHandlerAndEntityResolver resolver,
-	                                                                                     boolean waitForDependencies) {
+	                                                                                     TaskExecutor taskExecutor, boolean waitForDependencies) {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		BundleContext bc = LocalBundleContext.getContext();
 		try {
@@ -56,7 +57,7 @@ public class DefaultOsgiBundleXmlApplicationContextFactory implements OsgiBundle
 			Thread.currentThread().setContextClassLoader(cl);
 			LocalBundleContext.setContext(aBundleContext);
 
-			return createApplicationContext(aBundleContext, configLocations, resolver, cl, waitForDependencies);
+			return createApplicationContext(aBundleContext, configLocations, resolver, cl, taskExecutor, waitForDependencies);
 		}
 		finally {
 			LocalBundleContext.setContext(bc);

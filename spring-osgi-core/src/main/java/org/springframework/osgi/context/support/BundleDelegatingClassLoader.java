@@ -104,17 +104,13 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	}
 
 	protected Class findClass(String name) throws ClassNotFoundException {
-		try {
-			try {
-				return this.backingBundle.loadClass(name);
-			}
-			catch (ClassNotFoundException ex) {
-				return parent.loadClass(name);
-			}
+        // loadClass will have already checked the parent.
+        try {
+            return this.backingBundle.loadClass(name);
 		}
 		catch (ClassNotFoundException cnfe) {
 			if (log.isDebugEnabled() || DEBUG) {
-				debugClassLoading(name, null);
+                debugClassLoading(name, null);
 			}
 			throw cnfe;
 		}
@@ -337,9 +333,10 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	}
 
 	protected URL findResource(String name) {
-		if (log.isDebugEnabled())
+		if (log.isDebugEnabled()) {
 			log.debug("looking for resource " + name);
-		URL url = this.backingBundle.getResource(name);
+        }
+        URL url = this.backingBundle.getResource(name);
 
 		if (url != null && log.isDebugEnabled())
 			log.debug("found resource " + name + " at " + url);
@@ -347,10 +344,10 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	}
 
 	protected Enumeration findResources(String name) throws IOException {
-		if (log.isDebugEnabled())
+		if (log.isDebugEnabled()) {
 			log.debug("looking for resources " + name);
-
-		Enumeration enm = this.backingBundle.getResources(name);
+        }
+        Enumeration enm = this.backingBundle.getResources(name);
 
 		if (enm != null && enm.hasMoreElements() && log.isDebugEnabled())
 			log.debug("found resource " + name + " at " + this.backingBundle.getLocation());
