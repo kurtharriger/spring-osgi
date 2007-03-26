@@ -18,6 +18,7 @@
 package org.springframework.osgi.context.support;
 
 import org.osgi.framework.BundleContext;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * Factory interface for the creation of OsgiBundleXmlApplicationContext.
@@ -38,36 +39,38 @@ public interface OsgiBundleXmlApplicationContextFactory {
 	 * @return OsgiBundleXmlApplicationContext
 	 */
 	AbstractBundleXmlApplicationContext createApplicationContext(BundleContext aBundleContext,
-                                                                 String[] configLocations,
-                                                                 OsgiBundleNamespaceHandlerAndEntityResolver resolver);
-	
+	                                                             String[] configLocations,
+	                                                             OsgiBundleNamespaceHandlerAndEntityResolver resolver);
+
 	/**
 	 * Create an OsgiBundleXmlApplicationContext in the context of a Bundle Context ClassLoader
 	 *
 	 * @param aBundleContext  the OSGi BundleContext for the bundle
 	 * @param configLocations location paths for the context config files
-     * @param resolver the Spring namespace plugins
+	 * @param resolver the Spring namespace plugins
+	 * @param taskExecutor
 	 * @param waitForDependencies
 	 * @return OsgiBundleXmlApplicationContext
 	 */
 	AbstractBundleXmlApplicationContext createApplicationContextWithBundleContext(
-            BundleContext aBundleContext,
-            String[] configLocations,
-            OsgiBundleNamespaceHandlerAndEntityResolver resolver,
-            boolean waitForDependencies);
+		BundleContext aBundleContext,
+		String[] configLocations,
+		OsgiBundleNamespaceHandlerAndEntityResolver resolver,
+		TaskExecutor taskExecutor, boolean waitForDependencies);
 
 	/**
 	 * Create an OsgiBundleXmlApplicationContext
 	 *
 	 * @param aBundleContext  the OSGi BundleContext for the bundle
 	 * @param configLocations location paths for the context config files
-     * @param resolver the Spring namespace plugins
+	 * @param resolver the Spring namespace plugins
 	 * @param cl the ClassLoader to use
+	 * @param taskExecutor
 	 * @param waitForDependencies
 	 * @return OsgiBundleXmlApplicationContext
 	 */
 	AbstractBundleXmlApplicationContext createApplicationContext(BundleContext aBundleContext,
-	                                                                    String[] configLocations, OsgiBundleNamespaceHandlerAndEntityResolver resolver,
-	                                                                    ClassLoader cl, boolean waitForDependencies);
+	                                                             String[] configLocations, OsgiBundleNamespaceHandlerAndEntityResolver resolver,
+	                                                             ClassLoader cl, TaskExecutor taskExecutor, boolean waitForDependencies);
 
 }

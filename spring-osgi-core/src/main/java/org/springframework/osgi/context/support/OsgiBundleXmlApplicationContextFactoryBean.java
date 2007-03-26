@@ -26,6 +26,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.osgi.context.BundleContextAware;
 
 /**
@@ -42,7 +43,7 @@ public class OsgiBundleXmlApplicationContextFactoryBean implements FactoryBean, 
 
 	public Object getObject() throws Exception {
 		ConfigurableApplicationContext appContext = contextFactory.createApplicationContextWithBundleContext(context,
-			new String[]{configLocation.getURL().toString()}, resolver, false);
+			new String[]{configLocation.getURL().toString()}, resolver, new SyncTaskExecutor(), false);
 		appContext.refresh();
 		return appContext;
 	}

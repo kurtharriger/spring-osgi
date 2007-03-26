@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.test;
 
+import java.util.Map;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
@@ -104,7 +106,18 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 			barrier.await(timeout, unit);
 		}
 		catch (Throwable e) {
-			throw new RuntimeException("Gave up waiting for application context for '" + forBundleWithSymbolicName
+            /*
+            Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
+            int t = 0;
+            for (StackTraceElement[] i : stacks.values()) {
+                System.out.println("Thread [" + t + "]");
+                for (int j = 0 ; j<i.length; j++) {
+                    System.out.println("  " + i[j]);
+                }
+                t++;
+            }
+            */
+            throw new RuntimeException("Gave up waiting for application context for '" + forBundleWithSymbolicName
 					+ "' to be created");
 		}
 	}

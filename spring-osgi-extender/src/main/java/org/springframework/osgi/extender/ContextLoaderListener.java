@@ -344,7 +344,7 @@ public class ContextLoaderListener implements BundleActivator,
 				this.contextFactory,
 				this.namespacePlugins,
 				config,
-				this);
+				this, taskExecutor);
 		if (config.createAsynchronously()) {
 			this.taskExecutor.execute(contextCreator);
 		}
@@ -456,7 +456,7 @@ public class ContextLoaderListener implements BundleActivator,
 			String[] locations = new String[]{
 				OsgiBundleResource.BUNDLE_URL_URL_PREFIX + extenderConfigFile.toExternalForm()};
 			this.extenderContext = this.contextFactory.createApplicationContextWithBundleContext(
-				context, locations, this.namespacePlugins, false);
+				context, locations, this.namespacePlugins, taskExecutor, false);
 			extenderContext.refresh();
 
 			if (extenderContext.containsBean(TASK_EXECUTOR_BEAN_NAME)) {

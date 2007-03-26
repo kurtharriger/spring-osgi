@@ -33,6 +33,7 @@ import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * Search a bundle for Spring resources, and if found create an application context for it.
@@ -51,6 +52,7 @@ public class ApplicationContextCreator implements Runnable {
 	private final NamespacePlugins namespacePlugins;
 	private final ApplicationEventMulticaster mcast;
 	private final ApplicationContextConfiguration config;
+	private final TaskExecutor taskExecutor;
 	private Throwable creationTrace;
 
 	/**
@@ -60,6 +62,7 @@ public class ApplicationContextCreator implements Runnable {
 	 * @param forBundle
 	 * @param applicationContextMap
 	 * @param pendingRegistrationTasks
+	 * @param taskExecutor
 	 */
 	public ApplicationContextCreator(
 		Bundle forBundle,
@@ -68,8 +71,8 @@ public class ApplicationContextCreator implements Runnable {
 		Map pendingRegistrationTasks,
 		OsgiBundleXmlApplicationContextFactory contextFactory,
 		NamespacePlugins namespacePlugins,
-	    ApplicationContextConfiguration config,
-		ApplicationEventMulticaster mcast) {
+		ApplicationContextConfiguration config,
+		ApplicationEventMulticaster mcast, TaskExecutor taskExecutor) {
 		this.bundle = forBundle;
 		this.applicationContextMap = applicationContextMap;
 		this.contextsPendingInitializationMap = contextsPendingInitializationMap;
@@ -78,6 +81,7 @@ public class ApplicationContextCreator implements Runnable {
 		this.pendingRegistrationTasksMap = pendingRegistrationTasks;
 		this.config = config;
 		this.mcast = mcast;
+		this.taskExecutor = taskExecutor;
 		// Do some sanity checking.
 		Assert.notNull(mcast);
 		Long bundleKey = new Long(this.bundle.getBundleId());
@@ -144,7 +148,7 @@ public class ApplicationContextCreator implements Runnable {
 				config.getConfigurationLocations(),
 				this.namespacePlugins,
 				cl,
-				config.waitForDependencies());
+				taskExecutor, config.waitForDependencies());
 
 			synchronized (this.contextsPendingInitializationMap) {
 				// creating the beans may take a long time (possible 'forever') if the

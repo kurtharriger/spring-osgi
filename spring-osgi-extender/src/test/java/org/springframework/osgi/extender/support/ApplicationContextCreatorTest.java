@@ -31,6 +31,8 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContextF
 import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 public class ApplicationContextCreatorTest extends TestCase {
 
@@ -42,11 +44,11 @@ public class ApplicationContextCreatorTest extends TestCase {
 	private final Map pendingRegistrationTasks = new HashMap();
 	private NamespacePlugins namespacePlugins = new NamespacePlugins();
 	private final ApplicationEventMulticaster mcast = new SimpleApplicationEventMulticaster();
-
+	private final TaskExecutor taskExecutor = new SyncTaskExecutor();
 	public void testNoContextCreatedIfNotSpringPowered() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(null);
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, null, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, null, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast, taskExecutor);
 		creator.run(); // will NPE if not detecting that this bundle is not spring-powered!
 	}
 
@@ -61,7 +63,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 			new String[]{"bundle-url:file://META-INF/spring/context.xml", "bundle-url:file://META-INF/spring/context-two.xml"},
 			namespacePlugins,
 			cl,
-			true);
+			taskExecutor, true);
 		AbstractBundleXmlApplicationContext context =
 			new AbstractBundleXmlApplicationContext(aBundle.getContext(), META_INF_SPRING_CONTENT) {
 				public void refresh() {
@@ -73,7 +75,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 		control.replay();
 
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast, taskExecutor);
 		creator.run();
 
 		control.verify();
@@ -90,14 +92,14 @@ public class ApplicationContextCreatorTest extends TestCase {
 			new String[]{"bundle-url:file://META-INF/spring/context.xml", "bundle-url:file://META-INF/spring/context-two.xml"},
 			namespacePlugins,
 			cl,
-			true);
+			taskExecutor, true);
 		MapTestingBundleXmlApplicationContext context = new MapTestingBundleXmlApplicationContext(aBundle.getContext(), META_INF_SPRING_CONTENT);
 		control.setMatcher(MockControl.ARRAY_MATCHER);
 		control.setReturnValue(context);
 
 		control.replay();
 
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast, taskExecutor);
 		creator.run();
 
 		control.verify();
@@ -120,7 +122,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 			new String[]{"bundle-url:file://META-INF/spring/context.xml", "bundle-url:file://META-INF/spring/context-two.xml"},
 			namespacePlugins,
 			cl,
-			true);
+			taskExecutor, true);
 		AbstractBundleXmlApplicationContext context =
 			new AbstractBundleXmlApplicationContext(aBundle.getContext(), META_INF_SPRING_CONTENT) {
 				public void refresh() {
@@ -132,7 +134,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 		control.replay();
 
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast, taskExecutor);
 
 		try {
 			creator.run();
@@ -162,7 +164,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 			new String[]{"bundle-url:file://META-INF/spring/context.xml", "bundle-url:file://META-INF/spring/context-two.xml"},
 			namespacePlugins,
 			cl,
-			true);
+			taskExecutor, true);
 
 		AbstractBundleXmlApplicationContext context =
 			new AbstractBundleXmlApplicationContext(aBundle.getContext(), META_INF_SPRING_CONTENT) {
@@ -178,7 +180,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STARTED, aBundle));
 		mockListener.replay();
 
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast, taskExecutor);
 		creator.run();
 
 		control.verify();
@@ -200,7 +202,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 			new String[]{"bundle-url:file://META-INF/spring/context.xml", "bundle-url:file://META-INF/spring/context-two.xml"},
 			namespacePlugins,
 			cl,
-			true);
+			taskExecutor, true);
 
 		AbstractBundleXmlApplicationContext context =
 			new AbstractBundleXmlApplicationContext(aBundle.getContext(), META_INF_SPRING_CONTENT) {
@@ -216,7 +218,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STOPPED, aBundle));
 		mockListener.replay();
 
-		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast);
+		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, factory, namespacePlugins, new ApplicationContextConfiguration(aBundle), mcast, taskExecutor);
 		creator.run();
 
 		control.verify();
