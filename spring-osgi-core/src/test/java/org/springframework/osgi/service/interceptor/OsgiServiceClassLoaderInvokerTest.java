@@ -57,7 +57,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 			super(context, reference, contextClassLoader);
 		}
 
-		protected Object getTarget() throws Throwable {
+		protected Object getTarget() {
 			return target;
 		}
 	}
@@ -131,7 +131,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 	}
 
 	public void testDoInvokeWithServiceTCCL() throws Throwable {
-		
+
 		Method md = TCCLGetter.class.getMethod("getTCCL", null);
 		MethodInvocation invocation = new ReflectiveMethodInvocation(null, null, md, null, null, null);
 
@@ -156,9 +156,9 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 		assertSame("the TCCL hasn't been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
 
 	}
-	
+
 	public void testDoInvokeWithUnmanagedTCCL() throws Throwable {
-		
+
 		Method md = TCCLGetter.class.getMethod("getTCCL", null);
 		MethodInvocation invocation = new ReflectiveMethodInvocation(null, null, md, null, null, null);
 

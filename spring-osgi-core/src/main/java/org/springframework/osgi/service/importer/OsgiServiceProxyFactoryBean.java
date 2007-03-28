@@ -41,7 +41,7 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * Factory bean for OSGi services. Returns a dynamic proxy which handles the
- * lookup, retrieval and can cope with the dynamic nature of the OSGi platform.
+ * lookup and retrieval and can cope with the dynamic nature of the OSGi platform.
  * 
  * @author Costin Leau
  * @author Adrian Colyer
@@ -156,7 +156,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 			filterWithClasses);
 
 		if (log.isTraceEnabled())
-			log.trace("added serviceBeanName " + ObjectUtils.nullSafeToString(serviceBeanName) + " and filter=["
+			log.trace("unified serviceBeanName [" + ObjectUtils.nullSafeToString(serviceBeanName) + "] and filter=["
 					+ filterWithClasses + "]  in=[" + filterWithServiceBeanName + "]");
 
 		// create (which implies validation) the actual filter
@@ -233,7 +233,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	protected void addOsgiRetryInterceptor(ProxyFactory factory, Filter filter,
 			TargetSourceLifecycleListener[] listeners) {
 		OsgiServiceDynamicInterceptor lookupAdvice = new OsgiServiceDynamicInterceptor(bundleContext,
-				contextClassloader);
+				contextClassloader, CardinalityOptions.atLeastOneRequired(cardinality));
 		lookupAdvice.setListeners(listeners);
 		lookupAdvice.setFilter(filter);
 		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));

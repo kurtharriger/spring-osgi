@@ -65,6 +65,9 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 
 		isLifecycleListener = target instanceof TargetSourceLifecycleListener;
 
+		if (isLifecycleListener)
+			if (log.isDebugEnabled())
+				log.debug(target.getClass().getName() + " is a lifecycle listener");
 		bindMethods = determineCustomMethods(bindMethod);
 		unbindMethods = determineCustomMethods(unbindMethod);
 
@@ -96,7 +99,8 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 					if (args != null && args.length == 2) {
 						if (Dictionary.class.isAssignableFrom(args[1])) {
 							if (log.isDebugEnabled())
-								log.debug("discovered custom method [" + method.toString() + "]");
+								log.debug("discovered custom method [" + method.toString() + "] on "
+										+ target.getClass());
 							methods.put(args[0], method);
 						}
 					}

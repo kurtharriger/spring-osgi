@@ -13,12 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created on 23-Jan-2006 by Adrian Colyer
  */
 package org.springframework.osgi.context.support;
 
+import java.io.IOException;
+
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.xml.ResourceEntityResolver;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.osgi.util.ConfigUtils;
+import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiServiceUtils;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Application context backed by an OSGi bundle. Will use the bundle classpath
@@ -26,46 +36,139 @@ import org.springframework.beans.BeansException;
  * understands the "bundle:" resource prefix for explicit loading of resources
  * from the bundle. When the bundle prefix is used the target resource must be
  * contained within the bundle (or attached fragments), the classpath is not
- * searched. <p/> This application context will publish itself as a service
- * using the service name
- * "&lt;bundle-symbolic-name&gt-springApplicationContext". To specify an
- * alternate service name, use the org.springframework.context.service.name
- * manifest header in the bundle manifest. For example: <p/> <code>
- * org.springframework.context.service.name=myApplicationContextService
- * </code>
- * <p/> TODO: provide means to access OSGi services etc. through this application context?
- * 
- * TODO: think about whether restricting config files to bundle: is the right thing to do
- *  
- * TODO: it goes away and comes back
+ * searched. <p/>
  * 
  * @author Adrian Colyer
  * @author Andy Piper
  * @author Hal Hildebrand
+ * @author Costin Leau
  * @since 2.0
  */
-public class OsgiBundleXmlApplicationContext extends AbstractBundleXmlApplicationContext {
+
+// TODO: provide means to access OSGi services etc. through this application
+// context?
+// TODO: think about whether restricting config files to bundle: is the right
+// thing to do
+public class OsgiBundleXmlApplicationContext extends AbstractRefreshableOsgiBundleApplicationContext {
+
+	/** retrieved from the BundleContext * */
+	private OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver;
 
 	public OsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations) {
-		this(context, configLocations, null);
+		setBundleContext(context);
+		setConfigLocations(configLocations);
+		this.setDisplayName(ClassUtils.getShortName(getClass()) + "(bundle="
+				+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ", config="
+				+ StringUtils.arrayToCommaDelimitedString(getConfigLocations()) + ")");
 	}
 
-	public OsgiBundleXmlApplicationContext(BundleContext aBundleContext, String[] configLocations,
-	                                       OsgiBundleNamespaceHandlerAndEntityResolver resolver) {
-		this(aBundleContext, configLocations, BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundleContext.getBundle()), resolver);
+	protected String[] getDefaultConfigLocations() {
+		return new String[] { ConfigUtils.SPRING_CONTEXT_DIRECTORY };
 	}
 
-	public OsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations, ClassLoader classLoader,
-	                                       OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
-		super(context, configLocations, classLoader, namespaceResolver);
-		// don't refresh in constructor as refresh may take a long time when waiting for
-		// service dependencies, and we want to return the "in-progress" context object so we can
-		// stop the bundle at any point...
+	/**
+	 * Loads the bean definitions via an XmlBeanDefinitionReader.
+	 * 
+	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
+	 * @see #initBeanDefinitionReader
+	 * @see #loadBeanDefinitions
+	 */
+	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
+		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
+		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+
+		// Configure the bean definition reader with this context's
+		// resource loading environment.
+		beanDefinitionReader.setResourceLoader(this);
+
+		// prefer the namespace plugin instead of ResourceEntityResolver
+
+		OsgiBundleNamespaceHandlerAndEntityResolver defaultHandlerResolver = (namespaceResolver != null ? namespaceResolver
+				: lookupHandlerAndResolver());
+
+		if (defaultHandlerResolver != null) {
+			beanDefinitionReader.setEntityResolver(defaultHandlerResolver);
+			beanDefinitionReader.setNamespaceHandlerResolver(defaultHandlerResolver);
+		}
+		else {
+			// fallback to ResourceEntityResolver
+			beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
+		}
+
+		// Allow a subclass to provide custom initialization of the reader,
+		// then proceed with actually loading the bean definitions.
+		initBeanDefinitionReader(beanDefinitionReader);
+		loadBeanDefinitions(beanDefinitionReader);
 	}
 
-	public void refresh() throws BeansException {
-		super.refresh();
-		// Only publish the context once the beans are created.
-		publishContextAsOsgiService();
+	/**
+	 * Lookup the NamespaceHandler and entity resolver Service inside the OSGi
+	 * space.
+	 * 
+	 * @return
+	 */
+	protected OsgiBundleNamespaceHandlerAndEntityResolver lookupHandlerAndResolver() {
+		// FIXME: add smart lookup proxy - if no service is available, an
+		// exception will be thrown
+		ServiceReference reference = OsgiServiceUtils.getService(getBundleContext(),
+			OsgiBundleNamespaceHandlerAndEntityResolver.class, null);
+
+		OsgiBundleNamespaceHandlerAndEntityResolver resolver = (OsgiBundleNamespaceHandlerAndEntityResolver) getBundleContext().getService(
+			reference);
+
+		if (logger.isDebugEnabled())
+			logger.debug("looking for NamespaceHandlerAndEntityResolver OSGi service.... found=" + resolver);
+
+		return resolver;
 	}
+
+	/**
+	 * We can't look in META-INF across bundles when using osgi, so we need to
+	 * change the default namespace handler (spring.handlers) location with a
+	 * custom resolver. Each Spring OSGi bundle which provides a namespace
+	 * handler plugin publishes a NamespaceHandlerResolver service as well as an
+	 * EntityResolver service which is used to plug in the namespaces supported
+	 * by the bundle.
+	 */
+	protected void initBeanDefinitionReader(XmlBeanDefinitionReader beanDefinitionReader) {
+		if (namespaceResolver != null) {
+			beanDefinitionReader.setEntityResolver(namespaceResolver);
+			beanDefinitionReader.setNamespaceHandlerResolver(namespaceResolver);
+		}
+	}
+
+	/**
+	 * Load the bean definitions with the given XmlBeanDefinitionReader.
+	 * <p>
+	 * The lifecycle of the bean factory is handled by the refreshBeanFactory
+	 * method; therefore this method is just supposed to load and/or register
+	 * bean definitions.
+	 * <p>
+	 * Delegates to a ResourcePatternResolver for resolving location patterns
+	 * into Resource instances.
+	 * 
+	 * @throws org.springframework.beans.BeansException in case of bean
+	 * registration errors
+	 * @throws java.io.IOException if the required XML document isn't found
+	 * @see #refreshBeanFactory
+	 * @see #getConfigLocations
+	 * @see #getResources
+	 * @see #getResourcePatternResolver
+	 */
+	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
+		String[] configLocations = getConfigLocations();
+		if (configLocations != null) {
+			for (int i = 0; i < configLocations.length; i++) {
+				reader.loadBeanDefinitions(configLocations[i]);
+			}
+		}
+	}
+
+	/**
+	 * @param namespaceResolver The namespaceResolver to set.
+	 */
+	public void setNamespaceResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
+		this.namespaceResolver = namespaceResolver;
+	}
+
 }

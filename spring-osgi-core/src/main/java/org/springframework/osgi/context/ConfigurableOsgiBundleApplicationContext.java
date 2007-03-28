@@ -47,5 +47,28 @@ public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableAp
 	 * @see #refresh()
 	 */
 	void setBundleContext(BundleContext bundleContext);
-	
+
+	/**
+	 * Flag which indicates if the application context has been fully
+	 * initialized and is ready for usage or not. This is useful for
+	 * implementations that rely on several 3rd party services before creating
+	 * the current beans.
+	 * 
+	 */
+	boolean isAvailable();
+
+	/**
+	 * Eagerly initialize the imported services for the current application
+	 * context.
+	 * 
+	 * @param eagerlyInitImporters The eagerlyInitImporters to set.
+	 */
+	void setEagerlyInitImporters(boolean eagerlyInitImporters);
+
+	/**
+	 * Publish the application context as an OSGi service.
+	 * 
+	 * @param publishContextAsService The publishContextAsService to set.
+	 */
+	void setPublishContextAsService(boolean publishContextAsService);
 }

@@ -24,6 +24,8 @@ import org.easymock.MockControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.springframework.beans.BeansException;
+import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
  * 
@@ -31,10 +33,12 @@ import org.osgi.framework.Constants;
  */
 public class AbstractBundleXmlApplicationContextTest extends TestCase {
 
-	AbstractBundleXmlApplicationContext xmlContext;
+	OsgiBundleXmlApplicationContext xmlContext;
 
 	MockControl bundleCtxCtrl, bundleCtrl;
+
 	BundleContext context;
+
 	Bundle bundle;
 
 	Dictionary dictionary;
@@ -54,7 +58,10 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 	}
 
 	private void createContext() {
-		xmlContext = new AbstractBundleXmlApplicationContext(context, new String[] {}) {
+		xmlContext = new OsgiBundleXmlApplicationContext(context, new String[] {}) {
+			public void refresh() throws BeansException {
+				// no-op
+			}
 		};
 	}
 
@@ -70,7 +77,7 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 
 	public void testGetBundleName() {
 		String symbolicName = "symbolic";
-		//bundleCtrl.reset();
+		// bundleCtrl.reset();
 		bundleCtrl.expectAndReturn(bundle.getSymbolicName(), symbolicName, MockControl.ONE_OR_MORE);
 		bundleCtxCtrl.replay();
 		bundleCtrl.replay();
@@ -78,7 +85,7 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 		// check default
 		createContext();
 
-		assertEquals(symbolicName, xmlContext.getBundleName());
+		assertEquals(symbolicName, OsgiBundleUtils.getNullSafeSymbolicName(bundle));
 	}
 
 	public void testGetBundleNameFallbackMechanism() {
@@ -92,18 +99,18 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 		createContext();
 
 		// use the 2 symbolic name calls
-		assertEquals(title, xmlContext.getBundleName());
+		assertEquals(title, OsgiBundleUtils.getNullSafeSymbolicName(bundle));
 	}
 
 	public void testGetServiceName() {
 		String symbolicName = "symbolic";
-		//bundleCtrl.reset();
+		// bundleCtrl.reset();
 		bundleCtrl.expectAndReturn(bundle.getSymbolicName(), symbolicName, MockControl.ONE_OR_MORE);
 		bundleCtxCtrl.replay();
 		bundleCtrl.replay();
 
 		createContext();
-		assertEquals(symbolicName, xmlContext.getServiceName());
+		assertEquals(symbolicName, OsgiBundleUtils.getNullSafeSymbolicName(bundle));
 
 	}
 

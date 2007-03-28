@@ -15,15 +15,12 @@
  */
 package org.springframework.osgi.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.util.Assert;
 
 /**
@@ -36,12 +33,36 @@ import org.springframework.util.Assert;
  */
 public abstract class OsgiListenerUtils {
 
-
+	/**
+	 * Add a service listener to the given application context, under the
+	 * specified filter.
+	 * 
+	 * @see #addServiceListener(BundleContext, ServiceListener, String)
+	 * @param context
+	 * @param listener
+	 * @param filter
+	 */
 	public static void addServiceListener(BundleContext context, ServiceListener listener, Filter filter) {
 		String toStringFilter = (filter == null ? null : filter.toString());
 		addServiceListener(context, listener, toStringFilter);
 	}
 
+	/**
+	 * Add a service listener to the given application context, under the
+	 * specified filter given as a String. The method will also retrieve the
+	 * services registered before the listener registration and will inform the
+	 * listener through service events of type REGISTERED. This might cause
+	 * problems in case a service is being registered between the listener
+	 * registration and the retrieval of existing services and thus, can cause
+	 * event duplication to occur on the listener.
+	 * 
+	 * <p/> For most implementations this is not a problem; if it is then do not
+	 * use this method.
+	 * 
+	 * @param context
+	 * @param listener
+	 * @param filter
+	 */
 	public static void addServiceListener(BundleContext context, ServiceListener listener, String filter) {
 		Assert.notNull(context);
 		Assert.notNull(listener);

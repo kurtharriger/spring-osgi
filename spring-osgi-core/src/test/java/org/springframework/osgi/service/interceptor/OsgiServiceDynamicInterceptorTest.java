@@ -32,6 +32,7 @@ import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
+import org.springframework.osgi.service.support.RetryTemplate;
 
 /**
  * @author Costin Leau
@@ -66,7 +67,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		// special mock context
 		// 1. will return no service for the null Filter ("null")
 		// 2. will return ref2 for filter serv2Filter
-		
+
 		// the same goes with getService
 		BundleContext ctx = new MockBundleContext() {
 
@@ -245,4 +246,24 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		assertNotNull("should have initialized listener", listener);
 	}
 
+	public void testMandatoryCardinality() {
+		MockBundleContext ctx = new MockBundleContext() {
+			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+				return null;
+			}
+		};
+		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED, true);
+		interceptor.setFilter(new MockFilter());
+		RetryTemplate template = new RetryTemplate();
+		template.setRetryNumbers(1);
+		template.setWaitTime(10);
+		interceptor.setRetryTemplate(template);
+		try {
+			interceptor.afterPropertiesSet();
+			fail("expected exception");
+		}
+		catch (ServiceUnavailableException sue) {
+			// expected
+		}
+	}
 }

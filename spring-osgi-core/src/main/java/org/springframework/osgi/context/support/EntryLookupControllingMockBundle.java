@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.extender.support;
+package org.springframework.osgi.context.support;
 
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -1,0 +1,223 @@
+/*
+ * Copyright 2002-2007 the original author or authors.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.osgi.util;
+
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.osgi.framework.Bundle;
+import org.springframework.osgi.io.OsgiBundleResource;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+/**
+ * OSGi bundle manifest manifest based utility class.
+ * 
+ * Defines Spring/OSGi constants and method for configuring Spring application
+ * context.
+ * 
+ * @author Costin Leau
+ * 
+ */
+public abstract class ConfigUtils {
+
+	private static final String CONTEXT_DIR = "/META-INF/spring/";
+
+	private static final String CONTEXT_FILES = "*.xml";
+
+	public static final String SPRING_CONTEXT_DIRECTORY = OsgiBundleResource.BUNDLE_URL_PREFIX + CONTEXT_DIR
+			+ CONTEXT_FILES;
+
+	public static final String CONFIG_WILDCARD = "*";
+
+	/**
+	 * Manifest entry name for configuring Spring application context.
+	 */
+	public static final String SPRING_CONTEXT_HEADER = "Spring-Context";
+
+	/**
+	 * Directive for publishing Spring application context as a service.
+	 */
+	public static final String DIRECTIVE_DONT_PUBLISH = "publish-context";
+
+	/**
+	 * Directive for finding imported OSGi service first, before initializing
+	 * any beans.
+	 * 
+	 */
+	public static final String DIRECTIVE_EAGERLY_INIT_IMPORTERS = "eagerly-init-importers";
+
+	/**
+	 * Identical in behavior with {@link #DIRECTIVE_WAIT_FOR_DEPENDENCIES}
+	 */
+	public static final String DIRECTIVE_WAIT_FOR_DEPENDENCIES = "wait-for-dependencies";
+
+	/**
+	 * Create asynchronously directive.
+	 */
+	public static final String DIRECTIVE_CREATE_ASYNCHRONOUSLY = "create-asynchronously";
+
+	public static final String EQUALS = ":=";
+
+	/**
+	 * Token used for separating directives inside a header.
+	 */
+	public static final String DIRECTIVE_SEPARATOR = ";";
+
+	public static final String CONTEXT_LOCATION_SEPARATOR = ",";
+
+	public static final boolean DIRECTIVE_DONT_PUBLISH_DEFAULT = false;
+
+	public static final boolean DIRECTIVE_EAGERLY_INIT_IMPORTERS_DEFAULT = false;
+
+	public static final boolean DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT = true;
+
+	private static final Set DIRECTIVES = new HashSet(3);
+
+	static {
+		CollectionUtils.mergeArrayIntoCollection(new String[] { DIRECTIVE_DONT_PUBLISH,
+				DIRECTIVE_EAGERLY_INIT_IMPORTERS, DIRECTIVE_CREATE_ASYNCHRONOUSLY }, DIRECTIVES);
+	}
+
+	/**
+	 * Return the {@value #SPRING_CONTEXT_HEADER} if present from the given
+	 * dictionary.
+	 * 
+	 * @param headers
+	 * @return
+	 */
+	public static String getSpringContextHeader(Dictionary headers) {
+		Object header = null;
+		if (headers != null)
+			header = headers.get(SPRING_CONTEXT_HEADER);
+		return (header != null ? header.toString() : null);
+	}
+
+	/**
+	 * Return the directive value as a String. If the directive does not exist
+	 * or is invalid (wrong format) a null string will be returned.
+	 * 
+	 * @param header
+	 * @param directive
+	 * @return
+	 */
+	public static String getDirectiveValue(String header, String directive) {
+		Assert.notNull(header, "not-null header required");
+		Assert.notNull(directive, "not-null directive required");
+		String[] directives = StringUtils.tokenizeToStringArray(header, DIRECTIVE_SEPARATOR);
+
+		for (int i = 0; i < directives.length; i++) {
+			String[] splittedDirective = StringUtils.delimitedListToStringArray(directives[i].trim(), EQUALS);
+			if (splittedDirective.length == 2 && splittedDirective[0].equals(directive))
+				return splittedDirective[1];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Shortcut for finding the boolean value for
+	 * {@link #DIRECTIVE_DONT_PUBLISH} directive using the given headers.
+	 * 
+	 * @param headers
+	 * @return
+	 */
+	public static boolean getDontPublishContext(Dictionary headers) {
+		String header = getSpringContextHeader(headers);
+		return (header != null ? Boolean.valueOf(getDirectiveValue(header, DIRECTIVE_DONT_PUBLISH)).booleanValue()
+				: DIRECTIVE_DONT_PUBLISH_DEFAULT);
+	}
+
+	/**
+	 * Shortcut for finding the boolean value for
+	 * {@link #DIRECTIVE_DONT_PUBLISH} directive using the given headers.
+	 * 
+	 * @param headers
+	 * @return
+	 */
+	public static boolean getEagerlyInitializeImporters(Dictionary headers) {
+		String header = getSpringContextHeader(headers);
+		return (header != null ? Boolean.valueOf(getDirectiveValue(header, DIRECTIVE_EAGERLY_INIT_IMPORTERS)).booleanValue()
+				: DIRECTIVE_EAGERLY_INIT_IMPORTERS_DEFAULT);
+	}
+
+	public static boolean getCreateAsync(Dictionary headers) {
+		String header = getSpringContextHeader(headers);
+		return (header != null ? Boolean.valueOf(getDirectiveValue(header, DIRECTIVE_CREATE_ASYNCHRONOUSLY)).booleanValue()
+				: DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT);
+	}
+
+	public static boolean getWaitForDependencies(Dictionary headers) {
+		String header = getSpringContextHeader(headers);
+		return (header != null ? Boolean.valueOf(getDirectiveValue(header, DIRECTIVE_WAIT_FOR_DEPENDENCIES)).booleanValue()
+				: DIRECTIVE_EAGERLY_INIT_IMPORTERS_DEFAULT);
+	}
+
+	/**
+	 * Return the config locations from the Spring-Context header. The returned
+	 * Strings can be sent to a
+	 * {@link org.springframework.core.io.ResourceLoader} for loading the
+	 * configurations.
+	 * 
+	 * @param headers
+	 * @return
+	 */
+	public static String[] getConfigLocations(Dictionary headers) {
+		String header = getSpringContextHeader(headers);
+
+		if (StringUtils.hasText(header)) {
+			// get the file location
+			String locations = StringUtils.tokenizeToStringArray(header, DIRECTIVE_SEPARATOR)[0];
+			// parse it into individual token
+			String[] ctxEntries = StringUtils.tokenizeToStringArray(locations, CONTEXT_LOCATION_SEPARATOR);
+
+			for (int i = 0; i < ctxEntries.length; i++) {
+				// replace the wild card with the predefined pattern
+				if (CONFIG_WILDCARD.equals(ctxEntries[i]))
+					ctxEntries[i] = SPRING_CONTEXT_DIRECTORY;
+			}
+
+			// remove duplicates
+			return StringUtils.removeDuplicateStrings(ctxEntries);
+		}
+		return new String[0];
+	}
+
+	/**
+	 * Dictates if the given bundle is Spring/OSGi powered or not.
+	 * 
+	 * <p/> The method looks first for a Spring-Context bundle header and then
+	 * for *.xml files under META-INF/spring folder. If either is present, true
+	 * is returned.
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public static boolean isSpringOsgiPoweredBundle(Bundle bundle) {
+		Assert.notNull(bundle, "non-null bundle required");
+
+		// look first for Spring-Context entry
+		if (getSpringContextHeader(bundle.getHeaders()) != null)
+			return true;
+
+		// check the default locations now
+		Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
+		return (defaultConfig != null ? defaultConfig.hasMoreElements() : false);
+	}
+}

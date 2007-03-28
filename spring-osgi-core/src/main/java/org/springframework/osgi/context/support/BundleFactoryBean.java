@@ -16,9 +16,6 @@
  */
 package org.springframework.osgi.context.support;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
@@ -40,26 +37,34 @@ import org.springframework.util.Assert;
 
 /**
  * Install Bundles using a FactoryBean. This allows customers to use Spring to
- * drive bundle management. Bundles states can be modified using the state parameter.
- * Most commonly this is set to "start".
- * <p/>
- * Note that there are some issues with installing bundles dynamically in that Spring
- * aggressively loads bean classes so its not currently possible to have bean definitions that
- * use the same bundle in the same application context file.
- *
+ * drive bundle management. Bundles states can be modified using the state
+ * parameter. Most commonly this is set to "start". <p/> Note that there are
+ * some issues with installing bundles dynamically in that Spring aggressively
+ * loads bean classes so its not currently possible to have bean definitions
+ * that use the same bundle in the same application context file.
+ * 
  * @author Andy Piper
  */
-public class BundleFactoryBean implements FactoryBean, BundleContextAware,
-	SynchronousBundleListener, InitializingBean, DisposableBean {
+public class BundleFactoryBean implements FactoryBean, BundleContextAware, SynchronousBundleListener, InitializingBean,
+		DisposableBean {
 	private Resource bundleUrl;
+
 	private Bundle bundle;
+
 	private BundleContext bundleContext;
+
 	private String state;
+
 	private int startLevel;
+
 	private ClassLoader classloader;
+
 	private String symbolicName;
+
 	private static Log log = LogFactory.getLog(BundleFactoryBean.class);
+
 	private boolean pushBundleAsContextClassLoader = false;
+
 	private final Latch latch = new Latch();
 
 	public BundleFactoryBean() {
@@ -137,17 +142,17 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 	}
 
 	/**
-	 * Determines whether invocations on the remote service should be performed in the context
-	 * of the target bundle's ClassLoader. The default is false.
+	 * Determines whether invocations on the remote service should be performed
+	 * in the context of the target bundle's ClassLoader. The default is false.
 	 */
 	public boolean isPushBundleAsContextClassloader() {
 		return pushBundleAsContextClassLoader;
 	}
 
 	/**
-	 * Determines whether invocations on the remote service should be performed in the context
-	 * of the target bundle's ClassLoader. The default is false.
-	 *
+	 * Determines whether invocations on the remote service should be performed
+	 * in the context of the target bundle's ClassLoader. The default is false.
+	 * 
 	 * @param pushBundleAsContextClassLoader
 	 */
 	public void setPushBundleAsContextClassloader(boolean pushBundleAsContextClassLoader) {
@@ -155,7 +160,8 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 	}
 
 	public synchronized void afterPropertiesSet() throws Exception {
-		// REVIEW andyp -- we optionally push the Bundle's classloader as the CCL before
+		// REVIEW andyp -- we optionally push the Bundle's classloader as the
+		// CCL before
 		// invoking any lifecycle tasks.
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		try {
@@ -211,8 +217,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 				public void onApplicationEvent(ApplicationEvent event) {
 					SpringBundleEvent ev = (SpringBundleEvent) event;
 					if (((Bundle) ev.getSource()).getBundleId() == b.getBundleId()) {
-						if (ev.getType() == BundleEvent.STARTED
-							|| ev.getType() == BundleEvent.STOPPED) {
+						if (ev.getType() == BundleEvent.STARTED || ev.getType() == BundleEvent.STOPPED) {
 							latch.decr();
 						}
 					}
@@ -222,9 +227,9 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 		}
 	}
 
-
 	private void updateStartLevel(int level) {
-		if (level == 0 || bundle == null) return;
+		if (level == 0 || bundle == null)
+			return;
 		// Set the start level of the bundle if we are able.
 		ServiceReference startref = bundleContext.getServiceReference(StartLevel.class.getName());
 		if (startref != null) {
@@ -237,30 +242,27 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 	}
 
 	public synchronized void bundleChanged(BundleEvent event) {
-		if (bundle == null) return;
-		// System.out.println("EVENT: " + event.getBundle().getSymbolicName() + " " + event.getType());
+		if (bundle == null)
+			return;
+		// System.out.println("EVENT: " + event.getBundle().getSymbolicName() +
+		// " " + event.getType());
 		if (event.getBundle().getBundleId() == bundle.getBundleId()) {
 			switch (event.getType()) {
-				case BundleEvent.UNINSTALLED:
-					latch.reset();
-					bundle = null;
-					classloader = null;
-					bundleContext.removeBundleListener(this);
-					break;
-					/*
-									case BundleEvent.RESOLVED:
-										if (log.isInfoEnabled()) log.info("Bundle [" + beanName
-												+ "] was resolved, updating properties");
-										try {
-											afterPropertiesSet();
-										}
-										catch (Exception e) {
-											if (log.isWarnEnabled()) log.warn("Could not change bundle state", e);
-										}
-										break;
-									*/
-				default:
-					break;
+			case BundleEvent.UNINSTALLED:
+				latch.reset();
+				bundle = null;
+				classloader = null;
+				bundleContext.removeBundleListener(this);
+				break;
+			/*
+			 * case BundleEvent.RESOLVED: if (log.isInfoEnabled())
+			 * log.info("Bundle [" + beanName + "] was resolved, updating
+			 * properties"); try { afterPropertiesSet(); } catch (Exception e) {
+			 * if (log.isWarnEnabled()) log.warn("Could not change bundle
+			 * state", e); } break;
+			 */
+			default:
+				break;
 			}
 		}
 	}
@@ -304,17 +306,11 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware,
 	}
 
 	/*
-	public static void dumpStacks() {
-		Map stacks = Thread.getAllStackTraces();
-		for (Iterator i = stacks.entrySet().iterator(); i.hasNext();) {
-			Map.Entry e = (Map.Entry) i.next();
-			System.out.println("");
-			System.out.println(e.getKey());
-			StackTraceElement[] se = (StackTraceElement[]) e.getValue();
-			for (int j = 0; j < se.length; j++) {
-				System.out.println(" " + se[j]);
-			}
-		}
-	}
-	*/
+	 * public static void dumpStacks() { Map stacks =
+	 * Thread.getAllStackTraces(); for (Iterator i =
+	 * stacks.entrySet().iterator(); i.hasNext();) { Map.Entry e = (Map.Entry)
+	 * i.next(); System.out.println(""); System.out.println(e.getKey());
+	 * StackTraceElement[] se = (StackTraceElement[]) e.getValue(); for (int j =
+	 * 0; j < se.length; j++) { System.out.println(" " + se[j]); } } }
+	 */
 }

@@ -50,7 +50,6 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 			 */
 			protected void loadBeanDefinitions(DefaultListableBeanFactory arg0) throws IOException, BeansException {
 			}
-
 		};
 	}
 

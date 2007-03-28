@@ -79,7 +79,7 @@ public class ServiceWrapper {
 
 	public Object getService() {
 		// TODO: check synch and service cleanup
-		synchronized (reference) {
+		//synchronized (reference) {
 			if (isServiceAlive()) {
 				try {
 					return context.getService(reference);
@@ -88,7 +88,7 @@ public class ServiceWrapper {
 					// context.ungetService(reference);
 				}
 			}
-		}
+		//}
 		return null;
 	}
 

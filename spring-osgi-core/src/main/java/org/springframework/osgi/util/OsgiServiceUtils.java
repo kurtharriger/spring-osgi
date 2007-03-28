@@ -21,8 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
+import org.springframework.core.ConstantException;
+import org.springframework.core.Constants;
 import org.springframework.osgi.AmbiguousServiceReferenceException;
 import org.springframework.osgi.NoSuchServiceException;
 import org.springframework.util.Assert;
@@ -32,9 +36,11 @@ import org.springframework.util.ObjectUtils;
  * Utility class offering easy access to OSGi services
  * 
  * @author Adrian Colyer
- * @since 2.0
+ * @author Costin Leau
  */
 public abstract class OsgiServiceUtils {
+
+	public static final Constants BUNDLE_EVENTS = new Constants(BundleEvent.class);
 
 	/**
 	 * Find the single OSGi service of the given type and matching the given
@@ -137,27 +143,37 @@ public abstract class OsgiServiceUtils {
 		}
 	}
 
-	public final static String[] EVENT_CODES = { "INSTALLED", "STARTED", "STOPPED", "UPDATED", "UNINSTALLED",
-			"RESOLVED", "UNRESOLVED", "STARTING", "STOPPING", "LAZY_ACTIVATION"// new
-	// in
-	// r4.1
-	};
-
-	public final static int NUM_CODES = EVENT_CODES.length;
+	/**
+	 * Unregisters the given service registration from the given bundle. Returns
+	 * true if the unregistration process succeeded, false otherwise.
+	 * 
+	 * @param registration
+	 * @return
+	 */
+	public static boolean unregisterService(ServiceRegistration registration) {
+		try {
+			if (registration != null) {
+				registration.unregister();
+				return true;
+			}
+		}
+		catch (IllegalStateException alreadyUnregisteredException) {
+		}
+		return false;
+	}
 
 	/**
-	 * Convert event codes to a printable String
+	 * Convert event codes to a printable String.
 	 * 
 	 * @param type
 	 */
-	public static String eventToString(int type) {
-		int i = 0;
-		while ((type & 0x1) == 0) {
-			type >>= 1;
-			i++;
+	public static String getBundleEventAsString(int bundleEvent) {
+		try {
+			return BUNDLE_EVENTS.toCode(new Integer(bundleEvent), "");
 		}
-		Assert.state(i < NUM_CODES);
-		return EVENT_CODES[i];
+		catch (ConstantException cex) {
+			return "UNKNOWN EVENT TYPE";
+		}
 	}
 
 	/**
