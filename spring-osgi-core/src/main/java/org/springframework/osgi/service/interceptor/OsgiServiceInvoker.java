@@ -58,7 +58,7 @@ public abstract class OsgiServiceInvoker implements MethodInterceptor {
 	 * @return
 	 * @throws Throwable
 	 */
-	protected abstract Object getTarget() throws Throwable;
+	protected abstract Object getTarget();
 
 	/*
 	 * (non-Javadoc)

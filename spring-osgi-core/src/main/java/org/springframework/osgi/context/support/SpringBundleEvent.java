@@ -55,7 +55,7 @@ public class SpringBundleEvent extends ApplicationEvent {
 	}
 
 	public String toString() {
-		 return "[" + OsgiServiceUtils.eventToString(eventType)
+		 return "[" + OsgiServiceUtils.getBundleEventAsString(eventType)
 			 + ", " + ((Bundle)getSource()).getSymbolicName() + "]";
 	}
 

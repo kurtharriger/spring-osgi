@@ -15,14 +15,16 @@
  */
 package org.springframework.osgi.service.util;
 
+import java.util.Dictionary;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
-import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Costin Leau
@@ -30,18 +32,19 @@ import org.springframework.osgi.util.OsgiServiceUtils;
  */
 public abstract class OsgiServiceBindingUtils {
 
-	private static final Log log = LogFactory.getLog(OsgiListenerUtils.class);
+	private static final Log log = LogFactory.getLog(OsgiServiceBindingUtils.class);
 
 	public static void callListenersBind(BundleContext context, ServiceReference reference,
 			TargetSourceLifecycleListener[] listeners) {
-		boolean debug = log.isDebugEnabled();
-		Object service = OsgiServiceUtils.getService(context, reference);
-		for (int i = 0; i < listeners.length; i++) {
-			{
+		if (!ObjectUtils.isEmpty(listeners)) {
+			boolean debug = log.isDebugEnabled();
+			Object service = OsgiServiceUtils.getService(context, reference);
+			Dictionary properties = OsgiServiceReferenceUtils.getServiceProperties(reference);
+			for (int i = 0; i < listeners.length; i++) {
 				if (debug)
 					log.debug("calling bind on " + listeners[i] + " w/ reference " + reference);
 				try {
-					listeners[i].bind(service, OsgiServiceReferenceUtils.getServiceProperties(reference));
+					listeners[i].bind(service, properties);
 				}
 				catch (Exception ex) {
 					log.warn("bind method on listener " + listeners[i] + " threw exception ", ex);
@@ -52,16 +55,19 @@ public abstract class OsgiServiceBindingUtils {
 
 	public static void callListenersUnbind(BundleContext context, ServiceReference reference,
 			TargetSourceLifecycleListener[] listeners) {
-		boolean debug = log.isDebugEnabled();
-		Object service = OsgiServiceUtils.getService(context, reference);
-		for (int i = 0; i < listeners.length; i++) {
-			if (debug)
-				log.debug("calling unbind on " + listeners[i] + " w/ reference " + reference);
-			try {
-				listeners[i].unbind(service, OsgiServiceReferenceUtils.getServiceProperties(reference));
-			}
-			catch (Exception ex) {
-				log.warn("unbind method on listener " + listeners[i] + " threw exception ", ex);
+		if (!ObjectUtils.isEmpty(listeners)) {
+			boolean debug = log.isDebugEnabled();
+			Object service = OsgiServiceUtils.getService(context, reference);
+			Dictionary properties = OsgiServiceReferenceUtils.getServiceProperties(reference);
+			for (int i = 0; i < listeners.length; i++) {
+				if (debug)
+					log.debug("calling unbind on " + listeners[i] + " w/ reference " + reference);
+				try {
+					listeners[i].unbind(service, properties);
+				}
+				catch (Exception ex) {
+					log.warn("unbind method on listener " + listeners[i] + " threw exception ", ex);
+				}
 			}
 		}
 	}

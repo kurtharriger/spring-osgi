@@ -71,23 +71,6 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 			switch (event.getType()) {
 
 			case (ServiceEvent.REGISTERED):
-				// be cautious!
-
-				// add only if needed to not create a new service proxy for
-				// nothing
-				synchronized (serviceReferences) {
-					if (!serviceReferences.containsKey(serviceId)) {
-						found = true;
-						serviceReferences.put(serviceId, createServiceProxy(ref));
-						serviceIDs.add(serviceId);
-						// call listener
-					}
-				}
-				// inform listeners
-				if (found)
-					OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
-
-				break;
 			case (ServiceEvent.MODIFIED):
 				// same as ServiceEvent.REGISTERED
 				synchronized (serviceReferences) {

@@ -54,8 +54,15 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
 
+	private final boolean serviceRequiredAtStartup;
+
 	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader) {
+		this(context, contextClassLoader, true);
+	}
+
+	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader, boolean serviceRequiredAtStartup) {
 		super(context, null, contextClassLoader);
+		this.serviceRequiredAtStartup = serviceRequiredAtStartup;
 	}
 
 	private class Listener implements ServiceListener {
@@ -72,12 +79,6 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 			switch (event.getType()) {
 
 			case (ServiceEvent.REGISTERED):
-				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
-					// inform listeners
-					OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
-				}
-
-				break;
 			case (ServiceEvent.MODIFIED):
 				// same as ServiceEvent.REGISTERED
 				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
@@ -170,7 +171,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 	 * (non-Javadoc)
 	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#getTarget()
 	 */
-	protected Object getTarget() throws Throwable {
+	protected Object getTarget() {
 		Object target = null;
 
 		if (wrapper == null || !wrapper.isServiceAlive())
@@ -180,8 +181,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 		// nothing found
 		if (target == null) {
-			throw new ServiceUnavailableException("Could not find service [" + wrapper
-				+ "], filter [" + filter.toString() + "]", null, filter.toString());
+			throw new ServiceUnavailableException("Could not find service [" + wrapper + "], filter ["
+					+ filter.toString() + "]", null, filter.toString());
 		}
 
 		return target;
@@ -196,9 +197,17 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 	}
 
 	public void afterPropertiesSet() {
-		if (log.isDebugEnabled())
+		boolean debug = log.isDebugEnabled();
+		if (debug)
 			log.debug("adding osgi listener for services matching [" + filter + "]");
 		OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
+		if (serviceRequiredAtStartup) {
+			if (debug)
+				log.debug("1..x cardinality - looking for service at startup...");
+			Object target = getTarget();
+			if (debug)
+				log.debug("service retrieved " + target);
+		}
 	}
 
 	public void setFilter(Filter filter) {

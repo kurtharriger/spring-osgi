@@ -36,10 +36,11 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.Constants;
+import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.OsgiBundleScope;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
@@ -68,10 +69,9 @@ import org.springframework.util.StringUtils;
  * @author Hal Hildebrand
  * @author Andy Piper
  * 
- * @since 1.0
  */
 public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBean, DisposableBean, BundleContextAware,
-		FactoryBean {
+		FactoryBean, Ordered {
 
 	/**
 	 * ServiceFactory used for posting the bean instantiation until it is first
@@ -214,6 +214,8 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 	private Object target;
 
+	private int order = Ordered.LOWEST_PRECEDENCE;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -223,7 +225,8 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
 		Assert.notNull(bundleContext, "required property 'bundleContext' has not been set");
 
-		if (targetBeanName == null && target == null || (targetBeanName != null && target != null))
+		if (!StringUtils.hasText(targetBeanName) && target == null
+				|| (StringUtils.hasText(targetBeanName) && target != null))
 			throw new IllegalArgumentException("either 'target' or 'targetBeanName' have to be specified");
 
 		if (propertiesResolver == null) {
@@ -242,6 +245,21 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		if (this.contextClassloaderManagementStrategy == ExportClassLoadingOptions.SERVICE_PROVIDER) {
 			// FIXME: add classloading wrappers
 			wrapWithClassLoaderManagingProxy(serviceClass, interfaces);
+		}
+
+		// check if there is a reference to a non-lazy bean
+		if (StringUtils.hasText(targetBeanName)) {
+			if (beanFactory instanceof ConfigurableListableBeanFactory) {
+				// in case the target is non-lazy, singleton bean, initialize it
+				BeanDefinition beanDef = ((ConfigurableListableBeanFactory) beanFactory).getBeanDefinition(targetBeanName);
+
+				if (beanDef.isSingleton() && !beanDef.isLazyInit()) {
+					if (log.isDebugEnabled())
+						log.debug("target bean [" + targetBeanName
+								+ "] is a non-lazy singleton; forcing initialization before publishing");
+					beanFactory.getBean(targetBeanName);
+				}
+			}
 		}
 
 		// if we have a nested bean / non-Spring managed object
@@ -359,11 +377,10 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 * @return
 	 */
 	protected ServiceRegistration registerService(Class[] classes, Properties serviceProperties) {
-		Assert
-				.notEmpty(
-						classes,
-						"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
-		
+		Assert.notEmpty(
+			classes,
+			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
+
 		// create an array of classnames (used for registering the service)
 		String[] names = new String[classes.length];
 
@@ -387,9 +404,8 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		boolean bundleScoped = false;
 		// if we do have a bundle scope, use ServiceFactory decoration
 		if (targetBeanName != null) {
-			if (beanFactory instanceof ListableBeanFactory) {
-				String beanScope = ((ConfigurableListableBeanFactory) beanFactory).getBeanDefinition(targetBeanName)
-						.getScope();
+			if (beanFactory instanceof ConfigurableListableBeanFactory) {
+				String beanScope = ((ConfigurableListableBeanFactory) beanFactory).getBeanDefinition(targetBeanName).getScope();
 				bundleScoped = OsgiBundleScope.SCOPE_NAME.equals(beanScope);
 			}
 			else
@@ -449,8 +465,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 * @param classloaderManagementOption
 	 */
 	public void setContextClassloader(String classloaderManagementOption) {
-		this.contextClassloaderManagementStrategy = ExportClassLoadingOptions
-				.getFromString(classloaderManagementOption);
+		this.contextClassloaderManagementStrategy = ExportClassLoadingOptions.getFromString(classloaderManagementOption);
 	}
 
 	/**
@@ -560,4 +575,19 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	public void setInterfaces(Class[] serviceInterfaces) {
 		this.interfaces = serviceInterfaces;
 	}
+
+	/**
+	 * @return Returns the order.
+	 */
+	public int getOrder() {
+		return order;
+	}
+
+	/**
+	 * @param order The order to set.
+	 */
+	public void setOrder(int order) {
+		this.order = order;
+	}
+
 }

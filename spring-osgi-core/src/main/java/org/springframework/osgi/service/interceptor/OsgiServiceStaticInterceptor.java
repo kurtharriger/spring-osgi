@@ -39,16 +39,17 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 		this.wrapper = new ServiceWrapper(reference, context);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#getTarget()
 	 */
-	protected Object getTarget() throws Throwable {
+	protected Object getTarget() {
 		// service has died, clean up
 		if (!wrapper.isServiceAlive()) {
 			wrapper.cleanup();
 			throw new ServiceUnavailableException("Service n/a", wrapper.getClass(), null);
 		}
-		
+
 		return wrapper.getService();
 	}
 }
