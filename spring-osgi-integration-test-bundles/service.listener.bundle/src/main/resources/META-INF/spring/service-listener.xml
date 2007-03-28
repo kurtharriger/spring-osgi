@@ -6,7 +6,9 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
     <bean id="listener" class="org.springframework.osgi.test.service.listener.MyListener" lazy-init="false">
+		<!--
         <property name="simpleService" ref="simpleServiceOsgi"/>
+        -->
     </bean>
 
     <osgi:reference id="simpleServiceOsgi" interface="org.springframework.osgi.test.simpleservice.MyService">
