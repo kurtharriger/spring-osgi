@@ -77,7 +77,7 @@ public class OsgiBundleResourceLoaderTest extends TestCase {
 	public void testGetRelativeResource() throws Exception {
 		String res = "foo.txt";
 		URL expected = new URL("file://" + res);
-		control.expectAndReturn(bundle.getResource(res), expected);
+		control.expectAndReturn(bundle.getEntry(res), expected);
 		control.replay();
 
 		Resource resource = loader.getResource(res);
@@ -89,7 +89,7 @@ public class OsgiBundleResourceLoaderTest extends TestCase {
 	public void testGetFallbackResource() throws Exception {
 		String res = "foo.txt";
 		URL expected = new URL("http://" + res);
-		control.expectAndReturn(bundle.getResource(res), expected);
+		control.expectAndReturn(bundle.getEntry(res), expected);
 		control.replay();
 
 		Resource resource = loader.getResource(res);
