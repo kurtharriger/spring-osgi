@@ -45,6 +45,8 @@ import org.springframework.util.ResourceUtils;
  * @author Costin Leau
  * 
  */
+// TODO: add support for urls (file://, http:// and so on)
+// TODO: fallback strategy (claspath vs local bundle)
 public class OsgiBundleResource extends AbstractResource {
 
 	public static final String BUNDLE_URL_PREFIX = "bundle:";

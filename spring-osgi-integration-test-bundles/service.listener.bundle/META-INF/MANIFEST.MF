@@ -4,3 +4,4 @@ Bundle-Version: 1.0
 Bundle-ClassPath: .
 Import-Package: org.springframework.osgi.test.simpleservice
 Export-Package: org.springframework.osgi.test.service.listener
+Spring-Context: *; eagerly-init-importers:=true

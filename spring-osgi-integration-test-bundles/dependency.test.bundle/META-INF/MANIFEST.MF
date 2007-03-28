@@ -2,6 +2,7 @@ Bundle-Name: org.springframework.osgi.test.dependencies
 Bundle-SymbolicName: org.springframework.osgi.test.dependencies
 Bundle-Version: 1.0
 Bundle-ClassPath: .
+Spring-Context: *; eagerly-init-importers:=true
 Import-Package: org.springframework.osgi.test.simpleservice,
   org.springframework.osgi.test.simpleservice2
 Export-Package: org.springframework.osgi.test.dependencies
