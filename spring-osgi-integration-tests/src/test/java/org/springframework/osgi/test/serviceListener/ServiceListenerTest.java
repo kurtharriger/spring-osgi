@@ -16,14 +16,7 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 
 	protected String[] getBundles() {
 		return new String[] {
-				localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
 						"1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.service.listener",
@@ -49,9 +42,13 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 		assertTrue("Expected only one unbinding of service", MyListener.UNBOUND_COUNT < 2);
 		assertEquals("Expected unbinding of service not seen", 1, MyListener.UNBOUND_COUNT);
 
+		logger.debug("about to restart simple service");
 		simpleServiceBundle.start();
 		waitOnContextCreation("org.springframework.osgi.test.simpleservice");
-
+		// wait some more to let the listener binding propagate
+		Thread.sleep(10);
+		
+		logger.debug("simple service succesfully restarted");
 		assertTrue("Expected only two bindings of service", MyListener.BOUND_COUNT < 3);
 		assertEquals("Expected binding of service not seen", 2, MyListener.BOUND_COUNT);
 		assertEquals("Unexpected unbinding of service", 1, MyListener.UNBOUND_COUNT);
