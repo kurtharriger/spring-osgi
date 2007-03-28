@@ -40,8 +40,8 @@ import org.springframework.osgi.util.OsgiBundleUtils;
  * Contains facilities for tracing classloading behavior so that issues can be
  * easily resolved. Debugging can be enabled by setting the system property
  * <code>org.springframework.osgi.DebugClassLoading</code> to true.
- *
- *
+ * 
+ * 
  * @author Adrian Colyer
  * @author Andy Piper
  * @author Costin Leau
@@ -50,8 +50,8 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 public class BundleDelegatingClassLoader extends ClassLoader {
 	private ClassLoader parent;
 
-	private static final boolean DEBUG = Boolean.getBoolean("org.springframework.osgi.DebugClassLoading");
 	private Bundle backingBundle;
+
 	private static final Log log = LogFactory.getLog(BundleDelegatingClassLoader.class);
 
 	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle aBundle) {
@@ -104,19 +104,18 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	}
 
 	protected Class findClass(String name) throws ClassNotFoundException {
-        // loadClass will have already checked the parent.
-        try {
-            return this.backingBundle.loadClass(name);
+		try {
+			return this.backingBundle.loadClass(name);
 		}
 		catch (ClassNotFoundException cnfe) {
-			if (log.isDebugEnabled() || DEBUG) {
-                debugClassLoading(name, null);
+			if (log.isTraceEnabled()) {
+				debugClassLoading(name, null);
 			}
 			throw cnfe;
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			// This is almost always an error
-			if (log.isWarnEnabled() || DEBUG) {
+			if (log.isTraceEnabled()) {
 				// This is caused by a dependent class failure,
 				// so make sure we search for the right one.
 				String cname = ncdfe.getMessage().replace('/', '.');
@@ -128,24 +127,27 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	/**
 	 * A best-guess attempt at figuring out why the class could not be found.
-	 *
+	 * 
 	 * @param name of the class we are trying to find.
 	 */
 	private synchronized void debugClassLoading(String name, String root) {
 		Dictionary dict = backingBundle.getHeaders();
 		String bname = dict.get(Constants.BUNDLE_NAME) + "(" + dict.get(Constants.BUNDLE_SYMBOLICNAME) + ")";
-		log.debug("Could not find class [" + name + "] required by [" + bname + "] scanning available bundles");
+		if (log.isTraceEnabled())
+			log.trace("Could not find class [" + name + "] required by [" + bname + "] scanning available bundles");
 
 		BundleContext context = OsgiBundleUtils.getBundleContext(backingBundle);
 		String packageName = name.substring(0, name.lastIndexOf('.'));
 		// Reject global packages
 		if (name.indexOf('.') < 0) {
-			log.debug("Class is not in a package, its unlikely that this will work");
+			if (log.isTraceEnabled())
+				log.trace("Class is not in a package, its unlikely that this will work");
 			return;
 		}
 		Version iversion = hasImport(backingBundle, packageName);
 		if (iversion != null && context != null) {
-			log.debug("Class is correctly imported as version [" + iversion + "], checking providing bundles");
+			if (log.isTraceEnabled())
+				log.trace("Class is correctly imported as version [" + iversion + "], checking providing bundles");
 			Bundle[] bundles = context.getBundles();
 			for (int i = 0; i < bundles.length; i++) {
 				if (bundles[i].getBundleId() != backingBundle.getBundleId()) {
@@ -160,10 +162,11 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 								// classpath also.
 								Version rootimport = hasImport(bundles[j], packageName);
 								if (rootimport == null || !rootimport.equals(iversion)) {
-									log.debug("Bundle [" + getBundleName(bundles[j]) + "] exports [" + root
-											+ "] as version [" + rootexport
-											+ "] but does not import dependent package [" + packageName
-											+ "] at version [" + iversion + "]");
+									if (log.isTraceEnabled())
+										log.trace("Bundle [" + getBundleName(bundles[j]) + "] exports [" + root
+												+ "] as version [" + rootexport
+												+ "] but does not import dependent package [" + packageName
+												+ "] at version [" + iversion + "]");
 								}
 							}
 						}
@@ -172,7 +175,8 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 			}
 		}
 		if (hasExport(backingBundle, packageName) != null) {
-			log.debug("Class is exported, checking this bundle");
+			if (log.isTraceEnabled())
+				log.trace("Class is exported, checking this bundle");
 			checkBundleForClass(backingBundle, name, iversion);
 		}
 	}
@@ -185,8 +189,9 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		// "]");
 		// Check for version matching
 		if (hasExport != null && !hasExport.equals(iversion)) {
-			log.debug("Bundle [" + getBundleName(bundle) + "] exports [" + packageName + "] as version [" + hasExport
-					+ "] but version [" + iversion + "] was required");
+			if (log.isTraceEnabled())
+				log.trace("Bundle [" + getBundleName(bundle) + "] exports [" + packageName + "] as version ["
+						+ hasExport + "] but version [" + iversion + "] was required");
 			return hasExport;
 		}
 		// Do more detailed checks
@@ -196,12 +201,14 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 			if (hasExport != null) {
 				URL url = checkBundleJarsForClass(bundle, name);
 				if (url != null) {
-					log.debug("Bundle [" + getBundleName(bundle) + "] contains [" + cname + "] in embedded jar ["
-							+ url.toString() + "] but exports the package");
+					if (log.isTraceEnabled())
+						log.trace("Bundle [" + getBundleName(bundle) + "] contains [" + cname + "] in embedded jar ["
+								+ url.toString() + "] but exports the package");
 				}
 				else {
-					log.debug("Bundle [" + getBundleName(bundle) + "] does not contain [" + cname
-							+ "] but exports the package");
+					if (log.isTraceEnabled())
+						log.trace("Bundle [" + getBundleName(bundle) + "] does not contain [" + cname
+								+ "] but exports the package");
 				}
 			}
 
@@ -214,12 +221,14 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 			Enumeration pe = bundle.findEntries(root, fileName, false);
 			if (pe != null) {
 				if (hasExport != null) {
-					log.debug("Bundle [" + getBundleName(bundle) + "] contains package [" + packageName
-							+ "] and exports it");
+					if (log.isTraceEnabled())
+						log.trace("Bundle [" + getBundleName(bundle) + "] contains package [" + packageName
+								+ "] and exports it");
 				}
 				else {
-					log.debug("Bundle [" + getBundleName(bundle) + "] contains package [" + packageName
-							+ "] but does not export it");
+					if (log.isTraceEnabled())
+						log.trace("Bundle [" + getBundleName(bundle) + "] contains package [" + packageName
+								+ "] but does not export it");
 				}
 
 			}
@@ -227,19 +236,22 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		// Found the resource, check that it is exported.
 		else {
 			if (hasExport != null) {
-				log.debug("Bundle [" + getBundleName(bundle) + "] contains resource [" + cname
-						+ "] and it is correctly exported as version [" + hasExport + "]");
+				if (log.isTraceEnabled())
+					log.trace("Bundle [" + getBundleName(bundle) + "] contains resource [" + cname
+							+ "] and it is correctly exported as version [" + hasExport + "]");
 				Class c = null;
 				try {
 					c = bundle.loadClass(name);
 				}
 				catch (ClassNotFoundException e1) {
 				}
-				log.debug("Bundle [" + getBundleName(bundle) + "] loadClass [" + cname + "] returns [" + c + "]");
+				if (log.isTraceEnabled())
+					log.trace("Bundle [" + getBundleName(bundle) + "] loadClass [" + cname + "] returns [" + c + "]");
 			}
 			else {
-				log.debug("Bundle [" + getBundleName(bundle) + "] contains resource [" + cname
-						+ "] but its package is not exported");
+				if (log.isTraceEnabled())
+					log.trace("Bundle [" + getBundleName(bundle) + "] contains resource [" + cname
+							+ "] but its package is not exported");
 			}
 		}
 		return hasExport;
@@ -261,7 +273,8 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 				jin.close();
 			}
 			catch (IOException e1) {
-				log.debug("Skipped " + url.toString() + ": " + e1.getMessage());
+				if (log.isTraceEnabled())
+					log.trace("Skipped " + url.toString() + ": " + e1.getMessage());
 			}
 		}
 		return null;
@@ -333,24 +346,23 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	}
 
 	protected URL findResource(String name) {
-		if (log.isDebugEnabled()) {
-			log.debug("looking for resource " + name);
-        }
-        URL url = this.backingBundle.getResource(name);
+		if (log.isTraceEnabled())
+			log.trace("looking for resource " + name);
+		URL url = this.backingBundle.getResource(name);
 
-		if (url != null && log.isDebugEnabled())
-			log.debug("found resource " + name + " at " + url);
+		if (url != null && log.isTraceEnabled())
+			log.trace("found resource " + name + " at " + url);
 		return url;
 	}
 
 	protected Enumeration findResources(String name) throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("looking for resources " + name);
-        }
-        Enumeration enm = this.backingBundle.getResources(name);
+		if (log.isTraceEnabled())
+			log.trace("looking for resources " + name);
 
-		if (enm != null && enm.hasMoreElements() && log.isDebugEnabled())
-			log.debug("found resource " + name + " at " + this.backingBundle.getLocation());
+		Enumeration enm = this.backingBundle.getResources(name);
+
+		if (enm != null && enm.hasMoreElements() && log.isTraceEnabled())
+			log.trace("found resource " + name + " at " + this.backingBundle.getLocation());
 
 		return enm;
 	}
