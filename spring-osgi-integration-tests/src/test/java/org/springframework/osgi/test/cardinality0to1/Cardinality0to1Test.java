@@ -22,13 +22,7 @@ public class Cardinality0to1Test extends AbstractConfigurableBundleCreatorTests 
 
     protected String[] getBundles() {
         return new String[]{
-                localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
-                localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
-                localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
-                localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
-                localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
-                localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
                                    "1.0-SNAPSHOT"),
                 localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.cardinality0to1",

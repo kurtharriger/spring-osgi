@@ -53,13 +53,8 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 	}
 
 	protected String[] getBundles() {
-		return new String[] { localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
+		return new String[] {
 				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-beans", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
 				// required by cm_all for logging
 				localMavenArtifact("org.knopflerfish.bundles", "log_all", "2.0.0"),
 				localMavenArtifact("org.knopflerfish.bundles", "cm_all", "2.0.0") };

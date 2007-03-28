@@ -16,9 +16,11 @@
 package org.springframework.osgi.test.bundleScope;
 
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.scope.common.ScopeTestService;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Integration tests for 'bundle' scoped beans.
@@ -30,22 +32,18 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getBundles() {
 		return new String[] {
-				localMavenArtifact("org.springframework.osgi", "aopalliance.osgi", "1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-aop", "2.1-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-osgi-core", "1.0-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "spring-osgi-extender", "1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.scoped.bundle.common",
-						"1.0-SNAPSHOT"),
+					"1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.scoped.bundle.a",
-						"1.0-SNAPSHOT"),
+					"1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.scoped.bundle.b",
-						"1.0-SNAPSHOT") };
+					"1.0-SNAPSHOT") };
 	}
 
 	protected String getManifestLocation() {
 		return "org/springframework/osgi/test/bundleScope/ScopingTest.MF";
-		//return null;
+		// return null;
 	}
 
 	public void testEnvironmentValidity() throws Exception {
@@ -65,15 +63,15 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 	public void testServiceAScopeForBundleA() throws Exception {
 		ScopeTestService serviceAInBundleA = (ScopeTestService) org.springframework.osgi.test.scope.a.BeanReference.BEAN;
 
-		assertFalse("same bean instance used for different bundles", serviceAInBundleA.equals(getServiceA()
-				.getServiceIdentity()));
+		assertFalse("same bean instance used for different bundles",
+			serviceAInBundleA.equals(getServiceA().getServiceIdentity()));
 	}
 
 	public void testServiceAScopeForBundleB() throws Exception {
 		ScopeTestService serviceAInBundleB = (ScopeTestService) org.springframework.osgi.test.scope.b.BeanReference.BEAN;
 
-		assertFalse("same bean instance used for different bundles", serviceAInBundleB.equals(getServiceA()
-				.getServiceIdentity()));
+		assertFalse("same bean instance used for different bundles",
+			serviceAInBundleB.equals(getServiceA().getServiceIdentity()));
 	}
 
 	public void testServiceAScopeForBundleAAndBundleB() throws Exception {
@@ -81,7 +79,7 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 		ScopeTestService serviceAInBundleB = (ScopeTestService) org.springframework.osgi.test.scope.b.BeanReference.BEAN;
 
 		assertFalse("same bean instance used for different bundles", serviceAInBundleA.getServiceIdentity().equals(
-				serviceAInBundleB.getServiceIdentity()));
+			serviceAInBundleB.getServiceIdentity()));
 	}
 
 	protected ScopeTestService getServiceA() throws Exception {
@@ -93,10 +91,14 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	protected ScopeTestService getService(String bundleName) {
-		ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(getBundleContext(), ScopeTestService.class
-				.getName(), "(Bundle-SymbolicName=org.springframework.osgi.test.scope." + bundleName + ")");
-		if (ref == null)
+		ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(getBundleContext(),
+			ScopeTestService.class.getName(), "(Bundle-SymbolicName=org.springframework.osgi.test.scope." + bundleName
+					+ ")");
+		if (ref == null) {
+			String filter = OsgiFilterUtils.unifyFilter(ScopeTestService.class, null);
+			System.out.println(ObjectUtils.nullSafeToString(OsgiServiceReferenceUtils.getServiceReferences(getBundleContext(), filter)));
 			throw new IllegalStateException("cannot find service with owning bundle " + bundleName);
+		}
 		return (ScopeTestService) getBundleContext().getService(ref);
 
 	}

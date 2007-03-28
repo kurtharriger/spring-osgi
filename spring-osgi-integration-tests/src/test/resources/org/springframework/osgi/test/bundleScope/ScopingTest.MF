@@ -6,6 +6,7 @@ Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator
 Import-Package: junit.framework,
   org.osgi.framework,
   org.apache.commons.logging,
+  org.springframework.util,
   org.springframework.osgi.service,
   org.springframework.osgi.util,
   org.springframework.osgi.test,
