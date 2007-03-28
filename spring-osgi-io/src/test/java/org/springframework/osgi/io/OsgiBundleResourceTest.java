@@ -33,7 +33,9 @@ import org.springframework.osgi.mock.MockBundle;
 public class OsgiBundleResourceTest extends TestCase {
 
 	private OsgiBundleResource resource;
+
 	private Bundle bundle;
+
 	private String path;
 
 	/*
@@ -105,19 +107,21 @@ public class OsgiBundleResourceTest extends TestCase {
 		catch (Exception ex) {
 			// expected
 		}
+	}
 
-    File tmp = File.createTempFile("foo", "bar");
-    resource = new OsgiBundleResource(bundle, "file:" + tmp.toString());
-    assertNotNull(resource.getURL());
+	public void testNonBundleUrlWhichExists() throws Exception {
+		File tmp = File.createTempFile("foo", "bar");
+		tmp.deleteOnExit();
+		resource = new OsgiBundleResource(bundle, "file:" + tmp.toString());
+		assertNotNull(resource.getURL());
+		assertTrue(resource.exists());
+		tmp.delete();
+	}
 
-    resource = new OsgiBundleResource(bundle, "file:foo" + tmp.toString());
-    try {
-      resource.getURL();
-      fail("should have thrown exception");
-    }
-    catch (Exception ex) {
-      // expected
-    }
+	public void testNonBundleUrlWhichDoesNotExist() throws Exception {
+		resource = new OsgiBundleResource(bundle, "file:foo123123");
+		resource.getURL();
+		assertFalse(resource.exists());
 	}
 
 	/**

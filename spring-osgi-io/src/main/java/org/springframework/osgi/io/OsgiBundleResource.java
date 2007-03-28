@@ -15,13 +15,14 @@
  */
 package org.springframework.osgi.io;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.MalformedURLException;
+import java.util.Enumeration;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.AbstractResource;
@@ -30,28 +31,29 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.util.ResourceUtils;
 
 /**
  * Resource implementation for OSGi environments. Lazy evaluation of the
  * resource will be used.
  * 
  * Understands the "bundle:" resource prefix for explicit loading of resources
- * from the bundle. When the bundle prefix is used the target resource must be
- * contained within the bundle (or attached fragments), the classpath is not
- * searched.
+ * from the bundle. By default (no prefix or "bundle:" prefix) the resource is
+ * localized just within the underlying bundle and attached fragments. For
+ * classpath search use
+ * {@link org.springframework.core.io.ResourceLoader#CLASSPATH_URL_PREFIX}.
  * 
- * @author Adrian Colyer
+ * As fallback, the path is transformed to an URL thus supporting OSGi framework
+ * specific prefixes.
+ * 
  * @author Costin Leau
+ * @author Adrian Colyer
  * 
  */
-// TODO: add support for urls (file://, http:// and so on)
-// TODO: fallback strategy (claspath vs local bundle)
 public class OsgiBundleResource extends AbstractResource {
 
 	public static final String BUNDLE_URL_PREFIX = "bundle:";
 
-	public static final String BUNDLE_URL_URL_PREFIX = "bundle-url:";
+	// public static final String BUNDLE_URL_URL_PREFIX = "bundle-url:";
 
 	private static final char PREFIX_SEPARATOR = ':';
 
@@ -61,6 +63,9 @@ public class OsgiBundleResource extends AbstractResource {
 
 	private final String path;
 
+	// helper field
+	private final boolean hasBundlePrefix;
+
 	public OsgiBundleResource(Bundle bundle, String path) {
 		Assert.notNull(bundle, "Bundle must not be null");
 		this.bundle = bundle;
@@ -69,6 +74,8 @@ public class OsgiBundleResource extends AbstractResource {
 		Assert.notNull(path, "Path must not be null");
 
 		this.path = StringUtils.cleanPath(path);
+
+		hasBundlePrefix = this.path.startsWith(BUNDLE_URL_PREFIX);
 	}
 
 	/**
@@ -101,35 +108,44 @@ public class OsgiBundleResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation returns a URL for the underlying bundle resource.
+	 * Locates the resource in the underlying bundle based on the prefix, if it
+	 * exists. Note that the location happens per call since the classpath of
+	 * the bundle for example can change during a bundle lifecycle (depending on
+	 * its imports).
 	 * 
 	 * @see org.osgi.framework.Bundle#getEntry(String)
 	 * @see org.osgi.framework.Bundle#getResource(String)
 	 */
 	public URL getURL() throws IOException {
+		// TODO: does it make sense to cache the trimmed string to avoid the
+		// workload on subsequent calls?
 		URL url = null;
 
-		if (this.path.startsWith(BUNDLE_URL_PREFIX)) {
-			url = getResourceFromBundle(this.path.substring(BUNDLE_URL_PREFIX.length()));
+		String prefix = getPrefix(path);
+
+		// no prefix is treated just like bundle:
+		if (!StringUtils.hasText(prefix))
+			prefix = BUNDLE_URL_PREFIX;
+
+		// locate inside the bundle (bundle:)
+		if (BUNDLE_URL_PREFIX.equals(prefix)) {
+			url = getResourceFromBundle((hasBundlePrefix ? path.substring(BUNDLE_URL_PREFIX.length()) : path));
 		}
-		else if (this.path.startsWith(BUNDLE_URL_URL_PREFIX)) {
-			url = new URL(this.path.substring(BUNDLE_URL_URL_PREFIX.length()));
-		}
-		else if (this.path.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)) {
-			url = getResourceFromBundleClasspath(this.path.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length()));
-		}
-		else if (this.path.startsWith(ResourceUtils.FILE_URL_PREFIX)) {
-			url = getResourceFromFilesystem(this.path.substring(ResourceUtils.FILE_URL_PREFIX.length()));
-		}
-		// Costin: default fallback - take from resource classpath
-		// TODO: should it matter if the path is absolute or not?
+		// locate inside the classpath (classpath:)
 		else {
-			url = getResourceFromBundleClasspath(this.path);
+			if (path.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)) {
+				url = getResourceFromBundleClasspath(path.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length()));
+			}
+			else {
+				// just try to convert it to an URL
+				url = new URL(path);
+			}
 		}
 
 		if (url == null) {
 			throw new FileNotFoundException(getDescription() + " cannot be resolved to URL because it does not exist");
 		}
+
 		return url;
 	}
 
@@ -156,26 +172,44 @@ public class OsgiBundleResource extends AbstractResource {
 	 * Resolves a resource from *this bundle only*. Only the bundle and its
 	 * attached fragments are searched for the given resource.
 	 * 
-	 * @param bundleRelativePath
+	 * @param bundlePath
 	 * @return a URL to the returned resource or null if none is found
 	 * 
 	 * @see org.osgi.framework.Bundle#getEntry(String)
 	 */
-	protected URL getResourceFromBundle(String bundleRelativePath) {
-		return bundle.getEntry(bundleRelativePath);
+	protected URL getResourceFromBundle(String bundlePath) throws IOException {
+
+		// ask nicely first
+		URL url = bundle.getEntry(bundlePath);
+
+		// let's ask again (workaround for KF which does not return URLs for
+		// folders directly)
+		if (url == null) {
+			// ask for entries in the current folder
+			Enumeration enm = bundle.findEntries(bundlePath, null, false);
+
+			// get the first one and create the initial one
+			if (enm != null && enm.hasMoreElements()) {
+				URL foundURL = (URL) enm.nextElement();
+				return new URL(foundURL, "./");
+			}
+		}
+
+		// nothing found in the end
+		return url;
 	}
 
 	/**
 	 * Resolves a resource from the bundle's classpath. This will find resources
 	 * in this bundle and also in imported packages from other bundles.
 	 * 
-	 * @param bundleRelativePath
+	 * @param bundlePath
 	 * @return a URL to the returned resource or null if none is found
 	 * 
 	 * @see org.osgi.framework.Bundle#getResource(String)
 	 */
-	protected URL getResourceFromBundleClasspath(String bundleRelativePath) {
-		return bundle.getResource(bundleRelativePath);
+	protected URL getResourceFromBundleClasspath(String bundlePath) {
+		return bundle.getResource(bundlePath);
 	}
 
 	/**
@@ -249,5 +283,17 @@ public class OsgiBundleResource extends AbstractResource {
 	 */
 	public int hashCode() {
 		return this.path.hashCode();
+	}
+
+	private String getPrefix(String path) {
+		String EMPTY_PREFIX = "";
+		String DELIMITER = ":";
+		if (path == null)
+			return EMPTY_PREFIX;
+		int index = path.indexOf(DELIMITER);
+		if (index > 0)
+			// include :
+			return path.substring(0, index + 1);
+		return EMPTY_PREFIX;
 	}
 }
