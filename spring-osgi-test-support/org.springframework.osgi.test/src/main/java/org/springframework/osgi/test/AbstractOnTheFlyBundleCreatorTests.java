@@ -142,8 +142,8 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		// add Import-Package entry
 		addImportPackage(manifest);
 
-		if (log.isDebugEnabled())
-			log.debug("created manifest:" + manifest.getMainAttributes().entrySet());
+		if (logger.isDebugEnabled())
+			logger.debug("created manifest:" + manifest.getMainAttributes().entrySet());
 		return manifest;
 	}
 
@@ -161,8 +161,8 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 				packages.add(imports[i]);
 		}
 
-		if (log.isDebugEnabled())
-			log.debug("found imports for " + packages);
+		if (logger.isDebugEnabled())
+			logger.debug("found imports for " + packages);
 
 		manifest.getMainAttributes().putValue(Constants.IMPORT_PACKAGE,
 			StringUtils.collectionToCommaDelimitedString(packages));
@@ -229,13 +229,15 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	 * @see org.springframework.osgi.test.AbstractOsgiTests#postProcessBundleContext(org.osgi.framework.BundleContext)
 	 */
 	protected void postProcessBundleContext(BundleContext context) throws Exception {
-		log.debug("post processing: creating test bundle");
+		super.postProcessBundleContext(context);
+
+		logger.debug("post processing: creating test bundle");
 
 		// create the actual jar
 		Resource jar = jarCreator.createJar(getManifest());
 
-		if (log.isTraceEnabled())
-			log.trace("created jar:\n" + JarUtils.dumpJarContent(jar));
+		if (logger.isTraceEnabled())
+			logger.trace("created jar:\n" + JarUtils.dumpJarContent(jar));
 
 		installAndStartBundle(context, jar);
 	}
@@ -245,9 +247,8 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		Bundle bundle = context.installBundle("[onTheFly-test-bundle]" + ClassUtils.getShortName(getClass()) + "["
 				+ hashCode() + "]", resource.getInputStream());
 
-		log.debug("test bundle succesfully installed");
+		logger.debug("test bundle succesfully installed");
 		bundle.start();
-		log.debug("test bundle succesfully started");
-
+		logger.debug("test bundle succesfully started");
 	}
 }

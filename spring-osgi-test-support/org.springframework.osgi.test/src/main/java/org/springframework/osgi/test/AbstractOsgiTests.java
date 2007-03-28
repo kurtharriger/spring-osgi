@@ -27,8 +27,6 @@ import junit.framework.Protectable;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -92,8 +90,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	private TestCase osgiJUnitTest = this;
 
 	private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
-
-	protected final Log log = LogFactory.getLog(getClass());
 
 	public AbstractOsgiTests() {
 		super();
@@ -160,37 +156,40 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	protected abstract OsgiPlatform createPlatform();
 
 	/**
-	 * Callback hook invoked <b>before</b> preparing the OSGi environment for
-	 * test execution.
+	 * Callback for processing the platform bundle context before any bundles
+	 * have been installed. The method is invoked <b>after</b> starting the
+	 * OSGi environment but <b>before</b> any bundles are installed in the OSGi
+	 * framework.
 	 * 
 	 * Normally, this method is called only one during the lifecycle of a test
 	 * suite.
 	 * 
+	 * @see #postProcessBundleContext(BundleContext)
+	 * @param platformBundleContext
 	 * @throws Exception
 	 */
-	protected void beforeOsgiSetup() throws Exception {
-
+	protected void preProcessBundleContext(BundleContext platformBundleContext) throws Exception {
 	}
 
 	/**
-	 * Callback hook invoked <b>after</b> preparing the OSGi environment for
-	 * test execution but <b>before</b> any test is executed.
+	 * Callback for processing the platform bundle context after the critical
+	 * test infrastructure bundles have been installed and started. The method
+	 * is invoked <b>after</b> preparing the OSGi environment for the test
+	 * execution but <b>before</b> any test is executed.
+	 * 
+	 * The given BundleContext belongs to the underlying OSGi framework.
 	 * 
 	 * Normally, this method is called only one during the lifecycle of a test
 	 * suite.
-	 * @throws Exception
-	 */
-	protected void afterOsgiSetup() throws Exception {
-
-	}
-
-	/**
-	 * Callback for processing the bundle context after the bundles have been
-	 * installed and started.
 	 * 
-	 * @param context
+	 * <p/> Note that at this point, {@link #getBundleContext()} returns null
+	 * since the OSGi test execution hasn't started yet - the only BundleContext
+	 * available is that of the OSGi framework.
+	 * 
+	 * @see #preProcessBundleContext(BundleContext)
+	 * @param platformBundleContext
 	 */
-	protected void postProcessBundleContext(BundleContext context) throws Exception {
+	protected void postProcessBundleContext(BundleContext platformBundleContext) throws Exception {
 	}
 
 	//
@@ -286,11 +285,11 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			startup();
 		}
 		catch (Exception e) {
-			log.debug("Caught exception starting up", e);
+			logger.debug("Caught exception starting up", e);
 			throw e;
 		}
 
-		log.debug("writing test name [" + getName() + "] to OSGi");
+		logger.debug("writing test name [" + getName() + "] to OSGi");
 		// write test name to OSGi
 		outputStream.writeUTF(getName());
 		outputStream.flush();
@@ -342,18 +341,19 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			// make sure the platform is closed properly
 			registerShutdownHook();
 
-			// hook before the OSGi platform is initialized
-			beforeOsgiSetup();
-
 			osgiPlatform = createPlatform();
 			// start platform
-			log.debug("about to start " + osgiPlatform);
+			logger.debug("about to start " + osgiPlatform);
 			osgiPlatform.start();
 			// platform context
 			platformContext = osgiPlatform.getBundleContext();
 
 			// log platform name and version
 			logPlatformInfo(platformContext);
+
+			// hook before the OSGi platform is setup but right after is has
+			// been started
+			preProcessBundleContext(platformContext);
 
 			// install bundles (from the local system/classpath)
 			Resource[] bundleResources = locateBundles();
@@ -365,23 +365,22 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 			// start bundles
 			for (int i = 0; i < bundles.length; i++) {
-				log.debug("starting bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]");
+				logger.debug("starting bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]");
 				try {
 					bundles[i].start();
 				}
 				catch (Throwable ex) {
-					log.warn("can't start bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName()
+					logger.warn("can't start bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName()
 							+ "]", ex);
 				}
 
 			}
+			
+			// hook after the OSGi platform has been setup
 			postProcessBundleContext(platformContext);
 
+			// this might fail since the bundles are started asynch
 			initializeServiceRunnerInvocationMethods();
-
-			// hook after the OSGi platform has been setup
-			afterOsgiSetup();
-
 		}
 	}
 
@@ -402,7 +401,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		// Version
 		platformInfo.append(sysBundle.getHeaders().get(Constants.BUNDLE_VERSION));
 		platformInfo.append("]");
-		log.info(platformInfo + " started");
+		logger.info(platformInfo + " started");
 	}
 
 	/**
@@ -457,7 +456,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	private Bundle installBundle(Resource location) throws Exception {
 		Assert.notNull(platformContext);
 		Assert.notNull(location);
-		log.debug("installing bundle from location " + location.getDescription());
+		logger.debug("installing bundle from location " + location.getDescription());
 		return platformContext.installBundle(location.getDescription(), location.getInputStream());
 	}
 
@@ -492,11 +491,11 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		// finish stream creation (to avoid circular dependencies)
 		createInStream();
 
-		log.debug("reading OSGi results for test [" + getName() + "]");
+		logger.debug("reading OSGi results for test [" + getName() + "]");
 
 		TestUtils.receiveTestResult(this.originalResult, osgiJUnitTest, inputStream);
 
-		log.debug("test[" + getName() + "]'s result read");
+		logger.debug("test[" + getName() + "]'s result read");
 	}
 
 	/**
@@ -521,14 +520,14 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		IOUtils.closeStream(inputStream);
 		IOUtils.closeStream(outputStream);
 
-		log.info("shutting down OSGi platform");
+		logger.info("shutting down OSGi platform");
 		if (osgiPlatform != null) {
 			try {
 				osgiPlatform.stop();
 			}
 			catch (Exception ex) {
 				// swallow
-				log.warn("shutdown procedure threw exception " + ex);
+				logger.warn("shutdown procedure threw exception " + ex);
 			}
 			osgiPlatform = null;
 		}
@@ -558,7 +557,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		// flush header right away
 		outputStream.flush();
 
-		log.debug("opened writer to OSGi");
+		logger.debug("opened writer to OSGi");
 	}
 
 	/**
@@ -568,7 +567,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		try {
 			byte[] inputSource = (byte[]) System.getProperties().get(OsgiJUnitTest.FROM_OSGI);
 			inputStream = new ObjectInputStream(new ByteArrayInputStream(inputSource));
-			log.debug("opened reader from OSGi");
+			logger.debug("opened reader from OSGi");
 		}
 		catch (IOException ex) {
 			throw new RuntimeException("cannot open streams; it's likely the osgi test execution failed;" + ex);

@@ -121,9 +121,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	protected String[] getMandatoryBundles() {
 		return new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
 				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
-				getSpringMockUrl(), getUtilConcurrentLibUrl(), getSpringOSGiIoBundleUrl(),
-				getSpringOSGiCoreBundleUrl(), getSpringAopUrl(), getAopAllianceUrl(), getSpringOSGiTestBundleUrl(),
-				getSpringOSGiExtenderBundleUrl(), getAsmLibrary() };
+				getSpringMockUrl(), getUtilConcurrentLibUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
+				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl(),
+				getSpringOSGiExtenderBundleUrl() };
 	}
 
 	public Bundle findBundleByLocation(String bundleLocation) {
