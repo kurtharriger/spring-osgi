@@ -6,6 +6,7 @@ Import-Package: junit.framework,
   org.apache.commons.logging,
   org.springframework.test,
   org.springframework.osgi.io,
+  org.springframework.osgi.util,
   edu.emory.mathcs.backport.java.util.concurrent,
   org.objectweb.asm; version="[2,3)",
   org.objectweb.asm.signature; version="[2,3)"
@@ -18,7 +19,7 @@ DynamicImport-Package: javax.swing, javax.swing.border,
   org.apache.felix,main, *
 Export-Package: org.springframework.osgi.test,
   org.springframework.osgi.test.platform,
-  org.springframework.osgi.test.storage,  
+  org.springframework.osgi.test.storage,
   org.springframework.osgi.test.util
 Bundle-ClassPath: target/classes/,.
 

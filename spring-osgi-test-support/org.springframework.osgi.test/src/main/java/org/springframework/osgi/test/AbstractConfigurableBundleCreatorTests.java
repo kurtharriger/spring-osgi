@@ -126,7 +126,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 			try {
 				if (stream != null) {
 					settings.load(stream);
-					log.debug("loaded jar settings from " + getSettingsLocation());
+					logger.debug("loaded jar settings from " + getSettingsLocation());
 				}
 			}
 			finally {
@@ -134,7 +134,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 			}
 		}
 		else
-			log.warn(getSettingsLocation() + " was not found; using defaults");
+			logger.warn(getSettingsLocation() + " was not found; using defaults");
 
 		return settings;
 	}
