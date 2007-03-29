@@ -45,7 +45,6 @@ import org.springframework.osgi.context.support.OsgiPlatformDetector;
 import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.osgi.extender.support.ApplicationContextCloser;
 import org.springframework.osgi.extender.support.ApplicationContextCreator;
-import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
@@ -432,8 +431,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		Bundle extenderBundle = context.getBundle();
 		URL extenderConfigFile = extenderBundle.getResource(EXTENDER_CONFIG_FILE_LOCATION);
 		if (extenderConfigFile != null) {
-			String[] locations = new String[] { OsgiBundleResource.BUNDLE_URL_URL_PREFIX
-					+ extenderConfigFile.toExternalForm() };
+			String[] locations = new String[] { extenderConfigFile.toExternalForm() };
 
 			this.extenderContext = new OsgiBundleXmlApplicationContext(context, locations);
 			this.extenderContext.setNamespaceResolver(this.namespacePlugins);
