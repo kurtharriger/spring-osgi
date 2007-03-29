@@ -30,6 +30,7 @@ import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.extender.ServiceDependentOsgiBundleXmlApplicationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -138,7 +139,7 @@ public class ApplicationContextCreator implements Runnable {
 			LocalBundleContext.setContext(bundleContext);
 
 			applicationContext = createApplicationContext(bundleContext, config.getConfigurationLocations());
-			applicationContext.setEagerlyInitImporters(config.isWaitForDependencies());
+			applicationContext.setEagerlyInitImporters(false);
 			applicationContext.setPublishContextAsService(config.isPublishContextAsService());
 			applicationContext.setNamespaceResolver(namespacePlugins);
 
@@ -193,7 +194,7 @@ public class ApplicationContextCreator implements Runnable {
 	}
 
 	protected OsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
-		return new OsgiBundleXmlApplicationContext(context, locations);
+		return new ServiceDependentOsgiBundleXmlApplicationContext(context, locations);
 	}
 
 	private void postEvent(int starting) {

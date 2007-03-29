@@ -7,7 +7,8 @@ Bundle-Version: ${spring.osgi.bundle.version}
 Bundle-ManifestVersion: 2
 Bundle-Vendor: Spring Framework
 Bundle-Activator: org.springframework.osgi.extender.ContextLoaderListener
-Import-Package: org.apache.commons.logging,
+Import-Package: edu.emory.mathcs.backport.java.util.concurrent,
+   org.apache.commons.logging,
    org.aopalliance.aop,
    org.aopalliance.intercept,
    org.osgi.framework,

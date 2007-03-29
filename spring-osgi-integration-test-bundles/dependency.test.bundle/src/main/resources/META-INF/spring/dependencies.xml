@@ -10,13 +10,11 @@
 
     <osgi:reference id="simpleService3"
                     interface="org.springframework.osgi.test.simpleservice2.MyService2"
-                    filter="(service=3)"
-                    timeout="10000"/>
+                    filter="(service=3)"/>
 
     <osgi:reference id="simpleService2"
                     interface="org.springframework.osgi.test.simpleservice2.MyService2"
-                    filter="(service=2)"
-                    timeout="10000"/>
+                    filter="(service=2)"/>
 
     <bean id="dependent" class="org.springframework.osgi.test.dependencies.DependentImpl" lazy-init="false">
         <property name="service2" ref="simpleService2"/>
