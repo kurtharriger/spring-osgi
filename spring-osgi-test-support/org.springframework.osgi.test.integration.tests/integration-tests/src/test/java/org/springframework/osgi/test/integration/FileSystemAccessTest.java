@@ -33,14 +33,19 @@ public class FileSystemAccessTest extends AbstractConfigurableBundleCreatorTests
 		// load file using absolute path
 		ResourceLoader fileLoader = new DefaultResourceLoader();
 		Resource res = fileLoader.getResource(FileSystemAccessTest.class.getName().replace('.', '/').concat(".class"));
-		String fileLocation = "file://" + res.getFile().getAbsolutePath();
+		String fileLocation = "file:///" + res.getFile().getAbsolutePath();
 		// use file system resource loader
 		Resource fileResource = fileLoader.getResource(fileLocation);
 		assertTrue(fileResource.exists());
+
 		// try loading the file using OsgiBundleResourceLoader
 		Resource osgiResource = getResourceLoader().getResource(fileLocation);
-		// check existence of the same file when loading through the OsgiBundleRL
+		// check existence of the same file when loading through the
+		// OsgiBundleRL
 		// NOTE andyp -- we want this to work!!
 		assertTrue(osgiResource.exists());
+		
+		assertEquals(fileResource.getURL(), osgiResource.getURL());
 	}
+
 }
