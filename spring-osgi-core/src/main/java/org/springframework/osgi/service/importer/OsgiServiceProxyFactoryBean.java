@@ -37,7 +37,7 @@ import org.springframework.osgi.service.support.RetryTemplate;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
+import org.springframework.util.ObjectUtils; 
 
 /**
  * Factory bean for OSGi services. Returns a dynamic proxy which handles the
@@ -74,7 +74,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	// filter used to narrow service matches, may be null
 	private String filter;
 
-	// Constructed object of this factory
+    // Constructed object of this factory
 	private Object proxy;
 
 	// Cumulated filter string between the specified classes/interfaces and the
@@ -92,6 +92,14 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	public Object getObject() throws Exception {
+        if (proxy != null) {
+            return proxy;
+        }
+
+        if (CardinalityOptions.atMostOneExpected(cardinality))
+			proxy = createSingleServiceProxy();
+		else
+			proxy = createMultiServiceCollection(getUnifiedFilter());
 		return proxy;
 	}
 
@@ -137,23 +145,35 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
 		Assert.notNull(serviceTypes, "Required serviceTypes property was not set");
+        // Create the filter, if not already created, to ensure it is valid
+        getUnifiedFilter();
+	}
 
-		// clean up parent classes
-		serviceTypes = OsgiServiceUtils.removeParents(serviceTypes);
-		// validate specified classes
-		Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
+
+    public Filter getUnifiedFilter() {
+        if (unifiedFilter != null) {
+            return unifiedFilter;
+        }
+
+        // I know this should be done in afterPropertiesSet, but since we need this *before* that method is called...
+        Assert.notNull(serviceTypes, "Required serviceTypes property was not set");
+
+        // clean up parent classes
+        serviceTypes = OsgiServiceUtils.removeParents(serviceTypes);
+        // validate specified classes
+        Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
 			"more then one concrete class specified; cannot create proxy");
 
-		String filterWithClasses = OsgiFilterUtils.unifyFilter(serviceTypes, filter);
+        String filterWithClasses = OsgiFilterUtils.unifyFilter(serviceTypes, filter);
 
-		if (log.isTraceEnabled())
-			log.trace("unified classes=" + ObjectUtils.nullSafeToString(serviceTypes) + " and filter=[" + filter
-					+ "]  in=[" + filterWithClasses + "]");
+        if (log.isTraceEnabled())
+            log.trace("unified classes=" + ObjectUtils.nullSafeToString(serviceTypes) + " and filter=[" + filter
+                    + "]  in=[" + filterWithClasses + "]");
 
-		// add the serviceBeanName constraint
+        // add the serviceBeanName constraint
 		String filterWithServiceBeanName = OsgiFilterUtils.unifyFilter(
 			BeanNameServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY.toString(), new String[] { serviceBeanName },
-			filterWithClasses);
+            filterWithClasses);
 
 		if (log.isTraceEnabled())
 			log.trace("unified serviceBeanName [" + ObjectUtils.nullSafeToString(serviceBeanName) + "] and filter=["
@@ -162,17 +182,19 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		// create (which implies validation) the actual filter
 		unifiedFilter = OsgiFilterUtils.createFilter(filterWithServiceBeanName);
 
-		if (CardinalityOptions.atMostOneExpected(cardinality))
-			proxy = createSingleServiceProxy();
-		else
-			proxy = createMultiServiceCollection(unifiedFilter);
-	}
+        return unifiedFilter;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 */
+    public int getCard() {
+        return cardinality;
+    }
+
+
+    /*
+      * (non-Javadoc)
+      *
+      * @see org.springframework.beans.factory.DisposableBean#destroy()
+      */
 	public void destroy() throws Exception {
 		// FIXME: add destroy behavior
 	}
@@ -207,7 +229,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		addLocalBundleContextSupport(factory);
 
 		// dynamic retry interceptor / context classloader
-		addOsgiRetryInterceptor(factory, unifiedFilter, listeners);
+		addOsgiRetryInterceptor(factory, getUnifiedFilter(), listeners);
 
 		// TODO: should these be enabled ?
 		// factory.setFrozen(true);

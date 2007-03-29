@@ -89,7 +89,8 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 
 	public void testFullReference() throws Exception {
 		OsgiServiceProxyFactoryBean factory = (OsgiServiceProxyFactoryBean) appContext.getBean("&full-options");
-		TargetSourceLifecycleListener[] listeners = factory.getListeners();
+        factory.getObject();  // required to initialize expected listeners because of?  god help me, I'm going insane
+        TargetSourceLifecycleListener[] listeners = factory.getListeners();
 		assertNotNull(listeners);
 		assertEquals(5, listeners.length);
 
