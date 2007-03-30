@@ -102,7 +102,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * The bundles we are currently managing. Keys are bundle ids, values are
 	 * application contexts
 	 */
-	private Map managedBundles;
+	private final Map managedBundles;
 
 	/**
 	 * ApplicationContexts which are being initialized by an
@@ -110,7 +110,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * example, they are waiting on service dependencies). Keys are bundle ids,
 	 * values are application contexts
 	 */
-	private Map applicationContextsBeingInitialized;
+	private final Map applicationContextsBeingInitialized;
 
 	/**
 	 * ApplicationContextCreator tasks that are in process. Keys are bundle ids,
@@ -127,7 +127,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	/**
 	 * List of listeners subscribed to spring bundle events
 	 */
-	private Set springBundleListeners = new HashSet();
+	private final Set springBundleListeners = new HashSet();
 
 	/**
 	 * Are we running under knoplerfish? Required for bug workaround with
@@ -159,6 +159,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * Required by the BundleActivator contract
 	 */
 	public ContextLoaderListener() {
+		this.managedBundles = new HashMap();
+		this.applicationContextsBeingInitialized = new HashMap();
 	}
 
 	/**
@@ -181,8 +183,6 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 		this.isKnopflerfish = OsgiPlatformDetector.isKnopflerfish(context);
 		this.bundleId = context.getBundle().getBundleId();
-		this.managedBundles = new HashMap();
-		this.applicationContextsBeingInitialized = new HashMap();
 		this.pendingRegistrationTasks = new HashMap();
 		this.namespacePlugins = new NamespacePlugins();
 		this.context = context;
@@ -218,8 +218,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 		unregisterListenerService();
 		unregisterResolverService();
-		this.managedBundles = null;
-		this.applicationContextsBeingInitialized = null;
+		this.managedBundles.clear();
+		this.applicationContextsBeingInitialized.clear();
 		this.pendingRegistrationTasks = null;
 		this.namespacePlugins = null;
 		this.taskExecutor = null;
@@ -434,8 +434,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			String[] locations = new String[] { extenderConfigFile.toExternalForm() };
 
 			this.extenderContext = new OsgiBundleXmlApplicationContext(context, locations);
-			this.extenderContext.setNamespaceResolver(this.namespacePlugins);
-			this.extenderContext.setEagerlyInitImporters(false);
+			this.extenderContext.setNamespaceResolver(this.namespacePlugins); 
 
 			extenderContext.refresh();
 

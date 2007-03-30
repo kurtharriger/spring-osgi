@@ -19,9 +19,6 @@
 package org.springframework.osgi.context.support;
 
 import java.util.Dictionary;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.ConfigUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
@@ -36,11 +33,7 @@ import org.springframework.util.StringUtils;
  */
 public class ApplicationContextConfiguration {
 
-	private static final Log log = LogFactory.getLog(ApplicationContextConfiguration.class);
-
 	private final Bundle bundle;
-
-	private boolean waitForDependencies = false;
 
 	private boolean asyncCreation = true;
 
@@ -52,7 +45,9 @@ public class ApplicationContextConfiguration {
 
 	private String toString;
 
-	public ApplicationContextConfiguration(Bundle forBundle) {
+    private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
+
+    public ApplicationContextConfiguration(Bundle forBundle) {
 		this.bundle = forBundle;
 		initialise();
 		// create toString
@@ -65,8 +60,8 @@ public class ApplicationContextConfiguration {
 		buf.append(asyncCreation);
 		buf.append("|publishCtx=");
 		buf.append(publishContextAsService);
-		buf.append("|waitForDependencies/eagerlyInitImporters=");
-		buf.append(waitForDependencies);
+		buf.append("|timeout=");
+		buf.append(timeout);
 		toString = buf.toString();
 	}
 
@@ -81,11 +76,11 @@ public class ApplicationContextConfiguration {
 	}
 
 	/**
-	 * Should the application context wait for all non-optional service
-	 * references to be satisfied before starting?
+	 * How long should the application context wait for dependent services
+     * to be satisfied on context creation?
 	 */
-	public boolean isWaitForDependencies() {
-		return this.waitForDependencies;
+	public long getTimeout() {
+		return this.timeout;
 	}
 
 	/**
@@ -126,12 +121,9 @@ public class ApplicationContextConfiguration {
 		if (isSpringPoweredBundle) {
 			String springContextHeader = ConfigUtils.getSpringContextHeader(headers);
 			if (StringUtils.hasText(springContextHeader)) {
-				this.waitForDependencies = ConfigUtils.getWaitForDependencies(headers)
-						|| ConfigUtils.getEagerlyInitializeImporters(headers);
+				this.timeout = ConfigUtils.getTimeOut(headers);
 				this.publishContextAsService = !ConfigUtils.getDontPublishContext(headers);
 				this.asyncCreation = ConfigUtils.getCreateAsync(headers);
-				if (asyncCreation)
-					waitForDependencies = false;
 				this.configurationLocations = ConfigUtils.getConfigLocations(headers);
 			}
 		}

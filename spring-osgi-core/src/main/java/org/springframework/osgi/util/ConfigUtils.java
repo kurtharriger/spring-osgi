@@ -55,20 +55,15 @@ public abstract class ConfigUtils {
 	 * Directive for publishing Spring application context as a service.
 	 */
 	public static final String DIRECTIVE_DONT_PUBLISH = "publish-context";
+    /**
+     * Directive for indicating wait-for time when satisfying manditory dependencies
+     * defined in seconds
+     */
+    public static final String DIRECTIVE_TIMEOUT = "timeout";
 
-	/**
-	 * Directive for finding imported OSGi service first, before initializing
-	 * any beans.
-	 * 
-	 */
-	public static final String DIRECTIVE_EAGERLY_INIT_IMPORTERS = "eagerly-init-importers";
+    public static final String DIRECTIVE_TIMEOUT_VALUE_NONE = "none";
 
-	/**
-	 * Identical in behavior with {@link #DIRECTIVE_WAIT_FOR_DEPENDENCIES}
-	 */
-	public static final String DIRECTIVE_WAIT_FOR_DEPENDENCIES = "wait-for-dependencies";
-
-	/**
+    /**
 	 * Create asynchronously directive.
 	 */
 	public static final String DIRECTIVE_CREATE_ASYNCHRONOUSLY = "create-asynchronously";
@@ -84,15 +79,17 @@ public abstract class ConfigUtils {
 
 	public static final boolean DIRECTIVE_DONT_PUBLISH_DEFAULT = false;
 
-	public static final boolean DIRECTIVE_EAGERLY_INIT_IMPORTERS_DEFAULT = false;
-
 	public static final boolean DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT = true;
 
-	private static final Set DIRECTIVES = new HashSet(3);
+    public static final long DIRECTIVE_TIMEOUT_DEFAULT = 5 * 60; // 5 minutes
+
+    public static final long DIRECTIVE_NO_TIMEOUT = -2L; // Indicates wait forever
+
+    private static final Set DIRECTIVES = new HashSet(3);
 
 	static {
 		CollectionUtils.mergeArrayIntoCollection(new String[] { DIRECTIVE_DONT_PUBLISH,
-				DIRECTIVE_EAGERLY_INIT_IMPORTERS, DIRECTIVE_CREATE_ASYNCHRONOUSLY }, DIRECTIVES);
+				DIRECTIVE_TIMEOUT, DIRECTIVE_CREATE_ASYNCHRONOUSLY }, DIRECTIVES);
 	}
 
 	/**
@@ -144,18 +141,6 @@ public abstract class ConfigUtils {
 				: DIRECTIVE_DONT_PUBLISH_DEFAULT);
 	}
 
-	/**
-	 * Shortcut for finding the boolean value for
-	 * {@link #DIRECTIVE_DONT_PUBLISH} directive using the given headers.
-	 * 
-	 * @param headers
-	 * @return
-	 */
-	public static boolean getEagerlyInitializeImporters(Dictionary headers) {
-		String header = getSpringContextHeader(headers);
-		return (header != null ? Boolean.valueOf(getDirectiveValue(header, DIRECTIVE_EAGERLY_INIT_IMPORTERS)).booleanValue()
-				: DIRECTIVE_EAGERLY_INIT_IMPORTERS_DEFAULT);
-	}
 
 	public static boolean getCreateAsync(Dictionary headers) {
 		String header = getSpringContextHeader(headers);
@@ -163,10 +148,14 @@ public abstract class ConfigUtils {
 				: DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT);
 	}
 
-	public static boolean getWaitForDependencies(Dictionary headers) {
+	public static long getTimeOut(Dictionary headers) {
 		String header = getSpringContextHeader(headers);
-		return (header != null ? Boolean.valueOf(getDirectiveValue(header, DIRECTIVE_WAIT_FOR_DEPENDENCIES)).booleanValue()
-				: DIRECTIVE_EAGERLY_INIT_IMPORTERS_DEFAULT);
+        String timeoutValue = getDirectiveValue(header, DIRECTIVE_TIMEOUT); 
+        if (DIRECTIVE_TIMEOUT_VALUE_NONE.equals(timeoutValue)) {
+            return DIRECTIVE_NO_TIMEOUT;
+        }
+        return (header != null && timeoutValue != null ? Long.valueOf(timeoutValue).longValue()
+				: DIRECTIVE_TIMEOUT_DEFAULT);
 	}
 
 	/**
@@ -218,6 +207,6 @@ public abstract class ConfigUtils {
 
 		// check the default locations now
 		Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
-		return (defaultConfig != null ? defaultConfig.hasMoreElements() : false);
+		return (defaultConfig != null && defaultConfig.hasMoreElements());
 	}
 }

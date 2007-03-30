@@ -28,11 +28,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
-import org.springframework.osgi.context.support.ApplicationContextConfiguration;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.context.support.ApplicationContextConfiguration; 
 import org.springframework.osgi.context.support.EntryLookupControllingMockBundle;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.context.support.SpringBundleEvent;
+import org.springframework.osgi.extender.ServiceDependentOsgiBundleXmlApplicationContext;
 
 public class ApplicationContextCreatorTest extends TestCase {
 
@@ -50,8 +49,8 @@ public class ApplicationContextCreatorTest extends TestCase {
 	private ApplicationContextCreator createCreator(Bundle aBundle) {
 		return new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, null,
 				new ApplicationContextConfiguration(aBundle), mcast) {
-			protected OsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
-				return new OsgiBundleXmlApplicationContext(context, locations) {
+			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
+				return new ServiceDependentOsgiBundleXmlApplicationContext(context, locations) {
 					public void refresh() throws BeansException {
 						// no-op
 					}
@@ -72,7 +71,6 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	public void testContextIsPlacedIntoPendingMapPriorToRefreshAndMovedAfterwards() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
-		ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundle, getClass().getClassLoader());
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		final MapTestingBundleXmlApplicationContext testingContext = new MapTestingBundleXmlApplicationContext(
 				aBundle.getContext(), META_INF_SPRING_CONTENT);
@@ -80,7 +78,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap,
 				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast) {
 
-			protected OsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
+			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return testingContext;
 			}
 		};
@@ -96,9 +94,8 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	public void testContextIsRemovedFromMapsOnException() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
-		ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundle, getClass().getClassLoader());
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
-		final OsgiBundleXmlApplicationContext testContext = new OsgiBundleXmlApplicationContext(aBundle.getContext(),
+		final ServiceDependentOsgiBundleXmlApplicationContext testContext = new ServiceDependentOsgiBundleXmlApplicationContext(aBundle.getContext(),
 				META_INF_SPRING_CONTENT) {
 			public void refresh() {
 				throw new RuntimeException("bang! (this exception deliberately caused by test case)") {
@@ -111,7 +108,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap,
 				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast) {
 
-			protected OsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
+			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return testContext;
 			}
 
@@ -131,7 +128,6 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	public void testCreationEvent() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
-		ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundle, getClass().getClassLoader());
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		MockControl mockListener = MockControl.createControl(ApplicationListener.class);
 		ApplicationListener listener = (ApplicationListener) mockListener.getMock();
@@ -148,12 +144,11 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	public void testCreationFailureEvent() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
-		ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(aBundle, getClass().getClassLoader());
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		MockControl mockListener = MockControl.createControl(ApplicationListener.class);
 		ApplicationListener listener = (ApplicationListener) mockListener.getMock();
 		mcast.addApplicationListener(listener);
-		final OsgiBundleXmlApplicationContext testContext = new OsgiBundleXmlApplicationContext(aBundle.getContext(),
+		final ServiceDependentOsgiBundleXmlApplicationContext testContext = new ServiceDependentOsgiBundleXmlApplicationContext(aBundle.getContext(),
 				META_INF_SPRING_CONTENT) {
 			public void refresh() {
 				throw new RuntimeException("bang! (this exception deliberately caused by test case)") {
@@ -166,7 +161,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap,
 				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast) {
 
-			protected OsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
+			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return testContext;
 			}
 
@@ -182,7 +177,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		mcast.removeAllListeners();
 	}
 
-	private class MapTestingBundleXmlApplicationContext extends OsgiBundleXmlApplicationContext {
+	private class MapTestingBundleXmlApplicationContext extends ServiceDependentOsgiBundleXmlApplicationContext {
 
 		public boolean isRefreshed = false;
 

@@ -5,20 +5,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-    <bean id="listener" class="org.springframework.osgi.test.service.listener.MyListener" lazy-init="false">
-		<!--
-        <property name="simpleService" ref="simpleServiceOsgi"/>
-        -->
-    </bean>
+    <bean id="listener" class="org.springframework.osgi.test.service.listener.MyListener"/>
 
     <osgi:reference id="simpleServiceOsgi" interface="org.springframework.osgi.test.simpleservice.MyService">
         <osgi:listener bind-method="serviceAvailable" unbind-method="serviceUnavailable" ref="listener"/>
-    </osgi:reference>
-
-    <!-- This is required because the osgi refernce is always lazy.  We need to add a flag to initialize
-         the service references even when there is no other bean referring to them -->
-    <bean id="anchor" class="org.springframework.osgi.test.service.listener.Anchor" lazy-init="false">
-        <property name="reference" ref="simpleServiceOsgi"/>
-    </bean>
-
+    </osgi:reference> 
 </beans>

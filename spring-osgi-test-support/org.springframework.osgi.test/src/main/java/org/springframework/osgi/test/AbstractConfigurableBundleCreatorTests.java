@@ -134,7 +134,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 			}
 		}
 		else
-			logger.warn(getSettingsLocation() + " was not found; using defaults");
+			logger.info(getSettingsLocation() + " was not found; using defaults");
 
 		return settings;
 	}

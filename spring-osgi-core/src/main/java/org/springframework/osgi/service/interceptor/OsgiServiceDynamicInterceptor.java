@@ -63,7 +63,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader, boolean serviceRequiredAtStartup) {
 		super(context, null, contextClassLoader);
 		this.serviceRequiredAtStartup = serviceRequiredAtStartup;
-	}
+    }
 
 	private class Listener implements ServiceListener {
 
@@ -172,7 +172,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#getTarget()
 	 */
 	protected Object getTarget() {
-		Object target = null;
+		Object target;
 
 		if (wrapper == null || !wrapper.isServiceAlive())
 			lookupService();
@@ -200,14 +200,14 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 		boolean debug = log.isDebugEnabled();
 		if (debug)
 			log.debug("adding osgi listener for services matching [" + filter + "]");
-		OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
+        OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
 		if (serviceRequiredAtStartup) {
 			if (debug)
 				log.debug("1..x cardinality - looking for service at startup...");
 			Object target = getTarget();
 			if (debug)
 				log.debug("service retrieved " + target);
-		}
+	    }
 	}
 
 	public void setFilter(Filter filter) {

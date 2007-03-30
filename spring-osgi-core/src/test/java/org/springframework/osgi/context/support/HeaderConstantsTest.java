@@ -30,8 +30,6 @@ public class HeaderConstantsTest extends TestCase {
 
 	private Dictionary headers;
 
-	private String springCtxHeader;
-
 	/*
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -104,28 +102,6 @@ public class HeaderConstantsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.util.ConfigUtils#getEagerlyInitializeImporters(java.util.Dictionary)}.
-	 */
-	public void testGetEagerlyInitializeImporters() {
-		String header = "nothing";
-		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertFalse(ConfigUtils.getDontPublishContext(headers));
-
-		header = ConfigUtils.DIRECTIVE_EAGERLY_INIT_IMPORTERS + ConfigUtils.EQUALS + true;
-		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertTrue(ConfigUtils.getEagerlyInitializeImporters(headers));
-
-		header = ConfigUtils.DIRECTIVE_EAGERLY_INIT_IMPORTERS + ConfigUtils.EQUALS + false;
-		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertFalse(ConfigUtils.getEagerlyInitializeImporters(headers));
-
-		header = ConfigUtils.DIRECTIVE_EAGERLY_INIT_IMPORTERS + ConfigUtils.EQUALS + "bla";
-		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertFalse(ConfigUtils.getEagerlyInitializeImporters(headers));
-	}
-
-	/**
-	 * Test method for
 	 * {@link org.springframework.osgi.util.ConfigUtils#getCreateAsync(java.util.Dictionary)}.
 	 */
 	public void testGetCreateAsync() {
@@ -148,24 +124,20 @@ public class HeaderConstantsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.util.ConfigUtils#getWaitForDependencies(java.util.Dictionary)}.
+	 * {@link org.springframework.osgi.util.ConfigUtils#getTimeout(java.util.Dictionary)}.
 	 */
-	public void testGetWaitForDependencies() {
+	public void testGetTimeout() {
 		String header = "nothing";
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertFalse(ConfigUtils.getDontPublishContext(headers));
+		assertEquals(new Long(ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT), new Long(ConfigUtils.getTimeOut(headers)));
 
-		header = ConfigUtils.DIRECTIVE_WAIT_FOR_DEPENDENCIES + ConfigUtils.EQUALS + true;
+        header = ConfigUtils.DIRECTIVE_TIMEOUT + ConfigUtils.EQUALS + "500";
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertTrue(ConfigUtils.getWaitForDependencies(headers));
+		assertEquals(new Long(500), new Long(ConfigUtils.getTimeOut(headers)));
 
-		header = ConfigUtils.DIRECTIVE_WAIT_FOR_DEPENDENCIES + ConfigUtils.EQUALS + false;
+		header = ConfigUtils.DIRECTIVE_TIMEOUT + ConfigUtils.EQUALS + ConfigUtils.DIRECTIVE_TIMEOUT_VALUE_NONE;
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertFalse(ConfigUtils.getWaitForDependencies(headers));
-
-		header = ConfigUtils.DIRECTIVE_WAIT_FOR_DEPENDENCIES + ConfigUtils.EQUALS + "bla";
-		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertFalse(ConfigUtils.getWaitForDependencies(headers));
+		assertEquals(new Long(-2), new Long(ConfigUtils.getTimeOut(headers)));
 	}
 
 }

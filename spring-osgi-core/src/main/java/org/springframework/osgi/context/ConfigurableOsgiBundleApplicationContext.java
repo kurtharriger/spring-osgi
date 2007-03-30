@@ -55,15 +55,7 @@ public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableAp
 	 * the current beans.
 	 * 
 	 */
-	boolean isAvailable();
-
-	/**
-	 * Eagerly initialize the imported services for the current application
-	 * context.
-	 * 
-	 * @param eagerlyInitImporters The eagerlyInitImporters to set.
-	 */
-	void setEagerlyInitImporters(boolean eagerlyInitImporters);
+	boolean isAvailable(); 
 
 	/**
 	 * Publish the application context as an OSGi service.

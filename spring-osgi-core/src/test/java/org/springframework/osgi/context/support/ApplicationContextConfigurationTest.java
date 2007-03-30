@@ -55,48 +55,30 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		assertTrue("bundle is spring powered", config.isSpringPoweredBundle());
 	}
 
-	public void testBundleWithNoHeaderShouldNotWaitForDependencies() {
+	public void testBundleWithNoHeaderShouldWaitFiveMinutes() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
-		assertFalse("bundle should wait for dependencies", config.isWaitForDependencies());
+        assertEquals("bundle should timeout in five minutes", new Long(5 * 60), new Long(config.getTimeout()));
 	}
 
-	public void testBundleWithWaitTrueShouldWaitForDependencies() {
+	public void testBundleWithWaitFiveSecondWaitForTimeout() {
 		Dictionary headers = new Hashtable();
-		headers.put("Spring-Context", "*;wait-for-dependencies:=true");
+		headers.put("Spring-Context", "*;timeout:=5");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
-		assertTrue("bundle should wait for dependencies", config.isWaitForDependencies());
+		assertEquals("bundle should timeout in 5 s", new Long(5), new Long(config.getTimeout()));
 	}
 
-	public void testBundleWithWaitFalseShouldNotWaitForDependencies() {
+	public void testBundleWithWaitForEver() {
 		// *;flavour
 		Dictionary headers = new Hashtable();
-		headers.put("Spring-Context", "*;wait-for-dependencies:=false");
+		headers.put("Spring-Context", "*;timeout:=none");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
-		assertFalse("bundle should not wait for dependencies", config.isWaitForDependencies());
-
-		// at end of list
-		headers = new Hashtable();
-		headers.put("Spring-Context", "META-INF/spring/context.xml,*;wait-for-dependencies:=false");
-		aBundle = new EntryLookupControllingMockBundle(headers);
-		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
-		aBundle.setEntryReturnOnNextCallToGetEntry("file://META-INF/spring/context.xml");
-		config = new ApplicationContextConfiguration(aBundle);
-		assertFalse("bundle should not wait for dependencies", config.isWaitForDependencies());
-
-		// in middle of list
-		headers = new Hashtable();
-		headers.put("Spring-Context", "META-INF/spring/context.xml;wait-for-dependencies:=false,*");
-		aBundle = new EntryLookupControllingMockBundle(headers);
-		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
-		aBundle.setEntryReturnOnNextCallToGetEntry("file://META-INF/spring/context.xml");
-		config = new ApplicationContextConfiguration(aBundle);
-		assertFalse("bundle should not wait for dependencies", config.isWaitForDependencies());
+		assertEquals("bundle should timeout -2 (indicates forever)", new Long(-2), new Long(config.getTimeout()));
 	}
 
 	public void testConfigLocationsInMetaInfNoHeader() {
