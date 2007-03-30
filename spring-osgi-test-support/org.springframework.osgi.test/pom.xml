@@ -81,7 +81,7 @@
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.main</artifactId>
-      <version>0.8.0-incubator</version>
+      <version>0.9.0-incubator-SNAPSHOT</version>
       <type>jar</type>
       <scope>provided</scope>
     </dependency>
@@ -118,6 +118,14 @@
         </includes>
         <directory>src/main/resources/org/springframework/osgi/test</directory>
       </resource>
+      <resource>
+        <targetPath>org/springframework/osgi/test/platform</targetPath>
+        <filtering>false</filtering>
+        <includes>
+          <include>felix.config.properties</include>
+        </includes>
+        <directory>src/main/resources/org/springframework/osgi/test/platform</directory>
+      </resource>  
     </resources>
     <plugins>
         

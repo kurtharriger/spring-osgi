@@ -346,7 +346,7 @@ limitations under the License.
         <dependency>
           <groupId>org.apache.felix</groupId>
           <artifactId>org.apache.felix.main</artifactId>
-          <version>0.8.0-incubator</version>
+          <version>0.9.0-incubator-SNAPSHOT</version>
           <type>jar</type>
           <scope>provided</scope>
         </dependency>
@@ -450,7 +450,7 @@ limitations under the License.
       <url>http://people.apache.org/repo/m2-incubating-repository/</url>
     </repository>  
     <repository>
-        <id>eclipse-repository</id>
+            <id>eclipse-repository</id>
         <name>Eclipse Repository</name>
         <url>http://repo1.maven.org/eclipse/</url>
     </repository>
@@ -466,8 +466,13 @@ limitations under the License.
         https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
     </repository>
-
-  </repositories>
+	<repository>
+	 <snapshots><enabled>true</enabled></snapshots>
+	<id>apache-snapshot-repo</id>
+      <name>Apache snapshot repo</name>
+      <url>http://cvs.apache.org/maven-snapshot-repository/</url>
+	</repository>
+</repositories>
 
   <pluginRepositories>
     <pluginRepository>
