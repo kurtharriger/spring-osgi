@@ -31,6 +31,7 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.service.CardinalityOptions;
 import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.util.ConfigUtils;
 
 import java.util.*;
 
@@ -43,50 +44,39 @@ import java.util.*;
  * @author Costin Leau
  */
 public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleXmlApplicationContext {
-    private final Set dependencies = new LinkedHashSet();
-    private final Set unsatisfiedDependencies = new LinkedHashSet();
+    private boolean dependenciesSatisfied = false;
+    private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
 
     private static final Log log = LogFactory.getLog(ServiceDependentOsgiBundleXmlApplicationContext.class);
 
 
     public ServiceDependentOsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations) {
-        super(context, configLocations);
+        super(context, configLocations); 
     }
 
 
-    protected void findServiceDependencies() {
-        ConfigurableListableBeanFactory factory = getBeanFactory();
-        String[] beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(factory,
-                                                                             OsgiServiceProxyFactoryBean.class, true,
-                                                                             false);
-        for (int i = 0; i < beans.length; i++) {
-            String beanName = "&" + beans[i];  // magic pixie dust to find the unicorn
-            OsgiServiceProxyFactoryBean reference = (OsgiServiceProxyFactoryBean) factory.getBean(beanName);
-            Dependency dependency = new Dependency(reference);
-            dependencies.add(dependency);
-            if (!dependency.isSatisfied()) {
-                unsatisfiedDependencies.add(dependency);
-            }
-        }
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
     }
 
 
     /*
-      * (non-Javadoc)
-      * @see org.springframework.context.support.AbstractApplicationContext#onRefresh()
-      */
+    * (non-Javadoc)
+    * @see org.springframework.context.support.AbstractApplicationContext#onRefresh()
+    */
     protected void onRefresh() throws BeansException {
-        dependencies.clear();
-        unsatisfiedDependencies.clear();
+        CyclicBarrier barrier = new CyclicBarrier(2);
+        DependencyListener listener = new DependencyListener(barrier);
+        listener.findServiceDependencies();
 
-        findServiceDependencies();
-
-        if (!unsatisfiedDependencies.isEmpty()) {
-            CyclicBarrier barrier = new CyclicBarrier(2);
-            DependencyListener listener = new DependencyListener(barrier);
-            registerListener(listener);
+        if (!listener.getUnsatisfiedDependencies().isEmpty()) {
+            listener.register();
             try {
-                barrier.await(100, TimeUnit.SECONDS);
+                if (timeout == ConfigUtils.DIRECTIVE_NO_TIMEOUT) {
+                    barrier.await();
+                } else {
+                    barrier.await(timeout, TimeUnit.SECONDS);
+                }
             } catch (BrokenBarrierException e) {
                 throw new ApplicationContextException("Unable to complete application context initializition for '"
                                                       + getBundle().getSymbolicName()
@@ -102,46 +92,17 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
                 getBundleContext().removeServiceListener(listener);
             }
         } else {
-
             if (log.isDebugEnabled()) {
                 log.debug("No outstanding dependencies, completing initialization for " + getDisplayName());
             }
         }
-
-        dependencies.clear();
+        dependenciesSatisfied = true;
         super.onRefresh();
     }
 
 
-    protected void registerListener(DependencyListener listener) {
-        boolean multiple = unsatisfiedDependencies.size() > 1;
-        StringBuffer sb = new StringBuffer(100 * unsatisfiedDependencies.size());
-        if (multiple) {
-            sb.append("(|");
-        }
-        for (Iterator i = unsatisfiedDependencies.iterator(); i.hasNext();) {
-            ((Dependency) i.next()).appendTo(sb);
-        }
-        if (multiple) {
-            sb.append(')');
-        }
-        String filter = sb.toString();
-        if (log.isInfoEnabled()) {
-            log.info(getDisplayName() + " registering listener with filter: " + filter);
-        }
-        try {
-            getBundleContext().addServiceListener(listener, filter);
-        }
-        catch (InvalidSyntaxException e) {
-            throw (IllegalStateException) new IllegalStateException("Filter string '" + filter
-                                                                    + "' has invalid syntax: "
-                                                                    + e.getMessage()).initCause(e);
-        }
-    }
-
-
     public boolean isAvailable() {
-        return isActive() && unsatisfiedDependencies.isEmpty();
+        return isActive() && dependenciesSatisfied;
     }
 
 
@@ -154,10 +115,63 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
      */
     private class DependencyListener implements ServiceListener {
         private CyclicBarrier barrier;
+        private final Set dependencies = new LinkedHashSet();
+        private final Set unsatisfiedDependencies = new LinkedHashSet();
 
 
         private DependencyListener(CyclicBarrier barrier) {
             this.barrier = barrier;
+        }
+
+
+        private void findServiceDependencies() {
+            ConfigurableListableBeanFactory factory = getBeanFactory();
+            String[] beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(factory,
+                                                                                 OsgiServiceProxyFactoryBean.class,
+                                                                                 true,
+                                                                                 false);
+            for (int i = 0; i < beans.length; i++) {
+                String beanName = "&" + beans[i];
+                OsgiServiceProxyFactoryBean reference = (OsgiServiceProxyFactoryBean) factory.getBean(beanName);
+                Dependency dependency = new Dependency(reference);
+                dependencies.add(dependency);
+                if (!dependency.isSatisfied()) {
+                    unsatisfiedDependencies.add(dependency);
+                }
+            }
+
+        }
+
+
+        private Set getUnsatisfiedDependencies() {
+            return unsatisfiedDependencies;
+        }
+
+
+        private void register() {
+            boolean multiple = unsatisfiedDependencies.size() > 1;
+            StringBuffer sb = new StringBuffer(100 * unsatisfiedDependencies.size());
+            if (multiple) {
+                sb.append("(|");
+            }
+            for (Iterator i = unsatisfiedDependencies.iterator(); i.hasNext();) {
+                ((Dependency) i.next()).appendTo(sb);
+            }
+            if (multiple) {
+                sb.append(')');
+            }
+            String filter = sb.toString();
+            if (log.isInfoEnabled()) {
+                log.info(getDisplayName() + " registering listener with filter: " + filter);
+            }
+            try {
+                getBundleContext().addServiceListener(this, filter);
+            }
+            catch (InvalidSyntaxException e) {
+                throw (IllegalStateException) new IllegalStateException("Filter string '" + filter
+                                                                        + "' has invalid syntax: "
+                                                                        + e.getMessage()).initCause(e);
+            }
         }
 
 
@@ -210,7 +224,7 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
                 }
 
             } else {
-                registerListener(this); // re-register with the new filter
+                register(); // re-register with the new filter
             }
         }
     }

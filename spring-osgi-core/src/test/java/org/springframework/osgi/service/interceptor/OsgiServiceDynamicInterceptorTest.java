@@ -30,8 +30,7 @@ import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
-import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions; 
 import org.springframework.osgi.service.support.RetryTemplate;
 
 /**
@@ -246,13 +245,17 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		assertNotNull("should have initialized listener", listener);
 	}
 
-	public void testMandatoryCardinality() {
+    /**
+     * HSH - Mandatory cardinality is enforced by the extender in the wait-for semantic regarding
+     * dependent services of cardinality {1..}
+     * 
+    public void testMandatoryCardinality() {
 		MockBundleContext ctx = new MockBundleContext() {
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 				return null;
 			}
 		};
-		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED, true);
+		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED);
 		interceptor.setFilter(new MockFilter());
 		RetryTemplate template = new RetryTemplate();
 		template.setRetryNumbers(1);
@@ -266,4 +269,5 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 			// expected
 		}
 	}
+     **/
 }

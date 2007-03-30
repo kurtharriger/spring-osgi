@@ -35,7 +35,6 @@ import org.springframework.osgi.context.OsgiBundleScope;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
@@ -112,8 +111,6 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 
 	private boolean publishContextAsService = true;
 
-	private boolean eagerlyInitImporters = false;
-
 	public AbstractRefreshableOsgiBundleApplicationContext() {
 		super(null);
 		setDisplayName("Root OsgiBundleApplicationContext");
@@ -177,18 +174,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		}
 	}
 
-	// initialize special beans
-	protected void onRefresh() throws BeansException {
-		super.onRefresh();
-
-		if (eagerlyInitImporters) {
-			if (logger.isDebugEnabled())
-				logger.debug("eagerly initializing importers");
-			getBeanFactory().getBeansOfType(OsgiServiceProxyFactoryBean.class, false, true);
-		}
-	}
-
-	// synchronization required around close as after this, the BundleContext is
+    // synchronization required around close as after this, the BundleContext is
 	// invalid - cannot allow close to happen on a separate thread during
 	// refresh!
 	public synchronized void close() {
@@ -295,10 +281,6 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	protected Resource getResourceByPath(String path) {
 		Assert.notNull(path, "Path is required");
 		return new OsgiBundleResource(this.bundle, path);
-	}
-
-	public void setEagerlyInitImporters(boolean eagerlyInitImporters) {
-		this.eagerlyInitImporters = eagerlyInitImporters;
 	}
 
 	public void setPublishContextAsService(boolean publishContextAsService) {

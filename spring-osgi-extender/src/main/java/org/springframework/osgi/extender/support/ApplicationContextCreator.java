@@ -103,7 +103,7 @@ public class ApplicationContextCreator implements Runnable {
 	 */
 	public void run() {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-		OsgiBundleXmlApplicationContext applicationContext;
+		ServiceDependentOsgiBundleXmlApplicationContext applicationContext;
 		Long bundleKey = new Long(this.bundle.getBundleId());
 
 		if (!config.isSpringPoweredBundle()) {
@@ -138,12 +138,12 @@ public class ApplicationContextCreator implements Runnable {
 			Thread.currentThread().setContextClassLoader(cl);
 			LocalBundleContext.setContext(bundleContext);
 
-			applicationContext = createApplicationContext(bundleContext, config.getConfigurationLocations());
-			applicationContext.setEagerlyInitImporters(false);
+			applicationContext = createApplicationContext(bundleContext, config.getConfigurationLocations()); 
 			applicationContext.setPublishContextAsService(config.isPublishContextAsService());
 			applicationContext.setNamespaceResolver(namespacePlugins);
+            applicationContext.setTimeout(config.getTimeout());
 
-			synchronized (this.contextsPendingInitializationMap) {
+            synchronized (this.contextsPendingInitializationMap) {
 				// creating the beans may take a long time (possible 'forever')
 				// if the
 				// service dependencies are not satisfied. We need to be able to
@@ -193,7 +193,7 @@ public class ApplicationContextCreator implements Runnable {
 		}
 	}
 
-	protected OsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
+	protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 		return new ServiceDependentOsgiBundleXmlApplicationContext(context, locations);
 	}
 

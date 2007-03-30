@@ -37,7 +37,10 @@ import org.springframework.osgi.service.support.RetryTemplate;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils; 
+import org.springframework.util.ObjectUtils;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * Factory bean for OSGi services. Returns a dynamic proxy which handles the
@@ -48,7 +51,8 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean, BundleContextAware {
+public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean,
+                                                    BundleContextAware, ApplicationListener {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
@@ -86,21 +90,30 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 	private String serviceBeanName;
 
-	/*
+
+    public void onApplicationEvent(ApplicationEvent applicationEvent) {
+        if (applicationEvent instanceof ContextRefreshedEvent) {
+            // This sets up the listeners for beans which are not referred to by any other
+            // bean in the context.  We can't do this in afterPropertiesSet, so we have to do
+            // it here.
+            getObject();
+        }
+    }
+
+    /*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
-	public Object getObject() throws Exception {
-        if (proxy != null) {
-            return proxy;
+	public Object getObject() {
+        if (proxy == null) {
+            if (CardinalityOptions.atMostOneExpected(cardinality)) {
+                proxy = createSingleServiceProxy();
+            } else {
+                proxy = createMultiServiceCollection(getUnifiedFilter());
+            }
         }
-
-        if (CardinalityOptions.atMostOneExpected(cardinality))
-			proxy = createSingleServiceProxy();
-		else
-			proxy = createMultiServiceCollection(getUnifiedFilter());
-		return proxy;
+        return proxy;
 	}
 
 	/*
@@ -143,26 +156,22 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
+        Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
 		Assert.notNull(serviceTypes, "Required serviceTypes property was not set");
-        // Create the filter, if not already created, to ensure it is valid
-        getUnifiedFilter();
-	}
+        // validate specified classes
+        Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
+			"more then one concrete class specified; cannot create proxy");
+        getUnifiedFilter(); // eager initialization of the cache to catch filter errors
+    }
 
 
     public Filter getUnifiedFilter() {
         if (unifiedFilter != null) {
             return unifiedFilter;
-        }
-
-        // I know this should be done in afterPropertiesSet, but since we need this *before* that method is called...
-        Assert.notNull(serviceTypes, "Required serviceTypes property was not set");
+        } 
 
         // clean up parent classes
         serviceTypes = OsgiServiceUtils.removeParents(serviceTypes);
-        // validate specified classes
-        Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
-			"more then one concrete class specified; cannot create proxy");
 
         String filterWithClasses = OsgiFilterUtils.unifyFilter(serviceTypes, filter);
 
@@ -213,7 +222,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		return true;
 	}
 
-	protected Object createSingleServiceProxy() throws Exception {
+	protected Object createSingleServiceProxy() {
 		if (log.isDebugEnabled())
 			log.debug("creating a singleService proxy");
 
