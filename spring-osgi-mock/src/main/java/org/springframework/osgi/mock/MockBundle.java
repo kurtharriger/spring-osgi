@@ -38,15 +38,18 @@ import org.osgi.framework.ServiceReference;
 public class MockBundle implements Bundle {
 
 	private String location;
+
 	private Dictionary headers;
+
 	private long bundleId = 0;
 
-	// required for introspection by util classes (should be removed)	
+	// required for introspection by util classes (should be removed)
 	private BundleContext bundleContext;
 
 	private ClassLoader loader = getClass().getClassLoader();
 
 	private Dictionary defaultHeaders = new Hashtable(0);
+
 	private final String SYMBOLIC_NAME = "Mock-Bundle_" + System.currentTimeMillis();
 
 	private static class EmptyEnumeration implements Enumeration {
@@ -88,7 +91,7 @@ public class MockBundle implements Bundle {
 	 * filePattern);
 	 * 
 	 * @see org.osgi.framework.Bundle#findEntries(java.lang.String,
-	 *      java.lang.String, boolean)
+	 * java.lang.String, boolean)
 	 */
 	public Enumeration findEntries(String path, String filePattern, boolean recurse) {
 		Enumeration enm = null;
@@ -114,7 +117,7 @@ public class MockBundle implements Bundle {
 	public void setBundleId(long bundleId) {
 		this.bundleId = bundleId;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -281,12 +284,17 @@ public class MockBundle implements Bundle {
 	 */
 	public void update(InputStream in) throws BundleException {
 	}
-	
+
 	// chiefly here so that compilers/find-bugs don't complain about the
 	// "unused" bundleContext field.
-	// also enables OsgiResoureUtils.getBundleContext to find the context via reflection
+	// also enables OsgiResoureUtils.getBundleContext to find the context via
+	// reflection
 	public BundleContext getContext() {
 		return this.bundleContext;
+	}
+
+	public BundleContext getBundleContext() {
+		return getContext();
 	}
 
 }
