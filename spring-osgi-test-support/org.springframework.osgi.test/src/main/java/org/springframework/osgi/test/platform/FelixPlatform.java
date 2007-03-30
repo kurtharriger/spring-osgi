@@ -18,6 +18,7 @@ package org.springframework.osgi.test.platform;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -27,8 +28,7 @@ import org.apache.felix.framework.util.MutablePropertyResolverImpl;
 import org.apache.felix.main.Main;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
 
 /**
  * Apache's Felix OSGi platform.
@@ -40,21 +40,26 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 
 	private static final Log log = LogFactory.getLog(FelixPlatform.class);
 
+	private static final String FELIX_CONF_FILE = "felix.config.properties";
+
+	private static final String FELIX_CONFIG_PROPERTY = "felix.config.properties";
+
+	private static final String FELIX_PROFILE_DIR_PROPERTY = "felix.cache.profiledir";
+
 	private BundleContext context;
 
 	private Felix platform;
 
-	private File felixCacheDir;
+	private File felixStorageDir;
 
 	public FelixPlatform() {
 		toString = "Felix OSGi Platform";
-		
+
 		// load Felix configuration
 		Properties props = getConfigurationProperties();
 		props.putAll(getFelixConfiguration());
 		props.putAll(getLocalConfiguration());
 	}
-
 
 	/*
 	 * (non-Javadoc)
@@ -77,26 +82,18 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		try {
 			File tempFileName = File.createTempFile("org.springframework.osgi", "felix");
 			tempFileName.delete(); // we want it to be a directory...
-			this.felixCacheDir = new File(tempFileName.getAbsolutePath());
-			this.felixCacheDir.mkdir();
-			this.felixCacheDir.deleteOnExit();
-			props.setProperty("felix.cache.dir", this.felixCacheDir.getAbsolutePath());
-			if (log.isDebugEnabled())
-				log.debug("felix cache folder is " + felixCacheDir.getAbsolutePath());
+			this.felixStorageDir = new File(tempFileName.getAbsolutePath());
+			this.felixStorageDir.mkdir();
+			this.felixStorageDir.deleteOnExit();
+			props.setProperty(FELIX_PROFILE_DIR_PROPERTY, this.felixStorageDir.getAbsolutePath());
+			if (log.isTraceEnabled())
+				log.trace("felix storage dir is " + felixStorageDir.getAbsolutePath());
 		}
 		catch (IOException ex) {
 			if (log.isWarnEnabled()) {
 				log.warn("Could not create temporary directory for Felix, using default", ex);
 			}
 		}
-
-		// specify a cache profile
-		props.setProperty("felix.cache.profile", "spring.osgi.junit.test");
-		// embedded use
-		props.setProperty("felix.embedded.execution", "true");
-
-		// no auto-start
-		props.setProperty("felix.auto.start.1", "");
 
 		return props;
 	}
@@ -111,19 +108,14 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	 * @return
 	 */
 	protected Properties getFelixConfiguration() {
-		// a naive solution since there can be multiple config.properties in the
-		// classpath
-		Resource resource = new ClassPathResource("config.properties");
+		String location = "/".concat(ClassUtils.classPackageAsResourcePath(getClass())).concat("/").concat(
+			FELIX_CONF_FILE);
+		URL url = getClass().getResource(location);
+		if (url == null)
+			throw new RuntimeException("cannot find felix configuration properties file:" + location);
 
-		String urlForm = null;
-		try {
-			urlForm = resource.getURL().toExternalForm();
-		}
-		catch (IOException ex) {
-			throw new RuntimeException("cannot get URL form for " + resource);
-		}
 		// used with Main
-		System.getProperties().setProperty("felix.config.properties", urlForm);
+		System.getProperties().setProperty(FELIX_CONFIG_PROPERTY, url.toExternalForm());
 
 		// load config.properties (use Felix's Main for resolving placeholders)
 		return Main.loadConfigProperties();
@@ -143,9 +135,9 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		getBundle.setAccessible(true);
 
 		Bundle systemBundle = (Bundle) getBundle.invoke(platform, new Object[] { new Long(0) });
-		// call getContext (part of BundleImpl class which has default
-		// visibility)
-		Method getContext = systemBundle.getClass().getSuperclass().getDeclaredMethod("getContext", null);
+
+		// call getBundleContext
+		Method getContext = systemBundle.getClass().getSuperclass().getDeclaredMethod("getBundleContext", null);
 		getContext.setAccessible(true);
 		context = (BundleContext) getContext.invoke(systemBundle, null);
 	}
@@ -158,7 +150,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	public void stop() throws Exception {
 		platform.shutdown();
 		// remove cache folder
-		felixCacheDir.delete();
+		felixStorageDir.delete();
 	}
 
 }
