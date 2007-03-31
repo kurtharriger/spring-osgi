@@ -23,6 +23,7 @@ import org.osgi.framework.BundleContext;
 import org.springframework.core.ConstantException;
 import org.springframework.core.Constants;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Utility class for OSGi {@link Bundle}s.
@@ -46,41 +47,37 @@ public abstract class OsgiBundleUtils {
 	public static BundleContext getBundleContext(Bundle bundle) {
 		if (bundle == null)
 			return null;
-		try {
-			// Retrieve bundle context from Equinox
-			Method m = bundle.getClass().getDeclaredMethod("getContext", new Class[0]);
-			m.setAccessible(true);
-			return (BundleContext) m.invoke(bundle, new Object[0]);
-		}
-		catch (Throwable t) {
-			// fall back to getBundleContext
-			try {
-				Method m = bundle.getClass().getDeclaredMethod("getBundleContext", new Class[0]);
-				m.setAccessible(true);
-				return (BundleContext) m.invoke(bundle, new Object[0]);
-			}
-			catch (Throwable th) {
 
-				// Retrieve bundle context from Knopflerfish
-				try {
-					Field[] fields = bundle.getClass().getDeclaredFields();
-					Field f = null;
-					for (int i = 0; i < fields.length; i++) {
-						if (fields[i].getName().equals("bundleContext")) {
-							f = fields[i];
-							break;
-						}
-					}
-					if (f == null) {
-						throw new IllegalStateException("No bundleContext field!");
-					}
-					f.setAccessible(true);
-					return (BundleContext) f.get(bundle);
-				}
-				catch (IllegalAccessException e) {
-					throw (IllegalStateException) new IllegalStateException("Exception retrieving bundle context").initCause(e);
+		// try Equinox getContext
+		Method m = ReflectionUtils.findMethod(bundle.getClass(), "getContext", new Class[0]);
+
+		// fallback to getBundleContext (OSGi 4.1)
+		if (m == null)
+			m = ReflectionUtils.findMethod(bundle.getClass(), "getBundleContext", new Class[0]);
+
+		if (m != null) {
+			m.setAccessible(true);
+			return (BundleContext) ReflectionUtils.invokeMethod(m, bundle);
+		}
+
+		// Retrieve bundle context from Knopflerfish
+		try {
+			Field[] fields = bundle.getClass().getDeclaredFields();
+			Field f = null;
+			for (int i = 0; i < fields.length; i++) {
+				if (fields[i].getName().equals("bundleContext")) {
+					f = fields[i];
+					break;
 				}
 			}
+			if (f == null) {
+				throw new IllegalStateException("No bundleContext field!");
+			}
+			f.setAccessible(true);
+			return (BundleContext) f.get(bundle);
+		}
+		catch (IllegalAccessException e) {
+			throw (IllegalStateException) new IllegalStateException("Exception retrieving bundle context").initCause(e);
 		}
 	}
 
