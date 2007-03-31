@@ -53,24 +53,33 @@ public abstract class OsgiBundleUtils {
 			return (BundleContext) m.invoke(bundle, new Object[0]);
 		}
 		catch (Throwable t) {
-			// Retrieve bundle context from Knopflerfish
+			// fall back to getBundleContext
 			try {
-				Field[] fields = bundle.getClass().getDeclaredFields();
-				Field f = null;
-				for (int i = 0; i < fields.length; i++) {
-					if (fields[i].getName().equals("bundleContext")) {
-						f = fields[i];
-						break;
-					}
-				}
-				if (f == null) {
-					throw new IllegalStateException("No bundleContext field!");
-				}
-				f.setAccessible(true);
-				return (BundleContext) f.get(bundle);
+				Method m = bundle.getClass().getDeclaredMethod("getBundleContext", new Class[0]);
+				m.setAccessible(true);
+				return (BundleContext) m.invoke(bundle, new Object[0]);
 			}
-			catch (IllegalAccessException e) {
-				throw (IllegalStateException) new IllegalStateException("Exception retrieving bundle context").initCause(e);
+			catch (Throwable th) {
+
+				// Retrieve bundle context from Knopflerfish
+				try {
+					Field[] fields = bundle.getClass().getDeclaredFields();
+					Field f = null;
+					for (int i = 0; i < fields.length; i++) {
+						if (fields[i].getName().equals("bundleContext")) {
+							f = fields[i];
+							break;
+						}
+					}
+					if (f == null) {
+						throw new IllegalStateException("No bundleContext field!");
+					}
+					f.setAccessible(true);
+					return (BundleContext) f.get(bundle);
+				}
+				catch (IllegalAccessException e) {
+					throw (IllegalStateException) new IllegalStateException("Exception retrieving bundle context").initCause(e);
+				}
 			}
 		}
 	}
