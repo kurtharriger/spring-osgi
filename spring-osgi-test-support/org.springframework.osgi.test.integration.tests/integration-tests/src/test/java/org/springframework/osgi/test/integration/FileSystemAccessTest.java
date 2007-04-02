@@ -29,13 +29,24 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  */
 public class FileSystemAccessTest extends AbstractConfigurableBundleCreatorTests {
 
-	public void testFileOutsideOSGi() throws Exception {
+	private Resource thisClass;
+
+	private ResourceLoader loader;
+
+	protected void onSetUp() throws Exception {
 		// load file using absolute path
-		ResourceLoader fileLoader = new DefaultResourceLoader();
-		Resource res = fileLoader.getResource(FileSystemAccessTest.class.getName().replace('.', '/').concat(".class"));
-		String fileLocation = "file:///" + res.getFile().getAbsolutePath();
+		loader = new DefaultResourceLoader();
+		thisClass = loader.getResource(FileSystemAccessTest.class.getName().replace('.', '/').concat(".class"));
+	}
+
+	protected void onTearDown() throws Exception {
+		thisClass = null;
+	}
+
+	public void testFileOutsideOSGi() throws Exception {
+		String fileLocation = "file:///" + thisClass.getFile().getAbsolutePath();
 		// use file system resource loader
-		Resource fileResource = fileLoader.getResource(fileLocation);
+		Resource fileResource = loader.getResource(fileLocation);
 		assertTrue(fileResource.exists());
 
 		// try loading the file using OsgiBundleResourceLoader
@@ -44,8 +55,19 @@ public class FileSystemAccessTest extends AbstractConfigurableBundleCreatorTests
 		// OsgiBundleRL
 		// NOTE andyp -- we want this to work!!
 		assertTrue(osgiResource.exists());
-		
+
 		assertEquals(fileResource.getURL(), osgiResource.getURL());
 	}
 
+	public void testNonExistentFileOutsideOSGi() throws Exception {
+		String nonExistingLocation = thisClass.getURL().toExternalForm().concat("-bogus-extension");
+
+		Resource nonExistingFile = loader.getResource(nonExistingLocation);
+		assertNotNull(nonExistingFile);
+		assertFalse(nonExistingFile.exists());
+
+		Resource nonExistingFileOutsideOsgi = getResourceLoader().getResource(nonExistingLocation);
+		assertNotNull(nonExistingFileOutsideOsgi);
+		assertFalse(nonExistingFileOutsideOsgi.exists());
+	}
 }
