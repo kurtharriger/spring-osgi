@@ -48,15 +48,21 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		super(resourceLoader);
 	}
 
-	// Remove classpath* and pattern with classpath: support for now
 	public Resource[] getResources(String locationPattern) throws IOException {
 		Assert.notNull(locationPattern, "Location pattern must not be null");
+		// Remove classpath* and pattern with classpath: support for now
 		if (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) {
 			throw new IllegalArgumentException(CLASSPATH_ALL_URL_PREFIX + " not supported");
 		}
 		else {
 			if (getPathMatcher().isPattern(locationPattern)) {
-				if (!locationPattern.startsWith(OsgiBundleResource.BUNDLE_URL_PREFIX))
+				String prefix = getPrefix(locationPattern);
+
+				// no prefix is treated just like bundle:
+				if (!StringUtils.hasText(prefix))
+					prefix = OsgiBundleResource.BUNDLE_URL_PREFIX;
+
+				if (!OsgiBundleResource.BUNDLE_URL_PREFIX.equals(prefix))
 					throw new IllegalArgumentException("patterns allowed only with "
 							+ OsgiBundleResource.BUNDLE_URL_PREFIX);
 				// a file pattern for bundle
@@ -83,11 +89,17 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		if (rootDirResource instanceof OsgiBundleResource) {
 			OsgiBundleResource bundleResource = (OsgiBundleResource) rootDirResource;
 			// use the Url to get the path (bundle.getPath() can contain bundle:
-			// or classpath: prefix
-			String pathInsideTheBundle = bundleResource.getURL().getPath();
-			String fullPattern = pathInsideTheBundle + subPattern;
+			// or classpath: prefix)
+
+			// don't call this since it fails on Felix
+			//String cleanPath = bundleResource.getURL().getPath();
+			String rootPath = bundleResource.getPath();
+			// strip prefix
+			int index = rootPath.indexOf(":");
+			String cleanPath = (index > -1 ? rootPath.substring(index + 1) : rootPath);
+			String fullPattern = cleanPath + subPattern;
 			Set result = CollectionFactory.createLinkedSetIfPossible(16);
-			doRetrieveMatchingBundleEntries(bundleResource.getBundle(), fullPattern, pathInsideTheBundle, result);
+			doRetrieveMatchingBundleEntries(bundleResource.getBundle(), fullPattern, cleanPath, result);
 			return result;
 		}
 
@@ -95,13 +107,16 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	}
 
 	/**
-	 * Seach each level inside the bundle for entries (resources which are retrieved w/o using the bundle classloader).
-	 * The method queries each folder for all entries and applies matching afterwards. The Bundle API contains a recursive
-	 * method for applying matching but the pattern is different from the Ant-style for example (does not recognize ** for
-	 * folders nor ?). The method while not extremely efficient, allows custom pattern matchers to be applied without any
-	 * knowledge of the underlying OSGi matching implementation.
+	 * Seach each level inside the bundle for entries (resources which are
+	 * retrieved w/o using the bundle classloader). The method queries each
+	 * folder for all entries and applies matching afterwards. The Bundle API
+	 * contains a recursive method for applying matching but the pattern is
+	 * different from the Ant-style for example (does not recognize ** for
+	 * folders nor ?). The method while not extremely efficient, allows custom
+	 * pattern matchers to be applied without any knowledge of the underlying
+	 * OSGi matching implementation.
 	 * 
-	 * @param bundle the bundle to do the lookup 
+	 * @param bundle the bundle to do the lookup
 	 * @param fullPattern matching pattern
 	 * @param dir directory inside the bundle
 	 * @param result set of results (used to concatenate matching sub dirs).
@@ -110,7 +125,8 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	protected void doRetrieveMatchingBundleEntries(Bundle bundle, String fullPattern, String dir, Set result)
 			throws IOException {
 
-		// get only the resources from current folder (use null instead of * to make it work over mocks also)
+		// get only the resources from current folder (use null instead of * to
+		// make it work over mocks also)
 		Enumeration candidates = bundle.findEntries(dir, null, false);
 		if (candidates != null) {
 			boolean dirDepthNotFixed = (fullPattern.indexOf("**") != -1);
@@ -128,7 +144,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				}
 				if (currPath.endsWith("/")
 						&& (dirDepthNotFixed || StringUtils.countOccurrencesOf(currPath, "/") < StringUtils.countOccurrencesOf(
-								fullPattern, "/"))) {
+							fullPattern, "/"))) {
 					// Search subdirectories recursively: we manually get the
 					// folders on only one level
 					doRetrieveMatchingBundleEntries(bundle, fullPattern, currPath, result);
@@ -138,5 +154,17 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				}
 			}
 		}
+	}
+
+	private String getPrefix(String path) {
+		String EMPTY_PREFIX = "";
+		String DELIMITER = ":";
+		if (path == null)
+			return EMPTY_PREFIX;
+		int index = path.indexOf(DELIMITER);
+		if (index > 0)
+			// include :
+			return path.substring(0, index + 1);
+		return EMPTY_PREFIX;
 	}
 }

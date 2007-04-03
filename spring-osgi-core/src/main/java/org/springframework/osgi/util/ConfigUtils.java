@@ -17,13 +17,10 @@ package org.springframework.osgi.util;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -55,15 +52,16 @@ public abstract class ConfigUtils {
 	 * Directive for publishing Spring application context as a service.
 	 */
 	public static final String DIRECTIVE_DONT_PUBLISH = "publish-context";
-    /**
-     * Directive for indicating wait-for time when satisfying manditory dependencies
-     * defined in seconds
-     */
-    public static final String DIRECTIVE_TIMEOUT = "timeout";
 
-    public static final String DIRECTIVE_TIMEOUT_VALUE_NONE = "none";
+	/**
+	 * Directive for indicating wait-for time when satisfying manditory
+	 * dependencies defined in seconds
+	 */
+	public static final String DIRECTIVE_TIMEOUT = "timeout";
 
-    /**
+	public static final String DIRECTIVE_TIMEOUT_VALUE_NONE = "none";
+
+	/**
 	 * Create asynchronously directive.
 	 */
 	public static final String DIRECTIVE_CREATE_ASYNCHRONOUSLY = "create-asynchronously";
@@ -81,16 +79,10 @@ public abstract class ConfigUtils {
 
 	public static final boolean DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT = true;
 
-    public static final long DIRECTIVE_TIMEOUT_DEFAULT = 5 * 60; // 5 minutes
+	public static final long DIRECTIVE_TIMEOUT_DEFAULT = 5 * 60; // 5 minutes
 
-    public static final long DIRECTIVE_NO_TIMEOUT = -2L; // Indicates wait forever
-
-    private static final Set DIRECTIVES = new HashSet(3);
-
-	static {
-		CollectionUtils.mergeArrayIntoCollection(new String[] { DIRECTIVE_DONT_PUBLISH,
-				DIRECTIVE_TIMEOUT, DIRECTIVE_CREATE_ASYNCHRONOUSLY }, DIRECTIVES);
-	}
+	public static final long DIRECTIVE_NO_TIMEOUT = -2L; // Indicates wait
+															// forever
 
 	/**
 	 * Return the {@value #SPRING_CONTEXT_HEADER} if present from the given
@@ -141,7 +133,6 @@ public abstract class ConfigUtils {
 				: DIRECTIVE_DONT_PUBLISH_DEFAULT);
 	}
 
-
 	public static boolean getCreateAsync(Dictionary headers) {
 		String header = getSpringContextHeader(headers);
 		return (header != null ? Boolean.valueOf(getDirectiveValue(header, DIRECTIVE_CREATE_ASYNCHRONOUSLY)).booleanValue()
@@ -150,11 +141,11 @@ public abstract class ConfigUtils {
 
 	public static long getTimeOut(Dictionary headers) {
 		String header = getSpringContextHeader(headers);
-        String timeoutValue = getDirectiveValue(header, DIRECTIVE_TIMEOUT); 
-        if (DIRECTIVE_TIMEOUT_VALUE_NONE.equals(timeoutValue)) {
-            return DIRECTIVE_NO_TIMEOUT;
-        }
-        return (header != null && timeoutValue != null ? Long.valueOf(timeoutValue).longValue()
+		String timeoutValue = getDirectiveValue(header, DIRECTIVE_TIMEOUT);
+		if (DIRECTIVE_TIMEOUT_VALUE_NONE.equals(timeoutValue)) {
+			return DIRECTIVE_NO_TIMEOUT;
+		}
+		return (header != null && timeoutValue != null ? Long.valueOf(timeoutValue).longValue()
 				: DIRECTIVE_TIMEOUT_DEFAULT);
 	}
 

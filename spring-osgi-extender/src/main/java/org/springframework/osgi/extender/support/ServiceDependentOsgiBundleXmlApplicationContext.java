@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.springframework.osgi.extender;
+package org.springframework.osgi.extender.support;
 
 
 import edu.emory.mathcs.backport.java.util.concurrent.BrokenBarrierException;
