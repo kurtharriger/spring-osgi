@@ -25,9 +25,9 @@ import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Subclass of AbstractOnTheFlyBundleCreatorTests which adds extra functionality for
- * configuring the jar creation. The created bundle (jar) can be configured by
- * indicating the locations for:
+ * Subclass of AbstractOnTheFlyBundleCreatorTests which adds extra functionality
+ * for configuring the jar creation. The created bundle (jar) can be configured
+ * by indicating the locations for:
  * <ul>
  * <li>root folder - the starting point on which the resource patterns are
  * applied</li>
@@ -52,8 +52,11 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnTheFlyBundleCreatorTests {
 
 	protected static final String ROOT_DIR = "root.dir";
+
 	protected static final String INCLUDE_PATTERNS = "include.patterns";
+
 	protected static final String LIBS = "libs";
+
 	protected static final String MANIFEST = "manifest";
 
 	public static final Properties DEFAULT_SETTINGS = new Properties();
@@ -118,7 +121,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 	 */
 	protected Properties getSettings() throws Exception {
 		Properties settings = new Properties(DEFAULT_SETTINGS);
-		//settings.setProperty(ROOT_DIR, getRootPath());
+		// settings.setProperty(ROOT_DIR, getRootPath());
 		Resource resource = new ClassPathResource(getSettingsLocation());
 
 		if (resource.exists()) {
@@ -139,6 +142,10 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 		return settings;
 	}
 
+	/**
+	 * Load the jar settings, first from the disk falling back to the default
+	 * settings, if none is found.
+	 */
 	protected void postProcessBundleContext(BundleContext context) throws Exception {
 		// hook in properties loading
 

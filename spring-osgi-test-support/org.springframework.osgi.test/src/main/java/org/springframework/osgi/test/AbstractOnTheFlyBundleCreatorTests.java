@@ -215,22 +215,12 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		return visitor.getPackages();
 	}
 
-	private String[] getMandatoryPackageBundleImport() {
-		return new String[] { "junit.framework", "org.osgi.framework;specification-version=\"1.3.0\"",
-				"org.springframework.core.io", "org.springframework.util", "org.springframework.osgi.test",
-				"org.springframework.osgi.test.platform", "org.springframework.osgi.context.support;version=",
-				"org.springframework.beans", "org.springframework.beans.factory", "org.springframework.context",
-				"org.apache.commons.logging" };
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.springframework.osgi.test.AbstractOsgiTests#postProcessBundleContext(org.osgi.framework.BundleContext)
 	 */
 	protected void postProcessBundleContext(BundleContext context) throws Exception {
-		super.postProcessBundleContext(context);
-
 		logger.debug("post processing: creating test bundle");
 
 		// create the actual jar
@@ -240,6 +230,9 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 			logger.trace("created jar:\n" + JarUtils.dumpJarContent(jar));
 
 		installAndStartBundle(context, jar);
+
+		// now do the delegation
+		super.postProcessBundleContext(context);
 	}
 
 	private void installAndStartBundle(BundleContext context, Resource resource) throws Exception {
