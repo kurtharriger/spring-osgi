@@ -48,7 +48,9 @@ import org.springframework.osgi.extender.support.ApplicationContextCreator;
 import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
- * Osgi Extender that listens to bundle events and manages the creation and
+ * Osgi Extender that bootstraps 'Spring powered bundles'. <p/>
+ * 
+ * The class listens to bundle events and manages the creation and
  * destruction of application contexts for bundles that have one or both of:
  * <ul>
  * <li> A manifest header entry Spring-Context

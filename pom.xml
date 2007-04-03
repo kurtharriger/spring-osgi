@@ -4,7 +4,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-m1</version>
   <name>Spring OSGi</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
@@ -396,20 +396,39 @@ limitations under the License.
               <packages>org.springframework.osgi*</packages>
             </group>
             <group>
+              <title>Spring OSGi Extender</title>
+              <packages>org.springframework.osgi.extender*</packages>
+            </group>
+            <group>
                <title>Spring OSGi JUnit Support</title>
                <packages>org.springframework.osgi.test*</packages>
             </group>
+            <!--
+            :org.springframework.osgi.test.platform:org.springframework.osgi.test.support:org.springframework.osgi.test.util:org.springframework.osgi.test.storage
+            -->
+            <group>
+                <title>Spring OSGi Mock</title>
+               <packages>org.springframework.osgi.mock*</packages>
+            </group>
+            
             <group>
                <title>Samples</title>
                <packages>org.springframework.osgi.sample*</packages>
             </group>
           </groups>
-          <excludePackageNames>org.springframework.osgi.test.trivial*</excludePackageNames>
+          <excludePackageNames>org.springframework.osgi.test.io*:org.springframework.osgi.test.bundleScope:org.springframework.osgi.test.card*:org.springframework.osgi.test.dep*:org.springframework.osgi.test.lifecy*:org.springframework.osgi.test.maven*:org.springframework.osgi.test.property*:org.springframework.osgi.test.reference*:org.springframework.osgi.test.service*:org.springframework.osgi.test.trivial*:org.springframework.osgi.test.simple:org.springframework.osgi.test.scope*</excludePackageNames>
           <links>
             <link>http://java.sun.com/j2se/1.4.2/docs/api/</link>
             <link>
               http://static.springframework.org/spring/docs/2.0.x/api/
             </link>
+            <link>http://asm.objectweb.org/asm223/javadoc/user</link>
+            <link>http://cglib.sourceforge.net/apidocs</link>
+            <link>http://logging.apache.org/log4j/docs/api/</link>
+            <link>http://jakarta.apache.org/commons/logging/apidocs/</link>
+            <link>http://www2.osgi.org/javadoc/r4/</link>
+            <link>http://junit.sourceforge.net/javadoc/</link>
+            <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
           </links>
         </configuration>
       </plugin>
@@ -418,7 +437,7 @@ limitations under the License.
         <artifactId>maven-project-info-reports-plugin</artifactId>
       </plugin>
     </plugins>
-  </reporting>
+   </reporting>
 
   <distributionManagement>
     <repository>
@@ -473,8 +492,9 @@ limitations under the License.
 	 <snapshots><enabled>true</enabled></snapshots>
 	<id>apache-snapshot-repo</id>
       <name>Apache snapshot repo</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository/</url>
+      <url>http://cvs.apache.org/maven-snapshot-repository</url>
 	</repository>
+	
 </repositories>
 
   <pluginRepositories>
@@ -485,6 +505,14 @@ limitations under the License.
         https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
     </pluginRepository>
+
+    <pluginRepository>
+      <id>maven-repo</id>
+      <name>maven repo</name>
+      <url>http://repo1.maven.org/maven2/</url>
+    </pluginRepository>
+    
+       
   </pluginRepositories>
 
 </project>

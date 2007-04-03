@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Osgi namespace config tag parser.
+ * 
  * @author Hal Hildebrand
  *         Date: Nov 2, 2006
  *         Time: 8:06:32 AM

@@ -25,6 +25,13 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 /**
+ * ServiceReference mock.
+ * 
+ * <p/> This mock tries to adhere to the OSGi spec as much as possible by
+ * providing the mandatory service properties such as
+ * {@link Constants#SERVICE_ID}, {@link Constants#OBJECTCLASS} and
+ * {@link Constants#SERVICE_RANKING}.
+ * 
  * @author Costin Leau
  * 
  */
