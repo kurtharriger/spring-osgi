@@ -62,7 +62,8 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 		String anotherClassName = "bar.foo";
 		bundleCtrl.expectAndReturn(bundle.loadClass(className), Object.class);
 		bundleCtrl.expectAndThrow(bundle.loadClass(anotherClassName), new ClassNotFoundException());
-		bundleCtrl.replay();
+        bundleCtrl.expectAndReturn(bundle.getSymbolicName(), "Test Bundle Symbolic Name");
+        bundleCtrl.replay();
 
 		assertSame(Object.class, classLoader.findClass(className));
 
