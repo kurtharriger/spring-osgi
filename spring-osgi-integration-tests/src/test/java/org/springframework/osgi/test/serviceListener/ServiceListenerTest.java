@@ -10,7 +10,8 @@ import org.springframework.osgi.test.service.listener.MyListener;
 public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String getManifestLocation() {
-		//return "classpath:org/springframework/osgi/test/serviceListener/ServiceListenerTest.MF";
+		// return
+		// "classpath:org/springframework/osgi/test/serviceListener/ServiceListenerTest.MF";
 		return null;
 	}
 
@@ -18,9 +19,9 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 		return new String[] {
 				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
-						"1.0-SNAPSHOT"),
+					"1.0-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.service.listener",
-						"1.0-SNAPSHOT") };
+					"1.0-SNAPSHOT") };
 	}
 
 	public void testServiceListener() throws Exception {
@@ -47,7 +48,7 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 		waitOnContextCreation("org.springframework.osgi.test.simpleservice");
 		// wait some more to let the listener binding propagate
 		Thread.sleep(10);
-		
+
 		logger.debug("simple service succesfully restarted");
 		assertTrue("Expected only two bindings of service", MyListener.BOUND_COUNT < 3);
 		assertEquals("Expected binding of service not seen", 2, MyListener.BOUND_COUNT);

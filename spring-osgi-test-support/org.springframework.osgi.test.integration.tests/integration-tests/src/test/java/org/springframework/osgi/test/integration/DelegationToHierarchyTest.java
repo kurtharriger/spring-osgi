@@ -88,5 +88,4 @@ public class DelegationToHierarchyTest extends TestCase implements OsgiJUnitTest
 		osgiDelegate.setName(getName());
 		osgiDelegate.run(result);
 	}
-
-}
+ }
