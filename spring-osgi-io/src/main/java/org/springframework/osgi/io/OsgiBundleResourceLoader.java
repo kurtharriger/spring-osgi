@@ -21,8 +21,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
- * ResourceLoader implementation that resolves paths inside an OSGi bundle, for
- * use outside a OSGi ApplicationContext. Will use the bundle classpath for
+ * OSGi specific ResourceLoader implementation.
+ * 
+ * The loader resolves paths inside an OSGi bundle using the bundle entries for
  * resource loading for any unqualified resource string.
  * 
  * Also understands the "bundle:" resource prefix for explicit loading of

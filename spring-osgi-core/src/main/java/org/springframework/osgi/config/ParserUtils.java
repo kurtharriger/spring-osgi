@@ -26,9 +26,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
+ * Parsing utility class.
+ * 
  * @author Andy Piper
  * @author Costin Leau
- * @since 2.1
  */
 public class ParserUtils {
 

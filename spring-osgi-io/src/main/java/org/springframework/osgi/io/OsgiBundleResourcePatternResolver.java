@@ -29,10 +29,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * OSGi-aware subclass of PathMatchingResourcePatternResolver.
  * 
- * OSGi-aware subclass of PathMatchingResourcePatternResolver, able to find
- * matching resources inside an OSGi bundle root directory via OSGi API's
- * <code>Bundle.getEntryPaths</code> and <code>Bundle.getResources</code>
+ * This implementation uses the OSGi API's
+ * {@link Bundle#findEntries(String, String, boolean)},
+ * {@link Bundle#getEntryPaths(String)} and {@link Bundle#getResources(String)}
+ * to find matching resources inside an OSGi bundle.
+ * 
  * Falls back to the superclass' file system checking for other resources.
  * 
  * @author Costin Leau
@@ -92,7 +95,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			// or classpath: prefix)
 
 			// don't call this since it fails on Felix
-			//String cleanPath = bundleResource.getURL().getPath();
+			// String cleanPath = bundleResource.getURL().getPath();
 			String rootPath = bundleResource.getPath();
 			// strip prefix
 			int index = rootPath.indexOf(":");

@@ -33,13 +33,14 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Resource implementation for OSGi environments. Lazy evaluation of the
- * resource will be used.
+ * Resource implementation for OSGi environments. 
+ * <p/>
+ * Lazy evaluation of the resource will be used.
  * 
  * Understands the "bundle:" resource prefix for explicit loading of resources
  * from the bundle. By default (no prefix or "bundle:" prefix) the resource is
  * localized just within the underlying bundle and attached fragments. For
- * classpath search use
+ * classpath search, use
  * {@link org.springframework.core.io.ResourceLoader#CLASSPATH_URL_PREFIX}.
  * 
  * As fallback, the path is transformed to an URL thus supporting OSGi framework

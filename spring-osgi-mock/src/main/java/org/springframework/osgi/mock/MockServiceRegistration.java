@@ -21,6 +21,11 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 /**
+ * ServiceRegistration mock.
+ * 
+ * <p/> The mock allows the service properties modification (through
+ * {@link #setProperties(Dictionary)}) as long as the underlying reference is
+ * of type {@link MockServiceReference}.
  * @author Costin Leau
  * 
  */

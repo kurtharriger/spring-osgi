@@ -21,6 +21,10 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 
 /**
+ * Filter mock.
+ * 
+ * <p/>
+ * Just a no-op interface implementation.
  * @author Costin Leau
  * 
  */

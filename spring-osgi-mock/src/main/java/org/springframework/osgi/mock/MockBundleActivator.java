@@ -19,6 +19,9 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 /**
+ * BundleActivator mock.
+ * <p/>
+ * Doesn't provide any functionality.
  * @author Costin Leau
  *
  */

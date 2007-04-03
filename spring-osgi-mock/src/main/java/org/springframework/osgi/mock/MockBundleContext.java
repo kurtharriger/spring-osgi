@@ -32,6 +32,13 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 /**
+ * BundleContext mock.
+ * 
+ * <p/> Can be configured to use a predefined Bundle or/and configuration. By
+ * default, will create an internal MockBundle. Most of the operations are no-op
+ * (as annonymous classes with specific functionality can be created per use
+ * basis).
+ * 
  * @author Costin Leau
  * 
  */
@@ -85,7 +92,7 @@ public class MockBundleContext implements BundleContext {
 		}
 		catch (InvalidSyntaxException ex) {
 			throw new IllegalStateException("exception should not occur");
-		}		
+		}
 	}
 
 	/*

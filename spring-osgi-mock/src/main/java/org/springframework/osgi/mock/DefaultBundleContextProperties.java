@@ -20,6 +20,8 @@ import java.util.Properties;
 import org.osgi.framework.Constants;
 
 /**
+ * Default properties used by the BundleContext.
+ * 
  * @author Costin Leau
  * 
  */

@@ -30,7 +30,10 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
 /**
- * This bundle uses the current classloader to for loading classes/resources.
+ * Bundle Mock.
+ * 
+ * <p/>
+ * The mock will the thread current classloader for loading classes/resources.
  * 
  * @author Costin Leau
  * 
