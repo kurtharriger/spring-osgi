@@ -29,8 +29,11 @@ public class ReferenceProxyTest extends AbstractConfigurableBundleCreatorTests {
 	public void testReferenceProxyLifecycle() throws Exception {
 		waitOnContextCreation("org.springframework.osgi.test.simpleservice");
 		waitOnContextCreation("org.springframework.osgi.test.reference.proxy");
+	
 		MyService reference = ServiceReferer.serviceReference;
-		assertNotNull(reference.stringValue());
+		
+		assertNotNull("reference not initialized", reference);
+		assertNotNull("no value specified in the reference", reference.stringValue());
 
 		Bundle simpleServiceBundle = findBundleBySymbolicName("org.springframework.osgi.test.simpleservice");
 
