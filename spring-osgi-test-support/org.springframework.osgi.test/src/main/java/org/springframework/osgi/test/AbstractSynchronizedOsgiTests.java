@@ -168,18 +168,13 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	}
 
 	private void barrierFailed(Exception cause, String bundleName) {
-	            /*
-            Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
-            int t = 0;
-            for (StackTraceElement[] i : stacks.values()) {
-                System.out.println("Thread [" + t + "]");
-                for (int j = 0 ; j<i.length; j++) {
-                    System.out.println("  " + i[j]);
-                }
-                t++;
-            }
-            */
-            
+		/*
+		 * Map<Thread, StackTraceElement[]> stacks =
+		 * Thread.getAllStackTraces(); int t = 0; for (StackTraceElement[] i :
+		 * stacks.values()) { System.out.println("Thread [" + t + "]"); for (int
+		 * j = 0 ; j<i.length; j++) { System.out.println(" " + i[j]); } t++; }
+		 */
+
 		if (logger.isDebugEnabled())
 			logger.debug("waiting for applicationContext for bundle=" + bundleName + " timed out");
 
@@ -193,7 +188,8 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 
 	/**
 	 * Should the test class wait for the context creation of Spring/OSGi
-	 * bundles before executing the tests or not? Default is true.
+	 * bundles before executing the tests or not? Default is false (seems to be
+	 * working inside Eclipse but not in Maven).
 	 * 
 	 * @return
 	 */
