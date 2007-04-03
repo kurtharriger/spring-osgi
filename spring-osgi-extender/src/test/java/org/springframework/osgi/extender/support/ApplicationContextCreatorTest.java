@@ -31,7 +31,6 @@ import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.osgi.context.support.ApplicationContextConfiguration; 
 import org.springframework.osgi.context.support.EntryLookupControllingMockBundle;
 import org.springframework.osgi.context.support.SpringBundleEvent;
-import org.springframework.osgi.extender.ServiceDependentOsgiBundleXmlApplicationContext;
 
 public class ApplicationContextCreatorTest extends TestCase {
 

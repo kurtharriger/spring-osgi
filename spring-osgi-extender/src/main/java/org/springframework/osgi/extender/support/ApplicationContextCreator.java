@@ -30,7 +30,6 @@ import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.osgi.util.OsgiBundleUtils;
-import org.springframework.osgi.extender.ServiceDependentOsgiBundleXmlApplicationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
