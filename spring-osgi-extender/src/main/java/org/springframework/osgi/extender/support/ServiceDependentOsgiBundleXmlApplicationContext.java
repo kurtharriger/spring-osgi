@@ -46,6 +46,7 @@ import java.util.*;
 public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleXmlApplicationContext {
     private boolean dependenciesSatisfied = false;
     private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
+    private Thread refreshWorker;
 
     private static final Log log = LogFactory.getLog(ServiceDependentOsgiBundleXmlApplicationContext.class);
 
@@ -57,6 +58,24 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
 
     public void setTimeout(long timeout) {
         this.timeout = timeout;
+    }
+
+    public void close() {
+        if (refreshWorker != null) {
+            refreshWorker.interrupt();
+            // refreshWorker.stop();
+            refreshWorker = null;
+        }
+        super.close();
+    }
+
+    public void refresh() {
+        refreshWorker = Thread.currentThread();
+        try {
+            super.refresh();
+        } finally {
+            refreshWorker = null;
+        }
     }
 
 
