@@ -111,7 +111,11 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 			if (log.isTraceEnabled()) {
 				debugClassLoading(name, null);
 			}
-			throw cnfe;
+            ClassNotFoundException e = new ClassNotFoundException(name +
+                                                                  " not found from bundle [" +
+                                                                  backingBundle.getSymbolicName() +
+                                                                  "]", cnfe);
+            throw e;
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			// This is almost always an error
@@ -120,8 +124,13 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 				// so make sure we search for the right one.
 				String cname = ncdfe.getMessage().replace('/', '.');
 				debugClassLoading(cname, name);
-			}
-			throw ncdfe;
+            }
+            NoClassDefFoundError e = new NoClassDefFoundError(name +
+                                                              " not found from bundle [" +
+                                                              backingBundle.getSymbolicName() +
+                                                              "]");
+            e.initCause(e);
+			throw e;
 		}
 	}
 
