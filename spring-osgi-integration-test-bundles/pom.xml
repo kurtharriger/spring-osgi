@@ -3,14 +3,13 @@
   <parent>
     <artifactId>spring-osgi</artifactId>
     <groupId>org.springframework.osgi</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-m1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-integration-test-bundles</artifactId>
   <packaging>pom</packaging>
   <name>Spring application bundles for integration testing</name>
-  <version>1.0-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   <dependencies>
   </dependencies>
@@ -64,9 +63,9 @@
     </plugins>
  </build>
 
+   <!-- the above doesn't work, so we spell it out in full below
   <reporting>
    <excludeDefaults>true</excludeDefaults>
-   <!-- the above doesn't work, so we spell it out in full below -->
    <plugins>
      <plugin>
        <groupId>org.apache.maven.plugins</groupId>
@@ -76,6 +75,14 @@
         <reportSet></reportSet>
        </reportSets>
      </plugin>   
+	<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+        <excludePackageNames>*</excludePackageNames>
+        </configuration>
+     </plugin>   
    </plugins>
   </reporting>
+  -->
 </project>

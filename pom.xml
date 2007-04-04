@@ -175,9 +175,7 @@ limitations under the License.
     <module>spring-osgi-integration-tests</module>
     <module>samples</module>
     <module>spring-osgi-bundle-archetype</module>
-    <!--
     <module>release</module>
-    -->
   </modules>
 
   <!-- shared dependencies across modules -->
@@ -400,6 +398,10 @@ limitations under the License.
               <packages>org.springframework.osgi.extender*</packages>
             </group>
             <group>
+               <title>Spring OSGi IO</title>
+               <packages>org.springframework.osgi.io*</packages>
+            </group>
+            <group>
                <title>Spring OSGi JUnit Support</title>
                <packages>org.springframework.osgi.test*</packages>
             </group>
@@ -417,6 +419,9 @@ limitations under the License.
             </group>
           </groups>
           <excludePackageNames>org.springframework.osgi.test.io*:org.springframework.osgi.test.bundleScope:org.springframework.osgi.test.card*:org.springframework.osgi.test.dep*:org.springframework.osgi.test.lifecy*:org.springframework.osgi.test.maven*:org.springframework.osgi.test.property*:org.springframework.osgi.test.reference*:org.springframework.osgi.test.service*:org.springframework.osgi.test.trivial*:org.springframework.osgi.test.simple:org.springframework.osgi.test.scope*</excludePackageNames>
+          <stylesheetfile>${basedir}/docs/stylesheet.css</stylesheetfile>
+          <overview>${basedir}/docs/overview.html</overview>
+          <breakiterator>true</breakiterator>
           <links>
             <link>http://java.sun.com/j2se/1.4.2/docs/api/</link>
             <link>
@@ -429,6 +434,8 @@ limitations under the License.
             <link>http://www2.osgi.org/javadoc/r4/</link>
             <link>http://junit.sourceforge.net/javadoc/</link>
             <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
+            <link>http://aopalliance.sourceforge.net/doc</link>
+            <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
           </links>
         </configuration>
       </plugin>

@@ -64,13 +64,7 @@ public class SimpleServiceBundleTest extends AbstractConfigurableBundleCreatorTe
 	 */
 	protected String[] getBundles() {
 		return new String[] {
-			localMavenArtifact("org.springframework.osgi", "aopalliance.osgi","1.0-SNAPSHOT"),
-			localMavenArtifact("org.springframework.osgi", "spring-aop","2.1-SNAPSHOT"),
-			localMavenArtifact("org.springframework.osgi", "spring-context", "2.1-SNAPSHOT"),
-			localMavenArtifact("org.springframework.osgi", "spring-beans","2.1-SNAPSHOT"),
-			localMavenArtifact("org.springframework.osgi", "spring-osgi-core","1.0-SNAPSHOT"),
-			localMavenArtifact("org.springframework.osgi", "spring-osgi-extender","1.0-SNAPSHOT"),
-			localMavenArtifact("org.springframework.osgi.samples", "simple-service-bundle","1.0-SNAPSHOT")
+			localMavenArtifact("org.springframework.osgi.samples", "simple-service-bundle","1.0-m1")
 		};
 	}
 	

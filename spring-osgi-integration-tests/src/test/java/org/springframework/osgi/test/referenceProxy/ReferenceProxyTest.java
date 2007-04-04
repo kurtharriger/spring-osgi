@@ -21,9 +21,9 @@ public class ReferenceProxyTest extends AbstractConfigurableBundleCreatorTests {
 		return new String[] {
 				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
-					"1.0-SNAPSHOT"),
+					"1.0-m1"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.reference.proxy",
-					"1.0-SNAPSHOT") };
+					"1.0-m1") };
 	}
 
 	public void testReferenceProxyLifecycle() throws Exception {

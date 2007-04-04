@@ -3,47 +3,48 @@
   <parent>
     <artifactId>weather</artifactId>
     <groupId>org.springframework.osgi.samples</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-m1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>weather-service-integration-test</artifactId>
   <packaging>jar</packaging>
   <name>Spring OSGi Samples: Weather Service Integration Tests</name>
-  <version>1.0-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
+  
   <dependencies>
     <dependency>
       <groupId>org.springframework.osgi.samples</groupId>
       <artifactId>weather-dao</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi.samples</groupId>
       <artifactId>weather-service</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi.samples</groupId>
       <artifactId>weather-service-test</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi.samples</groupId>
       <artifactId>wiring-bundle</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>org.springframework.osgi.test</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
       <scope>provided</scope>
     </dependency>
-        <dependency>
+    
+    <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-core</artifactId>
       <version>2.1-SNAPSHOT</version>
