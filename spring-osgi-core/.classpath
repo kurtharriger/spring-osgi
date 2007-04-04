@@ -5,23 +5,22 @@
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry exported="true" kind="lib" path="target/classes" sourcepath="target/classes"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="var" path="M2_REPO/easymock/easymock/1.2_Java1.3/easymock-1.2_Java1.3.jar"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.4/servlet-api-2.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/1.0-SNAPSHOT/spring-osgi-mock-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/1.0-m1/spring-osgi-mock-1.0-m1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/equinox/org.eclipse.osgi/3.2.0/org.eclipse.osgi-3.2.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-core/2.1-SNAPSHOT/spring-core-2.1-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-beans/2.1-SNAPSHOT/spring-beans-2.1-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-aop/2.1-SNAPSHOT/spring-aop-2.1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-web/2.1-SNAPSHOT/spring-web-2.1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-web/2.1-SNAPSHOT/spring-web-2.1-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-context/2.1-SNAPSHOT/spring-context-2.1-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/aopalliance.osgi/1.0-SNAPSHOT/aopalliance.osgi-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/1.0-SNAPSHOT/spring-osgi-io-1.0-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j-full/1.1.0/slf4j-log4j-full-1.1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/jcl104-over-slf4j.osgi/1.1.0/jcl104-over-slf4j.osgi-1.1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/1.0-m1/spring-osgi-io-1.0-m1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.13-SNAPSHOT/log4j.osgi-1.2.13-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/backport-util-concurrent/3.0-SNAPSHOT/backport-util-concurrent-3.0-SNAPSHOT.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.4.2"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.3.0/jcl104-over-slf4j-1.3.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
