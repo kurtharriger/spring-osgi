@@ -19,5 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.4.2"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/backport-util-concurrent/3.0-SNAPSHOT/backport-util-concurrent-3.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
