@@ -4,13 +4,12 @@
 	<parent>
 		<artifactId>weather</artifactId>
 		<groupId>org.springframework.osgi.samples</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0-m1</version>
 	</parent>
 	<groupId>org.springframework.osgi.samples</groupId>
 	<artifactId>wiring-bundle</artifactId>
 	<packaging>osgi-bundle</packaging>
 	<name>Spring OSGi Sample Wiring Bundle</name>
-	<version>1.0-SNAPSHOT</version>
 	<url>http://www.springframework.org/osgi</url>
 
 	<build>

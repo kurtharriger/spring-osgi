@@ -3,14 +3,13 @@
 	<parent>
 		<artifactId>spring-osgi</artifactId>
 		<groupId>org.springframework.osgi</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0-m1</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.osgi</groupId>
 	<artifactId>spring-osgi-extender</artifactId>
 	<packaging>osgi-bundle</packaging>
 	<name>org.springframework.osgi.extender bundle</name>
-	<version>1.0-SNAPSHOT</version>
 	<url>http://www.springframework.org/osgi</url>
 
 	<dependencies>
@@ -23,15 +22,24 @@
 		<dependency>
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>spring-osgi-io</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-osgi-mock</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
 			<artifactId>spring-osgi-core</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>spring-aop</artifactId>
@@ -63,13 +71,6 @@
 			<version>2.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>spring-osgi-mock</artifactId>
-			<version>1.0-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-
 
 	</dependencies>
 

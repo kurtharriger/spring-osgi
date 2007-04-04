@@ -16,10 +16,10 @@
 package org.springframework.osgi.test.bundleScope;
 
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.util.OsgiFilterUtils;
-import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.scope.common.ScopeTestService;
+import org.springframework.osgi.util.OsgiFilterUtils;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -34,11 +34,11 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 		return new String[] {
 				localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.scoped.bundle.common",
-					"1.0-SNAPSHOT"),
+					"1.0-m1"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.scoped.bundle.a",
-					"1.0-SNAPSHOT"),
+					"1.0-m1"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.scoped.bundle.b",
-					"1.0-SNAPSHOT") };
+					"1.0-m1") };
 	}
 
 	protected String getManifestLocation() {

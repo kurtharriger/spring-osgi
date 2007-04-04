@@ -3,20 +3,19 @@
   <parent>
     <artifactId>spring-osgi</artifactId>
     <groupId>org.springframework.osgi</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-m1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-io</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>org.springframework.osgi.io bundle</name>
-  <version>1.0-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   <dependencies>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-mock</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

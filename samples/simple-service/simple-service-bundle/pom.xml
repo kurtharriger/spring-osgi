@@ -2,15 +2,15 @@
   <parent>
     <artifactId>simple-service</artifactId>
     <groupId>org.springframework.osgi.samples</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-m1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>simple-service-bundle</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>Spring OSGi Samples: Simple Service Bundle</name>
-  <version>1.0-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
+  
   <dependencies>
     <dependency>
       <groupId>org.springframework.osgi</groupId>

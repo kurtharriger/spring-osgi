@@ -4,20 +4,19 @@
   <parent>
     <artifactId>weather</artifactId>
     <groupId>org.springframework.osgi.samples</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-m1</version>
   </parent>
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>weather-service</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>Spring OSGi Weather Sample Service</name>
-  <version>1.0-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
 
   <dependencies>
     <dependency>
       <groupId>org.springframework.osgi.samples</groupId>
       <artifactId>weather-dao</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
       <scope>compile</scope>
     </dependency>
 
