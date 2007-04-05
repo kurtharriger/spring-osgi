@@ -13,7 +13,7 @@
     <artifactId>org.springframework.osgi.test.cardinality0to1</artifactId>
     <packaging>osgi-bundle</packaging>
     <name>Spring context service reference cardinality 0..1 bundle</name>
-    <description>An OSGi bundle that tests the service reference cardinality value {0..1}</description>
+    <description>An OSGi bundle that tests the service reference cardinality value 0..1</description>
     <url>http://www.springframework.org/osgi</url>
 
     <dependencies>
