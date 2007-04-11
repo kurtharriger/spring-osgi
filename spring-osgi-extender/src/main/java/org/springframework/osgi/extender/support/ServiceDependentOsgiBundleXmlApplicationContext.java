@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.*;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
@@ -52,7 +53,7 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
 
 
     public ServiceDependentOsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations) {
-        super(context, configLocations); 
+        super(context, configLocations);
     }
 
 
@@ -150,7 +151,7 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
                                                                                  true,
                                                                                  false);
             for (int i = 0; i < beans.length; i++) {
-                String beanName = "&" + beans[i];
+                String beanName = BeanFactory.FACTORY_BEAN_PREFIX + beans[i];
                 OsgiServiceProxyFactoryBean reference = (OsgiServiceProxyFactoryBean) factory.getBean(beanName);
                 Dependency dependency = new Dependency(reference);
                 dependencies.add(dependency);

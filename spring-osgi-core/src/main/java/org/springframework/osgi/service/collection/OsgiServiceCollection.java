@@ -47,60 +47,75 @@ import org.springframework.util.Assert;
  * OSGi service dynamic collection - allows iterating while the underlying
  * storage is being shrunk/expanded. This collection is read-only - its content
  * is being retrieved dynamically from the OSGi platform.
- * 
+ * <p/>
  * <strong>Note</strong>:It is <strong>not</strong> synchronized.
- * 
+ *
  * @author Costin Leau
- * 
  */
 public class OsgiServiceCollection implements Collection, InitializingBean {
 
 	/**
 	 * Listener tracking the OSGi services which form the dynamic collection.
-	 * 
+	 *
 	 * @author Costin Leau
-	 * 
 	 */
 	private class Listener implements ServiceListener {
 
 		public void serviceChanged(ServiceEvent event) {
-			ServiceReference ref = event.getServiceReference();
-			Long serviceId = (Long) ref.getProperty(Constants.SERVICE_ID);
-			boolean found = false;
+			try {
+				ServiceReference ref = event.getServiceReference();
+				Long serviceId = (Long) ref.getProperty(Constants.SERVICE_ID);
+				boolean found = false;
 
-			switch (event.getType()) {
 
-			case (ServiceEvent.REGISTERED):
-			case (ServiceEvent.MODIFIED):
-				// same as ServiceEvent.REGISTERED
-				synchronized (serviceReferences) {
-					if (!serviceReferences.containsKey(serviceId)) {
-						found = true;
-						serviceReferences.put(serviceId, createServiceProxy(ref));
-						serviceIDs.add(serviceId);
-					}
+				switch (event.getType()) {
+
+					case (ServiceEvent.REGISTERED):
+					case (ServiceEvent.MODIFIED):
+						// same as ServiceEvent.REGISTERED
+						synchronized (serviceReferences) {
+							if (!serviceReferences.containsKey(serviceId)) {
+								found = true;
+								serviceReferences.put(serviceId, createServiceProxy(ref));
+								serviceIDs.add(serviceId);
+							}
+						}
+						// inform listeners
+						if (found)
+							OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
+
+						break;
+					case (ServiceEvent.UNREGISTERING):
+						synchronized (serviceReferences) {
+							// remove servce
+							Object proxy = serviceReferences.remove(serviceId);
+							found = serviceIDs.remove(serviceId);
+							if (proxy != null) {
+								invalidateProxy(proxy);
+							}
+						}
+
+						if (found)
+							OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
+						break;
+
+					default:
+						throw new IllegalArgumentException("unsupported event type");
 				}
-				// inform listeners
-				if (found)
-					OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
-
-				break;
-			case (ServiceEvent.UNREGISTERING):
-				synchronized (serviceReferences) {
-					// remove servce
-					Object proxy = serviceReferences.remove(serviceId);
-					found = serviceIDs.remove(serviceId);
-					if (proxy != null) {
-						invalidateProxy(proxy);
-					}
+			}
+			// OSGi swallows these exceptions so make sure we get a chance to see them.
+			catch (Error e) {
+				if (log.isErrorEnabled()) {
+					log.error("serviceChanged() processing failed", e);
 				}
+				throw e;
 
-				if (found)
-					OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
-				break;
-
-			default:
-				throw new IllegalArgumentException("unsupported event type");
+			}
+			catch (RuntimeException re) {
+				if (log.isWarnEnabled()) {
+					log.warn("serviceChanged() processing failed", re);
+				}
+				throw re;
 			}
 		}
 	}
@@ -112,7 +127,9 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	// values
 	protected final Map serviceReferences = new LinkedHashMap(8);
 
-	/** list binding the service IDs to the map of service proxies * */
+	/**
+	 * list binding the service IDs to the map of service proxies *
+	 */
 	protected final Collection serviceIDs = createInternalDynamicStorage();
 
 	private final Filter filter;
@@ -147,8 +164,6 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 
 	/**
 	 * Create the dynamic storage used internally.
-	 * 
-	 * @return
 	 */
 	protected Collection createInternalDynamicStorage() {
 		return new DynamicCollection();
@@ -158,9 +173,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	 * Create a service proxy over the service reference. The proxy purpose is
 	 * to transparently decouple the client from holding a strong reference to
 	 * the service (which might go away).
-	 * 
+	 *
 	 * @param ref
-	 * @return
 	 */
 	private Object createServiceProxy(ServiceReference ref) {
 		// get classes under which the service was registered
@@ -301,7 +315,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	/**
 	 * The optional interceptors used when proxying each service. These will
 	 * always be added before the OsgiServiceStaticInterceptor.
-	 * 
+	 *
 	 * @param interceptors The interceptors to set.
 	 */
 	public void setInterceptors(Object[] interceptors) {

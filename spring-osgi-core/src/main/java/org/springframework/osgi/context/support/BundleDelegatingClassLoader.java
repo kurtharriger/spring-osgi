@@ -111,11 +111,10 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 			if (log.isTraceEnabled()) {
 				debugClassLoading(name, null);
 			}
-            ClassNotFoundException e = new ClassNotFoundException(name +
-                                                                  " not found from bundle [" +
-                                                                  backingBundle.getSymbolicName() +
-                                                                  "]", cnfe);
-            throw e;
+			throw new ClassNotFoundException(name +
+			                                                      " not found from bundle [" +
+			                                                      backingBundle.getSymbolicName() +
+			                                                      "]", cnfe);
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			// This is almost always an error
@@ -134,12 +133,17 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		}
 	}
 
+
+	private synchronized void debugClassLoading(String name, String root) {
+		debugClassLoading(backingBundle, name, root);
+	}
+
 	/**
 	 * A best-guess attempt at figuring out why the class could not be found.
 	 * 
 	 * @param name of the class we are trying to find.
 	 */
-	private synchronized void debugClassLoading(String name, String root) {
+	public static void debugClassLoading(Bundle backingBundle, String name, String root) {
 		Dictionary dict = backingBundle.getHeaders();
 		String bname = dict.get(Constants.BUNDLE_NAME) + "(" + dict.get(Constants.BUNDLE_SYMBOLICNAME) + ")";
 		if (log.isTraceEnabled())
@@ -190,7 +194,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		}
 	}
 
-	private Version checkBundleForClass(Bundle bundle, String name, Version iversion) {
+	private static Version checkBundleForClass(Bundle bundle, String name, Version iversion) {
 		String packageName = name.substring(0, name.lastIndexOf('.'));
 		Version hasExport = hasExport(bundle, packageName);
 
@@ -266,7 +270,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		return hasExport;
 	}
 
-	private URL checkBundleJarsForClass(Bundle bundle, String name) {
+	private static URL checkBundleJarsForClass(Bundle bundle, String name) {
 		String cname = name.replace('.', '/') + ".class";
 		for (Enumeration e = bundle.findEntries("/", "*.jar", true); e != null && e.hasMoreElements();) {
 			URL url = (URL) e.nextElement();
@@ -289,7 +293,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		return null;
 	}
 
-	private Version hasImport(Bundle bundle, String packageName) {
+	private static Version hasImport(Bundle bundle, String packageName) {
 		Dictionary dict = bundle.getHeaders();
 		// Check imports
 		String imports = (String) dict.get(Constants.IMPORT_PACKAGE);
@@ -318,13 +322,13 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		return null;
 	}
 
-	private Version hasExport(Bundle bundle, String packageName) {
+	private static Version hasExport(Bundle bundle, String packageName) {
 		Dictionary dict = bundle.getHeaders();
 		return getVersion((String) dict.get(Constants.EXPORT_PACKAGE), packageName);
 	}
 
 	// Pull out a version of the meta-data
-	private Version getVersion(String stmt, String packageName) {
+	private static Version getVersion(String stmt, String packageName) {
 		if (stmt != null) {
 			for (StringTokenizer strok = new StringTokenizer(stmt, ","); strok.hasMoreTokens();) {
 				StringTokenizer parts = new StringTokenizer(strok.nextToken(), ";");
@@ -347,7 +351,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		return null;
 	}
 
-	private String getBundleName(Bundle bundle) {
+	private static String getBundleName(Bundle bundle) {
 		Dictionary dict = bundle.getHeaders();
 		String name = (String) dict.get(Constants.BUNDLE_NAME);
 		String sname = (String) dict.get(Constants.BUNDLE_SYMBOLICNAME);
