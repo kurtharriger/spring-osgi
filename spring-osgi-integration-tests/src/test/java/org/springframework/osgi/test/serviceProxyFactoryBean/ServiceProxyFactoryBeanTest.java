@@ -86,11 +86,12 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 	public void testFactoryBeanForMultipleServices() throws Exception {
 
 		fb.setCardinality("0..N");
-		fb.setInterface(new Class[] { Number.class });
+		fb.setInterface(new Class[] { Collection.class });
 		fb.afterPropertiesSet();
 
 		List registrations = new ArrayList(3);
 
+		// Eek. cglib dances the bizarre initialization hula of death here. Must use interfaces for now.
 		try {
 			Object result = fb.getObject();
 			assertTrue(result instanceof Collection);
@@ -100,16 +101,20 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 			Iterator iter = col.iterator();
 
 			assertFalse(iter.hasNext());
-			registrations.add(publishService(new Long(10), Number.class.getName()));
+			ArrayList a = new ArrayList();
+			a.add(new Long(10));
+			registrations.add(publishService(a, Collection.class.getName()));
 			Object service = iter.next();
-			assertTrue(service instanceof Number);
-			assertEquals(10, ((Number) service).longValue());
+			assertTrue(service instanceof Collection);
+			assertEquals(10, ((Number)((Collection) service).toArray()[0]).intValue());
 
 			assertFalse(iter.hasNext());
-			registrations.add(publishService(new Integer(100), Number.class.getName()));
+			a = new ArrayList();
+			a.add(new Long(100));
+			registrations.add(publishService(a, Collection.class.getName()));
 			service = iter.next();
-			assertTrue(service instanceof Number);
-			assertEquals(100, ((Number) service).intValue());
+			assertTrue(service instanceof Collection);
+			assertEquals(100, ((Number)((Collection) service).toArray()[0]).intValue());
 		}
 		finally {
 			for (int i = 0; i < registrations.size(); i++) {

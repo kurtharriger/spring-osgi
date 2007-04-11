@@ -25,7 +25,11 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.service.CardinalityOptions;
@@ -38,21 +42,17 @@ import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * Factory bean for OSGi services. Returns a dynamic proxy which handles the
  * lookup and retrieval and can cope with the dynamic nature of the OSGi platform.
- * 
+ *
  * @author Costin Leau
  * @author Adrian Colyer
  * @author Hal Hildebrand
- * 
  */
 public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean,
-                                                    BundleContextAware, ApplicationListener {
+	BundleContextAware, ApplicationListener {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
@@ -78,7 +78,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	// filter used to narrow service matches, may be null
 	private String filter;
 
-    // Constructed object of this factory
+	// Constructed object of this factory
 	private Object proxy;
 
 	// Cumulated filter string between the specified classes/interfaces and the
@@ -89,31 +89,33 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
 
 	private String serviceBeanName;
+	private ClassLoader classloader;
 
 
-    public void onApplicationEvent(ApplicationEvent applicationEvent) {
-        if (applicationEvent instanceof ContextRefreshedEvent) {
-            // This sets up the listeners for beans which are not referred to by any other
-            // bean in the context.  We can't do this in afterPropertiesSet, so we have to do
-            // it here.
-            getObject();
-        }
-    }
+	public void onApplicationEvent(ApplicationEvent applicationEvent) {
+		if (applicationEvent instanceof ContextRefreshedEvent) {
+			// This sets up the listeners for beans which are not referred to by any other
+			// bean in the context.  We can't do this in afterPropertiesSet, so we have to do
+			// it here.
+			getObject();
+		}
+	}
 
-    /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
-	 */
+	/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.springframework.beans.factory.FactoryBean#getObject()
+		 */
 	public Object getObject() {
-        if (proxy == null) {
-            if (CardinalityOptions.atMostOneExpected(cardinality)) {
-                proxy = createSingleServiceProxy();
-            } else {
-                proxy = createMultiServiceCollection(getUnifiedFilter());
-            }
-        }
-        return proxy;
+		if (proxy == null) {
+			if (CardinalityOptions.atMostOneExpected(cardinality)) {
+				proxy = createSingleServiceProxy();
+			}
+			else {
+				proxy = createMultiServiceCollection(getUnifiedFilter());
+			}
+		}
+		return proxy;
 	}
 
 	/*
@@ -156,54 +158,55 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-        Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
+		Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
 		Assert.notNull(serviceTypes, "Required serviceTypes property was not set");
-        // validate specified classes
-        Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
+		// validate specified classes
+		Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
 			"more then one concrete class specified; cannot create proxy");
-        getUnifiedFilter(); // eager initialization of the cache to catch filter errors
-    }
+		getUnifiedFilter(); // eager initialization of the cache to catch filter errors
+		Assert.notNull(serviceTypes, "Required serviceTypes property no longer exists");
+	}
 
 
-    public Filter getUnifiedFilter() {
-        if (unifiedFilter != null) {
-            return unifiedFilter;
-        } 
+	public Filter getUnifiedFilter() {
+		if (unifiedFilter != null) {
+			return unifiedFilter;
+		}
 
-        // clean up parent classes
-        serviceTypes = OsgiServiceUtils.removeParents(serviceTypes);
+		// clean up parent classes
+		serviceTypes = OsgiServiceUtils.removeParents(serviceTypes);
 
-        String filterWithClasses = OsgiFilterUtils.unifyFilter(serviceTypes, filter);
+		String filterWithClasses = OsgiFilterUtils.unifyFilter(serviceTypes, filter);
 
-        if (log.isTraceEnabled())
-            log.trace("unified classes=" + ObjectUtils.nullSafeToString(serviceTypes) + " and filter=[" + filter
-                    + "]  in=[" + filterWithClasses + "]");
+		if (log.isTraceEnabled())
+			log.trace("unified classes=" + ObjectUtils.nullSafeToString(serviceTypes) + " and filter=[" + filter
+				+ "]  in=[" + filterWithClasses + "]");
 
-        // add the serviceBeanName constraint
+		// add the serviceBeanName constraint
 		String filterWithServiceBeanName = OsgiFilterUtils.unifyFilter(
-			BeanNameServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY.toString(), new String[] { serviceBeanName },
-            filterWithClasses);
+			BeanNameServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY.toString(), new String[]{serviceBeanName},
+			filterWithClasses);
 
 		if (log.isTraceEnabled())
 			log.trace("unified serviceBeanName [" + ObjectUtils.nullSafeToString(serviceBeanName) + "] and filter=["
-					+ filterWithClasses + "]  in=[" + filterWithServiceBeanName + "]");
+				+ filterWithClasses + "]  in=[" + filterWithServiceBeanName + "]");
 
 		// create (which implies validation) the actual filter
 		unifiedFilter = OsgiFilterUtils.createFilter(filterWithServiceBeanName);
 
-        return unifiedFilter;
-    }
+		return unifiedFilter;
+	}
 
-    public int getCard() {
-        return cardinality;
-    }
+	public int getCard() {
+		return cardinality;
+	}
 
 
-    /*
-      * (non-Javadoc)
-      *
-      * @see org.springframework.beans.factory.DisposableBean#destroy()
-      */
+	/*
+		  * (non-Javadoc)
+		  *
+		  * @see org.springframework.beans.factory.DisposableBean#destroy()
+		  */
 	public void destroy() throws Exception {
 		// FIXME: add destroy behavior
 	}
@@ -245,7 +248,16 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		// factory.setOptimize(true);
 		// factory.setOpaque(true);
 
-		return factory.getProxy(ProxyFactory.class.getClassLoader());
+		try {
+			return factory.getProxy(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
+				ProxyFactory.class.getClassLoader()));
+		}
+		catch (NoClassDefFoundError ncdfe) {
+			if (log.isWarnEnabled()) {
+				debugClassLoading(ncdfe);
+			}
+			throw ncdfe;
+		}
 	}
 
 	protected Object createMultiServiceCollection(Filter filter) {
@@ -262,9 +274,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	}
 
 	protected void addOsgiRetryInterceptor(ProxyFactory factory, Filter filter,
-			TargetSourceLifecycleListener[] listeners) {
+	                                       TargetSourceLifecycleListener[] listeners) {
 		OsgiServiceDynamicInterceptor lookupAdvice = new OsgiServiceDynamicInterceptor(bundleContext,
-				contextClassloader, CardinalityOptions.atLeastOneRequired(cardinality));
+			contextClassloader, CardinalityOptions.atLeastOneRequired(cardinality));
 		lookupAdvice.setListeners(listeners);
 		lookupAdvice.setFilter(filter);
 		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
@@ -277,7 +289,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	/**
 	 * Based on the given class, use JDK Proxy or CGLIB instrumentation when
 	 * generating the proxy.
-	 * 
+	 *
 	 * @param factory
 	 * @param classes
 	 */
@@ -296,8 +308,30 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	}
 
 	/**
+	 * Try and figure out why the proxy generation failed.
+	 *
+	 * @param ncdfe
+	 */
+	protected void debugClassLoading(NoClassDefFoundError ncdfe) {
+		String cname = ncdfe.getMessage().replace('/', '.');
+		BundleDelegatingClassLoader.debugClassLoading(bundleContext.getBundle(), cname, null);
+		// Check out all the classes.
+		for (int i = 0; i < serviceTypes.length; i++) {
+			ClassLoader cl = serviceTypes[i].getClassLoader();
+			String cansee = "cannot";
+			try {
+				cl.loadClass(cname);
+				cansee = "can";
+			}
+			catch (Exception e) {}
+			log.warn(serviceTypes[i].toString() + " is loaded by " + cl.toString() + " which "
+				+ cansee + " see " + cname);
+		}
+	}
+
+	/**
 	 * Add the local bundle context support.
-	 * 
+	 *
 	 * @param factory
 	 */
 	protected void addLocalBundleContextSupport(ProxyFactory factory) {
@@ -325,7 +359,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	/**
 	 * The optional cardinality attribute allows a reference cardinality to be
 	 * specified (0..1, 1..1, 0..n, or 1..n). The default is '1..1'.
-	 * 
+	 *
 	 * @param cardinality
 	 */
 	public void setCardinality(String cardinality) {
@@ -349,7 +383,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * How many times should we attempt to rebind to a target service if the
 	 * service we are currently using is unregistered. Default is 3 times. <p/>
 	 * Changing this property after initialization is complete has no effect.
-	 * 
+	 *
 	 * @param maxRetries The maxRetries to set.
 	 */
 	public void setRetryTimes(int maxRetries) {
@@ -359,7 +393,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	/**
 	 * How long should we wait between failed attempts at rebinding to a service
 	 * that has been unregistered. <p/>
-	 * 
+	 *
 	 * @param millisBetweenRetries The millisBetweenRetries to set.
 	 */
 	public void setTimeout(long millisBetweenRetries) {
@@ -391,7 +425,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * To find a bean published as a service by the OsgiServiceExporter, simply
 	 * set this property. You may specify additional filtering criteria if
 	 * needed (using the filter property) but this is not required.
-	 * 
+	 *
 	 * @param serviceBeanName The serviceBeanName to set.
 	 */
 	public void setServiceBeanName(String serviceBeanName) {
@@ -402,5 +436,4 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	public void setBeanName(String beanName) {
 		setServiceBeanName(beanName);
 	}
-
 }
