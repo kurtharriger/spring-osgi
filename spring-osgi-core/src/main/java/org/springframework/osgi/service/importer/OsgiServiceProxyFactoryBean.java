@@ -25,10 +25,12 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.beans.factory.FactoryBeanNotInitializedException;
+import org.springframework.beans.BeansException; 
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
@@ -52,7 +54,7 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  */
 public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean,
-	BundleContextAware, ApplicationListener {
+	BundleContextAware, ApplicationContextAware {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
@@ -89,33 +91,29 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
 
 	private String serviceBeanName;
-	private ClassLoader classloader;
 
 
-	public void onApplicationEvent(ApplicationEvent applicationEvent) {
-		if (applicationEvent instanceof ContextRefreshedEvent) {
-			// This sets up the listeners for beans which are not referred to by any other
-			// bean in the context.  We can't do this in afterPropertiesSet, so we have to do
-			// it here.
-			getObject();
-		}
-	}
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        if (applicationContext instanceof ConfigurableOsgiBundleApplicationContext) {
+            ((ConfigurableOsgiBundleApplicationContext) applicationContext).addReference(this);
+        }
+    }
 
-	/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.springframework.beans.factory.FactoryBean#getObject()
-		 */
+
+    /*
+          * (non-Javadoc)
+          *
+          * @see org.springframework.beans.factory.FactoryBean#getObject()
+          */
 	public Object getObject() {
-		if (proxy == null) {
-			if (CardinalityOptions.atMostOneExpected(cardinality)) {
-				proxy = createSingleServiceProxy();
-			}
-			else {
-				proxy = createMultiServiceCollection(getUnifiedFilter());
-			}
-		}
-		return proxy;
+        if (proxy == null) {
+            if (CardinalityOptions.atMostOneExpected(cardinality)) {
+                proxy = createSingleServiceProxy();
+            } else {
+                proxy = createMultiServiceCollection(getUnifiedFilter());
+            }
+        }
+        return proxy;
 	}
 
 	/*
@@ -165,7 +163,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 			"more then one concrete class specified; cannot create proxy");
 		getUnifiedFilter(); // eager initialization of the cache to catch filter errors
 		Assert.notNull(serviceTypes, "Required serviceTypes property no longer exists");
-	}
+    }
 
 
 	public Filter getUnifiedFilter() {
@@ -267,9 +265,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		OsgiServiceCollection collection = new OsgiServiceList(filter, bundleContext);
 
 		collection.setListeners(listeners);
-		collection.setContextClassLoader(contextClassloader);
-		// setup done
-		collection.afterPropertiesSet();
+		collection.setContextClassLoader(contextClassloader); 
+        collection.afterPropertiesSet();
 		return collection;
 	}
 
@@ -281,7 +278,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		lookupAdvice.setFilter(filter);
 		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
 
-		lookupAdvice.afterPropertiesSet();
+        lookupAdvice.afterPropertiesSet();
 
 		factory.addAdvice(lookupAdvice);
 	}
@@ -323,7 +320,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 				cl.loadClass(cname);
 				cansee = "can";
 			}
-			catch (Exception e) {}
+			catch (Exception e) {
+                // ignored
+            }
 			log.warn(serviceTypes[i].toString() + " is loaded by " + cl.toString() + " which "
 				+ cansee + " see " + cname);
 		}
@@ -435,5 +434,5 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	// FIXME: this should be removed - bean-name-> service-bean-name
 	public void setBeanName(String beanName) {
 		setServiceBeanName(beanName);
-	}
+	} 
 }

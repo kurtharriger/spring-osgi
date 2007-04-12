@@ -44,19 +44,19 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 	// FIXME: externalize them
 	protected String getSpringOSGiTestBundleUrl() {
-		return "org.springframework.osgi,org.springframework.osgi.test,1.0-m1";
+		return "org.springframework.osgi,org.springframework.osgi.test,1.0-m2-SNAPSHOT";
 	}
 
 	protected String getSpringOSGiIoBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-io,1.0-m1";
+		return "org.springframework.osgi,spring-osgi-io,1.0-m2-SNAPSHOT";
 	}
 
 	protected String getSpringOSGiCoreBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-core,1.0-m1";
+		return "org.springframework.osgi,spring-osgi-core,1.0-m2-SNAPSHOT";
 	}
 
 	protected String getSpringOSGiExtenderBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-extender,1.0-m1";
+		return "org.springframework.osgi,spring-osgi-extender,1.0-m2-SNAPSHOT";
 	}
 
 	protected String getSpringCoreBundleUrl() {

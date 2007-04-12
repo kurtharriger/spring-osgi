@@ -42,9 +42,8 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 
 	private GenericApplicationContext appContext;
 
-	private BundleContext bundleContext;
 
-	protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
 		// reset counter just to be sure
 		DummyListener.BIND_CALLS = 0;
 		DummyListener.UNBIND_CALLS = 0;
@@ -55,14 +54,14 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 		DummyListenerServiceSignature2.BIND_CALLS = 0;
 		DummyListenerServiceSignature2.UNBIND_CALLS = 0;
 
-		bundleContext = new MockBundleContext() {
-			// service reference already registered
-			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
-				return new ServiceReference[] { new MockServiceReference(new String[] { Cloneable.class.getName() }) };
-			}
-		};
+        BundleContext bundleContext = new MockBundleContext() {
+            // service reference already registered
+            public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+                return new ServiceReference[]{new MockServiceReference(new String[]{Cloneable.class.getName()})};
+            }
+        };
 
-		appContext = new GenericApplicationContext();
+        appContext = new GenericApplicationContext();
 		appContext.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
 
 		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
