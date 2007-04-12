@@ -24,10 +24,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.*;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.BeansException; 
 import org.springframework.context.ApplicationContextException;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.service.CardinalityOptions;
@@ -54,7 +51,7 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
 
     public ServiceDependentOsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations) {
         super(context, configLocations);
-    }
+    } 
 
 
     public void setTimeout(long timeout) {
@@ -145,14 +142,8 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
 
 
         private void findServiceDependencies() {
-            ConfigurableListableBeanFactory factory = getBeanFactory();
-            String[] beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(factory,
-                                                                                 OsgiServiceProxyFactoryBean.class,
-                                                                                 true,
-                                                                                 false);
-            for (int i = 0; i < beans.length; i++) {
-                String beanName = BeanFactory.FACTORY_BEAN_PREFIX + beans[i];
-                OsgiServiceProxyFactoryBean reference = (OsgiServiceProxyFactoryBean) factory.getBean(beanName);
+            for (Iterator i = references.iterator(); i.hasNext(); ) { 
+                OsgiServiceProxyFactoryBean reference = (OsgiServiceProxyFactoryBean) i.next();
                 Dependency dependency = new Dependency(reference);
                 dependencies.add(dependency);
                 if (!dependency.isSatisfied()) {

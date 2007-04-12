@@ -32,7 +32,7 @@ public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
     protected String[] getBundles() {
         return new String[]{
                 localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"), 
-                localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.lifecycle", "1.0-m1")
+                localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.lifecycle", "1.0-m2-SNAPSHOT")
         };
     }
     

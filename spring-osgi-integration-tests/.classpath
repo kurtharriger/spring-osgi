@@ -4,10 +4,10 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-test-support"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.test.lifecycle/1.0-m1/org.springframework.osgi.test.lifecycle-1.0-m1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.test.lifecycle/1.0-m2-SNAPSHOT/org.springframework.osgi.test.lifecycle-1.0-m2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.0-m1/spring-osgi-core-1.0-m1.jar" sourcepath="/OSGI_SRC_ROOT/spring-osgi-core/src/main/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.test.service.listener/1.0-m1/org.springframework.osgi.test.service.listener-1.0-m1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.0-m2-SNAPSHOT/spring-osgi-core-1.0-m2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/spring-osgi-core/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.test.service.listener/1.0-m2-SNAPSHOT/org.springframework.osgi.test.service.listener-1.0-m2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-context/2.1-SNAPSHOT/spring-context-2.1-SNAPSHOT.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Integration Test Simple Service Bundle"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Cardinality 0..1 Integration Tests"/>
@@ -24,6 +24,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.4.2"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/asm.osgi/2.2.2-SNAPSHOT/asm.osgi-2.2.2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.3.0/jcl104-over-slf4j-1.3.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/1.0-m1/spring-osgi-io-1.0-m1.jar" sourcepath="/OSGI_SRC_ROOT/spring-osgi-io/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/1.0-m2-SNAPSHOT/spring-osgi-io-1.0-m2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/spring-osgi-io/src/main/java"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

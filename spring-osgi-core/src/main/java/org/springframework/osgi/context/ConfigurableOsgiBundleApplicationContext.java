@@ -63,4 +63,13 @@ public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableAp
 	 * @param publishContextAsService The publishContextAsService to set.
 	 */
 	void setPublishContextAsService(boolean publishContextAsService);
+
+
+    /**
+     * Add a reference factory which refers to an OSGi service dependency
+     * for this context
+     * 
+     * @param reference
+     */
+    void addReference(Object reference);
 }

@@ -63,7 +63,7 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
     protected String[] getBundles() {
         return new String[]{
 			localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-SNAPSHOT"),            
-            localMavenArtifact("org.springframework.osgi", "wiring-bundle", "1.0-m1")
+            localMavenArtifact("org.springframework.osgi", "wiring-bundle", "1.0-m2-SNAPSHOT")
         };
     }
 

@@ -15,8 +15,7 @@
  */
 package org.springframework.osgi.context.support;
 
-import java.util.Dictionary;
-import java.util.Properties;
+import java.util.*;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -37,6 +36,7 @@ import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
+import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -110,6 +110,8 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	private ServiceRegistration serviceRegistration;
 
 	private boolean publishContextAsService = true;
+    
+    protected List references = new ArrayList();
 
 	public AbstractRefreshableOsgiBundleApplicationContext() {
 		super(null);
@@ -172,7 +174,11 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 			// publish the context only after all the beans have been published
 			publishContextAsOsgiServiceIfNecessary();
 		}
-	}
+        for (Iterator i = references.iterator(); i.hasNext(); ) {
+            OsgiServiceProxyFactoryBean factory = (OsgiServiceProxyFactoryBean) i.next();
+            factory.getObject();
+        }
+    }
 
     // synchronization required around close as after this, the BundleContext is
 	// invalid - cannot allow close to happen on a separate thread during
@@ -318,4 +324,8 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		return isActive();
 	}
 
+
+    public void addReference(Object reference) {
+        references.add(reference);
+    }
 }

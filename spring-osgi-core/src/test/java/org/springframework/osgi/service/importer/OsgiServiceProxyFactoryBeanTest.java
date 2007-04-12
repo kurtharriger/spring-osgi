@@ -15,7 +15,7 @@
  *
  * Created on 25-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.service;
+package org.springframework.osgi.service.importer;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -33,6 +33,7 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.TargetSourceLifecycleListener;
 
 /**
  * @author Adrian Colyer
@@ -112,9 +113,9 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		dict.put(Constants.OBJECTCLASS, new String[] { Serializable.class.getName() });
 		ref.setProperties(dict);
 
-		serviceFactoryBean.afterPropertiesSet();
+		serviceFactoryBean.afterPropertiesSet(); 
 
-		Object proxy = serviceFactoryBean.getObject();
+        Object proxy = serviceFactoryBean.getObject();
 		assertTrue(proxy instanceof Serializable);
 		assertTrue("should be proxied", proxy instanceof Advised);
 
@@ -149,9 +150,9 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		TargetSourceLifecycleListener[] listeners = { (TargetSourceLifecycleListener) MockControl.createControl(
 			TargetSourceLifecycleListener.class).getMock() };
 		serviceFactoryBean.setListeners(listeners);
-		serviceFactoryBean.afterPropertiesSet();
+		serviceFactoryBean.afterPropertiesSet(); 
 
-		Field field = OsgiServiceCollection.class.getDeclaredField("listeners");
+        Field field = OsgiServiceCollection.class.getDeclaredField("listeners");
 		field.setAccessible(true);
 		assertSame(listeners, field.get(serviceFactoryBean.getObject()));
 	}

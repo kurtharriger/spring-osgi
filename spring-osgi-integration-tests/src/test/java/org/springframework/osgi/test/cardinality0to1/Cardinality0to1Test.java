@@ -22,9 +22,9 @@ public class Cardinality0to1Test extends AbstractConfigurableBundleCreatorTests 
 		return new String[] {
 				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
-					"1.0-m1"),
+					"1.0-m2-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.cardinality0to1",
-					"1.0-m1") };
+					"1.0-m2-SNAPSHOT") };
 	}
 
 	public void test0to1Cardinality() throws Exception {
@@ -33,7 +33,7 @@ public class Cardinality0to1Test extends AbstractConfigurableBundleCreatorTests 
 		BundleContext bundleContext = getBundleContext();
 
 		Bundle simpleService2Bundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.test.simple.service2", "1.0-m1").getURL().toExternalForm());
+			"org.springframework.osgi", "org.springframework.osgi.test.simple.service2", "1.0-m2-SNAPSHOT").getURL().toExternalForm());
 
 		assertNotNull("Cannot find the simple service 2 bundle", simpleService2Bundle);
 

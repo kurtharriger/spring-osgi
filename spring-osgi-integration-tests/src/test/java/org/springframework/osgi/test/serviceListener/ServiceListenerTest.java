@@ -19,9 +19,9 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 		return new String[] {
 				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.simple.service",
-					"1.0-m1"),
+					"1.0-m2-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.test.service.listener",
-					"1.0-m1") };
+					"1.0-m2-SNAPSHOT") };
 	}
 
 	public void testServiceListener() throws Exception {
