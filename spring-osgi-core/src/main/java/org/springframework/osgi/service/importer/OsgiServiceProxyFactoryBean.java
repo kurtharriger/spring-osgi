@@ -25,12 +25,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.FactoryBeanNotInitializedException;
-import org.springframework.beans.BeansException; 
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.BundleContextAware; 
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
@@ -44,6 +39,9 @@ import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * Factory bean for OSGi services. Returns a dynamic proxy which handles the
@@ -54,7 +52,7 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  */
 public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean,
-	BundleContextAware, ApplicationContextAware {
+	BundleContextAware, ApplicationListener {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
@@ -93,9 +91,12 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	private String serviceBeanName;
 
 
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        if (applicationContext instanceof ConfigurableOsgiBundleApplicationContext) {
-            ((ConfigurableOsgiBundleApplicationContext) applicationContext).addReference(this);
+    public void onApplicationEvent(ApplicationEvent applicationEvent) {
+        if (applicationEvent instanceof ContextRefreshedEvent) {
+            // This sets up the listeners for beans which are not referred to by any other
+            // bean in the context.  We can't do this in afterPropertiesSet, so we have to do
+            // it here.
+            getObject();
         }
     }
 

@@ -109,7 +109,8 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		prop.setProperty("white", "horse");
 		assertEquals(prop, exporter.getServiceProperties());
 
-		assertSame(appContext.getBean("string"), getServiceAtIndex(1));
+        // Should be wrapped with a TCCL setting proxy
+        assertNotSame(appContext.getBean("string"), getServiceAtIndex(1));
 	}
 
 	public void testNestedService() throws Exception {

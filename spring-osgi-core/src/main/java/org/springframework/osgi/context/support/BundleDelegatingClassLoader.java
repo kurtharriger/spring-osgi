@@ -257,7 +257,8 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 					c = bundle.loadClass(name);
 				}
 				catch (ClassNotFoundException e1) {
-				}
+                    // Ignored
+                }
 				if (log.isTraceEnabled())
 					log.trace("Bundle [" + getBundleName(bundle) + "] loadClass [" + cname + "] returns [" + c + "]");
 			}
@@ -392,5 +393,11 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	public Bundle getBundle() {
 		return backingBundle;
 	}
+
+    public String toString() {
+		Dictionary dict = backingBundle.getHeaders();
+		String bname = dict.get(Constants.BUNDLE_NAME) + "(" + dict.get(Constants.BUNDLE_SYMBOLICNAME) + ")";
+        return "BundleDelegatingClassLoader for [" + bname + "]";
+    }
 
 }

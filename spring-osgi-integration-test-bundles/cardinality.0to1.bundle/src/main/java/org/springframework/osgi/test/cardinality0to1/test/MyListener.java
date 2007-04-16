@@ -11,7 +11,6 @@ import java.util.Dictionary;
 public class MyListener {
     public static int BOUND_COUNT = 0;
     public static int UNBOUND_COUNT = 0;
-    public static MyService2 service;
 
 
     public void serviceAvailable(MyService2 simpleService, Dictionary properties) {
@@ -21,11 +20,6 @@ public class MyListener {
 
     public void serviceUnavailable(MyService2 simpleService, Dictionary properties) {
         UNBOUND_COUNT++;
-    }
-
-
-    public void setSimpleService(MyService2 simpleService) {
-        service = simpleService;
     }
 }
 

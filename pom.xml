@@ -19,14 +19,14 @@
 
   <properties>
     <!-- Spring dist version for turning into OSGi bundles -->
-    <base.spring.version>2.0.4</base.spring.version>
+    <base.spring.version>2.0.3</base.spring.version>
     <!-- Spring version declaration in bundles -->
-    <spring.version>2.0.4</spring.version>
+    <spring.version>2.0.3</spring.version>
     <!--- Spring packages exported version -->
-    <spring.export.version>2.1.0.SNAPSHOT-204</spring.export.version>
+    <spring.export.version>2.1.0.SNAPSHOT-203</spring.export.version>
     <!--- Spring packages imported version -->
     <spring.import.version>2.1.0</spring.import.version>
-    <spring.bundle.version>2.1.0.SNAPSHOT-204</spring.bundle.version>
+    <spring.bundle.version>2.1.0.SNAPSHOT-203</spring.bundle.version>
     <!--- Spring OSGi packages imported version -->
     <spring.osgi.import.version>1.0.0.m2-SNAPSHOT</spring.osgi.import.version>
     <!--- Spring OSGi packages exported version -->

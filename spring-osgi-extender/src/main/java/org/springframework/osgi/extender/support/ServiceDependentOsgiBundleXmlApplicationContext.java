@@ -24,7 +24,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.*;
-import org.springframework.beans.BeansException; 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.service.CardinalityOptions;
@@ -142,13 +145,27 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
 
 
         private void findServiceDependencies() {
-            for (Iterator i = references.iterator(); i.hasNext(); ) { 
-                OsgiServiceProxyFactoryBean reference = (OsgiServiceProxyFactoryBean) i.next();
+            ConfigurableListableBeanFactory factory = getBeanFactory();
+            String[] beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(factory,
+                                                                                 OsgiServiceProxyFactoryBean.class,
+                                                                                 true,
+                                                                                 true);
+            for (int i = 0; i < beans.length; i++) {
+                String beanName = BeanFactory.FACTORY_BEAN_PREFIX + beans[i];
+                OsgiServiceProxyFactoryBean reference = (OsgiServiceProxyFactoryBean) factory.getBean(beanName);
                 Dependency dependency = new Dependency(reference);
                 dependencies.add(dependency);
                 if (!dependency.isSatisfied()) {
                     unsatisfiedDependencies.add(dependency);
                 }
+            }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug(dependencies.size() +
+                          " dependencies, " +
+                          unsatisfiedDependencies.size() +
+                          " unsatisfied for " +
+                          getDisplayName());
             }
 
         }

@@ -5,8 +5,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-    <bean id="listener" class="org.springframework.osgi.test.cardinality0to1.test.MyListener">
-		<property name="simpleService" ref="simpleServiceOsgi"/>
+    <bean id="listener" class="org.springframework.osgi.test.cardinality0to1.test.MyListener"/>
+    <bean id="my-container" class="org.springframework.osgi.test.cardinality0to1.test.ReferenceContainer">
+        <property name="simpleService" ref="simpleServiceOsgi"/>
     </bean>
 
     <osgi:reference id="simpleServiceOsgi"
