@@ -109,9 +109,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	/** Used for publishing the app context * */
 	private ServiceRegistration serviceRegistration;
 
-	private boolean publishContextAsService = true;
-    
-    protected List references = new ArrayList();
+	private boolean publishContextAsService = true; 
 
 	public AbstractRefreshableOsgiBundleApplicationContext() {
 		super(null);
@@ -174,10 +172,6 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 			// publish the context only after all the beans have been published
 			publishContextAsOsgiServiceIfNecessary();
 		}
-        for (Iterator i = references.iterator(); i.hasNext(); ) {
-            OsgiServiceProxyFactoryBean factory = (OsgiServiceProxyFactoryBean) i.next();
-            factory.getObject();
-        }
     }
 
     // synchronization required around close as after this, the BundleContext is
@@ -323,9 +317,4 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		// simply delegate to isActive
 		return isActive();
 	}
-
-
-    public void addReference(Object reference) {
-        references.add(reference);
-    }
 }

@@ -31,11 +31,7 @@ import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.CollectionFactory;
@@ -43,13 +39,16 @@ import org.springframework.core.Constants;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.OsgiBundleScope;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.service.OsgiServicePropertiesResolver;
+import org.springframework.osgi.service.interceptor.OsgiServiceTCCLInvoker;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.aop.framework.ProxyFactory; 
 
 /**
  * FactoryBean that transparently publishes other beans in the same application
@@ -71,7 +70,7 @@ import org.springframework.util.StringUtils;
  * 
  */
 public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBean, DisposableBean, BundleContextAware,
-		FactoryBean, Ordered {
+		FactoryBean, Ordered, BeanClassLoaderAware {
 
 	/**
 	 * ServiceFactory used for posting the bean instantiation until it is first
@@ -82,8 +81,13 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 		// used if the published bean is itself a ServiceFactory
 		private ServiceFactory serviceFactory;
+        private Class[] classes;
 
-		public Object getService(Bundle bundle, ServiceRegistration serviceRegistration) {
+        protected LazyBeanServiceFactory(Class[] classes) {
+            this.classes = classes;
+        }
+
+        public Object getService(Bundle bundle, ServiceRegistration serviceRegistration) {
 
 			Object bean = (target != null ? target : beanFactory.getBean(targetBeanName));
 
@@ -103,8 +107,13 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 					log.error("Activation method for [" + bean + "] threw an exception", ex);
 				}
 			}
-			return bean;
-		}
+
+            if (contextClassloaderManagementStrategy == ExportClassLoadingOptions.SERVICE_PROVIDER) {
+                return wrapWithClassLoaderManagingProxy(bean, classes);
+            } else {
+                return bean;
+            }
+        }
 
 		public void ungetService(Bundle bundle, ServiceRegistration serviceRegistration, Object bean) {
 			// FIXME: what's the spec on this one?
@@ -134,11 +143,13 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		private ServiceFactory decoratedServiceFactory;
 
 		private Runnable destructionCallback;
+        private Class[] classes;
 
-		public BundleScopeServiceFactory(ServiceFactory serviceFactory) {
+        public BundleScopeServiceFactory(ServiceFactory serviceFactory, Class[] classes) {
 			Assert.notNull(serviceFactory);
 			this.decoratedServiceFactory = serviceFactory;
-		}
+            this.classes = classes;
+        }
 
 		/*
 		 * (non-Javadoc)
@@ -154,7 +165,10 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 				Object callback = OsgiBundleScope.CALLING_BUNDLE.get();
 				if (callback != null && callback instanceof Runnable)
 					this.destructionCallback = (Runnable) callback;
-				return obj;
+                if (contextClassloaderManagementStrategy == ExportClassLoadingOptions.SERVICE_PROVIDER) {
+                    obj = wrapWithClassLoaderManagingProxy(obj, classes);
+                }
+                return obj;
 			}
 			finally {
 				// clean ThreadLocal
@@ -210,13 +224,15 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 	private String deactivationMethod;
 
-	private int contextClassloaderManagementStrategy;
+	private int contextClassloaderManagementStrategy = ExportClassLoadingOptions.UNMANAGED;
 
 	private Object target;
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
-	/*
+    private ClassLoader classLoader;
+
+    /*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
@@ -242,12 +258,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		// which doesn't declare its product type)
 		Class serviceClass = (target != null ? target.getClass() : beanFactory.getType(targetBeanName));
 
-		if (this.contextClassloaderManagementStrategy == ExportClassLoadingOptions.SERVICE_PROVIDER) {
-			// FIXME: add classloading wrappers
-			wrapWithClassLoaderManagingProxy(serviceClass, interfaces);
-		}
-
-		// check if there is a reference to a non-lazy bean
+        // check if there is a reference to a non-lazy bean
 		if (StringUtils.hasText(targetBeanName)) {
 			if (beanFactory instanceof ConfigurableListableBeanFactory) {
 				// in case the target is non-lazy, singleton bean, initialize it
@@ -272,17 +283,57 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 * Proxy the target object with a proxy that manages the context
 	 * classloader.
 	 * 
-	 * @param target2
+	 * @param target
 	 * @return
 	 */
-	private Object wrapWithClassLoaderManagingProxy(Class serviceType, Class[] interfaces) {
+	private Object wrapWithClassLoaderManagingProxy(final Object target, Class[] interfaces) { 
+        ProxyFactory factory = new ProxyFactory();
 
-		// TODO implement wrapping, take into account that toBeProxied may
-		// *already* be advised...
-		return new Object();
+		// mold the proxy
+        for (int i = 0; i < interfaces.length; i++) {
+		    factory.addInterface(interfaces[i]);
+		}
+
+        factory.addAdvice(new OsgiServiceTCCLInvoker(target, classLoader));
+
+		try {
+			return factory.getProxy(
+                    BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
+				                                                           ProxyFactory.class.getClassLoader()));
+		} catch (NoClassDefFoundError ncdfe) {
+			if (log.isWarnEnabled()) {
+				debugClassLoading(ncdfe);
+			}
+			throw ncdfe;
+		}
 	}
 
-	private Properties mergeServiceProperties(String beanName) {
+	/**
+	 * Try and figure out why the proxy generation failed.
+	 *
+	 * @param ncdfe
+	 */
+	protected void debugClassLoading(NoClassDefFoundError ncdfe) {
+		String cname = ncdfe.getMessage().replace('/', '.');
+		BundleDelegatingClassLoader.debugClassLoading(bundleContext.getBundle(), cname, null);
+		// Check out all the classes.
+		for (int i = 0; i < interfaces.length; i++) {
+			ClassLoader cl = interfaces[i].getClassLoader();
+			String cansee = "cannot";
+			try {
+				cl.loadClass(cname);
+				cansee = "can";
+			}
+			catch (Exception e) {
+                // ignored
+            }
+			log.warn(interfaces[i].toString() + " is loaded by " + cl.toString() + " which "
+				+ cansee + " see " + cname);
+		}
+	}
+
+
+    private Properties mergeServiceProperties(String beanName) {
 		Properties p = propertiesResolver.getServiceProperties(beanName);
 		if (serviceProperties != null) {
 			p.putAll(serviceProperties);
@@ -392,10 +443,10 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 		log.info("Publishing service under classes [" + ObjectUtils.nullSafeToString(names) + "]");
 
-		ServiceFactory serviceFactory = new LazyBeanServiceFactory();
+		ServiceFactory serviceFactory = new LazyBeanServiceFactory(classes);
 
 		if (isBeanBundleScoped())
-			serviceFactory = new BundleScopeServiceFactory(serviceFactory);
+			serviceFactory = new BundleScopeServiceFactory(serviceFactory, classes);
 
 		return bundleContext.registerService(names, serviceFactory, serviceProperties);
 	}
@@ -437,7 +488,13 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 	}
 
-	public Object getObject() throws Exception {
+
+    public void setBeanClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+
+    public Object getObject() throws Exception {
 		return serviceRegistration;
 	}
 

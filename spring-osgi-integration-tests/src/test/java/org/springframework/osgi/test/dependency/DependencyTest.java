@@ -52,9 +52,9 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 				simpleService3Bundle.getState()));
 
 		startDependencyAsynch(dependencyTestBundle);
-		//startDependency(dependencyTestBundle);
+        Thread.sleep(2000);  // Yield to give bundle time to get into waiting state.
 
-		ServiceReference dependentRef = bundleContext.getServiceReference(DEPENDENT_CLASS_NAME);
+        ServiceReference dependentRef = bundleContext.getServiceReference(DEPENDENT_CLASS_NAME);
 
 		startDependency(simpleService3Bundle);
 

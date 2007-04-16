@@ -6,6 +6,7 @@ import org.osgi.framework.BundleException;
 import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.cardinality0to1.test.MyListener;
+import org.springframework.osgi.test.cardinality0to1.test.ReferenceContainer;
 
 /**
  * @author Hal Hildebrand Date: Dec 6, 2006 Time: 6:04:42 PM
@@ -42,10 +43,10 @@ public class Cardinality0to1Test extends AbstractConfigurableBundleCreatorTests 
 
 		assertEquals("Unxpected initial binding of service", 0, MyListener.BOUND_COUNT);
 		assertEquals("Unexpected initial unbinding of service", 0, MyListener.UNBOUND_COUNT);
-		assertNotNull("Service reference should be not null", MyListener.service);
+		assertNotNull("Service reference should be not null", ReferenceContainer.service);
 
 		try {
-			MyListener.service.stringValue();
+			ReferenceContainer.service.stringValue();
 			fail("Service should be unavailable");
 		}
 		catch (ServiceUnavailableException e) {
@@ -56,9 +57,9 @@ public class Cardinality0to1Test extends AbstractConfigurableBundleCreatorTests 
 
 		assertEquals("Expected initial binding of service", 1, MyListener.BOUND_COUNT);
 		assertEquals("Unexpected initial unbinding of service", 0, MyListener.UNBOUND_COUNT);
-		assertNotNull("Service reference should be not null", MyListener.service);
+		assertNotNull("Service reference should be not null", ReferenceContainer.service);
 
-		assertNotNull(MyListener.service.stringValue());
+		assertNotNull(ReferenceContainer.service.stringValue());
 
 	}
 

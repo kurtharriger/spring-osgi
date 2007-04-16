@@ -6,6 +6,7 @@ import org.osgi.framework.BundleException;
 import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.cardinality0to1.test.MyListener;
+import org.springframework.osgi.test.cardinality0to1.test.ReferenceContainer;
 
 /**
  * @author Hal Hildebrand
@@ -50,10 +51,10 @@ public class MavenArtifactLookupTest extends AbstractConfigurableBundleCreatorTe
 
 		assertEquals("Unxpected initial binding of service", 0, MyListener.BOUND_COUNT);
 		assertEquals("Unexpected initial unbinding of service", 0, MyListener.UNBOUND_COUNT);
-		assertNotNull("Service reference should be not null", MyListener.service);
+		assertNotNull("Service reference should be not null", ReferenceContainer.service);
 
 		try {
-			MyListener.service.stringValue();
+			ReferenceContainer.service.stringValue();
 			fail("Service should be unavailable");
 		}
 		catch (ServiceUnavailableException e) {
@@ -64,9 +65,9 @@ public class MavenArtifactLookupTest extends AbstractConfigurableBundleCreatorTe
 
 		assertEquals("Expected initial binding of service", 1, MyListener.BOUND_COUNT);
 		assertEquals("Unexpected initial unbinding of service", 0, MyListener.UNBOUND_COUNT);
-		assertNotNull("Service reference should be not null", MyListener.service);
+		assertNotNull("Service reference should be not null", ReferenceContainer.service);
 
-		assertNotNull(MyListener.service.stringValue());
+		assertNotNull(ReferenceContainer.service.stringValue());
 
 	}
 
