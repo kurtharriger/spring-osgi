@@ -15,15 +15,23 @@
  */
 package org.springframework.osgi.test.platform;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
- * Base class for OsgiPlatform classes.
+ * Base class for OsgiPlatform classes. Provides common functionality such as
+ * creation a temporary folder on startup and removal on shutdown.
  * 
  * @author Costin Leau
  * 
  */
 public abstract class AbstractOsgiPlatform implements OsgiPlatform {
+
+	protected Log log = LogFactory.getLog(getClass());
 
 	/**
 	 * Subclasses should override this field.
@@ -42,5 +50,26 @@ public abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
 	public String toString() {
 		return toString;
+	}
+
+	protected File createTempDir(String suffix) {
+		if (suffix == null)
+			suffix = "osgi";
+		File tempFileName;
+
+		try {
+			tempFileName = File.createTempFile("org.springframework.osgi", suffix);
+		}
+		catch (IOException ex) {
+			if (log.isWarnEnabled()) {
+				log.warn("Could not create temporary directory, returning current folder", ex);
+			}
+			return new File(".");
+		}
+
+		tempFileName.delete(); // we want it to be a directory...
+		File tempFolder = new File(tempFileName.getAbsolutePath());
+		tempFolder.mkdir();
+		return tempFolder;
 	}
 }

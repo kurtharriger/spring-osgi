@@ -72,15 +72,15 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	protected String getSlf4jApi() {
-		return "org.slf4j,slf4j-api,1.3.0";
+		return "org.slf4j,slf4j-api,1.3.1";
 	}
 
 	protected String getJclOverSlf4jUrl() {
-		return "org.slf4j,jcl104-over-slf4j,1.3.0";
+		return "org.slf4j,jcl104-over-slf4j,1.3.1";
 	}
 
 	protected String getSlf4jLog4jUrl() {
-		return "org.slf4j,slf4j-log4j12,1.3.0";
+		return "org.slf4j,slf4j-log4j12,1.3.1";
 	}
 
 	protected String getLog4jLibUrl() {

@@ -16,7 +16,6 @@
 package org.springframework.osgi.test.platform;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Properties;
@@ -28,6 +27,7 @@ import org.apache.felix.framework.util.MutablePropertyResolverImpl;
 import org.apache.felix.main.Main;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -78,22 +78,10 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	protected Properties getLocalConfiguration() {
 		Properties props = new Properties();
 
-		// specify a cache directory
-		try {
-			File tempFileName = File.createTempFile("org.springframework.osgi", "felix");
-			tempFileName.delete(); // we want it to be a directory...
-			this.felixStorageDir = new File(tempFileName.getAbsolutePath());
-			this.felixStorageDir.mkdir();
-			this.felixStorageDir.deleteOnExit();
-			props.setProperty(FELIX_PROFILE_DIR_PROPERTY, this.felixStorageDir.getAbsolutePath());
-			if (log.isTraceEnabled())
-				log.trace("felix storage dir is " + felixStorageDir.getAbsolutePath());
-		}
-		catch (IOException ex) {
-			if (log.isWarnEnabled()) {
-				log.warn("Could not create temporary directory for Felix, using default", ex);
-			}
-		}
+		felixStorageDir = createTempDir("felix");
+		props.setProperty(FELIX_PROFILE_DIR_PROPERTY, this.felixStorageDir.getAbsolutePath());
+		if (log.isTraceEnabled())
+			log.trace("felix storage dir is " + felixStorageDir.getAbsolutePath());
 
 		return props;
 	}
@@ -150,7 +138,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	public void stop() throws Exception {
 		platform.shutdown();
 		// remove cache folder
-		felixStorageDir.delete();
+		IOUtils.delete(felixStorageDir);
 	}
 
 }

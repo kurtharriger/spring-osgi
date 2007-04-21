@@ -15,9 +15,12 @@
  */
 package org.springframework.osgi.test.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.springframework.util.Assert;
 
 /**
  * Utility class for IO operations.
@@ -58,5 +61,32 @@ public abstract class IOUtils {
 			catch (IOException ex) {
 				// ignore
 			}
+	}
+
+	/**
+	 * Delete the given file (can be a simple file or a folder).
+	 * 
+	 * @param file the file to be deleted
+	 * @return if the deletion succeded or not
+	 */
+	public static boolean delete(File file) {
+
+		// bail out quickly
+		if (file == null)
+			return false;
+
+		// recursively delete children file
+		if (file.isDirectory()) {
+			String[] children = file.list();
+			for (int i = 0; i < children.length; i++) {
+				boolean success = delete(new File(file, children[i]));
+				if (!success) {
+					return false;
+				}
+			}
+		}
+
+		// The directory is now empty so delete it
+		return file.delete();
 	}
 }

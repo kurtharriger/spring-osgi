@@ -15,12 +15,12 @@
  */
 package org.springframework.osgi.test.platform;
 
+import java.io.File;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.knopflerfish.framework.Framework;
 import org.osgi.framework.BundleContext;
+import org.springframework.osgi.test.util.IOUtils;
 
 /**
  * Knopflerfish 2.x Platform.
@@ -30,20 +30,27 @@ import org.osgi.framework.BundleContext;
  */
 public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 
-	private static final Log log = LogFactory.getLog(KnopflerfishPlatform.class);
-	
 	private BundleContext context;
 
 	private Framework framework;
 
+	private File kfStorageDir;
+	
 	public KnopflerfishPlatform() {
 		toString = "Knopflerfish OSGi Platform";
+
+		kfStorageDir = createTempDir("kf");
 		
 		// default properties
 		Properties props = getConfigurationProperties();
-		props.setProperty("org.knopflerfish.framework.bundlestorage", "memory");
+		props.setProperty("org.osgi.framework.dir", kfStorageDir.getAbsolutePath());
+		props.setProperty("org.knopflerfish.framework.bundlestorage", "file");
+		props.setProperty("org.knopflerfish.framework.bundlestorage.file.reference", "true");
+		props.setProperty("org.knopflerfish.framework.bundlestorage.file.unpack", "false");
 		props.setProperty("org.knopflerfish.startlevel.use", "true");
 		props.setProperty("org.knopflerfish.osgi.setcontextclassloader", "true");
+		// embedded mode
+		props.setProperty("org.knopflerfish.framework.exitonshutdown", "false");
 
 	}
 
@@ -77,5 +84,6 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 	 */
 	public void stop() throws Exception {
 		framework.shutdown();
+		IOUtils.delete(kfStorageDir);
 	}
 }
