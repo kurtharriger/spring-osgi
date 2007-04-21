@@ -81,6 +81,12 @@ public abstract class AbstractIoTest extends AbstractConfigurableBundleCreatorTe
 		assertFalse(nonExistingFileOutsideOsgi.exists());
 	}
 
+	public void testClassPathFileLevelWildcardMatching() throws Exception {
+		// find all classes
+		Resource[] res = patternLoader.getResources("classpath:/org/springframework/osgi/test/io/AbstractIoTest.class");
+		// at least two integration tests are available
+		assertEquals(1, res.length);
+	}
 	public void testFileLevelWildcardMatching() throws Exception {
 		// find all classes
 		Resource[] res = patternLoader.getResources("bundle:/org/springframework/osgi/test/io/*.class");
@@ -89,40 +95,38 @@ public abstract class AbstractIoTest extends AbstractConfigurableBundleCreatorTe
 	}
 
 	// fails on KF
-	public void tstFileLevelPatternMatching() throws Exception {
+	public void testFileLevelPatternMatching() throws Exception {
 		// find just this class
 		Resource[] res = patternLoader.getResources("bundle:/org/springframework/osgi/test/io/AbstractIo*.class");
 		// should find only 1
 		assertEquals(1, res.length);
 	}
+	public void testFileLevelCharPatternMatchingForOneChar() throws Exception {
+		Resource[] res = patternLoader.getResources("bundle:org/springframework/osgi/test/io/AbstractIoTe*t.class");
+		// should find only 1
+		assertEquals(1, res.length);
+	}
+
 
 	// works on Equinox, Felix | fails on KF (which doesn't return AbstractIoTest.class)
-	public void tstFileLevelCharMatching() throws Exception {
+	public void testFileLevelCharMatching() throws Exception {
 		Resource[] res = patternLoader.getResources("bundle:org/springframework/osgi/test/io/AbstractIoTe?t.class");
 		// should find only 1
 		assertEquals(1, res.length);
 	}
 
-	// works on Equinox
+	public void testFileLevelDoubleCharMatching() throws Exception {
+		Resource[] res = patternLoader.getResources("bundle:org/springframework/osgi/test/io/AbstractIoT??t.class");
+		// should find only 1
+		assertEquals(1, res.length);
+	}
+
+
+	// works on Equinox only
 	public void tstFolderLevelWildcardMatching() throws Exception {
 		// find all classes
 		Resource[] res = patternLoader.getResources("bundle:/**/AbstractIoTest.class");
 		// at least two integration tests are available
-		assertEquals(1, res.length);
-	}
-
-	// falls on all platforms
-	public void tstFolderLevelPatternMatching() throws Exception {
-		// find just this class
-		Resource[] res = patternLoader.getResources("bundle:org/spring*/**/AbstractIo*.class");
-		// should find only 1
-		assertEquals(1, res.length);
-	}
-
-	// falls on all platforms
-	public void tstFolderLevelCharMatching() throws Exception {
-		Resource[] res = patternLoader.getResources("bundle:org/springframework/osgi/test/i?/AbstractIoTe?t.class");
-		// should find only 1
 		assertEquals(1, res.length);
 	}
 
