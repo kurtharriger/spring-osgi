@@ -16,7 +16,7 @@
 	<bean id="initializer" class="java.util.Properties" depends-on="weatherTest"/>
 
 	<osgi:reference id="weatherService" interface="org.springframework.osgi.samples.weather.service.WeatherService"
-	                bean-name="weatherService" timeout="2000">
+	                bean-name="weatherService" timeout="2000" depends-on="weatherServiceBundle">
 		<osgi:listener ref="weatherListener"/>
 	</osgi:reference>
 

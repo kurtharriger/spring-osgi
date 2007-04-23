@@ -86,6 +86,7 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      */
     public void testWeatherServiceExported() {
         waitOnContextCreation("org.springframework.osgi.samples.weather.service");
+        //waitOnContextCreation("org.springframework.osgi.samples.weather.dao");
         waitOnContextCreation("org.springframework.osgi.samples.wiring.bundle");
 
         BundleContext context = getBundleContext();
