@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
-      <artifactId>org.springframework.osgi.test</artifactId>
+      <artifactId>spring-osgi-test</artifactId>
       <version>${project.parent.version}</version>
       <scope>provided</scope>
     </dependency>
