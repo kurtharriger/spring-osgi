@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
-  <artifactId>spring-osgi-test-support-integration-tests</artifactId>
+  <artifactId>spring-osgi-test-integration</artifactId>
   <packaging>pom</packaging>
   <name>Spring JUnit support for OSGi (integration tests)</name>
   <url>http://www.springframework.org/osgi</url>

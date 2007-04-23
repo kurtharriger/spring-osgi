@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
-  <artifactId>org.springframework.osgi.test</artifactId>
+  <artifactId>spring-osgi-test</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>Spring OSGi JUnit testing bundle</name>
   <url>http://www.springframework.org/osgi</url>

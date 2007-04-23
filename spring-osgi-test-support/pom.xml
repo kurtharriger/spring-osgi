@@ -12,8 +12,8 @@
   <name>Spring JUnit support for OSGi</name>
   <url>http://www.springframework.org/osgi</url>
    <modules>
-    <module>org.springframework.osgi.test</module>
-    <module>org.springframework.osgi.test.integration.tests</module>
+    <module>spring-osgi-test</module>
+    <module>spring-osgi-test-integration</module>
   </modules>
   <!-- Needed if trying to get stacktraces from the test framework -->
 <!--build>
