@@ -51,7 +51,7 @@ public abstract class ConfigUtils {
 	/**
 	 * Directive for publishing Spring application context as a service.
 	 */
-	public static final String DIRECTIVE_DONT_PUBLISH = "publish-context";
+	public static final String DIRECTIVE_PUBLISH_CONTEXT = "publish-context";
 
 	/**
 	 * Directive for indicating wait-for time when satisfying manditory
@@ -75,14 +75,15 @@ public abstract class ConfigUtils {
 
 	public static final String CONTEXT_LOCATION_SEPARATOR = ",";
 
-	public static final boolean DIRECTIVE_DONT_PUBLISH_DEFAULT = false;
+	public static final boolean DIRECTIVE_PUBLISH_CONTEXT_DEFAULT = true;
 
 	public static final boolean DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT = true;
 
 	public static final long DIRECTIVE_TIMEOUT_DEFAULT = 5 * 60; // 5 minutes
 
 	public static final long DIRECTIVE_NO_TIMEOUT = -2L; // Indicates wait
-															// forever
+
+	// forever
 
 	/**
 	 * Return the {@value #SPRING_CONTEXT_HEADER} if present from the given
@@ -121,32 +122,50 @@ public abstract class ConfigUtils {
 	}
 
 	/**
+	 * Shortuct method to retrieve directive values. Used internally by the
+	 * dedicated getXXX.
+	 * 
+	 * @param directiveName
+	 * @return
+	 */
+	private static String getDirectiveValue(Dictionary headers, String directiveName) {
+		String header = getSpringContextHeader(headers);
+		if (header != null) {
+			String directive = getDirectiveValue(header, directiveName);
+			if (directive != null)
+				return directive;
+		}
+		return null;
+	}
+
+	/**
 	 * Shortcut for finding the boolean value for
-	 * {@link #DIRECTIVE_DONT_PUBLISH} directive using the given headers.
+	 * {@link #DIRECTIVE_PUBLISH_CONTEXT} directive using the given headers.
 	 * 
 	 * @param headers
 	 * @return
 	 */
-	public static boolean getDontPublishContext(Dictionary headers) {
-		String header = getSpringContextHeader(headers);
-		return (header != null ? Boolean.valueOf(getDirectiveValue(header, DIRECTIVE_DONT_PUBLISH)).booleanValue()
-				: DIRECTIVE_DONT_PUBLISH_DEFAULT);
+	public static boolean getPublishContext(Dictionary headers) {
+		String value = getDirectiveValue(headers, DIRECTIVE_PUBLISH_CONTEXT);
+		return (value != null ? Boolean.valueOf(value).booleanValue() : DIRECTIVE_PUBLISH_CONTEXT_DEFAULT);
 	}
 
 	public static boolean getCreateAsync(Dictionary headers) {
-		String header = getSpringContextHeader(headers);
-		return (header != null ? Boolean.valueOf(getDirectiveValue(header, DIRECTIVE_CREATE_ASYNCHRONOUSLY)).booleanValue()
-				: DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT);
+		String value = getDirectiveValue(headers, DIRECTIVE_CREATE_ASYNCHRONOUSLY);
+		return (value != null ? Boolean.valueOf(value).booleanValue() : DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT);
 	}
 
 	public static long getTimeOut(Dictionary headers) {
-		String header = getSpringContextHeader(headers);
-		String timeoutValue = getDirectiveValue(header, DIRECTIVE_TIMEOUT);
-		if (DIRECTIVE_TIMEOUT_VALUE_NONE.equals(timeoutValue)) {
-			return DIRECTIVE_NO_TIMEOUT;
+		String value = getDirectiveValue(headers, DIRECTIVE_TIMEOUT);
+
+		if (value != null) {
+			if (DIRECTIVE_TIMEOUT_VALUE_NONE.equalsIgnoreCase(value)) {
+				return DIRECTIVE_NO_TIMEOUT;
+			}
+			return Long.valueOf(value).longValue();
 		}
-		return (header != null && timeoutValue != null ? Long.valueOf(timeoutValue).longValue()
-				: DIRECTIVE_TIMEOUT_DEFAULT);
+
+		return DIRECTIVE_TIMEOUT_DEFAULT;
 	}
 
 	/**

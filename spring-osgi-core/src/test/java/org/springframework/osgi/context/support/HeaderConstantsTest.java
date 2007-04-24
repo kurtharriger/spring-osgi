@@ -80,24 +80,24 @@ public class HeaderConstantsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.util.ConfigUtils#getDontPublishContext(java.util.Dictionary)}.
+	 * {@link org.springframework.osgi.util.ConfigUtils#getPublishContext(java.util.Dictionary)}.
 	 */
 	public void testGetDontPublishContext() {
 		String header = "nothing";
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertFalse(ConfigUtils.getDontPublishContext(headers));
+		assertTrue(ConfigUtils.getPublishContext(headers));
 
-		header = ConfigUtils.DIRECTIVE_DONT_PUBLISH + ConfigUtils.EQUALS + true;
+		header = ConfigUtils.DIRECTIVE_PUBLISH_CONTEXT + ConfigUtils.EQUALS + true;
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertTrue(ConfigUtils.getDontPublishContext(headers));
+		assertTrue(ConfigUtils.getPublishContext(headers));
 
-		header = ConfigUtils.DIRECTIVE_DONT_PUBLISH + ConfigUtils.EQUALS + false;
+		header = ConfigUtils.DIRECTIVE_PUBLISH_CONTEXT + ConfigUtils.EQUALS + false;
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertFalse(ConfigUtils.getDontPublishContext(headers));
+		assertFalse(ConfigUtils.getPublishContext(headers));
 
-		header = ConfigUtils.DIRECTIVE_DONT_PUBLISH + ConfigUtils.EQUALS + "bla";
+		header = ConfigUtils.DIRECTIVE_PUBLISH_CONTEXT + ConfigUtils.EQUALS + "bla";
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertFalse(ConfigUtils.getDontPublishContext(headers));
+		assertFalse(ConfigUtils.getPublishContext(headers));
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class HeaderConstantsTest extends TestCase {
 	public void testGetCreateAsync() {
 		String header = "nothing";
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
-		assertFalse(ConfigUtils.getDontPublishContext(headers));
+		assertTrue(ConfigUtils.getPublishContext(headers));
 
 		header = ConfigUtils.DIRECTIVE_CREATE_ASYNCHRONOUSLY + ConfigUtils.EQUALS + true;
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, header);
