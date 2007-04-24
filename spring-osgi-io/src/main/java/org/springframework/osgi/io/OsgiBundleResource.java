@@ -251,14 +251,12 @@ public class OsgiBundleResource extends AbstractResource {
 	 */
 	public String getDescription() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("OSGi bundle resource [id=");
-
+		buf.append("OSGi resource[");
+		buf.append(this.path);
+		buf.append("|id=");
 		buf.append(bundle.getBundleId());
 		buf.append("|symName=");
 		buf.append(bundle.getSymbolicName());
-		buf.append("|");
-
-		buf.append(this.path);
 		buf.append("]");
 
 		return buf.toString();

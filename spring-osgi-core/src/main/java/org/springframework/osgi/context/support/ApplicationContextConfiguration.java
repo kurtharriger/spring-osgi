@@ -19,6 +19,7 @@
 package org.springframework.osgi.context.support;
 
 import java.util.Dictionary;
+
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.ConfigUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
@@ -35,13 +36,13 @@ public class ApplicationContextConfiguration {
 
 	private final Bundle bundle;
 
-	private boolean asyncCreation = true;
+	private boolean asyncCreation = ConfigUtils.DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT;
 
 	private String[] configurationLocations = new String[0];
 
 	private boolean isSpringPoweredBundle = true;
 
-	private boolean publishContextAsService = true;
+	private boolean publishContextAsService = ConfigUtils.DIRECTIVE_PUBLISH_CONTEXT_DEFAULT;
 
 	private String toString;
 
@@ -122,7 +123,7 @@ public class ApplicationContextConfiguration {
 			String springContextHeader = ConfigUtils.getSpringContextHeader(headers);
 			if (StringUtils.hasText(springContextHeader)) {
 				this.timeout = ConfigUtils.getTimeOut(headers);
-				this.publishContextAsService = !ConfigUtils.getDontPublishContext(headers);
+				this.publishContextAsService = ConfigUtils.getPublishContext(headers);
 				this.asyncCreation = ConfigUtils.getCreateAsync(headers);
 				this.configurationLocations = ConfigUtils.getConfigLocations(headers);
 			}

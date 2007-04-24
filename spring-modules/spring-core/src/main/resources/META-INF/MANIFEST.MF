@@ -8,9 +8,10 @@ Bundle-Version: ${spring.bundle.version}
 Bundle-Vendor: Spring Framework
 Import-Package: org.apache.commons.collections.map;resolution:=optional,
    org.apache.commons.collections.set;resolution:=optional,
+   edu.emory.mathcs.backport.java.util.concurrent;resolution:=optional,
    org.apache.commons.logging,
-   org.apache.log4j,
-   org.apache.log4j.xml,
+   org.apache.log4j;resolution:=optional,
+   org.apache.log4j.xml;resolution:=optional,
    org.objectweb.asm;resolution:=optional,
    org.objectweb.asm.commons;resolution:=optional
 DynamicImport-Package: *
