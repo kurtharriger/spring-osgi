@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-Name: Integration test for OSGi testing framework
-Bundle-SymbolicName: org.springframework.osgi.test.support.integration
+Bundle-SymbolicName: org.springframework.osgi.iandt.integration
 Bundle-Vendor: Spring Framework
 Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator
 Import-Package: junit.framework,

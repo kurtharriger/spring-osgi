@@ -4,6 +4,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-    <bean id="guinea-pig" class="org.springframework.osgi.test.lifecycle.GuineaPig"/>
+    <bean id="guinea-pig" class="org.springframework.osgi.iandt.lifecycle.GuineaPig"/>
 
 </beans>

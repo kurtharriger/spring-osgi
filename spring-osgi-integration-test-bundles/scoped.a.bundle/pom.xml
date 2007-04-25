@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.osgi</groupId>
-    <artifactId>org.springframework.osgi.test.scoped.bundle.a</artifactId>
+    <artifactId>org.springframework.osgi.iandt.scoped.bundle.a</artifactId>
     <packaging>osgi-bundle</packaging>
     <name>Bundle scoping test bundle - A</name>
     <description>An OSGi bundle which tests 'bundle' scoped beans</description>

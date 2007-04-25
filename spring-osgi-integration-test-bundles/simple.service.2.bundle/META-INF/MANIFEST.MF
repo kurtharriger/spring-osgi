@@ -1,7 +1,7 @@
 Bundle-Version: 1.0
-Bundle-SymbolicName: org.springframework.osgi.test.simpleservice2
+Bundle-SymbolicName: org.springframework.osgi.iandt.simpleservice2
 Bundle-Name: Simple-Service-2
 Bundle-Vendor: Spring Framework
-Import-Package: org.springframework.osgi.test.simpleservice2, org.springframework.osgi.test.simpleservice2.impl
+Import-Package: org.springframework.osgi.iandt.simpleservice2, org.springframework.osgi.iandt.simpleservice2.impl
 Bundle-ClassPath: .,
  target/classes/

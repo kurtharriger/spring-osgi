@@ -1,6 +1,6 @@
-Bundle-Name: org.springframework.osgi.test.reference.proxy
-Bundle-SymbolicName: org.springframework.osgi.test.reference.proxy
+Bundle-Name: org.springframework.osgi.iandt.reference.proxy
+Bundle-SymbolicName: org.springframework.osgi.iandt.reference.proxy
 Bundle-Version: 1.0
 Bundle-ClassPath: .
-Import-Package: org.springframework.osgi.test.simpleservice
-Export-Package: org.springframework.osgi.test.reference.proxy
+Import-Package: org.springframework.osgi.iandt.simpleservice
+Export-Package: org.springframework.osgi.iandt.reference.proxy

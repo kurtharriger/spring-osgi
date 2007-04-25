@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.osgi</groupId>
-    <artifactId>org.springframework.osgi.test.simple.service3</artifactId>
+    <artifactId>org.springframework.osgi.iandt.simple.service3</artifactId>
     <packaging>osgi-bundle</packaging>
     <name>Simple service test bundle 3</name>
     <description>An OSGi bundle that provides yet another simple service</description>

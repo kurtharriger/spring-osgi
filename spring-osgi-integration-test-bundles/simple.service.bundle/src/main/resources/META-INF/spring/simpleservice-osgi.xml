@@ -6,6 +6,6 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
     
     <osgi:service id="simpleServiceOsgi" ref="simpleService"
-                  interface="org.springframework.osgi.test.simpleservice.MyService"/>
+                  interface="org.springframework.osgi.iandt.simpleservice.MyService"/>
 
 </beans>

@@ -6,7 +6,7 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
     
     <osgi:service id="simpleServiceOsgi" ref="simpleService"
-                  interface="org.springframework.osgi.test.simpleservice2.MyService2" lazy-init="false">
+                  interface="org.springframework.osgi.iandt.simpleservice2.MyService2" lazy-init="false">
         <osgi:service-properties>
             <prop key="service">3</prop>
         </osgi:service-properties>

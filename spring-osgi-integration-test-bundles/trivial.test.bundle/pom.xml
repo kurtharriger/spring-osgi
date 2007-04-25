@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
-  <artifactId>org.springframework.osgi.test.trivial.tests</artifactId>
+  <artifactId>org.springframework.osgi.iandt.trivial.tests</artifactId>
   <packaging>osgi-bundle</packaging>
   <name>Simple test that uses trivial bundle</name>
   <description>Contains a single test case that exercises function in 
@@ -17,7 +17,7 @@
 
     <dependency>
       <groupId>org.springframework.osgi</groupId>
-      <artifactId>org.springframework.osgi.test.trivial</artifactId>
+      <artifactId>org.springframework.osgi.iandt.trivial</artifactId>
       <version>${project.parent.version}</version>
       <scope>provided</scope>
     </dependency>

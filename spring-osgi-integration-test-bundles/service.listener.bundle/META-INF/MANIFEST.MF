@@ -1,7 +1,7 @@
-Bundle-Name: org.springframework.osgi.test.service.listener
-Bundle-SymbolicName: org.springframework.osgi.test.service.listener
+Bundle-Name: org.springframework.osgi.iandt.service.listener
+Bundle-SymbolicName: org.springframework.osgi.iandt.service.listener
 Bundle-Version: 1.0
 Bundle-ClassPath: .
-Import-Package: org.springframework.osgi.test.simpleservice
-Export-Package: org.springframework.osgi.test.service.listener
+Import-Package: org.springframework.osgi.iandt.simpleservice
+Export-Package: org.springframework.osgi.iandt.service.listener
 Spring-Context: *; eagerly-init-importers:=true
