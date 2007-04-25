@@ -15,6 +15,7 @@
  */
 package org.springframework.osgi.iandt.serviceProxyFactoryBean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -24,6 +25,7 @@ import java.util.List;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
  * @author Costin Leau
@@ -59,11 +61,15 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 		return getBundleContext().registerService(name, obj, null);
 	}
 
+	private ServiceRegistration publishService(Object obj, String names[]) throws Exception {
+		return getBundleContext().registerService(names, obj, null);
+	}
+
 	private ServiceRegistration publishService(Object obj) throws Exception {
 		return publishService(obj, obj.getClass().getName());
 	}
 
-	public void testFactoryBeanForOneService() throws Exception {
+	public void testFactoryBeanForOneServiceAsClass() throws Exception {
 		long time = 1234;
 		Date date = new Date(time);
 		ServiceRegistration reg = publishService(date);
@@ -75,7 +81,7 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 		try {
 			Object result = fb.getObject();
 			assertTrue(result instanceof Date);
-			assertEquals(time, date.getTime());
+			assertEquals(time, ((Date) result).getTime());
 		}
 		finally {
 			if (reg != null)
@@ -83,15 +89,50 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 		}
 	}
 
-	public void testFactoryBeanForMultipleServices() throws Exception {
+	public void testFactoryBeanForOneServiceAsInterface() throws Exception {
+		long time = 1234;
+		Date date = new Date(time);
+
+		Class[] intfs = new Class[] { Comparable.class, Serializable.class, Cloneable.class };
+
+		String[] classes = new String[] { Comparable.class.getName(), Serializable.class.getName(),
+				Cloneable.class.getName(), Date.class.getName() };
+
+		ServiceRegistration reg = publishService(date, classes);
+
+		fb.setCardinality("1..1");
+		fb.setInterface(intfs);
+		fb.setFilter(OsgiFilterUtils.unifyFilter(Date.class, null));
+		fb.afterPropertiesSet();
+
+		try {
+			Object result = fb.getObject();
+			// the interfaces are implemented
+			assertTrue(result instanceof Comparable);
+			assertTrue(result instanceof Serializable);
+			assertTrue(result instanceof Cloneable);
+			// but not the class
+			assertFalse(result instanceof Date);
+			// compare the strings
+			assertEquals(result.toString(), date.toString());
+		}
+		finally {
+			if (reg != null)
+				reg.unregister();
+		}
+	}
+
+	public void testFactoryBeanForMultipleServicesAsInterfaces() throws Exception {
 
 		fb.setCardinality("0..N");
+		// look for collections
 		fb.setInterface(new Class[] { Collection.class });
 		fb.afterPropertiesSet();
 
 		List registrations = new ArrayList(3);
 
-		// Eek. cglib dances the bizarre initialization hula of death here. Must use interfaces for now.
+		// Eek. cglib dances the bizarre initialization hula of death here. Must
+		// use interfaces for now.
 		try {
 			Object result = fb.getObject();
 			assertTrue(result instanceof Collection);
@@ -101,12 +142,16 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 			Iterator iter = col.iterator();
 
 			assertFalse(iter.hasNext());
+
 			ArrayList a = new ArrayList();
 			a.add(new Long(10));
+
 			registrations.add(publishService(a, Collection.class.getName()));
+
 			Object service = iter.next();
+
 			assertTrue(service instanceof Collection);
-			assertEquals(10, ((Number)((Collection) service).toArray()[0]).intValue());
+			assertEquals(10, ((Number) ((Collection) service).toArray()[0]).intValue());
 
 			assertFalse(iter.hasNext());
 			a = new ArrayList();
@@ -114,7 +159,47 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 			registrations.add(publishService(a, Collection.class.getName()));
 			service = iter.next();
 			assertTrue(service instanceof Collection);
-			assertEquals(100, ((Number)((Collection) service).toArray()[0]).intValue());
+			assertEquals(100, ((Number) ((Collection) service).toArray()[0]).intValue());
+		}
+		finally {
+			for (int i = 0; i < registrations.size(); i++) {
+				((ServiceRegistration) registrations.get(i)).unregister();
+			}
+		}
+	}
+
+	public void testFactoryBeanForMultipleServicesAsClasses() throws Exception {
+
+		fb.setCardinality("0..N");
+		fb.setInterface(new Class[] { Date.class });
+		fb.afterPropertiesSet();
+
+		List registrations = new ArrayList(2);
+
+		long time = 321;
+		Date date = new Date(time);
+
+		try {
+			Object result = fb.getObject();
+			assertTrue(result instanceof Collection);
+			Collection col = (Collection) result;
+
+			assertTrue(col.isEmpty());
+			Iterator iter = col.iterator();
+
+			assertFalse(iter.hasNext());
+			registrations.add(publishService(date));
+			Object service = iter.next();
+			assertTrue(service instanceof Date);
+			assertEquals(time, ((Date) service).getTime());
+
+			assertFalse(iter.hasNext());
+			time = 111;
+			date = new Date(time);
+			registrations.add(publishService(date));
+			service = iter.next();
+			assertTrue(service instanceof Date);
+			assertEquals(time, ((Date) service).getTime());
 		}
 		finally {
 			for (int i = 0; i < registrations.size(); i++) {
