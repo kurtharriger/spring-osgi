@@ -168,13 +168,13 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 		}
 	}
 
-	public void testFactoryBeanForMultipleServicesAsClasses() throws Exception {
+	public void tstFactoryBeanForMultipleServicesAsClasses() throws Exception {
 
 		fb.setCardinality("0..N");
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 
-		List registrations = new ArrayList(2);
+		List registrations = new ArrayList(3);
 
 		long time = 321;
 		Date date = new Date(time);
@@ -207,4 +207,6 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 			}
 		}
 	}
+
+	
 }
