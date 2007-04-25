@@ -128,7 +128,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
                                                               " not found from bundle [" +
                                                               backingBundle.getSymbolicName() +
                                                               "]");
-            e.initCause(e);
+            e.initCause(ncdfe);
 			throw e;
 		}
 	}
