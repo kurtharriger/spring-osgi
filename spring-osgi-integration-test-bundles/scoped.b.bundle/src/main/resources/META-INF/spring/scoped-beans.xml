@@ -7,19 +7,19 @@
 	default-lazy-init="false">
 
 	<bean id="b.service"
-		class="org.springframework.osgi.test.scope.common.HashCodeScopeTestService"
+		class="org.springframework.osgi.iandt.scope.common.HashCodeScopeTestService"
 		scope="bundle" />
 
 	<osgi:service ref="b.service" auto-export="all" />
 	
 	
 	<osgi:reference id="serviceFromA"
-		interface="org.springframework.osgi.test.scope.common.ScopeTestService"
+		interface="org.springframework.osgi.iandt.scope.common.ScopeTestService"
 		cardinality="0..1" timeout="10"
 	/>
-<!--		filter="(Bundle-SymbolicName=org.springframework.osgi.test.scope.a)" 	-->
+<!--		filter="(Bundle-SymbolicName=org.springframework.osgi.iandt.scope.a)" 	-->
 	<bean id="staticReference"
-		class="org.springframework.osgi.test.scope.b.BeanReference">
+		class="org.springframework.osgi.iandt.scope.b.BeanReference">
 		<property name="bean" ref="b.service" />
 	</bean>
 

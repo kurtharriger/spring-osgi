@@ -122,61 +122,61 @@
 
         <dependency>
             <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.test.service.listener</artifactId>
+            <artifactId>org.springframework.osgi.iandt.service.listener</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.test.lifecycle</artifactId>
+            <artifactId>org.springframework.osgi.iandt.lifecycle</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.test.reference.proxy</artifactId>
+            <artifactId>org.springframework.osgi.iandt.reference.proxy</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.test.simple.service</artifactId>
+            <artifactId>org.springframework.osgi.iandt.simple.service</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.test.simple.service2</artifactId>
+            <artifactId>org.springframework.osgi.iandt.simple.service2</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.test.dependencies</artifactId>
+            <artifactId>org.springframework.osgi.iandt.dependencies</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.test.cardinality0to1</artifactId>
+            <artifactId>org.springframework.osgi.iandt.cardinality0to1</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.test.scoped.bundle.a</artifactId>
+            <artifactId>org.springframework.osgi.iandt.scoped.bundle.a</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.test.scoped.bundle.b</artifactId>
+            <artifactId>org.springframework.osgi.iandt.scoped.bundle.b</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.test.scoped.bundle.common</artifactId>
+            <artifactId>org.springframework.osgi.iandt.scoped.bundle.common</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>

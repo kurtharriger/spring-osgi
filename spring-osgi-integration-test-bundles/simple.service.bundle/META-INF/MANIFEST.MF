@@ -1,9 +1,9 @@
 Bundle-Version: 1.0
-Bundle-SymbolicName: org.springframework.osgi.test.simpleservice
+Bundle-SymbolicName: org.springframework.osgi.iandt.simpleservice
 Bundle-Name: Simple-Service-Sample
 Bundle-Vendor: Spring Framework
 Spring-Context: *; eagerly-init-importers:=true
-Export-Package: org.springframework.osgi.test.simpleservice, org.springframework.osgi.test.simpleservice2,
-  org.springframework.osgi.test.simpleservice.impl, org.springframework.osgi.test.simpleservice2.impl
+Export-Package: org.springframework.osgi.iandt.simpleservice, org.springframework.osgi.iandt.simpleservice2,
+  org.springframework.osgi.iandt.simpleservice.impl, org.springframework.osgi.iandt.simpleservice2.impl
 Bundle-ClassPath: .,
  target/classes/
