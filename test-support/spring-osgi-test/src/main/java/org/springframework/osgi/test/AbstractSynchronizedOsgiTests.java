@@ -188,13 +188,12 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 
 	/**
 	 * Should the test class wait for the context creation of Spring/OSGi
-	 * bundles before executing the tests or not? Default is false (seems to be
-	 * working inside Eclipse but not in Maven).
+	 * bundles before executing the tests or not? Default is true.
 	 * 
 	 * @return
 	 */
 	protected boolean shouldWaitForSpringBundlesContextCreation() {
-		return false;
+		return true;
 	}
 
 	/**
