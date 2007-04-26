@@ -37,8 +37,6 @@ public class MavenArtifactLookupTest extends AbstractConfigurableBundleCreatorTe
 	}
 
 	public void test0to1Cardinality() throws Exception {
-		waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
-		waitOnContextCreation("org.springframework.osgi.iandt.cardinality.0to1");
 		BundleContext bundleContext = getBundleContext();
 
 		Bundle simpleService2Bundle = bundleContext.installBundle(getLocator().locateArtifact(

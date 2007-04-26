@@ -39,7 +39,6 @@ public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
     
 
 	public void testLifecycle() throws Exception {
-    	waitOnContextCreation("org.springframework.osgi.iandt.lifecycle");
         assertNotSame("Guinea pig has already been shutdown", "true",
                       System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
 

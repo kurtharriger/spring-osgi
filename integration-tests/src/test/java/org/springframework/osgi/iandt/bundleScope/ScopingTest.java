@@ -47,8 +47,6 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	public void testEnvironmentValidity() throws Exception {
-		waitOnContextCreation("org.springframework.osgi.iandt.scope.a");
-		waitOnContextCreation("org.springframework.osgi.iandt.scope.b");
 		assertNotNull(getServiceA());
 		assertNotNull(getServiceB());
 	}
