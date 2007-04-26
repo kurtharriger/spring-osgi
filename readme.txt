@@ -1,4 +1,4 @@
-SPRING OSGI 1.0-M1 (April 2007)
+SPRING OSGI 1.0-M2 (May 2007)
 -------------------------------
 http://www.springframework.org/osgi
 

@@ -42,5 +42,4 @@ public class AppCtxInjectionTest extends AbstractConfigurableBundleCreatorTests 
 	protected String[] getConfigLocations() {
 		return new String[] { "AppCtxInjectionTest.xml" };
 	}
-
 }

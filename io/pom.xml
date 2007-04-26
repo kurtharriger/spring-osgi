@@ -22,7 +22,6 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-core</artifactId>
       <version>${spring.maven.artifact.version}</version>
-      <scope>provided</scope>
     </dependency> 
 
     <dependency>
