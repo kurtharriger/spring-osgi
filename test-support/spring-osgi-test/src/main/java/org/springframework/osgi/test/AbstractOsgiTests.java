@@ -379,7 +379,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			// hook after the OSGi platform has been setup
 			postProcessBundleContext(platformContext);
 
-			// this might fail since the bundles are started asynch
 			initializeServiceRunnerInvocationMethods();
 		}
 	}

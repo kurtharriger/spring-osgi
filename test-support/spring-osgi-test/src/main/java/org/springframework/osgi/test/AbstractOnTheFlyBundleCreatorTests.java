@@ -28,7 +28,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.storage.FileSystemStorage;
 import org.springframework.osgi.test.storage.MemoryStorage;
 import org.springframework.osgi.test.util.DependencyVisitor;
 import org.springframework.osgi.test.util.JarCreator;

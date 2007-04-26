@@ -17,7 +17,6 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-io</artifactId>
       <version>${project.parent.version}</version>
-      <scope>provided</scope>
     </dependency>
     
    <dependency>
@@ -32,25 +31,21 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-beans</artifactId>
       <version>${spring.maven.artifact.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-context</artifactId>
       <version>${spring.maven.artifact.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-core</artifactId>
       <version>${spring.maven.artifact.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-aop</artifactId>
       <version>${spring.maven.artifact.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
@@ -62,7 +57,6 @@
       <groupId>org.aopalliance</groupId>
       <artifactId>aopalliance</artifactId>
       <version>1.0</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

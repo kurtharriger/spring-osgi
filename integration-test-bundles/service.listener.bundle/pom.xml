@@ -16,26 +16,7 @@
     <url>http://www.springframework.org/osgi</url>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${spring.maven.artifact.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>spring-osgi-core</artifactId>
-            <version>${project.parent.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>4.0</version>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.simple.service</artifactId>

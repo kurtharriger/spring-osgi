@@ -25,6 +25,7 @@
       <version>${project.parent.version}</version>
       <scope>provided</scope>
     </dependency>
+    <!--
     
     <dependency>
       <groupId>org.springframework.osgi</groupId>
@@ -44,7 +45,7 @@
       <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>
     </dependency>
-
+  -->
 
     <dependency>
             <groupId>org.springframework.osgi</groupId>
@@ -54,6 +55,7 @@
             <scope>test</scope>
     </dependency>
 
+<!--
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>backport-util-concurrent</artifactId>
@@ -68,6 +70,7 @@
       <scope>provided</scope>
     </dependency>     
             
+            -->
   </dependencies>
 
 
