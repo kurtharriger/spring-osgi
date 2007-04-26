@@ -50,142 +50,142 @@
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-aop</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-aspects</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-context</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-core</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-dao</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-hibernate2</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-hibernate3</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-ibatis</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-jca</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-jdbc</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-jdo</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-jmx</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-jmx</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-jpa</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-mock</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-portlet</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-remoting</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-struts</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-support</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-toplink</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-web</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-web</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${spring.maven.artifact.version}</version>
         </dependency>
 
         <!-- Required libraries repackaged as OSGi bundles --> 
       <dependency>
       <groupId>org.slf4j</groupId>
        <artifactId>jcl104-over-slf4j</artifactId>
-      <version>1.3.0</version>
+      <version>1.3.1</version>
       <scope>provided</scope>
     </dependency>
 
      <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.3.0</version>
+      <version>1.3.1</version>
       <scope>provided</scope>
      </dependency>
      <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.3.0</version>
+      <version>1.3.1</version>
       <scope>provided</scope>
      </dependency>    
      <dependency>

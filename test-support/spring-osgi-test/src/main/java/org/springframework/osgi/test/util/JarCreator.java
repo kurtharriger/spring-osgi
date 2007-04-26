@@ -29,6 +29,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.test.storage.FileSystemStorage;
+import org.springframework.osgi.test.storage.MemoryStorage;
 import org.springframework.osgi.test.storage.Storage;
 import org.springframework.util.StringUtils;
 
@@ -58,7 +59,7 @@ public class JarCreator {
 
 	private ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
 
-	private Storage storage = new FileSystemStorage();
+	private Storage storage = new MemoryStorage();
 
 	private String rootPath = determineRootPath();
 
