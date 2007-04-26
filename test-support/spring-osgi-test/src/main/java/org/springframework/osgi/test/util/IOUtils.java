@@ -76,17 +76,16 @@ public abstract class IOUtils {
 			return false;
 
 		// recursively delete children file
+		boolean success = true;
+
 		if (file.isDirectory()) {
 			String[] children = file.list();
 			for (int i = 0; i < children.length; i++) {
-				boolean success = delete(new File(file, children[i]));
-				if (!success) {
-					return false;
-				}
+				success &= delete(new File(file, children[i]));
 			}
 		}
 
 		// The directory is now empty so delete it
-		return file.delete();
+		return success &= file.delete();
 	}
 }

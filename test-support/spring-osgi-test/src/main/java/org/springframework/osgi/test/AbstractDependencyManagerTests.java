@@ -60,7 +60,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	protected String getSpringCoreBundleUrl() {
-		return "org.springframework.osgi,spring-core,2.1-SNAPSHOT";
+		return "org.springframework.osgi,spring-core,2.1-m2-SNAPSHOT";
 	}
 
 	protected String getJUnitLibUrl() {
@@ -89,20 +89,20 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	protected String getSpringMockUrl() {
-		return "org.springframework.osgi,spring-mock,2.1-SNAPSHOT";
+		return "org.springframework.osgi,spring-mock,2.1-m2-SNAPSHOT";
 	}
 
 	protected String getSpringContextUrl() {
-		return "org.springframework.osgi,spring-context,2.1-SNAPSHOT";
+		return "org.springframework.osgi,spring-context,2.1-m2-SNAPSHOT";
 	}
 
 	protected String getSpringAopUrl() {
-		return "org.springframework.osgi,spring-aop,2.1-SNAPSHOT";
+		return "org.springframework.osgi,spring-aop,2.1-m2-SNAPSHOT";
 
 	}
 
 	protected String getSpringBeansUrl() {
-		return "org.springframework.osgi,spring-beans,2.1-SNAPSHOT";
+		return "org.springframework.osgi,spring-beans,2.1-m2-SNAPSHOT";
 	}
 
 	protected String getAopAllianceUrl() {
