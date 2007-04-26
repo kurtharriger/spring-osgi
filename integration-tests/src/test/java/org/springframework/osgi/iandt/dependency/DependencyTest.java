@@ -31,7 +31,6 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 
 	public void testDependencies() throws Exception {
 		BundleContext bundleContext = getBundleContext();
-		waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
 
 		Bundle dependencyTestBundle = bundleContext.installBundle(getLocator().locateArtifact(
 			"org.springframework.osgi", "org.springframework.osgi.iandt.dependencies", "1.0-m2-SNAPSHOT").getURL().toExternalForm());

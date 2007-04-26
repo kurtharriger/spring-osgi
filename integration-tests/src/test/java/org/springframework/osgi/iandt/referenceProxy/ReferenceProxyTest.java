@@ -27,8 +27,6 @@ public class ReferenceProxyTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	public void testReferenceProxyLifecycle() throws Exception {
-		waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
-		waitOnContextCreation("org.springframework.osgi.iandt.reference.proxy");
 	
 		MyService reference = ServiceReferer.serviceReference;
 		

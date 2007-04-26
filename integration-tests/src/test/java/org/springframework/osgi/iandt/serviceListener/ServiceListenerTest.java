@@ -25,8 +25,6 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 	}
 
 	public void testServiceListener() throws Exception {
-		waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
-		waitOnContextCreation("org.springframework.osgi.iandt.service.listener");
 		assertEquals("Expected initial binding of service", 1, MyListener.BOUND_COUNT);
 		assertEquals("Unexpected initial unbinding of service", 0, MyListener.UNBOUND_COUNT);
 
