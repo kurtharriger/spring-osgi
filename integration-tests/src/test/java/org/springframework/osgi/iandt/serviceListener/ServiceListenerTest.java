@@ -34,7 +34,7 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 
 		simpleServiceBundle.stop();
 		while (simpleServiceBundle.getState() == Bundle.STOPPING) {
-			Thread.sleep(10);
+			Thread.sleep(100);
 		}
 
 		assertEquals("Expected one binding of service", 1, MyListener.BOUND_COUNT);
@@ -45,11 +45,15 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 		simpleServiceBundle.start();
 		waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
 		// wait some more to let the listener binding propagate
-		Thread.sleep(10);
+		Thread.sleep(100);
 
 		logger.debug("simple service succesfully restarted");
 		assertTrue("Expected only two bindings of service", MyListener.BOUND_COUNT < 3);
 		assertEquals("Expected binding of service not seen", 2, MyListener.BOUND_COUNT);
 		assertEquals("Unexpected unbinding of service", 1, MyListener.UNBOUND_COUNT);
+	}
+	
+	protected long getDefaultWaitTime() {
+		return 7L;
 	}
 }
