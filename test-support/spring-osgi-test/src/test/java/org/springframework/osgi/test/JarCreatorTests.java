@@ -24,7 +24,7 @@ import java.util.jar.Manifest;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.test.storage.FileSystemStorage;
+import org.springframework.osgi.test.storage.MemoryStorage;
 import org.springframework.osgi.test.storage.Storage;
 import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.osgi.test.util.JarCreator;
@@ -45,7 +45,7 @@ public class JarCreatorTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		creator = new JarCreator();
-		storage = new FileSystemStorage();
+		storage = new MemoryStorage();
 		creator.setStorage(storage);
 	}
 
@@ -73,10 +73,12 @@ public class JarCreatorTests extends TestCase {
 		// create a simple jar from a given class and a manifest
 		creator.setContentPattern(new String[] { clazzURL.getFile() });
 		creator.setRootPath("file:");
-		
+		creator.setAddFolders(true);
+
+		String currentPath = new URL(clazzURL, ".").toExternalForm();
+
 		// create the jar
 		creator.createJar(mf);
-		
 
 		// start reading the jar
 		JarInputStream jarStream = null;
@@ -85,8 +87,13 @@ public class JarCreatorTests extends TestCase {
 			jarStream = new JarInputStream(storage.getInputStream());
 			// get manifest
 			assertEquals(mf, jarStream.getManifest());
-			
-			// move the jar stream to the file content
+
+			// move the jar stream to the first entry (which should be the file
+			// folder)
+			String entryName = jarStream.getNextEntry().getName();
+			assertEquals("file folder not included", currentPath, entryName);
+
+			// now get the file
 			jarStream.getNextEntry();
 			// open the original file
 			InputStream originalFile = clazzURL.openStream();

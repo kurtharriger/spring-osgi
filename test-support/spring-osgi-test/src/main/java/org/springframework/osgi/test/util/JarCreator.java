@@ -18,17 +18,21 @@ package org.springframework.osgi.test.util;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.osgi.test.storage.FileSystemStorage;
 import org.springframework.osgi.test.storage.MemoryStorage;
 import org.springframework.osgi.test.storage.Storage;
 import org.springframework.util.StringUtils;
@@ -41,6 +45,8 @@ import org.springframework.util.StringUtils;
  */
 public class JarCreator {
 
+	private static final Log log = LogFactory.getLog(JarCreator.class);
+
 	public static final String CLASS_PATTERN = "/**/*.class";
 
 	public static final String XML_PATTERN = "/**/*.xml";
@@ -51,8 +57,6 @@ public class JarCreator {
 
 	public static final String[] DEFAULT_CONTENT_PATTERN = new String[] { CLASS_PATTERN, XML_PATTERN, PROPS_PATTERN };
 
-	private static final Log log = LogFactory.getLog(JarCreator.class);
-
 	private String TEST_CLASSES_DIR = "test-classes";
 
 	private String[] contentPattern = DEFAULT_CONTENT_PATTERN;
@@ -62,6 +66,8 @@ public class JarCreator {
 	private Storage storage = new MemoryStorage();
 
 	private String rootPath = determineRootPath();
+
+	private boolean addFolders = true;
 
 	/**
 	 * Resources' root path (the root path does not become part of the jar).
@@ -97,12 +103,42 @@ public class JarCreator {
 
 		// load manifest
 		// add it to the jar
-		if (log.isDebugEnabled() && manifest != null)
-			log.debug("adding MANIFEST.MF [" + manifest.getMainAttributes().entrySet() + "]");
+		if (log.isTraceEnabled() && manifest != null)
+			log.trace("adding MANIFEST.MF [" + manifest.getMainAttributes().entrySet() + "]");
 
-		Resource[][] resources = resolveResources();
 		URL rootURL = new URL(rootPath);
 		String rootPath = StringUtils.cleanPath(rootURL.getPath());
+
+		Resource[][] resources = resolveResources();
+
+		// removed duplicates
+		Map entries = new TreeMap();
+
+		// empty stream used for folders
+		Resource folderResource = new ByteArrayResource(new byte[0]);
+
+		// add folder entries also
+		for (int i = 0; i < resources.length; i++) {
+			for (int j = 0; j < resources[i].length; j++) {
+				String relativeName = determineRelativeName(rootPath, resources[i][j]);
+				entries.put(relativeName, resources[i][j]);
+
+				if (addFolders) {
+					int slash = relativeName.lastIndexOf('/');
+					// ignore root folder
+					if (slash > 1)
+						entries.put(relativeName.substring(0, slash + 1), folderResource);
+				}
+			}
+		}
+
+		if (log.isTraceEnabled()) {
+			log.trace("adding entries:");
+			Set key = entries.keySet();
+			for (Iterator iter = key.iterator(); iter.hasNext();) {
+				log.trace(iter.next());
+			}
+		}
 
 		JarOutputStream jarStream = null;
 
@@ -115,12 +151,10 @@ public class JarCreator {
 					outputStream));
 
 			// add deps
-			for (int i = 0; i < resources.length; i++) {
-				for (int j = 0; j < resources[i].length; j++) {
-					// write the test
-					writtenBytes += JarUtils.writeToJar(resources[i][j], determineRelativeName(rootPath,
-							resources[i][j]), jarStream);
-				}
+			for (Iterator iter = entries.entrySet().iterator(); iter.hasNext();) {
+				Map.Entry element = (Map.Entry) iter.next();
+				// write jar entry
+				writtenBytes += JarUtils.writeToJar((Resource) element.getValue(), (String) element.getKey(), jarStream);
 			}
 		}
 		finally {
@@ -253,4 +287,21 @@ public class JarCreator {
 		this.rootPath = rootPath;
 	}
 
+	/**
+	 * @return Returns the addFolders.
+	 */
+	public boolean isAddFolders() {
+		return addFolders;
+	}
+
+	/**
+	 * Whether the folders in which the files reside, should be added to the
+	 * archive. Default is true since otherwise, the archive will contains only
+	 * files and no folders.
+	 * 
+	 * @param addFolders The addFolders to set.
+	 */
+	public void setAddFolders(boolean addFolders) {
+		this.addFolders = addFolders;
+	}
 }

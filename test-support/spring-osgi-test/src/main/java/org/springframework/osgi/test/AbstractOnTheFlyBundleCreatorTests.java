@@ -31,7 +31,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.storage.MemoryStorage;
 import org.springframework.osgi.test.util.DependencyVisitor;
 import org.springframework.osgi.test.util.JarCreator;
-import org.springframework.osgi.test.util.JarUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -225,9 +224,6 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 		// create the actual jar
 		Resource jar = jarCreator.createJar(getManifest());
-
-		if (logger.isTraceEnabled())
-			logger.trace("created jar:\n" + JarUtils.dumpJarContent(jar));
 
 		installAndStartBundle(context, jar);
 
