@@ -30,6 +30,8 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	public void testDependencies() throws Exception {
+		// waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
+
 		BundleContext bundleContext = getBundleContext();
 
 		Bundle dependencyTestBundle = bundleContext.installBundle(getLocator().locateArtifact(
@@ -50,10 +52,7 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 		assertNotSame("simple service 3 bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
 				simpleService3Bundle.getState()));
 
-		startDependencyAsynch(dependencyTestBundle);
-        Thread.sleep(2000);  // Yield to give bundle time to get into waiting state.
-
-        ServiceReference dependentRef = bundleContext.getServiceReference(DEPENDENT_CLASS_NAME);
+		ServiceReference dependentRef = bundleContext.getServiceReference(DEPENDENT_CLASS_NAME);
 
 		startDependency(simpleService3Bundle);
 
@@ -63,11 +62,11 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 
 		startDependency(simpleService2Bundle);
 
-
 		assertNull("Service with unsatisfied dependencies has been started!", dependentRef);
 
+		startDependency(dependencyTestBundle);
 		// Context switch to allow service to start up...
-		waitOnContextCreation("org.springframework.osgi.iandt.dependencies");
+		//waitOnContextCreation("org.springframework.osgi.iandt.dependencies");
 
 		dependentRef = bundleContext.getServiceReference(DEPENDENT_CLASS_NAME);
 
@@ -91,6 +90,7 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 			public void run() {
 				try {
 					bundle.start();
+					System.out.println("started dependency test bundle");
 				}
 				catch (BundleException ex) {
 					System.err.println("can't start bundle " + ex);
@@ -102,4 +102,26 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 		thread.setName("dependency test bundle");
 		thread.start();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#shouldWaitForSpringBundlesContextCreation()
+	 */
+	protected boolean shouldWaitForSpringBundlesContextCreation() {
+		return true;
+	}
+	
+	
+
+	/* (non-Javadoc)
+	 * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#getDefaultWaitTime()
+	 */
+	protected long getDefaultWaitTime() {
+		return 15L;
+	}
+
+	protected String getPlatformName() {
+		return KNOPFLERFISH_PLATFORM;
+	}
+
 }
