@@ -40,7 +40,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
  */
 public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurableOsgiTests {
 
-	private static final long DEFAULT_WAIT_TIME = 5L;
+	protected static final long DEFAULT_WAIT_TIME = 5L;
 
 	private static final long DEFAULT_SLEEP_INTERVAL = 500;
 
@@ -183,7 +183,20 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	}
 
 	public void waitOnContextCreation(String forBundleWithSymbolicName) {
-		waitOnContextCreation(getBundleContext(), forBundleWithSymbolicName, DEFAULT_WAIT_TIME, DEFAULT_TIME_UNIT);
+		waitOnContextCreation(getBundleContext(), forBundleWithSymbolicName, getDefaultWaitTime(), DEFAULT_TIME_UNIT);
+	}
+
+	/**
+	 * Return the default waiting time in seconds for
+	 * {@link #waitOnContextCreation(String)}. Subclasses should override this
+	 * method if the {@link #DEFAULT_WAIT_TIME} is not enough. For more
+	 * customization, consider setting
+	 * {@link #shouldWaitForSpringBundlesContextCreation()} to false and using
+	 * {@link #waitOnContextCreation(BundleContext, String, long, TimeUnit)}.
+	 * @return
+	 */
+	protected long getDefaultWaitTime() {
+		return DEFAULT_WAIT_TIME;
 	}
 
 	/**
@@ -197,7 +210,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	}
 
 	/**
-	 * Takes care of waiting for Spring powered bundle application context
+	 * Take care of waiting for Spring powered bundle application context
 	 * creation.
 	 */
 	protected void postProcessBundleContext(BundleContext platformBundleContext) throws Exception {
@@ -213,21 +226,21 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 				Bundle bundle = bundles[i];
 				String bundleName = OsgiBundleUtils.getNullSafeSymbolicName(bundle);
 				if (OsgiBundleUtils.isBundleActive(bundle)) {
-					if (ConfigUtils.isSpringOsgiPoweredBundle(bundle)) {
+					if (ConfigUtils.isSpringOsgiPoweredBundle(bundle) && ConfigUtils.getPublishContext(bundle.getHeaders())) {
 						if (debug)
-							logger.debug("Bundle [" + bundleName + "] is Spring/OSGi powered; waiting for it");
-						waitOnContextCreation(platformBundleContext, bundleName, DEFAULT_WAIT_TIME, DEFAULT_TIME_UNIT);
+							logger.debug("Bundle [" + bundleName + "] triggers a context creation; waiting for it");
+						// use platformBundleContext
+						waitOnContextCreation(platformBundleContext, bundleName, getDefaultWaitTime(),
+							DEFAULT_TIME_UNIT);
 					}
 					else if (trace)
-						logger.trace("Bundle [" + bundleName + "] is not Spring/OSGi powered");
+						logger.trace("Bundle [" + bundleName + "] does not trigger a context creation.");
 				}
 				else {
 					if (trace)
 						logger.trace("Bundle [" + bundleName + "] is not active; ignoring");
-
 				}
 			}
 		}
-
 	}
 }

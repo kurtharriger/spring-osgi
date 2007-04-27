@@ -50,8 +50,8 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'. <p/>
  * 
- * The class listens to bundle events and manages the creation and
- * destruction of application contexts for bundles that have one or both of:
+ * The class listens to bundle events and manages the creation and destruction
+ * of application contexts for bundles that have one or both of:
  * <ul>
  * <li> A manifest header entry Spring-Context
  * <li> XML files in META-INF/spring
@@ -179,9 +179,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * @see org.osgi.framework.BundleActivator#start
 	 */
 	public void start(BundleContext context) throws Exception {
-		if (log.isInfoEnabled()) {
-			log.info("Starting org.springframework.osgi.extender bundle");
-		}
+		log.info("Starting org.springframework.osgi.extender bundle");
 
 		this.isKnopflerfish = OsgiPlatformDetector.isKnopflerfish(context);
 		this.bundleId = context.getBundle().getBundleId();
@@ -214,9 +212,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * @see org.osgi.framework.BundleActivator#stop
 	 */
 	public void stop(BundleContext context) throws Exception {
-		if (log.isInfoEnabled()) {
-			log.info("Stopping org.springframework.osgi.extender bundle");
-		}
+		log.info("Stopping org.springframework.osgi.extender bundle");
 
 		unregisterListenerService();
 		unregisterResolverService();
@@ -232,8 +228,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 	private void registerListenerService(BundleContext context) {
-		if (log.isInfoEnabled()) {
-			log.info("Registering Spring ContextListenerContext service");
+		if (log.isDebugEnabled()) {
+			log.debug("Registering Spring ContextListenerContext service");
 		}
 
 		listenerServiceRegistration = context.registerService(
@@ -241,8 +237,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 	private void unregisterListenerService() {
-		if (log.isInfoEnabled()) {
-			log.info("Unregistering Spring ContextListenerContext service");
+		if (log.isDebugEnabled()) {
+			log.debug("Unregistering Spring ContextListenerContext service");
 		}
 
 		OsgiServiceUtils.unregisterService(listenerServiceRegistration);
@@ -253,8 +249,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * Register the NamespacePlugins instance as an Osgi Resolver service
 	 */
 	private ServiceRegistration registerResolverService(BundleContext context) {
-		if (log.isInfoEnabled()) {
-			log.info("Registering Spring NamespaceHandler and EntityResolver service");
+		if (log.isDebugEnabled()) {
+			log.debug("Registering Spring NamespaceHandler and EntityResolver service");
 		}
 
 		return context.registerService(OSGI_BUNDLE_RESOLVER_INTERFACE_NAME, this.namespacePlugins, null);
@@ -264,8 +260,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * Unregister the NamespaceHandler and EntityResolver service
 	 */
 	private void unregisterResolverService() {
-		if (log.isInfoEnabled()) {
-			log.info("Unregistering Spring NamespaceHandler and EntityResolver service");
+		if (log.isDebugEnabled()) {
+			log.debug("Unregistering Spring NamespaceHandler and EntityResolver service");
 		}
 
 		OsgiServiceUtils.unregisterService(resolverServiceRegistration);
@@ -284,7 +280,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			return;
 		}
 
-		if (log.isInfoEnabled()) {
+		if (log.isDebugEnabled()) {
 			log.debug("Processing bundle event [" + OsgiServiceUtils.getBundleEventAsString(event.getType())
 					+ "] for bundle [" + event.getBundle().getSymbolicName() + "]");
 		}
@@ -390,8 +386,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * @param bundle
 	 */
 	private void addHandler(Bundle bundle) {
-		if (log.isInfoEnabled()) {
-			log.info("Adding namespace handler resolver for " + bundle.getSymbolicName());
+		if (log.isDebugEnabled()) {
+			log.debug("Adding namespace handler resolver for " + bundle.getSymbolicName());
 		}
 
 		this.namespacePlugins.addHandler(bundle);
@@ -405,8 +401,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 */
 	private void maybeRemoveNameSpaceHandlerFor(Bundle bundle) {
 		boolean removed = this.namespacePlugins.removeHandler(bundle);
-		if (removed && log.isInfoEnabled()) {
-			log.info("Removed namespace handler resolver for " + bundle.getSymbolicName());
+		if (removed && log.isDebugEnabled()) {
+			log.debug("Removed namespace handler resolver for " + bundle.getSymbolicName());
 		}
 	}
 
@@ -436,7 +432,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			String[] locations = new String[] { extenderConfigFile.toExternalForm() };
 
 			this.extenderContext = new OsgiBundleXmlApplicationContext(context, locations);
-			this.extenderContext.setNamespaceResolver(this.namespacePlugins); 
+			this.extenderContext.setNamespaceResolver(this.namespacePlugins);
 
 			extenderContext.refresh();
 
@@ -516,8 +512,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 	public void multicastEvent(ApplicationEvent event) {
 		synchronized (springBundleListeners) {
-			if (log.isInfoEnabled()) {
-				log.info("Posting context event " + event.toString());
+			if (log.isDebugEnabled()) {
+				log.debug("Posting context event " + event.toString());
 			}
 			for (Iterator i = springBundleListeners.iterator(); i.hasNext();) {
 				ApplicationListener l = (ApplicationListener) i.next();

@@ -141,6 +141,7 @@ public abstract class ConfigUtils {
 	/**
 	 * Shortcut for finding the boolean value for
 	 * {@link #DIRECTIVE_PUBLISH_CONTEXT} directive using the given headers.
+	 * Assumes the headers belong to a Spring powered bundle.
 	 * 
 	 * @param headers
 	 * @return
@@ -150,11 +151,27 @@ public abstract class ConfigUtils {
 		return (value != null ? Boolean.valueOf(value).booleanValue() : DIRECTIVE_PUBLISH_CONTEXT_DEFAULT);
 	}
 
+	/**
+	 * Shortcut for finding the boolean value for
+	 * {@link #DIRECTIVE_CREATE_ASYNCHRONOUSLY} directive using the given
+	 * headers. Assumes the headers belong to a Spring powered bundle.
+	 * 
+	 * @param headers
+	 * @return
+	 */
 	public static boolean getCreateAsync(Dictionary headers) {
 		String value = getDirectiveValue(headers, DIRECTIVE_CREATE_ASYNCHRONOUSLY);
 		return (value != null ? Boolean.valueOf(value).booleanValue() : DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT);
 	}
 
+	/**
+	 * Shortcut for finding the boolean value for {@link #DIRECTIVE_TIMEOUT}
+	 * directive using the given headers. Assumes the headers belong to a Spring
+	 * powered bundle.
+	 * 
+	 * @param headers
+	 * @return
+	 */
 	public static long getTimeOut(Dictionary headers) {
 		String value = getDirectiveValue(headers, DIRECTIVE_TIMEOUT);
 

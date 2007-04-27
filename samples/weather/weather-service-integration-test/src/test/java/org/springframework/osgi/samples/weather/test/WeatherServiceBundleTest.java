@@ -85,9 +85,9 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      * easier way to get a reference to a published service.
      */
     public void testWeatherServiceExported() {
-        waitOnContextCreation("org.springframework.osgi.samples.weather.service");
+        //waitOnContextCreation("org.springframework.osgi.samples.weather.service");
         //waitOnContextCreation("org.springframework.osgi.samples.weather.dao");
-        waitOnContextCreation("org.springframework.osgi.samples.wiring.bundle");
+        //waitOnContextCreation("org.springframework.osgi.samples.wiring.bundle");
 
         BundleContext context = getBundleContext();
         ServiceReference ref = context.getServiceReference("org.springframework.osgi.samples.weather.service.WeatherService");
@@ -100,5 +100,9 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
         finally {
             context.ungetService(ref);
         }
+    }
+    
+    protected long getDefaultWaitTime(){
+         return 10L;
     }
 }
