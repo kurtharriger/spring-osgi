@@ -63,4 +63,13 @@ public class ReferenceProxyTest extends AbstractConfigurableBundleCreatorTests {
 		// Service should be running
 		assertNotNull(reference.stringValue());
 	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#getDefaultWaitTime()
+	 */
+	protected long getDefaultWaitTime() {
+		return 15L;
+	}
+	
+	
 }

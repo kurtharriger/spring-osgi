@@ -38,7 +38,8 @@ public abstract class JarUtils {
 	private static final int DEFAULT_BUFFER_SIZE = 1024;
 
 	/**
-	 * Dumps the content of a jar and returns it as a String.
+	 * Dump the entries of a jar and return them as a String. This method can be
+	 * memory expensive depending on the jar size.
 	 * 
 	 * @param jis
 	 * @return
@@ -64,12 +65,19 @@ public abstract class JarUtils {
 		return buffer.toString();
 	}
 
+	/**
+	 * Dump the entries of a jar and return them as a String. This method can be
+	 * memory expensive depending on the jar size.
+	 * 
+	 * @param resource
+	 * @return
+	 */
 	public static String dumpJarContent(Resource resource) {
 		try {
 			return dumpJarContent(new JarInputStream(resource.getInputStream()));
 		}
 		catch (IOException ex) {
-			return "reading from stream failed";
+			return "reading from stream failed" + ex;
 		}
 	}
 
@@ -126,7 +134,6 @@ public abstract class JarUtils {
 	 */
 	public static Manifest getManifest(InputStream stream) {
 		JarInputStream myStream = null;
-		Manifest man = null;
 		try {
 			myStream = new JarInputStream(stream);
 			return myStream.getManifest();
@@ -158,5 +165,5 @@ public abstract class JarUtils {
 		}
 		return null;
 	}
-	
+
 }
