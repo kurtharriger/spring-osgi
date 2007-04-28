@@ -32,7 +32,7 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * 
  */
-public abstract class AbstractIoTest extends AbstractConfigurableBundleCreatorTests {
+public class AbstractIoTest extends AbstractConfigurableBundleCreatorTests {
 
 	private Resource thisClass;
 
