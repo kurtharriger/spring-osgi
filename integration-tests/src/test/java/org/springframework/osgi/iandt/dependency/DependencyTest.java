@@ -13,9 +13,7 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 	private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.dependencies.Dependent";
 
-	private Thread thread;
-
-	// private static final String SERVICE_2_FILTER = "(service=2)";
+    // private static final String SERVICE_2_FILTER = "(service=2)";
 	// private static final String SERVICE_3_FILTER = "(service=3)";
 
 	protected String getManifestLocation() {
@@ -52,7 +50,11 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 		assertNotSame("simple service 3 bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
 				simpleService3Bundle.getState()));
 
+        startDependencyAsynch(dependencyTestBundle);
+        Thread.sleep(2000);  // Yield to give bundle time to get into waiting state.
 		ServiceReference dependentRef = bundleContext.getServiceReference(DEPENDENT_CLASS_NAME);
+
+		assertNull("Service with unsatisfied dependencies has been started!", dependentRef);
 
 		startDependency(simpleService3Bundle);
 
@@ -64,9 +66,7 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 
 		assertNull("Service with unsatisfied dependencies has been started!", dependentRef);
 
-		startDependency(dependencyTestBundle);
-		// Context switch to allow service to start up...
-		//waitOnContextCreation("org.springframework.osgi.iandt.dependencies");
+		waitOnContextCreation("org.springframework.osgi.iandt.dependencies");
 
 		dependentRef = bundleContext.getServiceReference(DEPENDENT_CLASS_NAME);
 
@@ -97,8 +97,8 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 				}
 			}
 		};
-		thread = new Thread(runnable);
-		thread.setDaemon(false);
+        Thread thread = new Thread(runnable);
+        thread.setDaemon(false);
 		thread.setName("dependency test bundle");
 		thread.start();
 	}
@@ -117,11 +117,7 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 	 * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#getDefaultWaitTime()
 	 */
 	protected long getDefaultWaitTime() {
-		return 15L;
-	}
-
-	protected String getPlatformName() {
-		return KNOPFLERFISH_PLATFORM;
-	}
+		return 60L;
+	} 
 
 }
