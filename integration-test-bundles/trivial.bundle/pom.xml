@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>org.springframework.osgi.iandt.trivial</artifactId>
-  <packaging>osgi-bundle</packaging>
+  <packaging>jar</packaging>
   <name>Trivial OSGi bundle</name>
   <description>An OSGi bundle that contains and exports just one class
   </description>

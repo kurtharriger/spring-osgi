@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.scoped.bundle.b</artifactId>
-    <packaging>osgi-bundle</packaging>
+	<packaging>jar</packaging>
     <name>Bundle scoping test bundle - B</name>
     <description>An OSGi bundle which tests 'bundle' scoped beans</description>
     <url>http://www.springframework.org/osgi</url>

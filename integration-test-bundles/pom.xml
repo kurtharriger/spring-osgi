@@ -12,6 +12,13 @@
   <name>Spring application bundles for integration testing</name>
   <url>http://www.springframework.org/osgi</url>
   
+  <properties>
+    <!-- root, empty package -->
+    <!-- plugin not yet enabled to avoid further problems -->
+	<spring.osgi.import.pkg>!org.springframework.osgi.iandt, *</spring.osgi.import.pkg>
+	<spring.osgi.export.pkg>${pom.artifactId}*</spring.osgi.export.pkg>
+  </properties>
+  
   <!-- shared dependencies -->
   <dependencies>
             <dependency>
@@ -27,8 +34,8 @@
             <version>4.0</version>
             <scope>provided</scope>
         </dependency>
-        
   </dependencies>
+  
   <modules>
     <module>simple.service.bundle</module>
     <module>simple.service.2.bundle</module>
@@ -64,19 +71,19 @@
       </resource>
     </resources>
 
-    <!-- There is a bug in maven which prevents correct inheritance beyond one-layer
-     Deep. We therefore have to reconfigure the plugin here -->
+    
     <plugins>
       <plugin>
-        <groupId>org.apache.felix.plugins</groupId>
-        <artifactId>maven-osgi-plugin</artifactId>
-        <extensions>true</extensions>
-        <version>0.8.0-SNAPSHOT</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
         <configuration>
-          <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          <archive>
+            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
         </configuration>
       </plugin>
     </plugins>
+    
  </build>
 
    <!-- the above doesn't work, so we spell it out in full below
