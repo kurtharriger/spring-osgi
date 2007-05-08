@@ -68,14 +68,26 @@ public class JarCreatorTests extends TestCase {
 		entries.put("test", attrs);
 
 		String location = JarCreatorTests.class.getName().replace('.', '/') + ".class";
+		// get absolute file location
+		// file:/D:/work/i21/spring-osgi-sf/...s/org/springframework/osgi/test/JarCreatorTests.class
 		final URL clazzURL = getClass().getClassLoader().getResource(location);
 
-		// create a simple jar from a given class and a manifest
-		creator.setContentPattern(new String[] { clazzURL.getFile() });
-		creator.setRootPath("file:");
-		creator.setAddFolders(true);
+		// go two folders above
+		// file:/D:/work/i21/spring-osgi-sf/...s/org/springframework/
+		String rootPath = new URL(clazzURL, "../../").toExternalForm();
+		
+		
+		String firstLevel = new URL(clazzURL, "../").toExternalForm().substring(rootPath.length());
+		// get file folder
+		String secondLevel = new URL(clazzURL, ".").toExternalForm().substring(rootPath.length());
 
-		String currentPath = new URL(clazzURL, ".").toExternalForm();
+		// now determine the file relative to the root
+		String file = clazzURL.toExternalForm().substring(rootPath.length());
+
+		// create a simple jar from a given class and a manifest
+		creator.setContentPattern(new String[] { file });
+		creator.setRootPath(rootPath);
+		creator.setAddFolders(true);
 
 		// create the jar
 		creator.createJar(mf);
@@ -88,10 +100,13 @@ public class JarCreatorTests extends TestCase {
 			// get manifest
 			assertEquals(mf, jarStream.getManifest());
 
-			// move the jar stream to the first entry (which should be the file
+			// move the jar stream to the first entry (which should be org/
 			// folder)
 			String entryName = jarStream.getNextEntry().getName();
-			assertEquals("file folder not included", currentPath, entryName);
+			assertEquals("folders above the file not included", firstLevel, entryName);
+			
+			entryName = jarStream.getNextEntry().getName();
+			assertEquals("file folder not included", secondLevel, entryName);
 
 			// now get the file
 			jarStream.getNextEntry();
