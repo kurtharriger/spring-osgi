@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project>
+  <parent>
+    <artifactId>spring-framework-required-libraries</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>1.0-m2-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.springframework.osgi</groupId>
+  <artifactId>c3p0.osgi</artifactId>
+  <packaging>bundle</packaging>
+  <name>c3p0 (OSGi version)</name>
+  <version>0.9.0.4</version>
+  <url>http:// www.springframework.org</url>
+
+  <properties>
+    <unpack.version>0.9.0.4</unpack.version>
+    <spring.osgi.export.pkg>com.mchange.*</spring.osgi.export.pkg>
+    <spring.osgi.import.pkg>
+    javax.naming*;resolution:=optional,
+    org.apache.log4j*;resolution:=optional,
+    org.w3c.dom*;resolution:=optional,
+    *
+    </spring.osgi.import.pkg>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>c3p0</groupId>
+      <artifactId>c3p0</artifactId>
+      <version>0.9.0.4</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+</project>

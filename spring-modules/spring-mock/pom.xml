@@ -9,40 +9,30 @@
 
 	<groupId>org.springframework.osgi</groupId>
 	<artifactId>spring-mock</artifactId>
-	<packaging>osgi-bundle</packaging>
+	<packaging>bundle</packaging>
 	<name>Spring mock module (OSGi version)</name>
 	<version>${project.parent.version}</version>
 	<url>http://www.springframework.org</url>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>dependency-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.springframework</groupId>
-									<artifactId>${project.artifactId}</artifactId>
-									<version>${base.spring.version}</version>
-									<type>jar</type>
-								</artifactItem> 
-							</artifactItems>
-							<outputDirectory>
-								${project.build.directory}/classes
-							</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+    <properties>
+	   <!-- optional imports-->
+	   <spring.osgi.import.pkg>
+  javax.naming*;resolution:=optional,
+  javax.servlet*;resolution:=optional,
+  javax.portlet;resolution:=optional,
+  javax.sql*;resolution:=optional,
+  javax.persistence*;resolution:=optional,
+  org.apache.taglibs.standard.lang.support*;resolution:=optional,
+  org.aspectj.weaver.loadtime*;resolution:=optional,
+  org.springframework.jndi*;resolution:=optional;version="${spring.import.version}",  
+  org.springframework.dao*;resolution:=optional;version="${spring.import.version}",
+  org.springframework.jdbc.core*;resolution:=optional;version="${spring.import.version}",
+  org.springframework.transaction*;resolution:=optional;version="${spring.import.version}",
+  org.springframework.orm.jpa*;resolution:=optional;version="${spring.import.version}",
+  org.springframework.instrument.classloading*;resolution:=optional;version="${spring.import.version}",
+  org.springframework.web*;resolution:=optional;version="${spring.import.version}",
+  *
+		</spring.osgi.import.pkg>
+    </properties>
 
 </project>

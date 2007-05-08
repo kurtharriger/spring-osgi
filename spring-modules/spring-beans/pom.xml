@@ -9,43 +9,20 @@
 
 	<groupId>org.springframework.osgi</groupId>
 	<artifactId>spring-beans</artifactId>
-	<packaging>osgi-bundle</packaging>
+	<packaging>bundle</packaging>
 	<name>Spring beans module (OSGi version)</name>
 	<version>${project.parent.version}</version>
 	<url>http://www.springframework.org</url>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>dependency-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<!-- Because we are overwriting the spring.handlers/schemas resources, the
-										 unpacking has to occur before the resources are copied from the local
-										 build -->
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.springframework</groupId>
-									<artifactId>${project.artifactId}</artifactId>
-									<version>${base.spring.version}</version>
-									<type>jar</type>
-								</artifactItem>
-							</artifactItems>
-							<outputDirectory>
-								${project.build.directory}/classes
-							</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+	
+	<properties>
+	   <!-- optional imports-->
+	   <spring.osgi.import.pkg>
+	net.sf.cglib*;resolution:=optional,
+	org.w3c.dom;resolution:=optional,
+	org.xml.sax;resolution:=optional,
+	javax.xml.parsers;resolution:=optional,
+	*
+	  </spring.osgi.import.pkg>
+	</properties>
 
 </project>

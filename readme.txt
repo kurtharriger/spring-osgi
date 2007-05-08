@@ -57,6 +57,7 @@ Project info at the SourceForge site: http://sourceforge.net/projects/springfram
 
 Spring OSGi is released under the terms of the Apache Software License (see license.txt).
 All libraries included in the "-with-dependencies" download are subject to their respective licenses.
+This product includes software developed by the Apache Software Foundation (http://www.apache.org).
 
 4. WHERE TO START
 

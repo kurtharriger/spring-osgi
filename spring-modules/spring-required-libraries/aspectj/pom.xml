@@ -9,41 +9,15 @@
 
   <groupId>org.springframework.osgi</groupId>
   <artifactId>aspectjrt.osgi</artifactId>
-  <packaging>osgi-bundle</packaging>
+  <packaging>bundle</packaging>
   <name>AspectJ Runtime Library</name>
   <version>1.5.2a-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>dependency-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.aspectj</groupId>
-                  <artifactId>aspectjrt</artifactId>
-                  <version>1.5.2a</version>
-                  <type>jar</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>
-                ${project.build.directory}/classes
-              </outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <properties>
+    <unpack.version>1.5.2a</unpack.version>
+    <spring.osgi.export.pkg>org.aspectj.*</spring.osgi.export.pkg>
+  </properties>
   
   <dependencies>
     <dependency>

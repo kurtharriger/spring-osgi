@@ -9,43 +9,18 @@
 
   <groupId>org.springframework.osgi</groupId>
   <artifactId>commons-pool.osgi</artifactId>
-  <packaging>osgi-bundle</packaging>
+  <packaging>bundle</packaging>
   <name>Jakarta Commons Pool (OSGi version)</name>
   <version>1.0-SNAPSHOT</version>
   <url>http:// www.springframework.org</url>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>dependency-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>commons-pool</groupId>
-                  <artifactId>commons-pool</artifactId>
-                  <version>1.0</version>
-                  <type>jar</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>
-                ${project.build.directory}/classes
-              </outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <properties>
+    <unpack.version>1.0</unpack.version>
+    <spring.osgi.export.pkg>org.apache.commons.pool.*</spring.osgi.export.pkg>
+  </properties> 
   
-  <dependencies>
+
+   <dependencies>
     <dependency>
       <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>

@@ -8,9 +8,18 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-io</artifactId>
-  <packaging>osgi-bundle</packaging>
-  <name>org.springframework.osgi.io bundle</name>
+  <packaging>bundle</packaging>
+  <name>Spring OSGi IO</name>
   <url>http://www.springframework.org/osgi</url>
+  <description>
+  Spring/OSGi IO abstract classes. Provides Resource, ResourceLoader and ResourcePatternResolver
+  for OSGi environments.
+  </description>
+  
+  <properties>
+	<spring.osgi.export.pkg>org.springframework.osgi.io</spring.osgi.export.pkg>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
@@ -18,10 +27,14 @@
       <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
+    
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-core</artifactId>
       <version>${spring.maven.artifact.version}</version>
+      
+      <!-- assume it's there since io is usually ran as part of a suite -->
+      <scope>provided</scope>
     </dependency> 
 
     <dependency>
@@ -33,38 +46,12 @@
     
   </dependencies>
 
-<build>
-  <plugins>
-    <plugin>
-      <artifactId>maven-clean-plugin</artifactId>
-      <configuration>
-        <filesets>
-          <fileset>
-            <directory>META-INF</directory>
-            <includes>
-              <include>MANIFEST.MF</include>
-            </includes>
-            <followSymlinks>false</followSymlinks>
-          </fileset>
-        </filesets>
-      </configuration>
-    </plugin>
-    </plugins>
-</build>
-
   <reporting>
     <plugins>
        <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
       </plugin>
-       <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-clover-plugin</artifactId>
-		<configuration>
-			<licenseFile>${user.home}/clover/clover.license</licenseFile>
-		</configuration>
-	   </plugin>      
     </plugins>
   </reporting>
 

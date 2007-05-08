@@ -16,7 +16,6 @@
 package org.springframework.osgi.io;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Enumeration;
 import java.util.Set;
 
@@ -130,12 +129,14 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 
 		// get only the resources from current folder (use null instead of * to
 		// make it work over mocks also)
-		Enumeration candidates = bundle.findEntries(dir, null, false);
+		// Enumeration candidates = bundle.findEntries(dir, null, false);
+
+		// entries are relative to the root path - miss the leading /
+		Enumeration candidates = bundle.getEntryPaths(dir);
 		if (candidates != null) {
 			boolean dirDepthNotFixed = (fullPattern.indexOf("**") != -1);
 			while (candidates.hasMoreElements()) {
-				URL currURL = (URL) candidates.nextElement();
-				String currPath = currURL.getPath();
+				String currPath = "/" + (String) candidates.nextElement();
 				if (!currPath.startsWith(dir)) {
 					// Returned resource path does not start with relative
 					// directory:

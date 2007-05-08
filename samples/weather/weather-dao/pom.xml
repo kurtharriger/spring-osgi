@@ -8,7 +8,7 @@
   </parent>
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>weather-dao</artifactId>
-  <packaging>osgi-bundle</packaging>
+  	<packaging>bundle</packaging>
   <name>Spring OSGi Weather Sample Dao</name>
   <url>http://www.springframework.org/osgi</url>
 

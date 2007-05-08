@@ -28,9 +28,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
-import org.springframework.osgi.context.support.ApplicationContextConfiguration; 
-import org.springframework.osgi.context.support.EntryLookupControllingMockBundle;
+import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.context.support.SpringBundleEvent;
+import org.springframework.osgi.mock.EntryLookupControllingMockBundle;
 
 public class ApplicationContextCreatorTest extends TestCase {
 

@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.osgi</groupId>
     <artifactId>spring-osgi-integration-tests</artifactId>
-    <packaging>osgi-bundle</packaging>
+    <packaging>jar</packaging>
     <name>Spring OSGi integration in-framework testing</name>
     <url>http://www.springframework.org/osgi</url>
     <dependencies>

@@ -123,11 +123,17 @@ public class JarCreator {
 				String relativeName = determineRelativeName(rootPath, resources[i][j]);
 				entries.put(relativeName, resources[i][j]);
 
+				String token = relativeName;
+				// get folder and walk up to the root
 				if (addFolders) {
-					int slash = relativeName.lastIndexOf('/');
-					// ignore root folder
-					if (slash > 1)
-						entries.put(relativeName.substring(0, slash + 1), folderResource);
+					int slashIndex;
+					// stop at root folder
+					while ((slashIndex = token.lastIndexOf('/')) > 1) {
+						// add the folder with trailing /
+						entries.put(token.substring(0, slashIndex + 1), folderResource);
+						// walk the tree
+						token = token.substring(0, slashIndex);
+					}
 				}
 			}
 		}

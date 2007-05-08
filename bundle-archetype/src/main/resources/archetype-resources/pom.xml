@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
-  <packaging>osgi-bundle</packaging>
+  	<packaging>bundle</packaging>
   <name>Spring OSGi Bundle</name>
   <version>${version}</version>
   <url>http://www.springframework.org/osgi</url>
@@ -66,12 +66,9 @@
     <plugins>
       <plugin>
         <groupId>org.apache.felix.plugins</groupId>
-        <artifactId>maven-osgi-plugin</artifactId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
-        <version>0.8.0-SNAPSHOT</version>
-        <configuration>
-          <manifestFile>META-INF/MANIFEST.MF</manifestFile>
-        </configuration>
+        <version>0.9.0-incubator-SNAPSHOT</version>
       </plugin>
     </plugins>
   </build>

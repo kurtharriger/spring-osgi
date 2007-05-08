@@ -9,40 +9,29 @@
 
 	<groupId>org.springframework.osgi</groupId>
 	<artifactId>spring-remoting</artifactId>
-	<packaging>osgi-bundle</packaging>
+	<packaging>bundle</packaging>
 	<name>Spring remoting module (OSGi version)</name>
 	<version>${project.parent.version}</version>
 	<url>http://www.springframework.org</url>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>dependency-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.springframework</groupId>
-									<artifactId>${project.artifactId}</artifactId>
-									<version>${base.spring.version}</version>
-									<type>jar</type>
-								</artifactItem> 
-							</artifactItems>
-							<outputDirectory>
-								${project.build.directory}/classes
-							</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
+	
+	<properties>
+	   <!-- optional imports-->
+	   <spring.osgi.import.pkg>
+   com.caucho.*;resolution:=optional,
+   javax.naming;resolution:=optional,
+   javax.rmi*;resolution:=optional,
+   javax.ejb;resolution:=optional,
+   javax.jms;resolution:=optional,
+   javax.servlet*;resolution:=optional,
+   javax.xml*;resolution:=optional,
+   org.aopalliance*;resolution:=optional,
+   org.omg*;resolution:=optional,
+   org.springframework.web*;version="${spring.import.version}";resolution:=optional,
+   org.apache.axis.encoding.ser*;resolution:=optional,
+   org.apache.commons.httpclient*;resolution:=optional,
+   org.w3c.dom;resolution:=optional,
+   *
+   		</spring.osgi.import.pkg>
+	</properties>
+	
 </project>

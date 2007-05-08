@@ -126,7 +126,7 @@ public class AbstractIoTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	// works on Equinox only
-	public void tstFolderLevelWildcardMatching() throws Exception {
+	public void testFolderLevelWildcardMatching() throws Exception {
 		// find all classes
 		Resource[] res = patternLoader.getResources("bundle:/**/AbstractIoTest.class");
 		// at least two integration tests are available

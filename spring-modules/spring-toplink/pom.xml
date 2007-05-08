@@ -9,40 +9,36 @@
 
 	<groupId>org.springframework.osgi</groupId>
 	<artifactId>spring-toplink</artifactId>
-	<packaging>osgi-bundle</packaging>
+	<packaging>bundle</packaging>
 	<name>Spring Toplink module (OSGi version)</name>
 	<version>${project.parent.version}</version>
 	<url>http://www.springframework.org</url>
+	
+	<properties>
+	   <!-- optional imports-->
+	   <spring.osgi.import.pkg>
+   org.aopalliance*;resolution:=optional,
+   *
+   		</spring.osgi.import.pkg>
+	</properties>
+	
+	
+	  <!-- template dependencies for Spring jars to avoid duplication -->
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>${pom.artifactId}</artifactId>
+      <version>${spring.version}</version>
+      <scope>provided</scope>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>dependency-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.springframework</groupId>
-									<artifactId>${project.artifactId}</artifactId>
-									<version>${base.spring.version}</version>
-									<type>jar</type>
-								</artifactItem> 
-							</artifactItems>
-							<outputDirectory>
-								${project.build.directory}/classes
-							</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
+	<exclusions>
+        <exclusion>
+	  <groupId>com.oracle.toplink</groupId>
+      <artifactId>toplink</artifactId>
+        </exclusion>
+      </exclusions>
+             
+    </dependency>
+  </dependencies>
+	
 </project>

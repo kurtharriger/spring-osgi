@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>simple-service-bundle</artifactId>
-  <packaging>osgi-bundle</packaging>
+  <packaging>bundle</packaging>
   <name>Spring OSGi Samples: Simple Service Bundle</name>
   <url>http://www.springframework.org/osgi</url>
   

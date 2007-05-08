@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>org.springframework.osgi.samples</groupId>
 	<artifactId>wiring-bundle</artifactId>
-	<packaging>osgi-bundle</packaging>
+		<packaging>bundle</packaging>
 	<name>Spring OSGi Sample Wiring Bundle</name>
 	<url>http://www.springframework.org/osgi</url>
 

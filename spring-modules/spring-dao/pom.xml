@@ -9,40 +9,30 @@
 
 	<groupId>org.springframework.osgi</groupId>
 	<artifactId>spring-dao</artifactId>
-	<packaging>osgi-bundle</packaging>
+	<packaging>bundle</packaging>
 	<name>Spring dao module (OSGi version)</name>
 	<version>${project.parent.version}</version>
 	<url>http://www.springframework.org</url>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>dependency-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.springframework</groupId>
-									<artifactId>${project.artifactId}</artifactId>
-									<version>${base.spring.version}</version>
-									<type>jar</type>
-								</artifactItem>
-							</artifactItems>
-							<outputDirectory>
-								${project.build.directory}/classes
-							</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+
+    <properties>
+	   <!-- optional imports-->
+	   <spring.osgi.import.pkg>
+	    javax.naming;resolution:=optional,
+	    javax.transaction;resolution:=optional,
+	    org.aopalliance.*;resolution:=optional,
+	    org.objectweb.jotm*;resolution:=optional,
+	    <!-- oracle tx -->
+	    oracle.j2ee.transaction;resolution:=optional,
+	    com.evermind.server;resolution:=optional,
+	    <!-- weblogic tx -->
+	    weblogic.transaction;resolution:=optional,
+	    <!-- websphere tx -->
+	    com.ibm.ws.Transaction;resolution:=optional,
+	    com.ibm.ejs.jts.jta;resolution:=optional,
+	    !org.w3c.dom,
+	    *
+	   </spring.osgi.import.pkg>
+    </properties>
 
 </project>

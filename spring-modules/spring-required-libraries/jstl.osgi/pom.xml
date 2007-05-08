@@ -7,38 +7,23 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>jstl.osgi</artifactId>
-  <packaging>osgi-bundle</packaging>
+  <packaging>bundle</packaging>
   <name>JSTL (OSGi version)</name>
   <version>1.1.2-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>dependency-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>javax.servlet</groupId>
-                  <artifactId>jstl</artifactId>
-                  <version>1.1.2</version>
-                  <type>jar</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.directory}/classes</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  
+  <properties>
+    <unpack.version>1.1.2</unpack.version>
+    <spring.osgi.export.pkg>javax.servlet.jsp.jstl*</spring.osgi.export.pkg>
+    <spring.osgi.import.pkg>
+    javax.xml.parsers;resolution:=optional,
+    org.xml.sax*;resolution:=optional,
+    *
+    </spring.osgi.import.pkg>
+    
+    
+  </properties> 
+  
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>
