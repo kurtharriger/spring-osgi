@@ -110,7 +110,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	protected String getAsmLibrary() {
-		return "org.springframework.osgi,asm.osgi,2.2.2-SNAPSHOT";
+		return "org.springframework.osgi,asm.osgi,2.2.3-SNAPSHOT";
 	}
 
 	/**

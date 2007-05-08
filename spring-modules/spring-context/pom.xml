@@ -9,40 +9,29 @@
 
 	<groupId>org.springframework.osgi</groupId>
 	<artifactId>spring-context</artifactId>
-	<packaging>osgi-bundle</packaging>
+	<packaging>bundle</packaging>
 	<name>Spring context module (OSGi version)</name>
 	<version>${project.parent.version}</version>
 	<url>http://www.springframework.org</url>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>dependency-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.springframework</groupId>
-									<artifactId>${project.artifactId}</artifactId>
-									<version>${base.spring.version}</version>
-									<type>jar</type>
-								</artifactItem>
-							</artifactItems>
-							<outputDirectory>
-								${project.build.directory}/classes
-							</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
+    <properties>
+       <!-- bug related to empty packages -->
+       <!-- optional imports-->
+	   <spring.osgi.import.pkg>
+   !org.springframework.instrument,
+   org.aopalliance*;resolution:=optional,
+   commonj.timers*;resolution:=optional,
+   commonj.work*;resolution:=optional,
+   org.apache.catalina.loader*;resolution:=optional,
+   org.aspectj.weaver.loadtime*;resolution:=optional,
+   com.sun.enterprise.loader*;resolution:=optional,
+   edu.emory.mathcs.backport.java.util.concurrent*;resolution:=optional,
+   javax.naming;resolution:=optional,
+   javax.persistence.spi;resolution:=optional,
+   org.springframework.aop*;resolution:=optional;version="${spring.import.version}",
+   org.xml.sax;resolution:=optional,
+   *
+          </spring.osgi.import.pkg>
+    </properties>
+    
 </project>

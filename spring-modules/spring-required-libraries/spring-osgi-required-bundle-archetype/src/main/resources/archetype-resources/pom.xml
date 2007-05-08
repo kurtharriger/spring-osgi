@@ -9,7 +9,7 @@
 
   <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
-  <packaging>osgi-bundle</packaging>
+  	<packaging>bundle</packaging>
   <name>Some Java Library (OSGi version)</name>
   <version>${version}-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>

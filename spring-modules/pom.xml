@@ -12,6 +12,15 @@
   <name>Spring Framework jars packaged as OSGi bundles</name>
   <version>2.1-m2-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
+  
+  <!-- templating properties for unpack task -->
+  
+  <!-- defaults point to Spring framework -->
+  <properties>
+    <spring.osgi.export.pkg>org.springframework</spring.osgi.export.pkg>
+  </properties>
+ 
+
   <modules>
     <module>spring-aop</module>
     <module>spring-aspects</module>
@@ -39,11 +48,23 @@
     <module>spring-required-libraries</module>
   </modules>
 
+
+  <!-- template dependencies for Spring jars to avoid duplication -->
+    <dependencies>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>${pom.artifactId}</artifactId>
+      <version>${spring.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  
  <build>
     <resources>
       <resource>
         <!-- Bug MRESOURCES-35 means we can't use absolute paths -->
         <!-- Bug in eclipse means we have to put META-INF in ${basedir} -->
+         
         <targetPath>../../META-INF</targetPath>
         <filtering>true</filtering>
         <includes>
@@ -54,21 +75,13 @@
       <resource>
         <filtering>true</filtering>
         <directory>src/main/resources</directory>
+        
       </resource>
     </resources>
 
     <!-- There is a bug in maven which prevents correct inheritance beyond one-layer
      Deep. We therefore have to reconfigure the plugin here -->
     <plugins>
-      <plugin>
-        <groupId>org.apache.felix.plugins</groupId>
-        <artifactId>maven-osgi-plugin</artifactId>
-        <extensions>true</extensions>
-        <version>0.8.0-SNAPSHOT</version>
-        <configuration>
-          <manifestFile>META-INF/MANIFEST.MF</manifestFile>
-        </configuration>
-      </plugin>
     <plugin>
       <artifactId>maven-clean-plugin</artifactId>
       <configuration>
@@ -83,8 +96,9 @@
         </filesets>
       </configuration>
     </plugin>
-    </plugins>
+	</plugins>
  </build>
+
 
   <reporting>
    <excludeDefaults>true</excludeDefaults>

@@ -20,6 +20,8 @@ import java.util.Hashtable;
 
 import junit.framework.TestCase;
 
+import org.springframework.osgi.mock.EntryLookupControllingMockBundle;
+
 /**
  * Test that given a bundle, we can correctly determine the spring configuration
  * required for it.

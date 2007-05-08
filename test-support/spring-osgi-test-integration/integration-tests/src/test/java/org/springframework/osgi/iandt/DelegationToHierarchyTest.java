@@ -43,11 +43,12 @@ public class DelegationToHierarchyTest extends TestCase implements OsgiJUnitTest
 			Manifest manifest = new Manifest();
 			Attributes attributes = manifest.getMainAttributes();
 			attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
-			attributes.putValue(Constants.BUNDLE_SYMBOLICNAME, "org.springframework.osgi.test.delegation");
+			attributes.putValue(Constants.BUNDLE_SYMBOLICNAME, "org.springframework.osgi.iandt");
 			attributes.putValue(Constants.BUNDLE_ACTIVATOR, JUnitTestActivator.class.getName());
 			attributes.putValue(Constants.IMPORT_PACKAGE, "junit.framework,"
 					+ "org.osgi.framework;specification-version=\"1.3.0\","
-					+ "org.springframework.core.io;version=\"2.1\"," + "org.springframework.osgi.test");
+					+ "org.springframework.core.io,"
+					+ "org.springframework.osgi.test");
 			return manifest;
 		}
 	};

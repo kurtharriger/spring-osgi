@@ -1,29 +1,4 @@
-Implementation-Title: Spring Framework
-Implementation-Version: ${spring.version}
-Spring-Version: ${spring.version}
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.springframework.core
-Bundle-Name: org.springframework.core
-Bundle-Version: ${spring.bundle.version}
-Bundle-Vendor: Spring Framework
-Import-Package: org.apache.commons.collections.map;resolution:=optional,
-   org.apache.commons.collections.set;resolution:=optional,
-   edu.emory.mathcs.backport.java.util.concurrent;resolution:=optional,
-   org.apache.commons.logging,
-   org.apache.log4j;resolution:=optional,
-   org.apache.log4j.xml;resolution:=optional,
-   org.objectweb.asm;resolution:=optional,
-   org.objectweb.asm.commons;resolution:=optional
-DynamicImport-Package: *
-Export-Package: org.springframework.core.io.support;version="${spring.import.version}",
- org.springframework.core;version="${spring.import.version}",
- org.springframework.core.annotation;version="${spring.import.version}",
- org.springframework.core.enums;version="${spring.import.version}",
- org.springframework.core.io;version="${spring.import.version}",
- org.springframework.core.style;version="${spring.import.version}",
- org.springframework.core.task;version="${spring.import.version}",
- org.springframework.util;version="${spring.import.version}",
- org.springframework.util.comparator;version="${spring.import.version}",
- org.springframework.util.xml;version="${spring.import.version}"
-Bundle-ClassPath: .,
- target/classes/
+DynamicImport-Package: javax.xml.transform, 
+  org.w3c.dom,
+  org.xml.sax,
+  *

@@ -9,41 +9,15 @@
 
   <groupId>org.springframework.osgi</groupId>
   <artifactId>commons-lang.osgi</artifactId>
-  <packaging>osgi-bundle</packaging>
+  <packaging>bundle</packaging>
   <name>commons-lang (OSGi version)</name>
   <version>2.2</version>
   <url>http:// www.springframework.org</url>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>dependency-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-                  <version>2.2</version>
-                  <type>jar</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>
-                ${project.build.directory}/classes
-              </outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <properties>
+    <unpack.version>2.2</unpack.version>
+    <spring.osgi.export.pkg>org.apache.commons.lang.*</spring.osgi.export.pkg>
+  </properties> 
   
   <dependencies>
     <dependency>

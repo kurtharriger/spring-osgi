@@ -9,42 +9,21 @@
 
   <groupId>org.springframework.osgi</groupId>
   <artifactId>hsqldb.osgi</artifactId>
-  <packaging>osgi-bundle</packaging>
+  	<packaging>bundle</packaging>
   <name>HSQLDB (OSGi version)</name>
   <version>1.8.0.7</version>
   <url>http:// www.springframework.org</url>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>dependency-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>hsqldb</groupId>
-                  <artifactId>hsqldb</artifactId>
-                  <version>1.8.0.7</version>
-                  <type>jar</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>
-                ${project.build.directory}/classes
-              </outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-  
+  <properties>
+    <unpack.version>1.8.0.7</unpack.version>
+    <spring.osgi.export.pkg>org.hsqldb*</spring.osgi.export.pkg>
+    <spring.osgi.import.pkg>
+    javax.*;resolution:=optional,
+    com.sun*;resolution:=optional,
+    *
+    </spring.osgi.import.pkg>
+  </properties> 
+    
   <dependencies>
     <dependency>
       <groupId>hsqldb</groupId>

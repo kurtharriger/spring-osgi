@@ -26,7 +26,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.osgi.context.support.EntryLookupControllingMockBundle;
+import org.springframework.osgi.mock.EntryLookupControllingMockBundle;
 import org.springframework.osgi.mock.MockBundle;
 
 /**

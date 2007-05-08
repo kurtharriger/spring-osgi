@@ -7,9 +7,25 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-test</artifactId>
-  <packaging>osgi-bundle</packaging>
+  <packaging>bundle</packaging>
   <name>Spring OSGi JUnit testing bundle</name>
   <url>http://www.springframework.org/osgi</url>
+  <description>
+  Spring/OSGi testing framework. Provides JUnit based integration testing inside OSGi containers.
+  </description>
+  
+  <properties>
+     <spring.osgi.export.pkg>org.springframework.osgi.test*</spring.osgi.export.pkg>
+	<spring.osgi.import.pkg>
+	  org.objectweb.asm*; version="[2,3)",
+	  javax.swing.*;resolution:=optional,
+	  org.eclipse.*;resolution:=optional,
+	  org.knopflerfish*;resolution:=optional,
+	  org.apache.felix.*;resolution:=optional,
+	  *
+	</spring.osgi.import.pkg>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -33,7 +49,7 @@
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>asm.osgi</artifactId>
-      <version>2.2.2-SNAPSHOT</version>
+      <version>2.2.3-SNAPSHOT</version>
     </dependency>
         
      <dependency>
@@ -74,26 +90,7 @@
   </dependencies>
 
   <build>
-    <resources>
-      <resource>
-        <targetPath>org/springframework/osgi/test</targetPath>
-        <filtering>true</filtering>
-        <includes>
-          <include>MANIFEST.MF</include>
-        </includes>
-        <directory>src/main/resources/org/springframework/osgi/test</directory>
-      </resource>
-      <resource>
-        <targetPath>org/springframework/osgi/test/platform</targetPath>
-        <filtering>false</filtering>
-        <includes>
-          <include>felix.config.properties</include>
-        </includes>
-        <directory>src/main/resources/org/springframework/osgi/test/platform</directory>
-      </resource>  
-    </resources>
-    <plugins>
-        
+     <plugins>
         <!-- required since starting multiple osgi platforms inside the same VM might is not recommended -->
         <!-- (for example multiple URL stream factories might be registered) -->
         <plugin>
@@ -112,14 +109,7 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
       </plugin>
-       <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-clover-plugin</artifactId>
-		<configuration>
-			<licenseFile>${user.home}/clover/clover.license</licenseFile>
-		</configuration>
-	   </plugin>      
-    </plugins>
+    </plugins>      
   </reporting>
 
 </project>

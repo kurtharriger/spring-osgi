@@ -8,9 +8,25 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-core</artifactId>
-  <packaging>osgi-bundle</packaging>
-  <name>org.springframework.osgi.core bundle</name>
+  <packaging>bundle</packaging>
   <url>http://www.springframework.org/osgi</url>
+  <name>Spring/OSGi core</name>
+  <description>
+  Spring/OSGi core classes. Offers OSGi-based application context and importer/exporter functionality.
+  </description>
+  
+  
+  <properties>
+	<spring.osgi.export.pkg>!org.springframework.osgi.io, org.springframework.osgi*</spring.osgi.export.pkg>
+	<spring.osgi.import.pkg>
+		org.osgi.service.cm;version=1.2;resolution:=optional,
+		org.aopalliance.*;resolution:=optional,
+		org.w3c.dom;resolution:=optional,
+		org.xml.sax;resolution:=optional,
+		*
+	</spring.osgi.import.pkg>
+  </properties>
+  
   <dependencies>
 
     <dependency>
@@ -23,7 +39,7 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-mock</artifactId>
       <version>${project.parent.version}</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
 
 
@@ -70,46 +86,16 @@
       <version>1.0</version>
       <scope>provided</scope>
     </dependency> 
-    
-        
+       
   </dependencies>
   
-<build>
-  <plugins>
-    <plugin>
-      <artifactId>maven-clean-plugin</artifactId>
-      <configuration>
-        <filesets>
-          <fileset>
-            <directory>META-INF</directory>
-            <includes>
-              <include>MANIFEST.MF</include>
-            </includes>
-            <followSymlinks>false</followSymlinks>
-          </fileset>
-        </filesets>
-      </configuration>
-    </plugin>
-    </plugins>
-</build>
   <reporting>
     <plugins>
-       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-       </plugin>
        
        <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
       </plugin>
-       <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-clover-plugin</artifactId>
-		<configuration>
-			<licenseFile>${user.home}/clover/clover.license</licenseFile>
-		</configuration>
-	   </plugin>
     </plugins>
   </reporting>
 
