@@ -32,7 +32,7 @@ public class RunBundleCreationTest extends TestCase {
 	private TestResult result;
 
 	protected void setUp() throws Exception {
-		test = new BundleCreationTests();
+		test = new BundleCreationTst();
 		result = new TestResult();
 	}
 
