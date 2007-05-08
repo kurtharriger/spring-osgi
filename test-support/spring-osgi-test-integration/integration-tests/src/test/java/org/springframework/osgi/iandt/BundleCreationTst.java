@@ -21,12 +21,12 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  * Test to check if the testcase is properly packaged in a bundle jar and deploy
  * on the OSGi platform.
  * 
- * Note: this test case is not intended to be run in isolation!
+ * Note: this test case is not intended to be run (hence the Tst name).
  * 
  * @author Costin Leau
  * 
  */
-public class BundleCreationTests extends AbstractConfigurableBundleCreatorTests {
+public class BundleCreationTst extends AbstractConfigurableBundleCreatorTests {
 
 	/*
 	 * (non-Javadoc)
