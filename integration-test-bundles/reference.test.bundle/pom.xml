@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.reference.proxy</artifactId>
-    <packaging>osgi-bundle</packaging>
+    <packaging>jar</packaging>
     <name>Spring context service reference lifecycle test bundle</name>
     <description>An OSGi bundle that tests the proxy behavior on an OSGi service reference</description>
     <url>http://www.springframework.org/osgi</url>

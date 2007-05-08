@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>org.springframework.osgi.iandt.trivial.tests</artifactId>
-  <packaging>osgi-bundle</packaging>
+  <packaging>jar</packaging>
   <name>Simple test that uses trivial bundle</name>
   <description>Contains a single test case that exercises function in 
    org.springframework.osgi.trivial bundle. Used as a basic proof of 
