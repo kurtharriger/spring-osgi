@@ -569,13 +569,15 @@ limitations under the License.
       <name>Apache M2 Incubator Repository</name>
       <url>http://people.apache.org/repo/m2-incubating-repository/</url>
     </pluginRepository>
-    
+
+    <!-- Please, please, please!  Never add this repository to the list.
+        ever.  for any reason.  I'm not kidding.
     <pluginRepository>
 	 <snapshots><enabled>true</enabled></snapshots>
 	<id>apache-snapshot-repo</id>
       <name>Apache snapshot repo</name>
       <url>http://cvs.apache.org/maven-snapshot-repository</url>
-	</pluginRepository>
+	</pluginRepository-->
 
            
   </pluginRepositories>
