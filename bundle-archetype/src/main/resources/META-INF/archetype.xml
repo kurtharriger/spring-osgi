@@ -5,7 +5,10 @@
     <source>src/main/java/impl/BeanImpl.java</source>
   </sources>
   <resources>
+    <!--
     <resource>META-INF/MANIFEST.MF</resource>
+    -->
+    <resource>readme.txt</resource>
     <resource>src/main/resources/META-INF/spring/bundle-context.xml</resource>
     <resource>src/main/resources/META-INF/spring/bundle-context-osgi.xml</resource>
     <resource>.classpath</resource>
