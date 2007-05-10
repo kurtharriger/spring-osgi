@@ -19,8 +19,10 @@
    	   <!-- optional imports-->
 	   <spring.osgi.import.pkg>
 		weblogic.management;resolution:=optional,
-		javax.naming;resolution:=optional,
 		org.aopalliance;resolution:=optional,
+		javax.management.remote*;resolution:=optional,
+		javax.naming;resolution:=optional,
+		org.springframework.jndi*;resolution:=optional,
 		*
        </spring.osgi.import.pkg>
    </properties>
