@@ -8,45 +8,47 @@
 	</parent>
 	<groupId>org.springframework.osgi.samples</groupId>
 	<artifactId>wiring-bundle</artifactId>
-		<packaging>bundle</packaging>
+	
+	<!-- if bundle is used, resource filtering will not work -->
+	<packaging>jar</packaging>
 	<name>Spring OSGi Sample Wiring Bundle</name>
 	<url>http://www.springframework.org/osgi</url>
 
-	<build>
-  <plugins>
-    <plugin>
-      <artifactId>maven-clean-plugin</artifactId>
-      <configuration>
-        <filesets>
-          <fileset>
-            <directory>META-INF</directory>
-            <includes>
-              <include>MANIFEST.MF</include>
-            </includes>
-            <followSymlinks>false</followSymlinks>
-          </fileset>
-        </filesets>
-      </configuration>
-    </plugin>
-    </plugins>
+  <properties>
+	<spring.osgi.export.pkg>!*</spring.osgi.export.pkg>
+	<!-- put the import here since we have no classes and the plugin has nothing to analyze -->
+	<spring.osgi.import.pkg>
+	org.springframework.osgi.bundle.support,
+    org.springframework.osgi.config,
+    org.springframework.osgi.context,
+    org.springframework.osgi.context.support,
+    org.springframework.osgi.service,
+    org.springframework.jmx.export
+   </spring.osgi.import.pkg>
+   
+   <localRepository>${user.home}/.m2/repository</localRepository>
+
+  </properties>
+  
+  <build>
+  
 		<resources>
-			<resource>
-				<!-- Bug MRESOURCES-35 means we can't use absolute paths -->
-				<!-- Bug in eclipse means we have to put META-INF in ${basedir} -->
-				<targetPath>../../META-INF</targetPath>
-				<filtering>true</filtering>
-				<includes>
-					<include>MANIFEST.MF</include>
-				</includes>
-				<directory>src/main/resources/META-INF</directory>
-			</resource>
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		
+	<plugins>
+	<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+	</plugins>
 	</build>
-	<!--properties>
-		<localRepository>${user.home}/.m2/repository</localRepository>
-	</properties-->
 </project>

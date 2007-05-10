@@ -7,7 +7,5 @@ Import-Package: org.springframework.osgi.bundle.support,
    org.springframework.osgi.context,
    org.springframework.osgi.context.support,
    org.springframework.osgi.service,
-   org.springframework.jmx.export;version=${spring.version}
+   org.springframework.jmx.export
 DynamicImport-Package: *
-Bundle-ClassPath: .,
- target/classes/

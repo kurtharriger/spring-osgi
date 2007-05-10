@@ -15,10 +15,13 @@
  */
 package org.springframework.osgi.samples.weather.test;
 
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.springframework.core.JdkVersion;
 import org.springframework.osgi.samples.weather.service.WeatherService;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
@@ -45,6 +48,7 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      */
     protected String getManifestLocation() {
         return "classpath:org/springframework/osgi/samples/weather/test/MANIFEST.MF";
+    	//return null;
     }
 
     /**
@@ -61,10 +65,14 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      * to be specified here.
      */
     protected String[] getBundles() {
-        return new String[]{
-			localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-m2-SNAPSHOT"),            
-            localMavenArtifact("org.springframework.osgi", "wiring-bundle", "1.0-m2-SNAPSHOT")
-        };
+    	List bundles = new ArrayList();
+    	bundles.add(localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-m2-SNAPSHOT"));
+    	bundles.add(localMavenArtifact("org.springframework.osgi", "wiring-bundle", "1.0-m2-SNAPSHOT"));
+    	
+    	// if < jdk 1.5, add an JMX implementation
+    	if (!JdkVersion.isAtLeastJava15())
+    		bundles.add(localMavenArtifact("org.springframework.osgi", "mx4j", "3.0.2-SNAPSHOT"));
+    	return (String[]) bundles.toArray(new String[bundles.size()]);
     }
 
     /**

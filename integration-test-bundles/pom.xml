@@ -54,24 +54,6 @@
   </modules>
 
  <build>
-    <resources>
-      <resource>
-        <!-- Bug MRESOURCES-35 means we can't use absolute paths -->
-        <!-- Bug in eclipse means we have to put META-INF in ${basedir} -->
-        <targetPath>../../META-INF</targetPath>
-        <filtering>true</filtering>
-        <includes>
-          <include>MANIFEST.MF</include>
-        </includes>
-        <directory>src/main/resources/META-INF</directory>
-      </resource>
-      <resource>
-        <filtering>true</filtering>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
-
-    
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

@@ -4,5 +4,4 @@ Bundle-SymbolicName: org.springframework.osgi.samples.weather.dao
 Bundle-Name: weather-dao
 Bundle-Vendor: Spring Framework
 Export-Package: org.springframework.osgi.samples.weather.dao
-Bundle-ClassPath: .,
- target/classes/
+

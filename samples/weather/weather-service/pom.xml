@@ -8,10 +8,14 @@
   </parent>
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>weather-service</artifactId>
-  	<packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <name>Spring OSGi Weather Sample Service</name>
   <url>http://www.springframework.org/osgi</url>
 
+  <properties>
+     <spring.osgi.export.pkg>org.springframework.osgi.samples.weather.service</spring.osgi.export.pkg>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>org.springframework.osgi.samples</groupId>
@@ -22,4 +26,18 @@
 
   </dependencies>
 
+  <build>
+
+	<plugins>
+	<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+	</plugins>
+  </build>	
 </project>
