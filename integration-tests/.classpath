@@ -19,7 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Bundle Scoped B Integration Test"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-mock/2.1-m2-SNAPSHOT/spring-mock-2.1-m2-SNAPSHOT.jar" sourcepath="/SPRING_MOCK_SRC"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.4.2"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/asm.osgi/2.2.2-SNAPSHOT/asm.osgi-2.2.2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.3.0/jcl104-over-slf4j-1.3.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/1.0-m2-SNAPSHOT/spring-osgi-io-1.0-m2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/io"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.3.0/slf4j-api-1.3.0.jar"/>

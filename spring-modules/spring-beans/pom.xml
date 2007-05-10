@@ -23,6 +23,7 @@
 	javax.xml.parsers;resolution:=optional,
 	*
 	  </spring.osgi.import.pkg>
+	  
 	</properties>
 
 </project>
