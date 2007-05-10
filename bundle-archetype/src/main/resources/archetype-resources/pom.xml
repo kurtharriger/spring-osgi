@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>${groupId}</groupId>
   <artifactId>${artifactId}</artifactId>
-  	<packaging>bundle</packaging>
+  <packaging>bundle</packaging>
   <name>Spring OSGi Bundle</name>
   <version>${version}</version>
   <url>http://www.springframework.org/osgi</url>
@@ -61,7 +61,9 @@
     </dependency>
   </dependencies>
 
-  <!-- for packaging as an OSGi bundle, we use the maven-osgi-plugin -->
+  <!-- for packaging as an OSGi bundle, we use the maven-bundle-plugin -->
+  
+  <!-- see http://cwiki.apache.org/FELIX/maven-bundle-plugin-bnd.html for more info -->
   <build>
     <plugins>
       <plugin>
@@ -69,58 +71,83 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
         <version>0.9.0-incubator-SNAPSHOT</version>
+        <configuration>
+           <instructions>
+               <Export-Package><your-package>*</Export-Package>
+               <Import-Package>*</Import-Package>
+           </instructions>
+        </configuration>
       </plugin>
     </plugins>
   </build>
+  
+  <!-- ================================================ -->
+  <!--            Repository Configuration              -->
+  <!-- ================================================ -->
 
-<!--
-    <repositories>
+  <repositories>
+    <repository>    
+      <id>apache.m2.incubator</id>
+      <name>Apache M2 Incubator Repository</name>
+      <url>http://people.apache.org/repo/m2-incubating-repository/</url>
+    </repository>  
     <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>apache-snapshots</id>
-      <name>Apache Snapshots</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository</url>
-    </repository>
-    <repository>
-      <snapshots>
-         <enabled>true</enabled>
-      </snapshots>
-      <id>spring-ext</id>
-      <name>Spring External Dependencies Repository</name>
-      <url>https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
-    </repository>
-    <repository>
-      <id>springframework.org</id>
-      <name>Springframework Maven SNAPSHOT Repository</name>
-      <url>http://static.springframework.org/maven2-snapshots</url>
+            <id>eclipse-repository</id>
+        <name>Eclipse Repository</name>
+        <url>http://repo1.maven.org/eclipse/</url>
     </repository>
     <repository>
       <id>safehaus-repository</id>
       <name>Safehaus Repository</name>
       <url>http://m2.safehaus.org</url>
-    </repository>  
+    </repository>
+    <repository>
+      <id>spring-ext</id>
+      <name>Spring External Dependencies Repository</name>
+      <url>
+        https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+      </url>
+    </repository>
+	<repository>
+	 <snapshots><enabled>true</enabled></snapshots>
+	<id>apache-snapshot-repo</id>
+      <name>Apache snapshot repo</name>
+      <url>http://cvs.apache.org/maven-snapshot-repository</url>
+	</repository>
+	
   </repositories>
-  
-   needed so that maven can find the maven-osgi-plugin
+
   <pluginRepositories>
     <pluginRepository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshots</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository</url>
+      <id>spring-ext</id>
+      <name>Spring External Dependencies Repository</name>
+      <url>
+        https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+      </url>
     </pluginRepository>
+
     <pluginRepository>
-    	<snapshots>
-    	  <enabled>true</enabled>
-    	</snapshots>
-    	<id>codehaus-snapshot-repository</id>
-    	<name>Codehaus Snapshots Repository</name>
-    	<url>http://snapshots.repository.codehaus.org</url>
+      <id>maven-repo</id>
+      <name>maven repo</name>
+      <url>http://repo1.maven.org/maven2/</url>
     </pluginRepository>
+    
+    <!-- maven osgi bundle plugin -->
+    <pluginRepository>
+      <id>apache.m2.incubator</id>
+      <name>Apache M2 Incubator Repository</name>
+      <url>http://people.apache.org/repo/m2-incubating-repository/</url>
+    </pluginRepository>
+
+    <!-- Please, please, please!  Never add this repository to the list.
+        ever.  for any reason.  I'm not kidding.
+    <pluginRepository>
+	 <snapshots><enabled>true</enabled></snapshots>
+	<id>apache-snapshot-repo</id>
+      <name>Apache snapshot repo</name>
+      <url>http://cvs.apache.org/maven-snapshot-repository</url>
+	</pluginRepository-->
+
+           
   </pluginRepositories>
-  -->
 </project>
