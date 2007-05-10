@@ -16,8 +16,9 @@
 
   <properties>
     <unpack.version>3.2</unpack.version>
-    <spring.osgi.export.pkg>org.apache.commons.collections.*</spring.osgi.export.pkg>
-    <spring.osgi.import.pkg>!org.apache.commons.collections,*</spring.osgi.import.pkg>
+    <spring.osgi.export.pkg>org.apache.commons.collections*</spring.osgi.export.pkg>
+    <!-- !org.apache.commons.collections,-->
+    <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
   </properties> 
   
   <dependencies>

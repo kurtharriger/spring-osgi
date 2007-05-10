@@ -1,8 +1,0 @@
-Bundle-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: javax.portlet
-Bundle-Name: Portlet-API
-Export-Package: javax.portlet
-
-
-
