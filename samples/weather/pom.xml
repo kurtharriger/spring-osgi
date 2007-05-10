@@ -11,6 +11,7 @@
   <packaging>pom</packaging>
   <name>Spring OSGi Weather Sample</name>
   <url>http://www.springframework.org/osgi</url>
+  
   <modules>
     <module>weather-dao</module>
     <module>weather-service</module>
