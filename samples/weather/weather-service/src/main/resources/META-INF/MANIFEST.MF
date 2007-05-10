@@ -1,0 +1,7 @@
+Bundle-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.osgi.samples.weather.service
+Bundle-Name: weather.service
+Bundle-Vendor: Spring Framework
+Export-Package: org.springframework.osgi.samples.weather.service
+Import-Package: org.springframework.osgi.samples.weather.dao
