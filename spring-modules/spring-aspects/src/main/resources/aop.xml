@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<aspectj>
+
+	<aspects>
+		<aspect name="org.springframework.beans.factory.aspectj.AnnotationBeanConfigurerAspect"/>
+		<aspect name="org.springframework.transaction.aspectj.AnnotationTransactionAspect"/>
+	</aspects>
+
+</aspectj>

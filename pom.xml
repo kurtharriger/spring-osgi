@@ -44,7 +44,12 @@
     -->
     
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
+    <spring.osgi.private.pkg>!*</spring.osgi.private.pkg>
+    
     <spring.osgi.symbolic.name>${groupId}.${artifactId}</spring.osgi.symbolic.name>
+    <!-- the default-->
+    <spring.osgi.include.res>src/main/resources/</spring.osgi.include.res>
+
   </properties>
 
   <!-- ============================================= -->
@@ -184,7 +189,9 @@ limitations under the License.
     <module>integration-test-bundles</module>
     <module>integration-tests</module>
     <module>samples</module>
+    <!--
     <module>bundle-archetype</module>
+    -->
     <module>release</module>
   </modules>
 
@@ -258,29 +265,32 @@ limitations under the License.
         <version>0.9.0-incubator-SNAPSHOT</version>
         <configuration>
           <instructions>
-           <!-- bundle specific conf -->
+           
+           <!-- bundle specific conf -->      
            <Bundle-Name>${artifactId}</Bundle-Name>
            <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
            <Bundle-Version>${spring.osgi.bundle.version}</Bundle-Version>
            <Export-Package>${spring.osgi.export.pkg}.*;version=${spring.osgi.export.version}</Export-Package>
            <Import-Package>${spring.osgi.import.pkg}</Import-Package>
-           <!-- spring specific -->
+           <Private-Package>${spring.osgi.private.pkg}</Private-Package>
+
+		   <!-- Spring specific -->
            <Implementation-Title>Spring OSGi Framework</Implementation-Title>
 		   <Implementation-Version>${version}</Implementation-Version>
 		   <Spring-Version>${spring.version}</Spring-Version>
-		   <!-- bnd tool specific -->
 		   
-		   <!-- ignore resoources -->
-		   <_donotcopy>(CVS|.svn|.+.bak|~.+)</_donotcopy>
+		   <!-- w/o this, custom MANIFEST entries do not get added 
+		   <_include>-src/main/resources/META-INF/MANIFEST.MF</_include>
 		   
-		   <!-- bug FELIX-261
-		   <Include-Resource></Include-Resource>
+		    - bug FELIX-261-
+		   <Include-Resource>${spring.osgi.include.res}</Include-Resource>
 		   -->
 		  </instructions>
         </configuration>
         <extensions>true</extensions>
       </plugin> 
       
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -462,7 +472,7 @@ limitations under the License.
                <packages>org.springframework.osgi.sample*</packages>
             </group>
           </groups>
-          <excludePackageNames>org.springframework.osgi.test.io*:org.springframework.osgi.test.bundleScope:org.springframework.osgi.test.card*:org.springframework.osgi.test.dep*:org.springframework.osgi.test.lifecy*:org.springframework.osgi.test.maven*:org.springframework.osgi.test.property*:org.springframework.osgi.test.reference*:org.springframework.osgi.test.service*:org.springframework.osgi.test.trivial*:org.springframework.osgi.test.simple:org.springframework.osgi.test.scope*</excludePackageNames>
+          <excludePackageNames>org.springframework.osgi.iandt*</excludePackageNames>
           <stylesheetfile>${basedir}/docs/stylesheet.css</stylesheetfile>
           <overview>${basedir}/docs/overview.html</overview>
           <breakiterator>true</breakiterator>
@@ -550,6 +560,8 @@ limitations under the License.
 
   <pluginRepositories>
     <pluginRepository>
+      <!-- the plugin snapshots used for releases are kept here in a frozen state -->
+      <snapshots><enabled>true</enabled></snapshots>
       <id>spring-ext</id>
       <name>Spring External Dependencies Repository</name>
       <url>
@@ -577,9 +589,8 @@ limitations under the License.
 	<id>apache-snapshot-repo</id>
       <name>Apache snapshot repo</name>
       <url>http://cvs.apache.org/maven-snapshot-repository</url>
-	</pluginRepository-->
-
-           
+	</pluginRepository>
+           -->
   </pluginRepositories>
 
 </project>

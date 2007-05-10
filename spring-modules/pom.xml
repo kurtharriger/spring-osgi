@@ -18,6 +18,8 @@
   <!-- defaults point to Spring framework -->
   <properties>
     <spring.osgi.export.pkg>org.springframework</spring.osgi.export.pkg>
+    <!-- copy the resources inside the bundles | pattern works only for Spring -->
+    <spring.osgi.include.res>@${pom.artifactId}-${spring.version}.jar!/META-INF/*</spring.osgi.include.res>	     
   </properties>
  
 

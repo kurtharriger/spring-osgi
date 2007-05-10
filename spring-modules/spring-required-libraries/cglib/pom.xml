@@ -9,27 +9,25 @@
 
   <groupId>org.springframework.osgi</groupId>
   <artifactId>cglib-nodep.osgi</artifactId>
-  <!-- cglib is incomplete and the resulting manifest is not good -->
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>cglib (OSGi version)</name>
   <version>2.1.3-SNAPSHOT</version>
   <url>http:// www.springframework.org</url>
 
   <properties>
     <unpack.version>2.1.3</unpack.version>
-    <!--
+    
     <spring.osgi.export.pkg>!net.sf.cglib.asm*, net.sf.cglib*</spring.osgi.export.pkg>
     <spring.osgi.import.pkg>
-    net.sf.cglib.asm*;resolution:=optional,
+    net.sf.cglib.asm.util;resolution:=optional,
     org.apache.tools.ant*;resolution:=optional,
     org.codehaus.aspectwerkz.hook;resolution:=optional,
     *
     </spring.osgi.import.pkg>
-    -->
+    <spring.osgi.private.pkg>net.sf.cglib.asm*</spring.osgi.private.pkg>
   </properties>
   
   <dependencies>
-    <!--
 
     <dependency>
       <groupId>cglib</groupId>
@@ -37,10 +35,9 @@
       <version>2.1_3</version>
       <scope>provided</scope>
     </dependency>
-      -->
 
   </dependencies>
-  
+  <!--
   <build>  
 	<plugins>
       <plugin>
@@ -82,5 +79,5 @@
       
     </plugins>
   </build>  
-  
+  -->
 </project>

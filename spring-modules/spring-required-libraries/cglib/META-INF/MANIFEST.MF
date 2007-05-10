@@ -15,3 +15,4 @@ Export-Package: net.sf.cglib.beans,
   net.sf.cglib.transform.hook,
   net.sf.cglib.transform.impl,
   net.sf.cglib.util
+
