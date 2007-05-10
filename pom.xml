@@ -43,7 +43,6 @@
     <project.svn.revision>1.0.0.m2-SNAPSHOT</project.svn.revision>
     -->
     
-    <spring.osgi.private.pkg>!*</spring.osgi.private.pkg>
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
     <spring.osgi.symbolic.name>${groupId}.${artifactId}</spring.osgi.symbolic.name>
   </properties>
@@ -185,10 +184,8 @@ limitations under the License.
     <module>integration-test-bundles</module>
     <module>integration-tests</module>
     <module>samples</module>
-    <!--
     <module>bundle-archetype</module>
     <module>release</module>
-    -->
   </modules>
 
   <!-- shared dependencies across modules -->
@@ -267,7 +264,6 @@ limitations under the License.
            <Bundle-Version>${spring.osgi.bundle.version}</Bundle-Version>
            <Export-Package>${spring.osgi.export.pkg}.*;version=${spring.osgi.export.version}</Export-Package>
            <Import-Package>${spring.osgi.import.pkg}</Import-Package>
-           <Private-Package>${spring.osgi.private.pkg}</Private-Package>
            <!-- spring specific -->
            <Implementation-Title>Spring OSGi Framework</Implementation-Title>
 		   <Implementation-Version>${version}</Implementation-Version>
