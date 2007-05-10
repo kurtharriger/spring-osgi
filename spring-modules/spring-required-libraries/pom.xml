@@ -44,6 +44,7 @@
     <module>jstl.osgi</module>
     <module>junit</module>
     <module>log4j</module>
+    <module>mx4j</module>
     <module>mysql-connector</module>
     <module>portlet-api.osgi</module>
     <module>servlet-api.osgi</module>
