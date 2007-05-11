@@ -1,4 +1,2 @@
-DynamicImport-Package: javax.xml.transform, 
-  org.w3c.dom,
-  org.xml.sax,
-  *
+DynamicImport-Package: *
+
