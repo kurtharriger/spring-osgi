@@ -112,7 +112,7 @@
            <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
            <Bundle-Version>${spring.bundle.version}</Bundle-Version>
            <Export-Package>${spring.osgi.export.pkg}.*;version=${spring.export.version}</Export-Package>
-           <Import-Package>${spring.osgi.import.pkg}</Import-Package>
+           <Import-Package>${spring.osgi.import.pkg};version=${spring.import.version}</Import-Package>
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
 
 		   <!-- Spring specific -->
