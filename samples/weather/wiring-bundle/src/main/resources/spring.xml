@@ -29,15 +29,15 @@
 	      depends-on="weatherTestBundle"/>
 
 	<osgi:bundle id="weatherTestBundle" depends-on="weatherServiceBundle"
-	             location="file:${localRepository}/org/springframework/osgi/samples/weather-service-test/${pom.version}/weather-service-test-1.0-m2-SNAPSHOT.jar" state="start"/>
+	             location="file:${localRepository}/org/springframework/osgi/samples/weather-service-test/${pom.version}/weather-service-test-${pom.version}.jar" state="start"/>
 
 	<osgi:bundle id="weatherDaoBundle"
-	             location="file:${localRepository}/org/springframework/osgi/samples/weather-dao/${pom.version}/weather-dao-1.0-m2-SNAPSHOT.jar"
+	             location="file:${localRepository}/org/springframework/osgi/samples/weather-dao/${pom.version}/weather-dao-${pom.version}.jar"
 	             state="start"/>
 
 	<!-- Note that this is not a real bundle - we are creating it on the fly from a regular jar -->
 	<osgi:virtual-bundle id="weatherServiceBundle" depends-on="weatherDaoBundle"
-	                     location="file:${localRepository}/org/springframework/osgi/samples/weather-service/${pom.version}/weather-service-1.0-m2-SNAPSHOT.jar"
+	                     location="file:${localRepository}/org/springframework/osgi/samples/weather-service/${pom.version}/weather-service-${pom.version}.jar"
 	                     state="start" version="1.0" group-id="org.springframework.osgi.samples.weather" artifact-id="service">
 		<osgi:imports>
 			<osgi:package name="org.springframework.osgi.samples.weather.dao" version="0.0"/>

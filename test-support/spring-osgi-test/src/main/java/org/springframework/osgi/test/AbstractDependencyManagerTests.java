@@ -42,25 +42,46 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		super(name);
 	}
 
+	private static final String SPRING_OSGI_VERSION = "1.0-m2";
+
+	private static final String SPRING_BUNDLED_VERSION = "2.0.5-osgi-m2";
+
+	/**
+	 * Return the Spring/OSGi version used by the core bundles.
+	 * @return
+	 */
+	protected String getSpringOsgiVersion() {
+		return SPRING_OSGI_VERSION;
+	}
+
+	/**
+	 * Return the Spring osgified version used by the test core bundles.
+	 * 
+	 * @return
+	 */
+	protected String getSpringBundledVersion() {
+		return SPRING_BUNDLED_VERSION;
+	}
+
 	// FIXME: externalize them
 	protected String getSpringOSGiTestBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-test,1.0-m2-SNAPSHOT";
+		return "org.springframework.osgi,spring-osgi-test," + getSpringOsgiVersion();
 	}
 
 	protected String getSpringOSGiIoBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-io,1.0-m2-SNAPSHOT";
+		return "org.springframework.osgi,spring-osgi-io," + getSpringOsgiVersion();
 	}
 
 	protected String getSpringOSGiCoreBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-core,1.0-m2-SNAPSHOT";
+		return "org.springframework.osgi,spring-osgi-core," + getSpringOsgiVersion();
 	}
 
 	protected String getSpringOSGiExtenderBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-extender,1.0-m2-SNAPSHOT";
+		return "org.springframework.osgi,spring-osgi-extender," + getSpringOsgiVersion();
 	}
 
 	protected String getSpringCoreBundleUrl() {
-		return "org.springframework.osgi,spring-core,2.1-m2-SNAPSHOT";
+		return "org.springframework.osgi,spring-core," + getSpringBundledVersion();
 	}
 
 	protected String getJUnitLibUrl() {
@@ -89,20 +110,20 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	protected String getSpringMockUrl() {
-		return "org.springframework.osgi,spring-mock,2.1-m2-SNAPSHOT";
+		return "org.springframework.osgi,spring-mock," + getSpringBundledVersion();
 	}
 
 	protected String getSpringContextUrl() {
-		return "org.springframework.osgi,spring-context,2.1-m2-SNAPSHOT";
+		return "org.springframework.osgi,spring-context," + getSpringBundledVersion();
 	}
 
 	protected String getSpringAopUrl() {
-		return "org.springframework.osgi,spring-aop,2.1-m2-SNAPSHOT";
+		return "org.springframework.osgi,spring-aop," + getSpringBundledVersion();
 
 	}
 
 	protected String getSpringBeansUrl() {
-		return "org.springframework.osgi,spring-beans,2.1-m2-SNAPSHOT";
+		return "org.springframework.osgi,spring-beans," + getSpringBundledVersion();
 	}
 
 	protected String getAopAllianceUrl() {

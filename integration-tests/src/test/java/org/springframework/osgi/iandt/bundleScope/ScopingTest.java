@@ -34,11 +34,11 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 		return new String[] {
 				localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT"),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.scoped.bundle.common",
-					"1.0-m2-SNAPSHOT"),
+					getSpringOsgiVersion()),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.scoped.bundle.a",
-					"1.0-m2-SNAPSHOT"),
+					getSpringOsgiVersion()),
 				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.scoped.bundle.b",
-					"1.0-m2-SNAPSHOT") };
+					getSpringOsgiVersion()) };
 	}
 
 	protected String getManifestLocation() {

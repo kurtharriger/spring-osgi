@@ -4,7 +4,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-m2-SNAPSHOT</version>
+  <version>1.0-m2</version>
   <name>Spring OSGi</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
@@ -24,19 +24,21 @@
     <spring.version>2.0.5</spring.version>
 
     <!--- Spring packages imported version -->
-    <spring.import.version>2.1.0</spring.import.version>
-    <!--- Spring packages exported version -->
+    <spring.import.version>${spring.version}</spring.import.version>
+    <!--- Spring packages exported version 
     <spring.export.version>2.1.0.SNAPSHOT-205</spring.export.version>
-    <!-- used inside MANIFEST.MF -->    
+    -->
+    <!-- used inside MANIFEST.MF 
     <spring.bundle.version>2.1.0.SNAPSHOT-205</spring.bundle.version>
-
-    <spring.maven.artifact.version>2.1-m2-SNAPSHOT</spring.maven.artifact.version>
+    --> 
+    <!-- naming pattern for Spring OSGi bundles that get published into maven -->   
+    <spring.maven.artifact.version>${base.spring.version}-osgi-m2</spring.maven.artifact.version>
     
-    <!--- Spring OSGi packages imported version -->
-    <spring.osgi.import.version>1.0.0.m2-SNAPSHOT</spring.osgi.import.version>
+    <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
+    <spring.osgi.import.version>1.0.0.m2</spring.osgi.import.version>
     <!--- Spring OSGi packages exported version -->
-    <spring.osgi.export.version>1.0.0.m2-SNAPSHOT</spring.osgi.export.version>
-    <spring.osgi.bundle.version>1.0.0.m2-SNAPSHOT</spring.osgi.bundle.version>
+    <spring.osgi.export.version>1.0.0.m2</spring.osgi.export.version>
+    <spring.osgi.bundle.version>1.0.0.m2</spring.osgi.bundle.version>
      <!-- Convenience for seeing the svn change #, but contains whitespace -->
     <project.svn.revision>$Rev$</project.svn.revision>
     <!--
@@ -274,14 +276,18 @@ limitations under the License.
            <!-- bundle specific conf -->      
            <Bundle-Name>${artifactId}</Bundle-Name>
            <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
+           <!-- bnd does a great job of determining this one in an OSGi-friendly manner
            <Bundle-Version>${spring.osgi.bundle.version}</Bundle-Version>
+           -->
            <Export-Package>${spring.osgi.export}</Export-Package>
            <Import-Package>${spring.osgi.import}</Import-Package>
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
 
 		   <!-- Spring specific -->
            <Implementation-Title>Spring OSGi Framework</Implementation-Title>
-		   <Implementation-Version>${version}</Implementation-Version>
+           <!-- this actually depends on what we are packing -->
+		   <Implementation-Version>${spring.version}</Implementation-Version>
+		   -->
 		   <Spring-Version>${spring.version}</Spring-Version>
 		   
 		   <!-- w/o this, custom MANIFEST entries do not get added 

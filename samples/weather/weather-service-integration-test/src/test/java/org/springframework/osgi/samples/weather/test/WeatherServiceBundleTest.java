@@ -66,8 +66,8 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      */
     protected String[] getBundles() {
     	List bundles = new ArrayList();
-    	bundles.add(localMavenArtifact("org.springframework.osgi", "spring-jmx", "2.1-m2-SNAPSHOT"));
-    	bundles.add(localMavenArtifact("org.springframework.osgi", "wiring-bundle", "1.0-m2-SNAPSHOT"));
+    	bundles.add(localMavenArtifact("org.springframework.osgi", "spring-jmx", getSpringBundledVersion()));
+    	bundles.add(localMavenArtifact("org.springframework.osgi", "wiring-bundle", getSpringOsgiVersion()));
     	
     	// if < jdk 1.5, add an JMX implementation
     	if (!JdkVersion.isAtLeastJava15())
