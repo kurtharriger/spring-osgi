@@ -19,8 +19,7 @@
 	   <spring.osgi.import.pkg>
 	      javax.portlet;resolution:=optional,
 		  javax.servlet*;resolution:=optional,
-		  org.aopalliance*;resolution:=optional,
-		  *
+		  org.aopalliance*;resolution:=optional
 	   </spring.osgi.import.pkg>	   
     </properties>	   
 

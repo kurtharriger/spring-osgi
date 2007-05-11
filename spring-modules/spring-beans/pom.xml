@@ -20,8 +20,8 @@
 	net.sf.cglib*;resolution:=optional,
 	org.w3c.dom;resolution:=optional,
 	org.xml.sax;resolution:=optional,
-	javax.xml.parsers;resolution:=optional,
-	*
+	javax.xml.parsers;resolution:=optional
+	
 	  </spring.osgi.import.pkg>
 	  
 	</properties>

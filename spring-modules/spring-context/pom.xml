@@ -18,7 +18,7 @@
        <!-- bug related to empty packages -->
        <!-- optional imports-->
 	   <spring.osgi.import.pkg>
-   !org.springframework.instrument,
+   org.springframework.instrument;resolution:=optional,
    org.aopalliance*;resolution:=optional,
    commonj.timers*;resolution:=optional,
    commonj.work*;resolution:=optional,
@@ -29,8 +29,7 @@
    javax.naming;resolution:=optional,
    javax.persistence.spi;resolution:=optional,
    org.springframework.aop*;resolution:=optional;version="${spring.import.version}",
-   org.xml.sax;resolution:=optional,
-   *
+   org.xml.sax;resolution:=optional
           </spring.osgi.import.pkg>
     </properties>
     

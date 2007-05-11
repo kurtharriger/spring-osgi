@@ -22,8 +22,7 @@
    org.objectweb.asm*;resolution:=optional,
    javax.xml.transform;resolution:=optional,
    org.w3c.dom;resolution:=optional,
-   org.xml.sax;resolution:=optional,
-   *
+   org.xml.sax;resolution:=optional
     </spring.osgi.import.pkg>
   </properties> 
   

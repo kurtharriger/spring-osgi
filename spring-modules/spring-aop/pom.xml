@@ -22,7 +22,7 @@
    org.apache.commons.pool*;resolution:=optional,
    org.apache.oro.*;resolution:=optional,
    org.aspectj.*;resolution:=optional,
-   org.w3c.dom*;resolution:=optional,
-   *</spring.osgi.import.pkg>
+   org.w3c.dom*;resolution:=optional
+   </spring.osgi.import.pkg>
     </properties>
 </project>

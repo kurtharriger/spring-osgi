@@ -30,8 +30,7 @@
   org.springframework.transaction*;resolution:=optional;version="${spring.import.version}",
   org.springframework.orm.jpa*;resolution:=optional;version="${spring.import.version}",
   org.springframework.instrument.classloading*;resolution:=optional;version="${spring.import.version}",
-  org.springframework.web*;resolution:=optional;version="${spring.import.version}",
-  *
+  org.springframework.web*;resolution:=optional;version="${spring.import.version}"
 		</spring.osgi.import.pkg>
     </properties>
 

@@ -23,8 +23,7 @@
    org.apache.commons.fileupload*;resolution:=optional,
    org.apache.log4j*;resolution:=optional,
    org.apache.taglibs.standard.lang.support*;resolution:=optional,
-   org.xml.sax;resolution:=optional,
-   *
+   org.xml.sax;resolution:=optional
       </spring.osgi.import.pkg>
     </properties>
 </project>

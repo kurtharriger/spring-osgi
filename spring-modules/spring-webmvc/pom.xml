@@ -24,8 +24,7 @@
    org.apache.commons.attributes*;resolution:=optional,
    org.apache.poi.*;resolution:=optional,
    org.apache.struts.tiles*;resolution:=optional,
-   org.apache.velocity*;resolution:=optional,
-   * 
+   org.apache.velocity*;resolution:=optional
 	   </spring.osgi.import.pkg>
     </properties>
 </project>
