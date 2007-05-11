@@ -1,4 +1,0 @@
-DynamicImport-Package: org.xml.sax,
-   javax.xml.parsers,
-   org.w3c.dom,
-   org.springframework.jndi
