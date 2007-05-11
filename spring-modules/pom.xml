@@ -98,6 +98,38 @@
         </filesets>
       </configuration>
     </plugin>
+
+       <!-- OSGi Felix bundle plugin -->
+       <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>0.9.0-incubator-SNAPSHOT</version>
+        <configuration>
+          <instructions>
+           
+           <!-- bundle specific conf -->      
+           <Bundle-Name>${artifactId}</Bundle-Name>
+           <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
+           <Bundle-Version>${spring.bundle.version}</Bundle-Version>
+           <Export-Package>${spring.osgi.export.pkg}.*;version=${spring.export.version}</Export-Package>
+           <Import-Package>${spring.osgi.import.pkg}</Import-Package>
+           <Private-Package>${spring.osgi.private.pkg}</Private-Package>
+
+		   <!-- Spring specific -->
+           <Implementation-Title>Spring OSGi Framework</Implementation-Title>
+		   <Implementation-Version>${version}</Implementation-Version>
+		   <Spring-Version>${spring.version}</Spring-Version>
+		   
+		   <!-- w/o this, custom MANIFEST entries do not get added 
+		   <_include>-src/main/resources/META-INF/MANIFEST.MF</_include>
+		   
+		    - bug FELIX-261-
+		   <Include-Resource>${spring.osgi.include.res}</Include-Resource>
+		   -->
+		  </instructions>
+        </configuration>
+        <extensions>true</extensions>
+      </plugin> 
 	</plugins>
  </build>
 
