@@ -17,9 +17,13 @@
   
   <!-- defaults point to Spring framework -->
   <properties>
-      <spring.osgi.export.pkg>org.springframework*</spring.osgi.export.pkg>
+    <spring.osgi.export.pkg>org.springframework*</spring.osgi.export.pkg>
     <!-- override Spring/OSGi with Spring defaults -->
     <spring.osgi.export>${spring.osgi.export.pkg}*;version=${spring.version}</spring.osgi.export>
+    
+    <spring.osgi.import>org.springframework*;version=${spring.version}, ${spring.osgi.import.pkg}</spring.osgi.import>
+     
+   
     <!-- use spring version -->
     <!-- copy the resources inside the bundles | pattern works only for Spring -->
     <spring.osgi.include.res>@${pom.artifactId}-${spring.version}.jar!/META-INF/*</spring.osgi.include.res>	     

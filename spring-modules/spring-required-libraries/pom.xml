@@ -14,7 +14,8 @@
   
   <properties>
       <spring.osgi.export>${spring.osgi.export.pkg}*;version=${unpack.version}</spring.osgi.export>
-  </properties>
+      <spring.osgi.import>${spring.osgi.import.pkg}</spring.osgi.import>
+ </properties>
 
   <modules>
     <module>aop-alliance</module>

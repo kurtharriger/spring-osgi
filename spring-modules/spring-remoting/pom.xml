@@ -17,6 +17,7 @@
 	<properties>
 	   <!-- optional imports-->
 	   <spring.osgi.import.pkg>
+   junit.framework;resolution:=optional,
    com.caucho.*;resolution:=optional,
    javax.naming;resolution:=optional,
    javax.rmi*;resolution:=optional,
