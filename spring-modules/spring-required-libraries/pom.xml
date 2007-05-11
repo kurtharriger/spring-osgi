@@ -12,7 +12,9 @@
   <name>Spring Framework dependencies packaged as OSGi bundles</name>
   <url>http://www.springframework.org/osgi</url>
   
- 
+  <properties>
+      <spring.osgi.export>${spring.osgi.export.pkg}*;version=${unpack.version}</spring.osgi.export>
+  </properties>
 
   <modules>
     <module>aop-alliance</module>

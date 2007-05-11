@@ -46,7 +46,12 @@
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
     <spring.osgi.private.pkg>!*</spring.osgi.private.pkg>
     
+    <!-- complete access to export/import properties -->
+    <spring.osgi.export>${spring.osgi.export.pkg}*;version=${spring.osgi.export.version}</spring.osgi.export>
+    <spring.osgi.import>${spring.osgi.import.pkg}</spring.osgi.import>
+    
     <spring.osgi.symbolic.name>${groupId}.${artifactId}</spring.osgi.symbolic.name>
+    
     <!-- the default-->
     <spring.osgi.include.res>src/main/resources/</spring.osgi.include.res>
 
@@ -270,8 +275,8 @@ limitations under the License.
            <Bundle-Name>${artifactId}</Bundle-Name>
            <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
            <Bundle-Version>${spring.osgi.bundle.version}</Bundle-Version>
-           <Export-Package>${spring.osgi.export.pkg}.*;version=${spring.osgi.export.version}</Export-Package>
-           <Import-Package>${spring.osgi.import.pkg}</Import-Package>
+           <Export-Package>${spring.osgi.export}</Export-Package>
+           <Import-Package>${spring.osgi.import}</Import-Package>
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
 
 		   <!-- Spring specific -->
