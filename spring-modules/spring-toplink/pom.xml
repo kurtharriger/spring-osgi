@@ -17,8 +17,7 @@
 	<properties>
 	   <!-- optional imports-->
 	   <spring.osgi.import.pkg>
-   org.aopalliance*;resolution:=optional,
-   *
+   org.aopalliance*;resolution:=optional
    		</spring.osgi.import.pkg>
 	</properties>
 	

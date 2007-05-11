@@ -30,8 +30,7 @@
 	    <!-- websphere tx -->
 	    com.ibm.ws.Transaction;resolution:=optional,
 	    com.ibm.ejs.jts.jta;resolution:=optional,
-	    !org.w3c.dom,
-	    *
+	    !org.w3c.dom
 	   </spring.osgi.import.pkg>
     </properties>
 

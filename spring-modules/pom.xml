@@ -21,7 +21,7 @@
     <!-- override Spring/OSGi with Spring defaults -->
     <spring.osgi.export>${spring.osgi.export.pkg}*;version=${spring.version}</spring.osgi.export>
     
-    <spring.osgi.import>org.springframework*;version=${spring.version}, ${spring.osgi.import.pkg}</spring.osgi.import>
+    <spring.osgi.import>${spring.osgi.import.pkg}, org.springframework*;version=${spring.version}, *</spring.osgi.import>
      
    
     <!-- use spring version -->

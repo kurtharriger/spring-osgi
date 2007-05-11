@@ -33,8 +33,7 @@
    org.quartz*;resolution:=optional,
    oracle*;resolution:=optional,
    org.springframework.jdbc.datasource*;version="${spring.import.version}";resolution:=optional,
-   org.w3c.dom;resolution:=optional,
-   *
+   org.w3c.dom;resolution:=optional
    		</spring.osgi.import.pkg>
 	</properties>
 

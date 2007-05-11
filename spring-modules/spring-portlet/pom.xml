@@ -18,8 +18,7 @@
 	   <!-- optional imports-->
 	   <spring.osgi.import.pkg>
 	    org.apache.commons.fileupload*;resolution:=optional,
-	    org.xml.sax;resolution:=optional,
-	    *
+	    org.xml.sax;resolution:=optional
 		</spring.osgi.import.pkg>
 	</properties>
 
