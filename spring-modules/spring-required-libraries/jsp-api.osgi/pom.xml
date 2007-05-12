@@ -2,7 +2,7 @@
   <parent>
     <artifactId>spring-framework-required-libraries</artifactId>
     <groupId>org.springframework.osgi</groupId>
-    <version>1.0-m2</version>
+    <version>1.0-m3-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>

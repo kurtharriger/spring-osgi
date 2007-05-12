@@ -42,9 +42,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		super(name);
 	}
 
-	private static final String SPRING_OSGI_VERSION = "1.0-m2";
+	private static final String SPRING_OSGI_VERSION = "1.0-m3-SNAPSHOT";
 
-	private static final String SPRING_BUNDLED_VERSION = "2.0.5-osgi-m2";
+	private static final String SPRING_BUNDLED_VERSION = "2.0.5-osgi-m3-SNAPSHOT";
 
 	/**
 	 * Return the Spring/OSGi version used by the core bundles.

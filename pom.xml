@@ -4,7 +4,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-m2</version>
+  <version>1.0-m3-SNAPSHOT</version>
   <name>Spring OSGi</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
@@ -32,17 +32,17 @@
     <spring.bundle.version>2.1.0.SNAPSHOT-205</spring.bundle.version>
     --> 
     <!-- naming pattern for Spring OSGi bundles that get published into maven -->   
-    <spring.maven.artifact.version>${base.spring.version}-osgi-m2</spring.maven.artifact.version>
+    <spring.maven.artifact.version>${base.spring.version}-osgi-m3-SNAPSHOT</spring.maven.artifact.version>
     
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
-    <spring.osgi.import.version>1.0.0.m2</spring.osgi.import.version>
+    <spring.osgi.import.version>1.0.0.m3</spring.osgi.import.version>
     <!--- Spring OSGi packages exported version -->
-    <spring.osgi.export.version>1.0.0.m2</spring.osgi.export.version>
-    <spring.osgi.bundle.version>1.0.0.m2</spring.osgi.bundle.version>
+    <spring.osgi.export.version>1.0.0.m3</spring.osgi.export.version>
+    <spring.osgi.bundle.version>1.0.0.m3</spring.osgi.bundle.version>
      <!-- Convenience for seeing the svn change #, but contains whitespace -->
     <project.svn.revision>$Rev$</project.svn.revision>
     <!--
-    <project.svn.revision>1.0.0.m2-SNAPSHOT</project.svn.revision>
+    <project.svn.revision>1.0.0.m3-SNAPSHOT</project.svn.revision>
     -->
     
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>

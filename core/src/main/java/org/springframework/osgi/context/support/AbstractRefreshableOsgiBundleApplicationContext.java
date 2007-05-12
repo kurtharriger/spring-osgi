@@ -25,6 +25,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -36,7 +37,6 @@ import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -150,28 +150,14 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 
 	/**
 	 * Sets a default config location if no explicit config location specified.
-	 * Synchronization required to cope with dynamic nature of OSGi which may
-	 * attempt to close this bundle during the refresh!
 	 * 
 	 * @see #getDefaultConfigLocations
 	 * @see #setConfigLocations
 	 */
-	public void refresh() throws BeansException {
-
-		// TODO: should refresh imported beans
-		if (ObjectUtils.isEmpty(configLocations)) {
-			setConfigLocations(getDefaultConfigLocations());
-		}
-		synchronized (this) {
-			if (!OsgiBundleUtils.isBundleActive(getBundle())) {
-				throw new ApplicationContextException("Unable to refresh application context: bundle is "
-						+ OsgiBundleUtils.getBundleStateAsString(getBundle()));
-			}
-			super.refresh();
-
-			// publish the context only after all the beans have been published
-			publishContextAsOsgiServiceIfNecessary();
-		}
+	public synchronized void refresh() throws BeansException {
+        preRefresh();
+        onRefresh();
+        postRefresh();
     }
 
     // synchronization required around close as after this, the BundleContext is
@@ -252,7 +238,13 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 			}
 			this.serviceRegistration = getBundleContext().registerService(
 				new String[] { ApplicationContext.class.getName() }, this, serviceProperties);
-		}
+		} else {
+			if (logger.isInfoEnabled()) {
+				logger.info("Not publishing application context with properties ("
+						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
+						+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
+			}
+        }
 	}
 
 	/**
@@ -317,4 +309,81 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		// simply delegate to isActive
 		return isActive();
 	}
+
+
+    protected void preRefresh() throws BeansException, IllegalStateException {
+
+        // TODO: should refresh imported beans
+        if (ObjectUtils.isEmpty(configLocations)) {
+            setConfigLocations(getDefaultConfigLocations());
+        }
+        if (!OsgiBundleUtils.isBundleActive(getBundle())) {
+            throw new ApplicationContextException("Unable to refresh application context: bundle is "
+                                                  + OsgiBundleUtils.getBundleStateAsString(getBundle()));
+        }
+
+        // Prepare this context for refreshing.
+        prepareRefresh();
+
+        // Tell the subclass to refresh the internal bean factory.
+        ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+
+        // Prepare the bean factory for use in this context.
+        prepareBeanFactory(beanFactory);
+
+        try {
+            // Allows post-processing of the bean factory in context subclasses.
+            postProcessBeanFactory(beanFactory);
+
+            // Invoke factory processors registered as beans in the context.
+            invokeBeanFactoryPostProcessors(beanFactory);
+
+            // Register bean processors that intercept bean creation.
+            registerBeanPostProcessors(beanFactory);
+
+            // Initialize message source for this context.
+            initMessageSource();
+
+            // Initialize event multicaster for this context.
+            initApplicationEventMulticaster();
+        }
+
+        catch (BeansException ex) {
+            // Destroy already created singletons to avoid dangling resources.
+            beanFactory.destroySingletons();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Post refresh error", ex);
+            }
+            throw ex;
+        }
+    }
+
+
+    protected void postRefresh() throws BeansException {
+        try {
+
+            // Initialize other special beans in specific context subclasses.
+            onRefresh();
+
+            // Check for listener beans and register them.
+            registerListeners();
+
+            // Instantiate singletons this late to allow them to access the message source.
+
+            getBeanFactory().preInstantiateSingletons();
+
+            // Last step: publish corresponding event.
+            publishEvent(new ContextRefreshedEvent(this));
+        } catch (BeansException ex) {
+            // Destroy already created singletons to avoid dangling resources.
+            getBeanFactory().destroySingletons();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Post refresh error", ex);
+            }
+            throw ex;
+        }
+
+        // publish the context only after all the beans have been published
+        publishContextAsOsgiServiceIfNecessary();
+    }
 }

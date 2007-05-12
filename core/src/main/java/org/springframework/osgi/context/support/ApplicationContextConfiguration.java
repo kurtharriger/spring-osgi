@@ -19,11 +19,14 @@
 package org.springframework.osgi.context.support;
 
 import java.util.Dictionary;
+import java.util.Enumeration;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.ConfigUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Determine configuration information needed to construct an application
@@ -48,6 +51,9 @@ public class ApplicationContextConfiguration {
 
     private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
 
+    private static final Log log = LogFactory.getLog(ApplicationContextConfiguration.class);
+
+
     public ApplicationContextConfiguration(Bundle forBundle) {
 		this.bundle = forBundle;
 		initialise();
@@ -64,7 +70,10 @@ public class ApplicationContextConfiguration {
 		buf.append("|timeout=");
 		buf.append(timeout);
 		toString = buf.toString();
-	}
+        if (log.isDebugEnabled()) {
+            log.debug("configuration: " + toString);
+        }
+    }
 
 	/**
 	 * True if this bundle has at least one defined application context
@@ -125,10 +134,18 @@ public class ApplicationContextConfiguration {
 				this.timeout = ConfigUtils.getTimeOut(headers);
 				this.publishContextAsService = ConfigUtils.getPublishContext(headers);
 				this.asyncCreation = ConfigUtils.getCreateAsync(headers);
-				this.configurationLocations = ConfigUtils.getConfigLocations(headers);
-			}
-		}
-	}
+                try {
+                    this.configurationLocations = ConfigUtils.getConfigLocations(headers, bundle);
+                } catch (MissingConfiguration e) {
+                    this.configurationLocations = new String[0];
+                    this.isSpringPoweredBundle = false;
+                }
+                if (this.configurationLocations.length == 0) {
+                    this.isSpringPoweredBundle = false;
+                }
+            }
+        }
+    }
 
 	/*
 	 * (non-Javadoc)

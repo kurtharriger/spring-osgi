@@ -24,7 +24,7 @@ import org.easymock.MockControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.springframework.beans.BeansException;
+import org.springframework.beans.BeansException; 
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
@@ -50,10 +50,13 @@ public class ApplicationContextCreatorTest extends TestCase {
 				new ApplicationContextConfiguration(aBundle), mcast) {
 			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return new ServiceDependentOsgiBundleXmlApplicationContext(context, locations) {
-					public void refresh() throws BeansException {
-						// no-op
+					public void create(Runnable postAction) throws BeansException {
+						postAction.run();
 					}
-				};
+
+                    protected void postRefresh() { 
+                    }
+                };
 			}
 		};
 
@@ -62,7 +65,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 	public void testNoContextCreatedIfNotSpringPowered() {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(null);
-		createCreator(aBundle).run(); // will NPE if not detecting that this
+		createCreator(aBundle).create(null); // will NPE if not detecting that this
 		// bundle is
 		// not
 		// spring-powered!
@@ -81,9 +84,9 @@ public class ApplicationContextCreatorTest extends TestCase {
 				return testingContext;
 			}
 		};
-		creator.run();
+		creator.create(null);
 
-		assertTrue("context was refreshed", testingContext.isRefreshed);
+		assertTrue("context was not refreshed", testingContext.isRefreshed);
 
 		Long key = new Long(0);
 		assertFalse(initMap.containsKey(key));
@@ -96,7 +99,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		final ServiceDependentOsgiBundleXmlApplicationContext testContext = new ServiceDependentOsgiBundleXmlApplicationContext(aBundle.getContext(),
 				META_INF_SPRING_CONTENT) {
-			public void refresh() {
+			public void create(Runnable postAction) {
 				throw new RuntimeException("bang! (this exception deliberately caused by test case)") {
 					public synchronized Throwable fillInStackTrace() {
 						return null;
@@ -114,7 +117,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		};
 
 		try {
-			creator.run();
+			creator.create(null);
 		}
 		catch (Throwable t) {
 			fail("Exception should have been handled inside creator");
@@ -135,7 +138,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STARTED, aBundle));
 		mockListener.replay();
 
-		createCreator(aBundle).run();
+		createCreator(aBundle).create(null);
 
 		// mockListener.verify();
 		mcast.removeAllListeners();
@@ -149,7 +152,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		mcast.addApplicationListener(listener);
 		final ServiceDependentOsgiBundleXmlApplicationContext testContext = new ServiceDependentOsgiBundleXmlApplicationContext(aBundle.getContext(),
 				META_INF_SPRING_CONTENT) {
-			public void refresh() {
+			public void create(Runnable postAction) {
 				throw new RuntimeException("bang! (this exception deliberately caused by test case)") {
 					public synchronized Throwable fillInStackTrace() {
 						return null;
@@ -170,7 +173,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STOPPED, aBundle));
 		mockListener.replay();
 
-		creator.run();
+		creator.create(null);
 
 		mockListener.verify();
 		mcast.removeAllListeners();
@@ -184,12 +187,16 @@ public class ApplicationContextCreatorTest extends TestCase {
 			super(context, configLocations);
 		}
 
-		public void refresh() {
+		public void create(Runnable postAction) {
 			Long key = new Long(0);
 			assertTrue("pending map contains this context", initMap.containsKey(key));
 			assertEquals("pending map contains this context under bundle id", this, initMap.get(key));
 			assertFalse("completed map does not contain this context", contextMap.containsKey(key));
 			isRefreshed = true;
-		}
-	}
+            postAction.run();
+        }
+
+        protected void postRefresh() { 
+        }
+    }
 }

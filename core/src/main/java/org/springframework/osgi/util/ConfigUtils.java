@@ -17,9 +17,11 @@ package org.springframework.osgi.util;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.ArrayList;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.io.OsgiBundleResource;
+import org.springframework.osgi.context.support.MissingConfiguration;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -194,7 +196,7 @@ public abstract class ConfigUtils {
 	 * @param headers
 	 * @return
 	 */
-	public static String[] getConfigLocations(Dictionary headers) {
+	public static String[] getConfigLocations(Dictionary headers, Bundle bundle) throws MissingConfiguration {
 		String header = getSpringContextHeader(headers);
 
 		if (StringUtils.hasText(header)) {
@@ -203,13 +205,28 @@ public abstract class ConfigUtils {
 			// parse it into individual token
 			String[] ctxEntries = StringUtils.tokenizeToStringArray(locations, CONTEXT_LOCATION_SEPARATOR);
 
-			for (int i = 0; i < ctxEntries.length; i++) {
-				// replace the wild card with the predefined pattern
-				if (CONFIG_WILDCARD.equals(ctxEntries[i]))
-					ctxEntries[i] = SPRING_CONTEXT_DIRECTORY;
-			}
+            ArrayList entries = new ArrayList();
+            for (int i = 0; i < ctxEntries.length; i++) {
+				if (CONFIG_WILDCARD.equals(ctxEntries[i])) {
+				    // replace the wild card with the predefined pattern
+		            Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
+		            if (defaultConfig != null) {
+                        while(defaultConfig.hasMoreElements()) {
+                            entries.add(defaultConfig.nextElement().toString());
+                        }
+                    }
+                } else {
+                    // preturn (refix with bundle:
+                    String entry = OsgiBundleResource.BUNDLE_URL_PREFIX + ctxEntries[i];
+                    if (bundle.getEntry(entry) == null) {
+                        throw new MissingConfiguration(entry);
+                    }
+                    entries.add(entry);
+                }
+            }
 
-			// remove duplicates
+            ctxEntries = (String[]) entries.toArray(new String[entries.size()]);
+            // remove duplicates
 			return StringUtils.removeDuplicateStrings(ctxEntries);
 		}
 		return new String[0];
