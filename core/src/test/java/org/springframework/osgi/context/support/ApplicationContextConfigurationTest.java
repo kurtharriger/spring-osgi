@@ -94,7 +94,7 @@ public class ApplicationContextConfigurationTest extends TestCase {
 	}
 
 	// FIXME: move this tests from ApplicationConfiguration to AbstractOsgiXmlCtxTests
-	public void tstConfigLocationsInMetaInfWithHeader() {
+	public void testConfigLocationsInMetaInfWithHeader() {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "META-INF/spring/context.xml");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
@@ -102,23 +102,22 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		aBundle.setEntryReturnOnNextCallToGetEntry("file://META-INF/spring/context.xml");
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		String[] configFiles = config.getConfigurationLocations();
-		assertEquals("1 config file", 1, configFiles.length);
-		assertEquals("bundle:META-INF/spring/context.xml", configFiles[0]);
+        assertEquals("bundle:META-INF/spring/context.xml", configFiles[0]);
 	}
 
-	public void tstConfigLocationsInMetaInfWithWildcardHeader() {
+	public void testConfigLocationsInMetaInfWithWildcardHeader() {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "*;wait-for-dependencies:=false");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		String[] configFiles = config.getConfigurationLocations();
-		assertEquals("2 config files", 2, configFiles.length);
-		assertEquals("bundle-url:file://META-INF/spring/context.xml", configFiles[0]);
-		assertEquals("bundle-url:file://META-INF/spring/context-two.xml", configFiles[1]);
+		assertEquals("1 config files", 2, configFiles.length);
+		assertEquals("file://META-INF/spring/context-two.xml", configFiles[0]);
+		assertEquals("file://META-INF/spring/context.xml", configFiles[1]); 
 	}
 
-	public void tstBundleWithHeaderWithBadEntriesAndNoMetaInfResourcesIsNotSpringPowered() {
+	public void testBundleWithHeaderWithBadEntriesAndNoMetaInfResourcesIsNotSpringPowered() {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "META-INF/splurge/context.xml");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
@@ -127,7 +126,7 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		assertFalse("bundle is not spring powered", config.isSpringPoweredBundle());
 	}
 
-	public void tstHeaderWithWildcardEntryAndNoMetaInfResources() {
+	public void testHeaderWithWildcardEntryAndNoMetaInfResources() {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "*;wait-for-dependencies:=false");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
@@ -136,15 +135,63 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		assertFalse("not spring powered", config.isSpringPoweredBundle());
 	}
 
-	public void tstHeaderWithBadEntry() {
+	public void testHeaderWithBadEntry() {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "META-INF/spring/context-two.xml,META-INF/splurge/context.xml,");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setEntryReturnOnNextCallToGetEntry("file://META-INF/spring/context-two.xml");
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
-		assertTrue("bundle is not spring powered", config.isSpringPoweredBundle());
+		assertFalse("bundle is not spring powered", config.isSpringPoweredBundle());
 		String[] configFiles = config.getConfigurationLocations();
-		assertEquals("1 config file", 1, configFiles.length);
-		assertEquals("bundle:META-INF/spring/context-two.xml", configFiles[0]);
+		assertEquals("0 config file", 0, configFiles.length); 
+	}
+
+	public void testCreateAsynchronouslyDefaultTrue() {
+		// *;flavour
+		Dictionary headers = new Hashtable();
+		headers.put("Spring-Context", "*;timeout:=none");
+		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
+		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
+		assertTrue("bundle should have create-asynchronously = true", config.isCreateAsynchronously());
+	}
+
+	public void testSetCreateAsynchronouslyTrue() {
+		// *;flavour
+		Dictionary headers = new Hashtable();
+		headers.put("Spring-Context", "*;create-asynchronously:=true");
+		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
+		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
+		assertTrue("bundle should have create-asynchronously = true", config.isCreateAsynchronously());
+	}
+
+	public void testSetCreateAsynchronouslyFalse() {
+		// *;flavour
+		Dictionary headers = new Hashtable();
+		headers.put("Spring-Context", "*;create-asynchronously:=false");
+		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
+		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
+		assertFalse("bundle should have create-asynchronously = false", config.isCreateAsynchronously());
+	}
+
+	public void testCreateAsynchronouslyDefaultTrueIfAbsent() {
+		// *;flavour
+		Dictionary headers = new Hashtable(); 
+		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
+		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
+		assertTrue("bundle should have create-asynchronously = true", config.isCreateAsynchronously());
+	}
+
+	public void testCreateAsynchronouslyDefaultTrueIfGarbage() {
+		// *;flavour
+		Dictionary headers = new Hashtable();
+		headers.put("Spring-Context", "*;favour:=false");
+		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
+		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
+		assertTrue("bundle should have create-asynchronously = true", config.isCreateAsynchronously());
 	}
 }

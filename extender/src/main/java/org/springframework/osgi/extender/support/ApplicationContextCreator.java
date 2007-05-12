@@ -16,6 +16,8 @@
 package org.springframework.osgi.extender.support;
 
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,15 +25,16 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.context.support.LocalBundleContext;
-import org.springframework.osgi.context.support.NamespacePlugins;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.osgi.context.support.NamespacePlugins; 
 import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * Search a bundle for Spring resources, and if found create an application
@@ -39,9 +42,10 @@ import org.springframework.util.StringUtils;
  * 
  * @author Adrian Colyer
  */
-public class ApplicationContextCreator implements Runnable {
+public class ApplicationContextCreator {
 
-	private static final Log log = LogFactory.getLog(ApplicationContextCreator.class);
+    private static Timer timer = new Timer();
+    private static final Log log = LogFactory.getLog(ApplicationContextCreator.class);
 
 	private final Bundle bundle;
 
@@ -100,10 +104,9 @@ public class ApplicationContextCreator implements Runnable {
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run() {
+	public void create(final TaskExecutor executor) {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-		ServiceDependentOsgiBundleXmlApplicationContext applicationContext;
-		Long bundleKey = new Long(this.bundle.getBundleId());
+		final Long bundleKey = new Long(this.bundle.getBundleId());
 
 		if (!config.isSpringPoweredBundle()) {
 			return;
@@ -124,75 +127,117 @@ public class ApplicationContextCreator implements Runnable {
 					+ "]: failed to resolve BundleContext for bundle [" + bundle + "]");
 			return;
 		}
+        if (log.isInfoEnabled()) {
+            log.info("Starting bundle [" + bundle.getSymbolicName() + "] with configuration ["
+                     + StringUtils.arrayToCommaDelimitedString(config.getConfigurationLocations()) + "]");
+        }
 
-		try {
-			if (log.isInfoEnabled()) {
-				log.info("Starting bundle [" + bundle.getSymbolicName() + "] with configuration ["
-						+ StringUtils.arrayToCommaDelimitedString(config.getConfigurationLocations()) + "]");
-			}
+        // The parent ClassLoader is this class so that imports present in
+        // the extender will be honored.
+        final ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, getClass().getClassLoader());
+        Thread.currentThread().setContextClassLoader(cl);
+        LocalBundleContext.setContext(bundleContext);
 
-			// The parent ClassLoader is this class so that imports present in
-			// the extender will be honored.
-			ClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, getClass().getClassLoader());
-			Thread.currentThread().setContextClassLoader(cl);
-			LocalBundleContext.setContext(bundleContext);
+		final ServiceDependentOsgiBundleXmlApplicationContext applicationContext;
+        applicationContext = createApplicationContext(bundleContext, config.getConfigurationLocations());
+        applicationContext.setPublishContextAsService(config.isPublishContextAsService());
+        applicationContext.setNamespaceResolver(namespacePlugins);
 
-			applicationContext = createApplicationContext(bundleContext, config.getConfigurationLocations()); 
-			applicationContext.setPublishContextAsService(config.isPublishContextAsService());
-			applicationContext.setNamespaceResolver(namespacePlugins);
-            applicationContext.setTimeout(config.getTimeout());
+        final TimerTask timeout = new TimerTask() {
+            public void run() {
+                ApplicationContextException e = new ApplicationContextException(
+                        "Application context initializition for '"
+                        + bundle.getSymbolicName() + "' has timed out");
+                e.fillInStackTrace();
+                fail(applicationContext, e, bundleKey);
+            }
+        };
 
-            synchronized (this.contextsPendingInitializationMap) {
-				// creating the beans may take a long time (possible 'forever')
-				// if the
-				// service dependencies are not satisfied. We need to be able to
-				// stop this bundle and stop the context creation even before it
-				// is fully
-				// completed initializing.
-				this.contextsPendingInitializationMap.put(bundleKey, applicationContext);
-			}
+        synchronized (this.contextsPendingInitializationMap) {
+            // creating the beans may take a long time (possible 'forever')
+            // if the service dependencies are not satisfied. We need to be
+            // able to stop this bundle and stop the context creation even
+            // before it is fully completed initializing.
+            this.contextsPendingInitializationMap.put(bundleKey, applicationContext);
+        }
 
-			applicationContext.refresh();
+        long timeout_in_milliseconds = config.getTimeout() * 1000;
+        timer.schedule(timeout, timeout_in_milliseconds);
 
-			// ensure no-one else modifies the context map while we do this
-			// do not change locking order without also changing
-			// ApplicationContextCloser
-			synchronized (this.applicationContextMap) {
-				synchronized (this.contextsPendingInitializationMap) {
-					if (this.contextsPendingInitializationMap.containsKey(bundleKey)) {
-						// it is possible the key is no longer in the map if the
-						// bundle was
-						// stopped during the time it took us to get here...
-						this.contextsPendingInitializationMap.remove(bundleKey);
-						this.applicationContextMap.put(bundleKey, applicationContext);
-					}
-				}
-			}
-			postEvent(BundleEvent.STARTED);
-		}
-		catch (Throwable t) {
-			if (log.isErrorEnabled()) {
-				log.error("Unable to create application context for [" + bundle.getSymbolicName() + "]", t);
-				if (log.isInfoEnabled()) {
-					log.info("Calling code: ", creationTrace);
-				}
-			}
-			// do not change locking order without also changing application
-			// context closer
-			synchronized (this.applicationContextMap) {
-				synchronized (this.contextsPendingInitializationMap) {
-					this.contextsPendingInitializationMap.remove(bundleKey);
-					this.applicationContextMap.remove(bundleKey);
-				}
-			}
-			postEvent(BundleEvent.STOPPED);
-		}
-		finally {
+        final Runnable post = new Runnable() {
+            public void run() {
+                timeout.cancel();
+                ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(cl);
+                try {
+                    applicationContext.complete();
+                } catch (Throwable t) {
+                    fail(applicationContext, t, bundleKey);
+                } finally {
+                    Thread.currentThread().setContextClassLoader(ccl);
+                }
+
+                // ensure no-one else modifies the context map while we do this
+                // do not change locking order without also changing
+                // ApplicationContextCloser
+                synchronized (applicationContextMap) {
+                    synchronized (contextsPendingInitializationMap) {
+                        if (contextsPendingInitializationMap.containsKey(bundleKey)) {
+                            // it is possible the key is no longer in the map if the
+                            // bundle was stopped during the time it took us to get here...
+                            contextsPendingInitializationMap.remove(bundleKey);
+                            applicationContextMap.put(bundleKey, applicationContext);
+                        }
+                    }
+                }
+                postEvent(BundleEvent.STARTED);
+            }
+        };
+
+        Runnable postAction;
+        if (executor == null) {
+            postAction = post;
+        } else {
+            postAction = new Runnable() {
+                public void run() {
+                    executor.execute(post);
+                }
+            };
+        }
+
+        try {
+            applicationContext.create(postAction);
+		} catch (Throwable t) {
+            timeout.cancel();
+            fail(applicationContext, t, bundleKey);
+		} finally {
 			Thread.currentThread().setContextClassLoader(ccl);
 		}
 	}
 
-	protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
+
+    private void fail(ServiceDependentOsgiBundleXmlApplicationContext applicationContext, Throwable t,
+                      Long bundleKey) {
+        applicationContext.interrupt();
+        if (log.isErrorEnabled()) {
+            log.error("Unable to create application context for [" + bundle.getSymbolicName() + "]", t);
+            if (log.isInfoEnabled()) {
+                log.info("Calling code: ", creationTrace);
+            }
+        }
+        // do not change locking order without also changing application
+        // context closer
+        synchronized (this.applicationContextMap) {
+            synchronized (this.contextsPendingInitializationMap) {
+                this.contextsPendingInitializationMap.remove(bundleKey);
+                this.applicationContextMap.remove(bundleKey);
+            }
+        }
+        postEvent(BundleEvent.STOPPED);
+    }
+
+
+    protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 		return new ServiceDependentOsgiBundleXmlApplicationContext(context, locations);
 	}
 

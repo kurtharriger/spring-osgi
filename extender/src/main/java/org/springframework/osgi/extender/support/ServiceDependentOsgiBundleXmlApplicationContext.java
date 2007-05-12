@@ -17,10 +17,6 @@
 package org.springframework.osgi.extender.support;
 
 
-import edu.emory.mathcs.backport.java.util.concurrent.BrokenBarrierException;
-import edu.emory.mathcs.backport.java.util.concurrent.CyclicBarrier;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.*;
@@ -28,11 +24,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.context.ApplicationContextException;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.service.CardinalityOptions;
 import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
-import org.springframework.osgi.util.ConfigUtils;
 
 import java.util.*;
 
@@ -45,84 +39,57 @@ import java.util.*;
  * @author Costin Leau
  */
 public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleXmlApplicationContext {
-    private boolean dependenciesSatisfied = false;
-    private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
-    private Thread refreshWorker;
+    private volatile ContextState state = ContextState.INITIALIZED;
+    private DependencyListener listener;
 
     private static final Log log = LogFactory.getLog(ServiceDependentOsgiBundleXmlApplicationContext.class);
 
 
     public ServiceDependentOsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations) {
         super(context, configLocations);
-    } 
-
-
-    public void setTimeout(long timeout) {
-        this.timeout = timeout;
     }
 
-    public void close() {
-        if (refreshWorker != null) {
-            refreshWorker.interrupt();
-            // refreshWorker.stop();
-            refreshWorker = null;
+    protected synchronized void create(final Runnable postAction) throws BeansException {
+        preRefresh();
+        DependencyListener dl = new DependencyListener(postAction);
+        dl.findServiceDependencies();
+
+        state = ContextState.RESOLVING_DEPENDENCIES;
+        if (!dl.isSatisfied()) {
+            listener = dl;
+            listener.register();
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("No outstanding dependencies, completing initialization for "
+                          + getDisplayName());
+            } 
+            postAction.run();
+        }
+    }
+
+    public synchronized void close() {
+        state = ContextState.CLOSED;
+        if (listener != null) {
+            listener.deregister();
         }
         super.close();
     }
 
-    public void refresh() {
-        refreshWorker = Thread.currentThread();
-        try {
-            super.refresh();
-        } finally {
-            refreshWorker = null;
+
+    protected void interrupt() {
+        state = ContextState.INTERRUPTED;
+        if (listener != null) {
+            listener.deregister();
         }
     }
 
-
-    /*
-    * (non-Javadoc)
-    * @see org.springframework.context.support.AbstractApplicationContext#onRefresh()
-    */
-    protected void onRefresh() throws BeansException {
-        CyclicBarrier barrier = new CyclicBarrier(2);
-        DependencyListener listener = new DependencyListener(barrier);
-        listener.findServiceDependencies();
-
-        if (!listener.getUnsatisfiedDependencies().isEmpty()) {
-            listener.register();
-            try {
-                if (timeout == ConfigUtils.DIRECTIVE_NO_TIMEOUT) {
-                    barrier.await();
-                } else {
-                    barrier.await(timeout, TimeUnit.SECONDS);
-                }
-            } catch (BrokenBarrierException e) {
-                throw new ApplicationContextException("Unable to complete application context initializition for '"
-                                                      + getBundle().getSymbolicName()
-                                                      + "'", e);
-            } catch (InterruptedException e) {
-                throw new ApplicationContextException("Thread interrupted", e);
-
-            } catch (TimeoutException e) {
-                throw new ApplicationContextException("Unable to complete application context initializition for '"
-                                                      + getBundle().getSymbolicName()
-                                                      + "'", e);
-            } finally {
-                getBundleContext().removeServiceListener(listener);
-            }
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("No outstanding dependencies, completing initialization for " + getDisplayName());
-            }
-        }
-        dependenciesSatisfied = true;
-        super.onRefresh();
+    protected void complete() {
+        postRefresh();
     }
 
 
     public boolean isAvailable() {
-        return isActive() && dependenciesSatisfied;
+        return isActive() && (state == ContextState.DEPENDENCIES_RESOLVED);
     }
 
 
@@ -133,26 +100,25 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
      *
      * @author Costin Leau
      */
-    private class DependencyListener implements ServiceListener {
-        private CyclicBarrier barrier;
+    protected class DependencyListener implements ServiceListener {
         private final Set dependencies = new LinkedHashSet();
         private final Set unsatisfiedDependencies = new LinkedHashSet();
+        private final Runnable postAction;
 
 
-        private DependencyListener(CyclicBarrier barrier) {
-            this.barrier = barrier;
+        protected DependencyListener(Runnable postAction) {
+            this.postAction = postAction;
         }
 
-
-        private void findServiceDependencies() {
-            ConfigurableListableBeanFactory factory = getBeanFactory();
-            String[] beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(factory,
+        protected void findServiceDependencies() {
+            ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+            String[] beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
                                                                                  OsgiServiceProxyFactoryBean.class,
                                                                                  true,
                                                                                  true);
             for (int i = 0; i < beans.length; i++) {
                 String beanName = BeanFactory.FACTORY_BEAN_PREFIX + beans[i];
-                OsgiServiceProxyFactoryBean reference = (OsgiServiceProxyFactoryBean) factory.getBean(beanName);
+                OsgiServiceProxyFactoryBean reference = (OsgiServiceProxyFactoryBean) beanFactory.getBean(beanName);
                 Dependency dependency = new Dependency(reference);
                 dependencies.add(dependency);
                 if (!dependency.isSatisfied()) {
@@ -171,12 +137,12 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
         }
 
 
-        private Set getUnsatisfiedDependencies() {
-            return unsatisfiedDependencies;
+        protected boolean isSatisfied() {
+            return unsatisfiedDependencies.isEmpty();
         }
 
 
-        private void register() {
+        protected void register() {
             boolean multiple = unsatisfiedDependencies.size() > 1;
             StringBuffer sb = new StringBuffer(100 * unsatisfiedDependencies.size());
             if (multiple) {
@@ -202,6 +168,14 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
             }
         }
 
+        protected void deregister() {
+            try {
+                getBundleContext().removeServiceListener(this);
+            } catch (IllegalStateException e) {
+                // Bundle context is no longer valid
+            }
+        }
+
 
         /**
          * Process serviceChanged events, completing context initialization if
@@ -222,13 +196,13 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
                         case ServiceEvent.REGISTERED:
                             unsatisfiedDependencies.remove(dependency);
                             if (log.isDebugEnabled()) {
-                                log.debug("found service; eliminating dependency =" + dependency);
+                                log.debug("found service; eliminating " + dependency);
                             }
                             break;
                         case ServiceEvent.UNREGISTERING:
                             unsatisfiedDependencies.add(dependency);
                             if (log.isDebugEnabled()) {
-                                log.debug("service unregistered; adding dependency =" + dependency);
+                                log.debug("service unregistered; adding " + dependency);
                             }
                             break;
                         default: // do nothing
@@ -236,21 +210,22 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
                     }
                 }
             }
+
+            if (state == ContextState.INTERRUPTED || state == ContextState.CLOSED) {
+                deregister();
+                return;
+            }
+
             // Good to go!
             if (unsatisfiedDependencies.isEmpty()) {
+                deregister();
+                listener = null;
+                state = ContextState.DEPENDENCIES_RESOLVED;
                 if (log.isDebugEnabled()) {
-                    log.debug("Dependent services now satisfied, completing initialization for " + getDisplayName());
+                    log.debug("No outstanding dependencies, completing initialization for "
+                              + getDisplayName());
                 }
-                try {
-                    barrier.await();
-                } catch (BrokenBarrierException e) {
-                    log.error("Unable to complete application context initializition for '"
-                              + getBundle().getSymbolicName()
-                              + "'", e);
-                } catch (InterruptedException e) {
-                    // Outta here!  No logging! 
-                }
-
+                postAction.run();
             } else {
                 register(); // re-register with the new filter
             }

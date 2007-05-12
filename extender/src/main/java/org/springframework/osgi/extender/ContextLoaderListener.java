@@ -314,25 +314,36 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			log.debug("created config " + config);
 
 		if (!config.isSpringPoweredBundle()) {
-			// Avoid unnecessary thread creation for non-spring bundles
 			return;
 		}
-		ApplicationContextCreator contextCreator = new ApplicationContextCreator(bundle, this.managedBundles,
+		final ApplicationContextCreator contextCreator = new ApplicationContextCreator(bundle, this.managedBundles,
 				this.applicationContextsBeingInitialized, this.pendingRegistrationTasks, this.namespacePlugins, config,
 				this);
-		if (config.isCreateAsynchronously()) {
-			this.taskExecutor.execute(contextCreator);
-		}
-		else {
-			contextCreator.run();
-		}
+
+        if (config.isCreateAsynchronously()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Asynchronous context creation");
+            }
+            taskExecutor.execute(
+                    new Runnable() {
+                        public void run() {
+                            contextCreator.create(taskExecutor);
+                        }
+                    }
+            );
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Synchronous context creation");
+            }
+            contextCreator.create(taskExecutor);
+        }
 	}
 
 	/**
 	 * Closing an application context is a potentially long-running activity,
 	 * however, we *have* to do it synchronously during the event process as the
 	 * BundleContext object is not valid once we return from this method.
-	 * 
+	 *
 	 * @param bundle
 	 */
 	private void maybeCloseApplicationContextFor(Bundle bundle) {
@@ -421,7 +432,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * configuration file, and a bean named "taskExecutor" will be looked up by
 	 * name. If such a bean exists, it will be used.
 	 * </p>
-	 * 
+	 *
 	 * @param context
 	 * @return TaskExecutor
 	 */
