@@ -335,7 +335,11 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
             if (log.isDebugEnabled()) {
                 log.debug("Synchronous context creation");
             }
-            contextCreator.create(taskExecutor);
+            contextCreator.create(new TaskExecutor() {
+	            public void execute(Runnable task) {
+	                task.run();
+	            }
+            });
         }
 	}
 

@@ -216,11 +216,11 @@ public abstract class ConfigUtils {
                         }
                     }
                 } else {
-                    // preturn (refix with bundle:
-                    String entry = OsgiBundleResource.BUNDLE_URL_PREFIX + ctxEntries[i];
-                    if (bundle.getEntry(entry) == null) {
-                        throw new MissingConfiguration(entry);
+                    // return prefix with bundle:
+                    if (bundle.getEntry(ctxEntries[i]) == null) {
+                        throw new MissingConfiguration(ctxEntries[i]);
                     }
+                    String entry = OsgiBundleResource.BUNDLE_URL_PREFIX + ctxEntries[i];
                     entries.add(entry);
                 }
             }
