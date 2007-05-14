@@ -69,6 +69,7 @@
       <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>
     </dependency>
+	  
     <dependency>
       <groupId>org.aopalliance</groupId>
       <artifactId>aopalliance</artifactId>
