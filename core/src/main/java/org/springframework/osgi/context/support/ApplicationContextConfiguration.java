@@ -137,10 +137,13 @@ public class ApplicationContextConfiguration {
                 try {
                     this.configurationLocations = ConfigUtils.getConfigLocations(headers, bundle);
                 } catch (MissingConfiguration e) {
+                    log.error("Indicated Spring Context configuration file is missing [" +
+                              e.getMissingResource() + "] in " + toString, e);
                     this.configurationLocations = new String[0];
                     this.isSpringPoweredBundle = false;
                 }
                 if (this.configurationLocations.length == 0) {
+                    log.error("Bundle claims to be Spring powered, but does not contain any configuration resources: " + toString);
                     this.isSpringPoweredBundle = false;
                 }
             }

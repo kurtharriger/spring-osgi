@@ -218,7 +218,9 @@ public abstract class ConfigUtils {
                 } else {
                     // return prefix with bundle:
                     if (bundle.getEntry(ctxEntries[i]) == null) {
-                        throw new MissingConfiguration(ctxEntries[i]);
+                        MissingConfiguration mc = new MissingConfiguration("missing resource: " + ctxEntries[i]);
+                        mc.setMissingResource(ctxEntries[i]);
+                        throw mc;
                     }
                     String entry = OsgiBundleResource.BUNDLE_URL_PREFIX + ctxEntries[i];
                     entries.add(entry);
