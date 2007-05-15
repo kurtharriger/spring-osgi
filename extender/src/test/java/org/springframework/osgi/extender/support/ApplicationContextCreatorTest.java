@@ -17,6 +17,8 @@ package org.springframework.osgi.extender.support;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Dictionary;
+import java.util.Enumeration;
 
 import junit.framework.TestCase;
 
@@ -72,7 +74,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 	}
 
 	public void testContextIsPlacedIntoPendingMapPriorToRefreshAndMovedAfterwards() {
-		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
+		EntryLookupControllingMockBundle aBundle = new RepeatingEntryLookupControllingMockBundle(null);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		final MapTestingBundleXmlApplicationContext testingContext = new MapTestingBundleXmlApplicationContext(
 				aBundle.getContext(), META_INF_SPRING_CONTENT);
@@ -145,7 +147,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 	}
 
 	public void testCreationFailureEvent() {
-		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
+		EntryLookupControllingMockBundle aBundle = new RepeatingEntryLookupControllingMockBundle(null);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		MockControl mockListener = MockControl.createControl(ApplicationListener.class);
 		ApplicationListener listener = (ApplicationListener) mockListener.getMock();
@@ -197,6 +199,34 @@ public class ApplicationContextCreatorTest extends TestCase {
         }
 
         protected void postRefresh() { 
+        }
+    }
+
+    private static class RepeatingEntryLookupControllingMockBundle extends EntryLookupControllingMockBundle {
+        protected String[] findResult;
+
+        public RepeatingEntryLookupControllingMockBundle(Dictionary headers) {
+            super(headers);
+        }
+
+
+        public Enumeration findEntries(String path, String filePattern, boolean recurse) {
+            if (this.nextFindResult == null) {
+                return super.findEntries(path, filePattern, recurse);
+            } else {
+                Enumeration r = this.nextFindResult;
+                this.nextFindResult = createEnumerationOver(findResult);
+                return r;
+            }
+        }
+
+
+        public void setResultsToReturnOnNextCallToFindEntries(String[] r) {
+            findResult = r;
+            if (findResult == null) {
+                findResult = new String[0];
+            }
+            this.nextFindResult = createEnumerationOver(findResult);
         }
     }
 }

@@ -199,40 +199,38 @@ public abstract class ConfigUtils {
 	public static String[] getConfigLocations(Dictionary headers, Bundle bundle) throws MissingConfiguration {
 		String header = getSpringContextHeader(headers);
 
-		if (StringUtils.hasText(header)) {
+        String[] ctxEntries;
+        if (StringUtils.hasText(header)) {
 			// get the file location
 			String locations = StringUtils.tokenizeToStringArray(header, DIRECTIVE_SEPARATOR)[0];
 			// parse it into individual token
-			String[] ctxEntries = StringUtils.tokenizeToStringArray(locations, CONTEXT_LOCATION_SEPARATOR);
+			ctxEntries = StringUtils.tokenizeToStringArray(locations, CONTEXT_LOCATION_SEPARATOR);
+        } else {
+            ctxEntries = new String[] {SPRING_CONTEXT_DIRECTORY};
+        }
 
-            ArrayList entries = new ArrayList();
-            for (int i = 0; i < ctxEntries.length; i++) {
-				if (CONFIG_WILDCARD.equals(ctxEntries[i])) {
-				    // replace the wild card with the predefined pattern
-		            Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
-		            if (defaultConfig != null) {
-                        while(defaultConfig.hasMoreElements()) {
-                            entries.add(defaultConfig.nextElement().toString());
-                        }
-                    }
+        ArrayList entries = new ArrayList();
+        for (int i = 0; i < ctxEntries.length; i++) {
+            if (CONFIG_WILDCARD.equals(ctxEntries[i]) || SPRING_CONTEXT_DIRECTORY.equals(ctxEntries[i])) {
+                Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
+                if (defaultConfig != null && defaultConfig.hasMoreElements()) {
+                    entries.add(SPRING_CONTEXT_DIRECTORY);
+                }
+            } else {
+                if (bundle.getEntry(ctxEntries[i]) == null) {
+                    MissingConfiguration mc = new MissingConfiguration("missing resource: " + ctxEntries[i]);
+                    mc.setMissingResource(ctxEntries[i]);
+                    throw mc;
                 } else {
-                    // return prefix with bundle:
-                    if (bundle.getEntry(ctxEntries[i]) == null) {
-                        MissingConfiguration mc = new MissingConfiguration("missing resource: " + ctxEntries[i]);
-                        mc.setMissingResource(ctxEntries[i]);
-                        throw mc;
-                    }
-                    String entry = OsgiBundleResource.BUNDLE_URL_PREFIX + ctxEntries[i];
-                    entries.add(entry);
+                    entries.add(OsgiBundleResource.BUNDLE_URL_PREFIX + ctxEntries[i]);
                 }
             }
+        }
 
-            ctxEntries = (String[]) entries.toArray(new String[entries.size()]);
-            // remove duplicates
-			return StringUtils.removeDuplicateStrings(ctxEntries);
-		}
-		return new String[0];
-	}
+        ctxEntries = (String[]) entries.toArray(new String[entries.size()]);
+        // remove duplicates
+        return StringUtils.removeDuplicateStrings(ctxEntries);
+    }
 
 	/**
 	 * Dictates if the given bundle is Spring/OSGi powered or not.

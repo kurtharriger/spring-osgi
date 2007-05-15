@@ -20,8 +20,7 @@ import java.net.URL;
 import java.util.Dictionary;
 import java.util.Enumeration;
 
-import org.osgi.framework.BundleContext;
-import org.springframework.osgi.mock.MockBundle;
+import org.osgi.framework.BundleContext; 
 
 /**
  * Mock Bundle taht allows the entry to return on future calls.
@@ -31,9 +30,9 @@ import org.springframework.osgi.mock.MockBundle;
  */
 public class EntryLookupControllingMockBundle extends MockBundle {
 
-	private Enumeration nextFindResult = null;
+	protected Enumeration nextFindResult = null;
 
-	private String nextEntryResult = null;
+	protected String nextEntryResult = null;
 
 	public EntryLookupControllingMockBundle(Dictionary headers) {
 		super(headers);
@@ -69,7 +68,8 @@ public class EntryLookupControllingMockBundle extends MockBundle {
 				return result;
 			}
 			catch (MalformedURLException ex) {
-			}
+                // ignore
+            }
 			this.nextEntryResult = null;
 			return null;
 		}
@@ -87,7 +87,7 @@ public class EntryLookupControllingMockBundle extends MockBundle {
 		return super.getContext();
 	}
 
-	private Enumeration createEnumerationOver(String[] entries) {
+	protected Enumeration createEnumerationOver(String[] entries) {
 		return new ArrayEnumerator(entries);
 	}
 
