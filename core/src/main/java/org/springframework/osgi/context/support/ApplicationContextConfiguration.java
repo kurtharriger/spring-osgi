@@ -19,7 +19,6 @@
 package org.springframework.osgi.context.support;
 
 import java.util.Dictionary;
-import java.util.Enumeration;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.ConfigUtils;
@@ -124,7 +123,7 @@ public class ApplicationContextConfiguration {
 	 * as application context configuration files.
 	 */
 	private void initialise() {
-		Dictionary headers = bundle.getHeaders();
+        Dictionary headers = bundle.getHeaders();
 
 		this.isSpringPoweredBundle = ConfigUtils.isSpringOsgiPoweredBundle(bundle);
 
@@ -134,18 +133,19 @@ public class ApplicationContextConfiguration {
 				this.timeout = ConfigUtils.getTimeOut(headers);
 				this.publishContextAsService = ConfigUtils.getPublishContext(headers);
 				this.asyncCreation = ConfigUtils.getCreateAsync(headers);
-                try {
-                    this.configurationLocations = ConfigUtils.getConfigLocations(headers, bundle);
-                } catch (MissingConfiguration e) {
-                    log.error("Indicated Spring Context configuration file is missing [" +
-                              e.getMissingResource() + "] in " + toString, e);
-                    this.configurationLocations = new String[0];
-                    this.isSpringPoweredBundle = false;
-                }
+            }
+            try {
+                this.configurationLocations = ConfigUtils.getConfigLocations(headers, bundle);
                 if (this.configurationLocations.length == 0) {
-                    log.error("Bundle claims to be Spring powered, but does not contain any configuration resources: " + toString);
+                    log.error("Bundle claims to be Spring powered, but does not contain any configuration resources: "
+                              + OsgiBundleUtils.getNullSafeSymbolicName(bundle));
                     this.isSpringPoweredBundle = false;
                 }
+            } catch (MissingConfiguration e) {
+                log.error("Indicated Spring Context configuration file is missing [" +
+                          e.getMissingResource() + "] in " + OsgiBundleUtils.getNullSafeSymbolicName(bundle));
+                this.configurationLocations = new String[0];
+                this.isSpringPoweredBundle = false;
             }
         }
     }

@@ -17,10 +17,12 @@ package org.springframework.osgi.context.support;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Enumeration;
 
 import junit.framework.TestCase;
 
 import org.springframework.osgi.mock.EntryLookupControllingMockBundle;
+import org.springframework.osgi.util.ConfigUtils;
 
 /**
  * Test that given a bundle, we can correctly determine the spring configuration
@@ -41,7 +43,7 @@ public class ApplicationContextConfigurationTest extends TestCase {
 	}
 
 	public void testBundleWithSpringResourcesAndNoHeaderIsSpringPowered() {
-		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
+        EntryLookupControllingMockBundle aBundle = new RepeatingEntryLookupControllingMockBundle(null);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		assertTrue("bundle is spring powered", config.isSpringPoweredBundle());
@@ -117,9 +119,8 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		String[] configFiles = config.getConfigurationLocations();
 		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
-		assertEquals("1 config files", 2, configFiles.length);
-		assertEquals("file://META-INF/spring/context-two.xml", configFiles[0]);
-		assertEquals("file://META-INF/spring/context.xml", configFiles[1]); 
+		assertEquals("1 config files", 1, configFiles.length);
+        assertEquals(ConfigUtils.SPRING_CONTEXT_DIRECTORY, configFiles[0]);
 	}
 
     public void testConfigLocationsInMetaInfWithHeaderAndDependencies() {
@@ -217,4 +218,32 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		assertTrue("bundle should have create-asynchronously = true", config.isCreateAsynchronously());
 	}
+
+    private static class RepeatingEntryLookupControllingMockBundle extends EntryLookupControllingMockBundle {
+        protected String[] findResult;
+
+        public RepeatingEntryLookupControllingMockBundle(Dictionary headers) {
+            super(headers);
+        }
+
+
+        public Enumeration findEntries(String path, String filePattern, boolean recurse) {
+            if (this.nextFindResult == null) {
+                return super.findEntries(path, filePattern, recurse);
+            } else {
+                Enumeration r = this.nextFindResult;
+                this.nextFindResult = createEnumerationOver(findResult);
+                return r;
+            }
+        }
+
+
+        public void setResultsToReturnOnNextCallToFindEntries(String[] r) {
+            findResult = r;
+            if (findResult == null) {
+                findResult = new String[0];
+            }
+            this.nextFindResult = createEnumerationOver(findResult);
+        }
+    }
 }
