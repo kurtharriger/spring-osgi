@@ -15,9 +15,7 @@
  */
 package org.springframework.osgi.extender.support;
 
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,24 +42,24 @@ import org.springframework.core.task.TaskExecutor;
  */
 public class ApplicationContextCreator {
 
-    private static Timer timer = new Timer();
-    private static final Log log = LogFactory.getLog(ApplicationContextCreator.class);
+    protected static Timer timer = new Timer();
+    protected static final Log log = LogFactory.getLog(ApplicationContextCreator.class);
 
-	private final Bundle bundle;
+	protected final Bundle bundle;
 
-	private final Map applicationContextMap;
+	protected final Map applicationContextMap;
 
-	private final Map contextsPendingInitializationMap;
+	protected final Map contextsPendingInitializationMap;
 
-	private final Map pendingRegistrationTasksMap;
+	protected final Map pendingRegistrationTasksMap;
 
-	private final NamespacePlugins namespacePlugins;
+	protected final NamespacePlugins namespacePlugins;
 
-	private final ApplicationEventMulticaster mcast;
+	protected final ApplicationEventMulticaster mcast;
 
-	private final ApplicationContextConfiguration config;
+	protected final ApplicationContextConfiguration config;
 
-	private Throwable creationTrace;
+	protected Throwable creationTrace;
 
 	/**
 	 * Find spring resources in the given bundle, and if an application context
@@ -216,15 +214,10 @@ public class ApplicationContextCreator {
 	}
 
 
-    private void fail(ServiceDependentOsgiBundleXmlApplicationContext applicationContext, Throwable t,
+    protected void fail(ServiceDependentOsgiBundleXmlApplicationContext applicationContext, Throwable t,
                       Long bundleKey) {
         applicationContext.interrupt();
-        if (log.isErrorEnabled()) {
-            log.error("Unable to create application context for [" + bundle.getSymbolicName() + "]", t);
-            if (log.isInfoEnabled()) {
-                log.info("Calling code: ", creationTrace);
-            }
-        }
+
         // do not change locking order without also changing application
         // context closer
         synchronized (this.applicationContextMap) {
@@ -234,6 +227,28 @@ public class ApplicationContextCreator {
             }
         }
         postEvent(BundleEvent.STOPPED);
+
+        StringBuffer buf = new StringBuffer();
+        DependencyListener listener = applicationContext.getListener();
+        if (listener == null || listener.getUnsatisfiedDependencies().isEmpty()) {
+            buf.append("none");
+        } else {
+            for (Iterator dependencies = listener.getUnsatisfiedDependencies().iterator(); dependencies.hasNext();) {
+                Dependency dependency = (Dependency) dependencies.next();
+                buf.append(dependency.toString());
+                if (dependencies.hasNext()) {
+                    buf.append(", ");
+                }
+            }
+        }
+
+        if (log.isErrorEnabled()) {
+            log.error("Unable to create application context for [" + bundle.getSymbolicName()
+                      + "], unsatisfied dependencies: " + buf.toString(), t);
+            if (log.isInfoEnabled()) {
+                log.info("[" + bundle.getSymbolicName() + "]" + " creation calling code: ", creationTrace);
+            }
+        }
     }
 
 
@@ -241,7 +256,7 @@ public class ApplicationContextCreator {
 		return new ServiceDependentOsgiBundleXmlApplicationContext(context, locations);
 	}
 
-	private void postEvent(int starting) {
+	protected void postEvent(int starting) {
 		mcast.multicastEvent(new SpringBundleEvent(starting, bundle));
 	}
 }
