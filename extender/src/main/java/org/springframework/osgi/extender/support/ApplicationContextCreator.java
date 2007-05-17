@@ -41,8 +41,7 @@ import org.springframework.core.task.TaskExecutor;
  * @author Adrian Colyer
  */
 public class ApplicationContextCreator {
-
-    protected static Timer timer = new Timer();
+    
     protected static final Log log = LogFactory.getLog(ApplicationContextCreator.class);
 
 	protected final Bundle bundle;
@@ -61,7 +60,9 @@ public class ApplicationContextCreator {
 
 	protected Throwable creationTrace;
 
-	/**
+    protected Timer timer;
+
+    /**
 	 * Find spring resources in the given bundle, and if an application context
 	 * needs to be created, create it and add it to the map, keyed by bundle id
 	 * 
@@ -69,9 +70,14 @@ public class ApplicationContextCreator {
 	 * @param applicationContextMap
 	 * @param pendingRegistrationTasks
 	 */
-	public ApplicationContextCreator(Bundle forBundle, Map applicationContextMap, Map contextsPendingInitializationMap,
-			Map pendingRegistrationTasks, NamespacePlugins namespacePlugins, ApplicationContextConfiguration config,
-			ApplicationEventMulticaster mcast) {
+	public ApplicationContextCreator(Bundle forBundle,
+                                     Map applicationContextMap,
+                                     Map contextsPendingInitializationMap,
+			                         Map pendingRegistrationTasks,
+                                     NamespacePlugins namespacePlugins,
+                                     ApplicationContextConfiguration config,
+			                         ApplicationEventMulticaster mcast,
+                                     Timer timer) {
 		this.bundle = forBundle;
 		this.applicationContextMap = applicationContextMap;
 		this.contextsPendingInitializationMap = contextsPendingInitializationMap;
@@ -79,7 +85,9 @@ public class ApplicationContextCreator {
 		this.pendingRegistrationTasksMap = pendingRegistrationTasks;
 		this.config = config;
 		this.mcast = mcast;
-		// Do some sanity checking.
+        this.timer = timer;
+        
+        // Do some sanity checking.
 		Assert.notNull(mcast);
 		Long bundleKey = new Long(this.bundle.getBundleId());
 		synchronized (pendingRegistrationTasksMap) {
