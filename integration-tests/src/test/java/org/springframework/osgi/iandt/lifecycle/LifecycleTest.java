@@ -60,7 +60,7 @@ public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
         assertNotNull("Could not find the test bundle", testBundle);
         StringBuffer filter = new StringBuffer();
         filter.append("(&");
-        filter.append("(").append(Constants.OBJECTCLASS).append("=").append(AbstractRefreshableApplicationContext.class.getCanonicalName()).append(")");
+        filter.append("(").append(Constants.OBJECTCLASS).append("=").append(AbstractRefreshableApplicationContext.class.getName()).append(")");
         filter.append("(").append(AbstractRefreshableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
         filter.append("=").append(testBundle.getSymbolicName()).append(")");
         filter.append(")");
