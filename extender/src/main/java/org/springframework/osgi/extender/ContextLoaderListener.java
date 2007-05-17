@@ -17,11 +17,7 @@
 package org.springframework.osgi.extender;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,32 +75,36 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 public class ContextLoaderListener implements BundleActivator, SynchronousBundleListener, ApplicationEventMulticaster {
 	// The standard for META-INF header keys excludes ".", so these constants
 	// must use "-"
-	private static final String SPRING_HANDLER_MAPPINGS_LOCATION = "META-INF/spring.handlers";
+	protected static final String SPRING_HANDLER_MAPPINGS_LOCATION = "META-INF/spring.handlers";
 
-	private static final String EXTENDER_CONFIG_FILE_LOCATION = "META-INF/spring/extender.xml";
+	protected static final String EXTENDER_CONFIG_FILE_LOCATION = "META-INF/spring/extender.xml";
 
-	private static final String[] OSGI_BUNDLE_RESOLVER_INTERFACE_NAME = { "org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver" };
+	protected static final String[] OSGI_BUNDLE_RESOLVER_INTERFACE_NAME = { "org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver" };
 
-	private static final String TASK_EXECUTOR_BEAN_NAME = "taskExecutor";
+	protected static final String TASK_EXECUTOR_BEAN_NAME = "taskExecutor";
 
 	private static final Log log = LogFactory.getLog(ContextLoaderListener.class);
 
-	/**
+
+
+    protected Timer timer = new Timer("Spring Application Context Creation Timer", true);
+
+    /**
 	 * The id of the extender bundle itself
 	 */
-	private long bundleId;
+	protected long bundleId;
 
 	/**
 	 * Context created to configure the extender bundle itself (currently only
 	 * used for overriding task executor implementation).
 	 */
-	private OsgiBundleXmlApplicationContext extenderContext;
+	protected OsgiBundleXmlApplicationContext extenderContext;
 
 	/**
 	 * The bundles we are currently managing. Keys are bundle ids, values are
 	 * application contexts
 	 */
-	private final Map managedBundles;
+	protected final Map managedBundles;
 
 	/**
 	 * ApplicationContexts which are being initialized by an
@@ -112,50 +112,50 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * example, they are waiting on service dependencies). Keys are bundle ids,
 	 * values are application contexts
 	 */
-	private final Map applicationContextsBeingInitialized;
+	protected final Map applicationContextsBeingInitialized;
 
 	/**
 	 * ApplicationContextCreator tasks that are in process. Keys are bundle ids,
 	 * values are ApplicationContextCreator instances.
 	 */
-	private Map pendingRegistrationTasks;
+	protected Map pendingRegistrationTasks;
 
 	/**
 	 * ServiceRegistration object returned by OSGi when registering the
 	 * NamespacePlugins instance as a service
 	 */
-	private ServiceRegistration resolverServiceRegistration = null;
+	protected ServiceRegistration resolverServiceRegistration = null;
 
 	/**
 	 * List of listeners subscribed to spring bundle events
 	 */
-	private final Set springBundleListeners = new HashSet();
+	protected final Set springBundleListeners = new HashSet();
 
 	/**
 	 * Are we running under knoplerfish? Required for bug workaround with
 	 * calling getResource under KF
 	 */
-	private boolean isKnopflerfish = false;
+	protected boolean isKnopflerfish = false;
 
 	/**
 	 * The set of all namespace plugins known to the extender
 	 */
-	private NamespacePlugins namespacePlugins;
+	protected NamespacePlugins namespacePlugins;
 
 	/**
 	 * Task executor used for kicking off background activity
 	 */
-	private TaskExecutor taskExecutor;
+	protected TaskExecutor taskExecutor;
 
 	/**
 	 * Service for listener management
 	 */
-	private ServiceRegistration listenerServiceRegistration;
+	protected ServiceRegistration listenerServiceRegistration;
 
 	/**
 	 * The bundle's context
 	 */
-	private BundleContext context;
+	protected BundleContext context;
 
 	/*
 	 * Required by the BundleActivator contract
@@ -316,9 +316,12 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		if (!config.isSpringPoweredBundle()) {
 			return;
 		}
-		final ApplicationContextCreator contextCreator = new ApplicationContextCreator(bundle, this.managedBundles,
-				this.applicationContextsBeingInitialized, this.pendingRegistrationTasks, this.namespacePlugins, config,
-				this);
+		final ApplicationContextCreator contextCreator =
+                new ApplicationContextCreator(bundle, this.managedBundles,
+                                              this.applicationContextsBeingInitialized, this.pendingRegistrationTasks,
+                                              this.namespacePlugins, config,
+                                              this,
+                                              timer);
 
         if (config.isCreateAsynchronously()) {
             if (log.isDebugEnabled()) {

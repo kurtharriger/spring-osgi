@@ -47,6 +47,7 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
             listener = dl;
             listener.register();
         } else {
+            state = ContextState.DEPENDENCIES_RESOLVED;
             if (logger.isDebugEnabled()) {
                 logger.debug("No outstanding dependencies, completing initialization for "
                           + getDisplayName());
@@ -56,11 +57,11 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
     }
 
     public synchronized void close() {
-        state = ContextState.CLOSED;
         if (listener != null) {
             listener.deregister();
         }
         super.close();
+        state = ContextState.CLOSED;
     }
 
 
@@ -73,11 +74,16 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
 
     protected void complete() {
         postRefresh();
+        state = ContextState.CREATED;
     }
 
 
     public boolean isAvailable() {
-        return isActive() && (state == ContextState.DEPENDENCIES_RESOLVED || state == ContextState.CREATED);
+        return isActive();
+    }
+
+    public boolean isActive() {
+         return state == ContextState.CREATED;
     }
 
 

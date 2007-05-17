@@ -22,8 +22,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.config.Scope;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.config.Scope; 
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
@@ -237,7 +236,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 						+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
 			}
 			this.serviceRegistration = getBundleContext().registerService(
-				new String[] { ApplicationContext.class.getName() }, this, serviceProperties);
+				new String[] { AbstractRefreshableApplicationContext.class.getName() }, this, serviceProperties);
 		} else {
 			if (logger.isInfoEnabled()) {
 				logger.info("Not publishing application context with properties ("

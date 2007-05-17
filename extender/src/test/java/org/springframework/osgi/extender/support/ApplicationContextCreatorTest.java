@@ -15,10 +15,7 @@
  */
 package org.springframework.osgi.extender.support;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Dictionary;
-import java.util.Enumeration;
+import java.util.*;
 
 import junit.framework.TestCase;
 
@@ -47,9 +44,11 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	private final ApplicationEventMulticaster mcast = new SimpleApplicationEventMulticaster();
 
-	private ApplicationContextCreator createCreator(Bundle aBundle) {
+    private final Timer timer = new Timer("Test Timer", true);
+
+    private ApplicationContextCreator createCreator(Bundle aBundle) {
 		return new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, null,
-				new ApplicationContextConfiguration(aBundle), mcast) {
+				new ApplicationContextConfiguration(aBundle), mcast, timer) {
 			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return new ServiceDependentOsgiBundleXmlApplicationContext(context, locations) {
 					public void create(Runnable postAction) throws BeansException {
@@ -80,7 +79,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 				aBundle.getContext(), META_INF_SPRING_CONTENT);
 
 		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap,
-				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast) {
+				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast,timer) {
 
 			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return testingContext;
@@ -110,7 +109,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 			}
 		};
 		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap,
-				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast) {
+				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast, timer) {
 
 			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return testContext;
@@ -163,7 +162,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 			}
 		};
 		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap,
-				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast) {
+				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast, timer) {
 
 			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return testContext;
