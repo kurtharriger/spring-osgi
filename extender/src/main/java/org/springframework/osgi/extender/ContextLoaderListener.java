@@ -85,9 +85,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 	private static final Log log = LogFactory.getLog(ContextLoaderListener.class);
 
-
-
-    protected Timer timer = new Timer("Spring Application Context Creation Timer", true);
+	// "Spring Application Context Creation Timer"
+    protected Timer timer = new Timer(true);
 
     /**
 	 * The id of the extender bundle itself

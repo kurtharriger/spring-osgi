@@ -44,7 +44,8 @@ public class ApplicationContextCreatorTest extends TestCase {
 
 	private final ApplicationEventMulticaster mcast = new SimpleApplicationEventMulticaster();
 
-    private final Timer timer = new Timer("Test Timer", true);
+	//"Test Timer"
+    private final Timer timer = new Timer(true);
 
     private ApplicationContextCreator createCreator(Bundle aBundle) {
 		return new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, null,
