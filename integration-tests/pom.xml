@@ -102,7 +102,7 @@
             <artifactId>org.springframework.osgi.iandt.scoped.bundle.common</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
-        </dependency>  
+        </dependency>
         
     </dependencies>
     <build>
