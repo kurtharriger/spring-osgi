@@ -123,6 +123,20 @@ public class ApplicationContextConfigurationTest extends TestCase {
         assertEquals(ConfigUtils.SPRING_CONTEXT_DIRECTORY, configFiles[0]);
 	}
 
+	public void testEmptyConfigLocationsInMetaInf() {
+        System.out.println("tsst");
+        Dictionary headers = new Hashtable();
+		headers.put("Spring-Context", ";wait-for-dependencies:=false");
+		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
+		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
+        aBundle.setEntryReturnOnNextCallToGetEntry(META_INF_SPRING_CONTENT[0]);
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
+		String[] configFiles = config.getConfigurationLocations();
+		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
+		assertEquals("1 config files", 1, configFiles.length);
+        assertEquals(ConfigUtils.SPRING_CONTEXT_DIRECTORY, configFiles[0]);
+	}
+
     public void testConfigLocationsInMetaInfWithHeaderAndDependencies() {
         Dictionary headers = new Hashtable();
         headers.put("Spring-Context", "META-INF/spring/context.xml;wait-for-dependencies:=false");
