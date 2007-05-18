@@ -21,7 +21,7 @@
   
   <!-- shared dependencies -->
   <dependencies>
-            <dependency>
+        <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-core</artifactId>
             <version>${project.parent.version}</version>
@@ -30,8 +30,8 @@
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>4.0</version>
+            <artifactId>osgi_R4_core</artifactId>
+            <version>1.0</version>
             <scope>provided</scope>
         </dependency>
   </dependencies>
