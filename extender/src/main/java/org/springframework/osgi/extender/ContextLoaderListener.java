@@ -325,33 +325,39 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		if (!config.isSpringPoweredBundle()) {
 			return;
 		}
-		final ApplicationContextCreator contextCreator =
-                new ApplicationContextCreator(bundle, this.managedBundles,
-                                              this.applicationContextsBeingInitialized, this.pendingRegistrationTasks,
-                                              this.namespacePlugins, config,
-                                              this,
-                                              timer);
 
-        if (config.isCreateAsynchronously()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Asynchronous context creation");
-            }
-            taskExecutor.execute(
-                    new Runnable() {
-                        public void run() {
-                            contextCreator.create(taskExecutor);
+        try {
+            final ApplicationContextCreator contextCreator = new ApplicationContextCreator(bundle, this.managedBundles,
+                                                                                           this.applicationContextsBeingInitialized,
+                                                                                           this.pendingRegistrationTasks,
+                                                                                           this.namespacePlugins,
+                                                                                           config,
+                                                                                           this,
+                                                                                           timer);
+
+            if (config.isCreateAsynchronously()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Asynchronous context creation");
+                }
+                taskExecutor.execute(
+                        new Runnable() {
+                            public void run() {
+                                contextCreator.create(taskExecutor);
+                            }
                         }
+                );
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Synchronous context creation");
+                }
+                contextCreator.create(new TaskExecutor() {
+                    public void execute(Runnable task) {
+                        task.run();
                     }
-            );
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Synchronous context creation");
+                });
             }
-            contextCreator.create(new TaskExecutor() {
-	            public void execute(Runnable task) {
-	                task.run();
-	            }
-            });
+        } catch (Throwable e) { 
+            log.info("Cannot create context", e); 
         }
 	}
 
