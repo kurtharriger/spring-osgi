@@ -203,7 +203,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
         OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
 		if (serviceRequiredAtStartup) {
 			if (debug)
-				log.debug("1..x cardinality - looking for service at startup...");
+				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
 			Object target = getTarget();
 			if (debug)
 				log.debug("service retrieved " + target);
