@@ -175,36 +175,30 @@ public class ApplicationContextCreator {
                 timeout.cancel();
                 ClassLoader ccl = Thread.currentThread().getContextClassLoader();
                 Thread.currentThread().setContextClassLoader(cl);
-                Throwable error = null;
                 try {
                     applicationContext.complete();
+                    // ensure no-one else modifies the context map while we do this
+                    // do not change locking order without also changing
+                    // ApplicationContextCloser
+                    synchronized (applicationContextMap) {
+                        synchronized (contextsPendingInitializationMap) {
+                            if (contextsPendingInitializationMap.containsKey(bundleKey)) {
+                                // it is possible the key is no longer in the map if the
+                                // bundle was stopped during the time it took us to get here...
+                                contextsPendingInitializationMap.remove(bundleKey);
+                                applicationContextMap.put(bundleKey, applicationContext);
+                            }
+                        }
+                    }
+                    postEvent(BundleEvent.STARTED);
                 } catch (Throwable t) {
-                    error = t;
-                } finally {
-                    Thread.currentThread().setContextClassLoader(ccl);
-                }
-                if (error != null) {
                     // ensure that the context class loader is set to our class loader,
                     // as we're now handling the failure in this context
                     Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-                    fail(applicationContext, error, bundleKey);
-                    return;
+                    fail(applicationContext, t, bundleKey); 
+                } finally {
+                    Thread.currentThread().setContextClassLoader(ccl);
                 }
-
-                // ensure no-one else modifies the context map while we do this
-                // do not change locking order without also changing
-                // ApplicationContextCloser
-                synchronized (applicationContextMap) {
-                    synchronized (contextsPendingInitializationMap) {
-                        if (contextsPendingInitializationMap.containsKey(bundleKey)) {
-                            // it is possible the key is no longer in the map if the
-                            // bundle was stopped during the time it took us to get here...
-                            contextsPendingInitializationMap.remove(bundleKey);
-                            applicationContextMap.put(bundleKey, applicationContext);
-                        }
-                    }
-                }
-                postEvent(BundleEvent.STARTED);
             }
         };
 
