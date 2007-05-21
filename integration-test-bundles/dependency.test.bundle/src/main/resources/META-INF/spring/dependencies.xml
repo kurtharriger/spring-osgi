@@ -19,6 +19,9 @@
     <bean id="dependent" class="org.springframework.osgi.iandt.dependencies.DependentImpl" lazy-init="false">
         <property name="service2" ref="simpleService2"/>
         <property name="service3" ref="simpleService3"/>
+        <property name="service1">
+            <osgi:reference interface="org.springframework.osgi.iandt.simpleservice.MyService"/>
+        </property>
     </bean>
     
 </beans>

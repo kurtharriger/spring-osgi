@@ -151,6 +151,7 @@ public class ApplicationContextCreator {
 
         final TimerTask timeout = new TimerTask() {
             public void run() {
+                System.out.println("****failed");
                 ApplicationContextException e = new ApplicationContextException(
                         "Application context initializition for '"
                         + bundle.getSymbolicName() + "' has timed out");
