@@ -168,7 +168,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * <p/> Called by OSGi when this bundle is started. Finds all previously
 	 * resolved bundles and adds namespace handlers for them if necessary.
 	 * </p>
-	 * <p/> Does <em>not</em> create application contexts for bundles started
+	 * <p/> Creates application contexts for bundles started
 	 * before the extender was started.
 	 * </p>
 	 * <p/> Registers a namespace/entity resolving service for use by web app
@@ -189,17 +189,27 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		// Collect all previously resolved bundles which have namespace plugins
 		Bundle[] previousBundles = context.getBundles();
 		for (int i = 0; i < previousBundles.length; i++) {
-			maybeAddNamespaceHandlerFor(previousBundles[i]);
-		}
+            int state = previousBundles[i].getState();
+            if (state == Bundle.RESOLVED || state == Bundle.ACTIVE) {
+                maybeAddNamespaceHandlerFor(previousBundles[i]);
+            }
+        }
 
-		this.resolverServiceRegistration = registerResolverService(context);
+        this.resolverServiceRegistration = registerResolverService(context);
 		// do this once namespace handlers have been detected
 		this.taskExecutor = createTaskExecutor(context);
 
 		registerListenerService(context);
 		// listen to any changes in bundles
 		context.addBundleListener(this);
-	}
+
+		// Instantiate all previously resolved bundles which are Spring powered
+		for (int i = 0; i < previousBundles.length; i++) {
+            if (previousBundles[i].getState() == Bundle.ACTIVE) {
+                maybeCreateApplicationContextFor(previousBundles[i]);
+            }
+        }
+    }
 
 	/**
 	 * Called by OSGi when this bundled is stopped. Unregister the

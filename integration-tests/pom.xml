@@ -18,13 +18,13 @@
             <artifactId>spring-osgi-core</artifactId>
             <version>${project.parent.version}</version>
             <type>jar</type>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-test</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
       
         <!-- Configuration Admin -->
@@ -32,14 +32,14 @@
             <groupId>org.knopflerfish.bundles</groupId>
             <artifactId>cm_all</artifactId>
             <version>2.0.0</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.knopflerfish.bundles</groupId>
             <artifactId>log_all</artifactId>
             <version>2.0.0</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
 
 
@@ -47,61 +47,61 @@
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.service.listener</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.lifecycle</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.reference.proxy</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.simple.service</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.simple.service2</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.dependencies</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.cardinality0to1</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.scoped.bundle.a</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.scoped.bundle.b</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>org.springframework.osgi.iandt.scoped.bundle.common</artifactId>
             <version>${project.parent.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         
     </dependencies>
