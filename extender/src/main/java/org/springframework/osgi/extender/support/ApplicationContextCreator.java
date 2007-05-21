@@ -168,19 +168,27 @@ public class ApplicationContextCreator {
         }
 
         long timeout_in_milliseconds = config.getTimeout() * 1000;
-        timer.schedule(timeout, timeout_in_milliseconds);
+        timer.schedule(timeout, timeout_in_milliseconds); 
 
         final Runnable post = new Runnable() {
             public void run() {
                 timeout.cancel();
                 ClassLoader ccl = Thread.currentThread().getContextClassLoader();
                 Thread.currentThread().setContextClassLoader(cl);
+                Throwable error = null;
                 try {
                     applicationContext.complete();
                 } catch (Throwable t) {
-                    fail(applicationContext, t, bundleKey);
+                    error = t;
                 } finally {
                     Thread.currentThread().setContextClassLoader(ccl);
+                }
+                if (error != null) {
+                    // ensure that the context class loader is set to our class loader,
+                    // as we're now handling the failure in this context
+                    Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+                    fail(applicationContext, error, bundleKey);
+                    return;
                 }
 
                 // ensure no-one else modifies the context map while we do this
