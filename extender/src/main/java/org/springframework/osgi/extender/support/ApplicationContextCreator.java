@@ -150,8 +150,7 @@ public class ApplicationContextCreator {
         applicationContext.setNamespaceResolver(namespacePlugins);
 
         final TimerTask timeout = new TimerTask() {
-            public void run() {
-                System.out.println("****failed");
+            public void run() { 
                 ApplicationContextException e = new ApplicationContextException(
                         "Application context initializition for '"
                         + bundle.getSymbolicName() + "' has timed out");
