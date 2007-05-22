@@ -16,7 +16,7 @@
 
   <properties>
     <unpack.version>2.2</unpack.version>
-    <spring.osgi.export.pkg>org.apache.commons.lang.*</spring.osgi.export.pkg>
+    <spring.osgi.export.pkg>org.apache.commons.lang*</spring.osgi.export.pkg>
   </properties> 
   
   <dependencies>
