@@ -226,38 +226,44 @@ public class ApplicationContextCreator {
 
     protected void fail(ServiceDependentOsgiBundleXmlApplicationContext applicationContext, Throwable t,
                       Long bundleKey) {
-        applicationContext.interrupt();
+        try {
+            applicationContext.interrupt();
 
-        // do not change locking order without also changing application
-        // context closer
-        synchronized (this.applicationContextMap) {
-            synchronized (this.contextsPendingInitializationMap) {
-                this.contextsPendingInitializationMap.remove(bundleKey);
-                this.applicationContextMap.remove(bundleKey);
-            }
-        }
-        postEvent(BundleEvent.STOPPED);
-
-        StringBuffer buf = new StringBuffer();
-        DependencyListener listener = applicationContext.getListener();
-        if (listener == null || listener.getUnsatisfiedDependencies().isEmpty()) {
-            buf.append("none");
-        } else {
-            for (Iterator dependencies = listener.getUnsatisfiedDependencies().iterator(); dependencies.hasNext();) {
-                Dependency dependency = (Dependency) dependencies.next();
-                buf.append(dependency.toString());
-                if (dependencies.hasNext()) {
-                    buf.append(", ");
+            // do not change locking order without also changing application
+            // context closer
+            synchronized (this.applicationContextMap) {
+                synchronized (this.contextsPendingInitializationMap) {
+                    this.contextsPendingInitializationMap.remove(bundleKey);
+                    this.applicationContextMap.remove(bundleKey);
                 }
             }
-        }
+            postEvent(BundleEvent.STOPPED);
 
-        if (log.isErrorEnabled()) {
-            log.error("Unable to create application context for [" + bundle.getSymbolicName()
-                      + "], unsatisfied dependencies: " + buf.toString(), t);
-            if (log.isInfoEnabled()) {
-                log.info("[" + bundle.getSymbolicName() + "]" + " creation calling code: ", creationTrace);
+            StringBuffer buf = new StringBuffer();
+            DependencyListener listener = applicationContext.getListener();
+            if (listener == null || listener.getUnsatisfiedDependencies().isEmpty()) {
+                buf.append("none");
+            } else {
+                for (Iterator dependencies = listener.getUnsatisfiedDependencies().iterator(); dependencies.hasNext();)
+                {
+                    Dependency dependency = (Dependency) dependencies.next();
+                    buf.append(dependency.toString());
+                    if (dependencies.hasNext()) {
+                        buf.append(", ");
+                    }
+                }
             }
+
+            if (log.isErrorEnabled()) {
+                log.error("Unable to create application context for [" + bundle.getSymbolicName()
+                          + "], unsatisfied dependencies: " + buf.toString(), t);
+                if (log.isInfoEnabled()) {
+                    log.info("[" + bundle.getSymbolicName() + "]" + " creation calling code: ", creationTrace);
+                }
+            }
+        } catch (Throwable e) {
+            t.printStackTrace();
+            e.printStackTrace();
         }
     }
 

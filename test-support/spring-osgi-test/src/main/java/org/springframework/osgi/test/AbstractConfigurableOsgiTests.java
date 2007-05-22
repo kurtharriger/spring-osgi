@@ -148,6 +148,11 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 		defaults.add("com.sun.*");
 		// FIXME: the JAXP package (for 1.4 VMs) should be discovered in an OSGi manner
 		defaults.add("org.apache.xerces.jaxp.*");
+        // Felix does not include the ServiceTracker.   This comes from the compendium
+        // OSGi jar in the classpath.
+        if (FELIX_PLATFORM.equals(getPlatformName())) {
+            defaults.add("org.osgi.util.tracker");
+        }
 		return defaults;
 	}
 }
