@@ -23,8 +23,8 @@
     com.mchange*;resolution:=optional,
     org.apache.log4j;resolution:=optional,
     org.jboss*;resolution:=optional,
-    javax.naming;resolution:=optional,
-    javax.net;resolution:=optional,
+    javax.naming*;resolution:=optional,
+    javax.net*;resolution:=optional,
     *
     </spring.osgi.import.pkg>
     

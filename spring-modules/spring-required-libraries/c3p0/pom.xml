@@ -16,7 +16,7 @@
 
   <properties>
     <unpack.version>0.9.0.4</unpack.version>
-    <spring.osgi.export.pkg>com.mchange.*</spring.osgi.export.pkg>
+    <spring.osgi.export.pkg>com.mchange*</spring.osgi.export.pkg>
     <spring.osgi.import.pkg>
     javax.naming*;resolution:=optional,
     org.apache.log4j*;resolution:=optional,

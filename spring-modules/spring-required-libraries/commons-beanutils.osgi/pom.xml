@@ -14,7 +14,7 @@
   
   <properties>
     <unpack.version>1.7.0</unpack.version>
-    <spring.osgi.export.pkg>org.apache.commons.beanutils.*</spring.osgi.export.pkg>
+    <spring.osgi.export.pkg>org.apache.commons.beanutils*</spring.osgi.export.pkg>
   </properties>
 
   <dependencies>
