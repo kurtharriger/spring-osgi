@@ -11,4 +11,4 @@ Import-Package: junit.framework,
  org.springframework.osgi.annotation;resolution:=optional,
  org.springframework.osgi.test,
  org.springframework.osgi.iandt.simpleservice,
- org.springframework.osgi.iandt.annotation.proxy
+ org.springframework.osgi.iandt.annotation.proxy;resolution:=optional
