@@ -30,6 +30,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.Constants;
 
 /**
  * BundleContext mock.
@@ -193,6 +194,14 @@ public class MockBundleContext implements BundleContext {
 	 * java.lang.String)
 	 */
 	public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+		// Some jiggery-pokery to get round the fact that we don't ever use the clazz
+		if (clazz == null) {
+			int i = filter.indexOf(Constants.OBJECTCLASS + "=");
+			if (i>0) {
+				clazz = filter.substring(i+Constants.OBJECTCLASS.length()+1);
+				clazz = clazz.substring(0, clazz.indexOf(")"));
+			}
+		}
 		return new ServiceReference[] { new MockServiceReference(getBundle(), new String[] { clazz }) };
 	}
 

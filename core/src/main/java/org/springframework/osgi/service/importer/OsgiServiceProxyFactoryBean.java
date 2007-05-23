@@ -444,4 +444,16 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	public void setBeanName(String beanName) {
 		setServiceBeanName(beanName);
 	}
+
+	public int getContextCL() {
+		return contextClassloader;
+	}
+
+	public String getFilter() {
+		return filter;
+	}
+
+	public String getServiceBeanName() {
+		return serviceBeanName;
+	}
 }

@@ -17,6 +17,7 @@ package org.springframework.osgi.test;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
+import org.springframework.core.JdkVersion;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -80,6 +81,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return "org.springframework.osgi,spring-osgi-extender," + getSpringOsgiVersion();
 	}
 
+	protected String getSpringOSGiAnnotationBundleUrl() {
+		return "org.springframework.osgi,spring-osgi-annotation," + getSpringOsgiVersion();
+	}
+
 	protected String getSpringCoreBundleUrl() {
 		return "org.springframework.osgi,spring-core," + getSpringBundledVersion();
 	}
@@ -140,11 +145,21 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * @return the array of mandatory bundle names
 	 */
 	protected String[] getMandatoryBundles() {
-		return new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
+		if (!JdkVersion.isAtLeastJava15()) {
+			return new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
 				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
 				getSpringMockUrl(), getUtilConcurrentLibUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
 				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl(),
 				getSpringOSGiExtenderBundleUrl() };
+		}
+		else {
+			return new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
+				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
+				getSpringMockUrl(), getUtilConcurrentLibUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
+				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl(),
+				getSpringOSGiExtenderBundleUrl(), getSpringOSGiAnnotationBundleUrl() };
+		}
+
 	}
 
 	public Bundle findBundleByLocation(String bundleLocation) {

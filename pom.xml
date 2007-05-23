@@ -192,6 +192,8 @@ limitations under the License.
 	<module>io</module>    
     <module>core</module>
     <module>extender</module>
+    <!-- requires java 5 -->
+    <module>annotation</module>
     <module>test-support</module>
     <module>integration-test-bundles</module>
     <module>integration-tests</module>
