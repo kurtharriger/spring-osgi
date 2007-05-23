@@ -54,6 +54,15 @@
 	
   </modules>
 
+<profiles>
+    <profile>
+      <id>equinox-1.5</id>
+      <modules>
+       <module>annotation.test.bundle</module>
+</modules>
+   </profile>
+</profiles>
+
  <build>
     <plugins>
       <plugin>
