@@ -15,9 +15,7 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 public class AnnotationProxyTest extends AbstractConfigurableBundleCreatorTests {
 
     protected String getManifestLocation() {
-        // return
-        // "classpath:org/springframework/osgi/test/annotationProxy/ReferenceProxyTest.MF";
-        return null;
+        return "classpath:org/springframework/osgi/iandt/annotationProxy/AnnotationProxyTest.MF";
     }
 
     protected String[] getBundles() {
