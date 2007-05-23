@@ -56,6 +56,9 @@
 <profiles>
     <profile>
       <id>equinox-1.5</id>
+      <activation>
+           <jdk>1.5</jdk>
+      </activation>
       <modules>
        <module>annotation.test.bundle</module>
 </modules>
