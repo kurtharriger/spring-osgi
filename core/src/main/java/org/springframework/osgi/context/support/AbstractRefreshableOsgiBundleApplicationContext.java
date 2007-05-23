@@ -15,14 +15,17 @@
  */
 package org.springframework.osgi.context.support;
 
-import java.util.*;
+import java.util.Dictionary;
+import java.util.Properties;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.config.Scope; 
+import org.springframework.beans.factory.config.Scope;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
@@ -41,46 +44,44 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * 
  * AbstractRefreshableApplicationContext subclass that implements the
  * ConfigurableOsgiApplicationContext interface for OSGi environments.
  * Pre-implements a "configLocation" property, to be populated through the
  * ConfigurableOsgiApplicationContext interface on OSGi bundle startup.
- * 
- * <p>
+ * <p/>
+ * <p/>
  * This class is as easy to subclass as AbstractRefreshableApplicationContext:
  * All you need to implement is the <code>loadBeanDefinitions</code> method;
  * see the superclass javadoc for details. Note that implementations are
  * supposed to load bean definitions from the files specified by the locations
  * returned by the <code>getConfigLocations</code> method.
- * 
- * <p>
+ * <p/>
+ * <p/>
  * Interprets resource paths as OSGi bundle resources (either from the bundle
  * classpath or OSGi entries).
- * 
- * <p>
+ * <p/>
+ * <p/>
  * In addition to the special beans detected by AbstractApplicationContext, this
  * class registers the <code>BundleContextAwareProcessor</code> for processing
  * beans that implement the <code>BundleContextAware</code> interface.
- * 
- * <p>
+ * <p/>
+ * <p/>
  * This application context offers the OSGi-specific, "bundle" scope. See
  * {@link org.springframework.osgi.context.OsgiBundleScope}.
- * 
- * <p>
+ * <p/>
+ * <p/>
  * Note that OsgiApplicationContext implementations are generally supposed to
  * configure themselves based on the configuration received through the
  * ConfigurableOsgiBundleApplicationContext interface. In contrast, a standalone
  * application context might allow for configuration in custom startup code (for
  * example, GenericApplicationContext).
- * 
+ *
  * @author Costin Leau
  * @author Adrian Colyer
  * @author Hal Hildebrand
- * 
  */
 public abstract class AbstractRefreshableOsgiBundleApplicationContext extends AbstractRefreshableApplicationContext
-		implements ConfigurableOsgiBundleApplicationContext {
+	implements ConfigurableOsgiBundleApplicationContext {
 
 	/**
 	 * Service entry used for specifying the application context name when
@@ -88,27 +89,35 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 */
 	public static final String APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME = "org.springframework.context.service.name";
 
-	/** OSGi bundle - determined from the BundleContext */
+	/**
+	 * OSGi bundle - determined from the BundleContext
+	 */
 	private Bundle bundle;
 
-	/** OSGi bundle context */
+	/**
+	 * OSGi bundle context
+	 */
 	private BundleContext bundleContext;
 
-	/** Path to configuration files * */
+	/**
+	 * Path to configuration files *
+	 */
 	private String[] configLocations;
 
 	/**
 	 * Internal ResourceLoader implementation used for delegation.
-	 * 
+	 * <p/>
 	 * Note that the PatternResolver is handled through
 	 * {@link #getResourcePatternResolver()}
 	 */
 	private OsgiBundleResourceLoader osgiResourceLoader;
 
-	/** Used for publishing the app context * */
+	/**
+	 * Used for publishing the app context *
+	 */
 	private ServiceRegistration serviceRegistration;
 
-	private boolean publishContextAsService = true; 
+	private boolean publishContextAsService = true;
 
 	public AbstractRefreshableOsgiBundleApplicationContext() {
 		super(null);
@@ -149,17 +158,17 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 
 	/**
 	 * Sets a default config location if no explicit config location specified.
-	 * 
+	 *
 	 * @see #getDefaultConfigLocations
 	 * @see #setConfigLocations
 	 */
 	public synchronized void refresh() throws BeansException {
-        preRefresh();
-        onRefresh();
-        postRefresh();
-    }
+		preRefresh();
+		onRefresh();
+		postRefresh();
+	}
 
-    // synchronization required around close as after this, the BundleContext is
+	// synchronization required around close as after this, the BundleContext is
 	// invalid - cannot allow close to happen on a separate thread during
 	// refresh!
 	public synchronized void close() {
@@ -189,9 +198,9 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	/**
 	 * Return the default config locations to use, for the case where no
 	 * explicit config locations have been specified.
-	 * <p>
+	 * <p/>
 	 * Default implementation returns null, requiring explicit config locations.
-	 * 
+	 *
 	 * @see #setConfigLocations
 	 */
 	protected String[] getDefaultConfigLocations() {
@@ -205,6 +214,19 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		super.postProcessBeanFactory(beanFactory);
 		beanFactory.addBeanPostProcessor(new BundleContextAwareProcessor(this.bundleContext));
 		beanFactory.ignoreDependencyInterface(BundleContextAware.class);
+
+		// Try and add the annotation processor. This will simply fail if the annotation
+		// bundle is not present (presumably because we are on a pre-Java5 VM).
+		try {
+			Class bppClass = Class.forName("org.springframework.osgi.annotation.ServiceReferenceInjectionBeanPostProcessor");
+			BeanPostProcessor bpp = (BeanPostProcessor) bppClass.newInstance();
+			((BundleContextAware) bpp).setBundleContext(bundleContext);
+			((BeanFactoryAware) bpp).setBeanFactory(beanFactory);
+			beanFactory.addBeanPostProcessor(bpp);
+		}
+		catch (Throwable t) {
+			// Ignored
+		}
 
 		// register 'bundle' scope (but make sure we clean it, in case of a
 		// refresh)
@@ -223,7 +245,6 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 * Publish the application context as an OSGi service. The method internally
 	 * takes care of parsing the bundle headers and determined if actual
 	 * publishing is required or not.
-	 * 
 	 */
 	protected void publishContextAsOsgiServiceIfNecessary() {
 		if (publishContextAsService) {
@@ -232,23 +253,24 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 				OsgiBundleUtils.getNullSafeSymbolicName(getBundle()));
 			if (logger.isInfoEnabled()) {
 				logger.info("Publishing application context with properties ("
-						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
-						+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
+					+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
+					+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
 			}
 			this.serviceRegistration = getBundleContext().registerService(
-				new String[] { AbstractRefreshableApplicationContext.class.getName() }, this, serviceProperties);
-		} else {
+				new String[]{AbstractRefreshableApplicationContext.class.getName()}, this, serviceProperties);
+		}
+		else {
 			if (logger.isInfoEnabled()) {
 				logger.info("Not publishing application context with properties ("
-						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
-						+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
+					+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
+					+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
 			}
-        }
+		}
 	}
 
 	/**
 	 * This implementation supports pattern matching inside the OSGi bundle.
-	 * 
+	 *
 	 * @see OsgiBundleResourcePatternResolver
 	 */
 	protected ResourcePatternResolver getResourcePatternResolver() {
@@ -280,9 +302,8 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 
 	/**
 	 * Create the classloader that delegates to the underlying OSGi bundle.
-	 * 
+	 *
 	 * @param bundle
-	 * @return
 	 */
 	protected ClassLoader createBundleClassLoader(Bundle bundle) {
 		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
@@ -310,79 +331,80 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	}
 
 
-    protected void preRefresh() throws BeansException, IllegalStateException {
+	protected void preRefresh() throws BeansException, IllegalStateException {
 
-        // TODO: should refresh imported beans
-        if (ObjectUtils.isEmpty(configLocations)) {
-            setConfigLocations(getDefaultConfigLocations());
-        }
-        if (!OsgiBundleUtils.isBundleActive(getBundle())) {
-            throw new ApplicationContextException("Unable to refresh application context: bundle is "
-                                                  + OsgiBundleUtils.getBundleStateAsString(getBundle()));
-        }
+		// TODO: should refresh imported beans
+		if (ObjectUtils.isEmpty(configLocations)) {
+			setConfigLocations(getDefaultConfigLocations());
+		}
+		if (!OsgiBundleUtils.isBundleActive(getBundle())) {
+			throw new ApplicationContextException("Unable to refresh application context: bundle is "
+				+ OsgiBundleUtils.getBundleStateAsString(getBundle()));
+		}
 
-        // Prepare this context for refreshing.
-        prepareRefresh();
+		// Prepare this context for refreshing.
+		prepareRefresh();
 
-        // Tell the subclass to refresh the internal bean factory.
-        ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+		// Tell the subclass to refresh the internal bean factory.
+		ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-        // Prepare the bean factory for use in this context.
-        prepareBeanFactory(beanFactory);
+		// Prepare the bean factory for use in this context.
+		prepareBeanFactory(beanFactory);
 
-        try {
-            // Allows post-processing of the bean factory in context subclasses.
-            postProcessBeanFactory(beanFactory);
+		try {
+			// Allows post-processing of the bean factory in context subclasses.
+			postProcessBeanFactory(beanFactory);
 
-            // Invoke factory processors registered as beans in the context.
-            invokeBeanFactoryPostProcessors(beanFactory);
+			// Invoke factory processors registered as beans in the context.
+			invokeBeanFactoryPostProcessors(beanFactory);
 
-            // Register bean processors that intercept bean creation.
-            registerBeanPostProcessors(beanFactory);
+			// Register bean processors that intercept bean creation.
+			registerBeanPostProcessors(beanFactory);
 
-            // Initialize message source for this context.
-            initMessageSource();
+			// Initialize message source for this context.
+			initMessageSource();
 
-            // Initialize event multicaster for this context.
-            initApplicationEventMulticaster();
-        }
+			// Initialize event multicaster for this context.
+			initApplicationEventMulticaster();
+		}
 
-        catch (BeansException ex) {
-            // Destroy already created singletons to avoid dangling resources.
-            beanFactory.destroySingletons();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Post refresh error", ex);
-            }
-            throw ex;
-        }
-    }
+		catch (BeansException ex) {
+			// Destroy already created singletons to avoid dangling resources.
+			beanFactory.destroySingletons();
+			if (logger.isDebugEnabled()) {
+				logger.debug("Post refresh error", ex);
+			}
+			throw ex;
+		}
+	}
 
 
-    protected void postRefresh() throws BeansException {
-        try {
+	protected void postRefresh() throws BeansException {
+		try {
 
-            // Initialize other special beans in specific context subclasses.
-            onRefresh();
+			// Initialize other special beans in specific context subclasses.
+			onRefresh();
 
-            // Check for listener beans and register them.
-            registerListeners();
+			// Check for listener beans and register them.
+			registerListeners();
 
-            // Instantiate singletons this late to allow them to access the message source.
+			// Instantiate singletons this late to allow them to access the message source.
 
-            getBeanFactory().preInstantiateSingletons();
+			getBeanFactory().preInstantiateSingletons();
 
-            // Last step: publish corresponding event.
-            publishEvent(new ContextRefreshedEvent(this));
-        } catch (BeansException ex) {
-            // Destroy already created singletons to avoid dangling resources.
-            getBeanFactory().destroySingletons();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Post refresh error", ex);
-            }
-            throw ex;
-        }
+			// Last step: publish corresponding event.
+			publishEvent(new ContextRefreshedEvent(this));
+		}
+		catch (BeansException ex) {
+			// Destroy already created singletons to avoid dangling resources.
+			getBeanFactory().destroySingletons();
+			if (logger.isDebugEnabled()) {
+				logger.debug("Post refresh error", ex);
+			}
+			throw ex;
+		}
 
-        // publish the context only after all the beans have been published
-        publishContextAsOsgiServiceIfNecessary();
-    }
+		// publish the context only after all the beans have been published
+		publishContextAsOsgiServiceIfNecessary();
+	}
 }
