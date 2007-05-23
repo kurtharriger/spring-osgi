@@ -1,9 +1,11 @@
 package org.springframework.osgi.iandt.annotationProxy;
 
+import java.lang.reflect.Field;
+
 import org.osgi.framework.Bundle;
 import org.springframework.core.JdkVersion;
 import org.springframework.osgi.ServiceUnavailableException;
-import org.springframework.osgi.iandt.annotation.proxy.ServiceReferer;
+//import org.springframework.osgi.iandt.annotation.proxy.ServiceReferer;
 import org.springframework.osgi.iandt.simpleservice.MyService;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
@@ -41,7 +43,9 @@ public class AnnotationProxyTest extends AbstractConfigurableBundleCreatorTests 
         if (!JdkVersion.isAtLeastJava15()) {
             return;
         }
-        MyService reference = ServiceReferer.serviceReference;
+        Class referer = Class.forName("org.springframework.osgi.iandt.annotation.proxy.ServiceReferer");
+        Field ref = referer.getField("serviceReference");
+        MyService reference = (MyService)ref.get(null); //ServiceReferer.serviceReference;
 
         assertNotNull("reference not initialized", reference);
         assertNotNull("no value specified in the reference", reference.stringValue());
