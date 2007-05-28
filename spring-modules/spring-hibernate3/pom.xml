@@ -19,7 +19,8 @@
 	   <spring.osgi.import.pkg>
 	      javax.servlet*;resolution:=optional,
 		  javax.transaction;resolution:=optional,
-		  org.aopalliance*;resolution:=optional
+		  org.aopalliance*;resolution:=optional,
+		  org.springframework.web*;resolution:=optional;version=${spring.version}
 	   </spring.osgi.import.pkg>
 	</properties>
 	
