@@ -22,6 +22,7 @@ import org.osgi.framework.BundleContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.util.IOUtils;
+import org.springframework.osgi.test.util.JarCreator;
 import org.springframework.util.StringUtils;
 
 /**
@@ -63,7 +64,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 
 	static {
 		DEFAULT_SETTINGS.setProperty(ROOT_DIR, "file:./target/test-classes");
-		DEFAULT_SETTINGS.setProperty(INCLUDE_PATTERNS, "/**/*.class");
+		DEFAULT_SETTINGS.setProperty(INCLUDE_PATTERNS, StringUtils.arrayToCommaDelimitedString(JarCreator.DEFAULT_CONTENT_PATTERN));
 		DEFAULT_SETTINGS.setProperty(LIBS, "");
 		DEFAULT_SETTINGS.setProperty(MANIFEST, "");
 	}

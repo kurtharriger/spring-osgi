@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.context.support;
 
+
+import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Properties;
 
@@ -44,44 +46,46 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 
  * AbstractRefreshableApplicationContext subclass that implements the
  * ConfigurableOsgiApplicationContext interface for OSGi environments.
  * Pre-implements a "configLocation" property, to be populated through the
  * ConfigurableOsgiApplicationContext interface on OSGi bundle startup.
- * <p/>
- * <p/>
+ * 
+ * <p>
  * This class is as easy to subclass as AbstractRefreshableApplicationContext:
  * All you need to implement is the <code>loadBeanDefinitions</code> method;
  * see the superclass javadoc for details. Note that implementations are
  * supposed to load bean definitions from the files specified by the locations
  * returned by the <code>getConfigLocations</code> method.
- * <p/>
- * <p/>
+ * 
+ * <p>
  * Interprets resource paths as OSGi bundle resources (either from the bundle
  * classpath or OSGi entries).
- * <p/>
- * <p/>
+ * 
+ * <p>
  * In addition to the special beans detected by AbstractApplicationContext, this
  * class registers the <code>BundleContextAwareProcessor</code> for processing
  * beans that implement the <code>BundleContextAware</code> interface.
- * <p/>
- * <p/>
+ * 
+ * <p>
  * This application context offers the OSGi-specific, "bundle" scope. See
  * {@link org.springframework.osgi.context.OsgiBundleScope}.
- * <p/>
- * <p/>
+ * 
+ * <p>
  * Note that OsgiApplicationContext implementations are generally supposed to
  * configure themselves based on the configuration received through the
  * ConfigurableOsgiBundleApplicationContext interface. In contrast, a standalone
  * application context might allow for configuration in custom startup code (for
  * example, GenericApplicationContext).
- *
+ * 
  * @author Costin Leau
  * @author Adrian Colyer
  * @author Hal Hildebrand
+ * 
  */
 public abstract class AbstractRefreshableOsgiBundleApplicationContext extends AbstractRefreshableApplicationContext
-	implements ConfigurableOsgiBundleApplicationContext {
+		implements ConfigurableOsgiBundleApplicationContext {
 
 	/**
 	 * Service entry used for specifying the application context name when
@@ -89,38 +93,37 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 */
 	public static final String APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME = "org.springframework.context.service.name";
 
-	/**
-	 * OSGi bundle - determined from the BundleContext
-	 */
+	/** OSGi bundle - determined from the BundleContext */
 	private Bundle bundle;
 
-	/**
-	 * OSGi bundle context
-	 */
+	/** OSGi bundle context */
 	private BundleContext bundleContext;
 
-	/**
-	 * Path to configuration files *
-	 */
+	/** Path to configuration files * */
 	private String[] configLocations;
 
 	/**
 	 * Internal ResourceLoader implementation used for delegation.
-	 * <p/>
+	 * 
 	 * Note that the PatternResolver is handled through
 	 * {@link #getResourcePatternResolver()}
 	 */
 	private OsgiBundleResourceLoader osgiResourceLoader;
-
+	
 	/**
-	 * Used for publishing the app context *
+	 * Internal pattern resolver.
+	 * The parent one can't be used since it is being instantiated inside the constructor
+	 * when the bundle field is not instantiated yet.
 	 */
+	private OsgiBundleResourcePatternResolver osgiPatternResolver;
+
+	/** Used for publishing the app context * */
 	private ServiceRegistration serviceRegistration;
 
 	private boolean publishContextAsService = true;
 
 	public AbstractRefreshableOsgiBundleApplicationContext() {
-		super(null);
+		super();
 		setDisplayName("Root OsgiBundleApplicationContext");
 	}
 
@@ -134,6 +137,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		this.bundleContext = bundleContext;
 		this.bundle = bundleContext.getBundle();
 		this.osgiResourceLoader = new OsgiBundleResourceLoader(this.bundle);
+		this.osgiPatternResolver = new OsgiBundleResourcePatternResolver(this.bundle);
 		this.setClassLoader(createBundleClassLoader(this.bundle));
 	}
 
@@ -158,7 +162,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 
 	/**
 	 * Sets a default config location if no explicit config location specified.
-	 *
+	 * 
 	 * @see #getDefaultConfigLocations
 	 * @see #setConfigLocations
 	 */
@@ -198,9 +202,9 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	/**
 	 * Return the default config locations to use, for the case where no
 	 * explicit config locations have been specified.
-	 * <p/>
+	 * <p>
 	 * Default implementation returns null, requiring explicit config locations.
-	 *
+	 * 
 	 * @see #setConfigLocations
 	 */
 	protected String[] getDefaultConfigLocations() {
@@ -215,6 +219,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		beanFactory.addBeanPostProcessor(new BundleContextAwareProcessor(this.bundleContext));
 		beanFactory.ignoreDependencyInterface(BundleContextAware.class);
 
+		// FIXME: this should be removed since annotations are not mandatory
 		// Try and add the annotation processor. This will simply fail if the annotation
 		// bundle is not present (presumably because we are on a pre-Java5 VM).
 		try {
@@ -227,7 +232,6 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		catch (Throwable t) {
 			// Ignored
 		}
-
 		// register 'bundle' scope (but make sure we clean it, in case of a
 		// refresh)
 		cleanOsgiBundleScope(beanFactory);
@@ -245,6 +249,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 * Publish the application context as an OSGi service. The method internally
 	 * takes care of parsing the bundle headers and determined if actual
 	 * publishing is required or not.
+	 * 
 	 */
 	protected void publishContextAsOsgiServiceIfNecessary() {
 		if (publishContextAsService) {
@@ -253,28 +258,28 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 				OsgiBundleUtils.getNullSafeSymbolicName(getBundle()));
 			if (logger.isInfoEnabled()) {
 				logger.info("Publishing application context with properties ("
-					+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
-					+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
+						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
+						+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
 			}
 			this.serviceRegistration = getBundleContext().registerService(
-				new String[]{AbstractRefreshableApplicationContext.class.getName()}, this, serviceProperties);
+				new String[] { AbstractRefreshableApplicationContext.class.getName() }, this, serviceProperties);
 		}
 		else {
 			if (logger.isInfoEnabled()) {
 				logger.info("Not publishing application context with properties ("
-					+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
-					+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
+						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
+						+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
 			}
 		}
 	}
 
 	/**
 	 * This implementation supports pattern matching inside the OSGi bundle.
-	 *
+	 * 
 	 * @see OsgiBundleResourcePatternResolver
 	 */
 	protected ResourcePatternResolver getResourcePatternResolver() {
-		return new OsgiBundleResourcePatternResolver(this);
+		return new OsgiBundleResourcePatternResolver(this.bundle);
 	}
 
 	// delegate methods to a proper OsgiResourceLoader
@@ -285,6 +290,10 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 
 	public Resource getResource(String location) {
 		return osgiResourceLoader.getResource(location);
+	}
+
+	public Resource[] getResources(String locationPattern) throws IOException {
+		return osgiPatternResolver.getResources(locationPattern);
 	}
 
 	public void setClassLoader(ClassLoader classLoader) {
@@ -302,8 +311,9 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 
 	/**
 	 * Create the classloader that delegates to the underlying OSGi bundle.
-	 *
+	 * 
 	 * @param bundle
+	 * @return
 	 */
 	protected ClassLoader createBundleClassLoader(Bundle bundle) {
 		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
@@ -330,7 +340,6 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		return isActive();
 	}
 
-
 	protected void preRefresh() throws BeansException, IllegalStateException {
 
 		// TODO: should refresh imported beans
@@ -339,7 +348,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		}
 		if (!OsgiBundleUtils.isBundleActive(getBundle())) {
 			throw new ApplicationContextException("Unable to refresh application context: bundle is "
-				+ OsgiBundleUtils.getBundleStateAsString(getBundle()));
+					+ OsgiBundleUtils.getBundleStateAsString(getBundle()));
 		}
 
 		// Prepare this context for refreshing.
@@ -378,7 +387,6 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		}
 	}
 
-
 	protected void postRefresh() throws BeansException {
 		try {
 
@@ -388,7 +396,8 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 			// Check for listener beans and register them.
 			registerListeners();
 
-			// Instantiate singletons this late to allow them to access the message source.
+			// Instantiate singletons this late to allow them to access the
+			// message source.
 
 			getBeanFactory().preInstantiateSingletons();
 

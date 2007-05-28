@@ -49,7 +49,9 @@
     <module>cardinality.0to1.bundle</module>
 	<module>scoped.a.bundle</module>    
 	<module>scoped.b.bundle</module>    
-	<module>scoped.common.bundle</module>    
+	<module>scoped.common.bundle</module>
+	<module>io.fragment.1.bundle</module>    
+	<module>io.fragment.2.bundle</module>    
 	
   </modules>
 

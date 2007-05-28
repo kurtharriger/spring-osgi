@@ -52,6 +52,7 @@ public abstract class AbstractOsgiPlatform implements OsgiPlatform {
 		return toString;
 	}
 
+
 	protected File createTempDir(String suffix) {
 		if (suffix == null)
 			suffix = "osgi";

@@ -97,7 +97,6 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 			platform = new EquinoxPlatform();
 
 		// add boot delegation
-		// TODO: why is this needed ?
 		platform.getConfigurationProperties().setProperty(ORG_OSGI_FRAMEWORK_BOOTDELEGATION,
 				getBootDelegationPackageString());
 

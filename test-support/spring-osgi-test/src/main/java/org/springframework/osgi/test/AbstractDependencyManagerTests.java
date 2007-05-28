@@ -16,9 +16,10 @@
 package org.springframework.osgi.test;
 
 import org.osgi.framework.Bundle;
-import org.springframework.core.io.Resource;
 import org.springframework.core.JdkVersion;
+import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -98,15 +99,15 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	protected String getSlf4jApi() {
-		return "org.slf4j,slf4j-api,1.3.1";
+		return "org.slf4j,slf4j-api,1.4.0";
 	}
 
 	protected String getJclOverSlf4jUrl() {
-		return "org.slf4j,jcl104-over-slf4j,1.3.1";
+		return "org.slf4j,jcl104-over-slf4j,1.4.0";
 	}
 
 	protected String getSlf4jLog4jUrl() {
-		return "org.slf4j,slf4j-log4j12,1.3.1";
+		return "org.slf4j,slf4j-log4j12,1.4.0";
 	}
 
 	protected String getLog4jLibUrl() {
@@ -145,21 +146,19 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * @return the array of mandatory bundle names
 	 */
 	protected String[] getMandatoryBundles() {
-		if (!JdkVersion.isAtLeastJava15()) {
-			return new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
+
+		String[] jars = new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
 				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
 				getSpringMockUrl(), getUtilConcurrentLibUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
 				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl(),
 				getSpringOSGiExtenderBundleUrl() };
-		}
-		else {
-			return new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
-				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
-				getSpringMockUrl(), getUtilConcurrentLibUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
-				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl(),
-				getSpringOSGiExtenderBundleUrl(), getSpringOSGiAnnotationBundleUrl() };
+
+		String[] bundles = jars;
+		if (JdkVersion.isAtLeastJava15()) {
+			bundles = (String[]) ObjectUtils.addObjectToArray(jars, getSpringOSGiAnnotationBundleUrl());
 		}
 
+		return bundles;
 	}
 
 	public Bundle findBundleByLocation(String bundleLocation) {

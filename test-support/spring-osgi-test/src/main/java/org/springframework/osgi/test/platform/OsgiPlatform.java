@@ -42,14 +42,13 @@ public interface OsgiPlatform {
 	void stop() throws Exception;
 
 	/**
-	 * Return the {@link java.util.Properties} object used
-	 * for configuring the underlying OSGi implementation before
-	 * starting it.
-	 *  
+	 * Return the {@link java.util.Properties} object used for configuring the
+	 * underlying OSGi implementation before starting it.
+	 * 
 	 * @return
 	 */
 	Properties getConfigurationProperties();
-	
+
 	/**
 	 * Get a hold of the bundle context of the returned platform.
 	 * @return

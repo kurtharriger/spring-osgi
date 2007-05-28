@@ -64,4 +64,11 @@ public class OsgiBundleResourceLoader extends DefaultResourceLoader {
 		return new OsgiBundleResource(bundle, location);
 	}
 
+	/**
+	 * Return the bundle for this resource.
+	 */
+	public final Bundle getBundle() {
+		return bundle;
+	}
+
 }

@@ -29,7 +29,6 @@ import junit.framework.TestResult;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
@@ -40,6 +39,8 @@ import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.test.util.ConfigurableByteArrayOutputStream;
 import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.osgi.test.util.TestUtils;
+import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.util.Assert;
 
 /**
@@ -207,7 +208,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		originalResult = result;
 
 		// TODO: can this be actually improved (can we still reuse the
-		// testResult)
+		// testResult?)
 		result.startTest(osgiJUnitTest);
 		result.runProtected(osgiJUnitTest, new Protectable() {
 			public void protect() throws Throwable {
@@ -220,14 +221,27 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	public void runBare() throws Throwable {
-		prepareTestExecution();
-		try {
-			// invoke OSGi test run
-			invokeOSGiTestExecution();
-			readTestResult();
+		// add ConditionalTestCase behavior
+
+		// getName will return the name of the method being run
+		if (isDisabledInThisEnvironment(getName())) {
+			recordDisabled();
+			logger.warn("**** " + getClass().getName() + "." + getName() + " disabled in this environment: "
+					+ "Total disabled tests=" + getDisabledTestCount());
+			return;
 		}
-		finally {
-			completeTestExecution();
+		else
+
+		{
+			prepareTestExecution();
+			try {
+				// invoke OSGi test run
+				invokeOSGiTestExecution();
+				readTestResult();
+			}
+			finally {
+				completeTestExecution();
+			}
 		}
 	}
 
@@ -367,7 +381,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			for (int i = 0; i < bundles.length; i++) {
 				logger.debug("starting bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]");
 				try {
-					bundles[i].start();
+					if (!OsgiBundleUtils.isFragment(bundles[i]))
+						bundles[i].start();
 				}
 				catch (Throwable ex) {
 					logger.warn("can't start bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName()
@@ -375,7 +390,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 				}
 
 			}
-			
+
 			// hook after the OSGi platform has been setup
 			postProcessBundleContext(platformContext);
 
@@ -392,13 +407,9 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 		// add platform information
 		platformInfo.append(osgiPlatform);
-		// get current bundle (it has to be the system bundle since we just
-		// bootstrapped the platform)
-		Bundle sysBundle = context.getBundle();
-
 		platformInfo.append(" [");
 		// Version
-		platformInfo.append(sysBundle.getHeaders().get(Constants.BUNDLE_VERSION));
+		platformInfo.append(OsgiPlatformDetector.getVersion(context));
 		platformInfo.append("]");
 		logger.info(platformInfo + " started");
 	}
@@ -425,6 +436,12 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		// merge bundles
 		String[] mandatoryBundles = getMandatoryBundles();
 		String[] optionalBundles = getBundles();
+
+		if (mandatoryBundles == null)
+			mandatoryBundles = new String[0];
+
+		if (optionalBundles == null)
+			optionalBundles = new String[0];
 
 		String[] allBundles = new String[mandatoryBundles.length + optionalBundles.length];
 		System.arraycopy(mandatoryBundles, 0, allBundles, 0, mandatoryBundles.length);

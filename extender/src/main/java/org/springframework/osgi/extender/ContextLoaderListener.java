@@ -37,10 +37,10 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
-import org.springframework.osgi.context.support.OsgiPlatformDetector;
 import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.osgi.extender.support.ApplicationContextCloser;
 import org.springframework.osgi.extender.support.ApplicationContextCreator;
+import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**

@@ -15,14 +15,16 @@
  */
 package org.springframework.osgi.io;
 
+import java.net.URL;
+
 import junit.framework.TestCase;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.UrlResource;
 import org.springframework.osgi.mock.MockBundle;
-import org.springframework.util.ObjectUtils;
 
 /**
  * @author Costin Leau
@@ -85,19 +87,11 @@ public class OsgiBundleResourcePatternResolverTest extends TestCase {
 			// expected
 		}
 
-		res = resolver.getResources("bundle://foo");
+		String thisClass = "org/springframework/osgi/io/OsgiBundleResourcePatternResolverTest.class";
+
+		res = resolver.getResources("bundle:" + thisClass);
 		assertNotNull(res);
 		assertEquals(1, res.length);
-		assertEquals(new OsgiBundleResource(bundle, "bundle://foo"), res[0]);
-
-		// TODO: need a functional test here
-		res = resolver.getResources("bundle:org/springframework/osgi/io/OsgiBundleResourcePatternResolverT*");
-		assertNotNull(res);
-	}
-
-	public void testGetResourcesWoPrefix() throws Exception {
-		Resource[] resWoPrefix = resolver.getResources("**/*");
-		Resource[] resWPrefix = resolver.getResources("bundle:**/*");
-		assertTrue(ObjectUtils.nullSafeEquals(resWPrefix, resWoPrefix));
+		assertTrue(res[0] instanceof UrlResource);
 	}
 }

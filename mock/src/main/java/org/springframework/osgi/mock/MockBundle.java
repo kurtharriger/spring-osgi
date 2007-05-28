@@ -32,8 +32,8 @@ import org.osgi.framework.ServiceReference;
 /**
  * Bundle Mock.
  * 
- * <p/>
- * The mock will the thread current classloader for loading classes/resources.
+ * <p/> The mock will the thread current classloader for loading
+ * classes/resources.
  * 
  * @author Costin Leau
  * 
@@ -100,7 +100,7 @@ public class MockBundle implements Bundle {
 		Enumeration enm = null;
 
 		try {
-			enm = loader.getResources(path + filePattern);
+			enm = loader.getResources(path + "/" + filePattern);
 		}
 		catch (Exception ex) {
 			// catch to allow nice behavior

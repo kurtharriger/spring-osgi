@@ -117,4 +117,8 @@ public abstract class OsgiBundleUtils {
 			org.osgi.framework.Constants.BUNDLE_NAME) : bundle.getSymbolicName());
 	}
 
+	public static boolean isFragment(Bundle bundle) {
+		Assert.notNull(bundle, "bundle is required");
+		return bundle.getHeaders().get(org.osgi.framework.Constants.FRAGMENT_HOST) != null;
+	}
 }
