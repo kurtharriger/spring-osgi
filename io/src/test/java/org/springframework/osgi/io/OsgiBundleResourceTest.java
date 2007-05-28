@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.mock.ArrayEnumerator;
 import org.springframework.osgi.mock.MockBundle;
 
 /**
@@ -126,21 +127,21 @@ public class OsgiBundleResourceTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.io.OsgiBundleResource#getResourceFromBundle(java.lang.String)}.
+	 * {@link org.springframework.osgi.io.OsgiBundleResource#getResourceFromBundleSpace(java.lang.String)}.
 	 */
 	public void testGetResourceFromBundle() throws Exception {
 		MockControl control = MockControl.createControl(Bundle.class);
 		Bundle mock = (Bundle) control.getMock();
 
-		String location = "file://foo";
-		URL result = new URL(location);
+		String location = "foo";
+		URL result = new URL("file:/" + location);
 
-		control.expectAndReturn(mock.getEntry(location), result);
+		control.expectAndReturn(mock.findEntries("/", "foo", false), new ArrayEnumerator(new URL[] { result }));
 		control.replay();
 
 		resource = new OsgiBundleResource(mock, location);
 
-		assertSame(result, resource.getResourceFromBundle(location));
+		assertSame(result, resource.getResourceFromBundleSpace(location));
 		control.verify();
 	}
 

@@ -64,6 +64,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	private void initializeJarCreator() {
 		jarCreator = new JarCreator();
 		jarCreator.setStorage(new MemoryStorage());
+
 	}
 
 	/**
@@ -222,6 +223,9 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	protected void postProcessBundleContext(BundleContext context) throws Exception {
 		logger.debug("post processing: creating test bundle");
 
+		// add the content pattern
+		jarCreator.setContentPattern(getBundleContentPattern());
+		
 		// create the actual jar
 		Resource jar = jarCreator.createJar(getManifest());
 

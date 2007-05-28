@@ -57,6 +57,9 @@
     <!-- the default-->
     <spring.osgi.include.res>src/main/resources/</spring.osgi.include.res>
 
+
+   <!-- other properties -->
+   <slf4j.version>1.4.0</slf4j.version>
   </properties>
 
   <!-- ============================================= -->
@@ -222,19 +225,19 @@ limitations under the License.
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl104-over-slf4j</artifactId>
-      <version>1.3.1</version>
+      <version>${slf4j.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.3.1</version>
+      <version>${slf4j.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.3.1</version>
+      <version>${slf4j.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -336,7 +339,7 @@ limitations under the License.
         </configuration>
       </plugin>
       
-      <!-- invoke submodule -->
+      <!-- invoke submodule 
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
         <version>1.0</version>
@@ -362,7 +365,7 @@ limitations under the License.
            </execution>
         </executions>
       </plugin>
-    
+    -->
     </plugins>
   </build>
 
@@ -438,7 +441,11 @@ limitations under the License.
           <version>0.9.0-incubator-SNAPSHOT</version>
           <type>jar</type>
           <scope>provided</scope>
+<<<<<<< .mine
+        </dependency>
+=======
         </dependency> 
+>>>>>>> .r7276
       </dependencies>
       <properties>
         <osgi.test.platform>felix</osgi.test.platform>

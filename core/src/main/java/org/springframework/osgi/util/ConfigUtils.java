@@ -47,7 +47,7 @@ public abstract class ConfigUtils {
 
     private static final Log log = LogFactory.getLog(ConfigUtils.class);
 
-    public static final String SPRING_CONTEXT_DIRECTORY = OsgiBundleResource.BUNDLE_URL_PREFIX + CONTEXT_DIR
+    public static final String SPRING_CONTEXT_DIRECTORY = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX + CONTEXT_DIR
 			+ CONTEXT_FILES;
 
 	public static final String CONFIG_WILDCARD = "*";

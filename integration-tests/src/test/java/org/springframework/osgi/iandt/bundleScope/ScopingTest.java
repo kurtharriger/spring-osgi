@@ -94,10 +94,15 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 					+ ")");
 		if (ref == null) {
 			String filter = OsgiFilterUtils.unifyFilter(ScopeTestService.class, null);
-			System.out.println(ObjectUtils.nullSafeToString(OsgiServiceReferenceUtils.getServiceReferences(getBundleContext(), filter)));
+			System.out.println(ObjectUtils.nullSafeToString(OsgiServiceReferenceUtils.getServiceReferences(
+				getBundleContext(), filter)));
 			throw new IllegalStateException("cannot find service with owning bundle " + bundleName);
 		}
 		return (ScopeTestService) getBundleContext().getService(ref);
 
+	}
+
+	protected String getPlatformName() {
+		return KNOPFLERFISH_PLATFORM;
 	}
 }

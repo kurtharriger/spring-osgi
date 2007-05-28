@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.mock.ArrayEnumerator;
 
 /**
  * @author Costin Leau
@@ -32,6 +33,7 @@ public class OsgiBundleResourceLoaderTest extends TestCase {
 	OsgiBundleResourceLoader loader;
 
 	MockControl control;
+
 	Bundle bundle;
 
 	protected void setUp() throws Exception {
@@ -64,37 +66,35 @@ public class OsgiBundleResourceLoaderTest extends TestCase {
 
 	public void testGetBundleResource() throws Exception {
 		String res = "foo.txt";
-		URL expected = new URL("file://" + res);
-		control.expectAndReturn(bundle.getEntry(res), expected);
+		URL url = new URL("file:/" + res);
+		control.expectAndReturn(bundle.findEntries("/", res, false), new ArrayEnumerator(new URL[] {url}));
 		control.replay();
 
-		Resource resource = loader.getResource("bundle:" + res);
+		Resource resource = loader.getResource("bundle:/" + res);
 		assertNotNull(resource);
-		assertSame(expected, resource.getURL());
+		assertSame(url, resource.getURL());
 		control.verify();
 	}
 
 	public void testGetRelativeResource() throws Exception {
 		String res = "foo.txt";
-		URL expected = new URL("file://" + res);
-		control.expectAndReturn(bundle.getEntry(res), expected);
+		URL expected = new URL("file:/" + res);
 		control.replay();
 
-		Resource resource = loader.getResource(res);
+		Resource resource = loader.getResource("file:/" + res);
 		assertNotNull(resource);
-		assertSame(expected, resource.getURL());
+		assertEquals(expected, resource.getURL());
 		control.verify();
 	}
 
 	public void testGetFallbackResource() throws Exception {
 		String res = "foo.txt";
-		URL expected = new URL("http://" + res);
-		control.expectAndReturn(bundle.getEntry(res), expected);
+		URL expected = new URL("http:/" + res);
 		control.replay();
 
-		Resource resource = loader.getResource(res);
+		Resource resource = loader.getResource("http:/" + res);
 		assertNotNull(resource);
-		assertSame(expected, resource.getURL());
+		assertEquals(expected, resource.getURL());
 		control.verify();
 	}
 

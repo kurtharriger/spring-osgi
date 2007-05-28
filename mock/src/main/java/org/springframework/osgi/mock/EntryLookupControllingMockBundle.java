@@ -23,7 +23,7 @@ import java.util.Enumeration;
 import org.osgi.framework.BundleContext; 
 
 /**
- * Mock Bundle taht allows the entry to return on future calls.
+ * Mock Bundle that allows the entry to return on future calls.
  * 
  * @author Adrian Colyer
  * 
@@ -89,30 +89,5 @@ public class EntryLookupControllingMockBundle extends MockBundle {
 
 	protected Enumeration createEnumerationOver(String[] entries) {
 		return new ArrayEnumerator(entries);
-	}
-
-	private static class ArrayEnumerator implements Enumeration {
-
-		private final String[] source;
-
-		private int index = 0;
-
-		public ArrayEnumerator(String[] source) {
-			this.source = source;
-		}
-
-		public boolean hasMoreElements() {
-			return source.length > index;
-		}
-
-		public Object nextElement() {
-			try {
-				return new URL(source[index++]);
-			}
-			catch (MalformedURLException malEx) {
-				return null;
-			}
-		}
-
 	}
 }

@@ -134,6 +134,8 @@ public class JarCreator {
 						// walk the tree
 						token = token.substring(0, slashIndex);
 					}
+					// add root folder
+					entries.put("/", folderResource);
 				}
 			}
 		}

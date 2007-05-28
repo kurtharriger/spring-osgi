@@ -27,7 +27,7 @@
    </spring.osgi.import.pkg>
    
    <localRepository>${user.home}/.m2/repository</localRepository>
-
+   
   </properties>
   
   <build>
