@@ -339,7 +339,7 @@ limitations under the License.
         </configuration>
       </plugin>
       
-      <!-- invoke submodule 
+      <!-- invoke submodule -->
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
         <version>1.0</version>
@@ -365,7 +365,7 @@ limitations under the License.
            </execution>
         </executions>
       </plugin>
-    -->
+    
     </plugins>
   </build>
 
@@ -441,11 +441,7 @@ limitations under the License.
           <version>0.9.0-incubator-SNAPSHOT</version>
           <type>jar</type>
           <scope>provided</scope>
-<<<<<<< .mine
         </dependency>
-=======
-        </dependency> 
->>>>>>> .r7276
       </dependencies>
       <properties>
         <osgi.test.platform>felix</osgi.test.platform>
