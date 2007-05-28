@@ -101,8 +101,4 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 		return (ScopeTestService) getBundleContext().getService(ref);
 
 	}
-
-	protected String getPlatformName() {
-		return FELIX_PLATFORM;
-	}
 }
