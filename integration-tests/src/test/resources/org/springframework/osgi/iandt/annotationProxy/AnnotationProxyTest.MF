@@ -3,6 +3,7 @@ Bundle-Name: Functional testing of OSGi service reference listener
 Bundle-SymbolicName: org.springframework.osgi.iandt.annotation.proxy
 Bundle-Vendor: Spring Framework
 Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator
+Bundle-ManifestVersion: 2
 Import-Package: junit.framework,
  org.osgi.framework,
  org.springframework.osgi,
