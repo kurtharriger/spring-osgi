@@ -19,7 +19,9 @@
 	   <!-- optional imports-->
 	   <spring.osgi.import.pkg>
 	    javax.naming;resolution:=optional,
-	    javax.transaction;resolution:=optional,
+       <!-- rt.jar contains an incomplete version, so specify a version so
+       that other providers can coexist peacefully -->
+        javax.transaction;version=1.0.1;resolution:=optional,
 	    org.aopalliance.*;resolution:=optional,
 	    org.objectweb.jotm*;resolution:=optional,
 	    <!-- oracle tx -->
