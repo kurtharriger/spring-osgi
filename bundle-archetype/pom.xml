@@ -11,4 +11,16 @@
   <packaging>maven-plugin</packaging>
   <name>Archetype for creating Spring OSGi Bundle Projects</name>
   <url>http://www.springframework.org/osgi</url>
+  
+  
+ <build>
+    <resources>
+    
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+    
+    </resources>
+  </build>
 </project>
