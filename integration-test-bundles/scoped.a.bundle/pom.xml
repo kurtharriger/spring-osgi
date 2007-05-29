@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.osgi</groupId>
-    <artifactId>org.springframework.osgi.iandt.io.fragment.bundle</artifactId>
+    <artifactId>org.springframework.osgi.iandt.scoped.bundle.a</artifactId>
     <packaging>jar</packaging>
-    <name>IO Fragment Bundle</name>
-    <description>An OSGi fragment for IO integration tests</description>
+    <name>Bundle scoping test bundle - A</name>
+    <description>An OSGi bundle which tests 'bundle' scoped beans</description>
     <url>http://www.springframework.org/osgi</url>
 
     <dependencies>
