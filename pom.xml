@@ -188,20 +188,16 @@ limitations under the License.
 
   <!-- modules for Spring-OSGi -->
   <modules> 
-    <!--  should be ran manually due to maven and module classpath problems
-    <module>spring-modules</module>
-    -->
+    <!--module>spring-modules</module-->
     <module>mock</module>    
-	<module>io</module>    
+    <module>io</module>    
     <module>core</module>
     <module>extender</module>
     <module>test-support</module>
     <module>integration-test-bundles</module>
     <module>integration-tests</module>
     <module>samples</module>
-    <!--
     <module>bundle-archetype</module>
-    -->
     <module>release</module>
   </modules>
 
@@ -400,6 +396,7 @@ limitations under the License.
       </activation>
       <modules>
        <module>annotation</module>
+       <module>integration-tests-tiger</module>
       </modules>
       <dependencies>
         <dependency>
