@@ -109,7 +109,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * ApplicationContexts which are being initialized by an
 	 * ApplicationContextCreator, but have not yet completed initialization (for
 	 * example, they are waiting on service dependencies). Keys are bundle ids,
-	 * values are application contexts
+	 * values are the ApplicationContextCreators which are in the process of creating
+     * the application contexts
 	 */
 	protected final Map applicationContextsBeingInitialized;
 
@@ -376,7 +377,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		}
 		ApplicationContextCloser contextCloser = new ApplicationContextCloser(bundle, this.managedBundles,
 				this.applicationContextsBeingInitialized, this.pendingRegistrationTasks, this);
-		contextCloser.run();
+		contextCloser.close();
 	}
 
 	/**
