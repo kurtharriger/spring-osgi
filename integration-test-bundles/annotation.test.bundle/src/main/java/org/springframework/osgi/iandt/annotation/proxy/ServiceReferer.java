@@ -9,7 +9,7 @@ import org.springframework.osgi.annotation.ServiceReference;
 public class ServiceReferer {
     public static MyService serviceReference;
 
-    @ServiceReference
+    @ServiceReference (timeout = 5000)
     public void setServiceReference(MyService reference) {
         serviceReference = reference;
     }
