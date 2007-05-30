@@ -50,7 +50,7 @@ public class ApplicationContextCreatorTest extends TestCase {
     private ApplicationContextCreator createCreator(Bundle aBundle) {
 		return new ApplicationContextCreator(aBundle, contextMap, initMap, this.pendingRegistrationTasks, null,
 				new ApplicationContextConfiguration(aBundle), mcast, timer) {
-			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
+			protected ServiceDependentOsgiApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return new ServiceDependentOsgiBundleXmlApplicationContext(context, locations) {
 					public void create(Runnable postAction) throws BeansException {
 						postAction.run();
@@ -82,7 +82,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap,
 				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast,timer) {
 
-			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
+			protected ServiceDependentOsgiApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return testingContext;
 			}
 		};
@@ -112,7 +112,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap,
 				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast, timer) {
 
-			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
+			protected ServiceDependentOsgiApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return testContext;
 			}
 
@@ -165,7 +165,7 @@ public class ApplicationContextCreatorTest extends TestCase {
 		ApplicationContextCreator creator = new ApplicationContextCreator(aBundle, contextMap, initMap,
 				this.pendingRegistrationTasks, null, new ApplicationContextConfiguration(aBundle), mcast, timer) {
 
-			protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
+			protected ServiceDependentOsgiApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 				return testContext;
 			}
 
@@ -192,7 +192,8 @@ public class ApplicationContextCreatorTest extends TestCase {
 		public void create(Runnable postAction) {
 			Long key = new Long(0);
 			assertTrue("pending map contains this context", initMap.containsKey(key));
-			assertEquals("pending map contains this context under bundle id", this, initMap.get(key));
+            ApplicationContextCreator creator = (ApplicationContextCreator) initMap.get(key);
+            assertEquals("pending map contains this context under bundle id", this, creator.getContext());
 			assertFalse("completed map does not contain this context", contextMap.containsKey(key));
 			isRefreshed = true;
             postAction.run();

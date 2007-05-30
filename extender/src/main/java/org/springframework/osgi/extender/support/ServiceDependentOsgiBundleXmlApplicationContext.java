@@ -28,7 +28,8 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
  * @author Hal Hildebrand
  * @author Costin Leau
  */
-public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleXmlApplicationContext {
+public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleXmlApplicationContext
+        implements ServiceDependentOsgiApplicationContext {
     protected volatile ContextState state = ContextState.INITIALIZED;
     protected DependencyListener listener;
 
@@ -37,16 +38,29 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
         super(context, configLocations);
     }
 
-    protected synchronized void create(final Runnable postAction) throws BeansException {
+    public synchronized void create(final Runnable postAction) throws BeansException {
+        if (state == ContextState.INTERRUPTED) {
+            logger.warn("Context creation has been interrupted: " + getDisplayName());
+            return;
+        }
         preRefresh();
         DependencyListener dl = new DependencyListener(postAction, this);
         dl.findServiceDependencies();
+
+        if (state == ContextState.INTERRUPTED) {
+            logger.warn("Context creation has been interrupted: " + getDisplayName());
+            return;
+        }
 
         state = ContextState.RESOLVING_DEPENDENCIES;
         if (!dl.isSatisfied()) {
             listener = dl;
             listener.register();
         } else {
+            if (state == ContextState.INTERRUPTED) {
+                logger.warn("Context creation has been interrupted: " + getDisplayName());
+                return;
+            }
             state = ContextState.DEPENDENCIES_RESOLVED;
             if (logger.isDebugEnabled()) {
                 logger.debug("No outstanding dependencies, completing initialization for "
@@ -65,14 +79,18 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
     }
 
 
-    protected void interrupt() {
+    public void interrupt() {
         state = ContextState.INTERRUPTED;
         if (listener != null) {
             listener.deregister();
         }
     }
 
-    protected void complete() {
+    public void complete() {
+        if (state == ContextState.INTERRUPTED) {
+            logger.warn("Context creation has been interrupted: " + getDisplayName());
+            return;
+        }
         postRefresh();
         state = ContextState.CREATED;
     }

@@ -51,8 +51,9 @@
 	<module>scoped.b.bundle</module>    
 	<module>scoped.common.bundle</module>
 	<module>io.fragment.1.bundle</module>    
-	<module>io.fragment.2.bundle</module>    
-	
+	<module>io.fragment.2.bundle</module>
+    <module>error.bundle</module>
+
   </modules>
 
 <profiles>
