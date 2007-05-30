@@ -86,7 +86,7 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
         }
     }
 
-    public void complete() {
+    public synchronized void complete() {
         if (state == ContextState.INTERRUPTED) {
             logger.warn("Context creation has been interrupted: " + getDisplayName());
             return;
