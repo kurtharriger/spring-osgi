@@ -97,13 +97,14 @@ public class ContextControl {
             setThread(Thread.currentThread());
             context.create(postAction);
         } catch (ThreadDeath td) {
+            Thread.currentThread().setContextClassLoader(ccl);
             if (log.isDebugEnabled()) {
                 log.debug("Context creation interrupted for [" + bundle.getSymbolicName() + "]", td);
             }
         } catch (Throwable t) {
-            timeout.cancel();
             fail(t);
         } finally {
+            timeout.cancel();
             Thread.currentThread().setContextClassLoader(ccl);
         }
     }
@@ -141,6 +142,7 @@ public class ContextControl {
 
 
     protected void fail(Throwable t) {
+        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         try {
             interrupt();
 
@@ -192,9 +194,6 @@ public class ContextControl {
                         log.debug("Context creation interrupted for [" + bundle.getSymbolicName() + "]", td);
                     }
                 } catch (Throwable t) {
-                    // ensure that the context class loader is set to our class loader,
-                    // as we're now handling the failure in this context
-                    Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
                     fail(t);
                 } finally {
                     Thread.currentThread().setContextClassLoader(ccl);
