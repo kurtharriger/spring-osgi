@@ -39,7 +39,7 @@ public abstract class OsgiServiceBindingUtils {
 		if (!ObjectUtils.isEmpty(listeners)) {
 			boolean debug = log.isDebugEnabled();
 			Object service = OsgiServiceUtils.getService(context, reference);
-			Dictionary properties = OsgiServiceReferenceUtils.getServiceProperties(reference);
+			Dictionary properties = OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
 			for (int i = 0; i < listeners.length; i++) {
 				if (debug)
 					log.debug("calling bind on " + listeners[i] + " w/ reference " + reference);
@@ -58,7 +58,7 @@ public abstract class OsgiServiceBindingUtils {
 		if (!ObjectUtils.isEmpty(listeners)) {
 			boolean debug = log.isDebugEnabled();
 			Object service = OsgiServiceUtils.getService(context, reference);
-			Dictionary properties = OsgiServiceReferenceUtils.getServiceProperties(reference);
+			Dictionary properties = OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
 			for (int i = 0; i < listeners.length; i++) {
 				if (debug)
 					log.debug("calling unbind on " + listeners[i] + " w/ reference " + reference);

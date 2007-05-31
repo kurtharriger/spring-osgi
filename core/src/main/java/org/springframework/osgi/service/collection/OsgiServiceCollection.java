@@ -38,7 +38,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.interceptor.OsgiServiceInvoker;
 import org.springframework.osgi.service.interceptor.OsgiServiceStaticInterceptor;
+import org.springframework.osgi.service.interceptor.ServiceReferenceAwareAdvice;
 import org.springframework.osgi.service.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.util.Assert;
@@ -47,16 +49,16 @@ import org.springframework.util.Assert;
  * OSGi service dynamic collection - allows iterating while the underlying
  * storage is being shrunk/expanded. This collection is read-only - its content
  * is being retrieved dynamically from the OSGi platform.
- * <p/>
- * <strong>Note</strong>:It is <strong>not</strong> synchronized.
- *
+ * 
+ * <p/> <strong>Note</strong>: It is <strong>not</strong> synchronized.
+ * 
  * @author Costin Leau
  */
 public class OsgiServiceCollection implements Collection, InitializingBean {
 
 	/**
 	 * Listener tracking the OSGi services which form the dynamic collection.
-	 *
+	 * 
 	 * @author Costin Leau
 	 */
 	private class Listener implements ServiceListener {
@@ -67,43 +69,43 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 				Long serviceId = (Long) ref.getProperty(Constants.SERVICE_ID);
 				boolean found = false;
 
-
 				switch (event.getType()) {
 
-					case (ServiceEvent.REGISTERED):
-					case (ServiceEvent.MODIFIED):
-						// same as ServiceEvent.REGISTERED
-						synchronized (serviceReferences) {
-							if (!serviceReferences.containsKey(serviceId)) {
-								found = true;
-								serviceReferences.put(serviceId, createServiceProxy(ref));
-								serviceIDs.add(serviceId);
-							}
+				case (ServiceEvent.REGISTERED):
+				case (ServiceEvent.MODIFIED):
+					// same as ServiceEvent.REGISTERED
+					synchronized (serviceReferences) {
+						if (!serviceReferences.containsKey(serviceId)) {
+							found = true;
+							serviceReferences.put(serviceId, createServiceProxy(ref));
+							serviceIDs.add(serviceId);
 						}
-						// inform listeners
-						if (found)
-							OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
+					}
+					// inform listeners
+					if (found)
+						OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
 
-						break;
-					case (ServiceEvent.UNREGISTERING):
-						synchronized (serviceReferences) {
-							// remove servce
-							Object proxy = serviceReferences.remove(serviceId);
-							found = serviceIDs.remove(serviceId);
-							if (proxy != null) {
-								invalidateProxy(proxy);
-							}
+					break;
+				case (ServiceEvent.UNREGISTERING):
+					synchronized (serviceReferences) {
+						// remove servce
+						Object proxy = serviceReferences.remove(serviceId);
+						found = serviceIDs.remove(serviceId);
+						if (proxy != null) {
+							invalidateProxy(proxy);
 						}
+					}
 
-						if (found)
-							OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
-						break;
+					if (found)
+						OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
+					break;
 
-					default:
-						throw new IllegalArgumentException("unsupported event type");
+				default:
+					throw new IllegalArgumentException("unsupported event type");
 				}
 			}
-			// OSGi swallows these exceptions so make sure we get a chance to see them.
+			// OSGi swallows these exceptions so make sure we get a chance to
+			// see them.
 			catch (Error e) {
 				if (log.isErrorEnabled()) {
 					log.error("serviceChanged() processing failed", e);
@@ -173,7 +175,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	 * Create a service proxy over the service reference. The proxy purpose is
 	 * to transparently decouple the client from holding a strong reference to
 	 * the service (which might go away).
-	 *
+	 * 
 	 * @param ref
 	 */
 	private Object createServiceProxy(ServiceReference ref) {
@@ -217,13 +219,24 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 			}
 		}
 
-		factory.addAdvice(new OsgiServiceStaticInterceptor(context, ref, contextClassLoader));
+		addEndingInterceptors(factory, ref);
+
 		// TODO: why not add these?
 		// factory.setOptimize(true);
 		// factory.setFrozen(true);
 
 		return factory.getProxy(BundleDelegatingClassLoader.createBundleClassLoaderFor(ref.getBundle(),
 			ProxyFactory.class.getClassLoader()));
+	}
+
+	/**
+	 * Add the ending interceptors such as lookup and Service Reference aware.
+	 * @param pf
+	 */
+	protected void addEndingInterceptors(ProxyFactory factory, ServiceReference ref) {
+		OsgiServiceInvoker invoker = new OsgiServiceStaticInterceptor(context, ref, contextClassLoader);
+		factory.addAdvice(new ServiceReferenceAwareAdvice(invoker));
+		factory.addAdvice(invoker);
 	}
 
 	private void invalidateProxy(Object proxy) {
@@ -315,7 +328,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	/**
 	 * The optional interceptors used when proxying each service. These will
 	 * always be added before the OsgiServiceStaticInterceptor.
-	 *
+	 * 
 	 * @param interceptors The interceptors to set.
 	 */
 	public void setInterceptors(Object[] interceptors) {

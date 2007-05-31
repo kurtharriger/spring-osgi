@@ -31,43 +31,7 @@ import org.springframework.osgi.util.OsgiFilterUtils;
  * @author Costin Leau
  * 
  */
-public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreatorTests {
-
-	private OsgiServiceProxyFactoryBean fb;
-
-	protected String[] getBundles() {
-		return new String[] { localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT") };
-	}
-
-	protected String getManifestLocation() {
-		// return
-		// "org/springframework/osgi/test/serviceProxyFactoryBean/ServiceProxyFactoryBeanTest.MF";
-		return null;
-	}
-
-	protected void onSetUp() throws Exception {
-		fb = new OsgiServiceProxyFactoryBean();
-		fb.setBundleContext(getBundleContext());
-		// execute retries fast
-		fb.setRetryTimes(1);
-		fb.setTimeout(1);
-	}
-
-	protected void onTearDown() throws Exception {
-		fb = null;
-	}
-
-	private ServiceRegistration publishService(Object obj, String name) throws Exception {
-		return getBundleContext().registerService(name, obj, null);
-	}
-
-	private ServiceRegistration publishService(Object obj, String names[]) throws Exception {
-		return getBundleContext().registerService(names, obj, null);
-	}
-
-	private ServiceRegistration publishService(Object obj) throws Exception {
-		return publishService(obj, obj.getClass().getName());
-	}
+public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 	public void testFactoryBeanForOneServiceAsClass() throws Exception {
 		long time = 1234;
@@ -208,5 +172,4 @@ public class ServiceProxyFactoryBeanTest extends AbstractConfigurableBundleCreat
 		}
 	}
 
-	
 }

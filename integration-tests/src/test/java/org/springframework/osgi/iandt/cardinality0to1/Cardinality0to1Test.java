@@ -69,5 +69,4 @@ public class Cardinality0to1Test extends AbstractConfigurableBundleCreatorTests 
 
 		System.out.println("Dependency started");
 	}
-
 }

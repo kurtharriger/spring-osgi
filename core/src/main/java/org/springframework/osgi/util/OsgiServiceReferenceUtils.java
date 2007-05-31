@@ -15,8 +15,10 @@
  */
 package org.springframework.osgi.util;
 
+import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -140,23 +142,64 @@ public abstract class OsgiServiceReferenceUtils {
 	}
 
 	/**
-	 * Return a dictionary containing the properties available for the given
-	 * service reference.
+	 * Return a dict containing the properties available for the given service
+	 * reference. This method takes a snapshot of the properties; future changes
+	 * to the service properties will not be reflected in the returned dict.
+	 * 
+	 * <p/> Note that the returned type implements the Map interface also.
 	 * 
 	 * @param reference service reference
-	 * @return dictionary containing the service reference properties
+	 * @return dict containing the service reference properties taken as a
+	 * snapshot
 	 */
-	public static Dictionary getServiceProperties(ServiceReference reference) {
+	public static Dictionary getServicePropertiesSnapshot(ServiceReference reference) {
+		return new MapBasedDictionary(getServicePropertiesSnapshotAsMap(reference));
+	}
+
+	public static Map getServicePropertiesSnapshotAsMap(ServiceReference reference) {
 		Assert.notNull(reference);
 		String[] keys = reference.getPropertyKeys();
 
-		Dictionary dict = new Hashtable(keys.length);
+		Map map = new LinkedHashMap();
 
 		for (int i = 0; i < keys.length; i++) {
-			dict.put(keys[i], reference.getProperty(keys[i]));
+			map.put(keys[i], reference.getProperty(keys[i]));
 		}
 
-		// TODO: maybe return a read-only dictionary since we offer just a read-view
-		return dict;
+		// mark it as read-only
+		map = Collections.unmodifiableMap(map);
+		return map;
 	}
+
+	/**
+	 * Return a dictionary containing the properties available for the given
+	 * service reference. The returned object will reflect any updates made to
+	 * to the ServiceReference through the owning ServiceRegistration.
+	 * 
+	 * 
+	 * <p/> Note that the returned type implements the Map interface also.
+	 * 
+	 * @param reference an OSGi service reference
+	 * @return dict of properties which will reflect future reference changes
+	 */
+	public static Dictionary getServiceProperties(ServiceReference reference) {
+		return new MapBasedDictionary(getServicePropertiesAsMap(reference));
+	}
+
+	/**
+	 * Return a map containing the properties for the given service reference.
+	 * Consider using {@link #getServiceProperties(ServiceReference)} which
+	 * returns an object that extends {@link Dictionary} as well as implements
+	 * the {@link Map} interface.
+	 * 
+	 * @see #getServiceProperties(ServiceReference)
+	 * @param reference
+	 * @return
+	 */
+	public static Map getServicePropertiesAsMap(ServiceReference reference) {
+		Assert.notNull(reference);
+		return new ServiceReferenceBasedMap(reference);
+
+	}
+
 }
