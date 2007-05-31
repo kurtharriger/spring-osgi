@@ -296,6 +296,9 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
             }
             case BundleEvent.STOPPING: {
                 if (event.getBundle().getBundleId() == 0) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("System bundle stopping");
+                    }
                     // System bundle is shutting down; Special handling for framework shutdown
                     shutdown();
                 } else {
