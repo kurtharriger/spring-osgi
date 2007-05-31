@@ -59,7 +59,7 @@ public class ServiceWrapper {
 	}
 
 	public boolean isServiceAlive() {
-		return (reference == null || reference.getBundle() != null);
+		return (!(reference == null || context == null || reference.getBundle() == null));
 	}
 
 	public boolean equals(Object obj) {
@@ -79,16 +79,16 @@ public class ServiceWrapper {
 
 	public Object getService() {
 		// TODO: check synch and service cleanup
-		//synchronized (reference) {
-			if (isServiceAlive()) {
-				try {
-					return context.getService(reference);
-				}
-				finally {
-					// context.ungetService(reference);
-				}
+		// synchronized (reference) {
+		if (isServiceAlive()) {
+			try {
+				return context.getService(reference);
 			}
-		//}
+			finally {
+				// context.ungetService(reference);
+			}
+		}
+		// }
 		return null;
 	}
 
@@ -106,6 +106,5 @@ public class ServiceWrapper {
 
 	public void cleanup() {
 		this.context = null;
-		this.reference = null;
 	}
 }

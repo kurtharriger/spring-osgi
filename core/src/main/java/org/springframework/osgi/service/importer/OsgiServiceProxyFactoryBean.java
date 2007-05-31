@@ -26,6 +26,9 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.context.support.LocalBundleContext;
@@ -35,14 +38,12 @@ import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.collection.OsgiServiceList;
 import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
+import org.springframework.osgi.service.interceptor.ServiceReferenceAwareAdvice;
 import org.springframework.osgi.service.support.RetryTemplate;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * Factory bean for OSGi services. Returns a dynamic proxy which handles the
@@ -171,7 +172,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
 			"more then one concrete class specified; cannot create proxy");
 		getUnifiedFilter(); // eager initialization of the cache to catch filter
-							// errors
+		// errors
 		Assert.notNull(serviceTypes, "Required serviceTypes property no longer exists");
 		initialized = true;
 	}
@@ -247,7 +248,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		// Bundle Ctx
 		addLocalBundleContextSupport(factory);
 
-		// dynamic retry interceptor / context classloader
+		// dynamic retry interceptor / context classloader / service aware implementation
 		addOsgiRetryInterceptor(factory, getUnifiedFilter(), listeners);
 
 		// TODO: should these be enabled ?
@@ -279,6 +280,13 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		return collection;
 	}
 
+	/**
+	 * Add the retry interceptor and the ServiceReference aware mixin.
+	 * 
+	 * @param factory
+	 * @param filter
+	 * @param listeners
+	 */
 	protected void addOsgiRetryInterceptor(ProxyFactory factory, Filter filter,
 			TargetSourceLifecycleListener[] listeners) {
 		OsgiServiceDynamicInterceptor lookupAdvice = new OsgiServiceDynamicInterceptor(bundleContext,
@@ -289,6 +297,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 		lookupAdvice.afterPropertiesSet();
 
+		factory.addAdvice(new ServiceReferenceAwareAdvice(lookupAdvice));
 		factory.addAdvice(lookupAdvice);
 	}
 

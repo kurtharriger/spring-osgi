@@ -63,7 +63,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader, boolean serviceRequiredAtStartup) {
 		super(context, null, contextClassLoader);
 		this.serviceRequiredAtStartup = serviceRequiredAtStartup;
-    }
+	}
 
 	private class Listener implements ServiceListener {
 
@@ -96,7 +96,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 						if (serviceId == wrapper.getServiceId()) {
 							updated = true;
 							wrapper.cleanup();
-							wrapper = null;
+
 						}
 					}
 				}
@@ -131,7 +131,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 			boolean updated = false;
 			try {
 				synchronized (OsgiServiceDynamicInterceptor.this) {
-					if (wrapper != null) {
+					if (wrapper != null && wrapper.isServiceAlive()) {
 						// we have a new service
 						if (serviceRanking > wrapper.getServiceRanking()) {
 							updated = true;
@@ -167,6 +167,11 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 		}
 	}
 
+	protected void checkServiceWrapper() {
+		if (wrapper == null || !wrapper.isServiceAlive())
+			lookupService();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#getTarget()
@@ -174,8 +179,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 	protected Object getTarget() {
 		Object target;
 
-		if (wrapper == null || !wrapper.isServiceAlive())
-			lookupService();
+		checkServiceWrapper();
 
 		target = (wrapper != null ? wrapper.getService() : null);
 
@@ -196,18 +200,22 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 		}, this);
 	}
 
+	protected ServiceReference getServiceReference() {
+		return (wrapper != null ? wrapper.getReference() : null);
+	}
+
 	public void afterPropertiesSet() {
 		boolean debug = log.isDebugEnabled();
 		if (debug)
 			log.debug("adding osgi listener for services matching [" + filter + "]");
-        OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
+		OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
 		if (serviceRequiredAtStartup) {
 			if (debug)
 				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
 			Object target = getTarget();
 			if (debug)
 				log.debug("service retrieved " + target);
-	    }
+		}
 	}
 
 	public void setFilter(Filter filter) {

@@ -52,4 +52,13 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 
 		return wrapper.getService();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#getServiceReference()
+	 */
+	protected ServiceReference getServiceReference() {
+		return wrapper.getReference();
+	}
+
 }

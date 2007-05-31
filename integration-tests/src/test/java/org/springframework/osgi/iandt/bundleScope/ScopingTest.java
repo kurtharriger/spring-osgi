@@ -101,4 +101,5 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 		return (ScopeTestService) getBundleContext().getService(ref);
 
 	}
+
 }

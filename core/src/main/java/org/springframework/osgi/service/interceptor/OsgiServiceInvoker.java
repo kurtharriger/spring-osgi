@@ -15,13 +15,14 @@
  */
 package org.springframework.osgi.service.interceptor;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.ServiceReference;
 import org.springframework.util.Assert;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Base around interceptor for OSGi service invokers.
@@ -52,6 +53,14 @@ public abstract class OsgiServiceInvoker implements MethodInterceptor {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+	 */
+	public final Object invoke(MethodInvocation invocation) throws Throwable {
+		return doInvoke(getTarget(), invocation);
+	}
+
 	/**
 	 * Determine the target object to execute the invocation upon.
 	 * 
@@ -60,11 +69,14 @@ public abstract class OsgiServiceInvoker implements MethodInterceptor {
 	 */
 	protected abstract Object getTarget();
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+	/**
+	 * Convenience method exposing the target (OSGi service) reference so that
+	 * subinterceptors can access it. By default, returns null.
+	 * 
+	 * @return
 	 */
-	public final Object invoke(MethodInvocation invocation) throws Throwable {
-		return doInvoke(getTarget(), invocation);
+	protected ServiceReference getServiceReference() {
+		return null;
 	}
+
 }
