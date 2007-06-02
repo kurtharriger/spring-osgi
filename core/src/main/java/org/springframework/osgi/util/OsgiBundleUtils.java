@@ -121,4 +121,9 @@ public abstract class OsgiBundleUtils {
 		Assert.notNull(bundle, "bundle is required");
 		return bundle.getHeaders().get(org.osgi.framework.Constants.FRAGMENT_HOST) != null;
 	}
+
+	public static boolean isSystemBundle(Bundle bundle) {
+		Assert.notNull(bundle);
+		return (bundle.getBundleId() == 0);
+	}
 }

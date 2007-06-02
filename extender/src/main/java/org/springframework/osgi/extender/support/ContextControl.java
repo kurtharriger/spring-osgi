@@ -17,6 +17,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
+ * Context for a Spring powered OSGi application.
+ * 
  * @author Adrian Colyer
  * @author Hal Hildebrand
  */
