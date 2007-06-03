@@ -17,16 +17,13 @@ package org.springframework.osgi.util;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 
-import org.osgi.framework.Bundle;
-import org.springframework.osgi.io.OsgiBundleResource;
-import org.springframework.osgi.context.support.MissingConfiguration;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.Bundle;
+import org.springframework.osgi.io.OsgiBundleResource;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * OSGi bundle manifest manifest based utility class.
@@ -43,11 +40,11 @@ public abstract class ConfigUtils {
 
 	protected static final String CONTEXT_FILES = "*.xml";
 
-    protected static final String META_INF_WILD_CARD = CONTEXT_DIR + CONTEXT_FILES;
+	protected static final String META_INF_WILD_CARD = CONTEXT_DIR + CONTEXT_FILES;
 
-    private static final Log log = LogFactory.getLog(ConfigUtils.class);
+	private static final Log log = LogFactory.getLog(ConfigUtils.class);
 
-    public static final String SPRING_CONTEXT_DIRECTORY = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX + CONTEXT_DIR
+	public static final String SPRING_CONTEXT_FILES = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX + CONTEXT_DIR
 			+ CONTEXT_FILES;
 
 	public static final String CONFIG_WILDCARD = "*";
@@ -200,47 +197,31 @@ public abstract class ConfigUtils {
 	 * {@link org.springframework.core.io.ResourceLoader} for loading the
 	 * configurations.
 	 * 
+	 * <p/> This method does not perform any validation of the given resources.
+	 * 
 	 * @param headers
 	 * @return
 	 */
-	public static String[] getConfigLocations(Dictionary headers, Bundle bundle) throws MissingConfiguration {
+	public static String[] getConfigLocations(Dictionary headers) {
 		String header = getSpringContextHeader(headers);
-        if (header != null) {
-            header = header.trim();
-        }
+		if (header != null) {
+			header = header.trim();
+		}
 
-        String[] ctxEntries;
-        if (StringUtils.hasText(header) && !(';' == header.charAt(0))) {
+		String[] ctxEntries;
+		if (StringUtils.hasText(header) && !(';' == header.charAt(0))) {
 			// get the file location
-            String locations = StringUtils.tokenizeToStringArray(header, DIRECTIVE_SEPARATOR)[0]; 
-            // parse it into individual token
-			ctxEntries = StringUtils.tokenizeToStringArray(locations, CONTEXT_LOCATION_SEPARATOR); 
-        } else {
-            ctxEntries = new String[] {META_INF_WILD_CARD};
-        }
+			String locations = StringUtils.tokenizeToStringArray(header, DIRECTIVE_SEPARATOR)[0];
+			// parse it into individual token
+			ctxEntries = StringUtils.tokenizeToStringArray(locations, CONTEXT_LOCATION_SEPARATOR);
+		}
+		else {
+			ctxEntries = new String[] { SPRING_CONTEXT_FILES };
+		}
 
-        ArrayList entries = new ArrayList();
-        for (int i = 0; i < ctxEntries.length; i++) {
-            if (CONFIG_WILDCARD.equals(ctxEntries[i]) || META_INF_WILD_CARD.equals(ctxEntries[i])) {
-                Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
-                if (defaultConfig != null && defaultConfig.hasMoreElements()) {
-                    entries.add(SPRING_CONTEXT_DIRECTORY);
-                }
-            } else {
-                if (bundle.getEntry(ctxEntries[i]) == null) {
-                    MissingConfiguration mc = new MissingConfiguration("missing resource: " + ctxEntries[i]);
-                    mc.setMissingResource(ctxEntries[i]);
-                    throw mc;
-                } else {
-                    entries.add(OsgiBundleResource.BUNDLE_URL_PREFIX + ctxEntries[i]);
-                }
-            }
-        }
-
-        ctxEntries = (String[]) entries.toArray(new String[entries.size()]);
-        // remove duplicates
-        return StringUtils.removeDuplicateStrings(ctxEntries);
-    }
+		// remove duplicates
+		return StringUtils.removeDuplicateStrings(ctxEntries);
+	}
 
 	/**
 	 * Dictates if the given bundle is Spring/OSGi powered or not.
@@ -259,7 +240,7 @@ public abstract class ConfigUtils {
 		if (getSpringContextHeader(bundle.getHeaders()) != null)
 			return true;
 
-		// check the default locations now
+		// check the default locations now (could use the IO to do the checking)
 		Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
 		return (defaultConfig != null && defaultConfig.hasMoreElements());
 	}
