@@ -63,7 +63,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractRefreshableOsgiBund
 	}
 
 	protected String[] getDefaultConfigLocations() {
-		return new String[] { ConfigUtils.SPRING_CONTEXT_DIRECTORY };
+		return new String[] { ConfigUtils.SPRING_CONTEXT_FILES };
 	}
 
 	/**

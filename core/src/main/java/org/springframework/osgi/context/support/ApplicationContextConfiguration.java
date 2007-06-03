@@ -23,6 +23,7 @@ import java.util.Dictionary;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.ConfigUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,12 +49,11 @@ public class ApplicationContextConfiguration {
 
 	private String toString;
 
-    private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
+	private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
 
-    private static final Log log = LogFactory.getLog(ApplicationContextConfiguration.class);
+	private static final Log log = LogFactory.getLog(ApplicationContextConfiguration.class);
 
-
-    public ApplicationContextConfiguration(Bundle forBundle) {
+	public ApplicationContextConfiguration(Bundle forBundle) {
 		this.bundle = forBundle;
 		initialise();
 		// create toString
@@ -69,10 +69,10 @@ public class ApplicationContextConfiguration {
 		buf.append("|timeout=");
 		buf.append(timeout);
 		toString = buf.toString();
-        if (log.isDebugEnabled()) {
-            log.debug("configuration: " + toString);
-        }
-    }
+		if (log.isDebugEnabled()) {
+			log.debug("configuration: " + toString);
+		}
+	}
 
 	/**
 	 * True if this bundle has at least one defined application context
@@ -85,8 +85,8 @@ public class ApplicationContextConfiguration {
 	}
 
 	/**
-	 * How long should the application context wait for dependent services
-     * to be satisfied on context creation?
+	 * How long should the application context wait for dependent services to be
+	 * satisfied on context creation?
 	 */
 	public long getTimeout() {
 		return this.timeout;
@@ -123,7 +123,7 @@ public class ApplicationContextConfiguration {
 	 * as application context configuration files.
 	 */
 	private void initialise() {
-        Dictionary headers = bundle.getHeaders();
+		Dictionary headers = bundle.getHeaders();
 
 		this.isSpringPoweredBundle = ConfigUtils.isSpringOsgiPoweredBundle(bundle);
 
@@ -133,22 +133,18 @@ public class ApplicationContextConfiguration {
 				this.timeout = ConfigUtils.getTimeOut(headers);
 				this.publishContextAsService = ConfigUtils.getPublishContext(headers);
 				this.asyncCreation = ConfigUtils.getCreateAsync(headers);
-            }
-            try {
-                this.configurationLocations = ConfigUtils.getConfigLocations(headers, bundle);
-                if (this.configurationLocations.length == 0) {
-                    log.error("Bundle claims to be Spring powered, but does not contain any configuration resources: "
-                              + OsgiBundleUtils.getNullSafeSymbolicName(bundle));
-                    this.isSpringPoweredBundle = false;
-                }
-            } catch (MissingConfiguration e) {
-                log.error("Indicated Spring Context configuration file is missing [" +
-                          e.getMissingResource() + "] in " + OsgiBundleUtils.getNullSafeSymbolicName(bundle));
-                this.configurationLocations = new String[0];
-                this.isSpringPoweredBundle = false;
-            }
-        }
-    }
+			}
+			
+
+			this.configurationLocations = ConfigUtils.getConfigLocations(headers);
+			
+			if (ObjectUtils.isEmpty(this.configurationLocations)) {
+				log.error("Bundle claims to be Spring powered, but does not contain any configuration resources: "
+						+ OsgiBundleUtils.getNullSafeSymbolicName(bundle));
+				this.isSpringPoweredBundle = false;
+			}
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
