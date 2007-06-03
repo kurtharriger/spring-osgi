@@ -214,6 +214,12 @@ public abstract class ConfigUtils {
 			String locations = StringUtils.tokenizeToStringArray(header, DIRECTIVE_SEPARATOR)[0];
 			// parse it into individual token
 			ctxEntries = StringUtils.tokenizeToStringArray(locations, CONTEXT_LOCATION_SEPARATOR);
+
+			// replace * with a 'digestable' location
+			for (int i = 0; i < ctxEntries.length; i++) {
+				if (CONFIG_WILDCARD.equals(ctxEntries[i]))
+					ctxEntries[i] = META_INF_WILD_CARD;
+			}
 		}
 		else {
 			ctxEntries = new String[] { SPRING_CONTEXT_FILES };
