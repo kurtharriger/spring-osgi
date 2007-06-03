@@ -44,8 +44,7 @@ public abstract class ConfigUtils {
 
 	private static final Log log = LogFactory.getLog(ConfigUtils.class);
 
-	public static final String SPRING_CONTEXT_FILES = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX + CONTEXT_DIR
-			+ CONTEXT_FILES;
+	public static final String SPRING_CONTEXT_FILES = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX + META_INF_WILD_CARD;
 
 	public static final String CONFIG_WILDCARD = "*";
 
@@ -218,7 +217,7 @@ public abstract class ConfigUtils {
 			// replace * with a 'digestable' location
 			for (int i = 0; i < ctxEntries.length; i++) {
 				if (CONFIG_WILDCARD.equals(ctxEntries[i]))
-					ctxEntries[i] = META_INF_WILD_CARD;
+					ctxEntries[i] = SPRING_CONTEXT_FILES;
 			}
 		}
 		else {
