@@ -44,6 +44,8 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.util.ClassUtils;
+import org.springframework.aop.framework.ProxyFactory;
 
 /**
  * 
@@ -139,6 +141,12 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		this.osgiResourceLoader = new OsgiBundleResourceLoader(this.bundle);
 		this.osgiPatternResolver = new OsgiBundleResourcePatternResolver(this.bundle);
 		this.setClassLoader(createBundleClassLoader(this.bundle));
+		this.setDisplayName(ClassUtils.getShortName(getClass()) +
+                            "(bundle=" +
+                            getBundleSymbolicName() +
+                            ", config=" +
+                            StringUtils.arrayToCommaDelimitedString(getConfigLocations()) +
+                            ")");
 	}
 
 	/**
@@ -162,12 +170,15 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 
 	/**
 	 * Sets a default config location if no explicit config location specified.
+     *
+     * The refresh process has been broken up into 3 phases to support asynchronous context
+     * creation in subclasses.
 	 * 
 	 * @see #getDefaultConfigLocations
 	 * @see #setConfigLocations
 	 */
 	public synchronized void refresh() throws BeansException {
-		preRefresh();
+        preRefresh();
 		onRefresh();
 		postRefresh();
 	}
@@ -177,7 +188,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	// refresh!
 	public synchronized void close() {
 		if (!OsgiServiceUtils.unregisterService(serviceRegistration)) {
-			logger.warn("the application context service has been already unregistered");
+			logger.info("the application context service has been already unregistered");
 		}
 
 		// call super class
@@ -255,11 +266,11 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		if (publishContextAsService) {
 			Dictionary serviceProperties = new Properties();
 			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME,
-				OsgiBundleUtils.getNullSafeSymbolicName(getBundle()));
+                                  getBundleSymbolicName());
 			if (logger.isInfoEnabled()) {
 				logger.info("Publishing application context with properties ("
 						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
-						+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
+						+ getBundleSymbolicName() + ")");
 			}
 			this.serviceRegistration = getBundleContext().registerService(
 				new String[] { AbstractRefreshableApplicationContext.class.getName() }, this, serviceProperties);
@@ -268,12 +279,18 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 			if (logger.isInfoEnabled()) {
 				logger.info("Not publishing application context with properties ("
 						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
-						+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ")");
+						+ getBundleSymbolicName() + ")");
 			}
 		}
 	}
 
-	/**
+
+    public String getBundleSymbolicName() {
+        return OsgiBundleUtils.getNullSafeSymbolicName(getBundle());
+    }
+
+
+    /**
 	 * This implementation supports pattern matching inside the OSGi bundle.
 	 * 
 	 * @see OsgiBundleResourcePatternResolver
@@ -316,7 +333,8 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 * @return
 	 */
 	protected ClassLoader createBundleClassLoader(Bundle bundle) {
-		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
+		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle,
+                                                                      ProxyFactory.class.getClassLoader());
 	}
 
 	/**
@@ -340,7 +358,13 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		return isActive();
 	}
 
-	protected void preRefresh() throws BeansException, IllegalStateException {
+
+    /** this is the first half of the refresh process
+     *
+     * @throws BeansException
+     * @throws IllegalStateException
+     */
+    protected void preRefresh() throws BeansException, IllegalStateException {
 
 		// TODO: should refresh imported beans
 		if (ObjectUtils.isEmpty(configLocations)) {
@@ -387,7 +411,13 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		}
 	}
 
-	protected void postRefresh() throws BeansException {
+
+    /**
+     * This is the second half of the refresh process
+     * @throws BeansException
+     */
+
+    protected void postRefresh() throws BeansException {
 		try {
 
 			// Initialize other special beans in specific context subclasses.

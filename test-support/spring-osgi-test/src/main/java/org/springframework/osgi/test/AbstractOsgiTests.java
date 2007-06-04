@@ -34,6 +34,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.test.util.ConfigurableByteArrayOutputStream;
@@ -101,8 +102,9 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
-		ConfigurableApplicationContext context = new OsgiBundleXmlApplicationContext(getBundleContext(), locations);
-		context.refresh();
+		ConfigurableOsgiBundleApplicationContext context = new OsgiBundleXmlApplicationContext(locations);
+        context.setBundleContext(getBundleContext());
+        context.refresh();
 		return context;
 	}
 

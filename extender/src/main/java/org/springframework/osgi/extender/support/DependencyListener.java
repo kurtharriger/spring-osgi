@@ -25,14 +25,12 @@ import java.util.Set;
 public class DependencyListener implements ServiceListener {
     protected final Set dependencies = new LinkedHashSet();
     protected final Set unsatisfiedDependencies = new LinkedHashSet();
-    protected Runnable postAction;
     protected ServiceDependentOsgiBundleXmlApplicationContext context;
 
     private static final Log log = LogFactory.getLog(DependencyListener.class);
 
 
-    public DependencyListener(Runnable postAction, ServiceDependentOsgiBundleXmlApplicationContext context) {
-        this.postAction = postAction;
+    public DependencyListener(ServiceDependentOsgiBundleXmlApplicationContext context) {
         this.context = context;
     }
 
@@ -153,12 +151,11 @@ public class DependencyListener implements ServiceListener {
         if (unsatisfiedDependencies.isEmpty()) {
             deregister();
             context.listener = null;
-            context.setState(ContextState.DEPENDENCIES_RESOLVED);
             if (log.isDebugEnabled()) {
                 log.debug("No outstanding dependencies, completing initialization for "
                           + context.getDisplayName());
             }
-            postAction.run();
+            context.dependenciesAreSatisfied();
         } else {
             register(); // re-register with the new filter
         }

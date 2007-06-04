@@ -58,12 +58,13 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 	}
 
 	private void createContext() {
-		xmlContext = new OsgiBundleXmlApplicationContext(context, new String[] {}) {
+		xmlContext = new OsgiBundleXmlApplicationContext(new String[] {}) {
 			public void refresh() throws BeansException {
 				// no-op
 			}
 		};
-	}
+        xmlContext.setBundleContext(context);
+    }
 
 	protected void tearDown() throws Exception {
 		// bundleCtxCtrl.verify();

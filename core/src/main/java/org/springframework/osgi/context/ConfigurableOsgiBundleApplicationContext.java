@@ -16,6 +16,7 @@
 package org.springframework.osgi.context;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Bundle;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver;
 
@@ -32,7 +33,12 @@ import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEnt
  */
 public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableApplicationContext {
 
-	/**
+    /**
+     * @return the Bundle for this OSGi bundle application context.
+     */
+    Bundle getBundle();
+
+    /**
 	 * Set the config locations for this OSGi bundle application context. If not
 	 * set, the implementation is supposed to use a default for the given
 	 * namespace.

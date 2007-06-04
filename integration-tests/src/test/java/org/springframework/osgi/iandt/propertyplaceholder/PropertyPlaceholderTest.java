@@ -23,6 +23,7 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
@@ -39,7 +40,7 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 
 	private final static Dictionary DICT = new Hashtable();
 
-	private ConfigurableApplicationContext ctx;
+	private ConfigurableOsgiBundleApplicationContext ctx;
 
 	static {
 		DICT.put("foo", "bar");
@@ -63,9 +64,10 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 	protected void onSetUp() throws Exception {
 		prepareConfiguration();
 
-		ctx = new OsgiBundleXmlApplicationContext(getBundleContext(),
-				new String[] { "org/springframework/osgi/iandt/propertyplaceholder/placeholder.xml" });
-		ctx.refresh();
+        String[] locations = new String[]{"org/springframework/osgi/iandt/propertyplaceholder/placeholder.xml"};
+        ctx = new OsgiBundleXmlApplicationContext(locations);
+        ctx.setBundleContext(getBundleContext());
+        ctx.refresh();
 	}
 
 	protected void onTearDown() throws Exception {

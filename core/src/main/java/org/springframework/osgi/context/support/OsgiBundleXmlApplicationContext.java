@@ -18,17 +18,13 @@ package org.springframework.osgi.context.support;
 
 import java.io.IOException;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.osgi.util.ConfigUtils;
-import org.springframework.osgi.util.OsgiBundleUtils;
-import org.springframework.osgi.util.OsgiServiceUtils;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.osgi.util.ConfigUtils; 
+import org.springframework.osgi.util.OsgiServiceUtils; 
 
 /**
  * Application context backed by an OSGi bundle. Will use the bundle classpath
@@ -45,21 +41,16 @@ import org.springframework.util.StringUtils;
  * @since 2.0
  */
 
-// TODO: provide means to access OSGi services etc. through this application
-// context?
-// TODO: think about whether restricting config files to bundle: is the right
-// thing to do
+// TODO: provide means to access OSGi services etc. through this application context?
+// TODO: think about whether restricting config files to bundle: is the right thing to do
 public class OsgiBundleXmlApplicationContext extends AbstractRefreshableOsgiBundleApplicationContext {
 
 	/** retrieved from the BundleContext * */
 	private OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver;
 
-	public OsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations) {
-		setBundleContext(context);
-		setConfigLocations(configLocations);
-		this.setDisplayName(ClassUtils.getShortName(getClass()) + "(bundle="
-				+ OsgiBundleUtils.getNullSafeSymbolicName(getBundle()) + ", config="
-				+ StringUtils.arrayToCommaDelimitedString(getConfigLocations()) + ")");
+	public OsgiBundleXmlApplicationContext(String[] configLocations) {
+        setDisplayName("Unbound OsgiBundleXmlApplicationContext");
+        setConfigLocations(configLocations);
 	}
 
 	protected String[] getDefaultConfigLocations() {
