@@ -146,6 +146,8 @@ public class ServiceDependentOsgiBundleContextTest extends TestCase {
         context.listener.hasDependencies = true;
 
         context.refresh();
+        assertEquals("Creation thread is current thread", Thread.currentThread(), context.creationThread);
+        assertNotNull("Creation trace is filled", context.creationTrace);
         assertTrue("listener registered", context.listener.registered);
         assertFalse("listener not deregistered", context.listener.deregistered);
         List transitions = context.stateTransitions;
@@ -153,7 +155,11 @@ public class ServiceDependentOsgiBundleContextTest extends TestCase {
         assertEquals("INITIALIZED", ContextState.INITIALIZED, transitions.get(0));
         assertEquals("RESOLVING_DEPENDENCIES", ContextState.RESOLVING_DEPENDENCIES, transitions.get(1));
 
-        context.dependenciesAreSatisfied();
+        // simulates the callback from the OSGi framework when dependencies are satisfied
+        context.dependenciesAreSatisfied(true);
+
+        assertNull("Creation thread has been nulled", context.creationThread);
+        assertNull("Creation trace has been nulled", context.creationTrace);
 
         transitions = context.stateTransitions;
         assertEquals("number of state transitions", 4, transitions.size());
@@ -178,8 +184,7 @@ public class ServiceDependentOsgiBundleContextTest extends TestCase {
         assertSame("TCCL onRefresh", testLoader, context.loaderOnRefresh);
         assertSame("TCCL postRefresh", testLoader, context.loaderOnPostRefresh);
 
-        assertEquals("executed once", 1, executor.executionCount);
-
+        assertEquals("executed once", 1, executor.executionCount); 
     }
 
 

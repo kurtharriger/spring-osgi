@@ -41,7 +41,6 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
         implements ServiceDependentOsgiApplicationContext {
     private volatile ContextState state = ContextState.INITIALIZED;
     protected DependencyListener listener;
-    protected final Object closeSynch = new Object();
     protected TaskExecutor executor;
     protected Timer timer;
     protected Throwable creationTrace;
@@ -63,18 +62,22 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
      * When this method returns, the refresh process may be incomplete as there could be services that this
      * context is dependendent upon which are unresolved.
      */
-    public void refresh() {
+    public synchronized void refresh() {
         if (getState() == ContextState.INTERRUPTED) {
             logger.warn("Context creation has been interrupted: " + getDisplayName());
             return;
         }
 
+        creationTrace = new Exception("Context Refresh Trace");
+        creationTrace.fillInStackTrace();
+
         scheduleTimeout();
 
         postEvent(BundleEvent.STARTING);
 
-        ClassLoader ccl = Thread.currentThread().getContextClassLoader(); 
-        Thread.currentThread().setContextClassLoader(getClassLoader());
+        creationThread = Thread.currentThread();
+        ClassLoader ccl = creationThread.getContextClassLoader();
+        creationThread.setContextClassLoader(getClassLoader());
         try {
             preRefresh();
             DependencyListener dl = createDependencyListener();
@@ -100,7 +103,8 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
                     logger.debug("No outstanding dependencies, completing initialization for "
                                  + getDisplayName());
                 }
-                dependenciesAreSatisfied();
+                dependenciesAreSatisfied(false);
+                creationThread = null;
             }
         } catch (Throwable e) {
             fail(e);  
@@ -110,20 +114,25 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
     }
 
 
-    public void close() {
+    public synchronized void close() {
         if (getState() == ContextState.CLOSED) {
             return;
         }
-        postEvent(BundleEvent.STOPPING);
-        if (getState() != ContextState.CREATED && getState() != ContextState.INTERRUPTED) {
-            interrupt();
-        } else {
-            if (listener != null) {
-                listener.deregister();
+        try {
+            postEvent(BundleEvent.STOPPING);
+            if (getState() != ContextState.CREATED && getState() != ContextState.INTERRUPTED) {
+                interrupt();
+            } else {
+                if (listener != null) {
+                    listener.deregister();
+                }
+                super.close();
+                setState(ContextState.CLOSED);
+                postEvent(BundleEvent.STOPPED);
             }
-            super.close();
-            setState(ContextState.CLOSED);
-            postEvent(BundleEvent.STOPPED);
+        } finally {
+            creationTrace = null;
+            creationThread = null;
         }
     }
     
@@ -145,12 +154,13 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
 
 
     /**
-     * The service dependencies of the receiver are satisfied, so continue with the creation
+     * The service dependencies of the receiver are satisfied; continue with the creation
      * of the context.
+     * @param spawn - if true, then spawn a new thread if the executor is available
      */
-    protected void dependenciesAreSatisfied() {
+    protected void dependenciesAreSatisfied(boolean spawn) {
         setState(ContextState.DEPENDENCIES_RESOLVED);
-        if (executor == null) {
+        if (!spawn || executor == null) {
             // execute synchronously in the same thread
             postAction().run();
         } else {
@@ -197,9 +207,11 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
                 Thread.currentThread().setContextClassLoader(getClassLoader());
                 try {
                     // Continue with the refresh process...
-                    onRefresh();
-                    postRefresh();
-                    setState(ContextState.CREATED);
+                    synchronized (this) {
+                        onRefresh();
+                        postRefresh();
+                        setState(ContextState.CREATED);  
+                    }
                     postEvent(BundleEvent.STARTED);
                 } catch (ThreadDeath td) {
                     if (log.isDebugEnabled()) {
@@ -210,6 +222,7 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
                 } finally {
                     Thread.currentThread().setContextClassLoader(ccl);
                     creationThread = null;
+                    creationTrace = null;
                 }
             }
         };
@@ -281,6 +294,9 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
             // last ditch effort to get useful error information
             t.printStackTrace();
             e.printStackTrace();
+        } finally {
+            creationThread = null;
+            creationTrace = null;
         }
     }
 

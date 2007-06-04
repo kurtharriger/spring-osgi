@@ -155,7 +155,7 @@ public class DependencyListener implements ServiceListener {
                 log.debug("No outstanding dependencies, completing initialization for "
                           + context.getDisplayName());
             }
-            context.dependenciesAreSatisfied();
+            context.dependenciesAreSatisfied(true);
         } else {
             register(); // re-register with the new filter
         }
