@@ -16,9 +16,18 @@
  */
 package org.springframework.osgi.extender.support;
 
-import org.osgi.framework.BundleContext;
-import org.springframework.beans.BeansException;
+import org.osgi.framework.BundleEvent;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.osgi.context.support.SpringBundleEvent;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.context.ApplicationContextException;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.util.Timer;
+import java.util.Iterator;
+import java.util.TimerTask;
 
 /**
  * An OsgiBundleXmlApplicationContext which delays initialization until all
@@ -30,69 +39,254 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
  */
 public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleXmlApplicationContext
         implements ServiceDependentOsgiApplicationContext {
-    protected volatile ContextState state = ContextState.INITIALIZED;
+    private volatile ContextState state = ContextState.INITIALIZED;
     protected DependencyListener listener;
+    protected final Object closeSynch = new Object();
+    protected TaskExecutor executor;
+    protected Timer timer;
+    protected Throwable creationTrace;
+    protected Thread creationThread;
+    protected long timeout;
+    protected TimerTask timerTask;
+    protected ApplicationEventMulticaster mcast;
+
+    private static final Log log = LogFactory.getLog(ServiceDependentOsgiBundleXmlApplicationContext.class);
 
 
-    public ServiceDependentOsgiBundleXmlApplicationContext(BundleContext context, String[] configLocations) {
-        super(context, configLocations);
+    public ServiceDependentOsgiBundleXmlApplicationContext(String[] configLocations) {
+        super(configLocations);
     }
 
-    public synchronized void create(final Runnable postAction) throws BeansException {
-        if (state == ContextState.INTERRUPTED) {
-            logger.warn("Context creation has been interrupted: " + getDisplayName());
-            return;
-        }
-        preRefresh();
-        DependencyListener dl = new DependencyListener(postAction, this);
-        dl.findServiceDependencies();
 
-        if (state == ContextState.INTERRUPTED) {
+    /**
+     * Refresh the context.  This is the heart of darkness as this is designed to be an asynchronous process.
+     * When this method returns, the refresh process may be incomplete as there could be services that this
+     * context is dependendent upon which are unresolved.
+     */
+    public void refresh() {
+        if (getState() == ContextState.INTERRUPTED) {
             logger.warn("Context creation has been interrupted: " + getDisplayName());
             return;
         }
 
-        state = ContextState.RESOLVING_DEPENDENCIES;
-        if (!dl.isSatisfied()) {
-            listener = dl;
-            listener.register();
-        } else {
-            if (state == ContextState.INTERRUPTED) {
+        scheduleTimeout();
+
+        postEvent(BundleEvent.STARTING);
+
+        ClassLoader ccl = Thread.currentThread().getContextClassLoader(); 
+        Thread.currentThread().setContextClassLoader(getClassLoader());
+        try {
+            preRefresh();
+            DependencyListener dl = createDependencyListener();
+            dl.findServiceDependencies();
+
+            if (getState() == ContextState.INTERRUPTED) {
                 logger.warn("Context creation has been interrupted: " + getDisplayName());
                 return;
             }
-            state = ContextState.DEPENDENCIES_RESOLVED;
-            if (logger.isDebugEnabled()) {
-                logger.debug("No outstanding dependencies, completing initialization for "
-                          + getDisplayName());
-            } 
-            postAction.run();
+
+            setState(ContextState.RESOLVING_DEPENDENCIES);
+            if (!dl.isSatisfied()) {
+                // Asynchronously finish the context refresh process
+                listener = dl;
+                listener.register();
+            } else {
+                // Synchronously finish the context refresh process
+                if (getState() == ContextState.INTERRUPTED) {
+                    logger.warn("Context creation has been interrupted: " + getDisplayName());
+                    return;
+                } 
+                if (logger.isDebugEnabled()) {
+                    logger.debug("No outstanding dependencies, completing initialization for "
+                                 + getDisplayName());
+                }
+                dependenciesAreSatisfied();
+            }
+        } catch (Throwable e) {
+            fail(e);  
+        } finally {
+            Thread.currentThread().setContextClassLoader(ccl);
         }
     }
 
-    public synchronized void close() {
-        if (listener != null) {
-            listener.deregister();
+
+    public void close() {
+        if (getState() == ContextState.CLOSED) {
+            return;
         }
-        super.close();
-        state = ContextState.CLOSED;
-    }
-
-
-    public void interrupt() {
-        state = ContextState.INTERRUPTED;
-        if (listener != null) {
-            listener.deregister();
+        postEvent(BundleEvent.STOPPING);
+        if (getState() != ContextState.CREATED && getState() != ContextState.INTERRUPTED) {
+            interrupt();
+        } else {
+            if (listener != null) {
+                listener.deregister();
+            }
+            super.close();
+            setState(ContextState.CLOSED);
+            postEvent(BundleEvent.STOPPED);
         }
     }
+    
 
-    public synchronized void complete() {
-        if (state == ContextState.INTERRUPTED) {
+    protected void postRefresh() {
+        if (getState() == ContextState.INTERRUPTED) {
             logger.warn("Context creation has been interrupted: " + getDisplayName());
             return;
         }
-        postRefresh();
-        state = ContextState.CREATED;
+        super.postRefresh();
+        setState(ContextState.CREATED);
+        postEvent(BundleEvent.STARTED);
+    }
+
+
+    protected DependencyListener createDependencyListener() {
+        return new DependencyListener(this);
+    }
+
+
+    /**
+     * The service dependencies of the receiver are satisfied, so continue with the creation
+     * of the context.
+     */
+    protected void dependenciesAreSatisfied() {
+        setState(ContextState.DEPENDENCIES_RESOLVED);
+        if (executor == null) {
+            // execute synchronously in the same thread
+            postAction().run();
+        } else {
+            // execute asynchronously
+            executor.execute(postAction());
+        }
+    }
+
+
+    /**
+     * Schedule the timer task which will terminate the context creation process if dependencies are not
+     * satisfied within the specified timeout.
+     */
+    protected void scheduleTimeout() {
+        timerTask = new TimerTask() {
+            public void run() {
+                ApplicationContextException e =
+                        new ApplicationContextException("Application context initializition for '" +
+                                                        getBundleSymbolicName() +
+                                                        "' has timed out");
+                e.fillInStackTrace();
+                fail(e);
+            }
+        };
+
+        long timeout_in_milliseconds = timeout * 1000;
+        timer.schedule(timerTask, timeout_in_milliseconds);
+    }
+
+
+    /**
+     * Crete the Runnable action which will complete the context creation process.
+     * This process can be called synchronously or asynchronously, depending on context
+     * configuration and availability of dependencies.  Therefore, it is super critical
+     * to have the correct context class loader set as well as the correct error handling.
+     * @return
+     */
+    protected Runnable postAction() {
+        return new Runnable() {
+            public void run() {
+                creationThread = Thread.currentThread();
+                timerTask.cancel();
+                ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(getClassLoader());
+                try {
+                    // Continue with the refresh process...
+                    onRefresh();
+                    postRefresh();
+                    setState(ContextState.CREATED);
+                    postEvent(BundleEvent.STARTED);
+                } catch (ThreadDeath td) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Context creation interrupted for [" + getDisplayName() + "]", td);
+                    }
+                } catch (Throwable t) {
+                    fail(t);
+                } finally {
+                    Thread.currentThread().setContextClassLoader(ccl);
+                    creationThread = null;
+                }
+            }
+        };
+    }
+
+
+    /**
+     * Interrupt the context creation proces.  Deregister the listeners, interrupt the creation thread
+     * and close the receiver.
+     */
+    protected void interrupt() {
+        if (getState() == ContextState.INTERRUPTED || getState() == ContextState.CLOSED) {
+            return;
+        }
+        setState(ContextState.INTERRUPTED);
+        if (listener != null) {
+            listener.deregister();
+        }
+        if (creationThread != null) {
+            creationThread.interrupt();
+            try {
+                //noinspection deprecation
+                creationThread.stop();
+            } catch (ThreadDeath e) {
+                // ignore if this is the current thread.
+            }
+            creationThread = null;
+        }
+        close();
+    }
+
+
+    /**
+     * Fail creating the context.  Figure out unsatisfied dependencies and provide a very nice log message.
+     * @param t - the offending Throwable which caused our demise
+     */
+    protected void fail(Throwable t) {
+        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+        try {
+            interrupt();
+
+            StringBuffer buf = new StringBuffer();
+            if (listener == null || listener.getUnsatisfiedDependencies().isEmpty()) {
+                buf.append("none");
+            } else {
+                for (Iterator dependencies = listener.getUnsatisfiedDependencies().iterator();
+                     dependencies.hasNext();) {
+                    Dependency dependency = (Dependency) dependencies.next();
+                    buf.append(dependency.toString());
+                    if (dependencies.hasNext()) {
+                        buf.append(", ");
+                    }
+                }
+            }
+
+            if (log.isErrorEnabled()) {
+                log.error("Unable to create application context for [" +
+                          getBundleSymbolicName() +
+                          "], unsatisfied dependencies: " +
+                          buf.toString(), t);
+                if (log.isInfoEnabled()) {
+                    log.info("[" +
+                             getBundleSymbolicName() +
+                             "]" +
+                             " creation calling code: ", creationTrace);
+                }
+            }
+        } catch (Throwable e) {
+            // last ditch effort to get useful error information
+            t.printStackTrace();
+            e.printStackTrace();
+        }
+    }
+
+
+    protected void postEvent(int starting) {
+        mcast.multicastEvent(new SpringBundleEvent(starting, getBundle()));
     }
 
 
@@ -101,20 +295,32 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
     }
 
     public boolean isActive() {
-         return state == ContextState.CREATED;
+         return getState() == ContextState.CREATED;
     }
 
+
+    public void setExecutor(TaskExecutor executor) {
+        this.executor = executor;
+    }
+
+    public void setTimer(Timer timer) {
+        this.timer = timer;
+    }
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+
+    public void setMcast(ApplicationEventMulticaster mcast) {
+        this.mcast = mcast;
+    }
 
     public ContextState getState() {
         return state;
     }
 
-    protected void setState(ContextState s) {
-        state = s;
-    }
-
-
-    public DependencyListener getListener() {
-        return listener;
+    protected void setState(ContextState state) {
+        this.state = state;
     }
 }

@@ -1,7 +1,10 @@
 package org.springframework.osgi.extender.support;
 
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.beans.BeansException;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.context.event.ApplicationEventMulticaster;
+
+import java.util.Timer;
 
 /**
  * @author Hal Hildebrand
@@ -9,17 +12,19 @@ import org.springframework.beans.BeansException;
  *         Time: 7:39:17 PM
  */
 public interface ServiceDependentOsgiApplicationContext extends ConfigurableOsgiBundleApplicationContext {
-    void create(Runnable postAction) throws BeansException;
 
 
-    void interrupt();
+    void setExecutor(TaskExecutor executor);
+    
+
+    void setTimer(Timer timer);
 
 
-    void complete();
+    void setTimeout(long timeout);
+
+
+    void setMcast(ApplicationEventMulticaster mcast);
 
 
     ContextState getState();
-
-
-    DependencyListener getListener();
 }
