@@ -30,8 +30,7 @@ import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions; 
-import org.springframework.osgi.service.support.RetryTemplate;
+import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 
 /**
  * @author Costin Leau
