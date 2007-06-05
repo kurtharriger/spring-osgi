@@ -53,7 +53,7 @@
     <module>io.fragment.1.bundle</module>    
     <module>io.fragment.2.bundle</module>
     <module>error.bundle</module>
-
+    <module>deadlock.bundle</module> 
   </modules>
 
 <profiles>
