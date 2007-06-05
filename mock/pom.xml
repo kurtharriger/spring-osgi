@@ -18,8 +18,15 @@
   <properties>
 	<spring.osgi.export.pkg>org.springframework.osgi.mock</spring.osgi.export.pkg>
   </properties>
-  
-  <dependencies/>
+
+  <dependencies>
+    <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>osgi_R4_core</artifactId>
+        <version>1.0</version>
+        <scope>compile</scope>
+    </dependency>
+  </dependencies>
   <reporting>
     <plugins>
        <plugin>

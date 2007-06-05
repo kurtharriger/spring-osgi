@@ -29,7 +29,6 @@
   </properties>
   
   <dependencies>
-
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-io</artifactId>
@@ -81,15 +80,46 @@
       <artifactId>servlet-api</artifactId>
       <version>2.4</version>
       <scope>provided</scope>
-    </dependency>    
+    </dependency>
+
+
+    <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>osgi_R4_core</artifactId>
+        <version>1.0</version>
+        <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>osgi_R4_compendium</artifactId>
       <version>1.0</version>
-      <scope>provided</scope>
-    </dependency> 
-       
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.osgi</groupId>
+        <artifactId>mock-framework-util</artifactId>
+        <version>${project.parent.version}</version>
+        <scope>test</scope>
+    </dependency>
+
   </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>org.osgi.vendor.framework</name>
+                            <value>org.springframework.osgi</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
   
   <reporting>
     <plugins>

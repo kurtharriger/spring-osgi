@@ -2,9 +2,7 @@ package org.springframework.osgi.extender.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
+import org.osgi.framework.*;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -100,6 +98,9 @@ public class DependencyListener implements ServiceListener {
 
 
     protected void deregister() {
+        if (log.isDebugEnabled()) {
+            log.debug("deregistering listener for " + context.getDisplayName());
+        }
         try {
             context.getBundleContext().removeServiceListener(this);
         } catch (IllegalStateException e) {
@@ -116,29 +117,53 @@ public class DependencyListener implements ServiceListener {
      */
     public void serviceChanged(ServiceEvent serviceEvent) {
         if (unsatisfiedDependencies.isEmpty()) { // already completed.
+            if (log.isDebugEnabled()) {
+                log.debug("handling service event, but no unsatisfied dependencies for " +
+                          context.getDisplayName());
+            }
             return;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("handling service event [" +
+                      typeStringFor(serviceEvent.getType()) +
+                      ":" +
+                      toString(serviceEvent.getServiceReference()) +
+                      "] for " +
+                      context.getDisplayName());
         }
 
         for (Iterator i = dependencies.iterator(); i.hasNext();) {
             Dependency dependency = (Dependency) i.next();
-            if (dependency.matches(serviceEvent)) {
-                switch (serviceEvent.getType()) {
-                    case ServiceEvent.MODIFIED:
-                    case ServiceEvent.REGISTERED:
-                        unsatisfiedDependencies.remove(dependency);
-                        if (log.isDebugEnabled()) {
-                            log.debug("found service; eliminating " + dependency);
-                        }
-                        break;
-                    case ServiceEvent.UNREGISTERING:
-                        unsatisfiedDependencies.add(dependency);
-                        if (log.isDebugEnabled()) {
-                            log.debug("service unregistered; adding " + dependency);
-                        }
-                        break;
-                    default: // do nothing
-                        break;
+            try {
+                if (dependency.matches(serviceEvent)) {
+                    switch (serviceEvent.getType()) {
+                        case ServiceEvent.MODIFIED:
+                        case ServiceEvent.REGISTERED:
+                            unsatisfiedDependencies.remove(dependency);
+                            if (log.isDebugEnabled()) {
+                                log.debug("found service; eliminating " + dependency);
+                            }
+                            break;
+                        case ServiceEvent.UNREGISTERING:
+                            unsatisfiedDependencies.add(dependency);
+                            if (log.isDebugEnabled()) {
+                                log.debug("service unregistered; adding " + dependency);
+                            }
+                            break;
+                        default: // do nothing
+                            if (log.isDebugEnabled()) {
+                                log.debug("Unknown service event type for: " + dependency);
+                            }
+                            break;
+                    }
+                } else { 
+                    if (log.isDebugEnabled()) {
+                        log.debug(dependency + " does not match");
+                    }
                 }
+            } catch (Throwable e) {
+                // some frameworks will simply not log exception for event handlers
+                log.fatal("Exception during dependency processing for " + context.getDisplayName(), e);
             }
         }
 
@@ -160,4 +185,37 @@ public class DependencyListener implements ServiceListener {
             register(); // re-register with the new filter
         }
     }
+
+    protected String typeStringFor(int event) {
+        switch (event) {
+            case ServiceEvent.MODIFIED: return "MODIFIED";
+            case ServiceEvent.REGISTERED: return "REGISTERED";
+            case ServiceEvent.UNREGISTERING: return "UNREGISTERING";
+            default: return "Unknown ServiceEvent type";
+        }
+    }
+
+    protected String toString(ServiceReference ref) {
+        StringBuffer buf = new StringBuffer();
+        buf.append("ServiceReference [").append(ref.getBundle().getSymbolicName()).append("] ");
+        String clazzes[] = (String[]) ref.getProperty(Constants.OBJECTCLASS);
+        int size = clazzes.length;
+        buf.append('{');
+        for (int i = 0; i < size; i++) {
+            if (i > 0)
+                buf.append(", ");
+            buf.append(clazzes[i]);
+        }
+
+        buf.append("}={");
+        String[] keys = ref.getPropertyKeys();
+        for (int i = 0; i < keys.length; i++) {
+            if (!Constants.OBJECTCLASS.equals(keys[i])) {
+                buf.append(keys[i]).append('=').append(ref.getProperty(keys[i])).append(',');
+            }
+        }
+        buf.append('}');
+
+        return buf.toString();
+    } 
 }

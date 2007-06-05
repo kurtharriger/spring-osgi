@@ -76,8 +76,15 @@
 	    <groupId>org.osgi</groupId>
 	    <artifactId>osgi_R4_compendium</artifactId>
 	    <version>1.0</version>
-	    <scope>provided</scope>
-     </dependency> 
+	    <scope>compile</scope>
+     </dependency>
+
+    <dependency>
+        <groupId>org.springframework.osgi</groupId>
+        <artifactId>mock-framework-util</artifactId>
+        <version>${project.parent.version}</version>
+        <scope>test</scope>
+    </dependency>
 
   </dependencies>
 
@@ -90,6 +97,18 @@
             <source>1.5</source>
             <target>1.5</target>
             <debug>true</debug>
+          </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+              <systemProperties>
+                  <property>
+                      <name>org.osgi.vendor.framework</name>
+                      <value>org.springframework.osgi</value>
+                  </property>
+              </systemProperties>
           </configuration>
       </plugin>
   </plugins>
