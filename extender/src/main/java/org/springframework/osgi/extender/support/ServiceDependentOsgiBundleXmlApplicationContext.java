@@ -37,8 +37,7 @@ import java.util.TimerTask;
  * @author Hal Hildebrand
  * @author Costin Leau
  */
-public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleXmlApplicationContext
-        implements ServiceDependentOsgiApplicationContext {
+public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleXmlApplicationContext {
     private volatile ContextState state = ContextState.INITIALIZED;
     protected DependencyListener listener;
     protected TaskExecutor executor;
@@ -62,7 +61,7 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
      * When this method returns, the refresh process may be incomplete as there could be services that this
      * context is dependendent upon which are unresolved.
      */
-    public synchronized void refresh() {
+    public void refresh() {
         if (getState() == ContextState.INTERRUPTED) {
             logger.warn("Context creation has been interrupted: " + getDisplayName());
             return;
@@ -114,7 +113,7 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
     }
 
 
-    public synchronized void close() {
+    public void close() {
         if (getState() == ContextState.CLOSED) {
             return;
         }

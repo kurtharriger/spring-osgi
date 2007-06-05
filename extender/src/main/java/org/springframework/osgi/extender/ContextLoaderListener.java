@@ -40,7 +40,6 @@ import org.springframework.osgi.context.support.SpringBundleEvent;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.osgi.util.OsgiServiceUtils;
-import org.springframework.osgi.extender.support.ServiceDependentOsgiApplicationContext;
 import org.springframework.osgi.extender.support.ServiceDependentOsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.support.ContextState;
 
@@ -222,7 +221,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 		synchronized (managedContexts) {
 			for (Iterator i = managedContexts.values().iterator(); i.hasNext();) {
-				((ServiceDependentOsgiApplicationContext) i.next()).close();
+				((ServiceDependentOsgiBundleXmlApplicationContext) i.next()).close();
 			}
 			this.managedContexts.clear();
 		}
@@ -357,7 +356,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
         Long bundleId = new Long(bundle.getBundleId());
 
-        final ServiceDependentOsgiApplicationContext context =
+        final ServiceDependentOsgiBundleXmlApplicationContext context =
                 createApplicationContext(OsgiBundleUtils.getBundleContext(bundle),
                                          config.getConfigurationLocations());
 
@@ -402,9 +401,10 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 
-    protected ServiceDependentOsgiApplicationContext createApplicationContext(BundleContext context,
-                                                                              String[] locations) {
-        ServiceDependentOsgiApplicationContext sdoac = new ServiceDependentOsgiBundleXmlApplicationContext(locations);
+    protected ServiceDependentOsgiBundleXmlApplicationContext createApplicationContext(BundleContext context,
+                                                                                       String[] locations) {
+        ServiceDependentOsgiBundleXmlApplicationContext sdoac =
+                new ServiceDependentOsgiBundleXmlApplicationContext(locations);
         sdoac.setBundleContext(context);
         return sdoac;
     }
@@ -417,9 +417,9 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * @param bundle
 	 */
 	protected void maybeCloseApplicationContextFor(Bundle bundle) {
-		ServiceDependentOsgiApplicationContext context;
+		ServiceDependentOsgiBundleXmlApplicationContext context;
 		synchronized (managedContexts) {
-			context = (ServiceDependentOsgiApplicationContext) managedContexts.remove(new Long(bundle.getBundleId()));
+			context =  (ServiceDependentOsgiBundleXmlApplicationContext) managedContexts.remove(new Long(bundle.getBundleId()));
 			if (context == null) {
 				return;
 			}
@@ -547,7 +547,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			springBundleListeners.add(listener);
 			// Post events for things already started
 			for (Iterator i = managedContexts.values().iterator(); i.hasNext();) {
-				ServiceDependentOsgiApplicationContext context = (ServiceDependentOsgiApplicationContext) i.next();
+				ServiceDependentOsgiBundleXmlApplicationContext context =
+                        (ServiceDependentOsgiBundleXmlApplicationContext) i.next();
 				if (context.getState() == ContextState.CREATED) {
 					if (log.isInfoEnabled()) {
 						log.info("Posting creation event ["
