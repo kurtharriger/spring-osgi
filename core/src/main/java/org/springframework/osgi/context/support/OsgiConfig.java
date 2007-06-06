@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
@@ -17,24 +18,31 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.osgi.config.OsgiConfigDefinitionParser;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.util.Assert;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Hal Hildebrand
  *         Date: Nov 2, 2006
  *         Time: 8:31:33 AM
  */
-public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleContextAware {
+public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleContextAware, DisposableBean {
 	private String pid;
 	private List listeners;
 	private BeanFactory beanFactory;
 	private boolean factory = false;
 	private BundleContext bundleContext;
+    private ServiceRegistration registration;
+
+    private static final Log log = LogFactory.getLog(OsgiConfig.class);
 
 
-	public void setListeners(List listeners) {
+    public void setListeners(List listeners) {
 		this.listeners = listeners;
 	}
 
@@ -51,24 +59,39 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(pid, OsgiConfigDefinitionParser.PERSISTENT_ID + " property is required");
-
 		for (Iterator l = listeners.iterator(); l.hasNext();) {
 			ConfigListener listener = (ConfigListener) l.next();
 			listener.resolve(beanFactory, factory);
 		}
-
 		Hashtable props = new Hashtable();
 		props.put(Constants.SERVICE_PID, pid);
 		if (factory) {
-			bundleContext.registerService(ManagedServiceFactory.class.getName(), new FactoryUpdater(), props);
+			registration = bundleContext.registerService(ManagedServiceFactory.class.getName(),
+                                                         new FactoryUpdater(),
+                                                         props);
 		}
 		else {
-			bundleContext.registerService(ManagedService.class.getName(), new Updater(), props);
+            registration = bundleContext.registerService(ManagedService.class.getName(),
+                                                         new Updater(),
+                                                         props);
 		}
 	}
 
 
-	public void setBundleContext(BundleContext context) {
+    public void destroy() throws Exception {
+        if (registration != null) {
+            try {
+                registration.unregister();
+			} catch (IllegalStateException ise) {
+				if (log.isInfoEnabled()) {
+					log.info("Service [" + registration + "] has already been unregistered");
+				}
+			}
+        }
+    }
+
+
+    public void setBundleContext(BundleContext context) {
 		bundleContext = context;
 	}
 
@@ -117,7 +140,7 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 		private Object bean;
 
 
-		public void setReference(String reference) {
+        public void setReference(String reference) {
 			this.reference = reference;
 		}
 
@@ -133,15 +156,18 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 
 
 		void resolve(BeanFactory beanFactory, boolean isFactory) {
-			bean = beanFactory.getBean(reference);
+            bean = beanFactory.getBean(reference);
 			if (isFactory) {
 				try {
 					bean.getClass().getMethod(updateMethod, new Class[]{String.class, Map.class});
 				}
 				catch (NoSuchMethodException e) {
 					IllegalArgumentException illArgEx = 
-					   new IllegalArgumentException("Invalid or missing update method for bean " + reference
-						  + "; requires signature (java.lang.String, java.util.Map)");
+					   new IllegalArgumentException("Invalid or missing update method for bean " +
+                                                    reference +
+                                                    "; requires signature " +
+                                                    updateMethod +
+                                                    "(java.lang.String, java.util.Map)");
 					illArgEx.initCause(e);
 					throw illArgEx;
 				}
@@ -152,8 +178,11 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 				}
 				catch (NoSuchMethodException e) {
 					IllegalArgumentException illArgEx = 
-					  new IllegalArgumentException("Invalid or missing update method for bean " + reference
-						+ "; requires signature (java.util.Map)");
+					  new IllegalArgumentException("Invalid or missing update method for bean " +
+                                                   reference +
+                                                   "; requires signature " +
+                                                    updateMethod +
+                                                    "(java.util.Map)");
 					illArgEx.initCause(e);
 					throw illArgEx;
 				}
@@ -164,8 +193,11 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 				}
 				catch (NoSuchMethodException e) {
 					IllegalArgumentException illArgEx = 
-					  new IllegalArgumentException("Invalid or missing deleted method for bean " + reference
-						+ "; requires signature (java.lang.String)");
+					  new IllegalArgumentException("Invalid or missing deleted method for bean " +
+                                                   reference +
+                                                   "; requires signature " +
+                                                   deletedMethod +
+                                                   "(java.lang.String)");
 					illArgEx.initCause(e);
 					throw illArgEx;
 				}
@@ -180,9 +212,12 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 			}
 			catch (NoSuchMethodException e) {
 				throw new ConfigurationException(instancePid,
-					"Invalid or missing update method for bean " + reference
-						+ "; requires signature (java.util.String, java.util.Map)",
-					e);
+					                             "Invalid or missing update method for bean " +
+                                                 reference +
+                                                 "; requires signature " +
+                                                 updateMethod +
+                                                 "(java.util.String, java.util.Map)",
+					                             e);
 			}
 
 			try {
@@ -203,8 +238,13 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 				update = bean.getClass().getMethod(updateMethod, new Class[]{Map.class});
 			}
 			catch (NoSuchMethodException e) {
-				throw new ConfigurationException(servicePid, "Invalid or missing update method for bean " + reference
-					+ "; requires signature (java.util.Map)", e);
+				throw new ConfigurationException(servicePid,
+                                                 "Invalid or missing update method for bean " +
+                                                 reference +
+                                                 "; requires signature " +
+                                                 updateMethod +
+                                                 "(java.util.Map)",
+                                                 e);
 			}
 
 			try {
@@ -228,8 +268,11 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 				deleted = bean.getClass().getMethod(deletedMethod, new Class[]{String.class});
 			}
 			catch (NoSuchMethodException e) {
-				throw (IllegalStateException)new IllegalStateException("Invalid or missing deleted method for bean " + reference
-					+ "; requires signature (java.lang.String)").initCause(e);
+				throw (IllegalStateException)new IllegalStateException("Invalid or missing deleted method for bean " +
+                                                                       reference +
+                                                                       "; requires signature " +
+                                                                       deletedMethod +
+                                                                       "(java.lang.String)").initCause(e);
 			}
 
 			try {
