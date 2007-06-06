@@ -63,8 +63,9 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 
         appContext = new GenericApplicationContext();
 		appContext.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
+        appContext.setClassLoader(getClass().getClassLoader());
 
-		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
+        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
 		// reader.setEventListener(this.listener);
 		reader.loadBeanDefinitions(new ClassPathResource("osgiReferenceNamespaceHandlerTests.xml", getClass()));
 		appContext.refresh();

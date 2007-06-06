@@ -99,7 +99,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 			}
 		};
 
-		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED);
+		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED, getClass().getClassLoader());
 		interceptor.getRetryTemplate().setRetryNumbers(3);
 		interceptor.getRetryTemplate().setWaitTime(1);
 		interceptor.setFilter(new MockFilter());

@@ -29,8 +29,6 @@ import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.core.CollectionFactory;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -115,7 +113,7 @@ public class NamespacePlugins implements OsgiBundleNamespaceHandlerAndEntityReso
 
 		if (systemId != null) {
 			for (Iterator i = plugins.values().iterator(); i.hasNext();) {
-				InputSource is = null;
+				InputSource is;
 				Plugin plugin = (Plugin) i.next();
 				try {
 					is = plugin.resolveEntity(publicId, systemId);

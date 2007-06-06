@@ -22,10 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.FactoryBeanNotInitializedException;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.*;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -54,8 +51,9 @@ import org.springframework.util.ObjectUtils;
  * @author Adrian Colyer
  * @author Hal Hildebrand
  */
-public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean, BundleContextAware,
-		ApplicationListener {
+public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean,
+                                                    DisposableBean, BundleContextAware,
+		                                            ApplicationListener, BeanClassLoaderAware {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
@@ -67,35 +65,43 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 	public static final String OBJECTCLASS = "objectClass";
 
-	private BundleContext bundleContext;
+    protected ClassLoader classLoader;
 
-	private RetryTemplate retryTemplate = new RetryTemplate();
+    protected BundleContext bundleContext;
 
-	private int cardinality = CardinalityOptions.C_1__1;
+	protected RetryTemplate retryTemplate = new RetryTemplate();
 
-	private int contextClassloader = ReferenceClassLoadingOptions.CLIENT;
+	protected int cardinality = CardinalityOptions.C_1__1;
+
+	protected int contextClassloader = ReferenceClassLoadingOptions.CLIENT;
 
 	// not required to be an interface, but usually should be...
-	private Class[] serviceTypes;
+	protected Class[] serviceTypes;
 
 	// filter used to narrow service matches, may be null
-	private String filter;
+	protected String filter;
 
 	// Constructed object of this factory
-	private Object proxy;
+	protected Object proxy;
 
 	// Cumulated filter string between the specified classes/interfaces and the
 	// given filter
-	private Filter unifiedFilter;
+	protected Filter unifiedFilter;
 
 	// service lifecycle listener
-	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
+	protected TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
 
-	private String serviceBeanName;
+	protected String serviceBeanName;
 
-	private boolean initialized = false;
+	protected boolean initialized = false;
 
-	public void onApplicationEvent(ApplicationEvent applicationEvent) {
+
+    public void setBeanClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+
+    public void onApplicationEvent(ApplicationEvent applicationEvent) {
 		if (applicationEvent instanceof ContextRefreshedEvent) {
 			// This sets up the listeners for beans which are not referred to by
 			// any other
@@ -166,7 +172,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
+        Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
+        Assert.notNull(classLoader, "Required classLoader property was not set");
 		Assert.notNull(serviceTypes, "Required serviceTypes property was not set");
 		// validate specified classes
 		Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
@@ -257,8 +264,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		// factory.setOpaque(true);
 
 		try {
-			return factory.getProxy(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
-				ProxyFactory.class.getClassLoader()));
+			return factory.getProxy(classLoader);
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			if (log.isWarnEnabled()) {
@@ -272,7 +278,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		if (log.isDebugEnabled())
 			log.debug("creating a multi-value/collection proxy");
 
-		OsgiServiceCollection collection = new OsgiServiceList(filter, bundleContext);
+		OsgiServiceCollection collection = new OsgiServiceList(filter, bundleContext, classLoader);
 
 		collection.setListeners(listeners);
 		collection.setContextClassLoader(contextClassloader);
@@ -290,7 +296,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	protected void addOsgiRetryInterceptor(ProxyFactory factory, Filter filter,
 			TargetSourceLifecycleListener[] listeners) {
 		OsgiServiceDynamicInterceptor lookupAdvice = new OsgiServiceDynamicInterceptor(bundleContext,
-				contextClassloader, CardinalityOptions.atLeastOneRequired(cardinality));
+				contextClassloader, CardinalityOptions.atLeastOneRequired(cardinality), classLoader);
 		lookupAdvice.setListeners(listeners);
 		lookupAdvice.setFilter(filter);
 		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));

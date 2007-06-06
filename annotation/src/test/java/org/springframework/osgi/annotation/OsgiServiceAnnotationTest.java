@@ -47,7 +47,8 @@ public class OsgiServiceAnnotationTest extends TestCase {
 		processor = new ServiceReferenceInjectionBeanPostProcessor();
 		context = new MockBundleContext();
 		processor.setBundleContext(context);
-		MockControl factoryControl = MockControl.createControl(BeanFactory.class);
+        processor.setBeanClassLoader(getClass().getClassLoader());
+        MockControl factoryControl = MockControl.createControl(BeanFactory.class);
 		BeanFactory factory = (BeanFactory) factoryControl.getMock();
 		processor.setBeanFactory(factory);
 	}
@@ -182,7 +183,8 @@ public class OsgiServiceAnnotationTest extends TestCase {
 
 		ServiceReferenceInjectionBeanPostProcessor p = new ServiceReferenceInjectionBeanPostProcessor();
 		p.setBundleContext(context);
-		MockControl factoryControl = MockControl.createControl(BeanFactory.class);
+        p.setBeanClassLoader(getClass().getClassLoader());
+        MockControl factoryControl = MockControl.createControl(BeanFactory.class);
 		BeanFactory factory = (BeanFactory) factoryControl.getMock();
 		factoryControl.expectAndReturn(factory.containsBean("&myBean"), true);
 		factoryControl.replay();
@@ -256,6 +258,7 @@ public class OsgiServiceAnnotationTest extends TestCase {
 
 		ServiceReferenceInjectionBeanPostProcessor p = new ServiceReferenceInjectionBeanPostProcessor();
 		p.setBundleContext(context);
+        p.setBeanClassLoader(getClass().getClassLoader());
 		PropertyValues pvs = p.postProcessPropertyValues(new MutablePropertyValues(),
 			new PropertyDescriptor[] {
 				new PropertyDescriptor("serviceBean", ServiceFactoryBean.class),
@@ -299,6 +302,7 @@ public class OsgiServiceAnnotationTest extends TestCase {
 
 		ServiceReferenceInjectionBeanPostProcessor p = new ServiceReferenceInjectionBeanPostProcessor();
 		p.setBundleContext(context);
+        p.setBeanClassLoader(getClass().getClassLoader());
 		PropertyValues pvs = p.postProcessPropertyValues(new MutablePropertyValues(),
 			new PropertyDescriptor[] {
 				new PropertyDescriptor("serviceBean", ServiceBean.class),

@@ -68,6 +68,17 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		}
 	}
 
+	public void testAfterPropertiesSetNoClassLoader() throws Exception {
+		this.serviceFactoryBean.setBundleContext(this.bundleContext);
+		try {
+			this.serviceFactoryBean.afterPropertiesSet();
+			fail("should have throw IllegalArgumentException since classLoader was not set");
+		}
+		catch (IllegalArgumentException ex) {
+			assertEquals("Required classLoader property was not set", ex.getMessage());
+		}
+	}
+
 	public void testAfterPropertiesSetNoServiceType() throws Exception {
 		this.serviceFactoryBean.setBundleContext(this.bundleContext);
 		try {
@@ -113,7 +124,8 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		dict.put(Constants.OBJECTCLASS, new String[] { Serializable.class.getName() });
 		ref.setProperties(dict);
 
-		serviceFactoryBean.afterPropertiesSet(); 
+        serviceFactoryBean.setBeanClassLoader(getClass().getClassLoader());
+        serviceFactoryBean.afterPropertiesSet();
 
         Object proxy = serviceFactoryBean.getObject();
 		assertTrue(proxy instanceof Serializable);
@@ -150,6 +162,7 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		TargetSourceLifecycleListener[] listeners = { (TargetSourceLifecycleListener) MockControl.createControl(
 			TargetSourceLifecycleListener.class).getMock() };
 		serviceFactoryBean.setListeners(listeners);
+        serviceFactoryBean.setBeanClassLoader(getClass().getClassLoader());
 		serviceFactoryBean.afterPropertiesSet(); 
 
         Field field = OsgiServiceCollection.class.getDeclaredField("listeners");

@@ -28,6 +28,7 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.osgi.context.BundleContextAware;
@@ -40,13 +41,20 @@ import org.springframework.util.ReflectionUtils;
  * @author Andy Piper
  */
 public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
-	implements BundleContextAware, BeanFactoryAware {
+	implements BundleContextAware, BeanFactoryAware, BeanClassLoaderAware {
 
 	private BundleContext bundleContext;
 	private static Log logger = LogFactory.getLog(ServiceReferenceInjectionBeanPostProcessor.class);
 	private BeanFactory beanFactory;
+    private ClassLoader classLoader;
 
-	/**
+
+    public void setBeanClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+
+    /**
 	 * process FactoryBean created objects, since these will not have had services injected.
 	 *
 	 * @param bean
@@ -132,7 +140,8 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 		if (s.serviceBeanName().length() > 0) {
 			pfb.setServiceBeanName(s.serviceBeanName());
 		}
-		pfb.afterPropertiesSet();
+        pfb.setBeanClassLoader(classLoader);
+        pfb.afterPropertiesSet();
 		return pfb;
 	}
 

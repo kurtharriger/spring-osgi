@@ -20,6 +20,7 @@ import java.util.Dictionary;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 
 /**
  * @author Costin Leau
@@ -39,7 +40,10 @@ public abstract class ServiceBaseTest extends AbstractConfigurableBundleCreatorT
 		// execute retries fast
 		fb.setRetryTimes(1);
 		fb.setTimeout(1);
-	}
+        ClassLoader classLoader =
+                BundleDelegatingClassLoader.createBundleClassLoaderFor(getBundleContext().getBundle());
+        fb.setBeanClassLoader(classLoader);
+    }
 
 	protected void onTearDown() throws Exception {
 		fb = null;

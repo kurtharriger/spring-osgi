@@ -21,6 +21,8 @@ import java.util.ListIterator;
 
 import org.springframework.osgi.service.collection.OsgiServiceList;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.osgi.framework.BundleContext;
 
 /**
  * @author Costin Leau
@@ -29,7 +31,9 @@ import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 public class ServiceListTest extends ServiceCollectionTest {
 
 	protected Collection createCollection() {
-		OsgiServiceList col = new OsgiServiceList(null, getBundleContext());
+        BundleContext bundleContext = getBundleContext();
+        ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
+        OsgiServiceList col = new OsgiServiceList(null, bundleContext, classLoader);
 		col.setContextClassLoader(ReferenceClassLoadingOptions.UNMANAGED);
 		col.afterPropertiesSet();
 		return col;

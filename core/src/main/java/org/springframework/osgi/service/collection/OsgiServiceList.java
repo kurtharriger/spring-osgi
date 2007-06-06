@@ -36,8 +36,8 @@ public class OsgiServiceList extends OsgiServiceCollection implements List {
 
 	private final List storage = (List) serviceIDs;
 
-	public OsgiServiceList(Filter filter, BundleContext context) {
-		super(filter, context);
+	public OsgiServiceList(Filter filter, BundleContext context, ClassLoader classLoader) {
+		super(filter, context, classLoader);
 	}
 
 	protected Collection createInternalDynamicStorage() {
