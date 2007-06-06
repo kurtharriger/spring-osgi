@@ -33,6 +33,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 import org.springframework.aop.framework.Advised;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
@@ -54,12 +55,8 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	private static final Log log = LogFactory.getLog(BundleDelegatingClassLoader.class);
 
-	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle aBundle) {
-		return (BundleDelegatingClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
-			public Object run() {
-				return new BundleDelegatingClassLoader(aBundle);
-			}
-		});
+	public static BundleDelegatingClassLoader createBundleClassLoaderFor(Bundle aBundle) {
+		return createBundleClassLoaderFor(aBundle, ProxyFactory.class.getClassLoader());
 	}
 
 	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle aBundle, final ClassLoader parent) {
@@ -68,10 +65,6 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 				return new BundleDelegatingClassLoader(aBundle, parent);
 			}
 		});
-	}
-
-	private BundleDelegatingClassLoader(Bundle aBundle) {
-		this(aBundle, Advised.class.getClassLoader());
 	}
 
 	private BundleDelegatingClassLoader(Bundle aBundle, ClassLoader parentClassLoader) {

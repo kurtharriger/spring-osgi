@@ -54,7 +54,7 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 		assertEquals(classLoader, classLoader);
 		assertTrue(classLoader.equals(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle)));
 
-		//assertEquals(bundle.hashCode(), classLoader.hashCode());
+		//assertEquals(bundle.hashCode(), clientClassLoader.hashCode());
 	}
 
 	public void testFindClass() throws Exception {

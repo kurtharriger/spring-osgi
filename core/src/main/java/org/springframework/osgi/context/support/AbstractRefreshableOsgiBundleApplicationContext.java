@@ -25,6 +25,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
@@ -236,7 +237,8 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 		try {
 			Class bppClass = Class.forName("org.springframework.osgi.annotation.ServiceReferenceInjectionBeanPostProcessor");
 			BeanPostProcessor bpp = (BeanPostProcessor) bppClass.newInstance();
-			((BundleContextAware) bpp).setBundleContext(bundleContext);
+            ((BeanClassLoaderAware) bpp).setBeanClassLoader(getClassLoader());
+            ((BundleContextAware) bpp).setBundleContext(bundleContext);
 			((BeanFactoryAware) bpp).setBeanFactory(beanFactory);
 			beanFactory.addBeanPostProcessor(bpp);
 		}
@@ -333,8 +335,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 * @return
 	 */
 	protected ClassLoader createBundleClassLoader(Bundle bundle) {
-		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle,
-                                                                      ProxyFactory.class.getClassLoader());
+		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 	}
 
 	/**

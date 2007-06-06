@@ -56,12 +56,13 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 	private final boolean serviceRequiredAtStartup;
 
-	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader) {
-		this(context, contextClassLoader, true);
+	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader, ClassLoader classLoader) {
+		this(context, contextClassLoader, true, classLoader);
 	}
 
-	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader, boolean serviceRequiredAtStartup) {
-		super(context, null, contextClassLoader);
+	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader,
+                                         boolean serviceRequiredAtStartup, ClassLoader classLoader) {
+		super(context, null, contextClassLoader, classLoader);
 		this.serviceRequiredAtStartup = serviceRequiredAtStartup;
 	}
 

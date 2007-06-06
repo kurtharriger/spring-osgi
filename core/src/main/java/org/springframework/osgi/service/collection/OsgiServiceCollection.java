@@ -35,7 +35,6 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.interceptor.OsgiServiceInvoker;
@@ -140,19 +139,24 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 
 	private int contextClassLoader = ReferenceClassLoadingOptions.CLIENT;
 
-	// advices to be applied when creating service proxy
+    protected ClassLoader classLoader;
+
+
+    // advices to be applied when creating service proxy
 	private Object[] interceptors = new Object[0];
 
 	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
 
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
 
-	public OsgiServiceCollection(Filter filter, BundleContext context) {
-		Assert.notNull(context, "context is required");
+	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader) {
+        Assert.notNull(classLoader, "ClassLoader is required");
+        Assert.notNull(context, "context is required");
 
 		this.filter = filter;
 		this.context = context;
-	}
+        this.classLoader = classLoader;
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -225,8 +229,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 		// factory.setOptimize(true);
 		// factory.setFrozen(true);
 
-		return factory.getProxy(BundleDelegatingClassLoader.createBundleClassLoaderFor(ref.getBundle(),
-			ProxyFactory.class.getClassLoader()));
+		return factory.getProxy(classLoader);
 	}
 
 	/**
@@ -234,7 +237,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	 * @param pf
 	 */
 	protected void addEndingInterceptors(ProxyFactory factory, ServiceReference ref) {
-		OsgiServiceInvoker invoker = new OsgiServiceStaticInterceptor(context, ref, contextClassLoader);
+		OsgiServiceInvoker invoker = new OsgiServiceStaticInterceptor(context, ref, contextClassLoader, classLoader);
 		factory.addAdvice(new ServiceReferenceAwareAdvice(invoker));
 		factory.addAdvice(invoker);
 	}

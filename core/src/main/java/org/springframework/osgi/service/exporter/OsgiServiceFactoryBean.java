@@ -69,8 +69,10 @@ import org.springframework.aop.framework.ProxyFactory;
  * @author Andy Piper
  * 
  */
-public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBean, DisposableBean, BundleContextAware,
-		FactoryBean, Ordered, BeanClassLoaderAware {
+public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBean,
+                                               DisposableBean, BundleContextAware,
+		                                       FactoryBean, Ordered,
+                                               BeanClassLoaderAware {
 
 	/**
 	 * ServiceFactory used for posting the bean instantiation until it is first
@@ -297,9 +299,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
         factory.addAdvice(new OsgiServiceTCCLInvoker(target, classLoader));
 
 		try {
-			return factory.getProxy(
-                    BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
-				                                                           ProxyFactory.class.getClassLoader()));
+			return factory.getProxy(classLoader);
 		} catch (NoClassDefFoundError ncdfe) {
 			if (log.isWarnEnabled()) {
 				debugClassLoading(ncdfe);

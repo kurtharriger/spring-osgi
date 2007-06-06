@@ -31,7 +31,6 @@ import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
-import org.springframework.osgi.service.interceptor.OsgiServiceClassLoaderInvoker;
 
 /**
  * @author Costin Leau
@@ -53,8 +52,9 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 	 */
 	private class TCCLInvoker extends OsgiServiceClassLoaderInvoker {
 
-		public TCCLInvoker(BundleContext context, ServiceReference reference, int contextClassLoader) {
-			super(context, reference, contextClassLoader);
+		public TCCLInvoker(BundleContext context, ServiceReference reference, int contextClassLoader,
+                           ClassLoader classLoader) {
+			super(context, reference, contextClassLoader, classLoader);
 		}
 
 		protected Object getTarget() {
@@ -70,9 +70,9 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 
 	private ServiceReference reference;
 
-	private int classloader;
+    private ClassLoader classLoader = getClass().getClassLoader();
 
-	// make field static to make sure it is being initialized before the inner
+    // make field static to make sure it is being initialized before the inner
 	// class
 	// definition inside testDoInvoke is being read
 
@@ -86,9 +86,9 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 		target = new TCCLGetter();
 		context = new MockBundleContext();
 		reference = new MockServiceReference();
-		classloader = ReferenceClassLoadingOptions.CLIENT;
+        int classloaderUse = ReferenceClassLoadingOptions.CLIENT;
 
-		invoker = new TCCLInvoker(context, reference, classloader);
+        invoker = new TCCLInvoker(context, reference, classloaderUse, classLoader);
 	}
 
 	/*
@@ -113,7 +113,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 
 		OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
 
-		invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.CLIENT) {
+		invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.CLIENT, classLoader) {
 
 			protected ClassLoader determineClassLoader(BundleContext context, ServiceReference reference,
 					int contextClassLoader) {
@@ -137,7 +137,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 
 		OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
 
-		invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.SERVICE_PROVIDER) {
+		invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.SERVICE_PROVIDER, classLoader) {
 
 			protected ClassLoader determineClassLoader(BundleContext context, ServiceReference reference,
 					int contextClassLoader) {
@@ -164,7 +164,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 
 		OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
 
-		invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.UNMANAGED);
+		invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.UNMANAGED, classLoader);
 
 		ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 		ClassLoader invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
@@ -183,7 +183,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceClassLoaderInvoker#determineClassLoader(org.osgi.framework.BundleContext, org.osgi.framework.ServiceReference, int)}.
 	 */
 	public void testDetermineClassLoader() {
-		ClassLoader loader = null;
+		ClassLoader loader;
 		final Bundle clientBundle = new MockBundle();
 
 		BundleContext ctx = new MockBundleContext() {
@@ -201,7 +201,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 		};
 
 		loader = invoker.determineClassLoader(ctx, ref, ReferenceClassLoadingOptions.CLIENT);
-		assertEquals(BundleDelegatingClassLoader.createBundleClassLoaderFor(clientBundle), loader);
+		assertEquals(classLoader, loader);
 
 		loader = invoker.determineClassLoader(ctx, ref, ReferenceClassLoadingOptions.SERVICE_PROVIDER);
 		assertEquals(BundleDelegatingClassLoader.createBundleClassLoaderFor(serviceBundle), loader);

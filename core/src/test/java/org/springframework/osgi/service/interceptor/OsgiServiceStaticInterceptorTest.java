@@ -26,9 +26,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.interceptor.OsgiServiceStaticInterceptor;
-import org.springframework.osgi.service.support.ServiceWrapper;
+import org.springframework.osgi.mock.MockServiceReference;  
 
 /**
  * @author Costin Leau
@@ -38,37 +36,32 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 
 	private OsgiServiceStaticInterceptor interceptor;
 
-	private ServiceWrapper wrapper;
+    private Object service;
 
-	private ServiceReference reference;
+    private ClassLoader classLoader = getClass().getClassLoader();
 
-	private Object service;
-
-	protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
 		service = new Object();
 
-		reference = new MockServiceReference();
+        ServiceReference reference = new MockServiceReference();
 
-		BundleContext ctx = new MockBundleContext() {
+        BundleContext ctx = new MockBundleContext() {
 			public Object getService(ServiceReference reference) {
 				return service;
 			}
 		};
 
-		wrapper = new ServiceWrapper(reference, ctx);
-
-		interceptor = new OsgiServiceStaticInterceptor(ctx, reference, 2);
+        interceptor = new OsgiServiceStaticInterceptor(ctx, reference, 2, classLoader);
 	}
 
 	protected void tearDown() throws Exception {
 		service = null;
-		wrapper = null;
-		interceptor = null;
+        interceptor = null;
 	}
 
 	public void testNullWrapper() throws Exception {
 		try {
-			interceptor = new OsgiServiceStaticInterceptor(null, null, 0);
+			interceptor = new OsgiServiceStaticInterceptor(null, null, 0, classLoader);
 			fail("expected exception");
 		}
 		catch (RuntimeException ex) {
@@ -92,7 +85,7 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 			}
 		};
 
-		interceptor = new OsgiServiceStaticInterceptor(new MockBundleContext(), reference, 2);
+		interceptor = new OsgiServiceStaticInterceptor(new MockBundleContext(), reference, 2, classLoader);
 
 		Object target = new Object();
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);

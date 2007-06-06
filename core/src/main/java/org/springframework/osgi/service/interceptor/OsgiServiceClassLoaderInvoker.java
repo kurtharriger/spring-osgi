@@ -37,23 +37,30 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 
 	protected final BundleContext context;
 
-	// TODO: specify a default
+    protected ClassLoader clientClassLoader;
+
+    protected ClassLoader serviceClassLoader;
+
+    // TODO: specify a default
 	private int contextClassLoader;
 
 	private ServiceReference serviceReference;
 
-	public OsgiServiceClassLoaderInvoker(ServiceReference reference, int contextClassLoader) {
-		this(OsgiBundleUtils.getBundleContext(reference.getBundle()), reference, contextClassLoader);
+	public OsgiServiceClassLoaderInvoker(ServiceReference reference, int contextClassLoader, ClassLoader classLoader) {
+		this(OsgiBundleUtils.getBundleContext(reference.getBundle()), reference, contextClassLoader, classLoader);
 	}
 
-	public OsgiServiceClassLoaderInvoker(BundleContext context, ServiceReference reference, int contextClassLoader) {
+	public OsgiServiceClassLoaderInvoker(BundleContext context, ServiceReference reference, int contextClassLoader,
+                                         ClassLoader classLoader) {
 		Assert.notNull(context);
+        Assert.notNull(classLoader, "ClassLoader required");
 
-		this.context = context;
+        this.context = context;
 		this.serviceReference = reference;
 		this.contextClassLoader = contextClassLoader;
+        this.clientClassLoader = classLoader;
 
-		// if the reference is not needed create the classloader once and just
+        // if the reference is not needed create the classloader once and just
 		// reuse it
 		canCacheClassLoader = !(contextClassLoader == ReferenceClassLoadingOptions.SERVICE_PROVIDER);
 		if (canCacheClassLoader) {
@@ -65,22 +72,33 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 	protected ClassLoader determineClassLoader(BundleContext context, ServiceReference reference, int contextClassLoader) {
 		boolean trace = log.isTraceEnabled();
 
-		switch (contextClassLoader) {
-		case ReferenceClassLoadingOptions.CLIENT:
-			if (trace)
-				log.trace("client TCCL used for this invocation");
-			return BundleDelegatingClassLoader.createBundleClassLoaderFor(context.getBundle());
-		case ReferenceClassLoadingOptions.SERVICE_PROVIDER:
-			if (trace)
-				log.trace("service provider TCCL used for this invocation");
-			return BundleDelegatingClassLoader.createBundleClassLoaderFor(reference.getBundle());
-		case ReferenceClassLoadingOptions.UNMANAGED:
-			if (trace)
-				log.trace("no (unmanaged)TCCL used for this invocation");
+        switch (contextClassLoader) {
+            case ReferenceClassLoadingOptions.CLIENT: {
+                if (trace) {
+                    log.trace("client TCCL used for this invocation");
+                }
+                return clientClassLoader;
+            }
+            case ReferenceClassLoadingOptions.SERVICE_PROVIDER: {
+                if (trace) {
+                    log.trace("service provider TCCL used for this invocation");
+                }
+                if (serviceClassLoader == null) {
+                    serviceClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(reference.getBundle());
+                }
+                return serviceClassLoader;
+            }
+            case ReferenceClassLoadingOptions.UNMANAGED: {
+                if (trace) {
+                    log.trace("no (unmanaged)TCCL used for this invocation");
+                }
 
-			break;
-		}
-		return null;
+                break;
+            }
+            default:
+                throw new IllegalStateException("Illegal class loader invocation setting");
+        }
+        return null;
 	}
 
 	/*

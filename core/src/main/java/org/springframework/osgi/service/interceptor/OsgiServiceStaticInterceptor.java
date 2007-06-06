@@ -33,8 +33,9 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 
 	private ServiceWrapper wrapper;
 
-	public OsgiServiceStaticInterceptor(BundleContext context, ServiceReference reference, int contextClassLoader) {
-		super(context, reference, contextClassLoader);
+	public OsgiServiceStaticInterceptor(BundleContext context, ServiceReference reference, int contextClassLoader,
+                                        ClassLoader classLoader) {
+		super(context, reference, contextClassLoader, classLoader);
 		Assert.notNull(reference, "a not null service reference is required");
 		this.wrapper = new ServiceWrapper(reference, context);
 	}

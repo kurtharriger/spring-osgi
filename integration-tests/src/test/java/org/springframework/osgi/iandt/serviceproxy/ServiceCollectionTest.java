@@ -21,10 +21,12 @@ import java.util.Iterator;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.BundleContext;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -52,7 +54,9 @@ public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTest
 	}
 
 	protected Collection createCollection() {
-		OsgiServiceCollection collection = new OsgiServiceCollection(null, getBundleContext());
+        BundleContext bundleContext = getBundleContext();
+        BundleDelegatingClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
+        OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader);
 		collection.setContextClassLoader(ReferenceClassLoadingOptions.UNMANAGED);
 		collection.afterPropertiesSet();
 

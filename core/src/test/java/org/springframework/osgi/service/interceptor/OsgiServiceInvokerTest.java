@@ -17,10 +17,8 @@ package org.springframework.osgi.service.interceptor;
 
 import junit.framework.TestCase;
 
-import org.aopalliance.intercept.MethodInvocation;
-import org.osgi.framework.ServiceReference;
+import org.aopalliance.intercept.MethodInvocation; 
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
-import org.springframework.osgi.service.interceptor.OsgiServiceInvoker;
 
 /**
  * @author Costin Leau
