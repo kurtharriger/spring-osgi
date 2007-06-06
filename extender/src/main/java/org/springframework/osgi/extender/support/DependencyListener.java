@@ -116,25 +116,25 @@ public class DependencyListener implements ServiceListener {
      * @param serviceEvent
      */
     public void serviceChanged(ServiceEvent serviceEvent) {
-        if (unsatisfiedDependencies.isEmpty()) { // already completed.
+        try {
+            if (unsatisfiedDependencies.isEmpty()) { // already completed.
+                if (log.isDebugEnabled()) {
+                    log.debug("handling service event, but no unsatisfied dependencies for " +
+                              context.getDisplayName());
+                }
+                return;
+            }
             if (log.isDebugEnabled()) {
-                log.debug("handling service event, but no unsatisfied dependencies for " +
+                log.debug("handling service event [" +
+                          typeStringFor(serviceEvent.getType()) +
+                          ":" +
+                          toString(serviceEvent.getServiceReference()) +
+                          "] for " +
                           context.getDisplayName());
             }
-            return;
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("handling service event [" +
-                      typeStringFor(serviceEvent.getType()) +
-                      ":" +
-                      toString(serviceEvent.getServiceReference()) +
-                      "] for " +
-                      context.getDisplayName());
-        }
 
-        for (Iterator i = dependencies.iterator(); i.hasNext();) {
-            Dependency dependency = (Dependency) i.next();
-            try {
+            for (Iterator i = dependencies.iterator(); i.hasNext();) {
+                Dependency dependency = (Dependency) i.next();
                 if (dependency.matches(serviceEvent)) {
                     switch (serviceEvent.getType()) {
                         case ServiceEvent.MODIFIED:
@@ -156,33 +156,33 @@ public class DependencyListener implements ServiceListener {
                             }
                             break;
                     }
-                } else { 
+                } else {
                     if (log.isDebugEnabled()) {
                         log.debug(dependency + " does not match");
                     }
                 }
-            } catch (Throwable e) {
-                // some frameworks will simply not log exception for event handlers
-                log.fatal("Exception during dependency processing for " + context.getDisplayName(), e);
             }
-        }
 
-        if (context.getState() == ContextState.INTERRUPTED || context.getState() == ContextState.CLOSED) {
-            deregister();
-            return;
-        }
-
-        // Good to go!
-        if (unsatisfiedDependencies.isEmpty()) {
-            deregister();
-            context.listener = null;
-            if (log.isDebugEnabled()) {
-                log.debug("No outstanding dependencies, completing initialization for "
-                          + context.getDisplayName());
+            if (context.getState() == ContextState.INTERRUPTED || context.getState() == ContextState.CLOSED) {
+                deregister();
+                return;
             }
-            context.dependenciesAreSatisfied(true);
-        } else {
-            register(); // re-register with the new filter
+
+            // Good to go!
+            if (unsatisfiedDependencies.isEmpty()) {
+                deregister();
+                context.listener = null;
+                if (log.isDebugEnabled()) {
+                    log.debug("No outstanding dependencies, completing initialization for "
+                              + context.getDisplayName());
+                }
+                context.dependenciesAreSatisfied(true);
+            } else {
+                register(); // re-register with the new filter
+            }
+        } catch (Throwable e) {
+            // frameworks will simply not log exception for event handlers
+            log.fatal("Exception during dependency processing for " + context.getDisplayName(), e);
         }
     }
 

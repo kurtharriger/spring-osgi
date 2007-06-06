@@ -105,18 +105,10 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 			}
 			// OSGi swallows these exceptions so make sure we get a chance to
 			// see them.
-			catch (Error e) {
-				if (log.isErrorEnabled()) {
-					log.error("serviceChanged() processing failed", e);
-				}
-				throw e;
-
-			}
-			catch (RuntimeException re) {
+			catch (Throwable re) {
 				if (log.isWarnEnabled()) {
 					log.warn("serviceChanged() processing failed", re);
 				}
-				throw re;
 			}
 		}
 	}

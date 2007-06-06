@@ -33,6 +33,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
@@ -146,7 +147,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * Required by the BundleActivator contract
 	 */
 	public ContextLoaderListener() {
-		this.managedContexts = new HashMap();
+		this.managedContexts = CollectionFactory.createConcurrentMapIfPossible(100);
 	}
 
 	/**
@@ -218,15 +219,13 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		unregisterResolverService();
 
 		// Stop all managed contexts
+        for (Iterator i = managedContexts.values().iterator(); i.hasNext();) {
+            ((ServiceDependentOsgiBundleXmlApplicationContext) i.next()).close();
+        }
 
-		synchronized (managedContexts) {
-			for (Iterator i = managedContexts.values().iterator(); i.hasNext();) {
-				((ServiceDependentOsgiBundleXmlApplicationContext) i.next()).close();
-			}
-			this.managedContexts.clear();
-		}
+        this.managedContexts.clear();
 
-		this.namespacePlugins = null;
+        this.namespacePlugins = null;
 		this.taskExecutor = null;
 		if (this.extenderContext != null) {
 			this.extenderContext.close();
@@ -294,48 +293,52 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 * @see org.osgi.framework.SynchronousBundleListener#bundleChanged
 	 */
 	public void bundleChanged(BundleEvent event) {
-		Bundle bundle = event.getBundle();
+        try {
+            Bundle bundle = event.getBundle();
 
-		if (bundle.getBundleId() == bundleId) {
-			return;
-		}
+            if (bundle.getBundleId() == bundleId) {
+                return;
+            }
 
-		if (log.isDebugEnabled()) {
-			log.debug("Processing bundle event [" + OsgiServiceUtils.getBundleEventAsString(event.getType())
-					+ "] for bundle [" + OsgiBundleUtils.getNullSafeSymbolicName(bundle) + "]");
-		}
+            if (log.isDebugEnabled()) {
+                log.debug("Processing bundle event [" + OsgiServiceUtils.getBundleEventAsString(event.getType())
+                          + "] for bundle [" + OsgiBundleUtils.getNullSafeSymbolicName(bundle) + "]");
+            }
 
-		switch (event.getType()) {
-		case BundleEvent.STARTED: {
-			maybeCreateApplicationContextFor(bundle);
-			break;
-		}
-		case BundleEvent.STOPPING: {
-			if (OsgiBundleUtils.isSystemBundle(bundle)) {
-				if (log.isDebugEnabled()) {
-					log.debug("System bundle stopping");
-				}
-				// System bundle is shutting down; Special handling for
-				// framework shutdown
-				shutdown();
-			}
-			else {
-				maybeCloseApplicationContextFor(bundle);
-			}
-			break;
-		}
-		case BundleEvent.RESOLVED: {
-			maybeAddNamespaceHandlerFor(bundle);
-			break;
-		}
-		case BundleEvent.UNRESOLVED: {
-			maybeRemoveNameSpaceHandlerFor(bundle);
-			break;
-		}
-		default:
-			break;
-		}
-	}
+            switch (event.getType()) {
+                case BundleEvent.STARTED: {
+                    maybeCreateApplicationContextFor(bundle);
+                    break;
+                }
+                case BundleEvent.STOPPING: {
+                    if (OsgiBundleUtils.isSystemBundle(bundle)) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("System bundle stopping");
+                        }
+                        // System bundle is shutting down; Special handling for
+                        // framework shutdown
+                        shutdown();
+                    } else {
+                        maybeCloseApplicationContextFor(bundle);
+                    }
+                    break;
+                }
+                case BundleEvent.RESOLVED: {
+                    maybeAddNamespaceHandlerFor(bundle);
+                    break;
+                }
+                case BundleEvent.UNRESOLVED: {
+                    maybeRemoveNameSpaceHandlerFor(bundle);
+                    break;
+                }
+                default:
+                    break;
+            }
+        } catch (Throwable e) {
+            // OSGi frameworks simply swallow these exceptions
+            log.fatal("Exception handing bundle changed event", e);
+        }
+    }
 
 	/**
 	 * Context creation is a potentially long-running activity (certainly more
@@ -360,15 +363,13 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
                 createApplicationContext(OsgiBundleUtils.getBundleContext(bundle),
                                          config.getConfigurationLocations());
 
-		synchronized (managedContexts) {
-			if (managedContexts.containsKey(bundleId)) {
-				if (log.isDebugEnabled()) {
-					log.debug("Bundle is already under control: " + bundle.getSymbolicName());
-				}
-				return;
-			}
-			managedContexts.put(bundleId, context);
-		}
+        if (managedContexts.containsKey(bundleId)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Bundle is already under control: " + bundle.getSymbolicName());
+            }
+            return;
+        }
+        managedContexts.put(bundleId, context);
 
         context.setPublishContextAsService(config.isPublishContextAsService());
         context.setNamespaceResolver(namespacePlugins);
@@ -418,13 +419,12 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 */
 	protected void maybeCloseApplicationContextFor(Bundle bundle) {
 		ServiceDependentOsgiBundleXmlApplicationContext context;
-		synchronized (managedContexts) {
-			context =  (ServiceDependentOsgiBundleXmlApplicationContext) managedContexts.remove(new Long(bundle.getBundleId()));
-			if (context == null) {
-				return;
-			}
-		}
-		context.close();
+        context =
+                (ServiceDependentOsgiBundleXmlApplicationContext) managedContexts.remove(new Long(bundle.getBundleId()));
+        if (context == null) {
+            return;
+        }
+        context.close();
 	}
 
 	/**
@@ -543,23 +543,21 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 	public void addApplicationListener(ApplicationListener listener) {
-		synchronized (managedContexts) {
-			springBundleListeners.add(listener);
-			// Post events for things already started
-			for (Iterator i = managedContexts.values().iterator(); i.hasNext();) {
-				ServiceDependentOsgiBundleXmlApplicationContext context =
-                        (ServiceDependentOsgiBundleXmlApplicationContext) i.next();
-				if (context.getState() == ContextState.CREATED) {
-					if (log.isInfoEnabled()) {
-						log.info("Posting creation event ["
-								+ OsgiServiceUtils.getBundleEventAsString(BundleEvent.STARTED) + ", "
-								+ context.getDisplayName() + "]");
-					}
-					listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STARTED, context.getBundle()));
-				}
-			}
-		}
-	}
+        springBundleListeners.add(listener);
+        // Post events for things already started
+        for (Iterator i = managedContexts.values().iterator(); i.hasNext();) {
+            ServiceDependentOsgiBundleXmlApplicationContext context =
+                    (ServiceDependentOsgiBundleXmlApplicationContext) i.next();
+            if (context.getState() == ContextState.CREATED) {
+                if (log.isInfoEnabled()) {
+                    log.info("Posting creation event ["
+                             + OsgiServiceUtils.getBundleEventAsString(BundleEvent.STARTED) + ", "
+                             + context.getDisplayName() + "]");
+                }
+                listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STARTED, context.getBundle()));
+            }
+        }
+    }
 
 	public void removeApplicationListener(ApplicationListener listener) {
 		synchronized (springBundleListeners) {

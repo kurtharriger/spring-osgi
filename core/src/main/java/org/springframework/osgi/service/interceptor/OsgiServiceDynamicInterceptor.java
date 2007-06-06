@@ -69,64 +69,75 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 	private class Listener implements ServiceListener {
 
 		public void serviceChanged(ServiceEvent event) {
-			ServiceReference ref = event.getServiceReference();
+            try {
+                ServiceReference ref = event.getServiceReference();
 
-			// service id
-			long serviceId = ((Long) ref.getProperty(Constants.SERVICE_ID)).longValue();
-			// service ranking
-			Integer rank = (Integer) ref.getProperty(Constants.SERVICE_RANKING);
-			int ranking = (rank == null ? 0 : rank.intValue());
+                // service id
+                long serviceId = ((Long) ref.getProperty(Constants.SERVICE_ID)).longValue();
+                // service ranking
+                Integer rank = (Integer) ref.getProperty(Constants.SERVICE_RANKING);
+                int ranking = (rank == null ? 0 : rank.intValue());
 
-			switch (event.getType()) {
+                switch (event.getType()) {
 
-			case (ServiceEvent.REGISTERED):
-			case (ServiceEvent.MODIFIED):
-				// same as ServiceEvent.REGISTERED
-				if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
-					// inform listeners
-					OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
-				}
+                    case(ServiceEvent.REGISTERED):
+                    case(ServiceEvent.MODIFIED): {
+                        // same as ServiceEvent.REGISTERED
+                        if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
+                            // inform listeners
+                            OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
+                        }
 
-				break;
-			case (ServiceEvent.UNREGISTERING):
-				boolean updated = false;
+                        break;
+                    }
+                    case(ServiceEvent.UNREGISTERING): {
+                        boolean updated = false;
 
-				synchronized (OsgiServiceDynamicInterceptor.this) {
-					// remove service
-					if (wrapper != null) {
-						if (serviceId == wrapper.getServiceId()) {
-							updated = true;
-							wrapper.cleanup();
+                        synchronized (OsgiServiceDynamicInterceptor.this) {
+                            // remove service
+                            if (wrapper != null) {
+                                if (serviceId == wrapper.getServiceId()) {
+                                    updated = true;
+                                    wrapper.cleanup();
 
-						}
-					}
-				}
+                                }
+                            }
+                        }
 
-				if (log.isDebugEnabled()) {
-					String message = "service reference [" + ref + "] was unregistered";
-					if (updated)
-						message += " and was unbound from the service proxy";
-					else
-						message += " but did not affect the service proxy";
-					log.debug(message);
-				}
+                        if (log.isDebugEnabled()) {
+                            String message = "service reference [" + ref + "] was unregistered";
+                            if (updated) {
+                                message += " and was unbound from the service proxy";
+                            } else {
+                                message += " but did not affect the service proxy";
+                            }
+                            log.debug(message);
+                        }
 
-				if (updated)
-					OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
+                        if (updated) {
+                            OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
+                        }
 
-				// discover the new reference
-				ServiceReference newReference = OsgiServiceReferenceUtils.getServiceReference(context,
-					filter.toString());
+                        // discover the new reference
+                        ServiceReference newReference = OsgiServiceReferenceUtils.getServiceReference(context,
+                                                                                                      filter.toString());
 
-				if (newReference != null)
-					// update the listeners
-					serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, newReference));
+                        if (newReference != null)
+                        // update the listeners
+                        {
+                            serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, newReference));
+                        }
 
-				break;
-			default:
-				throw new IllegalArgumentException("unsupported event type");
-			}
-		}
+                        break;
+                    }
+                    default:
+                        throw new IllegalArgumentException("unsupported event type");
+                }
+            } catch (Throwable e) {
+                // The framework will swallow these exceptions without logging, so log them here
+                log.fatal("Exception during service event handling", e);
+            }
+        }
 
 		private boolean updateWrapperIfNecessary(ServiceReference ref, long serviceId, int serviceRanking) {
 			boolean updated = false;

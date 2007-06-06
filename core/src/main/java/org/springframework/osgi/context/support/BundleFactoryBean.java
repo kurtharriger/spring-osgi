@@ -242,30 +242,36 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Synch
 	}
 
 	public synchronized void bundleChanged(BundleEvent event) {
-		if (bundle == null)
-			return;
-		// System.out.println("EVENT: " + event.getBundle().getSymbolicName() +
-		// " " + event.getType());
-		if (event.getBundle().getBundleId() == bundle.getBundleId()) {
-			switch (event.getType()) {
-			case BundleEvent.UNINSTALLED:
-				latch.reset();
-				bundle = null;
-				classloader = null;
-				bundleContext.removeBundleListener(this);
-				break;
-			/*
-			 * case BundleEvent.RESOLVED: if (log.isInfoEnabled())
-			 * log.info("Bundle [" + beanName + "] was resolved, updating
-			 * properties"); try { afterPropertiesSet(); } catch (Exception e) {
-			 * if (log.isWarnEnabled()) log.warn("Could not change bundle
-			 * state", e); } break;
-			 */
-			default:
-				break;
-			}
-		}
-	}
+        try {
+            if (bundle == null) {
+                return;
+            }
+            // System.out.println("EVENT: " + event.getBundle().getSymbolicName() +
+            // " " + event.getType());
+            if (event.getBundle().getBundleId() == bundle.getBundleId()) {
+                switch (event.getType()) {
+                    case BundleEvent.UNINSTALLED:
+                        latch.reset();
+                        bundle = null;
+                        classloader = null;
+                        bundleContext.removeBundleListener(this);
+                        break;
+                        /*
+                   * case BundleEvent.RESOLVED: if (log.isInfoEnabled())
+                   * log.info("Bundle [" + beanName + "] was resolved, updating
+                   * properties"); try { afterPropertiesSet(); } catch (Exception e) {
+                   * if (log.isWarnEnabled()) log.warn("Could not change bundle
+                   * state", e); } break;
+                   */
+                    default:
+                        break;
+                }
+            }
+        } catch (Throwable e) {
+            // OSGi frameworks simply swallow these exceptions without logging...
+            log.fatal("Exception handling bundle changed event", e);
+        }
+    }
 
 	public void destroy() throws Exception {
 		if (bundle != null) {
