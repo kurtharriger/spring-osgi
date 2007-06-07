@@ -124,7 +124,8 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 		if (s.filter().length() > 0) {
 			pfb.setFilter(s.filter());
 		}
-		if (s.serviceType() == null || s.serviceType() == ServiceReference.class) {
+		if (s.serviceTypes() == null || s.serviceTypes().length == 0
+                || (s.serviceTypes().length == 1 && s.serviceTypes()[0].equals(ServiceReference.class))) {
 			Class[] params = writeMethod.getParameterTypes();
 			if (params.length != 1) {
 				throw new IllegalArgumentException("Setter for [" + beanName + "] must have only one argument");
@@ -132,7 +133,7 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 			pfb.setInterface(new Class[]{params[0]});
 		}
 		else {
-			pfb.setInterface(new Class[]{s.serviceType()});
+			pfb.setInterface(s.serviceTypes());
 		}
 		pfb.setCardinality(s.cardinality().toString());
 		pfb.setContextClassloader(s.contextClassloader().toString());
