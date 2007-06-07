@@ -31,7 +31,7 @@ import java.lang.annotation.Inherited;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ServiceReference {
-	/**
+    /**
 	 * The name of the bean that backs the injected service. May be null.
 	 */
 	String serviceBeanName() default "";
@@ -54,7 +54,7 @@ public @interface ServiceReference {
 	/**
 	 * Interface (or class) of the service to be injected
 	 */
-	Class serviceType() default ServiceReference.class;
+	Class[] serviceTypes() default ServiceReference.class;
 
 	/**
 	 * filter used to narrow service matches, may be null

@@ -183,8 +183,13 @@ public class AnnotatedBean {
 		return annotatedBeanTypeWithServiceType;
 	}
 
-	@ServiceReference(serviceType = Object.class)
+	@ServiceReference(serviceTypes = Object.class)
 	public void setAnnotatedBeanTypeWithServiceType(AnnotatedBean annotatedBeanTypeWithServiceType) {
 		this.annotatedBeanTypeWithServiceType = annotatedBeanTypeWithServiceType;
 	}
+
+    @ServiceReference(serviceTypes = { Object.class, AnnotatedBean.class })
+    public void setAnnotatedBeanTypeWithMultipleServiceTypes(AnnotatedBean annotatedBeanTypeWithServiceType) {
+        this.annotatedBeanTypeWithServiceType = annotatedBeanTypeWithServiceType;
+    }
 }
