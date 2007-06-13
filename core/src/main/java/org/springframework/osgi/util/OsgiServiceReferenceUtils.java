@@ -24,6 +24,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -43,7 +46,9 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class OsgiServiceReferenceUtils {
 
-	public static ServiceReference getServiceReference(BundleContext bundleContext, String[] classes) {
+    private static Log log = LogFactory.getLog(OsgiServiceReferenceUtils.class);
+
+    public static ServiceReference getServiceReference(BundleContext bundleContext, String[] classes) {
 		return getServiceReference(bundleContext, classes, null);
 	}
 
@@ -69,6 +74,10 @@ public abstract class OsgiServiceReferenceUtils {
 				winningId = serviceId;
 				winningRanking = serviceRanking;
 			}
+            // Multiple identical matches is probably not what the user intended.
+            if (serviceRanking == winningRanking) {
+                log.warn("Mutiple identical matches for single service filtered on [" + filter + "]");
+            }
 		}
 
 		return winningReference;
