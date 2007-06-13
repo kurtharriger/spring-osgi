@@ -423,9 +423,8 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 * Registration method.
 	 * 
 	 * @param classes
-	 * @param bean
 	 * @param serviceProperties
-	 * @return
+	 * @return the ServiceRegistration
 	 */
 	protected ServiceRegistration registerService(Class[] classes, Properties serviceProperties) {
 		Assert.notEmpty(
