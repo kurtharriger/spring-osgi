@@ -16,7 +16,6 @@
 package org.springframework.osgi.iandt.io;
 
 import org.springframework.core.io.Resource;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Test to check if loading of files outside of the OSGi world (directly from

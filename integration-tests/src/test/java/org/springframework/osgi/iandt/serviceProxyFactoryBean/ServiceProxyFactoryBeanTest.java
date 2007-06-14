@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**

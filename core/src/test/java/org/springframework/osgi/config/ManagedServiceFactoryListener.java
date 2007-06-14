@@ -1,7 +1,7 @@
 package org.springframework.osgi.config;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Dictionary;
 
 /**
  * @author Hal Hildebrand
@@ -12,7 +12,7 @@ public class ManagedServiceFactoryListener {
     public ArrayList notifications = new ArrayList();
 
 
-    public void eat(String pid, Map props) {
+    public void eat(String pid, Dictionary props) {
         notifications.add(new Object[]{pid, props});
     }
 

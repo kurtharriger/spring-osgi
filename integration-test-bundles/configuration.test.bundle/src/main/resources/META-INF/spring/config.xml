@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+    <osgi:config persistent-id="test.service.pid">
+        <osgi:config-listener ref="service" update-method="updateService"/>
+    </osgi:config>
+    <osgi:config persistent-id="test.service.factory.pid" factory="true">
+        <osgi:config-listener ref="factory" update-method="updateFactory"/>
+    </osgi:config>
+    <bean id="service"
+          class="org.springframework.osgi.iandt.configuration.ManagedServiceListener"
+          lazy-init="false"/>
+
+    <bean id="factory"
+          class="org.springframework.osgi.iandt.configuration.ManagedServiceFactoryListener"
+          lazy-init="false"/>
+
+</beans>

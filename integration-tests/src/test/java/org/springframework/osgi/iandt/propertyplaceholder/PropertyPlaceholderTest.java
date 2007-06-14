@@ -17,11 +17,11 @@ package org.springframework.osgi.iandt.propertyplaceholder;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.io.File;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.util.OsgiServiceUtils;
@@ -42,12 +42,38 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 
 	private ConfigurableOsgiBundleApplicationContext ctx;
 
+    private static String CONFIG_DIR = "test-config";
+
 	static {
 		DICT.put("foo", "bar");
 		DICT.put("white", "horse");
-		// This is needed when running under KF
-		System.setProperty("com.gatespace.bundle.cm.store", System.getProperty("user.dir"));
+        // Set up the bundle storage dirctory
+        System.setProperty("com.gatespace.bundle.cm.store", CONFIG_DIR);
+        initializeDirectory(CONFIG_DIR);
 	}
+
+    protected static void initializeDirectory(String dir) {
+        File directory = new File(dir);
+        remove(directory);
+        assertTrue(dir + " directory successfully created", directory.mkdirs());
+    }
+
+
+    private static void remove(File directory) {
+        if (directory.exists()) {
+            File[] files = directory.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                File file = files[i];
+                if (file.isDirectory()) {
+                    remove(file);
+                } else {
+                    assertTrue(file + " deleted", file.delete());
+                }
+            }
+            assertTrue(directory + " directory successfully cleared",
+                       directory.delete());
+        }
+    }
 
 	protected String getManifestLocation() {
 		return "classpath:org/springframework/osgi/iandt/propertyplaceholder/PropertyPlaceholder.MF";
