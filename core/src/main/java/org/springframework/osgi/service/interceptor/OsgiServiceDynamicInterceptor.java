@@ -69,7 +69,9 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 	private class Listener implements ServiceListener {
 
 		public void serviceChanged(ServiceEvent event) {
+            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
             try {
+                Thread.currentThread().setContextClassLoader(clientClassLoader);
                 ServiceReference ref = event.getServiceReference();
 
                 // service id
@@ -136,6 +138,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
             } catch (Throwable e) {
                 // The framework will swallow these exceptions without logging, so log them here
                 log.fatal("Exception during service event handling", e);
+            } finally {
+                Thread.currentThread().setContextClassLoader(tccl);
             }
         }
 
