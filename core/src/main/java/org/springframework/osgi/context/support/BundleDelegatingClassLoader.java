@@ -32,7 +32,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
-import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
@@ -378,9 +377,26 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		return (parent == null) ? findResource(name) : super.getResource(name);
 	}
 
-	public Class loadClass(String name) throws ClassNotFoundException {
-		return (parent == null) ? findClass(name) : super.loadClass(name);
-	}
+	protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        // TODO This lookup is reverse of what we want - i.e. bundle then parent, if available
+        // TODO However, felix has issues with finding some classes on the boot classpath if we don't
+        // TODO do things in this order.
+        Class clazz;
+        if (parent != null) {
+            try {
+                clazz = parent.loadClass(name);
+            } catch (ClassNotFoundException e) {
+                clazz = findClass(name);
+            }
+        } else {
+            clazz = findClass(name);
+        }
+
+        if (resolve) {
+            resolveClass(clazz);
+        }
+        return clazz;
+    }
 
 	// For testing
 	public Bundle getBundle() {

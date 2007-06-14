@@ -108,8 +108,14 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 			// bean in the context. We can't do this in afterPropertiesSet, so
 			// we have to do
 			// it here.
-			getObject();
-		}
+            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(classLoader);
+                getObject();
+            } finally {
+                Thread.currentThread().setContextClassLoader(tccl);
+            }
+        }
 	}
 
 	/*
@@ -244,7 +250,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		if (log.isDebugEnabled())
 			log.debug("creating a singleService proxy");
 
-		ProxyFactory factory = new ProxyFactory();
+        ProxyFactory factory = new ProxyFactory();
 
 		// mold the proxy
 		configureFactoryForClass(factory, serviceTypes);
@@ -263,8 +269,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		// factory.setOptimize(true);
 		// factory.setOpaque(true);
 
-		try {
-			return factory.getProxy(classLoader);
+		try { 
+            return factory.getProxy(classLoader);
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			if (log.isWarnEnabled()) {

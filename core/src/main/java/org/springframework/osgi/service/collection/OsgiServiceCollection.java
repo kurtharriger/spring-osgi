@@ -63,8 +63,10 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	private class Listener implements ServiceListener {
 
 		public void serviceChanged(ServiceEvent event) {
-			try {
-				ServiceReference ref = event.getServiceReference();
+            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(classLoader);
+                ServiceReference ref = event.getServiceReference();
 				Long serviceId = (Long) ref.getProperty(Constants.SERVICE_ID);
 				boolean found = false;
 
@@ -109,7 +111,9 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 				if (log.isWarnEnabled()) {
 					log.warn("serviceChanged() processing failed", re);
 				}
-			}
+			} finally {
+                Thread.currentThread().setContextClassLoader(tccl);
+            }
 		}
 	}
 

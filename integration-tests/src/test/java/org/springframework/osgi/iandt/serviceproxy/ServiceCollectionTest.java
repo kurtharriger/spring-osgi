@@ -58,9 +58,15 @@ public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTest
         BundleDelegatingClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
         OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader);
 		collection.setContextClassLoader(ReferenceClassLoadingOptions.UNMANAGED);
-		collection.afterPropertiesSet();
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(classLoader);
+            collection.afterPropertiesSet();
+        } finally {
+            Thread.currentThread().setContextClassLoader(tccl);
+        }
 
-		return collection;
+        return collection;
 	}
 
 	public void testCollectionListener() throws Exception {
