@@ -45,7 +45,11 @@ public class ContextLoaderListenerTest extends TestCase {
 	public void testStart() throws Exception {
 		MockControl bundleContextControl = MockControl.createControl(BundleContext.class);
 		BundleContext context = (BundleContext) bundleContextControl.getMock();
-		// check to see if we are on KF
+		// platform determination
+		context.getProperty(Constants.FRAMEWORK_VENDOR);
+		bundleContextControl.setReturnValue(null);
+		context.getProperty(Constants.FRAMEWORK_VENDOR);
+		bundleContextControl.setReturnValue(null);
 		context.getProperty(Constants.FRAMEWORK_VENDOR);
 		bundleContextControl.setReturnValue(null);
 		
