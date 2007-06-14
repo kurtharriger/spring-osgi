@@ -1,13 +1,7 @@
 package org.springframework.osgi.context.support;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
@@ -17,14 +11,18 @@ import org.osgi.service.cm.ManagedServiceFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.config.OsgiConfigDefinitionParser;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.util.Assert;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Hashtable;
+import java.util.Dictionary;
 
 /**
  * @author Hal Hildebrand
@@ -107,7 +105,8 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 				ConfigListener listener = (ConfigListener) l.next();
 				listener.updated(properties, pid);
 			}
-		}
+
+        }
 	}
 
 	private class FactoryUpdater implements ManagedServiceFactory {
@@ -159,7 +158,7 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
             bean = beanFactory.getBean(reference);
 			if (isFactory) {
 				try {
-					bean.getClass().getMethod(updateMethod, new Class[]{String.class, Map.class});
+					bean.getClass().getMethod(updateMethod, new Class[]{String.class, Dictionary.class});
 				}
 				catch (NoSuchMethodException e) {
 					IllegalArgumentException illArgEx = 
@@ -167,14 +166,14 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
                                                     reference +
                                                     "; requires signature " +
                                                     updateMethod +
-                                                    "(java.lang.String, java.util.Map)");
+                                                    "(java.lang.String, java.util.Dictionary)");
 					illArgEx.initCause(e);
 					throw illArgEx;
 				}
 			}
 			else {
 				try {
-					bean.getClass().getMethod(updateMethod, new Class[]{Map.class});
+					bean.getClass().getMethod(updateMethod, new Class[]{Dictionary.class});
 				}
 				catch (NoSuchMethodException e) {
 					IllegalArgumentException illArgEx = 
@@ -182,7 +181,7 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
                                                    reference +
                                                    "; requires signature " +
                                                     updateMethod +
-                                                    "(java.util.Map)");
+                                                    "(java.util.Dictionary)");
 					illArgEx.initCause(e);
 					throw illArgEx;
 				}
@@ -207,8 +206,8 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 
 		void updated(String instancePid, Dictionary properties) throws ConfigurationException {
 			Method update;
-			try {
-				update = bean.getClass().getMethod(updateMethod, new Class[]{String.class, Map.class});
+            try {
+				update = bean.getClass().getMethod(updateMethod, new Class[]{String.class, Dictionary.class});
 			}
 			catch (NoSuchMethodException e) {
 				throw new ConfigurationException(instancePid,
@@ -216,7 +215,7 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
                                                  reference +
                                                  "; requires signature " +
                                                  updateMethod +
-                                                 "(java.util.String, java.util.Map)",
+                                                 "(java.util.String, java.util.Dictionary)",
 					                             e);
 			}
 
@@ -235,7 +234,7 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 		void updated(Dictionary properties, String servicePid) throws ConfigurationException {
 			Method update;
 			try {
-				update = bean.getClass().getMethod(updateMethod, new Class[]{Map.class});
+				update = bean.getClass().getMethod(updateMethod, new Class[]{Dictionary.class});
 			}
 			catch (NoSuchMethodException e) {
 				throw new ConfigurationException(servicePid,
@@ -243,7 +242,7 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
                                                  reference +
                                                  "; requires signature " +
                                                  updateMethod +
-                                                 "(java.util.Map)",
+                                                 "(java.util.Dictionary)",
                                                  e);
 			}
 
