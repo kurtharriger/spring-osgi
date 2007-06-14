@@ -165,8 +165,9 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 */
 	public void start(BundleContext context) throws Exception {
 		log.info("Starting org.springframework.osgi.extender bundle");
+        OsgiPlatformDetector.determinePlatform(context);
 
-		this.isKnopflerfish = OsgiPlatformDetector.isKnopflerfish(context);
+        this.isKnopflerfish = OsgiPlatformDetector.isKnopflerfish();
 
 		this.bundleId = context.getBundle().getBundleId();
 		this.namespacePlugins = new NamespacePlugins();

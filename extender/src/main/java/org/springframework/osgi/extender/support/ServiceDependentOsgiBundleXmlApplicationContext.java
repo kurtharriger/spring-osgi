@@ -277,24 +277,37 @@ public class ServiceDependentOsgiBundleXmlApplicationContext extends OsgiBundleX
                 }
             }
 
-            if (!(t.getCause() instanceof ThreadDeath) && log.isErrorEnabled()) {
-                log.error("Unable to create application context for [" +
-                          getBundleSymbolicName() +
-                          "], unsatisfied dependencies: " +
-                          buf.toString(), t);
-                log.info("[" +
-                         getBundleSymbolicName() +
-                         "]" +
-                         " creation calling code: ", creationTrace);
-            } else if (t.getCause() instanceof ThreadDeath && log.isDebugEnabled()) {
-                log.debug("Unable to create application context for [" +
-                          getBundleSymbolicName() +
-                          "], unsatisfied dependencies: " +
-                          buf.toString(), t);
-                log.debug("[" +
-                          getBundleSymbolicName() +
-                          "]" +
-                          " creation calling code: ", creationTrace);
+            if (t instanceof ThreadDeath) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to create application context for [" +
+                              getBundleSymbolicName() +
+                              "], unsatisfied dependencies: " +
+                              buf.toString(), t);
+                    log.debug("[" +
+                             getBundleSymbolicName() +
+                             "]" +
+                             " creation calling code: ", creationTrace);
+                }
+            } else {
+                if (!(t.getCause() instanceof ThreadDeath) && log.isErrorEnabled()) {
+                    log.error("Unable to create application context for [" +
+                              getBundleSymbolicName() +
+                              "], unsatisfied dependencies: " +
+                              buf.toString(), t);
+                    log.info("[" +
+                             getBundleSymbolicName() +
+                             "]" +
+                             " creation calling code: ", creationTrace);
+                } else if (t.getCause() instanceof ThreadDeath && log.isDebugEnabled()) {
+                    log.debug("Unable to create application context for [" +
+                              getBundleSymbolicName() +
+                              "], unsatisfied dependencies: " +
+                              buf.toString(), t);
+                    log.debug("[" +
+                              getBundleSymbolicName() +
+                              "]" +
+                              " creation calling code: ", creationTrace);
+                }
             }
         } catch (Throwable e) {
             // last ditch effort to get useful error information

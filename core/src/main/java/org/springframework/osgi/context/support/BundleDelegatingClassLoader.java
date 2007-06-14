@@ -34,6 +34,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiPlatformDetector;
 
 /**
  * ClassLoader backed by an OSGi bundle. Will use the Bundle class loading.
@@ -48,29 +49,29 @@ import org.springframework.osgi.util.OsgiBundleUtils;
  * @since 2.0
  */
 public class BundleDelegatingClassLoader extends ClassLoader {
-	private ClassLoader parent;
-
+	private ClassLoader bridge;
 	private Bundle backingBundle;
 
-	private static final Log log = LogFactory.getLog(BundleDelegatingClassLoader.class);
+    private static final Log log = LogFactory.getLog(BundleDelegatingClassLoader.class);
 
 	public static BundleDelegatingClassLoader createBundleClassLoaderFor(Bundle aBundle) {
 		return createBundleClassLoaderFor(aBundle, ProxyFactory.class.getClassLoader());
 	}
 
-	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle aBundle, final ClassLoader parent) {
+	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle bundle,
+                                                                         final ClassLoader bridge) {
 		return (BundleDelegatingClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
 			public Object run() {
-				return new BundleDelegatingClassLoader(aBundle, parent);
+				return new BundleDelegatingClassLoader(bundle, bridge);
 			}
 		});
 	}
 
-	private BundleDelegatingClassLoader(Bundle aBundle, ClassLoader parentClassLoader) {
-		super(parentClassLoader);
-		this.backingBundle = aBundle;
-		this.parent = parentClassLoader;
-	}
+	private BundleDelegatingClassLoader(Bundle bundle, ClassLoader bridgeLoader) {
+		super(null);
+		this.backingBundle = bundle;
+		this.bridge = bridgeLoader;
+    }
 
 	public boolean equals(Object o) {
 		if (this == o)
@@ -82,15 +83,15 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		final BundleDelegatingClassLoader bundleDelegatingClassLoader = (BundleDelegatingClassLoader) o;
 
 		if (backingBundle.equals(bundleDelegatingClassLoader.backingBundle))
-			return (parent == null || parent.equals(bundleDelegatingClassLoader.parent));
+			return (bridge == null || bridge.equals(bundleDelegatingClassLoader.bridge));
 
 		return false;
 	}
 
 	public int hashCode() {
 		int hashCode = backingBundle.hashCode();
-		if (parent != null)
-			hashCode |= parent.hashCode();
+		if (bridge != null)
+			hashCode |= bridge.hashCode();
 
 		return hashCode;
 	}
@@ -104,9 +105,9 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 				debugClassLoading(name, null);
 			}
 			throw new ClassNotFoundException(name +
-			                                                      " not found from bundle [" +
-			                                                      backingBundle.getSymbolicName() +
-			                                                      "]", cnfe);
+                                             " not found from bundle [" +
+                                             backingBundle.getSymbolicName() +
+                                             "]", cnfe);
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			// This is almost always an error
@@ -374,24 +375,27 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	}
 
 	public URL getResource(String name) {
-		return (parent == null) ? findResource(name) : super.getResource(name);
+		return (bridge == null) ? findResource(name) : super.getResource(name);
 	}
 
 	protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        // TODO This lookup is reverse of what we want - i.e. bundle then parent, if available
-        // TODO However, felix has issues with finding some classes on the boot classpath if we don't
-        // TODO do things in this order.
         Class clazz;
-        if (parent != null) {
+        // TODO Felix finds Classes in the boot class path if we don't search the parent first
+        // TODO So, the order is reversed on that platform.
+        // TODO Kind of a big, gigantic hack - Hal
+        if (OsgiPlatformDetector.isFelix()) {
             try {
-                clazz = parent.loadClass(name);
+                clazz = bridge.loadClass(name);
             } catch (ClassNotFoundException e) {
                 clazz = findClass(name);
             }
-        } else {
-            clazz = findClass(name);
+        } else { 
+            try {
+                clazz = findClass(name);
+            } catch (ClassNotFoundException e) {
+                clazz = bridge.loadClass(name);
+            }
         }
-
         if (resolve) {
             resolveClass(clazz);
         }
