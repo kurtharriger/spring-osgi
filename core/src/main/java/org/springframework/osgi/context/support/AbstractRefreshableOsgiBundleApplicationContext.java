@@ -30,8 +30,11 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.context.ApplicationContextException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.BundleContextAware;
@@ -274,8 +277,13 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
 						+ getBundleSymbolicName() + ")");
 			}
-			this.serviceRegistration = getBundleContext().registerService(
-				new String[] { AbstractRefreshableApplicationContext.class.getName() }, this, serviceProperties);
+            // Publish under all the significant interfaces we might care about.
+            this.serviceRegistration = getBundleContext().registerService(
+				new String[] { AbstractRefreshableApplicationContext.class.getName(),
+                        AbstractApplicationContext.class.getName(),
+                        ConfigurableApplicationContext.class.getName(),
+                        ApplicationContext.class.getName()
+                }, this, serviceProperties);
 		}
 		else {
 			if (logger.isInfoEnabled()) {
