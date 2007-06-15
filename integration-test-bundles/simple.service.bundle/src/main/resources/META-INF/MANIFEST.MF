@@ -5,6 +5,6 @@ Bundle-Name: Simple-Service-Sample
 Bundle-Vendor: Spring Framework
 Spring-Context: *; eagerly-init-importers:=true
 Export-Package: org.springframework.osgi.iandt.simpleservice, org.springframework.osgi.iandt.simpleservice2,
-  org.springframework.osgi.iandt.simpleservice.impl, org.springframework.osgi.iandt.simpleservice2.impl
+  org.springframework.osgi.iandt.simpleservice2.impl
 Bundle-ClassPath: .,
  target/classes/
