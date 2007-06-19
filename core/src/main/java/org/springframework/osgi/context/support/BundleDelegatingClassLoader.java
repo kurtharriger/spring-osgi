@@ -41,8 +41,8 @@ import org.springframework.osgi.util.OsgiPlatformDetector;
  * Contains facilities for tracing classloading behavior so that issues can be
  * easily resolved. Debugging can be enabled by setting the system property
  * <code>org.springframework.osgi.DebugClassLoading</code> to true.
- * 
- * 
+ *
+ *
  * @author Adrian Colyer
  * @author Andy Piper
  * @author Costin Leau
@@ -54,7 +54,10 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
     private static final Log log = LogFactory.getLog(BundleDelegatingClassLoader.class);
 
-	public static BundleDelegatingClassLoader createBundleClassLoaderFor(Bundle aBundle) {
+    private static final String BUNDLE_DELEGATING_CLASS_LOADER_MONITOR = "BundleDelegatingClassLoader.monitor";
+    private static String MONITOR_CLASS_NAME = System.getProperty(BUNDLE_DELEGATING_CLASS_LOADER_MONITOR);
+
+    public static BundleDelegatingClassLoader createBundleClassLoaderFor(Bundle aBundle) {
 		return createBundleClassLoaderFor(aBundle, ProxyFactory.class.getClassLoader());
 	}
 
@@ -133,7 +136,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	/**
 	 * A best-guess attempt at figuring out why the class could not be found.
-	 * 
+	 *
 	 * @param name of the class we are trying to find.
 	 */
 	public static void debugClassLoading(Bundle backingBundle, String name, String root) {
@@ -386,14 +389,26 @@ public class BundleDelegatingClassLoader extends ClassLoader {
         if (OsgiPlatformDetector.isFelix()) {
             try {
                 clazz = bridge.loadClass(name);
+                if (MONITOR_CLASS_NAME != null && MONITOR_CLASS_NAME.equals(name)) {
+                    System.out.println("found " + MONITOR_CLASS_NAME + " from bridge " + clazz.getClassLoader());
+                }
             } catch (ClassNotFoundException e) {
                 clazz = findClass(name);
+                if (MONITOR_CLASS_NAME != null && MONITOR_CLASS_NAME.equals(name)) {
+                    System.out.println("found " + MONITOR_CLASS_NAME + " from " + clazz.getClassLoader());
+                }
             }
-        } else { 
+        } else {
             try {
                 clazz = findClass(name);
+                if (MONITOR_CLASS_NAME != null && MONITOR_CLASS_NAME.equals(name)) {
+                    System.out.println("found " + MONITOR_CLASS_NAME + " from " + clazz.getClassLoader());
+                }
             } catch (ClassNotFoundException e) {
                 clazz = bridge.loadClass(name);
+                if (MONITOR_CLASS_NAME != null && MONITOR_CLASS_NAME.equals(name)) {
+                    System.out.println("found " + MONITOR_CLASS_NAME + " from bridge " + clazz.getClassLoader());
+                }
             }
         }
         if (resolve) {
@@ -412,5 +427,4 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		String bname = dict.get(Constants.BUNDLE_NAME) + "(" + dict.get(Constants.BUNDLE_SYMBOLICNAME) + ")";
         return "BundleDelegatingClassLoader for [" + bname + "]";
     }
-
 }
