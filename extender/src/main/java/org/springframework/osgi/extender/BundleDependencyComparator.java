@@ -45,14 +45,9 @@ public class BundleDependencyComparator implements Comparator {
             return -1;
         } else if (b2Lower && !b1Lower) {
             return 1;
-        } else if (!b2Lower && !b1Lower) {
-        } else if (b2Lower && b1Lower) {
-            // Deal with circular references.
-            return compareUsingServiceRankingAndId(bundle1, bundle2);
         }
-
-        // Doesn't matter, sort consistently on classname
-        return bundle1.getSymbolicName().compareTo(bundle2.getSymbolicName());
+        // Deal with circular references and unrelated bundles.
+        return compareUsingServiceRankingAndId(bundle1, bundle2);
     }
 
 
@@ -137,6 +132,10 @@ public class BundleDependencyComparator implements Comparator {
         Arrays.sort(bservices, new IdComparator());
         int k0 = ((Long)(aservices[0].getProperty(Constants.SERVICE_ID))).intValue();
         int k1 = ((Long)(bservices[0].getProperty(Constants.SERVICE_ID))).intValue();
-        return k1-k0;
+		if (k1 != k0) {
+			return k1-k0;
+		}
+		// Doesn't matter, sort consistently on classname
+		return a.getSymbolicName().compareTo(b.getSymbolicName());
     }
 }
