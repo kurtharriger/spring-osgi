@@ -40,7 +40,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
  */
 public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurableOsgiTests {
 
-	protected static final long DEFAULT_WAIT_TIME = 5L;
+	protected static final long DEFAULT_WAIT_TIME = 60L;
 
 	private static final long DEFAULT_SLEEP_INTERVAL = 500;
 

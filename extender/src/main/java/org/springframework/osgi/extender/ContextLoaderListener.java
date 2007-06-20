@@ -213,15 +213,29 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	}
 
 	/**
-	 * Shutdown the extender and all bundled managed by it.
+	 * Shutdown the extender and all bundled managed by it.  Shutdown of contexts is in
+     * the topological order of the dependency graph formed by the service references.
 	 */
-	protected void shutdown() {
+	protected synchronized void shutdown() {
 		unregisterListenerService();
 		unregisterResolverService();
 
-		// Stop all managed contexts
-        for (Iterator i = managedContexts.values().iterator(); i.hasNext();) {
-            ((ServiceDependentOsgiBundleXmlApplicationContext) i.next()).close();
+        Bundle[] bundles =
+                new Bundle[managedContexts.size()];
+
+        int i = 0;
+        for (Iterator it = managedContexts.values().iterator(); it.hasNext();) {
+            ServiceDependentOsgiBundleXmlApplicationContext context
+                    = (ServiceDependentOsgiBundleXmlApplicationContext) it.next();
+            bundles [i++] = context.getBundle(); 
+        }
+
+        Arrays.sort(bundles, new BundleDependencyComparator());
+
+
+        for (i = 0; i < bundles.length; i++) {
+            Long id = new Long(bundles[i].getBundleId());
+            ((ServiceDependentOsgiBundleXmlApplicationContext) managedContexts.get(id)).close();
         }
 
         this.managedContexts.clear();
