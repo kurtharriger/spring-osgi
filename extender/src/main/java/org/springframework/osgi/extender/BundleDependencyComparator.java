@@ -24,11 +24,11 @@ public class BundleDependencyComparator implements Comparator {
                 return 0;
             } else {
                 // Sort nulls first
-                return -1;
+                return 1;
             }
         } else if (bundle2 == null) {
             // Sort nulls first
-            return 1;
+            return -1;
         }
 
         // At this point, we know that bundle1 and bundle2 are not null
@@ -42,9 +42,9 @@ public class BundleDependencyComparator implements Comparator {
         boolean b2Lower = references(bundle1, bundle2);
 
         if (b1Lower && !b2Lower) {
-            return -1;
-        } else if (b2Lower && !b1Lower) {
             return 1;
+        } else if (b2Lower && !b1Lower) {
+            return -1;
         }
         // Deal with circular references and unrelated bundles.
         return compareUsingServiceRankingAndId(bundle1, bundle2);
@@ -93,9 +93,9 @@ public class BundleDependencyComparator implements Comparator {
                 Integer i1 = ((Integer)((ServiceReference)o1).getProperty(Constants.SERVICE_RANKING));
                 Integer i2 = ((Integer)((ServiceReference)o2).getProperty(Constants.SERVICE_RANKING));
                 if (i1 == null && i2 == null) return 0;
-                else if (i1==null) return 1;
-                else if (i2==null) return -1;
-                return i2.intValue()-i1.intValue();
+                else if (i1==null) return -1;
+                else if (i2==null) return 1;
+                return i1.intValue()-i2.intValue();
             }
         }
 
@@ -103,7 +103,7 @@ public class BundleDependencyComparator implements Comparator {
             public int compare(Object o1, Object o2) {
                 int i1 = ((Long)((ServiceReference)o1).getProperty(Constants.SERVICE_ID)).intValue();
                 int i2 = ((Long)((ServiceReference)o2).getProperty(Constants.SERVICE_ID)).intValue();
-                return i1-i2;
+                return i2-i1;
             }
         }
 
@@ -120,20 +120,20 @@ public class BundleDependencyComparator implements Comparator {
         Integer i1 = ((Integer)(bservices[0].getProperty(Constants.SERVICE_RANKING)));
 
         if (i0 != null && i1 == null) {
-            return 1;
-        }
-        else if (i1 != null && i0 == null) {
             return -1;
         }
+        else if (i1 != null && i0 == null) {
+            return 1;
+        }
         else if (i0 != i1 && i0.intValue() != i1.intValue()) {
-            return i0.intValue()-i1.intValue();
+            return i1.intValue()-i0.intValue();
         }
         Arrays.sort(aservices, new IdComparator());
         Arrays.sort(bservices, new IdComparator());
         int k0 = ((Long)(aservices[0].getProperty(Constants.SERVICE_ID))).intValue();
         int k1 = ((Long)(bservices[0].getProperty(Constants.SERVICE_ID))).intValue();
 		if (k1 != k0) {
-			return k1-k0;
+			return k0-k1;
 		}
 		// Doesn't matter, sort consistently on classname
 		return a.getSymbolicName().compareTo(b.getSymbolicName());

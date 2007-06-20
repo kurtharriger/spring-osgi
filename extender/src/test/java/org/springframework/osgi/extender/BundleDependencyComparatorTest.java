@@ -22,15 +22,16 @@ public class BundleDependencyComparatorTest extends TestCase {
         TestBundle B = new TestBundle("B");
         TestBundle C = new TestBundle("C");
 
+        // Sets dependency A -> B -> C
         A.setUsingBundles(new Bundle[]{});
         B.setUsingBundles(new Bundle[]{A});
         C.setUsingBundles(new Bundle[]{B});
 
         Bundle[] bundles = new Bundle[]{C, A, B};
         Arrays.sort(bundles, new BundleDependencyComparator());
-        assertSame(C, bundles[0]);
+        assertSame(A, bundles[0]);
         assertSame(B, bundles[1]);
-        assertSame(A, bundles[2]);
+        assertSame(C, bundles[2]);
     }
 
 
@@ -39,15 +40,16 @@ public class BundleDependencyComparatorTest extends TestCase {
         TestBundle B = new TestBundle("B");
         TestBundle C = new TestBundle("C");
 
+        // Sets dependency A -> B -> C
         A.setUsingBundles(new Bundle[]{});
         B.setUsingBundles(new Bundle[]{A});
         C.setUsingBundles(new Bundle[]{B});
 
         Bundle[] bundles = new Bundle[]{C, B, A};
         Arrays.sort(bundles, new BundleDependencyComparator());
-        assertSame(C, bundles[0]);
+        assertSame(A, bundles[0]);
         assertSame(B, bundles[1]);
-        assertSame(A, bundles[2]);
+        assertSame(C, bundles[2]);
     }
 
 
@@ -56,15 +58,16 @@ public class BundleDependencyComparatorTest extends TestCase {
         TestBundle B = new TestBundle("B");
         TestBundle C = new TestBundle("C");
 
+        // Sets dependency A -> B -> C
         A.setUsingBundles(new Bundle[]{});
         B.setUsingBundles(new Bundle[]{A});
         C.setUsingBundles(new Bundle[]{B});
 
         Bundle[] bundles = new Bundle[]{A, B, C};
         Arrays.sort(bundles, new BundleDependencyComparator());
-        assertSame(C, bundles[0]);
+        assertSame(A, bundles[0]);
         assertSame(B, bundles[1]);
-        assertSame(A, bundles[2]);
+        assertSame(C, bundles[2]);
     }
 
 
@@ -75,6 +78,7 @@ public class BundleDependencyComparatorTest extends TestCase {
         TestBundle D = new TestBundle("D");
         TestBundle E = new TestBundle("E");
 
+        // Sets dependency A -> B -> C -> D -> E
         A.setUsingBundles(new Bundle[]{});
         B.setUsingBundles(new Bundle[]{A});
         C.setUsingBundles(new Bundle[]{B});
@@ -83,9 +87,9 @@ public class BundleDependencyComparatorTest extends TestCase {
 
         Bundle[] bundles = new Bundle[]{C, E, A};
         Arrays.sort(bundles, new BundleDependencyComparator());
-        assertSame(E, bundles[0]);
+        assertSame(A, bundles[0]);
         assertSame(C, bundles[1]);
-        assertSame(A, bundles[2]);
+        assertSame(E, bundles[2]);
     }
 
     public void testCircularReferenceId() throws Exception {
@@ -95,6 +99,7 @@ public class BundleDependencyComparatorTest extends TestCase {
         TestBundle D = new TestBundle("D", 0, 3);
         TestBundle E = new TestBundle("E", 0, 4);
 
+        // Sets dependency A -> B -> C -> D -> E -> A
         A.setUsingBundles(new Bundle[]{E});
         B.setUsingBundles(new Bundle[]{A});
         C.setUsingBundles(new Bundle[]{B});
@@ -103,11 +108,11 @@ public class BundleDependencyComparatorTest extends TestCase {
 
         Bundle[] bundles = new Bundle[]{E, D, C, B, A};
         Arrays.sort(bundles, new BundleDependencyComparator());
-        assertSame(E, bundles[0]);
-        assertSame(D, bundles[1]);
+        assertSame(A, bundles[0]);
+        assertSame(B, bundles[1]);
         assertSame(C, bundles[2]);
-        assertSame(B, bundles[3]);
-        assertSame(A, bundles[4]);
+        assertSame(D, bundles[3]);
+        assertSame(E, bundles[4]);
     }
 
     public void testCircularReferenceReference() throws Exception {
@@ -117,6 +122,7 @@ public class BundleDependencyComparatorTest extends TestCase {
         TestBundle D = new TestBundle("D", 1, 3);
         TestBundle E = new TestBundle("E", 0, 4);
 
+        // Sets dependency A -> B -> C -> D -> E -> A
         A.setUsingBundles(new Bundle[]{E});
         B.setUsingBundles(new Bundle[]{A});
         C.setUsingBundles(new Bundle[]{B});
@@ -125,11 +131,11 @@ public class BundleDependencyComparatorTest extends TestCase {
 
         Bundle[] bundles = new Bundle[]{E, D, C, B, A};
         Arrays.sort(bundles, new BundleDependencyComparator());
-        assertSame(E, bundles[0]);
-        assertSame(D, bundles[1]);
+        assertSame(A, bundles[0]);
+        assertSame(B, bundles[1]);
         assertSame(C, bundles[2]);
-        assertSame(B, bundles[3]);
-        assertSame(A, bundles[4]);
+        assertSame(D, bundles[3]);
+        assertSame(E, bundles[4]);
     }
 
     public void testForest() throws Exception {
@@ -144,31 +150,36 @@ public class BundleDependencyComparatorTest extends TestCase {
         TestBundle I = new TestBundle("I");
         TestBundle J = new TestBundle("J");
 
+        // Sets dependency A -> B -> C   B -> D -> E
         A.setUsingBundles(new Bundle[]{});
         B.setUsingBundles(new Bundle[]{A});
         C.setUsingBundles(new Bundle[]{B});
         D.setUsingBundles(new Bundle[]{B});
         E.setUsingBundles(new Bundle[]{D});
 
+
+        // Sets dependency F -> G   F -> H
         F.setUsingBundles(new Bundle[]{});
         G.setUsingBundles(new Bundle[]{F});
         H.setUsingBundles(new Bundle[]{F});
 
+
+        // Sets dependency I -> J
         I.setUsingBundles(new Bundle[]{});
         J.setUsingBundles(new Bundle[]{I});
 
         Bundle[] bundles = new Bundle[]{F, D, J, B, E, A, H, I, G, C};
         Arrays.sort(bundles, new BundleDependencyComparator());
-        assertSame(C, bundles[0]);
-        assertSame(E, bundles[1]);
-        assertSame(D, bundles[2]);
-        assertSame(B, bundles[3]);
-        assertSame(A, bundles[4]);
-        assertSame(G, bundles[5]);
-        assertSame(H, bundles[6]);
-        assertSame(F, bundles[7]);
-        assertSame(J, bundles[8]);
-        assertSame(I, bundles[9]);
+        assertSame(A, bundles[0]);
+        assertSame(B, bundles[1]);
+        assertSame(C, bundles[2]);
+        assertSame(D, bundles[3]);
+        assertSame(E, bundles[4]);
+        assertSame(F, bundles[5]);
+        assertSame(G, bundles[6]);
+        assertSame(H, bundles[7]);
+        assertSame(I, bundles[8]);
+        assertSame(J, bundles[9]);
     }
 
 

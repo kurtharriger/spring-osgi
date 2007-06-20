@@ -54,9 +54,6 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
     private static final Log log = LogFactory.getLog(BundleDelegatingClassLoader.class);
 
-    private static final String BUNDLE_DELEGATING_CLASS_LOADER_MONITOR = "BundleDelegatingClassLoader.monitor";
-    private static String MONITOR_CLASS_NAME = System.getProperty(BUNDLE_DELEGATING_CLASS_LOADER_MONITOR);
-
     public static BundleDelegatingClassLoader createBundleClassLoaderFor(Bundle aBundle) {
 		return createBundleClassLoaderFor(aBundle, ProxyFactory.class.getClassLoader());
 	}
@@ -389,26 +386,14 @@ public class BundleDelegatingClassLoader extends ClassLoader {
         if (OsgiPlatformDetector.isFelix()) {
             try {
                 clazz = bridge.loadClass(name);
-                if (MONITOR_CLASS_NAME != null && MONITOR_CLASS_NAME.equals(name)) {
-                    System.out.println("found " + MONITOR_CLASS_NAME + " from bridge " + clazz.getClassLoader());
-                }
             } catch (ClassNotFoundException e) {
                 clazz = findClass(name);
-                if (MONITOR_CLASS_NAME != null && MONITOR_CLASS_NAME.equals(name)) {
-                    System.out.println("found " + MONITOR_CLASS_NAME + " from " + clazz.getClassLoader());
-                }
             }
         } else {
             try {
                 clazz = findClass(name);
-                if (MONITOR_CLASS_NAME != null && MONITOR_CLASS_NAME.equals(name)) {
-                    System.out.println("found " + MONITOR_CLASS_NAME + " from " + clazz.getClassLoader());
-                }
             } catch (ClassNotFoundException e) {
                 clazz = bridge.loadClass(name);
-                if (MONITOR_CLASS_NAME != null && MONITOR_CLASS_NAME.equals(name)) {
-                    System.out.println("found " + MONITOR_CLASS_NAME + " from bridge " + clazz.getClassLoader());
-                }
             }
         }
         if (resolve) {

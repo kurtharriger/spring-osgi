@@ -237,8 +237,12 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 		for (i = 0; i < bundles.length; i++) {
 			Long id = new Long(bundles[i].getBundleId());
-			((ServiceDependentOsgiBundleXmlApplicationContext) managedContexts.get(id)).close();
-		}
+            ServiceDependentOsgiBundleXmlApplicationContext context
+                    = (ServiceDependentOsgiBundleXmlApplicationContext) managedContexts.get(id);
+            if (context != null) {
+                context.close();
+            }
+        }
 
 		this.managedContexts.clear();
 
