@@ -12,8 +12,7 @@ import java.util.Arrays;
 
 /**
  * @author Hal Hildebrand
- *         Date: Jun 19, 2007
- *         Time: 9:12:02 PM
+ * @author Andy Piper
  */
 public class BundleDependencyComparatorTest extends TestCase {
 
@@ -100,7 +99,8 @@ public class BundleDependencyComparatorTest extends TestCase {
         TestBundle E = new TestBundle("E", 0, 4);
 
         // Sets dependency A -> B -> C -> D -> E -> A
-        A.setUsingBundles(new Bundle[]{E});
+		// A has lowest id so gets shutdown last (started first).
+		A.setUsingBundles(new Bundle[]{E});
         B.setUsingBundles(new Bundle[]{A});
         C.setUsingBundles(new Bundle[]{B});
         D.setUsingBundles(new Bundle[]{C});
@@ -108,14 +108,50 @@ public class BundleDependencyComparatorTest extends TestCase {
 
         Bundle[] bundles = new Bundle[]{E, D, C, B, A};
         Arrays.sort(bundles, new BundleDependencyComparator());
-        assertSame(A, bundles[0]);
-        assertSame(B, bundles[1]);
+        assertSame(E, bundles[0]);
+        assertSame(D, bundles[1]);
         assertSame(C, bundles[2]);
-        assertSame(D, bundles[3]);
-        assertSame(E, bundles[4]);
+        assertSame(B, bundles[3]);
+        assertSame(A, bundles[4]);
     }
 
-    public void testCircularReferenceReference() throws Exception {
+	public void testCircularReferenceIdMulti() throws Exception {
+		TestBundle A = new TestBundle("A", 0, 0);
+		TestBundle B = new TestBundle("B", new int[] { 0, 0 }, new int[] { 4, 1 });
+		TestBundle C = new TestBundle("C", 0, 2);
+
+		// Sets dependency A -> B -> C -> A
+		// A has lowest id so gets shutdown last (started first).
+		A.setUsingBundles(new Bundle[]{C});
+		B.setUsingBundles(new Bundle[]{A});
+		C.setUsingBundles(new Bundle[]{B});
+
+		Bundle[] bundles = new Bundle[]{C, B, A};
+		Arrays.sort(bundles, new BundleDependencyComparator());
+		assertSame(C, bundles[0]);
+		assertSame(B, bundles[1]);
+		assertSame(A, bundles[2]);
+	}
+
+	public void testCircularReferenceRankMulti() throws Exception {
+		TestBundle A = new TestBundle("A", 0, 0);
+		TestBundle B = new TestBundle("B", new int[] { 0, 3 }, new int[] { 0, 0 });
+		TestBundle C = new TestBundle("C", 2, 0);
+
+		// Sets dependency A -> B -> C -> A
+		// B has highest rank so gets shutdown last (started first).
+		A.setUsingBundles(new Bundle[]{C});
+		B.setUsingBundles(new Bundle[]{A});
+		C.setUsingBundles(new Bundle[]{B});
+
+		Bundle[] bundles = new Bundle[]{C, B, A};
+		Arrays.sort(bundles, new BundleDependencyComparator());
+		assertSame(A, bundles[0]);
+		assertSame(C, bundles[1]);
+		assertSame(B, bundles[2]);
+	}
+
+	public void testCircularReferenceReference() throws Exception {
         TestBundle A = new TestBundle("A", 4, 0);
         TestBundle B = new TestBundle("B", 3, 1);
         TestBundle C = new TestBundle("C", 2, 2);
@@ -123,7 +159,8 @@ public class BundleDependencyComparatorTest extends TestCase {
         TestBundle E = new TestBundle("E", 0, 4);
 
         // Sets dependency A -> B -> C -> D -> E -> A
-        A.setUsingBundles(new Bundle[]{E});
+		// A has higher ranking so gets shutd own last
+		A.setUsingBundles(new Bundle[]{E});
         B.setUsingBundles(new Bundle[]{A});
         C.setUsingBundles(new Bundle[]{B});
         D.setUsingBundles(new Bundle[]{C});
@@ -131,11 +168,11 @@ public class BundleDependencyComparatorTest extends TestCase {
 
         Bundle[] bundles = new Bundle[]{E, D, C, B, A};
         Arrays.sort(bundles, new BundleDependencyComparator());
-        assertSame(A, bundles[0]);
-        assertSame(B, bundles[1]);
+        assertSame(E, bundles[0]);
+        assertSame(D, bundles[1]);
         assertSame(C, bundles[2]);
-        assertSame(D, bundles[3]);
-        assertSame(E, bundles[4]);
+        assertSame(B, bundles[3]);
+        assertSame(A, bundles[4]);
     }
 
     public void testForest() throws Exception {
@@ -186,14 +223,20 @@ public class BundleDependencyComparatorTest extends TestCase {
     public static class TestBundle extends MockBundle {
         protected Bundle[] usingBundles;
         protected String tag;
-        protected int rank;
-        protected int id;
+        protected int[] rank;
+        protected int[] id;
 
         public TestBundle(String tag, int rank, int id) {
             this.tag = tag;
-            this.rank = rank;
-            this.id = id;
+            this.rank = new int[] { rank };
+            this.id = new int[] { id };
         }
+
+		public TestBundle(String tag, int[] rank, int[] id) {
+			this.tag = tag;
+			this.rank = rank;
+			this.id = id;
+		}
 
         public TestBundle(String tag) {
             this(tag, 0, 0);
@@ -210,23 +253,27 @@ public class BundleDependencyComparatorTest extends TestCase {
 
 
         public ServiceReference[] getRegisteredServices() {
-            return new ServiceReference[]{
-                    new MockServiceReference() {
+			ServiceReference[] refs = new ServiceReference[rank.length];
+			for (int i=0; i<rank.length; i++) {
+				final int r = i;
+				refs[i] =
+					new MockServiceReference() {
                         public Bundle[] getUsingBundles() {
                             return usingBundles;
                         }
                         public Object getProperty(String p) {
                             if (p.equals(Constants.SERVICE_RANKING)) {
-                                return new Integer(rank);
+                                return new Integer(rank[r]);
                             }
                             else if (p.equals(Constants.SERVICE_ID)) {
-                                return new Long(id);
+                                return new Long(id[r]);
                             }
                             return null;
                         }
-                    }
-            };
-        }
+                    };
+			}
+			return refs;
+		}
 
 
         public String toString() {

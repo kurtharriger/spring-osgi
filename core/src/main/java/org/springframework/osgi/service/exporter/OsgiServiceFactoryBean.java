@@ -20,8 +20,10 @@ package org.springframework.osgi.service.exporter;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Properties;
 import java.util.Set;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Enumeration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -213,7 +215,9 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 	private ServiceRegistration serviceRegistration;
 
-	private Properties serviceProperties;
+	private Dictionary serviceProperties;
+
+	private int ranking;
 
 	private String targetBeanName;
 
@@ -333,12 +337,23 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	}
 
 
-    private Properties mergeServiceProperties(String beanName) {
-		Properties p = propertiesResolver.getServiceProperties(beanName);
-		if (serviceProperties != null) {
-			p.putAll(serviceProperties);
+    private Dictionary mergeServiceProperties(String beanName) {
+		Dictionary p = propertiesResolver.getServiceProperties(beanName);
+        Hashtable props = new Hashtable();
+        for (Enumeration e=p.keys(); e.hasMoreElements();) {
+            Object k = e.nextElement();
+            props.put(k, p.get(k));
+        }
+        if (serviceProperties != null) {
+            for (Enumeration e=serviceProperties.keys(); e.hasMoreElements();) {
+                Object k = e.nextElement();
+                props.put(k, serviceProperties.get(k));
+            }
+        }
+		if (ranking != 0) {
+			props.put(org.osgi.framework.Constants.SERVICE_RANKING, new Integer(ranking));
 		}
-		return p;
+		return props;
 	}
 
 	/**
@@ -355,7 +370,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 * Return an array of classes for the given bean that have been discovered
 	 * using the autoExportMode.
 	 * 
-	 * @param bean
+	 * @param clazz
 	 * @return
 	 */
 	protected Class[] autoDetectClassesForPublishing(Class clazz) {
@@ -397,10 +412,10 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 * classes required for publishing and then delegates the actual
 	 * registration to a dedicated method.
 	 * 
-	 * @param bean
-	 * @param serviceProperties
-	 */
-	protected void publishService(Class beanClass, Properties serviceProperties) {
+	 * @param beanClass
+     * @param serviceProperties
+     */
+	protected void publishService(Class beanClass, Dictionary serviceProperties) {
 		Class[] intfs = interfaces;
 		Class[] autoDetectedClasses = autoDetectClassesForPublishing(beanClass);
 
@@ -423,10 +438,10 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 * Registration method.
 	 * 
 	 * @param classes
-	 * @param serviceProperties
-	 * @return the ServiceRegistration
+     * @param serviceProperties
+     * @return the ServiceRegistration
 	 */
-	protected ServiceRegistration registerService(Class[] classes, Properties serviceProperties) {
+	protected ServiceRegistration registerService(Class[] classes, Dictionary serviceProperties) {
 		Assert.notEmpty(
 			classes,
 			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
@@ -585,12 +600,20 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		this.deactivationMethod = deactivationMethod;
 	}
 
-	public Properties getServiceProperties() {
+	public Dictionary getServiceProperties() {
 		return serviceProperties;
 	}
 
-	public void setServiceProperties(Properties serviceProperties) {
+	public void setServiceProperties(Dictionary serviceProperties) {
 		this.serviceProperties = serviceProperties;
+	}
+
+	public int getRanking() {
+		return ranking;
+	}
+
+	public void setRanking(int ranking) {
+		this.ranking = ranking;
 	}
 
 	/*
