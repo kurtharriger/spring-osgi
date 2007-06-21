@@ -380,21 +380,10 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class clazz;
-        // TODO Felix finds Classes in the boot class path if we don't search the parent first
-        // TODO So, the order is reversed on that platform.
-        // TODO Kind of a big, gigantic hack - Hal
-        if (OsgiPlatformDetector.isFelix()) {
-            try {
-                clazz = bridge.loadClass(name);
-            } catch (ClassNotFoundException e) {
-                clazz = findClass(name);
-            }
-        } else {
-            try {
-                clazz = findClass(name);
-            } catch (ClassNotFoundException e) {
-                clazz = bridge.loadClass(name);
-            }
+        try {
+            clazz = findClass(name);
+        } catch (ClassNotFoundException e) {
+            clazz = bridge.loadClass(name);
         }
         if (resolve) {
             resolveClass(clazz);

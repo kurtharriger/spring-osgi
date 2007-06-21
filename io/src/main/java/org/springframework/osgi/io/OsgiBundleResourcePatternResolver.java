@@ -48,9 +48,8 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 */
 	private Bundle bundle;
 
-	private boolean isFelix = false;
 
-	public OsgiBundleResourcePatternResolver(Bundle bundle) {
+    public OsgiBundleResourcePatternResolver(Bundle bundle) {
 		this(new OsgiBundleResourceLoader(bundle));
 	}
 
@@ -58,13 +57,8 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		super(resourceLoader);
 		if (resourceLoader instanceof OsgiBundleResourceLoader) {
 			this.bundle = ((OsgiBundleResourceLoader) resourceLoader).getBundle();
-			this.isFelix = isFelix(this.bundle);
 
-		}
-	}
-
-	private boolean isFelix(Bundle bundle) {
-		return (bundle != null && bundle.getClass().getPackage().getName().indexOf("felix") != -1);
+        }
 	}
 
 	public Resource[] getResources(String locationPattern) throws IOException {
@@ -78,9 +72,6 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			return findPathMatchingResources(locationPattern, type);
 		}
 		else {
-			// determine search type
-			String prefix = OsgiResourceUtils.getPrefix(locationPattern);
-
 			// consider bundle-space which can return multiple URLs
 			if (type == OsgiResourceUtils.PREFIX_NOT_SPECIFIED || type == OsgiResourceUtils.PREFIX_BUNDLE_SPACE) {
 				OsgiBundleResource resource = new OsgiBundleResource(bundle, locationPattern);
@@ -142,14 +133,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			searchType = bundleResource.getSearchType();
 		}
 		else if (rootDirResource instanceof UrlResource) {
-			rootPath = ((UrlResource) rootDirResource).getURL().getPath();
-
-			// handle Felix in a special way
-			if (isFelix) {
-				int index = rootPath.indexOf('/', rootPath.indexOf('/') + 1);
-				// strip the leading number (/0)
-				rootPath = rootPath.substring(index);
-			}
+			rootPath = rootDirResource.getURL().getPath();
 		}
 
 		if (rootPath != null) {
