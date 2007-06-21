@@ -77,6 +77,7 @@
 				<xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
 				<xsd:attribute name="context-classloader" type="TserviceClassLoaderOptions" default="unmanaged"/>
 				<xsd:attribute name="auto-export" type="TautoExportModes" default="disabled"/>
+				<xsd:attribute name="ranking" type="xsd:int" default="0"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>

@@ -11,8 +11,7 @@ import java.util.Arrays;
 
 /**
  * @author Hal Hildebrand
- *         Date: Jun 19, 2007
- *         Time: 8:56:12 PM
+ * @author Andy Piper
  */
 public class BundleDependencyComparator implements Comparator {
 
@@ -42,9 +41,11 @@ public class BundleDependencyComparator implements Comparator {
         boolean b2Lower = references(bundle1, bundle2);
 
         if (b1Lower && !b2Lower) {
-            return 1;
+			// b2->b1
+			return 1;
         } else if (b2Lower && !b1Lower) {
-            return -1;
+			// b1->b2
+			return -1;
         }
         // Deal with circular references and unrelated bundles.
         return compareUsingServiceRankingAndId(bundle1, bundle2);
@@ -93,9 +94,9 @@ public class BundleDependencyComparator implements Comparator {
                 Integer i1 = ((Integer)((ServiceReference)o1).getProperty(Constants.SERVICE_RANKING));
                 Integer i2 = ((Integer)((ServiceReference)o2).getProperty(Constants.SERVICE_RANKING));
                 if (i1 == null && i2 == null) return 0;
-                else if (i1==null) return -1;
-                else if (i2==null) return 1;
-                return i1.intValue()-i2.intValue();
+                else if (i1==null) return 1;
+                else if (i2==null) return -1;
+                return i2.intValue()-i1.intValue();
             }
         }
 
@@ -103,7 +104,7 @@ public class BundleDependencyComparator implements Comparator {
             public int compare(Object o1, Object o2) {
                 int i1 = ((Long)((ServiceReference)o1).getProperty(Constants.SERVICE_ID)).intValue();
                 int i2 = ((Long)((ServiceReference)o2).getProperty(Constants.SERVICE_ID)).intValue();
-                return i2-i1;
+                return i1-i2;
             }
         }
 
@@ -113,27 +114,41 @@ public class BundleDependencyComparator implements Comparator {
      */
     protected int compareUsingServiceRankingAndId(Bundle a, Bundle b) {
         ServiceReference[] aservices = a.getRegisteredServices();
+		ServiceReference[] bservices = b.getRegisteredServices();
+		if (aservices == null && bservices == null) {
+			return a.getSymbolicName().compareTo(b.getSymbolicName());
+		}
+		else if (aservices == null) {
+			return -1;
+		}
+		else if (bservices == null) {
+			return 1;
+		}
+
+		// Look for the highest ranked service in each bundle
         Arrays.sort(aservices, new RankingComparator());
-        ServiceReference[] bservices = b.getRegisteredServices();
         Arrays.sort(bservices, new RankingComparator());
-        Integer i0 = ((Integer)(aservices[0].getProperty(Constants.SERVICE_RANKING)));
+		Integer i0 = ((Integer)(aservices[0].getProperty(Constants.SERVICE_RANKING)));
         Integer i1 = ((Integer)(bservices[0].getProperty(Constants.SERVICE_RANKING)));
 
         if (i0 != null && i1 == null) {
-            return -1;
-        }
-        else if (i1 != null && i0 == null) {
             return 1;
         }
-        else if (i0 != i1 && i0.intValue() != i1.intValue()) {
-            return i1.intValue()-i0.intValue();
+        else if (i1 != null && i0 == null) {
+            return -1;
         }
+        else if (i0 != i1 && i0.intValue() != i1.intValue()) {
+            return i0.intValue()-i1.intValue();
+        }
+		// Look for the lowest id in each bundle (i.e. started first).
+		// There is an argument for looking for the highest id, since this will
+		// represent the _last_ service that was started in the bundle
         Arrays.sort(aservices, new IdComparator());
         Arrays.sort(bservices, new IdComparator());
-        int k0 = ((Long)(aservices[0].getProperty(Constants.SERVICE_ID))).intValue();
+		int k0 = ((Long)(aservices[0].getProperty(Constants.SERVICE_ID))).intValue();
         int k1 = ((Long)(bservices[0].getProperty(Constants.SERVICE_ID))).intValue();
 		if (k1 != k0) {
-			return k0-k1;
+			return k1-k0;
 		}
 		// Doesn't matter, sort consistently on classname
 		return a.getSymbolicName().compareTo(b.getSymbolicName());

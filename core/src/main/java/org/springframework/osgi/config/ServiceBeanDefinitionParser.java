@@ -17,15 +17,19 @@ package org.springframework.osgi.config;
 
 import java.util.Properties;
 import java.util.Set;
+import java.util.List;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
+import org.springframework.util.xml.DomUtils;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -106,9 +110,15 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 				// osgi:service-properties
 				else if (PROPS_ID.equals(subElement.getLocalName())) {
-					Properties props = parserContext.getDelegate().parsePropsElement(subElement);
-					builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
-				}
+                    if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.ENTRY_ELEMENT).size()>0) {
+                        Object props = parserContext.getDelegate().parseMapElement(subElement, builder.getRawBeanDefinition());
+					    builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
+                    }
+                    else {
+                        Object props = parserContext.getDelegate().parsePropsElement(subElement);
+					    builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
+                    }
+                }
 				// nested bean reference/declaration
 				else {
 					if (element.hasAttribute(REF))

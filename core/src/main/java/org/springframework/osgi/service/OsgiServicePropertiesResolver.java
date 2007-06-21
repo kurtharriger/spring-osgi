@@ -17,7 +17,7 @@
  */
 package org.springframework.osgi.service;
 
-import java.util.Properties;
+import java.util.Dictionary;
 
 import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
 
@@ -34,6 +34,6 @@ import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
  */
 public interface OsgiServicePropertiesResolver {
 
-	Properties getServiceProperties(String beanName);
+	Dictionary getServiceProperties(String beanName);
 	
 }

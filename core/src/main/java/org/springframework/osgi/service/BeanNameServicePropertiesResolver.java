@@ -17,7 +17,8 @@
  */
 package org.springframework.osgi.service;
 
-import java.util.Properties;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -57,8 +58,8 @@ public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesR
 	 * @see org.springframework.osgi.service.OsgiServicePropertiesResolver#getServiceProperties(java.lang.Object,
 	 *      java.lang.String)
 	 */
-	public Properties getServiceProperties(String beanName) {
-		Properties p = new Properties();
+	public Dictionary getServiceProperties(String beanName) {
+		Hashtable p = new Hashtable();
 		p.put(BEAN_NAME_PROPERTY_KEY, beanName);		
 		String name = getSymbolicName();
 		if (StringUtils.hasLength(name)) {
