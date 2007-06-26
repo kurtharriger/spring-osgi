@@ -17,7 +17,6 @@
 
 
 	<!-- osgi:service -->
-
 	<osgi:service interface="java.io.Serializable" lazy-init="true"
 		ref="string" />
 
@@ -27,8 +26,8 @@
 			<value>java.lang.Cloneable</value>
 		</osgi:interfaces>
 		<osgi:service-properties>
-			<prop key="foo">bar</prop>
-			<prop key="white">horse</prop>
+			<entry key="foo" value="bar"/>
+			<entry key="white" value="horse"/>
 		</osgi:service-properties>
 		<ref local="string" />
 	</osgi:service>
@@ -38,6 +37,17 @@
 		<osgi:interfaces>
 			<value>java.lang.Object</value>
 		</osgi:interfaces>
+		<bean class="java.util.HashMap"/>
+	</osgi:service>
+	
+	<!-- service properties -->
+	<osgi:service interface="java.io.Serializable" id="serviceProperties">
+		<osgi:service-properties>
+			<entry key="string" value="bee@bop"/>
+			<entry key="int">
+				<value type="java.lang.Integer">12</value>
+			</entry>
+		</osgi:service-properties>
 		<bean class="java.util.HashMap"/>
 	</osgi:service>
 </beans>

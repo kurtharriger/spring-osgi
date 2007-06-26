@@ -71,5 +71,10 @@ public class ReferenceProxyTest extends AbstractConfigurableBundleCreatorTests {
 		return 15L;
 	}
 	
-	
+
+
+	protected String getPlatformName() {
+		return KNOPFLERFISH_PLATFORM;
+	}
+
 }

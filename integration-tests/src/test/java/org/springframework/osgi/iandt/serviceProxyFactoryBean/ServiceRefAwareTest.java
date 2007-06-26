@@ -224,5 +224,4 @@ public class ServiceRefAwareTest extends ServiceBaseTest {
 
 		return true;
 	}
-
 }

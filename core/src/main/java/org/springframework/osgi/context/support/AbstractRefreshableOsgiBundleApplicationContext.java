@@ -231,10 +231,14 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 */
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		super.postProcessBeanFactory(beanFactory);
+		
 		beanFactory.addBeanPostProcessor(new BundleContextAwareProcessor(this.bundleContext));
 		beanFactory.ignoreDependencyInterface(BundleContextAware.class);
-
-		// FIXME: this should be removed since annotations are not mandatory
+		
+		// register Dictionary PropertyEditor
+		beanFactory.registerCustomEditor(Dictionary.class, new DictionaryEditor());
+		
+		// FIXME: this should be removed since annotations are not mandatory - similar behavior to Spring core
 		// Try and add the annotation processor. This will simply fail if the annotation
 		// bundle is not present (presumably because we are on a pre-Java5 VM).
 		try {

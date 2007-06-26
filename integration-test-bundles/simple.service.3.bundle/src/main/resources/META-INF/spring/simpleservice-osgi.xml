@@ -8,7 +8,7 @@
     <osgi:service id="simpleServiceOsgi" ref="simpleService"
                   interface="org.springframework.osgi.iandt.simpleservice2.MyService2" lazy-init="false" ranking="4">
         <osgi:service-properties>
-            <prop key="service">3</prop>
+            <entry key="service" value="3"/>
         </osgi:service-properties>
     </osgi:service>
 
