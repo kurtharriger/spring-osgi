@@ -344,9 +344,9 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 	private Dictionary mergeServiceProperties(String beanName) {
 		MapBasedDictionary props = new MapBasedDictionary(propertiesResolver.getServiceProperties(beanName));
-		
+
 		if (props != null)
-			props.putAll(props);
+			props.putAll((Map) props);
 
 		// add service properties
 		if (serviceProperties != null)
