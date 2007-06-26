@@ -252,4 +252,21 @@ public class MapBasedDictionary extends Dictionary implements Map {
 		return map.toString();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj) {
+		// this should work nicely since the Dictionary implementations inside the JDK are Maps also
+		return map.equals(obj);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	public int hashCode() {
+		return map.hashCode();
+	}
+
 }
