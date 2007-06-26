@@ -100,6 +100,21 @@ public class MapBasedDictionary extends Dictionary implements Map {
 		this.map = new LinkedHashMap(initialCapacity);
 	}
 
+	/**
+	 * Constructor for dealing with existing Dictionary. Will copy the content
+	 * into the inner Map.
+	 * 
+	 * @param dictionary
+	 */
+	public MapBasedDictionary(Dictionary dictionary) {
+		this(new LinkedHashMap(), dictionary);
+	}
+
+	public MapBasedDictionary(Map map, Dictionary dictionary) {
+		this(map);
+		putAll(dictionary);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.Map#clear()
@@ -175,6 +190,15 @@ public class MapBasedDictionary extends Dictionary implements Map {
 	 */
 	public void putAll(Map t) {
 		map.putAll(t);
+	}
+
+	public void putAll(Dictionary dictionary) {
+		if (dictionary != null)
+			// copy the dictionary
+			for (Enumeration enm = dictionary.keys(); enm.hasMoreElements();) {
+				Object key = enm.nextElement();
+				map.put(key, dictionary.get(key));
+			}
 	}
 
 	/*
