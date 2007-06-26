@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -58,9 +59,9 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 	protected void setUp() throws Exception {
 
 		services.clear();
-		
+
 		registration = new MockServiceRegistration();
-		
+
 		bundleContext = new MockBundleContext() {
 
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
@@ -109,8 +110,8 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		prop.setProperty("white", "horse");
 		assertEquals(prop, exporter.getServiceProperties());
 
-        // Should be wrapped with a TCCL setting proxy
-        assertNotSame(appContext.getBean("string"), getServiceAtIndex(1));
+		// Should be wrapped with a TCCL setting proxy
+		assertNotSame(appContext.getBean("string"), getServiceAtIndex(1));
 	}
 
 	public void testNestedService() throws Exception {
@@ -125,5 +126,13 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		Object bean = appContext.getBean("nestedService");
 		assertTrue(bean instanceof ServiceRegistration);
 		assertSame(registration, bean);
+	}
+
+	public void testServiceProperties() throws Exception {
+		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) appContext.getBean("&serviceProperties");
+		Map properties = exporter.getServiceProperties();
+		assertEquals(2, properties.size());
+		assertTrue(properties.get("string") instanceof String);
+		assertTrue(properties.get("int") instanceof Integer);
 	}
 }

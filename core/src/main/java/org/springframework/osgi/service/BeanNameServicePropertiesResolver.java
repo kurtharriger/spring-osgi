@@ -25,6 +25,7 @@ import org.osgi.framework.Constants;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
+import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -59,7 +60,7 @@ public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesR
 	 *      java.lang.String)
 	 */
 	public Dictionary getServiceProperties(String beanName) {
-		Hashtable p = new Hashtable();
+		Dictionary p = new MapBasedDictionary();
 		p.put(BEAN_NAME_PROPERTY_KEY, beanName);		
 		String name = getSymbolicName();
 		if (StringUtils.hasLength(name)) {

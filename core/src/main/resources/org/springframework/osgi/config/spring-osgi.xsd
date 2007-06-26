@@ -8,15 +8,28 @@
             attributeFormDefault="unqualified">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans"/>
+	<xsd:import namespace="http://www.springframework.org/schema/tool"/>
 
+	<xsd:annotation>
+		<xsd:documentation>
+		Defines the configuration elements for Spring OSGi support.
+		</xsd:documentation>
+	</xsd:annotation>
+	
 	<!-- reference -->
-	<xsd:element name="reference" type="Treference"/>
+	<xsd:element name="reference" type="Treference">
+		<xsd:annotation>
+			<xsd:documentation>
+			Reference to an OSGi service.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 
 	<xsd:complexType name="Treference">
 		<xsd:complexContent>
 			<xsd:extension base="beans:identifiedType">
 				<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-					<xsd:element name="property" type="beans:propertyType" minOccurs="0"/>
+					<xsd:element name="property" type="beans:mapType" minOccurs="0"/>
 					<xsd:element name="listener" type="Tlistener" minOccurs="0"/>
 				</xsd:sequence>
 				<xsd:attribute name="interface" use="required" type="xsd:string"/>
@@ -53,7 +66,7 @@
 			<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
 		</xsd:sequence>
 
-		<!-- shortcut for bean references -->		
+		<!-- shortcut for bean references -->
 		<xsd:attribute name="ref" type="xsd:string" use="optional"/>
 		<xsd:attribute name="bind-method" type="xsd:string" use="optional"/>
 		<xsd:attribute name="unbind-method" type="xsd:string" use="optional"/>
@@ -67,7 +80,7 @@
 			<xsd:extension base="beans:identifiedType">
 				<xsd:sequence minOccurs="0" maxOccurs="1">
 					<xsd:element name="interfaces" type="beans:listOrSetType" minOccurs="0"/>
-					<xsd:element name="service-properties" type="beans:propsType" minOccurs="0"/>
+					<xsd:element name="service-properties" type="beans:mapType" minOccurs="0"/>
 					<!-- nested bean declaration -->
 					<xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="skip"/>
 				</xsd:sequence>
