@@ -17,15 +17,15 @@
  */
 package org.springframework.osgi.service;
 
+import java.util.Map;
 import java.util.Properties;
-import java.util.Dictionary;
+
+import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-
-import junit.framework.TestCase;
 
 /**
  * @author Adrian Colyer
@@ -67,7 +67,7 @@ public class BeanNameServicePropertiesResolverTest extends TestCase {
 		
 		BeanNameServicePropertiesResolver resolver = new BeanNameServicePropertiesResolver();
 		resolver.setBundleContext(mockContext);
-		Dictionary ret = resolver.getServiceProperties("myBean");
+		Map ret = resolver.getServiceProperties("myBean");
 		
 		bundleControl.verify();
 		bundleContextControl.verify();

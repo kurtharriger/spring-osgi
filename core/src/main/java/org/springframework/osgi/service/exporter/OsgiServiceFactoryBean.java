@@ -20,7 +20,6 @@ package org.springframework.osgi.service.exporter;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -344,14 +343,10 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	}
 
 	private Dictionary mergeServiceProperties(String beanName) {
-		Dictionary p = propertiesResolver.getServiceProperties(beanName);
-		MapBasedDictionary props = new MapBasedDictionary();
-
-		// copy properties resolver
-		for (Enumeration e = p.keys(); e.hasMoreElements();) {
-			Object k = e.nextElement();
-			props.put(k, p.get(k));
-		}
+		MapBasedDictionary props = new MapBasedDictionary(propertiesResolver.getServiceProperties(beanName));
+		
+		if (props != null)
+			props.putAll(props);
 
 		// add service properties
 		if (serviceProperties != null)

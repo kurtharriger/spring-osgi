@@ -28,6 +28,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.util.Assert;
 
 /**
@@ -65,7 +66,7 @@ public class OsgiPropertyPlaceholder extends PropertyPlaceholderConfigurer imple
 		cmProperties = new Properties();
 		Dictionary dict = config.getProperties();
 		if (dict == null) {
-		    dict = new Hashtable();
+		    dict = new MapBasedDictionary();
 		}
 
 		// copy dictionary into properties

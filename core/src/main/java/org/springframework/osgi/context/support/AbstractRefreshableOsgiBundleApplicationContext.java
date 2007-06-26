@@ -43,6 +43,7 @@ import org.springframework.osgi.context.OsgiBundleScope;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
+import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
@@ -273,7 +274,7 @@ public abstract class AbstractRefreshableOsgiBundleApplicationContext extends Ab
 	 */
 	protected void publishContextAsOsgiServiceIfNecessary() {
 		if (publishContextAsService) {
-			Dictionary serviceProperties = new Properties();
+			Dictionary serviceProperties = new MapBasedDictionary();
 			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME,
                                   getBundleSymbolicName());
 			if (logger.isInfoEnabled()) {
