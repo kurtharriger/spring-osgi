@@ -28,13 +28,19 @@ import org.springframework.util.Assert;
 /**
  * Dictionary implementation backed by a map instance. While the JDK provides a
  * Dictionary implementation through Hashtable, the class itself is always
- * synchronized.
+ * synchronized and does not maintain the internal order.
  * 
  * <p/> This simple wrapper, accepts any type of Map as backing storage allowing
- * more options in chosing the approapriate implementation.
+ * more options in chosing the approapriate implementation. By default, a
+ * {@link java.util.LinkedHashMap} is used, if no Map is specified.
  * 
+ * <p/> This implementation will enforce the Dictionary behavior over the map
+ * when it comes to handling null values. As opposed to a Map, the Dictionary
+ * always throws {@link NullPointerException} if a given argument is null.
+ * 
+ * @see java.util.Map
+ * @see java.util.Dictionary
  * @author Costin Leau
- * 
  */
 public class MapBasedDictionary extends Dictionary implements Map {
 
@@ -131,6 +137,8 @@ public class MapBasedDictionary extends Dictionary implements Map {
 	 * @see java.util.Map#get(java.lang.Object)
 	 */
 	public Object get(Object key) {
+		if (key == null)
+			throw new NullPointerException();
 		return map.get(key);
 	}
 
@@ -155,6 +163,9 @@ public class MapBasedDictionary extends Dictionary implements Map {
 	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
 	 */
 	public Object put(Object key, Object value) {
+		if (key == null || value == null)
+			throw new NullPointerException();
+
 		return map.put(key, value);
 	}
 
@@ -171,6 +182,9 @@ public class MapBasedDictionary extends Dictionary implements Map {
 	 * @see java.util.Map#remove(java.lang.Object)
 	 */
 	public Object remove(Object key) {
+		if (key == null)
+			throw new NullPointerException();
+
 		return map.remove(key);
 	}
 
@@ -206,12 +220,12 @@ public class MapBasedDictionary extends Dictionary implements Map {
 		return new IteratorBasedEnumeration(map.keySet());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
 		return map.toString();
 	}
-	
-	
+
 }
