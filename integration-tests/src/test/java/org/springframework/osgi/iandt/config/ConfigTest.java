@@ -13,7 +13,6 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 import java.io.File;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.UUID;
 
 
 /**
