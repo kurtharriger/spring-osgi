@@ -20,6 +20,7 @@ import java.util.Hashtable;
  *         Date: Jun 14, 2007
  *         Time: 7:16:43 PM
  */
+
 public class ConfigTest extends AbstractConfigurableBundleCreatorTests {
     private ConfigurationAdmin admin;
 
