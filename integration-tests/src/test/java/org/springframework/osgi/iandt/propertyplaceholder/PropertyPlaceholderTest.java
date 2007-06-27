@@ -44,14 +44,6 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 
     private static String CONFIG_DIR = "test-config";
 
-	static {
-		DICT.put("foo", "bar");
-		DICT.put("white", "horse");
-        // Set up the bundle storage dirctory
-        System.setProperty("com.gatespace.bundle.cm.store", CONFIG_DIR);
-        initializeDirectory(CONFIG_DIR);
-	}
-
     protected static void initializeDirectory(String dir) {
         File directory = new File(dir);
         remove(directory);
@@ -88,6 +80,11 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 	}
 
 	protected void onSetUp() throws Exception {
+		DICT.put("foo", "bar");
+		DICT.put("white", "horse");
+        // Set up the bundle storage dirctory
+        System.setProperty("com.gatespace.bundle.cm.store", CONFIG_DIR);
+        initializeDirectory(CONFIG_DIR);
 		prepareConfiguration();
 
         String[] locations = new String[]{"org/springframework/osgi/iandt/propertyplaceholder/placeholder.xml"};

@@ -7,10 +7,14 @@
 
     <osgi:config persistent-id="test.service.pid">
         <osgi:config-listener ref="service" update-method="updateService"/>
+        <osgi:config-listener ref="service" update-method="updateServiceMap"/>
     </osgi:config>
+    
     <osgi:config persistent-id="test.service.factory.pid" factory="true">
         <osgi:config-listener ref="factory" update-method="updateFactory"/>
+        <osgi:config-listener ref="factory" update-method="updateFactoryMap"/>
     </osgi:config>
+
     <bean id="service"
           class="org.springframework.osgi.iandt.configuration.ManagedServiceListener"
           lazy-init="false"/>

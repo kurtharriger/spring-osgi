@@ -15,14 +15,12 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.config.OsgiConfigDefinitionParser;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Hashtable;
-import java.util.Dictionary;
+import java.util.*;
 
 /**
  * @author Hal Hildebrand
@@ -158,32 +156,44 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
             bean = beanFactory.getBean(reference);
 			if (isFactory) {
 				try {
-					bean.getClass().getMethod(updateMethod, new Class[]{String.class, Dictionary.class});
+					bean.getClass().getMethod(updateMethod, new Class[]{String.class, Map.class});
 				}
 				catch (NoSuchMethodException e) {
-					IllegalArgumentException illArgEx = 
-					   new IllegalArgumentException("Invalid or missing update method for bean " +
-                                                    reference +
-                                                    "; requires signature " +
-                                                    updateMethod +
-                                                    "(java.lang.String, java.util.Dictionary)");
-					illArgEx.initCause(e);
-					throw illArgEx;
+                    try {
+                        bean.getClass().getMethod(updateMethod, new Class[]{String.class, Dictionary.class});
+                    } catch (NoSuchMethodException e1) {
+                        IllegalArgumentException illArgEx =
+                                new IllegalArgumentException("Invalid or missing update method for bean " +
+                                                             reference +
+                                                             "; requires signature " +
+                                                             updateMethod +
+                                                             "(java.util.Dictionary) or " +
+                                                             updateMethod +
+                                                             "(java.util.Map)");
+                        illArgEx.initCause(e);
+                        throw illArgEx;
+                    }
 				}
 			}
 			else {
 				try {
-					bean.getClass().getMethod(updateMethod, new Class[]{Dictionary.class});
+					bean.getClass().getMethod(updateMethod, new Class[]{Map.class});
 				}
 				catch (NoSuchMethodException e) {
-					IllegalArgumentException illArgEx = 
-					  new IllegalArgumentException("Invalid or missing update method for bean " +
-                                                   reference +
-                                                   "; requires signature " +
-                                                    updateMethod +
-                                                    "(java.util.Dictionary)");
-					illArgEx.initCause(e);
-					throw illArgEx;
+                    try {
+                        bean.getClass().getMethod(updateMethod, new Class[]{Dictionary.class});
+                    } catch (NoSuchMethodException e1) {
+                        IllegalArgumentException illArgEx =
+                                new IllegalArgumentException("Invalid or missing update method for bean " +
+                                                             reference +
+                                                             "; requires signature " +
+                                                             updateMethod +
+                                                             "(java.util.Dictionary) or " +
+                                                             updateMethod +
+                                                             "(java.util.Map)");
+                        illArgEx.initCause(e);
+                        throw illArgEx;
+                    }
 				}
 			}
 			if (deletedMethod != null) {
@@ -206,21 +216,28 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 
 		void updated(String instancePid, Dictionary properties) throws ConfigurationException {
 			Method update;
+            MapBasedDictionary props = new MapBasedDictionary(properties);
             try {
-				update = bean.getClass().getMethod(updateMethod, new Class[]{String.class, Dictionary.class});
+				update = bean.getClass().getMethod(updateMethod, new Class[]{String.class, Map.class});
 			}
 			catch (NoSuchMethodException e) {
-				throw new ConfigurationException(instancePid,
-					                             "Invalid or missing update method for bean " +
-                                                 reference +
-                                                 "; requires signature " +
-                                                 updateMethod +
-                                                 "(java.util.String, java.util.Dictionary)",
-					                             e);
+                try {
+                    update = bean.getClass().getMethod(updateMethod, new Class[]{String.class, Dictionary.class});
+                } catch (NoSuchMethodException e1) {
+                    throw new ConfigurationException(instancePid,
+                                                     "Invalid or missing update method for bean " +
+                                                     reference +
+                                                     "; requires signature " +
+                                                     updateMethod +
+                                                     "(java.util.String, java.util.Dictionary) or " +
+                                                     updateMethod +
+                                                     "(java.util.Map)",
+                                                     e);
+                }
 			}
 
 			try {
-				update.invoke(bean, new Object[]{instancePid, properties});
+				update.invoke(bean, new Object[]{instancePid, props});
 			}
 			catch (IllegalAccessException e) {
 				throw new ConfigurationException(instancePid, "Insufficient permission to invoke update method", e);
@@ -233,21 +250,28 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 
 		void updated(Dictionary properties, String servicePid) throws ConfigurationException {
 			Method update;
-			try {
-				update = bean.getClass().getMethod(updateMethod, new Class[]{Dictionary.class});
+            MapBasedDictionary props = new MapBasedDictionary(properties);
+            try {
+				update = bean.getClass().getMethod(updateMethod, new Class[]{Map.class});
 			}
 			catch (NoSuchMethodException e) {
-				throw new ConfigurationException(servicePid,
-                                                 "Invalid or missing update method for bean " +
-                                                 reference +
-                                                 "; requires signature " +
-                                                 updateMethod +
-                                                 "(java.util.Dictionary)",
-                                                 e);
-			}
+                try {
+                    update = bean.getClass().getMethod(updateMethod, new Class[]{Dictionary.class});
+                } catch (NoSuchMethodException e1) { 
+                    throw new ConfigurationException(servicePid,
+                                                     "Invalid or missing update method for bean " +
+                                                     reference +
+                                                     "; requires signature " +
+                                                     updateMethod +
+                                                     "(java.util.Dictionary) or " +
+                                                     updateMethod +
+                                                     "(java.util.Map)",
+                                                     e);
+                }
+            }
 
 			try {
-				update.invoke(bean, new Object[]{properties});
+				update.invoke(bean, new Object[]{props});
 			}
 			catch (IllegalAccessException e) {
 				throw new ConfigurationException(servicePid, "Insufficient permission to invoke update method", e);
