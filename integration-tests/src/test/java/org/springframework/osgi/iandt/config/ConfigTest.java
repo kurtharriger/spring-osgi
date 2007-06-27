@@ -13,6 +13,7 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 import java.io.File;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.UUID;
 
 
 /**
@@ -28,14 +29,9 @@ public class ConfigTest extends AbstractConfigurableBundleCreatorTests {
     private static String CONFIG_DIR = "test-config";
 
 
-    static {
-        // Set up the bundle storage dirctory
+    protected String[] getBundles() {
         System.setProperty("com.gatespace.bundle.cm.store", CONFIG_DIR);
         initializeDirectory(CONFIG_DIR);
-    }
-
-
-    protected String[] getBundles() {
         return new String[]{
                 localMavenArtifact("org.knopflerfish.bundles", "log_all",
                                    "2.0.0"),
@@ -100,8 +96,11 @@ public class ConfigTest extends AbstractConfigurableBundleCreatorTests {
         Configuration config = admin.getConfiguration(ManagedServiceListener.SERVICE_FACTORY_PID, location);
         config.update(test);
         Thread.sleep(10);
-        assertEquals(1, ManagedServiceListener.updates.size());
+
+        assertEquals(2, ManagedServiceListener.updates.size());
         Dictionary props = (Dictionary) ManagedServiceListener.updates.get(0);
+        assertEquals("bar", props.get("foo"));
+        props = (Dictionary) ManagedServiceListener.updates.get(1);
         assertEquals("bar", props.get("foo"));
     }
 
@@ -116,10 +115,16 @@ public class ConfigTest extends AbstractConfigurableBundleCreatorTests {
                                                                 location);
         config.update(test);
         Thread.sleep(10);
-        assertEquals(1, ManagedServiceFactoryListener.updates.size());
+        Thread.sleep(10);
+        assertEquals(2, ManagedServiceFactoryListener.updates.size());
         Object[] update = (Object[]) ManagedServiceFactoryListener.updates.get(0);
         assertNotNull("instance Pid exists", update[0]);
         Dictionary props = (Dictionary) update[1];
+        assertEquals("bar", props.get("foo"));
+
+        update = (Object[]) ManagedServiceFactoryListener.updates.get(1);
+        assertNotNull("instance Pid exists", update[0]);
+        props = (Dictionary) update[1];
         assertEquals("bar", props.get("foo"));
     }
 }
