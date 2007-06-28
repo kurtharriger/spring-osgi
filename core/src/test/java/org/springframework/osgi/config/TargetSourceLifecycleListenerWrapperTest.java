@@ -20,10 +20,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.util.MapBasedDictionary;
 
 /**
  * 
@@ -38,11 +40,11 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 
 		public static int UNBIND_CALLS = 0;
 
-		public void bind(Object service, Dictionary properties) throws Exception {
+		public void bind(Object service, Map properties) throws Exception {
 			BIND_CALLS++;
 		}
 
-		public void unbind(Object service, Dictionary properties) throws Exception {
+		public void unbind(Object service, Map properties) throws Exception {
 			UNBIND_CALLS++;
 		}
 	}
@@ -56,13 +58,13 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 
 		public static List UNBIND_SERVICES = new ArrayList();
 
-		public void myBind(Object service, Dictionary properties) {
+		public void myBind(Object service, Map properties) {
 			BIND_CALLS++;
 			BIND_SERVICES.add(service);
 
 		}
 
-		public void myUnbind(Object service, Dictionary properties) {
+		public void myUnbind(Object service, Map properties) {
 			UNBIND_CALLS++;
 			UNBIND_SERVICES.add(service);
 
@@ -79,30 +81,30 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 
 	protected static class CustomAndListener extends JustListener {
 
-		public Integer aBind(Object service, Dictionary props) throws Exception {
+		public Integer aBind(Object service, Map props) throws Exception {
 			super.bind(service, props);
 			return null;
 		}
 
-		public void aUnbind(Object service, Dictionary props) throws Exception {
+		public void aUnbind(Object service, Map props) throws Exception {
 			super.unbind(service, props);
 		}
 	}
 
 	protected static class OverloadedCustomMethods extends CustomListener {
 
-		public void myBind(Date service, Dictionary properties) {
+		public void myBind(Date service, Map properties) {
 			super.myBind(service, properties);
 		}
 
-		public void myUnbind(String service, Dictionary properties) {
+		public void myUnbind(String service, Map properties) {
 			super.myUnbind(service, properties);
 		}
 	}
 
 	protected static class ExceptionListener extends CustomAndListener {
 
-		public void bind(Object service, Dictionary properties) throws Exception {
+		public void bind(Object service, Map properties) throws Exception {
 			throw new Exception("expected!") {
 				public synchronized Throwable fillInStackTrace() {
 					return null;
@@ -110,7 +112,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 			};
 		}
 
-		public void unbind(Object service, Dictionary properties) throws Exception {
+		public void unbind(Object service, Map properties) throws Exception {
 			throw new Exception("expected!") {
 				public synchronized Throwable fillInStackTrace() {
 					return null;
@@ -120,7 +122,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	protected static class ExceptionCustomListener extends CustomListener {
-		public void myBind(Date service, Dictionary properties) {
+		public void myBind(Date service, Map properties) {
 			throw (RuntimeException) new RuntimeException("expected!") {
 				public synchronized Throwable fillInStackTrace() {
 					return null;
@@ -128,13 +130,40 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 			};
 		}
 
-		public void myUnbind(String service, Dictionary properties) throws IOException {
+		public void myUnbind(String service, Map properties) throws IOException {
 			throw new IOException("expected!") {
 				public synchronized Throwable fillInStackTrace() {
 					return null;
 				}
 			};
 		}
+	}
+
+	// piggy backs on JustListener static fields
+	protected static class DictionaryAndMapCustomListener {
+		public void bind(Object service, Dictionary properties) {
+			JustListener.BIND_CALLS++;
+		}
+
+		public void unbind(Object service, Map props) {
+			JustListener.UNBIND_CALLS++;
+		}
+
+		public void unbind(Object service, Dictionary props) throws Exception {
+			JustListener.UNBIND_CALLS++;
+		}
+	}
+
+	protected static class OverridingMethodListener extends CustomListener {
+
+		public void myBind(Object service, Map properties) {
+			BIND_CALLS++;
+		}
+
+		public void myUnbind(Object service, Map properties) {
+			UNBIND_CALLS++;
+		}
+
 	}
 
 	private TargetSourceLifecycleListenerWrapper listener;
@@ -375,7 +404,43 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 		assertEquals(4, JustListener.BIND_CALLS);
 	}
 
-	public void testListenerWithOverloadedTypesAndMultipleParameters() throws Exception {
+	public void testListenerWithOverloadedTypesAndMultipleParameterTypes() throws Exception {
+		listener = new TargetSourceLifecycleListenerWrapper(new DictionaryAndMapCustomListener());
+		listener.setBindMethod("bind");
+		listener.setUnbindMethod("unbind");
+		listener.afterPropertiesSet();
+
+		Object service = new Date();
+		MapBasedDictionary props = new MapBasedDictionary();
+
+		assertEquals(0, JustListener.BIND_CALLS);
+		assertEquals(0, JustListener.UNBIND_CALLS);
+		listener.bind(service, props);
+
+		assertEquals(1, JustListener.BIND_CALLS);
+		assertEquals(0, JustListener.UNBIND_CALLS);
+
+		listener.unbind(service, props);
+		assertEquals(1, JustListener.BIND_CALLS);
+		assertEquals("only one unbind method should be called", 1, JustListener.UNBIND_CALLS);
+	}
+
+	public void testOverridingMethodsDiscovery() throws Exception {
+		listener = new TargetSourceLifecycleListenerWrapper(new OverridingMethodListener());
+		listener.setBindMethod("myBind");
+		listener.setUnbindMethod("myUnbind");
+		listener.afterPropertiesSet();
+
+		assertEquals(0, CustomListener.BIND_CALLS);
+		assertEquals(0, CustomListener.UNBIND_CALLS);
+
+		listener.bind(new Object(), null);
+		assertEquals(1, CustomListener.BIND_CALLS);
+		assertEquals(0, CustomListener.UNBIND_CALLS);
+
+		listener.unbind(new Object(), null);
+		assertEquals(1, CustomListener.BIND_CALLS);
+		assertEquals(1, CustomListener.UNBIND_CALLS);
 
 	}
 }
