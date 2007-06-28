@@ -41,7 +41,7 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 
 	/**
 	 * Map of methods keyed by the first parameter which indicates the service
-	 * type expected
+	 * type expected.
 	 */
 	private Map bindMethods, unbindMethods;
 
@@ -73,7 +73,8 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 
 		if (!isLifecycleListener && (bindMethods == null || unbindMethods == null))
 			throw new IllegalArgumentException("target object needs to implement "
-					+ TargetSourceLifecycleListener.class + " or custom bind/unbind methods have to be specified");
+					+ TargetSourceLifecycleListener.class.getName()
+					+ " or custom bind/unbind methods have to be specified");
 	}
 
 	/**
@@ -96,12 +97,22 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 				if (methodName.equals(method.getName())) {
 					// take a look at the variables
 					Class[] args = method.getParameterTypes();
+
+					// Properties can be passed as Map or Dictionary
 					if (args != null && args.length == 2) {
-						if (Dictionary.class.isAssignableFrom(args[1])) {
+						if (Dictionary.class.isAssignableFrom(args[1]) || Map.class.isAssignableFrom(args[1])) {
 							if (log.isDebugEnabled())
 								log.debug("discovered custom method [" + method.toString() + "] on "
 										+ target.getClass());
-							methods.put(args[0], method);
+							Method m = (Method) methods.get(args[0]);
+
+							if (m != null) {
+								if (log.isDebugEnabled())
+									log.debug("type " + args[0] + " already has an associated method [" + m.toString()
+											+ "];ignoring " + method);
+							}
+							else
+								methods.put(args[0], method);
 						}
 					}
 				}
@@ -124,7 +135,8 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 	 * @param service
 	 * @param properties
 	 */
-	protected void invokeCustomMethods(Object target, Map methods, Object service, Dictionary properties) {
+	// properties should be a Dictionary implementing a Map interface
+	protected void invokeCustomMethods(Object target, Map methods, Object service, Map properties) {
 		if (methods != null && !methods.isEmpty()) {
 			Object[] args = new Object[] { service, properties };
 			for (Iterator iter = methods.entrySet().iterator(); iter.hasNext();) {
@@ -135,7 +147,8 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 					try {
 						ReflectionUtils.invokeMethod((Method) entry.getValue(), target, args);
 					}
-					// make sure to log exceptions and continue with the rest of
+					// make sure to log exceptions and continue with the
+					// rest of
 					// the listeners
 					catch (Exception ex) {
 						log.warn("custom method [" + entry.getValue() + "] threw exception when passing service ["
@@ -146,7 +159,7 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 		}
 	}
 
-	public void bind(Object service, Dictionary properties) throws Exception {
+	public void bind(Object service, Map properties) throws Exception {
 		// first call interface method (if it exists)
 		if (isLifecycleListener) {
 			try {
@@ -160,7 +173,7 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 		invokeCustomMethods(target, bindMethods, service, properties);
 	}
 
-	public void unbind(Object service, Dictionary properties) throws Exception {
+	public void unbind(Object service, Map properties) throws Exception {
 		// first call interface method (if it exists)
 		if (isLifecycleListener) {
 			try {

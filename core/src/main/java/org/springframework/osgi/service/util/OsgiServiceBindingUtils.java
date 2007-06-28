@@ -16,6 +16,7 @@
 package org.springframework.osgi.service.util;
 
 import java.util.Dictionary;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,12 +40,15 @@ public abstract class OsgiServiceBindingUtils {
 		if (!ObjectUtils.isEmpty(listeners)) {
 			boolean debug = log.isDebugEnabled();
 			Object service = OsgiServiceUtils.getService(context, reference);
+			// TODO: is snapshot enough or should we use the dynamic lookup?
+
+			// get a Dictionary implementing a Map
 			Dictionary properties = OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
 			for (int i = 0; i < listeners.length; i++) {
 				if (debug)
 					log.debug("calling bind on " + listeners[i] + " w/ reference " + reference);
 				try {
-					listeners[i].bind(service, properties);
+					listeners[i].bind(service, (Map) properties);
 				}
 				catch (Exception ex) {
 					log.warn("bind method on listener " + listeners[i] + " threw exception ", ex);
@@ -58,12 +62,13 @@ public abstract class OsgiServiceBindingUtils {
 		if (!ObjectUtils.isEmpty(listeners)) {
 			boolean debug = log.isDebugEnabled();
 			Object service = OsgiServiceUtils.getService(context, reference);
+			// get a Dictionary implementing a Map
 			Dictionary properties = OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
 			for (int i = 0; i < listeners.length; i++) {
 				if (debug)
 					log.debug("calling unbind on " + listeners[i] + " w/ reference " + reference);
 				try {
-					listeners[i].unbind(service, properties);
+					listeners[i].unbind(service, (Map) properties);
 				}
 				catch (Exception ex) {
 					log.warn("unbind method on listener " + listeners[i] + " threw exception ", ex);

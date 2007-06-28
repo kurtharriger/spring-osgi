@@ -15,7 +15,7 @@
  */
 package org.springframework.osgi.service;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 /**
  * Listener tracking binding and unbinding of OSGi services used as normal
@@ -28,19 +28,23 @@ public interface TargetSourceLifecycleListener {
 
 	/**
 	 * Called when a service is being binded inside the proxy (be it single or
-	 * multi value).
+	 * multi value). The service properties are made available as a Map which
+	 * can be safely cast to a Dictionary if needed.
 	 * 
 	 * @param service the OSGi service instance
 	 * @param properties the service properties
+	 * @throws Exception exceptions are logged but not propagated to other listeners
 	 */
-	public void bind(Object service, Dictionary properties) throws Exception;
+	public void bind(Object service, Map properties) throws Exception;
 
 	/**
 	 * Called when a service is being unbinded inside the proxy (be it single or
-	 * multi value).
+	 * multi value). The service properties are made available as a Map which can
+	 * be safely cast to a Dictionary if needed.
 	 * 
 	 * @param service the OSGi service instance
 	 * @param properties the service properties
+	 * @throws Exception exceptions are logged but not propagated to other listeners
 	 */
-	public void unbind(Object service, Dictionary properties) throws Exception;
+	public void unbind(Object service, Map properties) throws Exception;
 }

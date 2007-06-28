@@ -169,7 +169,7 @@ public abstract class OsgiServiceReferenceUtils {
 		Assert.notNull(reference);
 		String[] keys = reference.getPropertyKeys();
 
-		Map map = new LinkedHashMap();
+		Map map = new LinkedHashMap(keys.length);
 
 		for (int i = 0; i < keys.length; i++) {
 			map.put(keys[i], reference.getProperty(keys[i]));
