@@ -111,7 +111,7 @@ public class JarCreator {
 
 		Resource[][] resources = resolveResources();
 
-		// removed duplicates
+		// remove duplicates
 		Map entries = new TreeMap();
 
 		// empty stream used for folders
@@ -126,6 +126,8 @@ public class JarCreator {
 				String token = relativeName;
 				// get folder and walk up to the root
 				if (addFolders) {
+					// add META-INF
+					entries.put("/META-INF/", folderResource);
 					int slashIndex;
 					// stop at root folder
 					while ((slashIndex = token.lastIndexOf('/')) > 1) {
@@ -135,7 +137,7 @@ public class JarCreator {
 						token = token.substring(0, slashIndex);
 					}
 					// add root folder
-					entries.put("/", folderResource);
+					//entries.put("/", folderResource);
 				}
 			}
 		}

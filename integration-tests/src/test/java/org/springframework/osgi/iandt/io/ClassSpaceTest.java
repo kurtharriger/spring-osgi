@@ -16,6 +16,7 @@
 package org.springframework.osgi.iandt.io;
 
 import org.springframework.core.io.Resource;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Classpath tests.
@@ -26,9 +27,29 @@ import org.springframework.core.io.Resource;
 public class ClassSpaceTest extends BaseIoTest {
 
 	public void testFolder() throws Exception {
-		Resource res[] = patternLoader.getResources("classpath:/META-INF/");
-		// not sure who's right, KF or Equinox.
+		Resource res[] = patternLoader.getResources("classpath:/org/springframework/osgi");
+		// EQ returns the fragments paths also
 		assertTrue(res.length >= 1);
+	}
+
+	// META-INF seems to be a special case, since the manifest is added
+	// automatically by the jar stream
+	// but it's the JarCreator which creates the META-INF folder
+	public void testMetaInfFolder() throws Exception {
+		Resource res[] = patternLoader.getResources("classpath:/META-INF");
+		// Equinox returns more entries (bootpath delegation)
+		assertTrue(res.length >= 1);
+	}
+
+	public void testWildcardAtFolderLevel() throws Exception {
+		try {
+			Resource res[] = patternLoader.getResources("classpath:/META-INF/*");
+			fail("should have thrown exception; pattern matching is not supported for class space lookups");
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		}
+
 	}
 
 	public void testClass() throws Exception {
@@ -51,7 +72,6 @@ public class ClassSpaceTest extends BaseIoTest {
 	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
 	 */
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (isFelix && testMethodName.equals("testFolder"));
+		return isKF() && ("testFolder".equals(testMethodName) || "testMetaInfFolder".equals(testMethodName));
 	}
-
 }

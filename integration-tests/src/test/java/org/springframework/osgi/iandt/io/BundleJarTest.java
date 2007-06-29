@@ -58,8 +58,9 @@ public class BundleJarTest extends BaseIoTest {
 	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
 	 */
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return isKF
+		return isKF()
 				&& ("testResourceWithWildcardAtFolderLevelFromFragmentsIgnored".equals(testMethodName) || "testResourceFromJarOnlyWithFolderLevelWildcard".equals(testMethodName));
+
 	}
 
 }

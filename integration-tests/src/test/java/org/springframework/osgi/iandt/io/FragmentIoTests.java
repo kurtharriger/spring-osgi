@@ -31,28 +31,28 @@ public class FragmentIoTests extends BaseIoTest {
 	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
 	 */
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (!isEquinox);
+		return (!isEquinox());
 	}
 
 	public void testFileWithTheSameNameInOwningBundleAndAttachedFragment() throws Exception {
 		Resource[] fragmentResource = patternLoader.getResources("bundle:/" + PACKAGE + "duplicate.file");
-		assertTrue("file with the same name avaiable in bundles are ignored", fragmentResource.length > 1);
+		assertTrue("file with the same name available in bundles are ignored", fragmentResource.length > 1);
 	}
 
 	public void testFileWithTheSameNameInOwningBundleAndAttachedFragmentWithMatchingAtFileLevel() throws Exception {
 		Resource[] fragmentResource = patternLoader.getResources("bundle:/" + PACKAGE + "dupli*.file");
-		assertTrue("file with the same name avaiable in bundles are ignored", fragmentResource.length > 1);
+		assertTrue("file with the same name available in bundles are ignored", fragmentResource.length > 1);
 	}
 
 	public void testFileWithTheSameNameInOwningBundleAndAttachedFragmentWithMatchingAtFileLevelOn1Char()
 			throws Exception {
 		Resource[] fragmentResource = patternLoader.getResources("bundle:/" + PACKAGE + "duplic?te.file");
-		assertTrue("file with the same name avaiable in bundles are ignored", fragmentResource.length > 1);
+		assertTrue("file with the same name available in bundles are ignored", fragmentResource.length > 1);
 	}
 
 	public void testFileWithTheSameNameInOwningBundleAndAttachedFragmentWithMatchingAtFolderLevel() throws Exception {
 		Resource[] fragmentResource = patternLoader.getResources("bundle:/org/springframework/**/*.file");
-		assertTrue("file with the same name avaiable in bundles are ignored", fragmentResource.length > 1);
+		assertTrue("file with the same name available in bundles are ignored", fragmentResource.length > 1);
 	}
 
 	public void testFileLevelWildCardMatchingIncludingFragmentResources() throws Exception {
@@ -82,25 +82,25 @@ public class FragmentIoTests extends BaseIoTest {
 	public void testFileWithTheSameNameOnlyInAttachedFragmentsOnly() throws Exception {
 		Resource[] fragmentResource = patternLoader.getResources("bundle:/" + PACKAGE + "fragment-duplicate.file");
 		// should find at least 2
-		assertTrue("files with the same name avaiable in attached fragments are ignored", fragmentResource.length > 1);
+		assertTrue("files with the same name available in attached fragments are ignored", fragmentResource.length > 1);
 	}
 
 	public void testFileWithTheSameNameOnlyInAttachedFragmentsOnlyWithMatchingAtFileLevel() throws Exception {
 		Resource[] fragmentResource = patternLoader.getResources("bundle:/" + PACKAGE + "fragment-dupli*.file");
 		// should find at least 2
-		assertTrue("files with the same name avaiable in attached fragments are ignored", fragmentResource.length > 1);
+		assertTrue("files with the same name available in attached fragments are ignored", fragmentResource.length > 1);
 	}
 
 	public void testFileWithTheSameNameOnlyInAttachedFragmentsOnlyWithMatchingAtFileLevelOnOneChar() throws Exception {
 		Resource[] fragmentResource = patternLoader.getResources("bundle:/" + PACKAGE + "fragment-duplic?t?.file");
 		// should find at least 2
-		assertTrue("files with the same name avaiable in attached fragments are ignored", fragmentResource.length > 1);
+		assertTrue("files with the same name available in attached fragments are ignored", fragmentResource.length > 1);
 	}
 
 	public void testFileWithTheSameNameOnlyInAttachedFragmentsOnlyWithMatchingAtFolderLevel() throws Exception {
 		Resource[] fragmentResource = patternLoader.getResources("bundle:/org/springframework/**/fragment-duplicate.file");
 		// should find at least 2
-		assertTrue("files with the same name avaiable in attached fragments are ignored", fragmentResource.length > 1);
+		assertTrue("files with the same name available in attached fragments are ignored", fragmentResource.length > 1);
 	}
 
 	public void testGetRootInBundleAndFragments() throws Exception {
@@ -166,4 +166,5 @@ public class FragmentIoTests extends BaseIoTest {
 		Resource[] res = patternLoader.getResources("classpath:/" + PACKAGE + "FragmentIoTests.class");
 		assertEquals(1, res.length);
 	}
+
 }
