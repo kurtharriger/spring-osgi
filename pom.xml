@@ -188,10 +188,12 @@ limitations under the License.
 
   <!-- modules for Spring-OSGi -->
   <modules> 
-    <!--module>spring-modules</module-->
+  <!--
+    <module>spring-modules</module>
+    -->
     <module>mock-framework-util</module>
     <module>mock</module>    
-    <module>io</module>    
+	<module>io</module>    
     <module>core</module>
     <module>extender</module>
     <module>test-support</module>
@@ -336,7 +338,7 @@ limitations under the License.
         </configuration>
       </plugin>
       
-      <!-- invoke submodule -->
+      <!-- invoke submodule 
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
         <version>1.0</version>
@@ -362,6 +364,7 @@ limitations under the License.
            </execution>
         </executions>
       </plugin>
+      -->
     </plugins>
   </build>
 
@@ -565,7 +568,7 @@ limitations under the License.
     <repository>    
       <id>apache.m2.incubator</id>
       <name>Apache M2 Incubator Repository</name>
-      <url>http://people.apache.org/repo/m2-incubating-repository/</url>
+      <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
     </repository>  
     <repository>
             <id>eclipse-repository</id>

@@ -16,7 +16,6 @@
 package org.springframework.osgi.iandt.io;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -51,6 +50,7 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 		Bundle bundle = getBundleContext().getBundle();
 		loader = new OsgiBundleResourceLoader(bundle);
 		patternLoader = new OsgiBundleResourcePatternResolver(loader);
+
 	}
 
 	protected void onTearDown() throws Exception {
@@ -77,18 +77,16 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 						+ getSpringOsgiVersion() };
 	}
 
-	protected static boolean isEquinox, isFelix, isKF;
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests#postProcessBundleContext(org.osgi.framework.BundleContext)
-	 */
-	protected void postProcessBundleContext(BundleContext context) throws Exception {
-		super.postProcessBundleContext(context);
-		Object platform = createPlatform();
-		isEquinox = (platform instanceof EquinoxPlatform);
-		isFelix = (platform instanceof FelixPlatform);
-		isKF = (platform instanceof KnopflerfishPlatform);
-
+	protected boolean isKF() {
+		return (createPlatform() instanceof KnopflerfishPlatform);
 	}
+
+	protected boolean isEquinox() {
+		return (createPlatform() instanceof EquinoxPlatform);
+	}
+
+	protected boolean isFelix() {
+		return (createPlatform() instanceof FelixPlatform);
+	}
+
 }
