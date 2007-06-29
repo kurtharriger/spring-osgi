@@ -114,11 +114,6 @@ public class RawIoTest extends BaseIoTest {
 		}
 		return count;
 	}
-
-	protected String getPlatformName() {
-		return FELIX_PLATFORM;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
