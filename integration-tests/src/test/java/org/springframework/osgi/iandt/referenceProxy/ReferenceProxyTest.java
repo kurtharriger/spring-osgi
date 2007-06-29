@@ -70,11 +70,4 @@ public class ReferenceProxyTest extends AbstractConfigurableBundleCreatorTests {
 	protected long getDefaultWaitTime() {
 		return 15L;
 	}
-	
-
-
-	protected String getPlatformName() {
-		return KNOPFLERFISH_PLATFORM;
-	}
-
 }

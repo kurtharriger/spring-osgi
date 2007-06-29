@@ -92,13 +92,13 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 				platform = new KnopflerfishPlatform();
 			}
 		}
-		
+
 		if (platform == null)
 			platform = new EquinoxPlatform();
 
 		// add boot delegation
 		platform.getConfigurationProperties().setProperty(ORG_OSGI_FRAMEWORK_BOOTDELEGATION,
-				getBootDelegationPackageString());
+			getBootDelegationPackageString());
 
 		return platform;
 	}
@@ -111,7 +111,9 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	 */
 	protected String getPlatformName() {
 		String systemProperty = System.getProperty(OSGI_FRAMEWORK_SELECTOR);
-
+		if (logger.isTraceEnabled())
+			logger.trace("system property [" + OSGI_FRAMEWORK_SELECTOR + "] has value=" + systemProperty);
+		
 		return (systemProperty == null ? EQUINOX_PLATFORM : systemProperty);
 	}
 
@@ -145,7 +147,8 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 		defaults.add("sun.*");
 		defaults.add("org.xml.*");
 		defaults.add("com.sun.*");
-		// FIXME: the JAXP package (for 1.4 VMs) should be discovered in an OSGi manner
+		// FIXME: the JAXP package (for 1.4 VMs) should be discovered in an OSGi
+		// manner
 		defaults.add("org.apache.xerces.jaxp.*");
 		return defaults;
 	}
