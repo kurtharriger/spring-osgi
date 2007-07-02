@@ -334,7 +334,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 						if (modifier.startsWith("version")) {
                             String vstr = modifier.substring(modifier.indexOf("=") + 1).trim();
                             if (vstr.startsWith("\"")) vstr = vstr.substring(1);
-                            if (vstr.endsWith("\"")) vstr = vstr.substring(0, vstr.length() - 2);
+                            if (vstr.endsWith("\"")) vstr = vstr.substring(0, vstr.length() - 1);
                             version = Version.parseVersion(vstr);
 						}
 					}

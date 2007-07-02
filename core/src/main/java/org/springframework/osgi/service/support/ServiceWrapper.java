@@ -105,6 +105,9 @@ public class ServiceWrapper {
 	}
 
 	public void cleanup() {
-		this.context = null;
+//        if (isServiceAlive()) {
+//           context.ungetService(reference);
+//      }
+        this.context = null;
 	}
 }
