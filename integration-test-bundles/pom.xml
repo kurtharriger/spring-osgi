@@ -39,6 +39,7 @@
   <modules>
     <module>simple.service.bundle</module>
     <module>simple.service.bundle.identical</module>
+    <module>simple.service.bundle.2.identical</module>
     <module>simple.service.2.bundle</module>
     <module>simple.service.3.bundle</module>
     <module>trivial.bundle</module>

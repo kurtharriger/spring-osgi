@@ -30,7 +30,6 @@ import org.osgi.framework.Bundle;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.UrlResource;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -278,7 +277,19 @@ public class OsgiBundleResource extends AbstractResource {
 		return StringUtils.getFilename(this.path);
 	}
 
-	/**
+    public File getFile() throws IOException {
+        if (searchType != OsgiResourceUtils.PREFIX_UNKNOWN) {
+            return super.getFile();
+        }
+        try {
+            URL url = new URL(path);
+            return new File(url.getPath());
+        } catch (MalformedURLException mue) {
+            throw new FileNotFoundException(getDescription() + " cannot be resolved to absolute file path");
+        }
+    }
+
+    /**
 	 * This implementation returns a description that includes the bundle
 	 * location.
 	 */
