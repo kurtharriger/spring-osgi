@@ -23,7 +23,7 @@
        org.enhydra.jdbc.core;resolution:=optional,
        weblogic.jdbc.extensions;resolution:=optional,
        javax.naming;resolution:=optional,
-       javax.transaction;resolution:=optional
+       javax.transaction;;version=1.0.1;resolution:=optional
 	   </spring.osgi.import.pkg>
   </properties>
 
