@@ -116,16 +116,13 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	 */
 	public void start() throws Exception {
 
-		platform = new Felix();
-		platform.start(new MutablePropertyResolverImpl(getConfigurationProperties()), null);
+		platform = new Felix(new MutablePropertyResolverImpl(getConfigurationProperties()), null);
+		platform.start();
 
-		Method getBundle = Felix.class.getDeclaredMethod("getBundle", new Class[] { long.class });
-		getBundle.setAccessible(true);
-
-		Bundle systemBundle = (Bundle) getBundle.invoke(platform, new Object[] { new Long(0) });
+		Bundle systemBundle = (Bundle) platform;
 
 		// call getBundleContext
-		Method getContext = systemBundle.getClass().getSuperclass().getDeclaredMethod("getBundleContext", null);
+		Method getContext = systemBundle.getClass().getDeclaredMethod("getBundleContext", null);
 		getContext.setAccessible(true);
 		context = (BundleContext) getContext.invoke(systemBundle, null);
 	}
@@ -136,7 +133,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	 * @see org.springframework.osgi.test.platform.OsgiPlatform#stop()
 	 */
 	public void stop() throws Exception {
-		platform.shutdown();
+		platform.stop();
 		// remove cache folder
 		IOUtils.delete(felixStorageDir);
 	}
