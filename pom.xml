@@ -94,10 +94,10 @@
 
   <scm>
     <connection>
-      scm:svn:https://svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
+      scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
     </connection>
     <developerConnection>
-      scm:svn:https://svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
+      scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
     </developerConnection>
     <url>
       http://svn.sourceforge.net/viewcvs.cgi/springframework/spring-osgi/trunk
@@ -188,9 +188,7 @@ limitations under the License.
 
   <!-- modules for Spring-OSGi -->
   <modules> 
-  <!--
     <module>spring-modules</module>
-    -->
     <module>mock-framework-util</module>
     <module>mock</module>    
 	<module>io</module>    
@@ -583,7 +581,7 @@ limitations under the License.
       <id>spring-ext</id>
       <name>Spring External Dependencies Repository</name>
       <url>
-        https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+        https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
     </repository>
 	<repository>
@@ -602,7 +600,7 @@ limitations under the License.
       <id>spring-ext</id>
       <name>Spring External Dependencies Repository</name>
       <url>
-        https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+        https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
     </pluginRepository>
 
@@ -612,13 +610,13 @@ limitations under the License.
       <url>http://repo1.maven.org/maven2/</url>
     </pluginRepository>
     
-    <!-- maven osgi bundle plugin -->
+    <!-- maven osgi bundle plugin 
     <pluginRepository>
       <id>apache.m2.incubator</id>
       <name>Apache M2 Incubator Repository</name>
       <url>http://people.apache.org/repo/m2-incubating-repository/</url>
     </pluginRepository>
-
+	-->
     <!-- Please, please, please!  Never add this repository to the list.
         ever.  for any reason.  I'm not kidding.
     <pluginRepository>
