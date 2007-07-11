@@ -9,111 +9,114 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.iandt.simpleservice.MyService;
 
 /**
+ * Test which installs twice a bundle with the same symbolic name but with
+ * different classes to check that proper reloading occurs.
+ * 
  * @author Andy Piper
  */
 public class DuplicateClassTest extends AbstractConfigurableBundleCreatorTests {
-    private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.simpleservice.MyService";
+	private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.simpleservice.MyService";
 
-    // private static final String SERVICE_2_FILTER = "(service=2)";
-    // private static final String SERVICE_3_FILTER = "(service=3)";
+	protected String getManifestLocation() {
+		 return "classpath:org/springframework/osgi/iandt/duplicateClass/DuplicateClassTest.MF";
+	}
 
-    protected String getManifestLocation() {
-        return "classpath:org/springframework/osgi/iandt/duplicateClass/DuplicateClassTest.MF";
-    }
+	protected String[] getBundles() {
+		return new String[] { localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT") };
+	}
 
-    protected String[] getBundles() {
-        return new String[] {
-                localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT") };
-    }
+	public void testDependencies() throws Exception {
 
-    public void testDependencies() throws Exception {
-        // waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
+		BundleContext bundleContext = getBundleContext();
 
-        BundleContext bundleContext = getBundleContext();
-        // Simple Service bundle
-        Bundle simpleServiceBundle = bundleContext.installBundle(getLocator().locateArtifact(
-            "org.springframework.osgi", "org.springframework.osgi.iandt.simple.service", getSpringOsgiVersion()).getURL().toExternalForm());
-        assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
-        assertNotSame("simple service bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
-                simpleServiceBundle.getState()));
-        startDependency(simpleServiceBundle);
+		// Simple Service bundle (provides the base package + 1 service)
+		Bundle simpleServiceBundle = bundleContext.installBundle(getLocator().locateArtifact(
+			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service", getSpringOsgiVersion()).getURL().toExternalForm());
+		assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
 
-        // Identical Simple Service bundle
-        Bundle simpleServiceDuplicateBundle = bundleContext.installBundle(getLocator().locateArtifact(
-            "org.springframework.osgi", "org.springframework.osgi.iandt.simple.service.identical", getSpringOsgiVersion()).getURL().toExternalForm());
-        assertNotNull("Cannot find the simple service duplicate bundle", simpleServiceDuplicateBundle);
-        assertNotSame("simple service 2 bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
-                simpleServiceDuplicateBundle.getState()));
-        startDependency(simpleServiceDuplicateBundle);
+		assertNotSame("simple service bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
+				simpleServiceBundle.getState()));
+		startDependency(simpleServiceBundle);
 
-        ServiceReference[] refs = bundleContext.getServiceReferences(DEPENDENT_CLASS_NAME, null);
+		// Identical Simple Service bundle (+1 service)
+		Bundle simpleServiceDuplicateBundle = bundleContext.installBundle(getLocator().locateArtifact(
+			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service.identical",
+			getSpringOsgiVersion()).getURL().toExternalForm());
+		assertNotNull("Cannot find the simple service duplicate bundle", simpleServiceDuplicateBundle);
+		assertNotSame("simple service 2 bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
+				simpleServiceDuplicateBundle.getState()));
+		startDependency(simpleServiceDuplicateBundle);
 
-        assertEquals(2, refs.length);
+		ServiceReference[] refs = bundleContext.getServiceReferences(DEPENDENT_CLASS_NAME, null);
 
-        MyService service1 = (MyService)bundleContext.getService(refs[0]);
-        MyService service2 = (MyService)bundleContext.getService(refs[1]);
+		assertEquals(2, refs.length);
 
-        assertNotNull(service1);
-        assertNotNull(service2);
+		MyService service1 = (MyService) bundleContext.getService(refs[0]);
+		MyService service2 = (MyService) bundleContext.getService(refs[1]);
 
-        String msg1 = service1.stringValue();
-        String msg2 = service2.stringValue();
+		assertNotNull(service1);
+		assertNotNull(service2);
 
-        String jmsg = "Bond.  James Bond.";
-        String cmsg = "Connery.  Sean Connery #1";
-        System.out.println(msg1);
-        System.out.println(msg2);
-        assertNotSame(msg1, msg2);
-        assertTrue(msg1.equals(jmsg) || msg1.equals(cmsg));
-        assertTrue(msg2.equals(jmsg) || msg2.equals(cmsg));
+		String msg1 = service1.stringValue();
+		String msg2 = service2.stringValue();
 
-        bundleContext.ungetService(refs[0]);
-        bundleContext.ungetService(refs[1]);
+		String jmsg = "Bond.  James Bond.";
+		String cmsg = "Connery.  Sean Connery #1";
+		System.out.println(msg1);
+		System.out.println(msg2);
+		assertNotSame(msg1, msg2);
+		assertTrue(msg1.equals(jmsg) || msg1.equals(cmsg));
+		assertTrue(msg2.equals(jmsg) || msg2.equals(cmsg));
 
-        // Uninstall it
-        simpleServiceBundle.uninstall();
-        simpleServiceDuplicateBundle.uninstall();
-        // Install something subtley different
-        simpleServiceDuplicateBundle = bundleContext.installBundle(getLocator().locateArtifact(
-            "org.springframework.osgi", "org.springframework.osgi.iandt.simple.service.2.identical", getSpringOsgiVersion()).getURL().toExternalForm());
-        assertNotNull("Cannot find the simple service duplicate 2 bundle", simpleServiceDuplicateBundle);
-        startDependency(simpleServiceDuplicateBundle);
+		bundleContext.ungetService(refs[0]);
+		bundleContext.ungetService(refs[1]);
 
-        refs = bundleContext.getServiceReferences(DEPENDENT_CLASS_NAME, null);
+		// Uninstall duplicate 1
+		simpleServiceDuplicateBundle.uninstall();
+		// stop base bundle so that the package is still around but its service
+		// is not
+		simpleServiceBundle.stop();
 
-        assertEquals(1, refs.length);
+		// Install something subtley different
+		simpleServiceDuplicateBundle = bundleContext.installBundle(getLocator().locateArtifact(
+			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service.2.identical",
+			getSpringOsgiVersion()).getURL().toExternalForm());
+		assertNotNull("Cannot find the simple service duplicate 2 bundle", simpleServiceDuplicateBundle);
+		startDependency(simpleServiceDuplicateBundle);
 
-        service1 = (MyService)bundleContext.getService(refs[0]);
+		refs = bundleContext.getServiceReferences(DEPENDENT_CLASS_NAME, null);
 
-        assertNotNull(service1);
+		assertEquals(1, refs.length);
 
-        msg1 = service1.stringValue();
+		service1 = (MyService) bundleContext.getService(refs[0]);
 
-        System.out.println(msg1);
-        assertTrue(msg1.equals("Dalton.  Timothy Dalton #1"));
-    }
+		assertNotNull(service1);
 
-    private void startDependency(Bundle bundle) throws BundleException, InterruptedException {
-        bundle.start();
-        waitOnContextCreation(bundle.getSymbolicName());
-        System.out.println("started bundle [" + OsgiBundleUtils.getNullSafeSymbolicName(bundle) + "]");
-    }
+		msg1 = service1.stringValue();
 
-    /*
-      * (non-Javadoc)
-      * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#shouldWaitForSpringBundlesContextCreation()
-      */
-    protected boolean shouldWaitForSpringBundlesContextCreation() {
-        return true;
-    }
+		System.out.println(msg1);
+		assertTrue(msg1.equals("Dalton.  Timothy Dalton #1"));
+	}
 
+	private void startDependency(Bundle bundle) throws BundleException, InterruptedException {
+		bundle.start();
+		waitOnContextCreation(bundle.getSymbolicName());
+		System.out.println("started bundle [" + OsgiBundleUtils.getNullSafeSymbolicName(bundle) + "]");
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#shouldWaitForSpringBundlesContextCreation()
+	 */
+	protected boolean shouldWaitForSpringBundlesContextCreation() {
+		return true;
+	}
 
-    /* (non-Javadoc)
-      * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#getDefaultWaitTime()
-      */
-    protected long getDefaultWaitTime() {
-        return 60L;
-    }
-
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#getDefaultWaitTime()
+	 */
+	protected long getDefaultWaitTime() {
+		return 60L;
+	}
 }
