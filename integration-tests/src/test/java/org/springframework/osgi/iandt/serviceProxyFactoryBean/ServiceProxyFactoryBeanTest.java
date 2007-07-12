@@ -21,9 +21,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.osgi.ServiceUnavailableException;
+import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
@@ -126,9 +130,7 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 			assertEquals(100, ((Number) ((Collection) service).toArray()[0]).intValue());
 		}
 		finally {
-			for (int i = 0; i < registrations.size(); i++) {
-				((ServiceRegistration) registrations.get(i)).unregister();
-			}
+			cleanRegistrations(registrations);
 		}
 	}
 
@@ -175,10 +177,59 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 			assertEquals(time, ((Date) service).getTime());
 		}
 		finally {
-			for (int i = 0; i < registrations.size(); i++) {
-				((ServiceRegistration) registrations.get(i)).unregister();
-			}
+			cleanRegistrations(registrations);
 		}
 	}
 
+	public void testIteratorWhenServiceGoesDown() throws Exception {
+		fb.setCardinality("0..N");
+		fb.setInterface(new Class[] { Date.class });
+		fb.afterPropertiesSet();
+
+		long time = 123;
+		Date date = new Date(time);
+		Properties props = new Properties();
+		props.put("Moroccan", "Sunset");
+
+		List registrations = new ArrayList(3);
+		try {
+			Collection col = (Collection) fb.getObject();
+			Iterator iter = col.iterator();
+
+			assertFalse(iter.hasNext());
+			registrations.add(publishService(date, props));
+			assertTrue(iter.hasNext());
+
+			// deregister service
+			((ServiceRegistration) registrations.remove(0)).unregister();
+
+			// has to successed
+			Object obj = iter.next();
+
+			assertTrue(obj instanceof ServiceReferenceAware);
+			assertTrue(obj instanceof Date);
+			Map map = ((ServiceReferenceAware) obj).getServiceProperties();
+			System.out.println(map);
+			// the properties will contain the ObjectClass also
+			assertTrue(map.keySet().containsAll(props.keySet()));
+			
+			try {
+				// make sure the service is dead
+				((Date) obj).getTime();
+				fail("should have thrown exception");
+			}
+			catch (ServiceUnavailableException ex) {
+				// proxy is dead
+			}			
+		}
+		finally {
+			cleanRegistrations(registrations);
+		}
+	}
+
+	private void cleanRegistrations(Collection list) {
+		for (Iterator iter = list.iterator(); iter.hasNext();) {
+			((ServiceRegistration) iter.next()).unregister();
+		}
+	}
 }
