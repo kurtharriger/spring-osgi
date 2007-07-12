@@ -23,7 +23,6 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.felix.framework.Felix;
-import org.apache.felix.framework.util.MutablePropertyResolverImpl;
 import org.apache.felix.main.Main;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -116,10 +115,10 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	 */
 	public void start() throws Exception {
 
-		platform = new Felix(new MutablePropertyResolverImpl(getConfigurationProperties()), null);
+		platform = new Felix(getConfigurationProperties(), null);
 		platform.start();
 
-		Bundle systemBundle = (Bundle) platform;
+		Bundle systemBundle = platform;
 
 		// call getBundleContext
 		Method getContext = systemBundle.getClass().getDeclaredMethod("getBundleContext", null);
