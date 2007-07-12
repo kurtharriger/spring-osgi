@@ -563,6 +563,45 @@ limitations under the License.
   <!--            Repository Configuration              -->
   <!-- ================================================ -->
 
+  <pluginRepositories>
+	<!-- the plugin snapshots used for releases are kept here in a frozen state -->
+    <pluginRepository>
+      <snapshots><enabled>true</enabled></snapshots>
+      <id>spring-ext</id>
+      <name>Spring External Dependencies Repository</name>
+      <url>
+        https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+      </url>
+    </pluginRepository>
+	
+	
+    <pluginRepository>
+      <id>maven-repo</id>
+      <name>maven repo</name>
+      <url>http://repo1.maven.org/maven2/</url>
+    </pluginRepository>
+    
+    <!-- maven osgi bundle plugin 
+    <pluginRepository>
+	  <snapshots><enabled>true</enabled></snapshots>
+      <id>apache.snapshot.repository</id>
+      <name>Apache M2 Incubator Repository</name>
+      <url>http://people.apache.org/maven-snapshot-repository</url>
+    </pluginRepository>
+	-->
+	
+    <!-- Please, please, please!  Never add this repository to the list.
+        ever.  for any reason.  I'm not kidding.
+    <pluginRepository>
+	 <snapshots><enabled>true</enabled></snapshots>
+	<id>apache-snapshot-repo</id>
+      <name>Apache snapshot repo</name>
+      <url>http://cvs.apache.org/maven-snapshot-repository</url>
+	</pluginRepository>
+           -->
+  </pluginRepositories>
+
+
   <repositories>
     <repository>    
       <id>apache.m2.incubator</id>
@@ -595,39 +634,6 @@ limitations under the License.
 	
   </repositories>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <!-- the plugin snapshots used for releases are kept here in a frozen state -->
-      <snapshots><enabled>true</enabled></snapshots>
-      <id>spring-ext</id>
-      <name>Spring External Dependencies Repository</name>
-      <url>
-        https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
-      </url>
-    </pluginRepository>
-
-    <pluginRepository>
-      <id>maven-repo</id>
-      <name>maven repo</name>
-      <url>http://repo1.maven.org/maven2/</url>
-    </pluginRepository>
-    
-    <!-- maven osgi bundle plugin 
-    <pluginRepository>
-      <id>apache.m2.incubator</id>
-      <name>Apache M2 Incubator Repository</name>
-      <url>http://people.apache.org/repo/m2-incubating-repository/</url>
-    </pluginRepository>
-	-->
-    <!-- Please, please, please!  Never add this repository to the list.
-        ever.  for any reason.  I'm not kidding.
-    <pluginRepository>
-	 <snapshots><enabled>true</enabled></snapshots>
-	<id>apache-snapshot-repo</id>
-      <name>Apache snapshot repo</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository</url>
-	</pluginRepository>
-           -->
-  </pluginRepositories>
+  
 
 </project>

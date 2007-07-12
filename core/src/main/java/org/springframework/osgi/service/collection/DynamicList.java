@@ -15,11 +15,11 @@
  */
 package org.springframework.osgi.service.collection;
 
-import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
+import java.util.RandomAccess;
 
 /**
  * Subclass offering a List extension for a DynamicCollection. This allows not
@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
  * @author Costin Leau
  *
  */
-public class DynamicList extends DynamicCollection implements List {
+public class DynamicList extends DynamicCollection implements List, RandomAccess {
 
 	/**
 	 * List iterator.
@@ -45,37 +45,61 @@ public class DynamicList extends DynamicCollection implements List {
 
 		public void add(Object o) {
 			removalAllowed = false;
-			DynamicList.this.add(cursor, o);
+			synchronized (lock) {
+				DynamicList.this.add(cursor, o);
+			}
 		}
 
 		public boolean hasPrevious() {
-			return (cursor - 1 >= 0);
+			synchronized (lock) {
+				return (cursor - 1 >= 0);
+			}
 		}
 
 		public int nextIndex() {
-			return cursor;
+			synchronized (lock) {
+				return cursor;
+			}
 		}
 
 		public Object previous() {
 			removalAllowed = true;
 			if (hasPrevious()) {
-				return storage.get(--cursor);
+				synchronized (lock) {
+					return storage.get(--cursor);
+				}
 			}
 
 			throw new NoSuchElementException();
 		}
 
 		public int previousIndex() {
-			return (cursor - 1);
+			synchronized (lock) {
+				return (cursor - 1);
+			}
 		}
 
 		public void set(Object o) {
 			if (!removalAllowed)
 				throw new IllegalStateException();
 
-			storage.set(cursor - 1, o);
+			synchronized (lock) {
+				storage.set(cursor - 1, o);
+			}
 		}
 
+	}
+
+	public DynamicList() {
+		super();
+	}
+
+	public DynamicList(Collection c) {
+		super(c);
+	}
+
+	public DynamicList(int size) {
+		super(size);
 	}
 
 	public void add(int index, Object o) {
@@ -100,7 +124,11 @@ public class DynamicList extends DynamicCollection implements List {
 
 	public ListIterator listIterator() {
 		ListIterator iter = new DynamicListIterator(0);
-		iterators.add(new WeakReference(iter));
+		
+		synchronized (iterators) {
+			iterators.put(iter, null);
+		}
+		
 		return iter;
 	}
 

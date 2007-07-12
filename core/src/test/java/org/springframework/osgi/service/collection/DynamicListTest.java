@@ -64,6 +64,7 @@ public class DynamicListTest extends TestCase {
 		dynamicList.add(b);
 		dynamicList.add(c);
 
+		assertTrue(iter.hasNext());
 		assertSame(a, iter.next());
 		// remove b
 		dynamicList.remove(b);
@@ -87,6 +88,7 @@ public class DynamicListTest extends TestCase {
 		dynamicList.add(a);
 		dynamicList.add(b);
 
+		assertTrue(iter.hasNext());
 		assertSame(a, iter.next());
 		assertTrue(iter.hasNext());
 		dynamicList.remove(a);
@@ -104,6 +106,7 @@ public class DynamicListTest extends TestCase {
 		dynamicList.add(a);
 		dynamicList.add(b);
 
+		assertTrue(iter.hasNext());
 		assertEquals(0, iter.nextIndex());
 		assertEquals(-1, iter.previousIndex());
 		assertSame(a, iter.next());
@@ -262,6 +265,8 @@ public class DynamicListTest extends TestCase {
 		catch (IllegalStateException ex) {
 			// expected
 		}
+		
+		assertTrue(iter.hasNext());
 		
 		iter.next();
 		iter.set(c);

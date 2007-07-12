@@ -15,240 +15,55 @@
  */
 package org.springframework.osgi.service.collection;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import junit.framework.TestCase;
 
+/**
+ * Tests regarding the collection behaviour.
+ * 
+ * @author Costin Leau
+ * 
+ */
 public class DynamicCollectionTest extends TestCase {
 
 	private Collection dynamicCollection;
 
-	private Iterator iter;
-
 	protected void setUp() throws Exception {
 		dynamicCollection = new DynamicCollection();
-		iter = dynamicCollection.iterator();
 	}
 
 	protected void tearDown() throws Exception {
 		dynamicCollection = null;
-		iter = null;
 	}
 
-	public void testAddWhileIterating() throws Exception {
-		assertTrue(dynamicCollection.isEmpty());
-		assertFalse(iter.hasNext());
-		Object a = new Object();
-		dynamicCollection.add(a);
-		assertTrue(iter.hasNext());
-		assertSame(a, iter.next());
-		assertFalse(iter.hasNext());
+	public void testAdd() {
+		assertTrue(dynamicCollection.add(new Object()));
 	}
 
-	public void testRemoveWhileIterating() throws Exception {
-		assertTrue(dynamicCollection.isEmpty());
-		assertFalse(iter.hasNext());
-		Object a = new Object();
-		Object b = new Object();
-		Object c = new Object();
-		dynamicCollection.add(a);
-		dynamicCollection.add(b);
-		dynamicCollection.add(c);
-
-		assertSame(a, iter.next());
-		dynamicCollection.remove(b);
-		assertTrue(iter.hasNext());
-		assertSame(c, iter.next());
+	public void testAddDuplicate() {
+		Object obj = new Object();
+		assertTrue(dynamicCollection.add(obj));
+		assertTrue(dynamicCollection.add(obj));
 	}
 
-	public void testRemovePreviouslyIteratedWhileIterating() throws Exception {
-		assertTrue(dynamicCollection.isEmpty());
-		assertFalse(iter.hasNext());
-
-		Object a = new Object();
-		Object b = new Object();
-		dynamicCollection.add(a);
-		dynamicCollection.add(b);
-
-		assertSame(a, iter.next());
-		assertTrue(iter.hasNext());
-		dynamicCollection.remove(a);
-		// still have b
-		assertTrue(iter.hasNext());
+	public void testRemove() {
+		Object obj = new Object();
+		assertFalse(dynamicCollection.remove(obj));
+		dynamicCollection.add(obj);
+		assertTrue(dynamicCollection.remove(obj));
+		assertFalse(dynamicCollection.remove(obj));
 	}
 
-	public void testRemoveUniteratedWhileIterating() throws Exception {
-		assertTrue(dynamicCollection.isEmpty());
-		assertFalse(iter.hasNext());
-
-		Object a = new Object();
-		Object b = new Object();
-		Object c = new Object();
-		dynamicCollection.add(a);
-		dynamicCollection.add(b);
-		dynamicCollection.add(c);
-
-		assertSame(a, iter.next());
-		assertTrue(iter.hasNext());
-		dynamicCollection.remove(a);
-		// still have b
-		assertTrue(iter.hasNext());
-		dynamicCollection.remove(b);
-		// still have c
-		assertTrue(iter.hasNext());
-		assertSame(c, iter.next());
+	public void testRemoveDuplicate() {
+		Object obj = new Object();
+		assertFalse(dynamicCollection.remove(obj));
+		dynamicCollection.add(obj);
+		dynamicCollection.add(obj);
+		assertTrue(dynamicCollection.remove(obj));
+		assertTrue(dynamicCollection.remove(obj));
+		dynamicCollection.add(obj);
+		assertTrue(dynamicCollection.remove(obj));
 	}
 
-	public void testIteratorRemove() throws Exception {
-		Object a = new Object();
-		Object b = new Object();
-		Object c = new Object();
-
-		dynamicCollection.add(a);
-		dynamicCollection.add(b);
-		dynamicCollection.add(c);
-
-		assertTrue(iter.hasNext());
-		try {
-			iter.remove();
-			fail("should have thrown exception");
-		}
-		catch (IllegalStateException ex) {
-			// expected
-		}
-
-		assertSame(a, iter.next());
-		assertSame(b, iter.next());
-		// remove b
-		iter.remove();
-
-		assertEquals(2, dynamicCollection.size());
-		assertSame(c, iter.next());
-		// remove c
-		iter.remove();
-		assertEquals(1, dynamicCollection.size());
-
-		try {
-			iter.remove();
-			fail("should have thrown exception");
-		}
-		catch (IllegalStateException ex) {
-			// expected
-		}
-	}
-
-	public void testRemoveAllWhileIterating() throws Exception {
-		Object a = new Object();
-		Object b = new Object();
-		Object c = new Object();
-
-		dynamicCollection.add(a);
-		dynamicCollection.add(b);
-		dynamicCollection.add(c);
-
-		Collection col = new ArrayList();
-		col.add(a);
-		col.add(c);
-
-		assertSame(a, iter.next());
-		// remove a and c
-		dynamicCollection.removeAll(col);
-		assertSame(b, iter.next());
-		assertFalse(iter.hasNext());
-	}
-
-	public void testAddAllWhileIterating() throws Exception {
-		Object a = new Object();
-		Object b = new Object();
-		Object c = new Object();
-
-		dynamicCollection.add(a);
-
-		Collection col = new ArrayList();
-		col.add(b);
-		col.add(c);
-
-		assertSame(a, iter.next());
-		assertFalse(iter.hasNext());
-		dynamicCollection.addAll(col);
-		assertSame(b, iter.next());
-		assertSame(c, iter.next());
-	}
-
-	public void testRemoveObjectWhenTheCollectionContainsDuplicates() throws Exception {
-		Object a = new Object();
-		Object b = new Object();
-		Object c = new Object();
-
-		// create a|b|a|c|a|a
-		dynamicCollection.add(a);
-		dynamicCollection.add(b);
-		dynamicCollection.add(a);
-		dynamicCollection.add(c);
-		dynamicCollection.add(a);
-		dynamicCollection.add(a);
-
-		Iterator i1 = dynamicCollection.iterator();
-
-		assertSame(a, iter.next());
-		assertSame(b, iter.next());
-		assertSame(a, iter.next());
-		iter.remove();
-		assertSame(a, i1.next());
-		assertSame(b, i1.next());
-		assertSame(c, i1.next());
-		assertSame(a, i1.next());
-
-		assertSame(c, iter.next());
-		assertSame(a, iter.next());
-		assertSame(a, iter.next());
-		iter.remove();
-
-		assertFalse(i1.hasNext());
-		assertFalse(iter.hasNext());
-	}
-
-	public void testRemoveUnexistingObj() throws Exception {
-		Object a = new Object();
-		Object b = new Object();
-
-		dynamicCollection.add(a);
-
-		assertFalse(dynamicCollection.remove(b));
-		assertTrue(dynamicCollection.remove(a));
-		dynamicCollection.add(b);
-		assertFalse(dynamicCollection.remove(a));
-		assertTrue(dynamicCollection.remove(b));
-		assertFalse(dynamicCollection.remove(b));
-	}
-
-	public void testCorrectExceptionThrownByIteratorWhenStructureChanges() {
-		Object a = new Object();
-
-		dynamicCollection.add(a);
-		dynamicCollection.add(a);
-
-		Iterator i1 = dynamicCollection.iterator();
-
-		iter.next();
-		iter.next();
-		
-		i1.next();
-		i1.remove();
-		i1.next();
-		i1.remove();
-		
-		assertFalse(iter.hasNext());
-		assertFalse(iter.hasNext());
-		
-		try {
-			iter.remove();
-			fail("should have thrown exception");
-		}
-		catch (IndexOutOfBoundsException ioobe) {
-			// expected
-		}
-	}
 }

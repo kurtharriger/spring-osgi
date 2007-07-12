@@ -18,6 +18,7 @@ package org.springframework.osgi.service.collection;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.RandomAccess;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -27,12 +28,14 @@ import org.osgi.framework.Filter;
  * storage is being shrunk/expanded. This collection is read-only - its content
  * is being retrieved dynamically from the OSGi platform.
  * 
- * <strong>Note</strong>:It is <strong>not</strong> synchronized.
+ * <p/> This collection and its iterators are thread-safe. That is, multiple
+ * threads can access the collection. However, since the collection is read-only,
+ * it cannot be modified by the client.
  * 
  * @author Costin Leau
  * 
  */
-public class OsgiServiceList extends OsgiServiceCollection implements List {
+public class OsgiServiceList extends OsgiServiceCollection implements List, RandomAccess {
 
 	private final List storage = (List) serviceIDs;
 
@@ -115,8 +118,9 @@ public class OsgiServiceList extends OsgiServiceCollection implements List {
 		throw new UnsupportedOperationException();
 	}
 
+	//
 	// WRITE operations forbidden
-
+	//
 	public Object remove(int index) {
 		throw new UnsupportedOperationException();
 	}
