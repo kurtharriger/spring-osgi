@@ -102,6 +102,13 @@
         <version>${project.parent.version}</version>
         <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>backport-util-concurrent</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
+
 
   </dependencies>
     <build>

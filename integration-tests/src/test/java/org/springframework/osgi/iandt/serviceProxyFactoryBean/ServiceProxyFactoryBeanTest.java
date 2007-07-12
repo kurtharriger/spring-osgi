@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.util.OsgiFilterUtils;
@@ -152,6 +153,14 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 			assertFalse(iter.hasNext());
 			registrations.add(publishService(date));
+			try {
+				iter.next();
+				fail("should have thrown exception");
+			}
+			catch (NoSuchElementException ex) {
+				// expected
+			}
+			assertTrue(iter.hasNext());
 			Object service = iter.next();
 			assertTrue(service instanceof Date);
 			assertEquals(time, ((Date) service).getTime());
@@ -160,6 +169,7 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 			time = 111;
 			date = new Date(time);
 			registrations.add(publishService(date));
+			assertTrue(iter.hasNext());
 			service = iter.next();
 			assertTrue(service instanceof Date);
 			assertEquals(time, ((Date) service).getTime());
