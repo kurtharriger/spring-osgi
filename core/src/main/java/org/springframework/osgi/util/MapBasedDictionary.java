@@ -52,7 +52,7 @@ public class MapBasedDictionary extends Dictionary implements Map {
 	 * @author Costin Leau
 	 * 
 	 */
-	private class IteratorBasedEnumeration implements Enumeration {
+	private static class IteratorBasedEnumeration implements Enumeration {
 
 		private Iterator it;
 
