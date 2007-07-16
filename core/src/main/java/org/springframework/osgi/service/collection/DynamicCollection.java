@@ -93,10 +93,10 @@ public class DynamicCollection extends AbstractCollection {
 						throw new NoSuchElementException();
 				}
 				else if (Boolean.TRUE == hasNext) {
-					if (hasNext())
-						synchronized (iteratorsLock) {
+					synchronized (iteratorsLock) {
+						if (hasNext())
 							return storage.get(cursor++);
-						}
+					}
 					// TODO: add hook for replaced objects
 					return null;
 				}
@@ -107,6 +107,7 @@ public class DynamicCollection extends AbstractCollection {
 				throw new NoSuchElementException();
 			}
 			finally {
+				// no matter what, reset hasNext
 				hasNext = null;
 			}
 		}

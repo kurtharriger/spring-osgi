@@ -75,7 +75,7 @@
 
   <ciManagement>
     <system>bamboo</system>
-    <url>http://build.springframework.org:8085/browse/OSGI-TRUNK</url>
+    <url>http://build.springframework.org:8085/bamboo/browse/OSGI-TRUNK</url>
     <notifiers>
       <notifier>
         <type>mail</type>
@@ -100,7 +100,7 @@
       scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
     </developerConnection>
     <url>
-      http://svn.sourceforge.net/viewcvs.cgi/springframework/spring-osgi/trunk
+      http://springframework.svn.sourceforge.net/viewcvs.cgi/springframework/spring-osgi/trunk
     </url>
   </scm>
 
@@ -473,6 +473,10 @@ limitations under the License.
           <aggregate>true</aggregate>
         </configuration>
       </plugin>
+      
+      <!-- ========= -->
+      <!--     Javadocs   -->
+      <!-- ========= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -509,8 +513,16 @@ limitations under the License.
             </group>
           </groups>
           <excludePackageNames>org.springframework.osgi.iandt*</excludePackageNames>
+          
+          <!--
+           cannot use this.
+           maven, how I love you..
+           
+           
           <stylesheetfile>${basedir}/docs/stylesheet.css</stylesheetfile>
           <overview>${basedir}/docs/overview.html</overview>
+                    -->
+                    
           <breakiterator>true</breakiterator>
           <links>
             <link>http://java.sun.com/j2se/1.4.2/docs/api/</link>
@@ -529,9 +541,45 @@ limitations under the License.
           </links>
         </configuration>
       </plugin>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin>
+      
+      <!-- ========= -->
+      <!--     FindBugs   -->
+      <!-- ========= -->
+  <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>findbugs-maven-plugin</artifactId>
+    <configuration>
+    <!--
+      <xmlOutput>true</xmlOutput>
+      <xmlOutputDirectory>target</xmlOutputDirectory>
+      -->
+      <threshold>Low</threshold>
+      <effort>Max</effort>
+      <!--
+      <debug>true</debug>
+      <relaxed>true</relaxed>
+      -->
+    </configuration>
+  </plugin>
+  
+      <!-- ========= -->
+      <!--         PMD      -->
+      <!-- ========= -->
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
+      
+      <!-- cobertura -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
       </plugin>
       
     </plugins>
