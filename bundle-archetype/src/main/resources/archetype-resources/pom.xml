@@ -111,7 +111,7 @@
       <id>spring-ext</id>
       <name>Spring External Dependencies Repository</name>
       <url>
-        https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+        https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
     </repository>
 	<repository>
@@ -127,7 +127,7 @@
       <id>spring-ext</id>
       <name>Spring External Dependencies Repository</name>
       <url>
-        https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+        https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
     </pluginRepository>
 

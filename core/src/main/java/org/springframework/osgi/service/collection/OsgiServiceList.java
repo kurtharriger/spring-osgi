@@ -37,6 +37,9 @@ import org.osgi.framework.Filter;
  */
 public class OsgiServiceList extends OsgiServiceCollection implements List, RandomAccess {
 
+	/**
+	 * cast the collection to a specialized collection
+	 */
 	private final List storage = (List) serviceIDs;
 
 	public OsgiServiceList(Filter filter, BundleContext context, ClassLoader classLoader) {
