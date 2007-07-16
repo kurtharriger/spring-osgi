@@ -17,6 +17,8 @@ package org.springframework.osgi.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -49,14 +51,21 @@ public abstract class OsgiBundleUtils {
 			return null;
 
 		// try Equinox getContext
-		Method m = ReflectionUtils.findMethod(bundle.getClass(), "getContext", new Class[0]);
+		Method meth = ReflectionUtils.findMethod(bundle.getClass(), "getContext", new Class[0]);
 
 		// fallback to getBundleContext (OSGi 4.1)
-		if (m == null)
-			m = ReflectionUtils.findMethod(bundle.getClass(), "getBundleContext", new Class[0]);
+		if (meth == null)
+			meth = ReflectionUtils.findMethod(bundle.getClass(), "getBundleContext", new Class[0]);
 
-		if (m != null) {
-			m.setAccessible(true);
+		final Method m = meth;
+		if (meth != null) {
+			AccessController.doPrivileged(new PrivilegedAction() {
+				public Object run() {
+					m.setAccessible(true);
+					return null;
+				}
+			});
+
 			return (BundleContext) ReflectionUtils.invokeMethod(m, bundle);
 		}
 
@@ -73,8 +82,14 @@ public abstract class OsgiBundleUtils {
 			if (f == null) {
 				throw new IllegalStateException("No bundleContext field!");
 			}
-			f.setAccessible(true);
-			return (BundleContext) f.get(bundle);
+			final Field field = f;
+			AccessController.doPrivileged(new PrivilegedAction() {
+				public Object run() {
+					field.setAccessible(true);
+					return null;
+				}
+			});
+			return (BundleContext) field.get(bundle);
 		}
 		catch (IllegalAccessException e) {
 			throw (IllegalStateException) new IllegalStateException("Exception retrieving bundle context").initCause(e);

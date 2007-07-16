@@ -18,23 +18,22 @@ package org.springframework.osgi.context.support;
 
 import java.io.IOException;
 import java.util.Dictionary;
-import java.util.Properties;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
-import org.springframework.context.ApplicationContextException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.BundleContextAware;
@@ -47,10 +46,9 @@ import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.util.ClassUtils;
-import org.springframework.aop.framework.ProxyFactory;
 
 /**
  * 

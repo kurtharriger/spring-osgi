@@ -40,7 +40,7 @@ public class ServiceReferenceBasedMap extends AbstractMap {
 
 	private static final String READ_ONLY_MSG = "this is a readonly map";
 
-	public class SimpleEntry implements Map.Entry {
+	public static class SimpleEntry implements Map.Entry {
 		Object key;
 
 		Object value;
