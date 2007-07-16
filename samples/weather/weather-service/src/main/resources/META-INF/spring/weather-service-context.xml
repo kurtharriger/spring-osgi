@@ -21,8 +21,9 @@
 			<value>org.springframework.osgi.samples.weather.service.WeatherService</value>
 		</osgi:interfaces>
 		<osgi:service-properties>
-			<entry key="foo" value="bar"/>
-		</osgi:service-properties>
+            <entry key="foo" value="bar"/>
+            <prop key="baz">myprop</prop>
+        </osgi:service-properties>
 	</osgi:service>
 
 </beans>
