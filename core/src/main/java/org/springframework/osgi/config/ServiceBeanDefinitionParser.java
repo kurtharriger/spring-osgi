@@ -114,9 +114,12 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
                         Object props = parserContext.getDelegate().parseMapElement(subElement, builder.getRawBeanDefinition());
 					    builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
                     }
-                    else {
+                    else if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.PROP_ELEMENT).size()>0) {
                         Object props = parserContext.getDelegate().parsePropsElement(subElement);
 					    builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
+                    }
+                    else {
+                        parserContext.getReaderContext().error("Invalid service property type", subElement);
                     }
                 }
 				// nested bean reference/declaration

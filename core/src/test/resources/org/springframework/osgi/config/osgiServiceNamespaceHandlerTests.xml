@@ -50,4 +50,13 @@
 		</osgi:service-properties>
 		<bean class="java.util.HashMap"/>
 	</osgi:service>
+
+    <!-- service properties -->
+    <osgi:service interface="java.io.Serializable" id="serviceProperties2">
+        <osgi:service-properties>
+            <prop key="string">myprop</prop>
+        </osgi:service-properties>
+        <bean class="java.util.HashMap"/>
+    </osgi:service>
+
 </beans>
