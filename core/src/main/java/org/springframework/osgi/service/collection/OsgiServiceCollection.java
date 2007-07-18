@@ -50,8 +50,8 @@ import org.springframework.util.Assert;
  * is being retrieved dynamically from the OSGi platform.
  * 
  * <p/> This collection and its iterators are thread-safe. That is, multiple
- * threads can access the collection. However, since the collection is read-only,
- * it cannot be modified by the client.
+ * threads can access the collection. However, since the collection is
+ * read-only, it cannot be modified by the client.
  * 
  * @see Collection
  * @author Costin Leau
@@ -99,7 +99,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 						found = serviceIDs.remove(serviceId);
 						if (proxy != null) {
 							invalidateProxy(proxy);
-							lastDeadProxy = proxy;
+							assignLastDeadProxy(proxy);
 						}
 					}
 					// TODO: should this be part of the lock also?
@@ -142,6 +142,9 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	/**
 	 * Recall the last proxy for the rare case, where a service goes down
 	 * between the #hasNext() and #next() call of an iterator.
+	 * 
+	 * Subclasses should implement their own strategy when it comes to assign a
+	 * value to it through
 	 */
 	protected volatile Object lastDeadProxy;
 
@@ -194,7 +197,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	 * 
 	 * @param ref
 	 */
-	private Object createServiceProxy(ServiceReference ref) {
+	protected Object createServiceProxy(ServiceReference ref) {
 		// get classes under which the service was registered
 		String[] classes = (String[]) ref.getProperty(Constants.OBJECTCLASS);
 
@@ -256,6 +259,17 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 
 	private void invalidateProxy(Object proxy) {
 		// TODO: add proxy invalidation
+	}
+
+	/**
+	 * Hook for tracking the last disappearing service to cope with the rare
+	 * case, where the last service in the collection disappears between calls
+	 * to hasNext() and next() on an iterator at the end of the collection.
+	 * 
+	 * @param proxy
+	 */
+	protected void assignLastDeadProxy(Object proxy) {
+		this.lastDeadProxy = proxy;
 	}
 
 	public Iterator iterator() {
