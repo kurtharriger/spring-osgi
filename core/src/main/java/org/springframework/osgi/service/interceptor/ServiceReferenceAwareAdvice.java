@@ -56,4 +56,16 @@ public class ServiceReferenceAwareAdvice extends DelegatingIntroductionIntercept
 		return serviceInvoker.getServiceReference();
 	}
 
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other instanceof ServiceReferenceAwareAdvice) {
+			ServiceReferenceAwareAdvice oth = (ServiceReferenceAwareAdvice) other;
+			return (serviceInvoker.equals(oth.serviceInvoker));
+		}
+		else
+			return false;
+
+	}
+
 }
