@@ -16,52 +16,32 @@
 package org.springframework.osgi.service.collection;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Set;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
+
 /**
- * Wrapper extension to {@link DynamicCollection} which prevents duplicates.
  * 
- * @see DynamicCollection
- * @see Set
+ * OSGi service dynamic collection - allows iterating while the underlying
+ * storage is being shrunk/expanded. This collection is read-only - its content
+ * is being retrieved dynamically from the OSGi platform.
+ * 
+ * <p/> This collection and its iterators are thread-safe. That is, multiple
+ * threads can access the collection. However, since the collection is
+ * read-only, it cannot be modified by the client.
+ * 
  * @author Costin Leau
  * 
  */
-public class DynamicSet extends DynamicCollection implements Set {
+public class OsgiServiceSet extends OsgiServiceCollection implements Set {
 
-	
-	public DynamicSet() {
-		super();
+	public OsgiServiceSet(Filter filter, BundleContext context, ClassLoader classLoader) {
+		super(filter, context, classLoader);
 	}
 
-	public DynamicSet(Collection c) {
-		super(c);
-	}
-
-	public DynamicSet(int size) {
-		super(size);
-	}
-
-	public boolean add(Object o) {
-		synchronized (storage) {
-			if (storage.contains(o))
-				return false;
-			storage.add(o);
-		}
-		return true;
-	}
-
-	public boolean addAll(Collection c) {
-		if (c == null)
-			throw new NullPointerException();
-		boolean result = false;
-		synchronized (storage) {
-			for (Iterator iter = c.iterator(); iter.hasNext();) {
-				result |= add(iter.next());
-			}
-		}
-
-		return result;
+	protected Collection createInternalDynamicStorage() {
+		return new DynamicSet();
 	}
 
 }

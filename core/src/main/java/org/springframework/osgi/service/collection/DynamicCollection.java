@@ -203,7 +203,7 @@ public class DynamicCollection extends AbstractCollection {
 			if (index == -1)
 				return false;
 
-			remove(storage.indexOf(o));
+			remove(index);
 			return true;
 		}
 	}
