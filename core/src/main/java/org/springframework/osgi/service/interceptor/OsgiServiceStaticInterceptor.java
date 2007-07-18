@@ -34,7 +34,7 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 	private ServiceWrapper wrapper;
 
 	public OsgiServiceStaticInterceptor(BundleContext context, ServiceReference reference, int contextClassLoader,
-                                        ClassLoader classLoader) {
+			ClassLoader classLoader) {
 		super(context, reference, contextClassLoader, classLoader);
 		Assert.notNull(reference, "a not null service reference is required");
 		this.wrapper = new ServiceWrapper(reference, context);
@@ -62,4 +62,14 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 		return wrapper.getReference();
 	}
 
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other instanceof OsgiServiceStaticInterceptor) {
+			OsgiServiceStaticInterceptor oth = (OsgiServiceStaticInterceptor) other;
+			return (this.context.equals(oth.context) && contextClassLoader == oth.contextClassLoader && wrapper.equals(oth.wrapper));
+		}
+		else
+			return false;
+	}
 }

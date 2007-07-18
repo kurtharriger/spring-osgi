@@ -51,9 +51,8 @@ import org.springframework.util.ObjectUtils;
  * @author Adrian Colyer
  * @author Hal Hildebrand
  */
-public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean,
-                                                    DisposableBean, BundleContextAware,
-		                                            ApplicationListener, BeanClassLoaderAware {
+public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean, BundleContextAware,
+		ApplicationListener, BeanClassLoaderAware {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
@@ -65,9 +64,9 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 	public static final String OBJECTCLASS = "objectClass";
 
-    protected ClassLoader classLoader;
+	protected ClassLoader classLoader;
 
-    protected BundleContext bundleContext;
+	protected BundleContext bundleContext;
 
 	protected RetryTemplate retryTemplate = new RetryTemplate();
 
@@ -95,27 +94,26 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 	protected boolean initialized = false;
 
+	public void setBeanClassLoader(ClassLoader classLoader) {
+		this.classLoader = classLoader;
+	}
 
-    public void setBeanClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
-
-
-    public void onApplicationEvent(ApplicationEvent applicationEvent) {
+	public void onApplicationEvent(ApplicationEvent applicationEvent) {
 		if (applicationEvent instanceof ContextRefreshedEvent) {
 			// This sets up the listeners for beans which are not referred to by
 			// any other
 			// bean in the context. We can't do this in afterPropertiesSet, so
 			// we have to do
 			// it here.
-            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-            try {
-                Thread.currentThread().setContextClassLoader(classLoader);
-                getObject();
-            } finally {
-                Thread.currentThread().setContextClassLoader(tccl);
-            }
-        }
+			ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+			try {
+				Thread.currentThread().setContextClassLoader(classLoader);
+				getObject();
+			}
+			finally {
+				Thread.currentThread().setContextClassLoader(tccl);
+			}
+		}
 	}
 
 	/*
@@ -129,7 +127,7 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 
 		if (proxy == null) {
 			if (CardinalityOptions.atMostOneExpected(cardinality)) {
-				proxy = createSingleServiceProxy();
+				proxy = createSingleServiceProxy(serviceTypes, listeners, classLoader);
 			}
 			else {
 				proxy = createMultiServiceCollection(getUnifiedFilter());
@@ -178,8 +176,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-        Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
-        Assert.notNull(classLoader, "Required classLoader property was not set");
+		Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
+		Assert.notNull(classLoader, "Required classLoader property was not set");
 		Assert.notNull(serviceTypes, "Required serviceTypes property was not set");
 		// validate specified classes
 		Assert.isTrue(doesContainMultipleConcreteClasses(serviceTypes),
@@ -246,14 +244,15 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		return true;
 	}
 
-	protected Object createSingleServiceProxy() {
+	protected Object createSingleServiceProxy(Class[] classes, TargetSourceLifecycleListener[] listeners,
+			ClassLoader loader) {
 		if (log.isDebugEnabled())
 			log.debug("creating a singleService proxy");
 
-        ProxyFactory factory = new ProxyFactory();
+		ProxyFactory factory = new ProxyFactory();
 
 		// mold the proxy
-		configureFactoryForClass(factory, serviceTypes);
+		configureFactoryForClass(factory, classes);
 
 		// TODO: the same advices should be available for the multi case/service
 		// collection
@@ -261,7 +260,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		// Bundle Ctx
 		addLocalBundleContextSupport(factory);
 
-		// dynamic retry interceptor / context classloader / service aware implementation
+		// dynamic retry interceptor / context classloader / service aware
+		// implementation
 		addOsgiRetryInterceptor(factory, getUnifiedFilter(), listeners);
 
 		// TODO: should these be enabled ?
@@ -269,8 +269,8 @@ public class OsgiServiceProxyFactoryBean implements FactoryBean, InitializingBea
 		// factory.setOptimize(true);
 		// factory.setOpaque(true);
 
-		try { 
-            return factory.getProxy(classLoader);
+		try {
+			return factory.getProxy(loader);
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			if (log.isWarnEnabled()) {
