@@ -41,6 +41,8 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 
 	private Map services;
 
+	private String[] classInterfaces = new String[] { Cloneable.class.getName() };
+
 	/*
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -75,7 +77,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 	public void testHashCodeBetweenProxyAndTarget() {
 		Date date = new Date(123);
 
-		ServiceReference ref = new MockServiceReference();
+		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
 		Object proxy = col.createServiceProxy(ref);
@@ -87,7 +89,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 	public void testHashCodeBetweenProxies() {
 		Date date = new Date(123);
 
-		ServiceReference ref = new MockServiceReference();
+		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
 		Object proxy = col.createServiceProxy(ref);
@@ -98,7 +100,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 	public void testEqualsBetweenProxyAndTarget() {
 		Date date = new Date(123);
 
-		ServiceReference ref = new MockServiceReference();
+		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
 		Object proxy = col.createServiceProxy(ref);
@@ -109,7 +111,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 	public void testEqualsBetweenProxies() {
 		Date date = new Date(123);
 
-		ServiceReference ref = new MockServiceReference();
+		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
 		Object proxy = col.createServiceProxy(ref);
@@ -120,7 +122,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 	public void testHashCodeBetweenProxyAndItself() {
 		Date date = new Date(123);
 
-		ServiceReference ref = new MockServiceReference();
+		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
 		Object proxy = col.createServiceProxy(ref);
@@ -131,7 +133,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 	public void testEqualsBetweenProxyAndItself() {
 		Date date = new Date(123);
 
-		ServiceReference ref = new MockServiceReference();
+		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
 		Object proxy = col.createServiceProxy(ref);
