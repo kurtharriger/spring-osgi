@@ -39,6 +39,8 @@ public class MockServiceReference implements ServiceReference {
 
 	private Bundle bundle;
 
+	private static long serviceId = System.currentTimeMillis();
+
 	// private ServiceRegistration registration;
 	private Dictionary properties;
 
@@ -83,7 +85,7 @@ public class MockServiceReference implements ServiceReference {
 	private void addMandatoryProperties(Dictionary dict) {
 		// add mandatory properties
 		if (dict.get(Constants.SERVICE_ID) == null)
-			dict.put(Constants.SERVICE_ID, new Long(System.currentTimeMillis()));
+			dict.put(Constants.SERVICE_ID, new Long(serviceId++));
 
 		if (dict.get(Constants.OBJECTCLASS) == null)
 			dict.put(Constants.OBJECTCLASS, objectClass);

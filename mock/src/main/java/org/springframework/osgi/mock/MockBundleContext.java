@@ -18,19 +18,21 @@ package org.springframework.osgi.mock;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Dictionary;
+import java.util.LinkedHashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.Constants;
 
 /**
  * BundleContext mock.
@@ -51,6 +53,8 @@ public class MockBundleContext implements BundleContext {
 
 	private Properties properties;
 
+	protected Set serviceListeners;
+
 	public MockBundleContext() {
 		this(null, null);
 	}
@@ -64,6 +68,9 @@ public class MockBundleContext implements BundleContext {
 		properties = new Properties(DEFAULT_PROPERTIES);
 		if (props != null)
 			properties.putAll(props);
+
+		// make sure the order is preserved
+		this.serviceListeners = new LinkedHashSet(2);
 	}
 
 	/*
@@ -103,6 +110,9 @@ public class MockBundleContext implements BundleContext {
 	 * java.lang.String)
 	 */
 	public void addServiceListener(ServiceListener listener, String filter) throws InvalidSyntaxException {
+		if (listener == null)
+			throw new IllegalArgumentException("non-null listener required");
+		this.serviceListeners.add(listener);
 	}
 
 	/*
@@ -194,14 +204,20 @@ public class MockBundleContext implements BundleContext {
 	 * java.lang.String)
 	 */
 	public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
-		// Some jiggery-pokery to get round the fact that we don't ever use the clazz
-		if (clazz == null) {
-			int i = filter.indexOf(Constants.OBJECTCLASS + "=");
-			if (i>0) {
-				clazz = filter.substring(i+Constants.OBJECTCLASS.length()+1);
-				clazz = clazz.substring(0, clazz.indexOf(")"));
+		// Some jiggery-pokery to get round the fact that we don't ever use the
+		// clazz
+		if (clazz == null)
+			if (filter != null) {
+				{
+					int i = filter.indexOf(Constants.OBJECTCLASS + "=");
+					if (i > 0) {
+						clazz = filter.substring(i + Constants.OBJECTCLASS.length() + 1);
+						clazz = clazz.substring(0, clazz.indexOf(")"));
+					}
+				}
 			}
-		}
+			else
+				clazz = Object.class.getName();
 		return new ServiceReference[] { new MockServiceReference(getBundle(), new String[] { clazz }) };
 	}
 
@@ -231,7 +247,19 @@ public class MockBundleContext implements BundleContext {
 	 * java.lang.Object, java.util.Dictionary)
 	 */
 	public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
-		return new MockServiceRegistration(properties);
+		MockServiceRegistration reg = new MockServiceRegistration(properties);
+
+		// disabled for now
+		// MockServiceReference ref = new MockServiceReference(this.bundle,
+		// properties, reg, clazzes);
+		// ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, ref);
+		//
+		// for (Iterator iter = serviceListeners.iterator(); iter.hasNext();) {
+		// ServiceListener listener = (ServiceListener) iter.next();
+		// listener.serviceChanged(event);
+		// }
+
+		return reg;
 	}
 
 	/*
@@ -266,6 +294,7 @@ public class MockBundleContext implements BundleContext {
 	 * @see org.osgi.framework.BundleContext#removeServiceListener(org.osgi.framework.ServiceListener)
 	 */
 	public void removeServiceListener(ServiceListener listener) {
+		serviceListeners.remove(listener);
 	}
 
 	/*
@@ -279,6 +308,15 @@ public class MockBundleContext implements BundleContext {
 
 	public void setBundle(Bundle bundle) {
 		this.bundle = bundle;
+	}
+
+	// hooks
+
+	/**
+	 * Handy method when mocking with listeners is required.
+	 */
+	public Set getServiceListeners() {
+		return serviceListeners;
 	}
 
 }
