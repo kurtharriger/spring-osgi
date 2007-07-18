@@ -18,7 +18,7 @@ package org.springframework.osgi.service.collection;
 import java.util.Date;
 import java.util.ListIterator;
 
-public class OsgiServiceListTests extends AbstractOsgiCollectionTests {
+public class OsgiServiceListTest extends AbstractOsgiCollectionTest {
 
 	private OsgiServiceList col;
 

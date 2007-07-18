@@ -37,7 +37,7 @@ import org.springframework.util.ClassUtils;
  * @author Costin Leau
  * 
  */
-public abstract class AbstractOsgiCollectionTests extends TestCase {
+public abstract class AbstractOsgiCollectionTest extends TestCase {
 
 	protected MockBundleContext context;
 
