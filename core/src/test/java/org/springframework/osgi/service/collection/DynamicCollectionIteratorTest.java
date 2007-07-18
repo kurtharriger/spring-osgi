@@ -29,7 +29,7 @@ import junit.framework.TestCase;
  * @author Costin Leau
  * 
  */
-public class DynamicCollectionIteratorTests extends TestCase {
+public class DynamicCollectionIteratorTest extends TestCase {
 	private Collection dynamicCollection;
 
 	private Iterator iter;

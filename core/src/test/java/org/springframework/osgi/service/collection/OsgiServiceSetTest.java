@@ -21,7 +21,7 @@ import java.util.Iterator;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceSetTests extends AbstractOsgiCollectionTests {
+public class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 
 	private OsgiServiceSet col;
 

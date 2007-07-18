@@ -31,7 +31,7 @@ import org.springframework.osgi.GCTests;
  * @author Costin Leau
  * 
  */
-public class WeakCollectionTests extends TestCase {
+public class WeakCollectionTest extends TestCase {
 
 	public void testWeakList() {
 		List list = new ArrayList();
