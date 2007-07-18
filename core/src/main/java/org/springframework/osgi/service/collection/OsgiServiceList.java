@@ -29,8 +29,8 @@ import org.osgi.framework.Filter;
  * is being retrieved dynamically from the OSGi platform.
  * 
  * <p/> This collection and its iterators are thread-safe. That is, multiple
- * threads can access the collection. However, since the collection is read-only,
- * it cannot be modified by the client.
+ * threads can access the collection. However, since the collection is
+ * read-only, it cannot be modified by the client.
  * 
  * @author Costin Leau
  * 
@@ -53,7 +53,9 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 	public Object get(int index) {
 		// get the id from the specified position and retrieve its associated
 		// service
-		return serviceReferences.get(storage.get(index));
+		synchronized (serviceIDs) {
+			return serviceReferences.get(storage.get(index));			
+		}
 	}
 
 	public int indexOf(Object o) {
@@ -89,7 +91,9 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 			}
 
 			public Object next() {
-				return serviceReferences.get(iter.next());
+				synchronized (serviceIDs) {
+					return serviceReferences.get(iter.next());
+				}
 			}
 
 			public int nextIndex() {
@@ -97,7 +101,9 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 			}
 
 			public Object previous() {
-				return serviceReferences.get(iter.previous());
+				synchronized (serviceIDs) {
+					return serviceReferences.get(iter.previous());
+				}
 			}
 
 			public int previousIndex() {

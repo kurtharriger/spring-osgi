@@ -115,12 +115,10 @@ public class DynamicSortedSet extends DynamicSet implements SortedSet {
 
 	public Object last() {
 		synchronized (storage) {
-			synchronized (storage) {
-				if (storage.isEmpty())
-					throw new NoSuchElementException();
-				else
-					return storage.get(storage.size() - 1);
-			}
+			if (storage.isEmpty())
+				throw new NoSuchElementException();
+			else
+				return storage.get(storage.size() - 1);
 		}
 	}
 
