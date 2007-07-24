@@ -50,7 +50,8 @@ public class OsgiServiceSortedList extends OsgiServiceList {
 	}
 
 	protected DynamicCollection createInternalDynamicStorage() {
-		return new DynamicSortedList(comparator);
+		storage = new DynamicSortedList(comparator);
+		return (DynamicCollection) storage;
 	}
 
 }

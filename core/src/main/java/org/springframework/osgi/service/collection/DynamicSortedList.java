@@ -70,11 +70,31 @@ public class DynamicSortedList extends DynamicList {
 				// duplicate found; it's okay since it's a list
 				boolean duplicate = (index >= 0);
 
+				// however, make sure we add the element at the end of the
+				// duplicates
+				if (duplicate) {
+					boolean stillEqual = true;
+					while (index + 1 < storage.size() && stillEqual) {
+
+						stillEqual = false;
+						Object next = storage.get(index + 1);
+
+						if ((comparator != null ? comparator.compare(o, next) == 0
+								: ((Comparable) o).compareTo(next) == 0)) {
+							stillEqual = true;
+							index++;
+						}
+					}
+				}
+
 				// translate index
-				if (!duplicate)
+				else
 					index = -index - 1;
 
-				super.add(index, o);
+				if (duplicate)
+					super.add(index + 1, o);
+				else
+					super.add(index, o);
 
 			}
 		}
@@ -90,6 +110,10 @@ public class DynamicSortedList extends DynamicList {
 	}
 
 	public boolean addAll(int index, Collection c) {
+		throw new UnsupportedOperationException("this is a sorted list; it is illegal to specify the element position");
+	}
+
+	public Object set(int index, Object o) {
 		throw new UnsupportedOperationException("this is a sorted list; it is illegal to specify the element position");
 	}
 
