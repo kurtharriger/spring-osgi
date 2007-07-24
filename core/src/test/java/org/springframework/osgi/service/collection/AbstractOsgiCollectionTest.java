@@ -111,6 +111,10 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 	}
 
 	protected void addService(Object service, Dictionary properties) {
+
+		ServiceReference ref = null;
+		ServiceEvent event = null;
+
 		Set intfs = ClassUtils.getAllInterfacesAsSet(service);
 		String[] clazzez = new String[intfs.size()];
 
@@ -119,9 +123,9 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 			clazzez[i++] = ((Class) iter.next()).getName();
 		}
 
-		ServiceReference ref = new MockServiceReference(null, properties, null, clazzez);
+		ref = new MockServiceReference(null, properties, null, clazzez);
 
-		ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, ref);
+		event = new ServiceEvent(ServiceEvent.REGISTERED, ref);
 
 		services.put(ref, service);
 

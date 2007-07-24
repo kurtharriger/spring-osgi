@@ -103,7 +103,7 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 	/**
 	 * cast the collection to a specialized collection
 	 */
-	private List storage;
+	protected List storage;
 
 	public OsgiServiceList(Filter filter, BundleContext context, ClassLoader classLoader) {
 		super(filter, context, classLoader);
