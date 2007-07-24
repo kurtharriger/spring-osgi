@@ -72,38 +72,45 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 				Thread.currentThread().setContextClassLoader(classLoader);
 				ServiceReference ref = event.getServiceReference();
 				Long serviceId = (Long) ref.getProperty(Constants.SERVICE_ID);
-				boolean found = false;
+				boolean collectionModified = false;
 
 				switch (event.getType()) {
 
 				case (ServiceEvent.REGISTERED):
 				case (ServiceEvent.MODIFIED):
 					// same as ServiceEvent.REGISTERED
-					synchronized (serviceIDs) {
-						if (!serviceReferences.containsKey(serviceId)) {
-							found = true;
-							serviceReferences.put(serviceId, createServiceProxy(ref));
-							serviceIDs.add(serviceId);
+					synchronized (serviceProxies) {
+						if (!servicesIdMap.containsKey(serviceId)) {
+							Object proxy = createServiceProxy(ref);
+							// let the dynamic collection decide if the service
+							// is added or not (think set, sorted set)
+							if (serviceProxies.add(proxy)) {
+								collectionModified = true;
+								servicesIdMap.put(serviceId, proxy);
+							}
 						}
 					}
 					// inform listeners
 					// TODO: should this be part of the lock also?
-					if (found)
+					if (collectionModified)
 						OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
 
 					break;
 				case (ServiceEvent.UNREGISTERING):
-					synchronized (serviceIDs) {
-						// remove servce
-						Object proxy = serviceReferences.remove(serviceId);
-						found = serviceIDs.remove(serviceId);
+					synchronized (serviceProxies) {
+						// remove service id / proxy association
+						Object proxy = servicesIdMap.remove(serviceId);
 						if (proxy != null) {
+							// before removal, allow analysis
+							checkDeadProxies(proxy);
+							// remove service proxy
+							collectionModified = serviceProxies.remove(proxy);
+							// invalidate it
 							invalidateProxy(proxy);
-							assignLastDeadProxy(proxy);
 						}
 					}
 					// TODO: should this be part of the lock also?
-					if (found)
+					if (collectionModified)
 						OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
 					break;
 
@@ -124,6 +131,33 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 		}
 	}
 
+	/**
+	 * Read-only iterator wrapper around the dynamic collection iterator.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	protected class OsgiServiceIterator implements Iterator {
+		// dynamic thread-safe iterator
+		private final Iterator iter = serviceProxies.iterator();
+
+		public boolean hasNext() {
+			return iter.hasNext();
+		}
+
+		public Object next() {
+			synchronized (serviceProxies) {
+				Object proxy = iter.next();
+				return (proxy == null ? tailDeadProxy : proxy);
+			}
+		}
+
+		public void remove() {
+			// write operations disabled
+			throw new UnsupportedOperationException();
+		}
+	}
+
 	private static final Log log = LogFactory.getLog(OsgiServiceCollection.class);
 
 	// map of services
@@ -131,13 +165,13 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	// values
 	// Map<ServiceId, ServiceProxy>
 	// 
-	// NOTE: this collection is protected by the 'serviceIDs' lock.
-	protected final Map serviceReferences = new LinkedHashMap(8);
+	// NOTE: this collection is protected by the 'serviceProxies' lock.
+	protected final Map servicesIdMap = new LinkedHashMap(8);
 
 	/**
-	 * list binding the service IDs to the map of service proxies
+	 * The dynamic collection.
 	 */
-	protected final Collection serviceIDs = createInternalDynamicStorage();
+	protected DynamicCollection serviceProxies;
 
 	/**
 	 * Recall the last proxy for the rare case, where a service goes down
@@ -146,7 +180,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	 * Subclasses should implement their own strategy when it comes to assign a
 	 * value to it through
 	 */
-	protected volatile Object lastDeadProxy;
+	protected volatile Object tailDeadProxy;
 
 	private final Filter filter;
 
@@ -177,16 +211,20 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() {
+		// create service proxies collection
+		this.serviceProxies = createInternalDynamicStorage();
+
 		if (log.isTraceEnabled())
 			log.trace("adding osgi listener for services matching [" + filter + "]");
 		OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
+
 	}
 
 	/**
 	 * Create the dynamic storage used internally. The storage <strong>has</strong>
 	 * to be thread-safe.
 	 */
-	protected Collection createInternalDynamicStorage() {
+	protected DynamicCollection createInternalDynamicStorage() {
 		return new DynamicCollection();
 	}
 
@@ -268,41 +306,32 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	 * 
 	 * @param proxy
 	 */
-	protected void assignLastDeadProxy(Object proxy) {
-		this.lastDeadProxy = proxy;
+	protected void checkDeadProxies(Object proxy, int proxyCollectionPos) {
+		if (proxyCollectionPos == serviceProxies.size() - 1)
+			tailDeadProxy = proxy;
+	}
+
+	/**
+	 * Private method, computing the index and share it with subclasses.
+	 * @param proxy
+	 */
+	private void checkDeadProxies(Object proxy) {
+		// no need for a collection lock (alreayd have it)
+		int index = serviceProxies.indexOf(proxy);
+		checkDeadProxies(proxy, index);
 	}
 
 	public Iterator iterator() {
-		// use the service map not just the list of indexes
-		return new Iterator() {
-			// dynamic thread-safe iterator
-			private final Iterator iter = serviceIDs.iterator();
-
-			public boolean hasNext() {
-				return iter.hasNext();
-			}
-
-			public Object next() {
-				synchronized (serviceIDs) {
-					Object id = iter.next();
-					return (id == null ? lastDeadProxy : serviceReferences.get(id));
-				}
-			}
-
-			public void remove() {
-				// write operations disabled
-				throw new UnsupportedOperationException();
-			}
-		};
+		return new OsgiServiceIterator();
 	}
 
 	public int size() {
-		return serviceIDs.size();
+		return serviceProxies.size();
 	}
 
 	public String toString() {
-		synchronized (serviceIDs) {
-			return serviceReferences.values().toString();
+		synchronized (serviceProxies) {
+			return serviceProxies.toString();
 		}
 	}
 
@@ -334,15 +363,11 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	}
 
 	public boolean contains(Object o) {
-		synchronized (serviceIDs) {
-			return serviceReferences.containsValue(o);
-		}
+		return serviceProxies.contains(o);
 	}
 
 	public boolean containsAll(Collection c) {
-		synchronized (serviceIDs) {
-			return serviceReferences.values().containsAll(c);
-		}
+		return serviceProxies.containsAll(c);
 	}
 
 	public boolean isEmpty() {
@@ -350,15 +375,11 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	}
 
 	public Object[] toArray() {
-		synchronized (serviceIDs) {
-			return serviceReferences.values().toArray();
-		}
+		return serviceProxies.toArray();
 	}
 
 	public Object[] toArray(Object[] array) {
-		synchronized (serviceIDs) {
-			return serviceReferences.values().toArray(array);
-		}
+		return serviceProxies.toArray(array);
 	}
 
 	/**

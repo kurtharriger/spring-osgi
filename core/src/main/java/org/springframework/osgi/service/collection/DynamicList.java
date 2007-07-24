@@ -103,7 +103,7 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 	}
 
 	public void add(int index, Object o) {
-		storage.add(index, o);
+		super.add(index, o);
 	}
 
 	public boolean addAll(int index, Collection c) {
@@ -124,11 +124,11 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 
 	public ListIterator listIterator() {
 		ListIterator iter = new DynamicListIterator(0);
-		
+
 		synchronized (iterators) {
 			iterators.put(iter, null);
 		}
-		
+
 		return iter;
 	}
 

@@ -15,13 +15,13 @@
  */
 package org.springframework.osgi.service.collection;
 
-import java.util.Set;
+import java.util.Comparator;
+import java.util.SortedSet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 
 /**
- * 
  * OSGi service dynamic collection - allows iterating while the underlying
  * storage is being shrunk/expanded. This collection is read-only - its content
  * is being retrieved dynamically from the OSGi platform.
@@ -33,14 +33,51 @@ import org.osgi.framework.Filter;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceSet extends OsgiServiceCollection implements Set {
+public class OsgiServiceSortedSet extends OsgiServiceSet implements SortedSet {
 
-	public OsgiServiceSet(Filter filter, BundleContext context, ClassLoader classLoader) {
+	/**
+	 * cast the collection to a specialized collection
+	 */
+	private SortedSet storage;
+
+	private final Comparator comparator;
+
+	public OsgiServiceSortedSet(Filter filter, BundleContext context, ClassLoader classLoader) {
+		this(filter, context, classLoader, null);
+	}
+
+	public OsgiServiceSortedSet(Filter filter, BundleContext context, ClassLoader classLoader, Comparator comparator) {
 		super(filter, context, classLoader);
+		this.comparator = comparator;
 	}
 
 	protected DynamicCollection createInternalDynamicStorage() {
-		return new DynamicSet();
+		storage = new DynamicSortedSet(comparator);
+		return (DynamicCollection) storage;
+	}
+
+	public Comparator comparator() {
+		return storage.comparator();
+	}
+
+	public Object first() {
+		return storage.first();
+	}
+
+	public Object last() {
+		return storage.last();
+	}
+
+	public SortedSet tailSet(Object fromElement) {
+		return storage.tailSet(fromElement);
+	}
+
+	public SortedSet headSet(Object toElement) {
+		return storage.headSet(toElement);
+	}
+
+	public SortedSet subSet(Object fromElement, Object toElement) {
+		return storage.subSet(fromElement, toElement);
 	}
 
 }

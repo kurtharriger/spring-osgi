@@ -15,6 +15,7 @@
  */
 package org.springframework.osgi.service.collection;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,9 +25,12 @@ import junit.framework.TestCase;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Unit test for the static proxies returned by Osgi collection.
@@ -82,6 +86,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 
 		Object proxy = col.createServiceProxy(ref);
 
+		System.out.println(ObjectUtils.nullSafeToString((ClassUtils.getAllInterfaces(proxy))));
 		assertFalse("proxy and service should have different hashcodes", date.hashCode() == proxy.hashCode());
 
 	}

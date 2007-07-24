@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public class ServiceWrapper {
+public class ServiceWrapper implements Comparable {
 
 	private ServiceReference reference;
 
@@ -52,25 +52,26 @@ public class ServiceWrapper {
 		this.context = bundleContext;
 
 		serviceId = OsgiServiceReferenceUtils.getServiceId(ref);
-
 		serviceRanking = OsgiServiceReferenceUtils.getServiceRanking(ref);
 
 		toString = "ServiceWrapper[serviceId=" + serviceId + "|ref=" + reference + "]";
 	}
 
 	public boolean isServiceAlive() {
-		return (!(reference == null || context == null || reference.getBundle() == null));
+		return (!(context == null || reference.getBundle() == null));
 	}
 
 	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
 		if (obj instanceof ServiceWrapper) {
-			return (hashCode() == obj.hashCode());
+			return (reference.equals(((ServiceWrapper) obj).reference));
 		}
 		return false;
 	}
 
 	public int hashCode() {
-		return (int) serviceId;
+		return ServiceWrapper.class.hashCode() * 13 + (int) serviceId;
 	}
 
 	public String toString() {
@@ -105,9 +106,17 @@ public class ServiceWrapper {
 	}
 
 	public void cleanup() {
-//        if (isServiceAlive()) {
-//           context.ungetService(reference);
-//      }
-        this.context = null;
+		// if (isServiceAlive()) {
+		// context.ungetService(reference);
+		// }
+		this.context = null;
+	}
+
+	public int compareTo(Object o) {
+		return compareTo((ServiceWrapper) o);
+	}
+
+	public int compareTo(ServiceWrapper other) {
+		return (serviceId < other.serviceId ? -1 : (serviceId == other.serviceId ? 0 : 1));
 	}
 }

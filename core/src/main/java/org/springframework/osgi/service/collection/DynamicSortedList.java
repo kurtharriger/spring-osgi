@@ -18,50 +18,42 @@ package org.springframework.osgi.service.collection;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.NoSuchElementException;
-import java.util.SortedSet;
 
 import org.springframework.util.Assert;
 
 /**
- * Dynamic sorted set. The elements added at runtime, while preserve their
- * natural order which means
+ * A specilized subtype of DynamicList which impose an order between its
+ * elements.
  * 
  * @author Costin Leau
  * 
  */
-public class DynamicSortedSet extends DynamicSet implements SortedSet {
+public class DynamicSortedList extends DynamicList {
 
 	private final Comparator comparator;
 
-	public DynamicSortedSet() {
+	public DynamicSortedList() {
 		this((Comparator) null);
 	}
 
-	public DynamicSortedSet(Collection c) {
-		comparator = null;
-		addAll(c);
-	}
-
-	public DynamicSortedSet(int size) {
-		super(size);
-		comparator = null;
-	}
-
-	public DynamicSortedSet(SortedSet ss) {
-		this.comparator = ss.comparator();
-		addAll(ss);
-	}
-
-	public DynamicSortedSet(Comparator c) {
+	public DynamicSortedList(Comparator c) {
+		super();
 		this.comparator = c;
 
 	}
 
-	public Comparator comparator() {
-		return comparator;
+	public DynamicSortedList(Collection c) {
+		this.comparator = null;
+		addAll(c);
 	}
 
+	public DynamicSortedList(int size) {
+		super(size);
+		this.comparator = null;
+	}
+
+	// this is very similar but not identical from DynamicSortedSet
+	// the main difference is that duplicates are accepted
 	public boolean add(Object o) {
 		Assert.notNull(o);
 
@@ -75,53 +67,30 @@ public class DynamicSortedSet extends DynamicSet implements SortedSet {
 		synchronized (iteratorsLock) {
 			synchronized (storage) {
 				index = Collections.binarySearch(storage, o, comparator);
-				// duplicate found; bail out
-				if (index >= 0)
-					return false;
+				// duplicate found; it's okay since it's a list
+				boolean duplicate = (index >= 0);
 
 				// translate index
-				index = -index - 1;
+				if (!duplicate)
+					index = -index - 1;
 
 				super.add(index, o);
+
 			}
 		}
-
 		return true;
 	}
 
-	public boolean remove(Object o) {
-		Assert.notNull(o);
-		return super.remove(o);
+	//
+	// DISABLED OPERATIONS
+	// 
+
+	public void add(int index, Object o) {
+		throw new UnsupportedOperationException("this is a sorted list; it is illegal to specify the element position");
 	}
 
-	public Object first() {
-		synchronized (storage) {
-			if (storage.isEmpty())
-				throw new NoSuchElementException();
-			else
-				return storage.get(0);
-		}
-	}
-
-	public SortedSet headSet(Object toElement) {
-		throw new UnsupportedOperationException();
-	}
-
-	public Object last() {
-		synchronized (storage) {
-			if (storage.isEmpty())
-				throw new NoSuchElementException();
-			else
-				return storage.get(storage.size() - 1);
-		}
-	}
-
-	public SortedSet subSet(Object fromElement, Object toElement) {
-		throw new UnsupportedOperationException();
-	}
-
-	public SortedSet tailSet(Object fromElement) {
-		throw new UnsupportedOperationException();
+	public boolean addAll(int index, Collection c) {
+		throw new UnsupportedOperationException("this is a sorted list; it is illegal to specify the element position");
 	}
 
 }

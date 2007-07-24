@@ -43,7 +43,7 @@ public class WeakCollectionTest extends TestCase {
 
 		GCTests.assertGCed(new WeakReference(new Object()));
 		for (int i = 0; i < list.size(); i++) {
-			System.out.println(((WeakReference) list.get(i)).get());
+			assertNull(((WeakReference) list.get(i)).get());
 
 		}
 	}
@@ -61,7 +61,7 @@ public class WeakCollectionTest extends TestCase {
 		
 		for (Iterator iter = entries.iterator(); iter.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();
-			System.out.println(entry.getKey());
+			assertNull(entry.getKey());
 		}
 
 	}

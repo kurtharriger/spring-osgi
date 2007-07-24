@@ -15,17 +15,23 @@
  */
 package org.springframework.osgi.service.collection;
 
+import java.util.Dictionary;
 import java.util.Iterator;
+import java.util.Properties;
+
+import org.osgi.framework.Constants;
 
 /**
  * @author Costin Leau
  * 
  */
-public abstract class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
+public class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 
 	private OsgiServiceSet col;
 
 	private Iterator iter;
+
+	private Dictionary serviceProps;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -33,6 +39,11 @@ public abstract class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 		col.afterPropertiesSet();
 
 		iter = col.iterator();
+
+		serviceProps = new Properties();
+		// set the id to test uniqueness
+		serviceProps.put(Constants.SERVICE_ID, new Long(13));
+
 	}
 
 	protected void tearDown() throws Exception {
@@ -43,14 +54,16 @@ public abstract class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 
 	public void testAddDuplicates() {
 		long time1 = 123;
+
 		Wrapper date = new DateWrapper(time1);
 
 		assertEquals(0, col.size());
 
-		addService(date);
+		addService(date, serviceProps);
 		assertEquals(1, col.size());
-		addService(date);
-		assertEquals(1, col.size());
+
+		addService(date, serviceProps);
+		assertEquals("set accepts duplicate services", 1, col.size());
 	}
 
 	public void testAddEqualServiceInstances() {
@@ -62,10 +75,10 @@ public abstract class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 
 		assertEquals(0, col.size());
 
-		addService(date1);
+		addService(date1, serviceProps);
 		assertEquals(1, col.size());
-		addService(date2);
-		assertEquals(1, col.size());
+		addService(date2, serviceProps);
+		assertEquals("set accepts duplicate services", 1, col.size());
 	}
 
 	public void testAddEqualServiceInstancesWithIterator() {
@@ -78,12 +91,12 @@ public abstract class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 		assertEquals(0, col.size());
 
 		assertFalse(iter.hasNext());
-		addService(date1);
+		addService(date1, serviceProps);
 		assertTrue(iter.hasNext());
-		assertEquals(date1.execute(), iter.next());
+		assertEquals(date1.execute(), ((Wrapper) iter.next()).execute());
 		assertFalse(iter.hasNext());
-		addService(date1);
-		assertFalse(iter.hasNext());
+		addService(date1, serviceProps);
+		assertFalse("set accepts duplicate services", iter.hasNext());
 	}
 
 	public void testRemoveDuplicates() {

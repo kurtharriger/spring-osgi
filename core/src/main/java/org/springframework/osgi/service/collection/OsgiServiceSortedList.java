@@ -15,32 +15,42 @@
  */
 package org.springframework.osgi.service.collection;
 
-import java.util.Set;
+import java.util.Comparator;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 
 /**
+ * Ordered list similar to a SortedSet with the difference, that it accepts
+ * duplicates.
  * 
- * OSGi service dynamic collection - allows iterating while the underlying
- * storage is being shrunk/expanded. This collection is read-only - its content
- * is being retrieved dynamically from the OSGi platform.
- * 
- * <p/> This collection and its iterators are thread-safe. That is, multiple
- * threads can access the collection. However, since the collection is
- * read-only, it cannot be modified by the client.
+ * @see Comparable
+ * @see Comparator
+ * @see java.util.SortedSet
  * 
  * @author Costin Leau
  * 
  */
-public class OsgiServiceSet extends OsgiServiceCollection implements Set {
+public class OsgiServiceSortedList extends OsgiServiceList {
 
-	public OsgiServiceSet(Filter filter, BundleContext context, ClassLoader classLoader) {
+	private final Comparator comparator;
+
+	/**
+	 * @param filter
+	 * @param context
+	 * @param classLoader
+	 */
+	public OsgiServiceSortedList(Filter filter, BundleContext context, ClassLoader classLoader) {
+		this(filter, context, classLoader, null);
+	}
+
+	public OsgiServiceSortedList(Filter filter, BundleContext context, ClassLoader classLoader, Comparator comparator) {
 		super(filter, context, classLoader);
+		this.comparator = comparator;
 	}
 
 	protected DynamicCollection createInternalDynamicStorage() {
-		return new DynamicSet();
+		return new DynamicSortedList(comparator);
 	}
 
 }
