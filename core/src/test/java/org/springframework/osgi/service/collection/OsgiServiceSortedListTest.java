@@ -182,5 +182,5 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		assertTrue(iterator.hasPrevious());
 		removeService(date1);
 	}
-
+	
 }

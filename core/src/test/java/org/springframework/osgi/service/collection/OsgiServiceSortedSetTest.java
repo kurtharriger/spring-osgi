@@ -103,4 +103,32 @@ public class OsgiServiceSortedSetTest extends AbstractOsgiCollectionTest {
 		assertTrue(iter.hasNext());
 		assertEquals(date3.toString(), iter.next().toString());
 	}
+	
+
+	public void testRemovalWhileIterating() {
+		Wrapper date1 = new DateWrapper(1);
+		Wrapper date2 = new DateWrapper(2);
+		Wrapper date3 = new DateWrapper(3);
+
+		addService(date2);
+		addService(date3);
+		addService(date1);
+		addService(date2);
+		addService(date1);
+
+		assertEquals("collection should not accept duplicates", 3, col.size());
+		
+		// date1
+		assertEquals(date1.toString(), iter.next().toString());
+
+		removeService(date1);
+
+		// date2
+		assertEquals(date2.toString(), iter.next().toString());
+
+		removeService(date2);
+		// date 3
+		assertEquals(date3.toString(), iter.next().toString());
+	}
+
 }
