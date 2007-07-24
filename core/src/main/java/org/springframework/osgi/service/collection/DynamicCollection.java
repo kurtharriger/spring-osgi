@@ -97,7 +97,6 @@ public class DynamicCollection extends AbstractCollection {
 						if (hasNext())
 							return storage.get(cursor++);
 					}
-					// TODO: add hook for replaced objects
 					return null;
 				}
 				else if (Boolean.FALSE == hasNext)
@@ -234,6 +233,30 @@ public class DynamicCollection extends AbstractCollection {
 		return o;
 	}
 
+	// extra-collection method used by list or sorted set.
+	// adds an object to the indicated position forcing an update on the
+	// iterators.
+	protected void add(int index, Object o) {
+		// update iterators (since items are not added at the end
+		// anymore)
+
+		synchronized (iteratorsLock) {
+
+			// update storage
+
+			storage.add(index, o);
+
+			for (Iterator iter = iterators.entrySet().iterator(); iter.hasNext();) {
+				Map.Entry entry = (Map.Entry) iter.next();
+				DynamicIterator dynamicIterator = (DynamicIterator) entry.getKey();
+
+				if (index < dynamicIterator.cursor)
+					dynamicIterator.cursor++;
+			}
+
+		}
+	}
+
 	public Object[] toArray() {
 		return storage.toArray();
 	}
@@ -244,6 +267,17 @@ public class DynamicCollection extends AbstractCollection {
 
 	public String toString() {
 		return storage.toString();
+	}
+
+	/**
+	 * Hook used by wrapping collections to determine the position of the object
+	 * being removed while iterating.
+	 * 
+	 * @param o
+	 * @return
+	 */
+	protected int indexOf(Object o) {
+		return storage.indexOf(o);
 	}
 
 }

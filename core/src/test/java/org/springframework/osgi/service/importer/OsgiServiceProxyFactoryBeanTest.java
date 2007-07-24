@@ -169,4 +169,5 @@ public class OsgiServiceProxyFactoryBeanTest extends TestCase {
 		field.setAccessible(true);
 		assertSame(listeners, field.get(serviceFactoryBean.getObject()));
 	}
+	
 }

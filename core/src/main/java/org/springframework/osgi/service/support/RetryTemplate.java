@@ -18,7 +18,7 @@ package org.springframework.osgi.service.support;
 import org.springframework.util.Assert;
 
 /**
- * Simple retry template.
+ * Wrapper retry template.
  *
  * @author Costin Leau
  */

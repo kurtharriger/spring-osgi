@@ -16,9 +16,11 @@
 package org.springframework.osgi.service.collection;
 
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -43,13 +45,11 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 
 	protected Map services;
 
-	
-
 	public static interface Wrapper {
 		Object execute();
 	}
 
-	public static class DateWrapper implements Wrapper {
+	public static class DateWrapper implements Wrapper, Comparable {
 		private Date date;
 
 		public DateWrapper(long time) {
@@ -59,9 +59,29 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 		public Object execute() {
 			return new Long(date.getTime());
 		}
+
+		public boolean equals(Object other) {
+			if (this == other)
+				return true;
+			if (other instanceof DateWrapper) {
+				DateWrapper oth = (DateWrapper) other;
+				return (date.equals(oth.date));
+			}
+			return false;
+		}
+
+		public int hashCode() {
+			return DateWrapper.class.hashCode() * 13 + date.hashCode();
+		}
+
+		public int compareTo(Object o) {
+			Wrapper wr = (Wrapper) o;
+			Long time = (Long) wr.execute();
+			return new Long(date.getTime()).compareTo(time);
+		}
+
 	};
 
-	
 	/*
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -90,7 +110,7 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 		context = null;
 	}
 
-	protected void addService(Object service) {
+	protected void addService(Object service, Dictionary properties) {
 		Set intfs = ClassUtils.getAllInterfacesAsSet(service);
 		String[] clazzez = new String[intfs.size()];
 
@@ -99,7 +119,7 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 			clazzez[i++] = ((Class) iter.next()).getName();
 		}
 
-		ServiceReference ref = new MockServiceReference(clazzez);
+		ServiceReference ref = new MockServiceReference(null, properties, null, clazzez);
 
 		ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, ref);
 
@@ -111,8 +131,12 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 		}
 	}
 
+	protected void addService(Object service) {
+		addService(service, new Properties());
+	}
+
 	protected void removeService(Object service) {
-		ServiceReference ref = null;
+		ServiceReference ref = new MockServiceReference();
 
 		for (Iterator iter = services.entrySet().iterator(); iter.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();

@@ -73,7 +73,7 @@ public class ParserUtils {
 	}
 
 	/**
-	 * Simple callback used for parsing attributes that have not been covered by
+	 * Wrapper callback used for parsing attributes that have not been covered by
 	 * the skipBeanAttributes method.
 	 * 
 	 * @author Costin Leau

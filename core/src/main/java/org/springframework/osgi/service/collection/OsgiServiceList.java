@@ -37,25 +37,95 @@ import org.osgi.framework.Filter;
  */
 public class OsgiServiceList extends OsgiServiceCollection implements List, RandomAccess {
 
+	protected class OsgiServiceListIterator implements ListIterator {
+
+		// dynamic iterator
+		private final ListIterator iter;
+
+		public OsgiServiceListIterator(int index) {
+			iter = storage.listIterator(index);
+		}
+
+		public Object next() {
+			synchronized (serviceProxies) {
+				Object proxy = iter.next();
+				return (proxy == null ? tailDeadProxy : proxy);
+			}
+		}
+
+		public Object previous() {
+			synchronized (serviceProxies) {
+				Object proxy = iter.previous();
+
+				return (proxy == null ? headDeadProxy : proxy);
+			}
+		}
+
+		//
+		// index operations
+		//
+		public boolean hasNext() {
+			return iter.hasNext();
+		}
+
+		public boolean hasPrevious() {
+			return iter.hasPrevious();
+		}
+
+		public int nextIndex() {
+			return iter.nextIndex();
+		}
+
+		public int previousIndex() {
+			return iter.previousIndex();
+		}
+
+		//
+		// read-only operations
+		//
+		public void add(Object o) {
+			throw new UnsupportedOperationException();
+		}
+
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+		public void set(Object o) {
+			throw new UnsupportedOperationException();
+		}
+
+	};
+
+	// dead proxy at the head of the collection
+	protected volatile Object headDeadProxy;
+
 	/**
 	 * cast the collection to a specialized collection
 	 */
-	private final List storage = (List) serviceIDs;
+	private List storage;
 
 	public OsgiServiceList(Filter filter, BundleContext context, ClassLoader classLoader) {
 		super(filter, context, classLoader);
 	}
 
-	protected Collection createInternalDynamicStorage() {
-		return new DynamicList();
+	protected DynamicCollection createInternalDynamicStorage() {
+		storage = new DynamicList();
+		return (DynamicList) storage;
 	}
 
 	public Object get(int index) {
-		// get the id from the specified position and retrieve its associated
-		// service
-		synchronized (serviceIDs) {
-			return serviceReferences.get(storage.get(index));			
-		}
+		return storage.get(index);
+	}
+
+	/**
+	 * Override to determine head proxies.
+	 */
+	protected void checkDeadProxies(Object proxy, int proxyCollectionPos) {
+		// head of collection
+		if (proxyCollectionPos == 0)
+			headDeadProxy = proxy;
+		super.checkDeadProxies(proxy, proxyCollectionPos);
 	}
 
 	public int indexOf(Object o) {
@@ -73,51 +143,7 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 	}
 
 	public ListIterator listIterator(final int index) {
-		return new ListIterator() {
-
-			// dynamic iterator
-			private final ListIterator iter = storage.listIterator(index);
-
-			public void add(Object o) {
-				throw new UnsupportedOperationException();
-			}
-
-			public boolean hasNext() {
-				return iter.hasNext();
-			}
-
-			public boolean hasPrevious() {
-				return iter.hasPrevious();
-			}
-
-			public Object next() {
-				synchronized (serviceIDs) {
-					return serviceReferences.get(iter.next());
-				}
-			}
-
-			public int nextIndex() {
-				return iter.nextIndex();
-			}
-
-			public Object previous() {
-				synchronized (serviceIDs) {
-					return serviceReferences.get(iter.previous());
-				}
-			}
-
-			public int previousIndex() {
-				return iter.previousIndex();
-			}
-
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-
-			public void set(Object o) {
-				throw new UnsupportedOperationException();
-			}
-		};
+		return new OsgiServiceListIterator(index);
 	}
 
 	public List subList(int fromIndex, int toIndex) {

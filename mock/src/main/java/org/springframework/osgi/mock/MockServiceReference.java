@@ -28,7 +28,7 @@ import org.osgi.framework.ServiceRegistration;
  * ServiceReference mock.
  * 
  * <p/> This mock tries to adhere to the OSGi spec as much as possible by
- * providing the mandatory service properties such as
+ * providing the mandatory serviceId properties such as
  * {@link Constants#SERVICE_ID}, {@link Constants#OBJECTCLASS} and
  * {@link Constants#SERVICE_RANKING}.
  * 
@@ -39,7 +39,9 @@ public class MockServiceReference implements ServiceReference {
 
 	private Bundle bundle;
 
-	private static long serviceId = System.currentTimeMillis();
+	private static long GLOBAL_SERVICE_ID = System.currentTimeMillis();
+
+	private long serviceId;
 
 	// private ServiceRegistration registration;
 	private Dictionary properties;
@@ -85,7 +87,7 @@ public class MockServiceReference implements ServiceReference {
 	private void addMandatoryProperties(Dictionary dict) {
 		// add mandatory properties
 		if (dict.get(Constants.SERVICE_ID) == null)
-			dict.put(Constants.SERVICE_ID, new Long(serviceId++));
+			dict.put(Constants.SERVICE_ID, new Long(GLOBAL_SERVICE_ID++));
 
 		if (dict.get(Constants.OBJECTCLASS) == null)
 			dict.put(Constants.OBJECTCLASS, objectClass);
@@ -94,6 +96,7 @@ public class MockServiceReference implements ServiceReference {
 		if (ranking == null || !(ranking instanceof Integer))
 			dict.put(Constants.SERVICE_RANKING, new Integer(0));
 
+		serviceId = ((Long) dict.get(Constants.SERVICE_ID)).longValue();
 	}
 
 	/*
@@ -170,4 +173,25 @@ public class MockServiceReference implements ServiceReference {
 			this.properties = properties;
 		}
 	}
+
+	/**
+	 * Two mock service references are equal if they contain the same service
+	 * id.
+	 */
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj instanceof MockServiceReference) {
+			return this.hashCode() == ((MockServiceReference) obj).hashCode();
+		}
+		return false;
+	}
+
+	/**
+	 * Return a hash code based on the class and service id.
+	 */
+	public int hashCode() {
+		return MockServiceReference.class.hashCode() * 13 + (int) serviceId;
+	}
+
 }
