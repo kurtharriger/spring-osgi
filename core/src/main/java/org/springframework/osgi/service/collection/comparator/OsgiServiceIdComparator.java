@@ -15,6 +15,7 @@
  */
 package org.springframework.osgi.service.collection.comparator;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import org.osgi.framework.Constants;
@@ -30,8 +31,9 @@ import org.springframework.osgi.service.ServiceReferenceAware;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceIdComparator implements Comparator {
+public class OsgiServiceIdComparator implements Comparator, Serializable {
 
+	private static final int hashCode = OsgiServiceIdComparator.class.hashCode() * 13;
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
@@ -48,6 +50,10 @@ public class OsgiServiceIdComparator implements Comparator {
 
 	public boolean equals(Object obj) {
 		return (this == obj || obj instanceof OsgiServiceIdComparator);
+	}
+
+	public int hashCode() {
+		return hashCode;
 	}
 
 }

@@ -15,12 +15,11 @@
  */
 package org.springframework.osgi.mock;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.Enumeration;
 
-import org.osgi.framework.BundleContext; 
+import org.osgi.framework.BundleContext;
 
 /**
  * Mock Bundle that allows the entry to return on future calls.
@@ -32,7 +31,7 @@ public class EntryLookupControllingMockBundle extends MockBundle {
 
 	protected Enumeration nextFindResult = null;
 
-	protected String nextEntryResult = null;
+	protected URL nextEntryResult = null;
 
 	public EntryLookupControllingMockBundle(Dictionary headers) {
 		super(headers);
@@ -56,22 +55,15 @@ public class EntryLookupControllingMockBundle extends MockBundle {
 		}
 	}
 
-	public void setEntryReturnOnNextCallToGetEntry(String entry) {
+	public void setEntryReturnOnNextCallToGetEntry(URL entry) {
 		this.nextEntryResult = entry;
 	}
 
 	public URL getEntry(String name) {
 		if (this.nextEntryResult != null) {
-			try {
-				URL result = new URL(this.nextEntryResult);
-				this.nextEntryResult = null;
-				return result;
-			}
-			catch (MalformedURLException ex) {
-                // ignore
-            }
+			URL result = this.nextEntryResult;
 			this.nextEntryResult = null;
-			return null;
+			return result;
 		}
 		else {
 			return super.getEntry(name);

@@ -102,8 +102,9 @@ public class MockBundle implements Bundle {
 		try {
 			enm = loader.getResources(path + "/" + filePattern);
 		}
-		catch (Exception ex) {
+		catch (IOException ex) {
 			// catch to allow nice behavior
+			System.err.println("returning an empty enumeration as cannot load resource; exception " + ex);
 		}
 		return (enm == null ? new EmptyEnumeration() : enm);
 	}
