@@ -257,4 +257,6 @@ public class MockBundleTest extends TestCase {
 	public void testLoadClass() throws Exception {
 		assertSame(getClass(), mock.loadClass(MockBundleTest.class.getName()));
 	}
+
+
 }

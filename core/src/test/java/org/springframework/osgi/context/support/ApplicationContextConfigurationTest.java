@@ -15,9 +15,10 @@
  */
 package org.springframework.osgi.context.support;
 
+import java.net.URL;
 import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 import junit.framework.TestCase;
 
@@ -43,18 +44,18 @@ public class ApplicationContextConfigurationTest extends TestCase {
 	}
 
 	public void testBundleWithSpringResourcesAndNoHeaderIsSpringPowered() {
-        EntryLookupControllingMockBundle aBundle = new RepeatingEntryLookupControllingMockBundle(null);
+		EntryLookupControllingMockBundle aBundle = new RepeatingEntryLookupControllingMockBundle(null);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		assertTrue("bundle is spring powered", config.isSpringPoweredBundle());
 	}
 
-	public void testBundleWithHeaderAndNoMetaInfResourcesIsSpringPowered() {
+	public void testBundleWithHeaderAndNoMetaInfResourcesIsSpringPowered() throws Exception {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "META-INF/spring/context.xml");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(null);
-		aBundle.setEntryReturnOnNextCallToGetEntry("file://META-INF/spring/context.xml");
+		aBundle.setEntryReturnOnNextCallToGetEntry(new URL("file://META-INF/spring/context.xml"));
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		assertTrue("bundle is spring powered", config.isSpringPoweredBundle());
 	}
@@ -63,7 +64,7 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
-        assertEquals("bundle should timeout in five minutes", new Long(5 * 60), new Long(config.getTimeout()));
+		assertEquals("bundle should timeout in five minutes", new Long(5 * 60), new Long(config.getTimeout()));
 	}
 
 	public void testBundleWithWaitFiveSecondWaitForTimeout() {
@@ -93,64 +94,67 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		String[] configFiles = config.getConfigurationLocations();
 		assertEquals("0 config files", 0, configFiles.length);
-//		assertEquals("bundle-url:file://META-INF/spring/context.xml", configFiles[0]);
-//		assertEquals("bundle-url:file://META-INF/spring/context-two.xml", configFiles[1]);
+		// assertEquals("bundle-url:file://META-INF/spring/context.xml",
+		// configFiles[0]);
+		// assertEquals("bundle-url:file://META-INF/spring/context-two.xml",
+		// configFiles[1]);
 	}
 
-	// FIXME: move this tests from ApplicationConfiguration to AbstractOsgiXmlCtxTests
-	public void tstConfigLocationsInMetaInfWithHeader() {
+	// FIXME: move this tests from ApplicationConfiguration to
+	// AbstractOsgiXmlCtxTests
+	public void tstConfigLocationsInMetaInfWithHeader() throws Exception {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "META-INF/spring/context.xml");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
-		aBundle.setEntryReturnOnNextCallToGetEntry("file://META-INF/spring/context.xml");
+		aBundle.setEntryReturnOnNextCallToGetEntry(new URL("file://META-INF/spring/context.xml"));
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		String[] configFiles = config.getConfigurationLocations();
 		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
-        assertEquals("bundle:META-INF/spring/context.xml", configFiles[0]);
+		assertEquals("bundle:META-INF/spring/context.xml", configFiles[0]);
 	}
 
-	public void tstConfigLocationsInMetaInfWithWildcardHeader() {
+	public void tstConfigLocationsInMetaInfWithWildcardHeader() throws Exception {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "*;wait-for-dependencies:=false");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
-        aBundle.setEntryReturnOnNextCallToGetEntry(META_INF_SPRING_CONTENT[0]);
+		aBundle.setEntryReturnOnNextCallToGetEntry(new URL(META_INF_SPRING_CONTENT[0]));
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		String[] configFiles = config.getConfigurationLocations();
 		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
 		assertEquals("1 config files", 1, configFiles.length);
-        assertEquals(ConfigUtils.SPRING_CONTEXT_FILES, configFiles[0]);
+		assertEquals(ConfigUtils.SPRING_CONTEXT_FILES, configFiles[0]);
 	}
 
-	public void tstEmptyConfigLocationsInMetaInf() {
-        System.out.println("tsst");
-        Dictionary headers = new Hashtable();
+	public void tstEmptyConfigLocationsInMetaInf() throws Exception {
+		System.out.println("tsst");
+		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", ";wait-for-dependencies:=false");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
-        aBundle.setEntryReturnOnNextCallToGetEntry(META_INF_SPRING_CONTENT[0]);
+		aBundle.setEntryReturnOnNextCallToGetEntry(new URL(META_INF_SPRING_CONTENT[0]));
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		String[] configFiles = config.getConfigurationLocations();
 		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
 		assertEquals("1 config files", 1, configFiles.length);
-        assertEquals(ConfigUtils.SPRING_CONTEXT_FILES, configFiles[0]);
+		assertEquals(ConfigUtils.SPRING_CONTEXT_FILES, configFiles[0]);
 	}
 
-    public void tstConfigLocationsInMetaInfWithHeaderAndDependencies() {
-        Dictionary headers = new Hashtable();
-        headers.put("Spring-Context", "META-INF/spring/context.xml;wait-for-dependencies:=false");
-        EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
-        aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
-        aBundle.setEntryReturnOnNextCallToGetEntry(META_INF_SPRING_CONTENT[0]);
-        ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
-        String[] configFiles = config.getConfigurationLocations();
-        assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
-        assertEquals("2 config files", 1, configFiles.length);
-        assertEquals("bundle:META-INF/spring/context.xml", configFiles[0]);
-    }
+	public void tstConfigLocationsInMetaInfWithHeaderAndDependencies() throws Exception {
+		Dictionary headers = new Hashtable();
+		headers.put("Spring-Context", "META-INF/spring/context.xml;wait-for-dependencies:=false");
+		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
+		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
+		aBundle.setEntryReturnOnNextCallToGetEntry(new URL(META_INF_SPRING_CONTENT[0]));
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
+		String[] configFiles = config.getConfigurationLocations();
+		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
+		assertEquals("2 config files", 1, configFiles.length);
+		assertEquals("bundle:META-INF/spring/context.xml", configFiles[0]);
+	}
 
-    public void tstBundleWithHeaderWithBadEntriesAndNoMetaInfResourcesIsNotSpringPowered() {
+	public void tstBundleWithHeaderWithBadEntriesAndNoMetaInfResourcesIsNotSpringPowered() {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "META-INF/splurge/context.xml");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
@@ -168,25 +172,25 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		assertFalse("not spring powered", config.isSpringPoweredBundle());
 	}
 
-	public void tstHeaderWithBadEntry() {
+	public void tstHeaderWithBadEntry() throws Exception {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "META-INF/spring/context-two.xml,META-INF/splurge/context.xml,");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
-		aBundle.setEntryReturnOnNextCallToGetEntry("file://META-INF/spring/context-two.xml");
+		aBundle.setEntryReturnOnNextCallToGetEntry(new URL("file://META-INF/spring/context-two.xml"));
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		assertFalse("bundle is not spring powered", config.isSpringPoweredBundle());
 		String[] configFiles = config.getConfigurationLocations();
-		assertEquals("0 config file", 0, configFiles.length); 
+		assertEquals("0 config file", 0, configFiles.length);
 	}
 
-	public void testCreateAsynchronouslyDefaultTrue() {
+	public void testCreateAsynchronouslyDefaultTrue() throws Exception {
 		// *;flavour
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "*;timeout:=none");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
-        aBundle.setEntryReturnOnNextCallToGetEntry(META_INF_SPRING_CONTENT[0]);
-        ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
+		aBundle.setEntryReturnOnNextCallToGetEntry(new URL(META_INF_SPRING_CONTENT[0]));
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
 		assertTrue("bundle should have create-asynchronously = true", config.isCreateAsynchronously());
 	}
@@ -202,13 +206,13 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		assertTrue("bundle should have create-asynchronously = true", config.isCreateAsynchronously());
 	}
 
-	public void testSetCreateAsynchronouslyFalse() {
+	public void testSetCreateAsynchronouslyFalse() throws Exception {
 		// *;flavour
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "META-INF/spring/context.xml;create-asynchronously:=false");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
-        aBundle.setEntryReturnOnNextCallToGetEntry(META_INF_SPRING_CONTENT[0]);
+		aBundle.setEntryReturnOnNextCallToGetEntry(new URL(META_INF_SPRING_CONTENT[0]));
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
 		assertFalse("bundle should have create-asynchronously = false", config.isCreateAsynchronously());
@@ -216,7 +220,7 @@ public class ApplicationContextConfigurationTest extends TestCase {
 
 	public void testCreateAsynchronouslyDefaultTrueIfAbsent() {
 		// *;flavour
-		Dictionary headers = new Hashtable(); 
+		Dictionary headers = new Hashtable();
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
@@ -233,31 +237,30 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		assertTrue("bundle should have create-asynchronously = true", config.isCreateAsynchronously());
 	}
 
-    private static class RepeatingEntryLookupControllingMockBundle extends EntryLookupControllingMockBundle {
-        protected String[] findResult;
+	private static class RepeatingEntryLookupControllingMockBundle extends EntryLookupControllingMockBundle {
+		protected String[] findResult;
 
-        public RepeatingEntryLookupControllingMockBundle(Dictionary headers) {
-            super(headers);
-        }
+		public RepeatingEntryLookupControllingMockBundle(Dictionary headers) {
+			super(headers);
+		}
 
+		public Enumeration findEntries(String path, String filePattern, boolean recurse) {
+			if (this.nextFindResult == null) {
+				return super.findEntries(path, filePattern, recurse);
+			}
+			else {
+				Enumeration r = this.nextFindResult;
+				this.nextFindResult = createEnumerationOver(findResult);
+				return r;
+			}
+		}
 
-        public Enumeration findEntries(String path, String filePattern, boolean recurse) {
-            if (this.nextFindResult == null) {
-                return super.findEntries(path, filePattern, recurse);
-            } else {
-                Enumeration r = this.nextFindResult;
-                this.nextFindResult = createEnumerationOver(findResult);
-                return r;
-            }
-        }
-
-
-        public void setResultsToReturnOnNextCallToFindEntries(String[] r) {
-            findResult = r;
-            if (findResult == null) {
-                findResult = new String[0];
-            }
-            this.nextFindResult = createEnumerationOver(findResult);
-        }
-    }
+		public void setResultsToReturnOnNextCallToFindEntries(String[] r) {
+			findResult = r;
+			if (findResult == null) {
+				findResult = new String[0];
+			}
+			this.nextFindResult = createEnumerationOver(findResult);
+		}
+	}
 }

@@ -79,4 +79,16 @@ public class MockServiceRegistration implements ServiceRegistration {
 	public void unregister() {
 	}
 
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj instanceof MockServiceRegistration)
+			return this.reference.equals(((MockServiceRegistration) obj).reference);
+		return false;
+	}
+
+	public int hashCode() {
+		return MockServiceRegistration.class.hashCode() * 13 + reference.hashCode();
+	}
+
 }

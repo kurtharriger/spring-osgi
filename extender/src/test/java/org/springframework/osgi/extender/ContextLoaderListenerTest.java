@@ -93,7 +93,7 @@ public class ContextLoaderListenerTest extends TestCase {
 		Dictionary headers = new Hashtable();
 		headers.put(Constants.BUNDLE_NAME,"Mock Bundle");
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
-		aBundle.setEntryReturnOnNextCallToGetEntry(new ClassPathResource("META-INF/spring/moved-extender.xml").getURL().toExternalForm());
+		aBundle.setEntryReturnOnNextCallToGetEntry(new ClassPathResource("META-INF/spring/moved-extender.xml").getURL());
 		bundleContextControl.expectAndReturn(context.getBundle(), aBundle);
 		bundleContextControl.expectAndReturn(context.getBundle(), aBundle);
 		bundleContextControl.expectAndReturn(context.getBundle(), aBundle);

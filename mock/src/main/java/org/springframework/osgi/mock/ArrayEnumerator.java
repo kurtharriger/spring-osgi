@@ -16,6 +16,7 @@
 package org.springframework.osgi.mock;
 
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
 
 /**
  * Simple enumeration mock backed by an array of objects.
@@ -36,6 +37,9 @@ public class ArrayEnumerator implements Enumeration {
 	}
 
 	public Object nextElement() {
-		return (source[index++]);
+		if (hasMoreElements())
+			return (source[index++]);
+		else
+			throw new NoSuchElementException();
 	}
 }

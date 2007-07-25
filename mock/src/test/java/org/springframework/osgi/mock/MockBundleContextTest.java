@@ -18,12 +18,14 @@ package org.springframework.osgi.mock;
 import java.io.ByteArrayInputStream;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 
 /**
  * @author Costin Leau
@@ -31,7 +33,7 @@ import org.osgi.framework.Constants;
  */
 public class MockBundleContextTest extends TestCase {
 
-	BundleContext mock;
+	MockBundleContext mock;
 
 	/*
 	 * (non-Javadoc)
@@ -208,5 +210,38 @@ public class MockBundleContextTest extends TestCase {
 		assertNotNull(mock.getProperty(Constants.FRAMEWORK_OS_NAME));
 		assertNotNull(mock.getProperty(Constants.FRAMEWORK_OS_VERSION));
 		assertNotNull(mock.getProperty(Constants.FRAMEWORK_PROCESSOR));
+	}
+
+	public void testAddServiceListener() throws Exception {
+		ServiceListener listener = new ServiceListener() {
+			public void serviceChanged(ServiceEvent event) {
+			}
+		};
+		mock.addServiceListener(listener);
+
+		assertEquals(1, mock.getServiceListeners().size());
+		assertSame(listener, mock.getServiceListeners().iterator().next());
+	}
+
+	public void testRemoveServiceListener() throws Exception {
+		ServiceListener listener = new ServiceListener() {
+			public void serviceChanged(ServiceEvent event) {
+			}
+		};
+
+		Set listeners = mock.getServiceListeners();
+
+		mock.removeServiceListener(null);
+		
+		assertEquals(0, listeners.size());
+		
+		mock.removeServiceListener(listener);
+		assertEquals(0, listeners.size());
+		
+		mock.addServiceListener(listener);
+		assertEquals(1, listeners.size());
+		
+		mock.removeServiceListener(listener);
+		assertEquals(0, listeners.size());
 	}
 }
