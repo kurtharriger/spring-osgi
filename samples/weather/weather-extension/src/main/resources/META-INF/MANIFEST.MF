@@ -1,0 +1,16 @@
+Bundle-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.osgi.samples.weather.extension
+Bundle-Name: weather-extension
+Bundle-Vendor: Spring Framework
+Export-Package: org.springframework.osgi.samples.weather.extension.bundle,
+  org.springframework.osgi.samples.weather.extension.config
+Import-Package: org.osgi.framework,
+  org.springframework.util,
+  org.springframework.osgi.context.support,
+  org.springframework.beans.factory.xml,
+  org.springframework.beans.factory.support,
+  org.springframework.core,
+  org.springframework.osgi.config,
+  org.springframework.util.xml,
+  org.w3c.dom

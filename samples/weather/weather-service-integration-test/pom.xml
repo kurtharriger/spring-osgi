@@ -33,6 +33,12 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi.samples</groupId>
+      <artifactId>weather-extension</artifactId>
+      <version>${project.parent.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.osgi.samples</groupId>
       <artifactId>wiring-bundle</artifactId>
       <version>${project.parent.version}</version>
       <scope>test</scope>

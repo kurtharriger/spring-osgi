@@ -18,7 +18,6 @@
 	<spring.osgi.export.pkg>!*</spring.osgi.export.pkg>
 	<!-- put the import here since we have no classes and the plugin has nothing to analyze -->
 	<spring.osgi.import.pkg>
-	org.springframework.osgi.bundle.support,
     org.springframework.osgi.config,
     org.springframework.osgi.context,
     org.springframework.osgi.context.support,

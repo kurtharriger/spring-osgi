@@ -3,11 +3,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:osgi="http://www.springframework.org/schema/osgi"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:extension="http://www.springframework.org/schema/osgi/samples/weather"
        xsi:schemaLocation="
   http://www.springframework.org/schema/beans
   http://www.springframework.org/schema/beans/spring-beans.xsd
   http://www.springframework.org/schema/osgi
-  http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+  http://www.springframework.org/schema/osgi/spring-osgi.xsd
+  http://www.springframework.org/schema/osgi/samples/weather
+  http://www.springframework.org/schema/osgi/samples/weather/extension-osgi.xsd"
+  >
 
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location" value="file:${project.build.directory}/classes/osgi.properties"/>
@@ -36,17 +40,17 @@
 	             state="start"/>
 
 	<!-- Note that this is not a real bundle - we are creating it on the fly from a regular jar -->
-	<osgi:virtual-bundle id="weatherServiceBundle" depends-on="weatherDaoBundle"
+	<extension:virtual-bundle id="weatherServiceBundle" depends-on="weatherDaoBundle"
 	                     location="file:${localRepository}/org/springframework/osgi/samples/weather-service/${pom.version}/weather-service-${pom.version}.jar"
 	                     state="start" version="1.0" group-id="org.springframework.osgi.samples.weather" artifact-id="service">
-		<osgi:imports>
-			<osgi:package name="org.springframework.osgi.samples.weather.dao" version="0.0"/>
-			<osgi:package name="org.springframework.osgi.config"/>
-		</osgi:imports>
-		<osgi:exports>
-			<osgi:package name="org.springframework.osgi.samples.weather.service" version="0.0.0"/>
-		</osgi:exports>
-	</osgi:virtual-bundle>
+		<extension:imports>
+			<extension:package name="org.springframework.osgi.samples.weather.dao" version="0.0"/>
+			<extension:package name="org.springframework.osgi.config"/>
+		</extension:imports>
+		<extension:exports>
+			<extension:package name="org.springframework.osgi.samples.weather.service" version="0.0.0"/>
+		</extension:exports>
+	</extension:virtual-bundle>
 
 	<!--bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
 		<property name="beans">
