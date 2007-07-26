@@ -67,7 +67,8 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
     protected String[] getBundles() {
     	List bundles = new ArrayList();
     	bundles.add(localMavenArtifact("org.springframework.osgi", "spring-jmx", getSpringBundledVersion()));
-    	bundles.add(localMavenArtifact("org.springframework.osgi", "wiring-bundle", getSpringOsgiVersion()));
+    	bundles.add(localMavenArtifact("org.springframework.osgi.samples", "weather-extension", getSpringOsgiVersion()));
+    	bundles.add(localMavenArtifact("org.springframework.osgi.samples", "wiring-bundle", getSpringOsgiVersion()));
     	
     	// if < jdk 1.5, add an JMX implementation
     	if (!JdkVersion.isAtLeastJava15())
@@ -93,9 +94,6 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      * easier way to get a reference to a published service.
      */
     public void testWeatherServiceExported() {
-        //waitOnContextCreation("org.springframework.osgi.samples.weather.service");
-        //waitOnContextCreation("org.springframework.osgi.samples.weather.dao");
-        //waitOnContextCreation("org.springframework.osgi.samples.wiring.bundle");
 
         BundleContext context = getBundleContext();
         ServiceReference ref = context.getServiceReference("org.springframework.osgi.samples.weather.service.WeatherService");
