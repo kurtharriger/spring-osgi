@@ -104,4 +104,46 @@ public class MockServiceRegistrationTest extends TestCase {
 			// expected
 		}
 	}
+
+	public void testHashCode() {
+		MockServiceReference ref = new MockServiceReference();
+		mock.setReference(ref);
+
+		MockServiceRegistration other = new MockServiceRegistration();
+		other.setReference(ref);
+
+		assertEquals(mock.hashCode(), other.hashCode());
+
+	}
+
+	public void testHashCodeWithDifferentServiceRef() {
+		MockServiceRegistration other = new MockServiceRegistration();
+		assertFalse(mock.hashCode() == other.hashCode());
+	}
+
+	public void testHashCodeSelf() {
+		assertEquals(mock.hashCode(), mock.hashCode());
+
+		mock.setReference(new MockServiceReference());
+		assertEquals(mock.hashCode(), mock.hashCode());
+	}
+
+	public void testEqualsTrue() {
+		MockServiceReference ref = new MockServiceReference();
+		mock.setReference(ref);
+
+		MockServiceRegistration other = new MockServiceRegistration();
+		other.setReference(ref);
+
+		assertEquals(mock, other);
+	}
+
+	public void testEqualsFalse() {
+		MockServiceRegistration other = new MockServiceRegistration();
+		assertFalse(mock.equals(other));
+	}
+
+	public void testEqualsThis() {
+		assertEquals(mock, mock);
+	}
 }

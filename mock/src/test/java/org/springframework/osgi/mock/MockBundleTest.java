@@ -258,5 +258,17 @@ public class MockBundleTest extends TestCase {
 		assertSame(getClass(), mock.loadClass(MockBundleTest.class.getName()));
 	}
 
+	public void testGetEmptyEnumerator() {
+		Enumeration enm = mock.getEntryPaths("bla");
+		assertFalse(enm.hasMoreElements());
+
+		try {
+			enm.nextElement();
+			fail("should have thrown exception");
+		}
+		catch (NoSuchElementException nsee) {
+			// expected
+		}
+	}
 
 }
