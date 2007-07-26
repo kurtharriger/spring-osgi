@@ -42,7 +42,6 @@ public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
 
 		registerBeanDefinitionParser("bundle", new BundleBeanDefinitionParser());
 
-		registerBeanDefinitionParser("virtual-bundle", new VirtualBundleBeanDefinitionParser());
 	}
 
 }
