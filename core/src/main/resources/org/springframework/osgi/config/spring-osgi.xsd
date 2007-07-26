@@ -77,8 +77,14 @@
 
     <xsd:complexType name="TmapOrPropsType">
         <xsd:choice>
+        	<xsd:sequence>
             <xsd:element name="props" type="beans:propsType"/>
+            </xsd:sequence>
+            
+            <xsd:sequence>
             <xsd:element name="map" type="beans:mapType"/>
+            </xsd:sequence>
+
         </xsd:choice>
     </xsd:complexType>
 
@@ -88,14 +94,15 @@
                 <xsd:sequence minOccurs="0" maxOccurs="1">
                     <xsd:element name="interfaces" type="beans:listOrSetType" minOccurs="0"/>
                     <xsd:element name="service-properties" minOccurs="0">
+                    <!-- This is a little bit of a hack to support both entry and prop, full validation occurs in the code -->
                         <xsd:complexType>
-                            <!-- This is a little bit of a hack to support both entry and prop, full validation occurs in the code -->
                             <xsd:sequence>
                                 <xsd:any namespace="http://www.springframework.org/schema/beans" processContents="strict"
                                          minOccurs="0" maxOccurs="unbounded"/>
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
+                    
                     <!-- nested bean declaration -->
                     <xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="skip"/>
                 </xsd:sequence>
@@ -190,37 +197,5 @@
             <xsd:enumeration value="update"/>
         </xsd:restriction>
     </xsd:simpleType>
-
-    <!-- virtual-bundle -->
-    <xsd:element name="virtual-bundle" type="TvirtualBundle"/>
-
-    <xsd:complexType name="TvirtualBundle">
-        <xsd:complexContent>
-            <xsd:extension base="Tbundle">
-                <xsd:all>
-                    <xsd:element name="imports" type="TpackageList" minOccurs="0"/>
-                    <xsd:element name="exports" type="TpackageList" minOccurs="0"/>
-                    <xsd:element name="dynamic-imports" type="TpackageList" minOccurs="0"/>
-                </xsd:all>
-                <xsd:attribute name="version" type="xsd:string" use="optional"/>
-                <xsd:attribute name="group-id" type="xsd:string" use="optional"/>
-                <xsd:attribute name="artifact-id" type="xsd:string" use="optional"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="TpackageList">
-        <xsd:sequence>
-            <xsd:element name="package" type="Tpackage" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-    </xsd:complexType>
-
-    <xsd:complexType name="Tpackage">
-        <xsd:sequence>
-            <xsd:element name="uses" type="TpackageList" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-        <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="version" type="xsd:string" use="optional"/>
-    </xsd:complexType>
 
 </xsd:schema>

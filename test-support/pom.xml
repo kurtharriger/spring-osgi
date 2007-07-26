@@ -18,9 +18,4 @@
   </modules>
   <!-- Needed if trying to get stacktraces from the test framework -->
 
-  <build>
-  <plugins>
-    </plugins>
-  </build>
-
 </project>

@@ -201,7 +201,9 @@ limitations under the License.
     <module>integration-tests</module>
     <module>samples</module>
     <module>bundle-archetype</module>
+    <!-- unused at the moment
     <module>release</module>
+    -->
   </modules>
 
   <!-- shared dependencies across modules -->

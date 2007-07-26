@@ -26,5 +26,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.service.listener/1.0-m3-SNAPSHOT/org.springframework.osgi.iandt.service.listener-1.0-m3-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.simple.service/1.0-m3-SNAPSHOT/org.springframework.osgi.iandt.simple.service-1.0-m3-SNAPSHOT.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/cglib-nodep.osgi/2.1.3-SNAPSHOT/cglib-nodep.osgi-2.1.3-SNAPSHOT.jar" sourcepath="/CGLIB_SRC"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Configuration Test Bundle"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>
