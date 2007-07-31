@@ -396,9 +396,9 @@ limitations under the License.
     <!-- requires java 5 -->
     <profile>
       <id>equinox-1.5</id>
-      <activation>
+      <!--activation>
            <jdk>1.5</jdk>
-      </activation>
+      </activation-->
       <modules>
        <module>annotation</module>
        <module>integration-tests-tiger</module>
@@ -670,13 +670,13 @@ limitations under the License.
       <name>Safehaus Repository</name>
       <url>http://m2.safehaus.org</url>
     </repository>
-    <repository>
+    <!--repository>
       <id>spring-ext</id>
       <name>Spring External Dependencies Repository</name>
       <url>
         https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
-    </repository>
+    </repository-->
 	<repository>
 	 <snapshots><enabled>true</enabled></snapshots>
 	<id>apache-snapshot-repo</id>

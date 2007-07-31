@@ -147,7 +147,7 @@ public class DependencyListener implements ServiceListener {
 				}
 				else {
 					if (log.isDebugEnabled()) {
-						log.debug(dependency + " does not match");
+						log.debug(dependency + " does not match: " + toString(serviceEvent.getServiceReference()));
 					}
 				}
 			}

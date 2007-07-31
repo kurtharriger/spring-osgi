@@ -15,10 +15,7 @@
  */
 package org.springframework.osgi.util;
 
-import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.*;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -211,11 +208,12 @@ public abstract class OsgiFilterUtils {
 	 * Validate the given String as a OSGi filter.
 	 * 
 	 * @param filter the filter expression
-	 * @return true if the filter is valid, false otherwise
+	 * @param bundleContext
+     * @return true if the filter is valid, false otherwise
 	 */
-	public static boolean isValidFilter(String filter) {
+	public static boolean isValidFilter(String filter, BundleContext bundleContext) {
 		try {
-			createFilter(filter);
+			createFilter(filter, bundleContext);
 			return true;
 		}
 		catch (IllegalArgumentException ex) {
@@ -229,12 +227,13 @@ public abstract class OsgiFilterUtils {
 	 * {@link IllegalArgumentException}.
 	 * 
 	 * @param filter filter string representation
-	 * @return OSGi filter
+	 * @param bundleContext
+     * @return OSGi filter
 	 */
-	public static Filter createFilter(String filter) {
+	public static Filter createFilter(String filter, BundleContext bundleContext) {
 		Assert.hasText(filter, "invalid filter");
 		try {
-			return FrameworkUtil.createFilter(filter);
+			return bundleContext.createFilter(filter);
 		}
 		catch (InvalidSyntaxException ise) {
 			throw (RuntimeException) new IllegalArgumentException("invalid filter: " + ise.getFilter()).initCause(ise);
