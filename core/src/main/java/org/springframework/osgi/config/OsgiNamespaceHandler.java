@@ -16,7 +16,6 @@
  */
 package org.springframework.osgi.config;
 
-import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
 

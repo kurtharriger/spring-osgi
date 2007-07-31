@@ -26,6 +26,7 @@
 		org.springframework.osgi.annotation;resolution:=optional,
 		*
 	</spring.osgi.import.pkg>
+	
   </properties>
   
   <dependencies>
@@ -83,17 +84,19 @@
     </dependency>
 
 
+<!--
     <dependency>
         <groupId>org.osgi</groupId>
         <artifactId>osgi_R4_core</artifactId>
         <version>1.0</version>
-        <scope>compile</scope>
+        <scope>provided</scope>
     </dependency>
+    -->
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>osgi_R4_compendium</artifactId>
       <version>1.0</version>
-      <scope>compile</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
