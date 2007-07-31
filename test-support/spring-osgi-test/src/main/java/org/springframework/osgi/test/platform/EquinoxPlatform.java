@@ -18,8 +18,6 @@ package org.springframework.osgi.test.platform;
 import java.lang.reflect.Field;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.osgi.framework.BundleContext;
 
@@ -30,8 +28,6 @@ import org.osgi.framework.BundleContext;
  * 
  */
 public class EquinoxPlatform extends AbstractOsgiPlatform {
-
-	private static final Log log = LogFactory.getLog(EquinoxPlatform.class);
 	
 	private BundleContext context;
 
@@ -45,7 +41,7 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 		props.setProperty("osgi.noShutdown", "true");
         props.setProperty("osgi.configuration.area", "eclipse_config");
         props.setProperty("osgi.instance.area", "eclipse_config");
-        props.setProperty("osgi.user.area", "eclipse_config");
+        props.setProperty("osgi.user.area", "eclipse_config");    
 
         // props.setProperty("eclipse.consoleLog", "true");
         // props.setProperty("osgi.debug", "");
