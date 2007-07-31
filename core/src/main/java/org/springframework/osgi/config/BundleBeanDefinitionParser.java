@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  *
  * @author Andy Piper
  */
-public class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	public static final String LAZY_INIT = "lazy-init";
 
 	protected void doParse(Element element, BeanDefinitionBuilder builder) {

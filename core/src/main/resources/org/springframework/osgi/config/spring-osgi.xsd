@@ -20,7 +20,7 @@
     <xsd:element name="reference" type="Treference">
         <xsd:annotation>
             <xsd:documentation>
-                Reference to an OSGi service.
+                Reference to a single OSGi service.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -35,22 +35,13 @@
                 <xsd:attribute name="interface" use="required" type="xsd:string"/>
                 <xsd:attribute name="filter" use="optional" type="xsd:string"/>
                 <xsd:attribute name="timeout" use="optional" type="xsd:int"/>
-                <xsd:attribute name="cardinality" use="optional" type="Tcardinality" default="1..1"/>
+                <xsd:attribute name="mandatory" use="optional" type="xsd:boolean" default="true"/>
                 <xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
                 <xsd:attribute name="bean-name" type="xsd:string" use="optional"/>
                 <xsd:attribute name="context-classloader" type="TreferenceClassLoaderOptions" default="client"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:simpleType name="Tcardinality">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="0..1"/>
-            <xsd:enumeration value="0..n"/>
-            <xsd:enumeration value="1..1"/>
-            <xsd:enumeration value="1..n"/>
-        </xsd:restriction>
-    </xsd:simpleType>
 
     <xsd:simpleType name="TreferenceClassLoaderOptions">
         <xsd:restriction base="xsd:string">
@@ -71,6 +62,66 @@
         <xsd:attribute name="bind-method" type="xsd:string" use="optional"/>
         <xsd:attribute name="unbind-method" type="xsd:string" use="optional"/>
     </xsd:complexType>
+
+	<!-- reference collections -->
+	
+	<xsd:complexType name="Tcomparator">
+        <xsd:sequence minOccurs="1" maxOccurs="1">
+            <!-- nested bean declaration -->
+            <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
+        </xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="TreferenceCollection">
+		<xsd:complexContent>
+			<xsd:extension base="Treference">
+				<xsd:sequence minOccurs="0" maxOccurs="1">
+					<xsd:element name="comparator" type="Tcomparator">
+						<xsd:annotation>
+							<xsd:documentation source="java:java.util.Comparator"/>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="comparator-ref" type="xsd:string" use="optional"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:element name="collection" type="Treference">
+		<xsd:annotation>
+			<!-- TODO: recopy this description around somehow; maybe includes would help -->
+			<xsd:documentation source="java:org.springframework.osgi.collection.OsgiServiceCollection">
+			 Collection of OSGi services. The collection will automatically pick up the OSGi services that match the criteria. The dynamic nature is understood
+			 by the collection which will grow or shrink in size, as matching services come and go. The collection offers 'consistent' iterators so that clients
+			 can safely travers the services, at a certain point in time, without having to worry about the dynamics.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	
+	<xsd:element name="list" type="TreferenceCollection">
+		<xsd:annotation>
+			<xsd:documentation source="java:org.springframework.osgi.collection.OsgiServiceList"/>
+		</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="sorted-list" type="TreferenceCollection">
+		<xsd:annotation>
+			<xsd:documentation source="java:org.springframework.osgi.collection.OsgiServiceSortedList"/>
+		</xsd:annotation>
+	</xsd:element>
+	
+	<xsd:element name="set" type="TreferenceCollection">
+		<xsd:annotation>
+			<xsd:documentation source="java:org.springframework.osgi.collection.OsgiServiceSet"/>
+		</xsd:annotation>
+	</xsd:element>
+	
+	<xsd:element name="sorted-set" type="TreferenceCollection">
+		<xsd:annotation>
+			<xsd:documentation source="java:org.springframework.osgi.collection.OsgiServiceSortedSet"/>
+		</xsd:annotation>
+	</xsd:element>
+	
 
     <!-- service -->
     <xsd:element name="service" type="Tservice"/>
@@ -119,7 +170,6 @@
 
     <xsd:simpleType name="TserviceClassLoaderOptions">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="client"/>
             <xsd:enumeration value="service-provider"/>
             <xsd:enumeration value="unmanaged"/>
         </xsd:restriction>

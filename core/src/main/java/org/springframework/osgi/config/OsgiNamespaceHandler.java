@@ -16,7 +16,9 @@
  */
 package org.springframework.osgi.config;
 
+import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
 
 /**
  * Namespace handler for Osgi definitions.
@@ -33,15 +35,45 @@ public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
 	 */
 	public void init() {
 		registerBeanDefinitionParser("reference", new ReferenceBeanDefinitionParser());
+
+		registerBeanDefinitionParser("collection", new CollectionBeanDefinitionParser());
+		registerBeanDefinitionParser("list", new CollectionBeanDefinitionParser() {
+			protected int getCollectionType() {
+				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.LIST;
+			}
+		});
 		
+		registerBeanDefinitionParser("list", new CollectionBeanDefinitionParser() {
+			protected int getCollectionType() {
+				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.LIST;
+			}
+		});
+
+		registerBeanDefinitionParser("set", new CollectionBeanDefinitionParser() {
+			protected int getCollectionType() {
+				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.SET;
+			}
+		});
+
+		registerBeanDefinitionParser("sorted-list", new CollectionBeanDefinitionParser() {
+			protected int getCollectionType() {
+				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.SORTED_LIST;
+			}
+		});
+
+		registerBeanDefinitionParser("sorted-set", new CollectionBeanDefinitionParser() {
+			protected int getCollectionType() {
+				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.SORTED_SET;
+			}
+		});
+
 		registerBeanDefinitionParser("service", new ServiceBeanDefinitionParser());
 
 		registerBeanDefinitionParser("property-placeholder", new OsgiPropertyPlaceholderDefinitionParser());
-		
+
 		registerBeanDefinitionParser("config", new OsgiConfigDefinitionParser());
 
 		registerBeanDefinitionParser("bundle", new BundleBeanDefinitionParser());
 
 	}
-
 }

@@ -15,11 +15,11 @@
 
 	<!-- more complex -->
 	<osgi:reference id="listeners" interface="java.io.Externalizable"
-		cardinality="0..n" />
+		mandatory="false" />
 
 	<!-- full options -->
 	<osgi:reference id="full-options" interface="java.lang.Cloneable"
-		cardinality="1..n" context-classloader="service-provider"
+		mandatory="true" context-classloader="service-provider"
 		timeout="2000" filter="(c=*)">
 		<osgi:listener>
 			<bean id="listener"

@@ -66,7 +66,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 
 		};
 
-		col = new OsgiServiceCollection(new MockFilter(), ctx, getClass().getClassLoader());
+		col = new OsgiServiceCollection(new MockFilter(), ctx, getClass().getClassLoader(), false);
 		col.afterPropertiesSet();
 	}
 

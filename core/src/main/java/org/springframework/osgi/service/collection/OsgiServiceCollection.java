@@ -35,6 +35,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.interceptor.OsgiServiceInvoker;
@@ -142,11 +143,13 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 		private final Iterator iter = serviceProxies.iterator();
 
 		public boolean hasNext() {
+			mandatoryServiceCheck();
 			return iter.hasNext();
 		}
 
 		public Object next() {
 			synchronized (serviceProxies) {
+				mandatoryServiceCheck();
 				Object proxy = iter.next();
 				return (proxy == null ? tailDeadProxy : proxy);
 			}
@@ -197,13 +200,17 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
 
-	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader) {
+	protected final boolean atLeastOneServiceMandatory;
+
+	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader, boolean mandatory) {
 		Assert.notNull(classLoader, "ClassLoader is required");
 		Assert.notNull(context, "context is required");
 
 		this.filter = filter;
 		this.context = context;
 		this.classLoader = classLoader;
+
+		this.atLeastOneServiceMandatory = mandatory;
 	}
 
 	/*
@@ -214,10 +221,26 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 		// create service proxies collection
 		this.serviceProxies = createInternalDynamicStorage();
 
-		if (log.isTraceEnabled())
+		boolean trace = log.isTraceEnabled();
+
+		if (trace)
 			log.trace("adding osgi listener for services matching [" + filter + "]");
 		OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
 
+		if (atLeastOneServiceMandatory) {
+			if (trace)
+				log.trace("1..x cardinality - looking for service [" + filter + "] at startup...");
+			mandatoryServiceCheck();
+		}
+	}
+
+	/**
+	 * Check to see wether at least one service is available.
+	 */
+	protected void mandatoryServiceCheck() {
+		if (atLeastOneServiceMandatory && serviceProxies.isEmpty())
+			throw new ServiceUnavailableException("Could not find matching service for filter [" + filter.toString()
+					+ "]", null, filter.toString());
 	}
 
 	/**
@@ -326,10 +349,12 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	}
 
 	public int size() {
+		mandatoryServiceCheck();
 		return serviceProxies.size();
 	}
 
 	public String toString() {
+		mandatoryServiceCheck();
 		synchronized (serviceProxies) {
 			return serviceProxies.toString();
 		}
@@ -363,22 +388,27 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	}
 
 	public boolean contains(Object o) {
+		mandatoryServiceCheck();
 		return serviceProxies.contains(o);
 	}
 
 	public boolean containsAll(Collection c) {
+		mandatoryServiceCheck();
 		return serviceProxies.containsAll(c);
 	}
 
 	public boolean isEmpty() {
+		mandatoryServiceCheck();
 		return size() == 0;
 	}
 
 	public Object[] toArray() {
+		mandatoryServiceCheck();
 		return serviceProxies.toArray();
 	}
 
 	public Object[] toArray(Object[] array) {
+		mandatoryServiceCheck();
 		return serviceProxies.toArray(array);
 	}
 

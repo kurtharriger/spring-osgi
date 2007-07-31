@@ -18,8 +18,6 @@ package org.springframework.osgi.config;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 
-import junit.framework.TestCase;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -30,7 +28,7 @@ import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
 
 /**
  * Integration test for osgi:reference namespace handler.
@@ -38,12 +36,11 @@ import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
  * @author Costin Leau
  * 
  */
-public class OsgiReferenceNamespaceHandlerTest extends TestCase {
+public class OsgiReferenceNamespaceHandlerTest extends PrivateFieldRetrieverTestCase {
 
 	private GenericApplicationContext appContext;
 
-
-    protected void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		// reset counter just to be sure
 		DummyListener.BIND_CALLS = 0;
 		DummyListener.UNBIND_CALLS = 0;
@@ -54,29 +51,36 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 		DummyListenerServiceSignature2.BIND_CALLS = 0;
 		DummyListenerServiceSignature2.UNBIND_CALLS = 0;
 
-        BundleContext bundleContext = new MockBundleContext() {
-            // service reference already registered
-            public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
-                return new ServiceReference[]{new MockServiceReference(new String[]{Cloneable.class.getName()})};
-            }
-        };
+		BundleContext bundleContext = new MockBundleContext() {
+			// service reference already registered
+			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+				return new ServiceReference[] { new MockServiceReference(new String[] { Cloneable.class.getName() }) };
+			}
+		};
 
-        appContext = new GenericApplicationContext();
+		appContext = new GenericApplicationContext();
 		appContext.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
-        appContext.setClassLoader(getClass().getClassLoader());
+		appContext.setClassLoader(getClass().getClassLoader());
 
-        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
+		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
 		// reader.setEventListener(this.listener);
 		reader.loadBeanDefinitions(new ClassPathResource("osgiReferenceNamespaceHandlerTests.xml", getClass()));
 		appContext.refresh();
+	}
+	
+	
+
+	protected void tearDown() throws Exception {
+		appContext.close();
 	}
 
 	public void testSimpleReference() throws Exception {
 		Object factoryBean = appContext.getBean("&serializable");
 
-		assertTrue(factoryBean instanceof OsgiServiceProxyFactoryBean);
-		OsgiServiceProxyFactoryBean proxyFactory = (OsgiServiceProxyFactoryBean) factoryBean;
-		Class[] intfs = proxyFactory.getInterface();
+		assertTrue(factoryBean instanceof OsgiSingleServiceProxyFactoryBean);
+		OsgiSingleServiceProxyFactoryBean proxyFactory = (OsgiSingleServiceProxyFactoryBean) factoryBean;
+		
+		Class[] intfs = (Class[]) getPrivateProperty(proxyFactory, "serviceTypes");
 		assertEquals(1, intfs.length);
 		assertSame(Serializable.class, intfs[0]);
 
@@ -88,9 +92,11 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 	}
 
 	public void testFullReference() throws Exception {
-		OsgiServiceProxyFactoryBean factory = (OsgiServiceProxyFactoryBean) appContext.getBean("&full-options");
-        factory.getObject();  // required to initialize expected listeners because of?  god help me, I'm going insane
-        TargetSourceLifecycleListener[] listeners = factory.getListeners();
+		OsgiSingleServiceProxyFactoryBean factory = (OsgiSingleServiceProxyFactoryBean) appContext.getBean("&full-options");
+		factory.getObject(); // required to initialize expected listeners
+		// because of? god help me, I'm going insane
+		TargetSourceLifecycleListener[] listeners = (TargetSourceLifecycleListener[]) getPrivateProperty(factory,
+			"listeners");
 		assertNotNull(listeners);
 		assertEquals(5, listeners.length);
 
@@ -116,4 +122,5 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 		listeners[4].unbind(null, null);
 		assertEquals(1, DummyListenerServiceSignature2.UNBIND_CALLS);
 	}
+
 }

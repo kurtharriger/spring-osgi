@@ -18,9 +18,10 @@ package org.springframework.osgi.iandt.serviceProxyFactoryBean;
 import java.util.Dictionary;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * @author Costin Leau
@@ -28,25 +29,9 @@ import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
  */
 public abstract class ServiceBaseTest extends AbstractConfigurableBundleCreatorTests {
 
-	protected OsgiServiceProxyFactoryBean fb;
 
 	protected String[] getBundles() {
 		return new String[] { localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT") };
-	}
-
-	protected void onSetUp() throws Exception {
-		fb = new OsgiServiceProxyFactoryBean();
-		fb.setBundleContext(getBundleContext());
-		// execute retries fast
-		fb.setRetryTimes(1);
-		fb.setTimeout(1);
-        ClassLoader classLoader =
-                BundleDelegatingClassLoader.createBundleClassLoaderFor(getBundleContext().getBundle());
-        fb.setBeanClassLoader(classLoader);
-    }
-
-	protected void onTearDown() throws Exception {
-		fb = null;
 	}
 
 	protected ServiceRegistration publishService(Object obj, String name) throws Exception {

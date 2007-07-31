@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd		
+		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+		
+	
+	<!-- simple collection types -->
+	
+	<osgi:collection id="simpleCollection" interface="java.io.Serializable" mandatory="false"/>
+	<osgi:list id="simpleList" interface="java.io.Serializable" mandatory="false"/>
+	<osgi:set id="simpleSet" interface="java.io.Serializable" mandatory="false"/>
+	<osgi:sorted-list id="simpleSortedList" interface="java.io.Serializable" mandatory="false"/>
+	<osgi:sorted-set id="simpleSortedSet" interface="java.lang.Comparable" mandatory="false"/>
+	
+	<!-- Comparator variants -->
+	<bean id="defaultComparator" class="org.springframework.osgi.service.collection.comparator.OsgiServiceIdComparator"/>
+	
+	<osgi:list id="implicitSortedList" interface="java.io.Serializable" comparator-ref="defaultComparator" mandatory="false"/>
+	
+	<osgi:set id="implicitSortedSet" interface="java.io.Externalizable" mandatory="false">
+		<osgi:comparator>
+			<ref bean="defaultComparator"/>
+		</osgi:comparator>
+	</osgi:set>
+	
+	<!-- with listeners -->
+	
+	<bean id="firstListener"
+		class="org.springframework.osgi.config.DummyListener" />
+	
+	<osgi:sorted-set id="sortedSetWithComparator" interface="java.io.Externalizable" comparator-ref="defaultComparator" mandatory="false">
+		<osgi:listener ref="firstListener" />
+	</osgi:sorted-set>
+
+</beans>

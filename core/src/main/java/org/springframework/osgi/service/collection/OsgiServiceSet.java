@@ -35,8 +35,8 @@ import org.osgi.framework.Filter;
  */
 public class OsgiServiceSet extends OsgiServiceCollection implements Set {
 
-	public OsgiServiceSet(Filter filter, BundleContext context, ClassLoader classLoader) {
-		super(filter, context, classLoader);
+	public OsgiServiceSet(Filter filter, BundleContext context, ClassLoader classLoader, boolean serviceMandatory) {
+		super(filter, context, classLoader, serviceMandatory);
 	}
 
 	protected DynamicCollection createInternalDynamicStorage() {

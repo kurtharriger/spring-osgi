@@ -17,8 +17,6 @@
  */
 package org.springframework.osgi.util;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -30,7 +28,6 @@ import org.springframework.core.Constants;
 import org.springframework.osgi.AmbiguousServiceReferenceException;
 import org.springframework.osgi.NoSuchServiceException;
 import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Utility class offering easy access to OSGi services
@@ -174,51 +171,6 @@ public abstract class OsgiServiceUtils {
 		catch (ConstantException cex) {
 			return "UNKNOWN EVENT TYPE";
 		}
-	}
-
-	/**
-	 * Parse the given class array and eliminate parents of existing classes.
-	 * 
-	 * @param classes
-	 * @return
-	 */
-	public static Class[] removeParents(Class[] classes) {
-		if (ObjectUtils.isEmpty(classes))
-			return new Class[0];
-
-		List clazz = new ArrayList(classes.length);
-		for (int i = 0; i < classes.length; i++) {
-			clazz.add(classes[i]);
-		}
-
-		// remove null elements
-		while (clazz.remove(null)) {
-		}
-
-		// only one class is allowed
-		// there can be multiple interfaces
-		// parents of classes inside the array are removed
-		// it will be removed
-
-		boolean dirty;
-		do {
-			dirty = false;
-			for (int i = 0; i < clazz.size(); i++) {
-				Class currentClass = (Class) clazz.get(i);
-				for (int j = 0; j < clazz.size(); j++) {
-					if (i != j) {
-						if (currentClass.isAssignableFrom((Class) clazz.get(j))) {
-							clazz.remove(i);
-							i--;
-							dirty = true;
-							break;
-						}
-					}
-				}
-			}
-		} while (dirty);
-
-		return (Class[]) clazz.toArray(new Class[clazz.size()]);
 	}
 
 }

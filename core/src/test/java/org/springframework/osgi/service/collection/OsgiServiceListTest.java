@@ -26,7 +26,7 @@ public class OsgiServiceListTest extends AbstractOsgiCollectionTest {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		col = new OsgiServiceList(null, context, getClass().getClassLoader());
+		col = new OsgiServiceList(null, context, getClass().getClassLoader(), false);
 		col.afterPropertiesSet();
 
 		iter = col.listIterator();

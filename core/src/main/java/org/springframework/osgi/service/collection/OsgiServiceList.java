@@ -48,6 +48,7 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 
 		public Object next() {
 			synchronized (serviceProxies) {
+				mandatoryServiceCheck();
 				Object proxy = iter.next();
 				return (proxy == null ? tailDeadProxy : proxy);
 			}
@@ -55,6 +56,7 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 
 		public Object previous() {
 			synchronized (serviceProxies) {
+				mandatoryServiceCheck();
 				Object proxy = iter.previous();
 
 				return (proxy == null ? headDeadProxy : proxy);
@@ -65,18 +67,22 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 		// index operations
 		//
 		public boolean hasNext() {
+			mandatoryServiceCheck();
 			return iter.hasNext();
 		}
 
 		public boolean hasPrevious() {
+			mandatoryServiceCheck();
 			return iter.hasPrevious();
 		}
 
 		public int nextIndex() {
+			mandatoryServiceCheck();
 			return iter.nextIndex();
 		}
 
 		public int previousIndex() {
+			mandatoryServiceCheck();
 			return iter.previousIndex();
 		}
 
@@ -105,8 +111,8 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 	 */
 	protected List storage;
 
-	public OsgiServiceList(Filter filter, BundleContext context, ClassLoader classLoader) {
-		super(filter, context, classLoader);
+	public OsgiServiceList(Filter filter, BundleContext context, ClassLoader classLoader, boolean serviceMandatory) {
+		super(filter, context, classLoader, serviceMandatory);
 	}
 
 	protected DynamicCollection createInternalDynamicStorage() {
@@ -115,6 +121,7 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 	}
 
 	public Object get(int index) {
+		mandatoryServiceCheck();
 		return storage.get(index);
 	}
 

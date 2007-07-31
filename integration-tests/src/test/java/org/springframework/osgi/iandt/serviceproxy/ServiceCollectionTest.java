@@ -56,7 +56,7 @@ public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTest
 	protected Collection createCollection() {
         BundleContext bundleContext = getBundleContext();
         BundleDelegatingClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
-        OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader);
+        OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader, false);
 		collection.setContextClassLoader(ReferenceClassLoadingOptions.UNMANAGED);
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         try {
