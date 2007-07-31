@@ -57,7 +57,7 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends PrivateFieldRetrieverT
 			private final String filter_Serializable = OsgiFilterUtils.unifyFilter(Serializable.class, null);
 
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
-				if (this.filter_Serializable.equals(filter))
+				if (this.filter_Serializable.equalsIgnoreCase(filter))
 					return new ServiceReference[] { ref };
 
 				return new ServiceReference[0];
@@ -68,6 +68,10 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends PrivateFieldRetrieverT
 		serviceFactoryBean.setBeanClassLoader(getClass().getClassLoader());
 		serviceFactoryBean.setInterface(new Class[] { TestCase.class });
 
+	}
+
+	protected void tearDown() {
+		serviceFactoryBean = null;
 	}
 
 	public void testListenersSetOnCollection() throws Exception {
