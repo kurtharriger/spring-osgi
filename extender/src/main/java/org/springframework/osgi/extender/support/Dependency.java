@@ -1,8 +1,11 @@
 package org.springframework.osgi.extender.support;
 
-import org.osgi.framework.*;
-import org.springframework.osgi.service.CardinalityOptions;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean;
 
 /**
  * @author Hal Hildebrand
@@ -12,14 +15,14 @@ import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 public class Dependency {
     protected String filterString;
     protected Filter filter;
-    protected int cardinality;
+    protected boolean isMandatory;
     protected BundleContext bundleContext;
 
 
-    public Dependency(BundleContext bc, OsgiServiceProxyFactoryBean reference) {
+    public Dependency(BundleContext bc, AbstractOsgiServiceProxyFactoryBean reference) {
         filter = reference.getUnifiedFilter();
         filterString = filter.toString();
-        cardinality = reference.getCard();
+        isMandatory = reference.isMandatory();
         bundleContext = bc;
     }
 
@@ -44,7 +47,7 @@ public class Dependency {
                                                                     + "' has invalid syntax: "
                                                                     + e.getMessage()).initCause(e);
         }
-        return !CardinalityOptions.atLeastOneRequired(cardinality) || (refs != null && refs.length != 0);
+        return !isMandatory || (refs != null && refs.length != 0);
     }
 
 

@@ -40,18 +40,23 @@ public class OsgiServiceSortedList extends OsgiServiceList {
 	 * @param context
 	 * @param classLoader
 	 */
-	public OsgiServiceSortedList(Filter filter, BundleContext context, ClassLoader classLoader) {
-		this(filter, context, classLoader, null);
+	public OsgiServiceSortedList(Filter filter, BundleContext context, ClassLoader classLoader, boolean serviceMandatory) {
+		this(filter, context, classLoader, null, serviceMandatory);
 	}
 
-	public OsgiServiceSortedList(Filter filter, BundleContext context, ClassLoader classLoader, Comparator comparator) {
-		super(filter, context, classLoader);
+	public OsgiServiceSortedList(Filter filter, BundleContext context, ClassLoader classLoader, Comparator comparator,
+			boolean serviceMandatory) {
+		super(filter, context, classLoader, serviceMandatory);
 		this.comparator = comparator;
 	}
 
 	protected DynamicCollection createInternalDynamicStorage() {
 		storage = new DynamicSortedList(comparator);
 		return (DynamicCollection) storage;
+	}
+
+	public Comparator comparator() {
+		return comparator;
 	}
 
 }

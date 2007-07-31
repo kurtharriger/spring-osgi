@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -22,6 +24,7 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Utility class for various types of listeners used inside Spring/OSGi. This
@@ -32,6 +35,8 @@ import org.springframework.util.Assert;
  * 
  */
 public abstract class OsgiListenerUtils {
+
+	private static final Log log = LogFactory.getLog(OsgiListenerUtils.class);
 
 	/**
 	 * Add a service listener to the given application context, under the
@@ -78,6 +83,10 @@ public abstract class OsgiListenerUtils {
 		// now get the already registered services and call the listener
 		// (the listener can handle duplicates)
 		ServiceReference[] alreadyRegistered = OsgiServiceReferenceUtils.getServiceReferences(context, filter);
+
+		if (log.isTraceEnabled())
+			log.trace("calling listener on already registered services: "
+					+ ObjectUtils.nullSafeToString(alreadyRegistered));
 
 		if (alreadyRegistered != null) {
 			for (int i = 0; i < alreadyRegistered.length; i++) {

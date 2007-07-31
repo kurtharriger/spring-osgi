@@ -42,12 +42,13 @@ public class OsgiServiceSortedSet extends OsgiServiceSet implements SortedSet {
 
 	private final Comparator comparator;
 
-	public OsgiServiceSortedSet(Filter filter, BundleContext context, ClassLoader classLoader) {
-		this(filter, context, classLoader, null);
+	public OsgiServiceSortedSet(Filter filter, BundleContext context, ClassLoader classLoader, boolean serviceMandatory) {
+		this(filter, context, classLoader, null, serviceMandatory);
 	}
 
-	public OsgiServiceSortedSet(Filter filter, BundleContext context, ClassLoader classLoader, Comparator comparator) {
-		super(filter, context, classLoader);
+	public OsgiServiceSortedSet(Filter filter, BundleContext context, ClassLoader classLoader, Comparator comparator,
+			boolean serviceMandatory) {
+		super(filter, context, classLoader, serviceMandatory);
 		this.comparator = comparator;
 	}
 
@@ -61,22 +62,27 @@ public class OsgiServiceSortedSet extends OsgiServiceSet implements SortedSet {
 	}
 
 	public Object first() {
+		mandatoryServiceCheck();
 		return storage.first();
 	}
 
 	public Object last() {
+		mandatoryServiceCheck();
 		return storage.last();
 	}
 
 	public SortedSet tailSet(Object fromElement) {
+		mandatoryServiceCheck();
 		return storage.tailSet(fromElement);
 	}
 
 	public SortedSet headSet(Object toElement) {
+		mandatoryServiceCheck();
 		return storage.headSet(toElement);
 	}
 
 	public SortedSet subSet(Object fromElement, Object toElement) {
+		mandatoryServiceCheck();
 		return storage.subSet(fromElement, toElement);
 	}
 

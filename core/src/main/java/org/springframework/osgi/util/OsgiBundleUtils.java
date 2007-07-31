@@ -26,6 +26,8 @@ import org.springframework.core.ConstantException;
 import org.springframework.core.Constants;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.ReflectionUtils.FieldCallback;
+import org.springframework.util.ReflectionUtils.FieldFilter;
 
 /**
  * Utility class for OSGi {@link Bundle}s.
@@ -46,7 +48,7 @@ public abstract class OsgiBundleUtils {
 	 * @param bundle
 	 * @return
 	 */
-	public static BundleContext getBundleContext(Bundle bundle) {
+	public static BundleContext getBundleContext(final Bundle bundle) {
 		if (bundle == null)
 			return null;
 
@@ -69,31 +71,26 @@ public abstract class OsgiBundleUtils {
 			return (BundleContext) ReflectionUtils.invokeMethod(m, bundle);
 		}
 
-		// Retrieve bundle context from Knopflerfish
-		try {
-			Field[] fields = bundle.getClass().getDeclaredFields();
-			Field f = null;
-			for (int i = 0; i < fields.length; i++) {
-				if (fields[i].getName().equals("bundleContext")) {
-					f = fields[i];
-					break;
-				}
+		// fallback to field inspection (KF and Prosyst)
+		final BundleContext[] ctx = new BundleContext[1];
+
+		ReflectionUtils.doWithFields(bundle.getClass(), new FieldCallback() {
+			public void doWith(final Field field) throws IllegalArgumentException, IllegalAccessException {
+				AccessController.doPrivileged(new PrivilegedAction() {
+					public Object run() {
+						field.setAccessible(true);
+						return null;
+					}
+				});
+				ctx[0] = (BundleContext) field.get(bundle);
 			}
-			if (f == null) {
-				throw new IllegalStateException("No bundleContext field!");
+		}, new FieldFilter() {
+			public boolean matches(Field field) {
+				return BundleContext.class.isAssignableFrom(field.getType());
 			}
-			final Field field = f;
-			AccessController.doPrivileged(new PrivilegedAction() {
-				public Object run() {
-					field.setAccessible(true);
-					return null;
-				}
-			});
-			return (BundleContext) field.get(bundle);
-		}
-		catch (IllegalAccessException e) {
-			throw (IllegalStateException) new IllegalStateException("Exception retrieving bundle context").initCause(e);
-		}
+		});
+		
+		return ctx[0];
 	}
 
 	/**

@@ -1,0 +1,125 @@
+/*
+ * Copyright 2002-2007 the original author or authors.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.osgi.service.importer;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
+import org.easymock.MockControl;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
+import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.ServiceUnavailableException;
+import org.springframework.osgi.config.PrivateFieldRetrieverTestCase;
+import org.springframework.osgi.mock.MockBundleContext;
+import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.util.OsgiFilterUtils;
+
+/**
+ * @author Costin Leau
+ * 
+ */
+public class OsgiMultiServiceProxyFactoryBeanTest extends PrivateFieldRetrieverTestCase {
+
+	private OsgiMultiServiceProxyFactoryBean serviceFactoryBean;
+
+	private MockBundleContext bundleContext;
+
+	private ServiceReference ref;
+
+	protected void setUp() throws Exception {
+		super.setUp();
+		this.serviceFactoryBean = new OsgiMultiServiceProxyFactoryBean();
+		// this.serviceFactoryBean.setApplicationContext(new
+		// GenericApplicationContext());
+
+		ref = new MockServiceReference(new String[] { Serializable.class.getName() });
+
+		bundleContext = new MockBundleContext() {
+			private final String filter_Serializable = OsgiFilterUtils.unifyFilter(Serializable.class, null);
+
+			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+				if (this.filter_Serializable.equals(filter))
+					return new ServiceReference[] { ref };
+
+				return new ServiceReference[0];
+			}
+		};
+
+		serviceFactoryBean.setBundleContext(this.bundleContext);
+		serviceFactoryBean.setBeanClassLoader(getClass().getClassLoader());
+		serviceFactoryBean.setInterface(new Class[] { TestCase.class });
+
+	}
+
+	public void testListenersSetOnCollection() throws Exception {
+		serviceFactoryBean.setMandatory(false);
+
+		TargetSourceLifecycleListener[] listeners = { (TargetSourceLifecycleListener) MockControl.createControl(
+			TargetSourceLifecycleListener.class).getMock() };
+		serviceFactoryBean.setListeners(listeners);
+		serviceFactoryBean.afterPropertiesSet();
+
+		assertSame(listeners, getPrivateProperty(serviceFactoryBean.getObject(), "listeners"));
+	}
+
+	public void testMandatoryServiceAtStartupFailure() throws Exception {
+		serviceFactoryBean.setMandatory(true);
+		serviceFactoryBean.afterPropertiesSet();
+
+		try {
+			serviceFactoryBean.getObject();
+			fail("should have thrown exception");
+		}
+		catch (ServiceUnavailableException ex) {
+			// expected
+		}
+	}
+
+	public void testMandatoryServiceAvailableAtStartup() {
+		serviceFactoryBean.setInterface(new Class[] { Serializable.class });
+		serviceFactoryBean.afterPropertiesSet();
+
+		assertNotNull(serviceFactoryBean.getObject());
+	}
+
+	public void testMandatoryServiceUnAvailableWhileWorking() {
+		serviceFactoryBean.setInterface(new Class[] { Serializable.class });
+		serviceFactoryBean.afterPropertiesSet();
+
+		Collection col = (Collection) serviceFactoryBean.getObject();
+
+		assertFalse(col.isEmpty());
+		Set listeners = bundleContext.getServiceListeners();
+
+		ServiceListener list = (ServiceListener) listeners.iterator().next();
+		list.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
+
+		try {
+			// disable filter
+			col.isEmpty();
+			fail("should have thrown exception");
+		}
+		catch (ServiceUnavailableException ex) {
+			// expected
+		}
+	}
+}

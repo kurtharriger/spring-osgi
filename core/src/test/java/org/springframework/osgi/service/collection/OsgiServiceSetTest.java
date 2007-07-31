@@ -35,7 +35,7 @@ public class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		col = new OsgiServiceSet(null, context, getClass().getClassLoader());
+		col = new OsgiServiceSet(null, context, getClass().getClassLoader(), false);
 		col.afterPropertiesSet();
 
 		iter = col.iterator();

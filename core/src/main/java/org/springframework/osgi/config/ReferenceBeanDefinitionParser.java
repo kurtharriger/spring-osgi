@@ -22,7 +22,6 @@ import java.util.List;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -30,7 +29,7 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.config.ParserUtils.AttributeCallback;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
@@ -40,6 +39,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * &lt;osgi:reference&gt; tag parser.
+ * 
  * @author Andy Piper
  * @author Costin Leau
  * @since 2.1
@@ -62,15 +63,13 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	public static final String INTERFACE_NAME = "interfaceName";
 
-
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser#getBeanClass(org.w3c.dom.Element)
 	 */
 	protected Class getBeanClass(Element element) {
-		return OsgiServiceProxyFactoryBean.class;
+		return OsgiSingleServiceProxyFactoryBean.class;
 	}
 
 	/*
@@ -81,17 +80,7 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	 * org.springframework.beans.factory.support.BeanDefinitionBuilder)
 	 */
 	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
-		AbstractBeanDefinition def = builder.getBeanDefinition();
-
 		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.springframework.osgi.config.ParserUtils.AttributeCallback#process(org.w3c.dom.Element,
-			 * org.w3c.dom.Attr,
-			 * org.springframework.beans.factory.support.BeanDefinitionBuilder)
-			 */
 			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 				String name = attribute.getLocalName();
 				// ref attribute will be handled separately
@@ -99,6 +88,10 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 			}
 		});
 
+		parseNestedElements(element, context, builder);
+	}
+
+	protected void parseNestedElements(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		// parse subelements
 		// context.getDelegate().parsePropertyElements(element,
 		// builder.getBeanDefinition());
@@ -122,11 +115,10 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 					// check inline ref
 					if (listnr.hasAttribute(REF))
-						context.getReaderContext()
-								.error("nested bean declaration is not allowed if 'ref' attribute has been specified",
-										beanDef);
+						context.getReaderContext().error(
+							"nested bean declaration is not allowed if 'ref' attribute has been specified", beanDef);
 
-					target = context.getDelegate().parsePropertySubElement(beanDef, def);
+					target = context.getDelegate().parsePropertySubElement(beanDef, builder.getBeanDefinition());
 				}
 			}
 
@@ -158,6 +150,7 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 		}
 
-		def.getPropertyValues().addPropertyValue(LISTENERS_PROPERTY, listenersRef);
+		builder.addPropertyValue(LISTENERS_PROPERTY, listenersRef);
+
 	}
 }
