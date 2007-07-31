@@ -57,7 +57,7 @@
     <!-- the default-->
     <spring.osgi.include.res>src/main/resources/</spring.osgi.include.res>
 
-
+    <cobertura.file>${basedir}/target/cobertura/cobertura.ser</cobertura.file>
    <!-- other properties -->
    <slf4j.version>1.4.0</slf4j.version>
   </properties>
@@ -317,7 +317,7 @@ limitations under the License.
             </property>
             <property>
 				<name>net.sourceforge.cobertura.datafile</name>
-				<value>${basedir}/target/cobertura/cobertura.ser</value>
+				<value>${cobertura.file}</value>
 			</property>
           </systemProperties>
         </configuration>
@@ -340,7 +340,7 @@ limitations under the License.
         </configuration>
       </plugin>
       
-      <!-- invoke submodule -->
+      <!-- invoke submodule 
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
         <version>1.0</version>
@@ -366,6 +366,17 @@ limitations under the License.
            </execution>
         </executions>
       </plugin>
+      -->
+      
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <configuration>
+          <cobertura>
+		       <format>xml</format>
+          </cobertura>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -384,7 +395,7 @@ limitations under the License.
           <artifactId>org.eclipse.osgi</artifactId>
           <version>3.2.2</version>
           <type>jar</type>
-          <scope>test</scope>
+          <scope>provided</scope>
         </dependency>
       </dependencies>
       <properties>
@@ -424,7 +435,7 @@ limitations under the License.
           <artifactId>framework</artifactId>
           <version>2.0.1</version>
           <type>jar</type>
-          <scope>test</scope>
+          <scope>provided</scope>
         </dependency>
       </dependencies>
       <properties>
@@ -441,7 +452,7 @@ limitations under the License.
           <artifactId>org.apache.felix.main</artifactId>
           <version>0.9.0-incubator-SNAPSHOT</version>
           <type>jar</type>
-          <scope>test</scope>
+          <scope>provided</scope>
         </dependency>
       </dependencies>
       <properties>
@@ -582,6 +593,11 @@ limitations under the License.
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
+        <configuration>
+           <cobertura>
+           <format>xml</format>
+		  </cobertura>
+        </configuration>
       </plugin>
       
     </plugins>

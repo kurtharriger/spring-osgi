@@ -23,6 +23,7 @@
 	    edu.emory.mathcs.backport.java.util.concurrent;resolution:=optional,
         *
 	</spring.osgi.import.pkg>
+	
   </properties>
   
     
