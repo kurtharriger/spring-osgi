@@ -14,6 +14,10 @@
 
   <properties>
      <spring.osgi.export.pkg> org.springframework.osgi.samples.weather</spring.osgi.export.pkg>
+     <spring.osgi.import.pkg>
+		org.w3c.dom;resolution:=optional,
+		*
+	 </spring.osgi.import.pkg>
   </properties>
   
   	<dependencies>
