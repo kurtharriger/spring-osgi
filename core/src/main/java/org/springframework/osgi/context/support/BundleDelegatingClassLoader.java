@@ -375,8 +375,12 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	}
 
 	public URL getResource(String name) {
-		return (bridge == null) ? findResource(name) : super.getResource(name);
-	}
+		URL resource = findResource(name);
+        if (resource == null) {
+            resource = bridge.getResource(name);
+        }
+        return resource;
+    }
 
 	protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class clazz;
