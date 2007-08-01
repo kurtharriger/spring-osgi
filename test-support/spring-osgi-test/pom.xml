@@ -123,7 +123,7 @@
     </plugins>
   </build>
 
-<!--profiles>
+<profiles>
     <profile>
       <id>equinox-1.5</id>
       <activation>
@@ -138,6 +138,6 @@
         </dependency>
       </dependencies>
    </profile>
-</profiles-->
+</profiles>
 
 </project>
