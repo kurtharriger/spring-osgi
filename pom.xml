@@ -196,6 +196,7 @@ limitations under the License.
 	<module>io</module>    
     <module>core</module>
     <module>extender</module>
+    <module>annotation-support</module>
     <module>test-support</module>
     <module>integration-test-bundles</module>
     <module>integration-tests</module>
@@ -400,7 +401,6 @@ limitations under the License.
            <jdk>1.5</jdk>
       </activation>
       <modules>
-       <module>annotation</module>
        <module>integration-tests-tiger</module>
       </modules>
       <dependencies>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project>
   <parent>
-    <artifactId>spring-osgi</artifactId>
+    <artifactId>spring-osgi-annotation.app</artifactId>
     <groupId>org.springframework.osgi</groupId>
     <version>1.0-m3-SNAPSHOT</version>
   </parent>
