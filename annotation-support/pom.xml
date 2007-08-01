@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <parent>
+        <artifactId>spring-osgi</artifactId>
+        <groupId>org.springframework.osgi</groupId>
+        <version>1.0-m3-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.springframework.osgi</groupId>
+    <artifactId>spring-osgi-annotation.app</artifactId>
+    <packaging>pom</packaging>
+    <name>Spring OSGi annotation support</name>
+    <url>http://www.springframework.org/osgi</url>
+
+
+    <profiles>
+        <profile>
+            <id>equinox-1.5</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <modules>
+                <module>annotation</module>
+            </modules>
+        </profile>
+    </profiles>
+    -->
+</project>
