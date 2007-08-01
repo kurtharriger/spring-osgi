@@ -62,9 +62,9 @@
 <profiles>
     <profile>
       <id>equinox-1.5</id>
-      <activation>
+      <!--activation>
            <jdk>1.5</jdk>
-      </activation>
+      </activation-->
       <modules>
        <module>annotation.test.bundle</module>
        <module>annotation.dependency.test.bundle</module>
