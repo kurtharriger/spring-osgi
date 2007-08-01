@@ -25,14 +25,14 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -116,10 +116,10 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 	private Object getServiceProperty(ServiceReference s, Method writeMethod, String beanName) throws Exception {
 		// Invocations will block here, so although the ApplicationContext is created nothing will
 		// proceed until all the dependencies are satisfied.
-		return getServiceProperty(new OsgiServiceProxyFactoryBean(), s, writeMethod, beanName).getObject();
+		return getServiceProperty(new OsgiSingleServiceProxyFactoryBean(), s, writeMethod, beanName).getObject();
 	}
 
-	/* package */ OsgiServiceProxyFactoryBean getServiceProperty(OsgiServiceProxyFactoryBean pfb, ServiceReference s, Method writeMethod, String beanName) throws Exception {
+	/* package */ OsgiSingleServiceProxyFactoryBean getServiceProperty(OsgiSingleServiceProxyFactoryBean pfb, ServiceReference s, Method writeMethod, String beanName) throws Exception {
 		pfb.setTimeout(s.timeout());
 		if (s.filter().length() > 0) {
 			pfb.setFilter(s.filter());
@@ -135,7 +135,7 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 		else {
 			pfb.setInterface(s.serviceTypes());
 		}
-		pfb.setCardinality(s.cardinality().toString());
+		pfb.setMandatory(s.mandatory());
 		pfb.setContextClassloader(s.contextClassloader().toString());
 		pfb.setBundleContext(bundleContext);
 		if (s.serviceBeanName().length() > 0) {

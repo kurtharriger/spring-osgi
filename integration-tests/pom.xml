@@ -128,9 +128,11 @@
     <profiles>
         <profile>
             <id>equinox-1.5</id>
-            <!--activation>
+            <!--
+            <activation>
                 <jdk>1.5</jdk>
-            </activation-->
+            </activation>
+            -->
             <dependencies>
                 <dependency>
                     <groupId>org.springframework.osgi</groupId>
