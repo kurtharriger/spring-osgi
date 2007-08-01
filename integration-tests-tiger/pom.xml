@@ -61,6 +61,13 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-annotation</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
         
         <dependency>
             <groupId>org.springframework.osgi</groupId>

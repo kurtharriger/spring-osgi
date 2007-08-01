@@ -154,10 +154,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 				getSpringOSGiExtenderBundleUrl() };
 
 		String[] bundles = jars;
-		/*
+
         if (JdkVersion.isAtLeastJava15()) {
 			bundles = (String[]) ObjectUtils.addObjectToArray(jars, getSpringOSGiAnnotationBundleUrl());
-		}*/
+		}
 
         return bundles;
 	}
