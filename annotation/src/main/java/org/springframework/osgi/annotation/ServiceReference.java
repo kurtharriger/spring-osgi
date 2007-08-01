@@ -39,8 +39,8 @@ public @interface ServiceReference {
 	/**
 	 * The cardinality of the service reference, defaults to mandatory.
 	 */
-	ServiceReferenceCardinality cardinality() default ServiceReferenceCardinality.C1__1;
-
+	boolean mandatory() default true;
+	
 	/**
 	 * The invocation context classloader setting. Defalts to the classloader of the client.
 	 */
