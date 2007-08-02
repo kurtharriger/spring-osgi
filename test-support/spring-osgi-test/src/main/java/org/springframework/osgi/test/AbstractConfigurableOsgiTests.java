@@ -22,6 +22,7 @@ import java.util.List;
 import org.springframework.osgi.test.platform.EquinoxPlatform;
 import org.springframework.osgi.test.platform.FelixPlatform;
 import org.springframework.osgi.test.platform.KnopflerfishPlatform;
+import org.springframework.osgi.test.platform.MBServerProfessionalPlatform;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 
 /**
@@ -55,10 +56,17 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	public static final String KNOPFLERFISH_PLATFORM = "knopflerfish";
 
 	/**
-	 * <a href="http://incubator.apache.org/felix">Felix</a> OSGi platform
+	 * <a href="http://felix.apache.org/">Felix</a> OSGi platform
 	 * constant.
 	 */
 	public static final String FELIX_PLATFORM = "felix";
+
+	
+	/**
+	 * <a href="http://www.prosyst.com/products/osgi_se_prof_ed.html">Prosyst mBedded Professional</a> OSGi platform
+	 * constant.
+	 */
+	public static final String MBEDDED_PRO_PLATFORM = "mbserver_pro";
 
 	/**
 	 * System property for selecting the appropriate OSGi implementation.
@@ -77,6 +85,7 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	 * 
 	 * @return the OSGi platform
 	 */
+	// FIXME: make this pluggable so that adding new platforms doesn't require adding new code
 	protected OsgiPlatform createPlatform() {
 		String platformName = getPlatformName();
 
@@ -90,6 +99,10 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 			}
 			else if (platformName.indexOf(KNOPFLERFISH_PLATFORM) > -1) {
 				platform = new KnopflerfishPlatform();
+			}
+			
+			else if (platformName.indexOf(MBEDDED_PRO_PLATFORM) > -1) {
+				platform = new MBServerProfessionalPlatform();
 			}
 		}
 

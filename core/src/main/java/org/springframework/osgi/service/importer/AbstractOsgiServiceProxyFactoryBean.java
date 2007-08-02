@@ -276,6 +276,7 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean
 
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
+		System.out.println("setting classloader " + classLoader + "@" + classLoader.getClass());
 	}
 
 	public void setMandatory(boolean mandatory) {
@@ -285,5 +286,5 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean
 	public boolean isMandatory() {
 		return mandatory;
 	}
-	
+
 }
