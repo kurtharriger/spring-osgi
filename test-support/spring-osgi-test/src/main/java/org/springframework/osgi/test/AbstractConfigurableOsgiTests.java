@@ -20,9 +20,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.osgi.test.platform.EquinoxPlatform;
-import org.springframework.osgi.test.platform.FelixPlatform;
-import org.springframework.osgi.test.platform.KnopflerfishPlatform;
 import org.springframework.osgi.test.platform.OsgiPlatform;
+import org.springframework.osgi.test.platform.Platforms;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Abstract JUnit super class which configures an {@link OsgiPlatform}. <p/>
@@ -43,31 +44,6 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	}
 
 	/**
-	 * <a href="http://www.eclipse.org/equinox">Equinox</a> OSGi platform
-	 * constant.
-	 */
-	public static final String EQUINOX_PLATFORM = "equinox";
-
-	/**
-	 * <a href="http://www.knopflerfish.org/">Knopflerfish</a> OSGi platform
-	 * constant.
-	 */
-	public static final String KNOPFLERFISH_PLATFORM = "knopflerfish";
-
-	/**
-	 * <a href="http://felix.apache.org/">Felix</a> OSGi platform
-	 * constant.
-	 */
-	public static final String FELIX_PLATFORM = "felix";
-
-	
-	/**
-	 * <a href="http://www.prosyst.com/products/osgi_se_prof_ed.html">Prosyst mBedded Professional</a> OSGi platform
-	 * constant.
-	 */
-	public static final String MBEDDED_PRO_PLATFORM = "mbserver_pro";
-
-	/**
 	 * System property for selecting the appropriate OSGi implementation.
 	 */
 	public static final String OSGI_FRAMEWORK_SELECTOR = "org.springframework.osgi.test.framework";
@@ -84,27 +60,40 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	 * 
 	 * @return the OSGi platform
 	 */
-	// FIXME: make this pluggable so that adding new platforms doesn't require adding new code
 	protected OsgiPlatform createPlatform() {
-		String platformName = getPlatformName();
+
+		boolean trace = logger.isTraceEnabled();
+		String platformClassName = getPlatformName();
 
 		OsgiPlatform platform = null;
-		if (platformName != null) {
-			platformName = platformName.toLowerCase();
+		ClassLoader currentCL = getClass().getClassLoader();
 
-			if (platformName.indexOf(FELIX_PLATFORM) > -1) {
-				platform = new FelixPlatform();
+		if (StringUtils.hasText(platformClassName)) {
+			if (ClassUtils.isPresent(platformClassName, currentCL)) {
+				Class platformClass = ClassUtils.resolveClassName(platformClassName, currentCL);
+				if (OsgiPlatform.class.isAssignableFrom(platformClass)) {
+					if (trace)
+						logger.trace("instantiating platform wrapper...");
+					try {
+						platform = (OsgiPlatform) platformClass.newInstance();
+					}
+					catch (Exception ex) {
+						logger.warn("cannot instantiate class [" + platformClass + "]; using default");
+					}
+				}
+				else
+					logger.warn("class [" + platformClass + "] does not implement " + OsgiPlatform.class.getName()
+							+ " interface; falling back to defaults");
+			}
+			else {
+				logger.warn("OSGi platform starter [" + platformClassName + "] not found; using default");
+			}
 
-			}
-			else if (platformName.indexOf(KNOPFLERFISH_PLATFORM) > -1) {
-				platform = new KnopflerfishPlatform();
-			}
-			
-//			else if (platformName.indexOf(MBEDDED_PRO_PLATFORM) > -1) {
-//				platform = new MBServerProfessionalPlatform();
-//			}
 		}
+		else
+			logger.trace("no platform specified; using default");
 
+		// fallback
 		if (platform == null)
 			platform = new EquinoxPlatform();
 
@@ -117,16 +106,19 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 
 	/**
 	 * Indicate what OSGi platform to be used by the test suite. By default,
-	 * {@link #OSGI_FRAMEWORK_SELECTOR} system property is used.
+	 * {@link #OSGI_FRAMEWORK_SELECTOR} system property is used. Subclasses can
+	 * override this and provide directly the OSGi platform name.
 	 * 
+	 * 
+	 * @see Platforms
 	 * @return platform
 	 */
 	protected String getPlatformName() {
 		String systemProperty = System.getProperty(OSGI_FRAMEWORK_SELECTOR);
 		if (logger.isTraceEnabled())
 			logger.trace("system property [" + OSGI_FRAMEWORK_SELECTOR + "] has value=" + systemProperty);
-		
-		return (systemProperty == null ? EQUINOX_PLATFORM : systemProperty);
+
+		return (systemProperty == null ? Platforms.EQUINOX : systemProperty);
 	}
 
 	/**
