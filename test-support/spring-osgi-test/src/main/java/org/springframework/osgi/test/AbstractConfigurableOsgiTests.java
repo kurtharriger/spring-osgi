@@ -22,7 +22,6 @@ import java.util.List;
 import org.springframework.osgi.test.platform.EquinoxPlatform;
 import org.springframework.osgi.test.platform.FelixPlatform;
 import org.springframework.osgi.test.platform.KnopflerfishPlatform;
-import org.springframework.osgi.test.platform.MBServerProfessionalPlatform;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 
 /**
@@ -101,9 +100,9 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 				platform = new KnopflerfishPlatform();
 			}
 			
-			else if (platformName.indexOf(MBEDDED_PRO_PLATFORM) > -1) {
-				platform = new MBServerProfessionalPlatform();
-			}
+//			else if (platformName.indexOf(MBEDDED_PRO_PLATFORM) > -1) {
+//				platform = new MBServerProfessionalPlatform();
+//			}
 		}
 
 		if (platform == null)
