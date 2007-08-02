@@ -250,6 +250,7 @@ limitations under the License.
   </dependencies>
   
  <build>
+ <!--
         <extensions>
             <extension>
                 <groupId>org.springframework.aws</groupId>
@@ -257,7 +258,7 @@ limitations under the License.
                 <version>1.1.1</version>
             </extension>
         </extensions>
-
+-->
     <resources>
       <resource>
         <!-- Bug MRESOURCES-35 means we can't use absolute paths -->
@@ -397,7 +398,7 @@ limitations under the License.
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>equinox</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.EquinoxPlatform</osgi.test.platform>
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
@@ -420,7 +421,7 @@ limitations under the License.
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>equinox</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.EquinoxPlatform</osgi.test.platform>
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
@@ -436,7 +437,7 @@ limitations under the License.
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>knopflerfish</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.KnopflerfishPlatform</osgi.test.platform>
 		<log4j.ignoreTCL>true</log4j.ignoreTCL>
 		<org.knopflerfish.osgi.setcontextclassloader>true</org.knopflerfish.osgi.setcontextclassloader>        
       </properties>
@@ -453,7 +454,7 @@ limitations under the License.
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>felix</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.FelixPlatform</osgi.test.platform>
 		<log4j.ignoreTCL>true</log4j.ignoreTCL>        
       </properties>
     </profile>
@@ -471,7 +472,7 @@ limitations under the License.
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>mbs_pro</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform..MBSProPlatform</osgi.test.platform>
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
@@ -619,11 +620,14 @@ limitations under the License.
         scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2
       </url>
     </repository>
+    
+    <!-- disable the repo for now
         <snapshotRepository>
             <id>spring-snapshot</id>
             <name>Spring Snapshot Repository</name>
             <url>s3://maven.springframework.org/snapshot</url>
         </snapshotRepository>
+        -->
     <site>
       <id>static.springframework.org</id>
       <name>SpringFramework.org</name>

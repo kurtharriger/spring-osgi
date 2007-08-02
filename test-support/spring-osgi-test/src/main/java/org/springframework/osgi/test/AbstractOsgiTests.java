@@ -155,8 +155,9 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * Create (and configure) the OSGi platform.
 	 * 
 	 * @return OSGi platform.
+	 * @throws Exception 
 	 */
-	protected abstract OsgiPlatform createPlatform();
+	protected abstract OsgiPlatform createPlatform() throws Exception;
 
 	/**
 	 * Callback for processing the platform bundle context before any bundles
