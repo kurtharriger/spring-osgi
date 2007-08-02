@@ -50,14 +50,6 @@
   </dependencies>
   
  <build>
-        <extensions>
-            <extension>
-                <groupId>org.springframework.aws</groupId>
-                <artifactId>spring-aws-maven</artifactId>
-                <version>1.1.1</version>
-            </extension>
-        </extensions>
-
     <resources>
       <resource>
         <!-- Bug MRESOURCES-35 means we can't use absolute paths -->
