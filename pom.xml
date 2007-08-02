@@ -19,9 +19,9 @@
 
   <properties>
     <!-- Spring dist version for turning into OSGi bundles -->
-    <base.spring.version>2.0.5</base.spring.version>
+    <base.spring.version>2.1</base.spring.version>
     <!-- Spring version declaration in bundles -->
-    <spring.version>2.0.5</spring.version>
+    <spring.version>2.1</spring.version>
 
     <!--- Spring packages imported version -->
     <spring.import.version>${spring.version}</spring.import.version>
@@ -32,19 +32,18 @@
     <spring.bundle.version>2.1.0.SNAPSHOT-205</spring.bundle.version>
     --> 
     <!-- naming pattern for Spring OSGi bundles that get published into maven -->   
-    <spring.maven.artifact.version>${base.spring.version}-osgi-m3-SNAPSHOT</spring.maven.artifact.version>
+    <spring.maven.artifact.version>2.1-m3</spring.maven.artifact.version>
+    
+    <!-- spring wrapped artifacts -->
+    <spring.wrapped.version>2.1-osgi-m4-SNAPSHOT</spring.wrapped.version>
     
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
     <spring.osgi.import.version>1.0.0.m3</spring.osgi.import.version>
     <!--- Spring OSGi packages exported version -->
     <spring.osgi.export.version>1.0.0.m3</spring.osgi.export.version>
     <spring.osgi.bundle.version>1.0.0.m3</spring.osgi.bundle.version>
-     <!-- Convenience for seeing the svn change #, but contains whitespace -->
-    <project.svn.revision>$Rev$</project.svn.revision>
-    <!--
-    <project.svn.revision>1.0.0.m3-SNAPSHOT</project.svn.revision>
-    -->
-    
+
+   
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
     <spring.osgi.private.pkg>!*</spring.osgi.private.pkg>
     
@@ -448,11 +447,27 @@ limitations under the License.
       <properties>
         <osgi.test.platform>felix</osgi.test.platform>
 		<log4j.ignoreTCL>true</log4j.ignoreTCL>        
-        <!--
-		<org.osgi.vendor.framework>org.apache.felix.framework</org.osgi.vendor.framework>
-		-->
       </properties>
     </profile>
+
+   <!-- not enabled yet
+    <profile>
+      <id>mbs_pro</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.prosyst.mbs</groupId>
+          <artifactId>serverjvm13</artifactId>
+          <version>6.1.1</version>
+          <type>jar</type>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+      <properties>
+        <osgi.test.platform>mbs_pro</osgi.test.platform>
+        <log4j.ignoreTCL>true</log4j.ignoreTCL>
+      </properties>
+    </profile>
+    -->
   </profiles>
 
   <!-- ======================================= -->
@@ -683,7 +698,12 @@ limitations under the License.
       <name>Apache snapshot repo</name>
       <url>http://cvs.apache.org/maven-snapshot-repository</url>
 	</repository>
-	
+
+    <repository>
+    <id>i21-s3-maven-repo</id>
+      <name>i21 S3 milestone repo</name>
+      <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+    </repository>
   </repositories>
 
   

@@ -92,7 +92,7 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 	}
 
 	public void testSimpleService() throws Exception {
-		Object bean = appContext.getBean("&" + OsgiServiceFactoryBean.class.getName());
+		Object bean = appContext.getBean("&" + OsgiServiceFactoryBean.class.getName()+"#0");
 		assertSame(OsgiServiceFactoryBean.class, bean.getClass());
 		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) bean;
 		assertTrue(Arrays.equals(new Class[] { Serializable.class }, exporter.getInterfaces()));

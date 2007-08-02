@@ -45,30 +45,32 @@
 
 
    <dependency>
-      <groupId>org.springframework.osgi</groupId>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
       <version>${spring.maven.artifact.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
       <version>${spring.maven.artifact.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
       <version>${spring.maven.artifact.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-aop</artifactId>
-      <version>${spring.maven.artifact.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
       <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+	<!-- this one is still wrapped internally -->
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-aop</artifactId>
+      <version>${spring.wrapped.version}</version>
     </dependency>
 	  
     <dependency>

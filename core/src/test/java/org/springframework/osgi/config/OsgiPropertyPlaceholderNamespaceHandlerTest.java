@@ -34,6 +34,7 @@ import org.springframework.core.io.support.PropertiesLoaderSupport;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.context.support.OsgiPropertyPlaceholder;
 import org.springframework.osgi.mock.MockBundleContext;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Costin Leau
@@ -42,9 +43,13 @@ import org.springframework.osgi.mock.MockBundleContext;
 public class OsgiPropertyPlaceholderNamespaceHandlerTest extends TestCase {
 
 	private GenericApplicationContext appContext;
+
 	private BundleContext bundleContext;
+
 	private MockControl adminControl;
+
 	private ConfigurationAdmin admin;
+
 	private Dictionary config;
 
 	protected void setUp() throws Exception {
@@ -61,7 +66,7 @@ public class OsgiPropertyPlaceholderNamespaceHandlerTest extends TestCase {
 
 		adminControl.replay();
 		configMock.replay();
-		
+
 		bundleContext = new MockBundleContext() {
 			// add Configuration admin support
 			public Object getService(ServiceReference reference) {
@@ -83,7 +88,8 @@ public class OsgiPropertyPlaceholderNamespaceHandlerTest extends TestCase {
 	}
 
 	public void testSimplePlaceholder() throws Exception {
-		OsgiPropertyPlaceholder simple = (OsgiPropertyPlaceholder) appContext.getBean(OsgiPropertyPlaceholder.class.getName());
+		OsgiPropertyPlaceholder simple = (OsgiPropertyPlaceholder) appContext.getBean(OsgiPropertyPlaceholder.class.getName()
+				+ "#0");
 		assertEquals("com.xyz.myapp", simple.getPersistentId());
 
 	}

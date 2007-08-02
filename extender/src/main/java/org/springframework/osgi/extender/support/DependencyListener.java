@@ -39,7 +39,7 @@ public class DependencyListener implements ServiceListener {
 	protected void findServiceDependencies() {
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 		String[] beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
-			AbstractOsgiServiceProxyFactoryBean.class, true, true);
+			AbstractOsgiServiceProxyFactoryBean.class, true, false);
 		for (int i = 0; i < beans.length; i++) {
 			String beanName = BeanFactory.FACTORY_BEAN_PREFIX + beans[i];
 			AbstractOsgiServiceProxyFactoryBean reference = (AbstractOsgiServiceProxyFactoryBean) beanFactory.getBean(beanName);

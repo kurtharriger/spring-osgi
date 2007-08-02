@@ -17,8 +17,7 @@ package org.springframework.osgi.service.interceptor;
 
 import junit.framework.TestCase;
 
-import org.aopalliance.intercept.MethodInvocation; 
-import org.springframework.aop.framework.ReflectiveMethodInvocation;
+import org.aopalliance.intercept.MethodInvocation;
 
 /**
  * @author Costin Leau
@@ -58,16 +57,14 @@ public class OsgiServiceInvokerTest extends TestCase {
 	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceInvoker#invoke(org.aopalliance.intercept.MethodInvocation)}.
 	 */
 	public void testInvoke() throws Throwable {
-		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), new Object(),
-				Object.class.getMethod("hashCode", null), null, null, null);
+		MethodInvocation invocation = new MockMethodInvocation(Object.class.getMethod("hashCode", null));
 		Object result = invoker.invoke(invocation);
 		assertEquals("different target invoked", new Integer(target.hashCode()), result);
 	}
 
 	public void testExceptionUnwrapping() throws Throwable {
-		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), new Object(),
-				Integer.class.getMethod("parseInt", new Class[] { String.class }), new Object[] { "invalid number" },
-				null, null);
+		MethodInvocation invocation = new MockMethodInvocation(Integer.class.getMethod("parseInt",
+			new Class[] { String.class }), new Object[] { "invalid number" });
 
 		try {
 			invoker.invoke(invocation);

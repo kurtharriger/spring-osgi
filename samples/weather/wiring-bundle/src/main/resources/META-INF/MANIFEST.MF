@@ -8,3 +8,4 @@ Import-Package: org.springframework.osgi.config,
    org.springframework.osgi.service,
    org.springframework.jmx.export
 DynamicImport-Package: *
+Spring-Context: 

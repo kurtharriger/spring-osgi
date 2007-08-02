@@ -65,7 +65,8 @@
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-aop</artifactId>
-      <version>${spring.maven.artifact.version}</version>
+      <version>${spring.wrapped.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
 	    <groupId>org.aopalliance</groupId>
