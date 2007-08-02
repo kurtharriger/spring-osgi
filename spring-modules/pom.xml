@@ -10,50 +10,31 @@
   <artifactId>spring-modules</artifactId>
   <packaging>pom</packaging>
   <name>Spring Framework jars packaged as OSGi bundles</name>
-  <version>2.0.5-osgi-m3-SNAPSHOT</version>
+  <version>2.1-osgi-m4-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   
   <!-- templating properties for unpack task -->
   
   <!-- defaults point to Spring framework -->
   <properties>
+  
+    <spring.version>2.1-m3</spring.version>
+  
     <spring.osgi.export.pkg>org.springframework*</spring.osgi.export.pkg>
+
     <!-- override Spring/OSGi with Spring defaults -->
     <spring.osgi.export>${spring.osgi.export.pkg}*;version=${spring.version}</spring.osgi.export>
-    
     <spring.osgi.import>${spring.osgi.import.pkg}, org.springframework*;version=${spring.version}, *</spring.osgi.import>
      
    
-    <!-- use spring version -->
     <!-- copy the resources inside the bundles | pattern works only for Spring -->
+    
     <spring.osgi.include.res>@${pom.artifactId}-${spring.version}.jar!/META-INF/*</spring.osgi.include.res>	     
   </properties>
  
 
   <modules>
     <module>spring-aop</module>
-    <module>spring-aspects</module>
-    <module>spring-beans</module>
-    <module>spring-context</module>
-    <module>spring-core</module>
-    <module>spring-dao</module>
-    <module>spring-hibernate2</module>
-    <module>spring-hibernate3</module>
-    <module>spring-ibatis</module>
-    <module>spring-jca</module>
-    <module>spring-jdbc</module>
-    <module>spring-jdo</module>
-    <module>spring-jms</module>
-    <module>spring-jmx</module>
-    <module>spring-jpa</module>
-    <module>spring-mock</module>
-    <module>spring-portlet</module>
-    <module>spring-remoting</module>
-    <module>spring-struts</module>
-    <module>spring-support</module>
-    <module>spring-toplink</module>
-    <module>spring-web</module>
-    <module>spring-webmvc</module>
     <module>spring-required-libraries</module>
   </modules>
 

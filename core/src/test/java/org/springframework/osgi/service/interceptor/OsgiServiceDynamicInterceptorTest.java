@@ -25,7 +25,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
@@ -137,7 +136,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		Object target = new Object();
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);
 
-		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), target, m, new Object[0], null, null);
+		MethodInvocation invocation = new MockMethodInvocation(m);
 		assertEquals(new Integer(service.hashCode()), interceptor.invoke(invocation));
 	}
 
@@ -151,7 +150,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		Object target = new Object();
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);
 
-		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), target, m, new Object[0], null, null);
+		MethodInvocation invocation = new MockMethodInvocation(m);
 		ServiceReference oldRef = reference;
 		reference = null;
 
@@ -175,7 +174,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		Object target = new Object();
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);
 
-		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), target, m, new Object[0], null, null);
+		MethodInvocation invocation = new MockMethodInvocation(m);
 		interceptor.setFilter(new MockFilter(nullFilter));
 		ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING, reference);
 		listener.serviceChanged(event);

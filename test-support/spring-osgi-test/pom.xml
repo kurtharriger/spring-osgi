@@ -22,6 +22,7 @@
 	  org.eclipse.*;resolution:=optional,
 	  org.knopflerfish*;resolution:=optional,
 	  org.apache.felix.*;resolution:=optional,
+	  com.prosyst.mbs*;resolution:=optional,
 	  *
 	</spring.osgi.import.pkg>
   </properties>
@@ -41,7 +42,7 @@
     </dependency>
     
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-mock</artifactId>
       <version>${spring.maven.artifact.version}</version>
     </dependency>
@@ -86,6 +87,16 @@
       <type>jar</type>
       <scope>provided</scope>
     </dependency>
+
+    <!--
+    <dependency>
+      <groupId>com.prosyst.mbs</groupId>
+      <artifactId>serverjvm13</artifactId>
+      <version>6.1.1</version>
+      <type>jar</type>
+      <scope>provided</scope>
+    </dependency>
+    -->
     
     <!-- for testing -->
     <dependency>

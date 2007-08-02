@@ -25,7 +25,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
@@ -109,7 +108,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 	public void testDoInvokeWithClientTCCL() throws Throwable {
 
 		Method md = TCCLGetter.class.getMethod("getTCCL", null);
-		MethodInvocation invocation = new ReflectiveMethodInvocation(null, null, md, null, null, null);
+		MethodInvocation invocation = new MockMethodInvocation(md);
 
 		OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
 
@@ -133,7 +132,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 	public void testDoInvokeWithServiceTCCL() throws Throwable {
 
 		Method md = TCCLGetter.class.getMethod("getTCCL", null);
-		MethodInvocation invocation = new ReflectiveMethodInvocation(null, null, md, null, null, null);
+		MethodInvocation invocation = new MockMethodInvocation(md);
 
 		OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
 
@@ -160,7 +159,7 @@ public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 	public void testDoInvokeWithUnmanagedTCCL() throws Throwable {
 
 		Method md = TCCLGetter.class.getMethod("getTCCL", null);
-		MethodInvocation invocation = new ReflectiveMethodInvocation(null, null, md, null, null, null);
+		MethodInvocation invocation = new MockMethodInvocation(md);
 
 		OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
 

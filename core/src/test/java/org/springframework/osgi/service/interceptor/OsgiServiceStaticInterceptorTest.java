@@ -23,10 +23,9 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.mock.MockServiceReference;  
+import org.springframework.osgi.mock.MockServiceReference;
 
 /**
  * @author Costin Leau
@@ -73,7 +72,7 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 		Object target = new Object();
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);
 
-		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), target, m, new Object[0], null, null);
+		MethodInvocation invocation = new MockMethodInvocation(m);
 		assertEquals(new Integer(service.hashCode()), interceptor.invoke(invocation));
 	}
 
@@ -90,7 +89,7 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 		Object target = new Object();
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);
 
-		MethodInvocation invocation = new ReflectiveMethodInvocation(new Object(), target, m, new Object[0], null, null);
+		MethodInvocation invocation = new MockMethodInvocation(m);
 		try {
 			interceptor.invoke(invocation);
 			fail("should have thrown exception");
