@@ -186,10 +186,8 @@ limitations under the License.
   <!-- =================================================== -->
 
   <!-- modules for Spring-OSGi -->
-  <modules> 
-  <!--
+  <modules>  
     <module>spring-modules</module>
-    -->
     <module>mock-framework-util</module>
     <module>mock</module>    
 	<module>io</module>    
