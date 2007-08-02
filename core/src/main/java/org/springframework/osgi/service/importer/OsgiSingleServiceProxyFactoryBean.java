@@ -102,13 +102,12 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 		// factory.setFrozen(true);
 		// factory.setOptimize(true);
 		// factory.setOpaque(true);
-		System.out.println("for proxying using loader " + loader + "@" + loader.getClass());
 
 		try {
 			return factory.getProxy(loader);
 		}
 		catch (NoClassDefFoundError ncdfe) {
-			if (true) {
+			if (log.isWarnEnabled()) {
 				debugClassLoading(ncdfe);
 			}
 			throw ncdfe;
