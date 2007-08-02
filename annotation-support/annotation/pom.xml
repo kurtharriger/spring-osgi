@@ -28,11 +28,6 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>${spring.maven.artifact.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-io</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
@@ -62,6 +57,7 @@
       <artifactId>spring-core</artifactId>
       <version>${spring.maven.artifact.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-aop</artifactId>
