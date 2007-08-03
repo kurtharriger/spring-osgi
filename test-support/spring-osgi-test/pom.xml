@@ -35,13 +35,6 @@
     </dependency>
       
     <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>osgi_R4_core</artifactId>
-        <version>1.0</version>
-        <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-mock</artifactId>
       <version>${spring.maven.artifact.version}</version>
@@ -86,9 +79,28 @@
       <version>0.9.0-incubator-SNAPSHOT</version>
       <type>jar</type>
       <scope>provided</scope>
+		  <exclusions>
+            <exclusion>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>org.apache.felix.framework</artifactId>
+            </exclusion>          
+            <exclusion>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>org.apache.felix.shell</artifactId>
+            </exclusion>          
+            <exclusion>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>org.apache.felix.shell.tui</artifactId>
+            </exclusion>          
+            <exclusion>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>org.apache.felix.bundlerepository</artifactId>
+            </exclusion>          
+          </exclusions>            
+      
     </dependency>
 
-    <!--
+    <!---->
     <dependency>
       <groupId>com.prosyst.mbs</groupId>
       <artifactId>serverjvm13</artifactId>
@@ -96,7 +108,7 @@
       <type>jar</type>
       <scope>provided</scope>
     </dependency>
-    -->
+    
     
     <!-- for testing -->
     <dependency>

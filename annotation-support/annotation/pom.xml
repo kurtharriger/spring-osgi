@@ -68,12 +68,13 @@
 	    <groupId>org.aopalliance</groupId>
 	    <artifactId>aopalliance</artifactId>
 	    <version>1.0</version>
+	    <scope>provided</scope>
     </dependency>
     <dependency>
 	    <groupId>org.osgi</groupId>
 	    <artifactId>osgi_R4_compendium</artifactId>
 	    <version>1.0</version>
-	    <scope>compile</scope>
+	    <scope>provided</scope>
      </dependency>
 
     <dependency>
@@ -83,13 +84,6 @@
         <scope>test</scope>
     </dependency>
       
-    <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>osgi_R4_core</artifactId>
-        <version>1.0</version>
-        <scope>provided</scope>
-    </dependency>
-
   </dependencies>
 
 <build>

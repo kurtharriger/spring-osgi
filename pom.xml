@@ -286,26 +286,14 @@ limitations under the License.
            <!-- bundle specific conf -->      
            <Bundle-Name>${artifactId}</Bundle-Name>
            <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
-           <!-- bnd does a great job of determining this one in an OSGi-friendly manner
-           <Bundle-Version>${spring.osgi.bundle.version}</Bundle-Version>
-           -->
            <Export-Package>${spring.osgi.export}</Export-Package>
            <Import-Package>${spring.osgi.import}</Import-Package>
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
 
-		   <!-- Spring specific -->
            <Implementation-Title>Spring OSGi Framework</Implementation-Title>
-           <!-- this actually depends on what we are packing -->
 		   <Implementation-Version>${spring.version}</Implementation-Version>
-		   -->
 		   <Spring-Version>${spring.version}</Spring-Version>
 		   
-		   <!-- w/o this, custom MANIFEST entries do not get added 
-		   <_include>-src/main/resources/META-INF/MANIFEST.MF</_include>
-		   
-		    - bug FELIX-261-
-		   <Include-Resource>${spring.osgi.include.res}</Include-Resource>
-		   -->
 		  </instructions>
         </configuration>
         <extensions>true</extensions>
@@ -414,7 +402,7 @@ limitations under the License.
           <artifactId>org.eclipse.osgi</artifactId>
           <version>3.2.2</version>
           <type>jar</type>
-          <scope>test</scope>
+          <scope>provided</scope>
         </dependency>
       </dependencies>
       <properties>
@@ -448,6 +436,25 @@ limitations under the License.
           <version>0.9.0-incubator-SNAPSHOT</version>
           <type>jar</type>
           <scope>provided</scope>
+          <!-- required to prevent felix to pull in stuff -->
+		  <exclusions>
+            <exclusion>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>org.apache.felix.framework</artifactId>
+            </exclusion>          
+            <exclusion>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>org.apache.felix.shell</artifactId>
+            </exclusion>          
+            <exclusion>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>org.apache.felix.shell.tui</artifactId>
+            </exclusion>          
+            <exclusion>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>org.apache.felix.bundlerepository</artifactId>
+            </exclusion>          
+          </exclusions>            
         </dependency>
       </dependencies>
       <properties>
@@ -456,7 +463,7 @@ limitations under the License.
       </properties>
     </profile>
 
-   <!-- not enabled yet
+   <!-- not enabled yet -->
     <profile>
       <id>mbs_pro</id>
       <dependencies>
@@ -473,7 +480,7 @@ limitations under the License.
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
-    -->
+    
   </profiles>
 
   <!-- ======================================= -->
