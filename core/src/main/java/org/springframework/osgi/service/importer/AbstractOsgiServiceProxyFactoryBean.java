@@ -176,7 +176,7 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean
 					+ filterWithClasses + "]  in=[" + filterWithServiceBeanName + "]");
 
 		// create (which implies validation) the actual filter
-		unifiedFilter = OsgiFilterUtils.createFilter(filterWithServiceBeanName, bundleContext);
+		unifiedFilter = OsgiFilterUtils.createFilter(filterWithServiceBeanName);
 
 		return unifiedFilter;
 	}

@@ -69,7 +69,7 @@ public class ServiceProxyTest extends AbstractConfigurableBundleCreatorTests {
                                                                                       classLoader);
 		// fast retry
 		interceptor.getRetryTemplate().setWaitTime(1);
-		interceptor.setFilter(OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null), getBundleContext()));
+		interceptor.setFilter(OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null)));
 		interceptor.afterPropertiesSet();
 		return interceptor;
 
