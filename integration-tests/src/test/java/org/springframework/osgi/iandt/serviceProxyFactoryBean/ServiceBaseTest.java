@@ -18,9 +18,6 @@ package org.springframework.osgi.iandt.serviceProxyFactoryBean;
 import java.util.Dictionary;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean;
-import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**

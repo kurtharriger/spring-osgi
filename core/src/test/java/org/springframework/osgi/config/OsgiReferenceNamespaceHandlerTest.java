@@ -28,7 +28,7 @@ import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
-import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 
 /**
  * Integration test for osgi:reference namespace handler.
@@ -77,8 +77,8 @@ public class OsgiReferenceNamespaceHandlerTest extends PrivateFieldRetrieverTest
 	public void testSimpleReference() throws Exception {
 		Object factoryBean = appContext.getBean("&serializable");
 
-		assertTrue(factoryBean instanceof OsgiSingleServiceProxyFactoryBean);
-		OsgiSingleServiceProxyFactoryBean proxyFactory = (OsgiSingleServiceProxyFactoryBean) factoryBean;
+		assertTrue(factoryBean instanceof OsgiServiceProxyFactoryBean);
+		OsgiServiceProxyFactoryBean proxyFactory = (OsgiServiceProxyFactoryBean) factoryBean;
 		
 		Class[] intfs = (Class[]) getPrivateProperty(proxyFactory, "serviceTypes");
 		assertEquals(1, intfs.length);
@@ -92,7 +92,7 @@ public class OsgiReferenceNamespaceHandlerTest extends PrivateFieldRetrieverTest
 	}
 
 	public void testFullReference() throws Exception {
-		OsgiSingleServiceProxyFactoryBean factory = (OsgiSingleServiceProxyFactoryBean) appContext.getBean("&full-options");
+		OsgiServiceProxyFactoryBean factory = (OsgiServiceProxyFactoryBean) appContext.getBean("&full-options");
 		factory.getObject(); // required to initialize expected listeners
 		// because of? god help me, I'm going insane
 		TargetSourceLifecycleListener[] listeners = (TargetSourceLifecycleListener[]) getPrivateProperty(factory,

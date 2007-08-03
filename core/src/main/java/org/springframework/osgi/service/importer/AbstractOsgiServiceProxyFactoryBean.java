@@ -31,6 +31,7 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.CardinalityOptions;
 import org.springframework.osgi.util.ClassUtils;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.Assert;
@@ -286,4 +287,9 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean
 		return mandatory;
 	}
 
+    /**
+     * Preserve some measure of backwards compatibility
+     * @param cardinality
+     */
+    public abstract void setCardinality(String cardinality);
 }
