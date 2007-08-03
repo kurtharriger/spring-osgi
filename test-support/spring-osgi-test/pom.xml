@@ -100,7 +100,7 @@
       
     </dependency>
 
-    <!---->
+    <!--
     <dependency>
       <groupId>com.prosyst.mbs</groupId>
       <artifactId>serverjvm13</artifactId>
@@ -108,7 +108,7 @@
       <type>jar</type>
       <scope>provided</scope>
     </dependency>
-    
+    -->
     
     <!-- for testing -->
     <dependency>
