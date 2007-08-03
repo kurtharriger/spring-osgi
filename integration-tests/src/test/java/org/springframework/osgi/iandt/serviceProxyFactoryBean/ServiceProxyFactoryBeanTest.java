@@ -20,7 +20,7 @@ import java.util.Date;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
@@ -29,10 +29,10 @@ import org.springframework.osgi.util.OsgiFilterUtils;
  */
 public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
-	private OsgiSingleServiceProxyFactoryBean fb;
+	private OsgiServiceProxyFactoryBean fb;
 
 	protected void onSetUp() throws Exception {
-		fb = new OsgiSingleServiceProxyFactoryBean();
+		fb = new OsgiServiceProxyFactoryBean();
 		fb.setBundleContext(getBundleContext());
 		// execute retries fast
 		fb.setRetryTimes(1);

@@ -20,8 +20,10 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Filter;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.CardinalityOptions;
 import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.service.interceptor.ServiceReferenceAwareAdvice;
 import org.springframework.osgi.service.support.RetryTemplate;
@@ -37,9 +39,9 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactoryBean {
+public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactoryBean {
 
-	private static final Log log = LogFactory.getLog(OsgiSingleServiceProxyFactoryBean.class);
+	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
 	protected RetryTemplate retryTemplate = new RetryTemplate();
 
@@ -166,4 +168,17 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 		this.retryTemplate.setWaitTime(millisBetweenRetries);
 	}
 
+    public void setCardinality(String cardinality) {
+        switch (CardinalityOptions.asInt(cardinality)) {
+            case CardinalityOptions.C_0__1:
+                mandatory = false;
+                break;
+            case CardinalityOptions.C_1__1:
+                mandatory = true;
+                break;
+            default:
+                throw new BeanInitializationException("Invalid cardinality [" + cardinality
+                        + "] for bean type [" + getClass().getName() +"]");
+        };
+    }
 }
