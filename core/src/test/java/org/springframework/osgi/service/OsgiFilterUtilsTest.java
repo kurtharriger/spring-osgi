@@ -70,7 +70,7 @@ public class OsgiFilterUtilsTest extends TestCase {
 	public void testOnlyClassArgument() {
 		String filter = OsgiFilterUtils.unifyFilter(classes[0], null);
 		assertNotNull(filter);
-		assertTrue(OsgiFilterUtils.isValidFilter(filter, getBundleContext()));
+		assertTrue(OsgiFilterUtils.isValidFilter(filter));
 	}
 
 	public void testJustClassWithNoFilter() {
@@ -83,13 +83,13 @@ public class OsgiFilterUtilsTest extends TestCase {
 	public void testClassWithExistingFilter() {
 		String filter = "(o=univ*of*mich*)";
 		String fl = OsgiFilterUtils.unifyFilter(classes[0], filter);
-		assertTrue(OsgiFilterUtils.isValidFilter(fl, getBundleContext()));
+		assertTrue(OsgiFilterUtils.isValidFilter(fl));
 	}
 
 	public void testMultipleClassesWithExistingFilter() {
 		String filter = "(|(sn=Jensen)(cn=Babs J*))";
 		String fl = OsgiFilterUtils.unifyFilter(classes, filter);
-		assertTrue(OsgiFilterUtils.isValidFilter(fl, getBundleContext()));
+		assertTrue(OsgiFilterUtils.isValidFilter(fl));
 	}
 
 	public void testMultipleClassesAddedOneByOne() {
@@ -97,7 +97,7 @@ public class OsgiFilterUtilsTest extends TestCase {
 		filter = OsgiFilterUtils.unifyFilter(classes[1], filter);
 		filter = OsgiFilterUtils.unifyFilter(classes[2], filter);
 
-		Filter osgiFilter = OsgiFilterUtils.createFilter(filter, getBundleContext());
+		Filter osgiFilter = OsgiFilterUtils.createFilter(filter);
 
 		// verify the filter using the matching against a dictionary
 		assertTrue(osgiFilter.matchCase(dictionary));
@@ -105,14 +105,14 @@ public class OsgiFilterUtilsTest extends TestCase {
 
 	public void testMultipleClassesAddedAtOnce() {
 		String filter = OsgiFilterUtils.unifyFilter(classes, null);
-		Filter osgiFilter = OsgiFilterUtils.createFilter(filter, getBundleContext());
+		Filter osgiFilter = OsgiFilterUtils.createFilter(filter);
 		// verify the filter using the matching against a dictionary
 		assertTrue(osgiFilter.matchCase(dictionary));
 	}
 
 	public void testNonMatching() {
 		String filter = OsgiFilterUtils.unifyFilter(classes, null);
-		Filter osgiFilter = OsgiFilterUtils.createFilter(filter, getBundleContext());
+		Filter osgiFilter = OsgiFilterUtils.createFilter(filter);
 		dictionary.put(Constants.OBJECTCLASS, new String[] { classes[0] });
 
 		// verify the filter using the matching against a dictionary
@@ -149,13 +149,13 @@ public class OsgiFilterUtilsTest extends TestCase {
 
 	public void testNoKeyOrItemButFilterSpecified() {
 		String filter = OsgiFilterUtils.unifyFilter("beanName", new String[] { "myBean" }, null);
-		assertTrue(OsgiFilterUtils.isValidFilter(filter, getBundleContext()));
+		assertTrue(OsgiFilterUtils.isValidFilter(filter));
 	}
 
 	public void testAddItemsUnderMultipleKeys() {
 		String filterA = OsgiFilterUtils.unifyFilter("firstKey", new String[] { "A", "B", "valueA" }, "(c=*)");
 		String filterB = OsgiFilterUtils.unifyFilter("secondKey", new String[] { "X", "Y", "valueZ" }, filterA);
-		assertTrue(OsgiFilterUtils.isValidFilter(filterB, getBundleContext()));
+		assertTrue(OsgiFilterUtils.isValidFilter(filterB));
 	}
 
 	public void testUnifyWhenNoItemIsSpecified() {
