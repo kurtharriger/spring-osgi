@@ -279,7 +279,7 @@ limitations under the License.
        <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>0.9.0-incubator-SNAPSHOT</version>
+        <version>1.0.0</version>
         <configuration>
           <instructions>
            
@@ -433,7 +433,7 @@ limitations under the License.
         <dependency>
           <groupId>org.apache.felix</groupId>
           <artifactId>org.apache.felix.main</artifactId>
-          <version>0.9.0-incubator-SNAPSHOT</version>
+          <version>1.0.0</version>
           <type>jar</type>
           <scope>provided</scope>
           <!-- required to prevent felix to pull in stuff -->
@@ -646,6 +646,13 @@ limitations under the License.
   <!-- ================================================ -->
 
   <pluginRepositories>
+	
+    <pluginRepository>
+      <id>maven-repo</id>
+      <name>maven repo</name>
+      <url>http://repo1.maven.org/maven2/</url>
+    </pluginRepository>
+
 	<!-- the plugin snapshots used for releases are kept here in a frozen state -->
     <pluginRepository>
       <snapshots><enabled>true</enabled></snapshots>
@@ -654,13 +661,6 @@ limitations under the License.
       <url>
         https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
-    </pluginRepository>
-	
-	
-    <pluginRepository>
-      <id>maven-repo</id>
-      <name>maven repo</name>
-      <url>http://repo1.maven.org/maven2/</url>
     </pluginRepository>
     
     <!-- maven osgi bundle plugin 
