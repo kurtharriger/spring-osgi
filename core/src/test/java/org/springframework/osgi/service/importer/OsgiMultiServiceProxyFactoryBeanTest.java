@@ -87,9 +87,9 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends PrivateFieldRetrieverT
 
 	public void testMandatoryServiceAtStartupFailure() throws Exception {
 		serviceFactoryBean.setMandatory(true);
-		serviceFactoryBean.afterPropertiesSet();
 
 		try {
+			serviceFactoryBean.afterPropertiesSet();
 			serviceFactoryBean.getObject();
 			fail("should have thrown exception");
 		}

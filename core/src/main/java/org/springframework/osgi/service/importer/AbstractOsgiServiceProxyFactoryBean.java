@@ -24,14 +24,10 @@ import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
-import org.springframework.osgi.service.CardinalityOptions;
 import org.springframework.osgi.util.ClassUtils;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.Assert;
@@ -48,7 +44,7 @@ import org.springframework.util.ObjectUtils;
  * 
  */
 public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean,
-		BundleContextAware, ApplicationListener, BeanClassLoaderAware {
+		BundleContextAware, BeanClassLoaderAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceProxyFactoryBean.class);
 
@@ -87,25 +83,6 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean
 
 	protected boolean initialized = false;
 
-	// FIXME: what is this used for ?
-	public void onApplicationEvent(ApplicationEvent applicationEvent) {
-		if (applicationEvent instanceof ContextRefreshedEvent) {
-			// This sets up the listeners for beans which are not referred to by
-			// any other
-			// bean in the context. We can't do this in afterPropertiesSet, so
-			// we have to do
-			// it here.
-			ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-			try {
-				Thread.currentThread().setContextClassLoader(classLoader);
-				getObject();
-			}
-			finally {
-				Thread.currentThread().setContextClassLoader(tccl);
-			}
-		}
-	}
-
 	/**
 	 * Subclasses have to implement this method and return the approapriate
 	 * service proxy.
@@ -143,7 +120,10 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean
 		getUnifiedFilter(); // eager initialization of the cache to catch filter
 		// errors
 		Assert.notNull(serviceTypes, "Required serviceTypes property not specified");
+		
 		initialized = true;
+		// initialize the bean to register the OSGi service listeners
+		getObject();
 	}
 
 	/**
@@ -287,9 +267,4 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean
 		return mandatory;
 	}
 
-    /**
-     * Preserve some measure of backwards compatibility
-     * @param cardinality
-     */
-    public abstract void setCardinality(String cardinality);
 }
