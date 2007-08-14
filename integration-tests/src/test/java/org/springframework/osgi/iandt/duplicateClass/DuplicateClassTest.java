@@ -4,9 +4,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.iandt.simpleservice.MyService;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * Test which installs twice a bundle with the same symbolic name but with
@@ -101,7 +101,7 @@ public class DuplicateClassTest extends AbstractConfigurableBundleCreatorTests {
 	private void startDependency(Bundle bundle) throws BundleException, InterruptedException {
 		bundle.start();
 		waitOnContextCreation(bundle.getSymbolicName());
-		System.out.println("started bundle [" + OsgiBundleUtils.getNullSafeSymbolicName(bundle) + "]");
+		System.out.println("started bundle [" + OsgiStringUtils.nullSafeSymbolicName(bundle) + "]");
 	}
 
 	/*

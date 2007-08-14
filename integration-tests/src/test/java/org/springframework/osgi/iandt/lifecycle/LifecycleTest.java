@@ -18,9 +18,9 @@ package org.springframework.osgi.iandt.lifecycle;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.util.tracker.ServiceTracker;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.context.support.AbstractRefreshableOsgiBundleApplicationContext;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
+import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * @author Hal Hildebrand
@@ -61,7 +61,7 @@ public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
         StringBuffer filter = new StringBuffer();
         filter.append("(&");
         filter.append("(").append(Constants.OBJECTCLASS).append("=").append(AbstractRefreshableApplicationContext.class.getName()).append(")");
-        filter.append("(").append(AbstractRefreshableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
+        filter.append("(").append(ConfigurableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
         filter.append("=").append(testBundle.getSymbolicName()).append(")");
         filter.append(")");
         ServiceTracker tracker = new ServiceTracker(getBundleContext(),

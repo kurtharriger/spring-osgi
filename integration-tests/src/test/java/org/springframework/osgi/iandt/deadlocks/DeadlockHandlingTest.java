@@ -5,7 +5,7 @@ import org.osgi.framework.Constants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.context.support.AbstractRefreshableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
@@ -14,11 +14,6 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  *         Time: 9:10:11 PM
  */
 public class DeadlockHandlingTest extends AbstractConfigurableBundleCreatorTests {
-
-    protected String getManifestLocation() {
-        return null;
-    }
-
 
     // Specifically do not wait
     protected boolean shouldWaitForSpringBundlesContextCreation() {
@@ -45,7 +40,7 @@ public class DeadlockHandlingTest extends AbstractConfigurableBundleCreatorTests
         filter.append("(").append(Constants.OBJECTCLASS).append("=")
                 .append(AbstractRefreshableApplicationContext.class.getName()).append(")");
         filter.append("(")
-                .append(AbstractRefreshableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
+                .append(ConfigurableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
         filter.append("=").append("org.springframework.osgi.iandt.deadlock").append(")");
         filter.append(")");
         ServiceTracker tracker = new ServiceTracker(getBundleContext(),
