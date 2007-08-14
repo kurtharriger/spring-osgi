@@ -22,13 +22,8 @@ import org.osgi.framework.ServiceListener;
 import org.springframework.osgi.util.ConfigUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
-import org.springframework.osgi.util.OsgiServiceReferenceUtils;
-import org.springframework.util.ObjectUtils;
-
-import edu.emory.mathcs.backport.java.util.concurrent.BrokenBarrierException;
-import edu.emory.mathcs.backport.java.util.concurrent.CyclicBarrier;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
+import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.osgi.util.concurrent.Counter;
 
 /**
  * JUnit superclass which offers synchronization for bundle initialization. It
@@ -42,78 +37,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 
 	protected static final long DEFAULT_WAIT_TIME = 60L;
 
-	private static final long DEFAULT_SLEEP_INTERVAL = 500;
-
-	private static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.SECONDS;
-
-	/**
-	 * Service listener searching for ApplicationContext published as services
-	 * with the given symbolic name.
-	 * 
-	 * @author Adrian Colyer
-	 * 
-	 */
-	private class ApplicationContextWaiter implements Runnable, ServiceListener {
-
-		private final String symbolicName;
-
-		private final CyclicBarrier barrier;
-
-		private boolean foundService = false;
-
-		private Boolean[] shouldStop;
-
-		private BundleContext context;
-
-		public ApplicationContextWaiter(BundleContext context, CyclicBarrier barrier, String bundleSymbolicName,
-				Boolean[] shouldStop) {
-			this.symbolicName = bundleSymbolicName;
-			this.barrier = barrier;
-			this.shouldStop = shouldStop;
-			this.context = context;
-		}
-
-		public void run() {
-
-			String filter = "(org.springframework.context.service.name=" + symbolicName + ")";
-
-			OsgiListenerUtils.addServiceListener(context, this, filter);
-
-			// now look and see if the service was already registered before
-			// we even got here...
-			if (!ObjectUtils.isEmpty(OsgiServiceReferenceUtils.getServiceReferences(context,
-				"org.springframework.context.ApplicationContext", filter))) {
-				endWait();
-			}
-
-			try {
-				// do the waiting on this thread
-				for (; !(shouldStop[0].booleanValue() || foundService);) {
-					Thread.sleep(DEFAULT_SLEEP_INTERVAL);
-				}
-
-				if (!shouldStop[0].booleanValue())
-					barrier.await(DEFAULT_WAIT_TIME, DEFAULT_TIME_UNIT);
-			}
-			catch (Exception ex) {
-				// got exception
-				System.err.println("got exception " + ex);
-			}
-		}
-
-		public void serviceChanged(ServiceEvent event) {
-			if (event.getType() == ServiceEvent.REGISTERED) {
-				// our wait is over...
-				endWait();
-			}
-		}
-
-		private void endWait() {
-			foundService = true;
-			if (logger.isDebugEnabled())
-				logger.debug("found appCtx for [" + symbolicName + "]");
-		}
-	}
+	private static final long SECOND = 1000;
 
 	public AbstractSynchronizedOsgiTests() {
 		super();
@@ -123,67 +47,67 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 		super(name);
 	}
 
-	public void waitOnContextCreation(BundleContext context, String forBundleWithSymbolicName, long timeout,
-			TimeUnit unit) {
-		// use a barrier to ensure we don't proceed until context is published
-		CyclicBarrier barrier = new CyclicBarrier(2);
-		// pass the boolean as an array to be able to modify it per-thread basis
-		Boolean[] shouldStop = new Boolean[] { Boolean.FALSE };
+	/**
+	 * Place the current (test) thread to wait for the a Spring application
+	 * context to be published under the given symbolic name. This method allows
+	 * waiting for full initialization of Spring OSGi bundles before starting
+	 * the actual test execution.
+	 * 
+	 * @param context
+	 * @param forBundleWithSymbolicName
+	 * @param timeout
+	 */
+	public void waitOnContextCreation(BundleContext context, String forBundleWithSymbolicName, long timeout) {
+		// translate from seconds to miliseconds
+		long time = timeout * SECOND;
 
-		ApplicationContextWaiter waiter = new ApplicationContextWaiter(context, barrier, forBundleWithSymbolicName,
-				shouldStop);
-		Thread waitThread = new Thread(waiter);
-		waitThread.setName("[" + forBundleWithSymbolicName + "] appCtx waiter");
-		waitThread.setDaemon(true);
+		// use the counter to make sure the threads block
+		final Counter counter = new Counter("waitForContext on bnd=" + forBundleWithSymbolicName);
+
+		counter.increment();
+
+		String filter = "(org.springframework.context.service.name=" + forBundleWithSymbolicName + ")";
+
+		ServiceListener listener = new ServiceListener() {
+			public void serviceChanged(ServiceEvent event) {
+				if (event.getType() == ServiceEvent.REGISTERED)
+					counter.decrement();
+			}
+		};
+
+		OsgiListenerUtils.addServiceListener(context, listener, filter);
 
 		if (logger.isDebugEnabled())
 			logger.debug("start waiting for Spring/OSGi bundle=" + forBundleWithSymbolicName);
 
-		waitThread.start();
-
 		try {
-			// test thread
-			barrier.await(timeout, unit);
-			if (logger.isDebugEnabled())
+			if (counter.waitForZero(time)) {
+				waitingFailed(forBundleWithSymbolicName);
+			}
+			else if (logger.isDebugEnabled()) {
 				logger.debug("found applicationContext for bundle=" + forBundleWithSymbolicName);
+			}
 		}
-		catch (BrokenBarrierException ex) {
-			barrierFailed(ex, forBundleWithSymbolicName);
-		}
-
-		catch (InterruptedException ex) {
-			barrierFailed(ex, forBundleWithSymbolicName);
-		}
-
-		catch (TimeoutException ex) {
-			barrierFailed(null, forBundleWithSymbolicName);
-		}
-
 		finally {
 			// inform waiting thread
-			shouldStop[0] = Boolean.TRUE;
-			context.removeServiceListener(waiter);
-			barrier.reset();
+			context.removeServiceListener(listener);
 		}
 	}
 
-	private void barrierFailed(Exception cause, String bundleName) {
-		/*
-		 * Map<Thread, StackTraceElement[]> stacks =
-		 * Thread.getAllStackTraces(); int t = 0; for (StackTraceElement[] i :
-		 * stacks.values()) { System.out.println("Thread [" + t + "]"); for (int
-		 * j = 0 ; j<i.length; j++) { System.out.println(" " + i[j]); } t++; }
-		 */
-
-		if (logger.isDebugEnabled())
-			logger.debug("waiting for applicationContext for bundle=" + bundleName + " timed out");
-
-		throw new RuntimeException("Gave up waiting for application context for '" + bundleName + "' to be created",
-				cause);
+	/**
+	 * 'Sugar' method - identical to waitOnContextCreation({@link #getBundleContext()},
+	 * forBundleWithSymbolicName, {@link #getDefaultWaitTime()}).
+	 * 
+	 * @param forBundleWithSymbolicName
+	 */
+	public void waitOnContextCreation(String forBundleWithSymbolicName) {
+		waitOnContextCreation(getBundleContext(), forBundleWithSymbolicName, getDefaultWaitTime());
 	}
 
-	public void waitOnContextCreation(String forBundleWithSymbolicName) {
-		waitOnContextCreation(getBundleContext(), forBundleWithSymbolicName, getDefaultWaitTime(), DEFAULT_TIME_UNIT);
+	private void waitingFailed(String bundleName) {
+		logger.warn("waiting for applicationContext for bundle=" + bundleName + " timed out");
+
+		throw new RuntimeException("Gave up waiting for application context for '" + bundleName + "' to be created");
 	}
 
 	/**
@@ -192,8 +116,10 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	 * method if the {@link #DEFAULT_WAIT_TIME} is not enough. For more
 	 * customization, consider setting
 	 * {@link #shouldWaitForSpringBundlesContextCreation()} to false and using
-	 * {@link #waitOnContextCreation(BundleContext, String, long, TimeUnit)}.
-	 * @return
+	 * {@link #waitOnContextCreation(BundleContext, String, long)}.
+	 * 
+	 * @return the default wait time (in seconds) for each spring bundle context
+	 * to be published as an OSGi service
 	 */
 	protected long getDefaultWaitTime() {
 		return DEFAULT_WAIT_TIME;
@@ -203,7 +129,8 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	 * Should the test class wait for the context creation of Spring/OSGi
 	 * bundles before executing the tests or not? Default is true.
 	 * 
-	 * @return
+	 * @return true if the test will wait for spring bundle context creation or
+	 * false otherwise
 	 */
 	protected boolean shouldWaitForSpringBundlesContextCreation() {
 		return true;
@@ -224,14 +151,14 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 			Bundle[] bundles = platformBundleContext.getBundles();
 			for (int i = 0; i < bundles.length; i++) {
 				Bundle bundle = bundles[i];
-				String bundleName = OsgiBundleUtils.getNullSafeSymbolicName(bundle);
+				String bundleName = OsgiStringUtils.nullSafeSymbolicName(bundle);
 				if (OsgiBundleUtils.isBundleActive(bundle)) {
-					if (ConfigUtils.isSpringOsgiPoweredBundle(bundle) && ConfigUtils.getPublishContext(bundle.getHeaders())) {
+					if (ConfigUtils.isSpringOsgiPoweredBundle(bundle)
+							&& ConfigUtils.getPublishContext(bundle.getHeaders())) {
 						if (debug)
 							logger.debug("Bundle [" + bundleName + "] triggers a context creation; waiting for it");
 						// use platformBundleContext
-						waitOnContextCreation(platformBundleContext, bundleName, getDefaultWaitTime(),
-							DEFAULT_TIME_UNIT);
+						waitOnContextCreation(platformBundleContext, bundleName, getDefaultWaitTime());
 					}
 					else if (trace)
 						logger.trace("Bundle [" + bundleName + "] does not trigger a context creation.");

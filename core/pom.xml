@@ -44,12 +44,6 @@
     </dependency>
 
    <dependency>
-       <groupId>org.springframework.osgi</groupId>
-       <artifactId>backport-util-concurrent</artifactId>
-       <version>3.0-SNAPSHOT</version>
-   </dependency>
-
-   <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>
       <version>${spring.maven.artifact.version}</version>
@@ -96,13 +90,6 @@
       <version>2.4</version>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>backport-util-concurrent</artifactId>
-      <version>3.0-SNAPSHOT</version>
-    </dependency>
-
 
     <dependency>
       <groupId>org.osgi</groupId>

@@ -132,9 +132,13 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	 * @see org.springframework.osgi.test.platform.OsgiPlatform#stop()
 	 */
 	public void stop() throws Exception {
-		platform.stop();
-		// remove cache folder
-		IOUtils.delete(felixStorageDir);
+		try {
+			platform.stop();
+		}
+		finally {
+			// remove cache folder
+			IOUtils.delete(felixStorageDir);
+		}
 	}
 
 }

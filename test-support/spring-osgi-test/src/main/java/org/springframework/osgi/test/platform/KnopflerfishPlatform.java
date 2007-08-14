@@ -35,12 +35,12 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 	private Framework framework;
 
 	private File kfStorageDir;
-	
+
 	public KnopflerfishPlatform() {
 		toString = "Knopflerfish OSGi Platform";
 
 		kfStorageDir = createTempDir("kf");
-		
+
 		// default properties
 		Properties props = getConfigurationProperties();
 		props.setProperty("org.osgi.framework.dir", kfStorageDir.getAbsolutePath());
@@ -71,7 +71,7 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 	public void start() throws Exception {
 		// copy configuration properties to sys properties
 		System.getProperties().putAll(getConfigurationProperties());
-		
+
 		framework = new Framework(this);
 		framework.launch(0);
 		context = framework.getSystemBundleContext();
@@ -83,7 +83,11 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 	 * @see org.springframework.osgi.test.OsgiPlatform#stop()
 	 */
 	public void stop() throws Exception {
-		framework.shutdown();
-		IOUtils.delete(kfStorageDir);
+		try {
+			framework.shutdown();
+		}
+		finally {
+			IOUtils.delete(kfStorageDir);
+		}
 	}
 }

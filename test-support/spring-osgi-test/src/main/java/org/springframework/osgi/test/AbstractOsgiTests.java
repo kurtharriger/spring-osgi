@@ -30,11 +30,13 @@ import junit.framework.TestResult;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.packageadmin.ExportedPackage;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.test.util.ConfigurableByteArrayOutputStream;
@@ -103,8 +105,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
 		ConfigurableOsgiBundleApplicationContext context = new OsgiBundleXmlApplicationContext(locations);
-        context.setBundleContext(getBundleContext());
-        context.refresh();
+		context.setBundleContext(getBundleContext());
+		context.refresh();
 		return context;
 	}
 
@@ -155,7 +157,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * Create (and configure) the OSGi platform.
 	 * 
 	 * @return OSGi platform.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	protected abstract OsgiPlatform createPlatform() throws Exception;
 
@@ -491,9 +493,10 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		// class is
 		// changed.
 		ServiceReference reference = platformContext.getServiceReference(ACTIVATOR_REFERENCE);
-		if (reference == null)
+		logWiring();
+		if (reference == null) {
 			throw new IllegalStateException("no OSGi service reference found at " + ACTIVATOR_REFERENCE);
-
+		}
 		service = platformContext.getService(reference);
 		if (service == null) {
 			throw new IllegalStateException("no service found for reference: " + reference);
@@ -504,6 +507,26 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			throw new IllegalStateException("no executeTest() method found on: " + service.getClass());
 		}
 
+	}
+
+	private void logWiring() {
+		// get PackageAdmin service
+		ServiceReference ref = platformContext.getServiceReference(org.osgi.service.packageadmin.PackageAdmin.class.getName());
+		if (ref == null) {
+			logger.warn("cannot log anything - no PackageAdmin present");
+			return;
+		}
+
+		PackageAdmin admin = (PackageAdmin) platformContext.getService(ref);
+		ExportedPackage pkg = admin.getExportedPackage("org.springframework.osgi.test");
+		logger.info("exporting bundle is " + pkg.getExportingBundle().getSymbolicName());
+		Bundle[] bundles = pkg.getImportingBundles();
+		StringBuffer buf = new StringBuffer();
+
+		for (int i = 0; i < bundles.length; i++) {
+			buf.append(bundles[i].getSymbolicName() + ", ");
+		}
+		logger.info("importing bundles are " + buf.toString());
 	}
 
 	private void readTestResult() {
