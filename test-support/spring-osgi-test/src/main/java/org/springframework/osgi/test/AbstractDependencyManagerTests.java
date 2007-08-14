@@ -104,10 +104,6 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return "org.springframework.osgi,junit.osgi,3.8.1-SNAPSHOT";
 	}
 
-	protected String getUtilConcurrentLibUrl() {
-		return "org.springframework.osgi,backport-util-concurrent,3.0-SNAPSHOT";
-	}
-
 	protected String getSlf4jApi() {
 		return "org.slf4j,slf4j-api,1.4.0";
 	}
@@ -159,7 +155,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 		String[] jars = new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
 				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
-				getSpringMockUrl(), getUtilConcurrentLibUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
+				getSpringMockUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
 				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl(),
 				getSpringOSGiExtenderBundleUrl() };
 
