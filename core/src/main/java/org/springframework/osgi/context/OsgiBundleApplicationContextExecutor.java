@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.util;
+package org.springframework.osgi.context;
 
-import junit.framework.TestCase;
-
-import org.osgi.framework.BundleEvent;
+import org.springframework.beans.BeansException;
 
 /**
+ * Executor of {@link DelegatedExecutionOsgiBundleApplicationContext}s. Decides how and when the
+ * application context will be refreshed/closed.
+ * 
  * @author Costin Leau
  * 
  */
-public class OsgiServiceUtilsTest extends TestCase {
+public interface OsgiBundleApplicationContextExecutor {
 
+	public void refresh() throws BeansException, IllegalStateException;
 
-	public void testGetBundleEventAsString() {
-		assertSame("INSTALLED", OsgiServiceUtils.getBundleEventAsString(BundleEvent.INSTALLED));
-		assertSame("STARTING", OsgiServiceUtils.getBundleEventAsString(BundleEvent.STARTING));
-		assertSame("UNINSTALLED", OsgiServiceUtils.getBundleEventAsString(BundleEvent.UNINSTALLED));
-		assertSame("UPDATED", OsgiServiceUtils.getBundleEventAsString(BundleEvent.UPDATED));
-		assertTrue(OsgiServiceUtils.getBundleEventAsString(-1324).startsWith("UNKNOWN"));
-	}
+	public void close();
 }

@@ -33,12 +33,13 @@ import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEnt
  */
 public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableApplicationContext {
 
-    /**
-     * @return the Bundle for this OSGi bundle application context.
-     */
-    Bundle getBundle();
+	/**
+	 * Service entry used for specifying the application context name when
+	 * published as an OSGi service
+	 */
+	static final String APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME = "org.springframework.context.service.name";
 
-    /**
+	/**
 	 * Set the config locations for this OSGi bundle application context. If not
 	 * set, the implementation is supposed to use a default for the given
 	 * namespace.
@@ -56,13 +57,21 @@ public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableAp
 	void setBundleContext(BundleContext bundleContext);
 
 	/**
-	 * Flag which indicates if the application context has been fully
-	 * initialized and is ready for usage or not. This is useful for
-	 * implementations that rely on several 3rd party services before creating
-	 * the current beans.
+	 * Return the bundle context for this application context. This method is
+	 * offered as a helper since as of OSGi 4.1, the bundle context can be
+	 * discovered from a given bundle.
 	 * 
+	 * @see #getBundle()
+	 * @return
 	 */
-	boolean isAvailable(); 
+	BundleContext getBundleContext();
+
+	/**
+	 * Return the OSGi bundle for this application context.
+	 * 
+	 * @return the Bundle for this OSGi bundle application context.
+	 */
+	Bundle getBundle();
 
 	/**
 	 * Publish the application context as an OSGi service.
@@ -71,9 +80,8 @@ public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableAp
 	 */
 	void setPublishContextAsService(boolean publishContextAsService);
 
-
-    /**
+	/**
 	 * @param namespaceResolver The namespaceResolver to set.
-     */
-    void setNamespaceResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver);
+	 */
+	void setNamespaceResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver);
 }

@@ -19,7 +19,7 @@
 package org.springframework.osgi.context.support;
 
 import org.springframework.context.ApplicationEvent;
-import org.springframework.osgi.util.OsgiServiceUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.osgi.framework.Bundle;
 
 /**
@@ -35,13 +35,17 @@ public class SpringBundleEvent extends ApplicationEvent {
 	}
 
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 
 		final SpringBundleEvent event = (SpringBundleEvent) o;
 
-		if (getType() != event.getType()) return false;
-		if (!getSource().equals(event.getSource())) return false;
+		if (getType() != event.getType())
+			return false;
+		if (!getSource().equals(event.getSource()))
+			return false;
 
 		return true;
 	}
@@ -55,8 +59,7 @@ public class SpringBundleEvent extends ApplicationEvent {
 	}
 
 	public String toString() {
-		 return "[" + OsgiServiceUtils.getBundleEventAsString(eventType)
-			 + ", " + ((Bundle)getSource()).getSymbolicName() + "]";
+		return "[" + eventType + ", " + ((Bundle) getSource()).getSymbolicName() + "]";
 	}
 
 }

@@ -20,8 +20,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.util.Assert;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Regrettably we sometimes need to know which Osgi platform we are currently
@@ -33,17 +31,12 @@ import org.apache.commons.logging.LogFactory;
  * @author Adrian Colyer
  */
 public abstract class OsgiPlatformDetector {
-    private static boolean isFelix = false;
-    private static boolean isKnopflerfish = false;
-    private static boolean isEquinox = false;
 
     private static final String[] EQUINOX_LABELS = new String[] { "Eclipse", "eclipse", "Equinox", "equinox", };
 
 	private static final String[] KF_LABELS = new String[] { "Knopflerfish", "knopflerfish" };
 
 	private static final String[] FELIX_LABELS = new String[] { "Apache Software Foundation", "Felix", "felix" };
-
-    private static final Log log = LogFactory.getLog(OsgiPlatformDetector.class);
 
 
     public static boolean isEquinox(BundleContext aContext) {
@@ -57,35 +50,6 @@ public abstract class OsgiPlatformDetector {
 	public static boolean isFelix(BundleContext aContext) {
 		return determinePlatform(aContext, FELIX_LABELS);
 	}
-
-    public static void determinePlatform(BundleContext aContext) {
-        isEquinox = determinePlatform(aContext, EQUINOX_LABELS);
-		isKnopflerfish = determinePlatform(aContext, KF_LABELS);
-		isFelix = determinePlatform(aContext, FELIX_LABELS);
-        if (log.isDebugEnabled()) {
-            if (isEquinox) {
-                log.debug("Equinox platform detected");
-            }
-            if (isKnopflerfish) {
-                log.debug("Knopflerfish platform detected");
-            }
-            if (isFelix) {
-                log.debug("Felix platform detected");
-            }
-        }
-    }
-
-    public static boolean isFelix() {
-        return isFelix;
-    }
-
-    public static boolean isEquinox() {
-        return isEquinox;
-    }
-
-    public static boolean isKnopflerfish() {
-        return isKnopflerfish;
-    }
 
     private static boolean determinePlatform(BundleContext context, String[] labels) {
 		Assert.notNull(context);

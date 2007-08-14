@@ -22,8 +22,6 @@ import java.security.PrivilegedAction;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.core.ConstantException;
-import org.springframework.core.Constants;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
@@ -37,8 +35,6 @@ import org.springframework.util.ReflectionUtils.FieldFilter;
  * 
  */
 public abstract class OsgiBundleUtils {
-
-	public static final Constants BUNDLE_STATES = new Constants(Bundle.class);
 
 	/**
 	 * Return the underlying BundleContext for the given Bundle. This uses
@@ -89,7 +85,7 @@ public abstract class OsgiBundleUtils {
 				return BundleContext.class.isAssignableFrom(field.getType());
 			}
 		});
-		
+
 		return ctx[0];
 	}
 
@@ -103,30 +99,6 @@ public abstract class OsgiBundleUtils {
 		Assert.notNull(bundle, "bundle is required");
 		int state = bundle.getState();
 		return (state == Bundle.ACTIVE || state == Bundle.STARTING);
-	}
-
-	/**
-	 * Return the Bundle state as a String.
-	 * 
-	 * @param bundle
-	 * @return
-	 */
-	public static String getBundleStateAsString(Bundle bundle) {
-		Assert.notNull(bundle, "bundle is required");
-		int state = bundle.getState();
-
-		try {
-			return BUNDLE_STATES.toCode(new Integer(state), "");
-		}
-		catch (ConstantException cex) {
-			return "UNKNOWN STATE";
-		}
-	}
-
-	public static String getNullSafeSymbolicName(Bundle bundle) {
-		Assert.notNull(bundle, "bundle is required");
-		return (String) (bundle.getSymbolicName() == null ? bundle.getHeaders().get(
-			org.osgi.framework.Constants.BUNDLE_NAME) : bundle.getSymbolicName());
 	}
 
 	public static boolean isFragment(Bundle bundle) {

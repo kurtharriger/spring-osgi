@@ -51,25 +51,15 @@ public class OsgiBundleUtilsTest extends TestCase {
 		bundle = null;
 	}
 
-	public void testGetBundleStateAsName() throws Exception {
-		OsgiBundleUtilsTest.state = Bundle.ACTIVE;
-		assertEquals("ACTIVE", OsgiBundleUtils.getBundleStateAsString(bundle));
-		OsgiBundleUtilsTest.state = Bundle.STARTING;
-		assertEquals("STARTING", OsgiBundleUtils.getBundleStateAsString(bundle));
-		OsgiBundleUtilsTest.state = Bundle.STOPPING;
-		assertEquals("STOPPING", OsgiBundleUtils.getBundleStateAsString(bundle));
-		OsgiBundleUtilsTest.state = -123;
-		assertEquals("UNKNOWN STATE", OsgiBundleUtils.getBundleStateAsString(bundle));
-	}
-
 	public void testIsInActiveBundleState() throws Exception {
 		OsgiBundleUtilsTest.state = Bundle.ACTIVE;
 		assertTrue(OsgiBundleUtils.isBundleActive(bundle));
-		
+
 		OsgiBundleUtilsTest.state = Bundle.STARTING;
 		assertTrue(OsgiBundleUtils.isBundleActive(bundle));
-		
+
 		OsgiBundleUtilsTest.state = Bundle.INSTALLED;
 		assertFalse(OsgiBundleUtils.isBundleActive(bundle));
 	}
+
 }
