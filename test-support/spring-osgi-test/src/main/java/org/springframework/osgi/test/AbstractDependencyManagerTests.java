@@ -47,7 +47,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	private static final String SPRING_OSGI_VERSION = "1.0-m3-SNAPSHOT";
 
 	private static final String SPRING_BUNDLED_VERSION = "2.1-m3";
-	
+
 	private static final String SPRING_WRAPPED_VERSION = "2.1-osgi-m4-SNAPSHOT";
 
 	/**
@@ -66,8 +66,8 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	protected String getSpringBundledVersion() {
 		return SPRING_BUNDLED_VERSION;
 	}
-	
-		/**
+
+	/**
 	 * Return the Spring wrapped version used by the core bundles.
 	 * @return
 	 */
@@ -102,6 +102,15 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 	protected String getJUnitLibUrl() {
 		return "org.springframework.osgi,junit.osgi,3.8.1-SNAPSHOT";
+	}
+
+	/**
+	 * Used only on JDK 1.4.
+	 * 
+	 * @return
+	 */
+	protected String getUtilConcurrentLibUrl() {
+		return "org.springframework.osgi,backport-util-concurrent,3.0-SNAPSHOT";
 	}
 
 	protected String getSlf4jApi() {
@@ -161,11 +170,14 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 		String[] bundles = jars;
 
-        if (JdkVersion.isAtLeastJava15()) {
+		if (JdkVersion.isAtLeastJava15()) {
 			bundles = (String[]) ObjectUtils.addObjectToArray(jars, getSpringOSGiAnnotationBundleUrl());
 		}
+		else {
+			bundles = (String[]) ObjectUtils.addObjectToArray(jars, getUtilConcurrentLibUrl());
+		}
 
-        return bundles;
+		return bundles;
 	}
 
 	public Bundle findBundleByLocation(String bundleLocation) {
