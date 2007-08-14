@@ -55,6 +55,8 @@ public class MockBundle implements Bundle {
 
 	private final String SYMBOLIC_NAME = "Mock-Bundle_" + System.currentTimeMillis();
 
+	private final String symName;
+
 	private static class EmptyEnumeration implements Enumeration {
 		public boolean hasMoreElements() {
 			return false;
@@ -73,18 +75,19 @@ public class MockBundle implements Bundle {
 		this(null, headers, null);
 	}
 
-	public MockBundle(String location) {
-		this(location, null, null);
-	}
-
 	public MockBundle(BundleContext context) {
 		this(null, null, context);
 	}
 
-	public MockBundle(String location, Dictionary headers, BundleContext context) {
-		defaultHeaders.put("Bundle-SymbolicName", SYMBOLIC_NAME);
+	public MockBundle(String symName) {
+		this(symName, null, null);
+	}
 
-		this.location = (location == null ? "<default location>" : location);
+	public MockBundle(String symName, Dictionary headers, BundleContext context) {
+		this.symName = ((symName != null && symName.length() > 0) ? symName : SYMBOLIC_NAME);
+		defaultHeaders.put("Bundle-SymbolicName", this.symName);
+
+		this.location = "<default location>";
 		this.headers = (headers == null ? defaultHeaders : headers);
 		this.bundleContext = (context == null ? new MockBundleContext(this) : context);
 	}
@@ -299,6 +302,14 @@ public class MockBundle implements Bundle {
 
 	public BundleContext getBundleContext() {
 		return getContext();
+	}
+
+	public String toString() {
+		return symName;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 }

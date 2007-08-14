@@ -73,11 +73,14 @@ public class MockBundleTest extends TestCase {
 	 */
 	public void testMockBundleString() {
 		String location = "some location";
-		mock = new MockBundle(location);
+		String symName = "symName";
+		mock = new MockBundle(symName);
+		((MockBundle) mock).setLocation(location);
 
 		assertSame(location, mock.getLocation());
 		assertNotNull(mock.getHeaders());
-		assertNotNull(mock.getSymbolicName());
+		assertEquals(symName, mock.getSymbolicName());
+		assertEquals(location, mock.getLocation());
 	}
 
 	/**
