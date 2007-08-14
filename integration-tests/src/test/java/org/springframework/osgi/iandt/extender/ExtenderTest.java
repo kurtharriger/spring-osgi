@@ -5,7 +5,7 @@ import org.osgi.framework.Constants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.context.support.AbstractRefreshableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.support.AbstractOsgiBundleApplicationContext;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
@@ -24,7 +24,7 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
     protected String[] getMandatoryBundles() {
         return new String[]{getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
                             getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
-                            getSpringMockUrl(), getUtilConcurrentLibUrl(), getAopAllianceUrl(), getAsmLibrary(),
+                            getSpringMockUrl(), getAopAllianceUrl(), getAsmLibrary(),
                             getSpringAopUrl(),
                             getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl()};
     }
@@ -54,7 +54,7 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
         filter.append("(").append(Constants.OBJECTCLASS).append("=")
                 .append(AbstractRefreshableApplicationContext.class.getName()).append(")");
         filter.append("(")
-                .append(AbstractRefreshableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
+                .append(AbstractOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
         filter.append("=").append("org.springframework.osgi.iandt.lifecycle").append(")");
         filter.append(")");
         ServiceTracker tracker = new ServiceTracker(getBundleContext(),
