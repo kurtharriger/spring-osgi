@@ -21,14 +21,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Filter;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
-import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.core.Constants;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.collection.OsgiServiceList;
 import org.springframework.osgi.service.collection.OsgiServiceSet;
 import org.springframework.osgi.service.collection.OsgiServiceSortedList;
 import org.springframework.osgi.service.collection.OsgiServiceSortedSet;
-import org.springframework.osgi.service.CardinalityOptions;
 import org.springframework.util.Assert;
 
 /**
@@ -72,13 +70,15 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 
 		public static Class getClassMapping(int collectionOptions) {
 			if (isOptionValid(collectionOptions))
-				return classMapping[collectionOptions - 1];
+				return classMapping[collectionOptions];
+			// return default option
 			else
-				throw new IllegalArgumentException();
+				return classMapping[0];
+
 		}
 
 		public static boolean isOptionValid(int option) {
-			return (option > 0 && option == classMapping.length);
+			return (option >= 0 && option < classMapping.length);
 		}
 	}
 
@@ -94,7 +94,6 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 		if (!initialized)
 			throw new FactoryBeanNotInitializedException();
 
-		// lazy creation
 		if (proxy == null) {
 			proxy = createMultiServiceCollection(getUnifiedFilter());
 		}
@@ -159,19 +158,4 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 	public void setCollectionType(int collectionType) {
 		this.collectionType = collectionType;
 	}
-
-    public void setCardinality(String cardinality) {
-        switch (CardinalityOptions.asInt(cardinality)) {
-            case CardinalityOptions.C_0__N:
-                mandatory = false;
-                break;
-            case CardinalityOptions.C_1__N:
-                mandatory = true;
-                break;
-            default:
-                throw new BeanInitializationException("Invalid cardinality [" + cardinality
-                        + "] for bean type [" + getClass().getName() +"]");
-        };
-    }
-    
 }
