@@ -5,7 +5,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * @author Hal Hildebrand Date: Dec 1, 2006 Time: 3:56:43 PM
@@ -92,7 +92,7 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 	private void startDependency(Bundle bundle) throws BundleException, InterruptedException {
 		bundle.start();
 		waitOnContextCreation(bundle.getSymbolicName());
-		System.out.println("started bundle [" + OsgiBundleUtils.getNullSafeSymbolicName(bundle) + "]");
+		System.out.println("started bundle [" + OsgiStringUtils.nullSafeSymbolicName(bundle) + "]");
 	}
 
 	private void startDependencyAsynch(final Bundle bundle) {
