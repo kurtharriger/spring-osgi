@@ -12,10 +12,10 @@
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.13/log4j-1.2.13.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.5.0_11"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_core/1.0/osgi_R4_core-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-context/2.0.5-osgi-m3-SNAPSHOT/spring-context-2.0.5-osgi-m3-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-core/2.0.5-osgi-m3-SNAPSHOT/spring-core-2.0.5-osgi-m3-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.1-m3/spring-context-2.1-m3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.1-m3/spring-core-2.1-m3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-mock"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-beans/2.0.5-osgi-m3-SNAPSHOT/spring-beans-2.0.5-osgi-m3-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.1-m3/spring-beans-2.1-m3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-core"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
