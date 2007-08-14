@@ -15,6 +15,9 @@
  */
 package org.springframework.osgi.extender.dependencies;
 
+import org.springframework.osgi.extender.dependencies.shutdown.RecursiveServiceDependencySorter;
+import org.springframework.osgi.extender.dependencies.shutdown.ServiceDependencySorter;
+
 /**
  * @author Costin Leau
  * 
