@@ -23,7 +23,6 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.core.ConstantException;
 import org.springframework.core.Constants;
 import org.springframework.osgi.AmbiguousServiceReferenceException;
 import org.springframework.osgi.NoSuchServiceException;
@@ -36,9 +35,6 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  */
 public abstract class OsgiServiceUtils {
-
-	public static final Constants BUNDLE_EVENTS = new Constants(BundleEvent.class);
-
 	/**
 	 * Find the single OSGi service of the given type and matching the given
 	 * filter. Throws an NoSuchServiceException if there are no matching
@@ -157,20 +153,6 @@ public abstract class OsgiServiceUtils {
 		catch (IllegalStateException alreadyUnregisteredException) {
 		}
 		return false;
-	}
-
-	/**
-	 * Convert event codes to a printable String.
-	 * 
-	 * @param type
-	 */
-	public static String getBundleEventAsString(int bundleEvent) {
-		try {
-			return BUNDLE_EVENTS.toCode(new Integer(bundleEvent), "");
-		}
-		catch (ConstantException cex) {
-			return "UNKNOWN EVENT TYPE";
-		}
 	}
 
 }

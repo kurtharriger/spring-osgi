@@ -22,17 +22,18 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.service.startlevel.StartLevel;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.util.OsgiListenerUtils;
+import org.springframework.osgi.util.concurrent.Counter;
 import org.springframework.util.Assert;
 
 /**
@@ -210,20 +211,33 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Synch
 		// Wait for the Spring artifacts to be created
 		// We could make this configurable.
 		if (config.isSpringPoweredBundle()) {
-			ServiceReference sref = bundleContext.getServiceReference(ApplicationEventMulticaster.class.getName());
-			ApplicationEventMulticaster ctx = (ApplicationEventMulticaster) bundleContext.getService(sref);
-			Assert.notNull(ctx);
-			ctx.addApplicationListener(new ApplicationListener() {
-				public void onApplicationEvent(ApplicationEvent event) {
-					SpringBundleEvent ev = (SpringBundleEvent) event;
-					if (((Bundle) ev.getSource()).getBundleId() == b.getBundleId()) {
-						if (ev.getType() == BundleEvent.STARTED || ev.getType() == BundleEvent.STOPPED) {
-							latch.decr();
-						}
-					}
+
+			final Counter latch = new Counter("bundle factory");
+			latch.increment();
+			String filter = "(org.springframework.context.service.name=" + b.getSymbolicName() + ")";
+
+			ServiceListener listener = new ServiceListener() {
+				public void serviceChanged(ServiceEvent event) {
+					if (event.getType() == ServiceEvent.REGISTERED)
+						latch.decrement();
 				}
-			});
-			latch.await();
+			};
+
+			OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
+
+			if (log.isDebugEnabled())
+				log.debug("start waiting for Spring/OSGi bundle=" + b.getSymbolicName());
+
+			try {
+				if (latch.waitForZero(2000)) {
+					log.warn("cannot find " + b.getSymbolicName());
+					throw new RuntimeException("cannot find service");
+				}
+			}
+			finally {
+				bundleContext.removeServiceListener(listener);
+			}
+
 		}
 	}
 
@@ -242,36 +256,39 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Synch
 	}
 
 	public synchronized void bundleChanged(BundleEvent event) {
-        try {
-            if (bundle == null) {
-                return;
-            }
-            // System.out.println("EVENT: " + event.getBundle().getSymbolicName() +
-            // " " + event.getType());
-            if (event.getBundle().getBundleId() == bundle.getBundleId()) {
-                switch (event.getType()) {
-                    case BundleEvent.UNINSTALLED:
-                        latch.reset();
-                        bundle = null;
-                        classloader = null;
-                        bundleContext.removeBundleListener(this);
-                        break;
-                        /*
-                   * case BundleEvent.RESOLVED: if (log.isInfoEnabled())
-                   * log.info("Bundle [" + beanName + "] was resolved, updating
-                   * properties"); try { afterPropertiesSet(); } catch (Exception e) {
-                   * if (log.isWarnEnabled()) log.warn("Could not change bundle
-                   * state", e); } break;
-                   */
-                    default:
-                        break;
-                }
-            }
-        } catch (Throwable e) {
-            // OSGi frameworks simply swallow these exceptions without logging...
-            log.fatal("Exception handling bundle changed event", e);
-        }
-    }
+		try {
+			if (bundle == null) {
+				return;
+			}
+			// System.out.println("EVENT: " +
+			// event.getBundle().getSymbolicName() +
+			// " " + event.getType());
+			if (event.getBundle().getBundleId() == bundle.getBundleId()) {
+				switch (event.getType()) {
+				case BundleEvent.UNINSTALLED:
+					latch.reset();
+					bundle = null;
+					classloader = null;
+					bundleContext.removeBundleListener(this);
+					break;
+				/*
+				 * case BundleEvent.RESOLVED: if (log.isInfoEnabled())
+				 * log.info("Bundle [" + beanName + "] was resolved, updating
+				 * properties"); try { afterPropertiesSet(); } catch (Exception
+				 * e) { if (log.isWarnEnabled()) log.warn("Could not change
+				 * bundle state", e); } break;
+				 */
+				default:
+					break;
+				}
+			}
+		}
+		catch (Throwable e) {
+			// OSGi frameworks simply swallow these exceptions without
+			// logging...
+			log.fatal("Exception handling bundle changed event", e);
+		}
+	}
 
 	public void destroy() throws Exception {
 		if (bundle != null) {

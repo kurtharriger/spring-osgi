@@ -28,7 +28,9 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
  * Application context backed by an OSGi bundle. Will use the bundle classpath
- * for resource loading for any unqualified resource string. <p/> Also
+ * for resource loading for any unqualified resource string. 
+ * 
+ * <p/> Also
  * understands the "bundle:" resource prefix for explicit loading of resources
  * from the bundle. When the bundle prefix is used the target resource must be
  * contained within the bundle (or attached fragments), the classpath is not
@@ -38,12 +40,11 @@ import org.springframework.osgi.util.OsgiServiceUtils;
  * @author Andy Piper
  * @author Hal Hildebrand
  * @author Costin Leau
- * @since 2.0
  */
 
 // TODO: provide means to access OSGi services etc. through this application context?
 // TODO: think about whether restricting config files to bundle: is the right thing to do
-public class OsgiBundleXmlApplicationContext extends AbstractRefreshableOsgiBundleApplicationContext {
+public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionApplicationContext {
 
 	/** retrieved from the BundleContext * */
 	private OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver;

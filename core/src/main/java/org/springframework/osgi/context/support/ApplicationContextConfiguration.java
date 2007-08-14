@@ -22,7 +22,7 @@ import java.util.Dictionary;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.ConfigUtils;
-import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.apache.commons.logging.Log;
@@ -59,7 +59,7 @@ public class ApplicationContextConfiguration {
 		// create toString
 		StringBuffer buf = new StringBuffer();
 		buf.append("AppCtxCfg [Bundle=");
-		buf.append(OsgiBundleUtils.getNullSafeSymbolicName(bundle));
+		buf.append(OsgiStringUtils.nullSafeSymbolicName(bundle));
 		buf.append("]isSpringBundle=");
 		buf.append(isSpringPoweredBundle);
 		buf.append("|async=");
@@ -140,7 +140,7 @@ public class ApplicationContextConfiguration {
 			
 			if (ObjectUtils.isEmpty(this.configurationLocations)) {
 				log.error("Bundle claims to be Spring powered, but does not contain any configuration resources: "
-						+ OsgiBundleUtils.getNullSafeSymbolicName(bundle));
+						+ OsgiStringUtils.nullSafeSymbolicName(bundle));
 				this.isSpringPoweredBundle = false;
 			}
 		}

@@ -25,7 +25,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.beans.BeansException;
-import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * 
@@ -86,7 +86,7 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 		// check default
 		createContext();
 
-		assertEquals(symbolicName, OsgiBundleUtils.getNullSafeSymbolicName(bundle));
+		assertEquals(symbolicName, OsgiStringUtils.nullSafeSymbolicName(bundle));
 	}
 
 	public void testGetBundleNameFallbackMechanism() {
@@ -100,7 +100,7 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 		createContext();
 
 		// use the 2 symbolic name calls
-		assertEquals(title, OsgiBundleUtils.getNullSafeSymbolicName(bundle));
+		assertEquals(title, OsgiStringUtils.nullSafeSymbolicName(bundle));
 	}
 
 	public void testGetServiceName() {
@@ -111,7 +111,7 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 		bundleCtrl.replay();
 
 		createContext();
-		assertEquals(symbolicName, OsgiBundleUtils.getNullSafeSymbolicName(bundle));
+		assertEquals(symbolicName, OsgiStringUtils.nullSafeSymbolicName(bundle));
 
 	}
 

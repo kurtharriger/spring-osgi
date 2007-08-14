@@ -33,7 +33,7 @@ import org.springframework.osgi.io.OsgiBundleResource;
  */
 public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCase {
 
-	private AbstractRefreshableOsgiBundleApplicationContext context;
+	private AbstractOsgiBundleApplicationContext context;
 
 	/*
 	 * (non-Javadoc)
@@ -41,7 +41,7 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
-		context = new AbstractRefreshableOsgiBundleApplicationContext() {
+		context = new AbstractOsgiBundleApplicationContext() {
 
 			/*
 			 * (non-Javadoc)

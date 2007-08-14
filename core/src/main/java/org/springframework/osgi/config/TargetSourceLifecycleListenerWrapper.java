@@ -138,14 +138,20 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 	// properties should be a Dictionary implementing a Map interface
 	protected void invokeCustomMethods(Object target, Map methods, Object service, Map properties) {
 		if (methods != null && !methods.isEmpty()) {
+			boolean trace = log.isTraceEnabled();
+
 			Object[] args = new Object[] { service, properties };
 			for (Iterator iter = methods.entrySet().iterator(); iter.hasNext();) {
 				Map.Entry entry = (Map.Entry) iter.next();
 				Class key = (Class) entry.getKey();
 				// find the compatible types (accept null service)
 				if (service == null || key.isInstance(service)) {
+					Method method = (Method) entry.getValue();
+					if (trace)
+						log.trace("invoking listener custom method " + method);
+
 					try {
-						ReflectionUtils.invokeMethod((Method) entry.getValue(), target, args);
+						ReflectionUtils.invokeMethod(method, target, args);
 					}
 					// make sure to log exceptions and continue with the
 					// rest of
@@ -160,8 +166,16 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 	}
 
 	public void bind(Object service, Map properties) throws Exception {
+		boolean trace = log.isTraceEnabled();
+
+		if (trace)
+			log.trace("invoking bind method for service " + service + " with props=" + properties);
+
 		// first call interface method (if it exists)
 		if (isLifecycleListener) {
+			if (trace)
+				log.trace("invoking listener interface methods");
+
 			try {
 				((TargetSourceLifecycleListener) target).bind(service, properties);
 			}
@@ -174,8 +188,15 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 	}
 
 	public void unbind(Object service, Map properties) throws Exception {
+		boolean trace = log.isTraceEnabled();
+
+		if (trace)
+			log.trace("invoking unbind method for service " + service + " with props=" + properties);
+
 		// first call interface method (if it exists)
 		if (isLifecycleListener) {
+			if (trace)
+				log.trace("invoking listener interface methods");
 			try {
 				((TargetSourceLifecycleListener) target).unbind(service, properties);
 			}
