@@ -36,7 +36,7 @@ import org.springframework.osgi.mock.MockServiceReference;
  */
 public class OsgiSingleServiceProxyFactoryBeanTest extends PrivateFieldRetrieverTestCase {
 
-	private OsgiServiceProxyFactoryBean serviceFactoryBean;
+	private OsgiSingleServiceProxyFactoryBean serviceFactoryBean;
 
 	private MockControl mockControl;
 
@@ -44,7 +44,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends PrivateFieldRetriever
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.serviceFactoryBean = new OsgiServiceProxyFactoryBean();
+		this.serviceFactoryBean = new OsgiSingleServiceProxyFactoryBean();
 		// this.serviceFactoryBean.setApplicationContext(new
 		// GenericApplicationContext());
 		this.mockControl = MockControl.createControl(BundleContext.class);

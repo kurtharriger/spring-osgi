@@ -35,8 +35,6 @@
                 <xsd:attribute name="interface" use="required" type="xsd:string"/>
                 <xsd:attribute name="filter" use="optional" type="xsd:string"/>
                 <xsd:attribute name="timeout" use="optional" type="xsd:int"/>
-                <!-- provided for compatibility, parser will handle inappropriate defaults -->
-                <xsd:attribute name="cardinality" use="optional" type="Tcardinality"/>
                 <xsd:attribute name="mandatory" use="optional" type="xsd:boolean" default="true"/>
                 <xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
                 <xsd:attribute name="bean-name" type="xsd:string" use="optional"/>
@@ -44,15 +42,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:simpleType name="Tcardinality">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="0..1"/>
-            <xsd:enumeration value="0..n"/>
-            <xsd:enumeration value="1..1"/>
-            <xsd:enumeration value="1..n"/>
-        </xsd:restriction>
-    </xsd:simpleType>
 
     <xsd:simpleType name="TreferenceClassLoaderOptions">
         <xsd:restriction base="xsd:string">
