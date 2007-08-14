@@ -48,10 +48,6 @@ public class ContextLoaderListenerTest extends TestCase {
 		// platform determination
 		context.getProperty(Constants.FRAMEWORK_VENDOR);
 		bundleContextControl.setReturnValue(null);
-		context.getProperty(Constants.FRAMEWORK_VENDOR);
-		bundleContextControl.setReturnValue(null);
-		context.getProperty(Constants.FRAMEWORK_VENDOR);
-		bundleContextControl.setReturnValue(null);
 		
 		// extracting bundle id from bundle
 		bundleContextControl.expectAndReturn(context.getBundle(), new MockBundle());

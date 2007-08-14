@@ -57,7 +57,7 @@ public class ServiceDependentOsgiBundleContextTest extends TestCase {
 
     public void testFullCycle() {
         context.refresh();
-        context.close();
+        context.shutdownComponent();
         assertEquals("state CLOSED", ContextState.CLOSED, context.getState());
         assertFalse("listener not registered", context.listener.registered);
         assertFalse("listener not deregistered", context.listener.deregistered);
@@ -121,7 +121,7 @@ public class ServiceDependentOsgiBundleContextTest extends TestCase {
         listener.onApplicationEvent(new SpringBundleEvent(BundleEvent.STOPPED, bundle));
         mockListener.replay();
         context.refresh();
-        context.close();
+        context.shutdownComponent();
         mockListener.verify();
         mcast.removeAllListeners();
     }
@@ -169,7 +169,7 @@ public class ServiceDependentOsgiBundleContextTest extends TestCase {
         assertEquals("CREATED", ContextState.CREATED, transitions.get(3));
 
 
-        context.close();
+        context.shutdownComponent();
         assertTrue("listener deregistered", context.listener.deregistered);
 
         transitions = context.stateTransitions;
@@ -236,7 +236,7 @@ public class ServiceDependentOsgiBundleContextTest extends TestCase {
         }
 
 
-        protected void preRefresh() {
+        protected void startRefresh() {
             loaderOnPreRefresh = Thread.currentThread().getContextClassLoader();
             refreshBeanFactory();
             if (exceptionInPreRefresh != null) {
@@ -246,7 +246,7 @@ public class ServiceDependentOsgiBundleContextTest extends TestCase {
         }
 
 
-        protected void postRefresh() {
+        protected void completeRefresh() {
             loaderOnPostRefresh = Thread.currentThread().getContextClassLoader();
             if (exceptionInPostRefresh != null) {
                 throw exceptionInPostRefresh;
