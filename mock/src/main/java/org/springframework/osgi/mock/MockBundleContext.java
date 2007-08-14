@@ -227,7 +227,9 @@ public class MockBundleContext implements BundleContext {
 	 * @see org.osgi.framework.BundleContext#installBundle(java.lang.String)
 	 */
 	public Bundle installBundle(String location) throws BundleException {
-		return new MockBundle(location);
+		MockBundle bundle = new MockBundle();
+		bundle.setLocation(location);
+		return bundle;
 	}
 
 	/*
@@ -237,7 +239,7 @@ public class MockBundleContext implements BundleContext {
 	 * java.io.InputStream)
 	 */
 	public Bundle installBundle(String location, InputStream input) throws BundleException {
-		return new MockBundle(location);
+		return installBundle(location);
 	}
 
 	/*
