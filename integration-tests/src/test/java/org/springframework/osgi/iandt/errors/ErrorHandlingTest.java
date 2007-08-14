@@ -1,4 +1,4 @@
-package org.springframework.osgi.iandt.error;
+package org.springframework.osgi.iandt.errors;
 
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
