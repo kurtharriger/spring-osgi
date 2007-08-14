@@ -5,7 +5,6 @@ import org.osgi.framework.Constants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.context.support.AbstractOsgiBundleApplicationContext;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
@@ -54,7 +53,7 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
         filter.append("(").append(Constants.OBJECTCLASS).append("=")
                 .append(AbstractRefreshableApplicationContext.class.getName()).append(")");
         filter.append("(")
-                .append(AbstractOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
+                .append("org.springframework.context.service.name");
         filter.append("=").append("org.springframework.osgi.iandt.lifecycle").append(")");
         filter.append(")");
         ServiceTracker tracker = new ServiceTracker(getBundleContext(),
