@@ -106,6 +106,14 @@
     </dependency>
     
     
+    <dependency>
+        <groupId>multithreadedtc</groupId>
+        <artifactId>multithreadedtc-jdk1.4</artifactId>
+        <version>1.01</version>
+        <scope>test</scope>
+    </dependency>
+    
+    
   </dependencies>
 
 </project>
