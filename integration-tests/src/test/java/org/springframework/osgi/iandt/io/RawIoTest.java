@@ -30,13 +30,6 @@ import org.springframework.util.ObjectUtils;
  */
 public class RawIoTest extends BaseIoTest {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.iandt.io.BaseIoTest#onSetUp()
-	 */
-	protected void onSetUp() throws Exception {
-	}
-
 	// don't use any extra bundles - just the test jar
 	protected String[] getBundles() {
 		return null;
@@ -59,7 +52,7 @@ public class RawIoTest extends BaseIoTest {
 	public void testGetResourceSOnRoot() throws Exception {
 		Enumeration enm = bundle.getResources("/");
 		Object[] res = copyEnumeration(enm);
-		assertEquals("root folder not validated" + ObjectUtils.nullSafeToString(res), 3, res.length);
+		assertEquals("root folder not validated" + ObjectUtils.nullSafeToString(res), 1, res.length);
 	}
 
 	// fails on KF
