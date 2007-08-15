@@ -31,7 +31,8 @@ public class FragmentIoTests extends BaseIoTest {
 	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
 	 */
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (!isEquinox());
+		//return (!isEquinox());
+		return false;
 	}
 
 	public void testFileWithTheSameNameInOwningBundleAndAttachedFragment() throws Exception {
@@ -107,44 +108,44 @@ public class FragmentIoTests extends BaseIoTest {
 		Resource[] res = patternLoader.getResources("/");
 		assertTrue(res.length > 1);
 		res = patternLoader.getResources("bundle:/");
-		assertTrue(res.length > 1);
+		assertTrue("found only " + ObjectUtils.nullSafeToString(res), res.length > 1);
 	}
 
 	public void testFileLevelWildcardMatching() throws Exception {
 		// find res files
 		Resource[] res = patternLoader.getResources("bundle:/" + PACKAGE + "*.res");
-		assertEquals(2, res.length);
+		assertEquals("found only " + ObjectUtils.nullSafeToString(res), 2, res.length);
 	}
 
 	public void testFileLevelPatternMatching() throws Exception {
 		// find just this class
 		Resource[] res = patternLoader.getResources("bundle:/" + PACKAGE + "IoTe*.class");
 		// should find only 1
-		assertEquals(1, res.length);
+		assertEquals("found only " + ObjectUtils.nullSafeToString(res), 1, res.length);
 	}
 
 	public void testFileLevelCharPatternMatchingForOneChar() throws Exception {
 		Resource[] res = patternLoader.getResources("bundle:" + PACKAGE + "IoTe*ts.class");
 		// should find only 1
-		assertEquals(1, res.length);
+		assertEquals("found only " + ObjectUtils.nullSafeToString(res), 1, res.length);
 	}
 
 	public void testFileLevelCharMatching() throws Exception {
 		Resource[] res = patternLoader.getResources("bundle:" + PACKAGE + "IoTe?ts.class");
 		// should find only 1
-		assertEquals(1, res.length);
+		assertEquals("found only " + ObjectUtils.nullSafeToString(res), 1, res.length);
 	}
 
 	public void testFileLevelDoubleCharMatching() throws Exception {
 		Resource[] res = patternLoader.getResources("bundle:" + PACKAGE + "IoTe??s.class");
 		// should find only 1
-		assertEquals(1, res.length);
+		assertEquals("found only " + ObjectUtils.nullSafeToString(res), 1, res.length);
 	}
 
 	public void testFolderLevelWildcardMatching() throws Exception {
 		// find all classes
 		Resource[] res = patternLoader.getResources("bundle:/**/io/*.class");
-		assertTrue(res.length > 3);
+		assertTrue("found only " + ObjectUtils.nullSafeToString(res), res.length > 3);
 	}
 
 	public void testNoPrefixMeansBundlePrefixOnClasses() throws Exception {
