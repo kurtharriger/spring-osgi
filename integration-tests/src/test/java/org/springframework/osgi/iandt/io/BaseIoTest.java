@@ -15,6 +15,10 @@
  */
 package org.springframework.osgi.iandt.io;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -26,6 +30,7 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.platform.EquinoxPlatform;
 import org.springframework.osgi.test.platform.FelixPlatform;
 import org.springframework.osgi.test.platform.KnopflerfishPlatform;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Common base test class for IO integration testing.
@@ -43,11 +48,13 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 
 	protected ResourcePatternResolver patternLoader;
 
+	protected Bundle bundle;
+
 	protected void onSetUp() throws Exception {
 		// load file using absolute path
 		defaultLoader = new DefaultResourceLoader();
 		thisClass = defaultLoader.getResource(getClass().getName().replace('.', '/').concat(".class"));
-		Bundle bundle = getBundleContext().getBundle();
+		bundle = getBundleContext().getBundle();
 		loader = new OsgiBundleResourceLoader(bundle);
 		patternLoader = new OsgiBundleResourcePatternResolver(loader);
 
@@ -77,6 +84,18 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 						+ getSpringOsgiVersion() };
 	}
 
+	protected Object[] copyEnumeration(Enumeration enm) {
+		List list = new ArrayList();
+		while (enm != null && enm.hasMoreElements())
+			list.add(enm.nextElement());
+		return list.toArray();
+	}
+
+	protected void assertResourceArray(Object[] array, int expectedSize) {
+		System.out.println(ObjectUtils.nullSafeToString(array));
+		assertTrue("found only " + ObjectUtils.nullSafeToString(array), array.length == expectedSize);
+	}
+
 	protected boolean isKF() {
 		return (createPlatform() instanceof KnopflerfishPlatform);
 	}
@@ -89,4 +108,7 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 		return (createPlatform() instanceof FelixPlatform);
 	}
 
+//	protected boolean isMBS() {
+//		return (createPlatform() instanceof MBSProPlatform);
+//	}
 }
