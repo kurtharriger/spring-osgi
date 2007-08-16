@@ -463,24 +463,24 @@ limitations under the License.
       </properties>
     </profile>
 
-   <!-- not enabled yet -->
+   <!-- not enabled yet 
     <profile>
       <id>mbs_pro</id>
       <dependencies>
         <dependency>
           <groupId>com.prosyst.mbs</groupId>
           <artifactId>serverjvm13</artifactId>
-          <version>6.1.1</version>
+          <version>6.1.2</version>
           <type>jar</type>
           <scope>provided</scope>
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>org.springframework.osgi.test.platform..MBSProPlatform</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.MBSProPlatform</osgi.test.platform>
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
-    
+     -->
   </profiles>
 
   <!-- ======================================= -->
@@ -566,9 +566,11 @@ limitations under the License.
             <link>http://jakarta.apache.org/commons/logging/apidocs/</link>
             <link>http://www2.osgi.org/javadoc/r4/</link>
             <link>http://junit.sourceforge.net/javadoc/</link>
-            <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
             <link>http://aopalliance.sourceforge.net/doc</link>
             <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
+			<!--
+                        <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
+                 -->
           </links>
         </configuration>
       </plugin>
@@ -621,7 +623,7 @@ limitations under the License.
     <repository>
       <id>static.springframework.org</id>
       <url>
-        scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2
+        scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2-snapshots/
       </url>
     </repository>
     
@@ -636,7 +638,7 @@ limitations under the License.
       <id>static.springframework.org</id>
       <name>SpringFramework.org</name>
       <url>
-        scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2/spring-osgi/
+        scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2-snapshots/spring-osgi/
       </url>
     </site>
   </distributionManagement>
