@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,33 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.platform;
+package org.springframework.osgi.iandt.platform;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.springframework.osgi.test.platform.MBSProPlatform;
+import org.springframework.osgi.test.platform.OsgiPlatform;
 
 /**
  * @author Costin Leau
  * 
  */
-public class FelixPlatformTest extends AbstractOsgiPlatformTest {
-
+public class MBSProPlatformTest extends OsgiPlatformTest {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.osgi.test.platform.AbstractOsgiPlatformTest#assertCorrectPlatform(org.osgi.framework.BundleContext)
+	 * @see org.springframework.osgi.test.platform.AbstractOsgiPlatformTestCase#assertCorrectPlatform()
 	 */
 	protected void assertCorrectPlatform(BundleContext context) {
-		assertSame("Apache Software Foundation", context.getProperty(Constants.FRAMEWORK_VENDOR));
+		String vendor = context.getProperty(Constants.FRAMEWORK_VENDOR);
+		assertEquals("ProSyst", vendor);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.osgi.test.platform.AbstractOsgiPlatformTest#createOsgiPlatform()
+	 * @see org.springframework.osgi.test.platform.AbstractOsgiPlatformTestCase#createOsgiPlatform()
 	 */
 	protected OsgiPlatform createOsgiPlatform() {
-		return new FelixPlatform();
+		return new MBSProPlatform();
 	}
 
 }

@@ -13,33 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.platform;
+package org.springframework.osgi.iandt.platform;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.springframework.osgi.test.platform.KnopflerfishPlatform;
+import org.springframework.osgi.test.platform.OsgiPlatform;
 
-/**
- * @author Costin Leau
- * 
- */
-public class EquinoxPlatformTest extends AbstractOsgiPlatformTest {
+public class KnopflerfishPlatformTest extends OsgiPlatformTest {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.platform.AbstractOsgiPlatformTestCase#assertCorrectPlatform()
-	 */
 	protected void assertCorrectPlatform(BundleContext context) {
-		assertEquals("Eclipse", context.getProperty(Constants.FRAMEWORK_VENDOR));
+		assertSame("Knopflerfish", context.getProperty(Constants.FRAMEWORK_VENDOR));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.platform.AbstractOsgiPlatformTestCase#createOsgiPlatform()
-	 */
 	protected OsgiPlatform createOsgiPlatform() {
-		return new EquinoxPlatform();
+		return new KnopflerfishPlatform();
 	}
 
 }

@@ -165,7 +165,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 				}
 				else {
 					if (trace)
-						logger.trace("Bundle [" + bundleName + "] is not active; ignoring");
+						logger.trace("Bundle [" + bundleName + "] is not active (probably a fragment); ignoring");
 				}
 			}
 		}

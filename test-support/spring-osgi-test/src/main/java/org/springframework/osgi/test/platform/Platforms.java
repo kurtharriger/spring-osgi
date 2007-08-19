@@ -45,6 +45,5 @@ public abstract class Platforms {
 	 * <a href="http://www.prosyst.com/products/osgi_se_prof_ed.html">Prosyst
 	 * mBedded Professional</a> OSGi platform constant.
 	 */
-
-	//public static final String MBS = MBSProPlatform.class.getName();
+	public static final String MBS = MBSProPlatform.class.getName();
 }

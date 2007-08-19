@@ -44,7 +44,9 @@ import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.osgi.test.util.TestUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * 
@@ -384,10 +386,16 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 			// start bundles
 			for (int i = 0; i < bundles.length; i++) {
-				logger.debug("starting bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]");
+
 				try {
-					if (!OsgiBundleUtils.isFragment(bundles[i]))
+					String info = "bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]";
+					if (!OsgiBundleUtils.isFragment(bundles[i])) {
+						logger.debug("starting " + info);
 						bundles[i].start();
+					}
+
+					else
+						logger.debug(info + " is a fragment; start not invoked");
 				}
 				catch (Throwable ex) {
 					logger.warn("can't start bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName()
@@ -492,12 +500,16 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		// this is a loose reference - update it if the JUnitTestActivator
 		// class is
 		// changed.
-		ServiceReference reference = platformContext.getServiceReference(ACTIVATOR_REFERENCE);
-		logWiring();
+
+		BundleContext ctx = getRuntimeBundleContext();
+
+		ServiceReference reference = ctx.getServiceReference(ACTIVATOR_REFERENCE);
 		if (reference == null) {
+			ObjectUtils.nullSafeToString(ctx.getBundles());
+			logWiring(ctx);
 			throw new IllegalStateException("no OSGi service reference found at " + ACTIVATOR_REFERENCE);
 		}
-		service = platformContext.getService(reference);
+		service = ctx.getService(reference);
 		if (service == null) {
 			throw new IllegalStateException("no service found for reference: " + reference);
 		}
@@ -509,15 +521,40 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 	}
 
-	private void logWiring() {
+	/**
+	 * Try to get the bundle context for spring-osgi-test-support bundle. This
+	 * is useful on platform where the platformContext or system BundleContext
+	 * doesn't behave like a normal context (such as mBedded Server).
+	 * 
+	 * Will fallback to {@link #platformContext}.
+	 * @return
+	 */
+	private BundleContext getRuntimeBundleContext() {
+
+		// read the system property
+		Long id = (Long) System.getProperties().get(OsgiJUnitTest.OSGI_TEST_BUNDLE_ID);
+
+		BundleContext ctx = null;
+		if (id != null)
+			try {
+				ctx = OsgiBundleUtils.getBundleContext(platformContext.getBundle(id.longValue()));
+			}
+			catch (RuntimeException ex) {
+				logger.trace("cannot determine bundle context for bundle " + id, ex);
+			}
+
+		return (ctx == null ? platformContext : ctx);
+	}
+
+	private void logWiring(BundleContext context) {
 		// get PackageAdmin service
-		ServiceReference ref = platformContext.getServiceReference(org.osgi.service.packageadmin.PackageAdmin.class.getName());
+		ServiceReference ref = context.getServiceReference(org.osgi.service.packageadmin.PackageAdmin.class.getName());
 		if (ref == null) {
 			logger.warn("cannot log anything - no PackageAdmin present");
 			return;
 		}
 
-		PackageAdmin admin = (PackageAdmin) platformContext.getService(ref);
+		PackageAdmin admin = (PackageAdmin) context.getService(ref);
 		ExportedPackage pkg = admin.getExportedPackage("org.springframework.osgi.test");
 		logger.info("exporting bundle is " + pkg.getExportingBundle().getSymbolicName());
 		Bundle[] bundles = pkg.getImportingBundles();

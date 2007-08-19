@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.platform;
+package org.springframework.osgi.iandt.platform;
 
 import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.osgi.framework.BundleContext;
+import org.springframework.osgi.test.platform.OsgiPlatform;
 
 /**
  * This test might log exceptions since the OSGi platform may try to register
