@@ -83,9 +83,7 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 
 		startDependency(simpleServiceBundle);
 
-		// FIXME currently does not work
-		// assertNull("Service with unsatisfied dependencies has been started!",
-		// dependentRef);
+		assertNull("Service with unsatisfied dependencies has been started!", dependentRef);
 
 		waitOnContextCreation("org.springframework.osgi.iandt.dependencies");
 

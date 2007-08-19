@@ -22,7 +22,6 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.platform.EquinoxPlatform;
 import org.springframework.osgi.test.platform.FelixPlatform;
 import org.springframework.osgi.test.platform.KnopflerfishPlatform;
-import org.springframework.osgi.test.platform.MBSProPlatform;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 
 /**
@@ -63,8 +62,6 @@ public class OsgiPlatformTest extends AbstractConfigurableBundleCreatorTests {
 		if ("Apache Software Foundation".equals(vendor))
 			assertTrue(platform instanceof FelixPlatform);
 		if ("Knopflerfish".equals(vendor))
-			assertTrue(platform instanceof KnopflerfishPlatform);
-		if ("ProSyst".equals(vendor))
-			assertTrue(platform instanceof MBSProPlatform);
+			assertTrue(platform instanceof KnopflerfishPlatform); 
 	}
 }
