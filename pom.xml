@@ -463,14 +463,14 @@ limitations under the License.
       </properties>
     </profile>
 
-   <!-- not enabled yet 
+   <!-- not enabled yet -->
     <profile>
-      <id>mbs_pro</id>
+      <id>mbspro</id>
       <dependencies>
         <dependency>
           <groupId>com.prosyst.mbs</groupId>
           <artifactId>serverjvm13</artifactId>
-          <version>6.1.2</version>
+          <version>6.1.3-SNAPSHOT</version>
           <type>jar</type>
           <scope>provided</scope>
         </dependency>
@@ -480,7 +480,6 @@ limitations under the License.
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
-     -->
   </profiles>
 
   <!-- ======================================= -->
