@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.springframework.util.Assert;
-
 /**
  * Utility class for IO operations.
  * 
