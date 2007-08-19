@@ -30,8 +30,6 @@ import junit.framework.TestResult;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.packageadmin.ExportedPackage;
-import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -44,9 +42,7 @@ import org.springframework.osgi.test.util.IOUtils;
 import org.springframework.osgi.test.util.TestUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
-import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 
 /**
  * 
@@ -505,8 +501,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 		ServiceReference reference = ctx.getServiceReference(ACTIVATOR_REFERENCE);
 		if (reference == null) {
-			ObjectUtils.nullSafeToString(ctx.getBundles());
-			logWiring(ctx);
 			throw new IllegalStateException("no OSGi service reference found at " + ACTIVATOR_REFERENCE);
 		}
 		service = ctx.getService(reference);
@@ -544,26 +538,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			}
 
 		return (ctx == null ? platformContext : ctx);
-	}
-
-	private void logWiring(BundleContext context) {
-		// get PackageAdmin service
-		ServiceReference ref = context.getServiceReference(org.osgi.service.packageadmin.PackageAdmin.class.getName());
-		if (ref == null) {
-			logger.warn("cannot log anything - no PackageAdmin present");
-			return;
-		}
-
-		PackageAdmin admin = (PackageAdmin) context.getService(ref);
-		ExportedPackage pkg = admin.getExportedPackage("org.springframework.osgi.test");
-		logger.info("exporting bundle is " + pkg.getExportingBundle().getSymbolicName());
-		Bundle[] bundles = pkg.getImportingBundles();
-		StringBuffer buf = new StringBuffer();
-
-		for (int i = 0; i < bundles.length; i++) {
-			buf.append(bundles[i].getSymbolicName() + ", ");
-		}
-		logger.info("importing bundles are " + buf.toString());
 	}
 
 	private void readTestResult() {
