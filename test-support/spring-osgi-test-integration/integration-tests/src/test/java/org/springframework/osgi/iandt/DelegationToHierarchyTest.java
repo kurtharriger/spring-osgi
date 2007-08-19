@@ -28,6 +28,7 @@ import org.springframework.osgi.test.AbstractOnTheFlyBundleCreatorTests;
 import org.springframework.osgi.test.AbstractOsgiTests;
 import org.springframework.osgi.test.JUnitTestActivator;
 import org.springframework.osgi.test.OsgiJUnitTest;
+import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * Tests that AbstractOsgiTests and subclasses can be delegated to rather than
@@ -49,7 +50,9 @@ public class DelegationToHierarchyTest extends TestCase implements OsgiJUnitTest
 					+ "org.osgi.framework;specification-version=\"1.3.0\"," + "org.springframework.core.io,"
 					+ "org.springframework.osgi.test");
 			return manifest;
+			
 		}
+		
 	};
 
 	public void osgiSetUp() throws Exception {

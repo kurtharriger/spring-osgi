@@ -131,9 +131,10 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		attrs.put(Attributes.Name.MANIFEST_VERSION, "1.0");
 		attrs.putValue(Constants.BUNDLE_MANIFESTVERSION, "2");
 
+		String description = getName() + "-" + getClass().getName();
 		// name/description
-		attrs.putValue(Constants.BUNDLE_NAME, "Test Bundle[" + this + "]");
-		attrs.putValue(Constants.BUNDLE_SYMBOLICNAME, "Test Bundle[" + this + "]");
+		attrs.putValue(Constants.BUNDLE_NAME, "TestBundle-" + description);
+		attrs.putValue(Constants.BUNDLE_SYMBOLICNAME, "TestBundle-" + description);
 		attrs.putValue(Constants.BUNDLE_DESCRIPTION, "on-the-fly test bundle");
 
 		// activator
@@ -225,7 +226,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 		// add the content pattern
 		jarCreator.setContentPattern(getBundleContentPattern());
-		
+
 		// create the actual jar
 		Resource jar = jarCreator.createJar(getManifest());
 
@@ -244,4 +245,5 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		bundle.start();
 		logger.debug("test bundle succesfully started");
 	}
+
 }

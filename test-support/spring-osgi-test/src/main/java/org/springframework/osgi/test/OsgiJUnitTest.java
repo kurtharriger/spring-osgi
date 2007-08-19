@@ -18,64 +18,69 @@ package org.springframework.osgi.test;
 import org.osgi.framework.BundleContext;
 
 /**
- * JUnit contract for OSGi environments. It wraps some of TestCase methods as well
- * as adds some to allow flexible access to the test instance by the TestRunnerService
- * implementation.
+ * JUnit contract for OSGi environments. It wraps some of TestCase methods as
+ * well as adds some to allow flexible access to the test instance by the
+ * TestRunnerService implementation.
  * 
  * @author Costin Leau
  * 
  */
 public interface OsgiJUnitTest {
 
-    /**
-     * Lookup marker for "to-OSGi" communication channel.
-     */
-     static final String FOR_OSGI = OsgiJUnitTest.class.getName() + "-osgi[in]";
-    /**
-     * Lookup marker for "from-OSGi" communication channel.
-     */
-     static final String FROM_OSGI = OsgiJUnitTest.class.getName() + "-osgi[out]";
+	/**
+	 * Lookup marker for "to-OSGi" communication channel.
+	 */
+	static final String FOR_OSGI = OsgiJUnitTest.class.getName() + "-osgi[in]";
 
-    /**
-     * Lookup marker for the test suite that is executed inside the OSGi
-     * container.
-     */
-     static final String OSGI_TEST = OsgiJUnitTest.class.getName() + "-test";
+	/**
+	 * Lookup marker for "from-OSGi" communication channel.
+	 */
+	static final String FROM_OSGI = OsgiJUnitTest.class.getName() + "-osgi[out]";
 
-    /**
-     * Replacement for the 'traditional' setUp. Called by TestRunnerService. 
-     *
-     * @see junit.framework.TestCase#setUp
-     * @throws Exception
-     */
-     void osgiSetUp() throws Exception;
+	/**
+	 * Lookup marker for the test suite that is executed inside the OSGi
+	 * container.
+	 */
+	static final String OSGI_TEST = OsgiJUnitTest.class.getName() + "-test";
 
-    /**
-     * Replacement for the 'traditional' tearDown. Called by TestRunnerService.
-     *
-     * @see junit.framework.TestCase#tearDown
-     * @throws Exception
-     */
-     void osgiTearDown() throws Exception;
+	/**
+	 * System property name used to pass around the spring-osgi-test bundle id.
+	 */
+	static final String OSGI_TEST_BUNDLE_ID = OsgiJUnitTest.class.getName() + "-bundle.id";
 
-    /**
-     * Replacement for the 'traditional' runTest. Called by TestRunnerService.
-     * @throws Throwable
-     */
-     void osgiRunTest() throws Throwable;
+	/**
+	 * Replacement for the 'traditional' setUp. Called by TestRunnerService.
+	 * 
+	 * @see junit.framework.TestCase#setUp
+	 * @throws Exception
+	 */
+	void osgiSetUp() throws Exception;
 
-     /**
-      * TestCase method added to the interface for usage
-      * by the OSGi test runner service.
-      *  
-      * @param name
-      */
-     void setName(String name);
+	/**
+	 * Replacement for the 'traditional' tearDown. Called by TestRunnerService.
+	 * 
+	 * @see junit.framework.TestCase#tearDown
+	 * @throws Exception
+	 */
+	void osgiTearDown() throws Exception;
 
+	/**
+	 * Replacement for the 'traditional' runTest. Called by TestRunnerService.
+	 * @throws Throwable
+	 */
+	void osgiRunTest() throws Throwable;
 
-    /**
-     * Provides the OSGi bundle context to the test
-     * @param bundleContext
-     */
-     void injectBundleContext(BundleContext bundleContext);
+	/**
+	 * TestCase method added to the interface for usage by the OSGi test runner
+	 * service.
+	 * 
+	 * @param name
+	 */
+	void setName(String name);
+
+	/**
+	 * Provides the OSGi bundle context to the test
+	 * @param bundleContext
+	 */
+	void injectBundleContext(BundleContext bundleContext);
 }

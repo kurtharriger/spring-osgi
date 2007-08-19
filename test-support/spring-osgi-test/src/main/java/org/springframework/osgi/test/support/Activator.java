@@ -20,6 +20,7 @@ import java.util.Hashtable;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.osgi.test.OsgiJUnitTest;
 import org.springframework.osgi.test.TestRunnerService;
 
 /**
@@ -39,6 +40,10 @@ public class Activator implements BundleActivator {
 	 */
 	public void start(BundleContext context) throws Exception {
 		registration = context.registerService(TestRunnerService.class.getName(), new OsgiJUnitService(), new Hashtable());
+		
+		// add also the bundle id so that AbstractOsgiTest can determine its BundleContext when used in an environment
+		// where the system bundle is treated as a special case (such as mBeddedServer).
+		System.getProperties().put(OsgiJUnitTest.OSGI_TEST_BUNDLE_ID, new Long(context.getBundle().getBundleId()));
 
 	}
 
