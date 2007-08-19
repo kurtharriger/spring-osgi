@@ -89,7 +89,6 @@ public abstract class OsgiPlatformDetector {
 	 * @return system bundle version.
 	 */
 	public static String getVersion(BundleContext ctx) {
-		Assert.notNull(ctx);
 		if (ctx == null)
 			return "";
 

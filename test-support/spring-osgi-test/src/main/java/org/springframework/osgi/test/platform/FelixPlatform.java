@@ -53,11 +53,14 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 
 	public FelixPlatform() {
 		toString = "Felix OSGi Platform";
+	}
 
+	protected Properties getPlatformProperties() {
 		// load Felix configuration
-		Properties props = getConfigurationProperties();
+		Properties props = new Properties();
 		props.putAll(getFelixConfiguration());
 		props.putAll(getLocalConfiguration());
+		return props;
 	}
 
 	/*

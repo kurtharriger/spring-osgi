@@ -28,25 +28,29 @@ import org.osgi.framework.BundleContext;
  * 
  */
 public class EquinoxPlatform extends AbstractOsgiPlatform {
-	
+
 	private BundleContext context;
 
 	public EquinoxPlatform() {
 		toString = "Equinox OSGi Platform";
-		
+	}
+
+	protected Properties getPlatformProperties() {
 		// default properties
-		Properties props = getConfigurationProperties();
+		Properties props = new Properties();
 		props.setProperty("eclipse.ignoreApp", "true");
 		props.setProperty("osgi.clean", "true");
 		props.setProperty("osgi.noShutdown", "true");
 
-        //props.setProperty("osgi.configuration.area", "eclipse_config");
-        //props.setProperty("osgi.instance.area", "eclipse_config");
-        //props.setProperty("osgi.user.area", "eclipse_config");    
+		// props.setProperty("osgi.configuration.area", "eclipse_config");
+		// props.setProperty("osgi.instance.area", "eclipse_config");
+		// props.setProperty("osgi.user.area", "eclipse_config");
 
-        //props.setProperty("eclipse.consoleLog", "true");
-        //props.setProperty("osgi.debug", "");
-    }
+		// props.setProperty("eclipse.consoleLog", "true");
+		// props.setProperty("osgi.debug", "");
+		
+		return props;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -66,7 +70,7 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 
 		// copy configuration properties to sys properties
 		System.getProperties().putAll(getConfigurationProperties());
-		
+
 		// Equinox 3.1.x returns void - use of reflection is required
 		// use main since in 3.1.x it sets up some system properties
 		EclipseStarter.main(new String[0]);

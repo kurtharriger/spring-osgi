@@ -11,6 +11,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-mock/2.1-m3/spring-mock-2.1-m3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.1-m3/spring-core-2.1-m3.jar" sourcepath="/M2_REPO/org/springframework/spring/2.0/spring-2.0-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.1-m3/spring-context-2.1-m3.jar" sourcepath="/M2_REPO/org/springframework/spring/2.0/spring-2.0-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframeworkspring-beans/2.1-m3/spring-beans-2.1-m3.jar" sourcepath="/M2_REPO/org/springframework/spring/2.0/spring-2.0-sources.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Weather Sample Service Bundle"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

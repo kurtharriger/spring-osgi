@@ -16,14 +16,17 @@
 package org.springframework.osgi.extender.support;
 
 import org.springframework.core.task.TaskExecutor;
+
 /**
  * @author Adrian Colyer
- *
+ * 
  */
 public class TestTaskExecutor implements TaskExecutor {
 
+	public static boolean called = false;
+
 	public void execute(Runnable toRun) {
-		throw new RuntimeException("test task executor does not really execute!");
+		called = true;
 	}
 
 }

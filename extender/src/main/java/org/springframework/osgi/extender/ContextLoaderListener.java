@@ -36,8 +36,6 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.springframework.beans.factory.xml.PluggableSchemaResolver;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -81,7 +79,80 @@ import org.springframework.util.Assert;
  * @author Hal Hildebrand
  * @author Adrian Colyer
  */
-public class ContextLoaderListener implements BundleActivator, SynchronousBundleListener, ApplicationEventMulticaster {
+public class ContextLoaderListener implements BundleActivator {
+
+	private class BundleListener implements SynchronousBundleListener {
+		/**
+		 * A bundle has been started, stopped, resolved, or unresolved. This
+		 * method is a synchronous callback, do not do any long-running work in
+		 * this thread.
+		 * 
+		 * @see org.osgi.framework.SynchronousBundleListener#bundleChanged
+		 */
+		public void bundleChanged(BundleEvent event) {
+
+			boolean debug = log.isDebugEnabled();
+			boolean trace = log.isTraceEnabled();
+
+			// check if we are being shutdown
+			synchronized (monitor) {
+				if (isClosed) {
+					if (trace)
+						log.trace("listener is closed; events are being ignored");
+					return;
+				}
+			}
+
+			try {
+				Bundle bundle = event.getBundle();
+
+				if (bundle.getBundleId() == bundleId) {
+					return;
+				}
+
+				if (trace) {
+					log.debug("Processing bundle event [" + OsgiStringUtils.nullSafeToString(event) + "] for bundle ["
+							+ OsgiStringUtils.nullSafeSymbolicName(bundle) + "]");
+				}
+
+				switch (event.getType()) {
+				case BundleEvent.STARTED: {
+					maybeCreateApplicationContextFor(bundle);
+					break;
+				}
+				case BundleEvent.STOPPING: {
+					if (OsgiBundleUtils.isSystemBundle(bundle)) {
+						if (debug) {
+							log.debug("System bundle stopping");
+						}
+						// System bundle is shutting down; Special handling for
+						// framework shutdown
+						shutdown();
+					}
+					else {
+						maybeCloseApplicationContextFor(bundle);
+					}
+					break;
+				}
+				case BundleEvent.RESOLVED: {
+					maybeAddNamespaceHandlerFor(bundle);
+					break;
+				}
+				case BundleEvent.UNRESOLVED: {
+					maybeRemoveNameSpaceHandlerFor(bundle);
+					break;
+				}
+				default:
+					break;
+				}
+			}
+			catch (Throwable e) {
+				// OSGi frameworks simply swallow these exceptions
+				log.fatal("Exception handing bundle changed event", e);
+			}
+		}
+	}
+
 	// The standard for META-INF header keys excludes ".", so these constants
 	// must use "-"
 	protected static final String SPRING_HANDLER_MAPPINGS_LOCATION = "META-INF/spring.handlers";
@@ -158,6 +229,9 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	 */
 	protected BundleContext context;
 
+	/** Bundle listener */
+	private SynchronousBundleListener bundleListener;
+
 	/**
 	 * Monitor used for dealing with the bundle activator and synchronous bundle
 	 * threads
@@ -165,6 +239,9 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 	private transient final Object monitor = new Object();
 
 	private boolean isClosed = false;
+
+	/** wait 3 seconds for each context to close */
+	private static long SHUTDOWN_WAIT_TIME = 3 * 1000;
 
 	/*
 	 * Required by the BundleActivator contract
@@ -213,8 +290,11 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		// registerShutdownHook();
 
 		registerListenerService(context);
+
+		bundleListener = new BundleListener();
+
 		// listen to any changes in bundles
-		context.addBundleListener(this);
+		context.addBundleListener(bundleListener);
 
 		// Instantiate all previously resolved bundles which are Spring
 		// powered
@@ -256,6 +336,11 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		// first stop the watchdog
 		stopTimer();
 
+		if (bundleListener != null) {
+			context.removeBundleListener(bundleListener);
+			bundleListener = null;
+		}
+			
 		unregisterListenerService();
 		unregisterResolverService();
 
@@ -309,7 +394,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 		// start the ripper >:)
 		for (int j = 0; j < tasks.length; j++) {
-			if (RunnableTimedExecution.execute(tasks[j], 2000)) {
+			if (RunnableTimedExecution.execute(tasks[j], SHUTDOWN_WAIT_TIME)) {
 				if (debug) {
 					log.debug(contextClosingDown[0] + " context did not closed succesfully; forcing shutdown");
 				}
@@ -330,17 +415,6 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		// task executor
 		stopTaskExecutor();
 
-	}
-
-	/**
-	 * Try to shutdown all threads started by this listener.
-	 * 
-	 */
-	protected void stopThreads() {
-		if (log.isDebugEnabled())
-			log.debug("Stopping running threads");
-		stopTimer();
-		stopTaskExecutor();
 	}
 
 	/**
@@ -370,9 +444,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 				if (debug)
 					log.debug("Waiting for " + asynchCounter + " service dependency listener(s) to stop...");
 
-				long MAX_WAIT = 1000;
-
-				asynchCounter.waitForZero(MAX_WAIT);
+				asynchCounter.waitForZero(SHUTDOWN_WAIT_TIME);
 
 				if (!asynchCounter.isZero()) {
 					if (debug)
@@ -401,8 +473,8 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			log.debug("Registering Spring ContextListenerContext service");
 		}
 
-		listenerServiceRegistration = context.registerService(
-			new String[] { ApplicationEventMulticaster.class.getName() }, this, null);
+//		listenerServiceRegistration = context.registerService(
+//			new String[] { ApplicationEventMulticaster.class.getName() }, this, null);
 	}
 
 	/**
@@ -439,83 +511,6 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 
 		OsgiServiceUtils.unregisterService(resolverServiceRegistration);
 		this.resolverServiceRegistration = null;
-	}
-
-	/**
-	 * A bundle has been started, stopped, resolved, or unresolved. This method
-	 * is a synchronous callback, do not do any long-running work in this
-	 * thread.
-	 * 
-	 * @see org.osgi.framework.SynchronousBundleListener#bundleChanged
-	 */
-	public void bundleChanged(BundleEvent event) {
-
-		boolean debug = log.isDebugEnabled();
-		boolean trace = log.isTraceEnabled();
-
-		// check if we are being shutdown
-		synchronized (monitor) {
-			if (isClosed) {
-				if (debug)
-					log.debug("listener is closed; events are being ignored");
-				return;
-			}
-
-		}
-
-		try {
-			Bundle bundle = event.getBundle();
-
-			if (bundle.getBundleId() == bundleId) {
-				return;
-			}
-
-			if (trace) {
-				log.debug("Processing bundle event [" + OsgiStringUtils.nullSafeToString(event) + "] for bundle ["
-						+ OsgiStringUtils.nullSafeSymbolicName(bundle) + "]");
-			}
-
-			switch (event.getType()) {
-			case BundleEvent.STARTED: {
-				maybeCreateApplicationContextFor(bundle);
-				break;
-			}
-			case BundleEvent.STOPPING: {
-				if (OsgiBundleUtils.isSystemBundle(bundle)) {
-					if (debug) {
-						log.debug("System bundle stopping");
-					}
-					// System bundle is shutting down; Special handling for
-					// framework shutdown
-
-					// FIXME: this should be on a different thread maybe as we
-					// are using the listener thread
-					// further more, we could move the different thread inside
-					// the shutdown to make sure we first set
-					// the proper flags up
-					shutdown();
-				}
-				else {
-					maybeCloseApplicationContextFor(bundle);
-				}
-				break;
-			}
-			case BundleEvent.RESOLVED: {
-				maybeAddNamespaceHandlerFor(bundle);
-				break;
-			}
-			case BundleEvent.UNRESOLVED: {
-				maybeRemoveNameSpaceHandlerFor(bundle);
-				break;
-			}
-			default:
-				break;
-			}
-		}
-		catch (Throwable e) {
-			// OSGi frameworks simply swallow these exceptions
-			log.fatal("Exception handing bundle changed event", e);
-		}
 	}
 
 	/**
@@ -560,9 +555,6 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		appCtxExecutor.setMonitoringCounter(asynchCounter);
 
 		asynchCounter.increment();
-
-		// FIXME: left things
-		// context.setMcast(this);
 
 		try {
 
@@ -612,7 +604,7 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 			public void run() {
 				context.close();
 			}
-		}, 2000);
+		}, SHUTDOWN_WAIT_TIME);
 	}
 
 	/**
@@ -739,45 +731,4 @@ public class ContextLoaderListener implements BundleActivator, SynchronousBundle
 		return taskExecutor;
 	}
 
-	public void addApplicationListener(ApplicationListener listener) {
-		springBundleListeners.add(listener);
-		// Post events for things already started
-		for (Iterator i = managedContexts.values().iterator(); i.hasNext();) {
-			ConfigurableOsgiBundleApplicationContext context = (ConfigurableOsgiBundleApplicationContext) i.next();
-
-			// FIXME: should do this?
-			// if (context.isAvailable()) {
-			// if (log.isInfoEnabled()) {
-			// log.info("Posting creation event [ STARTED, " +
-			// context.getDisplayName() + "]");
-			// }
-			// dependencyDetector.onApplicationEvent(new
-			// SpringBundleEvent(BundleEvent.STARTED, context.getBundle()));
-			// }
-		}
-	}
-
-	public void removeApplicationListener(ApplicationListener listener) {
-		synchronized (springBundleListeners) {
-			springBundleListeners.remove(listener);
-		}
-	}
-
-	public void removeAllListeners() {
-		synchronized (springBundleListeners) {
-			springBundleListeners.clear();
-		}
-	}
-
-	public void multicastEvent(ApplicationEvent event) {
-		synchronized (springBundleListeners) {
-			if (log.isDebugEnabled()) {
-				log.debug("Posting context event " + event.toString());
-			}
-			for (Iterator i = springBundleListeners.iterator(); i.hasNext();) {
-				ApplicationListener l = (ApplicationListener) i.next();
-				l.onApplicationEvent(event);
-			}
-		}
-	}
 }

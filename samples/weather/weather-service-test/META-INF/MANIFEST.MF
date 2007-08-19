@@ -1,9 +1,0 @@
-Bundle-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.springframework.osgi.samples.weather.service.test
-Bundle-Name: weather-service-test
-Bundle-Vendor: Spring Framework
-Export-Package: org.springframework.osgi.samples.weather.test
-Import-Package: org.springframework.osgi.samples.weather.service,org.springframework.osgi.service,
- junit.framework
-

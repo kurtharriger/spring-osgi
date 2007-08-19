@@ -24,7 +24,9 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for OsgiPlatform classes. Provides common functionality such as
- * creation a temporary folder on startup and removal on shutdown.
+ * creation a temporary folder on startup and removal on shutdown. The system
+ * properties will be used also to allow easy configuration from the command
+ * line.
  * 
  * @author Costin Leau
  * 
@@ -38,20 +40,30 @@ public abstract class AbstractOsgiPlatform implements OsgiPlatform {
 	 */
 	protected String toString = getClass().getName();
 
+	
 	protected Properties configurationProperties = new Properties();
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.osgi.test.platform.OsgiPlatform#getConfigurationProperties()
 	 */
 	public Properties getConfigurationProperties() {
+		// local properties
+		configurationProperties.putAll(getPlatformProperties());
+		// system properties
+		configurationProperties.putAll(System.getProperties());
 		return configurationProperties;
 	}
+
+	/**
+	 * Subclasses can override this to provide special platform properties.
+	 * 
+	 * @return
+	 */
+	protected abstract Properties getPlatformProperties();
 
 	public String toString() {
 		return toString;
 	}
-
 
 	protected File createTempDir(String suffix) {
 		if (suffix == null)

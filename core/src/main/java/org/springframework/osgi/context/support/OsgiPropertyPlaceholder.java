@@ -18,7 +18,6 @@ package org.springframework.osgi.context.support;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
@@ -32,8 +31,8 @@ import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.util.Assert;
 
 /**
- * Osgi Property Placeholder. For the moment, this is just a dummy/no-op
- * implementation.
+ * Osgi Property Placeholder. Allows reading of properties from an OSGi
+ * Configuration Admin Service as well as dynamic updates on interested beans.
  * 
  * @author Costin Leau
  * 
@@ -42,6 +41,7 @@ public class OsgiPropertyPlaceholder extends PropertyPlaceholderConfigurer imple
 		InitializingBean {
 
 	private String persistentId;
+
 	private BundleContext bundleContext;
 
 	private Properties cmProperties;
@@ -66,7 +66,7 @@ public class OsgiPropertyPlaceholder extends PropertyPlaceholderConfigurer imple
 		cmProperties = new Properties();
 		Dictionary dict = config.getProperties();
 		if (dict == null) {
-		    dict = new MapBasedDictionary();
+			dict = new MapBasedDictionary();
 		}
 
 		// copy dictionary into properties
@@ -82,7 +82,7 @@ public class OsgiPropertyPlaceholder extends PropertyPlaceholderConfigurer imple
 	protected Properties mergeProperties() throws IOException {
 		// add local properties as defaults
 		Properties prop = new Properties(super.mergeProperties());
-		
+
 		// add the OSGi properties on top
 		if (cmProperties != null)
 			prop.putAll(cmProperties);
