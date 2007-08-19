@@ -15,7 +15,6 @@
  */
 package org.springframework.osgi.context.support;
 
-
 import java.io.IOException;
 import java.util.Dictionary;
 
@@ -86,8 +85,8 @@ import org.springframework.util.StringUtils;
  * @author Hal Hildebrand
  * 
  */
-public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefreshableApplicationContext
-		implements ConfigurableOsgiBundleApplicationContext {
+public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefreshableApplicationContext implements
+		ConfigurableOsgiBundleApplicationContext {
 
 	/** OSGi bundle - determined from the BundleContext */
 	private Bundle bundle;
@@ -105,11 +104,11 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * {@link #getResourcePatternResolver()}
 	 */
 	private OsgiBundleResourceLoader osgiResourceLoader;
-	
+
 	/**
-	 * Internal pattern resolver.
-	 * The parent one can't be used since it is being instantiated inside the constructor
-	 * when the bundle field is not instantiated yet.
+	 * Internal pattern resolver. The parent one can't be used since it is being
+	 * instantiated inside the constructor when the bundle field is not
+	 * instantiated yet.
 	 */
 	private OsgiBundleResourcePatternResolver osgiPatternResolver;
 
@@ -135,12 +134,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		this.osgiResourceLoader = new OsgiBundleResourceLoader(this.bundle);
 		this.osgiPatternResolver = new OsgiBundleResourcePatternResolver(this.bundle);
 		this.setClassLoader(createBundleClassLoader(this.bundle));
-		this.setDisplayName(ClassUtils.getShortName(getClass()) +
-                            "(bundle=" +
-                            getBundleSymbolicName() +
-                            ", config=" +
-                            StringUtils.arrayToCommaDelimitedString(getConfigLocations()) +
-                            ")");
+		this.setDisplayName(ClassUtils.getShortName(getClass()) + "(bundle=" + getBundleSymbolicName() + ", config="
+				+ StringUtils.arrayToCommaDelimitedString(getConfigLocations()) + ")");
 	}
 
 	/**
@@ -203,21 +198,23 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 */
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		super.postProcessBeanFactory(beanFactory);
-		
+
 		beanFactory.addBeanPostProcessor(new BundleContextAwareProcessor(this.bundleContext));
 		beanFactory.ignoreDependencyInterface(BundleContextAware.class);
-		
+
 		// register Dictionary PropertyEditor
 		beanFactory.registerCustomEditor(Dictionary.class, new DictionaryEditor());
-		
-		// FIXME: this should be removed since annotations are not mandatory - similar behavior to Spring core
-		// Try and add the annotation processor. This will simply fail if the annotation
+
+		// FIXME: this should be removed since annotations are not mandatory -
+		// similar behavior to Spring core
+		// Try and add the annotation processor. This will simply fail if the
+		// annotation
 		// bundle is not present (presumably because we are on a pre-Java5 VM).
 		try {
 			Class bppClass = Class.forName("org.springframework.osgi.annotation.ServiceReferenceInjectionBeanPostProcessor");
 			BeanPostProcessor bpp = (BeanPostProcessor) bppClass.newInstance();
-            ((BeanClassLoaderAware) bpp).setBeanClassLoader(getClassLoader());
-            ((BundleContextAware) bpp).setBundleContext(bundleContext);
+			((BeanClassLoaderAware) bpp).setBeanClassLoader(getClassLoader());
+			((BundleContextAware) bpp).setBundleContext(bundleContext);
 			((BeanFactoryAware) bpp).setBeanFactory(beanFactory);
 			beanFactory.addBeanPostProcessor(bpp);
 		}
@@ -246,37 +243,29 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	protected void publishContextAsOsgiServiceIfNecessary() {
 		if (publishContextAsService) {
 			Dictionary serviceProperties = new MapBasedDictionary();
-			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME,
-                                  getBundleSymbolicName());
+			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getBundleSymbolicName());
 			if (logger.isInfoEnabled()) {
 				logger.info("Publishing application context with properties ("
-						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
-						+ getBundleSymbolicName() + ")");
+						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getBundleSymbolicName() + ")");
 			}
-            // Publish under all the significant interfaces we might care about.
-            this.serviceRegistration = getBundleContext().registerService(
-				new String[] { AbstractRefreshableApplicationContext.class.getName(),
-                        AbstractApplicationContext.class.getName(),
-                        ConfigurableApplicationContext.class.getName(),
-                        ApplicationContext.class.getName()
-                }, this, serviceProperties);
+			// Publish under all the significant interfaces we might care about.
+			this.serviceRegistration = getBundleContext().registerService(
+				org.springframework.osgi.util.ClassUtils.toStringArray(org.springframework.osgi.util.ClassUtils.getClassHierarchy(
+					getClass(), org.springframework.osgi.util.ClassUtils.INCLUDE_ALL_CLASSES)), this, serviceProperties);
 		}
 		else {
 			if (logger.isInfoEnabled()) {
 				logger.info("Not publishing application context with properties ("
-						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
-						+ getBundleSymbolicName() + ")");
+						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getBundleSymbolicName() + ")");
 			}
 		}
 	}
 
+	public String getBundleSymbolicName() {
+		return OsgiStringUtils.nullSafeSymbolicName(getBundle());
+	}
 
-    public String getBundleSymbolicName() {
-        return OsgiStringUtils.nullSafeSymbolicName(getBundle());
-    }
-
-
-    /**
+	/**
 	 * This implementation supports pattern matching inside the OSGi bundle.
 	 * 
 	 * @see OsgiBundleResourcePatternResolver

@@ -53,7 +53,7 @@ public class MockBundleContext implements BundleContext {
 
 	private Properties properties;
 
-	protected Set serviceListeners;
+	protected Set serviceListeners, bundleListeners;
 
 	public MockBundleContext() {
 		this(null, null);
@@ -71,6 +71,7 @@ public class MockBundleContext implements BundleContext {
 
 		// make sure the order is preserved
 		this.serviceListeners = new LinkedHashSet(2);
+		this.bundleListeners = new LinkedHashSet(2);
 	}
 
 	/*
@@ -79,6 +80,7 @@ public class MockBundleContext implements BundleContext {
 	 * @see org.osgi.framework.BundleContext#addBundleListener(org.osgi.framework.BundleListener)
 	 */
 	public void addBundleListener(BundleListener listener) {
+		bundleListeners.add(listener);
 	}
 
 	/*
@@ -280,6 +282,7 @@ public class MockBundleContext implements BundleContext {
 	 * @see org.osgi.framework.BundleContext#removeBundleListener(org.osgi.framework.BundleListener)
 	 */
 	public void removeBundleListener(BundleListener listener) {
+		bundleListeners.remove(listener);
 	}
 
 	/*
@@ -319,6 +322,10 @@ public class MockBundleContext implements BundleContext {
 	 */
 	public Set getServiceListeners() {
 		return serviceListeners;
+	}
+
+	public Set getBundleListeners() {
+		return bundleListeners;
 	}
 
 }

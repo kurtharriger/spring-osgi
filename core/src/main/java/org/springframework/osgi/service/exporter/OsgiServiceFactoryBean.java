@@ -377,34 +377,28 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 */
 	protected Class[] autoDetectClassesForPublishing(Class clazz) {
 
-		Class[] classes = new Class[0];
+		Class[] classes = null;
 
-		if (!isAutoExportModeEnabled(AUTO_EXPORT_DISABLED)) {
-			if (clazz == null) {
-				log.debug("service type is null - skipping autodetection");
-				return classes;
-			}
-			else {
-				Set composingClasses = new LinkedHashSet();
-
-				if (isAutoExportModeEnabled(AUTO_EXPORT_INTERFACES))
-					composingClasses.addAll(ClassUtils.getAllInterfacesForClassAsSet(clazz));
-
-				if (isAutoExportModeEnabled(AUTO_EXPORT_CLASS_HIERARCHY)) {
-					Class clz = clazz;
-					do {
-						composingClasses.add(clz);
-						clz = clz.getSuperclass();
-					} while (clz != null && clz != Object.class);
-				}
-
-				classes = (Class[]) composingClasses.toArray(new Class[composingClasses.size()]);
-
-				if (log.isDebugEnabled())
-					log.debug("autodetect mode [" + autoExportMode + "] discovered on class [" + clazz + "] classes "
-							+ ObjectUtils.nullSafeToString(classes));
-			}
+		switch (autoExportMode) {
+		case AUTO_EXPORT_ALL:
+			classes = org.springframework.osgi.util.ClassUtils.getClassHierarchy(clazz,
+				org.springframework.osgi.util.ClassUtils.INCLUDE_ALL_CLASSES);
+			break;
+		case AUTO_EXPORT_CLASS_HIERARCHY:
+			classes = org.springframework.osgi.util.ClassUtils.getClassHierarchy(clazz,
+				org.springframework.osgi.util.ClassUtils.INCLUDE_CLASS_HIERARCHY);
+			break;
+		case AUTO_EXPORT_INTERFACES:
+			classes = org.springframework.osgi.util.ClassUtils.getClassHierarchy(clazz,
+				org.springframework.osgi.util.ClassUtils.INCLUDE_INTERFACES);
+			break;
+		default:
+			classes = new Class[0];
+			break;
 		}
+		if (log.isTraceEnabled())
+			log.trace("autodetect mode [" + autoExportMode + "] discovered on class [" + clazz + "] classes "
+					+ ObjectUtils.nullSafeToString(classes));
 
 		return classes;
 	}
@@ -449,11 +443,8 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
 
 		// create an array of classnames (used for registering the service)
-		String[] names = new String[classes.length];
+		String[] names = org.springframework.osgi.util.ClassUtils.toStringArray(classes);
 
-		for (int i = 0; i < classes.length; i++) {
-			names[i] = classes[i].getName();
-		}
 		// sort the names in alphabetical order (eases debugging)
 		Arrays.sort(names);
 

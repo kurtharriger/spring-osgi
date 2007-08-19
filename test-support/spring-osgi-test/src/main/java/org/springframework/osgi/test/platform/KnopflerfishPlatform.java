@@ -38,11 +38,13 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 
 	public KnopflerfishPlatform() {
 		toString = "Knopflerfish OSGi Platform";
+	}
 
+	protected Properties getPlatformProperties() {
 		kfStorageDir = createTempDir("kf");
 
 		// default properties
-		Properties props = getConfigurationProperties();
+		Properties props = new Properties();
 		props.setProperty("org.osgi.framework.dir", kfStorageDir.getAbsolutePath());
 		props.setProperty("org.knopflerfish.framework.bundlestorage", "file");
 		props.setProperty("org.knopflerfish.framework.bundlestorage.file.reference", "true");
@@ -51,7 +53,7 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		props.setProperty("org.knopflerfish.osgi.setcontextclassloader", "true");
 		// embedded mode
 		props.setProperty("org.knopflerfish.framework.exitonshutdown", "false");
-
+		return props;
 	}
 
 	/*

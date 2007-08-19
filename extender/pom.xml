@@ -18,11 +18,6 @@
   
   <properties>
 	<spring.osgi.export.pkg>org.springframework.osgi.extender*</spring.osgi.export.pkg>
-	<spring.osgi.import.pkg>
-		org.springframework.osgi.annotation;resolution:=optional,		
-        *
-	</spring.osgi.import.pkg>
-	
   </properties>
   
     

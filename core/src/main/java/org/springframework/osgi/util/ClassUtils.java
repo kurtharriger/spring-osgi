@@ -16,7 +16,9 @@
 package org.springframework.osgi.util;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.util.ObjectUtils;
 
@@ -28,6 +30,22 @@ import org.springframework.util.ObjectUtils;
  * 
  */
 public abstract class ClassUtils {
+
+	/**
+	 * Include only the interfaces inherited from superclasses or implemented by
+	 * the current class.
+	 */
+	public static final int INCLUDE_INTERFACES = 1;
+
+	/**
+	 * Include only the class hierarchy (interfaces are excluded).
+	 */
+	public static final int INCLUDE_CLASS_HIERARCHY = 2;
+
+	/**
+	 * Include all inherited classes (classes or interfaces).
+	 */
+	public static final int INCLUDE_ALL_CLASSES = INCLUDE_INTERFACES | INCLUDE_CLASS_HIERARCHY;
 
 	/**
 	 * Determining if multiple classes(not interfaces) are specified, without
@@ -86,7 +104,6 @@ public abstract class ClassUtils {
 		// there can be multiple interfaces
 		// parents of classes inside the array are removed
 
-
 		boolean dirty;
 		do {
 			dirty = false;
@@ -106,5 +123,75 @@ public abstract class ClassUtils {
 		} while (dirty);
 
 		return (Class[]) clazz.toArray(new Class[clazz.size()]);
+	}
+
+	/**
+	 * Return an array of parent classes for the given class. The mode paramater
+	 * indicates whether only interfaces should be included, classes or both.
+	 * 
+	 * @see #INCLUDE_ALL_CLASSES
+	 * @see #INCLUDE_CLASS_HIERARCHY
+	 * @see #INCLUDE_INTERFACES
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	public static Class[] getClassHierarchy(Class clazz, int mode) {
+
+		Class[] classes = null;
+
+		if (clazz != null && isModeValid(mode)) {
+
+			Set composingClasses = new LinkedHashSet();
+
+			if (includesMode(mode, INCLUDE_INTERFACES))
+				composingClasses.addAll(org.springframework.util.ClassUtils.getAllInterfacesForClassAsSet(clazz));
+
+			if (includesMode(mode, INCLUDE_CLASS_HIERARCHY)) {
+				Class clz = clazz;
+				do {
+					composingClasses.add(clz);
+					clz = clz.getSuperclass();
+				} while (clz != null && clz != Object.class);
+			}
+
+			classes = (Class[]) composingClasses.toArray(new Class[composingClasses.size()]);
+
+		}
+		return (classes == null ? new Class[0] : classes);
+	}
+
+	/**
+	 * Test if testedMode includes an expected mode.
+	 * 
+	 * @param testedMode
+	 * @param mode
+	 * @return
+	 */
+	private static boolean includesMode(int testedMode, int mode) {
+		return (testedMode & mode) == mode;
+	}
+
+	/**
+	 * Test if a mode is valid.
+	 * 
+	 * @param mode
+	 * @return
+	 */
+	private static boolean isModeValid(int mode) {
+		return (mode >= INCLUDE_INTERFACES && mode <= INCLUDE_ALL_CLASSES);
+	}
+
+	public static String[] toStringArray(Class[] array) {
+		if (ObjectUtils.isEmpty(array))
+			return new String[0];
+
+		String[] strings = new String[array.length];
+
+		for (int i = 0; i < array.length; i++) {
+			strings[i] = array[i].getName();
+		}
+		
+		return strings;
 	}
 }
