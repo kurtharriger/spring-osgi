@@ -17,10 +17,6 @@ package org.springframework.osgi.iandt;
 
 import org.osgi.framework.Constants;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.test.platform.EquinoxPlatform;
-import org.springframework.osgi.test.platform.FelixPlatform;
-import org.springframework.osgi.test.platform.KnopflerfishPlatform;
-import org.springframework.osgi.test.platform.OsgiPlatform;
 
 /**
  * This test might log exceptions since the OSGi platform may try to register an
@@ -34,28 +30,22 @@ import org.springframework.osgi.test.platform.OsgiPlatform;
  */
 public class OsgiPlatformTest extends AbstractConfigurableBundleCreatorTests {
 
-	private OsgiPlatform platform;
+	private String platform;
 
 	protected void onSetUp() {
-		platform = createPlatform();
-
+		platform = getPlatformName();
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.osgi.test.platform.EquinoxPlatform#start()}.
-	 */
 	public void testOsgiPlatform() throws Exception {
-
 		String vendor = getBundleContext().getProperty(Constants.FRAMEWORK_VENDOR);
 
 		if ("Eclipse".equals(vendor))
-			assertTrue(platform instanceof EquinoxPlatform);
+			assertTrue(platform.indexOf("Equinox") >= 0);
 		if ("Apache Software Foundation".equals(vendor))
-			assertTrue(platform instanceof FelixPlatform);
+			assertTrue(platform.indexOf("Felix") >= 0);
 		if ("Knopflerfish".equals(vendor))
-			assertTrue(platform instanceof KnopflerfishPlatform);
-//		if ("ProSyst".equals(vendor))
-//			assertTrue(platform instanceof MBSProPlatform);
+			assertTrue(platform.indexOf("Knopflerfish") >= 0);
+		// if ("ProSyst".equals(vendor))
+		// assertTrue(platform.indexOf("MBSPro") >= 0);
 	}
 }
