@@ -34,9 +34,6 @@ public class DependencyTests extends AbstractConfigurableBundleCreatorTests {
 	// simple.service3 - publishes service3
 	// simple 		   - publishes service
 	public void testDependencies() throws Exception {
-        if (true) {
-            return;
-        }
         System.setProperty("org.springframework.osgi.iandt.simpleservice.impl.delay", "10000");
 		// waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
 

@@ -12,6 +12,7 @@ public class MyServiceImpl implements MyService, InitializingBean {
     public void afterPropertiesSet() throws Exception {
         Integer delay = Integer.getInteger("org.springframework.osgi.iandt.simpleservice.impl.delay", new Integer(0));
         System.getProperties().remove("org.springframework.osgi.iandt.simpleservice.impl.delay");
+        System.out.println("Delaying for:" + delay);
         Thread.sleep(delay.intValue());
     }
 
