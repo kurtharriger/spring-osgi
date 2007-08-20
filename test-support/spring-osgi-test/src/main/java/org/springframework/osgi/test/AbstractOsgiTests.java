@@ -126,7 +126,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Mandator bundles (part of the test setup).
+	 * Mandatory bundles (part of the test setup).
 	 * 
 	 * @return the array of mandatory bundle names.
 	 */

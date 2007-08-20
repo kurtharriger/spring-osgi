@@ -45,7 +45,22 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 
 	public AbstractSynchronizedOsgiTests(String name) {
 		super(name);
-	}
+    }
+
+	/**
+	 * Place the current (test) thread to wait for the a Spring application
+	 * context to be published under the given symbolic name. This method allows
+	 * waiting for full initialization of Spring OSGi bundles before starting
+	 * the actual test execution.
+	 *
+	 * @param context
+	 * @param forBundleWithSymbolicName
+	 * @param timeout
+	 */
+	public void waitOnContextCreation(String forBundleWithSymbolicName, long timeout) {
+        waitOnContextCreation(getBundleContext(), forBundleWithSymbolicName, timeout);
+
+    }
 
 	/**
 	 * Place the current (test) thread to wait for the a Spring application
@@ -58,7 +73,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	 * @param timeout
 	 */
 	public void waitOnContextCreation(BundleContext context, String forBundleWithSymbolicName, long timeout) {
-		// translate from seconds to miliseconds
+        // translate from seconds to miliseconds
 		long time = timeout * SECOND;
 
 		// use the counter to make sure the threads block
@@ -101,7 +116,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	 * @param forBundleWithSymbolicName
 	 */
 	public void waitOnContextCreation(String forBundleWithSymbolicName) {
-		waitOnContextCreation(getBundleContext(), forBundleWithSymbolicName, getDefaultWaitTime());
+		waitOnContextCreation(forBundleWithSymbolicName, getDefaultWaitTime());
 	}
 
 	private void waitingFailed(String bundleName) {
