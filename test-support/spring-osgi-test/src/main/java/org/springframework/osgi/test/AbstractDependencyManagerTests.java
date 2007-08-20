@@ -100,6 +100,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return "org.springframework,spring-core," + getSpringBundledVersion();
 	}
 
+	protected String getSpringBeansBundleUrl() {
+		return "org.springframework,spring-beans," + getSpringBundledVersion();
+	}
+
 	protected String getJUnitLibUrl() {
 		return "org.springframework.osgi,junit.osgi,3.8.1-SNAPSHOT";
 	}
@@ -165,10 +169,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		String[] jars = new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
 				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
 				getSpringMockUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
-				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl(),
-				getSpringOSGiExtenderBundleUrl() };
+				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringBeansBundleUrl(),
+                getSpringOSGiTestBundleUrl(), getSpringOSGiExtenderBundleUrl() };
 
-		String[] bundles = jars;
+		String[] bundles;
 
 		if (JdkVersion.isAtLeastJava15()) {
 			bundles = (String[]) ObjectUtils.addObjectToArray(jars, getSpringOSGiAnnotationBundleUrl());
