@@ -15,8 +15,6 @@
  */
 package org.springframework.osgi.iandt;
 
-import java.util.Properties;
-
 import org.osgi.framework.Constants;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.platform.EquinoxPlatform;
@@ -43,12 +41,6 @@ public class OsgiPlatformTest extends AbstractConfigurableBundleCreatorTests {
 
 	}
 
-	public void testGetConfigurationProperties() {
-		Properties configuration = platform.getConfigurationProperties();
-		assertNotNull(configuration);
-		assertFalse(configuration.isEmpty());
-	}
-
 	/**
 	 * Test method for
 	 * {@link org.springframework.osgi.test.platform.EquinoxPlatform#start()}.
@@ -62,6 +54,8 @@ public class OsgiPlatformTest extends AbstractConfigurableBundleCreatorTests {
 		if ("Apache Software Foundation".equals(vendor))
 			assertTrue(platform instanceof FelixPlatform);
 		if ("Knopflerfish".equals(vendor))
-			assertTrue(platform instanceof KnopflerfishPlatform); 
+			assertTrue(platform instanceof KnopflerfishPlatform);
+//		if ("ProSyst".equals(vendor))
+//			assertTrue(platform instanceof MBSProPlatform);
 	}
 }
