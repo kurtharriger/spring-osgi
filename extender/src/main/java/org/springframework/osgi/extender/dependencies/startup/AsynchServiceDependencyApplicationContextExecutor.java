@@ -199,6 +199,9 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 				delegateContext.preRefresh();
 			}
 
+			if (debug)
+				log.debug("prerefresh completed; determining dependencies...");
+			
 			DependencyServiceManager dl = createDependencyServiceListener();
 			dl.findServiceDependencies();
 

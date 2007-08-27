@@ -13,11 +13,13 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * ServiceListener used for tracking dependent services. Even if the
@@ -148,6 +150,7 @@ public class DependencyServiceManager {
 		Thread currentThread = Thread.currentThread();
 		ClassLoader oldTCCL = currentThread.getContextClassLoader();
 
+		boolean debug = log.isDebugEnabled();
 		try {
 			currentThread.setContextClassLoader(context.getClassLoader());
 
@@ -162,8 +165,18 @@ public class DependencyServiceManager {
 				ServiceDependency dependency = new ServiceDependency(bundleContext, reference.getUnifiedFilter(),
 						reference.isMandatory());
 
+				String realBean = beanName.substring(1);
+				
+				if (debug)
+					log.debug("destroying bean " + realBean + " from context " + beanFactory);
+				
+				// clean up factory singleton
+				((DefaultListableBeanFactory) beanFactory).destroySingleton(realBean);
+
 				dependencies.add(dependency);
 				if (!dependency.isServicePresent()) {
+					if (debug)
+						log.debug("adding dependency for importer " + beanName);
 					unsatisfiedDependencies.add(dependency);
 				}
 			}
@@ -172,7 +185,7 @@ public class DependencyServiceManager {
 			currentThread.setContextClassLoader(oldTCCL);
 		}
 
-		if (log.isDebugEnabled()) {
+		if (debug) {
 			log.debug(dependencies.size() + " dependencies, " + unsatisfiedDependencies.size() + " unsatisfied for "
 					+ context.getDisplayName());
 		}

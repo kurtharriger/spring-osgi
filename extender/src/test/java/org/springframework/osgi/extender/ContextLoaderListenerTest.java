@@ -86,37 +86,7 @@ public class ContextLoaderListenerTest extends TestCase {
 		bundleContextControl.verify();
 	}
 
-	public void tstTaskExecutorCreation() throws Exception {
-		MockControl bundleContextControl = MockControl.createNiceControl(BundleContext.class);
-		BundleContext context = (BundleContext) bundleContextControl.getMock();
-		bundleContextControl.expectAndReturn(context.getBundle(), new MockBundle());
-		bundleContextControl.expectAndReturn(context.getBundles(), new Bundle[0]);
-
-		Dictionary headers = new Hashtable();
-		headers.put(Constants.BUNDLE_NAME, "Mock Bundle");
-		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
-		aBundle.setEntryReturnOnNextCallToGetEntry(new ClassPathResource("META-INF/spring/moved-extender.xml").getURL());
-		bundleContextControl.expectAndReturn(context.getBundle(), aBundle);
-		bundleContextControl.expectAndReturn(context.getBundle(), aBundle);
-		bundleContextControl.expectAndReturn(context.getBundle(), aBundle);
-		bundleContextControl.replay();
-
-		this.listener.start(context);
-
-		MockBundle eventBundle = new MockBundle();
-		eventBundle.setBundleId(1);
-		BundleEvent event = new BundleEvent(BundleEvent.STARTED, eventBundle);
-
-		try {
-			// this.listener.bundleChanged(event);
-			fail("Should have thrown exception if taskExecutor was correctly configured");
-		}
-		catch (RuntimeException ex) {
-			assertEquals("test task executor does not really execute!", ex.getMessage());
-		}
-	}
-
-	public void testTaskExecutor() throws Exception {
+	public void tstTaskExecutor() throws Exception {
 		Dictionary headers = new Hashtable();
 		headers.put(Constants.BUNDLE_NAME, "Extender mock bundle");
 		final EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(headers);
