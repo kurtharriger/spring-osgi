@@ -27,7 +27,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.Resource; 
 import org.springframework.osgi.test.storage.MemoryStorage;
 import org.springframework.osgi.test.util.DependencyVisitor;
 import org.springframework.osgi.test.util.JarCreator;
@@ -169,7 +169,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 			StringUtils.collectionToCommaDelimitedString(packages));
 	}
 
-	/**
+    /**
 	 * Determine imports by walking a class hierarchy until the current package
 	 * is found.
 	 * 
@@ -182,7 +182,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 		Set cumulatedPackages = new LinkedHashSet();
 
-		String clazzPackage = null;
+		String clazzPackage;
 
 		do {
 			cumulatedPackages.addAll(determineImportsForClass(clazz));
@@ -204,7 +204,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	private Set determineImportsForClass(Class clazz) {
 		Assert.notNull(clazz, "a not-null class is required");
 		DependencyVisitor visitor = new DependencyVisitor();
-		ClassReader reader = null;
+		ClassReader reader;
 		try {
 			reader = new ClassReader(clazz.getResourceAsStream(ClassUtils.getClassFileName(clazz)));
 		}
@@ -230,9 +230,13 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		// create the actual jar
 		Resource jar = jarCreator.createJar(getManifest());
 
-		installAndStartBundle(context, jar);
+        try {
+            installAndStartBundle(context, jar);
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to start dyanamically generated bundle for Unit test", e);
+        }
 
-		// now do the delegation
+        // now do the delegation
 		super.postProcessBundleContext(context);
 	}
 

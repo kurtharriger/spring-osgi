@@ -42,9 +42,13 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 		props.setProperty("osgi.clean", "true");
 		props.setProperty("osgi.noShutdown", "true");
 
-		// props.setProperty("osgi.configuration.area", "eclipse_config");
-		// props.setProperty("osgi.instance.area", "eclipse_config");
-		// props.setProperty("osgi.user.area", "eclipse_config");
+        // Please keep these properties!!!!   Otherwise equinox leaves turds in the
+        // local repository, which is impossible to debug when you need to look at it
+        // Having the eclipse directories local means that other tests do not overwrite/clean
+        // important data that may contain necessary forensic information to debug the failure 
+        props.setProperty("osgi.configuration.area", "eclipse_config");
+		props.setProperty("osgi.instance.area", "eclipse_config");
+		props.setProperty("osgi.user.area", "eclipse_config");
 
 		// props.setProperty("eclipse.consoleLog", "true");
 		// props.setProperty("osgi.debug", "");
