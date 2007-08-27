@@ -24,7 +24,7 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
         return new String[]{getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
                             getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
                             getSpringMockUrl(), getAopAllianceUrl(), getAsmLibrary(),
-                            getSpringAopUrl(),
+                            getSpringAopUrl(), getUtilConcurrentLibUrl(),
                             getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl()};
     }
 

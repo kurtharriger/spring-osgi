@@ -1,8 +1,8 @@
 package org.springframework.osgi.iandt.serviceListener;
 
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.iandt.service.listener.MyListener;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * @author Hal Hildebrand Date: Nov 14, 2006 Time: 8:18:15 AM
@@ -56,4 +56,5 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 	protected long getDefaultWaitTime() {
 		return 7L;
 	}
+
 }

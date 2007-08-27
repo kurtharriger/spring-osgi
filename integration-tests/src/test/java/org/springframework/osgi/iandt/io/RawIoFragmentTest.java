@@ -28,13 +28,12 @@ import org.osgi.framework.Bundle;
  */
 public class RawIoFragmentTest extends BaseIoTest {
 
-	
 	//
 	// Folder tests
 	//
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (!isEquinox());
+		return !(isEquinox());
 	}
 
 	/**
@@ -70,7 +69,7 @@ public class RawIoFragmentTest extends BaseIoTest {
 		Object[] res = copyEnumeration(bundle.findEntries("/", "fragment2.folder", false));
 		assertResourceArray(res, 1);
 	}
-	
+
 	public void testNestedFolderOnlyInFragment1() {
 		Object[] res = copyEnumeration(bundle.findEntries("/fragment1.folder", "nested.folder.1", false));
 		assertResourceArray(res, 1);
@@ -86,17 +85,16 @@ public class RawIoFragmentTest extends BaseIoTest {
 		assertResourceArray(res, 2);
 	}
 
-	
 	public void testCommonFolderInFragmentsAndHost() {
 		Object[] res = copyEnumeration(bundle.findEntries("/org/springframework", "osgi", false));
 		assertResourceArray(res, 3);
 	}
-	
+
 	public void testFolderOnlyInHost() {
 		Object[] res = copyEnumeration(bundle.findEntries("/org/springframework/osgi/iandt", "bundleScope", false));
 		assertResourceArray(res, 1);
 	}
-	
+
 	//
 	// File tests
 	//
@@ -125,15 +123,20 @@ public class RawIoFragmentTest extends BaseIoTest {
 		Object[] res = copyEnumeration(bundle.findEntries("/fragment.folder/nested.folder", "nested.file", false));
 		assertResourceArray(res, 2);
 	}
-	
+
 	public void testNestedFileOnlyInFragment1() {
 		Object[] res = copyEnumeration(bundle.findEntries("/fragment1.folder/nested.folder.1", "nested.file.1.1", false));
 		assertResourceArray(res, 1);
 	}
-	
+
 	public void testNestedFileOnlyInFragment2() {
 		Object[] res = copyEnumeration(bundle.findEntries("/fragment2.folder/nested.folder.2", "nested.file.2.2", false));
 		assertResourceArray(res, 1);
+	}
+
+	public void testDuplicateFilesInHostAndFragments() {
+		Object[] res = copyEnumeration(bundle.findEntries("/org/springframework/osgi/iandt/io", "duplicate.file", false));
+		assertResourceArray(res, 2);
 	}
 
 }

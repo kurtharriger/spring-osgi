@@ -18,6 +18,7 @@ package org.springframework.osgi.iandt.io;
 import java.net.URL;
 import java.util.Enumeration;
 
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -68,7 +69,7 @@ public class RawIoTest extends BaseIoTest {
 		Enumeration enm = bundle.findEntries("/META-INF", null, false);
 		Object[] res = copyEnumeration(enm);
 		// should get 1 entry - META-INF/
-		assertEquals("folders ignored; found "+ ObjectUtils.nullSafeToString(res), 1, res.length);
+		assertEquals("folders ignored; found " + ObjectUtils.nullSafeToString(res), 1, res.length);
 	}
 
 	// Valid jars do not have entries for root folder / - in fact it doesn't
@@ -97,13 +98,19 @@ public class RawIoTest extends BaseIoTest {
 		assertEquals("folders ignored; found " + ObjectUtils.nullSafeToString(res), 1, res.length);
 	}
 
+	public void testURLFolderReturnsProperPathForFolders() throws Exception {
+		Enumeration enm = bundle.findEntries("/", "META-INF", false);
+		assertNotNull(enm);
+		assertTrue(enm.hasMoreElements());
+		assertTrue(((URL) enm.nextElement()).getPath().endsWith("/"));
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
 	 */
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (!(isEquinox() ));
-		//|| isMBS()
+		return (!(isEquinox()));
 	}
-
 }
