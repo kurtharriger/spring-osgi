@@ -236,7 +236,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 	private ClassLoader classLoader;
 
-	/*
+    /*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
@@ -473,13 +473,20 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	}
 
 	public Object getObject() throws Exception {
-        // determine serviceClass (can still be null if using a FactoryBean
-        // which doesn't declare its product type)
-        Class serviceClass = (target != null ? target.getClass() : beanFactory.getType(targetBeanName));
-        // if we have a nested bean / non-Spring managed object
-        String beanName = (targetBeanName == null ? ObjectUtils.getIdentityHexString(target) : targetBeanName);
+        if (serviceRegistration == null) {
+            synchronized (this) {
+                if (serviceRegistration == null) {
+                    // determine serviceClass (can still be null if using a FactoryBean
+                    // which doesn't declare its product type)
+                    Class serviceClass = (target != null ? target.getClass() : beanFactory.getType(targetBeanName));
+                    // if we have a nested bean / non-Spring managed object
+                    String beanName = (targetBeanName == null ? ObjectUtils.getIdentityHexString(target)
+                                       : targetBeanName); 
+                    publishService(serviceClass, mergeServiceProperties(beanName));
 
-        publishService(serviceClass, mergeServiceProperties(beanName));
+                }
+            }
+        }
         return serviceRegistration;
 	}
 
