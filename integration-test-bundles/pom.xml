@@ -36,6 +36,7 @@
     <module>simple.service.bundle.2.identical</module>
     <module>simple.service.2.bundle</module>
     <module>simple.service.3.bundle</module>
+    <module>dependency.factory.bundle</module>
     <module>trivial.bundle</module>
     <module>trivial.test.bundle</module>
     <module>lifecycle.test.bundle</module>

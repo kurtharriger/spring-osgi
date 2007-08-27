@@ -20,7 +20,6 @@ package org.springframework.osgi.service.exporter;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Dictionary;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,12 +32,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.CollectionFactory;
@@ -52,7 +46,6 @@ import org.springframework.osgi.service.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.interceptor.OsgiServiceTCCLInvoker;
 import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -77,7 +70,7 @@ import org.springframework.util.StringUtils;
  * 
  */
 public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBean, DisposableBean, BundleContextAware,
-		FactoryBean, Ordered, BeanClassLoaderAware {
+                                               SmartFactoryBean, Ordered, BeanClassLoaderAware {
 
 	/**
 	 * ServiceFactory used for posting the bean instantiation until it is first
@@ -86,7 +79,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 */
 	private class LazyBeanServiceFactory implements ServiceFactory {
 
-		// used if the published bean is itself a ServiceFactory
+        // used if the published bean is itself a ServiceFactory
 		private ServiceFactory serviceFactory;
 
 		private Class[] classes;
@@ -230,8 +223,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	private Class[] interfaces;
 
 	private int autoExportMode = AUTO_EXPORT_DISABLED;
-
-	// TODO: what are these?
+ 
 	private String activationMethod;
 
 	private String deactivationMethod;
@@ -266,9 +258,6 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		if (interfaces == null)
 			interfaces = new Class[0];
 
-		// determine serviceClass (can still be null if using a FactoryBean
-		// which doesn't declare its product type)
-		Class serviceClass = (target != null ? target.getClass() : beanFactory.getType(targetBeanName));
 
 		// check if there is a reference to a non-lazy bean
 		if (StringUtils.hasText(targetBeanName)) {
@@ -284,11 +273,6 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 				}
 			}
 		}
-
-		// if we have a nested bean / non-Spring managed object
-		String beanName = (targetBeanName == null ? ObjectUtils.getIdentityHexString(target) : targetBeanName);
-
-		publishService(serviceClass, mergeServiceProperties(beanName));
 	}
 
 	/**
@@ -358,16 +342,6 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	}
 
 	/**
-	 * Returns true if a given mode is enabled for this exporter instance.
-	 * 
-	 * @param mode
-	 * @return
-	 */
-	private boolean isAutoExportModeEnabled(int mode) {
-		return (mode == AUTO_EXPORT_DISABLED ? autoExportMode == AUTO_EXPORT_DISABLED : (autoExportMode & mode) == mode);
-	}
-
-	/**
 	 * Return an array of classes for the given bean that have been discovered
 	 * using the autoExportMode.
 	 * 
@@ -376,7 +350,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 */
 	protected Class[] autoDetectClassesForPublishing(Class clazz) {
 
-		Class[] classes = null;
+		Class[] classes;
 
 		switch (autoExportMode) {
 		case AUTO_EXPORT_ALL:
@@ -499,7 +473,14 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	}
 
 	public Object getObject() throws Exception {
-		return serviceRegistration;
+        // determine serviceClass (can still be null if using a FactoryBean
+        // which doesn't declare its product type)
+        Class serviceClass = (target != null ? target.getClass() : beanFactory.getType(targetBeanName));
+        // if we have a nested bean / non-Spring managed object
+        String beanName = (targetBeanName == null ? ObjectUtils.getIdentityHexString(target) : targetBeanName);
+
+        publishService(serviceClass, mergeServiceProperties(beanName));
+        return serviceRegistration;
 	}
 
 	public Class getObjectType() {
@@ -659,4 +640,13 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		this.order = order;
 	}
 
+
+    public boolean isEagerInit() {
+        return true;
+    }
+
+
+    public boolean isPrototype() {
+        return false;
+    }
 }
