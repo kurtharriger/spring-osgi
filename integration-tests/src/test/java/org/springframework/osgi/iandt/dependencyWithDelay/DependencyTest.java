@@ -15,7 +15,7 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * @author Hal Hildebrand Date: Dec 1, 2006 Time: 3:56:43 PM
  * @author Costin Leau
  */
-public class DependencyTests extends AbstractConfigurableBundleCreatorTests {
+public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
     private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.dependencies.Dependent";
 
 	// private static final String SERVICE_2_FILTER = "(service=2)";
@@ -32,7 +32,7 @@ public class DependencyTests extends AbstractConfigurableBundleCreatorTests {
 	// dependency bundle - depends on service2, service3 and, through a nested reference, to service1
 	// simple.service2 - publishes service2
 	// simple.service3 - publishes service3
-	// simple 		   - publishes service
+	// simple 		   - publishes service1
 	public void testDependencies() throws Exception {
         System.setProperty("org.springframework.osgi.iandt.simpleservice.impl.delay", "10000");
 		// waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
