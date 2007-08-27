@@ -107,8 +107,4 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 	protected boolean isFelix() {
 		return (createPlatform() instanceof FelixPlatform);
 	}
-
-//	protected boolean isMBS() {
-//		return (createPlatform() instanceof MBSProPlatform);
-//	}
 }

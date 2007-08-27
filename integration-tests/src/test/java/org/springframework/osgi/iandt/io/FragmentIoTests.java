@@ -31,7 +31,7 @@ public class FragmentIoTests extends BaseIoTest {
 	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
 	 */
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		//return (!isEquinox());
+		// return (!isEquinox());
 		return false;
 	}
 
@@ -42,6 +42,7 @@ public class FragmentIoTests extends BaseIoTest {
 
 	public void testFileWithTheSameNameInOwningBundleAndAttachedFragmentWithMatchingAtFileLevel() throws Exception {
 		Resource[] fragmentResource = patternLoader.getResources("bundle:/" + PACKAGE + "dupli*.file");
+		System.out.println(ObjectUtils.nullSafeToString(fragmentResource));
 		assertTrue("file with the same name available in bundles are ignored", fragmentResource.length > 1);
 	}
 
@@ -71,7 +72,7 @@ public class FragmentIoTests extends BaseIoTest {
 	}
 
 	public void testFileOnlyInOneFragment() throws Exception {
-		Resource[] fragmentResource = patternLoader.getResources("bundle:/fragment.file");
+		Resource[] fragmentResource = patternLoader.getResources("bundle:/fragment1.file");
 		assertEquals(1, fragmentResource.length);
 	}
 
@@ -167,5 +168,6 @@ public class FragmentIoTests extends BaseIoTest {
 		Resource[] res = patternLoader.getResources("classpath:/" + PACKAGE + "FragmentIoTests.class");
 		assertEquals(1, res.length);
 	}
+
 
 }

@@ -26,6 +26,7 @@ import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.ClassUtils;
 

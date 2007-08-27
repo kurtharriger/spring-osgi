@@ -11,7 +11,8 @@
         -->
     </bean>
 
+	
     <osgi:reference id="simpleServiceOsgi" interface="org.springframework.osgi.iandt.simpleservice.MyService">
-        <osgi:listener bind-method="serviceAvailable" unbind-method="serviceUnavailable" ref="listener"/>
+		<osgi:listener bind-method="serviceAvailable" unbind-method="serviceUnavailable" ref="listener"/>
     </osgi:reference> 
 </beans>
