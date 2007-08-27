@@ -22,8 +22,8 @@ import org.osgi.framework.Filter;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
@@ -43,8 +43,8 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean, InitializingBean, DisposableBean,
-		BundleContextAware, BeanClassLoaderAware {
+public abstract class AbstractOsgiServiceProxyFactoryBean implements SmartFactoryBean, InitializingBean,
+		DisposableBean, BundleContextAware, BeanClassLoaderAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceProxyFactoryBean.class);
 
@@ -107,6 +107,22 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.springframework.beans.factory.SmartFactoryBean#isEagerInit()
+	 */
+	public boolean isEagerInit() {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.beans.factory.SmartFactoryBean#isPrototype()
+	 */
+	public boolean isPrototype() {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
@@ -120,10 +136,10 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements FactoryBean
 		getUnifiedFilter(); // eager initialization of the cache to catch filter
 		// errors
 		Assert.notNull(serviceTypes, "Required serviceTypes property not specified");
-		
+
 		initialized = true;
 		// initialize the bean to register the OSGi service listeners
-		getObject();
+		// getObject();
 	}
 
 	/**

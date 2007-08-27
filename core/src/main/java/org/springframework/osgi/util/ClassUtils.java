@@ -20,6 +20,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.core.CollectionFactory;
+import org.springframework.core.JdkVersion;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -46,6 +48,13 @@ public abstract class ClassUtils {
 	 * Include all inherited classes (classes or interfaces).
 	 */
 	public static final int INCLUDE_ALL_CLASSES = INCLUDE_INTERFACES | INCLUDE_CLASS_HIERARCHY;
+
+	/** Whether the backport-concurrent library is present on the classpath */
+	// the CollectionFactory classloader is used since this creates the map internally
+	private static final boolean backportConcurrentAvailable =
+			org.springframework.util.ClassUtils.isPresent("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap",
+					CollectionFactory.class.getClassLoader());
+
 
 	/**
 	 * Determining if multiple classes(not interfaces) are specified, without
@@ -191,7 +200,17 @@ public abstract class ClassUtils {
 		for (int i = 0; i < array.length; i++) {
 			strings[i] = array[i].getName();
 		}
-		
+
 		return strings;
+	}
+
+	/**
+	 * Check the present of approapriate concurrent collection in the classpath.
+	 * This means backport-concurrent on Java 1.4, or Java5+.
+	 * 
+	 * @return true if a ConcurrentHashMap is available on the classpath.
+	 */
+	public static boolean concurrentLibAvailable() {
+		return (backportConcurrentAvailable || JdkVersion.isAtLeastJava15());
 	}
 }

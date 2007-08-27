@@ -68,6 +68,7 @@ public class ApplicationContextConfiguration {
 		buf.append(publishContextAsService);
 		buf.append("|timeout=");
 		buf.append(timeout);
+		buf.append("s");
 		toString = buf.toString();
 		if (log.isDebugEnabled()) {
 			log.debug("configuration: " + toString);
