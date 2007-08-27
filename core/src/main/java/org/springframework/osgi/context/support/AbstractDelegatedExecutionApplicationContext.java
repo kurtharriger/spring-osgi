@@ -133,6 +133,10 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 	public void preRefresh() {
 
+		// check concurrent collection (which are mandatory)
+		if (!org.springframework.osgi.util.ClassUtils.concurrentLibAvailable())
+			throw new IllegalStateException("JVM 5+ or backport-concurrent library (for JVM 1.4) required; see the FAQ for more details");
+
 		Thread thread = Thread.currentThread();
 		ClassLoader oldTCCL = thread.getContextClassLoader();
 
@@ -166,6 +170,9 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// context.
 					invokeBeanFactoryPostProcessors(beanFactory);
 
+					// Register bean processors that intercept bean creation.
+					registerBeanPostProcessors(beanFactory);
+
 				}
 				catch (BeansException ex) {
 					// Destroy already created singletons to avoid dangling
@@ -195,27 +202,11 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 				try {
 					ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
-					// Register bean processors that intercept bean creation.
-					registerBeanPostProcessors(beanFactory);
-
 					// Initialize message source for this context.
 					initMessageSource();
 
 					// Initialize event multicaster for this context.
 					initApplicationEventMulticaster();
-
-					// Initialize other special beans in specific context
-					// subclasses.
-					onRefresh();
-
-					// Check for listener beans and register them.
-					registerListeners();
-
-					// Instantiate singletons this late to allow them to access
-					// the
-					// message source.
-
-					beanFactory.preInstantiateSingletons();
 
 					// Initialize other special beans in specific context
 					// subclasses.

@@ -22,41 +22,36 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.osgi.context.BundleContextAware;
 
 /**
- * For internal use only. Used by OsgiBundleXmlApplicationContext to 
- * inject beans implementing BundleContextAware with a reference to the
- * current BundleContext.
+ * For internal use only. Used by OsgiBundleXmlApplicationContext to inject
+ * beans implementing BundleContextAware with a reference to the current
+ * BundleContext.
  * 
  * @author Adrian Colyer
+ * @author Costin Leau
  * @since 2.0
  */
-public class BundleContextAwareProcessor extends InstantiationAwareBeanPostProcessorAdapter {
+public class BundleContextAwareProcessor implements BeanPostProcessor {
 
-	private BundleContext bundleContext;
-	
+	private final BundleContext bundleContext;
+
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	public BundleContextAwareProcessor(BundleContext aContext) {
 		this.bundleContext = aContext;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization(java.lang.Object, java.lang.String)
-	 */
-	public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
+
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
+	}
+
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof BundleContextAware) {
-			if (this.bundleContext == null) {
-				throw new IllegalStateException("Cannot satisfy BundleContextAware for bean '" +
-						beanName + "' without BundleContext");
-			}
-			if (logger.isDebugEnabled()) {
-				logger.debug("Invoking setBundleContext on BundleContextAware bean '" + beanName + "'");
-			}
 			((BundleContextAware) bean).setBundleContext(this.bundleContext);
 		}
-		return true;
+		return bean;
 	}
+
 }
