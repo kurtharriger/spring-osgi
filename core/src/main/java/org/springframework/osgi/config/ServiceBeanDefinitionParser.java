@@ -40,6 +40,8 @@ import org.w3c.dom.NodeList;
  * @author Andy Piper
  */
 class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
+	private static final String TARGET_BEAN_NAME = "targetBeanName";
+
 	public static final String ACTIVATION_ID = "activation-method";
 
 	public static final String DEACTIVATION_ID = "deactivation-method";
@@ -98,7 +100,7 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 					// check shortcut
 					if (element.hasAttribute(INTERFACE)) {
 						parserContext.getReaderContext().error(
-								"either 'interface' attribute or <intefaces> element can be specified", element);
+								"either 'interface' attribute or <intefaces> sub-element has be specified", element);
 					}
 					Set interfaces = parserContext.getDelegate().parseSetElement(subElement,
 							builder.getBeanDefinition());
@@ -133,12 +135,10 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 		// do we have a bean reference ?
 		if (target instanceof RuntimeBeanReference) {
-			builder.addPropertyValue("targetBeanName", ((RuntimeBeanReference) target).getBeanName());
+			builder.addPropertyValue(TARGET_BEAN_NAME, ((RuntimeBeanReference) target).getBeanName());
 		}
-		// or a nested bean?
-		else {
-			builder.addPropertyValue("target", target);
-		}
+		
+		builder.addPropertyValue("target", target);
 		return builder.getBeanDefinition();
 	}
 
