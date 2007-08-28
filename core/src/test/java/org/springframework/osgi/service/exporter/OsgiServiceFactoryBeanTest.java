@@ -122,13 +122,9 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		}
 	}
 
-	public void testInitWithOnlyJustTargetOrTargetReference() throws Exception {
+	public void testInitWithOnlyJustTarget() throws Exception {
 		exporter.setTarget(new Object());
 		exporter.setInterfaces(new Class[] { Object.class });
-		exporter.afterPropertiesSet();
-
-		exporter.setTarget(null);
-		exporter.setTargetBeanName("costin");
 		exporter.afterPropertiesSet();
 	}
 

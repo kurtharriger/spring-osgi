@@ -77,18 +77,19 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		FactoryBean, Ordered, BeanClassLoaderAware {
 
 	/**
-	 * ServiceFactory used for posting the bean instantiation until it is first
-	 * needed.
+	 * ServiceFactory used for publishing the service beans. Acts as a a wrapper
+	 * around special beans (such as ServiceFactory) and delegates to the
+	 * container each time a bundle requests the service for the first time.
 	 * 
 	 */
-	private class LazyBeanServiceFactory implements ServiceFactory {
+	private class PublishingServiceFactory implements ServiceFactory {
 
 		// used if the published bean is itself a ServiceFactory
 		private ServiceFactory serviceFactory;
 
 		private Class[] classes;
 
-		protected LazyBeanServiceFactory(Class[] classes) {
+		protected PublishingServiceFactory(Class[] classes) {
 			this.classes = classes;
 		}
 
@@ -239,9 +240,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
 		Assert.notNull(bundleContext, "required property 'bundleContext' has not been set");
 
-		if (!StringUtils.hasText(targetBeanName) && target == null
-				|| (StringUtils.hasText(targetBeanName) && target != null))
-			throw new IllegalArgumentException("either 'target' or 'targetBeanName' have to be specified");
+		Assert.notNull(target, "'target' property is required");
 
 		if (propertiesResolver == null) {
 			propertiesResolver = new BeanNameServicePropertiesResolver();
@@ -252,29 +251,10 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		if (interfaces == null)
 			interfaces = new Class[0];
 
-		// check if there is a reference to a non-lazy bean
-		if (StringUtils.hasText(targetBeanName)) {
-			if (beanFactory instanceof ConfigurableListableBeanFactory) {
-
-				// make sure to initialize before publishing, non-lazy
-				// singletons
-				if (beanFactory.isSingleton(targetBeanName)) {
-					BeanDefinition beanDef = ((ConfigurableListableBeanFactory) beanFactory).getMergedBeanDefinition(targetBeanName);
-
-					if (!beanDef.isLazyInit()) {
-						if (log.isDebugEnabled())
-							log.debug("target bean [" + targetBeanName
-									+ "] is a non-lazy singleton; forcing initialization before publishing");
-						beanFactory.getBean(targetBeanName);
-					}
-				}
-			}
-		}
-
 		// determine serviceClass (can still be null if using a
 		// FactoryBean
 		// which doesn't declare its product type)
-		Class serviceClass = (target != null ? target.getClass() : beanFactory.getType(targetBeanName));
+		Class serviceClass = target.getClass();
 		// if we have a nested bean / non-Spring managed object
 		String beanName = (!StringUtils.hasText(targetBeanName) ? ObjectUtils.getIdentityHexString(target)
 				: targetBeanName);
@@ -429,7 +409,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 		log.info("Publishing service under classes [" + ObjectUtils.nullSafeToString(names) + "]");
 
-		ServiceFactory serviceFactory = new LazyBeanServiceFactory(classes);
+		ServiceFactory serviceFactory = new PublishingServiceFactory(classes);
 
 		if (isBeanBundleScoped())
 			serviceFactory = new BundleScopeServiceFactory(serviceFactory, classes);
@@ -640,11 +620,4 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		this.order = order;
 	}
 
-	public boolean isEagerInit() {
-		return true;
-	}
-
-	public boolean isPrototype() {
-		return false;
-	}
 }
