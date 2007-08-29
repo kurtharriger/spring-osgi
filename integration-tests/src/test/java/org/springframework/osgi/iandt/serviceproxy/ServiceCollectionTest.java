@@ -19,14 +19,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.BundleContext;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -34,6 +34,12 @@ import org.springframework.util.ClassUtils;
  * 
  */
 public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTests {
+
+	// private ConfigurableApplicationContext classReference1;
+	//
+	// private DisposableBean classRef2;
+	//
+	// private ConfigurableOsgiBundleApplicationContext context;
 
 	protected String[] getBundles() {
 		return new String[] { localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT") };
@@ -54,19 +60,22 @@ public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTest
 	}
 
 	protected Collection createCollection() {
-        BundleContext bundleContext = getBundleContext();
-        BundleDelegatingClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
-        OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader, false);
-		collection.setContextClassLoader(ReferenceClassLoadingOptions.UNMANAGED);
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(classLoader);
-            collection.afterPropertiesSet();
-        } finally {
-            Thread.currentThread().setContextClassLoader(tccl);
-        }
+		BundleContext bundleContext = getBundleContext();
+		BundleDelegatingClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 
-        return collection;
+		OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader, false);
+		collection.setContextClassLoader(ReferenceClassLoadingOptions.CLIENT);
+		ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+		try {
+			Thread.currentThread().setContextClassLoader(classLoader);
+			collection.setInterfaces(new Class[] { Date.class });
+			collection.afterPropertiesSet();
+		}
+		finally {
+			Thread.currentThread().setContextClassLoader(tccl);
+		}
+
+		return collection;
 	}
 
 	public void testCollectionListener() throws Exception {
