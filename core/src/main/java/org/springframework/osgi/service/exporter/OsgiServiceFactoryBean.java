@@ -47,8 +47,10 @@ import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.service.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.interceptor.OsgiServiceTCCLInvoker;
+import org.springframework.osgi.util.ClassUtils;
 import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -375,17 +377,13 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 		// filter duplicates
 		Set classes = new LinkedHashSet(intfs.length + autoDetectedClasses.length);
-		for (int i = 0; i < intfs.length; i++) {
-			classes.add(intfs[i]);
-		}
 
-		for (int i = 0; i < autoDetectedClasses.length; i++) {
-			classes.add(autoDetectedClasses[i]);
-		}
+		CollectionUtils.mergeArrayIntoCollection(intfs, classes);
+		CollectionUtils.mergeArrayIntoCollection(autoDetectedClasses, classes);
 
-		Class[] publishingClasses = (Class[]) classes.toArray(new Class[classes.size()]);
+		Class[] mergedClasses = (Class[]) classes.toArray(new Class[classes.size()]);
 
-		serviceRegistration = registerService(publishingClasses, serviceProperties);
+		serviceRegistration = registerService(mergedClasses, serviceProperties);
 	}
 
 	/**
@@ -400,18 +398,23 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 			classes,
 			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
 
+		// filter classes based on visibility
+		ClassLoader beanClassLoader = (target == null ? beanFactory.getType(targetBeanName).getClassLoader()
+				: target.getClass().getClassLoader());
+		Class[] visibleClasses = ClassUtils.getVisibleClasses(classes, beanClassLoader);
+
 		// create an array of classnames (used for registering the service)
-		String[] names = org.springframework.osgi.util.ClassUtils.toStringArray(classes);
+		String[] names = org.springframework.osgi.util.ClassUtils.toStringArray(visibleClasses);
 
 		// sort the names in alphabetical order (eases debugging)
 		Arrays.sort(names);
 
 		log.info("Publishing service under classes [" + ObjectUtils.nullSafeToString(names) + "]");
 
-		ServiceFactory serviceFactory = new PublishingServiceFactory(classes);
+		ServiceFactory serviceFactory = new PublishingServiceFactory(visibleClasses);
 
 		if (isBeanBundleScoped())
-			serviceFactory = new BundleScopeServiceFactory(serviceFactory, classes);
+			serviceFactory = new BundleScopeServiceFactory(serviceFactory, visibleClasses);
 
 		return bundleContext.registerService(names, serviceFactory, serviceProperties);
 	}

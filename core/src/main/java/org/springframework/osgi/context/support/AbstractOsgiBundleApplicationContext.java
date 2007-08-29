@@ -261,7 +261,11 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 			Class[] classes = org.springframework.osgi.util.ClassUtils.getClassHierarchy(getClass(),
 				org.springframework.osgi.util.ClassUtils.INCLUDE_ALL_CLASSES);
 
-			String[] serviceNames = org.springframework.osgi.util.ClassUtils.toStringArray(classes);
+			// filter classes based on visibility
+			Class[] filterClasses = org.springframework.osgi.util.ClassUtils.getVisibleClasses(classes,
+				this.getClass().getClassLoader());
+
+			String[] serviceNames = org.springframework.osgi.util.ClassUtils.toStringArray(filterClasses);
 
 			if (logger.isDebugEnabled())
 				logger.debug("publishing service under classes " + ObjectUtils.nullSafeToString(serviceNames));
