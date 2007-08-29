@@ -154,9 +154,6 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements SmartFactor
 			return unifiedFilter;
 		}
 
-		// clean up parent classes
-		serviceTypes = ClassUtils.removeParents(serviceTypes);
-
 		String filterWithClasses = OsgiFilterUtils.unifyFilter(serviceTypes, filter);
 
 		if (log.isTraceEnabled())
@@ -179,27 +176,6 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements SmartFactor
 	}
 
 	public abstract void destroy() throws Exception;
-
-	/**
-	 * Based on the given class, use JDK Proxy or CGLIB instrumentation when
-	 * generating the proxy.
-	 * 
-	 * @param factory
-	 * @param classes
-	 */
-	protected void configureFactoryForClass(ProxyFactory factory, Class[] classes) {
-		for (int i = 0; i < classes.length; i++) {
-			Class clazz = classes[i];
-
-			if (clazz.isInterface()) {
-				factory.addInterface(clazz);
-			}
-			else {
-				factory.setTargetClass(clazz);
-				factory.setProxyTargetClass(true);
-			}
-		}
-	}
 
 	/**
 	 * Try and figure out why the proxy generation failed.

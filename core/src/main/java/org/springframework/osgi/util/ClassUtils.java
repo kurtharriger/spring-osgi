@@ -16,12 +16,17 @@
 package org.springframework.osgi.util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.JdkVersion;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -50,11 +55,267 @@ public abstract class ClassUtils {
 	public static final int INCLUDE_ALL_CLASSES = INCLUDE_INTERFACES | INCLUDE_CLASS_HIERARCHY;
 
 	/** Whether the backport-concurrent library is present on the classpath */
-	// the CollectionFactory classloader is used since this creates the map internally
-	private static final boolean backportConcurrentAvailable =
-			org.springframework.util.ClassUtils.isPresent("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap",
-					CollectionFactory.class.getClassLoader());
+	// the CollectionFactory classloader is used since this creates the map
+	// internally
+	private static final boolean backportConcurrentAvailable = org.springframework.util.ClassUtils.isPresent(
+		"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap", CollectionFactory.class.getClassLoader());
 
+	/**
+	 * Simple class loading abstraction working on both ClassLoader and Bundle
+	 * classes.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	private static class ClassLoaderBridge {
+		private final Bundle bundle;
+
+		private final ClassLoader classLoader;
+
+		public ClassLoaderBridge(Bundle bundle) {
+			Assert.notNull(bundle);
+			this.bundle = bundle;
+			this.classLoader = null;
+		}
+
+		public ClassLoaderBridge(ClassLoader classLoader) {
+			Assert.notNull(classLoader);
+			this.classLoader = classLoader;
+			this.bundle = null;
+		}
+
+		public Class loadClass(String className) throws ClassNotFoundException {
+			return (bundle == null ? classLoader.loadClass(className) : bundle.loadClass(className));
+		}
+
+		public boolean canSee(String className) {
+			return (bundle == null ? org.springframework.util.ClassUtils.isPresent(className, classLoader) : isPresent(
+				className, bundle));
+		}
+	}
+
+	/**
+	 * Return an array of parent classes for the given class. The mode paramater
+	 * indicates whether only interfaces should be included, classes or both.
+	 * 
+	 * This method is normally used for publishing services and determing the
+	 * {@link org.osgi.framework.Constants#OBJECTCLASS} property.
+	 * 
+	 * <p/> Note: this method does class expansion returning parent as well as
+	 * children classes.
+	 * 
+	 * </p>
+	 * 
+	 * @see #INCLUDE_ALL_CLASSES
+	 * @see #INCLUDE_CLASS_HIERARCHY
+	 * @see #INCLUDE_INTERFACES
+	 * 
+	 * @param clazz
+	 * @param mode
+	 * @param classLoader
+	 * 
+	 * @return array of classes extended or implemented by the given class
+	 */
+	public static Class[] getClassHierarchy(Class clazz, int mode) {
+		Class[] classes = null;
+
+		if (clazz != null && isModeValid(mode)) {
+
+			Set composingClasses = new LinkedHashSet();
+			boolean includeClasses = includesMode(mode, INCLUDE_CLASS_HIERARCHY);
+			boolean includeInterfaces = includesMode(mode, INCLUDE_INTERFACES);
+
+			Class clz = clazz;
+			do {
+				if (includeClasses) {
+					composingClasses.add(clz);
+				}
+
+				if (includeInterfaces) {
+					CollectionUtils.mergeArrayIntoCollection(getAllInterfaces(clz), composingClasses);
+				}
+
+				clz = clz.getSuperclass();
+			} while (clz != null && clz != Object.class);
+
+			classes = (Class[]) composingClasses.toArray(new Class[composingClasses.size()]);
+		}
+		return (classes == null ? new Class[0] : classes);
+	}
+
+	/**
+	 * Sugar method, determining the class hierarchy of a given class and then
+	 * filtering based on the given classloader. If a null classloader, the one
+	 * of the given class will be used.
+	 * 
+	 * @param clazz
+	 * @param mode
+	 * @param loader
+	 * @return
+	 */
+	public static Class[] getVisibleClassHierarchy(Class clazz, int mode, ClassLoader loader) {
+		if (clazz == null)
+			return new Class[0];
+
+		ClassLoader cl = (loader == null ? clazz.getClassLoader() : loader);
+
+		// system classloader
+		if (cl == null)
+			cl = ClassLoader.getSystemClassLoader();
+
+		return getVisibleClasses(getClassHierarchy(clazz, mode), cl);
+	}
+
+	/**
+	 * 'Sugar' method that determines the class hierarchy of the given class,
+	 * returning only the classes visible to the given bundle.
+	 * 
+	 * @param clazz the class for which the hierarchy has to be determined
+	 * @param mode discovery mode
+	 * @param bundle bundle used for class visibility
+	 * @return array of visible classes part of the hierarchy
+	 */
+	public static Class[] getVisibleClassHierarchy(Class clazz, int mode, Bundle bundle) {
+		return getVisibleClasses(getClassHierarchy(clazz, mode), bundle);
+	}
+
+	/**
+	 * Given an array of classes, eliminate the ones that cannot be loaded by
+	 * the given classloader.
+	 * 
+	 * @return
+	 */
+	public static Class[] getVisibleClasses(Class[] classes, ClassLoader classLoader) {
+		return getVisibleClasses(classes, new ClassLoaderBridge(classLoader));
+	}
+
+	/**
+	 * Given an array of classes, eliminate the ones that cannot be loaded by
+	 * the given bundle.
+	 * 
+	 * @return
+	 */
+	public static Class[] getVisibleClasses(Class[] classes, Bundle bundle) {
+		return getVisibleClasses(classes, new ClassLoaderBridge(bundle));
+	}
+
+	private static Class[] getVisibleClasses(Class[] classes, ClassLoaderBridge loader) {
+		if (ObjectUtils.isEmpty(classes))
+			return classes;
+
+		Set classSet = new LinkedHashSet(classes.length);
+		CollectionUtils.mergeArrayIntoCollection(classes, classSet);
+
+		// filter class collection based on visibility
+		for (Iterator iter = classSet.iterator(); iter.hasNext();) {
+			Class clzz = (Class) iter.next();
+			if (!loader.canSee(clzz.getName())) {
+				iter.remove();
+			}
+		}
+		return (Class[]) classSet.toArray(new Class[classSet.size()]);
+	}
+
+	/**
+	 * Get all interfaces implemented by the given class. This method returns
+	 * both parent and children interfaces (i.e. Map and SortedMap).
+	 * 
+	 * @param clazz
+	 * @return all interfaces implemented by the given class.
+	 */
+	public static Class[] getAllInterfaces(Class clazz) {
+		Assert.notNull(clazz);
+		return getAllInterfaces(clazz, new LinkedHashSet(8));
+	}
+
+	/**
+	 * Recursive implementation for getting all interfaces.
+	 * 
+	 * @param clazz
+	 * @param interfaces
+	 * @return
+	 */
+	private static Class[] getAllInterfaces(Class clazz, Set interfaces) {
+		Class[] intfs = clazz.getInterfaces();
+		CollectionUtils.mergeArrayIntoCollection(intfs, interfaces);
+
+		for (int i = 0; i < intfs.length; i++) {
+			getAllInterfaces(intfs[i], interfaces);
+		}
+
+		return (Class[]) interfaces.toArray(new Class[interfaces.size()]);
+	}
+
+	/**
+	 * Check the present of a class inside a bundle. This method returns true if
+	 * the given bundle can load the given class or false otherwise.
+	 * 
+	 * @param className
+	 * @param bundle
+	 * @return
+	 */
+	public static boolean isPresent(String className, Bundle bundle) {
+		Assert.hasText(className);
+		Assert.notNull(bundle);
+
+		try {
+			bundle.loadClass(className);
+			return true;
+		}
+		catch (Exception cnfe) {
+			return false;
+		}
+	}
+
+	/**
+	 * Test if testedMode includes an expected mode.
+	 * 
+	 * @param testedMode
+	 * @param mode
+	 * @return
+	 */
+	private static boolean includesMode(int testedMode, int mode) {
+		return (testedMode & mode) == mode;
+	}
+
+	/**
+	 * Test if a mode is valid.
+	 * 
+	 * @param mode
+	 * @return
+	 */
+	private static boolean isModeValid(int mode) {
+		return (mode >= INCLUDE_INTERFACES && mode <= INCLUDE_ALL_CLASSES);
+	}
+
+	/**
+	 * Return an array of class string names for the given classes.
+	 * 
+	 * @param array
+	 * @return
+	 */
+	public static String[] toStringArray(Class[] array) {
+		if (ObjectUtils.isEmpty(array))
+			return new String[0];
+
+		String[] strings = new String[array.length];
+
+		for (int i = 0; i < array.length; i++) {
+			strings[i] = array[i].getName();
+		}
+
+		return strings;
+	}
+
+	/**
+	 * Check the present of approapriate concurrent collection in the classpath.
+	 * This means backport-concurrent on Java 1.4, or Java5+.
+	 * 
+	 * @return true if a ConcurrentHashMap is available on the classpath.
+	 */
+	public static boolean concurrentLibAvailable() {
+		return (backportConcurrentAvailable || JdkVersion.isAtLeastJava15());
+	}
 
 	/**
 	 * Determining if multiple classes(not interfaces) are specified, without
@@ -92,6 +353,11 @@ public abstract class ClassUtils {
 
 	/**
 	 * Parse the given class array and eliminate parents of existing classes.
+	 * Useful when creating proxies to minimize the number of implemented
+	 * interfaces and redundant class information.
+	 * 
+	 * @see #containsUnrelatedClasses(Class[])
+	 * @see #configureFactoryForClass(ProxyFactory, Class[])
 	 * 
 	 * @param classes array of classes
 	 * @return a new array without superclasses
@@ -135,82 +401,30 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return an array of parent classes for the given class. The mode paramater
-	 * indicates whether only interfaces should be included, classes or both.
+	 * Based on the given class, properly instruct the ProxyFactory proxies. For
+	 * additional sanity checks on the passed classes, check the methods below.
 	 * 
-	 * @see #INCLUDE_ALL_CLASSES
-	 * @see #INCLUDE_CLASS_HIERARCHY
-	 * @see #INCLUDE_INTERFACES
+	 * @see #containsUnrelatedClasses(Class[])
+	 * @see #removeParents(Class[])
 	 * 
-	 * @param clazz
-	 * @return
+	 * @param factory
+	 * @param classes
 	 */
-	public static Class[] getClassHierarchy(Class clazz, int mode) {
+	public static void configureFactoryForClass(ProxyFactory factory, Class[] classes) {
+		if (ObjectUtils.isEmpty(classes))
+			return;
 
-		Class[] classes = null;
+		for (int i = 0; i < classes.length; i++) {
+			Class clazz = classes[i];
 
-		if (clazz != null && isModeValid(mode)) {
-
-			Set composingClasses = new LinkedHashSet();
-
-			if (includesMode(mode, INCLUDE_INTERFACES))
-				composingClasses.addAll(org.springframework.util.ClassUtils.getAllInterfacesForClassAsSet(clazz));
-
-			if (includesMode(mode, INCLUDE_CLASS_HIERARCHY)) {
-				Class clz = clazz;
-				do {
-					composingClasses.add(clz);
-					clz = clz.getSuperclass();
-				} while (clz != null && clz != Object.class);
+			if (clazz.isInterface()) {
+				factory.addInterface(clazz);
 			}
-
-			classes = (Class[]) composingClasses.toArray(new Class[composingClasses.size()]);
-
+			else {
+				factory.setTargetClass(clazz);
+				factory.setProxyTargetClass(true);
+			}
 		}
-		return (classes == null ? new Class[0] : classes);
 	}
 
-	/**
-	 * Test if testedMode includes an expected mode.
-	 * 
-	 * @param testedMode
-	 * @param mode
-	 * @return
-	 */
-	private static boolean includesMode(int testedMode, int mode) {
-		return (testedMode & mode) == mode;
-	}
-
-	/**
-	 * Test if a mode is valid.
-	 * 
-	 * @param mode
-	 * @return
-	 */
-	private static boolean isModeValid(int mode) {
-		return (mode >= INCLUDE_INTERFACES && mode <= INCLUDE_ALL_CLASSES);
-	}
-
-	public static String[] toStringArray(Class[] array) {
-		if (ObjectUtils.isEmpty(array))
-			return new String[0];
-
-		String[] strings = new String[array.length];
-
-		for (int i = 0; i < array.length; i++) {
-			strings[i] = array[i].getName();
-		}
-
-		return strings;
-	}
-
-	/**
-	 * Check the present of approapriate concurrent collection in the classpath.
-	 * This means backport-concurrent on Java 1.4, or Java5+.
-	 * 
-	 * @return true if a ConcurrentHashMap is available on the classpath.
-	 */
-	public static boolean concurrentLibAvailable() {
-		return (backportConcurrentAvailable || JdkVersion.isAtLeastJava15());
-	}
 }

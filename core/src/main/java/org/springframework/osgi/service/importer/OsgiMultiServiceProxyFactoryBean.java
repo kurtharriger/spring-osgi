@@ -146,6 +146,7 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 
 		collection.setListeners(listeners);
 		collection.setContextClassLoader(contextClassloader);
+		collection.setInterfaces(serviceTypes);
 		collection.afterPropertiesSet();
 
 		return collection;

@@ -15,16 +15,13 @@
  */
 package org.springframework.osgi.service.collection;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -42,6 +39,7 @@ import org.springframework.osgi.service.interceptor.OsgiServiceInvoker;
 import org.springframework.osgi.service.interceptor.OsgiServiceStaticInterceptor;
 import org.springframework.osgi.service.interceptor.ServiceReferenceAwareAdvice;
 import org.springframework.osgi.service.util.OsgiServiceBindingUtils;
+import org.springframework.osgi.util.ClassUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.util.Assert;
 
@@ -200,6 +198,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
 
+	private Class[] interfaces;
+
 	protected final boolean atLeastOneServiceMandatory;
 
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader, boolean mandatory) {
@@ -259,38 +259,9 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	 * @param ref
 	 */
 	protected Object createServiceProxy(ServiceReference ref) {
-		// get classes under which the service was registered
-		String[] classes = (String[]) ref.getProperty(Constants.OBJECTCLASS);
-
-		List intfs = new ArrayList();
-		Class proxyClass = null;
-
-		for (int i = 0; i < classes.length; i++) {
-			// resolve classes (using the proper classloader)
-			Bundle loader = ref.getBundle();
-			try {
-				Class clazz = loader.loadClass(classes[i]);
-				// FIXME: discover lower class if multiple class names are used
-				// (basically detect the lowest subclass)
-				if (clazz.isInterface())
-					intfs.add(clazz);
-				else {
-					proxyClass = clazz;
-				}
-			}
-			catch (ClassNotFoundException cnfex) {
-				throw (RuntimeException) new IllegalArgumentException("cannot create proxy").initCause(cnfex);
-			}
-		}
 
 		ProxyFactory factory = new ProxyFactory();
-		if (!intfs.isEmpty())
-			factory.setInterfaces((Class[]) intfs.toArray(new Class[intfs.size()]));
-
-		if (proxyClass != null) {
-			factory.setProxyTargetClass(true);
-			factory.setTargetClass(proxyClass);
-		}
+		ClassUtils.configureFactoryForClass(factory, interfaces);
 
 		// add the interceptors
 		if (this.interceptors != null) {
@@ -443,5 +414,9 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	 */
 	public void setContextClassLoader(int contextClassLoader) {
 		this.contextClassLoader = contextClassLoader;
+	}
+
+	public void setInterfaces(Class[] interfaces) {
+		this.interfaces = interfaces;
 	}
 }

@@ -19,6 +19,7 @@ package org.springframework.osgi.service.exporter;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,9 +38,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.core.CollectionFactory;
 import org.springframework.core.Constants;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
@@ -375,7 +374,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		Class[] autoDetectedClasses = autoDetectClassesForPublishing(beanClass);
 
 		// filter duplicates
-		Set classes = CollectionFactory.createLinkedSetIfPossible(intfs.length + autoDetectedClasses.length);
+		Set classes = new LinkedHashSet(intfs.length + autoDetectedClasses.length);
 		for (int i = 0; i < intfs.length; i++) {
 			classes.add(intfs[i]);
 		}

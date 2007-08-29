@@ -15,32 +15,42 @@
  */
 package org.springframework.osgi.test;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.io.IOException;
 
+import org.osgi.framework.BundleContext;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplicationContext;
+import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 /**
- * JUnit superclass, which makes context creation optional (and injection)
- * optional. Required for mixing Spring existing testing hierarchy with the OSGi
- * testing framework functionality.
+ * JUnit superclass, which creates an empty OSGi bundle appCtx when no
+ * configuration file is specified. Required for mixing Spring existing testing
+ * hierarchy with the OSGi testing framework functionality.
  * 
  * @author Costin Leau
  * 
  */
 public abstract class AbstractOptionalDependencyInjectionTests extends AbstractDependencyInjectionSpringContextTests {
 
-	// by default don't (prevents accidental context creations between test runs)
-	private boolean shouldCreateContext = false;
+	/**
+	 * Empty OSGi application context that doesn't require any files to be
+	 * specified.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	private class EmptyOsgiApplicationContext extends AbstractDelegatedExecutionApplicationContext {
 
-	private class DummyConfigurableListableBeanFactory implements InvocationHandler {
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			// don't do anything
-			return null;
+		protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException, BeansException {
+		}
+
+		public void setNamespaceResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
 		}
 	}
 
@@ -52,42 +62,29 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 		super(name);
 	}
 
-	/**
-	 * Create an Osgi bundle based XML application context. If there are no
-	 * locations given (the default), the autowiring and context creation are
-	 * cancelled.
-	 */
-	protected ConfigurableApplicationContext loadContextLocations(String[] locations) throws Exception {
-
-		if (ObjectUtils.isEmpty(locations)) {
-			logger.info("No application context location specified; disabling injection");
-			shouldCreateContext = false;
-			setAutowireMode(AUTOWIRE_NO);
-			setPopulateProtectedVariables(false);
-
-			// return a fake object to preserve contract
-			return (ConfigurableApplicationContext) Proxy.newProxyInstance(ConfigurableApplicationContext.class
-					.getClassLoader(), new Class[] { ConfigurableApplicationContext.class },
-					new DummyConfigurableListableBeanFactory());
-
-		}
-
-		else {
-			shouldCreateContext = true;
-			// TODO: the load Count is not changed (since it's not accessible)
-			if (logger.isInfoEnabled()) {
-				logger.info("Loading context for locations: " + StringUtils.arrayToCommaDelimitedString(locations));
-			}
-
-			return createApplicationContext(locations);
-		}
-	}
-
 	protected void prepareTestInstance() throws Exception {
 		// create context (and apply autowiring) only if needed
-		if (shouldCreateContext)
-			super.prepareTestInstance();
+		super.prepareTestInstance();
 	}
 
-	protected abstract ConfigurableApplicationContext createApplicationContext(String[] locations);
+	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
+		ConfigurableOsgiBundleApplicationContext context = null;
+
+		if (ObjectUtils.isEmpty(locations))
+			context = new EmptyOsgiApplicationContext();
+		else
+			context = new OsgiBundleXmlApplicationContext(locations);
+
+		context.setBundleContext(getBundleContext());
+		context.refresh();
+		return context;
+	}
+
+	/**
+	 * Return the test bundle context.
+	 * 
+	 * @return test bundle context
+	 */
+	protected abstract BundleContext getBundleContext();
+
 }

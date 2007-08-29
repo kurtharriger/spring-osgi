@@ -27,9 +27,6 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -44,6 +41,7 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -115,6 +113,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	/** Used for publishing the app context * */
 	private ServiceRegistration serviceRegistration;
 
+	/** Should context be published as an OSGi service? */
 	private boolean publishContextAsService = true;
 
 	public AbstractOsgiBundleApplicationContext() {
@@ -154,7 +153,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	public String[] getConfigLocations() {
-		return (String[]) this.configLocations.clone();
+		return (this.configLocations != null ? this.configLocations : getDefaultConfigLocations());
 	}
 
 	protected void doClose() {
@@ -202,6 +201,16 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		beanFactory.addBeanPostProcessor(new BundleContextAwareProcessor(this.bundleContext));
 		beanFactory.ignoreDependencyInterface(BundleContextAware.class);
 
+		// add bundleContext bean
+		if (!beanFactory.containsLocalBean(BUNDLE_CONTEXT_BEAN_NAME)) {
+			logger.debug("registering BundleContext as a bean named " + BUNDLE_CONTEXT_BEAN_NAME);
+			beanFactory.registerSingleton(BUNDLE_CONTEXT_BEAN_NAME, this.bundleContext);
+		}
+		else {
+			logger.warn("a bean named " + BUNDLE_CONTEXT_BEAN_NAME
+					+ " already exists; the bundleContext will not be registered as a bean");
+		}
+
 		// register Dictionary PropertyEditor
 		beanFactory.registerCustomEditor(Dictionary.class, new DictionaryEditor());
 
@@ -248,10 +257,17 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 				logger.info("Publishing application context with properties ("
 						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getBundleSymbolicName() + ")");
 			}
-			// Publish under all the significant interfaces we might care about.
-			this.serviceRegistration = getBundleContext().registerService(
-				org.springframework.osgi.util.ClassUtils.toStringArray(org.springframework.osgi.util.ClassUtils.getClassHierarchy(
-					getClass(), org.springframework.osgi.util.ClassUtils.INCLUDE_ALL_CLASSES)), this, serviceProperties);
+
+			Class[] classes = org.springframework.osgi.util.ClassUtils.getClassHierarchy(getClass(),
+				org.springframework.osgi.util.ClassUtils.INCLUDE_ALL_CLASSES);
+
+			String[] serviceNames = org.springframework.osgi.util.ClassUtils.toStringArray(classes);
+
+			if (logger.isDebugEnabled())
+				logger.debug("publishing service under classes " + ObjectUtils.nullSafeToString(serviceNames));
+
+			// Publish under all the significant interfaces we see
+			this.serviceRegistration = getBundleContext().registerService(serviceNames, this, serviceProperties);
 		}
 		else {
 			if (logger.isInfoEnabled()) {

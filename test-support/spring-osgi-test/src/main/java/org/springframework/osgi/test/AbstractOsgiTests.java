@@ -30,11 +30,8 @@ import junit.framework.TestResult;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.test.util.ConfigurableByteArrayOutputStream;
@@ -101,12 +98,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		super(name);
 	}
 
-	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
-		ConfigurableOsgiBundleApplicationContext context = new OsgiBundleXmlApplicationContext(locations);
-		context.setBundleContext(getBundleContext());
-		context.refresh();
-		return context;
-	}
 
 	/**
 	 * Bundles that should be installed before the test execution.
