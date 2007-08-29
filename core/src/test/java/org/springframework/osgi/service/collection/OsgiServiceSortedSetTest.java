@@ -17,6 +17,8 @@ package org.springframework.osgi.service.collection;
 
 import java.util.Iterator;
 
+import org.springframework.osgi.service.collection.AbstractOsgiCollectionTest.Wrapper;
+
 /**
  * @author Costin Leau
  * 
@@ -29,6 +31,7 @@ public class OsgiServiceSortedSetTest extends AbstractOsgiCollectionTest {
 	protected void setUp() throws Exception {
 		super.setUp();
 		col = new OsgiServiceSortedSet(null, context, getClass().getClassLoader(), false);
+		col.setInterfaces(new Class[] { Wrapper.class, Comparable.class });
 		col.afterPropertiesSet();
 
 		iter = col.iterator();

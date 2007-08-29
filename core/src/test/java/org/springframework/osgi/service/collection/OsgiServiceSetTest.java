@@ -15,6 +15,7 @@
  */
 package org.springframework.osgi.service.collection;
 
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.Properties;
@@ -36,6 +37,7 @@ public class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 	protected void setUp() throws Exception {
 		super.setUp();
 		col = new OsgiServiceSet(null, context, getClass().getClassLoader(), false);
+		col.setInterfaces(new Class[] { Wrapper.class, Comparable.class });
 		col.afterPropertiesSet();
 
 		iter = col.iterator();

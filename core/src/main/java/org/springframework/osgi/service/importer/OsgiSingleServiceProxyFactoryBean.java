@@ -25,6 +25,7 @@ import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.service.interceptor.ServiceReferenceAwareAdvice;
 import org.springframework.osgi.service.support.RetryTemplate;
+import org.springframework.osgi.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -86,7 +87,7 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 		ProxyFactory factory = new ProxyFactory();
 
 		// mold the proxy
-		configureFactoryForClass(factory, classes);
+		ClassUtils.configureFactoryForClass(factory, classes);
 
 		// TODO: the same advices should be available for the multi case/service
 		// collection
