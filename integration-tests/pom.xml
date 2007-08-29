@@ -162,10 +162,7 @@
 							<name>net.sourceforge.cobertura.datafile</name>
 							<value>${basedir}/target/cobertura/cobertura.ser</value>
 						</property> 
-						<property>
-						   <name>mbs.domain.url</name>
-						   <value>${mbs.domain.url}</value>
-						</property>
+
                     </systemProperties>
                     <!--argLine>-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=2111,server=y,suspend=y</argLine-->
                 </configuration>
