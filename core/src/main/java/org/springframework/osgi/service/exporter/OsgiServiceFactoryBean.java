@@ -252,9 +252,6 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		if (interfaces == null)
 			interfaces = new Class[0];
 
-		// determine serviceClass (can still be null if using a
-		// FactoryBean
-		// which doesn't declare its product type)
 		Class serviceClass = target.getClass();
 		// if we have a nested bean / non-Spring managed object
 		String beanName = (!StringUtils.hasText(targetBeanName) ? ObjectUtils.getIdentityHexString(target)
@@ -398,9 +395,12 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 			classes,
 			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
 
+		Class beanClass = (target == null ? beanFactory.getType(targetBeanName)
+				: target.getClass());
+		
 		// filter classes based on visibility
-		ClassLoader beanClassLoader = (target == null ? beanFactory.getType(targetBeanName).getClassLoader()
-				: target.getClass().getClassLoader());
+		ClassLoader beanClassLoader = ClassUtils.getClassLoader(beanClass);
+		
 		Class[] visibleClasses = ClassUtils.getVisibleClasses(classes, beanClassLoader);
 
 		// create an array of classnames (used for registering the service)

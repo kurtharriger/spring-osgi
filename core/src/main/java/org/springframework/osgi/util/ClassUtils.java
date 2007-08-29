@@ -157,13 +157,7 @@ public abstract class ClassUtils {
 		if (clazz == null)
 			return new Class[0];
 
-		ClassLoader cl = (loader == null ? clazz.getClassLoader() : loader);
-
-		// system classloader
-		if (cl == null)
-			cl = ClassLoader.getSystemClassLoader();
-
-		return getVisibleClasses(getClassHierarchy(clazz, mode), cl);
+		return getVisibleClasses(getClassHierarchy(clazz, mode), getClassLoader(clazz));
 	}
 
 	/**
@@ -265,6 +259,19 @@ public abstract class ClassUtils {
 		catch (Exception cnfe) {
 			return false;
 		}
+	}
+
+	/**
+	 * Return the classloader for the given class. This method deals with JDK
+	 * classes which return by default, a null classloader.
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	public static ClassLoader getClassLoader(Class clazz) {
+		Assert.notNull(clazz);
+		ClassLoader loader = clazz.getClassLoader();
+		return (loader == null ? ClassLoader.getSystemClassLoader() : loader);
 	}
 
 	/**

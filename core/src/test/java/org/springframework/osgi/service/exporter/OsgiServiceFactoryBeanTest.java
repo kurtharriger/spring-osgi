@@ -195,10 +195,14 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 			public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
 				assertTrue(service instanceof ServiceFactory);
-				assertSame(props, properties);
 				return reg;
 			}
 		});
+
+		exporter.setTarget(MockControl.createControl(ServiceFactory.class).getMock());
+		exporter.setInterfaces(new Class[] { ServiceFactory.class });
+		exporter.setTargetBeanName("boo");
+		exporter.afterPropertiesSet();
 		assertSame(reg, exporter.registerService(clazz, props));
 	}
 
@@ -245,6 +249,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 		String beanName = "fooBar";
 		exporter.setTargetBeanName(beanName);
+		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), service.getClass());
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
 
 		beanFactoryControl.replay();
@@ -283,6 +288,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 		String beanName = "fooBar";
 		exporter.setTargetBeanName(beanName);
+		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), actualService.getClass());
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
 
 		beanFactoryControl.replay();
