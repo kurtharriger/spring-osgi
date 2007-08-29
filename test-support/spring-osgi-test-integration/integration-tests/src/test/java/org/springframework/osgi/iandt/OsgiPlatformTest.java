@@ -45,7 +45,5 @@ public class OsgiPlatformTest extends AbstractConfigurableBundleCreatorTests {
 			assertTrue(platform.indexOf("Felix") >= 0);
 		if ("Knopflerfish".equals(vendor))
 			assertTrue(platform.indexOf("Knopflerfish") >= 0);
-		// if ("ProSyst".equals(vendor))
-		// assertTrue(platform.indexOf("MBSPro") >= 0);
 	}
 }

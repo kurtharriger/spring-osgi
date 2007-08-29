@@ -313,6 +313,7 @@ limitations under the License.
 				<name>net.sourceforge.cobertura.datafile</name>
 				<value>${cobertura.file}</value>
 			</property>
+
           </systemProperties>
         </configuration>
       </plugin>
@@ -463,25 +464,9 @@ limitations under the License.
       </properties>
     </profile>
 
-   <!-- not enabled yet -->
-    <profile>
-      <id>mbspro</id>
-      <dependencies>
-        <dependency>
-          <groupId>com.prosyst.mbs</groupId>
-          <artifactId>serverjvm13</artifactId>
-          <version>6.1.3-SNAPSHOT</version>
-          <type>jar</type>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
-      <properties>
-        <osgi.test.platform>org.springframework.osgi.test.platform.MBSProPlatform</osgi.test.platform>
-        <log4j.ignoreTCL>true</log4j.ignoreTCL>
-      </properties>
-    </profile>
   </profiles>
-
+       
+       
   <!-- ======================================= -->
   <!--          Website and reporting          -->
   <!-- ======================================= -->
