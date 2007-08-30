@@ -89,6 +89,7 @@ public class ClassUtilsTest extends TestCase {
 	public void testAppContextClassHierarchy() {
 		Class[] clazz = ClassUtils.getClassHierarchy(OsgiBundleXmlApplicationContext.class,
 			ClassUtils.INCLUDE_ALL_CLASSES);
+		
 		Class[] expected = new Class[] { OsgiBundleXmlApplicationContext.class,
 				AbstractDelegatedExecutionApplicationContext.class, AbstractOsgiBundleApplicationContext.class,
 				AbstractRefreshableApplicationContext.class, AbstractApplicationContext.class,
@@ -102,6 +103,12 @@ public class ClassUtilsTest extends TestCase {
 	}
 
 	private boolean compareArrays(Object[] a, Object[] b) {
+		if ((a == null && b != null) || (b == null && a != null))
+			return false;
+		
+		if (a == b)
+			return true;
+
 		if (a.length != b.length)
 			return false;
 
