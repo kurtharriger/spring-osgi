@@ -58,7 +58,7 @@
 
     <cobertura.file>${basedir}/target/cobertura/cobertura.ser</cobertura.file>
    <!-- other properties -->
-   <slf4j.version>1.4.0</slf4j.version>
+   <slf4j.version>1.4.3</slf4j.version>
   </properties>
 
   <!-- ============================================= -->
