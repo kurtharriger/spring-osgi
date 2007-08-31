@@ -85,6 +85,11 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 	private class WatchDogTask extends TimerTask {
 
 		public void run() {
+			// deregister listener to get an accurate snapshot of the unsatisfied dependencies.
+			
+			if (dependencyDetector != null)
+				dependencyDetector.deregister();
+			
 			log.warn("timeout occured before finding service dependencies for [" + delegateContext.getDisplayName()
 					+ "]");
 
@@ -116,8 +121,7 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 
 				synchronized (monitor) {
 					if (state != ContextState.DEPENDENCIES_RESOLVED) {
-						if (debug)
-							logWrongState(ContextState.DEPENDENCIES_RESOLVED);
+						logWrongState(ContextState.DEPENDENCIES_RESOLVED);
 						return;
 					}
 					// otherwise update the state
@@ -187,8 +191,7 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 
 				// check before kicking the pedal
 				if (state != ContextState.INITIALIZED) {
-					if (debug)
-						logWrongState(ContextState.INITIALIZED);
+					logWrongState(ContextState.INITIALIZED);
 					return;
 				}
 
@@ -201,7 +204,7 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 
 			if (debug)
 				log.debug("prerefresh completed; determining dependencies...");
-			
+
 			DependencyServiceManager dl = createDependencyServiceListener();
 			dl.findServiceDependencies();
 
@@ -237,8 +240,7 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 		synchronized (monitor) {
 
 			if (state != ContextState.RESOLVING_DEPENDENCIES) {
-				if (debug)
-					logWrongState(ContextState.RESOLVING_DEPENDENCIES);
+				logWrongState(ContextState.RESOLVING_DEPENDENCIES);
 				return;
 			}
 
@@ -336,8 +338,7 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 				message.append("], unsatisfied dependencies: ");
 				message.append(buf.toString());
 
-				log.debug(message.toString(), t);
-				log.debug("[" + getBundleSymbolicName() + "]" + " creation calling code: ", t);
+				log.error(message.toString(), t);
 			}
 
 		}
@@ -422,7 +423,7 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 	 * @param expected the expected value for the context state.
 	 */
 	private void logWrongState(ContextState expected) {
-		log.debug("expecting state (" + expected + ") not (" + state + ") for context [" + getDisplayName()
+		log.error("expecting state (" + expected + ") not (" + state + ") for context [" + getDisplayName()
 				+ "]; assuming an interruption and bailing out");
 	}
 

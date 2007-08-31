@@ -94,4 +94,19 @@ public abstract class OsgiListenerUtils {
 			}
 		}
 	}
+
+	public static boolean removeServiceListener(BundleContext bundleContext, ServiceListener listener) {
+		if (bundleContext == null || listener == null)
+			return false;
+
+		try {
+			bundleContext.removeServiceListener(listener);
+			return true;
+		}
+		catch (IllegalStateException e) {
+			// Bundle context is no longer valid
+		}
+
+		return false;
+	}
 }

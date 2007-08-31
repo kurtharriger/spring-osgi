@@ -13,13 +13,12 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * ServiceListener used for tracking dependent services. Even if the
@@ -133,7 +132,7 @@ public class DependencyServiceManager {
 			}
 			catch (Throwable e) {
 				// frameworks will simply not log exception for event handlers
-				log.fatal("Exception during dependency processing for " + context.getDisplayName(), e);
+				log.error("Exception during dependency processing for " + context.getDisplayName(), e);
 			}
 		}
 	}
@@ -235,12 +234,7 @@ public class DependencyServiceManager {
 			log.debug("deregistering service dependency dependencyDetector for " + context.getDisplayName());
 		}
 
-		try {
-			bundleContext.removeServiceListener(listener);
-		}
-		catch (IllegalStateException e) {
-			// Bundle context is no longer valid
-		}
+		OsgiListenerUtils.removeServiceListener(bundleContext, listener);
 	}
 
 }
