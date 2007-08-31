@@ -20,12 +20,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.SortedSet;
 
+import junit.framework.TestCase;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
@@ -39,7 +42,7 @@ import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBea
  * @author Costin Leau
  * 
  */
-public class OsgiReferenceCollectionNamespaceHandlerTest extends PrivateFieldRetrieverTestCase {
+public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	private GenericApplicationContext appContext;
 
@@ -81,7 +84,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends PrivateFieldRet
 		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
 		OsgiMultiServiceProxyFactoryBean proxyFactory = (OsgiMultiServiceProxyFactoryBean) factoryBean;
 
-		Class[] intfs = (Class[]) getPrivateProperty(proxyFactory, "serviceTypes");
+		Class[] intfs = getInterfaces(proxyFactory);
 		assertEquals(1, intfs.length);
 		assertSame(Serializable.class, intfs[0]);
 
@@ -145,7 +148,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends PrivateFieldRet
 		Object bean = appContext.getBean("simpleSortedList");
 		assertTrue(bean instanceof OsgiServiceSortedList);
 
-		Class[] intfs = (Class[]) getPrivateProperty(factoryBean, "serviceTypes");
+		Class[] intfs = getInterfaces(factoryBean);
 		assertTrue(Arrays.equals(new Class[] { Serializable.class }, intfs));
 	}
 
@@ -156,8 +159,11 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends PrivateFieldRet
 		Object bean = appContext.getBean("simpleSortedSet");
 		assertTrue(bean instanceof OsgiServiceSortedSet);
 
-		Class[] intfs = (Class[]) getPrivateProperty(factoryBean, "serviceTypes");
+		Class[] intfs = getInterfaces(factoryBean);
 		assertTrue(Arrays.equals(new Class[] { Comparable.class }, intfs));
 	}
 
+	private Class[] getInterfaces(Object proxy) {
+		return (Class[]) TestUtils.getFieldValue(proxy, "serviceTypes");
+	}
 }

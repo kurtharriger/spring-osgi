@@ -27,7 +27,7 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.ServiceUnavailableException;
-import org.springframework.osgi.config.PrivateFieldRetrieverTestCase;
+import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
@@ -37,7 +37,7 @@ import org.springframework.osgi.util.OsgiFilterUtils;
  * @author Costin Leau
  * 
  */
-public class OsgiMultiServiceProxyFactoryBeanTest extends PrivateFieldRetrieverTestCase {
+public class OsgiMultiServiceProxyFactoryBeanTest extends TestCase {
 
 	private OsgiMultiServiceProxyFactoryBean serviceFactoryBean;
 
@@ -82,7 +82,7 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends PrivateFieldRetrieverT
 		serviceFactoryBean.setListeners(listeners);
 		serviceFactoryBean.afterPropertiesSet();
 
-		assertSame(listeners, getPrivateProperty(serviceFactoryBean.getObject(), "listeners"));
+		assertSame(listeners, TestUtils.getFieldValue(serviceFactoryBean.getObject(), "listeners"));
 	}
 
 	public void testMandatoryServiceAtStartupFailure() throws Exception {

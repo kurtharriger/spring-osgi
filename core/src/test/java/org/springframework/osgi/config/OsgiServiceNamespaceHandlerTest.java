@@ -16,7 +16,6 @@
 package org.springframework.osgi.config;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
@@ -35,14 +34,12 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.mock.MockServiceRegistration;
 import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.ReflectionUtils.FieldCallback;
-import org.springframework.util.ReflectionUtils.FieldFilter;
 
 /**
  * Integration test for osgi:service namespace handler.
@@ -100,17 +97,17 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		assertSame(OsgiServiceFactoryBean.class, bean.getClass());
 		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) bean;
 
-		assertTrue(Arrays.equals(new Class[] { Serializable.class }, exporter.getInterfaces()));
-		assertEquals("string", getField(exporter, "targetBeanName"));
-		assertEquals(appContext.getBean("string"), getField(exporter, "target"));
-		
+		assertTrue(Arrays.equals(new Class[] { Serializable.class }, getInterfaces(exporter)));
+		assertEquals("string", getTargetBeanName(exporter));
+		assertEquals(appContext.getBean("string"), getTarget(exporter));
+
 		assertSame(appContext.getBean("string"), getServiceAtIndex(0));
 	}
 
 	public void testBiggerService() throws Exception {
 		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) appContext.getBean("&manyOptions");
 
-		assertTrue(Arrays.equals(new Class[] { Serializable.class, Cloneable.class }, exporter.getInterfaces()));
+		assertTrue(Arrays.equals(new Class[] { Serializable.class, Cloneable.class }, getInterfaces(exporter)));
 		Properties prop = new Properties();
 		prop.setProperty("foo", "bar");
 		prop.setProperty("white", "horse");
@@ -118,28 +115,28 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 
 		// Should be wrapped with a TCCL setting proxy
 		assertNotSame(appContext.getBean("string"), getServiceAtIndex(1));
-		
-		assertEquals("string", getField(exporter, "targetBeanName"));
-		assertEquals(appContext.getBean("string"), getField(exporter, "target"));
+
+		assertEquals("string", getTargetBeanName(exporter));
+		assertEquals(appContext.getBean("string"), getTarget(exporter));
 
 	}
 
 	public void testNestedService() throws Exception {
 		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) appContext.getBean("&nestedService");
-		assertTrue(Arrays.equals(new Class[] { Object.class }, exporter.getInterfaces()));
+		assertTrue(Arrays.equals(new Class[] { Object.class }, getInterfaces(exporter)));
 
 		Object service = getServiceAtIndex(2);
 		assertSame(HashMap.class, service.getClass());
-		
-		assertNull(getField(exporter, "targetBeanName"));
-		assertNotNull(getField(exporter, "target"));
+
+		assertNull(getTargetBeanName(exporter));
+		assertNotNull(getTarget(exporter));
 	}
 
 	public void testServiceExporterFactoryBean() throws Exception {
 		Object bean = appContext.getBean("nestedService");
 		assertTrue(bean instanceof ServiceRegistration);
 		assertSame(registration, bean);
-		
+
 	}
 
 	public void testServiceProperties() throws Exception {
@@ -148,28 +145,21 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		assertEquals(2, properties.size());
 		assertTrue(properties.get("string") instanceof String);
 		assertTrue(properties.get("int") instanceof Integer);
-		
-		assertNull(getField(exporter, "targetBeanName"));
-		assertNotNull(getField(exporter, "target"));
+
+		assertNull(getTargetBeanName(exporter));
+		assertNotNull(getTarget(exporter));
 
 	}
 
-	private Object getField(final Object object, final String fieldName) {
-		final Object[] fld = new Object[1];
-		ReflectionUtils.doWithFields(object.getClass(), new FieldCallback() {
-			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-				field.setAccessible(true);
-				fld[0] = field.get(object);
-			}
+	private Class[] getInterfaces(OsgiServiceFactoryBean exporter) {
+		return (Class[]) TestUtils.getFieldValue(exporter, "interfaces");
+	}
 
-		}, new FieldFilter() {
+	private String getTargetBeanName(OsgiServiceFactoryBean exporter) {
+		return (String) TestUtils.getFieldValue(exporter, "targetBeanName");
+	}
 
-			public boolean matches(Field field) {
-				return fld[0] == null && fieldName.equals(field.getName());
-			}
-
-		});
-		
-		return fld[0];
+	private Object getTarget(OsgiServiceFactoryBean exporter) {
+		return TestUtils.getFieldValue(exporter, "target");
 	}
 }

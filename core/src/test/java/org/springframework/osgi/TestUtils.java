@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.config;
+package org.springframework.osgi;
 
 import java.lang.reflect.Field;
 
@@ -21,40 +21,30 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
 import org.springframework.util.ReflectionUtils.FieldFilter;
 
-import junit.framework.TestCase;
-
 /**
- * Base test class which permits retrieving values of private fields.
+ * Util classes for test cases.
  * 
  * @author Costin Leau
  * 
  */
-public abstract class PrivateFieldRetrieverTestCase extends TestCase {
+public abstract class TestUtils {
 
-	protected Object getPrivateProperty(final Object target, final String fieldName) {
-		final Field foundField[] = new Field[1];
-
-		ReflectionUtils.doWithFields(target.getClass(), new FieldCallback() {
-
+	public static Object getFieldValue(final Object object, final String fieldName) {
+		final Object[] fld = new Object[1];
+		ReflectionUtils.doWithFields(object.getClass(), new FieldCallback() {
 			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
 				field.setAccessible(true);
-				foundField[0] = field;
+				fld[0] = field.get(object);
 			}
 
 		}, new FieldFilter() {
 
 			public boolean matches(Field field) {
-				return fieldName.equals(field.getName());
+				return fld[0] == null && fieldName.equals(field.getName());
 			}
 
 		});
 
-		try {
-			return foundField[0].get(target);
-		}
-		catch (Exception ex) {
-			// translate
-			throw new RuntimeException(ex);
-		}
+		return fld[0];
 	}
 }

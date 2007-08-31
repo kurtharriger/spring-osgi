@@ -18,12 +18,15 @@ package org.springframework.osgi.config;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 
+import junit.framework.TestCase;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
@@ -36,7 +39,7 @@ import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBe
  * @author Costin Leau
  * 
  */
-public class OsgiReferenceNamespaceHandlerTest extends PrivateFieldRetrieverTestCase {
+public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 
 	private GenericApplicationContext appContext;
 
@@ -67,8 +70,6 @@ public class OsgiReferenceNamespaceHandlerTest extends PrivateFieldRetrieverTest
 		reader.loadBeanDefinitions(new ClassPathResource("osgiReferenceNamespaceHandlerTests.xml", getClass()));
 		appContext.refresh();
 	}
-	
-	
 
 	protected void tearDown() throws Exception {
 		appContext.close();
@@ -79,8 +80,9 @@ public class OsgiReferenceNamespaceHandlerTest extends PrivateFieldRetrieverTest
 
 		assertTrue(factoryBean instanceof OsgiSingleServiceProxyFactoryBean);
 		OsgiSingleServiceProxyFactoryBean proxyFactory = (OsgiSingleServiceProxyFactoryBean) factoryBean;
-		
-		Class[] intfs = (Class[]) getPrivateProperty(proxyFactory, "serviceTypes");
+
+		Class[] intfs = (Class[]) TestUtils.getFieldValue(proxyFactory, "serviceTypes");
+
 		assertEquals(1, intfs.length);
 		assertSame(Serializable.class, intfs[0]);
 
@@ -95,7 +97,7 @@ public class OsgiReferenceNamespaceHandlerTest extends PrivateFieldRetrieverTest
 		OsgiSingleServiceProxyFactoryBean factory = (OsgiSingleServiceProxyFactoryBean) appContext.getBean("&full-options");
 		factory.getObject(); // required to initialize expected listeners
 		// because of? god help me, I'm going insane
-		TargetSourceLifecycleListener[] listeners = (TargetSourceLifecycleListener[]) getPrivateProperty(factory,
+		TargetSourceLifecycleListener[] listeners = (TargetSourceLifecycleListener[]) TestUtils.getFieldValue(factory,
 			"listeners");
 		assertNotNull(listeners);
 		assertEquals(5, listeners.length);

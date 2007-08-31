@@ -19,12 +19,13 @@ import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import junit.framework.TestCase;
+
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.aop.framework.Advised;
 import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.config.PrivateFieldRetrieverTestCase;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 
@@ -34,7 +35,7 @@ import org.springframework.osgi.mock.MockServiceReference;
  * @author Costin Leau
  * 
  */
-public class OsgiSingleServiceProxyFactoryBeanTest extends PrivateFieldRetrieverTestCase {
+public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 
 	private OsgiSingleServiceProxyFactoryBean serviceFactoryBean;
 
