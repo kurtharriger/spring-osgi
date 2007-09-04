@@ -19,13 +19,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.util.ClassUtils;
@@ -43,8 +41,8 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public abstract class AbstractOsgiServiceProxyFactoryBean implements SmartFactoryBean, InitializingBean,
-		DisposableBean, BundleContextAware, BeanClassLoaderAware {
+public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServiceImporter implements SmartFactoryBean,
+		InitializingBean, DisposableBean, BundleContextAware, BeanClassLoaderAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceProxyFactoryBean.class);
 
@@ -62,9 +60,6 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements SmartFactor
 
 	protected int contextClassloader = ReferenceClassLoadingOptions.CLIENT;
 
-	/** is at least one service required? * */
-	protected boolean mandatory = true;
-
 	// not required to be an interface, but usually should be...
 	protected Class[] serviceTypes;
 
@@ -76,7 +71,7 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements SmartFactor
 	protected Filter unifiedFilter;
 
 	// service lifecycle listener
-	protected TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
+	protected TargetSourceLifecycleListener[] listeners;
 
 	/** Service Bean property of the OSGi service * */
 	protected String serviceBeanName;
@@ -133,13 +128,14 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements SmartFactor
 		// validate specified classes
 		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(serviceTypes),
 			"more then one concrete class specified; cannot create proxy");
+
+		this.listeners = (listeners == null ? new TargetSourceLifecycleListener[0] : listeners);
+		
 		getUnifiedFilter(); // eager initialization of the cache to catch filter
 		// errors
 		Assert.notNull(serviceTypes, "Required serviceTypes property not specified");
 
 		initialized = true;
-		// initialize the bean to register the OSGi service listeners
-		// getObject();
 	}
 
 	/**
@@ -176,31 +172,6 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements SmartFactor
 	}
 
 	public abstract void destroy() throws Exception;
-
-	/**
-	 * Try and figure out why the proxy generation failed.
-	 * 
-	 * @param ncdfe
-	 */
-	// FIXME: move this somewhere else
-	protected void debugClassLoading(NoClassDefFoundError ncdfe) {
-		String cname = ncdfe.getMessage().replace('/', '.');
-		BundleDelegatingClassLoader.debugClassLoading(bundleContext.getBundle(), cname, null);
-		// Check out all the classes.
-		for (int i = 0; i < serviceTypes.length; i++) {
-			ClassLoader cl = serviceTypes[i].getClassLoader();
-			String cansee = "cannot";
-			try {
-				cl.loadClass(cname);
-				cansee = "can";
-			}
-			catch (Exception e) {
-				// ignored
-			}
-			log.warn(serviceTypes[i].toString() + " is loaded by " + cl.toString() + " which " + cansee + " see "
-					+ cname);
-		}
-	}
 
 	/**
 	 * The type that the OSGi service was registered with
@@ -249,14 +220,6 @@ public abstract class AbstractOsgiServiceProxyFactoryBean implements SmartFactor
 
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
-	}
-
-	public void setMandatory(boolean mandatory) {
-		this.mandatory = mandatory;
-	}
-
-	public boolean isMandatory() {
-		return mandatory;
 	}
 
 }

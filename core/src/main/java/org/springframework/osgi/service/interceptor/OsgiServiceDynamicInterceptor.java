@@ -23,6 +23,9 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.ServiceUnavailableException;
+import org.springframework.osgi.internal.service.MandatoryDependencyEvent;
+import org.springframework.osgi.internal.service.MandatoryDependencyListener;
+import org.springframework.osgi.internal.service.ServiceImporter;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.support.DefaultRetryCallback;
 import org.springframework.osgi.service.support.RetryTemplate;
@@ -46,102 +49,104 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
  */
 public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker implements InitializingBean {
 
-	private ServiceWrapper wrapper;
-
-	protected RetryTemplate retryTemplate = new RetryTemplate();
-
-	protected Filter filter;
-
-	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
-
-	private final boolean serviceRequiredAtStartup;
-
-	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader, ClassLoader classLoader) {
-		this(context, contextClassLoader, true, classLoader);
-	}
-
-	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader,
-                                         boolean serviceRequiredAtStartup, ClassLoader classLoader) {
-		super(context, null, contextClassLoader, classLoader);
-		this.serviceRequiredAtStartup = serviceRequiredAtStartup;
-	}
-
 	private class Listener implements ServiceListener {
 
 		public void serviceChanged(ServiceEvent event) {
-            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-            try {
-                Thread.currentThread().setContextClassLoader(clientClassLoader);
-                ServiceReference ref = event.getServiceReference();
+			ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+			try {
+				Thread.currentThread().setContextClassLoader(clientClassLoader);
+				ServiceReference ref = event.getServiceReference();
 
-                // service id
-                long serviceId = ((Long) ref.getProperty(Constants.SERVICE_ID)).longValue();
-                // service ranking
-                Integer rank = (Integer) ref.getProperty(Constants.SERVICE_RANKING);
-                int ranking = (rank == null ? 0 : rank.intValue());
+				// service id
+				long serviceId = ((Long) ref.getProperty(Constants.SERVICE_ID)).longValue();
+				// service ranking
+				Integer rank = (Integer) ref.getProperty(Constants.SERVICE_RANKING);
+				int ranking = (rank == null ? 0 : rank.intValue());
 
-                switch (event.getType()) {
+				switch (event.getType()) {
 
-                    case(ServiceEvent.REGISTERED):
-                    case(ServiceEvent.MODIFIED): {
-                        // same as ServiceEvent.REGISTERED
-                        if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
-                            // inform listeners
-                            OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
-                        }
+				case (ServiceEvent.REGISTERED):
+				case (ServiceEvent.MODIFIED): {
+					// same as ServiceEvent.REGISTERED
+					if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
+						// inform listeners
+						OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
 
-                        break;
-                    }
-                    case(ServiceEvent.UNREGISTERING): {
-                        boolean updated = false;
+						// update dependency manager
+						if (listener != null) {
+							log.debug("calling satisfied on dependency listener");
+							listener.mandatoryServiceSatisfied(new MandatoryDependencyEvent(serviceImporter));
+						}
 
-                        synchronized (OsgiServiceDynamicInterceptor.this) {
-                            // remove service
-                            if (wrapper != null) {
-                                if (serviceId == wrapper.getServiceId()) {
-                                    updated = true;
-                                    wrapper.cleanup();
+					}
 
-                                }
-                            }
-                        }
+					break;
+				}
+				case (ServiceEvent.UNREGISTERING): {
+					boolean updated = false;
 
-                        if (log.isDebugEnabled()) {
-                            String message = "service reference [" + ref + "] was unregistered";
-                            if (updated) {
-                                message += " and was unbound from the service proxy";
-                            } else {
-                                message += " but did not affect the service proxy";
-                            }
-                            log.debug(message);
-                        }
+					synchronized (OsgiServiceDynamicInterceptor.this) {
+						// remove service
+						if (wrapper != null) {
+							if (serviceId == wrapper.getServiceId()) {
+								updated = true;
+								wrapper.cleanup();
 
-                        if (updated) {
-                            OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
-                        }
+							}
+						}
+					}
 
-                        // discover the new reference
-                        ServiceReference newReference = OsgiServiceReferenceUtils.getServiceReference(context,
-                                                                                                      filter.toString());
+					if (log.isDebugEnabled()) {
+						String message = "service reference [" + ref + "] was unregistered";
+						if (updated) {
+							message += " and was unbound from the service proxy";
+						}
+						else {
+							message += " but did not affect the service proxy";
+						}
+						log.debug(message);
+					}
 
-                        if (newReference != null)
-                        // update the listeners
-                        {
-                            serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, newReference));
-                        }
+					if (updated) {
+						OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
 
-                        break;
-                    }
-                    default:
-                        throw new IllegalArgumentException("unsupported event type");
-                }
-            } catch (Throwable e) {
-                // The framework will swallow these exceptions without logging, so log them here
-                log.fatal("Exception during service event handling", e);
-            } finally {
-                Thread.currentThread().setContextClassLoader(tccl);
-            }
-        }
+						// update dependency manager
+						if (listener != null) {
+							log.debug("calling unsatisfied on dependency listener");
+							listener.mandatoryServiceUnsatisfied(new MandatoryDependencyEvent(serviceImporter));
+						}
+
+					}
+
+					// discover the new reference
+					ServiceReference newReference = OsgiServiceReferenceUtils.getServiceReference(context,
+						filter.toString());
+
+					// we have a rebind
+					if (newReference != null) {
+						// update the listeners
+						serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, newReference));
+					}
+					// 
+					else {
+						// FIXME: OSGI-185
+					}
+
+					break;
+				}
+				default:
+					throw new IllegalArgumentException("unsupported event type");
+				}
+			}
+			catch (Throwable e) {
+				// The framework will swallow these exceptions without logging,
+				// so log them here
+				log.fatal("Exception during service event handling", e);
+			}
+			finally {
+				Thread.currentThread().setContextClassLoader(tccl);
+			}
+		}
 
 		private boolean updateWrapperIfNecessary(ServiceReference ref, long serviceId, int serviceRanking) {
 			boolean updated = false;
@@ -160,6 +165,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 								wrapper = new ServiceWrapper(ref, context);
 							}
 						}
+						// FIXME: do bind/unbind when updating the service
 					}
 					else {
 						wrapper = new ServiceWrapper(ref, context);
@@ -181,6 +187,30 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 			}
 		}
+	}
+
+	private ServiceWrapper wrapper;
+
+	protected RetryTemplate retryTemplate = new RetryTemplate();
+
+	protected Filter filter;
+
+	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
+
+	private final boolean serviceRequiredAtStartup;
+
+	private MandatoryDependencyListener listener;
+
+	private ServiceImporter serviceImporter;
+
+	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader, ClassLoader classLoader) {
+		this(context, contextClassLoader, true, classLoader);
+	}
+
+	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader,
+			boolean serviceRequiredAtStartup, ClassLoader classLoader) {
+		super(context, null, contextClassLoader, classLoader);
+		this.serviceRequiredAtStartup = serviceRequiredAtStartup;
 	}
 
 	protected void checkServiceWrapper() {
@@ -252,6 +282,14 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 	public void setListeners(TargetSourceLifecycleListener[] listeners) {
 		this.listeners = listeners;
+	}
+
+	public void setDependencyListener(MandatoryDependencyListener listener) {
+		this.listener = listener;
+	}
+
+	public void setServiceImporter(ServiceImporter importer) {
+		this.serviceImporter = importer;
 	}
 
 }

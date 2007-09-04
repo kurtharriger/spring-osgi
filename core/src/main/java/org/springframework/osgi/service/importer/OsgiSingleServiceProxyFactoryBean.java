@@ -21,6 +21,8 @@ import org.osgi.framework.Filter;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.osgi.context.support.LocalBundleContext;
+import org.springframework.osgi.internal.service.MandatoryDependencyListener;
+import org.springframework.osgi.internal.util.DebugUtils;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.service.interceptor.ServiceReferenceAwareAdvice;
@@ -61,7 +63,6 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 	public Object getObject() {
 		if (!initialized)
 			throw new FactoryBeanNotInitializedException();
-
 
 		if (proxy == null) {
 			proxy = createSingleServiceProxy(serviceTypes, listeners, classLoader);
@@ -109,7 +110,7 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			if (log.isWarnEnabled()) {
-				debugClassLoading(ncdfe);
+				DebugUtils.debugNoClassDefFoundWhenProxying(ncdfe, bundleContext, serviceTypes);
 			}
 			throw ncdfe;
 		}
@@ -129,6 +130,11 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 		lookupAdvice.setListeners(listeners);
 		lookupAdvice.setFilter(filter);
 		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
+
+		if (!depedencyListener.isEmpty()) {
+			lookupAdvice.setDependencyListener((MandatoryDependencyListener) this.depedencyListener.get(0));
+			lookupAdvice.setServiceImporter(this);
+		}
 
 		lookupAdvice.afterPropertiesSet();
 
@@ -166,5 +172,4 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 	public void setTimeout(long millisBetweenRetries) {
 		this.retryTemplate.setWaitTime(millisBetweenRetries);
 	}
-
 }

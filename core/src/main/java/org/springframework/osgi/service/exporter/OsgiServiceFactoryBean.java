@@ -35,20 +35,22 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Constants;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.OsgiBundleScope;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.internal.service.exporter.AbstractListenerAwareExporter;
+import org.springframework.osgi.internal.util.DebugUtils;
 import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.service.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.interceptor.OsgiServiceTCCLInvoker;
 import org.springframework.osgi.util.ClassUtils;
 import org.springframework.osgi.util.MapBasedDictionary;
+import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -74,8 +76,8 @@ import org.springframework.util.StringUtils;
  * @author Andy Piper
  * 
  */
-public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBean, DisposableBean, BundleContextAware,
-		FactoryBean, Ordered, BeanClassLoaderAware {
+public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implements BeanFactoryAware, DisposableBean,
+		BundleContextAware, FactoryBean, Ordered, BeanClassLoaderAware, BeanNameAware {
 
 	/**
 	 * ServiceFactory used for publishing the service beans. Acts as a a wrapper
@@ -232,6 +234,9 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 	private ClassLoader classLoader;
 
+	/** exporter bean name */
+	private String beanName;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -252,11 +257,7 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		if (interfaces == null)
 			interfaces = new Class[0];
 
-		Class serviceClass = target.getClass();
-		// if we have a nested bean / non-Spring managed object
-		String beanName = (!StringUtils.hasText(targetBeanName) ? ObjectUtils.getIdentityHexString(target)
-				: targetBeanName);
-		publishService(serviceClass, mergeServiceProperties(beanName));
+		super.afterPropertiesSet();
 	}
 
 	/**
@@ -281,32 +282,9 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			if (log.isWarnEnabled()) {
-				debugClassLoading(ncdfe);
+				DebugUtils.debugNoClassDefFoundWhenProxying(ncdfe, bundleContext, this.interfaces);
 			}
 			throw ncdfe;
-		}
-	}
-
-	/**
-	 * Try and figure out why the proxy generation failed.
-	 * 
-	 * @param ncdfe
-	 */
-	protected void debugClassLoading(NoClassDefFoundError ncdfe) {
-		String cname = ncdfe.getMessage().replace('/', '.');
-		BundleDelegatingClassLoader.debugClassLoading(bundleContext.getBundle(), cname, null);
-		// Check out all the classes.
-		for (int i = 0; i < interfaces.length; i++) {
-			ClassLoader cl = interfaces[i].getClassLoader();
-			String cansee = "cannot";
-			try {
-				cl.loadClass(cname);
-				cansee = "can";
-			}
-			catch (Exception e) {
-				// ignored
-			}
-			log.warn(interfaces[i].toString() + " is loaded by " + cl.toString() + " which " + cansee + " see " + cname);
 		}
 	}
 
@@ -368,9 +346,17 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 * @param beanClass
 	 * @param serviceProperties
 	 */
-	protected void publishService(Class beanClass, Dictionary serviceProperties) {
+	public void registerService() {
+
+		Class serviceClass = target.getClass();
+		// if we have a nested bean / non-Spring managed object
+		String beanName = (!StringUtils.hasText(targetBeanName) ? ObjectUtils.getIdentityHexString(target)
+				: targetBeanName);
+
+		Dictionary serviceProperties = mergeServiceProperties(beanName);
+
 		Class[] intfs = interfaces;
-		Class[] autoDetectedClasses = autoDetectClassesForPublishing(beanClass);
+		Class[] autoDetectedClasses = autoDetectClassesForPublishing(serviceClass);
 
 		// filter duplicates
 		Set classes = new LinkedHashSet(intfs.length + autoDetectedClasses.length);
@@ -380,7 +366,9 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 
 		Class[] mergedClasses = (Class[]) classes.toArray(new Class[classes.size()]);
 
-		serviceRegistration = registerService(mergedClasses, serviceProperties);
+		 ServiceRegistration reg = registerService(mergedClasses, serviceProperties);
+		
+		 serviceRegistration = notifyListeners((Map) serviceProperties, reg);
 	}
 
 	/**
@@ -395,12 +383,11 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 			classes,
 			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
 
-		Class beanClass = (target == null ? beanFactory.getType(targetBeanName)
-				: target.getClass());
-		
+		Class beanClass = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
+
 		// filter classes based on visibility
 		ClassLoader beanClassLoader = ClassUtils.getClassLoader(beanClass);
-		
+
 		Class[] visibleClasses = ClassUtils.getVisibleClasses(classes, beanClassLoader);
 
 		// create an array of classnames (used for registering the service)
@@ -437,26 +424,6 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		return bundleScoped;
 	}
 
-	/**
-	 * Unregisters (literally stops) a service.
-	 * 
-	 * @param registration
-	 */
-	protected void unregisterService(ServiceRegistration registration) {
-		if (registration != null)
-			try {
-				registration.unregister();
-			}
-			catch (IllegalStateException ise) {
-				// Service was already unregistered, probably because the bundle
-				// was stopped.
-				if (log.isInfoEnabled()) {
-					log.info("Service [" + registration + "] has already been unregistered");
-				}
-			}
-
-	}
-
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}
@@ -470,17 +437,28 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	}
 
 	public boolean isSingleton() {
-		return true;
+		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 */
 	public void destroy() {
 		// stop published service
+		unregisterService();
+	}
+
+	public void unregisterService() {
 		unregisterService(serviceRegistration);
+		serviceRegistration = null;
+	}
+
+	/**
+	 * Unregisters (literally stops) a service.
+	 * 
+	 * @param registration
+	 */
+	protected void unregisterService(ServiceRegistration registration) {
+		if (OsgiServiceUtils.unregisterService(registration)) {
+			log.info("Unregistered service [" + registration + "]");
+		}
 	}
 
 	/**
@@ -600,10 +578,6 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 		this.targetBeanName = name;
 	}
 
-	public Class[] getInterfaces() {
-		return interfaces;
-	}
-
 	public void setInterfaces(Class[] serviceInterfaces) {
 		this.interfaces = serviceInterfaces;
 	}
@@ -620,6 +594,11 @@ public class OsgiServiceFactoryBean implements BeanFactoryAware, InitializingBea
 	 */
 	public void setOrder(int order) {
 		this.order = order;
+	}
+
+
+	public void setBeanName(String name) {
+		this.beanName = name;
 	}
 
 }
