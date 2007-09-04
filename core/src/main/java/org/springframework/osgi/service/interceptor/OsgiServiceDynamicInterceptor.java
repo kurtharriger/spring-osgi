@@ -63,6 +63,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 				Integer rank = (Integer) ref.getProperty(Constants.SERVICE_RANKING);
 				int ranking = (rank == null ? 0 : rank.intValue());
 
+				boolean debug = log.isDebugEnabled();
+				
 				switch (event.getType()) {
 
 				case (ServiceEvent.REGISTERED):
@@ -74,7 +76,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 						// update dependency manager
 						if (listener != null) {
-							log.debug("calling satisfied on dependency listener");
+							if (debug)
+								log.debug("calling satisfied on dependency listener");
 							listener.mandatoryServiceSatisfied(new MandatoryDependencyEvent(serviceImporter));
 						}
 
@@ -83,55 +86,56 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 					break;
 				}
 				case (ServiceEvent.UNREGISTERING): {
-					boolean updated = false;
 
+					boolean serviceRemoved = false;
+					
 					synchronized (OsgiServiceDynamicInterceptor.this) {
 						// remove service
 						if (wrapper != null) {
 							if (serviceId == wrapper.getServiceId()) {
-								updated = true;
+								serviceRemoved = true;
 								wrapper.cleanup();
 
 							}
 						}
 					}
 
-					if (log.isDebugEnabled()) {
-						String message = "service reference [" + ref + "] was unregistered";
-						if (updated) {
-							message += " and was unbound from the service proxy";
-						}
-						else {
-							message += " but did not affect the service proxy";
-						}
-						log.debug(message);
-					}
-
-					if (updated) {
-						OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
-
-						// update dependency manager
-						if (listener != null) {
-							log.debug("calling unsatisfied on dependency listener");
-							listener.mandatoryServiceUnsatisfied(new MandatoryDependencyEvent(serviceImporter));
-						}
-
-					}
-
 					// discover the new reference
 					ServiceReference newReference = OsgiServiceReferenceUtils.getServiceReference(context,
-						filter.toString());
+						(filter == null ? null : filter.toString()));
 
-					// we have a rebind
+					// we have a rebind (a new service was binded)
 					if (newReference != null) {
 						// update the listeners
 						serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, newReference));
 					}
-					// 
+					// if there is no reference left, call listeners
 					else {
-						// FIXME: OSGI-185
-					}
+						if (serviceRemoved) {
+							// update dependency manager
+							if (listener != null) {
+								if (debug)
+									log.debug("calling unsatisfied on dependency listener");
+								listener.mandatoryServiceUnsatisfied(new MandatoryDependencyEvent(serviceImporter));
+							}
 
+							// inform listeners
+							OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
+
+							if (debug) {
+								String message = "service reference [" + ref + "] was unregistered";
+								if (serviceRemoved) {
+									message += " and was unbound from the service proxy";
+								}
+								else {
+									message += " but did not affect the service proxy";
+								}
+								log.debug(message);
+							}
+
+						}
+					}
+					
 					break;
 				}
 				default:
