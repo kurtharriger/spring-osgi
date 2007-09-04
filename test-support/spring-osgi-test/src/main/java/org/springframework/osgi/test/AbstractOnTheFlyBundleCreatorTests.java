@@ -233,7 +233,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
         try {
             installAndStartBundle(context, jar);
         } catch (Exception e) {
-            IllegalStateException ise = new IllegalStateException("Unable to start dyanamically generated bundle for Unit test");
+            IllegalStateException ise = new IllegalStateException("Unable to dynamically start generated bundle for Unit test");
             ise.initCause(e);
             throw ise;
         }
