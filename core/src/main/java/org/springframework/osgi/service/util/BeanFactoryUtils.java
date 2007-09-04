@@ -77,7 +77,9 @@ public abstract class BeanFactoryUtils {
 	private static void getTransitiveBeans(ConfigurableListableBeanFactory beanFactory, String beanName,
 			boolean rawFactoryBeans, Set beanNames) {
 		// strip out & just in case
-		String[] beans = beanFactory.getDependentBeans(org.springframework.beans.factory.BeanFactoryUtils.transformedBeanName(beanName));
+		String[] beans = new String[0];
+
+		//beanFactory.getDependentBeans(org.springframework.beans.factory.BeanFactoryUtils.transformedBeanName(beanName));
 
 		for (int i = 0; i < beans.length; i++) {
 			String bean = beans[i];
