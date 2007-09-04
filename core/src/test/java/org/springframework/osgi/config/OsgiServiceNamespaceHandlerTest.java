@@ -135,8 +135,7 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 	public void testServiceExporterFactoryBean() throws Exception {
 		Object bean = appContext.getBean("nestedService");
 		assertTrue(bean instanceof ServiceRegistration);
-		assertSame(registration, bean);
-
+		assertNotSame("registration not wrapped to provide exporting listener notification", registration, bean);
 	}
 
 	public void testServiceProperties() throws Exception {

@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.util;
 
+import java.util.Dictionary;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.FrameworkEvent;
@@ -48,6 +50,12 @@ public abstract class OsgiStringUtils {
 
 	private static final String EMPTY_STRING = "";
 
+	/**
+	 * Return a null-safe String representation for the given bundle event.
+	 * 
+	 * @param eventType bundle event given as an int
+	 * @return String representation for the bundle event
+	 */
 	public static String nullSafeBundleEventToString(int eventType) {
 		try {
 			return BUNDLE_EVENTS.toCode(new Integer(eventType), "");
@@ -59,9 +67,10 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Convert event codes to a printable String.
+	 * Return a null-safe String representation for the given bundle event.
 	 * 
-	 * @param type
+	 * @param event OSGi BundleEvent
+	 * @return String representation for the given bundle event
 	 */
 	public static String nullSafeToString(BundleEvent event) {
 		if (event == null)
@@ -74,6 +83,12 @@ public abstract class OsgiStringUtils {
 		}
 	}
 
+	/**
+	 * Return a null-safe String representation for the given ServiceEvent.
+	 * 
+	 * @param event OSGi ServiceEvent
+	 * @return String representation for the given ServiceEvent
+	 */
 	public static String nullSafeToString(ServiceEvent event) {
 		if (event == null)
 			return NULL_STRING;
@@ -86,6 +101,12 @@ public abstract class OsgiStringUtils {
 
 	}
 
+	/**
+	 * Return a null-safe String representation for the given FrameworkEvent.
+	 * 
+	 * @param event OSGi FrameworkEvent
+	 * @return String representation for the given FrameworkEvent
+	 */
 	public static String nullSafeToString(FrameworkEvent event) {
 		if (event == null)
 			return NULL_STRING;
@@ -98,10 +119,10 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Produce a nice string representation of this ServiceReference.
+	 * Produce a nice string representation of the given ServiceReference.
 	 * 
-	 * @param reference
-	 * @return
+	 * @param reference OSGi service reference
+	 * @return String representation for the ServiceReference
 	 */
 	public static String nullSafeToString(ServiceReference reference) {
 		if (reference == null)
@@ -132,8 +153,8 @@ public abstract class OsgiStringUtils {
 	/**
 	 * Return the Bundle state as a String.
 	 * 
-	 * @param bundle
-	 * @return
+	 * @param bundle OSGi bundle
+	 * @return bundle state as a string
 	 */
 	public static String bundleStateAsString(Bundle bundle) {
 		Assert.notNull(bundle, "bundle is required");
@@ -147,12 +168,59 @@ public abstract class OsgiStringUtils {
 		}
 	}
 
+	/**
+	 * Return the bundle symbolic name in a null safe manner (null will never be
+	 * returned).
+	 * 
+	 * @param bundle OSGi bundle
+	 * @return the bundle, symbolic name
+	 */
 	public static String nullSafeSymbolicName(Bundle bundle) {
 		if (bundle == null)
 			return NULL_STRING;
 
-		return (String) (bundle.getSymbolicName() == null ? bundle.getHeaders().get(
-			org.osgi.framework.Constants.BUNDLE_NAME) : bundle.getSymbolicName());
+		Dictionary headers = bundle.getHeaders();
+
+		if (headers == null)
+			return NULL_STRING;
+
+		return (String) (bundle.getSymbolicName() == null ? headers.get(org.osgi.framework.Constants.BUNDLE_NAME)
+				: bundle.getSymbolicName());
+	}
+
+	/**
+	 * Return the bundle name and symbolic name - useful when logging bundle
+	 * info.
+	 * 
+	 * @param bundle OSGi bundle
+	 * @return the bundle name and symbolic name
+	 */
+	public static String nullSafeNameAndSymName(Bundle bundle) {
+		if (bundle == null)
+			return NULL_STRING;
+
+		Dictionary dict = bundle.getHeaders();
+
+		if (dict == null)
+			return NULL_STRING;
+
+		StringBuffer buf = new StringBuffer();
+		String name = (String) dict.get(org.osgi.framework.Constants.BUNDLE_NAME);
+		if (name == null)
+			buf.append(NULL_STRING);
+		else
+			buf.append(name);
+		buf.append(" (");
+		String sname = (String) dict.get(org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME);
+
+		if (sname == null)
+			buf.append(NULL_STRING);
+		else
+			buf.append(sname);
+
+		buf.append(")");
+
+		return buf.toString();
 	}
 
 }
