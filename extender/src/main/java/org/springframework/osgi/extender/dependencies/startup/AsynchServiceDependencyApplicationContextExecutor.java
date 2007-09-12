@@ -315,33 +315,27 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 	private void fail(Throwable t) {
 		try {
 			close();
+            StringBuffer buf = new StringBuffer();
+            if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
+                buf.append("none");
+            } else {
+                for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().iterator();
+                     dependencies.hasNext();) {
+                    ServiceDependency dependency = (ServiceDependency) dependencies.next();
+                    buf.append(dependency.toString());
+                    if (dependencies.hasNext()) {
+                        buf.append(", ");
+                    }
+                }
+            }
+            StringBuffer message = new StringBuffer();
+            message.append("Unable to create application context for [");
+            message.append(getBundleSymbolicName());
+            message.append("], unsatisfied dependencies: ");
+            message.append(buf.toString());
 
-			boolean debug = log.isDebugEnabled();
-
-			if (debug) {
-				StringBuffer buf = new StringBuffer();
-				if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
-					buf.append("none");
-				}
-				else {
-					for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().iterator(); dependencies.hasNext();) {
-						ServiceDependency dependency = (ServiceDependency) dependencies.next();
-						buf.append(dependency.toString());
-						if (dependencies.hasNext()) {
-							buf.append(", ");
-						}
-					}
-				}
-				StringBuffer message = new StringBuffer();
-				message.append("Unable to create application context for [");
-				message.append(getBundleSymbolicName());
-				message.append("], unsatisfied dependencies: ");
-				message.append(buf.toString());
-
-				log.error(message.toString(), t);
-			}
-
-		}
+            log.error(message.toString(), t);
+        }
 		catch (Throwable e) {
 			// last ditch effort to get useful error information
 			t.printStackTrace();
