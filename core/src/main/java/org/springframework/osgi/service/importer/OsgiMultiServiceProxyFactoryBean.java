@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Filter;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.core.Constants;
+import org.springframework.osgi.internal.service.ImporterProxy;
 import org.springframework.osgi.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.collection.OsgiServiceList;
 import org.springframework.osgi.service.collection.OsgiServiceSet;
@@ -84,7 +85,7 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 
 	private static final Log log = LogFactory.getLog(OsgiMultiServiceProxyFactoryBean.class);
 
-	private Object proxy;
+	private ImporterProxy proxy;
 
 	private Comparator comparator;
 
@@ -105,11 +106,16 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 		return (proxy != null ? proxy.getClass() : CollectionOptions.getClassMapping(collectionType));
 	}
 
+	
+	public boolean isSatisfied() {
+		return (proxy == null ? true: proxy.isSatisfied());
+	}
+
 	public void destroy() throws Exception {
 		// FIXME: do cleanup
 	}
 
-	protected Object createMultiServiceCollection(Filter filter) {
+	protected ImporterProxy createMultiServiceCollection(Filter filter) {
 		if (log.isDebugEnabled())
 			log.debug("creating a multi-value/collection proxy");
 

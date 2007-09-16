@@ -15,7 +15,7 @@
  */
 package org.springframework.osgi.internal.service;
 
-import org.springframework.context.Lifecycle;
+import org.springframework.osgi.internal.OsgiLifecycle;
 
 /**
  * Interface describing the contract of OSGi service exporters. Used for
@@ -24,7 +24,7 @@ import org.springframework.context.Lifecycle;
  * @author Costin Leau
  * 
  */
-public interface ServiceExporter extends Lifecycle {
+public interface ServiceExporter extends OsgiLifecycle {
 
 	/**
 	 * Should this exporter, publish the service at startup or not. This method

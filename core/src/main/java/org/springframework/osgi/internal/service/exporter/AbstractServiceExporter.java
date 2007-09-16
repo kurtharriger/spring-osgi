@@ -15,7 +15,8 @@
  */
 package org.springframework.osgi.internal.service.exporter;
 
-import org.osgi.framework.ServiceRegistration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.internal.service.ServiceExporter;
 
@@ -25,12 +26,16 @@ import org.springframework.osgi.internal.service.ServiceExporter;
  */
 public abstract class AbstractServiceExporter implements ServiceExporter, InitializingBean {
 
+	private static final Log log = LogFactory.getLog(AbstractServiceExporter.class);
+
 	protected boolean publishAtStartup = true;
 
 	/** running monitor */
 	private final Object monitor = new Object();
 
 	private boolean running = false;
+
+	private boolean initialized = false;
 
 	/*
 	 * (non-Javadoc)
@@ -41,30 +46,43 @@ public abstract class AbstractServiceExporter implements ServiceExporter, Initia
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		if (publishAtStartup)
-			start();
+		synchronized (monitor) {
+			initialized = true;
+			if (publishAtStartup)
+				start();
+		}
 	}
 
 	public boolean isRunning() {
 		synchronized (monitor) {
-			return running;			
+			return running;
 		}
 	}
 
 	public void start() {
 		synchronized (monitor) {
 			if (!running) {
-				running = true;
-				registerService();
+				if (initialized) {
+					running = true;
+					registerService();
+				}
+				else
+					publishAtStartup = true;
 			}
 		}
+		if (!initialized)
+			log.trace("exporter not initialized, service not exported but registered for publication at startup");
 	}
 
 	public void stop() {
 		synchronized (monitor) {
 			if (running) {
-				running = false;
-				unregisterService();
+				if (initialized) {
+					running = false;
+					unregisterService();
+				}
+				else
+					publishAtStartup = false;
 			}
 		}
 	}

@@ -65,7 +65,5 @@ public class ServiceReferenceAwareAdvice extends DelegatingIntroductionIntercept
 		}
 		else
 			return false;
-
 	}
-
 }

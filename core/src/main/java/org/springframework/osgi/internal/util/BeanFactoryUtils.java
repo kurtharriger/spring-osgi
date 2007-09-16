@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.util;
+package org.springframework.osgi.internal.util;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -31,10 +31,8 @@ import org.springframework.util.Assert;
  */
 public abstract class BeanFactoryUtils {
 
-	private static final String[] EMPTY_ARRAY = new String[0];
-
 	/**
-	 * Return all beans that depend directly or indirectly (transitively), on
+	 * Return all beans depending directly or indirectly (transitively), on
 	 * the bean identified by the beanName. When dealing with a FactoryBean, the
 	 * factory itself can be returned or its product. Additional filtering can
 	 * be executed through the type parameter. If no filtering is required, then
@@ -50,7 +48,7 @@ public abstract class BeanFactoryUtils {
 	 * @param type type of the beans returned (null to return all beans)
 	 * @return bean names
 	 */
-	public static String[] getTransitiveDependentBeans(ConfigurableListableBeanFactory beanFactory, String beanName,
+	public static String[] getTransitiveDependenciesForBean(ConfigurableListableBeanFactory beanFactory, String beanName,
 			boolean rawFactoryBeans, Class type) {
 		Assert.notNull(beanFactory);
 		Assert.hasText(beanName);
@@ -76,15 +74,14 @@ public abstract class BeanFactoryUtils {
 
 	private static void getTransitiveBeans(ConfigurableListableBeanFactory beanFactory, String beanName,
 			boolean rawFactoryBeans, Set beanNames) {
+		// new String[0];
 		// strip out & just in case
-		String[] beans = new String[0];
-
-		//beanFactory.getDependentBeans(org.springframework.beans.factory.BeanFactoryUtils.transformedBeanName(beanName));
+		String[] beans = beanFactory.getDependenciesForBean(org.springframework.beans.factory.BeanFactoryUtils.transformedBeanName(beanName));
 
 		for (int i = 0; i < beans.length; i++) {
 			String bean = beans[i];
 			// & if needed
-			if (rawFactoryBeans && beanFactory.isFactoryBean(beanName))
+			if (rawFactoryBeans && beanFactory.isFactoryBean(bean))
 				bean = BeanFactory.FACTORY_BEAN_PREFIX + beans[i];
 
 			if (!beanNames.contains(bean)) {

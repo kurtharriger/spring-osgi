@@ -442,7 +442,7 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 	public void destroy() {
 		// stop published service
-		unregisterService();
+		stop();
 	}
 
 	public void unregisterService() {
