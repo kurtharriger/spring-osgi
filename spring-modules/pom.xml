@@ -18,7 +18,7 @@
   <!-- defaults point to Spring framework -->
   <properties>
   
-    <spring.version>2.1-m3</spring.version>
+    <spring.version>2.1-m4</spring.version>
   
     <spring.osgi.export.pkg>org.springframework*</spring.osgi.export.pkg>
 
@@ -34,7 +34,6 @@
  
 
   <modules>
-    <module>spring-aop</module>
     <module>spring-required-libraries</module>
   </modules>
 
