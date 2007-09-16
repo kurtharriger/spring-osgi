@@ -32,7 +32,7 @@
     <spring.bundle.version>2.1.0.SNAPSHOT-205</spring.bundle.version>
     --> 
     <!-- naming pattern for Spring OSGi bundles that get published into maven -->   
-    <spring.maven.artifact.version>2.1-m3</spring.maven.artifact.version>
+    <spring.maven.artifact.version>2.1-m4</spring.maven.artifact.version>
     
     <!-- spring wrapped artifacts -->
     <spring.wrapped.version>2.1-osgi-m4-SNAPSHOT</spring.wrapped.version>
