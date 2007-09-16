@@ -14,7 +14,6 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.OsgiListenerUtils;
@@ -170,7 +169,7 @@ public class DependencyServiceManager {
 					log.debug("destroying bean " + realBean + " from context " + beanFactory);
 				
 				// clean up factory singleton
-				((DefaultListableBeanFactory) beanFactory).destroySingleton(realBean);
+				//((DefaultListableBeanFactory) beanFactory).destroySingleton(realBean);
 
 				dependencies.add(dependency);
 				if (!dependency.isServicePresent()) {
