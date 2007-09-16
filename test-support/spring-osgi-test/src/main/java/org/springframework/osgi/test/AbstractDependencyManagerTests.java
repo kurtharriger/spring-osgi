@@ -46,9 +46,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 	private static final String SPRING_OSGI_VERSION = "1.0-m3-SNAPSHOT";
 
-	private static final String SPRING_BUNDLED_VERSION = "2.1-m3";
+	private static final String SPRING_BUNDLED_VERSION = "2.1-m4";
 
-	private static final String SPRING_WRAPPED_VERSION = "2.1-osgi-m4-SNAPSHOT";
+	private static final String SLF4J_VERSION = "1.4.3";
 
 	/**
 	 * Return the Spring/OSGi version used by the core bundles.
@@ -65,14 +65,6 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 */
 	protected String getSpringBundledVersion() {
 		return SPRING_BUNDLED_VERSION;
-	}
-
-	/**
-	 * Return the Spring wrapped version used by the core bundles.
-	 * @return
-	 */
-	protected String getSpringWrappedVersion() {
-		return SPRING_WRAPPED_VERSION;
 	}
 
 	// FIXME: externalize them
@@ -118,15 +110,15 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	protected String getSlf4jApi() {
-		return "org.slf4j,slf4j-api,1.4.0";
+		return "org.slf4j,slf4j-api," + SLF4J_VERSION;
 	}
 
 	protected String getJclOverSlf4jUrl() {
-		return "org.slf4j,jcl104-over-slf4j,1.4.0";
+		return "org.slf4j,jcl104-over-slf4j," + SLF4J_VERSION;
 	}
 
 	protected String getSlf4jLog4jUrl() {
-		return "org.slf4j,slf4j-log4j12,1.4.0";
+		return "org.slf4j,slf4j-log4j12," + SLF4J_VERSION;
 	}
 
 	protected String getLog4jLibUrl() {
@@ -135,7 +127,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	protected String getSpringMockUrl() {
-		return "org.springframework,spring-mock," + getSpringBundledVersion();
+		return "org.springframework,spring-test," + getSpringBundledVersion();
 	}
 
 	protected String getSpringContextUrl() {
@@ -143,7 +135,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	protected String getSpringAopUrl() {
-		return "org.springframework.osgi,spring-aop," + getSpringWrappedVersion();
+		return "org.springframework,spring-aop," + getSpringBundledVersion();
 
 	}
 
@@ -170,7 +162,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
 				getSpringMockUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
 				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringBeansBundleUrl(),
-                getSpringOSGiTestBundleUrl(), getSpringOSGiExtenderBundleUrl() };
+				getSpringOSGiTestBundleUrl(), getSpringOSGiExtenderBundleUrl() };
 
 		String[] bundles;
 

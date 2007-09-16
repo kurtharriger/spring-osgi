@@ -24,6 +24,7 @@
 		org.w3c.dom;resolution:=optional,
 		org.xml.sax;resolution:=optional,
 		org.springframework.osgi.annotation;resolution:=optional,
+		edu.emory.mathcs.backport*;resolution:=optional,
 		*
 	</spring.osgi.import.pkg>
 	
@@ -69,14 +70,14 @@
       <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>
     </dependency>
-
-	<!-- this one is still wrapped internally -->
+    
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-aop</artifactId>
-      <version>${spring.wrapped.version}</version>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${spring.maven.artifact.version}</version>
+      <scope>provided</scope>
     </dependency>
-	  
+
     <dependency>
       <groupId>org.aopalliance</groupId>
       <artifactId>aopalliance</artifactId>
@@ -97,6 +98,13 @@
       <version>1.0</version>
       <scope>provided</scope>
     </dependency>
+    
+   <dependency>
+    <groupId>backport-util-concurrent</groupId>
+    <artifactId>backport-util-concurrent</artifactId>
+    <version>3.0</version>
+    <scope>provided</scope>
+   </dependency> 
 
     <dependency>
         <groupId>org.springframework.osgi</groupId>
