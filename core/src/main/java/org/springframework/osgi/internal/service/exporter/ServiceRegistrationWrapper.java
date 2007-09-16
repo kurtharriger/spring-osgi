@@ -22,6 +22,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.service.util.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
+import org.springframework.util.Assert;
 
 /**
  * Wrapper class for {@link ServiceReference} which add notification for
@@ -37,6 +38,7 @@ public class ServiceRegistrationWrapper implements ServiceRegistration {
 	private final OsgiServiceRegistrationListener[] listeners;
 
 	public ServiceRegistrationWrapper(ServiceRegistration registration, OsgiServiceRegistrationListener[] listeners) {
+		Assert.notNull(registration);
 		this.delegate = registration;
 		this.listeners = (listeners == null ? new OsgiServiceRegistrationListener[0] : listeners);
 	}
@@ -62,6 +64,10 @@ public class ServiceRegistrationWrapper implements ServiceRegistration {
 			if (listeners[i] != null)
 				listeners[i].unregistered(properties);
 		}
+	}
+
+	public String toString() {
+		return "ServiceWrapper for " + delegate.toString();
 	}
 
 }

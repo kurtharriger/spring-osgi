@@ -35,11 +35,11 @@ public abstract class AbstractServiceImporter implements ServiceImporter {
 	/** is at least one service required? */
 	protected boolean mandatory = true;
 
-	protected List depedencyListener = new ArrayList(2);
+	protected List depedencyListeners = new ArrayList(2);
 
 	public void registerListener(MandatoryDependencyListener listener) {
 		Assert.notNull(listener);
-		depedencyListener.add(listener);
+		depedencyListeners.add(listener);
 	}
 
 	public boolean isMandatory() {
@@ -49,4 +49,5 @@ public abstract class AbstractServiceImporter implements ServiceImporter {
 	public void setMandatory(boolean mandatory) {
 		this.mandatory = mandatory;
 	}
+	
 }

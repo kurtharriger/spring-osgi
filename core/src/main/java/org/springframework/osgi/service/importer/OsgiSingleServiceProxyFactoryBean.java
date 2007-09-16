@@ -21,8 +21,8 @@ import org.osgi.framework.Filter;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.osgi.context.support.LocalBundleContext;
-import org.springframework.osgi.internal.service.MandatoryDependencyListener;
 import org.springframework.osgi.internal.util.DebugUtils;
+import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.service.interceptor.ServiceReferenceAwareAdvice;
@@ -46,7 +46,7 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 
 	protected RetryTemplate retryTemplate = new RetryTemplate();
 
-	private Object proxy;
+	private ServiceReferenceAware proxy;
 
 	/*
 	 * (non-Javadoc)
@@ -80,8 +80,15 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 
 	}
 
-	protected Object createSingleServiceProxy(Class[] classes, TargetSourceLifecycleListener[] listeners,
-			ClassLoader loader) {
+	public boolean isSatisfied() {
+		if (!isMandatory())
+			return true;
+		else
+			return (proxy == null ? true : proxy.getServiceReference().getBundle() != null);
+	}
+
+	protected ServiceReferenceAware createSingleServiceProxy(Class[] classes,
+			TargetSourceLifecycleListener[] listeners, ClassLoader loader) {
 		if (log.isDebugEnabled())
 			log.debug("creating a singleService proxy");
 
@@ -106,7 +113,7 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 		// factory.setOpaque(true);
 
 		try {
-			return factory.getProxy(loader);
+			return (ServiceReferenceAware) factory.getProxy(loader);
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			if (log.isWarnEnabled()) {
@@ -131,10 +138,9 @@ public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyF
 		lookupAdvice.setFilter(filter);
 		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
 
-		if (!depedencyListener.isEmpty()) {
-			lookupAdvice.setDependencyListener((MandatoryDependencyListener) this.depedencyListener.get(0));
-			lookupAdvice.setServiceImporter(this);
-		}
+		// add the listeners as a list since it might be updated after the proxy has been created
+		lookupAdvice.setDependencyListeners(this.depedencyListeners);
+		lookupAdvice.setServiceImporter(this);
 
 		lookupAdvice.afterPropertiesSet();
 

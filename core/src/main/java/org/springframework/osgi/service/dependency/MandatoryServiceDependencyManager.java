@@ -21,15 +21,13 @@ package org.springframework.osgi.service.dependency;
  * the implementation to discover the relationship between importer and
  * exporter.
  * 
- * Implementations take action when one of the importers fails to find at least
+ * Implementations should take action when one of the importers fails to find at least
  * one mandatory OSGi service.
  * 
  * @author Costin Leau
  * 
  */
 public interface MandatoryServiceDependencyManager {
-
-	void addMandatoryImporter(String importerBeanName);
 
 	void addServiceExporter(String exporterBeanName);
 }

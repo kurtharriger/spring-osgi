@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.service.interceptor;
 
+import java.util.List;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -64,7 +66,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 				int ranking = (rank == null ? 0 : rank.intValue());
 
 				boolean debug = log.isDebugEnabled();
-				
+
 				switch (event.getType()) {
 
 				case (ServiceEvent.REGISTERED):
@@ -75,12 +77,14 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 						OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
 
 						// update dependency manager
-						if (listener != null) {
-							if (debug)
-								log.debug("calling satisfied on dependency listener");
-							listener.mandatoryServiceSatisfied(new MandatoryDependencyEvent(serviceImporter));
+						if (mandatoryListeners != null) {
+							for (int i = 0; i < mandatoryListeners.size(); i++) {
+								if (debug)
+									log.debug("calling satisfied on dependency mandatoryListeners");
+								((MandatoryDependencyListener) mandatoryListeners.get(i)).mandatoryServiceSatisfied(new MandatoryDependencyEvent(
+										serviceImporter));
+							}
 						}
-
 					}
 
 					break;
@@ -88,7 +92,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 				case (ServiceEvent.UNREGISTERING): {
 
 					boolean serviceRemoved = false;
-					
+
 					synchronized (OsgiServiceDynamicInterceptor.this) {
 						// remove service
 						if (wrapper != null) {
@@ -113,12 +117,14 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 					else {
 						if (serviceRemoved) {
 							// update dependency manager
-							if (listener != null) {
-								if (debug)
-									log.debug("calling unsatisfied on dependency listener");
-								listener.mandatoryServiceUnsatisfied(new MandatoryDependencyEvent(serviceImporter));
+							if (mandatoryListeners != null) {
+								for (int i = 0; i < mandatoryListeners.size(); i++) {
+									if (debug)
+										log.debug("calling unsatisfied on dependency mandatoryListeners");
+									((MandatoryDependencyListener) mandatoryListeners.get(i)).mandatoryServiceUnsatisfied(new MandatoryDependencyEvent(
+											serviceImporter));
+								}
 							}
-
 							// inform listeners
 							OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
 
@@ -135,7 +141,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 						}
 					}
-					
+
 					break;
 				}
 				default:
@@ -203,7 +209,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 	private final boolean serviceRequiredAtStartup;
 
-	private MandatoryDependencyListener listener;
+	/** mandatory listeners */
+	private List mandatoryListeners;
 
 	private ServiceImporter serviceImporter;
 
@@ -257,7 +264,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 	public void afterPropertiesSet() {
 		boolean debug = log.isDebugEnabled();
 		if (debug)
-			log.debug("adding osgi listener for services matching [" + filter + "]");
+			log.debug("adding osgi mandatoryListeners for services matching [" + filter + "]");
 		OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
 		if (serviceRequiredAtStartup) {
 			if (debug)
@@ -288,8 +295,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 		this.listeners = listeners;
 	}
 
-	public void setDependencyListener(MandatoryDependencyListener listener) {
-		this.listener = listener;
+	public void setDependencyListeners(List listeners) {
+		this.mandatoryListeners = listeners;
 	}
 
 	public void setServiceImporter(ServiceImporter importer) {

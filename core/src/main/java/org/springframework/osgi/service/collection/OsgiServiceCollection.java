@@ -33,6 +33,7 @@ import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.ServiceUnavailableException;
+import org.springframework.osgi.internal.service.ImporterProxy;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.service.interceptor.OsgiServiceInvoker;
@@ -55,7 +56,7 @@ import org.springframework.util.Assert;
  * @see Collection
  * @author Costin Leau
  */
-public class OsgiServiceCollection implements Collection, InitializingBean {
+public class OsgiServiceCollection implements Collection, InitializingBean, ImporterProxy {
 
 	/**
 	 * Listener tracking the OSGi services which form the dynamic collection.
@@ -164,7 +165,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 	// map of services
 	// the service id is used as key while the service proxy is used for
 	// values
-	// Map<ServiceId, ServiceProxy>
+	// Map<ServiceId, ImporterProxy>
 	// 
 	// NOTE: this collection is protected by the 'serviceProxies' lock.
 	protected final Map servicesIdMap = new LinkedHashMap(8);
@@ -329,6 +330,13 @@ public class OsgiServiceCollection implements Collection, InitializingBean {
 		synchronized (serviceProxies) {
 			return serviceProxies.toString();
 		}
+	}
+
+	public boolean isSatisfied() {
+		if (atLeastOneServiceMandatory)
+			return serviceProxies.isEmpty();
+		else
+			return true;
 	}
 
 	//
