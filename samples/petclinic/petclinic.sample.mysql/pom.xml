@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi.samples.petclinic</groupId>
+  <artifactId>mysql-impl</artifactId>
+  <packaging>jar</packaging>
+  <name>Spring OSGi Bundle</name>
+  <version>1.0-m3-SNAPSHOT</version>
+  <url>http://www.springframework.org/osgi</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-core</artifactId>
+      <version>${pom.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  
+  </dependencies> 
+  
+  
+   <build> 
+	<plugins>
+	<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+	</plugins>
+	</build>
+   
+  
+
+</project>

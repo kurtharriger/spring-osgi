@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi.samples.petclinic</groupId>
+  <artifactId>contract</artifactId>
+  	<packaging>jar</packaging>
+  <name>Spring OSGi Bundle</name>
+  <version>1.0-m3-SNAPSHOT</version>
+  <url>http://www.springframework.org/osgi</url>
+  
+   <properties>
+     <spring.osgi.version>2.1-m4</spring.osgi.version>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${spring.osgi.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>${spring.osgi.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>${spring.osgi.version}</version>
+	  <scope>provided</scope>      
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+      <version>${spring.osgi.version}</version>
+      <scope>provided</scope>      
+    </dependency>
+    
+   <!-- commons-logging in slf4j wrapper -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl104-over-slf4j</artifactId>
+      <version>1.3.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.3.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.3.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>log4j.osgi</artifactId>
+      <version>1.2.13-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>    
+        
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${spring.osgi.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>${spring.osgi.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.2</version>
+      <scope>provided</scope>
+    </dependency>
+    
+  </dependencies>
+
+
+   <build> 
+	<plugins>
+	<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+	</plugins>
+	</build>
+
+  <repositories>
+    <repository>
+    <id>i21-s3-maven-repo</id>
+      <name>i21 S3 milestone repo</name>
+      <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+    </repository>	
+ </repositories>  
+ 	
+</project>
