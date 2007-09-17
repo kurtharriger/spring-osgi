@@ -4,7 +4,7 @@
   <groupId>org.springframework.osgi.samples.petclinic</groupId>
   <artifactId>mysql-impl</artifactId>
   <packaging>jar</packaging>
-  <name>Spring OSGi Bundle</name>
+  <name>Spring OSGi Petclinic Mysql</name>
   <version>1.0-m3-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   <dependencies>

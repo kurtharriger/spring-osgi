@@ -14,6 +14,7 @@
   <modules>
     <module>simple-service</module>
     <module>weather</module>
+    <module>petclinic</module>
   </modules>
 <build>
   <plugins>
