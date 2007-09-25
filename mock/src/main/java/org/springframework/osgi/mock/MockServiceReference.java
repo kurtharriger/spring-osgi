@@ -86,7 +86,8 @@ public class MockServiceReference implements ServiceReference {
 
 	private void addMandatoryProperties(Dictionary dict) {
 		// add mandatory properties
-		if (dict.get(Constants.SERVICE_ID) == null)
+		Object id = dict.get(Constants.SERVICE_ID);
+		if (id == null || !(id instanceof Long))
 			dict.put(Constants.SERVICE_ID, new Long(GLOBAL_SERVICE_ID++));
 
 		if (dict.get(Constants.OBJECTCLASS) == null)
@@ -192,6 +193,14 @@ public class MockServiceReference implements ServiceReference {
 	 */
 	public int hashCode() {
 		return MockServiceReference.class.hashCode() * 13 + (int) serviceId;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		return "owning bundle|" + bundle.hashCode() + "|props : " + properties;
 	}
 
 }

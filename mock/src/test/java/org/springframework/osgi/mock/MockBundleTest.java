@@ -136,7 +136,7 @@ public class MockBundleTest extends TestCase {
 	 * {@link org.springframework.osgi.mock.MockBundle#getBundleId()}.
 	 */
 	public void testGetBundleId() {
-		assertEquals(0, mock.getBundleId());
+		assertTrue(mock.getBundleId() != 0);
 	}
 
 	/**
