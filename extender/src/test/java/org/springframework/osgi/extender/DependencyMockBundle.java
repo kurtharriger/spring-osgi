@@ -16,9 +16,11 @@
 package org.springframework.osgi.extender;
 
 import java.util.Dictionary;
+import java.util.Properties;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockServiceReference;
@@ -61,23 +63,33 @@ public class DependencyMockBundle extends MockBundle {
 		super(location);
 	}
 
+	private Dictionary createProps(int index, int[] serviceRanking, long[] serviceId) {
+		// set Properties
+		Dictionary props = new Properties();
+
+		props.put(Constants.SERVICE_RANKING, new Integer((index < serviceRanking.length ? serviceRanking[index]
+				: serviceRanking[0])));
+		long id = (index < serviceId.length ? serviceId[index] : serviceId[0]);
+		if (id >= 0)
+			props.put(Constants.SERVICE_ID, new Long(id));
+
+		return props;
+	}
+
 	/**
 	 * Create one service reference returning the using bundle.
 	 * 
 	 * @param dependent
 	 */
-	public void setDependentOn(final Bundle[] dependent) {
+	public void setDependentOn(final Bundle[] dependent, int[] serviceRanking, long[] serviceId) {
 		this.dependentOn = dependent;
 
 		// initialize registered services
 		registeredServices = new ServiceReference[dependent.length];
-		for (int i = 0; i < registeredServices.length; i++) {
-			
-			registeredServices[i] = new MockServiceReference() {
 
-				public Bundle getBundle() {
-					return DependencyMockBundle.this;
-				}
+		for (int i = 0; i < registeredServices.length; i++) {
+			registeredServices[i] = new MockServiceReference(DependencyMockBundle.this, createProps(i, serviceRanking,
+				serviceId), null) {
 
 				public Bundle[] getUsingBundles() {
 					return dependent;
@@ -86,8 +98,20 @@ public class DependencyMockBundle extends MockBundle {
 		}
 	}
 
+	public void setDependentOn(final Bundle[] dependent, int serviceRanking, long serviceId) {
+		setDependentOn(dependent, new int[] { serviceRanking }, new long[] { serviceId });
+	}
+
+	public void setDependentOn(final Bundle[] dependent) {
+		setDependentOn(dependent, 0, -1);
+	}
+
 	public void setDependentOn(Bundle dependent) {
-		setDependentOn(new Bundle[] { dependent });
+		setDependentOn(new Bundle[] { dependent }, 0, -1);
+	}
+
+	public void setDependentOn(Bundle dependent, int serviceRanking, long serviceId) {
+		setDependentOn(new Bundle[] { dependent }, serviceRanking, serviceId);
 	}
 
 	protected void setDependsOn(Bundle[] depends) {

@@ -18,7 +18,6 @@ package org.springframework.osgi.extender;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,7 +35,6 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.springframework.beans.factory.xml.PluggableSchemaResolver;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -45,6 +43,8 @@ import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplic
 import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.osgi.extender.dependencies.shutdown.ComparatorServiceDependencySorter;
+import org.springframework.osgi.extender.dependencies.shutdown.ServiceDependencySorter;
 import org.springframework.osgi.extender.dependencies.startup.AsynchServiceDependencyApplicationContextExecutor;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
@@ -232,6 +232,9 @@ public class ContextLoaderListener implements BundleActivator {
 	/** Bundle listener */
 	private SynchronousBundleListener bundleListener;
 
+	/** Service-based dependency sorter for shutdown */ 
+	private ServiceDependencySorter shutdownDependencySorter = new ComparatorServiceDependencySorter();
+
 	/**
 	 * Monitor used for dealing with the bundle activator and synchronous bundle
 	 * threads
@@ -340,7 +343,7 @@ public class ContextLoaderListener implements BundleActivator {
 			context.removeBundleListener(bundleListener);
 			bundleListener = null;
 		}
-			
+
 		unregisterListenerService();
 		unregisterResolverService();
 
@@ -352,7 +355,7 @@ public class ContextLoaderListener implements BundleActivator {
 			bundles[i++] = context.getBundle();
 		}
 
-		Arrays.sort(bundles, new BundleDependencyComparator());
+		bundles = shutdownDependencySorter.computeServiceDependencyGraph(bundles);
 
 		boolean debug = log.isDebugEnabled();
 
@@ -473,8 +476,9 @@ public class ContextLoaderListener implements BundleActivator {
 			log.debug("Registering Spring ContextListenerContext service");
 		}
 
-//		listenerServiceRegistration = context.registerService(
-//			new String[] { ApplicationEventMulticaster.class.getName() }, this, null);
+		// listenerServiceRegistration = context.registerService(
+		// new String[] { ApplicationEventMulticaster.class.getName() }, this,
+		// null);
 	}
 
 	/**

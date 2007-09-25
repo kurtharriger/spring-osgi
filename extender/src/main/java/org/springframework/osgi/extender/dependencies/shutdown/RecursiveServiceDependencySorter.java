@@ -31,7 +31,7 @@ import org.springframework.util.ObjectUtils;
  * on.
  * 
  * The algorithm travers each node/bundle (and its dependencies) only once.
- * 
+ * <p/>
  * <strong>Note</strong> This class is thread-safe.
  * 
  * @author Costin Leau
@@ -50,6 +50,8 @@ public class RecursiveServiceDependencySorter implements ServiceDependencySorter
 
 		// nodes 'seen' or in-process
 		Set seen = new LinkedHashSet(bundles.length);
+		// nodes completely processed (used to determine circular cycles)
+		Set processed = new LinkedHashSet(bundles.length);
 
 		// pick up a node
 		for (int i = 0; i < bundles.length; i++) {
@@ -57,7 +59,7 @@ public class RecursiveServiceDependencySorter implements ServiceDependencySorter
 
 			// if the bundle is 'new', start the process
 			if (!seen.contains(bundle)) {
-				process(bundle, seen, dependencyList);
+				process(bundle, seen, processed, dependencyList);
 			}
 		}
 
@@ -72,7 +74,7 @@ public class RecursiveServiceDependencySorter implements ServiceDependencySorter
 	 * @param dependencyList
 	 * @param seen
 	 */
-	private void process(Bundle current, Set seen, List dependencyList) {
+	private void process(Bundle current, Set seen, Set processed, List dependencyList) {
 
 		// mark bundle (if it's already marked, return)
 		if (!seen.add(current))
@@ -92,7 +94,7 @@ public class RecursiveServiceDependencySorter implements ServiceDependencySorter
 				// invocations that would just return
 
 				// call method recursively
-				process(before, seen, dependencyList);
+				process(before, seen, processed, dependencyList);
 			}
 		}
 
@@ -105,7 +107,7 @@ public class RecursiveServiceDependencySorter implements ServiceDependencySorter
 		for (int i = 0; i < dependsOn.length; i++) {
 			Bundle after = dependsOn[i];
 			if (filter(after) && !seen.contains(after)) {
-				process(after, seen, dependencyList);
+				process(after, seen, processed, dependencyList);
 			}
 		}
 	}
