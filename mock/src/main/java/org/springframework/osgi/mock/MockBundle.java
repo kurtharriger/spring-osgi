@@ -44,7 +44,9 @@ public class MockBundle implements Bundle {
 
 	private Dictionary headers;
 
-	private long bundleId = 0;
+	private static int GENERAL_BUNDLE_ID = 0;
+	
+	private long bundleId = (GENERAL_BUNDLE_ID++);
 
 	// required for introspection by util classes (should be removed)
 	private BundleContext bundleContext;
