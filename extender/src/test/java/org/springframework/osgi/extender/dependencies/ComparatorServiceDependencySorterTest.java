@@ -15,19 +15,20 @@
  */
 package org.springframework.osgi.extender.dependencies;
 
-import org.springframework.osgi.extender.dependencies.shutdown.RecursiveServiceDependencySorter;
+import org.springframework.osgi.extender.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.dependencies.shutdown.ServiceDependencySorter;
 
 /**
- * Shutdown dependency sorted using a recursive algorithm.
- * While it works faster then the comparator it doesn't handle cyclic nodes (yet).
  * @author Costin Leau
- * 
+ *
  */
-public abstract class RecursiveServiceDependencySorterTest extends AbstractServiceDependencySorterTest {
+public class ComparatorServiceDependencySorterTest extends AbstractServiceDependencySorterTest {
 
+	/* (non-Javadoc)
+	 * @see org.springframework.osgi.extender.dependencies.AbstractServiceDependencySorterTest#createSorter()
+	 */
 	protected ServiceDependencySorter createSorter() {
-		return new RecursiveServiceDependencySorter();
+		return new ComparatorServiceDependencySorter();
 	}
 
 }
