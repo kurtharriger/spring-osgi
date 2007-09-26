@@ -22,6 +22,8 @@ import java.security.PrivilegedAction;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
@@ -103,11 +105,29 @@ public abstract class OsgiBundleUtils {
 
 	public static boolean isFragment(Bundle bundle) {
 		Assert.notNull(bundle, "bundle is required");
-		return bundle.getHeaders().get(org.osgi.framework.Constants.FRAGMENT_HOST) != null;
+		return bundle.getHeaders().get(Constants.FRAGMENT_HOST) != null;
 	}
 
 	public static boolean isSystemBundle(Bundle bundle) {
 		Assert.notNull(bundle);
 		return (bundle.getBundleId() == 0);
+	}
+
+	public static Version getBundleVersion(Bundle bundle) {
+		return getHeaderAsVersion(bundle, Constants.BUNDLE_VERSION);
+	}
+
+	/**
+	 * Return the version for a given bundle manifest header.
+	 * 
+	 * @param bundle OSGi bundle
+	 * @param header bundle manifest header
+	 * @return the header value as a Version.
+	 * @throws IllegalArgumentException if an illegal String/number if used for
+	 * constructing the version.
+	 */
+	public static Version getHeaderAsVersion(Bundle bundle, String header) {
+		Assert.notNull(bundle);
+		return Version.parseVersion((String) bundle.getHeaders().get(header));
 	}
 }

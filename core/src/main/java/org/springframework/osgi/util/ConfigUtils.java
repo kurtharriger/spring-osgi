@@ -36,13 +36,13 @@ import org.springframework.util.StringUtils;
  */
 public abstract class ConfigUtils {
 
+	private static final Log log = LogFactory.getLog(ConfigUtils.class);
+
 	protected static final String CONTEXT_DIR = "/META-INF/spring/";
 
 	protected static final String CONTEXT_FILES = "*.xml";
 
 	protected static final String META_INF_WILD_CARD = CONTEXT_DIR + CONTEXT_FILES;
-
-	private static final Log log = LogFactory.getLog(ConfigUtils.class);
 
 	public static final String SPRING_CONTEXT_FILES = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX + META_INF_WILD_CARD;
 
@@ -70,6 +70,11 @@ public abstract class ConfigUtils {
 	 * Create asynchronously directive.
 	 */
 	public static final String DIRECTIVE_CREATE_ASYNCHRONOUSLY = "create-asynchronously";
+
+	/**
+	 * Wait for dependencies.
+	 */
+	public static final String DIRECTIVE_WAIT_FOR_DEPS = "wait-for-dependencies";
 
 	public static final String EQUALS = ":=";
 

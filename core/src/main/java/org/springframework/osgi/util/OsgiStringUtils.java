@@ -184,8 +184,22 @@ public abstract class OsgiStringUtils {
 		if (headers == null)
 			return NULL_STRING;
 
-		return (String) (bundle.getSymbolicName() == null ? headers.get(org.osgi.framework.Constants.BUNDLE_NAME)
-				: bundle.getSymbolicName());
+		return (String) (bundle.getSymbolicName() == null ? NULL_STRING : bundle.getSymbolicName());
+	}
+
+	public static String nullSafeName(Bundle bundle) {
+		if (bundle == null)
+			return NULL_STRING;
+
+		Dictionary headers = bundle.getHeaders();
+
+		if (headers == null)
+			return NULL_STRING;
+
+		String name = (String) headers.get(org.osgi.framework.Constants.BUNDLE_NAME);
+
+		return (name == null ? NULL_STRING : name);
+
 	}
 
 	/**
