@@ -34,6 +34,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
+import org.osgi.framework.Version;
 import org.springframework.beans.factory.xml.PluggableSchemaResolver;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -46,6 +47,7 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.dependencies.shutdown.ServiceDependencySorter;
 import org.springframework.osgi.extender.dependencies.startup.AsynchServiceDependencyApplicationContextExecutor;
+import org.springframework.osgi.internal.extender.util.ConfigUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.osgi.util.OsgiServiceUtils;
@@ -232,7 +234,7 @@ public class ContextLoaderListener implements BundleActivator {
 	/** Bundle listener */
 	private SynchronousBundleListener bundleListener;
 
-	/** Service-based dependency sorter for shutdown */ 
+	/** Service-based dependency sorter for shutdown */
 	private ServiceDependencySorter shutdownDependencySorter = new ComparatorServiceDependencySorter();
 
 	/**
@@ -245,6 +247,9 @@ public class ContextLoaderListener implements BundleActivator {
 
 	/** wait 3 seconds for each context to close */
 	private static long SHUTDOWN_WAIT_TIME = 3 * 1000;
+
+	/** this extender versin */
+	private Version extenderVersion;
 
 	/*
 	 * Required by the BundleActivator contract
@@ -267,31 +272,37 @@ public class ContextLoaderListener implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#start
 	 */
 	public void start(BundleContext context) throws Exception {
-		log.info("Starting org.springframework.osgi.extender bundle");
+		this.extenderVersion = OsgiBundleUtils.getBundleVersion(context.getBundle());
+
+		log.info("Starting org.springframework.osgi.extender bundle v.[" + extenderVersion + "]");
 
 		this.isKnopflerfish = OsgiPlatformDetector.isKnopflerfish(context);
 
+		this.context = context;
 		this.bundleId = context.getBundle().getBundleId();
 		this.namespacePlugins = new NamespacePlugins();
-		this.context = context;
 
 		// Collect all previously resolved bundles which have namespace
 		// plugins
 		Bundle[] previousBundles = context.getBundles();
 		for (int i = 0; i < previousBundles.length; i++) {
-			int state = previousBundles[i].getState();
-			if (state == Bundle.RESOLVED || state == Bundle.ACTIVE) {
-				maybeAddNamespaceHandlerFor(previousBundles[i]);
+			Bundle bundle = previousBundles[i];
+			// do matching on extender version
+			if (OsgiBundleUtils.isBundleResolved(bundle)) {
+				maybeAddNamespaceHandlerFor(bundle);
 			}
 		}
+
 
 		this.resolverServiceRegistration = registerResolverService(context);
 		// do this once namespace handlers have been detected
 		this.taskExecutor = createTaskExecutor(context);
-
+		
 		// make sure to register this before any listening starts
 		// registerShutdownHook();
 
+		// first register the service listener to make sure that we
+		// catch any listener in starting phase
 		registerListenerService(context);
 
 		bundleListener = new BundleListener();
@@ -302,7 +313,7 @@ public class ContextLoaderListener implements BundleActivator {
 		// Instantiate all previously resolved bundles which are Spring
 		// powered
 		for (int i = 0; i < previousBundles.length; i++) {
-			if (previousBundles[i].getState() == Bundle.ACTIVE) {
+			if (OsgiBundleUtils.isBundleActive(previousBundles[i])) {
 				maybeCreateApplicationContextFor(previousBundles[i]);
 			}
 		}
@@ -526,6 +537,17 @@ public class ContextLoaderListener implements BundleActivator {
 	 * @param bundle
 	 */
 	protected void maybeCreateApplicationContextFor(Bundle bundle) {
+
+		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
+			if (log.isDebugEnabled())
+				log.debug("bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
+						+ "] expects an extender w/ version["
+						+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
+						+ "] which does not match current extender w/ version[" + extenderVersion
+						+ "]; skipping bundle");
+			return;
+		}
+
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
 		if (log.isDebugEnabled())
 			log.debug("created config " + config);

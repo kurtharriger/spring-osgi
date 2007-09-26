@@ -17,11 +17,7 @@ package org.springframework.osgi.extender.dependencies.startup;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean;
-import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
