@@ -21,23 +21,29 @@ import java.util.Enumeration;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 import org.osgi.framework.SynchronousBundleListener;
-import org.springframework.osgi.test.platform.Platforms;
-import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
+ * 
+ * http://sourceforge.net/tracker/index.php?func=detail&aid=1581187&group_id=82798&atid=567241
+ * ClassCastException from Bundle.getResource when called on Bundle passed to
+ * the caller
+ * 
+ * 
  * @author Costin Leau
  * 
  */
 public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 
-	private static final String LOCATION = "META-INF";
+	private static final String LOCATION = "META-INF/";
 
-	// http://sourceforge.net/tracker/index.php?func=detail&aid=1581187&group_id=82798&atid=567241
-	// ClassCastException from Bundle.getResource when called on Bundle passed
-	// to the caller
+	protected String getManifestLocation() {
+		return null;
+	}
 
 	public void testCallGetResourceOnADifferentBundle() throws Exception {
 		// find bundles
@@ -46,13 +52,22 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 			Bundle bundle = bundles[i];
 			logger.debug("calling #getResource on bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			URL url = bundle.getResource(LOCATION);
-//			if (!OsgiBundleUtils.isFragment(bundle))
-//				assertNotNull("bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " should have a " + LOCATION + " folder", url);
+
+			// if (!OsgiBundleUtils.isFragment(bundle))
+			// assertNotNull("bundle " +
+			// OsgiStringUtils.nullSafeNameAndSymName(bundle) + " should have a
+			// " + LOCATION + " folder", url);
 		}
 	}
 
-	protected String getManifestLocation() {
-		return null;
+	public void testGetResourceThroughSpringResourceAbstraction() throws Exception {
+		Bundle[] bundles = getBundleContext().getBundles();
+		for (int i = 1; i < bundles.length; i++) {
+			Bundle bundle = bundles[i];
+
+			Resource res = new OsgiBundleResource(bundle, ResourceLoader.CLASSPATH_URL_PREFIX + LOCATION);
+			System.out.println(res.exists());
+		}
 	}
 
 	public void testCallGetResourcesOnADifferentBundle() throws Exception {
@@ -62,8 +77,9 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 			Bundle bundle = bundles[i];
 			logger.debug("calling #getResources on bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			Enumeration enm = bundle.getResources(LOCATION);
-//			if (!OsgiBundleUtils.isFragment(bundle))
-//				assertNotNull("bundle " + bundle + " should have a " + LOCATION + " folder", enm);
+			// if (!OsgiBundleUtils.isFragment(bundle))
+			// assertNotNull("bundle " + bundle + " should have a " + LOCATION +
+			// " folder", enm);
 		}
 
 	}
@@ -107,11 +123,12 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 		assertTrue("bundle listener hasn't been called", listenerCalled[0]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
 	 */
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		return isKF();
 	}
-	
+
 }
