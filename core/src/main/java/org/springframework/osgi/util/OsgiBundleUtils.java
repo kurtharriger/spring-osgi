@@ -99,8 +99,12 @@ public abstract class OsgiBundleUtils {
 	 */
 	public static boolean isBundleActive(Bundle bundle) {
 		Assert.notNull(bundle, "bundle is required");
-		int state = bundle.getState();
-		return (state == Bundle.ACTIVE || state == Bundle.STARTING);
+		return (bundle.getState() == Bundle.ACTIVE);
+	}
+
+	public static boolean isBundleResolved(Bundle bundle) {
+		Assert.notNull(bundle, "bundle is required");
+		return (bundle.getState() >= Bundle.RESOLVED);
 	}
 
 	public static boolean isFragment(Bundle bundle) {
