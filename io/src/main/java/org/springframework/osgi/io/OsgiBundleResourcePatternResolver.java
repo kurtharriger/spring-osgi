@@ -77,19 +77,19 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 
 		// look for patterns
 		if (getPathMatcher().isPattern(locationPattern)) {
-			if (type == OsgiResourceUtils.PREFIX_CLASS_SPACE)
+			if (type == OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE)
 				throw new IllegalArgumentException("pattern matching is unsupported for class space lookups");
 			return findPathMatchingResources(locationPattern, type);
 		}
 		else {
 			// consider bundle-space which can return multiple URLs
-			if (type == OsgiResourceUtils.PREFIX_NOT_SPECIFIED || type == OsgiResourceUtils.PREFIX_BUNDLE_SPACE) {
+			if (type == OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED || type == OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE) {
 				OsgiBundleResource resource = new OsgiBundleResource(bundle, locationPattern);
 				URL[] urls = resource.getAllUrlsFromBundleSpace(locationPattern);
 				return OsgiResourceUtils.convertURLArraytoResourceArray(urls);
 			}
 
-			else if (type == OsgiResourceUtils.PREFIX_CLASS_SPACE) {
+			else if (type == OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE) {
 				// remove prefix
 				String location = OsgiResourceUtils.stripPrefix(locationPattern);
 				return OsgiResourceUtils.convertURLEnumerationToResourceArray(bundle.getResources(location));
@@ -175,16 +175,16 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		Enumeration candidates;
 
 		switch (searchType) {
-		case OsgiResourceUtils.PREFIX_NOT_SPECIFIED:
-		case OsgiResourceUtils.PREFIX_BUNDLE_SPACE:
+		case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
+		case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
 			// returns an enumeration of URLs
 			candidates = bundle.findEntries(dir, null, false);
 			break;
-		case OsgiResourceUtils.PREFIX_BUNDLE_JAR:
+		case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_JAR:
 			// returns an enumeration of Strings
 			candidates = bundle.getEntryPaths(dir);
 			break;
-		case OsgiResourceUtils.PREFIX_CLASS_SPACE:
+		case OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE:
 			// returns an enumeration of URLs
 			throw new IllegalArgumentException("class space does not support pattern matching");
 

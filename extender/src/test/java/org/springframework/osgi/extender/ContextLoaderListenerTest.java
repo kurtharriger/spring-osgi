@@ -73,7 +73,7 @@ public class ContextLoaderListenerTest extends TestCase {
 		// create task executor
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
 		aBundle.setEntryReturnOnNextCallToGetEntry(null);
-		bundleContextControl.expectAndReturn(context.getBundle(), aBundle);
+		bundleContextControl.expectAndReturn(context.getBundle(), aBundle, MockControl.ONE_OR_MORE);
 
 		// listen for bundle events
 		context.addBundleListener(null);

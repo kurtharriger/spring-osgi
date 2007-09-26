@@ -17,6 +17,7 @@
   </description>
   
   <properties>
+  	<spring.osgi.private.pkg>org.springframework.osgi.internal.extender*</spring.osgi.private.pkg>
 	<spring.osgi.export.pkg>org.springframework.osgi.extender*</spring.osgi.export.pkg>
   </properties>
   

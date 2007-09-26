@@ -44,19 +44,19 @@ public abstract class OsgiResourceUtils {
 	// PREFIXES TYPES
 
 	// non-osgi prefixes (file, http)
-	public static final int PREFIX_UNKNOWN = -1;
+	public static final int PREFIX_TYPE_UNKNOWN = -1;
 
 	// no prefix
-	public static final int PREFIX_NOT_SPECIFIED = 0;
+	public static final int PREFIX_TYPE_NOT_SPECIFIED = 0;
 
 	// bundle:
-	public static final int PREFIX_BUNDLE_SPACE = 1;
+	public static final int PREFIX_TYPE_BUNDLE_SPACE = 1;
 
 	// classpath:
-	public static final int PREFIX_CLASS_SPACE = 2;
+	public static final int PREFIX_TYPE_CLASS_SPACE = 2;
 
 	// bundle-jar:
-	public static final int PREFIX_BUNDLE_JAR = 4;
+	public static final int PREFIX_TYPE_BUNDLE_JAR = 4;
 
 	/**
 	 * Return the path prefix if there is any or {@link #EMPTY_PREFIX}
@@ -81,23 +81,23 @@ public abstract class OsgiResourceUtils {
 	 */
 	public static int getSearchType(String path) {
 		Assert.notNull(path);
-		int type = PREFIX_NOT_SPECIFIED;
+		int type = PREFIX_TYPE_NOT_SPECIFIED;
 		String prefix = getPrefix(path);
 
 		// no prefix is treated just like bundle:
 		if (!StringUtils.hasText(prefix))
-			type = PREFIX_NOT_SPECIFIED;
+			type = PREFIX_TYPE_NOT_SPECIFIED;
 		else if (prefix.startsWith(OsgiBundleResource.BUNDLE_URL_PREFIX))
-			type = PREFIX_BUNDLE_SPACE;
+			type = PREFIX_TYPE_BUNDLE_SPACE;
 		else if (prefix.startsWith(OsgiBundleResource.BUNDLE_JAR_URL_PREFIX))
-			type = PREFIX_BUNDLE_JAR;
+			type = PREFIX_TYPE_BUNDLE_JAR;
 		else if (prefix.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX))
-			type = PREFIX_CLASS_SPACE;
+			type = PREFIX_TYPE_CLASS_SPACE;
 		else if (prefix.startsWith(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX))
-			type = PREFIX_CLASS_SPACE;
+			type = PREFIX_TYPE_CLASS_SPACE;
 
 		else
-			type = PREFIX_UNKNOWN;
+			type = PREFIX_TYPE_UNKNOWN;
 
 		return type;
 	}

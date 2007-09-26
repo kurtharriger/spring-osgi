@@ -89,7 +89,7 @@ public class OsgiBundleResource extends AbstractResource {
 
 	// Bundle resource possible searches
 
-	private int searchType = OsgiResourceUtils.PREFIX_NOT_SPECIFIED;
+	private int searchType = OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED;
 
 	public OsgiBundleResource(Bundle bundle, String path) {
 		Assert.notNull(bundle, "Bundle must not be null");
@@ -146,23 +146,23 @@ public class OsgiBundleResource extends AbstractResource {
 
 		switch (searchType) {
 		// same as bundle space but with a different string
-		case OsgiResourceUtils.PREFIX_NOT_SPECIFIED:
+		case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
 			if (pathWithoutPrefix == null)
 				pathWithoutPrefix = path;
 			url = getResourceFromBundleSpace(pathWithoutPrefix);
 			break;
-		case OsgiResourceUtils.PREFIX_BUNDLE_SPACE:
+		case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
 			if (pathWithoutPrefix == null)
 				pathWithoutPrefix = path.substring(BUNDLE_URL_PREFIX.length());
 			url = getResourceFromBundleSpace(pathWithoutPrefix);
 			break;
-		case OsgiResourceUtils.PREFIX_BUNDLE_JAR:
+		case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_JAR:
 			if (pathWithoutPrefix == null)
 				pathWithoutPrefix = path.substring(BUNDLE_JAR_URL_PREFIX.length());
 
 			url = getResourceFromBundleJar(pathWithoutPrefix);
 			break;
-		case OsgiResourceUtils.PREFIX_CLASS_SPACE:
+		case OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE:
 			if (pathWithoutPrefix == null)
 				pathWithoutPrefix = path.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length());
 
@@ -278,7 +278,7 @@ public class OsgiBundleResource extends AbstractResource {
 	}
 
     public File getFile() throws IOException {
-        if (searchType != OsgiResourceUtils.PREFIX_UNKNOWN) {
+        if (searchType != OsgiResourceUtils.PREFIX_TYPE_UNKNOWN) {
             return super.getFile();
         }
         try {

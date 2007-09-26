@@ -56,10 +56,31 @@ public class OsgiBundleUtilsTest extends TestCase {
 		assertTrue(OsgiBundleUtils.isBundleActive(bundle));
 
 		OsgiBundleUtilsTest.state = Bundle.STARTING;
-		assertTrue(OsgiBundleUtils.isBundleActive(bundle));
+		assertFalse(OsgiBundleUtils.isBundleActive(bundle));
 
 		OsgiBundleUtilsTest.state = Bundle.INSTALLED;
 		assertFalse(OsgiBundleUtils.isBundleActive(bundle));
+	}
+
+	public void testIsBundleResolved() throws Exception {
+		OsgiBundleUtilsTest.state = Bundle.UNINSTALLED;
+		assertFalse(OsgiBundleUtils.isBundleResolved(bundle));
+
+		OsgiBundleUtilsTest.state = Bundle.INSTALLED;
+		assertFalse(OsgiBundleUtils.isBundleResolved(bundle));
+
+		OsgiBundleUtilsTest.state = Bundle.ACTIVE;
+		assertTrue(OsgiBundleUtils.isBundleResolved(bundle));
+
+		OsgiBundleUtilsTest.state = Bundle.RESOLVED;
+		assertTrue(OsgiBundleUtils.isBundleResolved(bundle));
+		
+		OsgiBundleUtilsTest.state = Bundle.STOPPING;
+		assertTrue(OsgiBundleUtils.isBundleResolved(bundle));
+
+		OsgiBundleUtilsTest.state = Bundle.STARTING;
+		assertTrue(OsgiBundleUtils.isBundleResolved(bundle));
+
 	}
 
 }
