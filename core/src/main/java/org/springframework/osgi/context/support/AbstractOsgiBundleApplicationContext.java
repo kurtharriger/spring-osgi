@@ -16,17 +16,21 @@
 package org.springframework.osgi.context.support;
 
 import java.io.IOException;
+import java.rmi.registry.Registry;
 import java.util.Dictionary;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.PropertyEditorRegistrar;
+import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
+import org.springframework.beans.propertyeditors.PropertiesEditor;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -211,8 +215,12 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 					+ " already exists; the bundleContext will not be registered as a bean");
 		}
 
-		// register Dictionary PropertyEditor
-		beanFactory.registerCustomEditor(Dictionary.class, new DictionaryEditor());
+		// register Dictionary PropertyEditor (reuse Properties object)
+		beanFactory.addPropertyEditorRegistrar(new PropertyEditorRegistrar() {
+			public void registerCustomEditors(PropertyEditorRegistry registry) {
+				registry.registerCustomEditor(Dictionary.class, new PropertiesEditor());
+			}
+		});
 
 		// FIXME: this should be removed since annotations are not mandatory -
 		// similar behavior to Spring core
