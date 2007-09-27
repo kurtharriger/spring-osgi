@@ -22,7 +22,7 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
     // Overridden to remove the spring extender bundle!
     protected String[] getMandatoryBundles() {
         return new String[]{getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
-                            getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
+                            getJUnitLibUrl(), getSpringCoreUrl(), getSpringBeansUrl(), getSpringContextUrl(),
                             getSpringMockUrl(), getAopAllianceUrl(), getAsmLibrary(),
                             getSpringAopUrl(), getUtilConcurrentLibUrl(),
                             getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl()};
