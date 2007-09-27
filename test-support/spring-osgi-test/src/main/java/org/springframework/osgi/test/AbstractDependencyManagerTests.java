@@ -88,14 +88,6 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return "org.springframework.osgi,spring-osgi-annotation," + getSpringOsgiVersion();
 	}
 
-	protected String getSpringCoreBundleUrl() {
-		return "org.springframework,spring-core," + getSpringBundledVersion();
-	}
-
-	protected String getSpringBeansBundleUrl() {
-		return "org.springframework,spring-beans," + getSpringBundledVersion();
-	}
-
 	protected String getJUnitLibUrl() {
 		return "org.springframework.osgi,junit.osgi,3.8.1-SNAPSHOT";
 	}
@@ -143,6 +135,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return "org.springframework,spring-beans," + getSpringBundledVersion();
 	}
 
+	protected String getSpringCoreUrl() {
+		return "org.springframework,spring-core," + getSpringBundledVersion();
+	}
+
 	protected String getAopAllianceUrl() {
 		return "org.springframework.osgi,aopalliance.osgi,1.0-SNAPSHOT";
 	}
@@ -159,9 +155,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	protected String[] getMandatoryBundles() {
 
 		String[] jars = new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
-				getJUnitLibUrl(), getSpringCoreBundleUrl(), getSpringBeansUrl(), getSpringContextUrl(),
+				getJUnitLibUrl(), getSpringCoreUrl(), getSpringBeansUrl(), getSpringContextUrl(),
 				getSpringMockUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
-				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringBeansBundleUrl(),
+				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringBeansUrl(),
 				getSpringOSGiTestBundleUrl(), getSpringOSGiExtenderBundleUrl() };
 
 		String[] bundles;
@@ -212,6 +208,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		Assert.isTrue(artifactId.length >= 3, "the CSV string " + bundleId + " contains too few values");
 		// TODO: add a smarter mechanism which can handle 1 or 2 values CSVs
 
+		for (int i = 0; i < artifactId.length; i++) {
+			artifactId[i] = StringUtils.trimWhitespace(artifactId[i]);
+		}
+		
 		return (artifactId.length == 3 ? locator.locateArtifact(artifactId[0], artifactId[1], artifactId[2])
 				: locator.locateArtifact(artifactId[0], artifactId[1], artifactId[2], artifactId[3]));
 	}
