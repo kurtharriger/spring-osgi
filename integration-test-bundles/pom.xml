@@ -53,6 +53,7 @@
     <module>deadlock.bundle</module>
     <module>configuration.test.bundle</module>
     <module>extender.version.bundle</module>
+    <module>config.bundle</module>
   </modules>
 
 <profiles>
