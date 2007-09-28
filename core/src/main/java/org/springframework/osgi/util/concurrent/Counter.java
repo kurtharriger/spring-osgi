@@ -142,7 +142,7 @@ public class Counter {
 	 * {@link Object#notify()} mechanism to work appropriately. Please see the
 	 * class javadoc for more info.
 	 * 
-	 * <p/> This method will return stop waiting and return false if the thread
+	 * <p/> This method will stop waiting and return true if the thread
 	 * is interrupted.
 	 * 
 	 * @param value the value to wait for

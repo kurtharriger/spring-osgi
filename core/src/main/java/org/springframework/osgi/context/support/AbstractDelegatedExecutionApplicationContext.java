@@ -45,16 +45,16 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		implements DelegatedExecutionOsgiBundleApplicationContext {
 
 	/**
-	 * Synchronous refresh executor (provides normal behavior).
+	 * Executor that doesn't wait for dependencies.
 	 * 
 	 * @author Costin Leau
 	 * 
 	 */
-	private class SynchronousRefreshExecutor implements OsgiBundleApplicationContextExecutor {
+	private class NoDependenciesWaitRefreshExecutor implements OsgiBundleApplicationContextExecutor {
 
 		private final DelegatedExecutionOsgiBundleApplicationContext context;
 
-		private SynchronousRefreshExecutor(DelegatedExecutionOsgiBundleApplicationContext ctx) {
+		private NoDependenciesWaitRefreshExecutor(DelegatedExecutionOsgiBundleApplicationContext ctx) {
 			context = ctx;
 		}
 
@@ -68,7 +68,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	}
 
 	/** Default executor */
-	private OsgiBundleApplicationContextExecutor executor = new SynchronousRefreshExecutor(this);
+	private OsgiBundleApplicationContextExecutor executor = new NoDependenciesWaitRefreshExecutor(this);
 
 	/** this context monitor */
 	private final Object contextMonitor = new Object();
@@ -90,7 +90,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * continuation-like behavior or completion of the refresh method on several
 	 * threads, in a asynch manner.
 	 * 
-	 * By default, a {@link SynchronousRefreshExecutor} is used which executes
+	 * By default, a {@link NoDependenciesWaitRefreshExecutor} is used which executes
 	 * the refresh method in one go (normal behavior).
 	 */
 	public void refresh() throws BeansException, IllegalStateException {

@@ -64,7 +64,7 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
-		assertEquals("bundle should timeout in five minutes", new Long(5 * 60), new Long(config.getTimeout()));
+		assertEquals("bundle should timeout in five minutes", new Long(5 * 60 * 1000), new Long(config.getTimeout()));
 	}
 
 	public void testBundleWithWaitFiveSecondWaitForTimeout() {
@@ -74,7 +74,7 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		aBundle.setResultsToReturnOnNextCallToFindEntries(META_INF_SPRING_CONTENT);
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
-		assertEquals("bundle should timeout in 5 s", new Long(5), new Long(config.getTimeout()));
+		assertEquals("bundle should timeout in 5 s", new Long(5 * 1000), new Long(config.getTimeout()));
 	}
 
 	public void testBundleWithWaitForEver() {

@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.extender.DependencyMockBundle;
-import org.springframework.osgi.extender.dependencies.shutdown.BundleDependencyComparator;
 import org.springframework.osgi.extender.dependencies.shutdown.ServiceDependencySorter;
 import org.springframework.util.ObjectUtils;
 

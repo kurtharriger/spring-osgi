@@ -72,9 +72,14 @@ public abstract class ConfigUtils {
 	public static final String DIRECTIVE_CREATE_ASYNCHRONOUSLY = "create-asynchronously";
 
 	/**
-	 * Wait for dependencies.
+	 * Wait for dependencies or directly start the context.
 	 */
 	public static final String DIRECTIVE_WAIT_FOR_DEPS = "wait-for-dependencies";
+
+	/**
+	 * {@link #DIRECTIVE_WAIT_FOR_DEPS} default.
+	 */
+	public static final boolean DIRECTIVE_WAIT_FOR_DEPS_DEFAULT = true;
 
 	public static final String EQUALS = ":=";
 
@@ -164,7 +169,9 @@ public abstract class ConfigUtils {
 	/**
 	 * Shortcut for finding the boolean value for
 	 * {@link #DIRECTIVE_CREATE_ASYNCHRONOUSLY} directive using the given
-	 * headers. Assumes the headers belong to a Spring powered bundle.
+	 * headers.
+	 * 
+	 * Assumes the headers belong to a Spring powered bundle.
 	 * 
 	 * @param headers
 	 * @return
@@ -176,8 +183,11 @@ public abstract class ConfigUtils {
 
 	/**
 	 * Shortcut for finding the boolean value for {@link #DIRECTIVE_TIMEOUT}
-	 * directive using the given headers. Assumes the headers belong to a Spring
-	 * powered bundle.
+	 * directive using the given headers.
+	 * 
+	 * Assumes the headers belong to a Spring powered bundle. Returns the
+	 * timeout (in seconds) for which the application context should wait to
+	 * have its dependencies satisfied.
 	 * 
 	 * @param headers
 	 * @return
@@ -193,6 +203,20 @@ public abstract class ConfigUtils {
 		}
 
 		return DIRECTIVE_TIMEOUT_DEFAULT;
+	}
+
+	/**
+	 * Shortcut for finding the boolean value for
+	 * {@link #DIRECTIVE_WAIT_FOR_DEPS} directive using the given headers.
+	 * Assumes the headers belong to a Spring powered bundle.
+	 * 
+	 * @param headers
+	 * @return
+	 */
+	public static boolean getWaitForDependencies(Dictionary headers) {
+		String value = getDirectiveValue(headers, DIRECTIVE_WAIT_FOR_DEPS);
+
+		return (value != null ? Boolean.valueOf(value).booleanValue() : DIRECTIVE_WAIT_FOR_DEPS_DEFAULT);
 	}
 
 	/**
@@ -250,7 +274,8 @@ public abstract class ConfigUtils {
 		if (getSpringContextHeader(bundle.getHeaders()) != null)
 			return true;
 
-		// check the default locations now (could use the IO to do the checking)
+		// check the default locations now
+		// TODO: use IO or getResource() to find the default configuration files
 		Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
 		return (defaultConfig != null && defaultConfig.hasMoreElements());
 	}
