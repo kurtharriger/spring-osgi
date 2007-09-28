@@ -19,7 +19,7 @@ import org.springframework.core.enums.StaticLabeledEnum;
 
 /**
  * State of an application context while being processed by
- * {@link AsynchServiceDependencyApplicationContextExecutor}.
+ * {@link DependencyWaiterApplicationContextExecutor}.
  * 
  * This enumeration holds the state of an application context at a certain time,
  * beyond the official states such as STARTED/STOPPED.

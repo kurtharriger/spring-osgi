@@ -33,16 +33,20 @@ import org.springframework.osgi.util.concurrent.Counter;
 import org.springframework.util.Assert;
 
 /**
- * Asynchronous executor that breaks the 'traditional'
+ * Dependency waiter executor that breaks the 'traditional'
  * {@link ConfigurableApplicationContext#refresh()} in two pieces so that beans
  * are not actually created unless the OSGi service imported are present.
+ * 
+ * Supports both asynch and synch behaviour.
+ * <p/>
+ * 
  * 
  * @author Hal Hildebrand
  * @author Costin Leau
  */
-public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBundleApplicationContextExecutor {
+public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApplicationContextExecutor {
 
-	private static final Log log = LogFactory.getLog(AsynchServiceDependencyApplicationContextExecutor.class);
+	private static final Log log = LogFactory.getLog(DependencyWaiterApplicationContextExecutor.class);
 
 	/**
 	 * this class monitor. Since multiple threads will access this object, we
@@ -54,6 +58,7 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 	private long timeout;
 
 	/** the timer used for executing the timeout */
+	// NOTE: the dog is not managed by this application so do not cancel it
 	private Timer watchdog;
 
 	/** watchdog task */
@@ -62,7 +67,7 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 	/** OSGi service dependencyDetector used for detecting dependencies */
 	protected DependencyServiceManager dependencyDetector;
 
-	protected DelegatedExecutionOsgiBundleApplicationContext delegateContext;
+	protected final DelegatedExecutionOsgiBundleApplicationContext delegateContext;
 
 	/**
 	 * State of the associated context from the executor POV.
@@ -78,25 +83,23 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 	private Counter monitorCounter;
 
 	/**
+	 * Should the waiting hold the thread or not.
+	 */
+	private final boolean synchronousWait;
+
+	/**
+	 * Counter used when waiting for dependencies to appear.
+	 */
+	private final Counter waitBarrier = new Counter("syncCounterWait");
+
+	/**
 	 * The task for the watch dog.
 	 * 
 	 * @author Hal Hildebrand
 	 */
 	private class WatchDogTask extends TimerTask {
-
 		public void run() {
-			// deregister listener to get an accurate snapshot of the unsatisfied dependencies.
-			
-			if (dependencyDetector != null)
-				dependencyDetector.deregister();
-			
-			log.warn("timeout occured before finding service dependencies for [" + delegateContext.getDisplayName()
-					+ "]");
-
-			ApplicationContextException e = new ApplicationContextException("Application context initializition for '"
-					+ OsgiStringUtils.nullSafeSymbolicName(getBundle()) + "' has timed out");
-			e.fillInStackTrace();
-			fail(e);
+			timeout();
 		}
 	}
 
@@ -104,8 +107,6 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 	 * Crete the Runnable action which will complete the context creation
 	 * process. This process can be called synchronously or asynchronously,
 	 * depending on context configuration and availability of dependencies.
-	 * Therefore, it is super critical to have the correct context class loader
-	 * set as well as the correct error handling.
 	 * 
 	 * @author Hal Hildebrand
 	 * @author Costin Leau
@@ -142,10 +143,11 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 
 	}
 
-	public AsynchServiceDependencyApplicationContextExecutor(
-			DelegatedExecutionOsgiBundleApplicationContext delegateContext) {
+	public DependencyWaiterApplicationContextExecutor(
+			DelegatedExecutionOsgiBundleApplicationContext delegateContext, boolean syncWait) {
 		this.delegateContext = delegateContext;
 		this.delegateContext.setExecutor(this);
+		this.synchronousWait = syncWait;
 	}
 
 	/**
@@ -178,6 +180,10 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 	 * dependencyDetector which will continue the refresh process
 	 * asynchronously.
 	 * 
+	 * Based on the {@link #synchronousWait}, the current thread can simply end
+	 * if there are any dependencies (the default) or wait to either timeout or
+	 * have all its dependencies met.
+	 * 
 	 */
 	protected void stageOne() {
 
@@ -205,25 +211,66 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 			if (debug)
 				log.debug("prerefresh completed; determining dependencies...");
 
-			DependencyServiceManager dl = createDependencyServiceListener();
+			Runnable task = null;
+
+			if (synchronousWait) {
+				task = new Runnable() {
+					public void run() {
+						// inform the waiting thread through the counter
+						waitBarrier.decrement();
+					}
+				};
+			}
+			else
+				task = new Runnable() {
+					public void run() {
+						// no waiting involved, just call stageTwo
+						stageTwo();
+					}
+				};
+
+			DependencyServiceManager dl = createDependencyServiceListener(task);
 			dl.findServiceDependencies();
 
-			if (!dl.isSatisfied()) {
-				// Asynchronously finish the context refresh process
-				dependencyDetector = dl;
-				if (debug)
-					log.debug("registering service dependency dependencyDetector for " + getDisplayName());
-				dependencyDetector.register();
-				startWatchDog();
-			}
-
-			else {
-				// Synchronously finish the context refresh process
+			// all dependencies are met, just go with stageTwo
+			if (dl.isSatisfied()) {
 				if (debug) {
 					log.debug("No outstanding dependencies, completing initialization for " + getDisplayName());
 				}
 				stageTwo();
 			}
+
+			else {
+				// there are dependencies not met
+				// register a listener to look for them
+				dependencyDetector = dl;
+				if (debug)
+					log.debug("registering service dependency dependencyDetector for " + getDisplayName());
+				dependencyDetector.register();
+
+				if (synchronousWait) {
+					waitBarrier.increment();
+					if (debug)
+						log.debug("synchronous wait-for-dependencies; waiting...");
+
+					// if waiting times out...
+					if (waitBarrier.waitForZero(timeout)) {
+						timeout();
+					}
+					else
+						stageTwo();
+
+				}
+				else {
+					// start the watchdog (we're asynch)
+					startWatchDog();
+
+					if (debug)
+						log.debug("asynch wait-for-dependencies; ending method");
+				}
+
+			}
+
 		}
 		catch (Throwable e) {
 			fail(e);
@@ -260,9 +307,6 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 	public void close() {
 		boolean debug = log.isDebugEnabled();
 
-		if (debug)
-			log.debug("about to close down..." + getDisplayName());
-
 		boolean normalShutdown = false;
 
 		synchronized (monitor) {
@@ -271,12 +315,12 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 			if (state.isDown()) {
 				return;
 			}
+
 			if (debug)
 				log.debug("closing appCtx for " + getDisplayName());
 
 			if (dependencyDetector != null) {
 				dependencyDetector.deregister();
-				dependencyDetector = null;
 			}
 
 			if (state == ContextState.STARTED) {
@@ -315,27 +359,27 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 	private void fail(Throwable t) {
 		try {
 			close();
-            StringBuffer buf = new StringBuffer();
-            if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
-                buf.append("none");
-            } else {
-                for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().iterator();
-                     dependencies.hasNext();) {
-                    ServiceDependency dependency = (ServiceDependency) dependencies.next();
-                    buf.append(dependency.toString());
-                    if (dependencies.hasNext()) {
-                        buf.append(", ");
-                    }
-                }
-            }
-            StringBuffer message = new StringBuffer();
-            message.append("Unable to create application context for [");
-            message.append(getBundleSymbolicName());
-            message.append("], unsatisfied dependencies: ");
-            message.append(buf.toString());
+			StringBuffer buf = new StringBuffer();
+			if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
+				buf.append("none");
+			}
+			else {
+				for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().iterator(); dependencies.hasNext();) {
+					ServiceDependency dependency = (ServiceDependency) dependencies.next();
+					buf.append(dependency.toString());
+					if (dependencies.hasNext()) {
+						buf.append(", ");
+					}
+				}
+			}
+			StringBuffer message = new StringBuffer();
+			message.append("Unable to create application context for [");
+			message.append(getBundleSymbolicName());
+			message.append("], unsatisfied dependencies: ");
+			message.append(buf.toString());
 
-            log.error(message.toString(), t);
-        }
+			log.error(message.toString(), t);
+		}
 		catch (Throwable e) {
 			// last ditch effort to get useful error information
 			t.printStackTrace();
@@ -343,8 +387,31 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 		}
 	}
 
-	protected DependencyServiceManager createDependencyServiceListener() {
-		return new DependencyServiceManager(this, delegateContext);
+	/**
+	 * Cancel waiting due to timeout.
+	 */
+	private void timeout() {
+		synchronized (monitor) {
+			// deregister listener to get an accurate snapshot of the
+			// unsatisfied dependencies.
+
+			if (dependencyDetector != null) {
+				dependencyDetector.deregister();
+			}
+
+			log.warn("timeout occured before finding service dependencies for [" + delegateContext.getDisplayName()
+					+ "]");
+
+			ApplicationContextException e = new ApplicationContextException("Application context initializition for '"
+					+ OsgiStringUtils.nullSafeSymbolicName(getBundle()) + "' has timed out");
+			e.fillInStackTrace();
+			fail(e);
+
+		}
+	}
+
+	protected DependencyServiceManager createDependencyServiceListener(Runnable task) {
+		return new DependencyServiceManager(this, delegateContext, task);
 	}
 
 	/**
@@ -421,8 +488,14 @@ public class AsynchServiceDependencyApplicationContextExecutor implements OsgiBu
 				+ "]; assuming an interruption and bailing out");
 	}
 
-	public void setMonitoringCounter(Counter asynchCounter) {
-		this.monitorCounter = asynchCounter;
+	/**
+	 * Pass in the context counter. Used by the listener to track the number of
+	 * contexts started.
+	 * 
+	 * @param asynchCounter
+	 */
+	public void setMonitoringCounter(Counter contextsStarted) {
+		this.monitorCounter = contextsStarted;
 	}
 
 }

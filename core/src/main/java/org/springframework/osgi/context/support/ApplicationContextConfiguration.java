@@ -29,8 +29,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Determine configuration information needed to construct an application
- * context for a given bundle
+ * Determine the configuration information needed to construct an application
+ * context for a given bundle. Reads all the options present in the bundle
+ * header.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -47,9 +48,11 @@ public class ApplicationContextConfiguration {
 
 	private boolean publishContextAsService = ConfigUtils.DIRECTIVE_PUBLISH_CONTEXT_DEFAULT;
 
+	private boolean waitForDeps = ConfigUtils.DIRECTIVE_WAIT_FOR_DEPS_DEFAULT;
+
 	private String toString;
 
-	private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
+	private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT * 1000;
 
 	private static final Log log = LogFactory.getLog(ApplicationContextConfiguration.class);
 
@@ -64,10 +67,12 @@ public class ApplicationContextConfiguration {
 		buf.append(isSpringPoweredBundle);
 		buf.append("|async=");
 		buf.append(asyncCreation);
+		buf.append("|wait-for-deps=");
+		buf.append(waitForDeps);
 		buf.append("|publishCtx=");
 		buf.append(publishContextAsService);
 		buf.append("|timeout=");
-		buf.append(timeout);
+		buf.append(timeout / 1000);
 		buf.append("s");
 		toString = buf.toString();
 		if (log.isDebugEnabled()) {
@@ -86,8 +91,8 @@ public class ApplicationContextConfiguration {
 	}
 
 	/**
-	 * How long should the application context wait for dependent services to be
-	 * satisfied on context creation?
+	 * How long (in miliseconds) should the application context wait for
+	 * dependent services to be satisfied on context creation?
 	 */
 	public long getTimeout() {
 		return this.timeout;
@@ -106,6 +111,16 @@ public class ApplicationContextConfiguration {
 	 */
 	public boolean isPublishContextAsService() {
 		return publishContextAsService;
+	}
+
+	/**
+	 * Will this configuration wait for dependencies.
+	 * 
+	 * @return true if the configuration indicates that dependencies should be
+	 * waited for.
+	 */
+	public boolean isWaitForDependencies() {
+		return waitForDeps;
 	}
 
 	/**
@@ -131,14 +146,16 @@ public class ApplicationContextConfiguration {
 		if (isSpringPoweredBundle) {
 			String springContextHeader = ConfigUtils.getSpringContextHeader(headers);
 			if (StringUtils.hasText(springContextHeader)) {
-				this.timeout = ConfigUtils.getTimeOut(headers);
+				// translate into miliseconds
+				long option = ConfigUtils.getTimeOut(headers);
+				this.timeout = (option >= 0 ? option * 1000 : option);
 				this.publishContextAsService = ConfigUtils.getPublishContext(headers);
 				this.asyncCreation = ConfigUtils.getCreateAsync(headers);
+				this.waitForDeps = ConfigUtils.getWaitForDependencies(headers);
 			}
-			
 
 			this.configurationLocations = ConfigUtils.getConfigLocations(headers);
-			
+
 			if (ObjectUtils.isEmpty(this.configurationLocations)) {
 				log.error("Bundle claims to be Spring powered, but does not contain any configuration resources: "
 						+ OsgiStringUtils.nullSafeSymbolicName(bundle));

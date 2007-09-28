@@ -35,13 +35,18 @@ public class DependencyServiceManager {
 
 	protected final Set unsatisfiedDependencies = Collections.synchronizedSet(new LinkedHashSet());
 
-	protected final AsynchServiceDependencyApplicationContextExecutor executor;
+	protected final DependencyWaiterApplicationContextExecutor executor;
 
 	protected final BundleContext bundleContext;
 
 	private final ServiceListener listener;
 
 	private final DelegatedExecutionOsgiBundleApplicationContext context;
+
+	/**
+	 * Task to execute if all dependencies are met.
+	 */
+	private final Runnable executeIfDone;
 
 	/**
 	 * Actual ServiceListener.
@@ -126,7 +131,11 @@ public class DependencyServiceManager {
 						log.debug("No outstanding dependencies, completing initialization for "
 								+ context.getDisplayName());
 					}
-					executor.stageTwo();
+					
+					// execute task to complete initialization
+					// NOTE: the runnable should be able to delegate any long process to a
+					// different thread.
+					executeIfDone.run();
 				}
 			}
 			catch (Throwable e) {
@@ -136,12 +145,23 @@ public class DependencyServiceManager {
 		}
 	}
 
-	public DependencyServiceManager(AsynchServiceDependencyApplicationContextExecutor executor,
-			DelegatedExecutionOsgiBundleApplicationContext context) {
+	/**
+	 * Create a dependency manager, indicating the executor bound to, the
+	 * context that contains the dependencies and the task to execute if all
+	 * dependencies are met.
+	 * 
+	 * @param executor
+	 * @param context
+	 * @param executeIfDone
+	 */
+	public DependencyServiceManager(DependencyWaiterApplicationContextExecutor executor,
+			DelegatedExecutionOsgiBundleApplicationContext context, Runnable executeIfDone) {
 		this.executor = executor;
 		this.context = context;
 		this.bundleContext = context.getBundleContext();
 		this.listener = new DependencyServiceListener();
+
+		this.executeIfDone = executeIfDone;
 	}
 
 	protected void findServiceDependencies() {
@@ -164,12 +184,13 @@ public class DependencyServiceManager {
 						reference.isMandatory());
 
 				String realBean = beanName.substring(1);
-				
+
 				if (debug)
 					log.debug("destroying bean " + realBean + " from context " + beanFactory);
-				
+
 				// clean up factory singleton
-				//((DefaultListableBeanFactory) beanFactory).destroySingleton(realBean);
+				// ((DefaultListableBeanFactory)
+				// beanFactory).destroySingleton(realBean);
 
 				dependencies.add(dependency);
 				if (!dependency.isServicePresent()) {
