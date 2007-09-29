@@ -50,8 +50,9 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 		protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException, BeansException {
 		}
 
-		public void setNamespaceResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
+		public void setNamespaceHandlerAndEntityResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
 		}
+
 	}
 
 	public AbstractOptionalDependencyInjectionTests() {
