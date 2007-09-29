@@ -58,12 +58,12 @@ public class ContextLoaderListenerTest extends TestCase {
 		bundleContextControl.expectAndReturn(context.getBundle(), new MockBundle());
 
 		// look for existing resolved bundles
-		bundleContextControl.expectAndReturn(context.getBundles(), new Bundle[0]);
+		bundleContextControl.expectAndReturn(context.getBundles(), new Bundle[0], 2);
 
 		// register namespace and entity resolving service
-//		context.registerService((String[]) null, null, null);
-//		bundleContextControl.setMatcher(MockControl.ALWAYS_MATCHER);
-//		bundleContextControl.setReturnValue(null);
+		// context.registerService((String[]) null, null, null);
+		// bundleContextControl.setMatcher(MockControl.ALWAYS_MATCHER);
+		// bundleContextControl.setReturnValue(null);
 
 		// register context service
 		context.registerService((String[]) null, null, null);
@@ -78,6 +78,8 @@ public class ContextLoaderListenerTest extends TestCase {
 		// listen for bundle events
 		context.addBundleListener(null);
 		bundleContextControl.setMatcher(MockControl.ALWAYS_MATCHER);
+		bundleContextControl.setVoidCallable(2);
+		
 
 		bundleContextControl.replay();
 
@@ -104,13 +106,13 @@ public class ContextLoaderListenerTest extends TestCase {
 		hdrs.put(ConfigUtils.SPRING_CONTEXT_HEADER, "bla bla");
 		MockBundle anotherBundle = new MockBundle(hdrs);
 		anotherBundle.setBundleId(1);
-		
+
 		BundleEvent event = new BundleEvent(BundleEvent.STARTED, anotherBundle);
 
 		BundleListener listener = (BundleListener) ctx.getBundleListeners().iterator().next();
 
 		TestTaskExecutor.called = false;
-		
+
 		listener.bundleChanged(event);
 		assertTrue("task executor should have been called if configured properly", TestTaskExecutor.called);
 	}

@@ -52,7 +52,7 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 			}
 
 
-            public void setNamespaceResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
+            public void setNamespaceHandlerAndEntityResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
             }
         };
 	}

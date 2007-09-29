@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.core.CollectionFactory;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -39,41 +41,70 @@ import org.xml.sax.SAXException;
  * @author Hal Hildebrand
  * @author Costin Leau
  * 
- * Date: Aug 23, 2006 Time: 8:32:49 PM
  */
-public class NamespacePlugins implements OsgiBundleNamespaceHandlerAndEntityResolver {
+// TODO: add versioning for namespaces
+public class NamespacePlugins implements OsgiBundleNamespaceHandlerAndEntityResolver, DisposableBean {
+
+	/**
+	 * Wrapper class which implements both EntityResolver and
+	 * {@link NamespaceHandlerResolver} interfaces.
+	 * 
+	 * Simply delegates to the actual implementation discovered in a specific
+	 * bundle.
+	 */
+	private static class Plugin implements NamespaceHandlerResolver, EntityResolver {
+		private final NamespaceHandlerResolver namespace;
+
+		private final EntityResolver entity;
+
+		private final Bundle bundle;
+
+		private Plugin(Bundle bundle) {
+			this.bundle = bundle;
+
+			// the bundle classloader used for the namespace parser/resolver
+			// discovery and instantiation
+			ClassLoader loader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
+
+			entity = new DelegatingEntityResolver(loader);
+			namespace = new DefaultNamespaceHandlerResolver(loader);
+		}
+
+		public NamespaceHandler resolve(String namespaceUri) {
+			return namespace.resolve(namespaceUri);
+		}
+
+		public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+			return entity.resolveEntity(publicId, systemId);
+		}
+
+		public Bundle getBundle() {
+			return bundle;
+		}
+	}
 
 	private static final Log log = LogFactory.getLog(NamespacePlugins.class);
 
+	// TODO - use a concurrent map
 	private final Map plugins = Collections.synchronizedMap(CollectionFactory.createLinkedMapIfPossible(5));
-
-	private String getBundleInfo(Bundle bundle) {
-		StringBuffer buf = new StringBuffer();
-		buf.append("bundle=[");
-		buf.append(bundle.getBundleId());
-		buf.append("|");
-		buf.append(bundle.getSymbolicName());
-		buf.append("]");
-
-		return buf.toString();
-	}
 
 	public void addHandler(Bundle bundle) {
 		if (log.isDebugEnabled())
-			log.debug("adding as handler " + getBundleInfo(bundle));
+			log.debug("adding as handler " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
 		// noinspection unchecked
 		plugins.put(bundle, new Plugin(bundle));
 	}
 
 	/**
-	 * Returns true if a handler mapping was found for the given bundle
-	 * @param bundle
-	 * @return
+	 * Return true if a handler mapping was removed for the given bundle.
+	 * 
+	 * @param bundle bundle to look at
+	 * @return true if the bundle was used in the plugin map
 	 */
 	public boolean removeHandler(Bundle bundle) {
 		if (log.isDebugEnabled())
-			log.debug("removing handler " + getBundleInfo(bundle));
+			log.debug("removing handler " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
 		return (plugins.remove(bundle) != null);
 	}
@@ -91,14 +122,14 @@ public class NamespacePlugins implements OsgiBundleNamespaceHandlerAndEntityReso
 				if (handler != null) {
 					if (debug)
 						log.debug("namespace handler for " + namespaceUri + " found inside "
-								+ getBundleInfo(plugin.getBundle()));
+								+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
 					return handler;
 				}
 			}
 			catch (IllegalArgumentException ex) {
 				if (debug)
 					log.debug("namespace handler for " + namespaceUri + " not found inside "
-							+ getBundleInfo(plugin.getBundle()));
+							+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
 
 			}
 		}
@@ -120,47 +151,23 @@ public class NamespacePlugins implements OsgiBundleNamespaceHandlerAndEntityReso
 					if (is != null) {
 						if (debug)
 							log.debug("XML schema for " + publicId + "|" + systemId + " found inside "
-									+ getBundleInfo(plugin.getBundle()));
+									+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
 						return is;
 					}
 
 				}
-				// REVIEW andyp -- seems like we should just throw here.
 				catch (FileNotFoundException ex) {
-					if (log.isErrorEnabled())
-						log.error("XML schema for " + publicId + "|" + systemId + " not found inside "
-									+ getBundleInfo(plugin.getBundle()), ex);
+					if (debug)
+						log.debug("XML schema for " + publicId + "|" + systemId + " not found inside "
+								+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()), ex);
 				}
 			}
 		}
 		return null;
 	}
 
-	private static class Plugin implements NamespaceHandlerResolver, EntityResolver {
-		private final NamespaceHandlerResolver namespace;
-
-		private final EntityResolver entity;
-
-		private final Bundle bundle;
-
-		private Plugin(Bundle bundle) {
-			this.bundle = bundle;
-			ClassLoader loader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
-
-			entity = new DelegatingEntityResolver(loader);
-			namespace = new DefaultNamespaceHandlerResolver(loader);
-		}
-
-		public NamespaceHandler resolve(String namespaceUri) {
-			return namespace.resolve(namespaceUri);
-		}
-
-		public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-			return entity.resolveEntity(publicId, systemId);
-		}
-
-		public Bundle getBundle() {
-			return bundle;
-		}
+	public void destroy() {
+		plugins.clear();
 	}
+
 }

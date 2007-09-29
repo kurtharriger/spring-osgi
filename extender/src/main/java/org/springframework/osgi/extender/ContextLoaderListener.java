@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
-import org.springframework.beans.factory.xml.PluggableSchemaResolver;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -43,20 +42,18 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplicationContext;
 import org.springframework.osgi.context.support.ApplicationContextConfiguration;
-import org.springframework.osgi.context.support.NamespacePlugins;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.dependencies.shutdown.ServiceDependencySorter;
 import org.springframework.osgi.extender.dependencies.startup.DependencyWaiterApplicationContextExecutor;
+import org.springframework.osgi.extender.support.NamespaceManager;
 import org.springframework.osgi.internal.extender.util.ConfigUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
-import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.concurrent.Counter;
 import org.springframework.osgi.util.concurrent.RunnableTimedExecution;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
-import org.springframework.util.Assert;
 
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'.
@@ -91,7 +88,14 @@ import org.springframework.util.Assert;
  */
 public class ContextLoaderListener implements BundleActivator {
 
-	private class BundleListener implements SynchronousBundleListener {
+	/**
+	 * Common base class for {@link ContextLoaderListener} listeners.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	private abstract class BaseListener implements SynchronousBundleListener {
+
 		/**
 		 * A bundle has been started, stopped, resolved, or unresolved. This
 		 * method is a synchronous callback, do not do any long-running work in
@@ -101,10 +105,9 @@ public class ContextLoaderListener implements BundleActivator {
 		 */
 		public void bundleChanged(BundleEvent event) {
 
-			boolean debug = log.isDebugEnabled();
 			boolean trace = log.isTraceEnabled();
 
-			// check if we are being shutdown
+			// check if the listener is still alive
 			synchronized (monitor) {
 				if (isClosed) {
 					if (trace)
@@ -112,64 +115,93 @@ public class ContextLoaderListener implements BundleActivator {
 					return;
 				}
 			}
-
+			if (trace) {
+				log.debug("Processing bundle event [" + OsgiStringUtils.nullSafeToString(event) + "] for bundle ["
+						+ OsgiStringUtils.nullSafeSymbolicName(event.getBundle()) + "]");
+			}
 			try {
-				Bundle bundle = event.getBundle();
 
-				if (bundle.getBundleId() == bundleId) {
-					return;
-				}
-
-				if (trace) {
-					log.debug("Processing bundle event [" + OsgiStringUtils.nullSafeToString(event) + "] for bundle ["
-							+ OsgiStringUtils.nullSafeSymbolicName(bundle) + "]");
-				}
-
-				switch (event.getType()) {
-				case BundleEvent.STARTED: {
-					maybeCreateApplicationContextFor(bundle);
-					break;
-				}
-				case BundleEvent.STOPPING: {
-					if (OsgiBundleUtils.isSystemBundle(bundle)) {
-						if (debug) {
-							log.debug("System bundle stopping");
-						}
-						// System bundle is shutting down; Special handling for
-						// framework shutdown
-						shutdown();
-					}
-					else {
-						maybeCloseApplicationContextFor(bundle);
-					}
-					break;
-				}
-				case BundleEvent.RESOLVED: {
-					maybeAddNamespaceHandlerFor(bundle);
-					break;
-				}
-				case BundleEvent.UNRESOLVED: {
-					maybeRemoveNameSpaceHandlerFor(bundle);
-					break;
-				}
-				default:
-					break;
-				}
+				handleEvent(event);
 			}
 			catch (Throwable e) {
 				// OSGi frameworks simply swallow these exceptions
-				log.fatal("Exception handing bundle changed event", e);
+				log.error("Exception handing bundle changed event", e);
+			}
+		}
+
+		protected abstract void handleEvent(BundleEvent event);
+	}
+
+	/**
+	 * Bundle listener used for detecting namespace handler/resolvers. Exists as
+	 * a separate listener so that it can be registered early to avoid race
+	 * conditions with bundles in INSTALLING state but still to avoid premature
+	 * context creation before the Spring {@link ContextLoaderListener} is not
+	 * fully initialized.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	private class NamespaceBundleLister extends BaseListener {
+		protected void handleEvent(BundleEvent event) {
+
+			Bundle bundle = event.getBundle();
+
+			switch (event.getType()) {
+			case BundleEvent.RESOLVED: {
+				maybeAddNamespaceHandlerFor(bundle);
+				break;
+			}
+			case BundleEvent.UNRESOLVED: {
+				maybeRemoveNameSpaceHandlerFor(bundle);
+				break;
+			}
+			default:
+				break;
 			}
 		}
 	}
 
-	// The standard for META-INF header keys excludes ".", so these constants
-	// must use "-"
-	protected static final String SPRING_HANDLER_MAPPINGS_LOCATION = "META-INF/spring.handlers";
+	/**
+	 * Bundle listener used for context creation/distruction.
+	 * 
+	 */
+	private class ContextBundleListener extends BaseListener {
+		protected void handleEvent(BundleEvent event) {
+
+			Bundle bundle = event.getBundle();
+
+			// ignore current bundle for context creation
+			if (bundle.getBundleId() == bundleId) {
+				return;
+			}
+
+			switch (event.getType()) {
+			case BundleEvent.STARTED: {
+				maybeCreateApplicationContextFor(bundle);
+				break;
+			}
+			case BundleEvent.STOPPING: {
+				if (OsgiBundleUtils.isSystemBundle(bundle)) {
+					if (log.isDebugEnabled()) {
+						log.debug("System bundle stopping");
+					}
+					// System bundle is shutting down; Special handling for
+					// framework shutdown
+					shutdown();
+				}
+				else {
+					maybeCloseApplicationContextFor(bundle);
+				}
+				break;
+			}
+			default:
+				break;
+			}
+		}
+	}
 
 	protected static final String EXTENDER_CONFIG_FILE_LOCATION = "META-INF/spring/extender.xml";
-
-	protected static final String[] OSGI_BUNDLE_RESOLVER_INTERFACE_NAME = { "org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver" };
 
 	protected static final String TASK_EXECUTOR_BEAN_NAME = "taskExecutor";
 
@@ -196,26 +228,9 @@ public class ContextLoaderListener implements BundleActivator {
 	protected final Map managedContexts;
 
 	/**
-	 * ServiceRegistration object returned by OSGi when registering the
-	 * NamespacePlugins instance as a service
-	 */
-	protected ServiceRegistration resolverServiceRegistration = null;
-
-	/**
 	 * List of listeners subscribed to spring bundle events
 	 */
 	protected final Set springBundleListeners = new LinkedHashSet();
-
-	/**
-	 * Are we running under knoplerfish? Required for bug workaround with
-	 * calling getResource under KF
-	 */
-	protected boolean isKnopflerfish = false;
-
-	/**
-	 * The set of all namespace plugins known to the extender
-	 */
-	protected NamespacePlugins namespacePlugins;
 
 	/** Task executor used for bootstraping the Spring contexts */
 	protected TaskExecutor taskExecutor;
@@ -250,12 +265,20 @@ public class ContextLoaderListener implements BundleActivator {
 	protected ServiceRegistration listenerServiceRegistration;
 
 	/**
+	 * Spring namespace/resolver manager.
+	 */
+	private NamespaceManager nsManager;
+
+	/**
 	 * The bundle's context
 	 */
 	protected BundleContext context;
 
-	/** Bundle listener */
-	private SynchronousBundleListener bundleListener;
+	/** Bundle listener interested in context creation */
+	private SynchronousBundleListener contextListener;
+
+	/** Bundle listener interested in namespace resolvers/parsers discovery */
+	private SynchronousBundleListener nsListener;
 
 	/** Service-based dependency sorter for shutdown */
 	private ServiceDependencySorter shutdownDependencySorter = new ComparatorServiceDependencySorter();
@@ -281,6 +304,7 @@ public class ContextLoaderListener implements BundleActivator {
 		this.managedContexts = CollectionFactory.createConcurrentMapIfPossible(30);
 		syncTaskExecutor = new TimerTaskExecutor();
 		syncTaskExecutor.afterPropertiesSet();
+
 	}
 
 	/**
@@ -301,28 +325,29 @@ public class ContextLoaderListener implements BundleActivator {
 
 		log.info("Starting org.springframework.osgi.extender bundle v.[" + extenderVersion + "]");
 
-		this.isKnopflerfish = OsgiPlatformDetector.isKnopflerfish(context);
-
 		this.context = context;
 		this.bundleId = context.getBundle().getBundleId();
-		this.namespacePlugins = new NamespacePlugins();
-		
-		// Collect all previously resolved bundles which have namespace
-		// plugins
+
+		// stage 1: discover existing namespaces
+		nsManager = new NamespaceManager(context);
+
+		// register listener first to make sure any bundles in INSTALLED state
+		// are not lost
+		nsListener = new NamespaceBundleLister();
+		context.addBundleListener(nsListener);
+
 		Bundle[] previousBundles = context.getBundles();
+
 		for (int i = 0; i < previousBundles.length; i++) {
 			Bundle bundle = previousBundles[i];
-			// do matching on extender version
 			if (OsgiBundleUtils.isBundleResolved(bundle)) {
 				maybeAddNamespaceHandlerFor(bundle);
 			}
 		}
 
-		// TODO: possible race condition - bundles resolved between these two
-		// calls
-		// will not be considered for namespace handling registration.
+		// discovery finished, publish the resolvers/parsers in the OSGi space
+		nsManager.afterPropertiesSet();
 
-		this.resolverServiceRegistration = registerResolverService(context);
 		// do this once namespace handlers have been detected
 		this.taskExecutor = createTaskExecutor(context);
 
@@ -333,10 +358,16 @@ public class ContextLoaderListener implements BundleActivator {
 		// catch any listener in starting phase
 		registerListenerService(context);
 
-		bundleListener = new BundleListener();
+		// stage 2: discover the bundles that are started
+		// and require context creation
 
+		// register the context creation listener
+		contextListener = new ContextBundleListener();
 		// listen to any changes in bundles
-		context.addBundleListener(bundleListener);
+		context.addBundleListener(contextListener);
+
+		// get the bundles again to get an updated view
+		previousBundles = context.getBundles();
 
 		// Instantiate all previously resolved bundles which are Spring
 		// powered
@@ -380,14 +411,18 @@ public class ContextLoaderListener implements BundleActivator {
 		// then the sync appCtx queue
 		syncTaskExecutor.destroy();
 
+		// remove the bundle listeners (we are closing down0
+		if (contextListener != null) {
+			context.removeBundleListener(contextListener);
+			contextListener = null;
+		}
 
-		if (bundleListener != null) {
-			context.removeBundleListener(bundleListener);
-			bundleListener = null;
+		if (nsListener != null) {
+			context.removeBundleListener(nsListener);
+			nsListener = null;
 		}
 
 		unregisterListenerService();
-		unregisterResolverService();
 
 		Bundle[] bundles = new Bundle[managedContexts.size()];
 
@@ -447,8 +482,9 @@ public class ContextLoaderListener implements BundleActivator {
 		}
 
 		this.managedContexts.clear();
+		// clear the namespace registry
+		nsManager.destroy();
 
-		this.namespacePlugins = null;
 		this.taskExecutor = null;
 		if (this.extenderContext != null) {
 			this.extenderContext.close();
@@ -508,6 +544,36 @@ public class ContextLoaderListener implements BundleActivator {
 	}
 
 	/**
+	 * Utility method that does extender range versioning and approapriate
+	 * logging.
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	private boolean handlerBundleMatchesExtenderVersion(Bundle bundle) {
+		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
+			if (log.isDebugEnabled())
+				log.debug("bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
+						+ "] expects an extender w/ version["
+						+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
+						+ "] which does not match current extender w/ version[" + extenderVersion
+						+ "]; skipping bundle from handler detection");
+			return false;
+		}
+		return true;
+	}
+
+	private void maybeAddNamespaceHandlerFor(Bundle bundle) {
+		if (handlerBundleMatchesExtenderVersion(bundle))
+			nsManager.maybeAddNamespaceHandlerFor(bundle);
+	}
+
+	private void maybeRemoveNameSpaceHandlerFor(Bundle bundle) {
+		if (handlerBundleMatchesExtenderVersion(bundle))
+			nsManager.maybeRemoveNameSpaceHandlerFor(bundle);
+	}
+
+	/**
 	 * Register a Spring applicationEvent multicaster for the managed bundles.
 	 * 
 	 * @param context
@@ -534,29 +600,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 		OsgiServiceUtils.unregisterService(listenerServiceRegistration);
 		this.listenerServiceRegistration = null;
-	}
-
-	/**
-	 * Register the NamespacePlugins instance as an Osgi Resolver service
-	 */
-	protected ServiceRegistration registerResolverService(BundleContext context) {
-		if (log.isDebugEnabled()) {
-			log.debug("Registering Spring NamespaceHandler and EntityResolver service");
-		}
-
-		return context.registerService(OSGI_BUNDLE_RESOLVER_INTERFACE_NAME, this.namespacePlugins, null);
-	}
-
-	/**
-	 * Unregister the NamespaceHandler and EntityResolver service
-	 */
-	protected void unregisterResolverService() {
-		if (log.isDebugEnabled()) {
-			log.debug("Unregistering Spring NamespaceHandler and EntityResolver service");
-		}
-
-		OsgiServiceUtils.unregisterService(resolverServiceRegistration);
-		this.resolverServiceRegistration = null;
 	}
 
 	/**
@@ -605,7 +648,7 @@ public class ContextLoaderListener implements BundleActivator {
 		managedContexts.put(bundleId, context);
 
 		context.setPublishContextAsService(config.isPublishContextAsService());
-		context.setNamespaceResolver(namespacePlugins);
+		context.setNamespaceHandlerAndEntityResolver(nsManager.getNamespacePlugins());
 
 		// wait/no wait for dependencies behavior
 
@@ -615,7 +658,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 			appCtxExecutor.setTimeout(config.getTimeout());
 			appCtxExecutor.setWatchdog(timer);
-			
+
 			appCtxExecutor.setTaskExecutor(sameThreadTaskExecutor);
 			appCtxExecutor.setMonitoringCounter(contextsStarted);
 
@@ -683,77 +726,6 @@ public class ContextLoaderListener implements BundleActivator {
 	}
 
 	/**
-	 * If this bundle defines handler mapping or schema mapping resources, then
-	 * register it with the namespace plugin handler.
-	 * 
-	 * @param bundle
-	 */
-	// TODO: should this be into Namespace plugins?
-	// TODO: what about custom locations (outside of META-INF/spring)
-	// FIXME: rely on OSGI-IO here
-	protected void maybeAddNamespaceHandlerFor(Bundle bundle) {
-		if (OsgiBundleUtils.isSystemBundle(bundle)) {
-			return; // Do not resolve namespace and entity handlers from the
-			// system bundle
-		}
-		if (isKnopflerfish) {
-			// knopflerfish (2.0.0) has a bug #1581187 which gives a classcast
-			// exception if you call getResource
-			// from outside of the bundle, yet getResource works bettor on
-			// equinox....
-			// see
-			// http://sourceforge.net/tracker/index.php?func=detail&aid=1581187&group_id=82798&atid=567241
-			if (bundle.getEntry(SPRING_HANDLER_MAPPINGS_LOCATION) != null
-					|| bundle.getEntry(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
-				addHandler(bundle);
-			}
-		}
-		else {
-			if (bundle.getResource(SPRING_HANDLER_MAPPINGS_LOCATION) != null
-					|| bundle.getResource(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
-				addHandler(bundle);
-			}
-		}
-	}
-
-	/**
-	 * Add this bundle to those known to provide handler or schema mappings
-	 * 
-	 * @param bundle
-	 */
-	protected void addHandler(Bundle bundle) {
-
-		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
-			if (log.isDebugEnabled())
-				log.debug("bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
-						+ "] expects an extender w/ version["
-						+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
-						+ "] which does not match current extender w/ version[" + extenderVersion
-						+ "]; skipping bundle from handler detection");
-			return;
-		}
-		if (log.isDebugEnabled()) {
-			log.debug("Adding namespace handler resolver for " + bundle.getSymbolicName());
-		}
-
-		this.namespacePlugins.addHandler(bundle);
-	}
-
-	/**
-	 * Remove this bundle from the set of those known to provide handler or
-	 * schema mappings.
-	 * 
-	 * @param bundle
-	 */
-	protected void maybeRemoveNameSpaceHandlerFor(Bundle bundle) {
-		Assert.notNull(namespacePlugins);
-		boolean removed = this.namespacePlugins.removeHandler(bundle);
-		if (removed && log.isDebugEnabled()) {
-			log.debug("Removed namespace handler resolver for " + bundle.getSymbolicName());
-		}
-	}
-
-	/**
 	 * <p/> Create the task executor to be used for any asynchronous activity
 	 * kicked off by this bundle. By default an
 	 * <code>org.springframework.core.task.SimpleAsyncTaskExecutor</code> will
@@ -782,7 +754,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 			this.extenderContext = new OsgiBundleXmlApplicationContext(locations);
 			this.extenderContext.setBundleContext(context);
-			this.extenderContext.setNamespaceResolver(this.namespacePlugins);
+			this.extenderContext.setNamespaceHandlerAndEntityResolver(nsManager.getNamespacePlugins());
 
 			extenderContext.refresh();
 

@@ -89,5 +89,5 @@ public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableAp
 	/**
 	 * @param namespaceResolver The namespaceResolver to set.
 	 */
-	void setNamespaceResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver);
+	void setNamespaceHandlerAndEntityResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver);
 }
