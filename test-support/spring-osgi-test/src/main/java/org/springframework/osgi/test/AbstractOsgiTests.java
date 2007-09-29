@@ -144,13 +144,14 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 	/**
 	 * Mandatory bundles (part of the test setup). Used by the test
-	 * infrastructure.
+	 * infrastructure. Override this method <i>only</i> if you want to change
+	 * the jars used by default, by the testing infrastructure.
 	 * 
 	 * User subclasses should use {@link #getBundles()} instead.
 	 * 
 	 * @return the array of mandatory bundle names.
 	 */
-	abstract String[] getMandatoryBundles();
+	protected abstract String[] getMandatoryBundles();
 
 	/**
 	 * Create (and configure) the OSGi platform.
