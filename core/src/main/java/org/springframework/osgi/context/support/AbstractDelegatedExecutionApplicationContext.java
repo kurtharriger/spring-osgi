@@ -178,9 +178,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// Destroy already created singletons to avoid dangling
 					// resources.
 					beanFactory.destroySingletons();
-					if (logger.isDebugEnabled()) {
-						logger.debug("Post refresh error", ex);
-					}
+					logger.error("Post refresh error", ex); 
 					throw ex;
 				}
 			}
@@ -225,9 +223,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// Destroy already created singletons to avoid dangling
 					// resources.
 					getBeanFactory().destroySingletons();
-					if (logger.isDebugEnabled()) {
-						logger.debug("Post refresh error", ex);
-					}
+				    logger.error("Post refresh error", ex); 
 					throw ex;
 				}
 			}
