@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006 the original author or authors.
+ * Copyright 2002-20067 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,35 +23,30 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.osgi.util.ConfigUtils; 
-import org.springframework.osgi.util.OsgiServiceUtils; 
+import org.springframework.osgi.util.ConfigUtils;
+import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
- * Application context backed by an OSGi bundle. Will use the bundle classpath
- * for resource loading for any unqualified resource string. 
- * 
- * <p/> Also
- * understands the "bundle:" resource prefix for explicit loading of resources
- * from the bundle. When the bundle prefix is used the target resource must be
- * contained within the bundle (or attached fragments), the classpath is not
- * searched. <p/>
+ * XML specific application context backed by an OSGi bundle.
  * 
  * @author Adrian Colyer
+ * @author Costin Leau
  * @author Andy Piper
  * @author Hal Hildebrand
- * @author Costin Leau
  */
 
-// TODO: provide means to access OSGi services etc. through this application context?
-// TODO: think about whether restricting config files to bundle: is the right thing to do
+// TODO: provide means to access OSGi services etc. through this application
+// context?
+// TODO: think about whether restricting config files to bundle: is the right
+// thing to do
 public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionApplicationContext {
 
 	/** retrieved from the BundleContext * */
-	private OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver;
+	private OsgiBundleNamespaceHandlerAndEntityResolver nsHandlerResolver;
 
 	public OsgiBundleXmlApplicationContext(String[] configLocations) {
-        setDisplayName("Unbound OsgiBundleXmlApplicationContext");
-        setConfigLocations(configLocations);
+		setDisplayName("Unbound OsgiBundleXmlApplicationContext");
+		setConfigLocations(configLocations);
 	}
 
 	protected String[] getDefaultConfigLocations() {
@@ -73,9 +68,9 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
 
-		// prefer the namespace plugin instead of ResourceEntityResolver
-
-		OsgiBundleNamespaceHandlerAndEntityResolver defaultHandlerResolver = (namespaceResolver != null ? namespaceResolver
+		// check if there is a handler resolver, trying to resolve it from the
+		// OSGi space
+		OsgiBundleNamespaceHandlerAndEntityResolver defaultHandlerResolver = (nsHandlerResolver != null ? nsHandlerResolver
 				: lookupHandlerAndResolver());
 
 		if (defaultHandlerResolver != null) {
@@ -100,18 +95,23 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * @return
 	 */
 	protected OsgiBundleNamespaceHandlerAndEntityResolver lookupHandlerAndResolver() {
-		// FIXME: add smart lookup proxy - if no service is available, an
-		// exception will be thrown
 		ServiceReference reference = OsgiServiceUtils.getService(getBundleContext(),
 			OsgiBundleNamespaceHandlerAndEntityResolver.class, null);
 
-		OsgiBundleNamespaceHandlerAndEntityResolver resolver = (OsgiBundleNamespaceHandlerAndEntityResolver) getBundleContext().getService(
-			reference);
+		if (reference != null) {
+			OsgiBundleNamespaceHandlerAndEntityResolver resolver = (OsgiBundleNamespaceHandlerAndEntityResolver) getBundleContext().getService(
+				reference);
+			if (logger.isDebugEnabled()) {
+				if (resolver != null) {
+					logger.debug("looking for NamespaceHandlerAndEntityResolver OSGi service.... found=" + resolver);
+				}
+				else
+					logger.debug("no NamespaceHandlerAndEntityResolver service found");
+			}
+			return resolver;
+		}
 
-		if (logger.isDebugEnabled())
-			logger.debug("looking for NamespaceHandlerAndEntityResolver OSGi service.... found=" + resolver);
-
-		return resolver;
+		return null;
 	}
 
 	/**
@@ -123,9 +123,9 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * by the bundle.
 	 */
 	protected void initBeanDefinitionReader(XmlBeanDefinitionReader beanDefinitionReader) {
-		if (namespaceResolver != null) {
-			beanDefinitionReader.setEntityResolver(namespaceResolver);
-			beanDefinitionReader.setNamespaceHandlerResolver(namespaceResolver);
+		if (nsHandlerResolver != null) {
+			beanDefinitionReader.setEntityResolver(nsHandlerResolver);
+			beanDefinitionReader.setNamespaceHandlerResolver(nsHandlerResolver);
 		}
 	}
 
@@ -157,10 +157,12 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * @param namespaceResolver The namespaceResolver to set.
+	 * Set the merged, namespace handler entity resolver class.
+	 * 
+	 * @param nsHandlerEntityResolver The nsHandlerResolver to set.
 	 */
-	public void setNamespaceResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
-		this.namespaceResolver = namespaceResolver;
+	public void setNamespaceHandlerAndEntityResolver(OsgiBundleNamespaceHandlerAndEntityResolver nsHandlerEntityResolver) {
+		this.nsHandlerResolver = nsHandlerEntityResolver;
 	}
 
 }
