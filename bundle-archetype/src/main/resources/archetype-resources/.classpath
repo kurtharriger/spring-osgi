@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry output="target/test-classes" kind="src" path="src/test/java"/>
 	<classpathentry output="target/test-classes" kind="src" path="src/test/resources"/>
-	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-mock/2.1-m3/spring-mock-2.1-m3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.1-m3/spring-core-2.1-m3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.1-m3/spring-context-2.1-m3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.1-m3/spring-beans-2.1-m3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/commons-logging.osgi/1.1-SNAPSHOT/commons-logging.osgi-1.1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-test/2.1-m4/spring-test-2.1-m4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.1-m4/spring-core-2.1-m4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.1-m4/spring-context-2.1-m4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.1-m4/spring-beans-2.1-m4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
