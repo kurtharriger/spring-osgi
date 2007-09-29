@@ -76,10 +76,10 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	private TestResult originalResult;
 
 	// The OSGi BundleContext (when executing the test as a bundle inside OSGi)
-	private BundleContext bundleContext;
+	protected BundleContext bundleContext;
 
 	// OsgiResourceLoader
-	private ResourceLoader resourceLoader;
+	protected ResourceLoader resourceLoader;
 
 	/**
 	 * Hook for JUnit infrastructures which can't reuse this class hierarchy.
@@ -98,6 +98,40 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		super(name);
 	}
 
+	//
+	// DEPRECATED METHODS
+	//
+	// FIXME: remove this after m3 release
+
+	/**
+	 * Legacy method - will be removed in future SVN revisions.
+	 * @return
+	 * @deprecated use
+	 */
+	protected String[] getBundleLocations() {
+		return getBundles();
+	}
+
+	/**
+	 * Return the resource loader used by this test.
+	 * 
+	 * @return an OsgiBundleResourceLoader if the bundleContext was set or null
+	 * otherwise.
+	 * @deprecated use the resourceLoader field directly
+	 */
+	protected ResourceLoader getResourceLoader() {
+		return resourceLoader;
+	}
+
+	/**
+	 * Return the bundleContext for the bundle in which this test is running.
+	 * 
+	 * @return
+	 * @deprecated use the bundleContext field directly
+	 */
+	protected BundleContext getBundleContext() {
+		return bundleContext;
+	}
 
 	/**
 	 * Bundles that should be installed before the test execution.
@@ -109,38 +143,14 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Legacy method - will be removed in future SVN revisions.
-	 * @return
-	 */
-	protected String[] getBundleLocations() {
-		return getBundles();
-	}
-
-	/**
-	 * Mandatory bundles (part of the test setup).
+	 * Mandatory bundles (part of the test setup). Used by the test
+	 * infrastructure.
+	 * 
+	 * User subclasses should use {@link #getBundles()} instead.
 	 * 
 	 * @return the array of mandatory bundle names.
 	 */
-	protected abstract String[] getMandatoryBundles();
-
-	/**
-	 * Return the resource loader used by this test.
-	 * 
-	 * @return an OsgiBundleResourceLoader if the bundleContext was set or null
-	 * otherwise.
-	 */
-	protected ResourceLoader getResourceLoader() {
-		return resourceLoader;
-	}
-
-	/**
-	 * Return the bundleContext for the bundle in which this test is running.
-	 * 
-	 * @return
-	 */
-	protected BundleContext getBundleContext() {
-		return bundleContext;
-	}
+	abstract String[] getMandatoryBundles();
 
 	/**
 	 * Create (and configure) the OSGi platform.
@@ -620,9 +630,10 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Set the bundle context to be used by this test. This method is called
-	 * automatically by the test infrastructure after the OSGi platform is being
-	 * setup.
+	 * Set the bundle context to be used by this test.
+	 * 
+	 * <p/> This method is called automatically by the test infrastructure after
+	 * the OSGi platform is being setup.
 	 */
 	public final void injectBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
@@ -637,9 +648,11 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	/**
 	 * Set the underlying OsgiJUnitTest used for the test delegation.
 	 * 
+	 * <p/> This method is called automatically by the test infrastructure after
+	 * the OSGi platform is being setup.
 	 * @param test
 	 */
-	public void injectOsgiJUnitTest(OsgiJUnitTest test) {
+	public final void injectOsgiJUnitTest(OsgiJUnitTest test) {
 		Assert.isInstanceOf(TestCase.class, test);
 		this.osgiJUnitTest = (TestCase) test;
 	}

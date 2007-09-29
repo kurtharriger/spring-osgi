@@ -140,9 +140,12 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	}
 
 	/**
+	 * List of OSGi packages that are delegated to the boot classpath. See the
+	 * OSGi specification regarding the format of the package string
+	 * representation.
 	 * 
-	 * @return the list of packages the OSGi platform will delegate to the boot
-	 * class path Answer an empty list if none.
+	 * @return the list of strings representing the packages that the OSGi
+	 * platform will delegate to the boot class path.
 	 */
 	protected List getBootDelegationPackages() {
 		List defaults = new ArrayList();
