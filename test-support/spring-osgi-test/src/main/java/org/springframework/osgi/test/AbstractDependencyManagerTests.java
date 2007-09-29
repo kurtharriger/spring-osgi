@@ -147,12 +147,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return "org.springframework.osgi,asm.osgi,2.2.3-SNAPSHOT";
 	}
 
-	/**
-	 * Mandator bundles (part of the test setup).
-	 * 
-	 * @return the array of mandatory bundle names
-	 */
-	String[] getMandatoryBundles() {
+	protected String[] getMandatoryBundles() {
 
 		String[] jars = new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
 				getJUnitLibUrl(), getSpringCoreUrl(), getSpringBeansUrl(), getSpringContextUrl(), getSpringMockUrl(),
