@@ -152,13 +152,13 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * 
 	 * @return the array of mandatory bundle names
 	 */
-	protected String[] getMandatoryBundles() {
+	String[] getMandatoryBundles() {
 
 		String[] jars = new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
-				getJUnitLibUrl(), getSpringCoreUrl(), getSpringBeansUrl(), getSpringContextUrl(),
-				getSpringMockUrl(), getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(),
-				getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringBeansUrl(),
-				getSpringOSGiTestBundleUrl(), getSpringOSGiExtenderBundleUrl() };
+				getJUnitLibUrl(), getSpringCoreUrl(), getSpringBeansUrl(), getSpringContextUrl(), getSpringMockUrl(),
+				getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(), getSpringOSGiIoBundleUrl(),
+				getSpringOSGiCoreBundleUrl(), getSpringBeansUrl(), getSpringOSGiTestBundleUrl(),
+				getSpringOSGiExtenderBundleUrl() };
 
 		String[] bundles;
 
@@ -173,7 +173,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	public Bundle findBundleByLocation(String bundleLocation) {
-		Bundle[] bundles = getBundleContext().getBundles();
+		Bundle[] bundles = bundleContext.getBundles();
 		for (int i = 0; i < bundles.length; i++) {
 			if (bundles[i].getLocation().equals(bundleLocation)) {
 				return bundles[i];
@@ -184,7 +184,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 	public Bundle findBundleBySymbolicName(String symbolicName) {
 		Assert.hasText(symbolicName, "a not-null/not-empty symbolicName is required");
-		Bundle[] bundles = getBundleContext().getBundles();
+		Bundle[] bundles = bundleContext.getBundles();
 		for (int i = 0; i < bundles.length; i++) {
 			if (symbolicName.equals(bundles[i].getSymbolicName())) {
 				return bundles[i];
@@ -211,7 +211,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		for (int i = 0; i < artifactId.length; i++) {
 			artifactId[i] = StringUtils.trimWhitespace(artifactId[i]);
 		}
-		
+
 		return (artifactId.length == 3 ? locator.locateArtifact(artifactId[0], artifactId[1], artifactId[2])
 				: locator.locateArtifact(artifactId[0], artifactId[1], artifactId[2], artifactId[3]));
 	}
@@ -230,8 +230,15 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return locator;
 	}
 
+	//
+	// FIXME: remove these methods after M3
+	//
+
 	/**
 	 * Compatibility method - will be removed in the very near future.
+	 * @deprecated this method will be removed after M3; use
+	 * {@link #getLocator() and ArtifactLocator#locateArtifact(String, String, String) method instead or
+	 * simply #locateBundle(String)
 	 * 
 	 * @param groupId
 	 * @param artifactId
@@ -244,6 +251,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 	/**
 	 * Compatibility method - will be removed in the very near future.
+	 * 
+	 * @deprecated this method will be removed after M3; use
+	 * {@link #getLocator() and ArtifactLocator#locateArtifact(String, String, String) method instead or
+	 * simply #locateBundle(String)
 	 * 
 	 * @param groupId
 	 * @param artifactId
