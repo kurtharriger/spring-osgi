@@ -53,7 +53,7 @@ public class SyncNoWaitWithReverseQueueTest extends BehaviorBaseTest {
 		assertTrue("bundle " + bundle + "hasn't been fully started", OsgiBundleUtils.isBundleActive(bundle));
 
 		// wait for the listener to get the bundles and wait for timeout
-		Thread.sleep(700);
+		Thread.sleep(1400);
 
 		// check that the dependency service is actually started as the
 		// dependency
