@@ -45,7 +45,7 @@ public abstract class BehaviorBaseTest extends AbstractConfigurableBundleCreator
 				+ bundle.getSymbolicName() + ")";
 
 		// do query
-		Object refs = OsgiServiceReferenceUtils.getServiceReference(getBundleContext(),
+		Object refs = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
 			ApplicationContext.class.getName(), query);
 		// make sure the appCtx is up
 		if (alive)
@@ -62,6 +62,6 @@ public abstract class BehaviorBaseTest extends AbstractConfigurableBundleCreator
 		Resource bundleLocation = locateBundle(bundleId);
 		assertTrue("bundle " + bundleId + " could not be found", bundleLocation.exists());
 
-		return getBundleContext().installBundle(bundleLocation.getURL().toString());
+		return bundleContext.installBundle(bundleLocation.getURL().toString());
 	}
 }

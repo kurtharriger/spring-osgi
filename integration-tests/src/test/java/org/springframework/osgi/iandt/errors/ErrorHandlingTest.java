@@ -45,7 +45,7 @@ public class ErrorHandlingTest extends AbstractConfigurableBundleCreatorTests {
                 .locateArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.error",
                                 getSpringOsgiVersion());
         assertNotNull("Error bundle resource exists", errorResource);
-        Bundle errorBundle = getBundleContext().installBundle(errorResource.getURL().toExternalForm());
+        Bundle errorBundle = bundleContext.installBundle(errorResource.getURL().toExternalForm());
         assertNotNull("Errro bundle exists", errorBundle);
 
         errorBundle.start(); 

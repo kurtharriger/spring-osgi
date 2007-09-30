@@ -1,7 +1,6 @@
 package org.springframework.osgi.iandt.dependencyWithDelay;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
@@ -11,33 +10,28 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * Crucial test for the asych, service-dependency waiting. Installs several
  * bundles which depend on each other services making sure that none of them
  * starts unless the dependent bundle (and its services) are also started.
- *
+ * 
  * @author Hal Hildebrand Date: Dec 1, 2006 Time: 3:56:43 PM
  * @author Costin Leau
  */
 public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
-    private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.dependencies.Dependent";
+	private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.dependencies.Dependent";
 
 	// private static final String SERVICE_2_FILTER = "(service=2)";
 	// private static final String SERVICE_3_FILTER = "(service=3)";
 
-    protected String getManifestLocation() {
+	protected String getManifestLocation() {
 		return null;
 	}
 
-	protected String[] getBundles() {
-		return new String[] { localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT") };
-	}
-
-	// dependency bundle - depends on service2, service3 and, through a nested reference, to service1
+	// dependency bundle - depends on service2, service3 and, through a nested
+	// reference, to service1
 	// simple.service2 - publishes service2
 	// simple.service3 - publishes service3
-	// simple 		   - publishes service1
+	// simple - publishes service1
 	public void testDependencies() throws Exception {
-        System.setProperty("org.springframework.osgi.iandt.simpleservice.impl.delay", "10000");
+		System.setProperty("org.springframework.osgi.iandt.simpleservice.impl.delay", "10000");
 		// waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
-
-		BundleContext bundleContext = getBundleContext();
 
 		Bundle dependencyTestBundle = bundleContext.installBundle(getLocator().locateArtifact(
 			"org.springframework.osgi", "org.springframework.osgi.iandt.dependencies", getSpringOsgiVersion()).getURL().toExternalForm());

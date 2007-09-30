@@ -89,16 +89,16 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	protected ScopeTestService getService(String bundleName) {
-		ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(getBundleContext(),
+		ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
 			ScopeTestService.class.getName(), "(Bundle-SymbolicName=org.springframework.osgi.iandt.scope." + bundleName
 					+ ")");
 		if (ref == null) {
 			String filter = OsgiFilterUtils.unifyFilter(ScopeTestService.class, null);
 			System.out.println(ObjectUtils.nullSafeToString(OsgiServiceReferenceUtils.getServiceReferences(
-				getBundleContext(), filter)));
+				bundleContext, filter)));
 			throw new IllegalStateException("cannot find service with owning bundle " + bundleName);
 		}
-		return (ScopeTestService) getBundleContext().getService(ref);
+		return (ScopeTestService) bundleContext.getService(ref);
 
 	}
 

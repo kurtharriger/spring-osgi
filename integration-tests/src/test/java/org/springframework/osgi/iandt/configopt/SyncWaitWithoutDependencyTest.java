@@ -59,10 +59,10 @@ public class SyncWaitWithoutDependencyTest extends BehaviorBaseTest {
 		// check the dependency ctx
 		assertContextServiceIs(tailBundle, false);
 		// and service
-		assertNull(getBundleContext().getServiceReference(Area.class.getName()));
+		assertNull(bundleContext.getServiceReference(Area.class.getName()));
 
 		// put a Shape service up (a polygon but not an area)
-		getBundleContext().registerService(Shape.class.getName(), new Polygon(), null);
+		bundleContext.registerService(Shape.class.getName(), new Polygon(), null);
 
 		// let bundle pick this up
 		Thread.sleep(500);
@@ -72,7 +72,7 @@ public class SyncWaitWithoutDependencyTest extends BehaviorBaseTest {
 		// check the dependency ctx
 		assertContextServiceIs(tailBundle, true);
 		// and service
-		assertNotNull(getBundleContext().getServiceReference(Area.class.getName()));
+		assertNotNull(bundleContext.getServiceReference(Area.class.getName()));
 
 	}
 }

@@ -26,7 +26,6 @@ import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.ClassUtils;
 
@@ -47,7 +46,7 @@ public class ServiceProxyTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	private ServiceRegistration publishService(Object obj) throws Exception {
-		return getBundleContext().registerService(obj.getClass().getName(), obj, null);
+		return bundleContext.registerService(obj.getClass().getName(), obj, null);
 	}
 
 	private Object createProxy(final Class clazz, Advice cardinalityInterceptor) {
@@ -64,8 +63,8 @@ public class ServiceProxyTest extends AbstractConfigurableBundleCreatorTests {
 
 	private Advice createCardinalityAdvice(Class clazz) {
         ClassLoader classLoader =
-                BundleDelegatingClassLoader.createBundleClassLoaderFor(getBundleContext().getBundle());
-        OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(getBundleContext(),
+                BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
+        OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(bundleContext,
                                                                                       2,
                                                                                       classLoader);
 		// fast retry
@@ -86,7 +85,7 @@ public class ServiceProxyTest extends AbstractConfigurableBundleCreatorTests {
 		long time = 123456;
 		Date date = new Date(time);
 		ServiceRegistration reg = publishService(date);
-		BundleContext ctx = getBundleContext();
+		BundleContext ctx = bundleContext;
 
 		try {
 			ServiceReference ref = ctx.getServiceReference(Date.class.getName());

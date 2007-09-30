@@ -1,12 +1,11 @@
 package org.springframework.osgi.iandt.mavenArtifact;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.springframework.osgi.ServiceUnavailableException;
+import org.springframework.osgi.iandt.cardinality0to1.test.MyListener;
 import org.springframework.osgi.iandt.cardinality0to1.test.ReferenceContainer;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.iandt.cardinality0to1.test.MyListener;
 
 /**
  * @author Hal Hildebrand
@@ -29,15 +28,11 @@ public class MavenArtifactLookupTest extends AbstractConfigurableBundleCreatorTe
 
 	protected String[] getBundles() {
 		return new String[] {
-				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT", "jar"),
-				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.simple.service",
-					getSpringOsgiVersion(), "jar"),
-				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.cardinality0to1",
-					getSpringOsgiVersion(), "jar") };
+				"org.springframework.osgi, org.springframework.osgi.iandt.simple.service," + getSpringOsgiVersion(),
+				"org.springframework.osgi, org.springframework.osgi.iandt.cardinality0to1," + getSpringOsgiVersion() };
 	}
 
 	public void test0to1Cardinality() throws Exception {
-		BundleContext bundleContext = getBundleContext();
 
 		Bundle simpleService2Bundle = bundleContext.installBundle(getLocator().locateArtifact(
 			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service2", getSpringOsgiVersion(), "jar").getURL().toExternalForm());

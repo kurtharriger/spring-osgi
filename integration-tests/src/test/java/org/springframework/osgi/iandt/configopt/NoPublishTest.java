@@ -44,6 +44,6 @@ public class NoPublishTest extends BehaviorBaseTest {
 
 		// but the point service is
 		assertNotNull("point service should have been published"
-				+ getBundleContext().getServiceReference(Point.class.getName()));
+				+ bundleContext.getServiceReference(Point.class.getName()));
 	}
 }

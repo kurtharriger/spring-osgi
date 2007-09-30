@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.osgi.framework.BundleContext;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.collection.OsgiServiceList;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
@@ -32,7 +31,6 @@ import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 public class ServiceListTest extends ServiceCollectionTest {
 
 	protected Collection createCollection() {
-		BundleContext bundleContext = getBundleContext();
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 		OsgiServiceList col = new OsgiServiceList(null, bundleContext, classLoader, false);
 		col.setContextClassLoader(ReferenceClassLoadingOptions.UNMANAGED);

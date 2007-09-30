@@ -89,7 +89,7 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 
         String[] locations = new String[]{"org/springframework/osgi/iandt/propertyplaceholder/placeholder.xml"};
         ctx = new OsgiBundleXmlApplicationContext(locations);
-        ctx.setBundleContext(getBundleContext());
+        ctx.setBundleContext(bundleContext);
         ctx.refresh();
 	}
 
@@ -109,9 +109,9 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 	// add a default table into OSGi
 	private void prepareConfiguration() throws Exception {
 
-		ServiceReference ref = OsgiServiceUtils.getService(getBundleContext(), ConfigurationAdmin.class, null);
+		ServiceReference ref = OsgiServiceUtils.getService(bundleContext, ConfigurationAdmin.class, null);
 
-		ConfigurationAdmin admin = (ConfigurationAdmin) getBundleContext().getService(ref);
+		ConfigurationAdmin admin = (ConfigurationAdmin) bundleContext.getService(ref);
 		Configuration config = admin.getConfiguration(ID);
 		config.update(DICT);
 	}

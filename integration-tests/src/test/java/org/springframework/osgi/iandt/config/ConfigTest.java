@@ -73,10 +73,10 @@ public class ConfigTest extends AbstractConfigurableBundleCreatorTests {
 
 
     protected void onSetUp() throws Exception {
-        ServiceReference ref = OsgiServiceUtils.getService(getBundleContext(), ConfigurationAdmin.class, null);
-        admin = (ConfigurationAdmin) getBundleContext().getService(ref);
+        ServiceReference ref = OsgiServiceUtils.getService(bundleContext, ConfigurationAdmin.class, null);
+        admin = (ConfigurationAdmin) bundleContext.getService(ref);
         assertNotNull("Configuration Admin exists", admin);
-        BundleContext bc = getBundleContext();
+        BundleContext bc = bundleContext;
         Bundle[] bundles = bc.getBundles();
         for (int i = 0; i < bundles.length; i++) {
             if ("org.springframework.osgi.iandt.configuration".equals(bundles[i].getSymbolicName())) {

@@ -53,7 +53,7 @@ public class AsyncNoWaitTest extends BehaviorBaseTest {
 		Thread.sleep(2000);
 
 		// put service up
-		registration = getBundleContext().registerService(Shape.class.getName(), new Area(), null);
+		registration = bundleContext.registerService(Shape.class.getName(), new Area(), null);
 
 		assertTrue("bundle " + bundle + "hasn't been fully started", OsgiBundleUtils.isBundleActive(bundle));
 

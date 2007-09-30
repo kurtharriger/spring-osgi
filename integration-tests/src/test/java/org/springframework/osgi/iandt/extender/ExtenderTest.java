@@ -1,93 +1,94 @@
 package org.springframework.osgi.iandt.extender;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.util.CollectionUtils;
 
 /**
- * @author Hal Hildebrand
- *         Date: May 21, 2007
- *         Time: 4:43:52 PM
+ * @author Hal Hildebrand Date: May 21, 2007 Time: 4:43:52 PM
  */
 public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
 
-    protected String getManifestLocation() {
-        return null;
-    }
+	protected String getManifestLocation() {
+		return null;
+	}
 
+	// Overridden to remove the spring extender bundle!
+	protected String[] getMandatoryBundles() {
+		String[] bundles = super.getMandatoryBundles();
+		List list = new ArrayList(bundles.length);
 
-    // Overridden to remove the spring extender bundle!
-    protected String[] getMandatoryBundles() {
-        return new String[]{getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
-                            getJUnitLibUrl(), getSpringCoreUrl(), getSpringBeansUrl(), getSpringContextUrl(),
-                            getSpringMockUrl(), getAopAllianceUrl(), getAsmLibrary(),
-                            getSpringAopUrl(), getUtilConcurrentLibUrl(),
-                            getSpringOSGiIoBundleUrl(), getSpringOSGiCoreBundleUrl(), getSpringOSGiTestBundleUrl()};
-    }
+		// remove extender
+		CollectionUtils.mergeArrayIntoCollection(bundles, list);
 
+		boolean found = false;
+		for (Iterator iter = list.iterator(); iter.hasNext() && !found;) {
+			String element = (String) iter.next();
+			if (element.indexOf("extender") >= 0) {
+				iter.remove();
+				found = true;
+			}
+		}
 
-    // Specifically cannot wait - test scenario has bundles which are spring powered, but will not be started.
-    protected boolean shouldWaitForSpringBundlesContextCreation() {
-        return false;
-    }
+		return (String[]) list.toArray(new String[list.size()]);
+	}
 
+	// Specifically cannot wait - test scenario has bundles which are spring
+	// powered, but will not be started.
+	protected boolean shouldWaitForSpringBundlesContextCreation() {
+		return false;
+	}
 
-    protected String[] getBundles() {
-        return new String[]{
-                localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
-                localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.lifecycle",
-                                   getSpringOsgiVersion())
-        };
-    }
+	protected String[] getBundles() {
+		return new String[] { "org.springframework.osgi, org.springframework.osgi.iandt.lifecycle,"
+				+ getSpringOsgiVersion() };
+	}
 
+	public void testLifecycle() throws Exception {
+		assertNull("Guinea pig has already been started",
+			System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
 
-    public void testLifecycle() throws Exception {
-        assertNull("Guinea pig has already been started",
-                   System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
+		StringBuffer filter = new StringBuffer();
+		filter.append("(&");
+		filter.append("(").append(Constants.OBJECTCLASS).append("=").append(
+			AbstractRefreshableApplicationContext.class.getName()).append(")");
+		filter.append("(").append("org.springframework.context.service.name");
+		filter.append("=").append("org.springframework.osgi.iandt.lifecycle").append(")");
+		filter.append(")");
+		ServiceTracker tracker = new ServiceTracker(bundleContext, bundleContext.createFilter(filter.toString()), null);
+		tracker.open();
 
-        StringBuffer filter = new StringBuffer();
-        filter.append("(&");
-        filter.append("(").append(Constants.OBJECTCLASS).append("=")
-                .append(AbstractRefreshableApplicationContext.class.getName()).append(")");
-        filter.append("(")
-                .append("org.springframework.context.service.name");
-        filter.append("=").append("org.springframework.osgi.iandt.lifecycle").append(")");
-        filter.append(")");
-        ServiceTracker tracker = new ServiceTracker(getBundleContext(),
-                                                    getBundleContext().createFilter(filter.toString()),
-                                                    null);
-        tracker.open();
+		AbstractRefreshableApplicationContext appContext = (AbstractRefreshableApplicationContext) tracker.waitForService(1);
 
-        AbstractRefreshableApplicationContext appContext = (AbstractRefreshableApplicationContext) tracker
-                .waitForService(1);
+		assertNull("lifecycle application context does not exist", appContext);
 
-        assertNull("lifecycle application context does not exist", appContext);
+		Resource extenderResource = getLocator().locateArtifact("org.springframework.osgi", "spring-osgi-extender",
+			getSpringOsgiVersion());
+		assertNotNull("Extender bundle resource", extenderResource);
+		Bundle extenderBundle = bundleContext.installBundle(extenderResource.getURL().toExternalForm());
+		assertNotNull("Extender bundle", extenderBundle);
 
+		extenderBundle.start();
 
-        Resource extenderResource = getLocator()
-                .locateArtifact("org.springframework.osgi", "spring-osgi-extender", getSpringOsgiVersion());
-        assertNotNull("Extender bundle resource", extenderResource);
-        Bundle extenderBundle = getBundleContext().installBundle(extenderResource.getURL().toExternalForm());
-        assertNotNull("Extender bundle", extenderBundle);
+		tracker.open();
 
-        extenderBundle.start();
+		appContext = (AbstractRefreshableApplicationContext) tracker.waitForService(60000);
 
-        tracker.open();
+		assertNotNull("lifecycle application context exists", appContext);
 
-        appContext = (AbstractRefreshableApplicationContext) tracker
-                .waitForService(60000);
+		assertNotSame("Guinea pig hasn't already been shutdown", "true",
+			System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
 
-        assertNotNull("lifecycle application context exists", appContext);
+		assertEquals("Guinea pig started up", "true",
+			System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.startUp"));
 
-
-        assertNotSame("Guinea pig hasn't already been shutdown", "true",
-                      System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
-
-        assertEquals("Guinea pig started up", "true",
-                     System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.startUp"));
-
-    }
+	}
 }

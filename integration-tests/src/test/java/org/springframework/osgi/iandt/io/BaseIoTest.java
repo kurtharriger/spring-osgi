@@ -54,7 +54,7 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 		// load file using absolute path
 		defaultLoader = new DefaultResourceLoader();
 		thisClass = defaultLoader.getResource(getClass().getName().replace('.', '/').concat(".class"));
-		bundle = getBundleContext().getBundle();
+		bundle = bundleContext.getBundle();
 		loader = new OsgiBundleResourceLoader(bundle);
 		patternLoader = new OsgiBundleResourcePatternResolver(loader);
 

@@ -48,7 +48,7 @@ public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
 
         assertEquals("Guinea pig didn't startup", "true",
                      System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.startUp"));
-        Bundle[] bundles = getBundleContext().getBundles();
+        Bundle[] bundles = bundleContext.getBundles();
         Bundle testBundle = null;
         for (int i = 0; i < bundles.length; i++) {
             if ("org.springframework.osgi.iandt.lifecycle".equals(bundles[i].getSymbolicName())) {
@@ -64,8 +64,8 @@ public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
         filter.append("(").append(ConfigurableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
         filter.append("=").append(testBundle.getSymbolicName()).append(")");
         filter.append(")");
-        ServiceTracker tracker = new ServiceTracker(getBundleContext(),
-                                                    getBundleContext().createFilter(filter.toString()),
+        ServiceTracker tracker = new ServiceTracker(bundleContext,
+                                                    bundleContext.createFilter(filter.toString()),
                                                     null);
         tracker.open();
 

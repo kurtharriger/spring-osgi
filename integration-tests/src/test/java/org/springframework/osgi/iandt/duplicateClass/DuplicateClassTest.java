@@ -1,7 +1,6 @@
 package org.springframework.osgi.iandt.duplicateClass;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.iandt.simpleservice.MyService;
@@ -21,13 +20,7 @@ public class DuplicateClassTest extends AbstractConfigurableBundleCreatorTests {
 		 return "classpath:org/springframework/osgi/iandt/duplicateClass/DuplicateClassTest.MF";
 	}
 
-	protected String[] getBundles() {
-		return new String[] { localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT") };
-	}
-
 	public void testDependencies() throws Exception {
-
-		BundleContext bundleContext = getBundleContext();
 
 		// Simple Service bundle (provides the base package + 1 service)
 		Bundle simpleServiceBundle = bundleContext.installBundle(getLocator().locateArtifact(

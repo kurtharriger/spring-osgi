@@ -31,7 +31,7 @@ public class DeadlockHandlingTest extends AbstractConfigurableBundleCreatorTests
                 .locateArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.deadlock",
                                 getSpringOsgiVersion());
         assertNotNull("bundle resource exists", errorResource);
-        Bundle errorBundle = getBundleContext().installBundle(errorResource.getURL().toExternalForm());
+        Bundle errorBundle = bundleContext.installBundle(errorResource.getURL().toExternalForm());
         assertNotNull("bundle exists", errorBundle);
         errorBundle.start();
         StringBuffer filter = new StringBuffer();
@@ -43,8 +43,8 @@ public class DeadlockHandlingTest extends AbstractConfigurableBundleCreatorTests
                 .append(ConfigurableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
         filter.append("=").append("org.springframework.osgi.iandt.deadlock").append(")");
         filter.append(")");
-        ServiceTracker tracker = new ServiceTracker(getBundleContext(),
-                                                    getBundleContext().createFilter(filter.toString()),
+        ServiceTracker tracker = new ServiceTracker(bundleContext,
+                                                    bundleContext.createFilter(filter.toString()),
                                                     null);
         tracker.open();
 
