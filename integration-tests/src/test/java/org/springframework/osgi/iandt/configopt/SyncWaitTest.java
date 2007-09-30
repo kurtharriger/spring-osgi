@@ -56,7 +56,7 @@ public class SyncWaitTest extends BehaviorBaseTest {
 
 		// check that the dependency service is actually started as the
 		// dependency bundle has started
-		assertNotNull(getBundleContext().getServiceReference(Shape.class.getName()));
+		assertNotNull(bundleContext.getServiceReference(Shape.class.getName()));
 
 		assertContextServiceIs(bundle, true);
 	}

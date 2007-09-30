@@ -1,7 +1,6 @@
 package org.springframework.osgi.iandt.dependency;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
@@ -25,18 +24,12 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 		return null;
 	}
 
-	protected String[] getBundles() {
-		return new String[] { localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT") };
-	}
-
 	// dependency bundle - depends on service2, service3 and, through a nested reference, to service1
 	// simple.service2 - publishes service2
 	// simple.service3 - publishes service3
 	// simple 		   - publishes service
 	public void testDependencies() throws Exception {
 		// waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
-
-		BundleContext bundleContext = getBundleContext();
 
 		Bundle dependencyTestBundle = bundleContext.installBundle(getLocator().locateArtifact(
 			"org.springframework.osgi", "org.springframework.osgi.iandt.dependencies", getSpringOsgiVersion()).getURL().toExternalForm());

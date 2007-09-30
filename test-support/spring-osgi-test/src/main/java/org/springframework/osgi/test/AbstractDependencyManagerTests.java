@@ -15,9 +15,13 @@
  */
 package org.springframework.osgi.test;
 
+import java.util.Properties;
+
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.springframework.core.JdkVersion;
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.test.util.PropertiesUtil;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -30,6 +34,10 @@ import org.springframework.util.StringUtils;
  * 
  */
 public abstract class AbstractDependencyManagerTests extends AbstractSynchronizedOsgiTests {
+
+	private static final String MANDATORY_FILE_CONF = "/org/springframework/osgi/test/boot-bundles.properties";
+
+	private static final String IGNORE = "ignore";
 
 	/**
 	 * Artifact locator (by default the Local Maven repo).
@@ -67,118 +75,70 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return SPRING_BUNDLED_VERSION;
 	}
 
-	// FIXME: externalize them
-	protected String getSpringOSGiTestBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-test," + getSpringOsgiVersion();
-	}
-
-	protected String getSpringOSGiIoBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-io," + getSpringOsgiVersion();
-	}
-
-	protected String getSpringOSGiCoreBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-core," + getSpringOsgiVersion();
-	}
-
-	protected String getSpringOSGiExtenderBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-extender," + getSpringOsgiVersion();
-	}
-
-	protected String getSpringOSGiAnnotationBundleUrl() {
-		return "org.springframework.osgi,spring-osgi-annotation," + getSpringOsgiVersion();
-	}
-
-	protected String getJUnitLibUrl() {
-		return "org.springframework.osgi,junit.osgi,3.8.1-SNAPSHOT";
-	}
-
-	/**
-	 * Used only on JDK 1.4.
-	 * 
-	 * @return
-	 */
-	protected String getUtilConcurrentLibUrl() {
-		return "org.springframework.osgi,backport-util-concurrent,3.0-SNAPSHOT";
-	}
-
-	protected String getSlf4jApi() {
-		return "org.slf4j,slf4j-api," + SLF4J_VERSION;
-	}
-
-	protected String getJclOverSlf4jUrl() {
-		return "org.slf4j,jcl104-over-slf4j," + SLF4J_VERSION;
-	}
-
-	protected String getSlf4jLog4jUrl() {
-		return "org.slf4j,slf4j-log4j12," + SLF4J_VERSION;
-	}
-
-	protected String getLog4jLibUrl() {
-		System.setProperty("log4j.ignoreTCL", "true");
-		return "org.springframework.osgi,log4j.osgi,1.2.13-SNAPSHOT";
-	}
-
-	protected String getSpringMockUrl() {
-		return "org.springframework,spring-test," + getSpringBundledVersion();
-	}
-
-	protected String getSpringContextUrl() {
-		return "org.springframework,spring-context," + getSpringBundledVersion();
-	}
-
-	protected String getSpringAopUrl() {
-		return "org.springframework,spring-aop," + getSpringBundledVersion();
-
-	}
-
-	protected String getSpringBeansUrl() {
-		return "org.springframework,spring-beans," + getSpringBundledVersion();
-	}
-
-	protected String getSpringCoreUrl() {
-		return "org.springframework,spring-core," + getSpringBundledVersion();
-	}
-
-	protected String getAopAllianceUrl() {
-		return "org.springframework.osgi,aopalliance.osgi,1.0-SNAPSHOT";
-	}
-
-	protected String getAsmLibrary() {
-		return "org.springframework.osgi,asm.osgi,2.2.3-SNAPSHOT";
+	protected String getMandatoryBundlesConfigurationFile() {
+		return MANDATORY_FILE_CONF;
 	}
 
 	protected String[] getMandatoryBundles() {
 
-		String[] jars = new String[] { getSlf4jApi(), getJclOverSlf4jUrl(), getSlf4jLog4jUrl(), getLog4jLibUrl(),
-				getJUnitLibUrl(), getSpringCoreUrl(), getSpringBeansUrl(), getSpringContextUrl(), getSpringMockUrl(),
-				getAopAllianceUrl(), getAsmLibrary(), getSpringAopUrl(), getSpringOSGiIoBundleUrl(),
-				getSpringOSGiCoreBundleUrl(), getSpringBeansUrl(), getSpringOSGiTestBundleUrl(),
-				getSpringOSGiExtenderBundleUrl() };
+		// load properties file
+		Properties props = PropertiesUtil.loadAndExpand(getClass().getResourceAsStream(
+			getMandatoryBundlesConfigurationFile()));
 
-		String[] bundles;
+		if (props == null)
+			throw new IllegalArgumentException("cannot load default configuration from "
+					+ getMandatoryBundlesConfigurationFile());
 
-		if (JdkVersion.isAtLeastJava15()) {
-			bundles = (String[]) ObjectUtils.addObjectToArray(jars, getSpringOSGiAnnotationBundleUrl());
+		boolean trace = logger.isTraceEnabled();
+
+		if (trace)
+			logger.trace("loaded properties " + props);
+
+		Properties excluded = PropertiesUtil.filterKeysStartingWith(props, IGNORE);
+
+		if (trace) {
+			logger.trace("excluded ignored properties " + excluded);
 		}
-		else {
-			bundles = (String[]) ObjectUtils.addObjectToArray(jars, getUtilConcurrentLibUrl());
-		}
+
+		// filter based on JDK codes
+		int jdkVersion = JdkVersion.getMajorJavaVersion();
+
+		int filteredVersion = JdkVersion.JAVA_14;
+		do {
+			String excludedValue = "-" + filteredVersion;
+			// filter based on detected JDK
+			excluded = PropertiesUtil.filterValuesStartingWith(props, excludedValue);
+			if (trace)
+				logger.trace("JDK " + filteredVersion + " excluded bundles " + excluded);
+			filteredVersion++;
+
+		} while (filteredVersion <= jdkVersion);
+
+		String[] bundles = (String[]) props.keySet().toArray(new String[props.size()]);
+		if (logger.isDebugEnabled())
+			logger.debug("loaded bundles " + ObjectUtils.nullSafeToString(bundles));
 
 		return bundles;
 	}
 
-	public Bundle findBundleByLocation(String bundleLocation) {
-		Bundle[] bundles = bundleContext.getBundles();
-		for (int i = 0; i < bundles.length; i++) {
-			if (bundles[i].getLocation().equals(bundleLocation)) {
-				return bundles[i];
-			}
-		}
-		return null;
+	// Set log4j property to avoid TCCL problems during startup
+	protected void preProcessBundleContext(BundleContext platformBundleContext) throws Exception {
+		System.setProperty("log4j.ignoreTCL", "true");
+		super.preProcessBundleContext(platformBundleContext);
 	}
 
-	public Bundle findBundleBySymbolicName(String symbolicName) {
-		Assert.hasText(symbolicName, "a not-null/not-empty symbolicName is required");
+	// protected Bundle findBundleByLocation(String bundleLocation) {
+	// Bundle[] bundles = bundleContext.getBundles();
+	// for (int i = 0; i < bundles.length; i++) {
+	// if (bundles[i].getLocation().equals(bundleLocation)) {
+	// return bundles[i];
+	// }
+	// }
+	// return null;
+	// }
+
+	protected Bundle findBundleBySymbolicName(String symbolicName) {
+		Assert.hasText(symbolicName, "a not-null/not-empty symbolicName isrequired");
 		Bundle[] bundles = bundleContext.getBundles();
 		for (int i = 0; i < bundles.length; i++) {
 			if (symbolicName.equals(bundles[i].getSymbolicName())) {

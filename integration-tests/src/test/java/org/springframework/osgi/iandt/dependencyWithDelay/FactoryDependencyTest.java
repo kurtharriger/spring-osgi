@@ -1,38 +1,31 @@
 package org.springframework.osgi.iandt.dependencyWithDelay;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.BundleException;
 
 /**
- * @author Hal Hildebrand
- *         Date: Aug 27, 2007
- *         Time: 9:36:23 AM
+ * @author Hal Hildebrand Date: Aug 27, 2007 Time: 9:36:23 AM
  */
 
 public class FactoryDependencyTest extends AbstractConfigurableBundleCreatorTests {
-    private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.dependencies.Dependent";
-    private static final String DELAY_PROP = "org.springframework.osgi.iandt.dependencies.factory.delay";
+	private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.dependencies.Dependent";
 
-    protected String getManifestLocation() {
+	private static final String DELAY_PROP = "org.springframework.osgi.iandt.dependencies.factory.delay";
+
+	protected String getManifestLocation() {
 		return null;
 	}
 
-	protected String[] getBundles() {
-		return new String[] { localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT") };
-	}
-
-	// dependency bundle - depends on service2, service3 and, through a nested reference, to service1
+	// dependency bundle - depends on service2, service3 and, through a nested
+	// reference, to service1
 	// simple.service2 - publishes service2
 	// simple.service3 - publishes service3
-	// simple 		   - publishes service1
+	// simple - publishes service1
 	public void testDependencies() throws Exception {
-        System.setProperty(DELAY_PROP, "10000"); 
-
-		BundleContext bundleContext = getBundleContext();
+		System.setProperty(DELAY_PROP, "10000");
 
 		Bundle dependencyTestBundle = bundleContext.installBundle(getLocator().locateArtifact(
 			"org.springframework.osgi", "org.springframework.osgi.iandt.dependencies", getSpringOsgiVersion()).getURL().toExternalForm());
@@ -42,7 +35,8 @@ public class FactoryDependencyTest extends AbstractConfigurableBundleCreatorTest
 		Bundle simpleService3Bundle = bundleContext.installBundle(getLocator().locateArtifact(
 			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service3", getSpringOsgiVersion()).getURL().toExternalForm());
 		Bundle factoryServiceBundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.dependendencies.factory", getSpringOsgiVersion()).getURL().toExternalForm());
+			"org.springframework.osgi", "org.springframework.osgi.iandt.dependendencies.factory",
+			getSpringOsgiVersion()).getURL().toExternalForm());
 
 		assertNotNull("Cannot find the factory service bundle", factoryServiceBundle);
 		assertNotNull("Cannot find the simple service 2 bundle", simpleService2Bundle);

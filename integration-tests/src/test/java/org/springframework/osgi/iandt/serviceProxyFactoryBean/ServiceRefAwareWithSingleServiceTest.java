@@ -37,11 +37,11 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 
 	protected void onSetUp() throws Exception {
 		fb = new OsgiSingleServiceProxyFactoryBean();
-		fb.setBundleContext(getBundleContext());
+		fb.setBundleContext(bundleContext);
 		// execute retries fast
 		fb.setRetryTimes(1);
 		fb.setTimeout(1);
-		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(getBundleContext().getBundle());
+		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 		fb.setBeanClassLoader(classLoader);
 	}
 

@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
@@ -42,7 +41,7 @@ public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTest
 	// private ConfigurableOsgiBundleApplicationContext context;
 
 	protected String[] getBundles() {
-		return new String[] { localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT") };
+		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT" };
 	}
 
 	protected String getManifestLocation() {
@@ -52,7 +51,7 @@ public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTest
 	}
 
 	protected ServiceRegistration publishService(Object obj) throws Exception {
-		return getBundleContext().registerService(obj.getClass().getName(), obj, null);
+		return bundleContext.registerService(obj.getClass().getName(), obj, null);
 	}
 
 	public void testCGLIBAvailable() throws Exception {
@@ -60,7 +59,6 @@ public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTest
 	}
 
 	protected Collection createCollection() {
-		BundleContext bundleContext = getBundleContext();
 		BundleDelegatingClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 
 		OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader, false);
@@ -81,7 +79,7 @@ public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTest
 	public void testCollectionListener() throws Exception {
 		Collection collection = createCollection();
 
-		ServiceReference[] refs = getBundleContext().getServiceReferences(null, null);
+		ServiceReference[] refs = bundleContext.getServiceReferences(null, null);
 
 		assertEquals(refs.length, collection.size());
 		int size = collection.size();
@@ -101,7 +99,7 @@ public class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTest
 
 	public void testCollectionContent() throws Exception {
 		Collection collection = createCollection();
-		ServiceReference[] refs = getBundleContext().getServiceReferences(null, null);
+		ServiceReference[] refs = bundleContext.getServiceReferences(null, null);
 
 		assertEquals(refs.length, collection.size());
 		int size = collection.size();

@@ -17,11 +17,8 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 
 	protected String[] getBundles() {
 		return new String[] {
-				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.simple.service",
-					getSpringOsgiVersion()),
-				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.service.listener",
-					getSpringOsgiVersion()) };
+				"org.springframework.osgi,org.springframework.osgi.iandt.simple.service," + getSpringOsgiVersion(),
+				"org.springframework.osgi, org.springframework.osgi.iandt.service.listener," + getSpringOsgiVersion() };
 	}
 
 	public void testServiceListener() throws Exception {
@@ -52,7 +49,7 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 		assertEquals("Expected binding of service not seen", 2, MyListener.BOUND_COUNT);
 		assertEquals("Unexpected unbinding of service", 1, MyListener.UNBOUND_COUNT);
 	}
-	
+
 	protected long getDefaultWaitTime() {
 		return 7L;
 	}

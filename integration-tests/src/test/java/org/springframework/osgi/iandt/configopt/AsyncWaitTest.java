@@ -63,7 +63,7 @@ public class AsyncWaitTest extends BehaviorBaseTest {
 		assertContextServiceIs(bundle, false);
 
 		// put service up
-		registration = getBundleContext().registerService(Shape.class.getName(), new Area(), null);
+		registration = bundleContext.registerService(Shape.class.getName(), new Area(), null);
 
 		// do wait a bit to let the appCtx to fully start
 		Thread.sleep(1000);

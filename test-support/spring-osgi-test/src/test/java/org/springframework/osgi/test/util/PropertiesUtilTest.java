@@ -43,13 +43,30 @@ public class PropertiesUtilTest extends TestCase {
 		assertEquals(VALUE, props.get("foo"));
 	}
 
-	public void testSimpleExpansion() {
+	public void testSimpleKeyExpansion() {
 		String key = "expanded." + VALUE;
 		assertEquals(key, props.get(key));
 	}
 
-	public void testDoubleExpansion() {
+	public void testDoubleKeyExpansion() {
 		String key = VALUE + VALUE;
 		assertEquals(key, props.get(key));
+	}
+
+	public void testSimpleValueExpansion() {
+		String key = "expanded.foo";
+		assertEquals(key, props.get(key));
+	}
+
+	public void testDoubleValueExpansion() {
+		String key = "foofoo";
+		assertEquals(key, props.get(key));
+	}
+
+	public void testKeyWithIncludeValue() {
+		Properties properties = new Properties();
+		String sign = "+";
+		properties.put("include", sign);
+		assertEquals(properties, PropertiesUtil.filterValuesStartingWith(props, sign));
 	}
 }

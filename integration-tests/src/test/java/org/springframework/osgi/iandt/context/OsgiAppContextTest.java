@@ -45,8 +45,8 @@ public class OsgiAppContextTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	public void testBundleContextIsTheSame() {
-		assertSame(getBundleContext(), bundleContext);
-		assertSame(getBundleContext(),
+		assertSame(bundleContext, bundleContext);
+		assertSame(bundleContext,
 			applicationContext.getBean(ConfigurableOsgiBundleApplicationContext.BUNDLE_CONTEXT_BEAN_NAME));
 	}
 }

@@ -35,15 +35,15 @@ public abstract class ServiceBaseTest extends AbstractConfigurableBundleCreatorT
 	}
 
 	protected ServiceRegistration publishService(Object obj, String name) throws Exception {
-		return getBundleContext().registerService(name, obj, null);
+		return bundleContext.registerService(name, obj, null);
 	}
 
 	protected ServiceRegistration publishService(Object obj, String names[]) throws Exception {
-		return getBundleContext().registerService(names, obj, null);
+		return bundleContext.registerService(names, obj, null);
 	}
 
 	protected ServiceRegistration publishService(Object obj, String names[], Dictionary dict) throws Exception {
-		return getBundleContext().registerService(names, obj, null);
+		return bundleContext.registerService(names, obj, null);
 	}
 
 	protected ServiceRegistration publishService(Object obj) throws Exception {
@@ -51,7 +51,7 @@ public abstract class ServiceBaseTest extends AbstractConfigurableBundleCreatorT
 	}
 
 	protected ServiceRegistration publishService(Object obj, Dictionary dict) throws Exception {
-		return getBundleContext().registerService(obj.getClass().getName(), obj, dict);
+		return bundleContext.registerService(obj.getClass().getName(), obj, dict);
 	}
 
 }

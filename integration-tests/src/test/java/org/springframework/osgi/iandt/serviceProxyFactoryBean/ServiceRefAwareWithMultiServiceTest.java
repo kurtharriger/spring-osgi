@@ -36,8 +36,8 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 
 	protected void onSetUp() throws Exception {
 		fb = new OsgiMultiServiceProxyFactoryBean();
-		fb.setBundleContext(getBundleContext());
-		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(getBundleContext().getBundle());
+		fb.setBundleContext(bundleContext);
+		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 		fb.setBeanClassLoader(classLoader);
 	}
 

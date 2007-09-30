@@ -47,7 +47,7 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 
 	public void testCallGetResourceOnADifferentBundle() throws Exception {
 		// find bundles
-		Bundle[] bundles = getBundleContext().getBundles();
+		Bundle[] bundles = bundleContext.getBundles();
 		for (int i = 1; i < bundles.length; i++) {
 			Bundle bundle = bundles[i];
 			logger.debug("calling #getResource on bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
@@ -61,7 +61,7 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 	}
 
 	public void testGetResourceThroughSpringResourceAbstraction() throws Exception {
-		Bundle[] bundles = getBundleContext().getBundles();
+		Bundle[] bundles = bundleContext.getBundles();
 		for (int i = 1; i < bundles.length; i++) {
 			Bundle bundle = bundles[i];
 
@@ -72,7 +72,7 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 
 	public void testCallGetResourcesOnADifferentBundle() throws Exception {
 		// find bundles
-		Bundle[] bundles = getBundleContext().getBundles();
+		Bundle[] bundles = bundleContext.getBundles();
 		for (int i = 1; i < bundles.length; i++) {
 			Bundle bundle = bundles[i];
 			logger.debug("calling #getResources on bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
@@ -87,7 +87,7 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 	public void testCallGetResourceOnADifferentBundleRetrievedThroughBundleEvent() throws Exception {
 		String CGLIB_BUNDLE_NAME = "spring-core";
 
-		Bundle[] bundles = getBundleContext().getBundles();
+		Bundle[] bundles = bundleContext.getBundles();
 		Bundle bundle = null;
 		// find cglib library as we don't use it
 		for (int i = 1; bundle == null && i < bundles.length; i++) {
@@ -101,7 +101,7 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 		final boolean[] listenerCalled = new boolean[] { false };
 
 		// register listener
-		getBundleContext().addBundleListener(new SynchronousBundleListener() {
+		bundleContext.addBundleListener(new SynchronousBundleListener() {
 			public void bundleChanged(BundleEvent event) {
 				// call getResource
 				event.getBundle().getResource(LOCATION);

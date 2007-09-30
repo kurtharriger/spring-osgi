@@ -40,12 +40,12 @@ public class ExtenderVersionTest extends AbstractConfigurableBundleCreatorTests 
 				+ getSpringOsgiVersion();
 		Resource location = locateBundle(bundleId);
 
-		Bundle bundle = getBundleContext().installBundle(location.getURL().toString());
+		Bundle bundle = bundleContext.installBundle(location.getURL().toString());
 		assertNotNull(bundle);
 		bundle.start();
 
 		assertTrue(OsgiBundleUtils.isBundleActive(bundle));
-		assertNull("no point should be published ", getBundleContext().getServiceReference(Point.class.getName()));
+		assertNull("no point should be published ", bundleContext.getServiceReference(Point.class.getName()));
 
 	}
 }

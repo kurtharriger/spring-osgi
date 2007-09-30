@@ -41,12 +41,19 @@ import org.springframework.util.StringUtils;
  */
 public abstract class PropertiesUtil {
 
-	private static final Log log = LogFactory.getLog(PropertiesUtil.class);
-
 	private static final String DELIM_START = "${";
 
 	private static final String DELIM_STOP = "}";
 
+	private static final Properties EMPTY_PROPERTIES = new Properties();
+
+	/**
+	 * Shortcut method - loads a property object from the given input stream and
+	 * applies property expansion.
+	 * 
+	 * @param stream
+	 * @return
+	 */
 	public static Properties loadAndExpand(InputStream stream) {
 		Properties props = new Properties();
 
@@ -59,22 +66,67 @@ public abstract class PropertiesUtil {
 		return expandProperties(props);
 	}
 
+	/**
+	 * Filter/Eliminate keys that start with the given prefix.
+	 * 
+	 * @param properties
+	 * @param prefix
+	 * @return
+	 */
 	public static Properties filterKeysStartingWith(Properties properties, String prefix) {
 		if (!StringUtils.hasText(prefix))
-			return properties;
+			return EMPTY_PROPERTIES;
 
 		Assert.notNull(properties);
+
+		Properties excluded = new Properties();
 
 		// filter ignore keys out
 		for (Enumeration enm = properties.keys(); enm.hasMoreElements();) {
 			String key = (String) enm.nextElement();
-			if (key.startsWith(prefix))
-				properties.remove(key);
+			if (key.startsWith(prefix)) {
+				excluded.put(key, properties.remove(key));
+			}
 		}
 
-		return properties;
+		return excluded;
 	}
 
+	/**
+	 * Filter/Eliminate keys that have a value that starts with the given
+	 * prefix.
+	 * 
+	 * @param properties
+	 * @param prefix
+	 * @return
+	 */
+	public static Properties filterValuesStartingWith(Properties properties, String prefix) {
+		if (!StringUtils.hasText(prefix))
+			return EMPTY_PROPERTIES;
+
+		Assert.notNull(properties);
+		Properties excluded = new Properties();
+
+		for (Enumeration enm = properties.keys(); enm.hasMoreElements();) {
+			String key = (String) enm.nextElement();
+			String value = properties.getProperty(key);
+			if (value.startsWith(prefix)) {
+				excluded.put(key, value);
+				properties.remove(key);
+			}
+		}
+		return excluded;
+	}
+
+	/**
+	 * Apply placeholder expansion to the given properties object.
+	 * 
+	 * Will return a new properties object, containing the expanded entries.
+	 * Note that both keys and values will be expanded.
+	 * 
+	 * @param props
+	 * @return
+	 */
 	public static Properties expandProperties(Properties props) {
 		Assert.notNull(props);
 
@@ -142,9 +194,6 @@ public abstract class PropertiesUtil {
 			}
 
 		} while (hasPlaceholder);
-
-		if (log.isTraceEnabled())
-			log.trace("expanded [" + prop + "] to [" + result);
 
 		return result.toString();
 	}
