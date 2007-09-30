@@ -56,8 +56,6 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 	private static final String SPRING_BUNDLED_VERSION = "2.1-m4";
 
-	private static final String SLF4J_VERSION = "1.4.3";
-
 	/**
 	 * Return the Spring/OSGi version used by the core bundles.
 	 * @return
@@ -100,19 +98,18 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 			logger.trace("excluded ignored properties " + excluded);
 		}
 
-		// filter based on JDK codes
-		int jdkVersion = JdkVersion.getMajorJavaVersion();
+		// filter bundles which are Tiger/JDK 1.5 specific
+		String sign = null;
+		if (JdkVersion.isAtLeastJava15()) {
+			sign = "-15";
+		}
+		else {
+			sign = "+15";
+		}
 
-		int filteredVersion = JdkVersion.JAVA_14;
-		do {
-			String excludedValue = "-" + filteredVersion;
-			// filter based on detected JDK
-			excluded = PropertiesUtil.filterValuesStartingWith(props, excludedValue);
-			if (trace)
-				logger.trace("JDK " + filteredVersion + " excluded bundles " + excluded);
-			filteredVersion++;
-
-		} while (filteredVersion <= jdkVersion);
+		excluded = PropertiesUtil.filterValuesStartingWith(props, sign);
+		if (trace)
+			logger.trace("JDK " + JdkVersion.getJavaVersion() + " excluded bundles " + excluded);
 
 		String[] bundles = (String[]) props.keySet().toArray(new String[props.size()]);
 		if (logger.isDebugEnabled())

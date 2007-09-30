@@ -15,8 +15,6 @@
  */
 package org.springframework.osgi.io;
 
-import java.net.URL;
-
 import junit.framework.TestCase;
 
 import org.osgi.framework.Bundle;
