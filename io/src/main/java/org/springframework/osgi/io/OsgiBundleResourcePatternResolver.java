@@ -27,6 +27,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,7 +57,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	private Bundle bundle;
 
 	private static final String FOLDER_SEPARATOR = "/";
-	
+
 	private static final String FOLDER_WILDCARD = "**";
 
 	public OsgiBundleResourcePatternResolver(Bundle bundle) {
@@ -81,23 +82,32 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				throw new IllegalArgumentException("pattern matching is unsupported for class space lookups");
 			return findPathMatchingResources(locationPattern, type);
 		}
+		// even though we have no pattern
+		// the OSGi space can return multiple entries for the same resource name
+		// - treat this case below
 		else {
+			Resource[] result = null;
 			// consider bundle-space which can return multiple URLs
-			if (type == OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED || type == OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE) {
+			if (type == OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED
+					|| type == OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE) {
 				OsgiBundleResource resource = new OsgiBundleResource(bundle, locationPattern);
 				URL[] urls = resource.getAllUrlsFromBundleSpace(locationPattern);
-				return OsgiResourceUtils.convertURLArraytoResourceArray(urls);
+				result = OsgiResourceUtils.convertURLArraytoResourceArray(urls);
 			}
 
 			else if (type == OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE) {
 				// remove prefix
 				String location = OsgiResourceUtils.stripPrefix(locationPattern);
-				return OsgiResourceUtils.convertURLEnumerationToResourceArray(bundle.getResources(location));
+				result = OsgiResourceUtils.convertURLEnumerationToResourceArray(bundle.getResources(location));
 			}
-			else {
-				// otherwise return only one
-				return new Resource[] { getResourceLoader().getResource(locationPattern) };
+
+			// check whether we found something or we should fallback to a
+			// non-existing resource
+			if (ObjectUtils.isEmpty(result)) {
+				result = new Resource[] { getResourceLoader().getResource(locationPattern) };
 			}
+
+			return result;
 		}
 	}
 

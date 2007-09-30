@@ -42,6 +42,9 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 	 * Empty OSGi application context that doesn't require any files to be
 	 * specified.
 	 * 
+	 * Useful to still get injection of bundleContext and OSGi specific resource
+	 * loading.
+	 * 
 	 * @author Costin Leau
 	 * 
 	 */
@@ -61,11 +64,6 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 
 	public AbstractOptionalDependencyInjectionTests(String name) {
 		super(name);
-	}
-
-	protected void prepareTestInstance() throws Exception {
-		// create context (and apply autowiring) only if needed
-		super.prepareTestInstance();
 	}
 
 	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
