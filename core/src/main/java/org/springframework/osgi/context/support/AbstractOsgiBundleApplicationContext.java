@@ -16,7 +16,6 @@
 package org.springframework.osgi.context.support;
 
 import java.io.IOException;
-import java.rmi.registry.Registry;
 import java.util.Dictionary;
 
 import org.osgi.framework.Bundle;
@@ -180,7 +179,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 			cleanOsgiBundleScope(getBeanFactory());
 		}
 		catch (Exception ex) {
-			logger.info("got exception when closing", ex);
+			logger.warn("got exception when closing", ex);
 		}
 	}
 
@@ -238,17 +237,36 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		catch (Throwable t) {
 			// Ignored
 		}
-		// register 'bundle' scope (but make sure we clean it, in case of a
-		// refresh)
-		cleanOsgiBundleScope(beanFactory);
+		// register a 'bundle' scope
 		beanFactory.registerScope(OsgiBundleScope.SCOPE_NAME, new OsgiBundleScope());
+	}
+
+
+	/*
+	 * Cleanup bundle scope (in case of a refresh).
+	 * 
+	 * (non-Javadoc)
+	 * @see org.springframework.context.support.AbstractApplicationContext#obtainFreshBeanFactory()
+	 */
+	// FIXME: replace this with #destroyBeans after SPR-3950 is fixed
+	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+		try {
+			// before refreshing, destroy the scope in the previous bean factory
+			cleanOsgiBundleScope(getBeanFactory());
+		}
+		catch (Exception ex) {
+			/* ignore - no beanFactory exists yet */
+		}		
+		return super.obtainFreshBeanFactory();
 	}
 
 	protected void cleanOsgiBundleScope(ConfigurableListableBeanFactory beanFactory) {
 		Scope scope = beanFactory.getRegisteredScope(OsgiBundleScope.SCOPE_NAME);
-		if (scope != null && scope instanceof OsgiBundleScope)
+		if (scope != null && scope instanceof OsgiBundleScope) {
+			if (logger.isDebugEnabled())
+				logger.debug("destroying existing bundle scope beans...");
 			((OsgiBundleScope) scope).destroy();
-
+		}
 	}
 
 	/**
