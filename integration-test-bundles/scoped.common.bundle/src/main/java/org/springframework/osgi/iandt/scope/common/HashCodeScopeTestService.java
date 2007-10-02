@@ -15,13 +15,15 @@
  */
 package org.springframework.osgi.iandt.scope.common;
 
+import java.util.Properties;
+
 /**
  * Hash-code based identity test.
  * 
  * @author Costin Leau
  * 
  */
-public class HashCodeScopeTestService implements ScopeTestService {
+public class HashCodeScopeTestService extends Properties implements ScopeTestService {
 
 	/*
 	 * (non-Javadoc)
