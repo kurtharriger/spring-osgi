@@ -12,4 +12,6 @@ Import-Package: junit.framework,
   org.springframework.osgi.test,
   org.springframework.osgi.iandt.scope.common,
   org.springframework.osgi.iandt.scope.a,
-  org.springframework.osgi.iandt.scope.b
+  org.springframework.osgi.iandt.scope.b,
+  org.springframework.context
+

@@ -70,9 +70,9 @@ public class OsgiBundleScopeTest extends TestCase {
 	}
 
 	public void testIsExternalBundleCalling() {
-		assertFalse(scope.isExternalBundleCalling());
+		assertFalse(scope.CALLING_BUNDLE.get() != null);
 		OsgiBundleScope.CALLING_BUNDLE.set(new Object());
-		assertTrue(scope.isExternalBundleCalling());
+		assertTrue(scope.CALLING_BUNDLE.get() != null);
 	}
 
 	public void testLocalDestructionCallback() {
@@ -91,12 +91,12 @@ public class OsgiBundleScopeTest extends TestCase {
 
 	public void testDestructionCallbackPassedAround() {
 		OsgiBundleScope.CALLING_BUNDLE.set(new Object());
-		
+
 		Runnable callback = new Runnable() {
 			public void run() {
 			}
 		};
-		
+
 		scope.registerDestructionCallback("foo", callback);
 		assertSame(callback, OsgiBundleScope.CALLING_BUNDLE.get());
 	}
