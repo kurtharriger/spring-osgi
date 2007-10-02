@@ -37,8 +37,7 @@ import org.springframework.util.Assert;
  * {@link ConfigurableApplicationContext#refresh()} in two pieces so that beans
  * are not actually created unless the OSGi service imported are present.
  * 
- * Supports both asynch and synch behaviour.
- * <p/>
+ * Supports both asynch and synch behaviour. <p/>
  * 
  * 
  * @author Hal Hildebrand
@@ -143,8 +142,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 	}
 
-	public DependencyWaiterApplicationContextExecutor(
-			DelegatedExecutionOsgiBundleApplicationContext delegateContext, boolean syncWait) {
+	public DependencyWaiterApplicationContextExecutor(DelegatedExecutionOsgiBundleApplicationContext delegateContext,
+			boolean syncWait) {
 		this.delegateContext = delegateContext;
 		this.delegateContext.setExecutor(this);
 		this.synchronousWait = syncWait;
@@ -171,6 +170,13 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		synchronized (monitor) {
 			Assert.notNull(watchdog, "watchdog timer required");
 			Assert.notNull(monitorCounter, " monitorCounter required");
+			if (state != ContextState.INTERRUPTED && state != ContextState.STOPPED)
+				state = ContextState.INITIALIZED;
+			else {
+				RuntimeException ex = new IllegalStateException("cannot refresh an interrupted/closed context");
+				log.fatal(ex);
+				throw ex;
+			}
 		}
 	}
 

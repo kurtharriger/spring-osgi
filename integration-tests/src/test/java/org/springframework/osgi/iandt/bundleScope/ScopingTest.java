@@ -15,7 +15,12 @@
  */
 package org.springframework.osgi.iandt.bundleScope;
 
+import java.util.Properties;
+
 import org.osgi.framework.ServiceReference;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.iandt.scope.common.ScopeTestService;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiFilterUtils;
@@ -32,18 +37,19 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getBundles() {
 		return new String[] {
-				localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.scoped.bundle.common",
-					getSpringOsgiVersion()),
-				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.scoped.bundle.a",
-					getSpringOsgiVersion()),
-				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.scoped.bundle.b",
-					getSpringOsgiVersion()) };
+				"org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT",
+				"org.springframework.osgi, org.springframework.osgi.iandt.scoped.bundle.common,"
+						+ getSpringOsgiVersion(),
+				"org.springframework.osgi, org.springframework.osgi.iandt.scoped.bundle.a," + getSpringOsgiVersion(),
+				"org.springframework.osgi, org.springframework.osgi.iandt.scoped.bundle.b," + getSpringOsgiVersion() };
 	}
 
 	protected String getManifestLocation() {
 		return "org/springframework/osgi/iandt/bundleScope/ScopingTest.MF";
-		// return null;
+	}
+
+	protected String[] getConfigLocations() {
+		return new String[] { "/org/springframework/osgi/iandt/bundleScope/scope-context.xml" };
 	}
 
 	public void testEnvironmentValidity() throws Exception {
@@ -80,6 +86,49 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 			serviceAInBundleB.getServiceIdentity()));
 	}
 
+	public void testScopedBeanNotExported() throws Exception {
+		Properties props = (Properties) applicationContext.getBean("props");
+		// ask for it again
+		Properties another = (Properties) applicationContext.getBean("props");
+		assertSame("different instances returned for the same scope", props, another);
+	}
+
+	public void testScopedBeanDestructionCallbackDuringContextRefresh() throws Exception {
+		Properties props = (Properties) applicationContext.getBean("props");
+		// add some content
+		props.put("foo", "bar");
+
+		// check by asking again for the bean
+		Properties another = (Properties) applicationContext.getBean("props");
+		assertSame(props, another);
+		assertTrue(another.containsKey("foo"));
+
+		// refresh context
+		applicationContext.refresh();
+		Properties refreshed = (Properties) applicationContext.getBean("props");
+		assertNotSame("context refresh does not clean scoped objects", props, refreshed);
+		assertTrue(refreshed.isEmpty());
+		// check that props object has been cleaned also
+		assertTrue("destroy callback wasn't called/applied", props.isEmpty());
+	}
+
+	public void testExportedScopedBeansDestructionCallbackCalled() throws Exception {
+		Object rawServiceA = getServiceA();
+		assertTrue(rawServiceA instanceof Properties);
+		Properties props = (Properties) rawServiceA;
+		// modify properties
+		props.put("service", "a");
+
+		// check service again
+		assertTrue(((Properties) getServiceA()).containsKey("service"));
+
+		// refresh opposite service
+		getAppCtx("org.springframework.osgi.iandt.scope.a").refresh();
+
+		// get service a again
+		assertTrue("scoped bean a did not have its callback called", ((Properties) getServiceA()).isEmpty());
+	}
+
 	protected ScopeTestService getServiceA() throws Exception {
 		return getService("a");
 	}
@@ -99,7 +148,16 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 			throw new IllegalStateException("cannot find service with owning bundle " + bundleName);
 		}
 		return (ScopeTestService) bundleContext.getService(ref);
+	}
 
+	private ConfigurableApplicationContext getAppCtx(String symBundle) {
+		ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(bundleContext, "("
+				+ ConfigurableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + symBundle
+				+ ")");
+
+		if (ref == null)
+			throw new IllegalArgumentException("cannot find appCtx for bundle " + symBundle);
+		return (ConfigurableApplicationContext) bundleContext.getService(ref);
 	}
 
 }

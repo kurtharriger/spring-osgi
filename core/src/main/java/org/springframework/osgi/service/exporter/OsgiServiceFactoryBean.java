@@ -142,53 +142,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 		}
 	}
 
-	/**
-	 * Decorating {@link org.osgi.framework.ServiceFactory} used for supporting
-	 * 'bundle' scoped beans.
-	 * 
-	 * @author Costin Leau
-	 * 
-	 */
-	private class BundleScopeServiceFactory implements ServiceFactory {
-		private ServiceFactory decoratedServiceFactory;
-
-		private Runnable destructionCallback;
-
-		private Class[] classes;
-
-		public BundleScopeServiceFactory(ServiceFactory serviceFactory, Class[] classes) {
-			Assert.notNull(serviceFactory);
-			this.decoratedServiceFactory = serviceFactory;
-			this.classes = classes;
-		}
-
-		public Object getService(Bundle bundle, ServiceRegistration registration) {
-			// inform OsgiBundleScope (just place a boolean)
-			OsgiBundleScope.CALLING_BUNDLE.set(Boolean.TRUE);
-			try {
-				Object obj = decoratedServiceFactory.getService(bundle, registration);
-				// retrieve destructionCallback if any
-				Object callback = OsgiBundleScope.CALLING_BUNDLE.get();
-				if (callback != null && callback instanceof Runnable)
-					this.destructionCallback = (Runnable) callback;
-				if (contextClassloaderManagementStrategy == ExportClassLoadingOptions.SERVICE_PROVIDER) {
-					obj = wrapWithClassLoaderManagingProxy(obj, classes);
-				}
-				return obj;
-			}
-			finally {
-				// clean ThreadLocal
-				OsgiBundleScope.CALLING_BUNDLE.set(null);
-			}
-		}
-
-		public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
-			decoratedServiceFactory.ungetService(bundle, registration, service);
-			if (destructionCallback != null)
-				destructionCallback.run();
-		}
-
-	}
 
 	private static final Log log = LogFactory.getLog(OsgiServiceFactoryBean.class);
 
@@ -401,7 +354,7 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 		ServiceFactory serviceFactory = new PublishingServiceFactory(visibleClasses);
 
 		if (isBeanBundleScoped())
-			serviceFactory = new BundleScopeServiceFactory(serviceFactory, visibleClasses);
+			serviceFactory = new OsgiBundleScope.BundleScopeServiceFactory(serviceFactory);
 
 		return bundleContext.registerService(names, serviceFactory, serviceProperties);
 	}
