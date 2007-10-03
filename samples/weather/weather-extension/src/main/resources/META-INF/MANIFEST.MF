@@ -11,5 +11,5 @@ Import-Package: org.osgi.framework,
   org.springframework.beans.factory.xml,
   org.springframework.beans.factory.support,
   org.springframework.core,
-  org.springframework.osgi.config,
+  org.springframework.osgi.internal.config,
   org.springframework.util.xml

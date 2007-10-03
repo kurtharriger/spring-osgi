@@ -25,7 +25,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
-import org.springframework.osgi.config.ParserUtils;
+import org.springframework.osgi.internal.config.ParserUtils;
 import org.springframework.osgi.samples.weather.extension.bundle.PackageSpecification;
 import org.springframework.osgi.samples.weather.extension.bundle.VirtualBundleFactoryBean;
 import org.springframework.util.xml.DomUtils;
