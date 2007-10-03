@@ -17,9 +17,9 @@ package org.springframework.osgi.test;
 
 import java.util.Properties;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.core.JdkVersion;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.util.PropertiesUtil;
 import org.springframework.util.Assert;
@@ -27,7 +27,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Dependency manager layer - uses iternally an {@link ArtifactLocator} to
+ * Dependency manager layer - uses internally an {@link ArtifactLocator} to
  * retrieve the required dependencies for the running test.
  * 
  * @author Costin Leau
@@ -35,7 +35,7 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractDependencyManagerTests extends AbstractSynchronizedOsgiTests {
 
-	private static final String MANDATORY_FILE_CONF = "/org/springframework/osgi/test/boot-bundles.properties";
+	private static final String TEST_FRRAMEWORK_BUNDLES_CONF_FILE = "/org/springframework/osgi/test/boot-bundles.properties";
 
 	private static final String IGNORE = "ignore";
 
@@ -73,19 +73,47 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return SPRING_BUNDLED_VERSION;
 	}
 
-	protected String getMandatoryBundlesConfigurationFile() {
-		return MANDATORY_FILE_CONF;
+	/**
+	 * Bundles that have to be installed as part of the test setup. This method
+	 * provides an alternative to {@link #getTestBundles()} as it allows
+	 * subclasses to specify just the bundle name w/o worrying about locating
+	 * the artifact (which is resolved through the {@link ArtifactLocator}).
+	 * 
+	 * <p/> A bundle name can have any value and depends on the format expected
+	 * by the {@link ArtifactLocator} implementation. By default, a CSV format
+	 * is expected.
+	 * 
+	 * <p/> This method allows a declarative approach in declaring bundles as
+	 * opposed to {@link #getTestBundles()} which provides a programmatic one.
+	 * 
+	 * @see #locateBundle(String)
+	 * @return an array of bundle identificators
+	 */
+	protected String[] getTestBundlesNames() {
+		return getBundles();
 	}
 
-	protected String[] getMandatoryBundles() {
-
+	/**
+	 * Declarative method indicating the bundles required by the test framework,
+	 * by their names rather then as {@link Resource}s.
+	 * 
+	 * <p/> This implementation reads a predefined properties file to determine
+	 * the bundles needed.
+	 * 
+	 * <p/> This method allows a declarative approach in declaring bundles as
+	 * opposed to {@link #getTestBundles()} which provides a programmatic one.
+	 * 
+	 * @see #getTestingFrameworkBundlesConfiguration()
+	 * @see #locateBundle(String)
+	 * @return an array of bundle identificators
+	 */
+	protected String[] getTestFrameworkBundlesNames() {
 		// load properties file
-		Properties props = PropertiesUtil.loadAndExpand(getClass().getResourceAsStream(
-			getMandatoryBundlesConfigurationFile()));
+		Properties props = PropertiesUtil.loadAndExpand(getTestingFrameworkBundlesConfiguration());
 
 		if (props == null)
 			throw new IllegalArgumentException("cannot load default configuration from "
-					+ getMandatoryBundlesConfigurationFile());
+					+ getTestingFrameworkBundlesConfiguration());
 
 		boolean trace = logger.isTraceEnabled();
 
@@ -118,6 +146,53 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		return bundles;
 	}
 
+	/**
+	 * Return the location of the test framework bundles configuration.
+	 * 
+	 * @return location of the test framework bundles configuration
+	 */
+	protected Resource getTestingFrameworkBundlesConfiguration() {
+		return new InputStreamResource(getClass().getResourceAsStream(TEST_FRRAMEWORK_BUNDLES_CONF_FILE));
+	}
+
+	/**
+	 * Default implementation that uses the {@link ArtifactLocator} to resolve
+	 * the bundles specified in {@link #getTestBundlesNames()}.
+	 * 
+	 * Subclasses that override this method should decide whether they want to
+	 * support {@link #getTestBundlesNames()} or not.
+	 * 
+	 * @see org.springframework.osgi.test.AbstractOsgiTests#getTestBundles()
+	 */
+	protected Resource[] getTestBundles() {
+		return locateBundles(getTestBundlesNames());
+	}
+
+	/**
+	 * Default implementation that uses {@link #getTestFrameworkBundlesNames()}
+	 * to discover the bundles part of the testing framework.
+	 * 
+	 * @see org.springframework.osgi.test.AbstractOsgiTests#getTestFrameworkBundles()
+	 */
+	protected Resource[] getTestFrameworkBundles() {
+		return locateBundles(getMandatoryBundles());
+	}
+
+	/**
+	 * Utility method that loads the bundles given as strings. Will delegate to
+	 * {@link #locateBundle(String)}.
+	 * 
+	 * @param bundles
+	 * @return
+	 */
+	private Resource[] locateBundles(String[] bundles) {
+		Resource[] res = new Resource[bundles.length];
+		for (int i = 0; i < bundles.length; i++) {
+			res[i] = locateBundle(bundles[i]);
+		}
+		return res;
+	}
+
 	// Set log4j property to avoid TCCL problems during startup
 	protected void preProcessBundleContext(BundleContext platformBundleContext) throws Exception {
 		System.setProperty("log4j.ignoreTCL", "true");
@@ -125,10 +200,15 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * Concrete implementation for locate Bundle. The given bundleId should be
-	 * in CSV format, specifying the artifact group, id, version and optionally
-	 * the type.
+	 * Locate (through the {@link ArtifactLocator}) an OSGi bundle given as a
+	 * String.
 	 * 
+	 * The default implementation expects the argument to be in Comma Separated
+	 * Values (CSV) format which indicates an artifact group, id, version and
+	 * optionally the type.
+	 * 
+	 * @param bundleId the bundle identificator in CSV format
+	 * @return a resource pointing to the artifact location
 	 */
 	protected Resource locateBundle(String bundleId) {
 		Assert.hasText(bundleId, "bundleId should not be empty");
@@ -138,7 +218,6 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 		Assert.isTrue(artifactId.length >= 3, "the CSV string " + bundleId + " contains too few values");
 		// TODO: add a smarter mechanism which can handle 1 or 2 values CSVs
-
 		for (int i = 0; i < artifactId.length; i++) {
 			artifactId[i] = StringUtils.trimWhitespace(artifactId[i]);
 		}
@@ -164,7 +243,6 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	//
 	// FIXME: remove these methods after M3
 	//
-
 	/**
 	 * Compatibility method - will be removed in the very near future.
 	 * @deprecated this method will be removed after M3; use
@@ -196,4 +274,28 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	protected String localMavenArtifact(String groupId, String artifactId, String version, String type) {
 		return groupId + "," + artifactId + "," + version + "," + type;
 	}
+
+	/**
+	 * @deprecated use {@link #getTestFrameworkBundlesNames()} instead.
+	 */
+	protected String[] getMandatoryBundles() {
+		return getTestFrameworkBundlesNames();
+	}
+
+	/**
+	 * @deprecated no replacement provided for it
+	 * @see org.springframework.osgi.test.AbstractOsgiTests#getBundleLocations()
+	 */
+	protected String[] getBundleLocations() {
+		return super.getBundleLocations();
+	}
+
+	/**
+	 * @deprecated use {@link #getTestBundlesNames()} instead.
+	 * @see org.springframework.osgi.test.AbstractOsgiTests#getBundles()
+	 */
+	protected String[] getBundles() {
+		return new String[0];
+	}
+
 }

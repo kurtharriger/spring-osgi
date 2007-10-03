@@ -16,15 +16,13 @@
 package org.springframework.osgi.test.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -51,14 +49,16 @@ public abstract class PropertiesUtil {
 	 * Shortcut method - loads a property object from the given input stream and
 	 * applies property expansion.
 	 * 
-	 * @param stream
+	 * @param resource
 	 * @return
 	 */
-	public static Properties loadAndExpand(InputStream stream) {
+	public static Properties loadAndExpand(Resource resource) {
 		Properties props = new Properties();
+		if (resource == null)
+			return props;
 
 		try {
-			props.load(stream);
+			props.load(resource.getInputStream());
 		}
 		catch (IOException ex) {
 			return null;
