@@ -35,7 +35,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceRegistration;
-import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
 
 /**
  * @author Costin Leau

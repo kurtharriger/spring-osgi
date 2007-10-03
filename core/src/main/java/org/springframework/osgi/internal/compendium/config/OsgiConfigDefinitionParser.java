@@ -1,17 +1,18 @@
-package org.springframework.osgi.config;
+package org.springframework.osgi.internal.compendium.config;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
-import org.springframework.osgi.context.support.OsgiConfig;
+import org.springframework.osgi.internal.config.ParserUtils;
+import org.springframework.osgi.internal.compendium.OsgiConfig;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Osgi namespace config tag parser.

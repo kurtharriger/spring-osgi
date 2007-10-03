@@ -17,8 +17,6 @@ package org.springframework.osgi.service.collection;
 
 import java.util.Iterator;
 
-import org.springframework.osgi.service.collection.AbstractOsgiCollectionTest.Wrapper;
-
 /**
  * @author Costin Leau
  * 

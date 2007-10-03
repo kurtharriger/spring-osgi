@@ -121,6 +121,19 @@ public abstract class OsgiBundleUtils {
 		return getHeaderAsVersion(bundle, Constants.BUNDLE_VERSION);
 	}
 
+	public static Bundle findBundleBySymbolicName(BundleContext bundleContext, String symbolicName) {
+		Assert.notNull(bundleContext, "bundleContext is required");
+		Assert.hasText(symbolicName, "a not-null/not-empty symbolicName isrequired");
+		
+		Bundle[] bundles = bundleContext.getBundles();
+		for (int i = 0; i < bundles.length; i++) {
+			if (symbolicName.equals(bundles[i].getSymbolicName())) {
+				return bundles[i];
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Return the version for a given bundle manifest header.
 	 * 

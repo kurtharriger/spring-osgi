@@ -1,9 +1,9 @@
 package org.springframework.osgi.service.interceptor;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Hal Hildebrand

@@ -15,7 +15,6 @@
  */
 package org.springframework.osgi.service.collection;
 
-import java.util.Date;
 import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.Properties;

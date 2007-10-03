@@ -20,13 +20,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Dictionary;
 import java.util.Enumeration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Constants;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.internal.util.DebugUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -119,7 +117,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	protected URL findResource(String name) {
 		boolean trace = log.isTraceEnabled();
-		
+
 		if (trace)
 			log.trace("looking for resource " + name);
 		URL url = this.backingBundle.getResource(name);
@@ -131,7 +129,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	protected Enumeration findResources(String name) throws IOException {
 		boolean trace = log.isTraceEnabled();
-		
+
 		if (trace)
 			log.trace("looking for resources " + name);
 
@@ -171,8 +169,6 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	}
 
 	public String toString() {
-		Dictionary dict = backingBundle.getHeaders();
-		String bname = dict.get(Constants.BUNDLE_NAME) + "(" + dict.get(Constants.BUNDLE_SYMBOLICNAME) + ")";
-		return "BundleDelegatingClassLoader for [" + bname + "]";
+		return "BundleDelegatingClassLoader for [" + OsgiStringUtils.nullSafeNameAndSymName(backingBundle) + "]";
 	}
 }

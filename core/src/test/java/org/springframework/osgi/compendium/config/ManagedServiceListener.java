@@ -1,4 +1,4 @@
-package org.springframework.osgi.config;
+package org.springframework.osgi.compendium.config;
 
 import java.util.ArrayList;
 import java.util.Dictionary;

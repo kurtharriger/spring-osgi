@@ -20,36 +20,43 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.service.startlevel.StartLevel;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.util.OsgiListenerUtils;
-import org.springframework.osgi.util.concurrent.Counter;
+import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 
 /**
- * Install Bundles using a FactoryBean. This allows customers to use Spring to
- * drive bundle management. Bundles states can be modified using the state
- * parameter. Most commonly this is set to "start". <p/> Note that there are
- * some issues with installing bundles dynamically in that Spring aggressively
- * loads bean classes so its not currently possible to have bean definitions
- * that use the same bundle in the same application context file.
+ * Install Bundles using a FactoryBean.
+ * 
+ * This allows customers to use Spring to drive bundle management. Bundles
+ * states can be modified using the state parameter. Most commonly this is set
+ * to "start".
+ * 
+ * <p/>Pay attention when installing bundles dynamically since classes can be
+ * loaded aggressively.
  * 
  * @author Andy Piper
  */
-public class BundleFactoryBean implements FactoryBean, BundleContextAware, SynchronousBundleListener, InitializingBean,
-		DisposableBean {
-	private Resource bundleUrl;
+public class BundleFactoryBean implements FactoryBean, BundleContextAware, InitializingBean, DisposableBean {
 
+	private static Log log = LogFactory.getLog(BundleFactoryBean.class);
+
+	// bundle info
+
+	/** Bundle location */
+	private Resource location;
+
+	/** Bundle symName */
+	private String symbolicName;
+
+	/** Actual bundle */
 	private Bundle bundle;
 
 	private BundleContext bundleContext;
@@ -60,57 +67,108 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Synch
 
 	private ClassLoader classloader;
 
-	private String symbolicName;
-
-	private static Log log = LogFactory.getLog(BundleFactoryBean.class);
-
+	/** unused at the moment */
 	private boolean pushBundleAsContextClassLoader = false;
 
-	private final Latch latch = new Latch();
+	/** wait until the operation invoked completes */
+	private boolean waitToComplete = false;
 
-	public BundleFactoryBean() {
-	}
-
-	public Object getObject() throws Exception {
-		return getBundle();
-	}
-
-	public synchronized Bundle getBundle() throws Exception {
-		Assert.notNull(bundleUrl, "location is required");
-		Assert.notNull(bundleContext, "BundleContext is required");
-
-		if (bundle == null) {
-			if (log.isInfoEnabled()) {
-				log.info("Loading bundle [" + bundleUrl.getURL());
-			}
-			bundle = bundleContext.installBundle(bundleUrl.getURL().toString());
-			classloader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
-			bundleContext.addBundleListener(this);
-
-		}
-		// Set the start level
-		updateStartLevel(getStartLevel());
-		return bundle;
-	}
-
+	// FactoryBean methods
 	public Class getObjectType() {
-		return Bundle.class;
+		return (bundle != null ? bundle.getClass() : Bundle.class);
 	}
 
 	public boolean isSingleton() {
 		return true;
 	}
 
+	public Object getObject() throws Exception {
+		return bundle;
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(bundleContext, "BundleContext is required");
+		Assert.hasText(symbolicName, "symbolic name is required");
+
+		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+		try {
+			if (pushBundleAsContextClassLoader) {
+				Thread.currentThread().setContextClassLoader(classloader);
+			}
+
+			Bundle bundle = findBundle();
+
+			Assert.notNull(bundle, "cannot find bundle with symbolic name=" + symbolicName);
+
+			// if we get here, the bundle is installed already
+			if (state == null || state.equalsIgnoreCase("install")) {
+			}
+
+			else if (state.equalsIgnoreCase("start")) {
+				bundle.start();
+			}
+			else if (state.equalsIgnoreCase("update")) {
+				if (location != null)
+					bundle.update(location.getInputStream());
+				else
+					bundle.update();
+			}
+			else if (state.equalsIgnoreCase("stop")) {
+				bundle.stop();
+			}
+			else if (state.equalsIgnoreCase("uninstall")) {
+				bundle.uninstall();
+			}
+		}
+		catch (BundleException ex) {
+			log.error(ex.getMessage(), ex);
+			throw (RuntimeException) new IllegalArgumentException("bundle "
+					+ OsgiStringUtils.nullSafeNameAndSymName(bundle) + " threw exception ").initCause(ex);
+		}
+		finally {
+			if (pushBundleAsContextClassLoader) {
+				Thread.currentThread().setContextClassLoader(ccl);
+			}
+		}
+	}
+
+	/*
+	 * No destruction behavior specified.
+	 * 
+	 * (non-Javadoc)
+	 * @see org.springframework.beans.factory.DisposableBean#destroy()
+	 */
+	public void destroy() throws Exception {
+		bundle = null;
+		classloader = null;
+	}
+
+	/**
+	 * Find a bundle based on the configuration.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	private Bundle findBundle() throws Exception {
+		// check if the bundle has been installed
+		Bundle bundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, symbolicName);
+
+		if (bundle == null) {
+			Assert.notNull(location, "could not find an installed bundle with symbolicName=[" + symbolicName
+					+ "] and no location was specified; cannot continue");
+
+			log.info("Loading bundle [" + location.getURL());
+			bundle = bundleContext.installBundle(location.getURL().toString());
+		}
+
+		// TODO: keep the start-level or not?
+		// updateStartLevel(getStartLevel());
+
+		return bundle;
+	}
+
 	public void setLocation(Resource url) throws Exception {
-		bundleUrl = url;
-	}
-
-	public Resource getLocation() {
-		return bundleUrl;
-	}
-
-	public String getSymbolicName() {
-		return symbolicName;
+		location = url;
 	}
 
 	public void setSymbolicName(String symbolicName) {
@@ -118,36 +176,15 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Synch
 	}
 
 	public void setBundleContext(BundleContext context) {
-		// System.err.println("setBundleContext(" + context + ")");
 		bundleContext = context;
-	}
-
-	public BundleContext getBundleContext() {
-		return bundleContext;
 	}
 
 	public synchronized void setState(String level) {
 		state = level;
 	}
 
-	public synchronized String getState() {
-		return state;
-	}
-
-	public int getStartLevel() {
-		return startLevel;
-	}
-
 	public void setStartLevel(int startLevel) {
 		this.startLevel = startLevel;
-	}
-
-	/**
-	 * Determines whether invocations on the remote service should be performed
-	 * in the context of the target bundle's ClassLoader. The default is false.
-	 */
-	public boolean isPushBundleAsContextClassloader() {
-		return pushBundleAsContextClassLoader;
 	}
 
 	/**
@@ -160,87 +197,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Synch
 		this.pushBundleAsContextClassLoader = pushBundleAsContextClassLoader;
 	}
 
-	public synchronized void afterPropertiesSet() throws Exception {
-		// REVIEW andyp -- we optionally push the Bundle's classloader as the
-		// CCL before
-		// invoking any lifecycle tasks.
-		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-		try {
-			if (pushBundleAsContextClassLoader) {
-				Thread.currentThread().setContextClassLoader(classloader);
-			}
-
-			Bundle b = getBundle();
-			if (state == null || state.equalsIgnoreCase("install")) {
-				// default is to install the bundle.
-			}
-			else if (state.equalsIgnoreCase("start")) {
-				// Don't try and start if we are not resolved.
-				// FIXME andyp -- this doesn't work as expected.
-				// if (b.getState() == Bundle.RESOLVED) {
-				b.start();
-				waitForContextCreation(b);
-				// }
-			}
-			else if (state.equalsIgnoreCase("stop")) {
-				b.stop();
-			}
-			else if (state.equalsIgnoreCase("uninstall")) {
-				b.uninstall();
-			}
-			else if (state.equalsIgnoreCase("update")) {
-				if ((b.getState() & (Bundle.RESOLVED | Bundle.ACTIVE)) != 0) {
-					b.update();
-				}
-			}
-		}
-		catch (BundleException e) {
-			// FIXME andyp -- convert to something spring-like
-			log.error(e.getMessage(), e);
-			throw e;
-		}
-		finally {
-			if (pushBundleAsContextClassLoader) {
-				Thread.currentThread().setContextClassLoader(ccl);
-			}
-		}
-	}
-
-	private void waitForContextCreation(final Bundle b) throws Exception {
-		ApplicationContextConfiguration config = new ApplicationContextConfiguration(b);
-		// Wait for the Spring artifacts to be created
-		// We could make this configurable.
-		if (config.isSpringPoweredBundle()) {
-
-			final Counter latch = new Counter("bundle factory");
-			latch.increment();
-			String filter = "(org.springframework.context.service.name=" + b.getSymbolicName() + ")";
-
-			ServiceListener listener = new ServiceListener() {
-				public void serviceChanged(ServiceEvent event) {
-					if (event.getType() == ServiceEvent.REGISTERED)
-						latch.decrement();
-				}
-			};
-
-			OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
-
-			if (log.isDebugEnabled())
-				log.debug("start waiting for Spring/OSGi bundle=" + b.getSymbolicName());
-
-			try {
-				if (latch.waitForZero(2000)) {
-					log.warn("cannot find " + b.getSymbolicName());
-					throw new RuntimeException("cannot find service");
-				}
-			}
-			finally {
-				bundleContext.removeServiceListener(listener);
-			}
-
-		}
-	}
-
+	// TODO: we don't support start-levels yet
 	private void updateStartLevel(int level) {
 		if (level == 0 || bundle == null)
 			return;
@@ -255,85 +212,8 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Synch
 		}
 	}
 
-	public synchronized void bundleChanged(BundleEvent event) {
-		try {
-			if (bundle == null) {
-				return;
-			}
-			// System.out.println("EVENT: " +
-			// event.getBundle().getSymbolicName() +
-			// " " + event.getType());
-			if (event.getBundle().getBundleId() == bundle.getBundleId()) {
-				switch (event.getType()) {
-				case BundleEvent.UNINSTALLED:
-					latch.reset();
-					bundle = null;
-					classloader = null;
-					bundleContext.removeBundleListener(this);
-					break;
-				/*
-				 * case BundleEvent.RESOLVED: if (log.isInfoEnabled())
-				 * log.info("Bundle [" + beanName + "] was resolved, updating
-				 * properties"); try { afterPropertiesSet(); } catch (Exception
-				 * e) { if (log.isWarnEnabled()) log.warn("Could not change
-				 * bundle state", e); } break;
-				 */
-				default:
-					break;
-				}
-			}
-		}
-		catch (Throwable e) {
-			// OSGi frameworks simply swallow these exceptions without
-			// logging...
-			log.fatal("Exception handling bundle changed event", e);
-		}
-	}
-
-	public void destroy() throws Exception {
-		if (bundle != null) {
-			// System.out.println("destroy(" + bundle + ")");
-			bundle.uninstall();
-			latch.reset();
-			bundle = null;
-			classloader = null;
-			bundleContext.removeBundleListener(this);
-		}
-	}
-
-	public ClassLoader getClassloader() {
-		return classloader;
-	}
-
 	public void setClassloader(ClassLoader classloader) {
 		this.classloader = classloader;
 	}
 
-	private class Latch {
-		private int count = 1;
-
-		synchronized void await() throws Exception {
-			while (count > 0) {
-				wait();
-			}
-		}
-
-		synchronized void decr() {
-			count--;
-			notifyAll();
-		}
-
-		synchronized void reset() {
-			count = 1;
-		}
-	}
-
-	/*
-	 * public static void dumpStacks() { Map stacks =
-	 * Thread.getAllStackTraces(); for (Iterator i =
-	 * stacks.entrySet().iterator(); i.hasNext();) { Map.Entry e = (Map.Entry)
-	 * i.next(); System.out.println(""); System.out.println(e.getKey());
-	 * StackTraceElement[] se = (StackTraceElement[]) e.getValue(); for (int j =
-	 * 0; j < se.length; j++) { System.out.println(" " + se[j]); } } }
-	 */
 }

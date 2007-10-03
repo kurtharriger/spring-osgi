@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.config;
+package org.springframework.osgi.internal.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
-import org.springframework.osgi.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
