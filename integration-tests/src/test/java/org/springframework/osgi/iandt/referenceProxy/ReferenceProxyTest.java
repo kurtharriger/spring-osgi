@@ -2,9 +2,10 @@ package org.springframework.osgi.iandt.referenceProxy;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.ServiceUnavailableException;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.iandt.reference.proxy.ServiceReferer;
 import org.springframework.osgi.iandt.simpleservice.MyService;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
  * @author Hal Hildebrand Date: Nov 25, 2006 Time: 12:42:30 PM
@@ -33,7 +34,7 @@ public class ReferenceProxyTest extends AbstractConfigurableBundleCreatorTests {
 		assertNotNull("reference not initialized", reference);
 		assertNotNull("no value specified in the reference", reference.stringValue());
 
-		Bundle simpleServiceBundle = findBundleBySymbolicName("org.springframework.osgi.iandt.simpleservice");
+		Bundle simpleServiceBundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.iandt.simpleservice");
 
 		assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
 		System.out.println("stopping bundle");

@@ -3,6 +3,7 @@ package org.springframework.osgi.iandt.serviceListener;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.iandt.service.listener.MyListener;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
  * @author Hal Hildebrand Date: Nov 14, 2006 Time: 8:18:15 AM
@@ -25,7 +26,8 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 		assertEquals("Expected initial binding of service", 1, MyListener.BOUND_COUNT);
 		assertEquals("Unexpected initial unbinding of service", 0, MyListener.UNBOUND_COUNT);
 
-		Bundle simpleServiceBundle = findBundleBySymbolicName("org.springframework.osgi.iandt.simpleservice");
+		Bundle simpleServiceBundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext,
+			"org.springframework.osgi.iandt.simpleservice");
 
 		assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
 
