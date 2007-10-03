@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import org.osgi.framework.Bundle;
 import org.springframework.core.JdkVersion;
 import org.springframework.osgi.ServiceUnavailableException;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.iandt.annotation.proxy.ServiceReferer;
 import org.springframework.osgi.iandt.simpleservice.MyService;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
@@ -20,7 +21,6 @@ public class AnnotationProxyTest extends AbstractConfigurableBundleCreatorTests 
 
     protected String[] getBundles() {
 	return new String[] {
-                    localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
                     localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.simple.service",
                             getSpringOsgiVersion()),
                     localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.annotation.proxy",
@@ -34,7 +34,7 @@ public class AnnotationProxyTest extends AbstractConfigurableBundleCreatorTests 
         assertNotNull("reference not initialized", reference);
         assertNotNull("no value specified in the reference", reference.stringValue());
 
-        Bundle simpleServiceBundle = findBundleBySymbolicName("org.springframework.osgi.iandt.simpleservice");
+        Bundle simpleServiceBundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.iandt.simpleservice");
 
         assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
         System.out.println("stopping bundle");
