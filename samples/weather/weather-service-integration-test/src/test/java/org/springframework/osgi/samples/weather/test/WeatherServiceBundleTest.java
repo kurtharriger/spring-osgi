@@ -81,7 +81,6 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      * context via the 'getBundleContext' operation
      */
     public void testOSGiStartedOk() {
-        BundleContext bundleContext = getBundleContext();
         assertNotNull(bundleContext);
     }
 
@@ -95,16 +94,15 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      */
     public void testWeatherServiceExported() {
 
-        BundleContext context = getBundleContext();
-        ServiceReference ref = context.getServiceReference("org.springframework.osgi.samples.weather.service.WeatherService");
+        ServiceReference ref = bundleContext.getServiceReference("org.springframework.osgi.samples.weather.service.WeatherService");
         assertNotNull("Service Reference is null", ref);
         try {
-            WeatherService weather = (WeatherService) context.getService(ref);
+            WeatherService weather = (WeatherService) bundleContext.getService(ref);
             assertNotNull("Cannot find the service", weather);
             assertEquals(new Double(15.0), weather.getHistoricalHigh(new GregorianCalendar(2004, 0, 1).getTime()));
         }
         finally {
-            context.ungetService(ref);
+        	bundleContext.ungetService(ref);
         }
     }
     

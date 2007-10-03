@@ -50,17 +50,17 @@ public class VirtualBundleFactoryBean extends BundleFactoryBean {
   public Bundle getBundle() throws Exception {
     URL url = null;
     Project project;
-    if (getLocation() == null) {
+    if (location == null) {
       url = new URL("file", "", getLocalRepository());
       project = new Project(groupId, artifactId, version, "jar", Collections.EMPTY_SET, exports, imports);
       // System.out.println("Repository is: " + url.toString());
     }
     else {
-      project = new Project(groupId, artifactId, version, "jar", getLocation().getURL().toString(),
+      project = new Project(groupId, artifactId, version, "jar", location.getURL().toString(),
         Collections.EMPTY_SET, exports, imports);
-      url = getLocation().getURL();
+      url = location.getURL();
     }
-    return new MavenBundleManager(getBundleContext(), url).installBundle(project);
+    return new MavenBundleManager(bundleContext, url).installBundle(project);
   }
 
   public String getVersion() {
@@ -109,7 +109,7 @@ public class VirtualBundleFactoryBean extends BundleFactoryBean {
       this.imports = imports;
   }
 
-  public synchronized void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() throws Exception {
     Assert.notNull(artifactId, "artifactId not supplied");
     super.afterPropertiesSet();
   }
