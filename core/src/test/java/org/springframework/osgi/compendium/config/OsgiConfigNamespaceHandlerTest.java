@@ -1,6 +1,11 @@
-package org.springframework.osgi.config;
+package org.springframework.osgi.compendium.config;
+
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import junit.framework.TestCase;
+
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ManagedService;
@@ -11,16 +16,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
-
 /**
  * @author Hal Hildebrand
  *         Date: Nov 2, 2006
  *         Time: 10:26:53 AM
  */
-public class OsgiConfigNamespaceHandlerTest extends TestCase {
+public abstract class OsgiConfigNamespaceHandlerTest extends TestCase {
     private static final String MANAGED_SERVICE_PID = "man.from.mars";
     private static final String MANAGED_FACTORY_SERVICE_PID = "man.from.mars.eating.guitars";
     private static final String MANAGED_SERVICE = "managed.service";

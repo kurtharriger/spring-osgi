@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.config;
+package org.springframework.osgi.internal.config;
 
 import java.util.Set;
 
@@ -24,7 +24,7 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
-import org.springframework.osgi.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
@@ -100,35 +100,36 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 					// check shortcut
 					if (element.hasAttribute(INTERFACE)) {
 						parserContext.getReaderContext().error(
-								"either 'interface' attribute or <intefaces> sub-element has be specified", element);
+							"either 'interface' attribute or <intefaces> sub-element has be specified", element);
 					}
 					Set interfaces = parserContext.getDelegate().parseSetElement(subElement,
-							builder.getBeanDefinition());
+						builder.getBeanDefinition());
 					builder.addPropertyValue(INTERFACES_ID, interfaces);
 				}
 
 				// osgi:service-properties
 				else if (PROPS_ID.equals(subElement.getLocalName())) {
-                    if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.ENTRY_ELEMENT).size()>0) {
-                        Object props = parserContext.getDelegate().parseMapElement(subElement, builder.getRawBeanDefinition());
-					    builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
-                    }
-                    else if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.PROP_ELEMENT).size()>0) {
-                        Object props = parserContext.getDelegate().parsePropsElement(subElement);
-					    builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
-                    }
-                    else {
-                        parserContext.getReaderContext().error("Invalid service property type", subElement);
-                    }
-                }
+					if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.ENTRY_ELEMENT).size() > 0) {
+						Object props = parserContext.getDelegate().parseMapElement(subElement,
+							builder.getRawBeanDefinition());
+						builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
+					}
+					else if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.PROP_ELEMENT).size() > 0) {
+						Object props = parserContext.getDelegate().parsePropsElement(subElement);
+						builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
+					}
+					else {
+						parserContext.getReaderContext().error("Invalid service property type", subElement);
+					}
+				}
 				// nested bean reference/declaration
 				else {
 					if (element.hasAttribute(REF))
 						parserContext.getReaderContext().error(
-								"nested bean definition/reference cannot be used when attribute 'ref' is specified",
-								element);
+							"nested bean definition/reference cannot be used when attribute 'ref' is specified",
+							element);
 					target = parserContext.getDelegate().parsePropertySubElement(subElement,
-							builder.getBeanDefinition());
+						builder.getBeanDefinition());
 				}
 			}
 		}
@@ -137,7 +138,7 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		if (target instanceof RuntimeBeanReference) {
 			builder.addPropertyValue(TARGET_BEAN_NAME, ((RuntimeBeanReference) target).getBeanName());
 		}
-		
+
 		builder.addPropertyValue("target", target);
 		return builder.getBeanDefinition();
 	}

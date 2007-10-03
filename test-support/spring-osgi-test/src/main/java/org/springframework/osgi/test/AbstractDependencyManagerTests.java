@@ -124,27 +124,6 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		super.preProcessBundleContext(platformBundleContext);
 	}
 
-	// protected Bundle findBundleByLocation(String bundleLocation) {
-	// Bundle[] bundles = bundleContext.getBundles();
-	// for (int i = 0; i < bundles.length; i++) {
-	// if (bundles[i].getLocation().equals(bundleLocation)) {
-	// return bundles[i];
-	// }
-	// }
-	// return null;
-	// }
-
-	protected Bundle findBundleBySymbolicName(String symbolicName) {
-		Assert.hasText(symbolicName, "a not-null/not-empty symbolicName isrequired");
-		Bundle[] bundles = bundleContext.getBundles();
-		for (int i = 0; i < bundles.length; i++) {
-			if (symbolicName.equals(bundles[i].getSymbolicName())) {
-				return bundles[i];
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Concrete implementation for locate Bundle. The given bundleId should be
 	 * in CSV format, specifying the artifact group, id, version and optionally

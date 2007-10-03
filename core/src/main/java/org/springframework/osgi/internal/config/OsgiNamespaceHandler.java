@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.springframework.osgi.config;
+package org.springframework.osgi.internal.config;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
@@ -26,7 +26,7 @@ import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBea
  * @author Andy Piper
  * @author Costin Leau
  */
-public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
+class OsgiNamespaceHandler extends NamespaceHandlerSupport {
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -41,7 +41,7 @@ public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
 				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.LIST;
 			}
 		});
-		
+
 		registerBeanDefinitionParser("list", new CollectionBeanDefinitionParser() {
 			protected int getCollectionType() {
 				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.LIST;
@@ -67,10 +67,6 @@ public class OsgiNamespaceHandler extends NamespaceHandlerSupport {
 		});
 
 		registerBeanDefinitionParser("service", new ServiceBeanDefinitionParser());
-
-		registerBeanDefinitionParser("property-placeholder", new OsgiPropertyPlaceholderDefinitionParser());
-
-		registerBeanDefinitionParser("config", new OsgiConfigDefinitionParser());
 
 		registerBeanDefinitionParser("bundle", new BundleBeanDefinitionParser());
 

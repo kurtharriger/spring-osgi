@@ -20,8 +20,6 @@ import java.util.Hashtable;
 
 import junit.framework.TestCase;
 
-import org.springframework.util.ObjectUtils;
-
 /**
  * @author Costin Leau
  * 

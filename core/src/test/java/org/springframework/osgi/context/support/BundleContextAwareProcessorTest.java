@@ -17,11 +17,11 @@
  */
 package org.springframework.osgi.context.support;
 
+import junit.framework.TestCase;
+
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.context.BundleContextAware;
-
-import junit.framework.TestCase;
 
 /**
  * 

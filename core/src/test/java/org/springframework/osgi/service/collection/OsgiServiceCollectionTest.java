@@ -18,8 +18,6 @@ package org.springframework.osgi.service.collection;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.springframework.osgi.service.collection.AbstractOsgiCollectionTest.Wrapper;
-
 /**
  * Mock test for OsgiServiceCollection.
  * 

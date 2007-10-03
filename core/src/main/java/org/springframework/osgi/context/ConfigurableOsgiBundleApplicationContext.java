@@ -15,8 +15,8 @@
  */
 package org.springframework.osgi.context;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver;
 

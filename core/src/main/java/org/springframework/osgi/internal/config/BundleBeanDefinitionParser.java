@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.springframework.osgi.config;
+package org.springframework.osgi.internal.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;

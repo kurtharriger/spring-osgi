@@ -18,9 +18,9 @@ package org.springframework.osgi.context.support;
 import java.util.Dictionary;
 import java.util.Properties;
 
-import org.springframework.osgi.util.ConfigUtils;
-
 import junit.framework.TestCase;
+
+import org.springframework.osgi.util.ConfigUtils;
 
 /**
  * @author Costin Leau

@@ -1,4 +1,4 @@
-package org.springframework.osgi.context.support;
+package org.springframework.osgi.internal.compendium;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,8 +20,8 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.config.OsgiConfigDefinitionParser;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.internal.compendium.config.OsgiConfigDefinitionParser;
 import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;

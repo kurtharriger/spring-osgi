@@ -24,6 +24,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.springframework.osgi.internal.config.TargetSourceLifecycleListenerWrapper;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.util.MapBasedDictionary;
 

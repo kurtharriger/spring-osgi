@@ -21,9 +21,13 @@ import java.util.Hashtable;
 
 import junit.framework.TestCase;
 
-import org.osgi.framework.*;
-import org.springframework.osgi.util.OsgiFilterUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
 import org.springframework.osgi.mock.MockBundleContext;
+import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
  * @author Costin Leau

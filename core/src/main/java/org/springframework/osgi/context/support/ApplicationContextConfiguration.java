@@ -20,13 +20,13 @@ package org.springframework.osgi.context.support;
 
 import java.util.Dictionary;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.ConfigUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Determine the configuration information needed to construct an application

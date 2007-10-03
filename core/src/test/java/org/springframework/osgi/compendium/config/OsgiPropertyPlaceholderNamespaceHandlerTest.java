@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.config;
+package org.springframework.osgi.compendium.config;
 
 import java.lang.reflect.Field;
 import java.util.Dictionary;
@@ -32,9 +32,8 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderSupport;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
-import org.springframework.osgi.context.support.OsgiPropertyPlaceholder;
+import org.springframework.osgi.internal.compendium.OsgiPropertyPlaceholder;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.util.ObjectUtils;
 
 /**
  * @author Costin Leau

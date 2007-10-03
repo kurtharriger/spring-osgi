@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.config;
+package org.springframework.osgi.internal.config;
 
 import java.lang.reflect.Method;
 import java.util.Dictionary;

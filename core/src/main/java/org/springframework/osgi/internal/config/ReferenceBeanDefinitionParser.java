@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.springframework.osgi.config;
+package org.springframework.osgi.internal.config;
 
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +28,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
-import org.springframework.osgi.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
