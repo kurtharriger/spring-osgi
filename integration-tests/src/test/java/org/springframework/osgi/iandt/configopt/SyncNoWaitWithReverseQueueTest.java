@@ -21,7 +21,7 @@ import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
- * Test the sync behavior but this time, by first staring the dependency and the
+ * Test the sync behaviour but this time, by first staring the dependency and the
  * the bundle.
  * 
  * @author Costin Leau
@@ -53,7 +53,7 @@ public class SyncNoWaitWithReverseQueueTest extends BehaviorBaseTest {
 		assertTrue("bundle " + bundle + "hasn't been fully started", OsgiBundleUtils.isBundleActive(bundle));
 
 		// wait for the listener to get the bundles and wait for timeout
-		Thread.sleep(1400);
+		Thread.sleep(1700);
 
 		// check that the dependency service is actually started as the
 		// dependency
