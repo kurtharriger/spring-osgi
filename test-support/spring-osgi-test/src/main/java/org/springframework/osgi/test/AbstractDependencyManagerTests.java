@@ -186,6 +186,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * @return
 	 */
 	private Resource[] locateBundles(String[] bundles) {
+		if (bundles == null)
+			bundles = new String[0];
+		
 		Resource[] res = new Resource[bundles.length];
 		for (int i = 0; i < bundles.length; i++) {
 			res[i] = locateBundle(bundles[i]);
