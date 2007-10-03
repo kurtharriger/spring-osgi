@@ -51,15 +51,15 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	// bundle info
 
 	/** Bundle location */
-	private Resource location;
+	protected Resource location;
 
 	/** Bundle symName */
-	private String symbolicName;
+	protected String symbolicName;
 
 	/** Actual bundle */
 	private Bundle bundle;
 
-	private BundleContext bundleContext;
+	protected BundleContext bundleContext;
 
 	private String state;
 
