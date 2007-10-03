@@ -1,5 +1,6 @@
 package org.springframework.osgi.extender.dependencies.shutdown;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +30,7 @@ import org.springframework.util.ObjectUtils;
  * @author Andy Piper
  * @author Costin Leau
  */
-public class BundleDependencyComparator implements Comparator {
+public class BundleDependencyComparator implements Comparator, Serializable {
 
 	private static final Log log = LogFactory.getLog(BundleDependencyComparator.class);
 

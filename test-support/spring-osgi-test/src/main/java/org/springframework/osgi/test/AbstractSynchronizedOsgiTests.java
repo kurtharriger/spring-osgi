@@ -55,7 +55,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	 * 
 	 * @param context
 	 * @param forBundleWithSymbolicName
-	 * @param timeout
+	 * @param timeout time to wait (in seconds) for the application context to be published
 	 */
 	public void waitOnContextCreation(String forBundleWithSymbolicName, long timeout) {
 		waitOnContextCreation(bundleContext, forBundleWithSymbolicName, timeout);

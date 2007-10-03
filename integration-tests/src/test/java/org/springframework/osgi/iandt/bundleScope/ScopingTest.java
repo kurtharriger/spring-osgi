@@ -125,6 +125,8 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 		// refresh opposite service
 		getAppCtx("org.springframework.osgi.iandt.scope.a").refresh();
 
+		// wait for the context to refresh
+		Thread.sleep(1000);
 		// get service a again
 		assertTrue("scoped bean a did not have its callback called", ((Properties) getServiceA()).isEmpty());
 	}

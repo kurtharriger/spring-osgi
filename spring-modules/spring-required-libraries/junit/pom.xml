@@ -11,11 +11,11 @@
   <artifactId>junit.osgi</artifactId>
   <packaging>bundle</packaging>
   <name>JUnit (OSGi version)</name>
-  <version>3.8.1-SNAPSHOT</version>
+  <version>3.8.2-SNAPSHOT</version>
   <url>http:// www.springframework.org</url>
 
   <properties>
-    <unpack.version>3.8.1</unpack.version>
+    <unpack.version>3.8.2</unpack.version>
     <spring.osgi.export.pkg>junit.*</spring.osgi.export.pkg>
     <spring.osgi.import.pkg>
       javax.swing.*;resolution:=optional,
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>3.8.2</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

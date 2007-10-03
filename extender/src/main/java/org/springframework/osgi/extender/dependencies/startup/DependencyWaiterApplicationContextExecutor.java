@@ -117,29 +117,21 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			if (debug)
 				log.debug("completing refresh for " + getDisplayName());
 
-			try {
-
-				synchronized (monitor) {
-					if (state != ContextState.DEPENDENCIES_RESOLVED) {
-						logWrongState(ContextState.DEPENDENCIES_RESOLVED);
-						return;
-					}
-					// otherwise update the state
-					state = ContextState.STARTED;
+			synchronized (monitor) {
+				if (state != ContextState.DEPENDENCIES_RESOLVED) {
+					logWrongState(ContextState.DEPENDENCIES_RESOLVED);
+					return;
 				}
-
-				// Continue with the refresh process...
-				synchronized (delegateContext.getMonitor()) {
-					delegateContext.postRefresh();
-				}
-
+				// otherwise update the state
+				state = ContextState.STARTED;
 			}
-			catch (Throwable t) {
-				fail(t);
+
+			// Continue with the refresh process...
+			synchronized (delegateContext.getMonitor()) {
+				delegateContext.postRefresh();
 			}
 
 		}
-
 	}
 
 	public DependencyWaiterApplicationContextExecutor(DelegatedExecutionOsgiBundleApplicationContext delegateContext,
@@ -276,7 +268,6 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				}
 
 			}
-
 		}
 		catch (Throwable e) {
 			fail(e);
@@ -348,6 +339,9 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 					delegateContext.normalClose();
 			}
 		}
+		catch (Exception ex) {
+			log.fatal("could not succesfully close context " + delegateContext, ex);
+		}
 		finally {
 			monitorCounter.decrement();
 		}
@@ -363,34 +357,34 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 * @param t - the offending Throwable which caused our demise
 	 */
 	private void fail(Throwable t) {
-		try {
-			close();
-			StringBuffer buf = new StringBuffer();
-			if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
-				buf.append("none");
-			}
-			else {
-				for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().iterator(); dependencies.hasNext();) {
-					ServiceDependency dependency = (ServiceDependency) dependencies.next();
-					buf.append(dependency.toString());
-					if (dependencies.hasNext()) {
-						buf.append(", ");
-					}
+
+		// this will not thrown any exceptions (it just logs them)
+		close();
+
+		StringBuffer buf = new StringBuffer();
+		if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
+			buf.append("none");
+		}
+		else {
+			for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().iterator(); dependencies.hasNext();) {
+				ServiceDependency dependency = (ServiceDependency) dependencies.next();
+				buf.append(dependency.toString());
+				if (dependencies.hasNext()) {
+					buf.append(", ");
 				}
 			}
-			StringBuffer message = new StringBuffer();
-			message.append("Unable to create application context for [");
-			message.append(getBundleSymbolicName());
-			message.append("], unsatisfied dependencies: ");
-			message.append(buf.toString());
+		}
+		StringBuffer message = new StringBuffer();
+		message.append("Unable to create application context for [");
+		message.append(getBundleSymbolicName());
+		message.append("], unsatisfied dependencies: ");
+		message.append(buf.toString());
 
-			log.error(message.toString(), t);
-		}
-		catch (Throwable e) {
-			// last ditch effort to get useful error information
-			t.printStackTrace();
-			e.printStackTrace();
-		}
+		log.error(message.toString(), t);
+
+		// rethrow the exception wrapped to the caller (and prevent bundles
+		// started in sync mode to complete).
+//		throw new ApplicationContextException("cannot refresh context", t);
 	}
 
 	/**
