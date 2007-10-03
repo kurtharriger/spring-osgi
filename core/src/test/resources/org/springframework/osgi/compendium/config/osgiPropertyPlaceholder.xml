@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd		
-		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi/spring-osgi-compendium.xsd">
 
-	<!-- osgi:property-placeholder -->
+	<!-- osgix:property-placeholder -->
 
 	<util:properties id="external-props"
 		location="org/springframework/osgi/config/properties.props" />
 
 	<!-- simple -->
-	<osgi:property-placeholder persistent-id="com.xyz.myapp" />
+	<osgix:property-placeholder persistent-id="com.xyz.myapp" />
 	<!-- average -->
-	<osgi:property-placeholder persistent-id="com.xyz.myapp"
+	<osgix:property-placeholder persistent-id="com.xyz.myapp"
 		defaults-ref="external-props" />
 
 	<!-- full options -->
-	<osgi:property-placeholder persistent-id="com.xyz.myapp"
+	<osgix:property-placeholder persistent-id="com.xyz.myapp"
 		placeholder-prefix="#" placeholder-suffix="%">
-		<osgi:default-properties>
+		<osgix:default-properties>
 			<prop key="rod">johnson</prop>
 			<prop key="rick">evans</prop>
-		</osgi:default-properties>
-	</osgi:property-placeholder>
+		</osgix:default-properties>
+	</osgix:property-placeholder>
 
 </beans>
