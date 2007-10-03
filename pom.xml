@@ -209,7 +209,7 @@ limitations under the License.
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>3.8.2</version>
       <scope>test</scope>
     </dependency>
 	<dependency>
@@ -388,29 +388,6 @@ limitations under the License.
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
-    <!-- requires java 5 -->
-    <profile>
-      <id>equinox-1.5</id>
-      <activation>
-           <jdk>1.5</jdk>
-      </activation>
-      <modules>
-       <module>integration-tests-tiger</module>
-      </modules>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.osgi</groupId>
-          <artifactId>org.eclipse.osgi</artifactId>
-          <version>3.2.2</version>
-          <type>jar</type>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
-      <properties>
-        <osgi.test.platform>org.springframework.osgi.test.platform.EquinoxPlatform</osgi.test.platform>
-        <log4j.ignoreTCL>true</log4j.ignoreTCL>
-      </properties>
-    </profile>
     <profile>
       <id>knopflerfish</id>
       <dependencies>
@@ -463,6 +440,31 @@ limitations under the License.
 		<log4j.ignoreTCL>true</log4j.ignoreTCL>        
       </properties>
     </profile>
+    
+    <!-- requires java 5 -->
+    <profile>
+      <id>equinox-1.5</id>
+      <activation>
+           <jdk>1.5</jdk>
+      </activation>
+      <modules>
+       <module>integration-tests-tiger</module>
+      </modules>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.osgi</groupId>
+          <artifactId>org.eclipse.osgi</artifactId>
+          <version>3.2.2</version>
+          <type>jar</type>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+      <properties>
+        <osgi.test.platform>org.springframework.osgi.test.platform.EquinoxPlatform</osgi.test.platform>
+        <log4j.ignoreTCL>true</log4j.ignoreTCL>
+      </properties>
+    </profile>
+
 
   </profiles>
        

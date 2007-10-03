@@ -53,7 +53,6 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.concurrent.Counter;
 import org.springframework.osgi.util.concurrent.RunnableTimedExecution;
-import org.springframework.scheduling.timer.TimerTaskExecutor;
 
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'.
@@ -120,12 +119,11 @@ public class ContextLoaderListener implements BundleActivator {
 						+ OsgiStringUtils.nullSafeSymbolicName(event.getBundle()) + "]");
 			}
 			try {
-
 				handleEvent(event);
 			}
-			catch (Throwable e) {
-				// OSGi frameworks simply swallow these exceptions
-				log.error("Exception handing bundle changed event", e);
+			catch (Exception ex) {
+				/* log exceptions before swallowing */
+				log.warn("got exception while handling event " + event, ex);
 			}
 		}
 
@@ -163,7 +161,7 @@ public class ContextLoaderListener implements BundleActivator {
 	}
 
 	/**
-	 * Bundle listener used for context creation/distruction.
+	 * Bundle listener used for context creation/destruction.
 	 * 
 	 */
 	private class ContextBundleListener extends BaseListener {
@@ -232,16 +230,8 @@ public class ContextLoaderListener implements BundleActivator {
 	 */
 	protected final Set springBundleListeners = new LinkedHashSet();
 
-	/** Task executor used for bootstraping the Spring contexts */
+	/** Task executor used for bootstraping the Spring contexts in async mode */
 	protected TaskExecutor taskExecutor;
-
-	/**
-	 * Synchronous task executor using a background thread (timer).
-	 * 
-	 * Acts as a queue for starting bundles in a synchronized, serialized
-	 * manner.
-	 */
-	private TimerTaskExecutor syncTaskExecutor;
 
 	/**
 	 * Task executor which uses the same thread for running tasks. Used when
@@ -294,7 +284,7 @@ public class ContextLoaderListener implements BundleActivator {
 	/** wait 3 seconds for each context to close */
 	private static long SHUTDOWN_WAIT_TIME = 3 * 1000;
 
-	/** this extender versin */
+	/** this extender version */
 	private Version extenderVersion;
 
 	/*
@@ -302,9 +292,6 @@ public class ContextLoaderListener implements BundleActivator {
 	 */
 	public ContextLoaderListener() {
 		this.managedContexts = CollectionFactory.createConcurrentMapIfPossible(30);
-		syncTaskExecutor = new TimerTaskExecutor();
-		syncTaskExecutor.afterPropertiesSet();
-
 	}
 
 	/**
@@ -373,7 +360,13 @@ public class ContextLoaderListener implements BundleActivator {
 		// powered
 		for (int i = 0; i < previousBundles.length; i++) {
 			if (OsgiBundleUtils.isBundleActive(previousBundles[i])) {
-				maybeCreateApplicationContextFor(previousBundles[i]);
+				try {
+					maybeCreateApplicationContextFor(previousBundles[i]);
+				}
+				catch (Throwable e) {
+					log.warn("Cannot start bundle " + OsgiStringUtils.nullSafeSymbolicName(previousBundles[i])
+							+ " due to", e);
+				}
 			}
 		}
 	}
@@ -408,8 +401,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 		// first stop the watchdog
 		stopTimer();
-		// then the sync appCtx queue
-		syncTaskExecutor.destroy();
 
 		// remove the bundle listeners (we are closing down0
 		if (contextListener != null) {
@@ -650,16 +641,40 @@ public class ContextLoaderListener implements BundleActivator {
 		context.setPublishContextAsService(config.isPublishContextAsService());
 		context.setNamespaceHandlerAndEntityResolver(nsManager.getNamespacePlugins());
 
-		// wait/no wait for dependencies behavior
+		Runnable contextRefresh = new Runnable() {
+			public void run() {
+				context.refresh();
+			}
+		};
 
+		// executor used for creating the appCtx
+		// chosen based on the sync/async configuration
+		TaskExecutor executor = null;
+
+		// synch/asynch context creation
+		if (config.isCreateAsynchronously()) {
+			if (log.isDebugEnabled()) {
+				log.debug("Asynchronous context creation for bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
+			}
+			// for the async stuff use the executor
+			executor = taskExecutor;
+		}
+		else {
+			if (log.isDebugEnabled()) {
+				log.debug("Synchronous context creation for bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
+			}
+			// for the sync stuff, use this thread
+			executor = sameThreadTaskExecutor;
+		}
+
+		// wait/no wait for dependencies behaviour
 		if (config.isWaitForDependencies()) {
 			DependencyWaiterApplicationContextExecutor appCtxExecutor = new DependencyWaiterApplicationContextExecutor(
 					context, !config.isCreateAsynchronously());
 
 			appCtxExecutor.setTimeout(config.getTimeout());
 			appCtxExecutor.setWatchdog(timer);
-
-			appCtxExecutor.setTaskExecutor(sameThreadTaskExecutor);
+			appCtxExecutor.setTaskExecutor(executor);
 			appCtxExecutor.setMonitoringCounter(contextsStarted);
 
 			contextsStarted.increment();
@@ -668,34 +683,7 @@ public class ContextLoaderListener implements BundleActivator {
 			// do nothing; by default contexts do not wait for services.
 		}
 
-		Runnable contextRefresh = new Runnable() {
-			public void run() {
-				context.refresh();
-			}
-		};
-
-		// synch/asynch context creation
-		try {
-			if (config.isCreateAsynchronously()) {
-				if (log.isDebugEnabled()) {
-					log.debug("Asynchronous context creation for bundle "
-							+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
-				}
-				// for the asynch stuff use the executor
-				taskExecutor.execute(contextRefresh);
-			}
-			else {
-				if (log.isDebugEnabled()) {
-					log.debug("Synchronous context creation for bundle "
-							+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
-				}
-				// for the synch stuff, use the queue
-				syncTaskExecutor.execute(contextRefresh);
-			}
-		}
-		catch (Throwable e) {
-			log.warn("Cannot start bundle " + OsgiStringUtils.nullSafeSymbolicName(bundle) + " due to", e);
-		}
+		executor.execute(contextRefresh);
 	}
 
 	protected OsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {

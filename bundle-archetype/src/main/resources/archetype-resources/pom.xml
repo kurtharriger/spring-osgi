@@ -9,15 +9,15 @@
   <url>http://www.springframework.org/osgi</url>
   
   <properties>
-	<slf4j.version>1.4.0</slf4j.version>
-	<spring.maven.artifact.version>2.1-m3</spring.maven.artifact.version>
+	<slf4j.version>1.4.3</slf4j.version>
+	<spring.maven.artifact.version>2.1-m4</spring.maven.artifact.version>
   </properties>
   
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>3.8.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -98,9 +98,9 @@
       <url>http://people.apache.org/repo/m2-incubating-repository/</url>
     </repository>  
     <repository>
-            <id>eclipse-repository</id>
-        <name>Eclipse Repository</name>
-        <url>http://repo1.maven.org/eclipse/</url>
+       <id>eclipse-repository</id>
+       <name>Eclipse Repository</name>
+       <url>http://repo1.maven.org/eclipse/</url>
     </repository>
     <repository>
       <id>safehaus-repository</id>
@@ -114,12 +114,6 @@
         https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
     </repository>
-	<repository>
-	 <snapshots><enabled>true</enabled></snapshots>
-	<id>apache-snapshot-repo</id>
-      <name>Apache snapshot repo</name>
-      <url>http://cvs.apache.org/maven-snapshot-repository</url>
-	</repository>
   </repositories>
 
   <pluginRepositories>
@@ -137,13 +131,6 @@
       <url>http://repo1.maven.org/maven2/</url>
     </pluginRepository>
     
-    <!-- maven osgi bundle plugin -->
-    <pluginRepository>
-      <id>apache.m2.incubator</id>
-      <name>Apache M2 Incubator Repository</name>
-      <url>http://people.apache.org/repo/m2-incubating-repository/</url>
-    </pluginRepository>
-          
   </pluginRepositories>
   
 </project>
