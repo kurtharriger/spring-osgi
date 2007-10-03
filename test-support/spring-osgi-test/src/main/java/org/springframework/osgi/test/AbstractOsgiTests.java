@@ -101,7 +101,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	//
 	// DEPRECATED METHODS
 	//
-	// FIXME: remove this after m3 release
+	// FIXME: remove deprecated methods after m3 release
 
 	/**
 	 * Legacy method - will be removed in future SVN revisions.
@@ -117,7 +117,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * 
 	 * @return an OsgiBundleResourceLoader if the bundleContext was set or null
 	 * otherwise.
-	 * @deprecated use the resourceLoader field directly
+	 * @deprecated use the {@link #resourceLoader} field directly
 	 */
 	protected ResourceLoader getResourceLoader() {
 		return resourceLoader;
@@ -127,7 +127,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * Return the bundleContext for the bundle in which this test is running.
 	 * 
 	 * @return
-	 * @deprecated use the bundleContext field directly
+	 * @deprecated use the {@link #bundleContext} field directly
 	 */
 	protected BundleContext getBundleContext() {
 		return bundleContext;
@@ -136,6 +136,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	/**
 	 * Bundles that should be installed before the test execution.
 	 * 
+	 * @deprecated use {@link #getTestBundlesNames()}
 	 * @return the array of bundles to install
 	 */
 	protected String[] getBundles() {
@@ -149,9 +150,28 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * 
 	 * User subclasses should use {@link #getBundles()} instead.
 	 * 
+	 * @deprecated use {@link #getTestFrameworkBundles()}
 	 * @return the array of mandatory bundle names.
 	 */
 	protected abstract String[] getMandatoryBundles();
+
+	/**
+	 * Test framework bundles (part of the test setup). Used by the test
+	 * infrastructure. Override this method <i>only</i> if you want to change
+	 * the jars used by default, by the testing infrastructure.
+	 * 
+	 * User subclasses should use {@link #getBundles()} instead.
+	 * 
+	 * @return the array of test framework bundle resources
+	 */
+	protected abstract Resource[] getTestFrameworkBundles();
+
+	/**
+	 * Bundles required for the the test execution.
+	 * 
+	 * @return the array of bundles to install
+	 */
+	protected abstract Resource[] getTestBundles();
 
 	/**
 	 * Create (and configure) the OSGi platform.
@@ -226,7 +246,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	public void runBare() throws Throwable {
-		// add ConditionalTestCase behavior
+		// add ConditionalTestCase behaviour
 
 		// getName will return the name of the method being run
 		if (isDisabledInThisEnvironment(getName())) {
@@ -279,7 +299,127 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	//
-	// Delegation methods for OSGi execution.
+	// OSGi testing infrastructure setup.
+	//
+
+	/**
+	 * Start the OSGi platform and install/start the bundles (happens once for
+	 * the all test runs)
+	 * 
+	 * @throws Exception
+	 */
+	private void startup() throws Exception {
+		if (osgiPlatform == null) {
+
+			boolean debug = logger.isDebugEnabled();
+
+			// make sure the platform is closed properly
+			registerShutdownHook();
+
+			osgiPlatform = createPlatform();
+			// start platform
+			if (debug)
+				logger.debug("about to start " + osgiPlatform);
+			osgiPlatform.start();
+			// platform context
+			platformContext = osgiPlatform.getBundleContext();
+
+			// log platform name and version
+			logPlatformInfo(platformContext);
+
+			// hook before the OSGi platform is setup but right after is has
+			// been started
+			preProcessBundleContext(platformContext);
+
+			// install bundles (from the local system/classpath)
+			Resource[] bundleResources = locateBundles();
+
+			Bundle[] bundles = new Bundle[bundleResources.length];
+			for (int i = 0; i < bundles.length; i++) {
+				bundles[i] = installBundle(bundleResources[i]);
+			}
+
+			// start bundles
+			for (int i = 0; i < bundles.length; i++) {
+
+				try {
+					String info = null;
+					if (debug)
+						info = "bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]";
+					
+					if (!OsgiBundleUtils.isFragment(bundles[i])) {
+						if (debug)
+							logger.debug("starting " + info);
+						bundles[i].start();
+					}
+
+					else if (debug)
+						logger.debug(info + " is a fragment; start not invoked");
+				}
+				catch (Throwable ex) {
+					logger.warn("can't start bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName()
+							+ "]", ex);
+				}
+
+			}
+
+			// hook after the OSGi platform has been setup
+			postProcessBundleContext(platformContext);
+
+			initializeServiceRunnerInvocationMethods();
+		}
+	}
+
+	// concatenate bundles to install
+	private Resource[] locateBundles() {
+		Resource[] testFrameworkBundles = getTestFrameworkBundles();
+		Resource[] testBundles = getTestBundles();
+
+		if (testFrameworkBundles == null)
+			testFrameworkBundles = new Resource[0];
+		if (testBundles == null)
+			testBundles = new Resource[0];
+
+		Resource[] allBundles = new Resource[testFrameworkBundles.length + testBundles.length];
+		System.arraycopy(testFrameworkBundles, 0, allBundles, 0, testFrameworkBundles.length);
+		System.arraycopy(testBundles, 0, allBundles, testFrameworkBundles.length, testBundles.length);
+		return allBundles;
+	}
+
+	/**
+	 * Log the underlying OSGi information (which can be tricky).
+	 * 
+	 */
+	private void logPlatformInfo(BundleContext context) {
+		StringBuffer platformInfo = new StringBuffer();
+
+		// add platform information
+		platformInfo.append(osgiPlatform);
+		platformInfo.append(" [");
+		// Version
+		platformInfo.append(OsgiPlatformDetector.getVersion(context));
+		platformInfo.append("]");
+		logger.info(platformInfo + " started");
+	}
+
+	/**
+	 * Install an OSGi bundle from the given location.
+	 * 
+	 * @param location
+	 * @return
+	 * @throws Exception
+	 */
+	private Bundle installBundle(Resource location) throws Exception {
+		Assert.notNull(platformContext);
+		Assert.notNull(location);
+		if (logger.isDebugEnabled())
+			logger.debug("installing bundle from location " + location.getDescription());
+		return platformContext.installBundle(location.getDescription(), location.getInputStream());
+	}
+
+	
+	//
+	// Delegation methods for OSGi execution and initialization
 	//
 
 	/**
@@ -343,150 +483,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		IOUtils.closeStream(inputStream);
 		IOUtils.closeStream(outputStream);
 	}
-
-	//
-	// OSGi testing infrastructure setup.
-	//
-
-	/**
-	 * Start the OSGi platform and install/start the bundles (happens once for
-	 * the all test runs)
-	 * 
-	 * @throws Exception
-	 */
-	private void startup() throws Exception {
-		if (osgiPlatform == null) {
-
-			// make sure the platform is closed properly
-			registerShutdownHook();
-
-			osgiPlatform = createPlatform();
-			// start platform
-			logger.debug("about to start " + osgiPlatform);
-			osgiPlatform.start();
-			// platform context
-			platformContext = osgiPlatform.getBundleContext();
-
-			// log platform name and version
-			logPlatformInfo(platformContext);
-
-			// hook before the OSGi platform is setup but right after is has
-			// been started
-			preProcessBundleContext(platformContext);
-
-			// install bundles (from the local system/classpath)
-			Resource[] bundleResources = locateBundles();
-
-			Bundle[] bundles = new Bundle[bundleResources.length];
-			for (int i = 0; i < bundles.length; i++) {
-				bundles[i] = installBundle(bundleResources[i]);
-			}
-
-			// start bundles
-			for (int i = 0; i < bundles.length; i++) {
-
-				try {
-					String info = "bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]";
-					if (!OsgiBundleUtils.isFragment(bundles[i])) {
-						logger.debug("starting " + info);
-						bundles[i].start();
-					}
-
-					else
-						logger.debug(info + " is a fragment; start not invoked");
-				}
-				catch (Throwable ex) {
-					logger.warn("can't start bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName()
-							+ "]", ex);
-				}
-
-			}
-
-			// hook after the OSGi platform has been setup
-			postProcessBundleContext(platformContext);
-
-			initializeServiceRunnerInvocationMethods();
-		}
-	}
-
-	/**
-	 * Log the underlying OSGi information (which can be tricky).
-	 * 
-	 */
-	private void logPlatformInfo(BundleContext context) {
-		StringBuffer platformInfo = new StringBuffer();
-
-		// add platform information
-		platformInfo.append(osgiPlatform);
-		platformInfo.append(" [");
-		// Version
-		platformInfo.append(OsgiPlatformDetector.getVersion(context));
-		platformInfo.append("]");
-		logger.info(platformInfo + " started");
-	}
-
-	/**
-	 * Load the bundles given as strings. Will delegate to
-	 * {@link #locateBundle(String)}.
-	 * 
-	 * @param bundles
-	 * @return
-	 */
-	protected Resource[] locateBundles(String[] bundles) {
-		Resource[] res = new Resource[bundles.length];
-		// ResourceLoader loader = new DefaultResourceLoader();
-
-		for (int i = 0; i < bundles.length; i++) {
-			// res[i] = loader.getResource(bundles[i]);
-			res[i] = locateBundle(bundles[i]);
-		}
-		return res;
-	}
-
-	protected Resource[] locateBundles() {
-		// merge bundles
-		String[] mandatoryBundles = getMandatoryBundles();
-		String[] optionalBundles = getBundles();
-
-		if (mandatoryBundles == null)
-			mandatoryBundles = new String[0];
-
-		if (optionalBundles == null)
-			optionalBundles = new String[0];
-
-		String[] allBundles = new String[mandatoryBundles.length + optionalBundles.length];
-		System.arraycopy(mandatoryBundles, 0, allBundles, 0, mandatoryBundles.length);
-		System.arraycopy(optionalBundles, 0, allBundles, mandatoryBundles.length, optionalBundles.length);
-
-		return locateBundles(allBundles);
-	}
-
-	/**
-	 * Locate (through a Resource) an OSGi bundle given by a String. Subclasses
-	 * should provide an implementation to this method.
-	 * 
-	 * Note that the String identifying the bundle can have arbitrary format
-	 * (such as Comma Separated Values) dependening on the strategy used.
-	 * 
-	 * @param bundleId
-	 * @return
-	 */
-	protected abstract Resource locateBundle(String bundleId);
-
-	/**
-	 * Install an OSGi bundle from the given location.
-	 * 
-	 * @param location
-	 * @return
-	 * @throws Exception
-	 */
-	private Bundle installBundle(Resource location) throws Exception {
-		Assert.notNull(platformContext);
-		Assert.notNull(location);
-		logger.debug("installing bundle from location " + location.getDescription());
-		return platformContext.installBundle(location.getDescription(), location.getInputStream());
-	}
-
+	
 	/**
 	 * Determine through reflection the methods used for invoking the
 	 * TestRunnerService.
