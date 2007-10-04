@@ -1,4 +1,4 @@
-package org.springframework.osgi.extender.dependencies.startup;
+package org.springframework.osgi.internal.extender.dependencies.startup;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -14,7 +14,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
+import org.springframework.osgi.internal.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;

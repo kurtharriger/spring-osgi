@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.extender.dependencies;
+package org.springframework.osgi.internal.extender.dependencies;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,8 +23,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.extender.DependencyMockBundle;
-import org.springframework.osgi.extender.dependencies.shutdown.ServiceDependencySorter;
+import org.springframework.osgi.internal.extender.DependencyMockBundle;
+import org.springframework.osgi.internal.extender.dependencies.shutdown.ServiceDependencySorter;
 import org.springframework.util.ObjectUtils;
 
 /**

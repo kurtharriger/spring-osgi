@@ -18,8 +18,8 @@
   
   <properties>
   	<spring.osgi.private.pkg>org.springframework.osgi.internal.extender*</spring.osgi.private.pkg>
-	<spring.osgi.export.pkg>org.springframework.osgi.extender*</spring.osgi.export.pkg>
-	
+  	<!-- don't export a thing -->
+	<spring.osgi.export.pkg>!*</spring.osgi.export.pkg>
 	<!-- add this until FELIX-390 gets fixed -->
 	<spring.osgi.import.pkg>
 	 org.springframework.beans.factory.xml,

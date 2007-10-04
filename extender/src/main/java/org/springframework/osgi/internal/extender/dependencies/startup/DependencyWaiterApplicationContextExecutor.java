@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.extender.dependencies.startup;
+package org.springframework.osgi.internal.extender.dependencies.startup;
 
 import java.util.Iterator;
 import java.util.Timer;
@@ -26,10 +26,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
-import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
+import org.springframework.osgi.internal.context.DelegatedExecutionOsgiBundleApplicationContext;
+import org.springframework.osgi.internal.context.OsgiBundleApplicationContextExecutor;
+import org.springframework.osgi.internal.util.concurrent.Counter;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.util.concurrent.Counter;
 import org.springframework.util.Assert;
 
 /**

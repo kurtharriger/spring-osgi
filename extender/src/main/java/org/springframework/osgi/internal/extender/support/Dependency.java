@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.extender.support;
+package org.springframework.osgi.internal.extender.support;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
