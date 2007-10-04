@@ -22,14 +22,15 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.PluggableSchemaResolver;
 import org.springframework.osgi.context.support.NamespacePlugins;
-import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
+import org.xml.sax.EntityResolver;
 
 /**
  * Support class that deals with namespace parsers discovered inside Spring
@@ -58,7 +59,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	 * ServiceRegistration object returned by OSGi when registering the
 	 * NamespacePlugins instance as a service
 	 */
-	private ServiceRegistration resolverServiceRegistration = null;
+	private ServiceRegistration nsResolverRegistration, enResolverRegistration = null;
 
 	/**
 	 * OSGi Environment.
@@ -66,8 +67,6 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	private final BundleContext context;
 
 	private static final String SPRING_HANDLER_MAPPINGS_LOCATION = "META-INF/spring.handlers";
-
-	private static final String[] OSGI_BUNDLE_RESOLVER_INTERFACE_NAME = { OsgiBundleNamespaceHandlerAndEntityResolver.class.getName() };
 
 	/**
 	 * Constructor.
@@ -142,12 +141,17 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	/**
 	 * Register the NamespacePlugins instance as an Osgi Resolver service
 	 */
-	private ServiceRegistration registerResolverService() {
+	private void registerResolverServices() {
 		if (log.isDebugEnabled()) {
-			log.debug("Registering Spring NamespaceHandler and EntityResolver service");
+			log.debug("Registering Spring NamespaceHandlerResolver and EntityResolver...");
 		}
 
-		return context.registerService(OSGI_BUNDLE_RESOLVER_INTERFACE_NAME, this.namespacePlugins, null);
+		nsResolverRegistration = context.registerService(new String[] { NamespaceHandlerResolver.class.getName() },
+			this.namespacePlugins, null);
+
+		enResolverRegistration = context.registerService(new String[] { EntityResolver.class.getName() },
+			this.namespacePlugins, null);
+
 	}
 
 	/**
@@ -155,12 +159,16 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	 */
 	private void unregisterResolverService() {
 
-		if (OsgiServiceUtils.unregisterService(resolverServiceRegistration)) {
+		boolean result = OsgiServiceUtils.unregisterService(nsResolverRegistration);
+		result = result || OsgiServiceUtils.unregisterService(enResolverRegistration);
+
+		if (result) {
 			if (log.isDebugEnabled())
 				log.debug("Unregistering Spring NamespaceHandler and EntityResolver service");
 		}
 
-		this.resolverServiceRegistration = null;
+		this.nsResolverRegistration = null;
+		this.enResolverRegistration = null;
 	}
 
 	/**
@@ -175,7 +183,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	//
 
 	public void afterPropertiesSet() {
-		resolverServiceRegistration = registerResolverService();
+		registerResolverServices();
 	}
 
 	public void destroy() {

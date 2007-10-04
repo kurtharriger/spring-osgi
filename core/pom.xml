@@ -23,8 +23,6 @@
 		org.aopalliance.*;resolution:=optional,
 		org.w3c.dom;resolution:=optional,
 		org.xml.sax;resolution:=optional,
-		org.springframework.osgi.annotation;resolution:=optional,
-		edu.emory.mathcs.backport*;resolution:=optional,
 		*
 	</spring.osgi.import.pkg>
 	

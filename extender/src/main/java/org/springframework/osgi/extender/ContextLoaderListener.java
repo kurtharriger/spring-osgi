@@ -639,7 +639,6 @@ public class ContextLoaderListener implements BundleActivator {
 		managedContexts.put(bundleId, context);
 
 		context.setPublishContextAsService(config.isPublishContextAsService());
-		context.setNamespaceHandlerAndEntityResolver(nsManager.getNamespacePlugins());
 
 		Runnable contextRefresh = new Runnable() {
 			public void run() {
@@ -742,7 +741,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 			this.extenderContext = new OsgiBundleXmlApplicationContext(locations);
 			this.extenderContext.setBundleContext(context);
-			this.extenderContext.setNamespaceHandlerAndEntityResolver(nsManager.getNamespacePlugins());
 
 			extenderContext.refresh();
 

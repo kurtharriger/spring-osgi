@@ -28,7 +28,6 @@ import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.extender.support.TestTaskExecutor;
-import org.springframework.osgi.internal.compendium.OsgiConfig;
 import org.springframework.osgi.mock.EntryLookupControllingMockBundle;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
@@ -68,7 +67,7 @@ public class ContextLoaderListenerTest extends TestCase {
 		// register context service
 		context.registerService((String[]) null, null, null);
 		bundleContextControl.setMatcher(MockControl.ALWAYS_MATCHER);
-		bundleContextControl.setReturnValue(null);
+		bundleContextControl.setReturnValue(null, MockControl.ONE_OR_MORE);
 
 		// create task executor
 		EntryLookupControllingMockBundle aBundle = new EntryLookupControllingMockBundle(null);

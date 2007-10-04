@@ -15,17 +15,17 @@
  */
 package org.springframework.osgi.iandt.propertyplaceholder;
 
+import java.io.File;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.io.File;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.util.OsgiServiceUtils;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
  * 
@@ -42,30 +42,29 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 
 	private ConfigurableOsgiBundleApplicationContext ctx;
 
-    private static String CONFIG_DIR = "test-config";
+	private static String CONFIG_DIR = "test-config";
 
-    protected static void initializeDirectory(String dir) {
-        File directory = new File(dir);
-        remove(directory);
-        assertTrue(dir + " directory successfully created", directory.mkdirs());
-    }
+	protected static void initializeDirectory(String dir) {
+		File directory = new File(dir);
+		remove(directory);
+		assertTrue(dir + " directory successfully created", directory.mkdirs());
+	}
 
-
-    private static void remove(File directory) {
-        if (directory.exists()) {
-            File[] files = directory.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                File file = files[i];
-                if (file.isDirectory()) {
-                    remove(file);
-                } else {
-                    assertTrue(file + " deleted", file.delete());
-                }
-            }
-            assertTrue(directory + " directory successfully cleared",
-                       directory.delete());
-        }
-    }
+	private static void remove(File directory) {
+		if (directory.exists()) {
+			File[] files = directory.listFiles();
+			for (int i = 0; i < files.length; i++) {
+				File file = files[i];
+				if (file.isDirectory()) {
+					remove(file);
+				}
+				else {
+					assertTrue(file + " deleted", file.delete());
+				}
+			}
+			assertTrue(directory + " directory successfully cleared", directory.delete());
+		}
+	}
 
 	protected String getManifestLocation() {
 		return "classpath:org/springframework/osgi/iandt/propertyplaceholder/PropertyPlaceholder.MF";
@@ -82,15 +81,15 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 	protected void onSetUp() throws Exception {
 		DICT.put("foo", "bar");
 		DICT.put("white", "horse");
-        // Set up the bundle storage dirctory
-        System.setProperty("com.gatespace.bundle.cm.store", CONFIG_DIR);
-        initializeDirectory(CONFIG_DIR);
+		// Set up the bundle storage dirctory
+		System.setProperty("com.gatespace.bundle.cm.store", CONFIG_DIR);
+		initializeDirectory(CONFIG_DIR);
 		prepareConfiguration();
 
-        String[] locations = new String[]{"org/springframework/osgi/iandt/propertyplaceholder/placeholder.xml"};
-        ctx = new OsgiBundleXmlApplicationContext(locations);
-        ctx.setBundleContext(bundleContext);
-        ctx.refresh();
+		String[] locations = new String[] { "org/springframework/osgi/iandt/propertyplaceholder/placeholder.xml" };
+		ctx = new OsgiBundleXmlApplicationContext(locations);
+		ctx.setBundleContext(bundleContext);
+		ctx.refresh();
 	}
 
 	protected void onTearDown() throws Exception {
@@ -109,7 +108,8 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 	// add a default table into OSGi
 	private void prepareConfiguration() throws Exception {
 
-		ServiceReference ref = OsgiServiceUtils.getService(bundleContext, ConfigurationAdmin.class, null);
+		ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
+			ConfigurationAdmin.class.getName(), null);
 
 		ConfigurationAdmin admin = (ConfigurationAdmin) bundleContext.getService(ref);
 		Configuration config = admin.getConfiguration(ID);

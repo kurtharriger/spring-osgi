@@ -43,10 +43,10 @@ import org.xml.sax.SAXException;
  * 
  */
 // TODO: add versioning for namespaces
-public class NamespacePlugins implements OsgiBundleNamespaceHandlerAndEntityResolver, DisposableBean {
+public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolver, DisposableBean {
 
 	/**
-	 * Wrapper class which implements both EntityResolver and
+	 * Wrapper class which implements both {@link EntityResolver} and
 	 * {@link NamespaceHandlerResolver} interfaces.
 	 * 
 	 * Simply delegates to the actual implementation discovered in a specific
@@ -92,7 +92,6 @@ public class NamespacePlugins implements OsgiBundleNamespaceHandlerAndEntityReso
 		if (log.isDebugEnabled())
 			log.debug("adding as handler " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
-		// noinspection unchecked
 		plugins.put(bundle, new Plugin(bundle));
 	}
 
