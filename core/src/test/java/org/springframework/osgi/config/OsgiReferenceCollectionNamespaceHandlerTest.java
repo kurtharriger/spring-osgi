@@ -30,12 +30,12 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
+import org.springframework.osgi.internal.service.collection.OsgiServiceCollection;
+import org.springframework.osgi.internal.service.collection.OsgiServiceList;
+import org.springframework.osgi.internal.service.collection.OsgiServiceSet;
+import org.springframework.osgi.internal.service.collection.OsgiServiceSortedList;
+import org.springframework.osgi.internal.service.collection.OsgiServiceSortedSet;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.service.collection.OsgiServiceCollection;
-import org.springframework.osgi.service.collection.OsgiServiceList;
-import org.springframework.osgi.service.collection.OsgiServiceSet;
-import org.springframework.osgi.service.collection.OsgiServiceSortedList;
-import org.springframework.osgi.service.collection.OsgiServiceSortedSet;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
 
 /**

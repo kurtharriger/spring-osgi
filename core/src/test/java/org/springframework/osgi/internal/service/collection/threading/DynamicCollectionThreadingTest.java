@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.collection.threading;
+package org.springframework.osgi.internal.service.collection.threading;
 
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.springframework.osgi.service.collection.DynamicCollection;
+import org.springframework.osgi.internal.service.collection.DynamicCollection;
 
 /**
  * Multithreading test for DynamicCollection.

@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.collection;
+package org.springframework.osgi.internal.service.collection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
+
+import org.springframework.osgi.internal.service.collection.DynamicSortedSet;
 
 import junit.framework.TestCase;
 

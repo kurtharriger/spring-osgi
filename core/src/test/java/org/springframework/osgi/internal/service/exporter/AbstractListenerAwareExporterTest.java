@@ -20,8 +20,8 @@ import java.util.HashMap;
 import junit.framework.TestCase;
 
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.osgi.internal.service.util.OsgiServiceRegistrationListener;
 import org.springframework.osgi.mock.MockServiceRegistration;
-import org.springframework.osgi.service.util.OsgiServiceRegistrationListener;
 
 public class AbstractListenerAwareExporterTest extends TestCase {
 

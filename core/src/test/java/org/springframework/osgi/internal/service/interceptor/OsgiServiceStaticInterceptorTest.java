@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.interceptor;
+package org.springframework.osgi.internal.service.interceptor;
 
 import java.lang.reflect.Method;
 
@@ -24,6 +24,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.ServiceUnavailableException;
+import org.springframework.osgi.internal.service.interceptor.OsgiServiceStaticInterceptor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 

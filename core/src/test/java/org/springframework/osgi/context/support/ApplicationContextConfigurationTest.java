@@ -22,8 +22,9 @@ import java.util.Hashtable;
 
 import junit.framework.TestCase;
 
+import org.springframework.osgi.internal.context.support.ApplicationContextConfiguration;
+import org.springframework.osgi.internal.util.ConfigUtils;
 import org.springframework.osgi.mock.EntryLookupControllingMockBundle;
-import org.springframework.osgi.util.ConfigUtils;
 
 /**
  * Test that given a bundle, we can correctly determine the spring configuration

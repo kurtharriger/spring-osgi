@@ -18,6 +18,8 @@ package org.springframework.osgi.util;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.springframework.osgi.internal.util.ConfigUtils;
+
 import junit.framework.TestCase;
 
 /**

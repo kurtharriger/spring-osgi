@@ -37,10 +37,10 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
-import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplicationContext;
 import org.springframework.osgi.context.support.AbstractOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.osgi.internal.context.DelegatedExecutionOsgiBundleApplicationContext;
+import org.springframework.osgi.internal.context.support.AbstractDelegatedExecutionApplicationContext;
 import org.springframework.util.ObjectUtils;
 
 /**
