@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.SpringProxy;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.internal.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
 import org.springframework.osgi.util.MapBasedDictionary;

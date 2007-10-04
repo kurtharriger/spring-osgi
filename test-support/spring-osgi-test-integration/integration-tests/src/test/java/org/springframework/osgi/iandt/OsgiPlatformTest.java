@@ -37,7 +37,7 @@ public class OsgiPlatformTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	public void testOsgiPlatform() throws Exception {
-		String vendor = getBundleContext().getProperty(Constants.FRAMEWORK_VENDOR);
+		String vendor = bundleContext.getProperty(Constants.FRAMEWORK_VENDOR);
 
 		if ("Eclipse".equals(vendor))
 			assertTrue(platform.indexOf("Equinox") >= 0);

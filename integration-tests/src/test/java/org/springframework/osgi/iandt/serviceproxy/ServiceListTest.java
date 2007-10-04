@@ -20,15 +20,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.collection.OsgiServiceList;
+import org.springframework.osgi.internal.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.internal.service.collection.OsgiServiceList;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 
 /**
  * @author Costin Leau
  * 
  */
-public class ServiceListTest extends ServiceCollectionTest {
+public abstract class  ServiceListTest extends ServiceCollectionTest {
 
 	protected Collection createCollection() {
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());

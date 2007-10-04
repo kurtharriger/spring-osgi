@@ -23,8 +23,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.ServiceUnavailableException;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
+import org.springframework.osgi.internal.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.internal.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.ClassUtils;
@@ -33,7 +33,7 @@ import org.springframework.util.ClassUtils;
  * @author Costin Leau
  * 
  */
-public class ServiceProxyTest extends AbstractConfigurableBundleCreatorTests {
+public abstract class ServiceProxyTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getBundles() {
 		return new String[] { localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT") };

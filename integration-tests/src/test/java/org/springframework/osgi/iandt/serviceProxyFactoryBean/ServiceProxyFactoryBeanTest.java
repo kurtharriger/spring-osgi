@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.internal.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
