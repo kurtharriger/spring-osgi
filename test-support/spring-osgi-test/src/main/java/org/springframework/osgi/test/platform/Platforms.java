@@ -15,6 +15,10 @@
  */
 package org.springframework.osgi.test.platform;
 
+import org.springframework.osgi.internal.test.platform.EquinoxPlatform;
+import org.springframework.osgi.internal.test.platform.FelixPlatform;
+import org.springframework.osgi.internal.test.platform.KnopflerfishPlatform;
+
 /**
  * Convenience class used for holding the OSGi platforms provided out of the
  * box.

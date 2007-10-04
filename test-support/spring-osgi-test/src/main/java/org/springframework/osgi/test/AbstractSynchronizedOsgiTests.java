@@ -19,11 +19,11 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
-import org.springframework.osgi.util.ConfigUtils;
+import org.springframework.osgi.internal.util.ConfigUtils;
+import org.springframework.osgi.internal.util.concurrent.Counter;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.util.concurrent.Counter;
 
 /**
  * JUnit superclass which offers synchronization for bundle initialization. It
