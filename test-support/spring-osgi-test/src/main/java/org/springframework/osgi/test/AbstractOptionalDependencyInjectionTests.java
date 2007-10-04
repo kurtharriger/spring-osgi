@@ -23,7 +23,6 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplicationContext;
-import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.util.ObjectUtils;
@@ -51,9 +50,6 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 	private class EmptyOsgiApplicationContext extends AbstractDelegatedExecutionApplicationContext {
 
 		protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException, BeansException {
-		}
-
-		public void setNamespaceHandlerAndEntityResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver) {
 		}
 
 	}
