@@ -14,5 +14,7 @@
     <bean id="dependent" class="org.springframework.osgi.iandt.annotation.dependencies.DependentImpl" lazy-init="false">
         <property name="service2" ref="simpleService2"/>
     </bean>
-    
+
+   <!-- annotation injection post processor -->
+   <bean class="org.springframework.osgi.annotation.ServiceReferenceInjectionBeanPostProcessor"/>    
 </beans>
