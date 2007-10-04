@@ -42,12 +42,12 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Constants;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.context.OsgiBundleScope;
+import org.springframework.osgi.internal.context.support.OsgiBundleScope;
+import org.springframework.osgi.internal.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.internal.service.exporter.AbstractListenerAwareExporter;
+import org.springframework.osgi.internal.service.interceptor.OsgiServiceTCCLInvoker;
 import org.springframework.osgi.internal.util.DebugUtils;
-import org.springframework.osgi.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.service.OsgiServicePropertiesResolver;
-import org.springframework.osgi.service.interceptor.OsgiServiceTCCLInvoker;
 import org.springframework.osgi.util.ClassUtils;
 import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.osgi.util.OsgiServiceUtils;
@@ -141,7 +141,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 				serviceFactory.ungetService(bundle, serviceRegistration, bean);
 		}
 	}
-
 
 	private static final Log log = LogFactory.getLog(OsgiServiceFactoryBean.class);
 
@@ -319,9 +318,9 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 		Class[] mergedClasses = (Class[]) classes.toArray(new Class[classes.size()]);
 
-		 ServiceRegistration reg = registerService(mergedClasses, serviceProperties);
-		
-		 serviceRegistration = notifyListeners((Map) serviceProperties, reg);
+		ServiceRegistration reg = registerService(mergedClasses, serviceProperties);
+
+		serviceRegistration = notifyListeners((Map) serviceProperties, reg);
 	}
 
 	/**
@@ -548,7 +547,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	public void setOrder(int order) {
 		this.order = order;
 	}
-
 
 	public void setBeanName(String name) {
 		this.beanName = name;
