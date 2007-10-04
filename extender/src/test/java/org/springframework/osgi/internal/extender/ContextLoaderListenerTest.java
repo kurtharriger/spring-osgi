@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.extender;
+package org.springframework.osgi.internal.extender;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -27,11 +27,11 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.osgi.extender.support.TestTaskExecutor;
+import org.springframework.osgi.internal.extender.support.TestTaskExecutor;
+import org.springframework.osgi.internal.util.ConfigUtils;
 import org.springframework.osgi.mock.EntryLookupControllingMockBundle;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.util.ConfigUtils;
 
 /**
  * @author Adrian Colyer

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.extender.dependencies.shutdown;
+package org.springframework.osgi.internal.extender.dependencies.shutdown;
 
 import org.osgi.framework.Bundle;
 

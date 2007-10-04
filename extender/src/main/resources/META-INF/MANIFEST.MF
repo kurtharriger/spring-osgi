@@ -4,4 +4,4 @@ Bundle-SymbolicName: org.springframework.osgi.extender
 Bundle-Version: ${spring.osgi.bundle.version}
 Bundle-ManifestVersion: 2
 Bundle-Vendor: Spring Framework
-Bundle-Activator: org.springframework.osgi.extender.ContextLoaderListener
+Bundle-Activator: org.springframework.osgi.internal.extender.ContextLoaderListener

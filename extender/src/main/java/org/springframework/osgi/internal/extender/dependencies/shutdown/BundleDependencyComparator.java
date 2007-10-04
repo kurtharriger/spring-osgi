@@ -1,4 +1,4 @@
-package org.springframework.osgi.extender.dependencies.shutdown;
+package org.springframework.osgi.internal.extender.dependencies.shutdown;
 
 import java.io.Serializable;
 import java.util.Comparator;

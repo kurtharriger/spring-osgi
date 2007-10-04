@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.springframework.osgi.extender;
+package org.springframework.osgi.internal.extender;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -40,19 +40,19 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplicationContext;
-import org.springframework.osgi.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
-import org.springframework.osgi.extender.dependencies.shutdown.ComparatorServiceDependencySorter;
-import org.springframework.osgi.extender.dependencies.shutdown.ServiceDependencySorter;
-import org.springframework.osgi.extender.dependencies.startup.DependencyWaiterApplicationContextExecutor;
-import org.springframework.osgi.extender.support.NamespaceManager;
+import org.springframework.osgi.internal.context.support.AbstractDelegatedExecutionApplicationContext;
+import org.springframework.osgi.internal.context.support.ApplicationContextConfiguration;
+import org.springframework.osgi.internal.extender.dependencies.shutdown.ComparatorServiceDependencySorter;
+import org.springframework.osgi.internal.extender.dependencies.shutdown.ServiceDependencySorter;
+import org.springframework.osgi.internal.extender.dependencies.startup.DependencyWaiterApplicationContextExecutor;
+import org.springframework.osgi.internal.extender.support.NamespaceManager;
 import org.springframework.osgi.internal.extender.util.ConfigUtils;
+import org.springframework.osgi.internal.util.concurrent.Counter;
+import org.springframework.osgi.internal.util.concurrent.RunnableTimedExecution;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.util.concurrent.Counter;
-import org.springframework.osgi.util.concurrent.RunnableTimedExecution;
 
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'.
