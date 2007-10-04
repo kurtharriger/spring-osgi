@@ -23,6 +23,7 @@
 	<!-- add this until FELIX-390 gets fixed -->
 	<spring.osgi.import.pkg>
 	 org.springframework.beans.factory.xml,
+	 org.xml.sax;resolution:=optional,
 	 *
 	</spring.osgi.import.pkg>
   </properties>
