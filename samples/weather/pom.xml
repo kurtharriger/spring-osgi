@@ -12,6 +12,9 @@
   <name>Spring OSGi Weather Sample</name>
   <url>http://www.springframework.org/osgi</url>
   
+  <properties>
+     <spring.osgi.private.pkg></spring.osgi.private.pkg>
+  </properties>
   <modules>
     <module>weather-dao</module>
     <module>weather-extension</module>

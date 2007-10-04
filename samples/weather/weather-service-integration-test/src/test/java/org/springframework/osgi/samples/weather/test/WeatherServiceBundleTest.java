@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.core.JdkVersion;
 import org.springframework.osgi.samples.weather.service.WeatherService;
