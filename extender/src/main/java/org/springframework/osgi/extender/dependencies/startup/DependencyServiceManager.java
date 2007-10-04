@@ -81,40 +81,7 @@ public class DependencyServiceManager {
 							+ OsgiStringUtils.nullSafeToString(ref) + "] for " + context.getDisplayName());
 				}
 
-				for (Iterator i = dependencies.iterator(); i.hasNext();) {
-					ServiceDependency dependency = (ServiceDependency) i.next();
-
-					// check if there is a match on the service
-					if (dependency.matches(serviceEvent)) {
-						switch (serviceEvent.getType()) {
-
-						case ServiceEvent.REGISTERED:
-						case ServiceEvent.MODIFIED:
-							unsatisfiedDependencies.remove(dependency);
-							if (debug) {
-								log.debug("found service; eliminating " + dependency);
-							}
-							break;
-
-						case ServiceEvent.UNREGISTERING:
-							unsatisfiedDependencies.add(dependency);
-							if (debug) {
-								log.debug("service unregistered; adding " + dependency);
-							}
-							break;
-						default: // do nothing
-							if (debug) {
-								log.debug("Unknown service event type for: " + dependency);
-							}
-							break;
-						}
-					}
-					else {
-						if (trace) {
-							log.trace(dependency + " does not match: " + OsgiStringUtils.nullSafeToString(ref));
-						}
-					}
-				}
+				updateDependencies(serviceEvent);
 
 				ContextState state = executor.getState();
 				if (state == ContextState.INTERRUPTED || state == ContextState.DEPENDENCIES_RESOLVED
@@ -131,9 +98,10 @@ public class DependencyServiceManager {
 						log.debug("No outstanding dependencies, completing initialization for "
 								+ context.getDisplayName());
 					}
-					
+
 					// execute task to complete initialization
-					// NOTE: the runnable should be able to delegate any long process to a
+					// NOTE: the runnable should be able to delegate any long
+					// process to a
 					// different thread.
 					executeIfDone.run();
 				}
@@ -141,6 +109,46 @@ public class DependencyServiceManager {
 			catch (Throwable e) {
 				// frameworks will simply not log exception for event handlers
 				log.error("Exception during dependency processing for " + context.getDisplayName(), e);
+			}
+		}
+
+		private void updateDependencies(ServiceEvent serviceEvent) {
+			boolean trace = log.isTraceEnabled();
+			boolean debug = log.isDebugEnabled();
+
+			for (Iterator i = dependencies.iterator(); i.hasNext();) {
+				ServiceDependency dependency = (ServiceDependency) i.next();
+
+				// check if there is a match on the service
+				if (dependency.matches(serviceEvent)) {
+					switch (serviceEvent.getType()) {
+
+					case ServiceEvent.REGISTERED:
+					case ServiceEvent.MODIFIED:
+						unsatisfiedDependencies.remove(dependency);
+						if (debug) {
+							log.debug("found service; eliminating " + dependency);
+						}
+						break;
+
+					case ServiceEvent.UNREGISTERING:
+						unsatisfiedDependencies.add(dependency);
+						if (debug) {
+							log.debug("service unregistered; adding " + dependency);
+						}
+						break;
+					default: // do nothing
+						if (debug) {
+							log.debug("Unknown service event type for: " + dependency);
+						}
+						break;
+					}
+				}
+				else {
+					if (trace) {
+						log.trace(dependency + " does not match: " + OsgiStringUtils.nullSafeToString(serviceEvent.getServiceReference()));
+					}
+				}
 			}
 		}
 	}

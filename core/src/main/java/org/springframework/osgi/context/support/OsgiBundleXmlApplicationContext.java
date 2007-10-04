@@ -18,13 +18,15 @@ package org.springframework.osgi.context.support;
 
 import java.io.IOException;
 
-import org.osgi.framework.ServiceReference;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
+import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.osgi.internal.util.TrackingUtil;
 import org.springframework.osgi.util.ConfigUtils;
-import org.springframework.osgi.util.OsgiServiceUtils;
+import org.xml.sax.EntityResolver;
 
 /**
  * XML specific application context backed by an OSGi bundle.
@@ -40,9 +42,6 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 // TODO: think about whether restricting config files to bundle: is the right
 // thing to do
 public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionApplicationContext {
-
-	/** retrieved from the BundleContext * */
-	private OsgiBundleNamespaceHandlerAndEntityResolver nsHandlerResolver;
 
 	public OsgiBundleXmlApplicationContext(String[] configLocations) {
 		setDisplayName("Unbound OsgiBundleXmlApplicationContext");
@@ -68,19 +67,11 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
 
-		// check if there is a handler resolver, trying to resolve it from the
-		// OSGi space
-		OsgiBundleNamespaceHandlerAndEntityResolver defaultHandlerResolver = (nsHandlerResolver != null ? nsHandlerResolver
-				: lookupHandlerAndResolver());
+		NamespaceHandlerResolver nsResolver = lookupNamespaceHandlerResolver();
+		EntityResolver enResolver = lookupEntityResolver();
 
-		if (defaultHandlerResolver != null) {
-			beanDefinitionReader.setEntityResolver(defaultHandlerResolver);
-			beanDefinitionReader.setNamespaceHandlerResolver(defaultHandlerResolver);
-		}
-		else {
-			// fallback to ResourceEntityResolver
-			beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
-		}
+		beanDefinitionReader.setEntityResolver(enResolver);
+		beanDefinitionReader.setNamespaceHandlerResolver(nsResolver);
 
 		// Allow a subclass to provide custom initialization of the reader,
 		// then proceed with actually loading the bean definitions.
@@ -88,45 +79,22 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		loadBeanDefinitions(beanDefinitionReader);
 	}
 
-	/**
-	 * Lookup the NamespaceHandler and entity resolver Service inside the OSGi
-	 * space.
-	 * 
-	 * @return
-	 */
-	protected OsgiBundleNamespaceHandlerAndEntityResolver lookupHandlerAndResolver() {
-		ServiceReference reference = OsgiServiceUtils.getService(getBundleContext(),
-			OsgiBundleNamespaceHandlerAndEntityResolver.class, null);
+	private NamespaceHandlerResolver lookupNamespaceHandlerResolver() {
+		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class[] { NamespaceHandlerResolver.class }, null,
+			getClass().getClassLoader(), getBundleContext(), new DefaultNamespaceHandlerResolver(getClassLoader()));
+	}
 
-		if (reference != null) {
-			OsgiBundleNamespaceHandlerAndEntityResolver resolver = (OsgiBundleNamespaceHandlerAndEntityResolver) getBundleContext().getService(
-				reference);
-			if (logger.isDebugEnabled()) {
-				if (resolver != null) {
-					logger.debug("looking for NamespaceHandlerAndEntityResolver OSGi service.... found=" + resolver);
-				}
-				else
-					logger.debug("no NamespaceHandlerAndEntityResolver service found");
-			}
-			return resolver;
-		}
-
-		return null;
+	private EntityResolver lookupEntityResolver() {
+		return (EntityResolver) TrackingUtil.getService(new Class[] { EntityResolver.class }, null,
+			getClass().getClassLoader(), getBundleContext(), new ResourceEntityResolver(this));
 	}
 
 	/**
-	 * We can't look in META-INF across bundles when using osgi, so we need to
-	 * change the default namespace handler (spring.handlers) location with a
-	 * custom resolver. Each Spring OSGi bundle which provides a namespace
-	 * handler plugin publishes a NamespaceHandlerResolver service as well as an
-	 * EntityResolver service which is used to plug in the namespaces supported
-	 * by the bundle.
+	 * Allows subclasses to do custom initialization here.
+	 * 
+	 * @param beanDefinitionReader
 	 */
 	protected void initBeanDefinitionReader(XmlBeanDefinitionReader beanDefinitionReader) {
-		if (nsHandlerResolver != null) {
-			beanDefinitionReader.setEntityResolver(nsHandlerResolver);
-			beanDefinitionReader.setNamespaceHandlerResolver(nsHandlerResolver);
-		}
 	}
 
 	/**
@@ -155,14 +123,4 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 			}
 		}
 	}
-
-	/**
-	 * Set the merged, namespace handler entity resolver class.
-	 * 
-	 * @param nsHandlerEntityResolver The nsHandlerResolver to set.
-	 */
-	public void setNamespaceHandlerAndEntityResolver(OsgiBundleNamespaceHandlerAndEntityResolver nsHandlerEntityResolver) {
-		this.nsHandlerResolver = nsHandlerEntityResolver;
-	}
-
 }

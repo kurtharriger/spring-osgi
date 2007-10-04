@@ -18,7 +18,6 @@ package org.springframework.osgi.context;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.osgi.context.support.OsgiBundleNamespaceHandlerAndEntityResolver;
 
 /**
  * Interface to be implemented by configurable OSGi bundle application contexts.
@@ -85,9 +84,4 @@ public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableAp
 	 * @param publishContextAsService The publishContextAsService to set.
 	 */
 	void setPublishContextAsService(boolean publishContextAsService);
-
-	/**
-	 * @param namespaceResolver The namespaceResolver to set.
-	 */
-	void setNamespaceHandlerAndEntityResolver(OsgiBundleNamespaceHandlerAndEntityResolver namespaceResolver);
 }

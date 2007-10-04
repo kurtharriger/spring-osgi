@@ -8,6 +8,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.springframework.osgi.iandt.configuration.ManagedServiceFactoryListener;
 import org.springframework.osgi.iandt.configuration.ManagedServiceListener;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 
 import java.io.File;
@@ -59,7 +60,8 @@ public abstract class ConfigTest extends AbstractConfigurableBundleCreatorTests 
 	}
 
 	protected void onSetUp() throws Exception {
-		ServiceReference ref = OsgiServiceUtils.getService(bundleContext, ConfigurationAdmin.class, null);
+		ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
+			ConfigurationAdmin.class.getName(), null);
 		admin = (ConfigurationAdmin) bundleContext.getService(ref);
 		assertNotNull("Configuration Admin exists", admin);
 		BundleContext bc = bundleContext;

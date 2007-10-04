@@ -18,7 +18,6 @@ package org.springframework.osgi.iandt.bundleScope;
 import java.util.Properties;
 
 import org.osgi.framework.ServiceReference;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.iandt.scope.common.ScopeTestService;
