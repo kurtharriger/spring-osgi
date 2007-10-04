@@ -45,7 +45,7 @@
 
    
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
-    <spring.osgi.private.pkg>!*</spring.osgi.private.pkg>
+    <spring.osgi.private.pkg></spring.osgi.private.pkg>
     
     <!-- complete access to export/import properties -->
     <spring.osgi.export>${spring.osgi.export.pkg}*;version=${spring.osgi.export.version}</spring.osgi.export>
@@ -362,6 +362,9 @@ limitations under the License.
         </executions>
       </plugin>
 
+       <!-- docbook plugin -->
+  
+
     </plugins>
   </build>
 
@@ -651,6 +654,11 @@ limitations under the License.
       </url>
     </pluginRepository>
     
+    <pluginRepository>
+      <id>agilejava</id>
+      <url>http://agilejava.com/maven/</url>
+    </pluginRepository>
+
     <!-- maven osgi bundle plugin 
     <pluginRepository>
 	  <snapshots><enabled>true</enabled></snapshots>
