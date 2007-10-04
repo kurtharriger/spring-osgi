@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.collection;
+package org.springframework.osgi.internal.service.collection;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.internal.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;

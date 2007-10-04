@@ -20,7 +20,7 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.util.ConfigUtils;
+import org.springframework.osgi.internal.util.ConfigUtils;
 
 /**
  * @author Costin Leau
@@ -51,7 +51,7 @@ public class HeaderConstantsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.util.ConfigUtils#getSpringContextHeader(java.util.Dictionary)}.
+	 * {@link org.springframework.osgi.internal.util.ConfigUtils#getSpringContextHeader(java.util.Dictionary)}.
 	 */
 	public void testGetServiceContextHeader() {
 		assertNull(ConfigUtils.getSpringContextHeader(headers));
@@ -62,7 +62,7 @@ public class HeaderConstantsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.util.ConfigUtils#getDirectiveValue(java.lang.String, java.lang.String)}.
+	 * {@link org.springframework.osgi.internal.util.ConfigUtils#getDirectiveValue(java.lang.String, java.lang.String)}.
 	 */
 	public void testGetDirectiveValue() {
 		String header = "bla bla";
@@ -80,7 +80,7 @@ public class HeaderConstantsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.util.ConfigUtils#getPublishContext(java.util.Dictionary)}.
+	 * {@link org.springframework.osgi.internal.util.ConfigUtils#getPublishContext(java.util.Dictionary)}.
 	 */
 	public void testGetDontPublishContext() {
 		String header = "nothing";
@@ -102,7 +102,7 @@ public class HeaderConstantsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.util.ConfigUtils#getCreateAsync(java.util.Dictionary)}.
+	 * {@link org.springframework.osgi.internal.util.ConfigUtils#getCreateAsync(java.util.Dictionary)}.
 	 */
 	public void testGetCreateAsync() {
 		String header = "nothing";
@@ -124,7 +124,7 @@ public class HeaderConstantsTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.util.ConfigUtils#getTimeout(java.util.Dictionary)}.
+	 * {@link org.springframework.osgi.internal.util.ConfigUtils#getTimeout(java.util.Dictionary)}.
 	 */
 	public void testGetTimeout() {
 		String header = "nothing";

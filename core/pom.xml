@@ -17,7 +17,15 @@
   
   
   <properties>
-	<spring.osgi.export.pkg>!org.springframework.osgi.io, org.springframework.osgi*</spring.osgi.export.pkg>
+  	<spring.osgi.export.pkg>
+		org.springframework.osgi.internal.config*,
+  	    org.springframework.osgi.internal.context*,
+  	    org.springframework.osgi.internal.util*,
+  	    !org.springframework.osgi.io, 
+  	    !org.springframework.osgi.internal*, 
+  	    org.springframework.osgi*
+  	</spring.osgi.export.pkg>
+  	
 	<spring.osgi.import.pkg>
 		org.osgi.service.cm;version=1.2;resolution:=optional,
 		org.aopalliance.*;resolution:=optional,
@@ -26,6 +34,7 @@
 		*
 	</spring.osgi.import.pkg>
 	
+	<spring.osgi.private.pkg>org.springframework.osgi.internal*</spring.osgi.private.pkg>
   </properties>
   
   <dependencies>

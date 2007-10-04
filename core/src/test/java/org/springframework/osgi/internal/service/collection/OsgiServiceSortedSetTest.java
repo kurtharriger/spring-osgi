@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.collection;
+package org.springframework.osgi.internal.service.collection;
 
 import java.util.Iterator;
-import java.util.ListIterator;
+
+import org.springframework.osgi.internal.service.collection.OsgiServiceSortedSet;
 
 /**
  * @author Costin Leau
  * 
  */
-public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
-
-	private OsgiServiceSortedList col;
+public class OsgiServiceSortedSetTest extends AbstractOsgiCollectionTest {
+	private OsgiServiceSortedSet col;
 
 	private Iterator iter;
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		col = new OsgiServiceSortedList(null, context, getClass().getClassLoader(), false);
+		col = new OsgiServiceSortedSet(null, context, getClass().getClassLoader(), false);
 		col.setInterfaces(new Class[] { Wrapper.class, Comparable.class });
 		col.afterPropertiesSet();
 
@@ -52,19 +52,18 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		assertEquals(1, col.size());
 
 		addService(date2);
-		// duplicates accepted
-		assertEquals("collection should accept duplicates", 2, col.size());
-		assertEquals(date2.toString(), col.get(0).toString());
+		assertEquals(1, col.size());
+		assertEquals(date2.toString(), col.first().toString());
 
 		addService(date1);
-		assertEquals("collection should accept duplicates", 3, col.size());
-		assertEquals(date1.toString(), col.get(0).toString());
+		assertEquals(2, col.size());
+		assertEquals(date1.toString(), col.first().toString());
 
 		addService(date3);
 
-		assertEquals("collection should accept duplicates", 4, col.size());
-		assertEquals(date1.toString(), col.get(0).toString());
-		assertEquals(date3.toString(), col.get(col.size() - 1).toString());
+		assertEquals(3, col.size());
+		assertEquals(date1.toString(), col.first().toString());
+		assertEquals(date3.toString(), col.last().toString());
 	}
 
 	public void testOrderingWhileRemoving() {
@@ -79,14 +78,14 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		removeService(date2);
 		assertEquals(2, col.size());
 
-		assertEquals(date1.toString(), col.get(0).toString());
-		assertEquals(date3.toString(), col.get(col.size() - 1).toString());
+		assertEquals(date1.toString(), col.first().toString());
+		assertEquals(date3.toString(), col.last().toString());
 
 		removeService(date1);
 
 		assertEquals(1, col.size());
-		assertEquals(date3.toString(), col.get(0).toString());
-		assertEquals(date3.toString(), col.get(col.size() - 1).toString());
+		assertEquals(date3.toString(), col.first().toString());
+		assertEquals(date3.toString(), col.last().toString());
 
 	}
 
@@ -94,12 +93,12 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		Wrapper date1 = new DateWrapper(1);
 		Wrapper date2 = new DateWrapper(2);
 		Wrapper date3 = new DateWrapper(3);
-
+		
 		addService(date2);
 
 		assertTrue(iter.hasNext());
 		assertEquals(date2.toString(), iter.next().toString());
-
+		
 		addService(date1);
 		assertFalse(iter.hasNext());
 
@@ -107,37 +106,7 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		assertTrue(iter.hasNext());
 		assertEquals(date3.toString(), iter.next().toString());
 	}
-
-	public void testOrderingAndDuplicatesWhileIterating() {
-		Wrapper date1 = new DateWrapper(1);
-		Wrapper date2 = new DateWrapper(2);
-		Wrapper date3 = new DateWrapper(3);
-
-		addService(date2);
-
-		assertTrue(iter.hasNext());
-		assertEquals(date2.toString(), iter.next().toString());
-
-		assertEquals(1, col.size());
-		
-		// check next duplicate
-		addService(date2);
-		assertEquals(2, col.size());
-		
-		assertEquals(date2.toString(), iter.next().toString());
-
-		addService(date1);
-		assertFalse(iter.hasNext());
-		assertEquals("collection should accept duplicates", 3, col.size());
-
-		addService(date1);
-		assertFalse(iter.hasNext());
-		assertEquals("collection should accept duplicates", 4, col.size());
-
-		addService(date3);
-		assertTrue(iter.hasNext());
-		assertEquals(date3.toString(), iter.next().toString());
-	}
+	
 
 	public void testRemovalWhileIterating() {
 		Wrapper date1 = new DateWrapper(1);
@@ -150,7 +119,7 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		addService(date2);
 		addService(date1);
 
-		assertEquals(5, col.size());
+		assertEquals("collection should not accept duplicates", 3, col.size());
 		
 		// date1
 		assertEquals(date1.toString(), iter.next().toString());
@@ -165,23 +134,4 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		assertEquals(date3.toString(), iter.next().toString());
 	}
 
-	public void testHeadDeadProxy() {
-		ListIterator iterator = col.listIterator();
-
-		Wrapper date1 = new DateWrapper(1);
-		Wrapper date2 = new DateWrapper(2);
-		Wrapper date3 = new DateWrapper(3);
-
-		
-		addService(date2);
-		addService(date1);
-		addService(date3);
-		
-		// date1
-		assertEquals(date1.toString(), iterator.next().toString());
-
-		assertTrue(iterator.hasPrevious());
-		removeService(date1);
-	}
-	
 }

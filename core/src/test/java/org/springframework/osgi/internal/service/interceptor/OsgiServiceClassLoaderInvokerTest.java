@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.interceptor;
+package org.springframework.osgi.internal.service.interceptor;
 
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -25,7 +25,8 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.internal.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.internal.service.interceptor.OsgiServiceClassLoaderInvoker;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;

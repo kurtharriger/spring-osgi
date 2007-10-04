@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.dependency;
+package org.springframework.osgi.internal.service.dependency;
 
 import java.util.Iterator;
 
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.osgi.internal.service.MandatoryDependencyEvent;
 import org.springframework.osgi.internal.service.MandatoryDependencyListener;
 import org.springframework.osgi.internal.service.ServiceExporter;
-import org.springframework.osgi.service.importer.AbstractServiceImporter;
+import org.springframework.osgi.internal.service.importer.AbstractServiceImporter;
 
 /**
  * @author Costin Leau

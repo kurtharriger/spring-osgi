@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.interceptor;
+package org.springframework.osgi.internal.service.interceptor;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;

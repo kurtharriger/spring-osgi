@@ -25,12 +25,11 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.internal.service.support.RetryTemplate;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.exporter.ExportClassLoadingOptions;
-import org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor;
-import org.springframework.osgi.service.support.RetryTemplate;
 
 /**
  * Test for the listener rebinding behavior. Makes sure the bind/unbind contract

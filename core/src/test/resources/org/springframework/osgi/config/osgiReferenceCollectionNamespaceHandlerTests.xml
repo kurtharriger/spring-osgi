@@ -18,7 +18,7 @@
 	<osgi:sorted-set id="simpleSortedSet" interface="java.lang.Comparable" mandatory="false"/>
 	
 	<!-- Comparator variants -->
-	<bean id="defaultComparator" class="org.springframework.osgi.service.collection.comparator.OsgiServiceIdComparator"/>
+	<bean id="defaultComparator" class="org.springframework.osgi.internal.service.collection.comparator.OsgiServiceIdComparator"/>
 	
 	<osgi:list id="implicitSortedList" interface="java.io.Serializable" comparator-ref="defaultComparator" mandatory="false"/>
 	
