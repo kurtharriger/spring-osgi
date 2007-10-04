@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.util.OsgiServiceRegistrationListener;
+import org.springframework.osgi.internal.service.util.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.Assert;
 

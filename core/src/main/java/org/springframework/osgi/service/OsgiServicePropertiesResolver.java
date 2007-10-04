@@ -19,6 +19,7 @@ package org.springframework.osgi.service;
 
 import java.util.Map;
 
+import org.springframework.osgi.internal.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
 
 /**
