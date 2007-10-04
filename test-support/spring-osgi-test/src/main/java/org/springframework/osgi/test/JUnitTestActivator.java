@@ -23,6 +23,8 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.osgi.internal.test.OsgiJUnitTest;
+import org.springframework.osgi.internal.test.TestRunnerService;
 
 /**
  * Test bundle activator - looks for a predefined JUnit test runner and triggers

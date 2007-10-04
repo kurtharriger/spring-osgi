@@ -17,6 +17,7 @@ package org.springframework.osgi.test;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.jar.Attributes;
@@ -27,12 +28,13 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource; 
-import org.springframework.osgi.test.storage.MemoryStorage;
-import org.springframework.osgi.test.util.DependencyVisitor;
-import org.springframework.osgi.test.util.JarCreator;
+import org.springframework.core.io.Resource;
+import org.springframework.osgi.internal.test.storage.MemoryStorage;
+import org.springframework.osgi.internal.test.util.DependencyVisitor;
+import org.springframework.osgi.internal.test.util.JarCreator;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -94,10 +96,12 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	 * manifest from the given location; in case the location is null, will
 	 * create a <code>Manifest</code> object containing default entries.
 	 * 
+	 * 
 	 * Subclasses should override this method to enhance the returned Manifest.
 	 * 
 	 * @return Manifest used for this test suite.
 	 * 
+	 * @see #createDefaultManifest()
 	 * @throws Exception
 	 */
 	protected Manifest getManifest() {
@@ -119,7 +123,8 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	}
 
 	/**
-	 * Create the default manifest in case none if found on the disk.
+	 * Create the default manifest in case none if found on the disk. By
+	 * default, the imports are synthetised based on the test class bytecode.
 	 * 
 	 * @return
 	 */
@@ -149,27 +154,43 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	}
 
 	private void addImportPackage(Manifest manifest) {
-		String[] imports = determineImports(getClass());
-		Set packages = new LinkedHashSet(imports.length);
-
-		String currentPckg = ClassUtils.classPackageAsResourcePath(getClass()).replace('/', '.');
-
-		// eliminate 'special' packages (java.* and the class declaring package)
-		for (int i = 0; i < imports.length; i++) {
-			String pckg = imports[i];
-
-			if (!(pckg.startsWith("java.") || pckg.equals(currentPckg)))
-				packages.add(imports[i]);
-		}
+		String[] rawImports = determineImports(getClass());
 
 		if (logger.isDebugEnabled())
-			logger.debug("found imports for " + packages);
+			logger.debug("Discovered raw imports " + ObjectUtils.nullSafeToString(rawImports));
+
+		Collection imports = eliminateSpecialPackages(rawImports);
+
+		if (logger.isDebugEnabled())
+			logger.debug("Filtered imports are " + imports);
 
 		manifest.getMainAttributes().putValue(Constants.IMPORT_PACKAGE,
-			StringUtils.collectionToCommaDelimitedString(packages));
+			StringUtils.collectionToCommaDelimitedString(imports));
 	}
 
-    /**
+	/**
+	 * Eliminate 'special' packages (java.*, test framework internal and the
+	 * class declaring package)
+	 * 
+	 * @param rawImports
+	 * @return
+	 */
+	private Collection eliminateSpecialPackages(String[] rawImports) {
+		String currentPckg = ClassUtils.classPackageAsResourcePath(getClass()).replace('/', '.');
+
+		Set filteredImports = new LinkedHashSet(rawImports.length);
+
+		for (int i = 0; i < rawImports.length; i++) {
+			String pckg = rawImports[i];
+
+			if (!(pckg.startsWith("java.") || pckg.startsWith("org.springframework.osgi.internal.test") || pckg.equals(currentPckg)))
+				filteredImports.add(pckg);
+		}
+
+		return filteredImports;
+	}
+
+	/**
 	 * Determine imports by walking a class hierarchy until the current package
 	 * is found.
 	 * 
@@ -230,15 +251,17 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		// create the actual jar
 		Resource jar = jarCreator.createJar(getManifest());
 
-        try {
-            installAndStartBundle(context, jar);
-        } catch (Exception e) {
-            IllegalStateException ise = new IllegalStateException("Unable to dynamically start generated bundle for Unit test");
-            ise.initCause(e);
-            throw ise;
-        }
+		try {
+			installAndStartBundle(context, jar);
+		}
+		catch (Exception e) {
+			IllegalStateException ise = new IllegalStateException(
+					"Unable to dynamically start generated bundle for Unit test");
+			ise.initCause(e);
+			throw ise;
+		}
 
-        // now do the delegation
+		// now do the delegation
 		super.postProcessBundleContext(context);
 	}
 

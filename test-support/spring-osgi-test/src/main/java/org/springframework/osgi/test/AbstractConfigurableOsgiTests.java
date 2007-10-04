@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.osgi.test.platform.EquinoxPlatform;
+import org.springframework.osgi.internal.test.platform.EquinoxPlatform;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.ClassUtils;

@@ -22,8 +22,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.osgi.internal.context.support.AbstractDelegatedExecutionApplicationContext;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.util.ObjectUtils;
 
