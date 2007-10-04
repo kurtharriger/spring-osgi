@@ -50,7 +50,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * @author Costin Leau
 	 * 
 	 */
-	private class NoDependenciesWaitRefreshExecutor implements OsgiBundleApplicationContextExecutor {
+	private static class NoDependenciesWaitRefreshExecutor implements OsgiBundleApplicationContextExecutor {
 
 		private final DelegatedExecutionOsgiBundleApplicationContext context;
 

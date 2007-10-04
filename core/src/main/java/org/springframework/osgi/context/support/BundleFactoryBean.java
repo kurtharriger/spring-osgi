@@ -96,7 +96,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 				Thread.currentThread().setContextClassLoader(classloader);
 			}
 
-			Bundle bundle = findBundle();
+			bundle = findBundle();
 
 			Assert.notNull(bundle, "cannot find bundle with symbolic name=" + symbolicName);
 

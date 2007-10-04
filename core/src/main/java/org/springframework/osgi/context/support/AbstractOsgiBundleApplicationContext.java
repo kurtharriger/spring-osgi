@@ -24,9 +24,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.beans.propertyeditors.PropertiesEditor;
@@ -221,22 +218,6 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 			}
 		});
 
-		// FIXME: this should be removed since annotations are not mandatory -
-		// similar behavior to Spring core
-		// Try and add the annotation processor. This will simply fail if the
-		// annotation
-		// bundle is not present (presumably because we are on a pre-Java5 VM).
-		try {
-			Class bppClass = Class.forName("org.springframework.osgi.annotation.ServiceReferenceInjectionBeanPostProcessor");
-			BeanPostProcessor bpp = (BeanPostProcessor) bppClass.newInstance();
-			((BeanClassLoaderAware) bpp).setBeanClassLoader(getClassLoader());
-			((BundleContextAware) bpp).setBundleContext(bundleContext);
-			((BeanFactoryAware) bpp).setBeanFactory(beanFactory);
-			beanFactory.addBeanPostProcessor(bpp);
-		}
-		catch (Throwable t) {
-			// Ignored
-		}
 		// register a 'bundle' scope
 		beanFactory.registerScope(OsgiBundleScope.SCOPE_NAME, new OsgiBundleScope());
 	}
@@ -254,7 +235,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 			// before refreshing, destroy the scope in the previous bean factory
 			cleanOsgiBundleScope(getBeanFactory());
 		}
-		catch (Exception ex) {
+		catch (IllegalStateException ex) {
 			/* ignore - no beanFactory exists yet */
 		}		
 		return super.obtainFreshBeanFactory();

@@ -175,7 +175,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	//
 
 	public void afterPropertiesSet() {
-		registerResolverService();
+		resolverServiceRegistration = registerResolverService();
 	}
 
 	public void destroy() {
