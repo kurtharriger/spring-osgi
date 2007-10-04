@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.internal.service.ServiceExporter;
-import org.springframework.osgi.service.util.OsgiServiceRegistrationListener;
+import org.springframework.osgi.internal.service.util.OsgiServiceRegistrationListener;
 
 /**
  * {@link ServiceExporter} extension that takes care of listeners registration
