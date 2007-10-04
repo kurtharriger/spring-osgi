@@ -37,7 +37,7 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractDependencyManagerTests extends AbstractSynchronizedOsgiTests {
 
-	private static final String TEST_FRRAMEWORK_BUNDLES_CONF_FILE = "/org/springframework/osgi/test/boot-bundles.properties";
+	private static final String TEST_FRRAMEWORK_BUNDLES_CONF_FILE = "/org/springframework/osgi/internal/test/boot-bundles.properties";
 
 	private static final String IGNORE = "ignore";
 

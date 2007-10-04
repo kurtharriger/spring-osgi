@@ -72,13 +72,13 @@ public abstract class AbstractOsgiPlatform implements OsgiPlatform {
 		File tempFileName;
 
 		try {
-			tempFileName = File.createTempFile("org.springframework.osgi", suffix);
+			tempFileName = File.createTempFile("org.sfw.osgi", suffix);
 		}
 		catch (IOException ex) {
 			if (log.isWarnEnabled()) {
-				log.warn("Could not create temporary directory, returning current folder", ex);
+				log.warn("Could not create temporary directory, returning a temp folder inside the current folder", ex);
 			}
-			return new File(".");
+			return new File("./tmp-test");
 		}
 
 		tempFileName.delete(); // we want it to be a directory...
