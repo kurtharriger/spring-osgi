@@ -23,11 +23,11 @@ import org.osgi.framework.Filter;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.core.Constants;
 import org.springframework.osgi.internal.service.ImporterProxy;
-import org.springframework.osgi.service.collection.OsgiServiceCollection;
-import org.springframework.osgi.service.collection.OsgiServiceList;
-import org.springframework.osgi.service.collection.OsgiServiceSet;
-import org.springframework.osgi.service.collection.OsgiServiceSortedList;
-import org.springframework.osgi.service.collection.OsgiServiceSortedSet;
+import org.springframework.osgi.internal.service.collection.OsgiServiceCollection;
+import org.springframework.osgi.internal.service.collection.OsgiServiceList;
+import org.springframework.osgi.internal.service.collection.OsgiServiceSet;
+import org.springframework.osgi.internal.service.collection.OsgiServiceSortedList;
+import org.springframework.osgi.internal.service.collection.OsgiServiceSortedSet;
 import org.springframework.util.Assert;
 
 /**
@@ -106,9 +106,8 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 		return (proxy != null ? proxy.getClass() : CollectionOptions.getClassMapping(collectionType));
 	}
 
-	
 	public boolean isSatisfied() {
-		return (proxy == null ? true: proxy.isSatisfied());
+		return (proxy == null ? true : proxy.isSatisfied());
 	}
 
 	public void destroy() throws Exception {

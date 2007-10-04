@@ -32,7 +32,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.context.OsgiBundleScope;
+import org.springframework.osgi.internal.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.internal.context.support.OsgiBundleScope;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
@@ -69,7 +70,7 @@ import org.springframework.util.StringUtils;
  * 
  * <p>
  * This application context offers the OSGi-specific, "bundle" scope. See
- * {@link org.springframework.osgi.context.OsgiBundleScope}.
+ * {@link org.springframework.osgi.internal.context.support.OsgiBundleScope}.
  * 
  * <p>
  * Note that OsgiApplicationContext implementations are generally supposed to
