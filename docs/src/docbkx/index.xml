@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<book xmlns:xi="http://www.w3.org/2001/XInclude">
+  <bookinfo>
+    <title>Spring Dynamic Modules for OSGi(tm) Service Platforms - Frequently
+    Asked Questions</title>
+
+    <!--
+        <releaseinfo>&version;</releaseinfo>
+	    -->
+
+    <authorgroup>
+      <author>
+        <firstname>Costin</firstname>
+      </author>
+
+      <author>
+        <firstname>Rick</firstname>
+
+        <surname>Evans</surname>
+      </author>
+    </authorgroup>
+
+    <legalnotice>
+      <para>Copies of this document may be made for your own use and for
+      distribution to others, provided that you do not charge any fee for such
+      copies and further provided that each copy contains this Copyright
+      Notice, whether distributed in print or electronically.</para>
+    </legalnotice>
+  </bookinfo>
+
+  <toc />
+
+  <part>
+    <title>Introduction</title>
+
+    <partintro>
+      <para>This first part of the reference documentation <link
+      linkend="what-is-spring-ws">is an overview</link> of Spring Web Services
+      and the underlying concepts. Spring-WS is then introduced, and <link
+      linkend="why-contract-first">the concepts</link> behind contract-first
+      Web service development are explained.</para>
+    </partintro>
+  </part>
+</book>
