@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<book xmlns:xi="http://www.w3.org/2001/XInclude">
+  <bookinfo>
+    <title>Spring Dynamic Modules for <trademark>OSGi</trademark> Service
+    Platforms * - Frequently Asked Questions</title>
+	
+	<subtitle>* - OSGi is a trademark of the OSGi Alliance, project name is
+        pending OSGi Alliance approval</subtitle>
+    
+    <releaseinfo>&version;</releaseinfo>
+
+    <authorgroup>
+      <author>
+        <firstname>Costin</firstname>
+        <surname>Leau</surname>
+      </author>
+    </authorgroup>
+
+    <legalnotice>
+      <para>Copies of this document may be made for your own use and for
+      distribution to others, provided that you do not charge any fee for such
+      copies and further provided that each copy contains this Copyright
+      Notice, whether distributed in print or electronically.</para>
+    </legalnotice>
+  </bookinfo>
+
+  <toc />
+
+  <chapter id="spring-osgi-faq">
+    <title>Frequently Asked Questions</title>
+
+    <section id="name-change">
+      <title>What happened to "Spring OSGi" project name?</title>
+
+        <para>The OSGi term is a trademark belonging to <ulink
+        url="http://www.osgi.org/">The OSGi Alliance</ulink>. In order to
+        comply with their guidelines, it was decided that the project name is
+        changed to "Spring Dynamic Modules for OSGi Service Platforms" (aka
+        Spring-DM). The new name is not yet final as approval for it is
+        pending.</para>
+
+        <para>For the record and to be absolutely clear on this, the
+        conversation about the OSGi usage has been very amicable; in fact OSGi
+        Alliance is very much supportive of Spring Dynamic Modules project.
+        Moreover, Interface21 is a member of OSGi Alliance.</para>
+	</section>
+	
+	<section id="internal-package">
+      <title>Why doesn't <literal>internal</literal> package have any
+        javadocs?</title>
+
+        <para>Package <literal>org.springframework.osgi.internal</literal> is
+        meant (as the name implies) to be a private, non-public package. Thus,
+        there is no documentation, support or compatibility guarantee for
+        them. In fact, the Spring Dynamic Modules bundle do not even export
+        them to prevent accidental usage. You might notice that the
+        distributed module bundles (<literal>spring-osgi-core</literal> for
+        example) do export some packages but again, these are for internal
+        usage for the rest of Spring-DM (such as
+        <literal>spring-osgi-extender</literal>).</para>
+
+        <para>If you find classes under this package, which you really, really
+        depend on, then consider raising an issue on <ulink type=""
+        url="http://opensource.atlassian.com/projects/spring/browse/OSGI">JIRA</ulink>.</para>
+	</section>
+	
+	<section id="backport-util-concurrent">
+	  <title>When running on JDK 1.4, I get an exception about
+        backport-util-concurrent library. Why is that?</title>
+
+        <para>OSGi platform is a concurrent environment. Beans from different
+        application contexts can interact with each other creating circular
+        cycles between their owning contexts. This means that the backing
+        contexts have to be able to lookup and create/retrieve bean instances,
+        all at the same time, on multiple threads. A traditional synchronised
+        collection allows proper locking and thread coordination and prevents
+        race conditions, but can cause very easily deadlocks.</para>
+
+        <para>Consider two contexts each containing two beans: <mediaobject>
+            <imageobject role="fo">
+              <imagedata align="center"
+                         fileref="src/docbkx/resources/images/deadlock.png"
+                         format="PNG"/>
+            </imageobject>
+
+            <imageobject role="html">
+              <imagedata align="center" fileref="images/deadlock.png"
+                         format="PNG"/>
+            </imageobject>
+
+            <caption>
+              <para>Inter-application context bean interaction</para>
+            </caption>
+          </mediaobject></para>
+
+        <para>If both bean A and C are requested by two separate threads at
+        the same time, this scenario will deadlock since each thread waits for
+        the other one to release the "bean registry" lock even just for
+        reading. However, when using a concurrent collection, reading doesn't
+        require a lock so each thread can interact with the other context
+        without waiting for a lock. JDK 1.5 and upwards provide already <ulink
+        url="http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/package-summary.html">concurrent
+        collections</ulink> under <literal>java.util</literal> package.
+        However, since JDK 1.4 does not have them, <ulink
+        url="http://dcl.mathcs.emory.edu/util/backport-util-concurrent/">backport-util-concurrent</ulink>
+        library is required.</para>
+      </section>
+
+      <section id="logging">
+        <title>How can I use logging in OSGi?</title>
+
+        <para>OSGi platforms do not change the way libraries work, it just
+        enforces tigther classloading. Thus, you can, in most of the cases,
+        use the same logging strategy used in non-OSGi environments.</para>
+
+        <para>Spring (and Spring-DM) use internally the <ulink
+        url="http://commons.apache.org/logging/">commons-logging API</ulink>
+        which acts as an "ultra-thin bridge between different logging
+        implementations". In OSGi, just like in a non-OSGi environment, Spring
+        and Spring-DM delegate all logging (including initialization) to the
+        actual commons-logging API implementation.</para>
+
+        <para>Out of the box, <ulink type=""
+        url="http://www.slf4j.org/">SLF4J</ulink> library is provided, which
+        shares the same purpose as commons-logging but withouth the
+        classloading discovery mechanism that causes loading issues, using
+        static wiring (see the SLF4J site for more info). Please see <link id="commons-logging">this
+        question</link> for more details on why commons-logging jar is not
+        used.</para>
+
+        <para>Spring-DM uses SLF4J on top of <ulink
+        url="http://logging.apache.org/log4j/">Log4J</ulink> but this can be
+        easily changed. As part of log4j initialization, a
+        <literal>log4j.properties</literal> or <literal>log4j.xml</literal>
+        configuration fille needs to be present in the bundle classpath. This
+        means that the configuration file has to be part of your bundle or one
+        of its attached fragments. Besides SLF4J, for another OSGi-aware
+        solution, one can try <ulink
+        url="http://wiki.ops4j.org/dokuwiki/doku.php?id=pax:logging">Pax
+        Logging</ulink>.</para>
+
+        <para>To learn more about log4j setup process, follow this <ulink
+        type=""
+        url="http://logging.apache.org/log4j/1.2/manual.html">link</ulink>.</para>
+      </section>
+
+      <section id="commons-logging">
+        <title>If you use commons-logging API, why do you rely on SLF4J and
+        not the commons-logging jar?</title>
+
+        <para>Commons-logging project provides the commons-logging API
+        (<literal>commons-logging-api-nn.jar</literal>) along with an
+        implementation (<literal>commons-logging-adapters-nn.jar</literal>)
+        that provides wrapper between the API and the actual logging libraries
+        used underneath (such as log4j, java.util.logging, etc). However, in
+        order to determine what implementation should be used, commons-logging
+        library tries to do some classloading-based discovery that is fragile
+        and can fail unexpectedly. In an strict classloading environment such
+        as OSGi, this mechanism adds unnecessary complexity - that's why we
+        decided to use SFL4J which is not just simpler and actively maintained
+        but is also OSGi-friendly out of the box.</para>
+
+        <para>For more information about commons-logging classloading
+        problems, see these links: <ulink
+        url="http://radio.weblogs.com/0122027/2003/08/15.html">#1</ulink>
+        <ulink
+        url="http://www.qos.ch/logging/thinkAgain.jsp">#2</ulink></para>
+      </section>
+
+      <section id="logging-impl-choice">
+        <title>Why don't you use the OSGi logging service/[put your favorite
+        logging library in here]?</title>
+
+        <para>It is completely up to you what logging implementation you want
+        Spring-DM to use. For OSGi logging service, just use a commons-logging
+        API implementation that relies on OSGi logging service for the actual
+        logging such as Pax Logging.</para>
+      </section>
+
+      <!-- this should be part of an OSGi intro more likely -->
+
+      <section id="auto-export-visibility">
+        <title>The autoExport option doesn't work properly! - only a part of
+        my class interface/parents are published...</title>
+
+        <para>autoExport flag, part of the service exporter, will discover and
+        include for exporting only the visible interfaces/classes implemented
+        by the service object. Consider class
+        <literal>GenericApplicationContext</literal> which implements among
+        others, interfaces <literal>BeanFactory</literal> (from
+        <literal>org.springframework.beans.factory</literal> package) and
+        <literal>ResourceLoader</literal>
+        (<literal>org.springframework.core.io</literal>).</para>
+
+        <para>
+          <mediaobject>
+            <imageobject role="fo">
+              <imagedata align="center"
+                         fileref="src/docbkx/resources/images/visibility.png"
+                         format="PNG"/>
+            </imageobject>
+
+            <imageobject role="html">
+              <imagedata align="center" fileref="images/visibility.png"
+                         format="PNG"/>
+            </imageobject>
+
+            <caption>
+              <para>Class Hierarchy</para>
+            </caption>
+          </mediaobject>
+        </para>
+
+        <para>Depending on your OSGi imports, the exporting bundle can see
+        only one of the packages, none or both. Based on these visibility
+        settings, the exporter will only export the classes that are 'known'
+        to the exporting bundle. For example, if the exporting bundle sees
+        <literal>org.springframework.core.io</literal> but not
+        <literal>org.springframework.beans.factory</literal>, the service will
+        be exported as a <literal>ResourceLoader</literal> but not as a
+        <literal>BeanFactory</literal>. In fact, exporting the object as a
+        <literal>BeanFactory</literal> will fail since the bundle doesn't se
+        this interface and thus doesn't know how to handle its
+        contract.</para>
+      </section>
+    </chapter>
+</book>
