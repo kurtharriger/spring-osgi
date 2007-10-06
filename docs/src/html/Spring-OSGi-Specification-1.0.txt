@@ -3,7 +3,7 @@ Spring Dynamic Modules Reference Guide
 
 _for OSGi(tm) Service Platforms._
 
-Version 1.0
+Version 1.0 M3
 
 * Adrian M Colyer, Interface21
 * Hal Hildebrand, Oracle
@@ -18,6 +18,8 @@ This document is the reference guide for Spring Dynamic Modules. It defines the 
 OSGi developers looking for an introduction to Spring should review the [introductory articles](http://www.springframework.org/documentation) on the springframework.org site. 
 
 _Note: OSGi is a trademark of the OSGi Alliance. Project name is pending final approval from the Alliance._
+
+_Note: Please see the [known issues](http://www.springframework/osgi/known_issues.html) page for Spring Dynamic Modules 1.0 M3 release._
 
 ### Why Spring Dynamic Modules?
 
@@ -105,7 +107,7 @@ It is possible to change the application context creation semantics so that appl
 
 #### 2.2.2 Application Context Service Publication
 
-Once the application context creation for a bundle has completed, the application context object is automatically exported as a service available through the OSGi Service Registry. The context is published under the interface `org.springframework.context.ApplicationContext` <font color="green">(and also all of the visible super-interfaces and types implemented by the context)</font>. The published service has a service property named `org.springframework.context.service.name` whose value is set to the bundle symbolic name of the bundle hosting the application context. It is possible to prevent publication of the application context as a service using a directive in the bundle's manifest. See section 3.2 for details.
+Once the application context creation for a bundle has completed, the application context object is automatically exported as a service available through the OSGi Service Registry. The context is published under the interface `org.springframework.context.ApplicationContext` (and also all of the visible super-interfaces and types implemented by the context). The published service has a service property named `org.springframework.context.service.name` whose value is set to the bundle symbolic name of the bundle hosting the application context. It is possible to prevent publication of the application context as a service using a directive in the bundle's manifest. See section 3.2 for details.
 
 Note: the application context is published as a service primarily to facilitate testing, administration, and management. Accessing this context object at runtime and invoking `getBean()` or similar operations is discouraged. The preferred way to access a bean defined in another application context is to export that bean as an OSGi service from the defining context, and then to import a reference to that service in the context that needs access to the service. Going via the service registry in this way ensures that a bean only sees services with compatible versions of service types, and that OSGi platform dynamics are respected.
 
@@ -188,7 +190,7 @@ If the extender bundle is stopped, then all the application contexts created by 
 
  1. Application contexts that do not export any services, or that export services that are not currently referenced, are shutdown in reverse order of bundle id. (Most recently installed bundles have their application contexts shutdown first).
  2. Shutting down the application contexts in step (1) may have released references these contexts were holding such that there are now additional application contexts that can be shutdown. If so, repeat step 1 again.
- 3. <font color="green">If there are no more active application contexts, we have finished. If there _are_ active application contexts then there must be a cyclic dependency of references. The circle is broken by determining the highest ranking service exported by each context: the bundle with the lowest ranking service in this set (or in the event of a tie, the highest service id), is shut down</font>. Repeat from step (1).
+ 3. <font >If there are no more active application contexts, we have finished. If there _are_ active application contexts then there must be a cyclic dependency of references. The circle is broken by determining the highest ranking service exported by each context: the bundle with the lowest ranking service in this set (or in the event of a tie, the highest service id), is shut down</font>. Repeat from step (1).
 
 3.0 Packaging and Deploying Spring-based OSGi applications
 -----------------------------------------------------------
@@ -211,12 +213,12 @@ Each application module should be packaged as an OSGi bundle. A bundle is essent
 
 The Spring extender recognizes a bundle as "Spring-powered" and will create an associated application context when the bundle is started if one or both of the following conditions is true:
 
- * The <font color="green"> bundle classpath</font> contains a folder `META-INF/spring` with one or more files in that folder with a '.xml' extension.
+ * The <font > bundle classpath</font> contains a folder `META-INF/spring` with one or more files in that folder with a '.xml' extension.
  * `META-INF/MANIFEST.MF` contains a manifest header `Spring-Context`.
 
 In addition, if the optional `SpringExtender-Version` header is declared in the bundle manifest, then the extender will only recognize bundles where the specified version constraints are satisfied by the version of the extender bundle (`Bundle-Version`). The value of the `SpringExtender-Version` header must follow the syntax for a version range as specified in section 3.2.5 of the OSGi Service Platform Core Specification.
 
-In the absence of the `Spring-Context` header the extender expects every ".xml" file in the `META-INF/spring` folder to be a valid Spring configuration file, <font color="green">and all directives (see below) take on their default values</font>.
+In the absence of the `Spring-Context` header the extender expects every ".xml" file in the `META-INF/spring` folder to be a valid Spring configuration file, <font >and all directives (see below) take on their default values</font>.
 
 An application context is constructed from this set of files. A suggested practice is to split the application context configuration into at least two files, named by convention _modulename_-context.xml and _modulename_-osgi-context.xml. The _modulename_-context.xml file contains regular bean definitions independent of any knowledge of OSGi. The _modulename_-osgi-context.xml file contains the bean definitions for importing and exporting OSGi services. It may (but is not required to) use the Spring Dynamic Modules OSGi schema as the top-level namespace instead of the Spring 'beans' namespace.
 
@@ -247,17 +249,17 @@ Creates an application context synchronously, using all of the "*.xml" files con
 
     Spring-Context: config/account-data-context.xml;create-asynchrously:=false
 
-Creates an application context synchronously using the `config/account-data-context.xml` configuration file. <font color="green">Care must be taken when specifying synchronous context creation as the application context will be created on the OSGi event thread, blocking further event delivery until the context is fully initialized. If an error occurs during the synchronous creation of the application context then a FrameworkEvent.ERROR event is raised. The bundle will still proceed to the ACTIVE state.</font>
+Creates an application context synchronously using the `config/account-data-context.xml` configuration file. <font >Care must be taken when specifying synchronous context creation as the application context will be created on the OSGi event thread, blocking further event delivery until the context is fully initialized. If an error occurs during the synchronous creation of the application context then a FrameworkEvent.ERROR event is raised. The bundle will still proceed to the ACTIVE state.</font>
 
- * _wait-for-dependencies_ (true|false): controls whether or not application context creation should wait for any mandatory service dependencies to be satisfied before proceeding (the default), or <font color="green">proceed immediately without waiting if dependencies are not satisfied upon startup.</font> 
+ * _wait-for-dependencies_ (true|false): controls whether or not application context creation should wait for any mandatory service dependencies to be satisfied before proceeding (the default), or <font >proceed immediately without waiting if dependencies are not satisfied upon startup.</font> 
 
 For example:
 
     Spring-Context: config/osgi-*.xml;wait-for-dependencies:=false
 
-<font color="green">Creates an application context using all the files matching "osgi-*.xml" in the config directory. Context creation will begin immediately even if dependencies are not satisfied. This essentially means that mandatory service references are treated as though they were optional - clients will be injected with a service object that may not be backed by an actual service in the registry initially. See section 4.2 for more details.</font>
+<font >Creates an application context using all the files matching "osgi-*.xml" in the config directory. Context creation will begin immediately even if dependencies are not satisfied. This essentially means that mandatory service references are treated as though they were optional - clients will be injected with a service object that may not be backed by an actual service in the registry initially. See section 4.2 for more details.</font>
 
- * _timeout_ (300): the time to wait (in seconds) for mandatory dependencies to be satisfied before giving up and failing application context creation. This setting is ignored if `wait-for-dependencies:=false` is specified. <font color="green">The default is 5 minutes (300 seconds).</font>
+ * _timeout_ (300): the time to wait (in seconds) for mandatory dependencies to be satisfied before giving up and failing application context creation. This setting is ignored if `wait-for-dependencies:=false` is specified. <font >The default is 5 minutes (300 seconds).</font>
 
 For example:
 
@@ -269,7 +271,7 @@ For example:
 
     Spring-Context: *;publish-context:=false
 
-<font color="green">If there is no Spring-Context manifest entry, or no value is specified for a given directive in that entry, then the directive takes on its default value.</font>
+<font >If there is no Spring-Context manifest entry, or no value is specified for a given directive in that entry, then the directive takes on its default value.</font>
 
 ### 3.2 Required Spring Framework and Spring Dynamic Modules Bundles
 
@@ -413,7 +415,7 @@ Given the interface hierarchy:
 
 then a service registered as supporting the `SubInterface` interface is _not_ considered a match in OSGi when a lookup is done for services supporting the `SuperInterface` interface. For this reason it is a best practice to export all interfaces supported by the service being registered explicitly, using either the `interfaces` element or `auto-export="interfaces"`.
 
-<font color="green">Note that when using auto-export, only types visible to the bundle exporting the service are registered. For example, a super-interface `SI` would not be exported as a supported service interface even when using `auto-export="interfaces"` if `SI` was not on the exporting bundle's classpath.</font>
+<font >Note that when using auto-export, only types visible to the bundle exporting the service are registered. For example, a super-interface `SI` would not be exported as a supported service interface even when using `auto-export="interfaces"` if `SI` was not on the exporting bundle's classpath.</font>
 
 #### 4.1.2 Controlling the set of advertised properties for an exported service
 
@@ -506,7 +508,7 @@ The register callback is invoked when the service is initially registered at sta
 
 Spring Dynamic Modules supports the declaration of beans that represent services accessed via the OSGi Service Registry. In this manner references to OSGi services can be injected into application components. The service lookup is made using the service interface type that the service is required to support, plus an optional filter expression that matches against the service properties published in the registry. 
 
-For some scenarios, a single matching service that meets the application requirements is all that is needed. The `reference` element defines a reference to a single service that meets the required specification. In other scenarios, especially when using the OSGi [whiteboard pattern](www.osgi.org/documents/osgi_technology/whiteboard.pdf), references to _all available_ matching services are required. Spring Dynamic Modules supports the management of this set of references as a `Collection`, `List`, `Set`, `SortedList`, or `SortedSet`.
+For some scenarios, a single matching service that meets the application requirements is all that is needed. The `reference` element defines a reference to a single service that meets the required specification. In other scenarios, especially when using the OSGi [whiteboard pattern](www.osgi.org/documents/osgi_technology/whiteboard.pdf), references to _all available_ matching services are required. Spring Dynamic Modules supports the management of this set of references as a `List`, `Set`.
 
 #### 4.2.1 Referencing an individual service
 
@@ -517,9 +519,9 @@ The `reference` element is used to define a reference to a service in the servic
 
 If there are several services in the service registry then the service returned is the service that would be returned by a call to `BundleContext.getServiceReference`. This means that the service with the highest ranking will be returned, or if there is a tie in ranking, the service with the lowest service id (the service registered first with the framework) is returned.
 
-The bean defined by the reference element implements all of the registered interfaces of the service <font color="green">that are visible to the bundle</font>. If the registered service interfaces include Java class types (as opposed to interface types) then support for these types is subject to the restrictions of Spring's AOP implementation (see the Spring Reference Guide). In short, `cglib` must be available, and `final` methods are not supported.
+The bean defined by the reference element implements all of the registered interfaces of the service <font >that are visible to the bundle</font>. If the registered service interfaces include Java class types (as opposed to interface types) then support for these types is subject to the restrictions of Spring's AOP implementation (see the Spring Reference Guide). In short, `cglib` must be available, and `final` methods are not supported.
 
-<font color="green">
+<font >
 If the property into which a reference bean is to be injected has type `ServiceReference` (instead of the service interface supported by the reference), then the OSGi `ServiceReference` for the service will be injected in place of the service itself.
 </font>
 
@@ -606,7 +608,7 @@ The signature of a custom bind or unbind method must be one of:
 
     public void anyMethodName(ServiceReference ref);
 
-<font color="green">If the method signature has a single argument of type `ServiceReference` then the `ServiceReference` of the service will be passed to the callback in place of the service object itself.</font>
+<font >If the method signature has a single argument of type `ServiceReference` then the `ServiceReference` of the service will be passed to the callback in place of the service object itself.</font>
 
 where `ServiceType` can be any type that is assignable from the `reference` interface type. The properties parameter contains the set of properties that the service was registered with.
 
@@ -633,7 +635,7 @@ The following example defines a bean of type List that will contain all register
     <list id="myEventListeners" 
       interface="com.xyz.EventListener"/>
 
-The members of the collection defined by the bean are managed dynamically by Spring. As matching services are registered and unregistered in the service registry, the collection membership will be kept up to date. Each member of the collection supports the service interfaces that the corresponding service was registered with <font color="green">and that are visible to the bundle</font>.
+The members of the collection defined by the bean are managed dynamically by Spring. As matching services are registered and unregistered in the service registry, the collection membership will be kept up to date. Each member of the collection supports the service interfaces that the corresponding service was registered with <font >and that are visible to the bundle</font>.
  
 It is possible to specify a sorting order using either the `comparator-ref` attribute, or the nested `comparator` element. The `comparator-ref` attribute is used to refer to a named bean implementing `java.util.Comparator`. The `comparator` element can be used to define an inline bean. For example:
 
@@ -647,7 +649,7 @@ It is possible to specify a sorting order using either the `comparator-ref` attr
       </comparator>
     </list>
 
-<font color="green">
+<font >
 To sort using a natural ordering instead of an explicit comparator, you can use the `natural-ordering` element inside of `comparator`. You need to specify the basis for the natural ordering: based on the service references, following the `ServiceReference` natural ordering defined in the OSGi Core Specification section 6.1.2.3; or based on the services themselves (in which case the services must be `Comparable`).
 
     <list id="myServices" interface"com.xyz.MyService">
@@ -661,7 +663,7 @@ To sort using a natural ordering instead of an explicit comparator, you can use 
 
 </font>
 
-When iterating over the collection, the semantics of `Iterator` are guaranteed to be observed (if `hasNext()` returns true, then `next()` will return a service, <font color="green"> if `hasNext()` returns false then `next()` will throw an exception.). In addition any elements added to the collection during iteration over a sorted collection will only be visible if the iterator has not already passed their sort point.</font>
+When iterating over the collection, the semantics of `Iterator` are guaranteed to be observed (if `hasNext()` returns true, then `next()` will return a service, <font > if `hasNext()` returns false then `next()` will throw an exception.). In addition any elements added to the collection during iteration over a sorted collection will only be visible if the iterator has not already passed their sort point.</font>
 
 ##### 4.2.2.1 Dealing with Service dynamics
 
@@ -940,7 +942,7 @@ Note that named properties can easily be published as service properties already
 
 ### B.2 Access to Service References for Collections
 
-<font color="green">
+<font >
 The current specification does not provide for access to the `ServiceReference` objects for services in a managed collection (i.e. obtained via a `set` or `list` declaration). A future release of Spring Dynamic Modules will provide an easy means of gaining access to these references.
 </font>
 
