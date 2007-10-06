@@ -69,6 +69,12 @@
       	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-215">OSGI-215</ulink></para> 
 		<para><literal>java.util.Comparable</literal> interface is not yet used for sorting.</para>
 		<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-216">OSGI-216</ulink></para>
-	</section>	
+	</section>
+	
+	<section id="annotations">
+      <title>A.1 Annotation-based injection</title>
+      	<para>Annotation extension does not appear under <literal>org.springframework.osgi.extensions.annotation</literal>.</para>
+      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-220">OSGI-220</ulink></para> 
+	</section>		
   </chapter>
 </book>
