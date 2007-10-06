@@ -26,11 +26,16 @@
                 <fo:table-body>
                     <fo:table-row>
                         <fo:table-cell text-align="center">
+							<!-- Logo
                             <fo:block>
                                 <fo:external-graphic src="file:src/docbkx/resources/images/spring-dm-logo.png"/>
                             </fo:block>
+                            -->
                             <fo:block font-family="Helvetica" font-size="22pt" padding-before="10mm">
-                                <xsl:value-of select="bookinfo/subtitle"/>
+                                <xsl:value-of select="bookinfo/subtitle"/> 
+                            </fo:block>
+                            <fo:block font-family="Helvetica" font-size="14pt" padding="10mm">
+                                <xsl:value-of select="bookinfo/title"/>
                             </fo:block>
                             <fo:block font-family="Helvetica" font-size="12pt" padding="10mm">
                                 <xsl:value-of select="bookinfo/releaseinfo"/>
@@ -96,13 +101,11 @@
         <xsl:param name="sequence" select="''"/>
         <xsl:param name="position" select="''"/>
         <xsl:param name="gentext-key" select="''"/>
-        <xsl:variable name="Version">
-            <xsl:if test="//releaseinfo">
-                <xsl:text>Spring-DM (</xsl:text>
-                <xsl:value-of select="//releaseinfo"/>
-                <xsl:text>)</xsl:text>
-            </xsl:if>
-        </xsl:variable>
+		<xsl:variable name="Version">
+			<xsl:if test="//releaseinfo">
+				<xsl:text>Spring Dynamic Modules(</xsl:text><xsl:value-of select="//releaseinfo" /><xsl:text>)</xsl:text>
+			</xsl:if>
+		</xsl:variable>
         <xsl:choose>
             <xsl:when test="$sequence='blank'">
                 <xsl:if test="$position = 'center'">

@@ -4,11 +4,9 @@
 <book xmlns:xi="http://www.w3.org/2001/XInclude">
   <bookinfo>
     <title>Spring Dynamic Modules for <trademark>OSGi</trademark> Service
-    Platforms * - Frequently Asked Questions</title>
+    Platforms <superscript>*</superscript></title>
 	
-	<subtitle>* - OSGi is a trademark of the OSGi Alliance, project name is
-        pending OSGi Alliance approval</subtitle>
-    
+	<subtitle>Frequently Asked Questions</subtitle>
     <releaseinfo>&version;</releaseinfo>
 
     <authorgroup>
@@ -19,6 +17,10 @@
     </authorgroup>
 
     <legalnotice>
+      <para><superscript>*</superscript> - OSGi is a trademark of <ulink url="http://www.osgi.org">
+      the OSGi Alliance</ulink>,project name is pending OSGi Alliance approval.
+      </para>
+      
       <para>Copies of this document may be made for your own use and for
       distribution to others, provided that you do not charge any fee for such
       copies and further provided that each copy contains this Copyright
@@ -85,7 +87,7 @@
 	  </para>
     </section>
     
-    <section id="requirements">
+    <section id="supported-osgi-platforms">
 	  <title>What OSGi platforms are supported?</title>
 	  <para>
 	  Spring-DM requires an OSGi 4.0 platform. The framework has been tested
@@ -209,7 +211,7 @@
       </section>
 
       <section id="commons-logging">
-        <title>If you use commons-logging API, why do you rely on SLF4J and
+        <title>If you use commons-logging API, why rely on SLF4J and
         not the commons-logging jar?</title>
 
         <para>The commons-logging project provides the commons-logging API
@@ -275,11 +277,10 @@
       <!-- this should be part of an OSGi intro more likely -->
 
       <section id="auto-export-visibility">
-        <title>The autoExport option doesn't work properly! - only a part of
-        my class interface/parents are published...</title>
+        <title>The autoExport option doesn't work properly!</title>
 
         <para>autoExport flag, part of the service exporter, will discover and
-        include for exporting only the visible interfaces/classes implemented
+        include for exporting only the <emphasis>visible</emphasis> interfaces/classes implemented
         by the service object. Consider class
         <literal>GenericApplicationContext</literal> which implements among
         others, interfaces <literal>BeanFactory</literal> (from
