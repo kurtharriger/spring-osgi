@@ -17,18 +17,26 @@ package org.springframework.osgi.internal.config;
 
 import java.util.Set;
 
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedList;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.internal.service.exporter.OsgiServiceRegistrationListenerWrapper;
 import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
+import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -52,6 +60,8 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 	public static final String PROPS_ID = "service-properties";
 
+	public static final String LISTENER = "registration-listener";
+
 	public static final String REF = "ref";
 
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
@@ -60,12 +70,6 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		// parse attributes
 		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.springframework.osgi.config.ParserUtils.AttributeCallback#process(org.w3c.dom.Element,
-			 * org.w3c.dom.Attr)
-			 */
 			public void process(Element parent, Attr attribute, BeanDefinitionBuilder bldr) {
 				String name = attribute.getLocalName();
 
@@ -75,7 +79,7 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 				else if (REF.equals(name)) {
 					;
 				}
-				// fallback mechanism
+				// fall-back mechanism
 				else {
 					bldr.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
 				}
@@ -89,14 +93,18 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 		NodeList nl = element.getChildNodes();
 
+		ManagedList listeners = new ManagedList();
+
 		// parse all sub elements
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
 			if (node instanceof Element) {
 				Element subElement = (Element) node;
 
+				String name = subElement.getLocalName();
+
 				// osgi:interfaces
-				if (INTERFACES_ID.equals(subElement.getLocalName())) {
+				if (INTERFACES_ID.equals(name)) {
 					// check shortcut
 					if (element.hasAttribute(INTERFACE)) {
 						parserContext.getReaderContext().error(
@@ -108,12 +116,13 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 				}
 
 				// osgi:service-properties
-				else if (PROPS_ID.equals(subElement.getLocalName())) {
+				else if (PROPS_ID.equals(name)) {
 					if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.ENTRY_ELEMENT).size() > 0) {
 						Object props = parserContext.getDelegate().parseMapElement(subElement,
 							builder.getRawBeanDefinition());
 						builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
 					}
+					// TODO: is this still needed ? (only maps are supported)
 					else if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.PROP_ELEMENT).size() > 0) {
 						Object props = parserContext.getDelegate().parsePropsElement(subElement);
 						builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
@@ -122,6 +131,12 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 						parserContext.getReaderContext().error("Invalid service property type", subElement);
 					}
 				}
+
+				// osgi:registration-listener
+				else if (LISTENER.equals(name)) {
+					listeners.add(getListener(parserContext, subElement, builder));
+				}
+
 				// nested bean reference/declaration
 				else {
 					if (element.hasAttribute(REF))
@@ -140,7 +155,63 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		}
 
 		builder.addPropertyValue("target", target);
+
+		// add listeners
+		builder.addPropertyValue("listeners", listeners);
+
 		return builder.getBeanDefinition();
+	}
+
+	private BeanDefinition getListener(ParserContext context, Element element, BeanDefinitionBuilder builder) {
+
+		// filter elements
+		NodeList nl = element.getChildNodes();
+
+		// wrapped object
+		Object target = null;
+
+		// discover if we have listener with ref and nested bean declaration
+		for (int i = 0; i < nl.getLength(); i++) {
+			Node node = nl.item(i);
+			if (node instanceof Element) {
+				Element beanDef = (Element) node;
+
+				if (element.hasAttribute(REF))
+					context.getReaderContext().error(
+						"nested bean declaration is not allowed if 'ref' attribute has been specified", beanDef);
+
+				target = context.getDelegate().parsePropertySubElement(beanDef, builder.getBeanDefinition());
+			}
+		}
+
+		// extract registration/unregistration attributes from
+		// <osgi:registration-listener>
+		// Element
+
+		MutablePropertyValues vals = new MutablePropertyValues();
+
+		NamedNodeMap attrs = element.getAttributes();
+		for (int x = 0; x < attrs.getLength(); x++) {
+			Attr attribute = (Attr) attrs.item(x);
+			String name = attribute.getLocalName();
+
+			if (REF.equals(name))
+				target = new RuntimeBeanReference(StringUtils.trimWhitespace(attribute.getValue()));
+			else
+				vals.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
+		}
+
+		// create serviceListener wrapper
+		RootBeanDefinition wrapperDef = new RootBeanDefinition(OsgiServiceRegistrationListenerWrapper.class);
+
+		ConstructorArgumentValues cav = new ConstructorArgumentValues();
+		cav.addIndexedArgumentValue(0, target);
+
+		wrapperDef.setConstructorArgumentValues(cav);
+		wrapperDef.setPropertyValues(vals);
+
+		return wrapperDef;
+
 	}
 
 	/*

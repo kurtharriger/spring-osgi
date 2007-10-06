@@ -78,7 +78,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		appContext.close();
 	}
 
-	public void testSimpleCollection() {
+	public void tstSimpleCollection() {
 		Object factoryBean = appContext.getBean("&simpleCollection");
 
 		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
@@ -130,7 +130,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		assertSame(appContext.getBean("defaultComparator"), ((SortedSet) bean).comparator());
 	}
 
-	public void testSortedSetWithComparator() {
+	public void tstSortedSetWithComparator() {
 		Object factoryBean = appContext.getBean("&sortedSetWithComparator");
 		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
 
@@ -141,7 +141,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	}
 
-	public void testSimpleSortedList() {
+	public void tstSimpleSortedList() {
 		Object factoryBean = appContext.getBean("&simpleSortedList");
 		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
 
@@ -152,7 +152,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		assertTrue(Arrays.equals(new Class[] { Serializable.class }, intfs));
 	}
 
-	public void testSimpleSortedSet() {
+	public void tstSimpleSortedSet() {
 		Object factoryBean = appContext.getBean("&simpleSortedSet");
 		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
 

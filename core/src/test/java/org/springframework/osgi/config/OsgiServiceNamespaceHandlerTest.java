@@ -36,6 +36,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
+import org.springframework.osgi.internal.service.util.OsgiServiceRegistrationListener;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.mock.MockServiceRegistration;
@@ -60,6 +61,9 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 	protected void setUp() throws Exception {
 
 		services.clear();
+
+		RegistrationListener.BIND_CALLS = 0;
+		RegistrationListener.UNBIND_CALLS = 0;
 
 		registration = new MockServiceRegistration();
 
@@ -148,6 +152,28 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		assertNull(getTargetBeanName(exporter));
 		assertNotNull(getTarget(exporter));
 
+	}
+
+	public void testListeners() throws Exception {
+		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) appContext.getBean("&exporterWithListener");
+		OsgiServiceRegistrationListener[] listeners = getListeners(exporter);
+		assertEquals(2, listeners.length);
+	}
+
+	public void testListenersInvoked() throws Exception {
+		// registration should have been already called
+		assertEquals(2, RegistrationListener.BIND_CALLS);
+		
+		Object target = appContext.getBean("exporterWithListener");
+		assertTrue(target instanceof ServiceRegistration);
+		
+		assertEquals(0, RegistrationListener.UNBIND_CALLS);
+		((ServiceRegistration) target).unregister();
+		assertEquals(2, RegistrationListener.UNBIND_CALLS);
+	}
+
+	private OsgiServiceRegistrationListener[] getListeners(OsgiServiceFactoryBean exporter) {
+		return (OsgiServiceRegistrationListener[]) TestUtils.getFieldValue(exporter, "listeners");
 	}
 
 	private Class[] getInterfaces(OsgiServiceFactoryBean exporter) {

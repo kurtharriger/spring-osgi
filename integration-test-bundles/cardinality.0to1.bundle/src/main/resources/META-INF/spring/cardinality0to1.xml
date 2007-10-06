@@ -12,7 +12,7 @@
 
     <osgi:reference id="simpleServiceOsgi"
                     interface="org.springframework.osgi.iandt.simpleservice2.MyService2"
-                    mandatory="false"
+                    cardinality="0..1"
                     timeout="10">
         <osgi:listener bind-method="serviceAvailable" unbind-method="serviceUnavailable" ref="listener"/>
     </osgi:reference>

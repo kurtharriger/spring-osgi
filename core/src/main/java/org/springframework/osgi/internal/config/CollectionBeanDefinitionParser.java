@@ -51,11 +51,22 @@ class CollectionBeanDefinitionParser extends ReferenceBeanDefinitionParser {
 
 			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 				String name = attribute.getLocalName();
+				String value = attribute.getValue();
+
+				if (CARDINALITY.equals(name)) {
+					if (value.startsWith("0"))
+						builder.addPropertyValue(MANDATORY, Boolean.FALSE);
+					else
+						builder.addPropertyValue(MANDATORY, Boolean.TRUE);
+				}
+
 				// ref attribute will be handled separately
-				if (!INLINE_COMPARATOR_REF.equals(name))
-					builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
 				else {
-					builder.addPropertyReference(NESTED_COMPARATOR, StringUtils.trimWhitespace(attribute.getValue()));
+					if (!INLINE_COMPARATOR_REF.equals(name))
+						builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), value);
+					else {
+						builder.addPropertyReference(NESTED_COMPARATOR, StringUtils.trimWhitespace(value));
+					}
 				}
 			}
 		});

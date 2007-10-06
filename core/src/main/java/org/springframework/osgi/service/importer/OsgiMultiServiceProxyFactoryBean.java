@@ -137,13 +137,13 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 					: new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, mandatory));
 			break;
 
-		case CollectionOptions.SORTED_LIST:
-			collection = new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, mandatory);
-			break;
-
-		case CollectionOptions.SORTED_SET:
-			collection = new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, mandatory);
-			break;
+//		case CollectionOptions.SORTED_LIST:
+//			collection = new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, mandatory);
+//			break;
+//
+//		case CollectionOptions.SORTED_SET:
+//			collection = new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, mandatory);
+//			break;
 
 		default:
 			throw new IllegalArgumentException("unknown collection type:" + collectionType);
