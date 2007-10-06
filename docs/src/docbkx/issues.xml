@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<book xmlns:xi="http://www.w3.org/2001/XInclude">
+  <bookinfo>
+    <title>Spring Dynamic Modules for <trademark>OSGi</trademark> Service Platforms</title>
+    <subtitle>Known Issues</subtitle>
+	<releaseinfo>&version;</releaseinfo>
+
+    <authorgroup>
+      <author>
+        <firstname>Costin</firstname>
+        <surname>Leau</surname>
+      </author>
+    </authorgroup>
+
+    <legalnotice>
+      <para>Copies of this document may be made for your own use and for
+      distribution to others, provided that you do not charge any fee for such
+      copies and further provided that each copy contains this Copyright
+      Notice, whether distributed in print or electronically.</para>
+    </legalnotice>
+  </bookinfo>
+
+  <toc />
+
+  <preface id="preface">
+	<title>Preface</title>
+	<para>
+	  This document describes known issues (and possible work-arounds). Each issue mentions the section of the reference
+	  documentation that explain the behaviour along with the associated
+	  <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI">JIRA</ulink> entry which
+	  provides an estimate on when it will be solved.
+	  As a rule, Spring Dynamic Modules 1.0 RC1 aims to solve most, if not all of them.
+	</para>
+  </preface>
+  
+  <chapter id="known-issues">
+    <title>Known Issues</title>
+
+    <section id="resource-prefix">
+      <title>2.4 The Resource abstraction</title>
+
+        <para>The new <literal>osgibundle</literal> prefix is not yet in place - use <literal>bundle</literal> for the time being.</para>
+        <para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-199">OSGI-199</ulink></para>
+	</section>
+	
+	<section id="shutdown-algo">
+      <title>2.6 Stopping the extender bundle</title>
+
+        <para>The shutdown algorithm considers all services exporter/imported by a bundle not just the ones managed	by the application context.</para>
+        <para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-203">OSGI-203</ulink></para>
+	</section>
+    <section id="registration-listener-custom-methods">
+      <title>4.1.6 Service registration and unregistration lifecyle</title>
+
+        <para>Custom methods for the service registration listeners are not supported yet.</para>
+        <para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-204">OSGI-204</ulink></para>
+	</section>
+	<section id="service-reference-conversion">
+      <title>4.2.1 Referencing an individual service</title>
+        <para>Conversion from service instance to <literal>ServiceReference</literal> is not supported yet.</para>
+        <para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-218">OSGI-218</ulink></para>
+	</section>
+	
+    <section id="sorted-collection">
+      <title>4.2.2 Referencing collections of services</title>
+      	<para><literal>Comparator</literal>-based sorting, applying natural ordering of services is not yet supported.</para>
+      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-215">OSGI-215</ulink></para> 
+		<para><literal>java.util.Comparable</literal> interface is not yet used for sorting.</para>
+		<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-216">OSGI-216</ulink></para>
+	</section>	
+  </chapter>
+</book>
