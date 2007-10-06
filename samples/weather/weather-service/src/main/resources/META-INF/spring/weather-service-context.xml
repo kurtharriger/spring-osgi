@@ -22,7 +22,7 @@
 		</osgi:interfaces>
 		<osgi:service-properties>
             <entry key="foo" value="bar"/>
-            <prop key="baz">myprop</prop>
+            <entry key="baz" value="myprop"/>
         </osgi:service-properties>
 	</osgi:service>
 
