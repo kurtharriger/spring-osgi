@@ -12,24 +12,25 @@
 
 
 	<bean name="string" class="java.lang.String">
-		<constructor-arg value="string bean"/>
+		<constructor-arg value="string bean" />
 	</bean>
 
 
 	<!-- osgi:service -->
-	
+
 	<!-- first annonymous service -->
-	<osgi:service interface="java.io.Serializable" lazy-init="true" id="inlineReference"
+	<osgi:service interface="java.io.Serializable" id="inlineReference"
 		ref="string" />
 
-	<osgi:service context-classloader="service-provider" id="manyOptions">
+	<osgi:service context-classloader="service-provider"
+		id="manyOptions">
 		<osgi:interfaces>
 			<value>java.io.Serializable</value>
 			<value>java.lang.Cloneable</value>
 		</osgi:interfaces>
 		<osgi:service-properties>
-			<entry key="foo" value="bar"/>
-			<entry key="white" value="horse"/>
+			<entry key="foo" value="bar" />
+			<entry key="white" value="horse" />
 		</osgi:service-properties>
 		<ref local="string" />
 	</osgi:service>
@@ -39,26 +40,42 @@
 		<osgi:interfaces>
 			<value>java.lang.Object</value>
 		</osgi:interfaces>
-		<bean class="java.util.HashMap"/>
+		<bean class="java.util.HashMap" />
 	</osgi:service>
-	
+
 	<!-- service properties -->
-	<osgi:service interface="java.io.Serializable" id="serviceProperties">
+	<osgi:service interface="java.io.Serializable"
+		id="serviceProperties">
 		<osgi:service-properties>
-			<entry key="string" value="bee@bop"/>
+			<entry key="string" value="bee@bop" />
 			<entry key="int">
 				<value type="java.lang.Integer">12</value>
 			</entry>
 		</osgi:service-properties>
-		<bean class="java.util.HashMap"/>
+		<bean class="java.util.HashMap" />
 	</osgi:service>
 
-    <!-- service properties -->
-    <osgi:service interface="java.io.Serializable" id="serviceProperties2">
-        <osgi:service-properties>
-            <prop key="string">myprop</prop>
-        </osgi:service-properties>
-        <bean class="java.util.HashMap"/>
-    </osgi:service>
+	<!-- service properties -->
+	<osgi:service interface="java.io.Serializable"
+		id="serviceProperties2">
+		<osgi:service-properties>
+			<entry key="string" value="myprop" />
+		</osgi:service-properties>
+		<bean class="java.util.HashMap" />
+	</osgi:service>
+
+	<bean id="listener"
+		class="org.springframework.osgi.config.RegistrationListener" />
+
+	<osgi:service interface="java.io.Serializable"
+		id="exporterWithListener">
+		<osgi:registration-listener>
+			<bean id="inner-listener"
+				class="org.springframework.osgi.config.RegistrationListener" />
+		</osgi:registration-listener>
+		<osgi:registration-listener ref="listener" />
+
+		<bean class="java.util.HashMap" />
+	</osgi:service>
 
 </beans>

@@ -63,6 +63,10 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	public static final String INTERFACE_NAME = "interfaceName";
 
+	public static final String CARDINALITY = "cardinality";
+
+	protected static final String MANDATORY = "mandatory";
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -83,8 +87,17 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
 			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 				String name = attribute.getLocalName();
-				// ref attribute will be handled separately
-				builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
+				String value = attribute.getValue();
+
+				if (CARDINALITY.equals(name)) {
+					if (value.startsWith("0"))
+						builder.addPropertyValue(MANDATORY, Boolean.FALSE);
+					else
+						builder.addPropertyValue(MANDATORY, Boolean.TRUE);
+				}
+				else
+					// ref attribute will be handled separately
+					builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), value);
 			}
 		});
 

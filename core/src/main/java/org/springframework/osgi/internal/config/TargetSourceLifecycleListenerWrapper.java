@@ -25,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
-import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -47,12 +46,13 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 
 	private String bindMethod, unbindMethod;
 
-	private Object target;
+	private final Object target;
 
-	private boolean isLifecycleListener;
+	private final boolean isLifecycleListener;
 
 	public TargetSourceLifecycleListenerWrapper(Object object) {
 		this.target = object;
+		isLifecycleListener = target instanceof TargetSourceLifecycleListener;
 	}
 
 	/*
@@ -61,9 +61,6 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(target, "target property required");
-
-		isLifecycleListener = target instanceof TargetSourceLifecycleListener;
 
 		if (isLifecycleListener)
 			if (log.isDebugEnabled())
