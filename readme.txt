@@ -63,7 +63,7 @@ This product includes software developed by the Apache Software Foundation (http
 4. WHERE TO START
 
 This distribution contains API documentation and two sample applications illustrating the current features of Spring DM.
-The Spring Dynamic Modules reference documentation can be found at http://www.springframework.org/osgi/current/docs/reference/
+The Spring Dynamic Modules reference documentation can be found at http://static.springframework.org/osgi/current/docs/reference/
 
 A great way to get started is to review and run the sample applications, supplementing with reference manual
 material as needed. You will require Maven 2, which can be downloaded from http://maven.apache.org/, for building

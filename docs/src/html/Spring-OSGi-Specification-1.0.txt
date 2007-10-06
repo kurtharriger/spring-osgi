@@ -19,7 +19,7 @@ OSGi developers looking for an introduction to Spring should review the [introdu
 
 _Note: OSGi is a trademark of the OSGi Alliance. Project name is pending final approval from the Alliance._
 
-_Note: Please see the [known issues](http://www.springframework/osgi/known_issues.html) page for Spring Dynamic Modules 1.0 M3 release._
+_Note: Please see the [known issues](http://static.springframework.org/spring-osgi/docs/current/reference/html_single/issues.html) page for Spring Dynamic Modules 1.0 M3 release._
 
 ### Why Spring Dynamic Modules?
 
