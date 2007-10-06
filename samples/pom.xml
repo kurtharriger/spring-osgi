@@ -16,7 +16,18 @@
     <module>weather</module>
     <module>petclinic</module>
   </modules>
-<build>
+  
+  <reporting>
+    <plugins>
+       <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+             <stylesheetfile>${basedir}/../../../docs/src/javadoc/javadoc.css</stylesheetfile>
+          </configuration>
+       </plugin>
+    </plugins>
+  </reporting>
+  <build>
   <plugins>
     <plugin>
       <artifactId>maven-clean-plugin</artifactId>

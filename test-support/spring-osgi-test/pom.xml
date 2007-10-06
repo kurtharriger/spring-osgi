@@ -14,6 +14,17 @@
   Spring/OSGi testing framework. Provides JUnit based integration testing inside OSGi containers.
   </description>
   
+  <reporting>
+    <plugins>
+       <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+             <stylesheetfile>${basedir}/../../docs/src/javadoc/javadoc.css</stylesheetfile>
+          </configuration>
+       </plugin>
+    </plugins>
+  </reporting>
+  
   <properties>
     <spring.osgi.export.pkg>
       !org.springframework.osgi.internal.test*, 

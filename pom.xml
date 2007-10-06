@@ -5,10 +5,10 @@
   <artifactId>spring-osgi</artifactId>
   <packaging>pom</packaging>
   <version>1.0-m3-SNAPSHOT</version>
-  <name>Spring OSGi</name>
+  <name>Spring Dynamic Modules</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
-  The Spring-OSGi project makes it easy to build Spring applications
+  The Spring Dynamic Modules project makes it easy to build Spring applications
   that run in an OSGi framework. A Spring application written in this
   way provides better separation of modules, the ability to
   dynamically add, remove, and update modules in a running system, the
@@ -290,7 +290,7 @@ limitations under the License.
            <Import-Package>${spring.osgi.import}</Import-Package>
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
 
-           <Implementation-Title>Spring OSGi Framework</Implementation-Title>
+           <Implementation-Title>Spring Dynamic Modules Framework</Implementation-Title>
 		   <Implementation-Version>${spring.version}</Implementation-Version>
 		   <Spring-Version>${spring.version}</Spring-Version>
 		   
@@ -502,28 +502,30 @@ limitations under the License.
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
           <aggregate>true</aggregate>
+		  <stylesheetfile>${basedir}/docs/src/javadoc/javadoc.css</stylesheetfile>
+          <overview>${basedir}/docs/src/javadoc/overview.html</overview>
           <groups>
             <group>
-              <title>Spring OSGi Core</title>
+              <title>Spring Dynamic Modules Core</title>
               <packages>org.springframework.osgi*</packages>
             </group>
             <group>
-              <title>Spring OSGi Extender</title>
+              <title>Spring Dynamic Modules Extender</title>
               <packages>org.springframework.osgi.extender*</packages>
             </group>
             <group>
-               <title>Spring OSGi IO</title>
+               <title>Spring Dynamic Modules IO</title>
                <packages>org.springframework.osgi.io*</packages>
             </group>
             <group>
-               <title>Spring OSGi JUnit Support</title>
+               <title>Spring Dynamic Modules JUnit Support</title>
                <packages>org.springframework.osgi.test*</packages>
             </group>
             <!--
             :org.springframework.osgi.test.platform:org.springframework.osgi.test.support:org.springframework.osgi.test.util:org.springframework.osgi.test.storage
             -->
             <group>
-                <title>Spring OSGi Mock</title>
+                <title>Spring Dynamic Modules Mock</title>
                <packages>org.springframework.osgi.mock*</packages>
             </group>
             
@@ -532,16 +534,8 @@ limitations under the License.
                <packages>org.springframework.osgi.sample*</packages>
             </group>
           </groups>
-          <excludePackageNames>org.springframework.osgi.iandt*</excludePackageNames>
+          <excludePackageNames>org.springframework.osgi.internal*:org.springframework.osgi.iandt*</excludePackageNames>
           
-          <!--
-           cannot use this.
-           maven, how I love you..
-           
-           
-          <stylesheetfile>${basedir}/docs/stylesheet.css</stylesheetfile>
-          <overview>${basedir}/docs/overview.html</overview>
-                    -->
                     
           <breakiterator>true</breakiterator>
           <links>
