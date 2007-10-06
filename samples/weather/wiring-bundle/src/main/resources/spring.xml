@@ -33,11 +33,11 @@
 	      depends-on="weatherTestBundle"/>
 	      
 	<osgi:bundle id="weatherTestBundle" depends-on="weatherServiceBundle" symbolic-name="org.springframework.osgi.samples.weather.service.test"
-	             location="file:${localRepository}/org/springframework/osgi/samples/weather-service-test/${pom.version}/weather-service-test-${pom.version}.jar" state="start"/>
+	             location="file:${localRepository}/org/springframework/osgi/samples/weather-service-test/${pom.version}/weather-service-test-${pom.version}.jar" action="start"/>
 
 	<osgi:bundle id="weatherDaoBundle" symbolic-name="org.springframework.osgi.samples.weather-dao"
 	             location="file:${localRepository}/org/springframework/osgi/samples/weather-dao/${pom.version}/weather-dao-${pom.version}.jar"
-	             state="start"/>
+	             action="start"/>
 
 
 
@@ -46,7 +46,7 @@
 	<extension:virtual-bundle id="weatherServiceBundle" depends-on="weatherDaoBundle"
 					     symbolic-name="org.springframework.osgi.samples.weather.service"
 	                     location="file:${localRepository}/org/springframework/osgi/samples/weather-service/${pom.version}/weather-service-${pom.version}.jar"
-	                     state="start" version="1.0" group-id="org.springframework.osgi.samples.weather" artifact-id="service">
+	                     action="start" version="1.0" group-id="org.springframework.osgi.samples.weather" artifact-id="service">
 		<extension:imports>
 			<extension:package name="org.springframework.osgi.samples.weather.dao" version="0.0"/>
 			<extension:package name="org.springframework.osgi.config"/>

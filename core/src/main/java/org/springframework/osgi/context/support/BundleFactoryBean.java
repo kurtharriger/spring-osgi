@@ -61,7 +61,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 
 	protected BundleContext bundleContext;
 
-	private String state;
+	private String action;
 
 	private int startLevel;
 
@@ -101,22 +101,22 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 			Assert.notNull(bundle, "cannot find bundle with symbolic name=" + symbolicName);
 
 			// if we get here, the bundle is installed already
-			if (state == null || state.equalsIgnoreCase("install")) {
+			if (action == null || action.equalsIgnoreCase("install")) {
 			}
 
-			else if (state.equalsIgnoreCase("start")) {
+			else if (action.equalsIgnoreCase("start")) {
 				bundle.start();
 			}
-			else if (state.equalsIgnoreCase("update")) {
+			else if (action.equalsIgnoreCase("update")) {
 				if (location != null)
 					bundle.update(location.getInputStream());
 				else
 					bundle.update();
 			}
-			else if (state.equalsIgnoreCase("stop")) {
+			else if (action.equalsIgnoreCase("stop")) {
 				bundle.stop();
 			}
-			else if (state.equalsIgnoreCase("uninstall")) {
+			else if (action.equalsIgnoreCase("uninstall")) {
 				bundle.uninstall();
 			}
 		}
@@ -179,8 +179,8 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		bundleContext = context;
 	}
 
-	public synchronized void setState(String level) {
-		state = level;
+	public void setAction(String action) {
+		this.action = action;
 	}
 
 	public void setStartLevel(int startLevel) {

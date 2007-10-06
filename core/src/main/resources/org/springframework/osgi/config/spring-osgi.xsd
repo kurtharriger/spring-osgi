@@ -415,7 +415,7 @@
     <xsd:complexType name="Tbundle">
         <xsd:complexContent>
             <xsd:extension base="beans:identifiedType">
-                <xsd:attribute name="symbolic-name" type="xsd:string" use="optional">
+                <xsd:attribute name="symbolic-name" type="xsd:string" use="required">
                 	<xsd:annotation>
                 		<xsd:documentation>
                 			The bundle symbolic name of the bundle object.
