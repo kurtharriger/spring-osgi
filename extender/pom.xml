@@ -16,6 +16,17 @@
   Spring/OSGi extender. Listens for and bootstraps Spring-powered OSGi bundles.
   </description>
   
+  <reporting>
+    <plugins>
+       <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+             <stylesheetfile>${basedir}/../docs/src/javadoc/javadoc.css</stylesheetfile>
+          </configuration>
+       </plugin>
+    </plugins>
+  </reporting>
+  
   <properties>
   	<spring.osgi.private.pkg>org.springframework.osgi.internal.extender*</spring.osgi.private.pkg>
   	<!-- don't export a thing -->
