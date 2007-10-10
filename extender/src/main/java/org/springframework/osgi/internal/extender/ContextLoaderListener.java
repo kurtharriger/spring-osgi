@@ -41,7 +41,7 @@ import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
-import org.springframework.osgi.internal.context.support.AbstractDelegatedExecutionApplicationContext;
+import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplicationContext;
 import org.springframework.osgi.internal.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.internal.extender.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.internal.extender.dependencies.shutdown.ServiceDependencySorter;

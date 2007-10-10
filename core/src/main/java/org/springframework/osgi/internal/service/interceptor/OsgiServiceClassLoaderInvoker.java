@@ -18,7 +18,7 @@ package org.springframework.osgi.internal.service.interceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.internal.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.Assert;

@@ -24,7 +24,6 @@ import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.osgi.internal.context.support.AbstractDelegatedExecutionApplicationContext;
 import org.springframework.osgi.internal.util.ConfigUtils;
 import org.springframework.osgi.internal.util.TrackingUtil;
 import org.xml.sax.EntityResolver;

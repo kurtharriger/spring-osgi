@@ -29,7 +29,7 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
-import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
@@ -73,7 +73,7 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	 * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser#getBeanClass(org.w3c.dom.Element)
 	 */
 	protected Class getBeanClass(Element element) {
-		return OsgiSingleServiceProxyFactoryBean.class;
+		return OsgiServiceProxyFactoryBean.class;
 	}
 
 	/*

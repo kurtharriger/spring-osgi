@@ -22,9 +22,9 @@ import java.util.Map;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.SpringProxy;
-import org.springframework.osgi.internal.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.ServiceReferenceAware;
-import org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.MapBasedDictionary;
 
 /**
@@ -33,10 +33,10 @@ import org.springframework.osgi.util.MapBasedDictionary;
  */
 public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 
-	private OsgiSingleServiceProxyFactoryBean fb;
+	private OsgiServiceProxyFactoryBean fb;
 
 	protected void onSetUp() throws Exception {
-		fb = new OsgiSingleServiceProxyFactoryBean();
+		fb = new OsgiServiceProxyFactoryBean();
 		fb.setBundleContext(bundleContext);
 		// execute retries fast
 		fb.setRetryTimes(1);
@@ -55,7 +55,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 		Dictionary dict = new MapBasedDictionary();
 		ServiceRegistration reg = publishService(date);
 
-		fb = new OsgiSingleServiceProxyFactoryBean();
+		fb = new OsgiServiceProxyFactoryBean();
 		fb.setMandatory(true);
 
 		fb.setInterface(new Class[] { Date.class });

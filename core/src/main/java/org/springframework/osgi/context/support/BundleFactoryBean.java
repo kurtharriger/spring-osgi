@@ -88,7 +88,6 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(bundleContext, "BundleContext is required");
-		Assert.hasText(symbolicName, "symbolic name is required");
 
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		try {
@@ -98,7 +97,8 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 
 			bundle = findBundle();
 
-			Assert.notNull(bundle, "cannot find bundle with symbolic name=" + symbolicName);
+            Assert.notNull(symbolicName, "Bundle-SymbolicName is required");            
+            Assert.notNull(bundle, "cannot find bundle with symbolic name=" + symbolicName);
 
 			// if we get here, the bundle is installed already
 			if (action == null || action.equalsIgnoreCase("install")) {
@@ -150,8 +150,12 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	 * @throws Exception
 	 */
 	private Bundle findBundle() throws Exception {
-		// check if the bundle has been installed
-		Bundle bundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, symbolicName);
+		// check if the bundle has been installed, if we are able to
+		Bundle bundle = null;
+
+        if (symbolicName != null) {
+            bundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, symbolicName);
+        }
 
 		if (bundle == null) {
 			Assert.notNull(location, "could not find an installed bundle with symbolicName=[" + symbolicName
@@ -159,7 +163,10 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 
 			log.info("Loading bundle [" + location.getURL());
 			bundle = bundleContext.installBundle(location.getURL().toString());
-		}
+            if (symbolicName == null) {
+                symbolicName = bundle.getSymbolicName();
+            }
+        }
 
 		// TODO: keep the start-level or not?
 		// updateStartLevel(getStartLevel());
@@ -171,7 +178,27 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		location = url;
 	}
 
-	public void setSymbolicName(String symbolicName) {
+    public String getSymbolicName() {
+        return symbolicName;
+    }
+
+    public ClassLoader getClassloader() {
+        return classloader;
+    }
+
+    public int getStartLevel() {
+        return startLevel;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public Resource getLocation() {
+        return location;
+    }
+
+    public void setSymbolicName(String symbolicName) {
 		this.symbolicName = symbolicName;
 	}
 

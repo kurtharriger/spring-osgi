@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.springframework.osgi.internal.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.internal.service.collection.OsgiServiceList;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 
