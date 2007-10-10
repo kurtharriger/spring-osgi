@@ -25,7 +25,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.internal.context.support.BundleDelegatingClassLoader;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.internal.service.interceptor.OsgiServiceClassLoaderInvoker;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
@@ -38,175 +38,175 @@ import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
  */
 public class OsgiServiceClassLoaderInvokerTest extends TestCase {
 
-	/**
-	 * @author Costin Leau
-	 */
-	private class TCCLGetter {
-		public ClassLoader getTCCL() {
-			return Thread.currentThread().getContextClassLoader();
-		}
-	}
+    /**
+     * @author Costin Leau
+     */
+    private class TCCLGetter {
+        public ClassLoader getTCCL() {
+            return Thread.currentThread().getContextClassLoader();
+        }
+    }
 
-	/**
-	 * @author Costin Leau
-	 */
-	private class TCCLInvoker extends OsgiServiceClassLoaderInvoker {
+    /**
+     * @author Costin Leau
+     */
+    private class TCCLInvoker extends OsgiServiceClassLoaderInvoker {
 
-		public TCCLInvoker(BundleContext context, ServiceReference reference, int contextClassLoader,
+        public TCCLInvoker(BundleContext context, ServiceReference reference, int contextClassLoader,
                            ClassLoader classLoader) {
-			super(context, reference, contextClassLoader, classLoader);
-		}
+            super(context, reference, contextClassLoader, classLoader);
+        }
 
-		protected Object getTarget() {
-			return target;
-		}
-	}
+        protected Object getTarget() {
+            return target;
+        }
+    }
 
-	private OsgiServiceClassLoaderInvoker invoker;
+    private OsgiServiceClassLoaderInvoker invoker;
 
-	private TCCLGetter target;
+    private TCCLGetter target;
 
-	private BundleContext context;
+    private BundleContext context;
 
-	private ServiceReference reference;
+    private ServiceReference reference;
 
     private ClassLoader classLoader = getClass().getClassLoader();
 
     // make field static to make sure it is being initialized before the inner
-	// class
-	// definition inside testDoInvoke is being read
+    // class
+    // definition inside testDoInvoke is being read
 
-	private static ClassLoader cl;
+    private static ClassLoader cl;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		target = new TCCLGetter();
-		context = new MockBundleContext();
-		reference = new MockServiceReference();
+    /*
+      * (non-Javadoc)
+      * @see junit.framework.TestCase#setUp()
+      */
+    protected void setUp() throws Exception {
+        target = new TCCLGetter();
+        context = new MockBundleContext();
+        reference = new MockServiceReference();
         int classloaderUse = ReferenceClassLoadingOptions.CLIENT;
 
         invoker = new TCCLInvoker(context, reference, classloaderUse, classLoader);
-	}
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception {
-		invoker = null;
-		reference = null;
-		context = null;
-		target = null;
-	}
+    /*
+      * (non-Javadoc)
+      * @see junit.framework.TestCase#tearDown()
+      */
+    protected void tearDown() throws Exception {
+        invoker = null;
+        reference = null;
+        context = null;
+        target = null;
+    }
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceClassLoaderInvoker#doInvoke(java.lang.Object, org.aopalliance.intercept.MethodInvocation)}.
-	 */
-	public void testDoInvokeWithClientTCCL() throws Throwable {
+    /**
+     * Test method for
+     * {@link org.springframework.osgi.service.interceptor.OsgiServiceClassLoaderInvoker#doInvoke(java.lang.Object, org.aopalliance.intercept.MethodInvocation)}.
+     */
+    public void testDoInvokeWithClientTCCL() throws Throwable {
 
-		Method md = TCCLGetter.class.getMethod("getTCCL", null);
-		MethodInvocation invocation = new MockMethodInvocation(md);
+        Method md = TCCLGetter.class.getMethod("getTCCL", null);
+        MethodInvocation invocation = new MockMethodInvocation(md);
 
-		OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
+        OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
 
-		invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.CLIENT, classLoader) {
+        invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.CLIENT, classLoader) {
 
-			protected ClassLoader determineClassLoader(BundleContext context, ServiceReference reference,
-					int contextClassLoader) {
-				return OsgiServiceClassLoaderInvokerTest.cl;
-			}
-		};
+            protected ClassLoader determineClassLoader(BundleContext context, ServiceReference reference,
+                                                       int contextClassLoader) {
+                return OsgiServiceClassLoaderInvokerTest.cl;
+            }
+        };
 
-		ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-		ClassLoader invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        ClassLoader invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
 
-		assertNotSame("the TCCL hasn't been changed", tccl, invocationTCCL);
-		assertSame("the TCCL hasn't been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
+        assertNotSame("the TCCL hasn't been changed", tccl, invocationTCCL);
+        assertSame("the TCCL hasn't been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
 
-		OsgiServiceClassLoaderInvokerTest.cl = null;
-	}
+        OsgiServiceClassLoaderInvokerTest.cl = null;
+    }
 
-	public void testDoInvokeWithServiceTCCL() throws Throwable {
+    public void testDoInvokeWithServiceTCCL() throws Throwable {
 
-		Method md = TCCLGetter.class.getMethod("getTCCL", null);
-		MethodInvocation invocation = new MockMethodInvocation(md);
+        Method md = TCCLGetter.class.getMethod("getTCCL", null);
+        MethodInvocation invocation = new MockMethodInvocation(md);
 
-		OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
+        OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
 
-		invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.SERVICE_PROVIDER, classLoader) {
+        invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.SERVICE_PROVIDER, classLoader) {
 
-			protected ClassLoader determineClassLoader(BundleContext context, ServiceReference reference,
-					int contextClassLoader) {
-				return OsgiServiceClassLoaderInvokerTest.cl;
-			}
-		};
+            protected ClassLoader determineClassLoader(BundleContext context, ServiceReference reference,
+                                                       int contextClassLoader) {
+                return OsgiServiceClassLoaderInvokerTest.cl;
+            }
+        };
 
-		ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-		ClassLoader invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        ClassLoader invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
 
-		assertNotSame("the TCCL hasn't been changed", tccl, invocationTCCL);
-		assertSame("the TCCL hasn't been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
+        assertNotSame("the TCCL hasn't been changed", tccl, invocationTCCL);
+        assertSame("the TCCL hasn't been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
 
-		OsgiServiceClassLoaderInvokerTest.cl = null;
-		invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
-		assertSame("the TCCL hasn't been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
+        OsgiServiceClassLoaderInvokerTest.cl = null;
+        invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
+        assertSame("the TCCL hasn't been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
 
-	}
+    }
 
-	public void testDoInvokeWithUnmanagedTCCL() throws Throwable {
+    public void testDoInvokeWithUnmanagedTCCL() throws Throwable {
 
-		Method md = TCCLGetter.class.getMethod("getTCCL", null);
-		MethodInvocation invocation = new MockMethodInvocation(md);
+        Method md = TCCLGetter.class.getMethod("getTCCL", null);
+        MethodInvocation invocation = new MockMethodInvocation(md);
 
-		OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
+        OsgiServiceClassLoaderInvokerTest.cl = new URLClassLoader(new URL[0]);
 
-		invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.UNMANAGED, classLoader);
+        invoker = new TCCLInvoker(context, reference, ReferenceClassLoadingOptions.UNMANAGED, classLoader);
 
-		ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-		ClassLoader invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        ClassLoader invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
 
-		assertSame("the TCCL has been changed", tccl, invocationTCCL);
-		assertNotSame("the TCCL has been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
+        assertSame("the TCCL has been changed", tccl, invocationTCCL);
+        assertNotSame("the TCCL has been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
 
-		OsgiServiceClassLoaderInvokerTest.cl = null;
-		invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
-		assertNotSame("the TCCL has been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
+        OsgiServiceClassLoaderInvokerTest.cl = null;
+        invocationTCCL = (ClassLoader) invoker.doInvoke(target, invocation);
+        assertNotSame("the TCCL has been changed", OsgiServiceClassLoaderInvokerTest.cl, invocationTCCL);
 
-	}
+    }
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceClassLoaderInvoker#determineClassLoader(org.osgi.framework.BundleContext, org.osgi.framework.ServiceReference, int)}.
-	 */
-	public void testDetermineClassLoader() {
-		ClassLoader loader;
-		final Bundle clientBundle = new MockBundle();
+    /**
+     * Test method for
+     * {@link org.springframework.osgi.service.interceptor.OsgiServiceClassLoaderInvoker#determineClassLoader(org.osgi.framework.BundleContext, org.osgi.framework.ServiceReference, int)}.
+     */
+    public void testDetermineClassLoader() {
+        ClassLoader loader;
+        final Bundle clientBundle = new MockBundle();
 
-		BundleContext ctx = new MockBundleContext() {
-			public Bundle getBundle() {
-				return clientBundle;
-			}
-		};
+        BundleContext ctx = new MockBundleContext() {
+            public Bundle getBundle() {
+                return clientBundle;
+            }
+        };
 
-		final Bundle serviceBundle = new MockBundle();
-		ServiceReference ref = new MockServiceReference() {
+        final Bundle serviceBundle = new MockBundle();
+        ServiceReference ref = new MockServiceReference() {
 
-			public Bundle getBundle() {
-				return serviceBundle;
-			}
-		};
+            public Bundle getBundle() {
+                return serviceBundle;
+            }
+        };
 
-		loader = invoker.determineClassLoader(ctx, ref, ReferenceClassLoadingOptions.CLIENT);
-		assertEquals(classLoader, loader);
+        loader = invoker.determineClassLoader(ctx, ref, ReferenceClassLoadingOptions.CLIENT);
+        assertEquals(classLoader, loader);
 
-		loader = invoker.determineClassLoader(ctx, ref, ReferenceClassLoadingOptions.SERVICE_PROVIDER);
-		assertEquals(BundleDelegatingClassLoader.createBundleClassLoaderFor(serviceBundle), loader);
+        loader = invoker.determineClassLoader(ctx, ref, ReferenceClassLoadingOptions.SERVICE_PROVIDER);
+        assertEquals(BundleDelegatingClassLoader.createBundleClassLoaderFor(serviceBundle), loader);
 
-		loader = invoker.determineClassLoader(ctx, ref, ReferenceClassLoadingOptions.UNMANAGED);
-		assertNull(loader);
-	}
+        loader = invoker.determineClassLoader(ctx, ref, ReferenceClassLoadingOptions.UNMANAGED);
+        assertNull(loader);
+    }
 }

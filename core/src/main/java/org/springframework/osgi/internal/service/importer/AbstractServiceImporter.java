@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.springframework.osgi.internal.service.MandatoryDependencyListener;
 import org.springframework.osgi.internal.service.ServiceImporter;
+import org.springframework.osgi.service.importer.CardinalityOptions;
 import org.springframework.util.Assert;
 
 /**
@@ -49,5 +50,14 @@ public abstract class AbstractServiceImporter implements ServiceImporter {
 	public void setMandatory(boolean mandatory) {
 		this.mandatory = mandatory;
 	}
-	
+
+    /**
+	 * The optional cardinality attribute allows a reference cardinality to be
+	 * specified (0..1, 1..1, 0..n, or 1..n). The default is '1..1'.
+	 *
+	 * @param cardinality
+	 */
+	public void setCardinality(String cardinality) {
+        this.mandatory = CardinalityOptions.atLeastOneRequired(CardinalityOptions.asInt(cardinality));
+	}
 }

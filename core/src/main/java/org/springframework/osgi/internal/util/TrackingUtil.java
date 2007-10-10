@@ -34,7 +34,7 @@ import org.springframework.osgi.util.OsgiServiceUtils;
  * class to ease usage.
  * 
  * <p/> This class can be seen as a much shorter, less featured version of
- * {@link org.springframework.osgi.service.importer.OsgiSingleServiceProxyFactoryBean}.
+ * {@link org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean}.
  * It is intended for the bootstrap areas of the project where no classloading
  * or listeners are required.
  * 

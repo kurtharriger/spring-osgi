@@ -40,9 +40,9 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public class OsgiSingleServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactoryBean {
+public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactoryBean {
 
-	private static final Log log = LogFactory.getLog(OsgiSingleServiceProxyFactoryBean.class);
+	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
 	protected RetryTemplate retryTemplate = new RetryTemplate();
 

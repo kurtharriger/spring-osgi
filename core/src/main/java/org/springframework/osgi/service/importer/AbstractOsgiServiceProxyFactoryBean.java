@@ -74,7 +74,7 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	// service lifecycle listener
 	protected TargetSourceLifecycleListener[] listeners;
 
-	/** Service Bean property of the OSGi service * */
+    /** Service Bean property of the OSGi service * */
 	protected String serviceBeanName;
 
 	protected boolean initialized = false;
