@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>hsqldb.osgi</name>
+	<name>c3p0.osgi</name>
 	<comment></comment>
 	<projects>
 	</projects>
