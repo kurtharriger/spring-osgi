@@ -3,22 +3,18 @@
   <parent>
     <artifactId>spring-osgi</artifactId>
     <groupId>org.springframework.osgi</groupId>
-    <version>1.0-m3</version>
+    <version>1.0-rc1-SNAPSHOT</version>
   </parent>
+  
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-modules</artifactId>
   <packaging>pom</packaging>
   <name>Spring Framework jars packaged as OSGi bundles</name>
-  <version>2.1-osgi-m4-SNAPSHOT</version>
+  <version>1.0-rc1-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   
-  <!-- templating properties for unpack task -->
-  
-  <!-- defaults point to Spring framework -->
   <properties>
-  
-    <spring.version>2.1-m4</spring.version>
   
     <spring.osgi.export.pkg>org.springframework*</spring.osgi.export.pkg>
 
@@ -26,9 +22,7 @@
     <spring.osgi.export>${spring.osgi.export.pkg}*;version=${spring.version}</spring.osgi.export>
     <spring.osgi.import>${spring.osgi.import.pkg}, org.springframework*;version=${spring.version}, *</spring.osgi.import>
      
-   
     <!-- copy the resources inside the bundles | pattern works only for Spring -->
-    
     <spring.osgi.include.res>@${pom.artifactId}-${spring.version}.jar!/META-INF/*</spring.osgi.include.res>	     
   </properties>
  
@@ -38,17 +32,7 @@
   </modules>
 
 
-  <!-- template dependencies for Spring jars to avoid duplication -->
-    <dependencies>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>${pom.artifactId}</artifactId>
-      <version>${spring.version}</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
-  
- <build>
+  <build>
     <resources>
       <resource>
         <!-- Bug MRESOURCES-35 means we can't use absolute paths -->

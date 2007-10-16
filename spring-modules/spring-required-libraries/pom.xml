@@ -3,7 +3,7 @@
   <parent>
     <artifactId>spring-osgi</artifactId>
     <groupId>org.springframework.osgi</groupId>
-    <version>1.0-m3</version>
+    <version>1.0-rc1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
@@ -28,9 +28,6 @@
     <module>commons-beanutils.osgi</module>
     <module>commons-collections</module>
     <module>commons-lang</module>
-    <!--
-    <module>commons-logging</module>
-    -->
     <module>commons-pool</module>
     <module>hsqldb</module>
     <module>jsp-api.osgi</module>

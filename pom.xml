@@ -4,7 +4,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-m3</version>
+  <version>1.0-rc1-SNAPSHOT</version>
   <name>Spring Dynamic Modules</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
@@ -18,30 +18,15 @@
   </description>
 
   <properties>
-    <!-- Spring dist version for turning into OSGi bundles -->
-    <base.spring.version>2.1</base.spring.version>
-    <!-- Spring version declaration in bundles -->
-    <spring.version>2.1</spring.version>
-
-    <!--- Spring packages imported version -->
-    <spring.import.version>${spring.version}</spring.import.version>
-    <!--- Spring packages exported version 
-    <spring.export.version>2.1.0.SNAPSHOT-205</spring.export.version>
-    -->
-    <!-- used inside MANIFEST.MF 
-    <spring.bundle.version>2.1.0.SNAPSHOT-205</spring.bundle.version>
-    --> 
     <!-- naming pattern for Spring OSGi bundles that get published into maven -->   
     <spring.maven.artifact.version>2.1-m4</spring.maven.artifact.version>
     
-    <!-- spring wrapped artifacts -->
-    <spring.wrapped.version>2.1-osgi-m4-SNAPSHOT</spring.wrapped.version>
-    
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
-    <spring.osgi.import.version>1.0.0.m3</spring.osgi.import.version>
+    <spring.osgi.import.version>1.0.0.rc1</spring.osgi.import.version>
+    
     <!--- Spring OSGi packages exported version -->
-    <spring.osgi.export.version>1.0.0.m3</spring.osgi.export.version>
-    <spring.osgi.bundle.version>1.0.0.m3</spring.osgi.bundle.version>
+    <spring.osgi.export.version>1.0.0.rc1</spring.osgi.export.version>
+    <spring.osgi.bundle.version>1.0.0.rc1</spring.osgi.bundle.version>
 
    
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
@@ -362,9 +347,6 @@ limitations under the License.
         </executions>
       </plugin>
 
-       <!-- docbook plugin -->
-  
-
     </plugins>
   </build>
 
@@ -653,24 +635,15 @@ limitations under the License.
       <url>http://agilejava.com/maven/</url>
     </pluginRepository>
 
-    <!-- maven osgi bundle plugin 
-    <pluginRepository>
-	  <snapshots><enabled>true</enabled></snapshots>
-      <id>apache.snapshot.repository</id>
-      <name>Apache M2 Incubator Repository</name>
-      <url>http://people.apache.org/maven-snapshot-repository</url>
-    </pluginRepository>
-	-->
-	
-    <!-- Please, please, please!  Never add this repository to the list.
-        ever.  for any reason.  I'm not kidding.
+    <!--  Do NOT enable this repository
+    
     <pluginRepository>
 	 <snapshots><enabled>true</enabled></snapshots>
 	<id>apache-snapshot-repo</id>
       <name>Apache snapshot repo</name>
       <url>http://cvs.apache.org/maven-snapshot-repository</url>
 	</pluginRepository>
-           -->
+    -->
   </pluginRepositories>
 
 

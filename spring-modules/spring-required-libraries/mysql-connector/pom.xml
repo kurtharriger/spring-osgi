@@ -3,7 +3,7 @@
   <parent>
     <artifactId>spring-framework-required-libraries</artifactId>
     <groupId>org.springframework.osgi</groupId>
-    <version>1.0-m3</version>
+    <version>1.0-rc1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -11,7 +11,7 @@
   <artifactId>mysql-connector-java.osgi</artifactId>
   	<packaging>bundle</packaging>
   <name>mysql-connector-java (OSGi version)</name>
-  <version>3.1.14</version>
+  <version>3.1.14-SNAPSHOT</version>
   <url>http:// www.springframework.org</url>
 
   <!-- defaults point to Spring framework -->
