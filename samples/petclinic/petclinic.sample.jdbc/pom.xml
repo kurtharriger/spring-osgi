@@ -3,7 +3,7 @@
   <parent>
     <artifactId>petclinic</artifactId>
     <groupId>org.springframework.osgi.samples</groupId>
-    <version>1.0-m3</version>
+    <version>1.0-rc1-SNAPSHOT</version>
   </parent>
   
   <modelVersion>4.0.0</modelVersion>
@@ -11,7 +11,7 @@
   <artifactId>jdbc</artifactId>
   <packaging>jar</packaging>
   <name>Spring OSGi Petclinic Jdbc Impl</name>
-  <version>1.0-m3</version>
+  <version>1.0-rc1-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   
   <properties>

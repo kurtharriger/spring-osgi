@@ -54,7 +54,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		super(name);
 	}
 
-	private static final String SPRING_OSGI_VERSION = "1.0-m3";
+	private static final String SPRING_OSGI_VERSION = "1.0-rc1-SNAPSHOT";
 
 	private static final String SPRING_BUNDLED_VERSION = "2.1-m4";
 
