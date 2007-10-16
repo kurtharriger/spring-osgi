@@ -40,8 +40,8 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplicationContext;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.internal.context.support.ApplicationContextConfiguration;
 import org.springframework.osgi.internal.extender.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.internal.extender.dependencies.shutdown.ServiceDependencySorter;
@@ -53,6 +53,7 @@ import org.springframework.osgi.internal.util.concurrent.RunnableTimedExecution;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'.
@@ -765,12 +766,14 @@ public class ContextLoaderListener implements BundleActivator {
 		}
 
 		synchronized (monitor) {
-			threadGroup = new ThreadGroup("spring-osgi-extender-task-executor");
+			threadGroup = new ThreadGroup("spring-osgi-extender[" + ObjectUtils.getIdentityHexString(this)
+					+ "]-threads");
 			threadGroup.setDaemon(false);
 		}
 
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
 		taskExecutor.setThreadGroup(threadGroup);
+		taskExecutor.setThreadNamePrefix("SpringOsgiExtenderThread-");
 		return taskExecutor;
 	}
 
