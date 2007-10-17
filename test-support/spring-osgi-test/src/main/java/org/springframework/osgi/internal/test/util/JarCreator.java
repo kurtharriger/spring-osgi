@@ -106,7 +106,7 @@ public class JarCreator {
 		if (log.isTraceEnabled() && manifest != null)
 			log.trace("adding MANIFEST.MF [" + manifest.getMainAttributes().entrySet() + "]");
 
-		URL rootURL = new URL(rootPath);
+		URL rootURL = new URL(getRootPath());
 		String rootPath = StringUtils.cleanPath(rootURL.getPath());
 
 		Resource[][] resources = resolveResources();
@@ -284,9 +284,9 @@ public class JarCreator {
 	}
 
 	/**
-	 * @param rootPath The rootPath to set.
+	 * @param 
 	 */
-	public String getRootPath(String rootPath) {
+	public String getRootPath() {
 		return rootPath;
 	}
 
