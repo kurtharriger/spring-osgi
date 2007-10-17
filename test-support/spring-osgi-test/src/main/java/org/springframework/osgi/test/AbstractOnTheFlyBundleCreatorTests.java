@@ -52,7 +52,7 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDependencyManagerTests {
 
-	private JarCreator jarCreator;
+	protected JarCreator jarCreator;
 
 	public AbstractOnTheFlyBundleCreatorTests() {
 		initializeJarCreator();
@@ -65,11 +65,10 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 	private void initializeJarCreator() {
 		jarCreator = new JarCreator();
-		jarCreator.setStorage(new MemoryStorage());
-
+        jarCreator.setStorage(new MemoryStorage());
 	}
 
-	/**
+    /**
 	 * Patterns for identifying the resources added to the jar. The patterns are
 	 * added to the root path when performing the search.
 	 * 

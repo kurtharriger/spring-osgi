@@ -154,8 +154,10 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 		jarSettings = null;
 		// load settings
 		jarSettings = getSettings();
+        // Somehow the JarCreator needs to get this
+        jarCreator.setRootPath(getRootPath());
 
-		super.postProcessBundleContext(context);
+        super.postProcessBundleContext(context);
 	}
 
 }
