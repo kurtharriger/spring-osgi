@@ -32,6 +32,7 @@
     <module>hsqldb</module>
     <module>jsp-api.osgi</module>
     <module>jstl.osgi</module>
+    <module>jta</module>
     <module>junit</module>
     <module>log4j</module>
     <module>mx4j</module>
