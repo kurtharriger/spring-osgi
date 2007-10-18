@@ -26,7 +26,7 @@ public class MavenArtifactLookupTest extends AbstractConfigurableBundleCreatorTe
 		return null;
 	}
 
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		return new String[] {
 				"org.springframework.osgi, org.springframework.osgi.iandt.simple.service," + getSpringOsgiVersion(),
 				"org.springframework.osgi, org.springframework.osgi.iandt.cardinality0to1," + getSpringOsgiVersion() };

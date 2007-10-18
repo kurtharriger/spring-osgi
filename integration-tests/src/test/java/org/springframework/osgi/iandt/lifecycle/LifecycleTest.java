@@ -23,63 +23,56 @@ import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
- * @author Hal Hildebrand
- *         Date: Oct 15, 2006
- *         Time: 5:51:36 PM
+ * @author Hal Hildebrand Date: Oct 15, 2006 Time: 5:51:36 PM
  */
 public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
 
-    protected String getManifestLocation() {
-        return null;
-    }
+	protected String getManifestLocation() {
+		return null;
+	}
 
-    protected String[] getBundles() {
-        return new String[]{
-                localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"), 
-                localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.lifecycle", getSpringOsgiVersion())
-        };
-    }
-    
-    
+	protected String[] getTestBundlesNames() {
+		return new String[] { "org.springframework.osgi,org.springframework.osgi.iandt.lifecycle,"
+				+ getSpringOsgiVersion() };
+	}
 
 	public void testLifecycle() throws Exception {
-        assertNotSame("Guinea pig has already been shutdown", "true",
-                      System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
+		assertNotSame("Guinea pig has already been shutdown", "true",
+			System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
 
-        assertEquals("Guinea pig didn't startup", "true",
-                     System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.startUp"));
-        Bundle[] bundles = bundleContext.getBundles();
-        Bundle testBundle = null;
-        for (int i = 0; i < bundles.length; i++) {
-            if ("org.springframework.osgi.iandt.lifecycle".equals(bundles[i].getSymbolicName())) {
-                testBundle = bundles[i];
-                break;
-            }
-        }
+		assertEquals("Guinea pig didn't startup", "true",
+			System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.startUp"));
+		Bundle[] bundles = bundleContext.getBundles();
+		Bundle testBundle = null;
+		for (int i = 0; i < bundles.length; i++) {
+			if ("org.springframework.osgi.iandt.lifecycle".equals(bundles[i].getSymbolicName())) {
+				testBundle = bundles[i];
+				break;
+			}
+		}
 
-        assertNotNull("Could not find the test bundle", testBundle);
-        StringBuffer filter = new StringBuffer();
-        filter.append("(&");
-        filter.append("(").append(Constants.OBJECTCLASS).append("=").append(AbstractRefreshableApplicationContext.class.getName()).append(")");
-        filter.append("(").append(ConfigurableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
-        filter.append("=").append(testBundle.getSymbolicName()).append(")");
-        filter.append(")");
-        ServiceTracker tracker = new ServiceTracker(bundleContext,
-                                                    bundleContext.createFilter(filter.toString()),
-                                                    null);
-        tracker.open();
+		assertNotNull("Could not find the test bundle", testBundle);
+		StringBuffer filter = new StringBuffer();
+		filter.append("(&");
+		filter.append("(").append(Constants.OBJECTCLASS).append("=").append(
+			AbstractRefreshableApplicationContext.class.getName()).append(")");
+		filter.append("(").append(ConfigurableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
+		filter.append("=").append(testBundle.getSymbolicName()).append(")");
+		filter.append(")");
+		ServiceTracker tracker = new ServiceTracker(bundleContext, bundleContext.createFilter(filter.toString()), null);
+		tracker.open();
 
-        AbstractRefreshableApplicationContext appContext = (AbstractRefreshableApplicationContext) tracker.waitForService(30000);
-        assertNotNull("test application context", appContext);
-        assertTrue("application context is active", appContext.isActive());
+		AbstractRefreshableApplicationContext appContext = (AbstractRefreshableApplicationContext) tracker.waitForService(30000);
+		assertNotNull("test application context", appContext);
+		assertTrue("application context is active", appContext.isActive());
 
-        testBundle.stop();
-	    while (testBundle.getState() == Bundle.STOPPING) {
-            Thread.sleep(10);
-        }
-        assertEquals("Guinea pig didn't shutdown", "true",
-                     System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
- 
-        assertFalse("application context is inactive", appContext.isActive());
-    }
+		testBundle.stop();
+		while (testBundle.getState() == Bundle.STOPPING) {
+			Thread.sleep(10);
+		}
+		assertEquals("Guinea pig didn't shutdown", "true",
+			System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
+
+		assertFalse("application context is inactive", appContext.isActive());
+	}
 }

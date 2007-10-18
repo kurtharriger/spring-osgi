@@ -76,9 +76,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	// the test results used by the triggering test runner
 	private TestResult originalResult;
 
-	// The OSGi BundleContext (when executing the test as a bundle inside OSGi)
-	protected BundleContext bundleContext;
-
 	// OsgiResourceLoader
 	protected ResourceLoader resourceLoader;
 
@@ -98,63 +95,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	public AbstractOsgiTests(String name) {
 		super(name);
 	}
-
-	//
-	// DEPRECATED METHODS
-	//
-	// FIXME: remove deprecated methods after m3 release
-
-	/**
-	 * Legacy method - will be removed in future SVN revisions.
-	 * @return
-	 * @deprecated use
-	 */
-	protected String[] getBundleLocations() {
-		return getBundles();
-	}
-
-	/**
-	 * Return the resource loader used by this test.
-	 * 
-	 * @return an OsgiBundleResourceLoader if the bundleContext was set or null
-	 * otherwise.
-	 * @deprecated use the {@link #resourceLoader} field directly
-	 */
-	protected ResourceLoader getResourceLoader() {
-		return resourceLoader;
-	}
-
-	/**
-	 * Return the bundleContext for the bundle in which this test is running.
-	 * 
-	 * @return
-	 * @deprecated use the {@link #bundleContext} field directly
-	 */
-	protected BundleContext getBundleContext() {
-		return bundleContext;
-	}
-
-	/**
-	 * Bundles that should be installed before the test execution.
-	 * 
-	 * @deprecated use {@link #getTestBundlesNames()}
-	 * @return the array of bundles to install
-	 */
-	protected String[] getBundles() {
-		return new String[0];
-	}
-
-	/**
-	 * Mandatory bundles (part of the test setup). Used by the test
-	 * infrastructure. Override this method <i>only</i> if you want to change
-	 * the jars used by default, by the testing infrastructure.
-	 * 
-	 * User subclasses should use {@link #getBundles()} instead.
-	 * 
-	 * @deprecated use {@link #getTestFrameworkBundles()}
-	 * @return the array of mandatory bundle names.
-	 */
-	protected abstract String[] getMandatoryBundles();
 
 	/**
 	 * Test framework bundles (part of the test setup). Used by the test
@@ -518,7 +458,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	/**
 	 * Try to get the bundle context for spring-osgi-test-support bundle. This
 	 * is useful on platform where the platformContext or system BundleContext
-	 * doesn't behave like a normal context (such as mBedded Server).
+	 * doesn't behave like a normal context.
 	 * 
 	 * Will fallback to {@link #platformContext}.
 	 * @return

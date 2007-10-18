@@ -101,8 +101,6 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		// configFiles[1]);
 	}
 
-	// FIXME: move this tests from ApplicationConfiguration to
-	// AbstractOsgiXmlCtxTests
 	public void tstConfigLocationsInMetaInfWithHeader() throws Exception {
 		Dictionary headers = new Hashtable();
 		headers.put("Spring-Context", "META-INF/spring/context.xml");

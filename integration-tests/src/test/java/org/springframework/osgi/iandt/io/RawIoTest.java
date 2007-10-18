@@ -32,7 +32,7 @@ import org.springframework.util.ObjectUtils;
 public class RawIoTest extends BaseIoTest {
 
 	// don't use any extra bundles - just the test jar
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		return null;
 	}
 

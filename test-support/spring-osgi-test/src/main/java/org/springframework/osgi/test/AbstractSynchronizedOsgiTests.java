@@ -73,7 +73,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	 * @param timeout
 	 */
 	public void waitOnContextCreation(BundleContext context, String forBundleWithSymbolicName, long timeout) {
-		// translate from seconds to miliseconds
+		// translate from seconds to milliseconds
 		long time = timeout * SECOND;
 
 		// use the counter to make sure the threads block

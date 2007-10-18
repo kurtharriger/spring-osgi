@@ -26,9 +26,8 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  */
 public abstract class ServiceBaseTest extends AbstractConfigurableBundleCreatorTests {
 
-
-	protected String[] getBundles() {
-		return new String[] { localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT") };
+	protected String[] getTestBundlesNames() {
+		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT" };
 	}
 
 	protected ServiceRegistration publishService(Object obj, String name) throws Exception {

@@ -37,7 +37,7 @@ public class IoTests extends BaseIoTest {
 	/**
 	 * Add a bundle fragment.
 	 */
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		return null;
 	}
 
@@ -48,7 +48,7 @@ public class IoTests extends BaseIoTest {
 		assertTrue(fileResource.exists());
 
 		// try loading the file using OsgiBundleResourceLoader
-		Resource osgiResource = getResourceLoader().getResource(fileLocation);
+		Resource osgiResource = resourceLoader.getResource(fileLocation);
 		// check existence of the same file when loading through the
 		// OsgiBundleRL
 		// NOTE andyp -- we want this to work!!
@@ -64,7 +64,7 @@ public class IoTests extends BaseIoTest {
 		assertNotNull(nonExistingFile);
 		assertFalse(nonExistingFile.exists());
 
-		Resource nonExistingFileOutsideOsgi = getResourceLoader().getResource(nonExistingLocation);
+		Resource nonExistingFileOutsideOsgi = resourceLoader.getResource(nonExistingLocation);
 		assertNotNull(nonExistingFileOutsideOsgi);
 		assertFalse(nonExistingFileOutsideOsgi.exists());
 	}
