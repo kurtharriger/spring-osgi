@@ -274,6 +274,24 @@
           </itemizedlist>
 	  </section>
 	  
+	  <section id="jdk-crippled-jta-api">
+        <title><emphasis>java.lang.NoClassDefFoundError: javax/transaction/...</emphasis> when trying to do data access</title>
+        
+          <para>
+          This problem is likely to be caused by bad class wiring. All 1.3+ JDKs include incomplete <emphasis>javax.transaction</emphasis> 
+          and <emphasis>javax.transaction.xa</emphasis> packages for usage inside ORB environments. To address the problem, use a proper
+          JTA library which contains all the classes from the forementioned packages and exports them with a specific version to prevent
+          confusion.
+          </para>
+          <para>
+          Spring-DM wraps JTA 1.1 library for OSGI environments which can be found at Spring snapshot repository. One can deploy this library
+          and specify version 1.1 for <emphasis>javax.transaction*</emphasis> packages inside <emphasis>Import-Package</emphasis> header.
+          By specifying the version, one can be sure that the proper package is used.
+          </para>
+          <para>
+          Note that JTA 1.1 is compatible with version 1.0.1.
+          </para>
+	  </section>
       <!-- this should be part of an OSGi intro more likely -->
 
       <section id="auto-export-visibility">
