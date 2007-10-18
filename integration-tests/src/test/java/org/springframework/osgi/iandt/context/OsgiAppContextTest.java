@@ -17,9 +17,8 @@ package org.springframework.osgi.iandt.context;
 
 import org.osgi.framework.BundleContext;
 import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-
+import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 /**
  * Integration test on the functionality offered by OSGi app context.
  * 
@@ -32,6 +31,7 @@ public class OsgiAppContextTest extends AbstractConfigurableBundleCreatorTests {
 
 	public void testBundleContextAvailableAsBean() {
 		ApplicationContext ctx = applicationContext;
+		assertNotNull(ctx);
 		assertTrue("bundleContext not available as a bean",
 			applicationContext.containsBean(ConfigurableOsgiBundleApplicationContext.BUNDLE_CONTEXT_BEAN_NAME));
 	}
@@ -45,7 +45,6 @@ public class OsgiAppContextTest extends AbstractConfigurableBundleCreatorTests {
 	}
 
 	public void testBundleContextIsTheSame() {
-		assertSame(bundleContext, bundleContext);
 		assertSame(bundleContext,
 			applicationContext.getBean(ConfigurableOsgiBundleApplicationContext.BUNDLE_CONTEXT_BEAN_NAME));
 	}

@@ -18,7 +18,7 @@
   </description>
 
   <properties>
-    <!-- naming pattern for Spring OSGi bundles that get published into maven -->   
+    <!-- Spring version -->   
     <spring.maven.artifact.version>2.1-m4</spring.maven.artifact.version>
     
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
@@ -31,6 +31,9 @@
    
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
     <spring.osgi.private.pkg></spring.osgi.private.pkg>
+    
+    <!-- symbolic name prefix -->
+    <symName.prefix>org.springframework.osgi.bundles</symName.prefix>
     
     <!-- complete access to export/import properties -->
     <spring.osgi.export>${spring.osgi.export.pkg}*;version=${spring.osgi.export.version}</spring.osgi.export>

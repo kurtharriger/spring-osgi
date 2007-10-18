@@ -29,6 +29,7 @@
   
   <properties>
 	<spring.osgi.export.pkg>org.springframework.osgi.io</spring.osgi.export.pkg>
+	<spring.osgi.symbolic.name>${symName.prefix}.io</spring.osgi.symbolic.name>
   </properties>
   
   <dependencies>
