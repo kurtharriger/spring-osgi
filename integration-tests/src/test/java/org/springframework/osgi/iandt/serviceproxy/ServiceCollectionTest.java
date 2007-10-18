@@ -40,7 +40,7 @@ public abstract class ServiceCollectionTest extends AbstractConfigurableBundleCr
 	//
 	// private ConfigurableOsgiBundleApplicationContext context;
 
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT" };
 	}
 

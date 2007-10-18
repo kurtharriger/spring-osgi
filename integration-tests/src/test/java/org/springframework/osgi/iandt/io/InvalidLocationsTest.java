@@ -53,7 +53,7 @@ public class InvalidLocationsTest extends BaseIoTest {
 		return null;
 	}
 
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		return null;
 	}
 

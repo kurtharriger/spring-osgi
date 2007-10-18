@@ -62,9 +62,9 @@ public class SimpleServiceBundleTest extends AbstractConfigurableBundleCreatorTe
 	 * test bundle are automatically included so do not need
 	 * to be specified here.
 	 */
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		return new String[] {
-			localMavenArtifact("org.springframework.osgi.samples", "simple-service-bundle",getSpringOsgiVersion())
+			"org.springframework.osgi.samples, simple-service-bundle," +getSpringOsgiVersion()
 		};
 	}
 	
@@ -73,7 +73,6 @@ public class SimpleServiceBundleTest extends AbstractConfigurableBundleCreatorTe
 	 * context via the 'getBundleContext' operation
 	 */
 	public void testOSGiStartedOk() {
-		BundleContext bundleContext = getBundleContext();
 		assertNotNull(bundleContext);
 	}
 	
@@ -88,15 +87,14 @@ public class SimpleServiceBundleTest extends AbstractConfigurableBundleCreatorTe
 	 */
 	public void testSimpleServiceExported() {
 		waitOnContextCreation("org.springframework.osgi.samples.simpleservice");
-		BundleContext context = getBundleContext();
-        ServiceReference ref = context.getServiceReference(MyService.class.getName());
+        ServiceReference ref = bundleContext.getServiceReference(MyService.class.getName());
         assertNotNull("Service Reference is null", ref);
         try {
-            MyService simpleService = (MyService) context.getService(ref);
+            MyService simpleService = (MyService) bundleContext.getService(ref);
             assertNotNull("Cannot find the service", simpleService);
             assertEquals("simple service at your service", simpleService.stringValue());
         } finally {
-            context.ungetService(ref);
+            bundleContext.ungetService(ref);
         }
 	}
 }

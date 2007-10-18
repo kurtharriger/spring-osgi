@@ -37,6 +37,9 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class AbstractOptionalDependencyInjectionTests extends AbstractDependencyInjectionSpringContextTests {
 
+	// The OSGi BundleContext (when executing the test as a bundle inside OSGi)
+	protected BundleContext bundleContext;
+
 	/**
 	 * Empty OSGi application context that doesn't require any files to be
 	 * specified.
@@ -74,16 +77,9 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 		else
 			context = new OsgiBundleXmlApplicationContext(locations);
 
-		context.setBundleContext(getBundleContext());
+		context.setBundleContext(bundleContext);
 		context.refresh();
 		return context;
 	}
-
-	/**
-	 * Return the test bundle context.
-	 * 
-	 * @return test bundle context
-	 */
-	protected abstract BundleContext getBundleContext();
-
+	
 }

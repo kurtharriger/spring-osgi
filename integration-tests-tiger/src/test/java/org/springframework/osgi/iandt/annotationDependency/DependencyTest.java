@@ -20,15 +20,8 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 		return "classpath:org/springframework/osgi/iandt/annotationDependency/DependencyTest.MF";
 	}
 
-	protected String[] getBundles() {
-		return new String[] {
-				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT") };
-	}
-
 	public void testDependencies() throws Exception {
 		// waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
-
-		BundleContext bundleContext = getBundleContext();
 
 		Bundle dependencyTestBundle = bundleContext.installBundle(getLocator().locateArtifact(
 			"org.springframework.osgi", "org.springframework.osgi.iandt.annotation.dependencies", getSpringOsgiVersion()).getURL().toExternalForm());

@@ -18,23 +18,21 @@ public class ReferenceProxyTest extends AbstractConfigurableBundleCreatorTests {
 		return null;
 	}
 
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		return new String[] {
-				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
-				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.simple.service",
-					getSpringOsgiVersion()),
-				localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.reference.proxy",
-					getSpringOsgiVersion()) };
+				"org.springframework.osgi, org.springframework.osgi.iandt.simple.service," + getSpringOsgiVersion(),
+				"org.springframework.osgi, org.springframework.osgi.iandt.reference.proxy," + getSpringOsgiVersion() };
 	}
 
 	public void testReferenceProxyLifecycle() throws Exception {
-	
+
 		MyService reference = ServiceReferer.serviceReference;
-		
+
 		assertNotNull("reference not initialized", reference);
 		assertNotNull("no value specified in the reference", reference.stringValue());
 
-		Bundle simpleServiceBundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.iandt.simpleservice");
+		Bundle simpleServiceBundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext,
+			"org.springframework.osgi.iandt.simpleservice");
 
 		assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
 		System.out.println("stopping bundle");
@@ -65,7 +63,8 @@ public class ReferenceProxyTest extends AbstractConfigurableBundleCreatorTests {
 		assertNotNull(reference.stringValue());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#getDefaultWaitTime()
 	 */
 	protected long getDefaultWaitTime() {

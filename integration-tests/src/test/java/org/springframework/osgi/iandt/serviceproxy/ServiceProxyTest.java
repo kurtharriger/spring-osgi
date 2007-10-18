@@ -35,13 +35,11 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class ServiceProxyTest extends AbstractConfigurableBundleCreatorTests {
 
-	protected String[] getBundles() {
-		return new String[] { localMavenArtifact("org.springframework.osgi", "cglib-nodep.osgi", "2.1.3-SNAPSHOT") };
+	protected String[] getTestBundlesNames() {
+		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT" };
 	}
 
 	protected String getManifestLocation() {
-		// return
-		// "org/springframework/osgi/test/serviceproxy/ServiceProxyTest.MF";
 		return null;
 	}
 
@@ -62,11 +60,8 @@ public abstract class ServiceProxyTest extends AbstractConfigurableBundleCreator
 	}
 
 	private Advice createCardinalityAdvice(Class clazz) {
-        ClassLoader classLoader =
-                BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
-        OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(bundleContext,
-                                                                                      2,
-                                                                                      classLoader);
+		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
+		OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(bundleContext, 2, classLoader);
 		// fast retry
 		interceptor.getRetryTemplate().setWaitTime(1);
 		interceptor.setFilter(OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null)));

@@ -73,10 +73,11 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 		return "org/springframework/osgi/iandt/io/FragmentIoTests.MF";
 	}
 
+	
 	/**
 	 * Add a bundle fragment.
 	 */
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		return new String[] {
 				"org.springframework.osgi,org.springframework.osgi.iandt.io.fragment.1.bundle,"
 						+ getSpringOsgiVersion(),

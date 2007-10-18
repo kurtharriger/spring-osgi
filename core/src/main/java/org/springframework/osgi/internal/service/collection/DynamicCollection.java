@@ -92,14 +92,14 @@ public class DynamicCollection extends AbstractCollection {
 					else
 						throw new NoSuchElementException();
 				}
-				else if (Boolean.TRUE == hasNext) {
+				else if (hasNext.booleanValue()) {
 					synchronized (iteratorsLock) {
 						if (hasNext())
 							return storage.get(cursor++);
 					}
 					return null;
 				}
-				else if (Boolean.FALSE == hasNext)
+				else if (!hasNext.booleanValue())
 					throw new NoSuchElementException();
 
 				// default

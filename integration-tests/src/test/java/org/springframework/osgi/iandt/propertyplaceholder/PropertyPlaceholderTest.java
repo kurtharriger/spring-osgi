@@ -70,12 +70,10 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 		return "classpath:org/springframework/osgi/iandt/propertyplaceholder/PropertyPlaceholder.MF";
 	}
 
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		return new String[] {
-				localMavenArtifact("org.springframework.osgi", "commons-collections.osgi", "3.2-SNAPSHOT"),
-				// required by cm_all for logging
-				localMavenArtifact("org.knopflerfish.bundles", "log_all", "2.0.0"),
-				localMavenArtifact("org.knopflerfish.bundles", "cm_all", "2.0.0") };
+		// required by cm_all for logging
+				"org.knopflerfish.bundles, log_all, 2.0.0", "org.knopflerfish.bundles, cm_all, 2.0.0" };
 	}
 
 	protected void onSetUp() throws Exception {

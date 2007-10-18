@@ -21,9 +21,11 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
 		return null;
 	}
 
+	
+	
 	// Overridden to remove the spring extender bundle!
-	protected String[] getMandatoryBundles() {
-		String[] bundles = super.getMandatoryBundles();
+	protected String[] getTestFrameworkBundlesNames(){
+		String[] bundles = super.getTestFrameworkBundlesNames();
 		List list = new ArrayList(bundles.length);
 
 		// remove extender
@@ -47,7 +49,7 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
 		return false;
 	}
 
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi, org.springframework.osgi.iandt.lifecycle,"
 				+ getSpringOsgiVersion() };
 	}

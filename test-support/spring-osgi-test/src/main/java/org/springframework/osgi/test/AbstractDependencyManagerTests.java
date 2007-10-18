@@ -42,7 +42,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	private static final String IGNORE = "ignore";
 
 	/**
-	 * Artifact locator (by default the Local Maven repo).
+	 * Artifact locator (by default the Local Maven repository).
 	 */
 	private ArtifactLocator locator = new LocalFileSystemMavenRepository();
 
@@ -57,7 +57,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	private static final String SPRING_OSGI_VERSION = "1.0-rc1-SNAPSHOT";
 
 	private static final String SPRING_BUNDLED_VERSION = "2.1-m4";
-
+	
 	/**
 	 * Return the Spring/OSGi version used by the core bundles.
 	 * @return
@@ -89,10 +89,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * opposed to {@link #getTestBundles()} which provides a programmatic one.
 	 * 
 	 * @see #locateBundle(String)
-	 * @return an array of bundle identificators
+	 * @return an array of bundle identifiers
 	 */
 	protected String[] getTestBundlesNames() {
-		return getBundles();
+		return new String[0];
 	}
 
 	/**
@@ -107,7 +107,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * 
 	 * @see #getTestingFrameworkBundlesConfiguration()
 	 * @see #locateBundle(String)
-	 * @return an array of bundle identificators
+	 * @return an array of bundle identifiers
 	 */
 	protected String[] getTestFrameworkBundlesNames() {
 		// load properties file
@@ -177,7 +177,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * @see org.springframework.osgi.test.AbstractOsgiTests#getTestFrameworkBundles()
 	 */
 	protected Resource[] getTestFrameworkBundles() {
-		return locateBundles(getMandatoryBundles());
+		return locateBundles(getTestFrameworkBundlesNames());
 	}
 
 	/**
@@ -212,7 +212,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * Values (CSV) format which indicates an artifact group, id, version and
 	 * optionally the type.
 	 * 
-	 * @param bundleId the bundle identificator in CSV format
+	 * @param bundleId the bundle identifier in CSV format
 	 * @return a resource pointing to the artifact location
 	 */
 	protected Resource locateBundle(String bundleId) {
@@ -244,63 +244,4 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	public ArtifactLocator getLocator() {
 		return locator;
 	}
-
-	//
-	// FIXME: remove these methods after M3
-	//
-	/**
-	 * Compatibility method - will be removed in the very near future.
-	 * @deprecated this method will be removed after M3; use
-	 * {@link #getLocator() and ArtifactLocator#locateArtifact(String, String, String) method instead or
-	 * simply #locateBundle(String)
-	 * 
-	 * @param groupId
-	 * @param artifactId
-	 * @param version
-	 * @return
-	 */
-	protected String localMavenArtifact(String groupId, String artifactId, String version) {
-		return groupId + "," + artifactId + "," + version;
-	}
-
-	/**
-	 * Compatibility method - will be removed in the very near future.
-	 * 
-	 * @deprecated this method will be removed after M3; use
-	 * {@link #getLocator() and ArtifactLocator#locateArtifact(String, String, String) method instead or
-	 * simply #locateBundle(String)
-	 * 
-	 * @param groupId
-	 * @param artifactId
-	 * @param version
-	 * @param type
-	 * @return
-	 */
-	protected String localMavenArtifact(String groupId, String artifactId, String version, String type) {
-		return groupId + "," + artifactId + "," + version + "," + type;
-	}
-
-	/**
-	 * @deprecated use {@link #getTestFrameworkBundlesNames()} instead.
-	 */
-	protected String[] getMandatoryBundles() {
-		return getTestFrameworkBundlesNames();
-	}
-
-	/**
-	 * @deprecated no replacement provided for it
-	 * @see org.springframework.osgi.test.AbstractOsgiTests#getBundleLocations()
-	 */
-	protected String[] getBundleLocations() {
-		return super.getBundleLocations();
-	}
-
-	/**
-	 * @deprecated use {@link #getTestBundlesNames()} instead.
-	 * @see org.springframework.osgi.test.AbstractOsgiTests#getBundles()
-	 */
-	protected String[] getBundles() {
-		return new String[0];
-	}
-
 }

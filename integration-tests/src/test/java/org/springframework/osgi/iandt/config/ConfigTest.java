@@ -26,7 +26,7 @@ public abstract class ConfigTest extends AbstractConfigurableBundleCreatorTests 
 
 	private static String CONFIG_DIR = "test-config";
 
-	protected String[] getBundles() {
+	protected String[] getTestBundlesNames() {
 		System.setProperty("com.gatespace.bundle.cm.store", CONFIG_DIR);
 		initializeDirectory(CONFIG_DIR);
 		return new String[] { "org.knopflerfish.bundles, log_all, 2.0.0", "org.knopflerfish.bundles, cm_all, 2.0.0",

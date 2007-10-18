@@ -19,12 +19,12 @@ public class AnnotationProxyTest extends AbstractConfigurableBundleCreatorTests 
         return "classpath:org/springframework/osgi/iandt/annotationProxy/AnnotationProxyTest.MF";
     }
 
-    protected String[] getBundles() {
+    protected String[] getTestBundlesNames() {
 	return new String[] {
-                    localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.simple.service",
-                            getSpringOsgiVersion()),
-                    localMavenArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.annotation.proxy",
-                            getSpringOsgiVersion())};
+                    "org.springframework.osgi, org.springframework.osgi.iandt.simple.service, "+
+                            getSpringOsgiVersion(),
+                    "org.springframework.osgi, org.springframework.osgi.iandt.annotation.proxy,"+
+                            getSpringOsgiVersion()};
     }
 
     public void testReferenceProxyLifecycle() throws Exception {
