@@ -46,6 +46,8 @@
 	</spring.osgi.import.pkg>
 	
 	<spring.osgi.private.pkg>org.springframework.osgi.internal*</spring.osgi.private.pkg>
+	
+	<spring.osgi.symbolic.name>${symName.prefix}.core</spring.osgi.symbolic.name>
   </properties>
   
   <dependencies>

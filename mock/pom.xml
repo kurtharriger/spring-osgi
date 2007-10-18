@@ -28,6 +28,7 @@
   
   <properties>
 	<spring.osgi.export.pkg>org.springframework.osgi.mock</spring.osgi.export.pkg>
+	<spring.osgi.symbolic.name>${symName.prefix}.mock</spring.osgi.symbolic.name>
   </properties>
 
   <dependencies>

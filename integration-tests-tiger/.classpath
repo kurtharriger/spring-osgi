@@ -18,10 +18,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Bundle Scoped A Integration Test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Bundle Scoped B Integration Test"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-mock/2.1-m3/spring-mock-2.1-m3.jar" sourcepath="/SPRING_MOCK_SRC"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.4.2"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.3.0/jcl104-over-slf4j-1.3.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.3.0/slf4j-api-1.3.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.3.0/slf4j-log4j12-1.3.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.4.3/slf4j-log4j12-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.lifecycle/1.0-m3-SNAPSHOT/org.springframework.osgi.iandt.lifecycle-1.0-m3-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.service.listener/1.0-m3-SNAPSHOT/org.springframework.osgi.iandt.service.listener-1.0-m3-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.simple.service/1.0-m3-SNAPSHOT/org.springframework.osgi.iandt.simple.service-1.0-m3-SNAPSHOT.jar"/>

@@ -39,6 +39,7 @@
 	  org.apache.felix.*;resolution:=optional,
 	  *
 	</spring.osgi.import.pkg>
+	<spring.osgi.symbolic.name>${symName.prefix}.test</spring.osgi.symbolic.name>
   </properties>
   
   <dependencies>

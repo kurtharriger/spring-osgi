@@ -62,6 +62,10 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 		super(name);
 	}
 
+	protected boolean isContextKeyEmpty(Object key) {
+		return false;
+	}
+	
 	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
 		ConfigurableOsgiBundleApplicationContext context = null;
 

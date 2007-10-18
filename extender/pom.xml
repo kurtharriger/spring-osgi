@@ -37,6 +37,7 @@
 	 org.xml.sax;resolution:=optional,
 	 *
 	</spring.osgi.import.pkg>
+	<spring.osgi.symbolic.name>${symName.prefix}.extender</spring.osgi.symbolic.name>
   </properties>
   
     
