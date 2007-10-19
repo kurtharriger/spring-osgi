@@ -26,30 +26,30 @@ import org.springframework.core.io.Resource;
 public class BundleJarTest extends BaseIoTest {
 
 	public void testResourceFromJarOnly() throws Exception {
-		Resource[] res = patternLoader.getResources("bundle-jar:/org/springframework/osgi/iandt/io/duplicate.file");
+		Resource[] res = patternLoader.getResources("osgibundlejar:/org/springframework/osgi/iandt/io/duplicate.file");
 		assertEquals(1, res.length);
 	}
 
 	// fails under KF with StackOverflow since getEntryPaths() returns "" ?
 	public void testResourceFromJarOnlyWithFolderLevelWildcard() throws Exception {
-		Resource[] res = patternLoader.getResources("bundle-jar:/**/duplicat*.file");
+		Resource[] res = patternLoader.getResources("osgibundlejar:/**/duplicat*.file");
 		assertEquals(1, res.length);
 	}
 
 	public void testResourceFromFragmentsIgnored() throws Exception {
-		Resource[] res = patternLoader.getResources("bundle-jar:/fragment*.file");
+		Resource[] res = patternLoader.getResources("osgibundlejar:/fragment*.file");
 		assertEquals(0, res.length);
 
 	}
 
 	public void testResourceWithWildcardAtFileLevelFromFragmentsIgnored() throws Exception {
-		Resource[] res = patternLoader.getResources("bundle-jar:/*.file");
+		Resource[] res = patternLoader.getResources("osgibundlejar:/*.file");
 		assertEquals(0, res.length);
 	}
 
 	// same as above
 	public void testResourceWithWildcardAtFolderLevelFromFragmentsIgnored() throws Exception {
-		Resource[] res = patternLoader.getResources("bundle-jar:/**/fragment*.file");
+		Resource[] res = patternLoader.getResources("osgibundlejar:/**/fragment*.file");
 		assertEquals(0, res.length);
 	}
 

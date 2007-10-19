@@ -72,7 +72,7 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 
 		bundleCtxCtrl.expectAndReturn(bundleCtx.getBundle(), bundle);
 
-		String location = "bundle://someLocation";
+		String location = "osgibundle://someLocation";
 		Resource bundleResource = new OsgiBundleResource(bundle, location);
 
 		bundleCtrl.replay();

@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
  * The loader resolves paths inside an OSGi bundle using the bundle entries for
  * resource loading for any unqualified resource string.
  * 
- * Also understands the "bundle:" resource prefix for explicit loading of
+ * Also understands the "osgibundle:" resource prefix for explicit loading of
  * resources from the bundle. When the bundle prefix is used the target resource
  * must be contained within the bundle (or attached fragments), the classpath is
  * not searched.
@@ -57,7 +57,7 @@ public class OsgiBundleResourceLoader extends DefaultResourceLoader {
 
 	/**
 	 * Implementation of getResource that delegates to the bundle for any
-	 * unqualified resource reference or a reference starting with "bundle:"
+	 * unqualified resource reference or a reference starting with "osgibundle:"
 	 */
 	public Resource getResource(String location) {
 		Assert.notNull(location, "location is required");

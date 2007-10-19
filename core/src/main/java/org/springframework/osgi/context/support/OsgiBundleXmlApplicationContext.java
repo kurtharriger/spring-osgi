@@ -39,7 +39,7 @@ import org.xml.sax.EntityResolver;
 
 // TODO: provide means to access OSGi services etc. through this application
 // context?
-// TODO: think about whether restricting config files to bundle: is the right
+// TODO: think about whether restricting config files to osgibundle: is the right
 // thing to do
 public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionApplicationContext {
 

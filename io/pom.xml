@@ -28,7 +28,9 @@
   </reporting>
   
   <properties>
-	<spring.osgi.export.pkg>org.springframework.osgi.io</spring.osgi.export.pkg>
+	<spring.osgi.export.pkg>!org.springframework.osgi.internal*, org.springframework.osgi.io</spring.osgi.export.pkg>
+	<spring.osgi.private.pkg>org.springframework.osgi.internal*</spring.osgi.private.pkg>
+	
 	<spring.osgi.symbolic.name>${symName.prefix}.io</spring.osgi.symbolic.name>
   </properties>
   

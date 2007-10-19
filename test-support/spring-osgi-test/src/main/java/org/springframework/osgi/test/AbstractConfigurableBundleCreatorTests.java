@@ -43,7 +43,7 @@ import org.springframework.util.StringUtils;
  * load file /foo/bar/SomeTest-bundle.properties). If no properties file is
  * found, a set of defaults will be used.</li>
  * 
- * <li>overriding the default getXXX methods and providing an alternatve
+ * <li>overriding the default getXXX methods and providing an alternative
  * implementation.</li>
  * </ul>
  * 

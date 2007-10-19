@@ -100,7 +100,7 @@ public class OsgiBundleResourceTest extends TestCase {
 	public void testGetURL() throws Exception {
 		assertNotNull(resource.getURL());
 
-		resource = new OsgiBundleResource(bundle, "bundle:foo" + path);
+		resource = new OsgiBundleResource(bundle, "osgibundle:foo" + path);
 		try {
 			resource.getURL();
 			fail("should have thrown exception");

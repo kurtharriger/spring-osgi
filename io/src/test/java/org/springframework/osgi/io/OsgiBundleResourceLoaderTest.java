@@ -70,7 +70,7 @@ public class OsgiBundleResourceLoaderTest extends TestCase {
 		control.expectAndReturn(bundle.findEntries("/", res, false), new ArrayEnumerator(new URL[] {url}));
 		control.replay();
 
-		Resource resource = loader.getResource("bundle:/" + res);
+		Resource resource = loader.getResource("osgibundle:/" + res);
 		assertNotNull(resource);
 		assertSame(url, resource.getURL());
 		control.verify();

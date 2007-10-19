@@ -87,7 +87,7 @@ public class OsgiBundleResourcePatternResolverTest extends TestCase {
 
 		String thisClass = "org/springframework/osgi/io/OsgiBundleResourcePatternResolverTest.class";
 
-		res = resolver.getResources("bundle:" + thisClass);
+		res = resolver.getResources("osgibundle:" + thisClass);
 		assertNotNull(res);
 		assertEquals(1, res.length);
 		assertTrue(res[0] instanceof UrlResource);

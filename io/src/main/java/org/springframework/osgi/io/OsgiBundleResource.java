@@ -30,6 +30,7 @@ import org.osgi.framework.Bundle;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.osgi.internal.io.OsgiResourceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -49,7 +50,7 @@ import org.springframework.util.StringUtils;
  * encountered</li>
  * </ul>
  * 
- * As fallback, the path is transformed to an URL thus supporting the underlying
+ * As fall back, the path is transformed to an URL thus supporting the underlying
  * OSGi framework specific prefixes.
  * 
  * Note that when the bundle space (bundle jar and its attached fragments) is
@@ -68,13 +69,13 @@ public class OsgiBundleResource extends AbstractResource {
 	 * searching the bundle and its attached fragments. If no prefix is
 	 * specified, this one will be used.
 	 */
-	public static final String BUNDLE_URL_PREFIX = "bundle:";
+	public static final String BUNDLE_URL_PREFIX = "osgibundle:";
 
 	/**
 	 * Prefix for searching only the bundle raw jar. Will ignore attached
 	 * fragments. Not used at the moment.
 	 */
-	public static final String BUNDLE_JAR_URL_PREFIX = "bundle-jar:";
+	public static final String BUNDLE_JAR_URL_PREFIX = "osgibundlejar:";
 
 	private static final char PREFIX_SEPARATOR = ':';
 
@@ -84,7 +85,7 @@ public class OsgiBundleResource extends AbstractResource {
 
 	private final String path;
 
-	// used to avoid removing the prefix everytime the URL is required
+	// used to avoid removing the prefix every time the URL is required
 	private String pathWithoutPrefix;
 
 	// Bundle resource possible searches
@@ -183,7 +184,7 @@ public class OsgiBundleResource extends AbstractResource {
 	}
 
 	/**
-	 * Resolves a resource from the filesystem.
+	 * Resolves a resource from the file system.
 	 * 
 	 * @param fileName
 	 * @return a URL to the returned resource or null if none is found
@@ -297,7 +298,7 @@ public class OsgiBundleResource extends AbstractResource {
 		StringBuffer buf = new StringBuffer();
 		buf.append("OSGi res[");
 		buf.append(this.path);
-		buf.append("|id=");
+		buf.append("|");
 		buf.append(bundle.getBundleId());
 		buf.append("|symName=");
 		buf.append(bundle.getSymbolicName());
