@@ -110,7 +110,7 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(aBundle);
 		String[] configFiles = config.getConfigurationLocations();
 		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
-		assertEquals("bundle:META-INF/spring/context.xml", configFiles[0]);
+		assertEquals("osgibundle:META-INF/spring/context.xml", configFiles[0]);
 	}
 
 	public void tstConfigLocationsInMetaInfWithWildcardHeader() throws Exception {
@@ -150,7 +150,7 @@ public class ApplicationContextConfigurationTest extends TestCase {
 		String[] configFiles = config.getConfigurationLocations();
 		assertTrue("bundle should be Spring powered", config.isSpringPoweredBundle());
 		assertEquals("2 config files", 1, configFiles.length);
-		assertEquals("bundle:META-INF/spring/context.xml", configFiles[0]);
+		assertEquals("osgibundle:META-INF/spring/context.xml", configFiles[0]);
 	}
 
 	public void tstBundleWithHeaderWithBadEntriesAndNoMetaInfResourcesIsNotSpringPowered() {

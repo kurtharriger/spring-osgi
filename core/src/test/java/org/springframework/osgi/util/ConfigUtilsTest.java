@@ -64,7 +64,7 @@ public class ConfigUtilsTest extends TestCase {
 	}
 
 	public void testGetNotExistingConfigLocations() throws Exception {
-		String location = "bundle:/META-INF/non-existing.xml";
+		String location = "osgibundle:/META-INF/non-existing.xml";
 		String entry = location + "; early-init-importers=true";
 
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, entry);
@@ -85,13 +85,13 @@ public class ConfigUtilsTest extends TestCase {
 
 	public void testMultipleConfigLocs() throws Exception {
 		String location1 = "classpath:/META-INF/spring/*.xml";
-		String location2 = "bundle:/META-INF/non-existing.xml";
+		String location2 = "osgibundle:/META-INF/non-existing.xml";
 
 		String entry = location1 + "," + location2 + "; early-init-importers=true";
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, entry);
 		String[] locations = ConfigUtils.getConfigLocations(headers);
 		assertEquals(2, locations.length);
-		assertEquals(location1, locations[1]);
-		assertEquals(location2, locations[0]);
+		assertEquals(location1, locations[0]);
+		assertEquals(location2, locations[1]);
 	}
 }

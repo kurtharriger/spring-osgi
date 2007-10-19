@@ -32,7 +32,7 @@
 		org.springframework.osgi.internal.config*,
   	    org.springframework.osgi.internal.context*,
   	    org.springframework.osgi.internal.util*,
-  	    !org.springframework.osgi.io, 
+  	    !org.springframework.osgi.io*, 
   	    !org.springframework.osgi.internal*, 
   	    org.springframework.osgi*
   	</spring.osgi.export.pkg>

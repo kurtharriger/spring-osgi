@@ -32,6 +32,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.osgi.internal.test.storage.MemoryStorage;
 import org.springframework.osgi.internal.test.util.DependencyVisitor;
 import org.springframework.osgi.internal.test.util.JarCreator;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -65,10 +66,10 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 	private void initializeJarCreator() {
 		jarCreator = new JarCreator();
-        jarCreator.setStorage(new MemoryStorage());
+		jarCreator.setStorage(new MemoryStorage());
 	}
 
-    /**
+	/**
 	 * Patterns for identifying the resources added to the jar. The patterns are
 	 * added to the root path when performing the search.
 	 * 
@@ -155,13 +156,15 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	private void addImportPackage(Manifest manifest) {
 		String[] rawImports = determineImports(getClass());
 
-		if (logger.isDebugEnabled())
-			logger.debug("Discovered raw imports " + ObjectUtils.nullSafeToString(rawImports));
+		boolean trace = logger.isTraceEnabled();
+
+		if (trace)
+			logger.trace("Discovered raw imports " + ObjectUtils.nullSafeToString(rawImports));
 
 		Collection imports = eliminateSpecialPackages(rawImports);
 
-		if (logger.isDebugEnabled())
-			logger.debug("Filtered imports are " + imports);
+		if (trace)
+			logger.trace("Filtered imports are " + imports);
 
 		manifest.getMainAttributes().putValue(Constants.IMPORT_PACKAGE,
 			StringUtils.collectionToCommaDelimitedString(imports));
@@ -269,9 +272,14 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		Bundle bundle = context.installBundle("[onTheFly-test-bundle]" + ClassUtils.getShortName(getClass()) + "["
 				+ hashCode() + "]", resource.getInputStream());
 
-		logger.debug("test bundle succesfully installed");
+		String bundleString = OsgiStringUtils.nullSafeNameAndSymName(bundle);
+		boolean debug = logger.isDebugEnabled();
+
+		if (debug)
+			logger.debug("test bundle [" + bundleString + "] succesfully installed");
 		bundle.start();
-		logger.debug("test bundle succesfully started");
+		if (debug)
+			logger.debug("test bundle [" + bundleString + "] succesfully started");
 	}
 
 }

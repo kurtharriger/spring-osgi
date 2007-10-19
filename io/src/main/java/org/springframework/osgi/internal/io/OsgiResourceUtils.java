@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.io;
+package org.springframework.osgi.internal.io;
 
 import java.net.URL;
 import java.util.Enumeration;
@@ -24,6 +24,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -49,13 +50,13 @@ public abstract class OsgiResourceUtils {
 	// no prefix
 	public static final int PREFIX_TYPE_NOT_SPECIFIED = 0;
 
-	// bundle:
+	// osgibundle:
 	public static final int PREFIX_TYPE_BUNDLE_SPACE = 1;
 
 	// classpath:
 	public static final int PREFIX_TYPE_CLASS_SPACE = 2;
 
-	// bundle-jar:
+	// osgibundlejar::
 	public static final int PREFIX_TYPE_BUNDLE_JAR = 4;
 
 	/**
@@ -84,7 +85,7 @@ public abstract class OsgiResourceUtils {
 		int type = PREFIX_TYPE_NOT_SPECIFIED;
 		String prefix = getPrefix(path);
 
-		// no prefix is treated just like bundle:
+		// no prefix is treated just like osgibundle:
 		if (!StringUtils.hasText(prefix))
 			type = PREFIX_TYPE_NOT_SPECIFIED;
 		else if (prefix.startsWith(OsgiBundleResource.BUNDLE_URL_PREFIX))
