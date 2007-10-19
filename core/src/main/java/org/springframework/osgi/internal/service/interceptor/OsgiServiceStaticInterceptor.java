@@ -22,7 +22,7 @@ import org.springframework.osgi.internal.service.support.ServiceWrapper;
 import org.springframework.util.Assert;
 
 /**
- * Interceptor offering static behavior around an OSGi service. If the OSGi
+ * Interceptor offering static behaviour around an OSGi service. If the OSGi
  * becomes unavailable, no look up or retries will be executed, the interceptor
  * throwing an exception.
  * 
