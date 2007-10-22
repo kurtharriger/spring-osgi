@@ -26,7 +26,7 @@ import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.internal.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.internal.service.importer.AbstractServiceImporter;
-import org.springframework.osgi.internal.service.util.ClassUtils;
+import org.springframework.osgi.internal.util.ClassUtils;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.Assert;

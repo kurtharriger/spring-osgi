@@ -135,7 +135,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	public void preRefresh() {
 
 		// check concurrent collection (which are mandatory)
-		if (!org.springframework.osgi.internal.service.util.ClassUtils.concurrentLibAvailable())
+		if (!org.springframework.osgi.internal.util.ClassUtils.concurrentLibAvailable())
 			throw new IllegalStateException("JVM 5+ or backport-concurrent library (for JVM 1.4) required; see the FAQ for more details");
 
 		Thread thread = Thread.currentThread();
