@@ -15,6 +15,7 @@
  */
 package org.springframework.osgi.internal.service.interceptor;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
@@ -35,9 +36,10 @@ import org.springframework.osgi.internal.service.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
- * Interceptor adding dynamic behavior for unary service (..1 cardinality). It
+ * Interceptor adding dynamic behaviour for unary service (..1 cardinality). It
  * will look for a service using the given filter, retrying if the service is
  * down or unavailable. Will dynamically rebound a new service, if one is
  * available with a higher service ranking.
@@ -229,10 +231,6 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 			lookupService();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#getTarget()
-	 */
 	protected Object getTarget() {
 		Object target;
 
@@ -242,8 +240,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 		// nothing found
 		if (target == null) {
-			throw new ServiceUnavailableException("Could not find service [" + wrapper + "], filter ["
-					+ filter.toString() + "]", null, filter.toString());
+			throw new ServiceUnavailableException("Could not find service [" + wrapper + "], filter [" + filter + "]",
+					null, ObjectUtils.nullSafeToString(filter));
 		}
 
 		return target;
@@ -303,4 +301,18 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 		this.serviceImporter = importer;
 	}
 
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other instanceof OsgiServiceDynamicInterceptor) {
+			OsgiServiceDynamicInterceptor oth = (OsgiServiceDynamicInterceptor) other;
+			return (serviceRequiredAtStartup == oth.serviceRequiredAtStartup
+					&& ObjectUtils.nullSafeEquals(wrapper, oth.wrapper)
+					&& ObjectUtils.nullSafeEquals(filter, oth.filter) && retryTemplate.equals(oth.retryTemplate)
+					&& ObjectUtils.nullSafeEquals(serviceImporter, oth.serviceImporter)
+					&& Arrays.equals(listeners, oth.listeners) && super.equals(other));
+		}
+		else
+			return false;
+	}
 }

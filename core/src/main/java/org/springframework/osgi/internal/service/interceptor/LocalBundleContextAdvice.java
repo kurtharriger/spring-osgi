@@ -24,34 +24,46 @@ import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
- * This class also functions as advice for temporarily pushing the thread-local context.
- *
+ * This class also functions as advice for temporarily pushing the thread-local
+ * context.
+ * 
  * @author Andy Piper
  * @author Costin Leau
  */
 public class LocalBundleContextAdvice implements MethodInterceptor {
 
-    private final BundleContext context;
+	private final BundleContext context;
 
-    public LocalBundleContextAdvice(Bundle bundle) {
-        this(OsgiBundleUtils.getBundleContext(bundle));
-    }
+	public LocalBundleContextAdvice(Bundle bundle) {
+		this(OsgiBundleUtils.getBundleContext(bundle));
+	}
 
-    public LocalBundleContextAdvice(BundleContext bundle) {
-        this.context = bundle;
-    }
+	public LocalBundleContextAdvice(BundleContext bundle) {
+		this.context = bundle;
+	}
 
-    public Object invoke(MethodInvocation invocation) throws Throwable {
-        // save the old context
-        BundleContext oldContext = LocalBundleContext.getContext();
+	public Object invoke(MethodInvocation invocation) throws Throwable {
+		// save the old context
+		BundleContext oldContext = LocalBundleContext.getContext();
 
-        try {
-            LocalBundleContext.setContext(context);
-            return invocation.proceed();
-        }
-        finally {
-            // restore old context
-            LocalBundleContext.setContext(oldContext);
-        }
-    }
+		try {
+			LocalBundleContext.setContext(context);
+			return invocation.proceed();
+		}
+		finally {
+			// restore old context
+			LocalBundleContext.setContext(oldContext);
+		}
+	}
+
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other instanceof LocalBundleContextAdvice) {
+			LocalBundleContextAdvice oth = (LocalBundleContextAdvice) other;
+			return context.equals(oth.context);
+		}
+		return false;
+	}
+
 }

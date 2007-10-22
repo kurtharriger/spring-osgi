@@ -227,7 +227,8 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 			factory.addInterface(interfaces[i]);
 		}
 
-		factory.addAdvice(new OsgiServiceTCCLInvoker(target, classLoader));
+		factory.addAdvice(new OsgiServiceTCCLInvoker(classLoader));
+		factory.setTarget(target);
 
 		try {
 			return factory.getProxy(classLoader);

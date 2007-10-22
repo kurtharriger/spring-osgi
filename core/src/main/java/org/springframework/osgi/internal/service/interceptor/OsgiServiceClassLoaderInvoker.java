@@ -22,6 +22,7 @@ import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Add the context classloader handling.
@@ -37,7 +38,7 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 
 	protected final BundleContext context;
 
-	protected ClassLoader clientClassLoader;
+	protected final ClassLoader clientClassLoader;
 
 	protected ClassLoader serviceClassLoader;
 
@@ -101,11 +102,6 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#doInvoke(org.osgi.framework.ServiceReference,
-	 * org.aopalliance.intercept.MethodInvocation)
-	 */
 	protected Object doInvoke(Object service, MethodInvocation invocation) throws Throwable {
 		if (!canCacheClassLoader)
 			tccl = determineClassLoader(context, serviceReference, contextClassLoader);
@@ -133,4 +129,17 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 			return super.doInvoke(service, invocation);
 		}
 	}
+
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other instanceof OsgiServiceClassLoaderInvoker) {
+			OsgiServiceClassLoaderInvoker oth = (OsgiServiceClassLoaderInvoker) other;
+			return contextClassLoader == oth.contextClassLoader && context.equals(oth.context)
+					&& clientClassLoader.equals(oth.clientClassLoader)
+					&& ObjectUtils.nullSafeEquals(serviceReference, oth.serviceReference);
+		}
+		return false;
+	}
+
 }

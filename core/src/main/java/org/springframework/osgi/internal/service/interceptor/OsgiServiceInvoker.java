@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
  */
 public abstract class OsgiServiceInvoker implements MethodInterceptor {
 
-	protected final Log log = LogFactory.getLog(getClass());
+	protected transient final Log log = LogFactory.getLog(getClass());
 
 	/**
 	 * Actual invocation - the class is being executed on a different object
@@ -53,10 +53,6 @@ public abstract class OsgiServiceInvoker implements MethodInterceptor {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
-	 */
 	public final Object invoke(MethodInvocation invocation) throws Throwable {
 		return doInvoke(getTarget(), invocation);
 	}

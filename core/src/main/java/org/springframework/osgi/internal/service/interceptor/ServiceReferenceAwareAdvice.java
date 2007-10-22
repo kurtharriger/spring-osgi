@@ -25,7 +25,7 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.Assert;
 
 /**
- * Mixin implementation for ServiceReferenceAware.
+ * Mix-in implementation for ServiceReferenceAware.
  * 
  * @author Costin Leau
  * 
@@ -39,19 +39,11 @@ public class ServiceReferenceAwareAdvice extends DelegatingIntroductionIntercept
 		this.serviceInvoker = serviceInvoker;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.ServiceReferenceAware#getServiceProperties()
-	 */
 	public Map getServiceProperties() {
 		ServiceReference ref = getServiceReference();
 		return (ref != null ? OsgiServiceReferenceUtils.getServicePropertiesAsMap(ref) : Collections.EMPTY_MAP);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.ServiceReferenceAware#getServiceReference()
-	 */
 	public ServiceReference getServiceReference() {
 		return serviceInvoker.getServiceReference();
 	}

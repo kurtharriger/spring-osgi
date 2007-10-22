@@ -12,7 +12,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.1-m4/spring-core-2.1-m4.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.1-m4/spring-beans-2.1-m4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/2.1-m4/spring-aop-2.1-m4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/2.1-m4/spring-aop-2.1-m4.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-web/2.1-m4/spring-web-2.1-m4.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.1-m4/spring-context-2.1-m4.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/aopalliance.osgi/1.0-SNAPSHOT/aopalliance.osgi-1.0-SNAPSHOT.jar"/>

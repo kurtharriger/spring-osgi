@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  */
 public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker {
 
-	private ServiceWrapper wrapper;
+	private final ServiceWrapper wrapper;
 
 	public OsgiServiceStaticInterceptor(BundleContext context, ServiceReference reference, int contextClassLoader,
 			ClassLoader classLoader) {
@@ -40,10 +40,6 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 		this.wrapper = new ServiceWrapper(reference, context);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#getTarget()
-	 */
 	protected Object getTarget() {
 		// service has died, clean up
 		if (!wrapper.isServiceAlive()) {
@@ -54,10 +50,6 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 		return wrapper.getService();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.interceptor.OsgiServiceInvoker#getServiceReference()
-	 */
 	protected ServiceReference getServiceReference() {
 		return wrapper.getReference();
 	}
@@ -67,9 +59,8 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 			return true;
 		if (other instanceof OsgiServiceStaticInterceptor) {
 			OsgiServiceStaticInterceptor oth = (OsgiServiceStaticInterceptor) other;
-			return (this.context.equals(oth.context) && contextClassLoader == oth.contextClassLoader && wrapper.equals(oth.wrapper));
+			return wrapper.equals(oth.wrapper) && super.equals(other);
 		}
-		else
-			return false;
+		return false;
 	}
 }
