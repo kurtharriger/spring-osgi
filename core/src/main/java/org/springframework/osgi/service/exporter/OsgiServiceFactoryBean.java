@@ -46,7 +46,7 @@ import org.springframework.osgi.internal.context.support.OsgiBundleScope;
 import org.springframework.osgi.internal.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.internal.service.exporter.AbstractListenerAwareExporter;
 import org.springframework.osgi.internal.service.interceptor.OsgiServiceTCCLInvoker;
-import org.springframework.osgi.internal.service.util.ClassUtils;
+import org.springframework.osgi.internal.util.ClassUtils;
 import org.springframework.osgi.internal.util.DebugUtils;
 import org.springframework.osgi.service.OsgiServicePropertiesResolver;
 import org.springframework.osgi.util.MapBasedDictionary;
@@ -269,16 +269,16 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 		switch (autoExportMode) {
 		case AUTO_EXPORT_ALL:
-			classes = org.springframework.osgi.internal.service.util.ClassUtils.getClassHierarchy(clazz,
-				org.springframework.osgi.internal.service.util.ClassUtils.INCLUDE_ALL_CLASSES);
+			classes = org.springframework.osgi.internal.util.ClassUtils.getClassHierarchy(clazz,
+				org.springframework.osgi.internal.util.ClassUtils.INCLUDE_ALL_CLASSES);
 			break;
 		case AUTO_EXPORT_CLASS_HIERARCHY:
-			classes = org.springframework.osgi.internal.service.util.ClassUtils.getClassHierarchy(clazz,
-				org.springframework.osgi.internal.service.util.ClassUtils.INCLUDE_CLASS_HIERARCHY);
+			classes = org.springframework.osgi.internal.util.ClassUtils.getClassHierarchy(clazz,
+				org.springframework.osgi.internal.util.ClassUtils.INCLUDE_CLASS_HIERARCHY);
 			break;
 		case AUTO_EXPORT_INTERFACES:
-			classes = org.springframework.osgi.internal.service.util.ClassUtils.getClassHierarchy(clazz,
-				org.springframework.osgi.internal.service.util.ClassUtils.INCLUDE_INTERFACES);
+			classes = org.springframework.osgi.internal.util.ClassUtils.getClassHierarchy(clazz,
+				org.springframework.osgi.internal.util.ClassUtils.INCLUDE_INTERFACES);
 			break;
 		default:
 			classes = new Class[0];
@@ -344,7 +344,7 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 		Class[] visibleClasses = ClassUtils.getVisibleClasses(classes, beanClassLoader);
 
 		// create an array of classnames (used for registering the service)
-		String[] names = org.springframework.osgi.internal.service.util.ClassUtils.toStringArray(visibleClasses);
+		String[] names = org.springframework.osgi.internal.util.ClassUtils.toStringArray(visibleClasses);
 
 		// sort the names in alphabetical order (eases debugging)
 		Arrays.sort(names);

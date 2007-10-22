@@ -265,14 +265,14 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getBundleSymbolicName() + ")");
 			}
 
-			Class[] classes = org.springframework.osgi.internal.service.util.ClassUtils.getClassHierarchy(getClass(),
-				org.springframework.osgi.internal.service.util.ClassUtils.INCLUDE_ALL_CLASSES);
+			Class[] classes = org.springframework.osgi.internal.util.ClassUtils.getClassHierarchy(getClass(),
+				org.springframework.osgi.internal.util.ClassUtils.INCLUDE_ALL_CLASSES);
 
 			// filter classes based on visibility
-			Class[] filterClasses = org.springframework.osgi.internal.service.util.ClassUtils.getVisibleClasses(classes,
+			Class[] filterClasses = org.springframework.osgi.internal.util.ClassUtils.getVisibleClasses(classes,
 				this.getClass().getClassLoader());
 
-			String[] serviceNames = org.springframework.osgi.internal.service.util.ClassUtils.toStringArray(filterClasses);
+			String[] serviceNames = org.springframework.osgi.internal.util.ClassUtils.toStringArray(filterClasses);
 
 			if (logger.isDebugEnabled())
 				logger.debug("publishing service under classes " + ObjectUtils.nullSafeToString(serviceNames));

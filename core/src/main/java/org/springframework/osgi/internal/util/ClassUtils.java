@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.internal.service.util;
+package org.springframework.osgi.internal.util;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;

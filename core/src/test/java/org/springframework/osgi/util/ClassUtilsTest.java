@@ -41,7 +41,7 @@ import org.springframework.osgi.context.support.AbstractOsgiBundleApplicationCon
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplicationContext;
 import org.springframework.osgi.internal.context.DelegatedExecutionOsgiBundleApplicationContext;
-import org.springframework.osgi.internal.service.util.ClassUtils;
+import org.springframework.osgi.internal.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
