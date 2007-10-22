@@ -15,6 +15,7 @@
  */
 package org.springframework.osgi.internal.service.collection;
 
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -37,12 +38,14 @@ import org.springframework.osgi.internal.service.ImporterProxy;
 import org.springframework.osgi.internal.service.interceptor.OsgiServiceInvoker;
 import org.springframework.osgi.internal.service.interceptor.OsgiServiceStaticInterceptor;
 import org.springframework.osgi.internal.service.interceptor.ServiceReferenceAwareAdvice;
+import org.springframework.osgi.internal.service.util.ClassUtils;
 import org.springframework.osgi.internal.service.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
-import org.springframework.osgi.util.ClassUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * OSGi service dynamic collection - allows iterating while the underlying
@@ -257,12 +260,21 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Impo
 	 * to transparently decouple the client from holding a strong reference to
 	 * the service (which might go away).
 	 * 
+	 * This method will create a proxy based on the service reference
+	 * {@link Constants#OBJECTCLASS} exposed classes.
+	 * 
 	 * @param ref
 	 */
 	protected Object createServiceProxy(ServiceReference ref) {
 
 		ProxyFactory factory = new ProxyFactory();
-		ClassUtils.configureFactoryForClass(factory, interfaces);
+
+		Class[] classes = discoverProxyClasses(ref);
+		if (log.isDebugEnabled())
+			log.debug("generating 'greedy' service proxy using classes " + ObjectUtils.nullSafeToString(classes)
+					+ " over " + ObjectUtils.nullSafeToString(interfaces));
+
+		ClassUtils.configureFactoryForClass(factory, classes);
 
 		// add the interceptors
 		if (this.interceptors != null) {
@@ -278,6 +290,19 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Impo
 		// factory.setFrozen(true);
 
 		return factory.getProxy(classLoader);
+	}
+
+	protected Class[] discoverProxyClasses(ServiceReference ref) {
+		String[] classNames = OsgiServiceReferenceUtils.getServiceObjectClasses(ref);
+
+		// try to get as many interfaces as possible
+		Class[] classes = ClassUtils.loadClasses(classNames, classLoader);
+		// exclude final classes
+		classes = ClassUtils.excludeClassesWithModifier(classes, Modifier.FINAL);
+		// remove class duplicates/parents
+		classes = ClassUtils.removeParents(classes);
+
+		return classes;
 	}
 
 	/**

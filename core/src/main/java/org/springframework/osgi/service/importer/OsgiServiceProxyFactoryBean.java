@@ -24,10 +24,10 @@ import org.springframework.osgi.internal.service.interceptor.LocalBundleContextA
 import org.springframework.osgi.internal.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.internal.service.interceptor.ServiceReferenceAwareAdvice;
 import org.springframework.osgi.internal.service.support.RetryTemplate;
+import org.springframework.osgi.internal.service.util.ClassUtils;
 import org.springframework.osgi.internal.util.DebugUtils;
 import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
-import org.springframework.osgi.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**

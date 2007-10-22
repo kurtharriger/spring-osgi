@@ -21,8 +21,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.AmbiguousServiceReferenceException;
-import org.springframework.osgi.NoSuchServiceException;
 import org.springframework.util.Assert;
 
 /**
