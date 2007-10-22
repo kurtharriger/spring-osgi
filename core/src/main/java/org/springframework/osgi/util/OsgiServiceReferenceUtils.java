@@ -26,6 +26,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.internal.util.ServiceReferenceBasedMap;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -148,6 +149,11 @@ public abstract class OsgiServiceReferenceUtils {
 		// if the property is not supplied or of incorrect type, use a
 		// default
 		return ((ranking != null && ranking instanceof Integer) ? ((Integer) ranking).intValue() : 0);
+	}
+
+	public static String[] getServiceObjectClasses(ServiceReference reference) {
+		Assert.notNull(reference);
+		return (String[]) reference.getProperty(Constants.OBJECTCLASS);
 	}
 
 	/**

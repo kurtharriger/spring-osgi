@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.util;
+package org.springframework.osgi.internal.util;
 
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -95,26 +95,14 @@ public class ServiceReferenceBasedMap extends AbstractMap {
 		this.reference = ref;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#clear()
-	 */
 	public void clear() {
 		throw new UnsupportedOperationException(READ_ONLY_MSG);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#containsKey(java.lang.Object)
-	 */
 	public boolean containsKey(Object key) {
 		return (get(key) != null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#containsValue(java.lang.Object)
-	 */
 	public boolean containsValue(Object value) {
 		Assert.notNull(value);
 		String[] keys = reference.getPropertyKeys();
@@ -125,10 +113,6 @@ public class ServiceReferenceBasedMap extends AbstractMap {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#entrySet()
-	 */
 	public Set entrySet() {
 		String[] keys = reference.getPropertyKeys();
 		Set entrySet = new LinkedHashSet(keys.length);
@@ -139,10 +123,6 @@ public class ServiceReferenceBasedMap extends AbstractMap {
 		return Collections.unmodifiableSet(entrySet);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#get(java.lang.Object)
-	 */
 	public Object get(Object key) {
 		if (key instanceof String)
 			return reference.getProperty((String) key);
@@ -150,26 +130,14 @@ public class ServiceReferenceBasedMap extends AbstractMap {
 			throw new IllegalArgumentException("only String keys are allowed");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
-	 */
 	public Object put(Object key, Object value) {
 		throw new UnsupportedOperationException(READ_ONLY_MSG);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#putAll(java.util.Map)
-	 */
 	public void putAll(Map t) {
 		throw new UnsupportedOperationException(READ_ONLY_MSG);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#remove(java.lang.Object)
-	 */
 	public Object remove(Object key) {
 		throw new UnsupportedOperationException(READ_ONLY_MSG);
 	}

@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.util;
+package org.springframework.osgi.internal.service.util;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -30,7 +31,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Class utility used internally. Contains mianly class inheritance mechanisms
+ * Class utility used internally. Contains mainly class inheritance mechanisms
  * used when creating OSGi service proxies.
  * 
  * @author Costin Leau
@@ -77,7 +78,7 @@ public abstract class ClassUtils {
 			this.bundle = bundle;
 			this.classLoader = null;
 		}
-
+		
 		public ClassLoaderBridge(ClassLoader classLoader) {
 			Assert.notNull(classLoader);
 			this.classLoader = classLoader;
@@ -315,7 +316,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Check the present of approapriate concurrent collection in the classpath.
+	 * Check the present of appropriate concurrent collection in the classpath.
 	 * This means backport-concurrent on Java 1.4, or Java5+.
 	 * 
 	 * @return true if a ConcurrentHashMap is available on the classpath.
@@ -432,6 +433,58 @@ public abstract class ClassUtils {
 				factory.setProxyTargetClass(true);
 			}
 		}
+	}
+
+	/**
+	 * Load classes with the given name, using the given classloader.
+	 * {@link ClassNotFoundException} exceptions are being ignored. The return
+	 * class array will not contain duplicates.
+	 * 
+	 * @param classNames array of classnames to load (in FQN format)
+	 * @param classLoader classloader used for loading the classes
+	 * @return an array of classes (can be smaller then the array of class
+	 * names) w/o duplicates
+	 */
+	public static Class[] loadClasses(String[] classNames, ClassLoader classLoader) {
+		if (ObjectUtils.isEmpty(classNames))
+			return new Class[0];
+
+		Assert.notNull(classLoader, "classLoader is required");
+		Set classes = new LinkedHashSet(classNames.length);
+
+		for (int i = 0; i < classNames.length; i++) {
+			try {
+				classes.add(classLoader.loadClass(classNames[i]));
+			}
+			catch (ClassNotFoundException ex) {
+				// ignore
+			}
+		}
+
+		return (Class[]) classes.toArray(new Class[classes.size()]);
+	}
+
+	/**
+	 * Exclude classes from the given array, which match the given modifier.
+	 * 
+	 * @see Modifier
+	 * 
+	 * @param classes array of classes (can be null)
+	 * @param modifier class modifier
+	 * @return array of classes (w/o duplicates) which does not have the given
+	 * modifier
+	 */
+	public static Class[] excludeClassesWithModifier(Class[] classes, int modifier) {
+		if (ObjectUtils.isEmpty(classes))
+			return new Class[0];
+
+		Set clazzes = new LinkedHashSet(classes.length);
+
+		for (int i = 0; i < classes.length; i++) {
+			if ((modifier & classes[i].getModifiers()) == 0)
+				clazzes.add(classes[i]);
+		}
+		return (Class[]) clazzes.toArray(new Class[clazzes.size()]);
 	}
 
 }
