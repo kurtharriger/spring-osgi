@@ -1,38 +1,40 @@
 package org.springframework.osgi.internal.service.interceptor;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.util.ObjectUtils;
 
 /**
+ * Simple interceptor for dealing with ThreadContextClassLoader management.
+ * 
  * @author Hal Hildebrand
- *         Date: Apr 13, 2007
- *         Time: 6:43:34 PM
+ * @author Costin Leau
  */
 public class OsgiServiceTCCLInvoker implements MethodInterceptor {
-    protected Object target;
-    protected ClassLoader loader;
+	protected final ClassLoader loader;
 
+	public OsgiServiceTCCLInvoker(ClassLoader loader) {
+		this.loader = loader;
+	}
 
-    public OsgiServiceTCCLInvoker(Object target, ClassLoader loader) {
-        this.target = target;
-        this.loader = loader;
-    }
+	public Object invoke(MethodInvocation invocation) throws Throwable {
+		ClassLoader previous = Thread.currentThread().getContextClassLoader();
+		try {
+			Thread.currentThread().setContextClassLoader(loader);
+			return invocation.proceed();
+		}
+		finally {
+			Thread.currentThread().setContextClassLoader(previous);
+		}
+	}
 
-
-    public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        ClassLoader previous = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(loader);
-            try {
-                return methodInvocation.getMethod().invoke(target, methodInvocation.getArguments());
-            }
-            catch (InvocationTargetException ex) {
-                throw ex.getTargetException();
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(previous);
-        }
-    }
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other instanceof OsgiServiceTCCLInvoker) {
+			OsgiServiceTCCLInvoker oth = (OsgiServiceTCCLInvoker) other;
+			return (ObjectUtils.nullSafeEquals(loader, oth.loader));
+		}
+		return false;
+	}
 }

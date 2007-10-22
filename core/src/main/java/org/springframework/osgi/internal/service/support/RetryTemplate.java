@@ -19,7 +19,7 @@ import org.springframework.util.Assert;
 
 /**
  * Wrapper retry template.
- *
+ * 
  * @author Costin Leau
  */
 public class RetryTemplate {
@@ -60,17 +60,17 @@ public class RetryTemplate {
 
 				// task is not complete - retry
 				count++;
-                if (waitTime != 0) {
-                    // Do NOT use Thread.sleep() here - it does not release locks.
-				    try {
-                        notificationLock.wait(waitTime);
-				    }
-				    catch (InterruptedException ex) {
-					    throw new RuntimeException("retry failed; interrupted while sleeping", ex);
-				    }
-                }
-            }
-			while (count < retryNumbers);
+				if (waitTime != 0) {
+					// Do NOT use Thread.sleep() here - it does not release
+					// locks.
+					try {
+						notificationLock.wait(waitTime);
+					}
+					catch (InterruptedException ex) {
+						throw new RuntimeException("retry failed; interrupted while sleeping", ex);
+					}
+				}
+			} while (count < retryNumbers);
 		}
 		return null;
 	}
@@ -93,6 +93,16 @@ public class RetryTemplate {
 
 	public void setWaitTime(long waitTime) {
 		this.waitTime = waitTime;
-    }
+	}
 
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other instanceof RetryTemplate) {
+			RetryTemplate oth = (RetryTemplate) other;
+
+			return (waitTime == oth.waitTime && retryNumbers == oth.retryNumbers);
+		}
+		return false;
+	}
 }
