@@ -16,9 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.springframework.osgi.annotation;
+package org.springframework.osgi.extensions.annotation;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.osgi.extensions.annotation.ServiceReferenceCardinality;
+import org.springframework.osgi.extensions.annotation.ServiceReferenceClassLoader;
 
 /**
  * @author Andy Piper

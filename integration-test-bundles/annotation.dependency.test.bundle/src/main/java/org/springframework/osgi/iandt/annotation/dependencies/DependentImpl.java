@@ -2,7 +2,7 @@ package org.springframework.osgi.iandt.annotation.dependencies;
 
 import org.springframework.osgi.iandt.simpleservice2.MyService2;
 import org.springframework.osgi.iandt.simpleservice.MyService;
-import org.springframework.osgi.annotation.ServiceReference;
+import org.springframework.osgi.extensions.annotation.ServiceReference;
 
 /**
  * @author Andy Piper
