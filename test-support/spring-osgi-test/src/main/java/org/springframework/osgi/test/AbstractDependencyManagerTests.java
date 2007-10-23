@@ -15,6 +15,7 @@
  */
 package org.springframework.osgi.test;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
@@ -59,16 +60,20 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	private static final String SPRING_VERSION_PROP_KEY = "ignore.spring.version";
 
 	/** uninitialised - read from the properties file */
-	private String springOsgiVersion = "";
-	
+	private String springOsgiVersion = null;
+
 	/** uninitialised - read from the properties file */
-	private String springBundledVersion = "";
+	private String springBundledVersion = null;
 
 	/**
 	 * Return the Spring/OSGi version used by the core bundles.
 	 * @return
 	 */
 	protected String getSpringOsgiVersion() {
+		if (springOsgiVersion == null) {
+			springOsgiVersion = System.getProperty(SPRING_OSGI_VERSION_PROP_KEY);
+		}
+
 		return springOsgiVersion;
 	}
 
@@ -78,6 +83,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * @return
 	 */
 	protected String getSpringBundledVersion() {
+		if (springBundledVersion == null) {
+			springBundledVersion = System.getProperty(SPRING_VERSION_PROP_KEY);
+		}
 		return springBundledVersion;
 	}
 
@@ -128,10 +136,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		if (trace)
 			logger.trace("loaded properties " + props);
 
-		// initialize test version fields
-		springBundledVersion = props.getProperty(SPRING_VERSION_PROP_KEY);
-		springOsgiVersion = props.getProperty(SPRING_OSGI_VERSION_PROP_KEY);
-		
+		// pass properties to test instance running inside OSGi space
+		System.getProperties().put(SPRING_OSGI_VERSION_PROP_KEY, props.get(SPRING_OSGI_VERSION_PROP_KEY));
+		System.getProperties().put(SPRING_VERSION_PROP_KEY, props.get(SPRING_VERSION_PROP_KEY));
+
 		Properties excluded = PropertiesUtil.filterKeysStartingWith(props, IGNORE);
 
 		if (trace) {
