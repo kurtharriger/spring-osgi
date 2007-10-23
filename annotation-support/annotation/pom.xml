@@ -16,7 +16,7 @@
   </description>
   
   <properties>
-	<spring.osgi.export.pkg>org.springframework.osgi.annotation</spring.osgi.export.pkg>
+	<spring.osgi.export.pkg>org.springframework.osgi.extensions.annotation</spring.osgi.export.pkg>
   </properties>
   
   <dependencies>

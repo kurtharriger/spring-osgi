@@ -850,7 +850,7 @@ This appendix describes extensions to the core functionality that are shipped wi
 
 The `org.springframework.osgi.extensions.annotation` bundle that ships with Spring Dynamic Modules provides early access to annotation-based support for injecting references to OSGi services. JDK 1.5 or above is required to use this feature.
 
-Bean class (setter) methods may be annotated with `org.springframework.osgi.annotation.ServiceReference`. By default the property type of the annotated property is used to look up a service with a matching service interface in the OSGi service registry and inject the result. For example, given the configuration:
+Bean class (setter) methods may be annotated with `org.springframework.osgi.extensions.annotation.ServiceReference`. By default the property type of the annotated property is used to look up a service with a matching service interface in the OSGi service registry and inject the result. For example, given the configuration:
 
     <bean id="annotationDriven" class="MyAnnotationDrivenBeanClass"/>
 

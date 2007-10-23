@@ -16,5 +16,5 @@
     </bean>
 
    <!-- annotation injection post processor -->
-   <bean class="org.springframework.osgi.annotation.ServiceReferenceInjectionBeanPostProcessor"/>    
+   <bean class="org.springframework.osgi.extensions.annotation.ServiceReferenceInjectionBeanPostProcessor"/>    
 </beans>

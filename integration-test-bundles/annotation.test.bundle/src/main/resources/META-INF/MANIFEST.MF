@@ -4,5 +4,5 @@ Bundle-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-ClassPath: .
 Import-Package: org.springframework.osgi.iandt.simpleservice,
-  org.springframework.osgi.annotation
+  org.springframework.osgi.extensions.annotation
 Export-Package: org.springframework.osgi.iandt.annotation.proxy

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.annotation;
+package org.springframework.osgi.extensions.annotation;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
@@ -29,6 +29,8 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.osgi.extensions.annotation.ServiceReference;
+import org.springframework.osgi.extensions.annotation.ServiceReferenceInjectionBeanPostProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.service.exporter.ExportClassLoadingOptions;
 import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;

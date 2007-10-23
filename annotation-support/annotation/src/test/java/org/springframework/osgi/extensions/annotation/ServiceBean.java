@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.springframework.osgi.annotation;
+package org.springframework.osgi.extensions.annotation;
 
 import java.io.Serializable;
 
