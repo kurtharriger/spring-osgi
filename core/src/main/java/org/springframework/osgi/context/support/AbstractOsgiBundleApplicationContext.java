@@ -15,11 +15,13 @@
  */
 package org.springframework.osgi.context.support;
 
+import java.beans.PropertyEditor;
 import java.io.IOException;
 import java.util.Dictionary;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyEditorRegistrar;
@@ -27,12 +29,15 @@ import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.beans.propertyeditors.PropertiesEditor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.internal.context.support.OsgiBundleScope;
+import org.springframework.osgi.internal.propertyeditors.SingleServiceReferenceEditor;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
@@ -60,7 +65,7 @@ import org.springframework.util.StringUtils;
  * 
  * <p>
  * Interprets resource paths as OSGi bundle resources (either from the bundle
- * classpath or OSGi entries).
+ * class space, bundle space or jar space).
  * 
  * <p>
  * In addition to the special beans detected by AbstractApplicationContext, this
@@ -68,8 +73,7 @@ import org.springframework.util.StringUtils;
  * beans that implement the <code>BundleContextAware</code> interface.
  * 
  * <p>
- * This application context offers the OSGi-specific, "bundle" scope. See
- * {@link org.springframework.osgi.internal.context.support.OsgiBundleScope}.
+ * This application context offers the OSGi-specific, "bundle" scope.
  * 
  * <p>
  * Note that OsgiApplicationContext implementations are generally supposed to
@@ -116,9 +120,22 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	/** Should context be published as an OSGi service? */
 	private boolean publishContextAsService = true;
 
+	/**
+	 * Create a new AbstractOsgiBundleApplicationContext with no parent.
+	 */
 	public AbstractOsgiBundleApplicationContext() {
 		super();
 		setDisplayName("Root OsgiBundleApplicationContext");
+	}
+
+	/**
+	 * Create a new AbstractOsgiBundleApplicationContext with the given parent
+	 * context.
+	 * 
+	 * @param parent the parent context
+	 */
+	public AbstractOsgiBundleApplicationContext(ApplicationContext parent) {
+		super(parent);
 	}
 
 	/**
@@ -152,6 +169,14 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		this.configLocations = configLocations;
 	}
 
+	/**
+	 * Return this application context configuration locations.
+	 * The default implementation will check whether there are any locations configured and,
+	 * if not, will return the default locations.
+	 * 
+	 * @see #getDefaultConfigLocations()
+	 * @return application context configuration locations.
+	 */
 	public String[] getConfigLocations() {
 		return (this.configLocations != null ? this.configLocations : getDefaultConfigLocations());
 	}
@@ -165,10 +190,6 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		super.doClose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.context.support.AbstractApplicationContext#destroyBeans()
-	 */
 	protected void destroyBeans() {
 		super.destroyBeans();
 
@@ -192,9 +213,6 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		return null;
 	}
 
-	/**
-	 * Register post processor for BeanContextAware beans.
-	 */
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		super.postProcessBeanFactory(beanFactory);
 
@@ -211,6 +229,19 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 					+ " already exists; the bundleContext will not be registered as a bean");
 		}
 
+		// register property editors
+		registerPropertyEditors(beanFactory);
+
+		// register a 'bundle' scope
+		beanFactory.registerScope(OsgiBundleScope.SCOPE_NAME, new OsgiBundleScope());
+	}
+
+	/**
+	 * Register OSGi-specific {@link PropertyEditor}s.
+	 * 
+	 * @param beanFactory beanFactory used for registration.
+	 */
+	protected void registerPropertyEditors(ConfigurableListableBeanFactory beanFactory) {
 		// register Dictionary PropertyEditor (reuse Properties object)
 		beanFactory.addPropertyEditorRegistrar(new PropertyEditorRegistrar() {
 			public void registerCustomEditors(PropertyEditorRegistry registry) {
@@ -218,17 +249,14 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 			}
 		});
 
-		// register a 'bundle' scope
-		beanFactory.registerScope(OsgiBundleScope.SCOPE_NAME, new OsgiBundleScope());
+		// register managed service -> ServiceReference editor
+		beanFactory.addPropertyEditorRegistrar(new PropertyEditorRegistrar() {
+			public void registerCustomEditors(PropertyEditorRegistry registry) {
+				registry.registerCustomEditor(ServiceReference.class, new SingleServiceReferenceEditor());
+			}
+		});
 	}
 
-
-	/*
-	 * Cleanup bundle scope (in case of a refresh).
-	 * 
-	 * (non-Javadoc)
-	 * @see org.springframework.context.support.AbstractApplicationContext#obtainFreshBeanFactory()
-	 */
 	// FIXME: replace this with #destroyBeans after SPR-3950 is fixed
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 		try {
@@ -237,7 +265,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		}
 		catch (IllegalStateException ex) {
 			/* ignore - no beanFactory exists yet */
-		}		
+		}
 		return super.obtainFreshBeanFactory();
 	}
 

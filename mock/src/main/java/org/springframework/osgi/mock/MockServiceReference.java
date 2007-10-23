@@ -200,7 +200,7 @@ public class MockServiceReference implements ServiceReference {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "owning bundle|" + bundle.hashCode() + "|props : " + properties;
+		return "mock service reference [owning bundle id=" + bundle.hashCode() + "|props : " + properties + "]";
 	}
 
 }
