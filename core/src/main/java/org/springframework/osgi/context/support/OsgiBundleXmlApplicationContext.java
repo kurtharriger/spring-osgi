@@ -24,32 +24,76 @@ import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.internal.util.ConfigUtils;
 import org.springframework.osgi.internal.util.TrackingUtil;
 import org.xml.sax.EntityResolver;
 
 /**
- * XML specific application context backed by an OSGi bundle.
+ * Standalone XML application context, backed by an OSGi bundle.
+ * 
+ * <p>
+ * The config location defaults can be overridden via
+ * {@link #getDefaultConfigLocations()}, Config locations can either denote
+ * concrete files like "/myfiles/context.xml" or Ant-style patterns like
+ * "/myfiles/*-context.xml" (see the
+ * {@link org.springframework.util.AntPathMatcher} javadoc for pattern details).
+ * </p>
+ * 
+ * <p>
+ * Note: In case of multiple config locations, later bean definitions will
+ * override ones defined in earlier loaded files. This can be leveraged to
+ * deliberately override certain bean definitions via an extra XML file.
+ * </p>
+ * 
+ * <p/> <b>This is the main ApplicationContext class for OSGi environments.</b>
  * 
  * @author Adrian Colyer
  * @author Costin Leau
  * @author Andy Piper
  * @author Hal Hildebrand
  */
-
-// TODO: provide means to access OSGi services etc. through this application
-// context?
-// TODO: think about whether restricting config files to osgibundle: is the right
-// thing to do
 public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionApplicationContext {
 
-	public OsgiBundleXmlApplicationContext(String[] configLocations) {
-		setDisplayName("Unbound OsgiBundleXmlApplicationContext");
-		setConfigLocations(configLocations);
+	/**
+	 * 
+	 * Create a new OsgiBundleXmlApplicationContext with no parent.
+	 * 
+	 */
+	public OsgiBundleXmlApplicationContext() {
+		this((String[]) null);
 	}
 
-	protected String[] getDefaultConfigLocations() {
-		return new String[] { ConfigUtils.SPRING_CONTEXT_FILES };
+	/**
+	 * Create a new OsgiBundleXmlApplicationContext with the given parent
+	 * context.
+	 * 
+	 * @param parent the parent context
+	 */
+	public OsgiBundleXmlApplicationContext(ApplicationContext parent) {
+		this(null, parent);
+	}
+
+	/**
+	 * Create a new OsgiBundleXmlApplicationContext with the given
+	 * configLocations.
+	 * 
+	 * @param configLocations array of configuration resources
+	 */
+	public OsgiBundleXmlApplicationContext(String[] configLocations) {
+		this(configLocations, null);
+	}
+
+	/**
+	 * Create a new OsgiBundleXmlApplicationContext with the given
+	 * configLocations and parent context.
+	 * 
+	 * @param configLocations array of configuration resources
+	 * @param parent the parent context
+	 */
+	public OsgiBundleXmlApplicationContext(String[] configLocations, ApplicationContext parent) {
+		super(parent);
+		setConfigLocations(configLocations);
 	}
 
 	/**
@@ -73,7 +117,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		beanDefinitionReader.setEntityResolver(enResolver);
 		beanDefinitionReader.setNamespaceHandlerResolver(nsResolver);
 
-		// Allow a subclass to provide custom initialization of the reader,
+		// Allow a subclass to provide custom initialisation of the reader,
 		// then proceed with actually loading the bean definitions.
 		initBeanDefinitionReader(beanDefinitionReader);
 		loadBeanDefinitions(beanDefinitionReader);
@@ -90,7 +134,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * Allows subclasses to do custom initialization here.
+	 * Allows subclasses to do custom initialisation here.
 	 * 
 	 * @param beanDefinitionReader
 	 */
@@ -122,5 +166,23 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 				reader.loadBeanDefinitions(configLocations[i]);
 			}
 		}
+	}
+
+	/**
+	 * Provide default locations for XML files. This implementation returns
+	 * 
+	 * <em>
+	 * META-INF/spring/*.xml
+	 * </em>
+	 * 
+	 * relying on the default resource environment for actual localisation.
+	 * 
+	 * <p/> By default, the bundle space will be used for locating the
+	 * resources.
+	 * 
+	 * @return xml default config locations
+	 */
+	protected String[] getDefaultConfigLocations() {
+		return new String[] { ConfigUtils.SPRING_CONTEXT_FILES };
 	}
 }

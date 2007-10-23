@@ -38,7 +38,9 @@ public interface ServiceReferenceAware {
 	/**
 	 * Return a map of service properties.
 	 * 
-	 * @return
+	 * <p/> If needed, the map can be cast to a {@link java.util.Dictionary} class.
+	 * 
+	 * @return map containing the service properties.
 	 */
 	Map getServiceProperties();
 

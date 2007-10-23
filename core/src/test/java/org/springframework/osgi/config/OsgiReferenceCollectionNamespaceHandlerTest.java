@@ -29,7 +29,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
-import org.springframework.osgi.context.support.BundleContextAwareProcessor;
+import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.internal.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.internal.service.collection.OsgiServiceList;
 import org.springframework.osgi.internal.service.collection.OsgiServiceSet;

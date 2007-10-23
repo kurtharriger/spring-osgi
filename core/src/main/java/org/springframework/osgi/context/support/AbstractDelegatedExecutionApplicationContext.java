@@ -17,6 +17,7 @@ package org.springframework.osgi.context.support;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.osgi.context.support.AbstractOsgiBundleApplicationContext;
 import org.springframework.osgi.internal.context.DelegatedExecutionOsgiBundleApplicationContext;
@@ -79,6 +80,25 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 	private boolean available = false;
 
+	/**
+	 * 
+	 * Create a new AbstractDelegatedExecutionApplicationContext with no parent.
+	 * 
+	 */
+	public AbstractDelegatedExecutionApplicationContext() {
+		super();
+	}
+
+	/**
+	 * Create a new AbstractDelegatedExecutionApplicationContext with the given
+	 * parent context.
+	 * 
+	 * @param parent the parent context
+	 */
+	public AbstractDelegatedExecutionApplicationContext(ApplicationContext parent) {
+		super(parent);
+	}
+
 	public boolean isAvailable() {
 		synchronized (availableMonitor) {
 			return available;
@@ -91,8 +111,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * continuation-like behavior or completion of the refresh method on several
 	 * threads, in a asynch manner.
 	 * 
-	 * By default, a {@link NoDependenciesWaitRefreshExecutor} is used which executes
-	 * the refresh method in one go (normal behavior).
+	 * By default, a {@link NoDependenciesWaitRefreshExecutor} is used which
+	 * executes the refresh method in one go (normal behavior).
 	 */
 	public void refresh() throws BeansException, IllegalStateException {
 		executor.refresh();
@@ -136,7 +156,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 		// check concurrent collection (which are mandatory)
 		if (!org.springframework.osgi.internal.util.ClassUtils.concurrentLibAvailable())
-			throw new IllegalStateException("JVM 5+ or backport-concurrent library (for JVM 1.4) required; see the FAQ for more details");
+			throw new IllegalStateException(
+					"JVM 5+ or backport-concurrent library (for JVM 1.4) required; see the FAQ for more details");
 
 		Thread thread = Thread.currentThread();
 		ClassLoader oldTCCL = thread.getContextClassLoader();
@@ -179,7 +200,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// Destroy already created singletons to avoid dangling
 					// resources.
 					beanFactory.destroySingletons();
-					logger.error("Post refresh error", ex); 
+					logger.error("Post refresh error", ex);
 					throw ex;
 				}
 			}
@@ -224,7 +245,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// Destroy already created singletons to avoid dangling
 					// resources.
 					getBeanFactory().destroySingletons();
-				    logger.error("Post refresh error", ex); 
+					logger.error("Post refresh error", ex);
 					throw ex;
 				}
 			}

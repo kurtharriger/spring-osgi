@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
 
 /**
  * 

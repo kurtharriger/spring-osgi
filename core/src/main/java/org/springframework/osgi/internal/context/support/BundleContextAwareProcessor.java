@@ -15,7 +15,7 @@
  *
  * Created on 23-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.context.support;
+package org.springframework.osgi.internal.context.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

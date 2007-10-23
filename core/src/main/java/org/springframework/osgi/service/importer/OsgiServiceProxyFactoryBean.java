@@ -48,18 +48,10 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 
 	private ServiceReferenceAware proxy;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean#destroy()
-	 */
 	public void destroy() throws Exception {
 		// FIXME: implement cleanup
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean#getObject()
-	 */
 	public Object getObject() {
 		if (!initialized)
 			throw new FactoryBeanNotInitializedException();
