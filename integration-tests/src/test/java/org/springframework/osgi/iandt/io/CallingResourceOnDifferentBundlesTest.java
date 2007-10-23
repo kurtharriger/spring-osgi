@@ -25,6 +25,7 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResource;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
@@ -52,11 +53,8 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 			Bundle bundle = bundles[i];
 			logger.debug("calling #getResource on bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			URL url = bundle.getResource(LOCATION);
-
-			// if (!OsgiBundleUtils.isFragment(bundle))
-			// assertNotNull("bundle " +
-			// OsgiStringUtils.nullSafeNameAndSymName(bundle) + " should have a
-			// " + LOCATION + " folder", url);
+			if (!OsgiBundleUtils.isFragment(bundle))
+				assertNotNull(url);
 		}
 	}
 
@@ -66,7 +64,8 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 			Bundle bundle = bundles[i];
 
 			Resource res = new OsgiBundleResource(bundle, ResourceLoader.CLASSPATH_URL_PREFIX + LOCATION);
-			System.out.println(res.exists());
+			if (!OsgiBundleUtils.isFragment(bundle))
+				assertTrue(res.exists());
 		}
 	}
 
@@ -77,9 +76,8 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 			Bundle bundle = bundles[i];
 			logger.debug("calling #getResources on bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			Enumeration enm = bundle.getResources(LOCATION);
-			// if (!OsgiBundleUtils.isFragment(bundle))
-			// assertNotNull("bundle " + bundle + " should have a " + LOCATION +
-			// " folder", enm);
+			if (!OsgiBundleUtils.isFragment(bundle))
+				assertNotNull(enm);
 		}
 
 	}
@@ -123,10 +121,6 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 		assertTrue("bundle listener hasn't been called", listenerCalled[0]);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
-	 */
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		return isKF();
 	}

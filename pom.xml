@@ -20,7 +20,7 @@
   <properties>
     <!-- Spring version -->   
     <spring.maven.artifact.version>2.5-rc1</spring.maven.artifact.version>
-    
+        
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
     <spring.osgi.import.version>1.0.0.rc1</spring.osgi.import.version>
     
@@ -279,8 +279,12 @@ limitations under the License.
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
 
            <Implementation-Title>Spring Dynamic Modules Framework</Implementation-Title>
-		   <Implementation-Version>${spring.version}</Implementation-Version>
-		   <Spring-Version>${spring.version}</Spring-Version>
+		   <Implementation-Version>${pom.version}</Implementation-Version>
+		   <Implementation-Vendor>Spring Dynamic Modules Framework</Implementation-Vendor>
+		   <Implementation-Vendor-Id>org.springframework.osgi</Implementation-Vendor-Id>
+		   
+		   <Spring-DM-Version>${pom.version}</Spring-DM-Version>
+		   <Spring-Version>${spring.maven.artifact.version}</Spring-Version>
 		   
 		  </instructions>
         </configuration>
