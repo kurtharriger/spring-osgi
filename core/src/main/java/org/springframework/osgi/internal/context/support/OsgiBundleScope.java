@@ -15,7 +15,6 @@
  */
 package org.springframework.osgi.internal.context.support;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,6 +27,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.Scope;
+import org.springframework.core.CollectionFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -48,7 +48,7 @@ import org.springframework.util.Assert;
 // This also means that the scope cannot interact with the cache and acts
 // only as an object creator and nothing more in favor of the ServiceFactory.
 // However, note that for the inner bundle, the scope has to mimic the OSGi
-// behavoir.
+// behaviour.
 // 
 public class OsgiBundleScope implements Scope, DisposableBean {
 
@@ -66,20 +66,18 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 	public static class BundleScopeServiceFactory implements ServiceFactory {
 		private ServiceFactory decoratedServiceFactory;
 
-		// FIXME: make this a concurrent map
 		/** destruction callbacks for bean instances */
-		private final Map callbacks = Collections.synchronizedMap(new LinkedHashMap(4));
+		private final Map callbacks = CollectionFactory.createConcurrentMap(4);
 
 		public BundleScopeServiceFactory(ServiceFactory serviceFactory) {
 			Assert.notNull(serviceFactory);
 			this.decoratedServiceFactory = serviceFactory;
 		}
 
-		/*
+		/**
 		 * Called if a bundle requests a service for the first time (start the
 		 * scope).
 		 * 
-		 * (non-Javadoc)
 		 * @see org.osgi.framework.ServiceFactory#getService(org.osgi.framework.Bundle,
 		 * org.osgi.framework.ServiceRegistration)
 		 */
@@ -93,7 +91,7 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 
 				// get callback (registered through the scope)
 				Object passedObject = OsgiBundleScope.CALLING_BUNDLE.get();
-				
+
 				// make sure it's not the marker object
 				if (passedObject != null && passedObject instanceof Runnable) {
 					Runnable callback = (Runnable) OsgiBundleScope.CALLING_BUNDLE.get();
@@ -108,10 +106,9 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 			}
 		}
 
-		/*
+		/**
 		 * Called if a bundle releases the service (stop the scope).
 		 * 
-		 * (non-Javadoc)
 		 * @see org.osgi.framework.ServiceFactory#ungetService(org.osgi.framework.Bundle,
 		 * org.osgi.framework.ServiceRegistration, java.lang.Object)
 		 */
@@ -147,8 +144,7 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 	 * is sychronized and is used by
 	 * {@link org.springframework.osgi.internal.context.support.OsgiBundleScope}.
 	 */
-	// TODO: replace this with a concurrent map
-	private final Map beans = Collections.synchronizedMap(new LinkedHashMap(16));
+	private final Map beans = CollectionFactory.createConcurrentMap(16);
 
 	/**
 	 * Unsynchronized map of callbacks for the services used by the running
@@ -215,16 +211,17 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 	 */
 	public void destroy() {
 		boolean debug = log.isDebugEnabled();
-		
+
 		// handle only the local cache/beans
-		// the ServiceFactory object will be destroyed upon service unregistration
+		// the ServiceFactory object will be destroyed upon service
+		// unregistration
 		for (Iterator iter = destructionCallbacks.entrySet().iterator(); iter.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();
 			Runnable callback = (Runnable) entry.getValue();
 
 			if (debug)
 				log.debug("destroying local bundle scoped bean [" + entry.getKey() + "]");
-			
+
 			callback.run();
 		}
 

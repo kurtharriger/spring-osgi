@@ -316,7 +316,6 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 
 	public void visitTypeVariable(String name) {
 		tempLdc = null;
-		// TODO verify
 	}
 
 	public SignatureVisitor visitArrayType() {

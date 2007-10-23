@@ -19,7 +19,7 @@
 
   <properties>
     <!-- Spring version -->   
-    <spring.maven.artifact.version>2.1-m4</spring.maven.artifact.version>
+    <spring.maven.artifact.version>2.5-rc1</spring.maven.artifact.version>
     
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
     <spring.osgi.import.version>1.0.0.rc1</spring.osgi.import.version>

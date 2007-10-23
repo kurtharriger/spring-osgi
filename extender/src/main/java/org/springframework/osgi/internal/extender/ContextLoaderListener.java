@@ -292,7 +292,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * Required by the BundleActivator contract
 	 */
 	public ContextLoaderListener() {
-		this.managedContexts = CollectionFactory.createConcurrentMapIfPossible(30);
+		this.managedContexts = CollectionFactory.createConcurrentMap(16);
 	}
 
 	/**

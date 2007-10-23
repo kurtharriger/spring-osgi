@@ -14,39 +14,29 @@
   <version>1.0-rc1-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   
-  <properties>
-     <spring.osgi.version>2.1-m4</spring.osgi.version>
-  </properties>
-  
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.2</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
-      <version>${spring.osgi.version}</version>
+      <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>      
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>${spring.osgi.version}</version>
+      <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>      
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
-      <version>${spring.osgi.version}</version>
+      <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>      
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>${spring.osgi.version}</version>
+      <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>      
     </dependency>
     <dependency>

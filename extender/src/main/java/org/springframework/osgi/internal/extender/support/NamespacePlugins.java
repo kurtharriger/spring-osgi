@@ -17,7 +17,6 @@ package org.springframework.osgi.internal.extender.support;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -86,8 +85,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 	private static final Log log = LogFactory.getLog(NamespacePlugins.class);
 
-	// TODO - use a concurrent map
-	private final Map plugins = Collections.synchronizedMap(CollectionFactory.createLinkedMapIfPossible(5));
+	private final Map plugins = CollectionFactory.createConcurrentMap(5);
 
 	public void addHandler(Bundle bundle) {
 		if (log.isDebugEnabled())
