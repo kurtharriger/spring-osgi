@@ -14,78 +14,42 @@
   <version>1.0-rc1-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   
-   <properties>
-     <spring.osgi.version>2.1-m4</spring.osgi.version>
-  </properties>
-  
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.2</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>${spring.osgi.version}</version>
+      <version>${spring.maven.artifact.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>${spring.osgi.version}</version>
+      <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-      <version>${spring.osgi.version}</version>
+      <version>${spring.maven.artifact.version}</version>
 	  <scope>provided</scope>      
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
-      <version>${spring.osgi.version}</version>
+      <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>      
     </dependency>
     
-   <!-- commons-logging in slf4j wrapper -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl104-over-slf4j</artifactId>
-      <version>1.3.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.3.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.3.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>log4j.osgi</artifactId>
-      <version>1.2.13-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>    
-        
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>${spring.osgi.version}</version>
+      <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
-      <version>${spring.osgi.version}</version>
+      <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

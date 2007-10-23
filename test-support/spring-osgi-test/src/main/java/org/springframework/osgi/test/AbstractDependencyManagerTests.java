@@ -54,16 +54,22 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		super(name);
 	}
 
-	private static final String SPRING_OSGI_VERSION = "1.0-rc1-SNAPSHOT";
+	private static final String SPRING_OSGI_VERSION_PROP_KEY = "ignore.spring.osgi.version";
 
-	private static final String SPRING_BUNDLED_VERSION = "2.1-m4";
+	private static final String SPRING_VERSION_PROP_KEY = "ignore.spring.version";
+
+	/** uninitialised - read from the properties file */
+	private String springOsgiVersion = "";
 	
+	/** uninitialised - read from the properties file */
+	private String springBundledVersion = "";
+
 	/**
 	 * Return the Spring/OSGi version used by the core bundles.
 	 * @return
 	 */
 	protected String getSpringOsgiVersion() {
-		return SPRING_OSGI_VERSION;
+		return springOsgiVersion;
 	}
 
 	/**
@@ -72,7 +78,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * @return
 	 */
 	protected String getSpringBundledVersion() {
-		return SPRING_BUNDLED_VERSION;
+		return springBundledVersion;
 	}
 
 	/**
@@ -122,6 +128,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		if (trace)
 			logger.trace("loaded properties " + props);
 
+		// initialize test version fields
+		springBundledVersion = props.getProperty(SPRING_VERSION_PROP_KEY);
+		springOsgiVersion = props.getProperty(SPRING_OSGI_VERSION_PROP_KEY);
+		
 		Properties excluded = PropertiesUtil.filterKeysStartingWith(props, IGNORE);
 
 		if (trace) {
@@ -190,7 +200,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	private Resource[] locateBundles(String[] bundles) {
 		if (bundles == null)
 			bundles = new String[0];
-		
+
 		Resource[] res = new Resource[bundles.length];
 		for (int i = 0; i < bundles.length; i++) {
 			res[i] = locateBundle(bundles[i]);

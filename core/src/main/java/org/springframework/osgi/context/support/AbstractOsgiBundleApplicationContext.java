@@ -170,8 +170,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	/**
-	 * Return this application context configuration locations.
-	 * The default implementation will check whether there are any locations configured and,
+	 * Return this application context configuration locations. The default
+	 * implementation will check whether there are any locations configured and,
 	 * if not, will return the default locations.
 	 * 
 	 * @see #getDefaultConfigLocations()
@@ -181,15 +181,22 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		return (this.configLocations != null ? this.configLocations : getDefaultConfigLocations());
 	}
 
+	/**
+	 * Unregister the ApplicationContext OSGi service (in case there is any).
+	 */
 	protected void doClose() {
 		if (!OsgiServiceUtils.unregisterService(serviceRegistration)) {
 			logger.info("the application context service has been already unregistered");
+			serviceRegistration = null;
 		}
 
 		// call super class
 		super.doClose();
 	}
 
+	/**
+	 * Clean up any beans from the bundle scope.
+	 */
 	protected void destroyBeans() {
 		super.destroyBeans();
 
@@ -255,18 +262,6 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 				registry.registerCustomEditor(ServiceReference.class, new SingleServiceReferenceEditor());
 			}
 		});
-	}
-
-	// FIXME: replace this with #destroyBeans after SPR-3950 is fixed
-	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
-		try {
-			// before refreshing, destroy the scope in the previous bean factory
-			cleanOsgiBundleScope(getBeanFactory());
-		}
-		catch (IllegalStateException ex) {
-			/* ignore - no beanFactory exists yet */
-		}
-		return super.obtainFreshBeanFactory();
 	}
 
 	protected void cleanOsgiBundleScope(ConfigurableListableBeanFactory beanFactory) {

@@ -84,7 +84,7 @@ public class DependencyMockBundle extends MockBundle {
 	public void setDependentOn(final Bundle[] dependent, int[] serviceRanking, long[] serviceId) {
 		this.dependentOn = dependent;
 
-		// initialize registered services
+		// initialise registered services
 		registeredServices = new ServiceReference[dependent.length];
 
 		for (int i = 0; i < registeredServices.length; i++) {

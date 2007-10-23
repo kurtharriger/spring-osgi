@@ -30,6 +30,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.CollectionFactory;
+import org.springframework.core.ConcurrentMap;
 import org.springframework.osgi.internal.service.MandatoryDependencyEvent;
 import org.springframework.osgi.internal.service.MandatoryDependencyListener;
 import org.springframework.osgi.internal.service.ServiceExporter;
@@ -99,16 +100,16 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 	private static final Log log = LogFactory.getLog(DefaultMandatoryDependencyManager.class);
 
 	/** association of importers instances: name -> ServiceImporter instance */
-	private final Map importers = CollectionFactory.createConcurrentMapIfPossible(4);
+	private final Map importers = CollectionFactory.createConcurrentMap(4);
 
 	/** association of exporter instances: name -> ServiceExporter instance */
-	private final Map exporters = CollectionFactory.createConcurrentMapIfPossible(4);
+	private final Map exporters = CollectionFactory.createConcurrentMap(4);
 
 	/** cache map - useful for avoiding double registration */
-	private final Map importersSeen = CollectionFactory.createConcurrentMapIfPossible(4);
+	private final ConcurrentMap importersSeen = CollectionFactory.createConcurrentMap(4);
 
 	/** cache map - useful for avoiding double registration */
-	private final Map exportersSeen = CollectionFactory.createConcurrentMapIfPossible(4);
+	private final ConcurrentMap exportersSeen = CollectionFactory.createConcurrentMap(4);
 
 	private static final Object VALUE = new Object();
 
@@ -120,14 +121,14 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 	 * the map contains as key the importers instances and as values, a list of
 	 * exporter instances
 	 */
-	private final Map importerToExportersDeps = CollectionFactory.createConcurrentMapIfPossible(8);
+	private final Map importerToExportersDeps = CollectionFactory.createConcurrentMap(8);
 
 	/**
-	 * Importers on which an exporter depends. The exporter instace is used as a
+	 * Importers on which an exporter depends. The exporter instance is used as a
 	 * key, while the value is represented by a list of importers name and their
 	 * status (up or down).
 	 */
-	private final Map exporterToImporterDeps = CollectionFactory.createConcurrentMapIfPossible(8);
+	private final Map exporterToImporterDeps = CollectionFactory.createConcurrentMap(8);
 
 	/** owning bean factory */
 	private ConfigurableListableBeanFactory beanFactory;
@@ -137,15 +138,13 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 	public void addServiceExporter(String exporterBeanName) {
 		Assert.hasText(exporterBeanName);
 
-		// FIXME: this should be atomical
-		if (!exportersSeen.containsKey(exporterBeanName)) {
-			exportersSeen.put(exporterBeanName, VALUE);
+		if (exportersSeen.putIfAbsent(exporterBeanName, VALUE) == null) {
 
 			String beanName = exporterBeanName;
-			
+
 			if (beanFactory.isFactoryBean(exporterBeanName))
 				beanName = BeanFactory.FACTORY_BEAN_PREFIX + exporterBeanName;
-			
+
 			// check if it's factory bean (no need to check for abstract
 			// definition since we're called by a BPP)
 			if (!beanFactory.isSingleton(beanName))
@@ -194,11 +193,9 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 					importers.put(importer, importerNames[i]);
 
 					// lock the entry
-					// TODO: fix this once putIfAbsent is available
 					synchronized (importerListener) {
-						if (!importersSeen.containsKey(importer)) {
+						if (importersSeen.putIfAbsent(importer, importerNames[i])== null) {
 							importer.registerListener(importerListener);
-							importersSeen.put(importer, importerNames[i]);
 						}
 					}
 				}
