@@ -3,6 +3,7 @@
 <xsd:schema xmlns="http://www.springframework.org/schema/osgi"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:beans="http://www.springframework.org/schema/beans"
+            xmlns:tool="http://www.springframework.org/schema/tool"
             targetNamespace="http://www.springframework.org/schema/osgi"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified"
@@ -17,6 +18,15 @@
         </xsd:documentation>
     </xsd:annotation>
 
+ 	<!-- attributes -->
+ 	<xsd:attribute name="default-timeout" type="xsd:long">
+ 		<xsd:annotation>
+        	<xsd:documentation>
+            	Default timeout (in milliseconds) for all reference(service importers) elements that do not explicitly specify one.
+        	</xsd:documentation>
+    	</xsd:annotation>
+ 	</xsd:attribute>
+ 	
     <!-- reference -->
     
     <xsd:element name="reference" type="TsingleReference">
@@ -44,8 +54,13 @@
                       <xsd:annotation>
                       	<xsd:documentation>
                       	  The service interface that the services obtained via the registry are required to support.
-                      	  By convention this is a Java interface type, but may also be a class type.
+                      	  By convention this is a Java interface type, but may also be a (non-final) class type.
                       	</xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation>
+  								<tool:expected-type type="java.lang.Class" />
+  							</tool:annotation>
+						</xsd:appinfo>  							
                       </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="filter" use="optional" type="xsd:string">
@@ -106,7 +121,6 @@
     	</xsd:annotation>
         <xsd:sequence minOccurs="0" maxOccurs="1">
             <!-- nested bean declaration -->
-            <!--  TODO: why can't we refer to beans:beanType here???  -->
             <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
         </xsd:sequence>
 
@@ -148,10 +162,10 @@
                       	</xsd:documentation>
                       </xsd:annotation>
                 </xsd:attribute>
-				<xsd:attribute name="timeout" use="optional" type="xsd:int">
+				<xsd:attribute name="timeout" use="optional" type="xsd:long">
                     <xsd:annotation>
                       	<xsd:documentation>
-                      	  For a 'reference' element, the amount of time (in ms) to wait for a backing service to be 
+                      	  For a 'reference' element, the amount of time (in milliseconds) to wait for a backing service to be 
                       	  available when an operation is invoked. If no timeout value is specified the 
                       	  invocation will block indefinitely until a backing service is available. See also the 
                       	  default-timeout attribute of the osgi element. 
@@ -170,35 +184,48 @@
    </xsd:simpleType>
 
 	<!-- reference collections (set, list) -->
-
 	<xsd:element name="list" type="TreferenceCollection">
 		<xsd:annotation>
-			<xsd:documentation source="java:org.springframework.osgi.collection.OsgiServiceList">
+			<xsd:documentation source="java:org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean">
 			  Defines a bean of type 'List' that contains all of the services matching the given criteria.
 			  The list members are managed dynamically as matching backing services come and go.
 			</xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="java.util.List"/>
+				</tool:annotation>
+			</xsd:appinfo>			
 		</xsd:annotation>
 	</xsd:element>
 
 	<xsd:element name="set" type="TreferenceCollection">
 		<xsd:annotation>
-			<xsd:documentation source="java:org.springframework.osgi.collection.OsgiServiceSet">
+			<xsd:documentation source="java:org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean">
 			  Defines a bean of type 'Set' that contains all of the services matching the given criteria.
 			  The set members are managed dynamically as matching backing services come and go.
 			</xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="java.util.Set"/>
+				</tool:annotation>
+			</xsd:appinfo>			
 		</xsd:annotation>
 	</xsd:element>
 
 	<xsd:complexType name="TreferenceCollection">
 		<xsd:complexContent>
 			<xsd:extension base="Treference">
-			<!-- TODO: Eclipse gives a schema validation error on this next line -->
 				<xsd:sequence minOccurs="0" maxOccurs="1">
 					<xsd:element name="comparator" type="Tcomparator">
 						<xsd:annotation>
 							<xsd:documentation source="java:java.util.Comparator">
 							  Used to define an inline bean of type Comparator that will be used to sort the matching services.
 							</xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation>
+									<tool:expected-type type="java.util.Comparator" />
+  								</tool:annotation>
+							</xsd:appinfo>  							
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -230,7 +257,6 @@
 		   <xsd:element name="natural" type="TnaturalOrdering"/>
      	   <xsd:sequence minOccurs="1" maxOccurs="1">
         	    <!-- nested bean declaration -->
-            	<!--  TODO: why can't we use beans:beanType here???  -->
            		<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
         	</xsd:sequence>
         </xsd:choice>
@@ -260,10 +286,15 @@
 
     <xsd:complexType name="Tservice">
     	<xsd:annotation>
-    		<xsd:documentation>
+    		<xsd:documentation source="java:org.springframework.osgi.service.exporter.OsgiServiceFactoryBean">
     			Exports the reference bean as a service in the OSGi service registry. The bean defined by this element is of 
     			type org.osgi.framework.ServiceRegistration.
     		</xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="org.osgi.framework.ServiceRegistration"/>
+				</tool:annotation>
+			</xsd:appinfo>			
     	</xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="beans:identifiedType">
@@ -292,7 +323,6 @@
                     </xsd:element>
                     
                     <!-- nested bean declaration -->
-                    <!-- TODO: why can't this be beans:beanType ??? -->
                     <xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="skip"/>
                 </xsd:sequence>
                 <xsd:attribute name="interface" type="xsd:string" use="optional">
@@ -300,6 +330,11 @@
                 		<xsd:documentation>
                 			Defines the interface to advertise for this service in the service registry.
                 		</xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation>
+  								<tool:expected-type type="java.lang.Class" />
+  							</tool:annotation>
+						</xsd:appinfo>  							
                 	</xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="ref" type="xsd:string" use="optional">
@@ -359,7 +394,6 @@
     	</xsd:annotation>
         <xsd:sequence minOccurs="0" maxOccurs="1">
             <!-- nested bean declaration -->
-            <!--  TODO: why can't we refer to beans:beanType here???  -->
             <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
         </xsd:sequence>
 
@@ -367,7 +401,7 @@
         <xsd:attribute name="ref" type="xsd:string" use="optional">
         	<xsd:annotation>
         		<xsd:documentation>
-        			Refers by name to the bean that will receive register and unregister events
+        			Refers by name to the bean that will receive register and unregister events.
         		</xsd:documentation>
         	</xsd:annotation>
         </xsd:attribute>
@@ -410,6 +444,11 @@
     		<xsd:documentation>
     			Defines a bean representing a Bundle object. May be used to drive bean lifecycle transitions.
     		</xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="org.osgi.framework.Bundle"/>
+				</tool:annotation>
+			</xsd:appinfo>    		
     	</xsd:annotation>
     </xsd:element>
 
@@ -433,8 +472,13 @@
                 <xsd:attribute name="location" type="xsd:string" use="optional">
                 	<xsd:annotation>
                 		<xsd:documentation>
-                			A URL from which the contents of the bundle can be loaded.
+                			A Resource from which the contents of the bundle can be loaded.
                 		</xsd:documentation>
+                		<xsd:appinfo>
+							<tool:annotation>
+  								<tool:expected-type type="org.springframework.core.io.Resource" />
+  							</tool:annotation>
+						</xsd:appinfo>  							
                 	</xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="action" type="TbundleAction" use="optional">

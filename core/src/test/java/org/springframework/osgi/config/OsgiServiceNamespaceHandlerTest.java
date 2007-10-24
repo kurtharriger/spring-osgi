@@ -36,10 +36,10 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
-import org.springframework.osgi.internal.service.util.OsgiServiceRegistrationListener;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.mock.MockServiceRegistration;
+import org.springframework.osgi.service.OsgiServiceRegistrationListener;
 import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
 
 /**

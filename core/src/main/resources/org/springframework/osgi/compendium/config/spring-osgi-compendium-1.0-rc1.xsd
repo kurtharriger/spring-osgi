@@ -3,6 +3,7 @@
 <xsd:schema xmlns="http://www.springframework.org/schema/osgi-compendium"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:beans="http://www.springframework.org/schema/beans"
+            xmlns:tool="http://www.springframework.org/schema/tool"
             targetNamespace="http://www.springframework.org/schema/osgi-compendium"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified"
@@ -26,6 +27,11 @@
     			delimited values ( ${...} by default) with properties sourced from
     			the Configuration Admin service under the given persistent id.
     		</xsd:documentation>
+    		<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="java.util.Properties"/>
+				</tool:annotation>
+			</xsd:appinfo>			
     	</xsd:annotation>
     </xsd:element>
 
