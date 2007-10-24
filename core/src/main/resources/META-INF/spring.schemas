@@ -1,2 +1,4 @@
-http\://www.springframework.org/schema/osgi/spring-osgi.xsd=org/springframework/osgi/config/spring-osgi.xsd
-http\://www.springframework.org/schema/osgi/spring-osgi-compendium.xsd=org/springframework/osgi/compendium/config/spring-osgi-compendium.xsd
+http\://www.springframework.org/schema/osgi/spring-osgi-1.0-rc1.xsd=org/springframework/osgi/config/spring-osgi-1.0-rc1.xsd
+http\://www.springframework.org/schema/osgi/spring-osgi.xsd=org/springframework/osgi/config/spring-osgi-1.0-rc1.xsd
+http\://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium-1.0-rc1.xsd=org/springframework/osgi/compendium/config/spring-osgi-compendium-1.0-rc1.xsd
+http\://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd=org/springframework/osgi/compendium/config/spring-osgi-compendium-1.0-rc1.xsd

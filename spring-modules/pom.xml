@@ -23,7 +23,7 @@
     <spring.osgi.import>${spring.osgi.import.pkg}, org.springframework*;version=${spring.version}, *</spring.osgi.import>
      
     <!-- copy the resources inside the bundles | pattern works only for Spring -->
-    <spring.osgi.include.res>@${pom.artifactId}-${spring.version}.jar!/META-INF/*</spring.osgi.include.res>	     
+    <spring.osgi.include.res>@${pom.artifactId}-${spring.version}.jar!/META-INF/*</spring.osgi.include.res>	 
   </properties>
  
 

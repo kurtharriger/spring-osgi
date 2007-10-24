@@ -748,7 +748,7 @@ The OSGi Service Platform Service Compendium specification defines a number of a
        xsi:schemaLocation="http://www.springframework.org/schema/osgi  
             http://www.springframework.org/schema/osgi/spring-osgi.xsd
             http://www.springframework.org/schema/osgi-compendium"
-            http://www.springframework.org/schema/osgi/spring-osgi-compendium.xsd"">
+            http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd"">
 
        <!-- use the OSGi namespace elements directly -->
        <service id="simpleServiceOsgi" ref="simpleService"
