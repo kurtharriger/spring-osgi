@@ -5,14 +5,15 @@
             xmlns:beans="http://www.springframework.org/schema/beans"
             targetNamespace="http://www.springframework.org/schema/osgi-compendium"
             elementFormDefault="qualified"
-            attributeFormDefault="unqualified">
+            attributeFormDefault="unqualified"
+            version="1.0-rc1">
 
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
     <xsd:import namespace="http://www.springframework.org/schema/tool"/>
 
     <xsd:annotation>
         <xsd:documentation>
-            Namespace support for the compendium services provided by Spring Dynamic Modules.
+            Namespace support for the compendium services provided by Spring Dynamic Modules, version 1.0-rc1.
         </xsd:documentation>
     </xsd:annotation>
 

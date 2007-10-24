@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                      		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi/spring-osgi-compendium.xsd">
+                      		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium-1.0-rc1.xsd">
 
 
     <osgix:config-properties persistent-id="test.service.pid">

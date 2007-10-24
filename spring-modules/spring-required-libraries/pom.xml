@@ -15,6 +15,7 @@
   <properties>
       <spring.osgi.export>${spring.osgi.export.pkg}*;version=${unpack.version}</spring.osgi.export>
       <spring.osgi.import>${spring.osgi.import.pkg}</spring.osgi.import>
+      <spring.osgi.include.res></spring.osgi.include.res>
  </properties>
 
   <modules>
