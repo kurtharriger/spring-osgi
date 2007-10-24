@@ -35,10 +35,6 @@ public class AsyncWaitTest extends BehaviorBaseTest {
 
 	private ServiceRegistration registration;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#onTearDown()
-	 */
 	protected void onTearDown() throws Exception {
 		OsgiServiceUtils.unregisterService(registration);
 	}
@@ -66,7 +62,7 @@ public class AsyncWaitTest extends BehaviorBaseTest {
 		registration = bundleContext.registerService(Shape.class.getName(), new Area(), null);
 
 		// do wait a bit to let the appCtx to fully start
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 
 		// check the appCtx again (should be published)
 		assertContextServiceIs(bundle, true);
