@@ -61,8 +61,14 @@ public class ServiceRegistrationWrapper implements ServiceRegistration {
 		// if no exception has been thrown (i.e. the delegate is properly
 		// unregistered), the liteners will be informed
 		for (int i = 0; i < listeners.length; i++) {
-			if (listeners[i] != null)
-				listeners[i].unregistered(properties);
+			if (listeners[i] != null) {
+				try {
+					listeners[i].unregistered(properties);
+				}
+				catch (Exception ex) {
+					// no need to log exceptions, the wrapper already does this
+				}
+			}
 		}
 	}
 

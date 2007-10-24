@@ -16,9 +16,10 @@
 package org.springframework.osgi.internal.config;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -26,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * TargetSourceLifecycleListener wrapper for custom beans, useful when custom
@@ -55,12 +57,10 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 		isLifecycleListener = target instanceof TargetSourceLifecycleListener;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	/**
+	 * Initialise adapter. Determine custom methods and do validation.
 	 */
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 
 		if (isLifecycleListener)
 			if (log.isDebugEnabled())
@@ -68,7 +68,7 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 		bindMethods = determineCustomMethods(bindMethod);
 		unbindMethods = determineCustomMethods(unbindMethod);
 
-		if (!isLifecycleListener && (bindMethods == null || unbindMethods == null))
+		if (!isLifecycleListener && (bindMethods.isEmpty() && unbindMethods.isEmpty()))
 			throw new IllegalArgumentException("target object needs to implement "
 					+ TargetSourceLifecycleListener.class.getName()
 					+ " or custom bind/unbind methods have to be specified");
@@ -76,17 +76,20 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 
 	/**
 	 * Determine a custom method (if specified) on the given object. If the
-	 * methodName is not null and no method is found, an exception is thrown.
+	 * methodName is not null and no method is found, an exception is thrown. If
+	 * the methodName is null/empty, an empty map is returned.
 	 * 
 	 * @param methodName
 	 * @return
 	 */
-	private Map determineCustomMethods(final String methodName) {
-		if (methodName == null) {
-			return null;
+	protected Map determineCustomMethods(final String methodName) {
+		if (!StringUtils.hasText(methodName)) {
+			return Collections.EMPTY_MAP;
 		}
 
-		final Map methods = new HashMap(3);
+		final Map methods = new LinkedHashMap(3);
+
+		final boolean trace = log.isTraceEnabled();
 
 		ReflectionUtils.doWithMethods(target.getClass(), new ReflectionUtils.MethodCallback() {
 
@@ -97,19 +100,24 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 
 					// Properties can be passed as Map or Dictionary
 					if (args != null && args.length == 2) {
-						if (Dictionary.class.isAssignableFrom(args[1]) || Map.class.isAssignableFrom(args[1])) {
-							if (log.isDebugEnabled())
-								log.debug("discovered custom method [" + method.toString() + "] on "
+						Class propType = args[1];
+						if (Dictionary.class.isAssignableFrom(propType) || Map.class.isAssignableFrom(propType)) {
+							if (trace)
+								log.trace("discovered custom method [" + method.toString() + "] on "
 										+ target.getClass());
+
+							// see if there was a method already found
 							Method m = (Method) methods.get(args[0]);
 
 							if (m != null) {
-								if (log.isDebugEnabled())
-									log.debug("type " + args[0] + " already has an associated method [" + m.toString()
+								if (trace)
+									log.trace("type " + args[0] + " already has an associated method [" + m.toString()
 											+ "];ignoring " + method);
 							}
-							else
+							else {
+								ReflectionUtils.makeAccessible(method);
 								methods.put(args[0], method);
+							}
 						}
 					}
 				}
@@ -124,15 +132,15 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 	}
 
 	/**
-	 * Call the method approapriate (which have the key an instance of the given
-	 * service) from the given method map.
+	 * Call the appropriate method (which have the key a type compatible of the
+	 * given service) from the given method map.
 	 * 
 	 * @param target
 	 * @param methods
 	 * @param service
 	 * @param properties
 	 */
-	// properties should be a Dictionary implementing a Map interface
+	// the properties field is Dictionary implementing a Map interface
 	protected void invokeCustomMethods(Object target, Map methods, Object service, Map properties) {
 		if (methods != null && !methods.isEmpty()) {
 			boolean trace = log.isTraceEnabled();
@@ -141,9 +149,9 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 			for (Iterator iter = methods.entrySet().iterator(); iter.hasNext();) {
 				Map.Entry entry = (Map.Entry) iter.next();
 				Class key = (Class) entry.getKey();
+				Method method = (Method) entry.getValue();
 				// find the compatible types (accept null service)
 				if (service == null || key.isInstance(service)) {
-					Method method = (Method) entry.getValue();
 					if (trace)
 						log.trace("invoking listener custom method " + method);
 
@@ -154,7 +162,7 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 					// rest of
 					// the listeners
 					catch (Exception ex) {
-						log.warn("custom method [" + entry.getValue() + "] threw exception when passing service ["
+						log.warn("custom method [" + method + "] threw exception when passing service type ["
 								+ (service != null ? service.getClass().getName() : null) + "]", ex);
 					}
 				}

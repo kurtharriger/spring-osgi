@@ -65,18 +65,10 @@ public class MapBasedDictionary extends Dictionary implements Map {
 			this(col.iterator());
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Enumeration#hasMoreElements()
-		 */
 		public boolean hasMoreElements() {
 			return it.hasNext();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see java.util.Enumeration#nextElement()
-		 */
 		public Object nextElement() {
 			return it.next();
 		}
@@ -84,8 +76,7 @@ public class MapBasedDictionary extends Dictionary implements Map {
 	}
 
 	public MapBasedDictionary(Map map) {
-		Assert.notNull(map);
-		this.map = map;
+		this.map = (map == null ? new LinkedHashMap() : map);
 	}
 
 	/**
@@ -112,71 +103,40 @@ public class MapBasedDictionary extends Dictionary implements Map {
 
 	public MapBasedDictionary(Map map, Dictionary dictionary) {
 		this(map);
-		putAll(dictionary);
+		if (dictionary != null)
+			putAll(dictionary);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#clear()
-	 */
 	public void clear() {
 		map.clear();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#containsKey(java.lang.Object)
-	 */
 	public boolean containsKey(Object key) {
 		return map.containsKey(key);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#containsValue(java.lang.Object)
-	 */
 	public boolean containsValue(Object value) {
 		return map.containsValue(value);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#entrySet()
-	 */
 	public Set entrySet() {
 		return map.entrySet();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#get(java.lang.Object)
-	 */
 	public Object get(Object key) {
 		if (key == null)
 			throw new NullPointerException();
 		return map.get(key);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#isEmpty()
-	 */
 	public boolean isEmpty() {
 		return map.isEmpty();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#keySet()
-	 */
 	public Set keySet() {
 		return map.keySet();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
-	 */
+	
 	public Object put(Object key, Object value) {
 		if (key == null || value == null)
 			throw new NullPointerException();
@@ -184,10 +144,6 @@ public class MapBasedDictionary extends Dictionary implements Map {
 		return map.put(key, value);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#putAll(java.util.Map)
-	 */
 	public void putAll(Map t) {
 		map.putAll(t);
 	}
@@ -201,10 +157,6 @@ public class MapBasedDictionary extends Dictionary implements Map {
 			}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#remove(java.lang.Object)
-	 */
 	public Object remove(Object key) {
 		if (key == null)
 			throw new NullPointerException();
@@ -212,59 +164,32 @@ public class MapBasedDictionary extends Dictionary implements Map {
 		return map.remove(key);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#size()
-	 */
 	public int size() {
 		return map.size();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Map#values()
-	 */
 	public Collection values() {
 		return map.values();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Dictionary#elements()
-	 */
 	public Enumeration elements() {
 		return new IteratorBasedEnumeration(map.values());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Dictionary#keys()
-	 */
 	public Enumeration keys() {
 		return new IteratorBasedEnumeration(map.keySet());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	public String toString() {
 		return map.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	public boolean equals(Object obj) {
-		// this should work nicely since the Dictionary implementations inside the JDK are Maps also
+		// this should work nicely since the Dictionary implementations inside
+		// the JDK are Maps also
 		return map.equals(obj);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	public int hashCode() {
 		return map.hashCode();
 	}

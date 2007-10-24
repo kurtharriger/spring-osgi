@@ -567,7 +567,7 @@ When the service backing a `reference` bean goes away, Spring Dynamic Modules tr
 
 When an operation is invoked on an unsatisfied `reference` bean (either optional or mandatory), the invocation blocks until the reference becomes satisfied. The optional `timeout` attribute of the `reference` element enables a timeout value (in milliseconds) to be specified. If a timeout value is specified and no matching service becomes available within the timeout period, an unchecked `ServiceUnavailableException` is thrown.
 
-When using the `osgi` element to enclose `service` and `reference` elements, the `default-timeout` attribute may be used to specify a default timeout for all reference elements that do not explicitly specify one. For example:
+When using the `osgi` element to enclose `service` and `reference` elements, the `default-timeout` attribute may be used to specify a default timeout (in milliseconds) for all reference elements that do not explicitly specify one. For example:
 
     <osgi default-timeout="5000">
 
