@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.internal.service.util;
+package org.springframework.osgi.service;
 
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public interface OsgiServiceRegistrationListener {
 	void registered(Map serviceProperties);
 
 	/**
-	 * Called when the OSGi service has been unregistered (unexported).
+	 * Called when the OSGi service has been unregistered (removed from OSGi space).
 	 * 
 	 * @param serviceProperties OSGi service registration properties
 	 */
