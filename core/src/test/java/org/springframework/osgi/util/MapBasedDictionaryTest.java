@@ -41,14 +41,8 @@ public class MapBasedDictionaryTest extends TestCase {
 	}
 
 	public void testDictionaryWithNullMap() {
-		try {
-			dict = new MapBasedDictionary((Map) null);
-			fail("should have thrown exception");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
-
+		dict = new MapBasedDictionary((Map) null);
+		assertTrue(dict.isEmpty());
 	}
 
 	public void testElements() {

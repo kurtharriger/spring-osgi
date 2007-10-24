@@ -44,7 +44,7 @@ public abstract class AbstractListenerAwareExporter extends AbstractServiceExpor
 		// wrap registration to be notified of unregistration
 		return new ServiceRegistrationWrapper(registration, listeners);
 	}
-	
+
 	/**
 	 * Call registration on listeners.
 	 * 
@@ -52,8 +52,15 @@ public abstract class AbstractListenerAwareExporter extends AbstractServiceExpor
 	 */
 	private void callRegisteredOnListeners(Map properties) {
 		for (int i = 0; i < listeners.length; i++) {
-			if (listeners[i] != null)
-				listeners[i].registered(properties);
+			if (listeners[i] != null) {
+				try {
+					listeners[i].registered(properties);
+				}
+				catch (Exception ex) {
+					// no need to log exceptions, the wrapper already does this
+				}
+			}
+
 		}
 	}
 

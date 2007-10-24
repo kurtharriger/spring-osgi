@@ -103,6 +103,12 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 		}
 	}
 
+	/**
+	 * Override standard methods with ones that throw exceptions.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
 	protected static class ExceptionListener extends CustomAndListener {
 
 		public void bind(Object service, Map properties) throws Exception {
@@ -164,7 +170,20 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 		public void myUnbind(Object service, Map properties) {
 			UNBIND_CALLS++;
 		}
+	}
 
+	protected static class JustBind {
+
+		public void myBind(Object service, Map properties) {
+			JustListener.BIND_CALLS++;
+		}
+	}
+
+	protected static class JustUnbind {
+
+		public void myUnbind(Object service, Map properties) {
+			JustListener.UNBIND_CALLS++;
+		}
 	}
 
 	private TargetSourceLifecycleListenerWrapper listener;
@@ -379,12 +398,12 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 		assertEquals(0, ExceptionCustomListener.BIND_CALLS);
 		assertEquals(0, ExceptionCustomListener.UNBIND_CALLS);
 		listener.bind(service, null);
-		assertEquals(1, ExceptionCustomListener.BIND_CALLS);
+		assertEquals("should have called overloaded method with type Object", 1, ExceptionCustomListener.BIND_CALLS);
 		assertEquals(0, ExceptionCustomListener.UNBIND_CALLS);
 
 		listener.unbind(service, null);
 		assertEquals(1, ExceptionCustomListener.BIND_CALLS);
-		assertEquals(1, ExceptionCustomListener.UNBIND_CALLS);
+		assertEquals("should have called overloaded method with type Object", 1, ExceptionCustomListener.UNBIND_CALLS);
 	}
 
 	public void testStandardListenerWithListeningMethodsSpecifiedAsCustomOnes() throws Exception {
@@ -443,5 +462,33 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 		assertEquals(1, CustomListener.BIND_CALLS);
 		assertEquals(1, CustomListener.UNBIND_CALLS);
 
+	}
+
+	public void testJustCustomBindMethod() throws Exception {
+		listener = new TargetSourceLifecycleListenerWrapper(new JustBind());
+		listener.setBindMethod("myBind");
+		listener.afterPropertiesSet();
+
+		assertEquals(0, JustListener.BIND_CALLS);
+		assertEquals(0, JustListener.UNBIND_CALLS);
+
+		listener.bind(new Object(), null);
+
+		assertEquals(1, JustListener.BIND_CALLS);
+		assertEquals(0, JustListener.UNBIND_CALLS);
+	}
+
+	public void testJustCustomUnbindMethod() throws Exception {
+		listener = new TargetSourceLifecycleListenerWrapper(new JustUnbind());
+		listener.setUnbindMethod("myUnbind");
+		listener.afterPropertiesSet();
+
+		assertEquals(0, JustListener.BIND_CALLS);
+		assertEquals(0, JustListener.UNBIND_CALLS);
+
+		listener.unbind(new Object(), null);
+
+		assertEquals(0, JustListener.BIND_CALLS);
+		assertEquals(1, JustListener.UNBIND_CALLS);
 	}
 }
