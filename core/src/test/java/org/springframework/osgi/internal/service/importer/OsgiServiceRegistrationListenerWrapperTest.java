@@ -124,9 +124,9 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 			};
 		}
 
-		public void myUnreg(Map properties) throws Exception {
+		public void myUnreg(Map properties) throws IOException {
 			UNREG_CALLS++;
-			throw new Exception("expected!") {
+			throw new IOException("expected!") {
 				public synchronized Throwable fillInStackTrace() {
 					return null;
 				}

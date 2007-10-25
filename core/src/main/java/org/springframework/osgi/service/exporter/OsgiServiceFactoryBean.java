@@ -189,11 +189,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	/** exporter bean name */
 	private String beanName;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
 		Assert.notNull(bundleContext, "required property 'bundleContext' has not been set");

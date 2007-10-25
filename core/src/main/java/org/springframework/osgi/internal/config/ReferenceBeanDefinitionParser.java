@@ -39,7 +39,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * &lt;osgi:reference&gt; tag parser.
+ * &lt;osgi:reference&gt; element parser.
  * 
  * @author Andy Piper
  * @author Costin Leau
@@ -67,22 +67,10 @@ class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	protected static final String MANDATORY = "mandatory";
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser#getBeanClass(org.w3c.dom.Element)
-	 */
 	protected Class getBeanClass(Element element) {
 		return OsgiServiceProxyFactoryBean.class;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser#doParse(org.w3c.dom.Element,
-	 * org.springframework.beans.factory.xml.ParserContext,
-	 * org.springframework.beans.factory.support.BeanDefinitionBuilder)
-	 */
 	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
 			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {

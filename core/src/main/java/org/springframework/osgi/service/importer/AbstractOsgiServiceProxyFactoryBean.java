@@ -80,48 +80,30 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	protected boolean initialized = false;
 
 	/**
-	 * Subclasses have to implement this method and return the approapriate
+	 * Subclasses have to implement this method and return the appropriate
 	 * service proxy.
 	 */
 	public abstract Object getObject();
 
 	/**
-	 * Subclasses have to implement this method and return the approapriate
+	 * Subclasses have to implement this method and return the appropriate
 	 * service proxy type.
 	 */
 
 	public abstract Class getObjectType();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
-	 */
 	public boolean isSingleton() {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.beans.factory.SmartFactoryBean#isEagerInit()
-	 */
 	public boolean isEagerInit() {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.beans.factory.SmartFactoryBean#isPrototype()
-	 */
 	public boolean isPrototype() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
 	public void afterPropertiesSet() {
 		Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
 		Assert.notNull(classLoader, "Required classLoader property was not set");

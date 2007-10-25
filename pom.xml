@@ -250,7 +250,6 @@ limitations under the License.
     <resources>
       <resource>
         <!-- Bug MRESOURCES-35 means we can't use absolute paths -->
-        <!-- Bug in eclipse means we have to put META-INF in ${basedir} -->
         <targetPath>../../META-INF</targetPath>
         <filtering>true</filtering>
         <includes>
@@ -363,7 +362,7 @@ limitations under the License.
 
   <!-- profiles for equinox, knoplerfish, and felix                 -->
   <!-- to use these profiles invoke maven with -Pprofile-name, e.g. -->
-  <!-- mvn -Pfelix test -->
+  <!-- mvn -Pfelix test 											-->
   <profiles>
     <profile>
       <id>equinox</id>
@@ -487,9 +486,9 @@ limitations under the License.
         </configuration>
       </plugin>
       
-      <!-- ========= -->
-      <!--     Javadocs   -->
-      <!-- ========= -->
+      <!-- =============== -->
+      <!--     Javadocs    -->
+      <!-- =============== -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -556,9 +555,9 @@ limitations under the License.
         <artifactId>maven-project-info-reports-plugin</artifactId>
       </plugin>
       
-      <!-- ========= -->
+      <!-- ============== -->
       <!--     FindBugs   -->
-      <!-- ========= -->
+      <!-- ============== -->
   <plugin>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>findbugs-maven-plugin</artifactId>
@@ -631,20 +630,20 @@ limitations under the License.
       <url>http://repo1.maven.org/maven2/</url>
     </pluginRepository>
 
-	<!-- the plugin snapshots used for releases are kept here in a frozen state -->
-    <pluginRepository>
-      <snapshots><enabled>true</enabled></snapshots>
-      <id>spring-ext</id>
-      <name>Spring External Dependencies Repository</name>
-      <url>
-        https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
-      </url>
-    </pluginRepository>
-    
     <pluginRepository>
       <id>agilejava</id>
       <url>http://agilejava.com/maven/</url>
     </pluginRepository>
+
+
+	<!-- alternative felix BND plugin snapshot -->
+	<pluginRepository>
+		<id>ops4j-snapshots</id>
+		<url>http://repository.ops4j.org/mvn-snapshots</url>
+		<releases>
+			<enabled>false</enabled>
+		</releases>
+	</pluginRepository>
 
     <!--  Do NOT enable this repository
     
@@ -694,7 +693,5 @@ limitations under the License.
       <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
     </repository>
   </repositories>
-
-  
 
 </project>

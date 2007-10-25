@@ -25,8 +25,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.osgi.internal.util.ReflectionUtils;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -91,38 +91,39 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 
 		final boolean trace = log.isTraceEnabled();
 
-		ReflectionUtils.doWithMethods(target.getClass(), new ReflectionUtils.MethodCallback() {
+		org.springframework.util.ReflectionUtils.doWithMethods(target.getClass(),
+			new org.springframework.util.ReflectionUtils.MethodCallback() {
 
-			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-				if (methodName.equals(method.getName())) {
-					// take a look at the variables
-					Class[] args = method.getParameterTypes();
+				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+					if (methodName.equals(method.getName())) {
+						// take a look at the variables
+						Class[] args = method.getParameterTypes();
 
-					// Properties can be passed as Map or Dictionary
-					if (args != null && args.length == 2) {
-						Class propType = args[1];
-						if (Dictionary.class.isAssignableFrom(propType) || Map.class.isAssignableFrom(propType)) {
-							if (trace)
-								log.trace("discovered custom method [" + method.toString() + "] on "
-										+ target.getClass());
-
-							// see if there was a method already found
-							Method m = (Method) methods.get(args[0]);
-
-							if (m != null) {
+						// Properties can be passed as Map or Dictionary
+						if (args != null && args.length == 2) {
+							Class propType = args[1];
+							if (Dictionary.class.isAssignableFrom(propType) || Map.class.isAssignableFrom(propType)) {
 								if (trace)
-									log.trace("type " + args[0] + " already has an associated method [" + m.toString()
-											+ "];ignoring " + method);
-							}
-							else {
-								ReflectionUtils.makeAccessible(method);
-								methods.put(args[0], method);
+									log.trace("discovered custom method [" + method.toString() + "] on "
+											+ target.getClass());
+
+								// see if there was a method already found
+								Method m = (Method) methods.get(args[0]);
+
+								if (m != null) {
+									if (trace)
+										log.trace("type " + args[0] + " already has an associated method ["
+												+ m.toString() + "];ignoring " + method);
+								}
+								else {
+									org.springframework.util.ReflectionUtils.makeAccessible(method);
+									methods.put(args[0], method);
+								}
 							}
 						}
 					}
 				}
-			}
-		});
+			});
 
 		if (!methods.isEmpty())
 			return methods;
@@ -162,8 +163,9 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 					// rest of
 					// the listeners
 					catch (Exception ex) {
+						Exception cause = ReflectionUtils.getInvocationException(ex);
 						log.warn("custom method [" + method + "] threw exception when passing service type ["
-								+ (service != null ? service.getClass().getName() : null) + "]", ex);
+								+ (service != null ? service.getClass().getName() : null) + "]", cause);
 					}
 				}
 			}

@@ -48,21 +48,26 @@ import org.w3c.dom.NodeList;
  * @author Andy Piper
  */
 class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
-	private static final String TARGET_BEAN_NAME = "targetBeanName";
 
-	public static final String ACTIVATION_ID = "activation-method";
+	// bean properties
+	private static final String TARGET_BEAN_NAME_PROP = "targetBeanName";
 
-	public static final String DEACTIVATION_ID = "deactivation-method";
+	private static final String TARGET_PROP = "target";
 
-	public static final String INTERFACES_ID = "interfaces";
+	private static final String LISTENERS_PROP = "listeners";
 
-	public static final String INTERFACE = "interface";
+	private static final String INTERFACES_PROP = "interfaces";
 
-	public static final String PROPS_ID = "service-properties";
+	// XML elements
+	private static final String INTERFACES_ID = "interfaces";
 
-	public static final String LISTENER = "registration-listener";
+	private static final String INTERFACE = "interface";
 
-	public static final String REF = "ref";
+	private static final String PROPS_ID = "service-properties";
+
+	private static final String LISTENER = "registration-listener";
+
+	private static final String REF = "ref";
 
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(OsgiServiceFactoryBean.class);
@@ -74,7 +79,7 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 				String name = attribute.getLocalName();
 
 				if (INTERFACE.equals(name)) {
-					bldr.addPropertyValue(INTERFACES_ID, attribute.getValue());
+					bldr.addPropertyValue(INTERFACES_PROP, attribute.getValue());
 				}
 				else if (REF.equals(name)) {
 					;
@@ -112,7 +117,7 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 					}
 					Set interfaces = parserContext.getDelegate().parseSetElement(subElement,
 						builder.getBeanDefinition());
-					builder.addPropertyValue(INTERFACES_ID, interfaces);
+					builder.addPropertyValue(INTERFACES_PROP, interfaces);
 				}
 
 				// osgi:service-properties
@@ -120,11 +125,6 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 					if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.ENTRY_ELEMENT).size() > 0) {
 						Object props = parserContext.getDelegate().parseMapElement(subElement,
 							builder.getRawBeanDefinition());
-						builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
-					}
-					// TODO: is this still needed ? (only maps are supported)
-					else if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.PROP_ELEMENT).size() > 0) {
-						Object props = parserContext.getDelegate().parsePropsElement(subElement);
 						builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
 					}
 					else {
@@ -151,13 +151,13 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 		// do we have a bean reference ?
 		if (target instanceof RuntimeBeanReference) {
-			builder.addPropertyValue(TARGET_BEAN_NAME, ((RuntimeBeanReference) target).getBeanName());
+			builder.addPropertyValue(TARGET_BEAN_NAME_PROP, ((RuntimeBeanReference) target).getBeanName());
 		}
 
-		builder.addPropertyValue("target", target);
+		builder.addPropertyValue(TARGET_PROP, target);
 
 		// add listeners
-		builder.addPropertyValue("listeners", listeners);
+		builder.addPropertyValue(LISTENERS_PROP, listeners);
 
 		return builder.getBeanDefinition();
 	}
@@ -186,8 +186,6 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 		// extract registration/unregistration attributes from
 		// <osgi:registration-listener>
-		// Element
-
 		MutablePropertyValues vals = new MutablePropertyValues();
 
 		NamedNodeMap attrs = element.getAttributes();
@@ -214,12 +212,7 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateIdAsFallback()
-	 */
 	protected boolean shouldGenerateIdAsFallback() {
 		return true;
 	}
-
 }

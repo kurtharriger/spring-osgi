@@ -65,6 +65,9 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		RegistrationListener.BIND_CALLS = 0;
 		RegistrationListener.UNBIND_CALLS = 0;
 
+		CustomRegistrationListener.REG_CALLS = 0;
+		CustomRegistrationListener.UNREG_CALLS = 0;
+
 		registration = new MockServiceRegistration();
 
 		bundleContext = new MockBundleContext() {
@@ -163,13 +166,33 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 	public void testListenersInvoked() throws Exception {
 		// registration should have been already called
 		assertEquals(2, RegistrationListener.BIND_CALLS);
-		
+
 		Object target = appContext.getBean("exporterWithListener");
 		assertTrue(target instanceof ServiceRegistration);
-		
+
 		assertEquals(0, RegistrationListener.UNBIND_CALLS);
 		((ServiceRegistration) target).unregister();
 		assertEquals(2, RegistrationListener.UNBIND_CALLS);
+	}
+
+	public void testFBWithCustomListeners() throws Exception {
+		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) appContext.getBean("&exporterWithCustomListener");
+		OsgiServiceRegistrationListener[] listeners = getListeners(exporter);
+		assertEquals(1, listeners.length);
+	}
+
+	public void testCustomListenerInvoked() throws Exception {
+		// registration should have been already called (service already
+		// published)
+		assertEquals(1, CustomRegistrationListener.REG_CALLS);
+
+		Object target = appContext.getBean("exporterWithCustomListener");
+
+		assertTrue(target instanceof ServiceRegistration);
+
+		assertEquals(0, CustomRegistrationListener.UNREG_CALLS);
+		((ServiceRegistration) target).unregister();
+		assertEquals(1, CustomRegistrationListener.UNREG_CALLS);
 	}
 
 	private OsgiServiceRegistrationListener[] getListeners(OsgiServiceFactoryBean exporter) {

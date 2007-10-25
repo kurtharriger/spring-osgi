@@ -63,10 +63,6 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 		return proxy;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.importer.AbstractOsgiServiceProxyFactoryBean#getObjectType()
-	 */
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(serviceTypes) ? Object.class : serviceTypes[0]));
 

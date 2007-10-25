@@ -21,6 +21,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.internal.service.ServiceExporter;
 
 /**
+ * Base class for ServiceExporters taking care of service registration and
+ * unregistration.
+ * 
  * @author Costin Leau
  * 
  */
@@ -37,10 +40,6 @@ public abstract class AbstractServiceExporter implements ServiceExporter, Initia
 
 	private boolean initialized = false;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.internal.ServiceExporter#setPublishAtStartup(boolean)
-	 */
 	public void setPublishAtStartup(boolean publish) {
 		this.publishAtStartup = publish;
 	}

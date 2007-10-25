@@ -21,8 +21,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Filter;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
-import org.springframework.core.Constants;
+import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.internal.service.ImporterProxy;
+import org.springframework.osgi.internal.service.collection.CollectionType;
 import org.springframework.osgi.internal.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.internal.service.collection.OsgiServiceList;
 import org.springframework.osgi.internal.service.collection.OsgiServiceSet;
@@ -45,51 +46,13 @@ import org.springframework.util.Assert;
  */
 public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactoryBean {
 
-	/**
-	 * Enumeration style class used to specify the collection type that this
-	 * FactoryBean should produce.
-	 * 
-	 * @author Costin Leau
-	 * 
-	 */
-	public static abstract class CollectionOptions {
-
-		public static final Constants COLLECTION_OPTIONS = new Constants(CollectionOptions.class);
-
-		public static final int COLLECTION = 1;
-
-		public static final int LIST = 2;
-
-		public static final int SET = 3;
-
-		public static final int SORTED_LIST = 4;
-
-		public static final int SORTED_SET = 5;
-
-		public static final Class[] classMapping = { OsgiServiceCollection.class, OsgiServiceList.class,
-				OsgiServiceSet.class, OsgiServiceSortedList.class, OsgiServiceSortedSet.class };
-
-		public static Class getClassMapping(int collectionOptions) {
-			if (isOptionValid(collectionOptions))
-				return classMapping[collectionOptions];
-			// return default option
-			else
-				return classMapping[0];
-
-		}
-
-		public static boolean isOptionValid(int option) {
-			return (option >= 0 && option < classMapping.length);
-		}
-	}
-
 	private static final Log log = LogFactory.getLog(OsgiMultiServiceProxyFactoryBean.class);
 
 	private ImporterProxy proxy;
 
 	private Comparator comparator;
 
-	private int collectionType = CollectionOptions.COLLECTION;
+	private CollectionType collectionType = CollectionType.LIST;
 
 	public Object getObject() {
 		if (!initialized)
@@ -103,7 +66,7 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 	}
 
 	public Class getObjectType() {
-		return (proxy != null ? proxy.getClass() : CollectionOptions.getClassMapping(collectionType));
+		return (proxy != null ? proxy.getClass() : collectionType.getCollectionClass());
 	}
 
 	public boolean isSatisfied() {
@@ -114,38 +77,40 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 		// FIXME: do cleanup
 	}
 
+	/**
+	 * Create the managed-collection given the existing settings.
+	 * 
+	 * @param filter OSGi filter
+	 * @return importer proxy
+	 */
 	protected ImporterProxy createMultiServiceCollection(Filter filter) {
 		if (log.isDebugEnabled())
 			log.debug("creating a multi-value/collection proxy");
 
 		OsgiServiceCollection collection;
 
-		switch (collectionType) {
-		case CollectionOptions.COLLECTION:
+		if (CollectionType.COLLECTION.equals(collectionType)) {
 			Assert.isNull(comparator, "when specifying a Comparator, a Set or a List have to be used");
 			collection = new OsgiServiceCollection(filter, bundleContext, classLoader, mandatory);
-			break;
+		}
 
-		case CollectionOptions.LIST:
-
+		else if (CollectionType.LIST.equals(collectionType)) {
 			collection = (comparator == null ? new OsgiServiceList(filter, bundleContext, classLoader, mandatory)
 					: new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, mandatory));
-			break;
-
-		case CollectionOptions.SET:
+		}
+		else if (CollectionType.SET.equals(collectionType)) {
 			collection = (comparator == null ? new OsgiServiceSet(filter, bundleContext, classLoader, mandatory)
 					: new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, mandatory));
-			break;
+		}
+		else if (CollectionType.SORTED_LIST.equals(collectionType)) {
+			collection = new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, mandatory);
+		}
 
-//		case CollectionOptions.SORTED_LIST:
-//			collection = new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, mandatory);
-//			break;
-//
-//		case CollectionOptions.SORTED_SET:
-//			collection = new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, mandatory);
-//			break;
+		else if (CollectionType.SORTED_SET.equals(collectionType)) {
+			collection = new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, mandatory);
+		}
 
-		default:
+		else {
 			throw new IllegalArgumentException("unknown collection type:" + collectionType);
 		}
 
@@ -157,11 +122,51 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 		return collection;
 	}
 
+	/**
+	 * Set the (optional) comparator for ordering the resulting collection. The
+	 * presence of a comparator will force the FactoryBean to use a 'sorted'
+	 * collection even though, the specified collection type does not imply
+	 * ordering. <p/> Thus, instead of list a sorted list will be created and
+	 * instead of a set, a sorted set.
+	 * 
+	 * @see #setCollectionType(String)
+	 * 
+	 * @param comparator Comparator (can be null) used for ordering the
+	 * resulting collection.
+	 */
 	public void setComparator(Comparator comparator) {
 		this.comparator = comparator;
 	}
 
-	public void setCollectionType(int collectionType) {
-		this.collectionType = collectionType;
+	/**
+	 * Set the collection type this FactoryBean will produce. Possible values
+	 * are:
+	 * <ul>
+	 * <li>list - create a list. If a comparator is set, a sorted list will be
+	 * created.</li>
+	 * <li>set - create a set. If a comparator is set, a sorted set will be
+	 * created.</li>
+	 * <li>sorted-list - create a sorted list. The ordering will be maintained
+	 * either through the comparator (if one is set) or using the natural object
+	 * ordering.</li>
+	 * <li>sorted-set - create a sorted list. The ordering will be maintained
+	 * either through the comparator (if one is set) or using the natural object
+	 * ordering.</li>
+	 * </ul>
+	 * 
+	 * @see java.util.Comparator
+	 * @see java.lang.Comparable
+	 * @see java.util.List
+	 * @see java.util.Set
+	 * @see java.util.SortedSet
+	 * @see #setComparator(Comparator)
+	 * 
+	 * @param collectionType the collection type as string using one of the
+	 * values above.
+	 */
+	public void setCollectionType(String collectionType) {
+		this.collectionType = (CollectionType) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(
+			CollectionType.class, collectionType);
 	}
+
 }
