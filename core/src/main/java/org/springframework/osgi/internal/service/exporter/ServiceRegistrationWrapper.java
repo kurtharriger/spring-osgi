@@ -54,12 +54,12 @@ public class ServiceRegistrationWrapper implements ServiceRegistration {
 	// call unregister on the actual service but inform also listeners
 	public void unregister() {
 		// if the delegate is unregistered then an exception will be thrown
-		Map properties = OsgiServiceReferenceUtils.getServicePropertiesSnapshotAsMap(delegate.getReference());
+		Map properties = (Map) OsgiServiceReferenceUtils.getServicePropertiesSnapshot(delegate.getReference());
 
 		delegate.unregister();
 
 		// if no exception has been thrown (i.e. the delegate is properly
-		// unregistered), the liteners will be informed
+		// unregistered), the listeners will be informed
 		for (int i = 0; i < listeners.length; i++) {
 			if (listeners[i] != null) {
 				try {

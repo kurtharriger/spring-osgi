@@ -67,6 +67,10 @@
 	<bean id="listener"
 		class="org.springframework.osgi.config.RegistrationListener" />
 
+	<bean id="customListener"
+		class="org.springframework.osgi.config.CustomRegistrationListener" />
+
+
 	<osgi:service interface="java.io.Serializable"
 		id="exporterWithListener">
 		<osgi:registration-listener>
@@ -76,6 +80,13 @@
 		<osgi:registration-listener ref="listener" />
 
 		<bean class="java.util.HashMap" />
+	</osgi:service>
+
+	<osgi:service id="exporterWithCustomListener"
+		interface="java.io.Externalizable" ref="string">
+		<osgi:registration-listener registration-method="onRegistration"
+			unregistration-method="onUnregistration" ref="customListener">
+		</osgi:registration-listener>
 	</osgi:service>
 
 </beans>

@@ -26,8 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.internal.config.TargetSourceLifecycleListenerWrapper;
+import org.springframework.osgi.internal.util.ReflectionUtils;
 import org.springframework.osgi.service.OsgiServiceRegistrationListener;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -95,35 +95,37 @@ public class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegist
 		// since we don't have overloaded methods, look first for Maps and, if
 		// nothing is found, then Dictionaries
 
-		ReflectionUtils.doWithMethods(target.getClass(), new ReflectionUtils.MethodCallback() {
+		org.springframework.util.ReflectionUtils.doWithMethods(target.getClass(),
+			new org.springframework.util.ReflectionUtils.MethodCallback() {
 
-			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-				// do matching on method name first
-				if (methodName.equals(method.getName())) {
-					// take a look at the parameter types
-					Class[] args = method.getParameterTypes();
-					if (args != null && args.length == 1) {
-						Class propType = args[0];
-						if (Dictionary.class.isAssignableFrom(propType) || Map.class.isAssignableFrom(propType)) {
-							if (trace)
-								log.trace("discovered custom method [" + method.toString() + "] on "
-										+ target.getClass());
-						}
-						// see if there was a method already found
-						Method m = (Method) methods.get(methodName);
+				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+					// do matching on method name first
+					if (methodName.equals(method.getName())) {
+						// take a look at the parameter types
+						Class[] args = method.getParameterTypes();
+						if (args != null && args.length == 1) {
+							Class propType = args[0];
+							if (Dictionary.class.isAssignableFrom(propType) || Map.class.isAssignableFrom(propType)) {
+								if (trace)
+									log.trace("discovered custom method [" + method.toString() + "] on "
+											+ target.getClass());
+							}
+							// see if there was a method already found
+							Method m = (Method) methods.get(methodName);
 
-						if (m != null) {
-							if (trace)
-								log.trace("there is already a custom method [" + m.toString() + "];ignoring " + method);
-						}
-						else {
-							ReflectionUtils.makeAccessible(method);
-							methods.put(methodName, method);
+							if (m != null) {
+								if (trace)
+									log.trace("there is already a custom method [" + m.toString() + "];ignoring "
+											+ method);
+							}
+							else {
+								org.springframework.util.ReflectionUtils.makeAccessible(method);
+								methods.put(methodName, method);
+							}
 						}
 					}
 				}
-			}
-		});
+			});
 
 		if (!methods.isEmpty())
 			return methods;
@@ -205,8 +207,9 @@ public class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegist
 				// rest of
 				// the listeners
 				catch (Exception ex) {
+					Exception cause = ReflectionUtils.getInvocationException(ex);
 					log.warn("custom method [" + method + "] threw exception when passing properties [" + properties
-							+ "]", ex);
+							+ "]", cause);
 				}
 			}
 		}

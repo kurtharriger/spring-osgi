@@ -57,10 +57,9 @@ public abstract class AbstractListenerAwareExporter extends AbstractServiceExpor
 					listeners[i].registered(properties);
 				}
 				catch (Exception ex) {
-					// no need to log exceptions, the wrapper already does this
+					// no need to log exceptions, the listener wrapper already does this for us
 				}
 			}
-
 		}
 	}
 

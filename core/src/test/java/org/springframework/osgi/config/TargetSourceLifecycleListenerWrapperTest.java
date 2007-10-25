@@ -120,7 +120,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 		}
 
 		public void unbind(Object service, Map properties) throws Exception {
-			throw new Exception("expected!") {
+			throw new IOException("expected!") {
 				public synchronized Throwable fillInStackTrace() {
 					return null;
 				}

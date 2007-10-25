@@ -15,32 +15,50 @@
  */
 package org.springframework.osgi.internal.config;
 
+import java.util.Comparator;
+
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.internal.service.collection.CollectionType;
+import org.springframework.osgi.internal.service.collection.comparator.OsgiServiceReferenceComparator;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * &lt;osgi:collection&gt;, &lt;osgi:list&gt;, &lt;osgi:set&gt;,
- * &lt;osgi:sorted-list&gt;, &lt;osgi:sorted-set&gt; tag parser.
+ * &lt;osgi:collection&gt;, &lt;osgi:list&gt;, &lt;osgi:set&gt;, element parser.
  * 
  * @author Costin Leau
  * 
  */
-class CollectionBeanDefinitionParser extends ReferenceBeanDefinitionParser {
+abstract class CollectionBeanDefinitionParser extends ReferenceBeanDefinitionParser {
 
-	public static final String NESTED_COMPARATOR = "comparator";
+	private static final String NESTED_COMPARATOR = "comparator";
 
-	public static final String INLINE_COMPARATOR_REF = "comparator-ref";
+	private static final String INLINE_COMPARATOR_REF = "comparator-ref";
 
-	public static final String COLLECTION_TYPE_PROP = "collectionType";
+	private static final String COLLECTION_TYPE_PROP = "collectionType";
+
+	private static final String COMPARATOR_PROPERTY = "comparator";
+
+	private static final String SERVICE_ORDER = "service";
+
+	private static final String SERVICE_REFERENCE_ORDER = "service-reference";
+
+	private static final Comparator SERVICE_REFERENCE_COMPARATOR = new OsgiServiceReferenceComparator();
+
+	private static final String NATURAL = "natural";
+
+	private static final String BASIS = "basis";
+
+	private static final String PROPERTY = "comparator";
 
 	protected Class getBeanClass(Element element) {
 		return OsgiMultiServiceProxyFactoryBean.class;
@@ -65,7 +83,7 @@ class CollectionBeanDefinitionParser extends ReferenceBeanDefinitionParser {
 					if (!INLINE_COMPARATOR_REF.equals(name))
 						builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), value);
 					else {
-						builder.addPropertyReference(NESTED_COMPARATOR, StringUtils.trimWhitespace(value));
+						builder.addPropertyReference(COMPARATOR_PROPERTY, StringUtils.trimWhitespace(value));
 					}
 				}
 			}
@@ -80,6 +98,7 @@ class CollectionBeanDefinitionParser extends ReferenceBeanDefinitionParser {
 
 		Object nestedComparator = null;
 
+		// comparator definition present
 		if (comparator != null) {
 			// check duplicate nested and inline bean definition
 			if (comparatorRef)
@@ -94,26 +113,61 @@ class CollectionBeanDefinitionParser extends ReferenceBeanDefinitionParser {
 				Node nd = nl.item(i);
 				if (nd instanceof Element) {
 					Element beanDef = (Element) nd;
-
-					nestedComparator = context.getDelegate().parsePropertySubElement(beanDef,
-						builder.getBeanDefinition());
+					String name = beanDef.getLocalName();
+					// check if we have a natural definition
+					if (NATURAL.equals(name))
+						nestedComparator = parseNaturalComparator(beanDef);
+					else
+						nestedComparator = context.getDelegate().parsePropertySubElement(beanDef,
+							builder.getBeanDefinition());
 				}
 			}
+
+			if (nestedComparator != null)
+				builder.addPropertyValue(COMPARATOR_PROPERTY, nestedComparator);
 		}
 
-		if (nestedComparator != null)
-			builder.addPropertyValue(NESTED_COMPARATOR, nestedComparator);
+		if (comparator != null) {
+			if (CollectionType.LIST.equals(collectionType()))
+				builder.addPropertyValue(COLLECTION_TYPE_PROP, CollectionType.SORTED_LIST.getLabel());
 
-		builder.addPropertyValue(COLLECTION_TYPE_PROP, new Integer(getCollectionType()));
+			if (CollectionType.SET.equals(collectionType()))
+				builder.addPropertyValue(COLLECTION_TYPE_PROP, CollectionType.SORTED_SET.getLabel());
+		}
+		else
+			builder.addPropertyValue(COLLECTION_TYPE_PROP, collectionType().getLabel());
+
+	}
+
+	protected Comparator parseNaturalComparator(Element element) {
+		Comparator comparator = null;
+		NamedNodeMap attributes = element.getAttributes();
+		for (int x = 0; x < attributes.getLength(); x++) {
+			Attr attribute = (Attr) attributes.item(x);
+			String name = attribute.getLocalName();
+			String value = attribute.getValue();
+
+			if (BASIS.equals(name)) {
+
+				if (SERVICE_REFERENCE_ORDER.equals(value))
+					return SERVICE_REFERENCE_COMPARATOR;
+
+				// no comparator means relying on Comparable interface of the
+				// services
+				else if (SERVICE_ORDER.equals(value))
+					return null;
+			}
+
+		}
+
+		return comparator;
 	}
 
 	/**
-	 * Indicate the collection parsed by this bean definition. Normally this is
-	 * overridden by the Namespace handler and customized appropriately.
+	 * Hook used for indicating the main collection type (set/list) on which
+	 * this parser applies.
 	 * 
-	 * @return
+	 * @return service collection type
 	 */
-	protected int getCollectionType() {
-		return OsgiMultiServiceProxyFactoryBean.CollectionOptions.COLLECTION;
-	}
+	protected abstract CollectionType collectionType();
 }

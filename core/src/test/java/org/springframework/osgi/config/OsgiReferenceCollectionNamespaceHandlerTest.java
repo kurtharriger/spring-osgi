@@ -15,9 +15,11 @@
  */
 package org.springframework.osgi.config;
 
+import java.io.Externalizable;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.SortedSet;
 
 import junit.framework.TestCase;
@@ -25,6 +27,7 @@ import junit.framework.TestCase;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -35,7 +38,9 @@ import org.springframework.osgi.internal.service.collection.OsgiServiceList;
 import org.springframework.osgi.internal.service.collection.OsgiServiceSet;
 import org.springframework.osgi.internal.service.collection.OsgiServiceSortedList;
 import org.springframework.osgi.internal.service.collection.OsgiServiceSortedSet;
+import org.springframework.osgi.internal.service.collection.comparator.OsgiServiceReferenceComparator;
 import org.springframework.osgi.mock.MockBundleContext;
+import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
 
 /**
@@ -163,7 +168,47 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		assertTrue(Arrays.equals(new Class[] { Comparable.class }, intfs));
 	}
 
+	public void testSortedSetWithNaturalOrderingOnRefs() throws Exception {
+		Object factoryBean = appContext.getBean("&sortedSetWithNaturalOrderingOnRefs");
+		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
+		
+		Comparator comp = getComparator(factoryBean);
+		
+		assertNotNull(comp);
+		assertSame(OsgiServiceReferenceComparator.class, comp.getClass());
+		
+		TargetSourceLifecycleListener[] listeners = getListeners(factoryBean);
+		assertEquals(2, listeners.length);
+
+		Object bean = appContext.getBean("sortedSetWithNaturalOrderingOnRefs");
+		assertTrue(bean instanceof OsgiServiceSortedSet);
+
+		Class[] intfs = getInterfaces(factoryBean);
+		assertTrue(Arrays.equals(new Class[] { Externalizable.class }, intfs));
+	}
+
+	public void testSortedListWithNaturalOrderingOnServs() throws Exception {
+		Object factoryBean = appContext.getBean("&sortedListWithNaturalOrderingOnServs");
+		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
+
+		assertNull(getComparator(factoryBean));
+
+		Object bean = appContext.getBean("sortedListWithNaturalOrderingOnServs");
+		assertTrue(bean instanceof OsgiServiceSortedList);
+
+		Class[] intfs = getInterfaces(factoryBean);
+		assertTrue(Arrays.equals(new Class[] { Externalizable.class }, intfs));
+	}
+
 	private Class[] getInterfaces(Object proxy) {
 		return (Class[]) TestUtils.getFieldValue(proxy, "serviceTypes");
+	}
+
+	private Comparator getComparator(Object proxy) {
+		return (Comparator) TestUtils.getFieldValue(proxy, "comparator");
+	}
+
+	private TargetSourceLifecycleListener[] getListeners(Object proxy) {
+		return (TargetSourceLifecycleListener[]) TestUtils.getFieldValue(proxy, "listeners");
 	}
 }

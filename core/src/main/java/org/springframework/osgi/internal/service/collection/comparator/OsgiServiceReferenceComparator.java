@@ -43,9 +43,9 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceIdComparator implements Comparator, Serializable {
+public class OsgiServiceReferenceComparator implements Comparator, Serializable {
 
-	private static final int hashCode = OsgiServiceIdComparator.class.hashCode() * 13;
+	private static final int hashCode = OsgiServiceReferenceComparator.class.hashCode() * 13;
 
 	public int compare(Object o1, Object o2) {
 
@@ -85,11 +85,6 @@ public class OsgiServiceIdComparator implements Comparator, Serializable {
 	}
 
 	public boolean equals(Object obj) {
-		return (this == obj || obj instanceof OsgiServiceIdComparator);
+		return (this == obj || obj instanceof OsgiServiceReferenceComparator);
 	}
-
-	public int hashCode() {
-		return hashCode;
-	}
-
 }

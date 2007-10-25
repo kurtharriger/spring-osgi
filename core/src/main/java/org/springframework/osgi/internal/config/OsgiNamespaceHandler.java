@@ -17,7 +17,7 @@
 package org.springframework.osgi.internal.config;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
-import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.internal.service.collection.CollectionType;
 
 /**
  * Namespace handler for Osgi definitions.
@@ -27,48 +27,37 @@ import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBea
  * @author Costin Leau
  */
 class OsgiNamespaceHandler extends NamespaceHandlerSupport {
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
-	 */
+
 	public void init() {
+		//
+		// Importer definitions
+		//
+
+		// a. single reference
 		registerBeanDefinitionParser("reference", new ReferenceBeanDefinitionParser());
 
-		registerBeanDefinitionParser("collection", new CollectionBeanDefinitionParser());
 		registerBeanDefinitionParser("list", new CollectionBeanDefinitionParser() {
-			protected int getCollectionType() {
-				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.LIST;
-			}
-		});
 
-		registerBeanDefinitionParser("list", new CollectionBeanDefinitionParser() {
-			protected int getCollectionType() {
-				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.LIST;
+			protected CollectionType collectionType() {
+				return CollectionType.LIST;
 			}
 		});
 
 		registerBeanDefinitionParser("set", new CollectionBeanDefinitionParser() {
-			protected int getCollectionType() {
-				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.SET;
+
+			protected CollectionType collectionType() {
+				return CollectionType.SET;
 			}
 		});
 
-		registerBeanDefinitionParser("sorted-list", new CollectionBeanDefinitionParser() {
-			protected int getCollectionType() {
-				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.SORTED_LIST;
-			}
-		});
-
-		registerBeanDefinitionParser("sorted-set", new CollectionBeanDefinitionParser() {
-			protected int getCollectionType() {
-				return OsgiMultiServiceProxyFactoryBean.CollectionOptions.SORTED_SET;
-			}
-		});
-
+		//
+		// Exporter
+		//
 		registerBeanDefinitionParser("service", new ServiceBeanDefinitionParser());
 
+		//
+		// Bundle FB
+		//
 		registerBeanDefinitionParser("bundle", new BundleBeanDefinitionParser());
-
 	}
 }
