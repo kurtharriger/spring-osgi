@@ -16,141 +16,84 @@
  */
 package org.springframework.osgi.internal.config;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.core.Conventions;
 import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.service.importer.CardinalityOptions;
 import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
-import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * &lt;osgi:reference&gt; element parser.
  * 
  * @author Andy Piper
  * @author Costin Leau
- * @since 2.1
  */
-class ReferenceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionParser {
 
-	public static final String PROPERTIES = "properties";
+	/**
+	 * Reference attribute callback extension that looks for 'singular'
+	 * reference attributes (such as timeout).
+	 * 
+	 * @author Costin Leau
+	 */
+	class TimeoutAttributeCallback implements AttributeCallback {
+		boolean isTimeoutSpecified = false;
 
-	public static final String LISTENER = "listener";
+		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
+			String name = attribute.getLocalName();
 
-	public static final String LISTENERS_PROPERTY = "listeners";
+			if (TIMEOUT.equals(name)) {
+				isTimeoutSpecified = true;
+			}
 
-	public static final String BIND_METHOD = "bind-method";
+			return true;
+		}
+	}
 
-	public static final String UNBIND_METHOD = "unbind-method";
+	// call properties
+	private static final String TIMEOUT_PROP = "timeout";
 
-	public static final String REF = "ref";
-
-	public static final String INTERFACE = "interface";
-
-	public static final String INTERFACE_NAME = "interfaceName";
-
-	public static final String CARDINALITY = "cardinality";
-
-	protected static final String MANDATORY = "mandatory";
+	// XML attributes/elements
+	protected static final String TIMEOUT = "timeout";
 
 	protected Class getBeanClass(Element element) {
 		return OsgiServiceProxyFactoryBean.class;
 	}
 
-	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
-		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
-			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
-				String name = attribute.getLocalName();
-				String value = attribute.getValue();
+	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks) {
+		// add timeout callback
+		TimeoutAttributeCallback timeoutCallback = new TimeoutAttributeCallback();
+		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(callbacks,
+			new AttributeCallback[] { timeoutCallback }));
 
-				if (CARDINALITY.equals(name)) {
-					if (value.startsWith("0"))
-						builder.addPropertyValue(MANDATORY, Boolean.FALSE);
-					else
-						builder.addPropertyValue(MANDATORY, Boolean.TRUE);
-				}
-				else
-					// ref attribute will be handled separately
-					builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), value);
-			}
-		});
-
-		parseNestedElements(element, context, builder);
-	}
-
-	protected void parseNestedElements(Element element, ParserContext context, BeanDefinitionBuilder builder) {
-		// parse subelements
-		// context.getDelegate().parsePropertyElements(element,
-		// builder.getBeanDefinition());
-		List listeners = DomUtils.getChildElementsByTagName(element, LISTENER);
-
-		ManagedList listenersRef = new ManagedList();
-		// loop on listeners
-		for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-			Element listnr = (Element) iter.next();
-
-			// wrapper target object
-			Object target = null;
-
-			// filter elements
-			NodeList nl = listnr.getChildNodes();
-
-			for (int i = 0; i < nl.getLength(); i++) {
-				Node node = nl.item(i);
-				if (node instanceof Element) {
-					Element beanDef = (Element) node;
-
-					// check inline ref
-					if (listnr.hasAttribute(REF))
-						context.getReaderContext().error(
-							"nested bean declaration is not allowed if 'ref' attribute has been specified", beanDef);
-
-					target = context.getDelegate().parsePropertySubElement(beanDef, builder.getBeanDefinition());
-				}
-			}
-
-			// extract bind/unbind attributes from <osgi:listener>
-			// Element
-
-			MutablePropertyValues vals = new MutablePropertyValues();
-
-			NamedNodeMap attrs = listnr.getAttributes();
-			for (int x = 0; x < attrs.getLength(); x++) {
-				Attr attribute = (Attr) attrs.item(x);
-				String name = attribute.getLocalName();
-
-				if (REF.equals(name))
-					target = new RuntimeBeanReference(StringUtils.trimWhitespace(attribute.getValue()));
-				else
-					vals.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
-			}
-
-			// create serviceListener wrapper
-			RootBeanDefinition wrapperDef = new RootBeanDefinition(TargetSourceLifecycleListenerWrapper.class);
-
-			ConstructorArgumentValues cav = new ConstructorArgumentValues();
-			cav.addIndexedArgumentValue(0, target);
-
-			wrapperDef.setConstructorArgumentValues(cav);
-			wrapperDef.setPropertyValues(vals);
-			listenersRef.add(wrapperDef);
-
+		// look for defaults
+		if (!timeoutCallback.isTimeoutSpecified) {
+			applyDefaultTimeout(builder, defaults);
 		}
-
-		builder.addPropertyValue(LISTENERS_PROPERTY, listenersRef);
 	}
+
+	protected String mandatoryCardinality() {
+		return CardinalityOptions.C_1__1.getLabel();
+	}
+
+	protected String optionalCardinality() {
+		return CardinalityOptions.C_0__1.getLabel();
+	}
+
+	/**
+	 * Apply default definitions to the existing bean definition. In this case,
+	 * it means applying the timeout.
+	 * 
+	 * This method is called when a certain expected element is not present.
+	 * 
+	 * @param element
+	 * @param context
+	 * @param builder
+	 */
+	protected void applyDefaultTimeout(BeanDefinitionBuilder builder, OsgiDefaultsDefinition defaults) {
+		builder.addPropertyValue(TIMEOUT_PROP, new TypedStringValue(defaults.getTimeout()));
+	}
+
 }

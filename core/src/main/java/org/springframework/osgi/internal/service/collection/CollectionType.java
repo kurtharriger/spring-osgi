@@ -16,6 +16,7 @@
 package org.springframework.osgi.internal.service.collection;
 
 import org.springframework.core.enums.StaticLabeledEnum;
+import org.springframework.core.enums.StaticLabeledEnumResolver;
 
 /**
  * Enumeration-like class which indicates the supported OSGi service collection
@@ -30,7 +31,7 @@ public class CollectionType extends StaticLabeledEnum {
 	private static final long serialVersionUID = 320203314729289568L;
 
 	/** unused */
-	public static final CollectionType COLLECTION = new CollectionType(1, "collection", OsgiServiceCollection.class);
+	//public static final CollectionType COLLECTION = new CollectionType(1, "collection", OsgiServiceCollection.class);
 
 	/**
 	 * List
@@ -51,6 +52,15 @@ public class CollectionType extends StaticLabeledEnum {
 	 * Sorted Set.
 	 */
 	public static final CollectionType SORTED_SET = new CollectionType(5, "sorted-set", OsgiServiceSortedSet.class);
+
+	
+	public static CollectionType resolveEnum(String label) {
+		return (CollectionType) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(CollectionType.class, label);
+	}
+	
+	public static CollectionType resolveEnum(int code) {
+		return (CollectionType) StaticLabeledEnumResolver.instance().getLabeledEnumByCode(CollectionType.class, new Integer(code));
+	}
 
 	private final Class collectionClass;
 

@@ -89,12 +89,7 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 
 		OsgiServiceCollection collection;
 
-		if (CollectionType.COLLECTION.equals(collectionType)) {
-			Assert.isNull(comparator, "when specifying a Comparator, a Set or a List have to be used");
-			collection = new OsgiServiceCollection(filter, bundleContext, classLoader, mandatory);
-		}
-
-		else if (CollectionType.LIST.equals(collectionType)) {
+		if (CollectionType.LIST.equals(collectionType)) {
 			collection = (comparator == null ? new OsgiServiceList(filter, bundleContext, classLoader, mandatory)
 					: new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, mandatory));
 		}
@@ -167,6 +162,13 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 	public void setCollectionType(String collectionType) {
 		this.collectionType = (CollectionType) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(
 			CollectionType.class, collectionType);
+	}
+
+	/* override to check proper cardinality - x..N */
+	public void setCardinality(String cardinality) {
+		Assert.isTrue(CardinalityOptions.isMultiple(CardinalityOptions.resolveEnum(cardinality)),
+			"only multiple cardinality ('X..N') accepted");
+		super.setCardinality(cardinality);
 	}
 
 }

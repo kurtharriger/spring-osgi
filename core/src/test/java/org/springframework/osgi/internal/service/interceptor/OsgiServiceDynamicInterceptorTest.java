@@ -99,7 +99,8 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 			}
 		};
 
-		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED, getClass().getClassLoader());
+		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED.shortValue(),
+				getClass().getClassLoader());
 		interceptor.getRetryTemplate().setRetryNumbers(3);
 		interceptor.getRetryTemplate().setWaitTime(1);
 		interceptor.setFilter(new MockFilter());
@@ -244,29 +245,20 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		assertNotNull("should have initialized listener", listener);
 	}
 
-    /**
-     * HSH - Mandatory cardinality is enforced by the extender in the wait-for semantic regarding
-     * dependent services of cardinality {1..}
-     * 
-    public void testMandatoryCardinality() {
-		MockBundleContext ctx = new MockBundleContext() {
-			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
-				return null;
-			}
-		};
-		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED);
-		interceptor.setFilter(new MockFilter());
-		RetryTemplate template = new RetryTemplate();
-		template.setRetryNumbers(1);
-		template.setWaitTime(10);
-		interceptor.setRetryTemplate(template);
-		try {
-			interceptor.afterPropertiesSet();
-			fail("expected exception");
-		}
-		catch (ServiceUnavailableException sue) {
-			// expected
-		}
-	}
-     **/
+	/**
+	 * HSH - Mandatory cardinality is enforced by the extender in the wait-for
+	 * semantic regarding dependent services of cardinality {1..}
+	 * 
+	 * public void testMandatoryCardinality() { MockBundleContext ctx = new
+	 * MockBundleContext() { public ServiceReference[]
+	 * getServiceReferences(String clazz, String filter) throws
+	 * InvalidSyntaxException { return null; } }; interceptor = new
+	 * OsgiServiceDynamicInterceptor(ctx,
+	 * ReferenceClassLoadingOptions.UNMANAGED); interceptor.setFilter(new
+	 * MockFilter()); RetryTemplate template = new RetryTemplate();
+	 * template.setRetryNumbers(1); template.setWaitTime(10);
+	 * interceptor.setRetryTemplate(template); try {
+	 * interceptor.afterPropertiesSet(); fail("expected exception"); } catch
+	 * (ServiceUnavailableException sue) { // expected } }
+	 */
 }

@@ -41,6 +41,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Constants;
 import org.springframework.core.Ordered;
+import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.internal.context.support.OsgiBundleScope;
 import org.springframework.osgi.internal.service.BeanNameServicePropertiesResolver;
@@ -178,7 +179,7 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 	private String deactivationMethod;
 
-	private int contextClassloaderManagementStrategy = ExportClassLoadingOptions.UNMANAGED;
+	private ExportClassLoadingOptions contextClassloaderManagementStrategy = ExportClassLoadingOptions.UNMANAGED;
 
 	private Object target;
 
@@ -415,7 +416,7 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	 * @param classloaderManagementOption
 	 */
 	public void setContextClassloader(String classloaderManagementOption) {
-		this.contextClassloaderManagementStrategy = ExportClassLoadingOptions.getFromString(classloaderManagementOption);
+		this.contextClassloaderManagementStrategy = ExportClassLoadingOptions.resolveEnum(classloaderManagementOption);
 	}
 
 	/**
@@ -495,11 +496,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 		this.ranking = ranking;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
-	 */
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = beanFactory;
 	}

@@ -15,8 +15,8 @@
  */
 package org.springframework.osgi.service.importer;
 
-import org.springframework.core.Constants;
-import org.springframework.util.Assert;
+import org.springframework.core.enums.StaticLabeledEnum;
+import org.springframework.core.enums.StaticLabeledEnumResolver;
 
 /**
  * Cardinality constants class.
@@ -24,43 +24,79 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public abstract class CardinalityOptions {
-
-	public static final int C_0__1 = 0;
-
-	public static final int C_0__N = 1;
-
-	public static final int C_1__1 = 2;
-
-	public static final int C_1__N = 3;
-
-	private final static Constants CARDINALITY = new Constants(CardinalityOptions.class);
+public class CardinalityOptions extends StaticLabeledEnum {
 
 	/**
-	 * Translates the cardinality string into an int representation. Accepts
-	 * values 0..N, 1..N, 0..1, 1..1.
+	 * Optional, singular cardinality.
+	 */
+	public static final CardinalityOptions C_0__1 = new CardinalityOptions(0, "0..1");
+
+	/**
+	 * Optional, multi-cardinality.
+	 */
+	public static final CardinalityOptions C_0__N = new CardinalityOptions(1, "0..N");
+
+	/**
+	 * Mandatory, singular cardinality.
+	 */
+	public static final CardinalityOptions C_1__1 = new CardinalityOptions(2, "1..1");
+
+	/**
+	 * Mandatory, multi-cardinality.
+	 */
+	public static final CardinalityOptions C_1__N = new CardinalityOptions(3, "1..N");
+
+	/**
+	 * Does this cardinality indicate that at most one service is expected?
 	 * 
 	 * @param cardinality
 	 * @return
 	 */
-	public static int asInt(String cardinality) {
-		Assert.hasText(cardinality);
-
-		// transform string to the constant representation
-		// a. C_ is appended to the string
-		// b. . -> _
-		return CARDINALITY.asNumber("C_".concat(cardinality.replace('.', '_'))).intValue();
+	public static boolean isSingular(CardinalityOptions cardinality) {
+		return CardinalityOptions.C_0__1.equals(cardinality) || CardinalityOptions.C_1__1.equals(cardinality);
+	}
+	
+	/**
+	 * Does this cardinality indicate that multiple services are expected?
+	 * 
+	 * @param cardinality
+	 * @return
+	 */
+	public static boolean isMultiple(CardinalityOptions cardinality) {
+		return CardinalityOptions.C_0__N.equals(cardinality) || CardinalityOptions.C_1__N.equals(cardinality);
 	}
 
-	public static boolean atMostOneExpected(int c) {
-		return CardinalityOptions.C_0__1 == c || CardinalityOptions.C_1__1 == c;
+	/**
+	 * Does this cardinality indicate that at least one service is required (mandatory cardinality).
+	 * 
+	 * @param cardinality
+	 * @return
+	 */
+	public static boolean isMandatory(CardinalityOptions cardinality) {
+		return CardinalityOptions.C_1__1.equals(cardinality) || CardinalityOptions.C_1__N.equals(cardinality);
 	}
 
-	public static boolean atLeastOneRequired(int c) {
-		return CardinalityOptions.C_1__1 == c || CardinalityOptions.C_1__N == c;
+	/**
+	 * Does this cardinality indicate that no service found is acceptable? 
+	 * 
+	 * @param cardinality
+	 * @return
+	 */
+	public static boolean isOptional(CardinalityOptions cardinality) {
+		return CardinalityOptions.C_0__N.equals(cardinality) || CardinalityOptions.C_0__1.equals(cardinality);
+	}
+	
+	public static CardinalityOptions resolveEnum(String label) {
+		return (CardinalityOptions) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(CardinalityOptions.class, label);
 	}
 
-	public static boolean moreThanOneExpected(int c) {
-		return CardinalityOptions.C_0__N == c || CardinalityOptions.C_1__N == c;
+	public static CardinalityOptions resolveEnum(int code) {
+		return (CardinalityOptions) StaticLabeledEnumResolver.instance().getLabeledEnumByCode(CardinalityOptions.class, new Integer(code));
+	}
+
+
+	
+	private CardinalityOptions(int code, String label) {
+		super(code, label);
 	}
 }

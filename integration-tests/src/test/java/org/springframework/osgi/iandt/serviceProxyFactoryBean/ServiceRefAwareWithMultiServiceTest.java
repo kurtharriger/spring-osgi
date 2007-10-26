@@ -47,7 +47,7 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 
 	// this fails due to some CGLIB problems
 	public void testProxyForMultipleCardinality() throws Exception {
-		fb.setMandatory(false);
+		fb.setCardinality("0..N");
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 

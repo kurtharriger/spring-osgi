@@ -35,6 +35,8 @@ public abstract class AbstractServiceImporter implements ServiceImporter {
 
 	/** is at least one service required? */
 	protected boolean mandatory = true;
+	
+	protected CardinalityOptions cardinality;
 
 	protected List depedencyListeners = new ArrayList(2);
 
@@ -47,17 +49,14 @@ public abstract class AbstractServiceImporter implements ServiceImporter {
 		return mandatory;
 	}
 
-	public void setMandatory(boolean mandatory) {
-		this.mandatory = mandatory;
-	}
-
     /**
 	 * The optional cardinality attribute allows a reference cardinality to be
-	 * specified (0..1, 1..1, 0..n, or 1..n). The default is '1..1'.
+	 * specified (0..1, 1..1, 0..N, or 1..N). The default is '1..X'.
 	 *
 	 * @param cardinality
 	 */
 	public void setCardinality(String cardinality) {
-        this.mandatory = CardinalityOptions.atLeastOneRequired(CardinalityOptions.asInt(cardinality));
+        this.cardinality = CardinalityOptions.resolveEnum(cardinality);
+        this.mandatory = CardinalityOptions.isMandatory(this.cardinality);
 	}
 }

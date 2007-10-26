@@ -56,7 +56,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 		ServiceRegistration reg = publishService(date);
 
 		fb = new OsgiServiceProxyFactoryBean();
-		fb.setMandatory(true);
+		fb.setCardinality("1..1");
 
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
@@ -108,7 +108,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 
 		ServiceRegistration reg = publishService(date, dict);
 
-		fb.setMandatory(true);
+		fb.setCardinality("1..1");
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 

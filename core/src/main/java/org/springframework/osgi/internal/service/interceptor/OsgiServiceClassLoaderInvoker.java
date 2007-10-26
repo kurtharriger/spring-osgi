@@ -42,8 +42,7 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 
 	protected ClassLoader serviceClassLoader;
 
-	// TODO: specify a default
-	protected int contextClassLoader;
+	protected int contextClassLoader = ReferenceClassLoadingOptions.UNMANAGED.shortValue();
 
 	private ServiceReference serviceReference;
 
@@ -63,7 +62,7 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 
 		// if the reference is not needed create the classloader once and just
 		// reuse it
-		canCacheClassLoader = !(contextClassLoader == ReferenceClassLoadingOptions.SERVICE_PROVIDER);
+		canCacheClassLoader = !(contextClassLoader == ReferenceClassLoadingOptions.SERVICE_PROVIDER.shortValue());
 		if (canCacheClassLoader) {
 			this.tccl = determineClassLoader(context, null, contextClassLoader);
 		}
@@ -73,14 +72,13 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 	protected ClassLoader determineClassLoader(BundleContext context, ServiceReference reference, int contextClassLoader) {
 		boolean trace = log.isTraceEnabled();
 
-		switch (contextClassLoader) {
-		case ReferenceClassLoadingOptions.CLIENT: {
+		if (ReferenceClassLoadingOptions.CLIENT.shortValue() == contextClassLoader) {
 			if (trace) {
 				log.trace("client TCCL used for this invocation");
 			}
 			return clientClassLoader;
 		}
-		case ReferenceClassLoadingOptions.SERVICE_PROVIDER: {
+		else if (ReferenceClassLoadingOptions.SERVICE_PROVIDER.shortValue() == contextClassLoader) {
 			if (trace) {
 				log.trace("service provider TCCL used for this invocation");
 			}
@@ -89,15 +87,10 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 			}
 			return serviceClassLoader;
 		}
-		case ReferenceClassLoadingOptions.UNMANAGED: {
+		else if (ReferenceClassLoadingOptions.UNMANAGED.shortValue() == contextClassLoader) {
 			if (trace) {
 				log.trace("no (unmanaged)TCCL used for this invocation");
 			}
-
-			break;
-		}
-		default:
-			throw new IllegalStateException("Illegal class loader invocation setting");
 		}
 		return null;
 	}

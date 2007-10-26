@@ -75,7 +75,7 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testListenersSetOnCollection() throws Exception {
-		serviceFactoryBean.setMandatory(false);
+		serviceFactoryBean.setCardinality(CardinalityOptions.C_0__N.getLabel());
 
 		TargetSourceLifecycleListener[] listeners = { (TargetSourceLifecycleListener) MockControl.createControl(
 			TargetSourceLifecycleListener.class).getMock() };
@@ -86,7 +86,7 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testMandatoryServiceAtStartupFailure() throws Exception {
-		serviceFactoryBean.setMandatory(true);
+		serviceFactoryBean.setCardinality(CardinalityOptions.C_1__N.getLabel());
 
 		try {
 			serviceFactoryBean.afterPropertiesSet();

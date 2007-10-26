@@ -50,7 +50,7 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
         Date date = new Date(time);
         ServiceRegistration reg = publishService(date);
 
-        fb.setMandatory(true);
+        fb.setCardinality("1..1");
         fb.setInterface(new Class[] { Date.class });
         fb.afterPropertiesSet();
 
@@ -76,7 +76,7 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
         ServiceRegistration reg = publishService(date, classes);
 
-        fb.setMandatory(true);
+        fb.setCardinality("1..1");
         fb.setInterface(intfs);
         fb.setFilter(OsgiFilterUtils.unifyFilter(Date.class, null));
         fb.afterPropertiesSet();
