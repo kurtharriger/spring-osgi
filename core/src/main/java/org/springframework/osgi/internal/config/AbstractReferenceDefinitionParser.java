@@ -60,10 +60,16 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
+			String value = attribute.getValue();
 
 			if (CARDINALITY.equals(name)) {
 				isCardinalitySpecified = true;
-				builder.addPropertyValue(CARDINALITY_PROP, determineCardinality(attribute.getValue()));
+				builder.addPropertyValue(CARDINALITY_PROP, determineCardinality(value));
+				return false;
+			}
+			
+			if (SERVICE_BEAN_NAME.equals(name)) {
+				builder.addPropertyValue(SERVICE_BEAN_NAME_PROP, value);
 				return false;
 			}
 			return true;
@@ -74,6 +80,8 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 	private static final String LISTENERS_PROP = "listeners";
 
 	private static final String CARDINALITY_PROP = "cardinality";
+	
+	private static final String SERVICE_BEAN_NAME_PROP = "serviceBeanName";
 
 	// XML attributes/elements
 	public static final String LISTENER = "listener";
@@ -91,6 +99,8 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 	public static final String CARDINALITY = "cardinality";
 
 	private static final String ZERO = "0";
+	
+	private static final String SERVICE_BEAN_NAME="bean-name";
 
 	// document defaults
 	protected OsgiDefaultsDefinition defaults = null;
