@@ -24,8 +24,8 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.core.Conventions;
 import org.springframework.osgi.internal.config.ParserUtils;
+import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.samples.weather.extension.bundle.PackageSpecification;
 import org.springframework.osgi.samples.weather.extension.bundle.VirtualBundleFactoryBean;
 import org.springframework.util.xml.DomUtils;
@@ -40,19 +40,15 @@ import org.w3c.dom.NamedNodeMap;
  */
 class VirtualBundleBeanDefinitionParser extends AbstractBeanDefinitionParser {
 	public static final String PACKAGE_ELEMENT = "package";
+
 	public static final String ID_NAME = "name";
+
 	public static final String ID_VERSION = "version";
 
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(VirtualBundleFactoryBean.class);
 
-		ParserUtils.parseCustomAttributes(element, builder, new ParserUtils.AttributeCallback() {
-
-			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
-				builder.addPropertyValue(Conventions.attributeNameToPropertyName(attribute.getLocalName()),
-					attribute.getValue());
-			}
-		});
+		ParserUtils.parseCustomAttributes(element, builder, (AttributeCallback) null);
 
 		Element e = DomUtils.getChildElementByTagName(element, "exports");
 		if (e != null) {
@@ -62,10 +58,10 @@ class VirtualBundleBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		if (e != null) {
 			builder.addPropertyValue("imports", extractPackageSet(e));
 		}
-//		e = DomUtils.getChildElementByTagName(element, "dynamic-imports");
-//		if (e != null) {
-//			// builder.addPropertyValue("dynamicImports", extractPackageSet(e));
-//		}
+		// e = DomUtils.getChildElementByTagName(element, "dynamic-imports");
+		// if (e != null) {
+		// // builder.addPropertyValue("dynamicImports", extractPackageSet(e));
+		// }
 
 		return builder.getBeanDefinition();
 	}
