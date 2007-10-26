@@ -20,9 +20,9 @@ package org.springframework.osgi.extensions.annotation;
  */
 public enum ServiceReferenceCardinality {
     C0__1("0..1"),
-    C0__N("0..n"),
+    C0__N("0..N"),
     C1__1("1..1"),
-    C1__N("1..n");
+    C1__N("1..N");
 
     private String strValue;
 
