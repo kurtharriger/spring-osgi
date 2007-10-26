@@ -15,20 +15,45 @@
  */
 package org.springframework.osgi.service.importer;
 
-import org.springframework.core.Constants;
-import org.springframework.osgi.service.exporter.ExportClassLoadingOptions;
+import org.springframework.core.enums.StaticLabeledEnum;
+import org.springframework.core.enums.StaticLabeledEnumResolver;
 
 /**
+ * Reference classloading options constants.
+ * 
  * @author Costin Leau
  * 
  */
-public abstract class ReferenceClassLoadingOptions extends ExportClassLoadingOptions {
+public class ReferenceClassLoadingOptions extends StaticLabeledEnum {
 
-	public static final Constants REFERENCE_CL_OPTIONS = new Constants(ReferenceClassLoadingOptions.class);
+	/**
+	 * The TCCL will not be managed upon service invocation.
+	 */
+	public static final ReferenceClassLoadingOptions UNMANAGED = new ReferenceClassLoadingOptions(0, "unmanaged");
 
-	public static final int CLIENT = 2;
+	/**
+	 * The TCCL will be set to the service provider upon service invocation.
+	 */
+	public static final ReferenceClassLoadingOptions SERVICE_PROVIDER = new ReferenceClassLoadingOptions(1,
+			"service-provider");
 
-	public static int getFromString(String classLoadingManagement) {
-		return getFromString(classLoadingManagement, REFERENCE_CL_OPTIONS);
+	/**
+	 * The TCCL will be set to the service provider upon service invocation.
+	 */
+	public static final ReferenceClassLoadingOptions CLIENT = new ReferenceClassLoadingOptions(2, "client");
+
+	public static ReferenceClassLoadingOptions resolveEnum(String label) {
+		return (ReferenceClassLoadingOptions) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(
+			ReferenceClassLoadingOptions.class, label);
 	}
+
+	public static ReferenceClassLoadingOptions resolveEnum(int code) {
+		return (ReferenceClassLoadingOptions) StaticLabeledEnumResolver.instance().getLabeledEnumByCode(
+			ReferenceClassLoadingOptions.class, new Integer(code));
+	}
+
+	private ReferenceClassLoadingOptions(int code, String label) {
+		super(code, label);
+	}
+
 }

@@ -18,7 +18,6 @@ package org.springframework.osgi.internal.compendium.config;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.core.Conventions;
 import org.springframework.osgi.internal.compendium.OsgiPropertyPlaceholder;
 import org.springframework.osgi.internal.config.ParserUtils;
 import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
@@ -35,46 +34,32 @@ import org.w3c.dom.Element;
 class OsgiPropertyPlaceholderDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	public static final String REF = "defaults-ref";
+
 	public static final String PROPERTIES_FIELD = "properties";
+
 	public static final String NESTED_PROPERTIES = "default-properties";
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser#getBeanClass(org.w3c.dom.Element)
-	 */
 	protected Class getBeanClass(Element element) {
 		return OsgiPropertyPlaceholder.class;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateId()
-	 */
 	protected boolean shouldGenerateId() {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser#doParse(org.w3c.dom.Element,
-	 *      org.springframework.beans.factory.xml.ParserContext,
-	 *      org.springframework.beans.factory.support.BeanDefinitionBuilder)
-	 */
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// do standard parsing
 		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
 
-			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
+			public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 				String name = attribute.getLocalName();
+				String value = attribute.getValue();
 				// transform ref into bean reference
-				if (REF.equals(name))
-					builder.addPropertyReference(PROPERTIES_FIELD, attribute.getValue());
-				else
-					// fallback to defaults
-					builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
+				if (REF.equals(name)) {
+					builder.addPropertyReference(PROPERTIES_FIELD, value);
+					return false;
+				}
+				return true;
 			}
 		});
 
@@ -84,10 +69,9 @@ class OsgiPropertyPlaceholderDefinitionParser extends AbstractSingleBeanDefiniti
 		if (nestedElement != null) {
 			if (element.hasAttribute(REF))
 				parserContext.getReaderContext().error(
-						"nested properties cannot be declared if '" + REF + "' attribute is specified", element);
+					"nested properties cannot be declared if '" + REF + "' attribute is specified", element);
 
 			builder.addPropertyValue(PROPERTIES_FIELD, parserContext.getDelegate().parsePropsElement(nestedElement));
 		}
 	}
-
 }

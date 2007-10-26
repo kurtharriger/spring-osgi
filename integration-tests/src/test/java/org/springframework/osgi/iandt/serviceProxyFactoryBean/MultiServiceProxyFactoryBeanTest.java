@@ -48,7 +48,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 	// causes CGLIB problems
 	public void tstFactoryBeanForMultipleServicesAsInterfaces() throws Exception {
 
-		fb.setMandatory(false);
+		fb.setCardinality("0..N");
 		// look for collections
 		fb.setInterface(new Class[] { ArrayList.class });
 		fb.afterPropertiesSet();
@@ -92,7 +92,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 	public void testFactoryBeanForMultipleServicesAsClasses() throws Exception {
 
-		fb.setMandatory(false);
+		fb.setCardinality("0..N");
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 
@@ -138,7 +138,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 	}
 
 	public void testIteratorWhenServiceGoesDown() throws Exception {
-		fb.setMandatory(false);
+		fb.setCardinality("0..N");
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 

@@ -19,12 +19,10 @@ import java.util.Comparator;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.core.Conventions;
-import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.internal.service.collection.CollectionType;
 import org.springframework.osgi.internal.service.collection.comparator.OsgiServiceReferenceComparator;
+import org.springframework.osgi.service.importer.CardinalityOptions;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
-import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -33,12 +31,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * &lt;osgi:collection&gt;, &lt;osgi:list&gt;, &lt;osgi:set&gt;, element parser.
+ * &lt;osgi:list&gt;, &lt;osgi:set&gt;, element parser.
  * 
  * @author Costin Leau
  * 
  */
-abstract class CollectionBeanDefinitionParser extends ReferenceBeanDefinitionParser {
+abstract class CollectionBeanDefinitionParser extends AbstractReferenceDefinitionParser {
 
 	private static final String NESTED_COMPARATOR = "comparator";
 
@@ -58,55 +56,47 @@ abstract class CollectionBeanDefinitionParser extends ReferenceBeanDefinitionPar
 
 	private static final String BASIS = "basis";
 
-	private static final String PROPERTY = "comparator";
-
 	protected Class getBeanClass(Element element) {
 		return OsgiMultiServiceProxyFactoryBean.class;
 	}
 
-	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
-		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
+	protected String mandatoryCardinality() {
+		return CardinalityOptions.C_1__N.getLabel();
+	}
 
-			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
-				String name = attribute.getLocalName();
-				String value = attribute.getValue();
+	protected String optionalCardinality() {
+		return CardinalityOptions.C_0__N.getLabel();
+	}
 
-				if (CARDINALITY.equals(name)) {
-					if (value.startsWith("0"))
-						builder.addPropertyValue(MANDATORY, Boolean.FALSE);
-					else
-						builder.addPropertyValue(MANDATORY, Boolean.TRUE);
-				}
-
-				// ref attribute will be handled separately
-				else {
-					if (!INLINE_COMPARATOR_REF.equals(name))
-						builder.addPropertyValue(Conventions.attributeNameToPropertyName(name), value);
-					else {
-						builder.addPropertyReference(COMPARATOR_PROPERTY, StringUtils.trimWhitespace(value));
-					}
-				}
-			}
-		});
-
+	protected void parseNestedElements(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		super.parseNestedElements(element, context, builder);
+		parseComparator(element, context, builder);
+	}
 
-		boolean comparatorRef = element.hasAttribute(INLINE_COMPARATOR_REF);
+	/**
+	 * Parse &lt;comparator&gt; element.
+	 * 
+	 * @param element
+	 * @param context
+	 * @param builder
+	 */
+	protected void parseComparator(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+		boolean hasComparatorRef = element.hasAttribute(INLINE_COMPARATOR_REF);
 
 		// check nested comparator
-		Element comparator = DomUtils.getChildElementByTagName(element, NESTED_COMPARATOR);
+		Element comparatorElement = DomUtils.getChildElementByTagName(element, NESTED_COMPARATOR);
 
 		Object nestedComparator = null;
 
 		// comparator definition present
-		if (comparator != null) {
+		if (comparatorElement != null) {
 			// check duplicate nested and inline bean definition
-			if (comparatorRef)
+			if (hasComparatorRef)
 				context.getReaderContext().error(
 					"nested comparator declaration is not allowed if " + INLINE_COMPARATOR_REF
-							+ " attribute has been specified", comparator);
+							+ " attribute has been specified", comparatorElement);
 
-			NodeList nl = comparator.getChildNodes();
+			NodeList nl = comparatorElement.getChildNodes();
 
 			// take only elements
 			for (int i = 0; i < nl.getLength(); i++) {
@@ -114,20 +104,31 @@ abstract class CollectionBeanDefinitionParser extends ReferenceBeanDefinitionPar
 				if (nd instanceof Element) {
 					Element beanDef = (Element) nd;
 					String name = beanDef.getLocalName();
-					// check if we have a natural definition
+					// check if we have a 'natural' tag (known comparator
+					// definitions)
 					if (NATURAL.equals(name))
 						nestedComparator = parseNaturalComparator(beanDef);
 					else
+						// we have a nested definition
 						nestedComparator = context.getDelegate().parsePropertySubElement(beanDef,
 							builder.getBeanDefinition());
 				}
 			}
 
+			// set the reference to the nested comparator reference
 			if (nestedComparator != null)
 				builder.addPropertyValue(COMPARATOR_PROPERTY, nestedComparator);
 		}
 
-		if (comparator != null) {
+		// set collection type
+		// based on the existence of the comparator
+		// we treat the case where the comparator is natural which means the
+		// comparator
+		// instance is null however, we have to force a sorted collection to be
+		// used
+		// so that the object natural ordering is used.
+
+		if (comparatorElement != null) {
 			if (CollectionType.LIST.equals(collectionType()))
 				builder.addPropertyValue(COLLECTION_TYPE_PROP, CollectionType.SORTED_LIST.getLabel());
 
@@ -139,6 +140,12 @@ abstract class CollectionBeanDefinitionParser extends ReferenceBeanDefinitionPar
 
 	}
 
+	/**
+	 * Parse &lt;osgi:natural&gt; element.
+	 * 
+	 * @param element
+	 * @return
+	 */
 	protected Comparator parseNaturalComparator(Element element) {
 		Comparator comparator = null;
 		NamedNodeMap attributes = element.getAttributes();

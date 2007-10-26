@@ -75,19 +75,18 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		// parse attributes
 		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
 
-			public void process(Element parent, Attr attribute, BeanDefinitionBuilder bldr) {
+			public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder bldr) {
 				String name = attribute.getLocalName();
 
 				if (INTERFACE.equals(name)) {
 					bldr.addPropertyValue(INTERFACES_PROP, attribute.getValue());
+					return false;
 				}
 				else if (REF.equals(name)) {
-					;
+					return false;
 				}
-				// fall-back mechanism
-				else {
-					bldr.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
-				}
+
+				return true;
 			}
 		});
 

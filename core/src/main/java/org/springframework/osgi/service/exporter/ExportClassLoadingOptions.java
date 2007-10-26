@@ -15,29 +15,39 @@
  */
 package org.springframework.osgi.service.exporter;
 
-import org.springframework.core.Constants;
-import org.springframework.util.Assert;
+import org.springframework.core.enums.StaticLabeledEnum;
+import org.springframework.core.enums.StaticLabeledEnumResolver;
 
 /**
- * Reference classloading options costants.
+ * Exporting classloading options constants.
  * 
  * @author Costin Leau
  * 
  */
-public abstract class ExportClassLoadingOptions {
+public class ExportClassLoadingOptions extends StaticLabeledEnum {
 
-	public static final Constants EXPORT_CL_OPTIONS = new Constants(ExportClassLoadingOptions.class);
+	/**
+	 * The TCCL will not be managed upon service invocation.
+	 */
+	public static final ExportClassLoadingOptions UNMANAGED = new ExportClassLoadingOptions(0, "unmanaged");
 
-	public static final int UNMANAGED = 0;
+	/**
+	 * The TCCL will be set to the service provider upon service invocation.
+	 */
+	public static final ExportClassLoadingOptions SERVICE_PROVIDER = new ExportClassLoadingOptions(1,
+			"service-provider");
 
-	public static final int SERVICE_PROVIDER = 1;
-
-	public static int getFromString(String classLoadingManagement) {
-		return getFromString(classLoadingManagement, EXPORT_CL_OPTIONS);
+	public static ExportClassLoadingOptions resolveEnum(String label) {
+		return (ExportClassLoadingOptions) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(
+			ExportClassLoadingOptions.class, label);
 	}
 
-	protected static int getFromString(String parameter, Constants constant) {
-		Assert.notNull(parameter, "non-null argument required");
-		return constant.asNumber(parameter.replace('-', '_')).intValue();
+	public static ExportClassLoadingOptions resolveEnum(int code) {
+		return (ExportClassLoadingOptions) StaticLabeledEnumResolver.instance().getLabeledEnumByCode(
+			ExportClassLoadingOptions.class, new Integer(code));
+	}
+
+	private ExportClassLoadingOptions(int code, String label) {
+		super(code, label);
 	}
 }

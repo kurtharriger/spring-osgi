@@ -18,23 +18,62 @@
         ]]></xsd:documentation>
     </xsd:annotation>
 
-	<xsd:attributeGroup name="osgi-defaults">
+	<!-- 
+	<xsd:attributeGroup name="defaults">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+			Defaults for Spring-DM OSGi declarations.
+			]]></xsd:documentation>
+		</xsd:annotation>
+		 -->
  		<!-- attributes -->
  		<xsd:attribute name="default-timeout" type="xsd:long" default="1000">
  			<xsd:annotation>
         		<xsd:documentation><![CDATA[
-            	Default timeout (in milliseconds) for all reference(service importers) elements that do not explicitly specify one.
+            	Default timeout (in milliseconds) for all reference (service importers) elements that do not explicitly specify one.
             	Default value is 1000 ms (1 second).
         		]]></xsd:documentation>
     		</xsd:annotation>
 	 	</xsd:attribute>
-	</xsd:attributeGroup>
+ 		<xsd:attribute name="default-cardinality" type="TdefaultCardinalityOptions" default="1..X">
+ 			<xsd:annotation>
+        		<xsd:documentation><![CDATA[
+            	Default cardinality (of the relationship to the backing service(s)) for all OSGi references (singular or collections) 
+            	elements that do not explicitly specify one.
+            	Default value is '1..X' which means that a backing service must exist (this is a mandatory service
+                reference). A value of '0..X' indicates that it is acceptable to be no backing service 
+                (an optional service reference).
+        		]]></xsd:documentation>
+    		</xsd:annotation>
+	 	</xsd:attribute>
+	 	<!-- 
+	</xsd:attributeGroup>	 	
+	 -->
+	
+	<xsd:simpleType name="TdefaultCardinalityOptions">
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="1..X">
+            	<xsd:annotation>
+            		<xsd:documentation><![CDATA[
+            		A backing service must exist (this is a mandatory service reference).
+            		]]></xsd:documentation>
+            	</xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="0..X">
+            	<xsd:annotation>
+            		<xsd:documentation><![CDATA[
+            		A backing service can be missing (this is an optional service reference).
+            		]]></xsd:documentation>
+            	</xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+	
     <!-- reference -->
-    
     <xsd:element name="reference" type="TsingleReference">
         <xsd:annotation>
             <xsd:documentation><![CDATA[
-                Defines a reference to a service obtained via the OSGi service registry.
+            Defines a reference to a service obtained via the OSGi service registry.
             ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -52,7 +91,7 @@
                       </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="interface" use="required" type="xsd:string">
+                <xsd:attribute name="interface" use="required" type="xsd:token">
                       <xsd:annotation>
                       	<xsd:documentation><![CDATA[
                       	  The service interface that the services obtained via the registry are required to support.
@@ -107,7 +146,7 @@
     </xsd:complexType>
     
     <xsd:simpleType name="TreferenceClassLoaderOptions">
-        <xsd:restriction base="xsd:string">
+        <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="client"/>
             <xsd:enumeration value="service-provider"/>
             <xsd:enumeration value="unmanaged"/>
@@ -134,14 +173,14 @@
         		]]></xsd:documentation>
         	</xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="bind-method" type="xsd:string" use="optional">
+        <xsd:attribute name="bind-method" type="xsd:token" use="optional">
         	<xsd:annotation>
         		<xsd:documentation><![CDATA[
         			The name of the method to be invoked when a backing service is bound.
         		]]></xsd:documentation>
         	</xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="unbind-method" type="xsd:string" use="optional">
+        <xsd:attribute name="unbind-method" type="xsd:token" use="optional">
         	<xsd:annotation>
         		<xsd:documentation><![CDATA[
         			The name of the method to be invoked when a backing service is unbound.
@@ -159,17 +198,16 @@
                       	<xsd:documentation><![CDATA[
                       	  Defines the required cardinality of the relationship to the backing service. The default
                       	  value is '1..1' which means that a backing service must exist (this is a mandatory service
-                      	  reference. A value of '0..1' indicates that it is acceptable for there to be no backing
-                      	  service (an optional service reference).
+                      	  reference). A value of '0..1' indicates that it is acceptable to be no backing service (an
+                      	  optional service reference).
                       	]]></xsd:documentation>
                       </xsd:annotation>
                 </xsd:attribute>
-				<xsd:attribute name="timeout" use="optional" type="xsd:long" default="1000">
+				<xsd:attribute name="timeout" use="optional" type="xsd:long">
                     <xsd:annotation>
                       	<xsd:documentation><![CDATA[
                       	  For a 'reference' element, the amount of time (in milliseconds) to wait for a backing service to be 
-                      	  available when an operation is invoked.
-                      	  Default value is 1000 ms (1 second). 
+                      	  available when an operation is invoked. If not specified, the default-timeout attribute will apply.
                       	  See also the default-timeout attribute of the osgi element.
                       	]]></xsd:documentation>
                       </xsd:annotation>
@@ -179,7 +217,7 @@
    </xsd:complexType>
    
    <xsd:simpleType name="TsingleReferenceCardinality">
-        <xsd:restriction base="xsd:string">
+        <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="1..1"/>
             <xsd:enumeration value="0..1"/>
         </xsd:restriction>
@@ -223,13 +261,11 @@
 							<xsd:documentation source="java:java.util.Comparator"><![CDATA[
 							  Used to define an inline bean of type Comparator that will be used to sort the matching services.
 							]]></xsd:documentation>
-							<!-- 
 							<xsd:appinfo>
 								<tool:annotation>
 									<tool:expected-type type="java.util.Comparator" />
   								</tool:annotation>
 							</xsd:appinfo>
-							 -->  							
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -281,14 +317,14 @@
 	</xsd:complexType>
 	
 	<xsd:simpleType name="TorderingBasis">
-		<xsd:restriction base="xsd:string">
+		<xsd:restriction base="xsd:token">
             <xsd:enumeration value="service"/>
             <xsd:enumeration value="service-reference"/>
         </xsd:restriction>
 	</xsd:simpleType>
 	
 	<xsd:simpleType name="TcollectionCardinality">
-        <xsd:restriction base="xsd:string">
+        <xsd:restriction base="xsd:token">
             <xsd:enumeration value="1..N"/>
             <xsd:enumeration value="0..N"/>
         </xsd:restriction>
@@ -339,7 +375,7 @@
                     <!-- nested bean declaration -->
                     <xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="skip"/>
                 </xsd:sequence>
-                <xsd:attribute name="interface" type="xsd:string" use="optional">
+                <xsd:attribute name="interface" type="xsd:token" use="optional">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
                 			Defines the interface to advertise for this service in the service registry.
@@ -419,14 +455,14 @@
         		]]></xsd:documentation>
         	</xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="registration-method" type="xsd:string" use="optional">
+        <xsd:attribute name="registration-method" type="xsd:token" use="optional">
         	<xsd:annotation>
         		<xsd:documentation><![CDATA[
         			The name of the method to be invoked when the service is registered.
         		]]></xsd:documentation>
         	</xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="unregistration-method" type="xsd:string" use="optional">
+        <xsd:attribute name="unregistration-method" type="xsd:token" use="optional">
         	<xsd:annotation>
         		<xsd:documentation><![CDATA[
         			The name of the method to be invoked when the service is unregistered.
@@ -436,14 +472,14 @@
     </xsd:complexType>
 
     <xsd:simpleType name="TserviceClassLoaderOptions">
-        <xsd:restriction base="xsd:string">
+        <xsd:restriction base="xsd:token">
             <xsd:enumeration value="service-provider"/>
             <xsd:enumeration value="unmanaged"/>
         </xsd:restriction>
     </xsd:simpleType>
 
     <xsd:simpleType name="TautoExportModes">
-        <xsd:restriction base="xsd:string">
+        <xsd:restriction base="xsd:token">
             <xsd:enumeration value="disabled"/>
             <xsd:enumeration value="interfaces"/>
             <xsd:enumeration value="class-hierarchy"/>
@@ -517,7 +553,7 @@
     </xsd:complexType>
 
     <xsd:simpleType name="TbundleAction">
-        <xsd:restriction base="xsd:string">
+        <xsd:restriction base="xsd:token">
             <xsd:enumeration value="start"/>
             <xsd:enumeration value="stop"/>
             <xsd:enumeration value="install"/>

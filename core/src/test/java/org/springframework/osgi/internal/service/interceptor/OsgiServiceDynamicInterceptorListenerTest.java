@@ -64,8 +64,8 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 			}
 		};
 
-		interceptor = new OsgiServiceDynamicInterceptor(bundleContext, ExportClassLoadingOptions.UNMANAGED,
-				getClass().getClassLoader());
+		interceptor = new OsgiServiceDynamicInterceptor(bundleContext,
+				ExportClassLoadingOptions.UNMANAGED.shortValue(), getClass().getClassLoader());
 		interceptor.setListeners(new TargetSourceLifecycleListener[] { listener });
 		RetryTemplate tmpl = new RetryTemplate();
 		tmpl.setRetryNumbers(1);
@@ -135,7 +135,7 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 		assertEquals(2, SimpleTargetSourceLifecycleListener.BIND);
 		assertEquals(0, SimpleTargetSourceLifecycleListener.UNBIND);
 	}
-	
+
 	public void testRebindWhenServiceGoesDownButAReplacementIsFound() {
 		interceptor.afterPropertiesSet();
 

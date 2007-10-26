@@ -47,19 +47,11 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceProxyFactoryBean.class);
 
-	public static final String FILTER_ATTRIBUTE = "filter";
-
-	public static final String INTERFACE_ATTRIBUTE = "interface";
-
-	public static final String CARDINALITY_ATTRIBUTE = "cardinality";
-
-	public static final String OBJECTCLASS = "objectClass";
-
 	protected ClassLoader classLoader;
 
 	protected BundleContext bundleContext;
 
-	protected int contextClassloader = ReferenceClassLoadingOptions.CLIENT;
+	protected int contextClassloader = ReferenceClassLoadingOptions.CLIENT.shortValue();
 
 	// not required to be an interface, but usually should be...
 	protected Class[] serviceTypes;
@@ -89,7 +81,6 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	 * Subclasses have to implement this method and return the appropriate
 	 * service proxy type.
 	 */
-
 	public abstract Class getObjectType();
 
 	public boolean isSingleton() {
@@ -164,7 +155,7 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	}
 
 	public void setContextClassloader(String classLoaderManagementOption) {
-		this.contextClassloader = ReferenceClassLoadingOptions.getFromString(classLoaderManagementOption);
+		this.contextClassloader = ReferenceClassLoadingOptions.resolveEnum(classLoaderManagementOption).shortValue();
 	}
 
 	public void setBundleContext(BundleContext context) {
@@ -194,11 +185,6 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	 */
 	public void setServiceBeanName(String serviceBeanName) {
 		this.serviceBeanName = serviceBeanName;
-	}
-
-	// FIXME: this should be removed - bean-name-> service-bean-name
-	public void setBeanName(String beanName) {
-		setServiceBeanName(beanName);
 	}
 
 	public void setBeanClassLoader(ClassLoader classLoader) {

@@ -191,7 +191,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Impo
 
 	private final BundleContext context;
 
-	private int contextClassLoader = ReferenceClassLoadingOptions.CLIENT;
+	private int contextClassLoader = ReferenceClassLoadingOptions.CLIENT.shortValue();
 
 	protected final ClassLoader classLoader;
 

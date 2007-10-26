@@ -28,6 +28,7 @@ import org.springframework.osgi.internal.util.ClassUtils;
 import org.springframework.osgi.internal.util.DebugUtils;
 import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -48,10 +49,6 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 
 	private ServiceReferenceAware proxy;
 
-	public void destroy() throws Exception {
-		// FIXME: implement cleanup
-	}
-
 	public Object getObject() {
 		if (!initialized)
 			throw new FactoryBeanNotInitializedException();
@@ -66,6 +63,10 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(serviceTypes) ? Object.class : serviceTypes[0]));
 
+	}
+	
+	public void destroy() throws Exception {
+		// FIXME: implement cleanup
 	}
 
 	public boolean isSatisfied() {
@@ -165,5 +166,12 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 	 */
 	public void setTimeout(long millisBetweenRetries) {
 		this.retryTemplate.setWaitTime(millisBetweenRetries);
+	}
+	
+	/* override to check proper cardinality - x..1 */
+	public void setCardinality(String cardinality) {
+		Assert.isTrue(CardinalityOptions.isSingular(CardinalityOptions.resolveEnum(cardinality)),
+			"only singular cardinality ('X..1') accepted");
+		super.setCardinality(cardinality);
 	}
 }

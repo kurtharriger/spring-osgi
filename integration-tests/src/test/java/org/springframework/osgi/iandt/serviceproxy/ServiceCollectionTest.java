@@ -62,7 +62,7 @@ public abstract class ServiceCollectionTest extends AbstractConfigurableBundleCr
 		BundleDelegatingClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 
 		OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader, false);
-		collection.setContextClassLoader(ReferenceClassLoadingOptions.CLIENT);
+		collection.setContextClassLoader(ReferenceClassLoadingOptions.CLIENT.shortValue());
 		ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 		try {
 			Thread.currentThread().setContextClassLoader(classLoader);

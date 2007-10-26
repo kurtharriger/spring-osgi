@@ -18,27 +18,19 @@ package org.springframework.osgi.internal.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
-import org.springframework.core.Conventions;
 import org.springframework.osgi.context.support.BundleFactoryBean;
-import org.w3c.dom.Attr;
+import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
 import org.w3c.dom.Element;
 
 /**
- * AbstractSingleBeanDefinitionParser that supports the "depends-on" attribute.
- *
+ * BundleFactoryBean definition.
+ * 
  * @author Andy Piper
+ * @author Costin Leau
  */
 class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
-	public static final String LAZY_INIT = "lazy-init";
-
 	protected void doParse(Element element, BeanDefinitionBuilder builder) {
-		ParserUtils.parseCustomAttributes(element, builder, new ParserUtils.AttributeCallback() {
-
-			public void process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
-				builder.addPropertyValue(Conventions.attributeNameToPropertyName(attribute.getLocalName()),
-					attribute.getValue());
-			}
-		});
+		ParserUtils.parseCustomAttributes(element, builder, (AttributeCallback) null);
 	}
 
 	protected Class getBeanClass(Element element) {
