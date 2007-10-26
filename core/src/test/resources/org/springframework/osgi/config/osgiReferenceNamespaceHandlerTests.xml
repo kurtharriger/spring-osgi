@@ -5,17 +5,16 @@
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi-1.0-rc1.xsd"
-	osgi:default-timeout="10"
-	osgi:default-cardinality="1..X">
+	osgi:default-timeout="10" osgi:default-cardinality="0..X">
 
 	<!-- osgi:reference -->
 
 	<!-- simple one -->
-	<osgi:reference id="serializable" interface="java.io.Serializable" />
+	<osgi:reference id="serializable" interface="java.io.Serializable"
+		cardinality="1..1" />
 
 	<!-- more complex -->
-	<osgi:reference id="listeners" interface="java.io.Externalizable"
-		cardinality="0..1" />
+	<osgi:reference id="listeners" interface="java.io.Externalizable" />
 
 	<!-- full options -->
 	<osgi:reference id="full-options" interface="java.lang.Cloneable"
@@ -44,5 +43,6 @@
 	<bean id="signature-listener2"
 		class="org.springframework.osgi.config.DummyListenerServiceSignature2" />
 
-
+	<osgi:reference id="importerWithBeanName"
+		interface="java.lang.Cloneable" bean-name="someBean" />
 </beans>

@@ -96,7 +96,7 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 	public void testFullReference() throws Exception {
 		OsgiServiceProxyFactoryBean factory = (OsgiServiceProxyFactoryBean) appContext.getBean("&full-options");
 		factory.getObject(); // required to initialise proxy and hook
-								// listeners into the binding process
+		// listeners into the binding process
 
 		TargetSourceLifecycleListener[] listeners = (TargetSourceLifecycleListener[]) TestUtils.getFieldValue(factory,
 			"listeners");
@@ -126,4 +126,9 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 		assertEquals(1, DummyListenerServiceSignature2.UNBIND_CALLS);
 	}
 
+	public void testBeanNameAttrToServiceBeanNameProperty() throws Exception {
+		OsgiServiceProxyFactoryBean factory = (OsgiServiceProxyFactoryBean) appContext.getBean("&importerWithBeanName");
+		Object obj = TestUtils.getFieldValue(factory, "serviceBeanName");
+		assertEquals("bean-name attr hasn't been properly parsed", "someBean", obj);
+	}
 }
