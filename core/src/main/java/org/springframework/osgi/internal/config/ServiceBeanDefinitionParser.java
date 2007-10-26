@@ -95,6 +95,7 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		if (element.hasAttribute(REF))
 			target = new RuntimeBeanReference(element.getAttribute(REF));
 
+		// element is considered parent
 		NodeList nl = element.getChildNodes();
 
 		ManagedList listeners = new ManagedList();
@@ -104,55 +105,29 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 			Node node = nl.item(i);
 			if (node instanceof Element) {
 				Element subElement = (Element) node;
-
 				String name = subElement.getLocalName();
 
-				// osgi:interfaces
-				if (INTERFACES_ID.equals(name)) {
-					// check shortcut
-					if (element.hasAttribute(INTERFACE)) {
-						parserContext.getReaderContext().error(
-							"either 'interface' attribute or <intefaces> sub-element has be specified", element);
-					}
-					Set interfaces = parserContext.getDelegate().parseSetElement(subElement,
-						builder.getBeanDefinition());
-					builder.addPropertyValue(INTERFACES_PROP, interfaces);
-				}
-
-				// osgi:service-properties
-				else if (PROPS_ID.equals(name)) {
-					if (DomUtils.getChildElementsByTagName(subElement, BeanDefinitionParserDelegate.ENTRY_ELEMENT).size() > 0) {
-						Object props = parserContext.getDelegate().parseMapElement(subElement,
-							builder.getRawBeanDefinition());
-						builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
-					}
-					else {
-						parserContext.getReaderContext().error("Invalid service property type", subElement);
-					}
-				}
-
+				if (parseInterfaces(element, subElement, parserContext, builder))
+					;
+				else if (parseServiceProperties(element, subElement, parserContext, builder))
+					;
 				// osgi:registration-listener
 				else if (LISTENER.equals(name)) {
-					listeners.add(getListener(parserContext, subElement, builder));
+					listeners.add(parseListener(parserContext, subElement, builder));
 				}
 
 				// nested bean reference/declaration
-				else {
-					if (element.hasAttribute(REF))
-						parserContext.getReaderContext().error(
-							"nested bean definition/reference cannot be used when attribute 'ref' is specified",
-							element);
-					target = parserContext.getDelegate().parsePropertySubElement(subElement,
-						builder.getBeanDefinition());
-				}
+				else
+					target = parseBeanReference(element, subElement, parserContext, builder);
 			}
 		}
 
-		// do we have a bean reference ?
+		// catch referenced bean name and initialize exporter
 		if (target instanceof RuntimeBeanReference) {
 			builder.addPropertyValue(TARGET_BEAN_NAME_PROP, ((RuntimeBeanReference) target).getBeanName());
 		}
 
+		// add target (can be either an object instance or a bean definition)
 		builder.addPropertyValue(TARGET_PROP, target);
 
 		// add listeners
@@ -161,7 +136,56 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		return builder.getBeanDefinition();
 	}
 
-	private BeanDefinition getListener(ParserContext context, Element element, BeanDefinitionBuilder builder) {
+	// osgi:interfaces
+	private boolean parseInterfaces(Element parent, Element element, ParserContext parserContext,
+			BeanDefinitionBuilder builder) {
+		String name = element.getLocalName();
+
+		// osgi:interfaces
+		if (INTERFACES_ID.equals(name)) {
+			// check shortcut on the parent
+			if (parent.hasAttribute(INTERFACE)) {
+				parserContext.getReaderContext().error(
+					"either 'interface' attribute or <intefaces> sub-element has be specified", parent);
+			}
+			Set interfaces = parserContext.getDelegate().parseSetElement(element, builder.getBeanDefinition());
+			builder.addPropertyValue(INTERFACES_PROP, interfaces);
+			return true;
+		}
+
+		return false;
+	}
+
+	// osgi:service-properties
+	private boolean parseServiceProperties(Element parent, Element element, ParserContext parserContext,
+			BeanDefinitionBuilder builder) {
+		String name = element.getLocalName();
+
+		if (PROPS_ID.equals(name)) {
+			if (DomUtils.getChildElementsByTagName(element, BeanDefinitionParserDelegate.ENTRY_ELEMENT).size() > 0) {
+				Object props = parserContext.getDelegate().parseMapElement(element, builder.getRawBeanDefinition());
+				builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
+			}
+			else {
+				parserContext.getReaderContext().error("Invalid service property type", element);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	// parse nested bean definition
+	private Object parseBeanReference(Element parent, Element element, ParserContext parserContext,
+			BeanDefinitionBuilder builder) {
+		// check shortcut on the parent
+		if (parent.hasAttribute(REF))
+			parserContext.getReaderContext().error(
+				"nested bean definition/reference cannot be used when attribute 'ref' is specified", parent);
+		return parserContext.getDelegate().parsePropertySubElement(element, builder.getBeanDefinition());
+	}
+
+	// osgi:listener
+	private BeanDefinition parseListener(ParserContext context, Element element, BeanDefinitionBuilder builder) {
 
 		// filter elements
 		NodeList nl = element.getChildNodes();
@@ -173,13 +197,13 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
 			if (node instanceof Element) {
-				Element beanDef = (Element) node;
-
+				Element nestedDefinition = (Element) node;
+				// check shortcut on the pparent
 				if (element.hasAttribute(REF))
 					context.getReaderContext().error(
-						"nested bean declaration is not allowed if 'ref' attribute has been specified", beanDef);
+						"nested bean declaration is not allowed if 'ref' attribute has been specified", nestedDefinition);
 
-				target = context.getDelegate().parsePropertySubElement(beanDef, builder.getBeanDefinition());
+				target = context.getDelegate().parsePropertySubElement(nestedDefinition, builder.getBeanDefinition());
 			}
 		}
 

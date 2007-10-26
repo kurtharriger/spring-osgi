@@ -29,7 +29,6 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
-import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -241,7 +240,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 				String name = attribute.getLocalName();
 
 				if (REF.equals(name))
-					target = new RuntimeBeanReference(StringUtils.trimWhitespace(attribute.getValue()));
+					target = new RuntimeBeanReference(attribute.getValue());
 				else
 					vals.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
 			}
