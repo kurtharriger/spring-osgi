@@ -41,7 +41,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Constants;
 import org.springframework.core.Ordered;
-import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.internal.context.support.OsgiBundleScope;
 import org.springframework.osgi.internal.service.BeanNameServicePropertiesResolver;

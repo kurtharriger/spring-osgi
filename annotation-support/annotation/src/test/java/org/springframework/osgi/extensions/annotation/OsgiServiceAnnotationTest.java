@@ -175,7 +175,7 @@ public class OsgiServiceAnnotationTest extends TestCase {
 			new Class[] { AnnotatedBean.class });
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
-		Class[] intfs = (Class[]) getPrivateProperty(pfb, "serviceTypes");
+		Class[] intfs = (Class[]) getPrivateProperty(pfb, "interfaces");
 		assertEquals(intfs[0], Object.class);
 	}
 
@@ -185,7 +185,7 @@ public class OsgiServiceAnnotationTest extends TestCase {
 			new Class[] { AnnotatedBean.class });
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
-		Class[] intfs = (Class[]) getPrivateProperty(pfb, "serviceTypes");
+		Class[] intfs = (Class[]) getPrivateProperty(pfb, "interfaces");
 		int ccl = ((Integer) getPrivateProperty(pfb, "contextClassloader")).intValue();
 		String filter = (String) getPrivateProperty(pfb, "filter");
 		String beanName = (String) getPrivateProperty(pfb, "serviceBeanName");

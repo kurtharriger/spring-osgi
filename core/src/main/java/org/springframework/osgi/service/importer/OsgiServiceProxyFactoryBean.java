@@ -54,14 +54,14 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 			throw new FactoryBeanNotInitializedException();
 
 		if (proxy == null) {
-			proxy = createSingleServiceProxy(serviceTypes, listeners, classLoader);
+			proxy = createSingleServiceProxy(interfaces, listeners, classLoader);
 		}
 
 		return proxy;
 	}
 
 	public Class getObjectType() {
-		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(serviceTypes) ? Object.class : serviceTypes[0]));
+		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(interfaces) ? Object.class : interfaces[0]));
 
 	}
 	
@@ -106,7 +106,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			if (log.isWarnEnabled()) {
-				DebugUtils.debugNoClassDefFoundWhenProxying(ncdfe, bundleContext, serviceTypes);
+				DebugUtils.debugNoClassDefFoundWhenProxying(ncdfe, bundleContext, interfaces);
 			}
 			throw ncdfe;
 		}

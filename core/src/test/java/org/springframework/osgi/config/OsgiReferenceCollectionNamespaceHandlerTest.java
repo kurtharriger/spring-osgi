@@ -175,15 +175,16 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		
 		assertNotNull(comp);
 		assertSame(OsgiServiceReferenceComparator.class, comp.getClass());
-		
+
+		Class[] intfs = getInterfaces(factoryBean);
+		assertTrue(Arrays.equals(new Class[] { Externalizable.class }, intfs));
+
 		TargetSourceLifecycleListener[] listeners = getListeners(factoryBean);
 		assertEquals(2, listeners.length);
 
 		Object bean = appContext.getBean("sortedSetWithNaturalOrderingOnRefs");
 		assertTrue(bean instanceof OsgiServiceSortedSet);
 
-		Class[] intfs = getInterfaces(factoryBean);
-		assertTrue(Arrays.equals(new Class[] { Externalizable.class }, intfs));
 	}
 
 	public void testSortedListWithNaturalOrderingOnServs() throws Exception {
@@ -200,7 +201,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 	}
 
 	private Class[] getInterfaces(Object proxy) {
-		return (Class[]) TestUtils.getFieldValue(proxy, "serviceTypes");
+		return (Class[]) TestUtils.getFieldValue(proxy, "interfaces");
 	}
 
 	private Comparator getComparator(Object proxy) {

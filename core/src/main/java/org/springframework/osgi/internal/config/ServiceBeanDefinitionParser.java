@@ -25,7 +25,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
+import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
@@ -47,7 +47,7 @@ import org.w3c.dom.NodeList;
  * @author Hal Hildebrand
  * @author Andy Piper
  */
-class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
+class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	// bean properties
 	private static final String TARGET_BEAN_NAME_PROP = "targetBeanName";
@@ -69,9 +69,11 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 	private static final String REF = "ref";
 
-	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(OsgiServiceFactoryBean.class);
+	protected Class getBeanClass(Element element) {
+		return OsgiServiceFactoryBean.class;
+	}
 
+	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes
 		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
 
@@ -101,14 +103,19 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		ManagedList listeners = new ManagedList();
 
 		// parse all sub elements
+		// we iterate through them since we have to 'catch' the possible nested
+		// bean which has an unknown name local name
+
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
 			if (node instanceof Element) {
 				Element subElement = (Element) node;
 				String name = subElement.getLocalName();
 
+				// osgi:interface
 				if (parseInterfaces(element, subElement, parserContext, builder))
 					;
+				// osgi:service-properties
 				else if (parseServiceProperties(element, subElement, parserContext, builder))
 					;
 				// osgi:registration-listener
@@ -132,8 +139,6 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 		// add listeners
 		builder.addPropertyValue(LISTENERS_PROP, listeners);
-
-		return builder.getBeanDefinition();
 	}
 
 	// osgi:interfaces
@@ -201,7 +206,8 @@ class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
 				// check shortcut on the pparent
 				if (element.hasAttribute(REF))
 					context.getReaderContext().error(
-						"nested bean declaration is not allowed if 'ref' attribute has been specified", nestedDefinition);
+						"nested bean declaration is not allowed if 'ref' attribute has been specified",
+						nestedDefinition);
 
 				target = context.getDelegate().parsePropertySubElement(nestedDefinition, builder.getBeanDefinition());
 			}
