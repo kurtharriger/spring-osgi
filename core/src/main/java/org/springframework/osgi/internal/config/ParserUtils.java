@@ -127,18 +127,6 @@ public abstract class ParserUtils {
 
 	private static final String DEFAULT_CARDINALITY = "default-cardinality";
 
-	// public static void parseDependsOn(Attr attribute, BeanDefinitionBuilder
-	// builder) {
-	// for (StringTokenizer dependents = new
-	// StringTokenizer(attribute.getValue(), ", ");
-	// dependents.hasMoreElements();) {
-	// String dep = (String) dependents.nextElement();
-	// if (StringUtils.hasText(dep)) {
-	// builder.addDependsOn(dep);
-	// }
-	// }
-	// }
-
 	/**
 	 * Wrapper callback used for parsing attributes (one at a time) that have
 	 * are non standard (ID, LAZY-INIT, DEPENDS-ON).
@@ -217,7 +205,7 @@ public abstract class ParserUtils {
 		AttributeCallback[] cbacks = (AttributeCallback[]) list.toArray(new AttributeCallback[list.size()]);
 		parseAttributes(element, builder, cbacks);
 	}
-	
+
 	/**
 	 * Derivative for
 	 * {@link #parseCustomAttributes(Element, BeanDefinitionBuilder, org.springframework.osgi.internal.config.ParserUtils.AttributeCallback[])}
