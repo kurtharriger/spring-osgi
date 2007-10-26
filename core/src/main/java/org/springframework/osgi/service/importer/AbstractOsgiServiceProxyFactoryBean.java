@@ -54,7 +54,7 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	protected int contextClassloader = ReferenceClassLoadingOptions.CLIENT.shortValue();
 
 	// not required to be an interface, but usually should be...
-	protected Class[] serviceTypes;
+	protected Class[] interfaces;
 
 	// filter used to narrow service matches, may be null
 	protected String filter;
@@ -66,7 +66,7 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	// service lifecycle listener
 	protected TargetSourceLifecycleListener[] listeners;
 
-    /** Service Bean property of the OSGi service * */
+	/** Service Bean property of the OSGi service * */
 	protected String serviceBeanName;
 
 	protected boolean initialized = false;
@@ -96,18 +96,18 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	}
 
 	public void afterPropertiesSet() {
-		Assert.notNull(this.bundleContext, "Required bundleContext property was not set");
-		Assert.notNull(classLoader, "Required classLoader property was not set");
-		Assert.notNull(serviceTypes, "Required serviceTypes property was not set");
+		Assert.notNull(this.bundleContext, "Required 'bundleContext' property was not set");
+		Assert.notNull(classLoader, "Required 'classLoader' property was not set");
+		Assert.notNull(interfaces, "Required 'interfaces' property was not set");
 		// validate specified classes
-		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(serviceTypes),
+		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(interfaces),
 			"more then one concrete class specified; cannot create proxy");
 
 		this.listeners = (listeners == null ? new TargetSourceLifecycleListener[0] : listeners);
-		
+
 		getUnifiedFilter(); // eager initialization of the cache to catch filter
 		// errors
-		Assert.notNull(serviceTypes, "Required serviceTypes property not specified");
+		Assert.notNull(interfaces, "Required serviceTypes property not specified");
 
 		initialized = true;
 	}
@@ -124,10 +124,10 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 			return unifiedFilter;
 		}
 
-		String filterWithClasses = OsgiFilterUtils.unifyFilter(serviceTypes, filter);
+		String filterWithClasses = OsgiFilterUtils.unifyFilter(interfaces, filter);
 
 		if (log.isTraceEnabled())
-			log.trace("unified classes=" + ObjectUtils.nullSafeToString(serviceTypes) + " and filter=[" + filter
+			log.trace("unified classes=" + ObjectUtils.nullSafeToString(interfaces) + " and filter=[" + filter
 					+ "]  in=[" + filterWithClasses + "]");
 
 		// add the serviceBeanName constraint
@@ -148,10 +148,17 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	public abstract void destroy() throws Exception;
 
 	/**
-	 * The type that the OSGi service was registered with
+	 * The type that the OSGi service was registered with.
+	 * 
+	 * @deprecated use {@link #setInterfaces(Class[])}. this method will be
+	 * removed after RC1.
 	 */
 	public void setInterface(Class[] serviceType) {
-		this.serviceTypes = serviceType;
+		this.interfaces = serviceType;
+	}
+
+	public void setInterfaces(Class[] serviceType) {
+		this.interfaces = serviceType;
 	}
 
 	public void setContextClassloader(String classLoaderManagementOption) {

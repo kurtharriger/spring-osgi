@@ -17,6 +17,7 @@ package org.springframework.osgi.internal.config;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
@@ -66,9 +67,14 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 				builder.addPropertyValue(CARDINALITY_PROP, determineCardinality(value));
 				return false;
 			}
-			
+
 			if (SERVICE_BEAN_NAME.equals(name)) {
 				builder.addPropertyValue(SERVICE_BEAN_NAME_PROP, value);
+				return false;
+			}
+
+			if (INTERFACE.equals(name)) {
+				builder.addPropertyValue(INTERFACES_PROP, value);
 				return false;
 			}
 			return true;
@@ -79,8 +85,10 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 	private static final String LISTENERS_PROP = "listeners";
 
 	private static final String CARDINALITY_PROP = "cardinality";
-	
+
 	private static final String SERVICE_BEAN_NAME_PROP = "serviceBeanName";
+
+	private static final String INTERFACES_PROP = "interfaces";
 
 	// XML attributes/elements
 	public static final String LISTENER = "listener";
@@ -93,13 +101,15 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 
 	public static final String INTERFACE = "interface";
 
-	public static final String INTERFACE_NAME = "interfaceName";
+	public static final String INTERFACES = "interfaces";
+
+	public static final String INTERFACEs = "interface";
 
 	public static final String CARDINALITY = "cardinality";
 
 	private static final String ZERO = "0";
-	
-	private static final String SERVICE_BEAN_NAME="bean-name";
+
+	private static final String SERVICE_BEAN_NAME = "bean-name";
 
 	// document defaults
 	protected OsgiDefaultsDefinition defaults = null;
@@ -191,7 +201,29 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 	 * @param builder
 	 */
 	protected void parseNestedElements(Element element, ParserContext context, BeanDefinitionBuilder builder) {
-		parseListeneres(element, context, builder);
+		parseInterfaces(element, context, builder);
+		parseListeners(element, context, builder);
+	}
+
+	/**
+	 * Parse interfaces.
+	 * 
+	 * @param element
+	 * @param context
+	 * @param builder
+	 */
+	protected void parseInterfaces(Element parent, ParserContext parserContext, BeanDefinitionBuilder builder) {
+
+		Element element = DomUtils.getChildElementByTagName(parent, INTERFACES);
+		if (element != null) {
+			// check shortcut on the parent
+			if (parent.hasAttribute(INTERFACE)) {
+				parserContext.getReaderContext().error(
+					"either 'interface' attribute or <intefaces> sub-element has be specified", parent);
+			}
+			Set interfaces = parserContext.getDelegate().parseSetElement(element, builder.getBeanDefinition());
+			builder.addPropertyValue(INTERFACES_PROP, interfaces);
+		}
 	}
 
 	/**
@@ -201,7 +233,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 	 * @param context
 	 * @param builder
 	 */
-	protected void parseListeneres(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+	protected void parseListeners(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		List listeners = DomUtils.getChildElementsByTagName(element, LISTENER);
 
 		ManagedList listenersRef = new ManagedList();

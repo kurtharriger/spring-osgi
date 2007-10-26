@@ -45,4 +45,12 @@
 
 	<osgi:reference id="importerWithBeanName"
 		interface="java.lang.Cloneable" bean-name="someBean" />
+
+	<!-- multiple interfaces -->
+	<osgi:reference id="multi-interfaces">
+		<osgi:interfaces>
+			<value>java.io.Serializable</value>
+			<value>java.io.Externalizable</value>
+		</osgi:interfaces>
+	</osgi:reference>
 </beans>

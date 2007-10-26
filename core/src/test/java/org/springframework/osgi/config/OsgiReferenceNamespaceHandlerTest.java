@@ -15,8 +15,10 @@
  */
 package org.springframework.osgi.config;
 
+import java.io.Externalizable;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -81,7 +83,7 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 		assertTrue(factoryBean instanceof OsgiServiceProxyFactoryBean);
 		OsgiServiceProxyFactoryBean proxyFactory = (OsgiServiceProxyFactoryBean) factoryBean;
 
-		Class[] intfs = (Class[]) TestUtils.getFieldValue(proxyFactory, "serviceTypes");
+		Class[] intfs = (Class[]) TestUtils.getFieldValue(proxyFactory, "interfaces");
 
 		assertEquals(1, intfs.length);
 		assertSame(Serializable.class, intfs[0]);
@@ -124,6 +126,15 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 
 		listeners[4].unbind(null, null);
 		assertEquals(1, DummyListenerServiceSignature2.UNBIND_CALLS);
+	}
+
+	public void testMultipleInterfaces() throws Exception {
+		OsgiServiceProxyFactoryBean factory = (OsgiServiceProxyFactoryBean) appContext.getBean("&multi-interfaces");
+		Class[] intfs = (Class[]) TestUtils.getFieldValue(factory, "interfaces");
+		assertNotNull(intfs);
+		assertEquals(2, intfs.length);
+
+		assertTrue(Arrays.equals(new Class[] { Serializable.class, Externalizable.class }, intfs));
 	}
 
 	public void testBeanNameAttrToServiceBeanNameProperty() throws Exception {

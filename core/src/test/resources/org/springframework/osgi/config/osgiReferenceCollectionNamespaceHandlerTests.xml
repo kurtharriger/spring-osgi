@@ -15,8 +15,8 @@
 		cardinality="0..N" />
 	<osgi:set id="simpleSet" interface="java.io.Serializable"
 		cardinality="0..N" />
-
-	<!-- Comparator variants -->
+ 
+	<!-- Comparator variants  -->
 	<beans:bean id="defaultComparator"
 		class="org.springframework.osgi.internal.service.collection.comparator.OsgiServiceReferenceComparator" />
 
@@ -37,9 +37,8 @@
 
 	<beans:bean id="secondListener"
 		class="org.springframework.osgi.config.DummyListener" />
-
-
-	<!-- sorted osgi:set (testing osgi:comparator variants) -->
+ 
+	<!-- sorted osgi:set (testing osgi:comparator variants) 	-->
 	<osgi:set id="sortedSetWithNaturalOrderingOnRefs"
 		interface="java.io.Externalizable" cardinality="0..N">
 		<osgi:listener ref="firstListener" />
@@ -48,6 +47,7 @@
 			<osgi:natural basis="service-reference" />
 		</osgi:comparator>
 	</osgi:set>
+
 	<osgi:list id="sortedListWithNaturalOrderingOnServs"
 		interface="java.io.Externalizable" cardinality="0..N">
 		<osgi:listener ref="firstListener" />
@@ -55,5 +55,5 @@
 			<osgi:natural basis="service" />
 		</osgi:comparator>
 	</osgi:list>
-
+ 
 </beans:beans>
