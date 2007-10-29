@@ -56,9 +56,10 @@ public class VirtualBundleFactoryBean extends BundleFactoryBean {
       // System.out.println("Repository is: " + url.toString());
     }
     else {
-      project = new Project(groupId, artifactId, version, "jar", location.getURL().toString(),
+      project = new Project(groupId, artifactId, version, "jar", location,
         Collections.EMPTY_SET, exports, imports);
-      url = location.getURL();
+      //url = resource.getURL();
+      url = new URL(location);
     }
     return new MavenBundleManager(bundleContext, url).installBundle(project);
   }
