@@ -22,7 +22,6 @@ import java.util.Set;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -62,6 +61,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 			String name = attribute.getLocalName();
 			String value = attribute.getValue();
 
+			// make sure the attribute is 
 			if (CARDINALITY.equals(name)) {
 				isCardinalitySpecified = true;
 				builder.addPropertyValue(CARDINALITY_PROP, determineCardinality(value));
@@ -187,8 +187,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 	 * @param defaults
 	 */
 	protected void applyDefaultCardinality(BeanDefinitionBuilder builder, OsgiDefaultsDefinition defaults) {
-		builder.addPropertyValue(CARDINALITY_PROP,
-			new TypedStringValue(determineCardinality(defaults.getCardinality())));
+		builder.addPropertyValue(CARDINALITY_PROP, determineCardinality(defaults.getCardinality()));
 	}
 
 	/**

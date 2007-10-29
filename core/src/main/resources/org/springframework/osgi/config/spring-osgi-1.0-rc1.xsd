@@ -38,9 +38,9 @@
         		<xsd:documentation><![CDATA[
             	Default cardinality (of the relationship to the backing service(s)) for all OSGi references (singular or collections) 
             	elements that do not explicitly specify one.
-            	Default value is '1..X' which means that a backing service must exist (this is a mandatory service
-                reference). A value of '0..X' indicates that it is acceptable to be no backing service 
-                (an optional service reference).
+            	Default value is '1..X' (resolved to '1..1' for osgi:reference and '1..N' for osgi:list/set) which means that a backing 
+            	service must exist (this is a mandatory service reference). A value of '0..X' (resolved to '0..1' for osgi:reference 
+            	and '0..N' for osgi:list/set) indicates that it is acceptable to be no backing service (an optional service reference).
         		]]></xsd:documentation>
     		</xsd:annotation>
 	 	</xsd:attribute>
@@ -119,8 +119,8 @@
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 							Used to refer to the name of another bean that this bean depends on. Ensures that the
-							service registry look-up does not happen until after the dependent bean has been created (most commonly used to refer to a 
-							bundle bean).
+							service registry look-up does not happen until after the dependent bean has been created 
+							(most commonly used to refer to a bundle bean).
 						]]></xsd:documentation>
 					</xsd:annotation>                
                 </xsd:attribute>
@@ -196,13 +196,13 @@
     <xsd:complexType name="TsingleReference">
         <xsd:complexContent>
             <xsd:extension base="Treference">
-                 <xsd:attribute name="cardinality" use="optional" type="TsingleReferenceCardinality" default="1..1">
+                 <xsd:attribute name="cardinality" use="optional" type="TsingleReferenceCardinality">
                 	<xsd:annotation>
                       	<xsd:documentation><![CDATA[
-                      	  Defines the required cardinality of the relationship to the backing service. The default
-                      	  value is '1..1' which means that a backing service must exist (this is a mandatory service
-                      	  reference). A value of '0..1' indicates that it is acceptable to be no backing service (an
-                      	  optional service reference).
+                      	  Defines the required cardinality of the relationship to the backing service. If not specified, 
+                      	  the default-cardinality attribute will apply. A value is '1..1' means that a backing service 
+                      	  must exist (this is a mandatory service reference). A value of '0..1' indicates that it is 
+                      	  acceptable to be no backing service (an optional service reference).
                       	]]></xsd:documentation>
                       </xsd:annotation>
                 </xsd:attribute>
@@ -281,13 +281,13 @@
 					</xsd:annotation>
 				</xsd:attribute>
 			
-			    <xsd:attribute name="cardinality" use="optional" type="TcollectionCardinality" default="1..N">
+			    <xsd:attribute name="cardinality" use="optional" type="TcollectionCardinality">
                 	<xsd:annotation>
                       	<xsd:documentation><![CDATA[
-                      	  Defines the required cardinality of the relationship to the backing services. The default
-                      	  value is '1..N' which means that at least one backing service must exist (this is a mandatory service
-                      	  reference. A value of '0..N' indicates that it is acceptable for there to be no backing
-                      	  service (an optional service reference).
+                      	  Defines the required cardinality of the relationship to the backing services. If not specified, 
+                      	  the default-cardinality attribute will apply. A value of '1..N' means that at least one backing 
+                      	  service must exist (this is a mandatory service reference. A value of '0..N' indicates that it 
+                      	  is acceptable for there to be no backing service (an optional service reference).
                       	]]></xsd:documentation>
                       </xsd:annotation>
                 </xsd:attribute>				

@@ -18,7 +18,6 @@ package org.springframework.osgi.config;
 import java.io.Externalizable;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.SortedSet;
 
@@ -32,7 +31,6 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
-import org.springframework.osgi.internal.service.collection.OsgiServiceCollection;
 import org.springframework.osgi.internal.service.collection.OsgiServiceList;
 import org.springframework.osgi.internal.service.collection.OsgiServiceSet;
 import org.springframework.osgi.internal.service.collection.OsgiServiceSortedList;
@@ -82,22 +80,6 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		appContext.close();
 	}
 
-	public void tstSimpleCollection() {
-		Object factoryBean = appContext.getBean("&simpleCollection");
-
-		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
-		OsgiMultiServiceProxyFactoryBean proxyFactory = (OsgiMultiServiceProxyFactoryBean) factoryBean;
-
-		Class[] intfs = getInterfaces(proxyFactory);
-		assertEquals(1, intfs.length);
-		assertSame(Serializable.class, intfs[0]);
-
-		// get the factory product
-		Object bean = appContext.getBean("simpleCollection");
-		assertTrue(bean instanceof Collection);
-		assertTrue(bean instanceof OsgiServiceCollection);
-	}
-
 	public void testSimpleList() {
 		Object factoryBean = appContext.getBean("&simpleList");
 		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
@@ -134,37 +116,26 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		assertSame(appContext.getBean("defaultComparator"), ((SortedSet) bean).comparator());
 	}
 
-	public void tstSortedSetWithComparator() {
-		Object factoryBean = appContext.getBean("&sortedSetWithComparator");
+	public void testSimpleSortedList() {
+		Object factoryBean = appContext.getBean("&implicitSortedList");
 		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
 
-		Object bean = appContext.getBean("sortedSetWithComparator");
-		assertTrue(bean instanceof OsgiServiceSortedSet);
-
-		assertSame(appContext.getBean("defaultComparator"), ((SortedSet) bean).comparator());
-
-	}
-
-	public void tstSimpleSortedList() {
-		Object factoryBean = appContext.getBean("&simpleSortedList");
-		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
-
-		Object bean = appContext.getBean("simpleSortedList");
+		Object bean = appContext.getBean("implicitSortedList");
 		assertTrue(bean instanceof OsgiServiceSortedList);
 
 		Class[] intfs = getInterfaces(factoryBean);
 		assertTrue(Arrays.equals(new Class[] { Serializable.class }, intfs));
 	}
 
-	public void tstSimpleSortedSet() {
-		Object factoryBean = appContext.getBean("&simpleSortedSet");
+	public void testSimpleSortedSet() {
+		Object factoryBean = appContext.getBean("&implicitSortedSet");
 		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
 
-		Object bean = appContext.getBean("simpleSortedSet");
+		Object bean = appContext.getBean("implicitSortedSet");
 		assertTrue(bean instanceof OsgiServiceSortedSet);
 
 		Class[] intfs = getInterfaces(factoryBean);
-		assertTrue(Arrays.equals(new Class[] { Comparable.class }, intfs));
+		assertTrue(Arrays.equals(new Class[] { Externalizable.class }, intfs));
 	}
 
 	public void testSortedSetWithNaturalOrderingOnRefs() throws Exception {
