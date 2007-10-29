@@ -158,7 +158,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		// no bundle (or no symbolicName)
 		if (bundle == null) {
 			// install bundle (default)
-			log.info("Loading bundle [" + resource.getURL() + "]");
+			log.info("Loading bundle [" + location + "]");
 			// TODO: consider resource
 			bundle = bundleContext.installBundle(location);
 
@@ -218,8 +218,8 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 
 	public void setLocation(String url) throws Exception {
 		location = url;
-		if (location != null)
-			resource = resourceLoader.getResource(location);
+//		if (location != null)
+//			resource = resourceLoader.getResource(location);
 	}
 
 	public String getSymbolicName() {
