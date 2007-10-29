@@ -508,10 +508,11 @@
     <xsd:complexType name="Tbundle">
         <xsd:complexContent>
             <xsd:extension base="beans:identifiedType">
-                <xsd:attribute name="symbolic-name" type="xsd:string" use="required">
+                <xsd:attribute name="symbolic-name" type="xsd:string" use="optional">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
-                			The bundle symbolic name of the bundle object.
+                			The bundle symbolic name of the bundle object. Normally used when interacting with an already
+                			installed bundle.
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
@@ -525,15 +526,11 @@
                 <xsd:attribute name="location" type="xsd:string" use="optional">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
-                			A Resource from which the contents of the bundle can be loaded.
+                			Location used to install, update or/and identify a bundle.
                 		]]></xsd:documentation>
-                		<xsd:appinfo>
-							<tool:annotation>
-  								<tool:expected-type type="org.springframework.core.io.Resource" />
-  							</tool:annotation>
-						</xsd:appinfo>  							
                 	</xsd:annotation>
                 </xsd:attribute>
+				<!-- add idea about Resource/InputStream -->
                 <xsd:attribute name="action" type="TbundleAction" use="optional">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
