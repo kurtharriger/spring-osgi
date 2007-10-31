@@ -173,12 +173,12 @@
       </section>
 
 	  <section id="maven-jdk6">
-	    <title>I cannot build the sources when using JDK 6. What can I do?</title>
+	    <title>I cannot build the sources when using JDK 6+. What can I do?</title>
 
-        <para>The problem is caused by Maven <a href="">profiles</a> feature which considers
-        only a certain JDK version rather then all compatible versions. As a workaround,
-        one can build the sources, using JDK 5.0 (if annotations are needed) or JDK 1.4.2 
-        (without annotations or other JDK 5 specific features).
+        <para>The problem is caused by Maven <a href="http://maven.apache.org/guides/introduction/introduction-to-profiles.html">profiles</a> 
+        feature which considers only a certain JDK version rather then all compatible versions. 
+        As a workaround, one can build the sources, using JDK 5.0 (if annotations are needed) or 
+        JDK 1.4.2 (without annotations or other JDK 5 specific features).
         </para>
       </section>
     
