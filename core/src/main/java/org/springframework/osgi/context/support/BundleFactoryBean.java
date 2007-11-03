@@ -20,85 +20,64 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.startlevel.StartLevel;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiBundleUtils;
-import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
  * Install Bundles using a FactoryBean.
- * <p/>
+ * 
  * This allows customers to use Spring to drive bundle management. Bundles
  * states can be modified using the state parameter. Most commonly this is set
  * to "start".
- * <p/>
+ * 
  * <p/>Pay attention when installing bundles dynamically since classes can be
  * loaded aggressively.
- *
+ * 
  * @author Andy Piper
+ * @author Costin Leau
  */
 public class BundleFactoryBean implements FactoryBean, BundleContextAware, InitializingBean, DisposableBean,
 		ResourceLoaderAware {
 
 	private static Log log = LogFactory.getLog(BundleFactoryBean.class);
 
-	public static final String START_ACTION = "start";
-
-	public static final String STOP_ACTION = "stop";
-
-	public static final String INSTALL_ACTION = "install";
-
-	public static final String UNINSTALL_ACTION = "uninstall";
-
-	public static final String UPDATE_ACTION = "update";
-
 	// bundle info
+	/** Bundle location */
+	private String location;
 
-	/**
-	 * Bundle location
-	 */
-	protected String location;
+	private Resource resource;
 
-	protected Resource resource;
+	private ResourceLoader resourceLoader = new DefaultResourceLoader();
 
-	protected ResourceLoader resourceLoader;
+	/** Bundle symName */
+	private String symbolicName;
 
-	/**
-	 * Bundle symName
-	 */
-	protected String symbolicName;
-
-	/**
-	 * Actual bundle
-	 */
+	/** Actual bundle */
 	private Bundle bundle;
 
-	protected BundleContext bundleContext;
+	private BundleContext bundleContext;
 
-	private String action, destroyAction;
+	private BundleAction action, destroyAction;
 
 	private int startLevel;
 
 	private ClassLoader classloader;
 
-	/**
-	 * unused at the moment
-	 */
+	/** unused at the moment */
 	private boolean pushBundleAsContextClassLoader = false;
 
-	/**
-	 * wait until the operation invoked completes
-	 */
+	/** wait until the operation invoked completes */
 	private boolean waitToComplete = false;
 
 	// FactoryBean methods
@@ -114,34 +93,41 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		return bundle;
 	}
 
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 		Assert.notNull(bundleContext, "BundleContext is required");
 
 		// check parameters
-		if (symbolicName == null && !StringUtils.hasText(location) && resource == null)
+		if (symbolicName == null && !StringUtils.hasText(location))
 			throw new IllegalArgumentException("Bundle-SymbolicName or location required");
 
-		if (StringUtils.hasText(location)) {
-			resource = resourceLoader.getResource(location);
-		} else {
-			location = resource.getURL().toString();
+		// try creating a resource
+		if (getLocation() != null) {
+			resource = resourceLoader.getResource(getLocation());
 		}
 
+		// find the bundle first of all
+		bundle = findBundle();
+
+		executeAction(action);
+	}
+
+	public void destroy() throws Exception {
+		executeAction(destroyAction);
+
+		bundle = null;
+		classloader = null;
+	}
+
+	private void executeAction(BundleAction action) {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		try {
 			if (pushBundleAsContextClassLoader) {
 				Thread.currentThread().setContextClassLoader(classloader);
 			}
 
-			// find the bundle first of all
-			bundle = findBundle();
-
-			executeAction(action);
-		}
-		catch (BundleException ex) {
-			log.error(ex.getMessage(), ex);
-			throw (RuntimeException) new IllegalArgumentException("bundle "
-					+ OsgiStringUtils.nullSafeNameAndSymName(bundle) + " threw exception ").initCause(ex);
+			if (action != null) {
+				bundle = action.execute(bundle);
+			}
 		}
 		finally {
 			if (pushBundleAsContextClassLoader) {
@@ -150,50 +136,19 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		}
 	}
 
-	public void destroy() throws Exception {
-		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-		try {
-			if (pushBundleAsContextClassLoader) {
-				Thread.currentThread().setContextClassLoader(classloader);
-			}
-
-			executeAction(destroyAction);
-		} finally {
-			if (pushBundleAsContextClassLoader) {
-				Thread.currentThread().setContextClassLoader(ccl);
-			}
-		}
-
-		bundle = null;
-		classloader = null;
-	}
-
 	/**
-	 * Find a bundle based on the configuration.
-	 *
+	 * Find a bundle based on the configuration (don't apply any actions for
+	 * it).
+	 * 
 	 * @return a Bundle instance based on the configuration.
-	 * @throws Exception
 	 */
-	private Bundle findBundle() throws Exception {
+	private Bundle findBundle() {
 		// first consider symbolicName
 		Bundle bundle = null;
 
-		if (symbolicName != null) {
+		// try to find the bundle
+		if (StringUtils.hasText(symbolicName))
 			bundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, symbolicName);
-		}
-
-		// no bundle (or no symbolicName)
-		if (bundle == null) {
-			// install bundle (default)
-			log.info("Loading bundle [" + location + "]");
-			// TODO: consider resource
-			bundle = bundleContext.installBundle(location);
-
-
-			Assert.notNull(location, "could not find an installed bundle with symbolicName=[" + symbolicName
-					+ "] and no location was specified; cannot continue");
-
-		}
 
 		// TODO: keep the start-level or not?
 		// updateStartLevel(getStartLevel());
@@ -201,67 +156,49 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		return bundle;
 	}
 
-	protected void executeAction(String action) throws Exception {
-		// default action (or no bundle) requires installation
-		if (bundle == null || INSTALL_ACTION.equalsIgnoreCase(action)) {
-			bundleContext.installBundle(location, resource.getInputStream());
-
-			if (symbolicName == null) {
-				symbolicName = bundle.getSymbolicName();
-			}
-
-			// TODO: uncomment this
-			// do validation (is the specified symbolic name correct?)
-//			else {
-//				String installedSymName = bundle.getSymbolicName();
-//				Assert.isTrue(symbolicName.equals(installedSymName),
-//					"the install bundle has a different symbolicName [" + installedSymName
-//							+ "] then the specified symbolicName=" + symbolicName);
-//			}
-
-		} else if (START_ACTION.equalsIgnoreCase(action)) {
-			bundle.start();
-		} else if (STOP_ACTION.equalsIgnoreCase(action)) {
-			bundle.stop();
-		} else if (UPDATE_ACTION.equalsIgnoreCase(action)) {
-			bundle.update();
-		} else if (UNINSTALL_ACTION.equalsIgnoreCase(action)) {
-			bundle.uninstall();
-		}
-	}
-
-	public void setLocation(String location) throws Exception {
-		this.location = location;
-	}
-
-	public void setLocation(Resource resource) throws Exception {
-		this.resource = resource;
-	}
-
-	public Resource getResource() {
-		return this.resource;
-	}
-
+	/**
+	 * Return the given bundle symbolic name.
+	 * 
+	 * @return bundle symbolic name
+	 */
 	public String getSymbolicName() {
 		return symbolicName;
 	}
 
-	public ClassLoader getClassloader() {
-		return classloader;
-	}
-
-	public int getStartLevel() {
-		return startLevel;
-	}
-
-	public String getAction() {
-		return action;
-	}
-
+	/**
+	 * Return the given location.
+	 * 
+	 * @return bundle location
+	 */
 	public String getLocation() {
 		return location;
 	}
 
+	/**
+	 * Return the {@link Resource} object (if a {@link ResourceLoader} is
+	 * available) from the given location (if any).
+	 * 
+	 * @return {@link Resource} object for the given location
+	 */
+	public Resource getResource() {
+		return resource;
+	}
+
+	/**
+	 * Set the bundle location (optional operation).
+	 * 
+	 * @param url bundle location (normally an URL or a Spring Resource)
+	 * 
+	 */
+	public void setLocation(String url) {
+		location = url;
+	}
+
+	/**
+	 * Set the bundle symbolic name (optional operation).
+	 * 
+	 * @param symbolicName bundle symbolic name
+	 */
 	public void setSymbolicName(String symbolicName) {
 		this.symbolicName = symbolicName;
 	}
@@ -270,11 +207,21 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		bundleContext = context;
 	}
 
-	public void setAction(String action) {
+	/**
+	 * Action to execute at startup.
+	 * 
+	 * @param action action to execute at startup
+	 */
+	public void setAction(BundleAction action) {
 		this.action = action;
 	}
 
-	public void setDestroyAction(String action) {
+	/**
+	 * Action to execute at shutdown.
+	 * 
+	 * @param action action to execute at shutdown
+	 */
+	public void setDestroyAction(BundleAction action) {
 		this.destroyAction = action;
 	}
 
@@ -285,14 +232,22 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	/**
 	 * Determines whether invocations on the remote service should be performed
 	 * in the context of the target bundle's ClassLoader. The default is false.
-	 *
+	 * 
 	 * @param pushBundleAsContextClassLoader
 	 */
 	public void setPushBundleAsContextClassloader(boolean pushBundleAsContextClassLoader) {
 		this.pushBundleAsContextClassLoader = pushBundleAsContextClassLoader;
 	}
 
+	/**
+	 * @deprecated use {@link #setClassLoader(ClassLoader)} instead.
+	 * @param classloader
+	 */
 	public void setClassloader(ClassLoader classloader) {
+		this.classloader = classloader;
+	}
+
+	public void setClassLoader(ClassLoader classloader) {
 		this.classloader = classloader;
 	}
 
@@ -300,6 +255,12 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		this.resourceLoader = resourceLoader;
 	}
 
+	/**
+	 * @return Returns the bundleContext.
+	 */
+	public BundleContext getBundleContext() {
+		return bundleContext;
+	}
 
 	// TODO: we don't support start-levels yet
 	private void updateStartLevel(int level) {
