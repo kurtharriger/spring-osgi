@@ -16,6 +16,7 @@
 package org.springframework.osgi.mock;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Dictionary;
 import java.util.LinkedHashSet;
@@ -241,6 +242,12 @@ public class MockBundleContext implements BundleContext {
 	 * java.io.InputStream)
 	 */
 	public Bundle installBundle(String location, InputStream input) throws BundleException {
+		try {
+			input.close();
+		}
+		catch (IOException ex) {
+			throw new BundleException("cannot close stream", ex);
+		}
 		return installBundle(location);
 	}
 
