@@ -27,95 +27,100 @@ import org.springframework.util.Assert;
 
 /**
  * BundleFactoryBean that creates bundles on the fly from regular jar files or
- * maven project jars. Version and identifying information is injected dynamically
- * as the jar is loaded. Bundle exports are synthesized based on the packages
- * incorporated in the jar file. Jars are by default loaded from the local maven
- * repository, but a remote repository can also be specified using the bundleURL
- * property.
- *
+ * maven project jars. Version and identifying information is injected
+ * dynamically as the jar is loaded. Bundle exports are synthesized based on the
+ * packages incorporated in the jar file. Jars are by default loaded from the
+ * local maven repository, but a remote repository can also be specified using
+ * the bundleURL property.
+ * 
  * @author Andy Piper
  */
-// FIXME andyp -- this class is looking a lot like Project, maybe the two should be merged
+// FIXME andyp -- this class is looking a lot like Project, maybe the two should
+// be merged
 public class VirtualBundleFactoryBean extends BundleFactoryBean {
-  private String artifactId;
-  private String groupId = "org.example.group";
+	private String artifactId;
 
-  private String version = "1.0";
-  private Set/*<String>*/ exports = Collections.EMPTY_SET;
-  private Set/*<String>*/ imports = Collections.EMPTY_SET;
+	private String groupId = "org.example.group";
 
-  public VirtualBundleFactoryBean() {
-  }
+	private String version = "1.0";
 
-  public Bundle getBundle() throws Exception {
-    URL url = null;
-    Project project;
-    if (location == null) {
-      url = new URL("file", "", getLocalRepository());
-      project = new Project(groupId, artifactId, version, "jar", Collections.EMPTY_SET, exports, imports);
-      // System.out.println("Repository is: " + url.toString());
-    }
-    else {
-      project = new Project(groupId, artifactId, version, "jar", location,
-        Collections.EMPTY_SET, exports, imports);
-      //url = resource.getURL();
-      url = new URL(location);
-    }
-    return new MavenBundleManager(bundleContext, url).installBundle(project);
-  }
+	private Set/* <String> */exports = Collections.EMPTY_SET;
 
-  public String getVersion() {
-    return version;
-  }
+	private Set/* <String> */imports = Collections.EMPTY_SET;
 
-  public void setVersion(String version) {
-    this.version = version;
-  }
+	public VirtualBundleFactoryBean() {
+	}
 
-  public String getArtifactId() {
-    return artifactId;
-  }
+	public Bundle getBundle() throws Exception {
 
-  public void setArtifactId(String artifactId) {
-    this.artifactId = artifactId;
-  }
+		URL url = null;
+		Project project;
+		String location = getLocation();
+		if (location == null) {
+			url = new URL("file", "", getLocalRepository());
+			project = new Project(groupId, artifactId, version, "jar", Collections.EMPTY_SET, exports, imports);
+			// System.out.println("Repository is: " + url.toString());
+		}
+		else {
+			project = new Project(groupId, artifactId, version, "jar", location, Collections.EMPTY_SET, exports,
+					imports);
+			url = getResource().getURL();
+		}
+		return new MavenBundleManager(getBundleContext(), url).installBundle(project);
+	}
 
-  public String getGroupId() {
-    return groupId;
-  }
+	public String getVersion() {
+		return version;
+	}
 
-  public void setGroupId(String groupId) {
-    this.groupId = groupId;
-  }
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
-  public Set/*<String>*/ getExports() {
-    return exports;
-  }
+	public String getArtifactId() {
+		return artifactId;
+	}
 
-  public void setExports(Set/*<String>*/ exports) {
-    if (exports == null)
-      this.exports = Collections.EMPTY_SET;
-    else
-      this.exports = exports;
-  }
+	public void setArtifactId(String artifactId) {
+		this.artifactId = artifactId;
+	}
 
-  public Set/*<String>*/ getImports() {
-    return imports;
-  }
+	public String getGroupId() {
+		return groupId;
+	}
 
-  public void setImports(Set/*<String>*/ imports) {
-    if (imports == null)
-      this.imports = Collections.EMPTY_SET;
-    else
-      this.imports = imports;
-  }
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
 
-  public void afterPropertiesSet() throws Exception {
-    Assert.notNull(artifactId, "artifactId not supplied");
-    super.afterPropertiesSet();
-  }
+	public Set/* <String> */getExports() {
+		return exports;
+	}
 
-  private String getLocalRepository() {
-    return new File(System.getProperty("user.home"), ".m2/repository").getAbsolutePath();
-  }
+	public void setExports(Set/* <String> */exports) {
+		if (exports == null)
+			this.exports = Collections.EMPTY_SET;
+		else
+			this.exports = exports;
+	}
+
+	public Set/* <String> */getImports() {
+		return imports;
+	}
+
+	public void setImports(Set/* <String> */imports) {
+		if (imports == null)
+			this.imports = Collections.EMPTY_SET;
+		else
+			this.imports = imports;
+	}
+
+	public void afterPropertiesSet() {
+		Assert.notNull(artifactId, "artifactId not supplied");
+		super.afterPropertiesSet();
+	}
+
+	private String getLocalRepository() {
+		return new File(System.getProperty("user.home"), ".m2/repository").getAbsolutePath();
+	}
 }

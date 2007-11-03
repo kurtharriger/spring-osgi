@@ -20,12 +20,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.osgi.internal.config.ParserUtils;
-import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.internal.config.BundleBeanDefinitionParser;
 import org.springframework.osgi.samples.weather.extension.bundle.PackageSpecification;
 import org.springframework.osgi.samples.weather.extension.bundle.VirtualBundleFactoryBean;
 import org.springframework.util.xml.DomUtils;
@@ -38,17 +35,16 @@ import org.w3c.dom.NamedNodeMap;
  * 
  * @author Andy Piper
  */
-class VirtualBundleBeanDefinitionParser extends AbstractBeanDefinitionParser {
+class VirtualBundleBeanDefinitionParser extends BundleBeanDefinitionParser {
 	public static final String PACKAGE_ELEMENT = "package";
 
 	public static final String ID_NAME = "name";
 
 	public static final String ID_VERSION = "version";
 
-	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(VirtualBundleFactoryBean.class);
+	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
-		ParserUtils.parseCustomAttributes(element, builder, (AttributeCallback) null);
+		super.doParse(element, parserContext, builder);
 
 		Element e = DomUtils.getChildElementByTagName(element, "exports");
 		if (e != null) {
@@ -63,7 +59,10 @@ class VirtualBundleBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		// // builder.addPropertyValue("dynamicImports", extractPackageSet(e));
 		// }
 
-		return builder.getBeanDefinition();
+	}
+
+	protected Class getBeanClass(Element element) {
+		return VirtualBundleFactoryBean.class;
 	}
 
 	private Set extractPackageSet(Element e) {
