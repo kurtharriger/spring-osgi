@@ -33,18 +33,17 @@ class BundleTemplate {
 
 	private final Bundle bundle;
 
-	private final BundleContext bundleContext;
+	//private final BundleContext bundleContext;
 
 	BundleTemplate(Bundle bundle) {
 		Assert.notNull(bundle);
 		this.bundle = bundle;
-		this.bundleContext = OsgiBundleUtils.getBundleContext(this.bundle);
 	}
 
 	BundleTemplate(BundleContext bundleContext) {
 		Assert.notNull(bundleContext);
-		this.bundleContext = bundleContext;
-		this.bundle = this.bundleContext.getBundle();
+		//this.bundleContext = bundleContext;
+		this.bundle = bundleContext.getBundle();
 	}
 
 	interface BundleCallback {
@@ -66,14 +65,14 @@ class BundleTemplate {
 		}
 	}
 
-	void executeCallback(BundleContextCallback callback) {
-		Assert.notNull(callback);
-		try {
-			callback.execute(bundleContext);
-		}
-		catch (BundleException ex) {
-			throw (RuntimeException) new IllegalStateException("exception occured while working with bundleContext "
-					+ bundleContext).initCause(ex);
-		}
-	}
+//	void executeCallback(BundleContextCallback callback) {
+//		Assert.notNull(callback);
+//		try {
+//			callback.execute(bundleContext);
+//		}
+//		catch (BundleException ex) {
+//			throw (RuntimeException) new IllegalStateException("exception occured while working with bundleContext "
+//					+ bundleContext).initCause(ex);
+//		}
+//	}
 }
