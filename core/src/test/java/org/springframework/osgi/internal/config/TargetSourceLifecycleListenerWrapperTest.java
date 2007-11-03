@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.config;
+package org.springframework.osgi.internal.config;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.internal.config.TargetSourceLifecycleListenerWrapper;
+import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.util.MapBasedDictionary;
 
@@ -183,6 +186,16 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 
 		public void myUnbind(Object service, Map properties) {
 			JustListener.UNBIND_CALLS++;
+		}
+	}
+
+	protected static class CustomServiceRefListener {
+		private void myUnbind(ServiceReference ref) {
+			JustListener.UNBIND_CALLS++;
+		}
+
+		private void myBind(ServiceReference ref) {
+			JustListener.BIND_CALLS++;
 		}
 	}
 
@@ -490,5 +503,46 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 
 		assertEquals(0, JustListener.BIND_CALLS);
 		assertEquals(1, JustListener.UNBIND_CALLS);
+	}
+
+	public void testCustomServiceRefBind() throws Exception {
+		listener = new TargetSourceLifecycleListenerWrapper(new CustomServiceRefListener());
+		listener.setBindMethod("myBind");
+		listener.afterPropertiesSet();
+
+		assertEquals(0, JustListener.BIND_CALLS);
+		assertEquals(0, JustListener.UNBIND_CALLS);
+
+		listener.bind(new ServiceReferenceAwareMock(), null);
+
+		assertEquals(1, JustListener.BIND_CALLS);
+		assertEquals(0, JustListener.UNBIND_CALLS);
+
+	}
+
+	public void testCustomServiceRefUnbind() throws Exception {
+		listener = new TargetSourceLifecycleListenerWrapper(new CustomServiceRefListener());
+		listener.setUnbindMethod("myUnbind");
+		listener.afterPropertiesSet();
+
+		assertEquals(0, JustListener.BIND_CALLS);
+		assertEquals(0, JustListener.UNBIND_CALLS);
+
+		listener.unbind(new ServiceReferenceAwareMock(), null);
+
+		assertEquals(0, JustListener.BIND_CALLS);
+		assertEquals(1, JustListener.UNBIND_CALLS);
+	}
+	
+	private class ServiceReferenceAwareMock implements ServiceReferenceAware {
+
+		public Map getServiceProperties() {
+			return new HashMap();
+		}
+
+		public ServiceReference getServiceReference() {
+			return new MockServiceReference();
+		}
+		
 	}
 }
