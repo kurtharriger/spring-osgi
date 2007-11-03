@@ -47,7 +47,7 @@
 	</xsd:attributeGroup>	 	
 	
 	<xsd:simpleType name="TdefaultCardinalityOptions">
-        <xsd:restriction base="xsd:NMTOKEN">
+        <xsd:restriction base="xsd:string">
             <xsd:enumeration value="1..X">
             	<xsd:annotation>
             		<xsd:documentation><![CDATA[
@@ -220,7 +220,7 @@
    </xsd:complexType>
    
    <xsd:simpleType name="TsingleReferenceCardinality">
-        <xsd:restriction base="xsd:NMTOKEN">
+        <xsd:restriction base="xsd:token">
             <xsd:enumeration value="1..1"/>
             <xsd:enumeration value="0..1"/>
         </xsd:restriction>
@@ -523,6 +523,7 @@
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
+               
                 <xsd:attribute name="location" type="xsd:string" use="optional">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
@@ -530,17 +531,26 @@
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
-				<!-- add idea about Resource/InputStream -->
                 <xsd:attribute name="action" type="TbundleAction" use="optional">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
-                			Lifecyle action to drive on the bundle. 'start' starts the bundle, installing if necessary.
-                			'stop' stops the bundle if it is currently ACTIVE. 'install' installs the bundle if it is 
-                			currently uninstalled. 'uninstall' stops the bundle if needed, and then uninstalls it.
-                			'update' installs the bundle if needed, and then invokes the Bundle.update() operation.
+                		Lifecyle action to drive on the bundle. 'start' starts the bundle, installing if necessary.
+                		'stop' stops the bundle if it is currently ACTIVE. 'install' installs the bundle if it is 
+                		currently uninstalled. 'uninstall' stops the bundle if needed, and then uninstalls it.
+                		'update' installs the bundle if needed, and then invokes the Bundle.update() operation.
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="destroy-action" type="TbundleAction" use="optional">
+                	<xsd:annotation>
+                		<xsd:documentation><![CDATA[
+                		Lifecyle action to drive on the bundle. 'start' starts the bundle, installing if necessary.
+                		'stop' stops the bundle if it is currently ACTIVE. 'install' installs the bundle if it is 
+                		currently uninstalled. 'uninstall' stops the bundle if needed, and then uninstalls it.
+                		'update' installs the bundle if needed, and then invokes the Bundle.update() operation.
+                		]]></xsd:documentation>
+                	</xsd:annotation>
+                </xsd:attribute>                
                 <xsd:attribute name="start-level" type="xsd:int" use="optional" default="0">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[

@@ -11,7 +11,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/1.0-rc1-SNAPSHOT/spring-osgi-mock-1.0-rc1-SNAPSHOT.jar" sourcepath="/OSGI_MOCK"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5-rc1/spring-core-2.5-rc1.jar" sourcepath="/SPRING_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5-rc1/spring-beans-2.5-rc1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5-rc1/spring-beans-2.5-rc1.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/2.5-rc1/spring-aop-2.5-rc1.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-web/2.5-rc1/spring-web-2.5-rc1.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5-rc1/spring-context-2.5-rc1.jar" sourcepath="/SPRING_SRC"/>
