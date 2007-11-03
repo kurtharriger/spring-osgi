@@ -24,8 +24,10 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.internal.util.ReflectionUtils;
+import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.util.StringUtils;
 
@@ -36,7 +38,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListener, InitializingBean {
+class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListener, InitializingBean {
 
 	private static final Log log = LogFactory.getLog(TargetSourceLifecycleListenerWrapper.class);
 
@@ -46,13 +48,18 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 	 */
 	private Map bindMethods, unbindMethods;
 
+	/**
+	 * anyName(ServiceReference reference) method signature.
+	 */
+	private Method bindReference, unbindReference;
+
 	private String bindMethod, unbindMethod;
 
 	private final Object target;
 
 	private final boolean isLifecycleListener;
 
-	public TargetSourceLifecycleListenerWrapper(Object object) {
+	TargetSourceLifecycleListenerWrapper(Object object) {
 		this.target = object;
 		isLifecycleListener = target instanceof TargetSourceLifecycleListener;
 	}
@@ -68,7 +75,24 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 		bindMethods = determineCustomMethods(bindMethod);
 		unbindMethods = determineCustomMethods(unbindMethod);
 
-		if (!isLifecycleListener && (bindMethods.isEmpty() && unbindMethods.isEmpty()))
+		if (StringUtils.hasText(bindMethod)) {
+			// determine methods using ServiceReference signature
+			bindReference = org.springframework.util.ReflectionUtils.findMethod(target.getClass(), bindMethod,
+				new Class[] { ServiceReference.class });
+
+			if (bindReference != null)
+				org.springframework.util.ReflectionUtils.makeAccessible(bindReference);
+		}
+		if (StringUtils.hasText(unbindMethod)) {
+			unbindReference = org.springframework.util.ReflectionUtils.findMethod(target.getClass(), unbindMethod,
+				new Class[] { ServiceReference.class });
+
+			if (unbindReference != null)
+				org.springframework.util.ReflectionUtils.makeAccessible(unbindReference);
+		}
+
+		if (!isLifecycleListener
+				&& (bindMethods.isEmpty() && unbindMethods.isEmpty() && bindReference == null && unbindReference == null))
 			throw new IllegalArgumentException("target object needs to implement "
 					+ TargetSourceLifecycleListener.class.getName()
 					+ " or custom bind/unbind methods have to be specified");
@@ -82,7 +106,7 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 	 * @param methodName
 	 * @return
 	 */
-	protected Map determineCustomMethods(final String methodName) {
+	private Map determineCustomMethods(final String methodName) {
 		if (!StringUtils.hasText(methodName)) {
 			return Collections.EMPTY_MAP;
 		}
@@ -124,12 +148,7 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 					}
 				}
 			});
-
-		if (!methods.isEmpty())
-			return methods;
-
-		throw new IllegalArgumentException("incorrect custom method [" + methodName + "] specified on class "
-				+ target.getClass());
+		return methods;
 	}
 
 	/**
@@ -142,7 +161,7 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 	 * @param properties
 	 */
 	// the properties field is Dictionary implementing a Map interface
-	protected void invokeCustomMethods(Object target, Map methods, Object service, Map properties) {
+	private void invokeCustomMethods(Object target, Map methods, Object service, Map properties) {
 		if (methods != null && !methods.isEmpty()) {
 			boolean trace = log.isTraceEnabled();
 
@@ -172,6 +191,38 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 		}
 	}
 
+	/**
+	 * Invoke method with signature bla(ServiceReference ref).
+	 * 
+	 * @param target
+	 * @param method
+	 * @param service
+	 */
+	private void invokeCustomServiceReferenceMethod(Object target, Method method, Object service) {
+		if (method != null) {
+			boolean trace = log.isTraceEnabled();
+
+			// get the service reference
+			// find the compatible types (accept null service)
+			if (trace)
+				log.trace("invoking listener custom method " + method);
+
+			ServiceReference ref = ((ServiceReferenceAware) service).getServiceReference();
+
+			try {
+				ReflectionUtils.invokeMethod(method, target, new Object[] { ref });
+			}
+			// make sure to log exceptions and continue with the
+			// rest of
+			// the listeners
+			catch (Exception ex) {
+				Exception cause = ReflectionUtils.getInvocationException(ex);
+				log.warn("custom method [" + method + "] threw exception when passing service reference ["
+						+ (service != null ? service.getClass().getName() : null) + "]", cause);
+			}
+		}
+	}
+
 	public void bind(Object service, Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
 
@@ -192,6 +243,7 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 		}
 
 		invokeCustomMethods(target, bindMethods, service, properties);
+		invokeCustomServiceReferenceMethod(target, bindReference, service);
 	}
 
 	public void unbind(Object service, Map properties) throws Exception {
@@ -213,6 +265,7 @@ public class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecyc
 		}
 
 		invokeCustomMethods(target, unbindMethods, service, properties);
+		invokeCustomServiceReferenceMethod(target, unbindReference, service);
 	}
 
 	/**

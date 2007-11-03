@@ -25,14 +25,14 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.internal.config.TargetSourceLifecycleListenerWrapper;
 import org.springframework.osgi.internal.util.ReflectionUtils;
 import org.springframework.osgi.service.OsgiServiceRegistrationListener;
 import org.springframework.util.StringUtils;
 
 /**
  * Adapter/wrapper class that handles listener with custom method invocation.
- * Similar in functionality to {@link TargetSourceLifecycleListenerWrapper}.
+ * Similar in functionality to
+ * {@link  org.springframework.osgi.internal.config.TargetSourceLifecycleListenerWrapper}.
  * 
  * @author Costin Leau
  * 
