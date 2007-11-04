@@ -53,10 +53,6 @@ public class BundleJarTest extends BaseIoTest {
 		assertEquals(0, res.length);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
-	 */
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		return isKF();
 	}

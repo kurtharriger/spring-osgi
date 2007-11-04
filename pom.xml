@@ -50,6 +50,11 @@
     <cobertura.file>${basedir}/target/cobertura/cobertura.ser</cobertura.file>
    <!-- other properties -->
    <slf4j.version>1.4.3</slf4j.version>
+   
+   <!-- platform versions -->
+   <equinox.ver>3.2.2</equinox.ver>
+   <kf.ver>2.0.1</kf.ver>
+   <felix.ver>1.0.1</felix.ver>
   </properties>
 
   <!-- ============================================= -->
@@ -373,7 +378,7 @@ limitations under the License.
         <dependency>
           <groupId>org.eclipse.osgi</groupId>
           <artifactId>org.eclipse.osgi</artifactId>
-          <version>3.2.2</version>
+          <version>${equinox.ver}</version>
           <type>jar</type>
           <scope>provided</scope>
         </dependency>
@@ -389,7 +394,7 @@ limitations under the License.
         <dependency>
           <groupId>knopflerfish</groupId>
           <artifactId>framework</artifactId>
-          <version>2.0.1</version>
+          <version>${kf.ver}</version>
           <type>jar</type>
           <scope>provided</scope>
         </dependency>
@@ -406,7 +411,7 @@ limitations under the License.
         <dependency>
           <groupId>org.apache.felix</groupId>
           <artifactId>org.apache.felix.main</artifactId>
-          <version>1.0.0</version>
+          <version>${felix.ver}</version>
           <type>jar</type>
           <scope>provided</scope>
           <!-- required to prevent felix to pull in stuff -->
@@ -449,7 +454,7 @@ limitations under the License.
         <dependency>
           <groupId>org.eclipse.osgi</groupId>
           <artifactId>org.eclipse.osgi</artifactId>
-          <version>3.2.2</version>
+          <version>${equinox.ver}</version>
           <type>jar</type>
           <scope>provided</scope>
         </dependency>

@@ -106,10 +106,6 @@ public class RawIoTest extends BaseIoTest {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
-	 */
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		return (!(isEquinox()));
 	}
