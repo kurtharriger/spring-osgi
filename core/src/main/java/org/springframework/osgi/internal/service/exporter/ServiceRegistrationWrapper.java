@@ -37,10 +37,14 @@ public class ServiceRegistrationWrapper implements ServiceRegistration {
 
 	private final OsgiServiceRegistrationListener[] listeners;
 
-	public ServiceRegistrationWrapper(ServiceRegistration registration, OsgiServiceRegistrationListener[] listeners) {
+	private final Object service;
+
+	public ServiceRegistrationWrapper(Object service, ServiceRegistration registration,
+			OsgiServiceRegistrationListener[] listeners) {
 		Assert.notNull(registration);
 		this.delegate = registration;
 		this.listeners = (listeners == null ? new OsgiServiceRegistrationListener[0] : listeners);
+		this.service = service;
 	}
 
 	public ServiceReference getReference() {
@@ -63,7 +67,7 @@ public class ServiceRegistrationWrapper implements ServiceRegistration {
 		for (int i = 0; i < listeners.length; i++) {
 			if (listeners[i] != null) {
 				try {
-					listeners[i].unregistered(properties);
+					listeners[i].unregistered(service, properties);
 				}
 				catch (Exception ex) {
 					// no need to log exceptions, the wrapper already does this

@@ -125,7 +125,6 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 
 		assertEquals("string", getTargetBeanName(exporter));
 		assertEquals(appContext.getBean("string"), getTarget(exporter));
-
 	}
 
 	public void testNestedService() throws Exception {
@@ -173,6 +172,9 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		assertEquals(0, RegistrationListener.UNBIND_CALLS);
 		((ServiceRegistration) target).unregister();
 		assertEquals(2, RegistrationListener.UNBIND_CALLS);
+		assertNotNull(RegistrationListener.SERVICE_REG);
+		assertNotNull(RegistrationListener.SERVICE_UNREG);
+		assertSame(RegistrationListener.SERVICE_REG, RegistrationListener.SERVICE_UNREG);
 	}
 
 	public void testFBWithCustomListeners() throws Exception {
@@ -193,6 +195,9 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		assertEquals(0, CustomRegistrationListener.UNREG_CALLS);
 		((ServiceRegistration) target).unregister();
 		assertEquals(1, CustomRegistrationListener.UNREG_CALLS);
+		// check service instance passed around
+		assertSame(appContext.getBean("string"), CustomRegistrationListener.SERVICE_REG);
+		assertSame(appContext.getBean("string"), CustomRegistrationListener.SERVICE_UNREG);
 	}
 
 	private OsgiServiceRegistrationListener[] getListeners(OsgiServiceFactoryBean exporter) {

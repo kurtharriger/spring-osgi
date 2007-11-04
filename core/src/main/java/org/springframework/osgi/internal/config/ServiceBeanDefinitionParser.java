@@ -30,7 +30,6 @@ import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
-import org.springframework.osgi.internal.service.exporter.OsgiServiceRegistrationListenerWrapper;
 import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;

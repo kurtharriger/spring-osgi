@@ -51,7 +51,7 @@ public class AbstractListenerAwareExporterTest extends TestCase {
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.REGISTERED);
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.UNREGISTERED);
 
-		exporter.notifyListeners(new HashMap(), new MockServiceRegistration());
+		exporter.notifyListeners(new Object(), new HashMap(), new MockServiceRegistration());
 
 		assertEquals(1, SimpleOsgiServiceRegistrationListener.REGISTERED);
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.UNREGISTERED);
@@ -61,7 +61,7 @@ public class AbstractListenerAwareExporterTest extends TestCase {
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.REGISTERED);
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.UNREGISTERED);
 
-		ServiceRegistration reg = exporter.notifyListeners(new HashMap(), new MockServiceRegistration());
+		ServiceRegistration reg = exporter.notifyListeners(new Object(), new HashMap(), new MockServiceRegistration());
 		assertTrue(reg instanceof ServiceRegistrationWrapper);
 		reg.unregister();
 

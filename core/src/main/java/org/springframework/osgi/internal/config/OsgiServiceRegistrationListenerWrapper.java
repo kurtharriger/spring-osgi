@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.internal.service.exporter;
+package org.springframework.osgi.internal.config;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.internal.util.ReflectionUtils;
 import org.springframework.osgi.service.OsgiServiceRegistrationListener;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -37,7 +38,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegistrationListener, InitializingBean {
+class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegistrationListener, InitializingBean {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceRegistrationListenerWrapper.class);
 
@@ -54,6 +55,7 @@ public class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegist
 	private Map registrationMethods, unregistrationMethods;
 
 	public OsgiServiceRegistrationListenerWrapper(Object object) {
+		Assert.notNull(object);
 		this.target = object;
 		isListener = target instanceof OsgiServiceRegistrationListener;
 	}
@@ -63,11 +65,13 @@ public class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegist
 	 */
 	public void afterPropertiesSet() {
 
+		Class clazz = target.getClass();
 		if (isListener)
 			if (log.isDebugEnabled())
-				log.debug(target.getClass().getName() + " is a registration listener");
-		registrationMethods = determineCustomMethods(registrationMethod);
-		unregistrationMethods = determineCustomMethods(unregistrationMethod);
+				log.debug(clazz.getName() + " is a registration listener");
+
+		registrationMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, registrationMethod);
+		unregistrationMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unregistrationMethod);
 
 		if (!isListener && (registrationMethods.isEmpty() && unregistrationMethods.isEmpty()))
 			throw new IllegalArgumentException("target object needs to implement "
@@ -134,7 +138,7 @@ public class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegist
 				+ target.getClass());
 	}
 
-	public void registered(Map serviceProperties) {
+	public void registered(Object service, Map serviceProperties) {
 		boolean trace = log.isTraceEnabled();
 
 		if (trace)
@@ -146,17 +150,17 @@ public class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegist
 				log.trace("invoking listener interface methods");
 
 			try {
-				((OsgiServiceRegistrationListener) target).registered(serviceProperties);
+				((OsgiServiceRegistrationListener) target).registered(service, serviceProperties);
 			}
 			catch (Exception ex) {
 				log.warn("standard registered method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
 
-		invokeCustomMethods(target, registrationMethods, serviceProperties);
+		CustomListenerAdapterUtils.invokeCustomMethods(target, registrationMethods, service, serviceProperties);
 	}
 
-	public void unregistered(Map serviceProperties) {
+	public void unregistered(Object service, Map serviceProperties) {
 
 		boolean trace = log.isTraceEnabled();
 
@@ -169,13 +173,13 @@ public class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegist
 				log.trace("invoking listener interface methods");
 
 			try {
-				((OsgiServiceRegistrationListener) target).unregistered(serviceProperties);
+				((OsgiServiceRegistrationListener) target).unregistered(service, serviceProperties);
 			}
 			catch (Exception ex) {
 				log.warn("standard unregistered method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
-		invokeCustomMethods(target, unregistrationMethods, serviceProperties);
+		CustomListenerAdapterUtils.invokeCustomMethods(target, unregistrationMethods, service, serviceProperties);
 	}
 
 	/**

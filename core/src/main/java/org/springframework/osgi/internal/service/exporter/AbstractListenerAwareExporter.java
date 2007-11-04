@@ -38,11 +38,11 @@ public abstract class AbstractListenerAwareExporter extends AbstractServiceExpor
 	 * @param properties
 	 * @return
 	 */
-	protected ServiceRegistration notifyListeners(Map properties, ServiceRegistration registration) {
+	protected ServiceRegistration notifyListeners(Object service, Map properties, ServiceRegistration registration) {
 		// notify listeners
-		callRegisteredOnListeners(properties);
+		callRegisteredOnListeners(service, properties);
 		// wrap registration to be notified of unregistration
-		return new ServiceRegistrationWrapper(registration, listeners);
+		return new ServiceRegistrationWrapper(service, registration, listeners);
 	}
 
 	/**
@@ -50,14 +50,15 @@ public abstract class AbstractListenerAwareExporter extends AbstractServiceExpor
 	 * 
 	 * @param properties
 	 */
-	private void callRegisteredOnListeners(Map properties) {
+	private void callRegisteredOnListeners(Object service, Map properties) {
 		for (int i = 0; i < listeners.length; i++) {
 			if (listeners[i] != null) {
 				try {
-					listeners[i].registered(properties);
+					listeners[i].registered(service, properties);
 				}
 				catch (Exception ex) {
-					// no need to log exceptions, the listener wrapper already does this for us
+					// no need to log exceptions, the listener wrapper already
+					// does this for us
 				}
 			}
 		}
