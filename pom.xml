@@ -39,7 +39,7 @@
     <spring.osgi.import>${spring.osgi.import.pkg}</spring.osgi.import>
 
 
-    <symName.prefix>org.springframework.osgi.bundles</symName.prefix>
+    <symName.prefix>org.springframework.osgi.bundle</symName.prefix>
     <spring.osgi.symbolic.name>${groupId}.${artifactId}</spring.osgi.symbolic.name>
 
     <!-- the default-->
