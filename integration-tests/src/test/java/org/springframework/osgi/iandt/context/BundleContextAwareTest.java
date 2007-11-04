@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.iandt.context;
 
+import java.io.Serializable;
+
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
@@ -39,6 +41,10 @@ public class BundleContextAwareTest extends AbstractConfigurableBundleCreatorTes
 		public void setBundleContext(BundleContext bundleContext) {
 			this.bundleContext = bundleContext;
 		}
+
+		private static class AnotherInnerClass implements Serializable {
+
+		}
 	}
 
 	protected String getManifestLocation() {
@@ -50,7 +56,6 @@ public class BundleContextAwareTest extends AbstractConfigurableBundleCreatorTes
 	}
 
 	public void testBundleContextAware() throws Exception {
-		Class clazz = BundleContextAware.class;
 		BundleContextAwareHolder holder = (BundleContextAwareHolder) applicationContext.getBean("bean");
 		assertNotNull(holder.getBundleContext());
 		assertSame(bundleContext, holder.getBundleContext());

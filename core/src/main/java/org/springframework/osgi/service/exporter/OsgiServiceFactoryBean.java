@@ -47,7 +47,6 @@ import org.springframework.osgi.internal.service.interceptor.OsgiServiceTCCLInvo
 import org.springframework.osgi.internal.util.ClassUtils;
 import org.springframework.osgi.internal.util.DebugUtils;
 import org.springframework.osgi.service.OsgiServicePropertiesResolver;
-import org.springframework.osgi.service.exporter.support.NoOpExporter;
 import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
@@ -161,7 +160,7 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	/** exporter bean name */
 	private String beanName;
 
-	private ClassExporter autoExport = new NoOpExporter();
+	//private ClassExporter autoExport = new NoOpExporter();
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");

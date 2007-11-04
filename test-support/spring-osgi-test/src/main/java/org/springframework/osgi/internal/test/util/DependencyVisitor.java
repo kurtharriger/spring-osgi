@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
@@ -37,8 +38,9 @@ import org.objectweb.asm.signature.SignatureVisitor;
  * href="http://asm.objectweb.org/doc/tutorial-asm-2.0.html">tutorial</a>.
  * 
  * <p/>The main differences from the original source in the article are the 1.4
- * compatibility and handling of class objects not instantiated
- * (MyClass.class.getName()) as these are specially handled by the compiler.
+ * compatibility, the handling of class objects not instantiated
+ * (MyClass.class.getName()) as these are specially handled by the compiler and
+ * analysis of inner classes.
  * 
  * @author Eugene Kuleshov
  * @author Costin Leau
@@ -125,6 +127,7 @@ public class DependencyVisitor implements AnnotationVisitor, SignatureVisitor, C
 
 	public void visitInnerClass(String name, String outerName, String innerName, int access) {
 		tempLdc = null;
+		
 		// addName( outerName);
 		// addName( innerName);
 	}
