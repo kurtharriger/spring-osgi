@@ -15,7 +15,6 @@
  */
 package org.springframework.osgi.test;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
@@ -66,10 +65,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	private String springBundledVersion = null;
 
 	/**
-	 * Return the Spring/OSGi version used by the core bundles.
+	 * Return the Spring-DM version used by the core bundles.
 	 * @return
 	 */
-	protected String getSpringOsgiVersion() {
+	protected String getSpringDMVersion() {
 		if (springOsgiVersion == null) {
 			springOsgiVersion = System.getProperty(SPRING_OSGI_VERSION_PROP_KEY);
 		}
@@ -78,15 +77,32 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
+	 * @deprecated use {@link #getSpringDMVersion()} instead.
+	 * 
+	 * @return
+	 */
+	protected String getSpringOsgiVersion() {
+		return getSpringDMVersion();
+	}
+
+	/**
 	 * Return the Spring osgified version used by the test core bundles.
 	 * 
 	 * @return
 	 */
-	protected String getSpringBundledVersion() {
+	protected String getSpringVersion() {
 		if (springBundledVersion == null) {
 			springBundledVersion = System.getProperty(SPRING_VERSION_PROP_KEY);
 		}
 		return springBundledVersion;
+	}
+
+	/**
+	 * @deprecated - use {@link #getSpringVersion()} instead
+	 * @return
+	 */
+	protected String getSpringBundledVersion() {
+		return getSpringVersion();
 	}
 
 	/**

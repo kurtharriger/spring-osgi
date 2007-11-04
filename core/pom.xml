@@ -38,8 +38,9 @@
   	</spring.osgi.export.pkg>
   	
 	<spring.osgi.import.pkg>
+		org.apache.commons.logging*,
+		org.aopalliance*,
 		org.osgi.service.cm;version=1.2;resolution:=optional,
-		org.aopalliance.*;resolution:=optional,
 		org.w3c.dom;resolution:=optional,
 		org.xml.sax;resolution:=optional,
 		*
