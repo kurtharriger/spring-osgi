@@ -25,19 +25,11 @@ import org.springframework.osgi.service.OsgiServiceRegistrationListener;
  */
 public class SimpleOsgiServiceRegistrationListener implements OsgiServiceRegistrationListener {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.util.OsgiServiceRegistrationListener#registered(java.util.Map)
-	 */
-	public void registered(Map serviceProperties) {
+	public void registered(Object service, Map serviceProperties) {
 		REGISTERED++;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.util.OsgiServiceRegistrationListener#unregistered(java.util.Map)
-	 */
-	public void unregistered(Map serviceProperties) {
+	public void unregistered(Object service, Map serviceProperties) {
 		UNREGISTERED++;
 
 	}

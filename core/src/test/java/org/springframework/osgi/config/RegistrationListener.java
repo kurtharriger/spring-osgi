@@ -31,12 +31,18 @@ public class RegistrationListener implements OsgiServiceRegistrationListener {
 
 	static int UNBIND_CALLS = 0;
 
-	public void registered(Map serviceProperties) {
+	static Object SERVICE_UNREG;
+
+	static Object SERVICE_REG;
+
+	public void registered(Object service, Map serviceProperties) {
 		BIND_CALLS++;
+		SERVICE_REG = service;
 	}
 
-	public void unregistered(Map serviceProperties) {
+	public void unregistered(Object service, Map serviceProperties) {
 		UNBIND_CALLS++;
+		SERVICE_UNREG = service;
 	}
 
 }

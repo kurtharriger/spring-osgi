@@ -30,12 +30,18 @@ public class CustomRegistrationListener {
 
 	public static int UNREG_CALLS = 0;
 
-	public void onRegistration(Map properties) {
+	public static Object SERVICE_UNREG;
+
+	public static Object SERVICE_REG;
+
+	public void onRegistration(Object service, Map properties) {
 		REG_CALLS++;
+		SERVICE_REG = service;
 	}
 
-	public void onUnregistration(Dictionary props) {
+	public void onUnregistration(Object service, Dictionary props) {
 		UNREG_CALLS++;
+		SERVICE_UNREG = service;
 	}
 
 }

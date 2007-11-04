@@ -16,10 +16,6 @@
 package org.springframework.osgi.internal.config;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -29,6 +25,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.internal.util.ReflectionUtils;
 import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -60,6 +57,7 @@ class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListe
 	private final boolean isLifecycleListener;
 
 	TargetSourceLifecycleListenerWrapper(Object object) {
+		Assert.notNull(object);
 		this.target = object;
 		isLifecycleListener = target instanceof TargetSourceLifecycleListener;
 	}
@@ -68,23 +66,25 @@ class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListe
 	 * Initialise adapter. Determine custom methods and do validation.
 	 */
 	public void afterPropertiesSet() {
-
+		Class clazz = target.getClass();
+		
 		if (isLifecycleListener)
 			if (log.isDebugEnabled())
-				log.debug(target.getClass().getName() + " is a lifecycle listener");
-		bindMethods = determineCustomMethods(bindMethod);
-		unbindMethods = determineCustomMethods(unbindMethod);
+				log.debug(clazz.getName() + " is a lifecycle listener");
+
+		bindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, bindMethod);
+		unbindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unbindMethod);
 
 		if (StringUtils.hasText(bindMethod)) {
 			// determine methods using ServiceReference signature
-			bindReference = org.springframework.util.ReflectionUtils.findMethod(target.getClass(), bindMethod,
+			bindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, bindMethod,
 				new Class[] { ServiceReference.class });
 
 			if (bindReference != null)
 				org.springframework.util.ReflectionUtils.makeAccessible(bindReference);
 		}
 		if (StringUtils.hasText(unbindMethod)) {
-			unbindReference = org.springframework.util.ReflectionUtils.findMethod(target.getClass(), unbindMethod,
+			unbindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, unbindMethod,
 				new Class[] { ServiceReference.class });
 
 			if (unbindReference != null)
@@ -96,99 +96,6 @@ class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListe
 			throw new IllegalArgumentException("target object needs to implement "
 					+ TargetSourceLifecycleListener.class.getName()
 					+ " or custom bind/unbind methods have to be specified");
-	}
-
-	/**
-	 * Determine a custom method (if specified) on the given object. If the
-	 * methodName is not null and no method is found, an exception is thrown. If
-	 * the methodName is null/empty, an empty map is returned.
-	 * 
-	 * @param methodName
-	 * @return
-	 */
-	private Map determineCustomMethods(final String methodName) {
-		if (!StringUtils.hasText(methodName)) {
-			return Collections.EMPTY_MAP;
-		}
-
-		final Map methods = new LinkedHashMap(3);
-
-		final boolean trace = log.isTraceEnabled();
-
-		org.springframework.util.ReflectionUtils.doWithMethods(target.getClass(),
-			new org.springframework.util.ReflectionUtils.MethodCallback() {
-
-				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-					if (methodName.equals(method.getName())) {
-						// take a look at the variables
-						Class[] args = method.getParameterTypes();
-
-						// Properties can be passed as Map or Dictionary
-						if (args != null && args.length == 2) {
-							Class propType = args[1];
-							if (Dictionary.class.isAssignableFrom(propType) || Map.class.isAssignableFrom(propType)) {
-								if (trace)
-									log.trace("discovered custom method [" + method.toString() + "] on "
-											+ target.getClass());
-
-								// see if there was a method already found
-								Method m = (Method) methods.get(args[0]);
-
-								if (m != null) {
-									if (trace)
-										log.trace("type " + args[0] + " already has an associated method ["
-												+ m.toString() + "];ignoring " + method);
-								}
-								else {
-									org.springframework.util.ReflectionUtils.makeAccessible(method);
-									methods.put(args[0], method);
-								}
-							}
-						}
-					}
-				}
-			});
-		return methods;
-	}
-
-	/**
-	 * Call the appropriate method (which have the key a type compatible of the
-	 * given service) from the given method map.
-	 * 
-	 * @param target
-	 * @param methods
-	 * @param service
-	 * @param properties
-	 */
-	// the properties field is Dictionary implementing a Map interface
-	private void invokeCustomMethods(Object target, Map methods, Object service, Map properties) {
-		if (methods != null && !methods.isEmpty()) {
-			boolean trace = log.isTraceEnabled();
-
-			Object[] args = new Object[] { service, properties };
-			for (Iterator iter = methods.entrySet().iterator(); iter.hasNext();) {
-				Map.Entry entry = (Map.Entry) iter.next();
-				Class key = (Class) entry.getKey();
-				Method method = (Method) entry.getValue();
-				// find the compatible types (accept null service)
-				if (service == null || key.isInstance(service)) {
-					if (trace)
-						log.trace("invoking listener custom method " + method);
-
-					try {
-						ReflectionUtils.invokeMethod(method, target, args);
-					}
-					// make sure to log exceptions and continue with the
-					// rest of
-					// the listeners
-					catch (Exception ex) {
-						Exception cause = ReflectionUtils.getInvocationException(ex);
-						log.warn("custom method [" + method + "] threw exception when passing service type ["
-								+ (service != null ? service.getClass().getName() : null) + "]", cause);
-					}
-				}
-			}
-		}
 	}
 
 	/**
@@ -242,7 +149,7 @@ class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListe
 			}
 		}
 
-		invokeCustomMethods(target, bindMethods, service, properties);
+		CustomListenerAdapterUtils.invokeCustomMethods(target, bindMethods, service, properties);
 		invokeCustomServiceReferenceMethod(target, bindReference, service);
 	}
 
@@ -264,7 +171,7 @@ class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListe
 			}
 		}
 
-		invokeCustomMethods(target, unbindMethods, service, properties);
+		CustomListenerAdapterUtils.invokeCustomMethods(target, unbindMethods, service, properties);
 		invokeCustomServiceReferenceMethod(target, unbindReference, service);
 	}
 

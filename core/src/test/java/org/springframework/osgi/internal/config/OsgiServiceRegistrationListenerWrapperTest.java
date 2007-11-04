@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.internal.service.importer;
+package org.springframework.osgi.internal.config;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +24,6 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.internal.service.exporter.OsgiServiceRegistrationListenerWrapper;
 import org.springframework.osgi.service.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.MapBasedDictionary;
 
@@ -40,11 +39,11 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 
 		public static int UNREG_CALLS = 0;
 
-		public void registered(Map serviceProperties) throws Exception {
+		public void registered(Object service, Map serviceProperties) throws Exception {
 			REG_CALLS++;
 		}
 
-		public void unregistered(Map serviceProperties) throws Exception {
+		public void unregistered(Object service, Map serviceProperties) throws Exception {
 			UNREG_CALLS++;
 		}
 	}
@@ -58,12 +57,12 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 
 		public static List UNREG_PROPS = new ArrayList();
 
-		public void myReg(Map properties) throws Exception {
+		public void myReg(Object service, Map properties) throws Exception {
 			REG_CALLS++;
 			REG_PROPS.add(properties);
 		}
 
-		public void myUnreg(Map properties) throws Exception {
+		public void myUnreg(Object service, Map properties) throws Exception {
 			UNREG_CALLS++;
 			UNREG_PROPS.add(properties);
 		}
@@ -79,13 +78,13 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 
 	protected static class CustomAndListener extends JustListener {
 
-		public Integer aReg(Map props) throws Exception {
-			super.registered(props);
+		public Integer aReg(Object service, Map props) throws Exception {
+			super.registered(service, props);
 			return null;
 		}
 
-		public void aUnreg(Map props) throws Exception {
-			super.unregistered(props);
+		public void aUnreg(Object service, Map props) throws Exception {
+			super.unregistered(service, props);
 		}
 	}
 
@@ -97,7 +96,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	 */
 	protected static class ExceptionListener extends CustomAndListener {
 
-		public void registered(Map properties) throws Exception {
+		public void registered(Object service, Map properties) throws Exception {
 			throw new Exception("expected!") {
 				public synchronized Throwable fillInStackTrace() {
 					return null;
@@ -105,7 +104,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 			};
 		}
 
-		public void unregistered(Map properties) throws Exception {
+		public void unregistered(Object service, Map properties) throws Exception {
 			throw new Exception("expected!") {
 				public synchronized Throwable fillInStackTrace() {
 					return null;
@@ -135,29 +134,29 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	protected static class DictionaryAndMapCustomListener {
-		public void registered(Dictionary properties) {
+		public void registered(Object service, Dictionary properties) {
 			JustListener.REG_CALLS++;
 		}
 
-		public void unregistered(Map props) {
+		public void unregistered(Object service, Map props) {
 			JustListener.UNREG_CALLS++;
 		}
 
-		public void unregistered(Dictionary props) throws Exception {
+		public void unregistered(Object service, Dictionary props) throws Exception {
 			JustListener.UNREG_CALLS++;
 		}
 	}
 
 	protected static class JustReg {
 
-		private void myReg(Map properties) {
+		private void myReg(Object service, Map properties) {
 			JustListener.REG_CALLS++;
 		}
 	}
 
 	protected static class JustUnreg {
 
-		protected void myUnreg(Map properties) {
+		protected void myUnreg(Object service, Map properties) {
 			JustListener.UNREG_CALLS++;
 		}
 	}
@@ -188,18 +187,19 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		listener = new OsgiServiceRegistrationListenerWrapper(new JustListener());
 		listener.afterPropertiesSet();
 
+		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
-		listener.registered(props);
+		listener.registered(service, props);
 		assertEquals(1, JustListener.REG_CALLS);
 		assertEquals(0, JustListener.UNREG_CALLS);
-		listener.registered(props);
+		listener.registered(service, props);
 		assertEquals(2, JustListener.REG_CALLS);
 		assertEquals(0, JustListener.UNREG_CALLS);
 
-		listener.unregistered(props);
+		listener.unregistered(service, props);
 		assertEquals(1, JustListener.UNREG_CALLS);
 		assertEquals(2, JustListener.REG_CALLS);
-		listener.unregistered(props);
+		listener.unregistered(service, props);
 		assertEquals(2, JustListener.UNREG_CALLS);
 		assertEquals(2, JustListener.REG_CALLS);
 	}
@@ -258,19 +258,22 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		Map props = Collections.EMPTY_MAP;
 		assertEquals(0, CustomListener.REG_CALLS);
 		assertEquals(0, CustomListener.UNREG_CALLS);
-		listener.registered(props);
+
+		Object service = new Object();
+
+		listener.registered(service, props);
 		assertEquals(1, CustomListener.REG_CALLS);
 		assertEquals(0, CustomListener.UNREG_CALLS);
 
-		listener.registered(props);
+		listener.registered(service, props);
 		assertEquals(2, CustomListener.REG_CALLS);
 		assertEquals(0, CustomListener.UNREG_CALLS);
 
-		listener.unregistered(props);
+		listener.unregistered(service, props);
 		assertEquals(2, CustomListener.REG_CALLS);
 		assertEquals(1, CustomListener.UNREG_CALLS);
 
-		listener.unregistered(props);
+		listener.unregistered(service, props);
 		assertEquals(2, CustomListener.REG_CALLS);
 		assertEquals(2, CustomListener.UNREG_CALLS);
 	}
@@ -280,13 +283,13 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		listener.setRegistrationMethod("myReg");
 		listener.setUnregistrationMethod("myUnreg");
 		listener.afterPropertiesSet();
-
+		Object service = new Object();
 		assertEquals(0, CustomListener.REG_CALLS);
 		assertEquals(0, CustomListener.UNREG_CALLS);
-		listener.registered(null);
+		listener.registered(service, null);
 		assertEquals("null properties allowed", 1, CustomListener.REG_CALLS);
 
-		listener.unregistered(null);
+		listener.unregistered(service, null);
 
 		assertEquals("null properties allowed", 1, CustomListener.UNREG_CALLS);
 	}
@@ -296,14 +299,14 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		listener.setRegistrationMethod("aReg");
 		listener.setUnregistrationMethod("aUnreg");
 		listener.afterPropertiesSet();
-
+		Object service = new Object();
 		assertEquals(0, CustomAndListener.REG_CALLS);
 		assertEquals(0, CustomAndListener.UNREG_CALLS);
-		listener.registered(props);
+		listener.registered(service, props);
 		assertEquals(2, CustomAndListener.REG_CALLS);
 		assertEquals(0, CustomAndListener.UNREG_CALLS);
 
-		listener.unregistered(props);
+		listener.unregistered(service, props);
 		assertEquals(2, CustomAndListener.REG_CALLS);
 		assertEquals(2, CustomAndListener.UNREG_CALLS);
 
@@ -314,14 +317,14 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		listener.setRegistrationMethod("aReg");
 		listener.setUnregistrationMethod("aUnreg");
 		listener.afterPropertiesSet();
-
+		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
 		assertEquals(0, JustListener.UNREG_CALLS);
-		listener.registered(props);
+		listener.registered(service, props);
 		assertEquals(1, JustListener.REG_CALLS);
 		assertEquals(0, JustListener.UNREG_CALLS);
 
-		listener.unregistered(props);
+		listener.unregistered(service, props);
 		assertEquals(1, JustListener.REG_CALLS);
 		assertEquals(1, JustListener.UNREG_CALLS);
 	}
@@ -331,14 +334,14 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		listener.setRegistrationMethod("myReg");
 		listener.setUnregistrationMethod("myUnreg");
 		listener.afterPropertiesSet();
-
+		Object service = new Object();
 		assertEquals(0, ExceptionCustomListener.REG_CALLS);
 		assertEquals(0, ExceptionCustomListener.UNREG_CALLS);
-		listener.registered(props);
+		listener.registered(service, props);
 		assertEquals(1, ExceptionCustomListener.REG_CALLS);
 		assertEquals(0, ExceptionCustomListener.UNREG_CALLS);
 
-		listener.unregistered(props);
+		listener.unregistered(service, props);
 		assertEquals(1, ExceptionCustomListener.REG_CALLS);
 		assertEquals(1, ExceptionCustomListener.UNREG_CALLS);
 	}
@@ -348,13 +351,13 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		listener.setRegistrationMethod("registered");
 		listener.setUnregistrationMethod("unregistered");
 		listener.afterPropertiesSet();
-
+		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
-		listener.registered(props);
+		listener.registered(service, props);
 		// only the interface is being called since the service is null
 		assertEquals(2, JustListener.REG_CALLS);
 
-		listener.registered(props);
+		listener.registered(service, props);
 		assertEquals(4, JustListener.REG_CALLS);
 	}
 
@@ -363,15 +366,15 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		listener.setRegistrationMethod("registered");
 		listener.setUnregistrationMethod("unregistered");
 		listener.afterPropertiesSet();
-
+		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
 		assertEquals(0, JustListener.UNREG_CALLS);
-		listener.registered(props);
+		listener.registered(service, props);
 
 		assertEquals(1, JustListener.REG_CALLS);
 		assertEquals(0, JustListener.UNREG_CALLS);
 
-		listener.unregistered(props);
+		listener.unregistered(service, props);
 		assertEquals(1, JustListener.REG_CALLS);
 		assertEquals("only one unregistered method should be called", 1, JustListener.UNREG_CALLS);
 	}
@@ -380,11 +383,11 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		listener = new OsgiServiceRegistrationListenerWrapper(new JustReg());
 		listener.setRegistrationMethod("myReg");
 		listener.afterPropertiesSet();
-
+		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
 		assertEquals(0, JustListener.UNREG_CALLS);
 
-		listener.registered(props);
+		listener.registered(service, props);
 
 		assertEquals(1, JustListener.REG_CALLS);
 		assertEquals(0, JustListener.UNREG_CALLS);
@@ -394,11 +397,11 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		listener = new OsgiServiceRegistrationListenerWrapper(new JustUnreg());
 		listener.setUnregistrationMethod("myUnreg");
 		listener.afterPropertiesSet();
-
+		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
 		assertEquals(0, JustListener.UNREG_CALLS);
 
-		listener.unregistered(props);
+		listener.unregistered(service, props);
 
 		assertEquals(0, JustListener.REG_CALLS);
 		assertEquals(1, JustListener.UNREG_CALLS);

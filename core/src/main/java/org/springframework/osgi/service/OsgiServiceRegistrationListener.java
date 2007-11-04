@@ -36,18 +36,20 @@ public interface OsgiServiceRegistrationListener {
 	 * Called when the the service exported has been registered in the OSGi
 	 * space.
 	 * 
+	 * @param service object registered as an OSGi service
 	 * @param serviceProperties OSGi service registration properties
 	 * @throws Exception exceptions are logged but not propagated to other listeners
 	 */
-	void registered(Map serviceProperties) throws Exception;
+	void registered(Object service, Map serviceProperties) throws Exception;
 
 	/**
 	 * Called when the OSGi service has been unregistered (removed from OSGi
 	 * space).
 	 * 
+	 * @param service object unregistered as a service from the OSGi space
 	 * @param serviceProperties OSGi service registration properties
 	 * @throws Exception exceptions are logged but not propagated to other listeners
 	 */
-	void unregistered(Map serviceProperties) throws Exception;
+	void unregistered(Object service, Map serviceProperties) throws Exception;
 
 }

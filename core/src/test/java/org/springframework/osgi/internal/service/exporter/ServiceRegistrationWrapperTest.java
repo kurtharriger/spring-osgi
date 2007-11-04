@@ -38,7 +38,7 @@ public class ServiceRegistrationWrapperTest extends TestCase {
 		mc = MockControl.createControl(ServiceRegistration.class);
 		actualRegistration = (ServiceRegistration) mc.getMock();
 
-		registration = new ServiceRegistrationWrapper(actualRegistration,
+		registration = new ServiceRegistrationWrapper(new Object(), actualRegistration,
 				new OsgiServiceRegistrationListener[] { new SimpleOsgiServiceRegistrationListener() });
 		SimpleOsgiServiceRegistrationListener.REGISTERED = 0;
 		SimpleOsgiServiceRegistrationListener.UNREGISTERED = 0;

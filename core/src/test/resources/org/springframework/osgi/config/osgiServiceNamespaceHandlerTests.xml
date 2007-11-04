@@ -61,9 +61,11 @@
 		<osgi:service-properties>
 			<entry key="string" value="myprop" />
 		</osgi:service-properties>
-		<bean class="java.util.HashMap" />
+		<ref local="map"/>
 	</osgi:service>
 
+	<bean id="map" class="java.util.HashMap" />
+	<!-- listeners -->
 	<bean id="listener"
 		class="org.springframework.osgi.config.RegistrationListener" />
 
