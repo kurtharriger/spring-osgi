@@ -17,6 +17,13 @@ package org.springframework.osgi.internal.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Dictionary;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Reflection related utility class. Similar to that found inside main Spring

@@ -16,7 +16,6 @@
  */
 package org.springframework.osgi.service.exporter;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.LinkedHashSet;
@@ -30,7 +29,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanFactory;
@@ -49,12 +47,12 @@ import org.springframework.osgi.internal.service.interceptor.OsgiServiceTCCLInvo
 import org.springframework.osgi.internal.util.ClassUtils;
 import org.springframework.osgi.internal.util.DebugUtils;
 import org.springframework.osgi.service.OsgiServicePropertiesResolver;
+import org.springframework.osgi.service.exporter.support.NoOpExporter;
 import org.springframework.osgi.util.MapBasedDictionary;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -106,17 +104,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 				bean = serviceFactory.getService(bundle, serviceRegistration);
 			}
 
-			// FIXME: what's the spec on this one?
-			if (StringUtils.hasText(activationMethod)) {
-				Method m = BeanUtils.resolveSignature(activationMethod, bean.getClass());
-				try {
-					ReflectionUtils.invokeMethod(m, bean);
-				}
-				catch (RuntimeException ex) {
-					log.error("Activation method for [" + bean + "] threw an exception", ex);
-				}
-			}
-
 			if (contextClassloaderManagementStrategy == ExportClassLoadingOptions.SERVICE_PROVIDER) {
 				return wrapWithClassLoaderManagingProxy(bean, classes);
 			}
@@ -126,17 +113,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 		}
 
 		public void ungetService(Bundle bundle, ServiceRegistration serviceRegistration, Object bean) {
-			// FIXME: what's the spec on this one?
-			if (StringUtils.hasText(deactivationMethod)) {
-				Method m = BeanUtils.resolveSignature(deactivationMethod, bean.getClass());
-				try {
-					ReflectionUtils.invokeMethod(m, bean);
-				}
-				catch (RuntimeException ex) {
-					log.error("Deactivation method for [" + bean + "] threw an exception", ex);
-				}
-			}
-
 			if (serviceFactory != null)
 				serviceFactory.ungetService(bundle, serviceRegistration, bean);
 		}
@@ -174,10 +150,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 	private int autoExportMode = AUTO_EXPORT_DISABLED;
 
-	private String activationMethod;
-
-	private String deactivationMethod;
-
 	private ExportClassLoadingOptions contextClassloaderManagementStrategy = ExportClassLoadingOptions.UNMANAGED;
 
 	private Object target;
@@ -188,6 +160,8 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 	/** exporter bean name */
 	private String beanName;
+
+	private ClassExporter autoExport = new NoOpExporter();
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
@@ -316,7 +290,7 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 		ServiceRegistration reg = registerService(mergedClasses, serviceProperties);
 
-		serviceRegistration = notifyListeners((Map) serviceProperties, reg);
+		serviceRegistration = notifyListeners(target, (Map) serviceProperties, reg);
 	}
 
 	/**
@@ -410,11 +384,20 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	}
 
 	/**
-	 * Set the context classloader management strategy to use when invoking
-	 * operations on the exposed target bean
+	 * @deprecated - use {@link #setContextClassLoader(String)} instead.
 	 * @param classloaderManagementOption
 	 */
 	public void setContextClassloader(String classloaderManagementOption) {
+		this.contextClassloaderManagementStrategy = ExportClassLoadingOptions.resolveEnum(classloaderManagementOption);
+	}
+
+	/**
+	 * Set the context classloader management strategy to use when invoking
+	 * operations on the exposed target bean.
+	 * 
+	 * @param classloaderManagementOption
+	 */
+	public void setContextClassLoader(String classloaderManagementOption) {
 		this.contextClassloaderManagementStrategy = ExportClassLoadingOptions.resolveEnum(classloaderManagementOption);
 	}
 
@@ -463,21 +446,9 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 		}
 	}
 
-	public String getActivationMethod() {
-		return activationMethod;
-	}
-
-	public void setActivationMethod(String activationMethod) {
-		this.activationMethod = activationMethod;
-	}
-
-	public String getDeactivationMethod() {
-		return deactivationMethod;
-	}
-
-	public void setDeactivationMethod(String deactivationMethod) {
-		this.deactivationMethod = deactivationMethod;
-	}
+	// public void setAutoExport(ClassExporter autoExport) {
+	// this.autoExport = autoExport;
+	// }
 
 	public Map getServiceProperties() {
 		return serviceProperties;
