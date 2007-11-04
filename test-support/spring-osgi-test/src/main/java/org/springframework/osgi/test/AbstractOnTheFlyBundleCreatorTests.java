@@ -16,9 +16,12 @@
 package org.springframework.osgi.test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -35,6 +38,7 @@ import org.springframework.osgi.internal.test.util.JarCreator;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -227,23 +231,41 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	private Set determineImportsForClass(Class clazz) {
 		Assert.notNull(clazz, "a not-null class is required");
 		DependencyVisitor visitor = new DependencyVisitor();
-		ClassReader reader;
-		try {
-			reader = new ClassReader(clazz.getResourceAsStream(ClassUtils.getClassFileName(clazz)));
-		}
-		catch (Exception ex) {
-			throw (RuntimeException) new IllegalArgumentException("cannot read class " + clazz).initCause(ex);
-		}
-		reader.accept(visitor, false);
 
+		// find inner classes
+		Set allClasses = new LinkedHashSet(4);
+
+		allClasses.add(clazz);
+		CollectionUtils.mergeArrayIntoCollection(clazz.getDeclaredClasses(), allClasses);
+
+		for (Iterator iterator = allClasses.iterator(); iterator.hasNext();) {
+			Class innerClazz = (Class) iterator.next();
+			CollectionUtils.mergeArrayIntoCollection(innerClazz.getDeclaredClasses(), allClasses);
+		}
+
+		boolean trace = logger.isTraceEnabled();
+		
+		if (trace)
+			logger.trace("discovered classes to analyze " + allClasses);
+		
+		ClassReader reader;
+
+		for (Iterator iterator = allClasses.iterator(); iterator.hasNext();) {
+			Class classToVisit = (Class) iterator.next();
+			try {
+				if (trace)
+					logger.trace("visiting class " + classToVisit);
+				reader = new ClassReader(clazz.getResourceAsStream(ClassUtils.getClassFileName(classToVisit)));
+			}
+			catch (Exception ex) {
+				throw (RuntimeException) new IllegalArgumentException("cannot read class " + clazz).initCause(ex);
+			}
+			reader.accept(visitor, false);
+		}
+		
 		return visitor.getPackages();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.AbstractOsgiTests#postProcessBundleContext(org.osgi.framework.BundleContext)
-	 */
 	protected void postProcessBundleContext(BundleContext context) throws Exception {
 		logger.debug("post processing: creating test bundle");
 
