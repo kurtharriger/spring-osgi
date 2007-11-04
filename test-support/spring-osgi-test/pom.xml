@@ -32,6 +32,7 @@
     </spring.osgi.export.pkg>
     <spring.osgi.private.pkg>org.springframework.osgi.internal.test*</spring.osgi.private.pkg>
 	<spring.osgi.import.pkg>
+	  org.apache.commons.logging*,
 	  org.objectweb.asm*;version="[2,3)";resolution:=optional,
 	  javax.swing.*;resolution:=optional,
 	  org.eclipse.*;resolution:=optional,
