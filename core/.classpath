@@ -17,7 +17,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5-rc1/spring-context-2.5-rc1.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/aopalliance.osgi/1.0-SNAPSHOT/aopalliance.osgi-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.13-SNAPSHOT/log4j.osgi-1.2.13-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
 	<classpathentry kind="var" path="M2_REPO/multithreadedtc/multithreadedtc-jdk1.4/1.01/multithreadedtc-jdk1.4-1.01.jar" sourcepath="/MTC_SRC"/>

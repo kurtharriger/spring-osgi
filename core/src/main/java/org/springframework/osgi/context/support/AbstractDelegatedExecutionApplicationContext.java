@@ -24,6 +24,7 @@ import org.springframework.osgi.internal.context.DelegatedExecutionOsgiBundleApp
 import org.springframework.osgi.internal.context.OsgiBundleApplicationContextExecutor;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -115,6 +116,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * executes the refresh method in one go (normal behavior).
 	 */
 	public void refresh() throws BeansException, IllegalStateException {
+		Assert.notNull(getBundleContext(), "bundle context should be set before refreshing the application context");
 		executor.refresh();
 	}
 
