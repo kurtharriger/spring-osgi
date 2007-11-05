@@ -25,6 +25,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.internal.test.OsgiJUnitTest;
 import org.springframework.osgi.internal.test.TestRunnerService;
+import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
  * Test bundle activator - looks for a predefined JUnit test runner and triggers
@@ -42,11 +43,6 @@ public class JUnitTestActivator implements BundleActivator {
 	private ServiceRegistration registration;
 	private TestRunnerService service;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
 	public void start(BundleContext bc) throws Exception {
 		this.context = bc;
 
@@ -90,15 +86,8 @@ public class JUnitTestActivator implements BundleActivator {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
 	public void stop(BundleContext bc) throws Exception {
-		bc.ungetService(reference);
-		if (registration != null)
-			registration.unregister();
+		OsgiServiceUtils.unregisterService(registration);
 	}
 
 }

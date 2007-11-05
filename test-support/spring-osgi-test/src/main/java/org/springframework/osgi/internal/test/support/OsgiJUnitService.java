@@ -69,12 +69,6 @@ public class OsgiJUnitService implements TestRunnerService {
 		log.debug("opened reader for OSGi");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.TestRunner#runTest(junit.framework.Test,
-	 * junit.framework.TestResult)
-	 */
 	public void runTest(OsgiJUnitTest test) {
 		try {
 			executeTest(test);

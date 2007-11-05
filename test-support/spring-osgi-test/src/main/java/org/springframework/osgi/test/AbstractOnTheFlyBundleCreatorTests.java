@@ -85,8 +85,8 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 	/**
 	 * Return the location (in Spring resource style) of the manifest location
-	 * to be used. If the manifest is created programatically, return a null
-	 * string and use {@link #getManifest()} and
+	 * to be used. If the manifest is created programatically (the default),
+	 * return a null string and use {@link #getManifest()} and
 	 * {@link #createDefaultManifest()}.
 	 * 
 	 * @return the manifest location
@@ -244,10 +244,10 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		}
 
 		boolean trace = logger.isTraceEnabled();
-		
+
 		if (trace)
 			logger.trace("discovered classes to analyze " + allClasses);
-		
+
 		ClassReader reader;
 
 		for (Iterator iterator = allClasses.iterator(); iterator.hasNext();) {
@@ -262,7 +262,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 			}
 			reader.accept(visitor, false);
 		}
-		
+
 		return visitor.getPackages();
 	}
 
