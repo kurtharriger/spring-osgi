@@ -131,16 +131,4 @@ public class ServiceComparatorTest extends AbstractConfigurableBundleCreatorTest
 		assertEquals(service2, iter.next());
 		assertEquals(service1, iter.next());
 	}
-
-	public void testUnorderedSetOfImportedObjects() throws Exception {
-		Set set = (Set) context.getBean("unorderedSet");
-
-		assertNotNull(set);
-		assertEquals(3, set.size());
-		Iterator iter = set.iterator();
-
-		assertEquals(service1, iter.next());
-		assertEquals(service2, iter.next());
-		assertEquals(service3, iter.next());
-	}
 }
