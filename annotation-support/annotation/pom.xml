@@ -70,9 +70,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-	    <groupId>org.aopalliance</groupId>
-	    <artifactId>aopalliance</artifactId>
-	    <version>1.0</version>
+	    <groupId>org.springframework.osgi</groupId>
+	    <artifactId>aopalliance.osgi</artifactId>
+	    <version>1.0-SNAPSHOT</version>
 	    <scope>provided</scope>
     </dependency>
     <dependency>
