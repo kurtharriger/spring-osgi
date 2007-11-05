@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="appendix-extensions">
+    <title>Appendix A: Extensions</title>
+
+    <para>This appendix describes extensions to the core functionality that
+    are shipped with the 1.0 distribution, but are not guaranteed to have
+    backwards compatibility across point releases. We anticipate these
+    features migrating into the core specification in future releases.</para>
+
+    <section>
+      <title>A.1 Annotation-based injection</title>
+
+      <para>The
+      <literal>org.springframework.osgi.extensions.annotation</literal> bundle
+      that ships with Spring Dynamic Modules provides early access to
+      annotation-based support for injecting references to OSGi services. JDK
+      1.5 or above is required to use this feature.</para>
+
+      <para>Bean class (setter) methods may be annotated with
+      <literal>org.springframework.osgi.extensions.annotation.ServiceReference</literal>.
+      By default the property type of the annotated property is used to look
+      up a service with a matching service interface in the OSGi service
+      registry and inject the result. For example, given the
+      configuration:</para>
+
+      <screen>&lt;bean id="annotationDriven" class="MyAnnotationDrivenBeanClass"/&gt;</screen>
+
+      <para>and the class declaration:</para>
+
+      <screen>public class MyAnnotationDrivenBeanClass {
+
+  @ServiceReference
+  public void setMessageService(MessageService aService) { ... }
+
+}</screen>
+
+      <para>then a service lookup for services implementing the
+      <literal>MessageService</literal> interface will be performed, and the
+      best match (using the same algorithm as documented for the
+      <literal>reference</literal> element) will be injected.</para>
+
+      <para>The <literal>ServiceReference</literal> annotation class has a
+      number of attributes that can be used to control the service lookup (for
+      example, to specify a filter string) that mirror the options provided by
+      the <literal>reference</literal> element. See the javadoc for more
+      information.</para>
+    </section>
+</chapter>

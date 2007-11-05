@@ -1,0 +1,1853 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter>
+
+  <section>
+
+    <section>
+      <title>Supported OSGi and JDK versions</title>
+
+      <para>Spring Dynamic Modules supports <ulink
+      url="http://www2.osgi.org/Specifications/HomePage?section=2">OSGi
+      R4</ulink> and above, and JDK level 1.4 and above. Bundles deployed for
+      use with Spring Dynamic Modules should specify
+      <literal>"Bundle-ManifestVersion: 2"</literal> in their manifest. We
+      test against <ulink
+      url="http://www.eclipse.org/equinox/">Equinox</ulink>, <ulink
+      url="http://felix.apache.org/">Felix</ulink>, and <ulink type=""
+      url="http://www.knopflerfish.org/">Knopflerfish</ulink> as part of our
+      continuous integration process.</para>
+    </section>
+
+    <section>
+      <title>Structure of this document</title>
+
+      <para>Chapter 2, "Bundles and Application Contexts" describes the
+      relationship between an OSGi Bundle and a Spring Application Context,
+      and introduces the Spring Extender Bundle support for instantiating
+      application contexts automatically.</para>
+
+      <para>Chapter 3, "Packaging and Deploying Spring-based OSGi
+      applications" describes how to deploy the Spring Framework jar files in
+      an OSGi environment, and how to reference external APIs from your
+      application bundles should you need to do so. This chapter also explains
+      some of the issues to be aware of when using existing enterprise
+      libraries not designed for OSGi in an OSGi environment.</para>
+
+      <para>Chapter 4, "The Service Registry" describes how to export Spring
+      beans as services in the OSGi service registry, and how to inject
+      references to OSGi services into beans. This chapter also defines how
+      the dynamic life-cycle of OSGi services and bundles is supported.</para>
+
+      <para>Chapter 5, "Working with Bundles" describes how to declare a bean
+      that represents an OSGi bundle, including support for installing new
+      bundles into the OSGi platform.</para>
+
+      <para>Chapter 6, "Compendium Services" describes the support provided
+      for the <ulink url="http://www2.osgi.org/Release4/Download">OSGi
+      Compendium Services</ulink>, including the Configuration Admin
+      service.</para>
+
+      <para>Chapter 7, "Testing OSGi based Applications" explains the
+      integration testing support provided by Spring Dynamic Modules. This
+      support enables you to write simple JUnit integration tests that can
+      start up an OSGi environment, install the bundles needed for the
+      integration test, execute the test case(s) inside of OSGi, and return
+      the results to the runner. This support makes it easy to integrate OSGi
+      integration testing into any environment that can work with
+      JUnit.</para>
+
+      <para>Appendix A, "Extensions" describes extensions that are included in
+      the 1.0 distribution, but are not guaranteed to be maintained in a
+      backward-compatible form in future point releases. We anticipate these
+      features moving into the core specification over time.</para>
+
+      <para>Appendix B, "Roadmap" describes some features that are included in
+      the 1.0 distribution but are still considered early-access. The
+      externals of these features may change in future releases. This appendix
+      also discusses other planned features for which no implementation yet
+      exists.</para>
+
+      <para>Appendix C defines the schemas provided by Spring Dynamic
+      Modules.</para>
+    </section>
+  </section>
+
+  <section>
+    <title>2.0 Bundles and Application Contexts</title>
+
+    <para>The unit of deployment (and modularity) in OSGi is the bundle (see
+    section 3.2 of the OSGi Service Platform Core Specification). A bundle
+    known to the OSGi runtime is in one of three steady states: installed,
+    resolved, or active. Bundles may export services (objects) to the OSGi
+    service registry, and by so doing make these services available for other
+    bundles to discover and to use. Bundles may also export Java packages,
+    enabling other bundles to import the exported types.</para>
+
+    <para>In Spring the primary unit of modularity is an application context,
+    which contains some number of beans (objects managed by the Spring
+    application context). Application contexts can be configured in a
+    hierarchy such that a child application context can see beans defined in a
+    parent, but not vice-versa. The Spring concepts of exporters and factory
+    beans are used to export references to beans to clients outside of the
+    application context, and to inject references to services that are defined
+    outside of the application context.</para>
+
+    <para>There is a natural affinity between an OSGi bundle and a Spring
+    application context. Using Spring Dynamic Modules, an active bundle may
+    contain a Spring application context, responsible for the instantiation,
+    configuration, assembly, and decoration of the objects (beans) within the
+    bundle. Some of these beans may optionally be exported as OSGi services
+    and thus made available to other bundles, beans within the bundle may also
+    be transparently injected with references to OSGi services.</para>
+
+    <section>
+      <title>2.1 The Spring Dynamic Modules Extender bundle</title>
+
+      <para>Spring Dynamic Modules provides an OSGi bundle
+      <literal>org.springframework.osgi.spring-osgi-extender</literal>. This
+      bundle is responsible for instantiating the Spring application contexts
+      for your application bundles. It serves the same purpose as the <ulink
+      url="http://www.springframework.org/docs/reference/webintegration.html">ContextLoaderListener</ulink>
+      does for Spring web applications. Once the extender bundle is installed
+      and started it looks for any existing Spring-powered bundles that are
+      already in the ACTIVE state and creates application contexts on their
+      behalf. In addition, it listens for bundle starting events and
+      automatically creates an application context for any Spring-powered
+      bundle that is subsequently started. Section 3 describes what the
+      extender recognizes as a "Spring-powered bundle".</para>
+    </section>
+
+    <section>
+      <title>2.2 Application Context Creation</title>
+
+      <para>The extender bundle creates applications contexts asynchronously.
+      This behavior ensures that starting an OSGi Service Platform is fast and
+      that bundles with service inter-dependencies do not cause deadlock on
+      startup. A Spring-powered bundle may therefore transition to the STARTED
+      state before its application context has been created. It is possible to
+      force synchronous creation of application contexts on a bundle-by-bundle
+      basis. See section 3 for information on how to specify this
+      behavior.</para>
+
+      <para>If application context creation fails for any reason then the
+      failure cause is logged. The bundle remains in the STARTED state. There
+      will be no services exported to the registry from the application
+      context in this scenario.</para>
+
+      <section>
+        <title>2.2.1 Mandatory Service Dependencies</title>
+
+        <para>If an application context declares mandatory dependencies on the
+        availability of certain OSGi services (see section 4.0) then creation
+        of the application context is blocked until all mandatory dependencies
+        can be satisfied through matching services available in the OSGi
+        service registry. Since a service may come and go at any moment in an
+        OSGi environment, this behavior only guarantees that all mandatory
+        services were available at the moment creation of the application
+        context began. One or more services may subsequently become
+        unavailable again during the process of application context creation.
+        Section 4.0 describes what happens when a mandatory service reference
+        becomes unsatisfied. In practice for most enterprise applications
+        built using Spring Dynamic Modules services the set of available
+        services and bundles will reach a steady state once the platform and
+        its installed bundles are all started. In such a world the behavior of
+        waiting for mandatory dependencies simply ensures that bundles A and
+        B, where bundle A depends on services exported by bundle B, may be
+        started in any order.</para>
+
+        <para>A timeout applies to the wait for mandatory dependencies to be
+        satisfied. By default the timeout is set to 5 minutes, but this value
+        can be configured using the <literal>timeout</literal> directive. See
+        section 3.0 for details.</para>
+
+        <para>It is possible to change the application context creation
+        semantics so that application context creation fails if all mandatory
+        services are not immediately available upon startup (see section 3.1).
+        When configured to not wait for dependencies, a bundle with
+        unsatisfied mandatory dependencies will be stopped, leaving the bundle
+        in the RESOLVED state.</para>
+      </section>
+
+      <section>
+        <title>2.2.2 Application Context Service Publication</title>
+
+        <para>Once the application context creation for a bundle has
+        completed, the application context object is automatically exported as
+        a service available through the OSGi Service Registry. The context is
+        published under the interface
+        <literal>org.springframework.context.ApplicationContext</literal> (and
+        also all of the visible super-interfaces and types implemented by the
+        context). The published service has a service property named
+        <literal>org.springframework.context.service.name</literal> whose
+        value is set to the bundle symbolic name of the bundle hosting the
+        application context. It is possible to prevent publication of the
+        application context as a service using a directive in the bundle's
+        manifest. See section 3.2 for details.</para>
+
+        <para>Note: the application context is published as a service
+        primarily to facilitate testing, administration, and management.
+        Accessing this context object at runtime and invoking
+        <literal>getBean()</literal> or similar operations is discouraged. The
+        preferred way to access a bean defined in another application context
+        is to export that bean as an OSGi service from the defining context,
+        and then to import a reference to that service in the context that
+        needs access to the service. Going via the service registry in this
+        way ensures that a bean only sees services with compatible versions of
+        service types, and that OSGi platform dynamics are respected.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>2.3 Bundle Lifecycle</title>
+
+      <para>OSGi is a dynamic platform: bundles may be installed, started,
+      updated, stopped, and uninstalled at any time during the running of the
+      framework.</para>
+
+      <para>When an active bundle is stopped, any services it exported during
+      its lifetime are automatically unregistered and the bundle returns to
+      the resolved state. A stopped bundle should release any resources it has
+      acquired and terminate any threads. Packages exported by a stopped
+      bundle continue to be available to other bundles.</para>
+
+      <para>A bundle in the resolved state may be uninstalled: packages that
+      were exported by an uninstalled bundle continue to be available to
+      bundles that imported them (but not to newly installed bundles).</para>
+
+      <para>A bundle in the resolved state may also be updated. The update
+      process migrates from one version of a bundle to another version of the
+      same bundle.</para>
+
+      <para>Finally of course a resolved bundle can be started, which
+      transitions it to the active state.</para>
+
+      <para>The OSGi <literal>PackageAdmin</literal>
+      <literal>refreshPackages</literal> operation refreshes packages across
+      the whole OSGi framework or a given subset of installed bundles. During
+      the refresh, an application context in an affected bundle will be
+      stopped and restarted. After a <literal>refreshPackages</literal>
+      operation, packages exported by older versions of updated bundles, or
+      packages exported by uninstalled bundles, are no longer available.
+      Consult the OSGi specifications for full details.</para>
+
+      <para>When a Spring-powered bundle is stopped, the application context
+      created for it is automatically destroyed. All services exported by the
+      bundle will be unregistered (removed from the service registry) and the
+      normal application context tear-down life-cycle is observed
+      (<literal>DisposableBean</literal> and <literal>destroy-method</literal>
+      callbacks are invoked on beans in the context).</para>
+
+      <para>If a Spring-powered bundle that has been stopped is subsequently
+      re-started, a new application context will be created for it.</para>
+    </section>
+
+    <section>
+      <title>2.4 The Resource abstraction</title>
+
+      <para>The Spring Framework defines a resource abstraction for loading
+      resources within an application context (see <ulink
+      url="http://www.springframework.org/docs/reference/resources.html">Spring's
+      resource abstraction</ulink>). All resource loading is done through the
+      <literal>ResourceLoader</literal> associated with the application
+      context. The <literal>ResourceLoader</literal> is also available to
+      beans wishing to load resources programmatically. Resource paths with
+      explicit prefixes - for example "classpath:" are treated uniformly
+      across all application context types (for example, web application
+      contexts and classpath-based application contexts). Relative resource
+      paths are interpreted differently based on the kind of application
+      context being created. This enables easy integration testing outside of
+      the ultimate deployment environment.</para>
+
+      <para>The Spring extender bundles creates a special subclass of
+      application context, an <literal>OSGiApplicationContext</literal>. An
+      OSGi application context treats a relative resource path as a reference
+      to a resource defined within the bundle (the bundle and its attached
+      fragments will be searched for matching resources). The context also
+      supports the explicit resource path prefixes
+      <literal>osgibundle</literal> and
+      <literal>osgibundlejar</literal>.</para>
+
+      <para>A resource path of the format "osgibundle:x/y/z" searches for
+      resource "x/y/z" in the bundle and its attached fragments (this is the
+      same as the relative resource behavior).</para>
+
+      <para>A resource path of the format "osgibundlejar:x/y/z" searches for
+      resource "x/y/z" in the bundle only, ignoring any attached
+      fragments.</para>
+
+      <para>A resource path using the "classpath:" prefix searches the bundle
+      classpath for matching resources.</para>
+
+      <para>All of the regular Spring resource prefixes such as "file:" and
+      "http:" are also supported, as are the pattern matching wildcards.
+      Resources loaded using such prefixes may come from any location, they
+      are not restricted to being defined within the resource-loading bundle
+      or its attached fragments.</para>
+
+      <para>OSGi platforms may define their own unique prefixes for accessing
+      bundle contents. For example, Equinox defines the 'bundleresource:' and
+      'bundlentry:' prefixes). These platform specific prefixes may also be
+      used with Spring OSGi, at the cost of course of tying yourself to a
+      particular OSGi implementation.</para>
+    </section>
+
+    <section>
+      <title>2.5 Accessing the BundleContext</title>
+
+      <para>In general there is no need to depend on any OSGi APIs when using
+      the Spring Dynamic Modules support. If you <emphasis>do</emphasis> need
+      access to the OSGi <literal>BundleContext</literal> object for your
+      bundle, then Spring makes this easy to do.</para>
+
+      <para>The OSGi application context created by the Spring extender will
+      automatically contain a bean of type <literal>BundleContext</literal>
+      and with name <literal>bundleContext</literal>. You can inject a
+      reference to this bean into any bean in the application context either
+      by-name or by-type. In addition, Spring Dynamic Modules defines the
+      interface
+      <literal>org.springframework.osgi.context.BundleContextAware</literal>:</para>
+
+      <screen>public interface BundleContextAware {
+  public void setBundleContext(BundleContext context);
+}</screen>
+
+      <para>Any bean implementing this interface will be injected with a
+      reference to the bundle context when it is configured by Spring. If you
+      wish to use this facility within a bundle, remember to import the
+      package <literal>org.springframework.osgi.context</literal> in your
+      bundle manifest.</para>
+
+      <section>
+        <title>2.5.1 ThreadLocal access to BundleContext</title>
+
+        <para>During creation of an application context, access to the
+        <literal>BundleContext</literal> object for the bundle is also
+        available through an inheritable thread-local variable. This variable
+        is accessible via the
+        <literal>org.springframework.osgi.context.support.LocalBundleContext</literal>
+        class.</para>
+
+        <screen>public class LocalBundleContext {
+  public static BundleContext getContext();
+}</screen>
+
+        <para>In addition, when an operation is invoked on an OSGi service
+        reference injected by Spring, Spring makes sure that the invoking
+        bundle's <literal>BundleContext</literal> is accessible on the
+        invoking thread via the <literal>LocalBundleContext</literal>.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>2.6 Stopping the extender bundle</title>
+
+      <para>If the extender bundle is stopped, then all the application
+      contexts created by the extender will be destroyed. Application contexts
+      are shutdown in the following order:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Application contexts that do not export any services, or that
+          export services that are not currently referenced, are shutdown in
+          reverse order of bundle id. (Most recently installed bundles have
+          their application contexts shutdown first).</para>
+        </listitem>
+
+        <listitem>
+          <para>Shutting down the application contexts in step (1) may have
+          released references these contexts were holding such that there are
+          now additional application contexts that can be shutdown. If so,
+          repeat step 1 again.</para>
+        </listitem>
+
+        <listitem>
+          <para>If there are no more active application contexts, we have
+          finished. If there <emphasis>are</emphasis> active application
+          contexts then there must be a cyclic dependency of references. The
+          circle is broken by determining the highest ranking service exported
+          by each context: the bundle with the lowest ranking service in this
+          set (or in the event of a tie, the highest service id), is shut
+          down. Repeat from step (1).</para>
+        </listitem>
+      </orderedlist>
+    </section>
+  </section>
+
+  <section>
+    <title>3.0 Packaging and Deploying Spring-based OSGi applications</title>
+
+    <para>A traditional Spring application uses either a single application
+    context, or a parent context containing service layer, data layer, and
+    domain objects with a child context containing web layer components. The
+    application context may well be formed by aggregating the contents of
+    multiple configuration files.</para>
+
+    <para>When deploying an application to OSGi the more natural structure is
+    to package the application as a set of peer bundles (application contexts)
+    interacting via the OSGi service registry. Independent subsystems should
+    be packaged as independent bundles or sets of bundles (vertical
+    partitioning). A subsystem may be package in a single bundle, or divided
+    into several bundles partitioned by layer (horizontal partitioning). A
+    straightforward web application may for example be divided into four
+    modules (bundles): a web bundle, service layer bundle, data layer bundle,
+    and domain model bundle. Such an application would look like this:</para>
+
+    <para><inlinemediaobject>
+        <imageobject>
+          <objectinfo>
+            <title>Bundles and Application Contexts</title>
+          </objectinfo>
+
+          <imagedata fileref="spring-osgi-model.png" />
+        </imageobject>
+      </inlinemediaobject></para>
+
+    <para>In this example the data layer bundle yields a data layer
+    application context that contains a number of internal components (beans).
+    Two of those beans are made publicly available outside of the application
+    context by publishing them as services in the OSGi service
+    registry.</para>
+
+    <para>The service layer bundle yields a service layer application context
+    that contains a number of internal components (beans). Some of those
+    components depend on data layer services, and import those services from
+    the OSGi service registry. Two of the service layer components are made
+    externally available as services in the OSGi service registry.</para>
+
+    <para>The web component bundle yields a web application context that
+    contains a number of internal components (beans). Some of those components
+    depend on application services, and import those services from the OSGi
+    service registry. Since the domain model bundle contributes only domain
+    model types, but does not need to create any components of its own, it has
+    no associated application context.</para>
+
+    <section>
+      <title>3.1 Bundle format and Manifest headers</title>
+
+      <para>Each application module should be packaged as an OSGi bundle. A
+      bundle is essentially a jar file with a
+      <literal>META-INF/MANIFEST.MF</literal> file containing a series of
+      headers recognized by the OSGi Service Platform. See the OSGi Service
+      Platform Core Specification section 3.2 for details. Some OSGi
+      implementations may support exploded jar files, but the format remains
+      the same.</para>
+
+      <para>The Spring extender recognizes a bundle as "Spring-powered" and
+      will create an associated application context when the bundle is started
+      if one or both of the following conditions is true:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>The bundle classpath contains a folder
+          <literal>META-INF/spring</literal> with one or more files in that
+          folder with a '.xml' extension.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>META-INF/MANIFEST.MF</literal> contains a manifest
+          header <literal>Spring-Context</literal>.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>In addition, if the optional
+      <literal>SpringExtender-Version</literal> header is declared in the
+      bundle manifest, then the extender will only recognize bundles where the
+      specified version constraints are satisfied by the version of the
+      extender bundle (<literal>Bundle-Version</literal>). The value of the
+      <literal>SpringExtender-Version</literal> header must follow the syntax
+      for a version range as specified in section 3.2.5 of the OSGi Service
+      Platform Core Specification.</para>
+
+      <para>In the absence of the <literal>Spring-Context</literal> header the
+      extender expects every ".xml" file in the
+      <literal>META-INF/spring</literal> folder to be a valid Spring
+      configuration file, and all directives (see below) take on their default
+      values.</para>
+
+      <para>An application context is constructed from this set of files. A
+      suggested practice is to split the application context configuration
+      into at least two files, named by convention
+      <emphasis>modulename</emphasis>-context.xml and
+      <emphasis>modulename</emphasis>-osgi-context.xml. The
+      <emphasis>modulename</emphasis>-context.xml file contains regular bean
+      definitions independent of any knowledge of OSGi. The
+      <emphasis>modulename</emphasis>-osgi-context.xml file contains the bean
+      definitions for importing and exporting OSGi services. It may (but is
+      not required to) use the Spring Dynamic Modules OSGi schema as the
+      top-level namespace instead of the Spring 'beans' namespace.</para>
+
+      <para>The <literal>Spring-Context</literal> manifest header may be used
+      to specify an alternate set of configuration files. The resource paths
+      are treated as relative resource paths and resolve to entries defined in
+      the bundle and the set of attached fragments. When the
+      <literal>Spring-Context</literal> header defines at least one
+      configuration file location, any files in
+      <literal>META-INF/spring</literal> are ignored unless directly
+      referenced from the <literal>Spring-Context</literal> header.</para>
+
+      <para>The syntax for the <literal>Spring-Context</literal> header value
+      is:</para>
+
+      <screen>Spring-Context-Value ::= context ( ',' context ) *
+context ::= path ( ';' path ) * (';' directive) *
+</screen>
+
+      <para>This syntax is consistent with the OSGi Service Platform common
+      header syntax defined in section 3.2.3 of the OSGi Service Platform Core
+      Specification.</para>
+
+      <para>For example, the manifest entry:</para>
+
+      <screen>Spring-Context: config/account-data-context.xml, config/account-security-context.xml
+</screen>
+
+      <para>will cause an application context to be instantiated using the
+      configuration found in the files
+      <literal>account-data-context.xml</literal> and
+      <literal>account-security-context.xml</literal> in the bundle jar
+      file.</para>
+
+      <para>A number of directives are available for use with the
+      <literal>Spring-Context</literal> header. These directives are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>create-asynchronously</emphasis> (false|true):
+          controls whether the application context is created asynchronously
+          (the default), or synchronously.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>For example:</para>
+
+      <screen>Spring-Context: *;create-asynchronously=false 
+</screen>
+
+      <para>Creates an application context synchronously, using all of the
+      "*.xml" files contained in the <literal>META-INF/spring</literal>
+      folder.</para>
+
+      <screen>Spring-Context: config/account-data-context.xml;create-asynchrously:=false
+</screen>
+
+      <para>Creates an application context synchronously using the
+      <literal>config/account-data-context.xml</literal> configuration file.
+      Care must be taken when specifying synchronous context creation as the
+      application context will be created on the OSGi event thread, blocking
+      further event delivery until the context is fully initialized. If an
+      error occurs during the synchronous creation of the application context
+      then a FrameworkEvent.ERROR event is raised. The bundle will still
+      proceed to the ACTIVE state.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>wait-for-dependencies</emphasis> (true|false):
+          controls whether or not application context creation should wait for
+          any mandatory service dependencies to be satisfied before proceeding
+          (the default), or proceed immediately without waiting if
+          dependencies are not satisfied upon startup.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>For example:</para>
+
+      <screen>Spring-Context: config/osgi-*.xml;wait-for-dependencies:=false
+</screen>
+
+      <para>Creates an application context using all the files matching
+      "osgi-*.xml" in the config directory. Context creation will begin
+      immediately even if dependencies are not satisfied. This essentially
+      means that mandatory service references are treated as though they were
+      optional - clients will be injected with a service object that may not
+      be backed by an actual service in the registry initially. See section
+      4.2 for more details.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>timeout</emphasis> (300): the time to wait (in
+          seconds) for mandatory dependencies to be satisfied before giving up
+          and failing application context creation. This setting is ignored if
+          <literal>wait-for-dependencies:=false</literal> is specified. The
+          default is 5 minutes (300 seconds).</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>For example:</para>
+
+      <screen>Spring-Context: *;timeout:=60
+</screen>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>publish-context</emphasis> (true|false): controls
+          whether or not the application context object itself should be
+          published in the OSGi service registry. The default is to publish
+          the context.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>For example:</para>
+
+      <screen>Spring-Context: *;publish-context:=false
+</screen>
+
+      <para>If there is no Spring-Context manifest entry, or no value is
+      specified for a given directive in that entry, then the directive takes
+      on its default value.</para>
+    </section>
+
+    <section>
+      <title>3.2 Required Spring Framework and Spring Dynamic Modules
+      Bundles</title>
+
+      <para>The Spring Dynamic Modules project provides an number of bundle
+      artifacts that must be installed in your OSGi platform in order for the
+      Spring extender to function correctly:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>The extender bundle itself,
+          <literal>org.springframework.osgi.extender</literal></para>
+        </listitem>
+
+        <listitem>
+          <para>The core implementation bundle for the Spring Dynamic Modules
+          support, <literal>org.springframework.osgi.core</literal></para>
+        </listitem>
+
+        <listitem>
+          <para>The Spring Dynamic Modules i/o support library bundle, '
+          <literal>org.springframework.osgi.io</literal></para>
+        </listitem>
+      </itemizedlist>
+
+      <para>In addition the Spring Framework provides a number of bundles that
+      are required to be installed. As of release 2.5 of the Spring Framework,
+      the Spring jars included in the Spring distribution are valid OSGi
+      bundles and can be installed directly into an OSGi platform. The minimum
+      required set of bundles is:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>spring-core.jar (bundle symbolic name
+          <literal>org.springframework.bundle.spring.core</literal>)</para>
+        </listitem>
+
+        <listitem>
+          <para>spring-context.jar (bundle symbolic name
+          <literal>org.springframework.bundle.spring.context</literal>)</para>
+        </listitem>
+
+        <listitem>
+          <para>spring-beans.jar (bundle symbolic name
+          <literal>org.springframework.bundle.spring.beans</literal>)</para>
+        </listitem>
+
+        <listitem>
+          <para>spring-aop.jar (bundle symbolic name
+          <literal>org.springframework.bundle.spring.aop</literal>)</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>In additional the following supporting library bundles are
+      required. OSGi-ready versions of these libraries are shipped with the
+      Spring Dynamic Modules distribution.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>aopalliance</para>
+        </listitem>
+
+        <listitem>
+          <para>backport-util (when running on JDK 1.4)</para>
+        </listitem>
+
+        <listitem>
+          <para>cglib-nodep (when proxying classes rather then
+          interfaces)</para>
+        </listitem>
+
+        <listitem>
+          <para>commons-logging (SLF4J version highly recommended)</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>3.3 Importing and Exporting packages</title>
+
+      <para>Refer to the OSGi Service Platform for details of the
+      <literal>Import-Package</literal> and <literal>Export-Package</literal>
+      manifest headers. Your bundle will need an
+      <literal>Import-Package</literal> entry for every external package that
+      the bundle depends on. If your bundle provides types that other bundles
+      need access to, you will need <literal>Export-Package</literal> entries
+      for every package that should be available from outside of the
+      bundle.</para>
+    </section>
+
+    <section>
+      <title>3.4 Considerations when using external libraries</title>
+
+      <para>Many enterprise application libraries assume that all of the types
+      and resources that comprise the application are accessible through the
+      context class loader. In OSGi R4, the set of types and resources
+      available through the context class loader is undefined. Libraries that
+      generate new classes dynamically can also cause problems in an OSGi
+      environment.</para>
+
+      <para>Spring Dynamic Modules guarantees that during the creation of an
+      application context on behalf of a given bundle, all of that types and
+      resources on the bundle's classpath are accessible via the context class
+      loader. Spring Dynamic Modules also allows you to control what is
+      accessible through the context class loader when invoking external
+      services and when servicing requests on exported services. See section 4
+      for details on this.</para>
+
+      <para>Work is underway in the OSGi R5 timeframe to provide standardized
+      support for dealing with generated classes and implicit class path
+      dependencies introduced by third-party libraries. In the interim you may
+      need to rely on workarounds such as the
+      <literal>DynamicImport-Package</literal> manifest header, or the
+      facilities provided by specific OSGi implementations such as Equinox's
+      buddy mechanism. The Spring Dynamic Modules tutorial contains more
+      detail on known issues with common enterprise libraries and the
+      workarounds.</para>
+    </section>
+
+    <section>
+      <title>3.5 Diagnosing problems</title>
+
+      <para>Your chosen OSGi platform implementation should be able to provide
+      you with a good deal of information about the current status of the OSGi
+      environment. For example, starting Equinox with the
+      <literal>-console</literal> argument provides a command-line console
+      through which you can determine which bundles are installed and their
+      states, the packages and services exported by bundles, find out why a
+      bundle has failed to resolve, and drive bundles through the
+      lifecycle.</para>
+
+      <para>In addition, Spring itself and the Spring Dynamic Modules bundles
+      contain extensive logging instrumentation that can help you diagnose
+      problems. The recommended approach is to deploy the Simple Logging
+      Facade for Java (<ulink url="http://www.slf4j.org/">slf4j</ulink>)
+      slf4j-api.jar and slf4j-log4j13.jar bundles (the jar files distributed
+      by the project are valid OSGi bundles). Then you simply need to create a
+      <literal>log4j.properties</literal> file in the root of your bundle
+      classpath.</para>
+    </section>
+  </section>
+
+  <section>
+    <title>4.0 The Service Registry</title>
+
+    <para>The OSGi service registry enables a bundle to publish objects to a
+    shared registry, advertised via a given set of Java interfaces. Published
+    services also have service properties associated with them in the
+    registry.</para>
+
+    <para>Spring Dynamic Modules provides an 'osgi' namespace for Spring (see
+    Appendix B) that can be used to export Spring beans as OSGi services, and
+    to define references to services obtained via the service registry. The
+    namespace elements may be used nested inside another top-level namespace
+    (typically the Spring 'beans' namespace), or within the top-level
+    <literal>osgi</literal> element.</para>
+
+    <para>The following example shows the use of the <literal>osgi</literal>
+    namespace within the familiar Spring beans element:</para>
+
+    <screen>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:osgi="http://www.springframework.org/schema/osgi"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/osgi  
+       http://www.springframework.org/schema/osgi/spring-osgi-2.5.xsd"&gt;
+
+    &lt;!-- use the OSGi namespace elements qualified with 'osgi:' --&gt;
+    &lt;osgi:service id="simpleServiceOsgi" ref="simpleService"
+      interface="org.xyz.MyService" /&gt;
+
+&lt;/beans&gt;</screen>
+
+    <para>Using the OSGi namespace as a top-level namespace the same service
+    would be declared as follows:</para>
+
+    <screen>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans:beans xmlns="http://www.springframework.org/schema/osgi"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:beans="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/osgi  
+       http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"&gt;
+
+  &lt;!-- use the OSGi namespace elements directly --&gt;
+  &lt;service id="simpleServiceOsgi" ref="simpleService"
+       interface="org.xyz.MyService" /&gt;
+
+&lt;/beans:beans&gt;</screen>
+
+    <para>Using the OSGi namespace as a top-level namespace is particularly
+    convenient when following the recommendation of section 3.1 to use a
+    dedicated configuration file for all OSGi-related declarations.</para>
+
+    <section>
+      <title>4.1 Exporting a Spring bean as an OSGi service</title>
+
+      <para>The <literal>service</literal> element is used to define a bean
+      representing an exported OSGi service. At a minimum you must specify the
+      bean to be exported, and the <emphasis>service interface</emphasis> that
+      the service offers.</para>
+
+      <para>For example, the declaration</para>
+
+      <screen>&lt;service ref="beanToPublish" interface="com.xyz.MessageService"/&gt;</screen>
+
+      <para>exports the bean with name <literal>beanToPublish</literal> with
+      interface <literal>com.xyz.MessageService</literal>. The published
+      service will have a service property with the name
+      <literal>org.springframework.osgi.beanname</literal> set to the name of
+      the target bean being registered (<literal>beanToPublish</literal> in
+      this case).</para>
+
+      <para>The bean <emphasis>defined</emphasis> by the
+      <literal>service</literal> element is of type
+      <literal>org.osgi.framework.ServiceRegistration</literal> and is the
+      <literal>ServiceRegistration</literal> object resulting from registering
+      the exported bean with the OSGi service registry. By giving this bean an
+      id you can inject a reference to the
+      <literal>ServiceRegistration</literal> object into other beans if
+      needed. For example:</para>
+
+      <screen>&lt;service id="myServiceRegistration" ref="beanToPublish"
+    interface="com.xyz.MessageService"/&gt;</screen>
+
+      <para>As an alternative to exporting a named bean, the bean to be
+      exported to the service registry may be defined as an anonymous inner
+      bean of the service element. Typically the top-level namespace would be
+      the <literal>beans</literal> namespace when using this style:</para>
+
+      <screen>&lt;osgi:service interface="com.xyz.MessageService"&gt;
+  &lt;bean class="SomeClass"&gt;
+     ...
+  &lt;/bean&gt;
+&lt;/osgi:service&gt;</screen>
+
+      <para>If the bean to be exported implements the
+      <literal>org.osgi.framework.ServiceFactory</literal> interface then the
+      <literal>ServiceFactory</literal> contract is honored as per section 5.6
+      of the OSGi Service Platform Core Specification. As an alternative to
+      implementing this OSGi API, Spring Dynamic Modules introduces a new bean
+      scope, the <literal>bundle</literal> scope. When a bean with bundle
+      scope is exported as an OSGi service then one instance of the bean will
+      be created for each unique client (service importing) bundle that
+      obtains a reference to it through the OSGi service registry. When a
+      service importing bundle is stopped, the bean instance associated with
+      it is disposed. To declare a bean with <literal>bundle</literal> scope
+      simply use the <literal>scope</literal> attribute of the
+      <literal>bean</literal> element:</para>
+
+      <screen>&lt;osgi:service ref="beanToBeExported" interface="com.xyz.MessageService"/&gt;
+
+&lt;bean id="beanToBeExported" scope="bundle" class="com.xyz.MessageServiceImpl"/&gt;</screen>
+
+      <section>
+        <title>4.1.1 Controlling the set of advertised service interfaces for
+        an exported service</title>
+
+        <para>The OSGi Service Platform Core Specification defines the term
+        <emphasis>service interface</emphasis> to represent the specification
+        of a service's public methods. Typically this will be a Java
+        interface, but the specification also supports registering service
+        objects under a class name, so the phrase <emphasis>service
+        interface</emphasis> can be interpreted as referring to either an
+        interface or a class.</para>
+
+        <para>There are several options for specifying the service
+        interface(s) under which the exported service is registered. The
+        simplest mechanism, shown above, is to use the
+        <literal>interface</literal> attribute to specify a fully-qualified
+        interface name. To register a service under multiple interfaces the
+        nested <literal>interfaces</literal> element can be used in place of
+        the <literal>interface</literal> attribute.</para>
+
+        <screen>&lt;osgi:service ref="beanToBeExported"&gt;
+  &lt;osgi:interfaces&gt;
+     &lt;value&gt;com.xyz.MessageService&lt;/value&gt;
+     &lt;value&gt;com.xyz.MarkerInterface&lt;/value&gt;
+  &lt;/osgi:interfaces&gt;
+&lt;/osgi:service&gt;</screen>
+
+        <para>Using the <literal>auto-export</literal> attribute you can avoid
+        the need to explicitly declare the service interfaces at all. The
+        <literal>auto-export</literal> attribute can have one of four
+        values:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>disabled : the default value; no auto-detected of service
+            interfaces is undertaken and the <literal>interface</literal>
+            attribute or <literal>interfaces</literal> element must be used
+            instead.</para>
+          </listitem>
+
+          <listitem>
+            <para>interfaces : the service will be registered using all of the
+            Java interface types implemented by the bean to be exported</para>
+          </listitem>
+
+          <listitem>
+            <para>class-hierarchy : the service will be registered using the
+            exported bean's implementation type and super-types</para>
+          </listitem>
+
+          <listitem>
+            <para>all : the service will be registered using the exported
+            bean's implementation type and super-types plus all interfaces
+            implemented by the bean.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>For example, to automatically register a bean under all of the
+        interfaces that it supports you would declare:</para>
+
+        <screen>&lt;service ref="beanToBeExported" auto-export="interfaces"/&gt;</screen>
+
+        <para>Given the interface hierarchy:</para>
+
+        <screen>public interface SuperInterface {}
+
+public interface SubInterface extends SuperInterface {}</screen>
+
+        <para>then a service registered as supporting the
+        <literal>SubInterface</literal> interface is <emphasis>not</emphasis>
+        considered a match in OSGi when a lookup is done for services
+        supporting the <literal>SuperInterface</literal> interface. For this
+        reason it is a best practice to export all interfaces supported by the
+        service being registered explicitly, using either the
+        <literal>interfaces</literal> element or
+        <literal>auto-export="interfaces"</literal>.</para>
+
+        <para>Note that when using auto-export, only types visible to the
+        bundle exporting the service are registered. For example, a
+        super-interface <literal>SI</literal> would not be exported as a
+        supported service interface even when using
+        <literal>auto-export="interfaces"</literal> if <literal>SI</literal>
+        was not on the exporting bundle's classpath.</para>
+      </section>
+
+      <section>
+        <title>4.1.2 Controlling the set of advertised properties for an
+        exported service</title>
+
+        <para>As previously described, an exported service is always
+        registered with the service property
+        <literal>org.springframework.osgi.beanname</literal> set to the name
+        of the bean being exported. Additional service properties can be
+        specified using the nested <literal>service-properties</literal>
+        element. The <literal>service-properties</literal> element contains
+        key-value pairs to be included in the advertised properties of the
+        service. The key must be a string value, and the value must be a type
+        recognized by OSGi Filters. See section 5.5 of the OSGi Service
+        Platform Core Specification for details of how property values are
+        matched against filter expressions.</para>
+
+        <para>The <literal>service-properties</literal> element must contain
+        at least one nested <literal>entry</literal> element from the Spring
+        beans namespace. For example:</para>
+
+        <screen>&lt;service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"&gt;
+  &lt;service-properties&gt;
+    &lt;beans:entry key="myOtherKey" value="aStringValue"/&gt;
+    &lt;beans:entry key="aThirdKey" value-ref="beanToExposeAsProperty"/&gt;
+  &lt;service-properties&gt;
+&lt;/service&gt;</screen>
+
+        <para>The Spring Dynamic Modules roadmap includes support for
+        exporting properties registered in the OSGi Configuration
+        Administration service as properties of the registered service. See
+        Appendix A for more details.</para>
+      </section>
+
+      <section>
+        <title>4.1.3 The depends-on attribute</title>
+
+        <para>Spring will manage explicit dependencies of a service element,
+        ensuring for example that the bean to be exported as a service is
+        fully constructed and configured before exporting it. If a service has
+        implicit dependencies on other components (including other service
+        elements) that must be fully initialized before the service can be
+        exported, then the optional <literal>depends-on</literal> attribute
+        can be used to express these dependencies.</para>
+
+        <screen>&lt;service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"
+     depends-on="myOtherComponent"/&gt;</screen>
+      </section>
+
+      <section>
+        <title>4.1.4 The ranking attribute</title>
+
+        <para>When registering a service with the service registry, you may
+        optionally specify a service ranking (see section 5.2.5 of the OSGi
+        Service Platform Core Specification). When a bundle looks up a service
+        in the service registry, given two or more matching services the one
+        with the highest ranking will be returned. The default ranking value
+        is zero. To explicitly specify a ranking value for the registered
+        service, use the optional <literal>ranking</literal> attribute.</para>
+
+        <screen>&lt;service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"
+  ranking="9"/&gt;</screen>
+      </section>
+
+      <section>
+        <title>4.1.5 The context-classloader attribute</title>
+
+        <para>The OSGi Service Platform Core Specification (most current
+        version is 4.1 at time of writing) does not specify what types and
+        resources are visible through the context class loader when an
+        operation is invoked on a service obtained via the service registry.
+        Since some services may use libraries that make certain assumptions
+        about the context class loader, Spring Dynamic Modules enables you to
+        explicitly control the context class loader during service execution.
+        This is achieved using the option
+        <literal>context-classloader</literal> attribute of the service
+        element.</para>
+
+        <para>The permissible values for the
+        <literal>context-classloader</literal> attribute are
+        <literal>unmanaged</literal> (the default) and
+        <literal>service-provider</literal>. When the
+        <literal>service-provider</literal> value is specified, Spring Dynamic
+        Modules ensures that the context class loader can see all of the
+        resources on the class path of the bundle defining the service.</para>
+      </section>
+
+      <section>
+        <title>4.1.6 Service registration and unregistration lifecycle</title>
+
+        <para>The service defined by a <literal>service</literal> element is
+        registered with the OSGi service registry when the application context
+        is first created. It will be unregistered automatically when the
+        bundle is stopped and the application context is disposed.</para>
+
+        <para>An exported service may depend, either directly or indirectly,
+        on other services in order to perform its function. If one of these
+        services is considered a <emphasis>mandatory</emphasis> dependency
+        (see section 4.2) and the dependency can no longer be satisfied
+        (because the backing service has gone away and there is no suitable
+        replacement available) then the exported service that depends on it
+        will be automatically unregistered from the service registry - meaning
+        that it is no longer available to clients. If the mandatory dependency
+        becomes satisfied once more (by registration of a suitable service),
+        then the exported service will be re-registered in the service
+        registry.</para>
+
+        <para>This automatic unregistering and re-registering of exported
+        services based on the availability of mandatory dependencies only
+        takes into account declarative dependencies. If exported service
+        <literal>S</literal> depends on bean <literal>A</literal>, which in
+        turn depends on mandatory imported service <literal>M</literal>, and
+        these dependencies are explicit in the Spring configuration file as
+        per the example below, then when <literal>M</literal> becomes
+        unsatisfied <literal>S</literal> will be unregistered. When
+        <literal>M</literal> becomes satisfied again, <literal>S</literal>
+        will be re-registered.</para>
+
+        <screen>&lt;osgi:service id="S" ref="A" interface="SomeInterface"/&gt;
+
+&lt;bean id="A" class="SomeImplementation"&gt;
+   &lt;property name="helperService" ref="M"/&gt;
+&lt;/bean&gt; 
+
+&lt;!-- the reference element is used to refer to a service
+     in the service registry --&gt;
+&lt;osgi:reference id="M" interface="HelperService"
+     cardinality="1..1"/&gt;</screen>
+
+        <para>If however the dependency from <literal>A</literal> on
+        <literal>M</literal> is not established through configuration as shown
+        above, but instead at runtime through for example passing a reference
+        to <literal>M</literal> to <literal>A</literal> without any
+        involvement from the Spring container, then Spring Dynamic Modules
+        will <emphasis>not</emphasis> track this dependency.</para>
+
+        <para>If you need to take some action when a service is unregistered
+        because its dependencies are not satisfied (or when it is registered),
+        then you can define a listener bean using the nested
+        <literal>registration-listener</literal> element.</para>
+
+        <para>The declaration of a registration listener must use either the
+        <literal>ref</literal> attribute to refer to a top-level bean
+        definition, or declare an anonymous listener bean inline. For
+        example:</para>
+
+        <screen>&lt;!-- example service declaration with two listeners --&gt;
+
+&lt;service ref="beanToBeExported" interface="SomeInterface"&gt;
+  &lt;registration-listener ref="myListener"
+    registration-method="serviceRegistered"
+    unregistration-method="serviceUnregistered"/&gt;
+  &lt;registration-listener
+     registration-method="register"
+     unregistration-method="unregister"&gt;
+     &lt;bean class="SomeListenerClass"/&gt;
+  &lt;/registration-listener&gt;
+&lt;/service&gt;</screen>
+
+        <para>The optional <literal>registration-method</literal> and
+        <literal>unregistration-method</literal> attributes specify the names
+        of the methods defined on the listener bean that are to be invoked
+        during registration and unregistration. A registration callback method
+        must have a signature matching the following format</para>
+
+        <screen>public void anyMethodName(ServiceType serviceInstance);</screen>
+
+        <para>where <literal>ServiceType</literal> can be any type compatible
+        with the exported service interface of the service.</para>
+
+        <para>An unregistration callback method must have a signature of the
+        form</para>
+
+        <screen>public void anyMethodName(ServiceType serviceInstance);</screen>
+
+        <para>where <literal>ServiceType</literal> can be any type compatible
+        with the exported service interface of the service.</para>
+
+        <para>The register callback is invoked when the service is initially
+        registered at startup, and whenever it is subsequently re-registered.
+        The unregister callback is invoked immediately after the service is
+        unregistered, including when the service is unregistered because the
+        bundle is stopping.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>4.2 Defining references to OSGi services</title>
+
+      <para>Spring Dynamic Modules supports the declaration of beans that
+      represent services accessed via the OSGi Service Registry. In this
+      manner references to OSGi services can be injected into application
+      components. The service lookup is made using the service interface type
+      that the service is required to support, plus an optional filter
+      expression that matches against the service properties published in the
+      registry.</para>
+
+      <para>For some scenarios, a single matching service that meets the
+      application requirements is all that is needed. The
+      <literal>reference</literal> element defines a reference to a single
+      service that meets the required specification. In other scenarios,
+      especially when using the OSGi <ulink
+      url="www.osgi.org/documents/osgi_technology/whiteboard.pdf">whiteboard
+      pattern</ulink>, references to <emphasis>all available</emphasis>
+      matching services are required. Spring Dynamic Modules supports the
+      management of this set of references as a <literal>List</literal>,
+      <literal>Set</literal>.</para>
+
+      <section>
+        <title>4.2.1 Referencing an individual service</title>
+
+        <para>The <literal>reference</literal> element is used to define a
+        reference to a service in the service registry. The
+        <literal>interface</literal> attribute identifies the service
+        interface that a matching service must implement. For example, the
+        following declaration creates a bean
+        <literal>messageService</literal>, which is backed by the service
+        returned from the service registry when querying it for a service
+        offering the <literal>MessageService</literal> interface.</para>
+
+        <screen>&lt;reference id="messageService" interface="com.xyz.MessageService"/&gt;</screen>
+
+        <para>If there are several services in the service registry then the
+        service returned is the service that would be returned by a call to
+        <literal>BundleContext.getServiceReference</literal>. This means that
+        the service with the highest ranking will be returned, or if there is
+        a tie in ranking, the service with the lowest service id (the service
+        registered first with the framework) is returned.</para>
+
+        <para>The bean defined by the reference element implements all of the
+        registered interfaces of the service that are visible to the bundle.
+        If the registered service interfaces include Java class types (as
+        opposed to interface types) then support for these types is subject to
+        the restrictions of Spring's AOP implementation (see the Spring
+        Reference Guide). In short, <literal>cglib</literal> must be
+        available, and <literal>final</literal> methods are not
+        supported.</para>
+
+        <para>If the property into which a reference bean is to be injected
+        has type <literal>ServiceReference</literal> (instead of the service
+        interface supported by the reference), then the OSGi
+        <literal>ServiceReference</literal> for the service will be injected
+        in place of the service itself.</para>
+
+        <section>
+          <title>4.2.1.1 The filter attribute</title>
+
+          <para>The optional <literal>filter</literal> attribute can be used
+          to specify an OSGi filter expression and constrains the service
+          registry lookup to only those services that match the given
+          filter.</para>
+
+          <para>For example:</para>
+
+          <screen>&lt;reference id="asyncMessageService" interface="com.xyz.MessageService"
+  filter="(asynchronous-delivery=true)"/&gt;</screen>
+        </section>
+
+        <section>
+          <title>4.2.1.2 The bean-name attribute</title>
+
+          <para>The <literal>bean-name</literal> attribute is a convenient
+          short-cut for specifying a filter expression that matches on the
+          bean-name property automatically set when exporting a bean using the
+          <literal>service</literal> element (see section 4.1).</para>
+
+          <para>For example:</para>
+
+          <screen>&lt;reference id="messageService" interface="com.xyz.MessageService"
+   bean-name="defaultMessageService"/&gt;</screen>
+        </section>
+
+        <section>
+          <title>4.2.1.3 The cardinality attribute</title>
+
+          <para>The <literal>cardinality</literal> attribute is used to
+          specify whether or not a matching service is required at all times.
+          A cardinality value of <literal>1..1</literal> (the default)
+          indicates that a matching service must always be available. A
+          cardinality value of <literal>0..1</literal> indicates that a
+          matching service is not required at all times (see section 4.2.1.6
+          for more details). A <literal>reference</literal> with cardinality
+          <literal>1..1</literal> is also known as a
+          <emphasis>mandatory</emphasis> service reference and by default
+          application context creation is deferred until the reference is
+          satisfied.</para>
+
+          <para>Note: it is an error to declare a mandatory reference to a
+          service that is also exported by the same bundle, this behavior can
+          cause application context creation to fail through either deadlock
+          or timeout.</para>
+        </section>
+
+        <section>
+          <title>4.2.1.4 The depends-on attribute</title>
+
+          <para>The <literal>depends-on</literal> attribute is used to specify
+          that the service reference should not be looked up in the service
+          registry until the named dependent bean has been
+          instantiated.</para>
+        </section>
+
+        <section>
+          <title>4.2.1.5 The context-classloader attribute</title>
+
+          <para>The OSGi Service Platform Core Specification (most current
+          version is 4.1 at time of writing) does not specify what types and
+          resources are visible through the context class loader when an
+          operation is invoked on a service obtained via the service registry.
+          Since some services may use libraries that make certain assumptions
+          about the context class loader, Spring Dynamic Modules enables you
+          to explicitly control the context class loader during service
+          invocation. This is achieved using the option
+          <literal>context-classloader</literal> attribute of the
+          <literal>reference</literal> element.</para>
+
+          <para>The permissible values for the
+          <literal>context-classloader</literal> attribute are
+          <literal>unmanaged</literal> (the default),
+          <literal>client</literal>, and <literal>service-provider</literal>.
+          When the <literal>client</literal> value is specified, the context
+          class loader at the point of service invocation is guaranteed to be
+          able to see types on the classpath of the invoking bundle. When the
+          <literal>service-provider</literal> value is specified, the context
+          class loader is guaranteed to be able to see types on the classpath
+          of the bundle that exported the service.</para>
+        </section>
+
+        <section>
+          <title>4.2.1.6 Dealing with Service dynamics</title>
+
+          <para>The bean defined by the <literal>reference</literal> element
+          is unchanging throughout the lifetime of the application context
+          (the object reference remains constant). However, the OSGi service
+          that backs the reference may come and go at any time. For a
+          mandatory service reference (cardinality <literal>1..1</literal>),
+          creation of the application context will block until a matching
+          service is available. For an optional service reference, the
+          reference bean will be created immediately, regardless of whether or
+          not there is currently a matching service.</para>
+
+          <para>When the service backing a <literal>reference</literal> bean
+          goes away, Spring Dynamic Modules tries to replace the backing
+          service with another service matching the reference criteria. An
+          application may be notified of a change in backing service by
+          registering a <literal>listener</literal>. If no matching service is
+          available, then the <literal>reference</literal> is said to be
+          <emphasis>unsatisfied</emphasis>. An unsatisfied mandatory service
+          causes any exported service (<literal>service</literal> bean) that
+          depends on it to be unregistered from the service registry until
+          such time as the reference is satisfied again.</para>
+
+          <para>When an operation is invoked on an unsatisfied
+          <literal>reference</literal> bean (either optional or mandatory),
+          the invocation blocks until the reference becomes satisfied. The
+          optional <literal>timeout</literal> attribute of the
+          <literal>reference</literal> element enables a timeout value (in
+          milliseconds) to be specified. If a timeout value is specified and
+          no matching service becomes available within the timeout period, an
+          unchecked <literal>ServiceUnavailableException</literal> is
+          thrown.</para>
+
+          <para>When using the <literal>osgi</literal> element to enclose
+          <literal>service</literal> and <literal>reference</literal>
+          elements, the <literal>default-timeout</literal> attribute may be
+          used to specify a default timeout (in milliseconds) for all
+          reference elements that do not explicitly specify one. For
+          example:</para>
+
+          <screen>&lt;beans:beans osgi:default-timeout="5000"&gt;
+
+  &lt;!-- we will wait up to 5 seconds for a matching service on
+       invocation --&gt;
+  &lt;reference id="someService" interface="com.xyz.AService"/&gt;
+
+  &lt;!-- we will wait only 1 second for a matching service on 
+       invocation --&gt;
+  &lt;reference id="someOtherService" interface="com.xyz.BService"
+       timeout="1000"/&gt;
+
+&lt;/beans:beans&gt;</screen>
+
+          <para>For applications that need to be aware of when the service
+          backing a <literal>reference</literal> bean is bound and unbound, it
+          is possible to register one or more listeners using the nested
+          <literal>listener</literal> element. The <literal>listener</literal>
+          element refers to a bean (either by name, or by defining one inline)
+          that will receive bind and unbind notifications. If this bean
+          implements Spring's
+          <literal>org.springframework.osgi.service.TargetSourceLifecycleListener</literal>
+          interface, then the <literal>bind</literal> and
+          <literal>unbind</literal> operations in this interface will be
+          invoked. Instead of implementing this interface (or in addition),
+          custom bind and unbind callback methods may be named.</para>
+
+          <para>An example of declaring a listener that implements
+          <literal>TargetSourceLifecycleListener</literal>:</para>
+
+          <screen>&lt;reference id="someService" interface="com.xyz.MessageService"&gt;
+  &lt;listener ref="aListenerBean"/&gt;
+&lt;/reference&gt;</screen>
+
+          <para>An example of declaring an inline listener bean with custom
+          bind and unbind methods:</para>
+
+          <screen>&lt;reference id="someService" interface="com.xyz.MessageService"&gt;
+  &lt;listener bind-method="onBind" unbind-method="onUnbind"&gt;
+     &lt;beans:bean class="MyCustomListener"/&gt;
+  &lt;/listener&gt;
+&lt;/reference&gt;</screen>
+
+          <para>If the listener bean implements the
+          <literal>TargetSourceLifecyleListener</literal> interface
+          <emphasis>and</emphasis> the listener definition specifies custom
+          bind and unbind operations then both the
+          <literal>TargetSourceLifecycleListener</literal> operation and the
+          custom operation will be invoked, in that order.</para>
+
+          <para>The signature of a custom bind or unbind method must be one
+          of:</para>
+
+          <screen>public void anyMethodName(ServiceType service, Dictionary properties);
+
+public void anyMethodName(ServiceType service, Map properties);
+
+public void anyMethodName(ServiceReference ref);</screen>
+
+          <para>If the method signature has a single argument of type
+          <literal>ServiceReference</literal> then the
+          <literal>ServiceReference</literal> of the service will be passed to
+          the callback in place of the service object itself.</para>
+
+          <para>where <literal>ServiceType</literal> can be any type that is
+          assignable from the <literal>reference</literal> interface type. The
+          properties parameter contains the set of properties that the service
+          was registered with.</para>
+
+          <para>A bind callback is invoked when the reference is initially
+          bound to a backing service, and whenever the backing service is
+          replaced by a new backing service.</para>
+
+          <para>An unbind callback is only invoked when the current backing
+          service is unregistered, and no replacement service is immediately
+          available (i.e., the <literal>reference</literal> becomes
+          unsatisfied).</para>
+
+          <para>Bind and unbind callbacks are made synchronously as part of
+          processing an OSGi <literal>serviceChanged</literal> event for the
+          backing OSGi service, and are invoked on the OSGi thread that
+          delivers the corresponding OSGi
+          <literal>ServiceEvent</literal>.</para>
+        </section>
+      </section>
+
+      <section>
+        <title>4.2.2 Referencing collections of services</title>
+
+        <para>Sometimes an application needs access not simply to any service
+        meeting some criteria, but to <emphasis>all</emphasis> services
+        meeting some criteria. The matching services may be held in a
+        <literal>List</literal> or <literal>Set</literal> (optionally
+        sorted).</para>
+
+        <para>The difference between using a <literal>List</literal> and a
+        <literal>Set</literal> to manage the collection is one of equality.
+        Two or more services published in the registry (and with distinct
+        service ids) may be "equal" to each other, depending on the
+        implementation of equals used by the service implementations. Only one
+        such service will be present in a set, whereas all services returned
+        from the registry will be present in a list.</para>
+
+        <para>The <literal>set</literal> and <literal>list</literal> elements
+        are used to define collections of services with set or list semantics
+        respectively.</para>
+
+        <para>These elements support the attributes
+        <literal>interface</literal>, <literal>filter</literal>,
+        <literal>bean-name</literal>, <literal>cardinality</literal>, and
+        <literal>context-classloader</literal>, with the same semantics as for
+        the <literal>reference</literal> element. The allowable values for the
+        <literal>cardinality</literal> attribute are <literal>0..n</literal>
+        and <literal>1..n</literal>. A cardinality value of
+        <literal>0..n</literal> indicates that it is permissible for their to
+        be no matching services. A cardinality value of
+        <literal>1..n</literal> indicates that at least one matching service
+        is required at all times. Such a reference is considered a
+        <emphasis>mandatory</emphasis> reference and any exported services
+        from the same bundle (<literal>service</literal> defined beans) that
+        depend on a mandatory reference will automatically be unregistered
+        when the reference becomes unsatisfied, and reregistered when the
+        reference becomes satisfied again.</para>
+
+        <para>The bean defined by a <literal>list</literal> element is of type
+        <literal>java.util.List</literal>. The bean defined by a
+        <literal>set</literal> element is of type
+        <literal>java.util.Set</literal>.</para>
+
+        <para>The following example defines a bean of type List that will
+        contain all registered services supporting the
+        <literal>EventListener</literal> interface:</para>
+
+        <screen>&lt;list id="myEventListeners" 
+  interface="com.xyz.EventListener"/&gt;</screen>
+
+        <para>The members of the collection defined by the bean are managed
+        dynamically by Spring. As matching services are registered and
+        unregistered in the service registry, the collection membership will
+        be kept up to date. Each member of the collection supports the service
+        interfaces that the corresponding service was registered with and that
+        are visible to the bundle.</para>
+
+        <para>It is possible to specify a sorting order using either the
+        <literal>comparator-ref</literal> attribute, or the nested
+        <literal>comparator</literal> element. The
+        <literal>comparator-ref</literal> attribute is used to refer to a
+        named bean implementing <literal>java.util.Comparator</literal>. The
+        <literal>comparator</literal> element can be used to define an inline
+        bean. For example:</para>
+
+        <screen>&lt;set id="myServices" interface="com.xyz.MyService"
+  comparator-ref="someComparator"/&gt;
+
+&lt;list id="myOtherServices" 
+  interface="com.xyz.OtherService"&gt;
+  &lt;comparator&gt;
+     &lt;beans:bean class="MyOtherServiceComparator"/&gt;
+  &lt;/comparator&gt;
+&lt;/list&gt;</screen>
+
+        <para>To sort using a natural ordering instead of an explicit
+        comparator, you can use the <literal>natural-ordering</literal>
+        element inside of <literal>comparator</literal>. You need to specify
+        the basis for the natural ordering: based on the service references,
+        following the <literal>ServiceReference</literal> natural ordering
+        defined in the OSGi Core Specification section 6.1.2.3; or based on
+        the services themselves (in which case the services must be
+        <literal>Comparable</literal>).</para>
+
+        <screen>&lt;list id="myServices" interface"com.xyz.MyService"&gt;
+  &lt;comparator&gt;&lt;natural-ordering basis="services"/&gt;&lt;/comparator&gt;
+&lt;/list&gt;
+
+&lt;set id="myOtherServices"interface="com.xyz.OtherService"&gt;
+  &lt;comparator&gt;&lt;natural-ordering basis="service-references"/&gt;&lt;/comparator&gt;
+&lt;/set&gt;</screen>
+
+        <para></para>
+
+        <para>When iterating over the collection, the semantics of
+        <literal>Iterator</literal> are guaranteed to be observed (if
+        <literal>hasNext()</literal> returns true, then
+        <literal>next()</literal> will return a service, if
+        <literal>hasNext()</literal> returns false then
+        <literal>next()</literal> will throw an exception.). In addition any
+        elements added to the collection during iteration over a sorted
+        collection will only be visible if the iterator has not already passed
+        their sort point.</para>
+
+        <section>
+          <title>4.2.2.1 Dealing with Service dynamics</title>
+
+          <para>Collection membership is automatically managed as matching
+          services are registered or unregistered. The nested
+          <literal>listener</literal> element is supported with all of the
+          reference collection beans. The bind callback is invoked whenever a
+          service is added to the collection, and the unbind callback is
+          invoked whenever a service is removed from the collection.</para>
+
+          <para>When iterating over the members of a collection, it is always
+          possible that the service backing a collection member is
+          unregistered after it has been returned from an invocation of
+          <literal>Iterator.next()</literal>. If an operation is invoked on
+          such a service, a <literal>ServiceUnavailableException</literal>
+          will be thrown.</para>
+        </section>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>5.0 Working with Bundles</title>
+
+    <para>The <literal>bundle</literal> element defines a bean of type
+    <literal>org.osgi.framework.Bundle</literal>. It provides a simple way to
+    work directly with bundles, including driving their lifecycle. In the
+    simplest case all you need to do is specify the
+    <literal>symbolic-name</literal> of the bundle you are interested
+    in:</para>
+
+    <screen>&lt;bundle id="aBundle" symbolic-name="org.xyz.abundle"/&gt;</screen>
+
+    <para>The bean <literal>aBundle</literal> can now be dependency injected
+    into any property of type <literal>Bundle</literal>.</para>
+
+    <para>The optional <literal>location</literal> and
+    <literal>action</literal> attributes provide declarative control over the
+    bundle's lifecycle. The <literal>location</literal> attribute is used to
+    specify a URL where the bundle jar file artifact can be found. The
+    <literal>action</literal> attribute specifies the lifecycle operation to
+    be invoked on the bundle object. The supported action values are
+    <literal>install</literal>, <literal>start</literal>,
+    <literal>update</literal>, <literal>stop</literal>, and
+    <literal>uninstall</literal>. These actions have the same semantics as the
+    operations of the corresponding names defined on the
+    <literal>Bundle</literal> interface (see the OSGi Service Platform Core
+    Specification), with the exception that pre-conditions are weakened to
+    allow for example a 'start' action to be specified against a bundle that
+    is not currently installed (it will be installed first).</para>
+
+    <para>The following table shows how actions are interpreted for the given
+    Bundle states:</para>
+
+    <table border="1" cellspacing="5">
+      <tr>
+        <th>action</th>
+
+        <th>UNINSTALLED</th>
+
+        <th>INSTALLED/RESOLVED</th>
+
+        <th>ACTIVE</th>
+      </tr>
+
+      <tr>
+        <th>install</th>
+
+        <td>installs the bundle</td>
+
+        <td>no action taken, bundle already installed</td>
+
+        <td>no action taken, bundle already installed</td>
+      </tr>
+
+      <tr>
+        <th>start</th>
+
+        <td>installs and starts the bundle</td>
+
+        <td>starts the bundle</td>
+
+        <td>no action taken, bundle already started</td>
+      </tr>
+
+      <tr>
+        <th>update</th>
+
+        <td>installs the bundle and then updates it (`Bundle.update()`)</td>
+
+        <td>updates the bundle</td>
+
+        <td>updates the bundle</td>
+      </tr>
+
+      <tr>
+        <th>stop</th>
+
+        <td>no action taken</td>
+
+        <td>no action taken</td>
+
+        <td>bundle is stopped</td>
+      </tr>
+
+      <tr>
+        <th>uninstall</th>
+
+        <td>no action taken</td>
+
+        <td>bundle is uninstalled</td>
+
+        <td>bundle is stopped and then uninstalled</td>
+      </tr>
+    </table>
+
+    <para>For example:</para>
+
+    <screen>&lt;!-- ensure this bundle is installed and started --&gt;
+&lt;bundle id="aBundle" symbolic-name="org.xyz.abundle"
+   location="http://www.xyz.com/bundles/org.xyz.abundle.jar"
+   action="start"/&gt;</screen>
+
+    <para>The 'start-level' attribute can be used to set the start level of
+    the bundle.</para>
+
+    <para>Finally, the <literal>bundle</literal> element also supports a
+    <literal>depends-on</literal> attribute which can be used to ensure that
+    the bundle bean is not created before a named bean on which it depends is
+    fully instantiated.</para>
+
+    <para>The samples that ship with the Spring Dynamic Modules project
+    further include support for a <literal>virtual-bundle</literal> element
+    that can be used to create and install OSGi bundles on the fly from
+    existing artifacts.</para>
+  </section>
+
+  <section>
+    <title>6.0 Compendium Services</title>
+
+    <para>The OSGi Service Platform Service Compendium specification defines a
+    number of additional services that may be supported by OSGi
+    implementations. Spring Dynamic Modules supports an additional
+    "compendium" namespace that provides support for some of these services.
+    By convention, the prefix <literal>osgix</literal> is used for this
+    namespace.</para>
+
+    <screen>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans:beans xmlns="http://www.springframework.org/schema/osgi"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+   xmlns:beans="http://www.springframework.org/schema/beans"
+   xsi:schemaLocation="http://www.springframework.org/schema/osgi  
+        http://www.springframework.org/schema/osgi/spring-osgi.xsd
+        http://www.springframework.org/schema/osgi-compendium
+        http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+        http://www.springframework.org/schema/beans   
+        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"&gt;
+
+   &lt;!-- use the OSGi namespace elements directly --&gt;
+   &lt;service id="simpleServiceOsgi" ref="simpleService"
+       interface="org.xyz.MyService" /&gt;
+
+   &lt;!-- qualify compendium namespace elements --&gt;
+   &lt;osgix:property-placeholder persistent-id="com.xyz.myapp"/&gt;
+
+&lt;/beans:beans&gt;</screen>
+
+    <para>At present this namespace provides support for the Configuration
+    Admin service. Support for other compendium services may be added in
+    future releases.</para>
+
+    <section>
+      <title>6.1 Configuration Admin</title>
+
+      <section>
+        <title>6.1.1 Property placeholder support</title>
+
+        <para>Spring Dynamic Modules provides support for sourcing bean
+        property values from the OSGi Configuration Administration service.
+        This support is enabled via the
+        <literal>property-placeholder</literal> element. The property
+        placeholder element provides for replacement of delimited string
+        values (placeholders) in bean property expressions with values sourced
+        from the configuration administration service. The required
+        <literal>persistent-id</literal> attribute specifies the persistent
+        identifier to be used as the key for the configuration dictionary. The
+        default delimiter for placeholder strings is "${...}".</para>
+
+        <para>Given the declarations:</para>
+
+        <screen>&lt;osgix:property-placeholder persistent-id="com.xyz.myapp"/&gt;
+
+&lt;bean id="someBean" class="AClass"&gt;
+  &lt;property name="timeout" value="${timeout}"/&gt;
+&lt;/bean&gt;</screen>
+
+        <para>Then the <literal>timeout</literal> property of
+        <literal>someBean</literal> will be set using the value of the
+        <literal>timeout</literal> entry in the configuration dictionary
+        registered under the <literal>com.xyz.myapp</literal> persistent
+        id.</para>
+
+        <para>The placeholder strings are evaluated at the time that the bean
+        is instantiated. Changes to the properties made via Configuration
+        Admin subsequent to the creation of the bean do
+        <emphasis>not</emphasis> result in re-injection of property values.
+        See the <literal>managed-service</literal> and
+        <literal>managed-service-reference</literal> elements documented in
+        appendix B if you require this level of integration. The
+        <literal>placeholder-prefix</literal> and
+        <literal>placeholder-suffix</literal> attributes can be used to change
+        the delimiter strings used for placeholder values.</para>
+
+        <para>It is possible to specify a default set of property values to be
+        used in the event that the configuration dictionary does not contain
+        an entry for a given key. The <literal>defaults-ref</literal>
+        attribute can be used to refer to a named bean of
+        <literal>Properties</literal> or <literal>Map</literal> type. Instead
+        of referring to an external bean, the
+        <literal>default-properties</literal> nested element may be used to
+        define an inline set of properties.</para>
+
+        <screen>&lt;osgix:property-placeholder persistent-id="com.xyz.myapp"&gt;
+  &lt;default-properties&gt; 
+     &lt;property name="productCategory" value="E792"/&gt;
+     &lt;property name="businessUnit" value="811"/&gt; 
+  &lt;/default-properties&gt;
+&lt;/osgix:property-placeholder&gt;</screen>
+
+        <para>The <literal>persistent-id</literal> attribute must refer to the
+        persistent-id of an OSGi <literal>ManagedService</literal>, it is a
+        configuration error to specify a factory persistent id referring to a
+        <literal>ManagedServiceFactory</literal>.</para>
+      </section>
+
+      <section>
+        <title>6.1.2 Configuration Dictionaries</title>
+
+        <para>Support for directly accessing configuration objects and their
+        associated dictionaries, and for instantiating beans directly from
+        configuration objects is on the Spring Dynamic Modules roadmap. See
+        Appendix A for more information.</para>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>7.0 Testing OSGi based Applications</title>
+
+    <para>By following best practices and using the Spring Dynamic Modules
+    support, your bean classes should be easy to unit test as they will have
+    no hard dependencies on OSGi, and the few OSGi APIs that you may interact
+    with (such as BundleContext) are interface-based and easy to mock. For
+    integration testing (making sure that your application behaves as expected
+    when running under OSGi) some support is needed.</para>
+
+    <para>The Spring Dynamic Modules project provides a test class hierarchy
+    (based on
+    <literal>org.springframework.osgi.test.AbstractOsgiTests</literal>) that
+    provides support for writing regular JUnit test cases that are then
+    automatically executed in an OSGi environment. The test support:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>starts the OSGi framework</para>
+      </listitem>
+
+      <listitem>
+        <para>installs and starts any specified bundles required for the
+        test</para>
+      </listitem>
+
+      <listitem>
+        <para>packages the test case itself into a 'virtual bundle' and
+        installs it in the OSGi framework</para>
+      </listitem>
+
+      <listitem>
+        <para>executes the test case inside the OSGi framework</para>
+      </listitem>
+
+      <listitem>
+        <para>shuts down the framework</para>
+      </listitem>
+
+      <listitem>
+        <para>passes the test results back to the originating test case
+        instance that is running outside of OSGi</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>By following this sequence it is trivial to write JUnit-based
+    integration tests for OSGi and have them integration into any environment
+    (IDE, build, etc.) that can work with JUnit.</para>
+
+    <para>It is most likely that your test cases will extend
+    <literal>AbstractConfigurableBundleCreatorTests</literal>. Within your
+    test case, access to the <literal>BundleContext</literal> is readily
+    available through the inherited <literal>getBundleContext()</literal>
+    method. From here it is easy to verify service publication, drive bundles
+    through the lifecycle and verify that components react as expected, and so
+    on.</para>
+
+    <para>Here's a simple test that verifies a service has been published as
+    expected:</para>
+
+    <screen>public class ServicePublicationTest extends AbstractConfigurableBundleCreatorTests {
+
+  protected String[] getBundles() {
+    return new String[] { "org.xyz.someapp, application-layer, 1.0-SNAPSHOT" };
+  }
+
+  public void testServicePublication() {
+     assertNotNull("MyService should be published in tthe registry", 
+                   getBundleContext().getServiceReference("org.xyz.MyService"));
+  }
+}</screen>
+
+    <para>All of the bundles required by Spring Dynamic Modules will be
+    installed by default. By overriding the <literal>getBundles</literal>
+    method you can specify additional application bundles to be installed for
+    the test. In this example we install one bundle, with group id
+    <literal>org.xyz.someapp</literal>, module id
+    <literal>application-layer</literal>, and version
+    <literal>1.0-SNAPSHOT</literal>. The default behavior of the test support
+    is to look up this dependency in your local maven repository. It is
+    possible to change the lookup strategy using a pluggable
+    <literal>ArtifactLocator</literal> (see the javadocs for more
+    information). Support for Ivy-based repositories is planned for a future
+    release.</para>
+
+    <para>The test support has been integrated with Equinox, Knopflerfish, and
+    Felix. You can configure the platform used to run the tests in one of two
+    ways:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Set the
+        <literal>org.springframework.osgi.test.framework</literal> system
+        property to one of <literal>equinox</literal>,
+        <literal>knopflerfish</literal>, or <literal>felix</literal>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Override the AbstractConfigurableOsgiTests#getPlatformName()
+        operation to return one of the constants: EQUINOX_PLATFORM,
+        KNOPFLERFISH_PLATFORM, or FELIX_PLATFORM.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>By default the test harness will attempt to use Equinox.</para>
+  </section>
+
+
+</chapter>
