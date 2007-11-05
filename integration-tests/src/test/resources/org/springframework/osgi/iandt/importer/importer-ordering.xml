@@ -7,13 +7,6 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi-1.0-rc1.xsd"
 	osgi:default-timeout="10" osgi:default-cardinality="0..X">
 
-	<set id="unorderedSet">
-		<interfaces>
-			<beans:value>org.springframework.osgi.iandt.importer.ServiceComparatorTest$MyInterface</beans:value>
-		</interfaces>
-	</set>
-	
-	 
 	<set id="setWithServiceOrder">
 		<interfaces>
 			<beans:value>org.springframework.osgi.iandt.importer.ServiceComparatorTest$MyInterface</beans:value>
