@@ -40,7 +40,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <includes>faq.xml,issues.xml</includes>
+                    <includes>index.xml,faq.xml,issues.xml</includes>
                     <chunkedOutput>true</chunkedOutput>
                     <htmlStylesheet>css/html.css</htmlStylesheet>
                     <xincludeSupported>true</xincludeSupported>
@@ -67,9 +67,9 @@
                                 <include name="**/*.jpg" />
                             </fileset>
                         </copy>
-                        <!--
-                        <move file="target/site/reference/pdf/*.pdf" tofile="target/site/reference/pdf/spring-osgi-reference.pdf" failonerror="false" />
-                        -->
+                        <move file="target/site/reference/pdf/index.pdf" tofile="target/site/reference/pdf/spring-dm-reference.pdf" failonerror="false" />
+                        <move file="target/site/reference/pdf/faq.pdf" tofile="target/site/reference/pdf/spring-dm-faq.pdf" failonerror="false" />
+                        <move file="target/site/reference/pdf/issues.pdf" tofile="target/site/reference/pdf/spring-dm-issues.pdf" failonerror="false" />
                     </postProcess>
                 </configuration>
             </plugin>

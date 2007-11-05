@@ -3,24 +3,42 @@
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <book xmlns:xi="http://www.w3.org/2001/XInclude">
   <bookinfo>
-    <title>Spring Dynamic Modules for OSGi(tm) Service Platforms - Frequently
-    Asked Questions</title>
+    <title>Spring Dynamic Modules Reference Guide</title>
+	<para><emphasis>for OSGi(tm) Service Platforms.</emphasis></para>
+    <releaseinfo>&version;</releaseinfo>
+    
+    <authorgroup>
+      <author>
+        <firstname>Adrian M</firstname>
+        <surname>Colyer</surname>
+        <affiliation>Interface21</affiliation>
+      </author>
+    </authorgroup>
 
-    <!--
-        <releaseinfo>&version;</releaseinfo>
-	    -->
+    <authorgroup>
+      <author>
+        <firstname>Hal</firstname>
+        <surname>Hildebrand</surname>
+        <affiliation>Oracle</affiliation>
+      </author>
+    </authorgroup>
 
     <authorgroup>
       <author>
         <firstname>Costin</firstname>
-      </author>
-
-      <author>
-        <firstname>Rick</firstname>
-
-        <surname>Evans</surname>
+        <surname>Leau</surname>
+        <affiliation>Interface21</affiliation>
       </author>
     </authorgroup>
+
+    <authorgroup>
+      <author>
+        <firstname>Andy</firstname>
+        <surname>Piper</surname>
+        <affiliation>BEA</affiliation>
+      </author>
+    </authorgroup>
+
 
     <legalnotice>
       <para>Copies of this document may be made for your own use and for
@@ -32,15 +50,64 @@
 
   <toc />
 
+  <xi:include href="preface.xml"/>
   <part>
-    <title>Introduction</title>
+      <title>Introduction</title>
+      <partintro>
+          <para>
+            <para>This document is the reference guide for Spring Dynamic Modules. It
+			defines the syntax and semantics for the <ulink url="http://www.osgi.org">
+			OSGi Service Platform</ulink> based namespaces; the Dynamic Modules extender bundle; 
+			and the OSGi manifest header entries defined by Dynamic Modules. 
+			For a tutorial introduction to building OSGi-based applications with Spring Dynamic 
+			Modules see the online tutorials and user guide.</para>
 
-    <partintro>
-      <para>This first part of the reference documentation <link
-      linkend="what-is-spring-ws">is an overview</link> of Spring Web Services
-      and the underlying concepts. Spring-WS is then introduced, and <link
-      linkend="why-contract-first">the concepts</link> behind contract-first
-      Web service development are explained.</para>
-    </partintro>
+			<para>OSGi developers looking for an introduction to Spring should review
+			the <ulink url="http://www.springframework.org/documentation">introductory
+			articles</ulink> on the springframework.org site.</para>
+
+			<para><emphasis>Note: OSGi is a trademark of the OSGi Alliance. Project
+			name is pending final approval from the Alliance.</emphasis></para>
+
+			<para><emphasis>Note: Please see the <ulink
+			url="http://static.springframework.org/spring-osgi/docs/current/reference/html_single/issues.html">known
+			issues</ulink> page for Spring Dynamic Modules ${version}
+			release.</emphasis></para>
+            This first part of the reference documentation
+            <link linkend="why-spring-dm">is an overview</link> of
+            Spring Dynamic Modules and the underlying concepts.
+          </para>
+      </partintro>
+      <xi:include href="why-spring-dm.xml"/>
+  </part>
+  <part>
+      <title>Reference</title>
+      <partintro>
+          <para>
+              This part of the reference documentation details the various components
+              that comprise Spring Dynamic Modules.
+          </para>
+      </partintro>
+      <!-- TODO: break this into several pieces -->
+      <xi:include href="spec.xml"/>
+      <xi:include href="appendix-extensions.xml"/>
+      <xi:include href="appendix-roadmap.xml"/>
+      <xi:include href="appendix-schema.xml"/>
+      <xi:include href="appendix-ack.xml"/>
+  </part>
+  <part id="resources">
+      <title>Other Resources</title>
+      <partintro>
+          <para>
+              In addition to this reference documentation, there exist a number of
+              other resources that may help you learn how to use OSGi and Spring Dynamic
+              Modules. These additional, third-party resources are enumerated in this 
+              section.
+          </para>
+      </partintro>
+      <xi:include href="links.xml"/>
+      <!-- 
+      <xi:include href="bibliography.xml"/>
+       -->
   </part>
 </book>
