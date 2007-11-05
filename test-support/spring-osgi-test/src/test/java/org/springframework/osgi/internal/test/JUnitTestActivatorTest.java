@@ -112,7 +112,6 @@ public class JUnitTestActivatorTest extends TestCase {
 		MockControl ctxCtrl = MockControl.createControl(BundleContext.class);
 		BundleContext ctx = (BundleContext) ctxCtrl.getMock();
 		
-		ctxCtrl.expectAndReturn(ctx.ungetService(ref), true);
 		reg.unregister();
 		
 		ctxCtrl.replay();
