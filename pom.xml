@@ -209,10 +209,10 @@ limitations under the License.
       <scope>test</scope>
     </dependency>
 	<dependency>
- 	<groupId>easymock</groupId>
-	    <artifactId>easymock</artifactId>
-		<version>1.2_Java1.3</version>
-		<scope>test</scope>
+ 	  <groupId>easymock</groupId>
+	  <artifactId>easymock</artifactId>
+	  <version>1.2_Java1.3</version>
+	  <scope>test</scope>
     </dependency>
     
     <!-- commons-logging in slf4j wrapper -->
@@ -237,7 +237,7 @@ limitations under the License.
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>log4j.osgi</artifactId>
-      <version>1.2.13-SNAPSHOT</version>
+      <version>1.2.15-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>    
   </dependencies>
@@ -333,33 +333,6 @@ limitations under the License.
              <descriptor>src/assembly/bin.xml</descriptor>
           </descriptors>
         </configuration>
-      </plugin>
-      
-      <!-- invoke submodule -->
-      <plugin>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <version>1.0</version>
-        <configuration>
-          <streamLogs>true</streamLogs>
-          <noLog>true</noLog>
-          <projectsDirectory>spring-modules</projectsDirectory>
-          <goals>
-			 <goal>clean</goal>
-			 <goal>install</goal>
-          </goals>
-          <pomIncludes>
-            <pomInclude>pom.xml</pomInclude>
-          </pomIncludes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>install</id>
-            <phase>install</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-           </execution>
-        </executions>
       </plugin>
 
     </plugins>
@@ -548,9 +521,7 @@ limitations under the License.
             <link>http://junit.sourceforge.net/javadoc/</link>
             <link>http://aopalliance.sourceforge.net/doc</link>
             <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
-			<!--
-                        <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
-                 -->
+            <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
           </links>
         </configuration>
       </plugin>
@@ -669,9 +640,9 @@ limitations under the License.
       <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
     </repository>  
     <repository>
-            <id>eclipse-repository</id>
-        <name>Eclipse Repository</name>
-        <url>http://repo1.maven.org/eclipse/</url>
+      <id>eclipse-repository</id>
+      <name>Eclipse Repository</name>
+      <url>http://repo1.maven.org/eclipse/</url>
     </repository>
     <repository>
       <id>safehaus-repository</id>
@@ -693,10 +664,21 @@ limitations under the License.
 	</repository>
 
     <repository>
-    <id>i21-s3-maven-repo</id>
+      <id>i21-s3-maven-repo</id>
       <name>i21 S3 milestone repo</name>
       <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
     </repository>
+    
+    <!-- temporary repository until moving to S3 -->
+    <repository>
+      <id>i21-temp-maven-repo</id>
+      <name>i21 temporary repo</name>
+      <snapshots>
+         <enabled>true</enabled>
+      </snapshots>
+      <url>http://static.springframework.org/maven2-snapshots</url>
+    </repository>
+    
   </repositories>
 
 </project>
