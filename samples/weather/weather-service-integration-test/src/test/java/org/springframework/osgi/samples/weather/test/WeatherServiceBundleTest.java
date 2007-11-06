@@ -71,7 +71,7 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
     	
     	// if < jdk 1.5, add an JMX implementation
     	if (!JdkVersion.isAtLeastJava15())
-    		bundles.add("org.springframework.osgi, mx4j, 3.0.2-SNAPSHOT");
+    		bundles.add("org.springframework.osgi, mx4j.osgi, 3.0.2-SNAPSHOT");
     	return (String[]) bundles.toArray(new String[bundles.size()]);
     }
 

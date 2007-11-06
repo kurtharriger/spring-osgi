@@ -120,7 +120,7 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 				decoratedServiceFactory.ungetService(bundle, registration, service);
 
 				// then apply the destruction callback (if any)
-				Runnable callback = (Runnable) callbacks.get(bundle);
+				Runnable callback = (Runnable) callbacks.remove(bundle);
 				if (callback != null)
 					callback.run();
 			}
@@ -144,7 +144,7 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 	 * is sychronized and is used by
 	 * {@link org.springframework.osgi.internal.context.support.OsgiBundleScope}.
 	 */
-	private final Map beans = CollectionFactory.createConcurrentMap(16);
+	private final Map beans = new LinkedHashMap(4);
 
 	/**
 	 * Unsynchronized map of callbacks for the services used by the running
@@ -162,11 +162,15 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 	public Object get(String name, ObjectFactory objectFactory) {
 		// outside bundle calling (no need to cache things)
 		if (isExternalBundleCalling()) {
-			return objectFactory.getObject();
+			Object bean = objectFactory.getObject();
+
+			return bean;
 		}
 		// in-appCtx call
 		else {
 			// use local bean repository
+			// cannot use a concurrent map since we want to postpone the call to
+			// getObject
 			synchronized (beans) {
 				Object bean = beans.get(name);
 				if (bean == null) {

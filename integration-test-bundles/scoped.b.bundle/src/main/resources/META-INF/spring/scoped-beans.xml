@@ -15,9 +15,10 @@
 	
 	<osgi:reference id="serviceFromA"
 		interface="org.springframework.osgi.iandt.scope.common.ScopeTestService"
+		filter="(Bundle-SymbolicName=org.springframework.osgi.iandt.scope.a)"
 		cardinality="0..1" timeout="10"
 	/>
-<!--		filter="(Bundle-SymbolicName=org.springframework.osgi.iandt.scope.a)" 	-->
+
 	<bean id="staticReference"
 		class="org.springframework.osgi.iandt.scope.b.BeanReference">
 		<property name="bean" ref="b.service" />

@@ -111,7 +111,9 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 	public void testInitWithTargetAndTargetRerefence() throws Exception {
 		exporter.setTarget(new Object());
 		exporter.setTargetBeanName("costin");
-
+		beanFactoryControl.expectAndReturn(beanFactory.isSingleton("costin"), false);
+		beanFactoryControl.expectAndReturn(beanFactory.getType("costin"), Object.class);
+		beanFactoryControl.replay();
 		try {
 			this.exporter.afterPropertiesSet();
 			fail("Expecting IllegalArgumentException");
@@ -200,7 +202,13 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 		exporter.setTarget(MockControl.createControl(ServiceFactory.class).getMock());
 		exporter.setInterfaces(new Class[] { ServiceFactory.class });
-		exporter.setTargetBeanName("boo");
+		String beanName = "boo";
+		exporter.setTargetBeanName(beanName);
+
+		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), false);
+		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), Object.class);
+		beanFactoryControl.replay();
+
 		exporter.afterPropertiesSet();
 		assertSame(reg, exporter.registerService(clazz, props));
 	}
@@ -248,10 +256,11 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 		String beanName = "fooBar";
 		exporter.setTargetBeanName(beanName);
-		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), service.getClass());
+		exporter.setInterfaces(new Class[] { service.getClass() });
+		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
-
 		beanFactoryControl.replay();
+		exporter.afterPropertiesSet();
 		exporter.registerService(new Class[] { service.getClass() }, new Properties());
 
 		assertSame(service, factory[0].getService(null, null));
@@ -282,15 +291,18 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 			}
 		};
 
+		String beanName = "fooBar";
+
+		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), true);
+		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
+		beanFactoryControl.replay();
+
 		exporter.setBundleContext(ctx);
 		exporter.setBeanFactory(beanFactory);
-
-		String beanName = "fooBar";
 		exporter.setTargetBeanName(beanName);
-		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), actualService.getClass());
-		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
+		exporter.setInterfaces(new Class[] { service.getClass() });
 
-		beanFactoryControl.replay();
+		exporter.afterPropertiesSet();
 		exporter.registerService(new Class[] { actualService.getClass() }, new Properties());
 		assertSame(actualService, factory[0].getService(null, null));
 		beanFactoryControl.verify();
@@ -315,8 +327,10 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 		// give an actual target object not a target reference
 		exporter.setTarget(service);
+		exporter.setInterfaces(new Class[] { service.getClass() });
 
 		beanFactoryControl.replay();
+		exporter.afterPropertiesSet();
 		exporter.registerService(new Class[] { service.getClass() }, new Properties());
 
 		assertSame(service, factory[0].getService(null, null));

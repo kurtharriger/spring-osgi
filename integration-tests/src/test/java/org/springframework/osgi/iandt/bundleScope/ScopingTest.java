@@ -20,6 +20,7 @@ import java.util.Properties;
 import org.osgi.framework.ServiceReference;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.iandt.scope.a.BeanReference;
 import org.springframework.osgi.iandt.scope.common.ScopeTestService;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiFilterUtils;
@@ -66,23 +67,26 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 	public void testServiceAScopeForBundleA() throws Exception {
 		ScopeTestService serviceAInBundleA = (ScopeTestService) org.springframework.osgi.iandt.scope.a.BeanReference.BEAN;
 
-		assertFalse("same bean instance used for different bundles",
-			serviceAInBundleA.equals(getServiceA().getServiceIdentity()));
+		System.out.println(serviceAInBundleA.getServiceIdentity());
+		System.out.println(getServiceA().getServiceIdentity());
+
+		assertFalse("same bean instance used for different bundles", serviceAInBundleA.getServiceIdentity().equals(
+			getServiceA().getServiceIdentity()));
 	}
 
 	public void testServiceAScopeForBundleB() throws Exception {
-		ScopeTestService serviceAInBundleB = (ScopeTestService) org.springframework.osgi.iandt.scope.b.BeanReference.BEAN;
+		String symName = "org.springframework.osgi.iandt.scope.b";
+		ScopeTestService serviceAInBundleB = (ScopeTestService) getAppCtx(symName).getBean("serviceFromA");
 
-		assertFalse("same bean instance used for different bundles",
-			serviceAInBundleB.equals(getServiceA().getServiceIdentity()));
+		assertFalse("same bean instance used for different bundles", serviceAInBundleB.getServiceIdentity().equals(
+			getServiceA().getServiceIdentity()));
 	}
 
-	public void testServiceAScopeForBundleAAndBundleB() throws Exception {
-		ScopeTestService serviceAInBundleA = (ScopeTestService) org.springframework.osgi.iandt.scope.a.BeanReference.BEAN;
+	public void testServiceBInBundleBAndTestBundle() throws Exception {
 		ScopeTestService serviceAInBundleB = (ScopeTestService) org.springframework.osgi.iandt.scope.b.BeanReference.BEAN;
 
-		assertFalse("same bean instance used for different bundles", serviceAInBundleA.getServiceIdentity().equals(
-			serviceAInBundleB.getServiceIdentity()));
+		assertFalse("same bean instance used for different bundles", serviceAInBundleB.getServiceIdentity().equals(
+			getServiceB().getServiceIdentity()));
 	}
 
 	public void testScopedBeanNotExported() throws Exception {
@@ -90,6 +94,18 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 		// ask for it again
 		Properties another = (Properties) applicationContext.getBean("props");
 		assertSame("different instances returned for the same scope", props, another);
+	}
+
+	public void testBeanReferenceAndLocalScopeInstanceForBundleA() throws Exception {
+		String symName = "org.springframework.osgi.iandt.scope.a";
+		assertSame("local references are different", getAppCtx(symName).getBean("a.service"),
+			org.springframework.osgi.iandt.scope.a.BeanReference.BEAN);
+	}
+
+	public void testBeanReferenceAndLocalScopeInstanceForBundleB() throws Exception {
+		String symName = "org.springframework.osgi.iandt.scope.b";
+		assertSame("local references are different", getAppCtx(symName).getBean("b.service"),
+			org.springframework.osgi.iandt.scope.b.BeanReference.BEAN);
 	}
 
 	public void testScopedBeanDestructionCallbackDuringContextRefresh() throws Exception {
@@ -160,5 +176,4 @@ public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
 			throw new IllegalArgumentException("cannot find appCtx for bundle " + symBundle);
 		return (ConfigurableApplicationContext) bundleContext.getService(ref);
 	}
-
 }

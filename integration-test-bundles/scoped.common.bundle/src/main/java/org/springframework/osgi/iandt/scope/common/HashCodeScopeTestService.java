@@ -25,10 +25,6 @@ import java.util.Properties;
  */
 public class HashCodeScopeTestService extends Properties implements ScopeTestService {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.iandt.scope.common.ScopeTestService#getServiceIdentity()
-	 */
 	public String getServiceIdentity() {
 		return "" + System.identityHashCode(this);
 	}

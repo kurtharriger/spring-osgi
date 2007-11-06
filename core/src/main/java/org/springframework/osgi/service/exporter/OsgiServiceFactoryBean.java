@@ -95,6 +95,8 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 		public Object getService(Bundle bundle, ServiceRegistration serviceRegistration) {
 
+			// prefer returning a target first (for example to avoid singleton
+			// lookups)
 			Object bean = (target != null ? target : beanFactory.getBean(targetBeanName));
 
 			// if we get a ServiceFactory, call its method
@@ -145,6 +147,8 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 	private String targetBeanName;
 
+	private boolean hasNamedBean;
+
 	private Class[] interfaces;
 
 	private int autoExportMode = AUTO_EXPORT_DISABLED;
@@ -153,6 +157,8 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 	private Object target;
 
+	private Class targetClass;
+
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	private ClassLoader classLoader;
@@ -160,13 +166,28 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	/** exporter bean name */
 	private String beanName;
 
-	//private ClassExporter autoExport = new NoOpExporter();
+	// private ClassExporter autoExport = new NoOpExporter();
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
 		Assert.notNull(bundleContext, "required property 'bundleContext' has not been set");
 
-		Assert.notNull(target, "'target' property is required");
+		hasNamedBean = StringUtils.hasText(targetBeanName);
+
+		Assert.isTrue(hasNamedBean || target != null, "either 'targetBeanName' or 'target' properties have to be set");
+		// initialize bean only when dealing with singletons and named beans
+		if (hasNamedBean) {
+			if (beanFactory.isSingleton(targetBeanName)) {
+				target = beanFactory.getBean(targetBeanName);
+				targetClass = target.getClass();
+			}
+			else {
+				targetClass = beanFactory.getType(targetBeanName);
+			}
+
+		}
+		else
+			targetClass = target.getClass();
 
 		if (propertiesResolver == null) {
 			propertiesResolver = new BeanNameServicePropertiesResolver();
@@ -269,15 +290,13 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	 */
 	public void registerService() {
 
-		Class serviceClass = target.getClass();
 		// if we have a nested bean / non-Spring managed object
-		String beanName = (!StringUtils.hasText(targetBeanName) ? ObjectUtils.getIdentityHexString(target)
-				: targetBeanName);
+		String beanName = (!hasNamedBean ? ObjectUtils.getIdentityHexString(target) : targetBeanName);
 
 		Dictionary serviceProperties = mergeServiceProperties(beanName);
 
 		Class[] intfs = interfaces;
-		Class[] autoDetectedClasses = autoDetectClassesForPublishing(serviceClass);
+		Class[] autoDetectedClasses = autoDetectClassesForPublishing(targetClass);
 
 		// filter duplicates
 		Set classes = new LinkedHashSet(intfs.length + autoDetectedClasses.length);
@@ -304,10 +323,8 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 			classes,
 			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
 
-		Class beanClass = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
-
 		// filter classes based on visibility
-		ClassLoader beanClassLoader = ClassUtils.getClassLoader(beanClass);
+		ClassLoader beanClassLoader = ClassUtils.getClassLoader(targetClass);
 
 		Class[] visibleClasses = ClassUtils.getVisibleClasses(classes, beanClassLoader);
 
@@ -401,14 +418,26 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	}
 
 	/**
-	 * Export the given object as an OSGi service. Normally used when the
+	 * Set the given object to export as an OSGi service. Normally used when the
 	 * exported service is a nested bean or an object not managed by the Spring
-	 * container.
+	 * container. Note that the passed target instance is ignored if
+	 * {@link #setTargetBeanName(String)} is used.
 	 * 
 	 * @param target The target to set.
 	 */
 	public void setTarget(Object target) {
 		this.target = target;
+	}
+
+	/**
+	 * Set the name of the bean managed by the Spring container, which will be
+	 * exported as an OSGi service. This method is normally what most use-cases
+	 * need, rather then {@link #setTarget(Object)}.
+	 * 
+	 * @param name target bean name
+	 */
+	public void setTargetBeanName(String name) {
+		this.targetBeanName = name;
 	}
 
 	/**
@@ -485,10 +514,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	 */
 	public void setResolver(OsgiServicePropertiesResolver resolver) {
 		this.propertiesResolver = resolver;
-	}
-
-	public void setTargetBeanName(String name) {
-		this.targetBeanName = name;
 	}
 
 	public void setInterfaces(Class[] serviceInterfaces) {
