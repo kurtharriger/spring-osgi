@@ -282,26 +282,18 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 			// start bundles
 			for (int i = 0; i < bundles.length; i++) {
+				String info = null;
+				if (debug)
+					info = "bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]";
 
-				try {
-					String info = null;
+				if (!OsgiBundleUtils.isFragment(bundles[i])) {
 					if (debug)
-						info = "bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]";
-					
-					if (!OsgiBundleUtils.isFragment(bundles[i])) {
-						if (debug)
-							logger.debug("starting " + info);
-						bundles[i].start();
-					}
-
-					else if (debug)
-						logger.debug(info + " is a fragment; start not invoked");
-				}
-				catch (Throwable ex) {
-					logger.warn("can't start bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName()
-							+ "]", ex);
+						logger.debug("starting " + info);
+					bundles[i].start();
 				}
 
+				else if (debug)
+					logger.debug(info + " is a fragment; start not invoked");
 			}
 
 			// hook after the OSGi platform has been setup
@@ -358,7 +350,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		return platformContext.installBundle(location.getDescription(), location.getInputStream());
 	}
 
-	
 	//
 	// Delegation methods for OSGi execution and initialization
 	//
@@ -424,7 +415,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		IOUtils.closeStream(inputStream);
 		IOUtils.closeStream(outputStream);
 	}
-	
+
 	/**
 	 * Determine through reflection the methods used for invoking the
 	 * TestRunnerService.
