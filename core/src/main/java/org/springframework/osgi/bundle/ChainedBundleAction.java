@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context.support;
+package org.springframework.osgi.bundle;
 
 import org.osgi.framework.Bundle;
 import org.springframework.util.ObjectUtils;
@@ -42,6 +42,10 @@ public class ChainedBundleAction implements BundleAction {
 		}
 
 		return bnd;
+	}
+
+	public String toString() {
+		return "chained actions " + ObjectUtils.nullSafeToString(actions);
 	}
 
 }

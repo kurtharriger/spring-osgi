@@ -24,13 +24,8 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.AmbiguousServiceReferenceException;
-import org.springframework.osgi.NoSuchServiceException;
-import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 

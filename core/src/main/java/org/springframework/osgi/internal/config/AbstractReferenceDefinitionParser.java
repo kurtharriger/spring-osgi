@@ -91,21 +91,21 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 	private static final String INTERFACES_PROP = "interfaces";
 
 	// XML attributes/elements
-	public static final String LISTENER = "listener";
+	private static final String LISTENER = "listener";
 
-	public static final String BIND_METHOD = "bind-method";
+	private static final String BIND_METHOD = "bind-method";
 
-	public static final String UNBIND_METHOD = "unbind-method";
+	private static final String UNBIND_METHOD = "unbind-method";
 
-	public static final String REF = "ref";
+	private static final String REF = "ref";
 
-	public static final String INTERFACE = "interface";
+	private static final String INTERFACE = "interface";
 
-	public static final String INTERFACES = "interfaces";
+	private static final String INTERFACES = "interfaces";
 
-	public static final String INTERFACEs = "interface";
+	private static final String INTERFACEs = "interface";
 
-	public static final String CARDINALITY = "cardinality";
+	private static final String CARDINALITY = "cardinality";
 
 	private static final String ZERO = "0";
 

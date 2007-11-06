@@ -11,12 +11,12 @@
 
 	<bundle id="wLocation" location="fromServer" />
 
-	<!-- start action -->
+ 	<!-- start action --> 
 	<bundle id="start" action="start" symbolic-name="startBundle" />
 
 	<bundle id="stop" destroy-action="stop" symbolic-name="startBundle" />
 
-	<!-- install/uninstall action -->
+	<!-- install/uninstall action --> 
 	<bundle id="install" action="start" destroy-action="uninstall"
 		location="fromClient" />
 
@@ -24,9 +24,14 @@
 		destroy-action="uninstall"
 		location="org/springframework/osgi/config/bundleBeanFactoryTest.xml" />
 
-	<!-- update/stop action -->
+	<!-- update/stop action --> 
 	<bundle id="update" action="update" destroy-action="stop"
 		symbolic-name="updateBundle" />
+
+	<!-- nested declaration -->
+	<bundle id="nested" action="start">
+		<beans:ref bean="createdByTheTest"/>
+	</bundle>
 
 
 </beans:beans>

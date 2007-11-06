@@ -26,6 +26,7 @@ import org.osgi.framework.BundleContext;
  * @author Andy Piper
  * @author Costin Leau
  */
+// FIXME: move this out of context.support pkg
 public class LocalBundleContext {
 
     private final static InheritableThreadLocal contextLocal = new InheritableThreadLocal();

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context.support;
+package org.springframework.osgi.bundle;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,7 +67,7 @@ public class InstallBundleAction implements BundleAction, BundleContextAware, Re
 	}
 
 	private Bundle installBundle() throws BundleException {
-		Assert.hasText(location, "location paramter required when installing a bundle");
+		Assert.hasText(location, "location parameter required when installing a bundle");
 
 		// install bundle (default)
 		log.info("Loading bundle from [" + location + "]");
@@ -116,5 +116,4 @@ public class InstallBundleAction implements BundleAction, BundleContextAware, Re
 	public Resource getResource() {
 		return resource;
 	}
-
 }

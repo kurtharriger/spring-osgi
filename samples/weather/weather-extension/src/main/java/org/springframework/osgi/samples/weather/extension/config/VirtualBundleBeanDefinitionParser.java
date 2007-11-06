@@ -21,10 +21,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.osgi.internal.config.BundleBeanDefinitionParser;
+import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.osgi.samples.weather.extension.bundle.PackageSpecification;
 import org.springframework.osgi.samples.weather.extension.bundle.VirtualBundleFactoryBean;
+import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -35,30 +36,40 @@ import org.w3c.dom.NamedNodeMap;
  * 
  * @author Andy Piper
  */
-class VirtualBundleBeanDefinitionParser extends BundleBeanDefinitionParser {
+class VirtualBundleBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 	public static final String PACKAGE_ELEMENT = "package";
 
 	public static final String ID_NAME = "name";
 
 	public static final String ID_VERSION = "version";
 
-	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+	public static final String DEPENDS_ON = "depends-on";
 
-		super.doParse(element, parserContext, builder);
-
+	protected void postProcess(BeanDefinitionBuilder beanDefinition, Element element) {
 		Element e = DomUtils.getChildElementByTagName(element, "exports");
 		if (e != null) {
-			builder.addPropertyValue("exports", extractPackageSet(e));
+			beanDefinition.addPropertyValue("exports", extractPackageSet(e));
 		}
 		e = DomUtils.getChildElementByTagName(element, "imports");
 		if (e != null) {
-			builder.addPropertyValue("imports", extractPackageSet(e));
+			beanDefinition.addPropertyValue("imports", extractPackageSet(e));
 		}
+
+		String dependsOn = element.getAttribute(DEPENDS_ON);
+
+		if (StringUtils.hasText(dependsOn)) {
+			beanDefinition.getBeanDefinition().setDependsOn(
+				StringUtils.tokenizeToStringArray(dependsOn, BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS));
+		}
+
 		// e = DomUtils.getChildElementByTagName(element, "dynamic-imports");
 		// if (e != null) {
 		// // builder.addPropertyValue("dynamicImports", extractPackageSet(e));
 		// }
+	}
 
+	protected boolean isEligibleAttribute(String attributeName) {
+		return !DEPENDS_ON.equalsIgnoreCase(attributeName) && super.isEligibleAttribute(attributeName);
 	}
 
 	protected Class getBeanClass(Element element) {

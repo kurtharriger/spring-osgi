@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.springframework.osgi.context.support;
+package org.springframework.osgi.bundle;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +31,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -97,8 +98,8 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		Assert.notNull(bundleContext, "BundleContext is required");
 
 		// check parameters
-		if (symbolicName == null && !StringUtils.hasText(location))
-			throw new IllegalArgumentException("Bundle-SymbolicName or location required");
+		if (bundle == null && !StringUtils.hasText(symbolicName) && !StringUtils.hasText(location))
+			throw new IllegalArgumentException("at least one of symbolicName, location, bundle properties is required ");
 
 		// try creating a resource
 		if (getLocation() != null) {
@@ -106,12 +107,22 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		}
 
 		// find the bundle first of all
-		bundle = findBundle();
+		if (bundle == null) {
+			bundle = findBundle();
+		}
 
+		if (log.isDebugEnabled())
+			log.debug("working with bundle[" + OsgiStringUtils.nullSafeNameAndSymName(bundle));
+
+		if (log.isDebugEnabled())
+			log.debug("executing start-up action " + action);
 		executeAction(action);
 	}
 
 	public void destroy() throws Exception {
+		if (log.isDebugEnabled())
+			log.debug("executing shutdown action " + action);
+
 		executeAction(destroyAction);
 
 		bundle = null;
@@ -255,13 +266,6 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		this.resourceLoader = resourceLoader;
 	}
 
-	/**
-	 * @return Returns the bundleContext.
-	 */
-	public BundleContext getBundleContext() {
-		return bundleContext;
-	}
-
 	// TODO: we don't support start-levels yet
 	private void updateStartLevel(int level) {
 		if (level == 0 || bundle == null)
@@ -275,6 +279,25 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 			}
 			bundleContext.ungetService(startref);
 		}
+	}
+
+	/**
+	 * Returns the bundle with which the class interacts.
+	 * 
+	 * @return Returns the bundle
+	 */
+	public Bundle getBundle() {
+		return bundle;
+	}
+
+	/**
+	 * Set the backing bundle used by this class. Allows programmatic
+	 * configuration of already retrieved/created bundle.
+	 * 
+	 * @param bundle The bundle to set.
+	 */
+	public void setBundle(Bundle bundle) {
+		this.bundle = bundle;
 	}
 
 }

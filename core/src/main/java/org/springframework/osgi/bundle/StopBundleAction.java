@@ -13,31 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context.support;
+package org.springframework.osgi.bundle;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
-import org.springframework.osgi.context.support.BundleTemplate.BundleCallback;
+import org.springframework.osgi.bundle.BundleTemplate.BundleCallback;
 
 /**
- * {@link Bundle} update action. It will install and start a bundle, if none is
- * available to execute the action upon.
- * 
- * @see Bundle#update()
- * 
  * @author Costin Leau
+ * 
  */
-public class UpdateBundleAction implements BundleAction {
+public class StopBundleAction implements BundleAction {
 
-	private final BundleCallback updateBundle = new BundleCallback() {
-
+	private static final BundleCallback stopBundle = new BundleCallback() {
 		public void execute(Bundle bundle) throws BundleException {
-			bundle.update();
+			bundle.stop();
 		}
 	};
 
 	public Bundle execute(Bundle bundle) {
-		new BundleTemplate(bundle).executeCallback(updateBundle);
+		if (bundle != null) {
+			new BundleTemplate(bundle).executeCallback(stopBundle);
+		}
 		return bundle;
 	}
 

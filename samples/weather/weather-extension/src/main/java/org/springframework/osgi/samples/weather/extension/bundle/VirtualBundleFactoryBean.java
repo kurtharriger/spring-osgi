@@ -22,7 +22,11 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.context.support.BundleFactoryBean;
+import org.osgi.framework.BundleContext;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
+import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.util.Assert;
 
 /**
@@ -37,7 +41,7 @@ import org.springframework.util.Assert;
  */
 // FIXME andyp -- this class is looking a lot like Project, maybe the two should
 // be merged
-public class VirtualBundleFactoryBean extends BundleFactoryBean {
+public class VirtualBundleFactoryBean implements InitializingBean, FactoryBean, BundleContextAware {
 	private String artifactId;
 
 	private String groupId = "org.example.group";
@@ -48,25 +52,48 @@ public class VirtualBundleFactoryBean extends BundleFactoryBean {
 
 	private Set/* <String> */imports = Collections.EMPTY_SET;
 
-	public VirtualBundleFactoryBean() {
-	}
+	private Resource location;
 
-	public Bundle getBundle() throws Exception {
+	private BundleContext bundleContext;
 
+	private Bundle bundle;
+
+	protected Bundle loadBundle() throws Exception {
 		URL url = null;
 		Project project;
-		String location = getLocation();
 		if (location == null) {
 			url = new URL("file", "", getLocalRepository());
 			project = new Project(groupId, artifactId, version, "jar", Collections.EMPTY_SET, exports, imports);
 			// System.out.println("Repository is: " + url.toString());
 		}
 		else {
-			project = new Project(groupId, artifactId, version, "jar", location, Collections.EMPTY_SET, exports,
+			url = location.getURL();
+			project = new Project(groupId, artifactId, version, "jar", url.toString(), Collections.EMPTY_SET, exports,
 					imports);
-			url = getResource().getURL();
 		}
-		return new MavenBundleManager(getBundleContext(), url).installBundle(project);
+		return new MavenBundleManager(bundleContext, url).installBundle(project);
+
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(artifactId, "artifactId not supplied");
+		bundle = loadBundle();
+	}
+
+	public Bundle getBundle() {
+		return bundle;
+	}
+
+	public Object getObject() {
+		return getBundle();
+	}
+
+	public Class getObjectType() {
+		return (bundle == null ? Bundle.class : bundle.getClass());
+	}
+
+	public boolean isSingleton() {
+		return true;
 	}
 
 	public String getVersion() {
@@ -115,12 +142,30 @@ public class VirtualBundleFactoryBean extends BundleFactoryBean {
 			this.imports = imports;
 	}
 
-	public void afterPropertiesSet() {
-		Assert.notNull(artifactId, "artifactId not supplied");
-		super.afterPropertiesSet();
-	}
-
 	private String getLocalRepository() {
 		return new File(System.getProperty("user.home"), ".m2/repository").getAbsolutePath();
+	}
+
+	/**
+	 * Returns the location.
+	 * 
+	 * @return Returns the location
+	 */
+	public Resource getLocation() {
+		return location;
+	}
+
+	/**
+	 * @param location The location to set.
+	 */
+	public void setLocation(Resource location) {
+		this.location = location;
+	}
+
+	/**
+	 * @param bundleContext The bundleContext to set.
+	 */
+	public void setBundleContext(BundleContext bundleContext) {
+		this.bundleContext = bundleContext;
 	}
 }
