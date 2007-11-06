@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context.support;
+package org.springframework.osgi.bundle;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 
@@ -33,7 +32,7 @@ class BundleTemplate {
 
 	private final Bundle bundle;
 
-	//private final BundleContext bundleContext;
+	// private final BundleContext bundleContext;
 
 	BundleTemplate(Bundle bundle) {
 		Assert.notNull(bundle);
@@ -42,7 +41,7 @@ class BundleTemplate {
 
 	BundleTemplate(BundleContext bundleContext) {
 		Assert.notNull(bundleContext);
-		//this.bundleContext = bundleContext;
+		// this.bundleContext = bundleContext;
 		this.bundle = bundleContext.getBundle();
 	}
 
@@ -64,15 +63,4 @@ class BundleTemplate {
 					+ OsgiStringUtils.nullSafeNameAndSymName(bundle)).initCause(ex);
 		}
 	}
-
-//	void executeCallback(BundleContextCallback callback) {
-//		Assert.notNull(callback);
-//		try {
-//			callback.execute(bundleContext);
-//		}
-//		catch (BundleException ex) {
-//			throw (RuntimeException) new IllegalStateException("exception occured while working with bundleContext "
-//					+ bundleContext).initCause(ex);
-//		}
-//	}
 }

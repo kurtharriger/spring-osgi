@@ -13,31 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context.support;
+package org.springframework.osgi.bundle;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleException;
-import org.springframework.osgi.context.support.BundleTemplate.BundleCallback;
 
 /**
- * {@link Bundle} start action. It will install the bundle if the given one is
- * null in order to start it.
- * 
- * @see Bundle#start()
+ * Simple strategy class that executes an action on a {@link Bundle}. Normally
+ * used with {@link BundleFactoryBean}. <p/> It's recommended that subclases
+ * implement {@link #toString()} to provide a user friendly representation of
+ * the action object.
  * 
  * @author Costin Leau
  * 
  */
-public class StartBundleAction implements BundleAction {
+public interface BundleAction {
 
-	private static final BundleCallback startBundle = new BundleCallback() {
-		public void execute(Bundle bundle) throws BundleException {
-			bundle.start();
-		}
-	};
-
-	public Bundle execute(Bundle bundle) {
-		new BundleTemplate(bundle).executeCallback(startBundle);
-		return bundle;
-	}
+	/**
+	 * Execute a {@link Bundle} action, based on a configuration and a given
+	 * bundle. Normally the returned Bundle is identical to the given one.
+	 * 
+	 * @param bundle on which the action is executed.
+	 * @return updated bundle
+	 */
+	Bundle execute(Bundle bundle);
 }

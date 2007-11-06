@@ -508,6 +508,23 @@
     <xsd:complexType name="Tbundle">
         <xsd:complexContent>
             <xsd:extension base="beans:identifiedType">
+              	
+              	<!-- optional nested bean declaration -->
+                <xsd:sequence minOccurs="0" maxOccurs="1">
+		    		<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="lax">
+            		   	<xsd:annotation>
+                    		<xsd:documentation><![CDATA[
+                    			OSGi bundle to work with.
+                    		]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation>
+  									<tool:exports type="org.osgi.framework.Bundle" />
+  								</tool:annotation>
+							</xsd:appinfo>  							
+                    	</xsd:annotation>
+            		</xsd:any>
+        		</xsd:sequence>
+        		
                 <xsd:attribute name="symbolic-name" type="xsd:string" use="optional">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[

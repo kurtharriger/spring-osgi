@@ -24,16 +24,18 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.osgi.context.support.BundleFactoryBean;
-import org.springframework.osgi.context.support.ChainedBundleAction;
-import org.springframework.osgi.context.support.InstallBundleAction;
-import org.springframework.osgi.context.support.StartBundleAction;
-import org.springframework.osgi.context.support.StopBundleAction;
-import org.springframework.osgi.context.support.UninstallBundleAction;
-import org.springframework.osgi.context.support.UpdateBundleAction;
+import org.springframework.osgi.bundle.BundleFactoryBean;
+import org.springframework.osgi.bundle.ChainedBundleAction;
+import org.springframework.osgi.bundle.InstallBundleAction;
+import org.springframework.osgi.bundle.StartBundleAction;
+import org.springframework.osgi.bundle.StopBundleAction;
+import org.springframework.osgi.bundle.UninstallBundleAction;
+import org.springframework.osgi.bundle.UpdateBundleAction;
 import org.springframework.osgi.internal.config.ParserUtils.AttributeCallback;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * BundleFactoryBean definition.
@@ -41,7 +43,7 @@ import org.w3c.dom.Element;
  * @author Andy Piper
  * @author Costin Leau
  */
-public class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	static class BundleActionCallback implements AttributeCallback {
 
@@ -155,10 +157,28 @@ public class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
 
 	private static final String DESTROY_ACTION_PROP = "destroyAction";
 
+	private static final String BUNDLE_PROP = "bundle";
+
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		BundleActionCallback callback = new BundleActionCallback(parserContext);
 
 		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback[] { callback });
+
+		// parse nested definition (in case there is any)
+
+		if (element.hasChildNodes()) {
+			NodeList nodes = element.getChildNodes();
+			boolean foundElement = false;
+			for (int i = 0; i < nodes.getLength() && !foundElement; i++) {
+				Node nd = nodes.item(i);
+				if (nd instanceof Element) {
+					foundElement = true;
+					Object obj = parserContext.getDelegate().parsePropertySubElement((Element) nd,
+						builder.getBeanDefinition());
+					builder.addPropertyValue(BUNDLE_PROP, obj);
+				}
+			}
+		}
 	}
 
 	protected Class getBeanClass(Element element) {

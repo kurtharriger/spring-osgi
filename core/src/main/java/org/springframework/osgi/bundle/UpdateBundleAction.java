@@ -13,25 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context.support;
+package org.springframework.osgi.bundle;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
+import org.springframework.osgi.bundle.BundleTemplate.BundleCallback;
 
 /**
- * Simple strategy class that executes an action on a {@link Bundle}. Normally
- * used with {@link BundleFactoryBean}.
+ * {@link Bundle} update action. It will install and start a bundle, if none is
+ * available to execute the action upon.
+ * 
+ * @see Bundle#update()
  * 
  * @author Costin Leau
- * 
  */
-public interface BundleAction {
+public class UpdateBundleAction implements BundleAction {
 
-	/**
-	 * Execute a {@link Bundle} action, based on a configuration and a given
-	 * bundle. Normally the returned Bundle is identical to the given one.
-	 * 
-	 * @param bundle on which the action is executed.
-	 * @return updated bundle
-	 */
-	Bundle execute(Bundle bundle);
+	private final BundleCallback updateBundle = new BundleCallback() {
+
+		public void execute(Bundle bundle) throws BundleException {
+			bundle.update();
+		}
+	};
+
+	public Bundle execute(Bundle bundle) {
+		new BundleTemplate(bundle).executeCallback(updateBundle);
+		return bundle;
+	}
+
 }

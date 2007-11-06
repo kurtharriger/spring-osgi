@@ -18,6 +18,8 @@
 package org.springframework.osgi;
 
 /**
+ * Base Osgi specific exception.
+ * 
  * @author Adrian Colyer
  * @since 2.0
  */
@@ -26,16 +28,17 @@ public class OsgiServiceException extends RuntimeException {
 	private static final long serialVersionUID = -3159995579765199853L;
 
 	private Class serviceType;
+
 	private String filter;
 
 	public Class getServiceType() {
 		return serviceType;
 	}
-	
+
 	public String getFilter() {
 		return filter;
 	}
-	
+
 	public OsgiServiceException(String message, Class serviceType, String filter) {
 		super(message);
 		this.serviceType = serviceType;

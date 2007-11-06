@@ -41,6 +41,7 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * @author Costin Leau
  * @since 2.0
  */
+// FIXME: move this out of context.support
 public class BundleDelegatingClassLoader extends ClassLoader {
 	private ClassLoader bridge;
 

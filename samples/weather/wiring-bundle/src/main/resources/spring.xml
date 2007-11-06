@@ -41,12 +41,14 @@
 
 
 
-
+	<osgi:bundle id="weatherServiceBundle" action="start">
+		<ref local="weatherServiceVirtualBundle"/>
+	</osgi:bundle>
+	
 	<!-- Note that this is not a real bundle - we are creating it on the fly from a regular jar -->
-	<extension:virtual-bundle id="weatherServiceBundle" depends-on="weatherDaoBundle"
-					     symbolic-name="org.springframework.osgi.samples.weather.service"
+	<extension:virtual-bundle id="weatherServiceVirtualBundle" depends-on="weatherDaoBundle"
 	                     location="file:${localRepository}/org/springframework/osgi/samples/weather-service/${pom.version}/weather-service-${pom.version}.jar"
-	                     action="start" version="1.0" group-id="org.springframework.osgi.samples.weather" artifact-id="service">
+	                     version="1.0" group-id="org.springframework.osgi.samples.weather" artifact-id="service">
 		<extension:imports>
 			<extension:package name="org.springframework.osgi.samples.weather.dao" version="0.0"/>
 			<extension:package name="org.springframework.osgi.config"/>

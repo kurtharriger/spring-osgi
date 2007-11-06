@@ -13,33 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context.support;
+package org.springframework.osgi.bundle;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
-import org.springframework.osgi.context.support.BundleTemplate.BundleCallback;
+import org.springframework.osgi.bundle.BundleTemplate.BundleCallback;
 
 /**
- * Uninstall {@link Bundle} action. If an invalid (null) bundle is given, no
- * action will be executed (i.e. no bundle means nothing to uninstall).
+ * {@link Bundle} start action. It will install the bundle if the given one is
+ * null in order to start it.
+ * 
+ * @see Bundle#start()
  * 
  * @author Costin Leau
  * 
  */
-public class UninstallBundleAction implements BundleAction {
+public class StartBundleAction implements BundleAction {
 
-	private static final BundleCallback uninstallBundle = new BundleCallback() {
+	private static final BundleCallback startBundle = new BundleCallback() {
 		public void execute(Bundle bundle) throws BundleException {
-			bundle.uninstall();
+			bundle.start();
 		}
 	};
 
 	public Bundle execute(Bundle bundle) {
-		if (bundle != null) {
-			new BundleTemplate(bundle).executeCallback(uninstallBundle);
-		}
-
+		new BundleTemplate(bundle).executeCallback(startBundle);
 		return bundle;
 	}
-
 }

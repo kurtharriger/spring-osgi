@@ -15,7 +15,6 @@
  */
 package org.springframework.osgi.config;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +31,12 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
-import org.springframework.osgi.context.support.BundleAction;
-import org.springframework.osgi.context.support.BundleFactoryBean;
-import org.springframework.osgi.context.support.ChainedBundleAction;
+import org.springframework.osgi.bundle.BundleAction;
+import org.springframework.osgi.bundle.BundleFactoryBean;
+import org.springframework.osgi.bundle.ChainedBundleAction;
 import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Costin Leau
@@ -218,6 +218,21 @@ public class BundleFactoryBeanParserTest extends TestCase {
 		assertSame(installBundle, appContext.getBean("updateFromActualLocation"));
 		appContext.close();
 		installBundleMC.verify();
+	}
+
+	public void testNestedBundleDeclaration() throws Exception {
+		MockControl ctrl = MockControl.createControl(Bundle.class);
+		Bundle bnd = (Bundle) ctrl.getMock();
+
+		bnd.start();
+		ctrl.replay();
+		appContext.getBeanFactory().registerSingleton("createdByTheTest", bnd);
+		refresh();
+
+		appContext.getBean("nested");
+		BundleFactoryBean fb = (BundleFactoryBean) appContext.getBean("&nested", BundleFactoryBean.class);
+
+		ctrl.verify();
 	}
 
 	private BundleAction getAction(BundleFactoryBean fb) {
