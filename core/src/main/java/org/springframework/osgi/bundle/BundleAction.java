@@ -16,24 +16,66 @@
 package org.springframework.osgi.bundle;
 
 import org.osgi.framework.Bundle;
+import org.springframework.core.enums.StaticLabeledEnum;
 
 /**
- * Simple strategy class that executes an action on a {@link Bundle}. Normally
- * used with {@link BundleFactoryBean}. <p/> It's recommended that subclases
- * implement {@link #toString()} to provide a user friendly representation of
- * the action object.
+ * {@link Bundle} actions supported by {@link BundleFactoryBean}.
  * 
  * @author Costin Leau
  * 
  */
-public interface BundleAction {
+public class BundleAction extends StaticLabeledEnum {
+
+	private static final long serialVersionUID = 3723986124669884703L;
 
 	/**
-	 * Execute a {@link Bundle} action, based on a configuration and a given
-	 * bundle. Normally the returned Bundle is identical to the given one.
+	 * Install bundle. This action is implied by {@link #START} and
+	 * {@link #UPDATE} in case no bundle is found in the existing OSGi
+	 * BundleContext.
 	 * 
-	 * @param bundle on which the action is executed.
-	 * @return updated bundle
+	 * @see org.osgi.framework.BundleContext#installBundle(String)
 	 */
-	Bundle execute(Bundle bundle);
+	public static final BundleAction INSTALL = new BundleAction(1, "install");
+
+	/**
+	 * Start bundle. If no bundle is found, it will try first to install one
+	 * based on the existing configuration.
+	 * 
+	 * @see Bundle#start()
+	 */
+	public static final BundleAction START = new BundleAction(2, "start");
+
+	/**
+	 * Update bundle. If no bundle is found, it will try first to install one
+	 * based on the existing configuration.
+	 * 
+	 * @see Bundle#update()
+	 */
+	public static final BundleAction UPDATE = new BundleAction(3, "update");
+
+	/**
+	 * Stop bundle. If no bundle is found, this action does nothing (it will
+	 * trigger loading).
+	 * 
+	 * @see Bundle#stop()
+	 */
+	public static final BundleAction STOP = new BundleAction(4, "stop");
+
+	/**
+	 * Uninstall bundle. If no bundle is found, this action does nothing (it
+	 * will trigger loading).
+	 * 
+	 * @see Bundle#uninstall()
+	 */
+	public static final BundleAction UNINSTALL = new BundleAction(5, "uninstall");
+
+	/**
+	 * Constructs a new <code>BundleAction</code> instance.
+	 * 
+	 * @param code
+	 * @param label
+	 */
+	private BundleAction(int code, String label) {
+		super(code, label);
+	}
 }

@@ -16,10 +16,14 @@
  */
 package org.springframework.osgi.bundle;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.startlevel.StartLevel;
 import org.springframework.beans.factory.DisposableBean;
@@ -40,10 +44,13 @@ import org.springframework.util.StringUtils;
  * 
  * This allows customers to use Spring to drive bundle management. Bundles
  * states can be modified using the state parameter. Most commonly this is set
- * to "start".
+ * to "start". Please see {@link BundleAction} and the relationship between the
+ * actions.
  * 
  * <p/>Pay attention when installing bundles dynamically since classes can be
  * loaded aggressively.
+ * 
+ * @see BundleAction
  * 
  * @author Andy Piper
  * @author Costin Leau
@@ -136,8 +143,40 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 				Thread.currentThread().setContextClassLoader(classloader);
 			}
 
-			if (action != null) {
-				bundle = action.execute(bundle);
+			// switch statement
+			// might look ugly but it's the only way to support the
+			// install/update variants
+			try {
+
+				// apply these actions only if we have a bundle
+				if (bundle != null) {
+					if (BundleAction.STOP == action) {
+						bundle.stop();
+					}
+
+					if (BundleAction.UNINSTALL == action) {
+						bundle.uninstall();
+					}
+				}
+
+				// if there is no bundle, then be sure to install one before
+				// executing the following actions
+				if (BundleAction.INSTALL == action || bundle == null) {
+					bundle = installBundle();
+				}
+
+				if (BundleAction.START == action) {
+					bundle.start();
+				}
+
+				if (BundleAction.UPDATE == action) {
+					bundle.update();
+				}
+
+			}
+			catch (BundleException be) {
+				throw (RuntimeException) new IllegalStateException("cannot execute action " + action.getLabel()
+						+ " on bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle)).initCause(be);
 			}
 		}
 		finally {
@@ -145,6 +184,40 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 				Thread.currentThread().setContextClassLoader(ccl);
 			}
 		}
+	}
+
+	/**
+	 * Install bundle - the equivalent of install action.
+	 * 
+	 * @return
+	 * @throws BundleException
+	 */
+	private Bundle installBundle() throws BundleException {
+		Assert.hasText(location, "location parameter required when installing a bundle");
+
+		// install bundle (default)
+		log.info("Loading bundle from [" + location + "]");
+
+		Bundle bundle = null;
+		boolean installBasedOnLocation = (resource == null);
+
+		if (!installBasedOnLocation) {
+			InputStream stream = null;
+			try {
+				stream = resource.getInputStream();
+			}
+			catch (IOException ex) {
+				// catch it since we fallback on normal install
+				installBasedOnLocation = true;
+			}
+			if (!installBasedOnLocation)
+				bundle = bundleContext.installBundle(location, stream);
+		}
+
+		if (installBasedOnLocation)
+			bundle = bundleContext.installBundle(location);
+
+		return bundle;
 	}
 
 	/**
