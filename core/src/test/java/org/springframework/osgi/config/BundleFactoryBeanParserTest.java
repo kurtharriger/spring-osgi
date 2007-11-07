@@ -33,10 +33,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.bundle.BundleAction;
 import org.springframework.osgi.bundle.BundleFactoryBean;
-import org.springframework.osgi.bundle.ChainedBundleAction;
 import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
+import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.util.ObjectUtils;
 
 /**
  * @author Costin Leau
@@ -46,7 +45,7 @@ public class BundleFactoryBeanParserTest extends TestCase {
 
 	private GenericApplicationContext appContext;
 
-	private Bundle startBundle, installBundle, updateBundle;
+	private Bundle startBundle, installBundle, updateBundle, bundleA;
 
 	private MockControl installBundleMC, startBundleMC, updateBundleMC;
 
@@ -71,7 +70,9 @@ public class BundleFactoryBeanParserTest extends TestCase {
 		startBundle = (Bundle) startBundleMC.getMock();
 		startBundleMC.expectAndReturn(startBundle.getSymbolicName(), "startBundle", MockControl.ONE_OR_MORE);
 
-		final Bundle[] bundles = new Bundle[] { installBundle, startBundle, updateBundle };
+		bundleA = new MockBundle("bundleA");
+
+		final Bundle[] bundles = new Bundle[] { installBundle, startBundle, updateBundle, bundleA };
 
 		BundleContext bundleContext = new MockBundleContext() {
 			// return proper bundles
@@ -119,7 +120,7 @@ public class BundleFactoryBeanParserTest extends TestCase {
 	public void testWithSymName() throws Exception {
 		refresh();
 		BundleFactoryBean fb = (BundleFactoryBean) appContext.getBean("&wSymName", BundleFactoryBean.class);
-		assertEquals("bundleA", fb.getSymbolicName());
+		assertSame(bundleA, fb.getObject());
 		assertNull(fb.getLocation());
 		assertNull(fb.getResource());
 
@@ -142,7 +143,7 @@ public class BundleFactoryBeanParserTest extends TestCase {
 		BundleFactoryBean fb = (BundleFactoryBean) appContext.getBean("&start", BundleFactoryBean.class);
 
 		BundleAction action = getAction(fb);
-		assertTrue(action instanceof ChainedBundleAction);
+		assertSame(BundleAction.START, action);
 		assertNull(getDestroyAction(fb));
 
 		assertSame(startBundle, appContext.getBean("start"));
@@ -158,7 +159,7 @@ public class BundleFactoryBeanParserTest extends TestCase {
 		refresh();
 
 		BundleFactoryBean fb = (BundleFactoryBean) appContext.getBean("&stop", BundleFactoryBean.class);
-		assertNotNull(getDestroyAction(fb));
+		assertSame(BundleAction.STOP, getDestroyAction(fb));
 
 		assertSame(startBundle, appContext.getBean("stop"));
 
@@ -176,8 +177,8 @@ public class BundleFactoryBeanParserTest extends TestCase {
 		BundleFactoryBean fb = (BundleFactoryBean) appContext.getBean("&update", BundleFactoryBean.class);
 
 		BundleAction action = getAction(fb);
-		assertTrue(action instanceof ChainedBundleAction);
-		assertNotNull(getDestroyAction(fb));
+		assertSame(BundleAction.UPDATE, action);
+		assertSame(BundleAction.STOP, getDestroyAction(fb));
 
 		assertSame(updateBundle, appContext.getBean("update"));
 		appContext.close();
@@ -213,6 +214,10 @@ public class BundleFactoryBeanParserTest extends TestCase {
 		BundleFactoryBean fb = (BundleFactoryBean) appContext.getBean("&updateFromActualLocation",
 			BundleFactoryBean.class);
 		assertEquals(1, INSTALL_BUNDLE_ACTION.size());
+
+		assertSame(BundleAction.UPDATE, getAction(fb));
+		assertSame(BundleAction.UNINSTALL, getDestroyAction(fb));
+
 		assertTrue(((String) INSTALL_BUNDLE_ACTION.get(0)).indexOf(STREAM_TAG) >= -1);
 
 		assertSame(installBundle, appContext.getBean("updateFromActualLocation"));
