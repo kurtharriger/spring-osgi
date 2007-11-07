@@ -25,9 +25,9 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.ServiceReferenceAware;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
 
 public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
