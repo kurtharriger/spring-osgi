@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service;
+package org.springframework.osgi.service.importer;
 
 import java.util.Map;
 
@@ -24,7 +24,7 @@ import java.util.Map;
  * @author Costin Leau
  * 
  */
-public interface TargetSourceLifecycleListener {
+public interface OsgiServiceLifecycleListener {
 
 	/**
 	 * Called when a service is being binded inside the proxy (be it single or

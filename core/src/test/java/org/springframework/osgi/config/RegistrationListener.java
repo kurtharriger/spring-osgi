@@ -17,7 +17,7 @@ package org.springframework.osgi.config;
 
 import java.util.Map;
 
-import org.springframework.osgi.service.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 
 /**
  * Registration listener.

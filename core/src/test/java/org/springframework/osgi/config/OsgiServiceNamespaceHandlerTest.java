@@ -39,8 +39,8 @@ import org.springframework.osgi.internal.context.support.BundleContextAwareProce
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.mock.MockServiceRegistration;
-import org.springframework.osgi.service.OsgiServiceRegistrationListener;
 import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 
 /**
  * Integration test for osgi:service namespace handler.

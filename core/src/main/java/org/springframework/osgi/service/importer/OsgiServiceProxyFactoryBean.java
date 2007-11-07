@@ -26,8 +26,6 @@ import org.springframework.osgi.internal.service.interceptor.ServiceReferenceAwa
 import org.springframework.osgi.internal.service.support.RetryTemplate;
 import org.springframework.osgi.internal.util.ClassUtils;
 import org.springframework.osgi.internal.util.DebugUtils;
-import org.springframework.osgi.service.ServiceReferenceAware;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -47,7 +45,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 
 	protected RetryTemplate retryTemplate = new RetryTemplate();
 
-	private ServiceReferenceAware proxy;
+	private ServiceReferenceAccessor proxy;
 
 	private LocalBundleContextAdvice bundleContextAdvice;
 
@@ -83,8 +81,8 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 			return (proxy == null ? true : proxy.getServiceReference().getBundle() != null);
 	}
 
-	protected ServiceReferenceAware createSingleServiceProxy(Class[] classes,
-			TargetSourceLifecycleListener[] listeners, ClassLoader loader) {
+	protected ServiceReferenceAccessor createSingleServiceProxy(Class[] classes,
+			OsgiServiceLifecycleListener[] listeners, ClassLoader loader) {
 		if (log.isDebugEnabled())
 			log.debug("creating a singleService proxy");
 
@@ -132,7 +130,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 		// factory.setOpaque(true);
 
 		try {
-			return (ServiceReferenceAware) factory.getProxy(loader);
+			return (ServiceReferenceAccessor) factory.getProxy(loader);
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			if (log.isWarnEnabled()) {

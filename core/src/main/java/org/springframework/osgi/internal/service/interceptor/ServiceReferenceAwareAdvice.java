@@ -15,33 +15,24 @@
  */
 package org.springframework.osgi.internal.service.interceptor;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.support.DelegatingIntroductionInterceptor;
-import org.springframework.osgi.service.ServiceReferenceAware;
-import org.springframework.osgi.util.OsgiServiceReferenceUtils;
+import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
 import org.springframework.util.Assert;
 
 /**
- * Mix-in implementation for ServiceReferenceAware.
+ * Mix-in implementation for ServiceReferenceAccessor.
  * 
  * @author Costin Leau
  * 
  */
-public class ServiceReferenceAwareAdvice extends DelegatingIntroductionInterceptor implements ServiceReferenceAware {
+public class ServiceReferenceAwareAdvice extends DelegatingIntroductionInterceptor implements ServiceReferenceAccessor {
 
 	private ServiceReference reference;
 
 	public ServiceReferenceAwareAdvice(ServiceReference reference) {
 		Assert.notNull(reference);
 		this.reference = reference;
-	}
-
-	public Map getServiceProperties() {
-		ServiceReference ref = getServiceReference();
-		return (ref != null ? OsgiServiceReferenceUtils.getServicePropertiesAsMap(ref) : Collections.EMPTY_MAP);
 	}
 
 	public ServiceReference getServiceReference() {

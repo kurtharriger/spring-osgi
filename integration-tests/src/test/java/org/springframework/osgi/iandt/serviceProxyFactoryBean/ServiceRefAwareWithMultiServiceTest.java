@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
 
 /**
  * @author Costin Leau
@@ -71,8 +71,8 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 			assertTrue(service instanceof Date);
 			assertEquals(time, ((Date) service).getTime());
 
-			assertTrue(service instanceof ServiceReferenceAware);
-			assertNotNull(((ServiceReferenceAware) service).getServiceReference());
+			assertTrue(service instanceof ServiceReferenceAccessor);
+			assertNotNull(((ServiceReferenceAccessor) service).getServiceReference());
 
 			assertFalse(iter.hasNext());
 			time = 111;
@@ -82,8 +82,8 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 			service = iter.next();
 			assertTrue(service instanceof Date);
 			assertEquals(time, ((Date) service).getTime());
-			assertTrue(service instanceof ServiceReferenceAware);
-			assertNotNull(((ServiceReferenceAware) service).getServiceReference());
+			assertTrue(service instanceof ServiceReferenceAccessor);
+			assertNotNull(((ServiceReferenceAccessor) service).getServiceReference());
 
 		}
 		finally {

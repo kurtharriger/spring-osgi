@@ -17,7 +17,8 @@ package org.springframework.osgi.internal.service.exporter;
 
 import java.util.Map;
 
-import org.springframework.osgi.service.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
+
 
 /**
  * @author Costin Leau

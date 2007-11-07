@@ -23,8 +23,8 @@ import java.util.Map;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.SpringProxy;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
 import org.springframework.osgi.util.MapBasedDictionary;
 
 /**
@@ -61,16 +61,16 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 
-		ServiceReferenceAware refAware = null;
+		ServiceReferenceAccessor refAware = null;
 		try {
 			Object result = fb.getObject();
 			assertTrue(result instanceof Date);
 			// check it's our object
 			assertEquals(time, ((Date) result).getTime());
 			assertTrue(result instanceof SpringProxy);
-			assertTrue(result instanceof ServiceReferenceAware);
+			assertTrue(result instanceof ServiceReferenceAccessor);
 
-			refAware = (ServiceReferenceAware) result;
+			refAware = (ServiceReferenceAccessor) result;
 			assertNotNull(refAware.getServiceReference());
 		}
 		finally {
@@ -118,19 +118,8 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 			// check it's our object
 			assertEquals(time, ((Date) result).getTime());
 
-			ServiceReferenceAware refAware = (ServiceReferenceAware) result;
-			// get properties
-			Map map = refAware.getServiceProperties();
+			ServiceReferenceAccessor refAware = (ServiceReferenceAccessor) result;
 
-			// compare content
-			assertTrue(doesMapContainsDictionary(dict, map));
-
-			// update properties dynamically
-			dict.put("another", "property");
-
-			reg.setProperties(dict);
-
-			assertTrue(doesMapContainsDictionary(dict, map));
 		}
 		finally {
 			if (reg != null)

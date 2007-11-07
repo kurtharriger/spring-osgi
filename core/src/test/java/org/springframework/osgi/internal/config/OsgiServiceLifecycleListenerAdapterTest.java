@@ -27,8 +27,8 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.ServiceReferenceAware;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
 import org.springframework.osgi.util.MapBasedDictionary;
 
 /**
@@ -36,9 +36,9 @@ import org.springframework.osgi.util.MapBasedDictionary;
  * @author Costin Leau
  * 
  */
-public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
+public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 
-	protected static class JustListener implements TargetSourceLifecycleListener {
+	protected static class JustListener implements OsgiServiceLifecycleListener {
 
 		public static int BIND_CALLS = 0;
 
@@ -199,7 +199,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 		}
 	}
 
-	private TargetSourceLifecycleListenerWrapper listener;
+	private OsgiServiceLifecycleListenerAdapter listener;
 
 	protected void setUp() throws Exception {
 		JustListener.BIND_CALLS = 0;
@@ -218,7 +218,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperOverListener() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new JustListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new JustListener());
 		listener.afterPropertiesSet();
 
 		assertEquals(0, JustListener.BIND_CALLS);
@@ -238,7 +238,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperOverNoInvalidClass() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new Object());
+		listener = new OsgiServiceLifecycleListenerAdapter(new Object());
 		try {
 			listener.afterPropertiesSet();
 			fail("should have thrown exception");
@@ -249,7 +249,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithIncorrectCustomMethodNames() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new Object());
+		listener = new OsgiServiceLifecycleListenerAdapter(new Object());
 		listener.setBindMethod("pop");
 		listener.setUnbindMethod("corn");
 
@@ -263,7 +263,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithCorrectCustomMethodNamesButIncorrectArgumentTypes() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new CustomListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new CustomListener());
 		listener.setBindMethod("wrongBind");
 		listener.setUnbindMethod("wrongUnbind");
 
@@ -283,7 +283,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithCustomMethods() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new CustomListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new CustomListener());
 		listener.setBindMethod("myBind");
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
@@ -309,7 +309,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithCustomMethodsAndNullParameters() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new CustomListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new CustomListener());
 		listener.setBindMethod("myBind");
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
@@ -325,7 +325,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithBothCustomAndInterfaceMethods() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new CustomAndListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new CustomAndListener());
 		listener.setBindMethod("aBind");
 		listener.setUnbindMethod("aUnbind");
 		listener.afterPropertiesSet();
@@ -345,7 +345,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithCustomOverloadedMethodsAndDifferentServiceTypes() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new OverloadedCustomMethods());
+		listener = new OsgiServiceLifecycleListenerAdapter(new OverloadedCustomMethods());
 		listener.setBindMethod("myBind");
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
@@ -384,7 +384,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testExceptionOnListenerMethod() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new ExceptionListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new ExceptionListener());
 		listener.setBindMethod("aBind");
 		listener.setUnbindMethod("aUnbind");
 		listener.afterPropertiesSet();
@@ -402,7 +402,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testExceptionOnCustomMethods() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new ExceptionCustomListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new ExceptionCustomListener());
 		listener.setBindMethod("myBind");
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
@@ -420,7 +420,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testStandardListenerWithListeningMethodsSpecifiedAsCustomOnes() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new JustListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new JustListener());
 		listener.setBindMethod("bind");
 		listener.setUnbindMethod("unbind");
 		listener.afterPropertiesSet();
@@ -438,7 +438,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testListenerWithOverloadedTypesAndMultipleParameterTypes() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new DictionaryAndMapCustomListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new DictionaryAndMapCustomListener());
 		listener.setBindMethod("bind");
 		listener.setUnbindMethod("unbind");
 		listener.afterPropertiesSet();
@@ -459,7 +459,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testOverridingMethodsDiscovery() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new OverridingMethodListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new OverridingMethodListener());
 		listener.setBindMethod("myBind");
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
@@ -478,7 +478,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testJustCustomBindMethod() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new JustBind());
+		listener = new OsgiServiceLifecycleListenerAdapter(new JustBind());
 		listener.setBindMethod("myBind");
 		listener.afterPropertiesSet();
 
@@ -492,7 +492,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testJustCustomUnbindMethod() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new JustUnbind());
+		listener = new OsgiServiceLifecycleListenerAdapter(new JustUnbind());
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
 
@@ -506,7 +506,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testCustomServiceRefBind() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new CustomServiceRefListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new CustomServiceRefListener());
 		listener.setBindMethod("myBind");
 		listener.afterPropertiesSet();
 
@@ -521,7 +521,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 	}
 
 	public void testCustomServiceRefUnbind() throws Exception {
-		listener = new TargetSourceLifecycleListenerWrapper(new CustomServiceRefListener());
+		listener = new OsgiServiceLifecycleListenerAdapter(new CustomServiceRefListener());
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
 
@@ -534,7 +534,7 @@ public class TargetSourceLifecycleListenerWrapperTest extends TestCase {
 		assertEquals(1, JustListener.UNBIND_CALLS);
 	}
 	
-	private class ServiceReferenceAwareMock implements ServiceReferenceAware {
+	private class ServiceReferenceAwareMock implements ServiceReferenceAccessor {
 
 		public Map getServiceProperties() {
 			return new HashMap();

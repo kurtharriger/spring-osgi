@@ -24,7 +24,7 @@ import org.easymock.MockControl;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 
 public class ServiceRegistrationWrapperTest extends TestCase {
 
@@ -38,7 +38,7 @@ public class ServiceRegistrationWrapperTest extends TestCase {
 		mc = MockControl.createControl(ServiceRegistration.class);
 		actualRegistration = (ServiceRegistration) mc.getMock();
 
-		registration = new ServiceRegistrationWrapper(new Object(), actualRegistration,
+		registration = new ServiceRegistrationDecorator(new Object(), actualRegistration,
 				new OsgiServiceRegistrationListener[] { new SimpleOsgiServiceRegistrationListener() });
 		SimpleOsgiServiceRegistrationListener.REGISTERED = 0;
 		SimpleOsgiServiceRegistrationListener.UNREGISTERED = 0;

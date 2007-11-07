@@ -29,7 +29,6 @@ import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.internal.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.internal.service.importer.AbstractServiceImporter;
 import org.springframework.osgi.internal.util.ClassUtils;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -66,7 +65,7 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	protected Filter unifiedFilter;
 
 	// service lifecycle listener
-	protected TargetSourceLifecycleListener[] listeners;
+	protected OsgiServiceLifecycleListener[] listeners;
 
 	/** Service Bean property of the OSGi service * */
 	protected String serviceBeanName;
@@ -105,7 +104,7 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(interfaces),
 			"more then one concrete class specified; cannot create proxy");
 
-		this.listeners = (listeners == null ? new TargetSourceLifecycleListener[0] : listeners);
+		this.listeners = (listeners == null ? new OsgiServiceLifecycleListener[0] : listeners);
 
 		getUnifiedFilter(); // eager initialization of the cache to catch filter
 		// errors
@@ -214,7 +213,7 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	/**
 	 * @param listeners The listeners to set.
 	 */
-	public void setListeners(TargetSourceLifecycleListener[] listeners) {
+	public void setListeners(OsgiServiceLifecycleListener[] listeners) {
 		this.listeners = listeners;
 	}
 

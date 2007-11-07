@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.internal.service.ServiceExporter;
-import org.springframework.osgi.service.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 
 /**
  * {@link ServiceExporter} extension that takes care of listeners registration
@@ -42,7 +42,7 @@ public abstract class AbstractListenerAwareExporter extends AbstractServiceExpor
 		// notify listeners
 		callRegisteredOnListeners(service, properties);
 		// wrap registration to be notified of unregistration
-		return new ServiceRegistrationWrapper(service, registration, listeners);
+		return new ServiceRegistrationDecorator(service, registration, listeners);
 	}
 
 	/**

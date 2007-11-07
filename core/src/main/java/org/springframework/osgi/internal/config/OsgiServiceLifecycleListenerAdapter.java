@@ -23,21 +23,21 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.internal.util.ReflectionUtils;
-import org.springframework.osgi.service.ServiceReferenceAware;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * TargetSourceLifecycleListener wrapper for custom beans, useful when custom
+ * OsgiServiceLifecycleListener wrapper for custom beans, useful when custom
  * methods are being used.
  * 
  * @author Costin Leau
  * 
  */
-class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListener, InitializingBean {
+class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean {
 
-	private static final Log log = LogFactory.getLog(TargetSourceLifecycleListenerWrapper.class);
+	private static final Log log = LogFactory.getLog(OsgiServiceLifecycleListenerAdapter.class);
 
 	/**
 	 * Map of methods keyed by the first parameter which indicates the service
@@ -56,10 +56,10 @@ class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListe
 
 	private final boolean isLifecycleListener;
 
-	TargetSourceLifecycleListenerWrapper(Object object) {
+	OsgiServiceLifecycleListenerAdapter(Object object) {
 		Assert.notNull(object);
 		this.target = object;
-		isLifecycleListener = target instanceof TargetSourceLifecycleListener;
+		isLifecycleListener = target instanceof OsgiServiceLifecycleListener;
 	}
 
 	/**
@@ -94,7 +94,7 @@ class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListe
 		if (!isLifecycleListener
 				&& (bindMethods.isEmpty() && unbindMethods.isEmpty() && bindReference == null && unbindReference == null))
 			throw new IllegalArgumentException("target object needs to implement "
-					+ TargetSourceLifecycleListener.class.getName()
+					+ OsgiServiceLifecycleListener.class.getName()
 					+ " or custom bind/unbind methods have to be specified");
 	}
 
@@ -114,7 +114,7 @@ class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListe
 			if (trace)
 				log.trace("invoking listener custom method " + method);
 
-			ServiceReference ref = ((ServiceReferenceAware) service).getServiceReference();
+			ServiceReference ref = ((ServiceReferenceAccessor) service).getServiceReference();
 
 			try {
 				ReflectionUtils.invokeMethod(method, target, new Object[] { ref });
@@ -142,7 +142,7 @@ class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListe
 				log.trace("invoking listener interface methods");
 
 			try {
-				((TargetSourceLifecycleListener) target).bind(service, properties);
+				((OsgiServiceLifecycleListener) target).bind(service, properties);
 			}
 			catch (Exception ex) {
 				log.warn("standard bind method on [" + target.getClass().getName() + "] threw exception", ex);
@@ -164,7 +164,7 @@ class TargetSourceLifecycleListenerWrapper implements TargetSourceLifecycleListe
 			if (trace)
 				log.trace("invoking listener interface methods");
 			try {
-				((TargetSourceLifecycleListener) target).unbind(service, properties);
+				((OsgiServiceLifecycleListener) target).unbind(service, properties);
 			}
 			catch (Exception ex) {
 				log.warn("standard unbind method on [" + target.getClass().getName() + "] threw exception", ex);

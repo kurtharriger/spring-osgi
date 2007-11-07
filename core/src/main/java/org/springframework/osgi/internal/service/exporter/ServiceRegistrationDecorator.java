@@ -20,17 +20,17 @@ import java.util.Map;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.Assert;
 
 /**
- * Wrapper class for {@link ServiceReference} which add notification for
+ * Decorator class for {@link ServiceReference} which add notification for
  * {@link ServiceRegistration#unregister()} method when dealing with listeners.
  * 
  * @author Costin Leau
  */
-public class ServiceRegistrationWrapper implements ServiceRegistration {
+public class ServiceRegistrationDecorator implements ServiceRegistration {
 
 	/** actual service registration */
 	private final ServiceRegistration delegate;
@@ -39,7 +39,7 @@ public class ServiceRegistrationWrapper implements ServiceRegistration {
 
 	private final Object service;
 
-	public ServiceRegistrationWrapper(Object service, ServiceRegistration registration,
+	public ServiceRegistrationDecorator(Object service, ServiceRegistration registration,
 			OsgiServiceRegistrationListener[] listeners) {
 		Assert.notNull(registration);
 		this.delegate = registration;
