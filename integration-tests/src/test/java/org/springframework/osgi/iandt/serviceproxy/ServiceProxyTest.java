@@ -33,6 +33,7 @@ import org.springframework.util.ClassUtils;
  * @author Costin Leau
  * 
  */
+// FIXME: don't rely on internal packages anymore
 public abstract class ServiceProxyTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getTestBundlesNames() {
@@ -61,11 +62,11 @@ public abstract class ServiceProxyTest extends AbstractConfigurableBundleCreator
 
 	private Advice createCardinalityAdvice(Class clazz) {
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
-		OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(bundleContext, 2, classLoader);
+		OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(bundleContext,
+				OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null)), 2, true, classLoader);
 		// fast retry
-		interceptor.getRetryTemplate().setWaitTime(1);
-		interceptor.setFilter(OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null)));
 		interceptor.afterPropertiesSet();
+		interceptor.getRetryTemplate().setWaitTime(1);
 		return interceptor;
 
 	}

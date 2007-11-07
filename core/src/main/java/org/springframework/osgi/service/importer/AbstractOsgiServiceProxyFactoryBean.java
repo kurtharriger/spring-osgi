@@ -19,11 +19,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
+import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.internal.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.internal.service.importer.AbstractServiceImporter;
 import org.springframework.osgi.internal.util.ClassUtils;
@@ -146,6 +148,39 @@ public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServic
 	}
 
 	public abstract void destroy() throws Exception;
+
+	/**
+	 * Determine the classloader to set.
+	 * 
+	 * @param reference
+	 * @param contextClassLoader
+	 * @return
+	 */
+	// FIXME: this should be moved outside the class
+	protected ClassLoader determineClassLoader(ServiceReference reference, int contextClassLoader,
+			ClassLoader clientClassLoader) {
+		boolean trace = log.isTraceEnabled();
+
+		if (ReferenceClassLoadingOptions.CLIENT.shortValue() == contextClassLoader) {
+			if (trace) {
+				log.trace("client TCCL used for this invocation");
+			}
+			return clientClassLoader;
+		}
+		else if (ReferenceClassLoadingOptions.SERVICE_PROVIDER.shortValue() == contextClassLoader) {
+			if (trace) {
+				log.trace("service provider TCCL used for this invocation");
+			}
+
+			return BundleDelegatingClassLoader.createBundleClassLoaderFor(reference.getBundle());
+		}
+		else if (ReferenceClassLoadingOptions.UNMANAGED.shortValue() == contextClassLoader) {
+			if (trace) {
+				log.trace("no (unmanaged)TCCL used for this invocation");
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * The type that the OSGi service was registered with.

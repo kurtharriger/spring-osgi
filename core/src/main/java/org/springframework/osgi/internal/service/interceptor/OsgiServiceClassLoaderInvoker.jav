@@ -15,7 +15,10 @@
  */
 package org.springframework.osgi.internal.service.interceptor;
 
+import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
@@ -25,38 +28,33 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Add the context classloader handling.
+ * Around interceptor for thread context classloader (TCCL) handling.
  * 
  * @author Costin Leau
  * 
  */
-public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
+
+// FIXME: merge this with OsgiServiceTCCLInvoker and move classloading detection
+// logic into a separate class
+public class OsgiServiceClassLoaderInvoker implements MethodInterceptor {
+
+	private static final Log log = LogFactory.getLog(OsgiServiceClassLoaderInvoker.class);
 
 	private ClassLoader tccl = null;
 
 	private boolean canCacheClassLoader = false;
 
-	protected final BundleContext context;
+	private final ClassLoader clientClassLoader;
 
-	protected final ClassLoader clientClassLoader;
-
-	protected ClassLoader serviceClassLoader;
+	private ClassLoader serviceClassLoader;
 
 	protected int contextClassLoader = ReferenceClassLoadingOptions.UNMANAGED.shortValue();
 
 	private ServiceReference serviceReference;
 
-	public OsgiServiceClassLoaderInvoker(ServiceReference reference, int contextClassLoader, ClassLoader classLoader) {
-		this(OsgiBundleUtils.getBundleContext(reference.getBundle()), reference, contextClassLoader, classLoader);
-	}
-
-	public OsgiServiceClassLoaderInvoker(BundleContext context, ServiceReference reference, int contextClassLoader,
-			ClassLoader classLoader) {
-		Assert.notNull(context);
+	public OsgiServiceClassLoaderInvoker(int contextClassLoader, ClassLoader classLoader) {
 		Assert.notNull(classLoader, "ClassLoader required");
 
-		this.context = context;
-		this.serviceReference = reference;
 		this.contextClassLoader = contextClassLoader;
 		this.clientClassLoader = classLoader;
 
@@ -64,12 +62,12 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 		// reuse it
 		canCacheClassLoader = !(contextClassLoader == ReferenceClassLoadingOptions.SERVICE_PROVIDER.shortValue());
 		if (canCacheClassLoader) {
-			this.tccl = determineClassLoader(context, null, contextClassLoader);
+			this.tccl = determineClassLoader(l, contextClassLoader);
 		}
 
 	}
 
-	protected ClassLoader determineClassLoader(BundleContext context, ServiceReference reference, int contextClassLoader) {
+	protected ClassLoader determineClassLoader(ServiceReference reference, int contextClassLoader) {
 		boolean trace = log.isTraceEnabled();
 
 		if (ReferenceClassLoadingOptions.CLIENT.shortValue() == contextClassLoader) {
@@ -95,14 +93,13 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 		return null;
 	}
 
-	protected Object doInvoke(Object service, MethodInvocation invocation) throws Throwable {
+	public Object invoke(MethodInvocation invocation) throws Throwable {
 		if (!canCacheClassLoader)
 			tccl = determineClassLoader(context, serviceReference, contextClassLoader);
 
 		ClassLoader oldCL = null;
 		boolean trace = log.isTraceEnabled();
 
-		// if it's unmanaged
 		if ((tccl != null && canCacheClassLoader) || !canCacheClassLoader) {
 			if (trace)
 				log.trace("temporary setting thread context classloader to " + tccl);
@@ -110,7 +107,7 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 				oldCL = Thread.currentThread().getContextClassLoader();
 				Thread.currentThread().setContextClassLoader(tccl);
 
-				return super.doInvoke(service, invocation);
+				return invocation.proceed();
 			}
 			finally {
 				if (trace)
@@ -118,8 +115,9 @@ public abstract class OsgiServiceClassLoaderInvoker extends OsgiServiceInvoker {
 				Thread.currentThread().setContextClassLoader(oldCL);
 			}
 		}
+		// if it's unmanaged
 		else {
-			return super.doInvoke(service, invocation);
+			return invocation.proceed();
 		}
 	}
 

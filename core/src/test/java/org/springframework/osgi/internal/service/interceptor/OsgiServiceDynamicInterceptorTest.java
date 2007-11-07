@@ -21,10 +21,12 @@ import junit.framework.TestCase;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.internal.service.support.RetryTemplate;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
@@ -49,6 +51,8 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	private ServiceListener listener;
 
+	private BundleContext ctx;
+
 	protected void setUp() throws Exception {
 		service = new Object();
 		serv2 = new Object();
@@ -66,7 +70,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		// 2. will return ref2 for filter serv2Filter
 
 		// the same goes with getService
-		BundleContext ctx = new MockBundleContext() {
+		ctx = new MockBundleContext() {
 
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 				if (serv2Filter.equals(filter))
@@ -98,18 +102,23 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 			}
 		};
 
-		interceptor = new OsgiServiceDynamicInterceptor(ctx, ReferenceClassLoadingOptions.UNMANAGED.shortValue(),
-				getClass().getClassLoader());
-		interceptor.getRetryTemplate().setRetryNumbers(3);
-		interceptor.getRetryTemplate().setWaitTime(1);
-		interceptor.setFilter(new MockFilter());
-		interceptor.afterPropertiesSet();
+		createInterceptor(null);
 	}
 
 	protected void tearDown() throws Exception {
 		service = null;
 		interceptor = null;
 		listener = null;
+	}
+
+	private void createInterceptor(Filter filter) {
+		interceptor = new OsgiServiceDynamicInterceptor(ctx, filter,
+				ReferenceClassLoadingOptions.UNMANAGED.shortValue(), false, getClass().getClassLoader());
+
+		interceptor.afterPropertiesSet();
+
+		interceptor.getRetryTemplate().setRetryNumbers(3);
+		interceptor.getRetryTemplate().setWaitTime(1);
 	}
 
 	/**
@@ -176,7 +185,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);
 
 		MethodInvocation invocation = new MockMethodInvocation(m);
-		interceptor.setFilter(new MockFilter(nullFilter));
+		createInterceptor(new MockFilter(nullFilter));
 		ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING, reference);
 		listener.serviceChanged(event);
 		interceptor.getRetryTemplate().setRetryNumbers(3);
@@ -222,7 +231,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		Object target = interceptor.getTarget();
 		assertSame("target not properly discovered", service, target);
 
-		interceptor.setFilter(new MockFilter(serv2Filter));
+		createInterceptor(new MockFilter(serv2Filter));
 		event = new ServiceEvent(ServiceEvent.UNREGISTERING, reference);
 		listener.serviceChanged(event);
 

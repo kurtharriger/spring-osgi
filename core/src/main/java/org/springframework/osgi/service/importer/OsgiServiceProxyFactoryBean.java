@@ -17,11 +17,11 @@ package org.springframework.osgi.service.importer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.Filter;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.osgi.internal.service.interceptor.LocalBundleContextAdvice;
 import org.springframework.osgi.internal.service.interceptor.OsgiServiceDynamicInterceptor;
+import org.springframework.osgi.internal.service.interceptor.OsgiServiceTCCLInterceptor;
 import org.springframework.osgi.internal.service.interceptor.ServiceReferenceAwareAdvice;
 import org.springframework.osgi.internal.service.support.RetryTemplate;
 import org.springframework.osgi.internal.util.ClassUtils;
@@ -49,6 +49,13 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 
 	private ServiceReferenceAware proxy;
 
+	private LocalBundleContextAdvice bundleContextAdvice;
+
+	public void afterPropertiesSet() {
+		super.afterPropertiesSet();
+		bundleContextAdvice = new LocalBundleContextAdvice(bundleContext);
+	}
+
 	public Object getObject() {
 		if (!initialized)
 			throw new FactoryBeanNotInitializedException();
@@ -64,7 +71,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(interfaces) ? Object.class : interfaces[0]));
 
 	}
-	
+
 	public void destroy() throws Exception {
 		// FIXME: implement cleanup
 	}
@@ -86,15 +93,38 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 		// mold the proxy
 		ClassUtils.configureFactoryForClass(factory, classes);
 
-		// TODO: the same advices should be available for the multi case/service
-		// collection
+		OsgiServiceDynamicInterceptor lookupAdvice = new OsgiServiceDynamicInterceptor(bundleContext, unifiedFilter,
+				contextClassloader, mandatory, classLoader);
 
-		// Bundle Ctx
-		addLocalBundleContextSupport(factory);
+		lookupAdvice.setListeners(listeners);
+		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
 
-		// dynamic retry interceptor / context classloader / service aware
-		// implementation
-		addOsgiRetryInterceptor(factory, getUnifiedFilter(), listeners);
+		// add the listeners as a list since it might be updated after the proxy
+		// has been created
+		lookupAdvice.setDependencyListeners(this.depedencyListeners);
+		lookupAdvice.setServiceImporter(this);
+
+		// init target-source
+		lookupAdvice.afterPropertiesSet();
+
+		// service aware mixin
+		factory.addAdvice(new ServiceReferenceAwareAdvice(lookupAdvice.getServiceReference()));
+
+		// Add advice for pushing the bundle context
+		factory.addAdvice(bundleContextAdvice);
+
+		// FIXME: the TCCL in case of service-managed uses the first bundle
+		// discovered ignoring
+		// future updates of the service reference. The best solution is to
+		// probably have
+		// a smart TCCL interceptor that creates the CL on the fly.
+
+		ClassLoader cl = determineClassLoader(lookupAdvice.getServiceReference(), contextClassloader, classLoader);
+		if (cl != null)
+			// context classloader
+			factory.addAdvice(new OsgiServiceTCCLInterceptor(cl));
+
+		factory.addAdvice(lookupAdvice);
 
 		// TODO: should these be enabled ?
 		// factory.setFrozen(true);
@@ -110,41 +140,6 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 			}
 			throw ncdfe;
 		}
-	}
-
-	/**
-	 * Add the retry interceptor and the ServiceReference aware mixin.
-	 * 
-	 * @param factory
-	 * @param filter
-	 * @param listeners
-	 */
-	protected void addOsgiRetryInterceptor(ProxyFactory factory, Filter filter,
-			TargetSourceLifecycleListener[] listeners) {
-		OsgiServiceDynamicInterceptor lookupAdvice = new OsgiServiceDynamicInterceptor(bundleContext,
-				contextClassloader, mandatory, classLoader);
-		lookupAdvice.setListeners(listeners);
-		lookupAdvice.setFilter(filter);
-		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
-
-		// add the listeners as a list since it might be updated after the proxy has been created
-		lookupAdvice.setDependencyListeners(this.depedencyListeners);
-		lookupAdvice.setServiceImporter(this);
-
-		lookupAdvice.afterPropertiesSet();
-
-		factory.addAdvice(new ServiceReferenceAwareAdvice(lookupAdvice));
-		factory.addAdvice(lookupAdvice);
-	}
-
-	/**
-	 * Add the local bundle context support.
-	 * 
-	 * @param factory
-	 */
-	protected void addLocalBundleContextSupport(ProxyFactory factory) {
-		// Add advice for pushing the bundle context
-		factory.addAdvice(new LocalBundleContextAdvice(bundleContext.getBundle()));
 	}
 
 	/**
@@ -167,7 +162,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactory
 	public void setTimeout(long millisBetweenRetries) {
 		this.retryTemplate.setWaitTime(millisBetweenRetries);
 	}
-	
+
 	/* override to check proper cardinality - x..1 */
 	public void setCardinality(String cardinality) {
 		Assert.isTrue(CardinalityOptions.isSingular(CardinalityOptions.resolveEnum(cardinality)),

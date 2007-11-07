@@ -32,11 +32,11 @@ import org.springframework.util.Assert;
  */
 public class ServiceReferenceAwareAdvice extends DelegatingIntroductionInterceptor implements ServiceReferenceAware {
 
-	private OsgiServiceInvoker serviceInvoker;
+	private ServiceReference reference;
 
-	public ServiceReferenceAwareAdvice(OsgiServiceInvoker serviceInvoker) {
-		Assert.notNull(serviceInvoker);
-		this.serviceInvoker = serviceInvoker;
+	public ServiceReferenceAwareAdvice(ServiceReference reference) {
+		Assert.notNull(reference);
+		this.reference = reference;
 	}
 
 	public Map getServiceProperties() {
@@ -45,7 +45,7 @@ public class ServiceReferenceAwareAdvice extends DelegatingIntroductionIntercept
 	}
 
 	public ServiceReference getServiceReference() {
-		return serviceInvoker.getServiceReference();
+		return reference;
 	}
 
 	public boolean equals(Object other) {
@@ -53,7 +53,7 @@ public class ServiceReferenceAwareAdvice extends DelegatingIntroductionIntercept
 			return true;
 		if (other instanceof ServiceReferenceAwareAdvice) {
 			ServiceReferenceAwareAdvice oth = (ServiceReferenceAwareAdvice) other;
-			return (serviceInvoker.equals(oth.serviceInvoker));
+			return (reference.equals(oth.reference));
 		}
 		else
 			return false;

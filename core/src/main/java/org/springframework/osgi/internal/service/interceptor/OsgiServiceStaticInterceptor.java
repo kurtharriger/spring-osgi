@@ -17,7 +17,6 @@ package org.springframework.osgi.internal.service.interceptor;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.internal.service.support.ServiceWrapper;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.util.Assert;
 
@@ -29,29 +28,34 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker {
+public class OsgiServiceStaticInterceptor extends OsgiServiceInvoker {
 
-	private final ServiceWrapper wrapper;
+	private final ServiceReference reference;
 
-	public OsgiServiceStaticInterceptor(BundleContext context, ServiceReference reference, int contextClassLoader,
-			ClassLoader classLoader) {
-		super(context, reference, contextClassLoader, classLoader);
+	private final BundleContext bundleContext;
+
+	public OsgiServiceStaticInterceptor(BundleContext context, ServiceReference reference) {
+		Assert.notNull(context);
 		Assert.notNull(reference, "a not null service reference is required");
-		this.wrapper = new ServiceWrapper(reference, context);
+		this.bundleContext = context;
+		this.reference = reference;
 	}
 
 	protected Object getTarget() {
-		// service has died, clean up
-		if (!wrapper.isServiceAlive()) {
-			wrapper.cleanup();
-			throw new ServiceUnavailableException(wrapper.getReference());
+		// check if the service is alive first
+		if (reference.getBundle() != null) {
+			// since requesting for a service requires additional work
+			// from the OSGi platform
+			Object target = bundleContext.getService(reference);
+			if (target != null)
+				return target;
 		}
-
-		return wrapper.getService();
+		// throw exception
+		throw new ServiceUnavailableException(reference);
 	}
 
-	protected ServiceReference getServiceReference() {
-		return wrapper.getReference();
+	public ServiceReference getServiceReference() {
+		return reference;
 	}
 
 	public boolean equals(Object other) {
@@ -59,7 +63,7 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 			return true;
 		if (other instanceof OsgiServiceStaticInterceptor) {
 			OsgiServiceStaticInterceptor oth = (OsgiServiceStaticInterceptor) other;
-			return wrapper.equals(oth.wrapper) && super.equals(other);
+			return reference.equals(oth.reference) && bundleContext.equals(bundleContext);
 		}
 		return false;
 	}

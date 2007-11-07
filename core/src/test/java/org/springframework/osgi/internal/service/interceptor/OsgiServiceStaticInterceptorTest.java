@@ -35,32 +35,32 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 
 	private OsgiServiceStaticInterceptor interceptor;
 
-    private Object service;
+	private Object service;
 
-    private ClassLoader classLoader = getClass().getClassLoader();
+	private ClassLoader classLoader = getClass().getClassLoader();
 
-    protected void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		service = new Object();
 
-        ServiceReference reference = new MockServiceReference();
+		ServiceReference reference = new MockServiceReference();
 
-        BundleContext ctx = new MockBundleContext() {
+		BundleContext ctx = new MockBundleContext() {
 			public Object getService(ServiceReference reference) {
 				return service;
 			}
 		};
 
-        interceptor = new OsgiServiceStaticInterceptor(ctx, reference, 2, classLoader);
+		interceptor = new OsgiServiceStaticInterceptor(ctx, reference);
 	}
 
 	protected void tearDown() throws Exception {
 		service = null;
-        interceptor = null;
+		interceptor = null;
 	}
 
 	public void testNullWrapper() throws Exception {
 		try {
-			interceptor = new OsgiServiceStaticInterceptor(null, null, 0, classLoader);
+			interceptor = new OsgiServiceStaticInterceptor(null, null);
 			fail("expected exception");
 		}
 		catch (RuntimeException ex) {
@@ -84,7 +84,7 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 			}
 		};
 
-		interceptor = new OsgiServiceStaticInterceptor(new MockBundleContext(), reference, 2, classLoader);
+		interceptor = new OsgiServiceStaticInterceptor(new MockBundleContext(), reference);
 
 		Object target = new Object();
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);

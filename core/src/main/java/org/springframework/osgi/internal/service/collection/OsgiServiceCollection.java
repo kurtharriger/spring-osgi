@@ -33,8 +33,9 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.internal.service.ImporterProxy;
-import org.springframework.osgi.internal.service.interceptor.OsgiServiceInvoker;
+import org.springframework.osgi.internal.service.interceptor.LocalBundleContextAdvice;
 import org.springframework.osgi.internal.service.interceptor.OsgiServiceStaticInterceptor;
 import org.springframework.osgi.internal.service.interceptor.ServiceReferenceAwareAdvice;
 import org.springframework.osgi.internal.service.util.OsgiServiceBindingUtils;
@@ -206,6 +207,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Impo
 
 	protected final boolean atLeastOneServiceMandatory;
 
+	private final LocalBundleContextAdvice bundleContextInterceptor;
+
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader, boolean mandatory) {
 		Assert.notNull(classLoader, "ClassLoader is required");
 		Assert.notNull(context, "context is required");
@@ -215,12 +218,11 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Impo
 		this.classLoader = classLoader;
 
 		this.atLeastOneServiceMandatory = mandatory;
+
+		// share instance
+		bundleContextInterceptor = new LocalBundleContextAdvice(context);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
 	public void afterPropertiesSet() {
 		// create service proxies collection
 		this.serviceProxies = createInternalDynamicStorage();
@@ -275,14 +277,24 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Impo
 
 		ClassUtils.configureFactoryForClass(factory, classes);
 
+		// add mixin first
+		factory.addAdvice(new ServiceReferenceAwareAdvice(ref));
+		// add bundle context interceptor
+		factory.addAdvice(bundleContextInterceptor);
+
+		// FIXME: add tccl handling
+		// share stateless interceptors
+		// factory.addAdvice(invoker);
+
 		// add the interceptors
+		// FIXME: why allow custom interceptors to be specified (?)
 		if (this.interceptors != null) {
 			for (int i = 0; i < this.interceptors.length; i++) {
 				factory.addAdvisor(this.advisorAdapterRegistry.wrap(this.interceptors[i]));
 			}
 		}
-
-		addEndingInterceptors(factory, ref);
+		// add the invoker interceptor last
+		factory.addAdvice(new OsgiServiceStaticInterceptor(context, ref));
 
 		// TODO: why not add these?
 		// factory.setOptimize(true);
@@ -302,16 +314,6 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Impo
 		classes = ClassUtils.removeParents(classes);
 
 		return classes;
-	}
-
-	/**
-	 * Add the ending interceptors such as lookup and Service Reference aware.
-	 * @param pf
-	 */
-	protected void addEndingInterceptors(ProxyFactory factory, ServiceReference ref) {
-		OsgiServiceInvoker invoker = new OsgiServiceStaticInterceptor(context, ref, contextClassLoader, classLoader);
-		factory.addAdvice(new ServiceReferenceAwareAdvice(invoker));
-		factory.addAdvice(invoker);
 	}
 
 	private void invalidateProxy(Object proxy) {
