@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.JdkVersion;
-import org.springframework.osgi.ServiceUnavailableException;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.iandt.annotation.proxy.ServiceReferer;
 import org.springframework.osgi.iandt.simpleservice.MyService;
