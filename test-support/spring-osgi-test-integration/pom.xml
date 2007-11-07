@@ -11,6 +11,16 @@
   <packaging>pom</packaging>
   <name>Spring JUnit support for OSGi (integration tests)</name>
   <url>http://www.springframework.org/osgi</url>
+  
+   <dependencies>
+    <dependency>
+     <groupId>org.springframework.osgi</groupId>
+     <artifactId>spring-osgi-annotation</artifactId>
+     <version>${project.parent.version}</version>
+     <scope>compile</scope>
+    </dependency>
+   </dependencies>
+   
    <modules>
     <module>integration-tests</module>
   </modules>

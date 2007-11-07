@@ -17,7 +17,6 @@ package org.springframework.osgi.internal.service.interceptor;
 
 import java.awt.Polygon;
 import java.awt.Shape;
-import java.util.Date;
 
 import junit.framework.TestCase;
 

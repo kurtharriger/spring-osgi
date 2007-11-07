@@ -23,10 +23,9 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.ServiceUnavailableException;
-import org.springframework.osgi.internal.service.interceptor.OsgiServiceStaticInterceptor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.ServiceUnavailableException;
 
 /**
  * @author Costin Leau

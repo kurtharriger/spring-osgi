@@ -72,8 +72,8 @@
     </section>
   </section>
 
-  <section>
-    <title>2.0 Bundles and Application Contexts</title>
+  <section id="bnd-app-ctx">
+    <title>Bundles and Application Contexts</title>
 
     <para>The unit of deployment (and modularity) in OSGi is the bundle (see
     section 3.2 of the OSGi Service Platform Core Specification). A bundle
@@ -100,8 +100,8 @@
     and thus made available to other bundles, beans within the bundle may also
     be transparently injected with references to OSGi services.</para>
 
-    <section>
-      <title>2.1 The Spring Dynamic Modules Extender bundle</title>
+    <section id="bnd-app-ctx:extender">
+      <title> The Spring Dynamic Modules Extender bundle</title>
 
       <para>Spring Dynamic Modules provides an OSGi bundle
       <literal>org.springframework.osgi.spring-osgi-extender</literal>. This
@@ -117,8 +117,8 @@
       extender recognizes as a "Spring-powered bundle".</para>
     </section>
 
-    <section>
-      <title>2.2 Application Context Creation</title>
+    <section id="bnd-app-ctx:app-creation">
+      <title>Application Context Creation</title>
 
       <para>The extender bundle creates applications contexts asynchronously.
       This behavior ensures that starting an OSGi Service Platform is fast and
@@ -134,8 +134,8 @@
       will be no services exported to the registry from the application
       context in this scenario.</para>
 
-      <section>
-        <title>2.2.1 Mandatory Service Dependencies</title>
+      <section id="bnd-app-ctx:app-creation:mandatory-deps">
+        <title>Mandatory Service Dependencies</title>
 
         <para>If an application context declares mandatory dependencies on the
         availability of certain OSGi services (see section 4.0) then creation
@@ -168,8 +168,8 @@
         in the RESOLVED state.</para>
       </section>
 
-      <section>
-        <title>2.2.2 Application Context Service Publication</title>
+      <section id="bnd-app-ctx:app-creation:app-ctx-publication">
+        <title>Application Context Service Publication</title>
 
         <para>Once the application context creation for a bundle has
         completed, the application context object is automatically exported as
@@ -197,8 +197,8 @@
       </section>
     </section>
 
-    <section>
-      <title>2.3 Bundle Lifecycle</title>
+    <section id="bnd-app-ctx:bnd-lifecycle">
+      <title>Bundle Lifecycle</title>
 
       <para>OSGi is a dynamic platform: bundles may be installed, started,
       updated, stopped, and uninstalled at any time during the running of the
@@ -241,8 +241,8 @@
       re-started, a new application context will be created for it.</para>
     </section>
 
-    <section>
-      <title>2.4 The Resource abstraction</title>
+    <section id="bnd-app-ctx:osgi-resource">
+      <title>The Resource abstraction</title>
 
       <para>The Spring Framework defines a resource abstraction for loading
       resources within an application context (see <ulink
@@ -291,8 +291,8 @@
       particular OSGi implementation.</para>
     </section>
 
-    <section>
-      <title>2.5 Accessing the BundleContext</title>
+    <section id="bnd-app-ctx:access-bnd-ctx">
+      <title>Accessing the BundleContext</title>
 
       <para>In general there is no need to depend on any OSGi APIs when using
       the Spring Dynamic Modules support. If you <emphasis>do</emphasis> need
@@ -317,8 +317,8 @@
       package <literal>org.springframework.osgi.context</literal> in your
       bundle manifest.</para>
 
-      <section>
-        <title>2.5.1 ThreadLocal access to BundleContext</title>
+      <section id="bnd-app-ctx:access-bnd-ctx:thread-local">
+        <title>ThreadLocal access to BundleContext</title>
 
         <para>During creation of an application context, access to the
         <literal>BundleContext</literal> object for the bundle is also
@@ -338,8 +338,8 @@
       </section>
     </section>
 
-    <section>
-      <title>2.6 Stopping the extender bundle</title>
+    <section id="bnd-app-ctx:access-bnd-ctx:stop-extender">
+      <title>Stopping the extender bundle</title>
 
       <para>If the extender bundle is stopped, then all the application
       contexts created by the extender will be destroyed. Application contexts
@@ -373,8 +373,8 @@
     </section>
   </section>
 
-  <section>
-    <title>3.0 Packaging and Deploying Spring-based OSGi applications</title>
+  <section id="app-deploy">
+    <title>Packaging and Deploying Spring-based OSGi applications</title>
 
     <para>A traditional Spring application uses either a single application
     context, or a parent context containing service layer, data layer, and
@@ -421,8 +421,8 @@
     model types, but does not need to create any components of its own, it has
     no associated application context.</para>
 
-    <section>
-      <title>3.1 Bundle format and Manifest headers</title>
+    <section id="app-deploy:headers">
+      <title>Bundle format and Manifest headers</title>
 
       <para>Each application module should be packaged as an OSGi bundle. A
       bundle is essentially a jar file with a
@@ -673,8 +673,8 @@ context ::= path ( ';' path ) * (';' directive) *
       </itemizedlist>
     </section>
 
-    <section>
-      <title>3.3 Importing and Exporting packages</title>
+    <section id="app-deploy:imports-exports">
+      <title>Importing and Exporting packages</title>
 
       <para>Refer to the OSGi Service Platform for details of the
       <literal>Import-Package</literal> and <literal>Export-Package</literal>
@@ -686,8 +686,8 @@ context ::= path ( ';' path ) * (';' directive) *
       bundle.</para>
     </section>
 
-    <section>
-      <title>3.4 Considerations when using external libraries</title>
+    <section id="app-deploy:ext-libs">
+      <title>Considerations when using external libraries</title>
 
       <para>Many enterprise application libraries assume that all of the types
       and resources that comprise the application are accessible through the
@@ -715,8 +715,8 @@ context ::= path ( ';' path ) * (';' directive) *
       workarounds.</para>
     </section>
 
-    <section>
-      <title>3.5 Diagnosing problems</title>
+    <section id="app-deploy:troubleshoot">
+      <title>Diagnosing problems</title>
 
       <para>Your chosen OSGi platform implementation should be able to provide
       you with a good deal of information about the current status of the OSGi
@@ -738,8 +738,8 @@ context ::= path ( ';' path ) * (';' directive) *
     </section>
   </section>
 
-  <section>
-    <title>4.0 The Service Registry</title>
+  <section id="service-registry">
+    <title>The Service Registry</title>
 
     <para>The OSGi service registry enables a bundle to publish objects to a
     shared registry, advertised via a given set of Java interfaces. Published
@@ -793,7 +793,7 @@ context ::= path ( ';' path ) * (';' directive) *
     convenient when following the recommendation of section 3.1 to use a
     dedicated configuration file for all OSGi-related declarations.</para>
 
-    <section>
+    <section id="service-registry:export">
       <title>4.1 Exporting a Spring bean as an OSGi service</title>
 
       <para>The <literal>service</literal> element is used to define a bean
@@ -853,8 +853,8 @@ context ::= path ( ';' path ) * (';' directive) *
 
 &lt;bean id="beanToBeExported" scope="bundle" class="com.xyz.MessageServiceImpl"/&gt;</screen>
 
-      <section>
-        <title>4.1.1 Controlling the set of advertised service interfaces for
+      <section id="service-registry:export:intfs">
+        <title>Controlling the set of advertised service interfaces for
         an exported service</title>
 
         <para>The OSGi Service Platform Core Specification defines the term
@@ -938,8 +938,8 @@ public interface SubInterface extends SuperInterface {}</screen>
         was not on the exporting bundle's classpath.</para>
       </section>
 
-      <section>
-        <title>4.1.2 Controlling the set of advertised properties for an
+      <section id="service-registry:export:props">
+        <title>Controlling the set of advertised properties for an
         exported service</title>
 
         <para>As previously described, an exported service is always
@@ -971,8 +971,8 @@ public interface SubInterface extends SuperInterface {}</screen>
         Appendix A for more details.</para>
       </section>
 
-      <section>
-        <title>4.1.3 The depends-on attribute</title>
+      <section id="service-registry:export:depends-on">
+        <title>The depends-on attribute</title>
 
         <para>Spring will manage explicit dependencies of a service element,
         ensuring for example that the bean to be exported as a service is
@@ -986,8 +986,8 @@ public interface SubInterface extends SuperInterface {}</screen>
      depends-on="myOtherComponent"/&gt;</screen>
       </section>
 
-      <section>
-        <title>4.1.4 The ranking attribute</title>
+      <section id="service-registry:export:ranking">
+        <title>The ranking attribute</title>
 
         <para>When registering a service with the service registry, you may
         optionally specify a service ranking (see section 5.2.5 of the OSGi
@@ -1001,8 +1001,8 @@ public interface SubInterface extends SuperInterface {}</screen>
   ranking="9"/&gt;</screen>
       </section>
 
-      <section>
-        <title>4.1.5 The context-classloader attribute</title>
+      <section id="service-registry:export:ccl">
+        <title>The context-classloader attribute</title>
 
         <para>The OSGi Service Platform Core Specification (most current
         version is 4.1 at time of writing) does not specify what types and
@@ -1024,8 +1024,8 @@ public interface SubInterface extends SuperInterface {}</screen>
         resources on the class path of the bundle defining the service.</para>
       </section>
 
-      <section>
-        <title>4.1.6 Service registration and unregistration lifecycle</title>
+      <section id="service-registry:export:lifecycle">
+        <title>Service registration and unregistration lifecycle</title>
 
         <para>The service defined by a <literal>service</literal> element is
         registered with the OSGi service registry when the application context
@@ -1123,8 +1123,8 @@ public interface SubInterface extends SuperInterface {}</screen>
       </section>
     </section>
 
-    <section>
-      <title>4.2 Defining references to OSGi services</title>
+    <section id="service-registry:refs">
+      <title>Defining references to OSGi services</title>
 
       <para>Spring Dynamic Modules supports the declaration of beans that
       represent services accessed via the OSGi Service Registry. In this
@@ -1145,8 +1145,8 @@ public interface SubInterface extends SuperInterface {}</screen>
       management of this set of references as a <literal>List</literal>,
       <literal>Set</literal>.</para>
 
-      <section>
-        <title>4.2.1 Referencing an individual service</title>
+      <section id="service-registry:refs:singular">
+        <title>Referencing an individual service</title>
 
         <para>The <literal>reference</literal> element is used to define a
         reference to a service in the service registry. The
@@ -1181,8 +1181,8 @@ public interface SubInterface extends SuperInterface {}</screen>
         <literal>ServiceReference</literal> for the service will be injected
         in place of the service itself.</para>
 
-        <section>
-          <title>4.2.1.1 The filter attribute</title>
+        <section id="service-registry:refs:singular:filter">
+          <title>The filter attribute</title>
 
           <para>The optional <literal>filter</literal> attribute can be used
           to specify an OSGi filter expression and constrains the service
@@ -1195,8 +1195,8 @@ public interface SubInterface extends SuperInterface {}</screen>
   filter="(asynchronous-delivery=true)"/&gt;</screen>
         </section>
 
-        <section>
-          <title>4.2.1.2 The bean-name attribute</title>
+        <section id="service-registry:refs:singular:bean-name">
+          <title>The bean-name attribute</title>
 
           <para>The <literal>bean-name</literal> attribute is a convenient
           short-cut for specifying a filter expression that matches on the
@@ -1209,8 +1209,8 @@ public interface SubInterface extends SuperInterface {}</screen>
    bean-name="defaultMessageService"/&gt;</screen>
         </section>
 
-        <section>
-          <title>4.2.1.3 The cardinality attribute</title>
+        <section id="service-registry:refs:singular:cardinality">
+          <title>The cardinality attribute</title>
 
           <para>The <literal>cardinality</literal> attribute is used to
           specify whether or not a matching service is required at all times.
