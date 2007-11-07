@@ -17,20 +17,20 @@ package org.springframework.osgi.internal.propertyeditors;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.ServiceReferenceAware;
+import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
 import org.springframework.util.Assert;
 
 /**
- * {@link ServiceReference} adapter using a {@link ServiceReferenceAware}
+ * {@link ServiceReference} adapter using a {@link ServiceReferenceAccessor}
  * internally for delegation.
  * 
  * @author Costin Leau
  * 
  */
 public class ServiceReferenceDelegate implements ServiceReference {
-	private final ServiceReferenceAware delegate;
+	private final ServiceReferenceAccessor delegate;
 
-	public ServiceReferenceDelegate(ServiceReferenceAware delegate) {
+	public ServiceReferenceDelegate(ServiceReferenceAccessor delegate) {
 		Assert.notNull(delegate, "delegate object should not be null");
 		this.delegate = delegate;
 	}

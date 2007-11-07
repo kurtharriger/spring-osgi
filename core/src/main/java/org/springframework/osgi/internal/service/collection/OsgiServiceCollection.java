@@ -33,7 +33,6 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.internal.service.ImporterProxy;
 import org.springframework.osgi.internal.service.interceptor.LocalBundleContextAdvice;
 import org.springframework.osgi.internal.service.interceptor.OsgiServiceStaticInterceptor;
@@ -41,7 +40,7 @@ import org.springframework.osgi.internal.service.interceptor.ServiceReferenceAwa
 import org.springframework.osgi.internal.service.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.internal.util.ClassUtils;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
@@ -199,7 +198,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Impo
 	// advices to be applied when creating service proxy
 	private Object[] interceptors = new Object[0];
 
-	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
+	private OsgiServiceLifecycleListener[] listeners = new OsgiServiceLifecycleListener[0];
 
 	private AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
 
@@ -438,7 +437,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Impo
 	/**
 	 * @param listeners The listeners to set.
 	 */
-	public void setListeners(TargetSourceLifecycleListener[] listeners) {
+	public void setListeners(OsgiServiceLifecycleListener[] listeners) {
 		Assert.notNull(listeners, "argument should not be null");
 		this.listeners = listeners;
 	}

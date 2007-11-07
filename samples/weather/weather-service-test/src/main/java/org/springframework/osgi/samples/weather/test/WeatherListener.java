@@ -16,12 +16,12 @@
  */
 package org.springframework.osgi.samples.weather.test;
 
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import java.util.Map;
 
 /**
  */
-public class WeatherListener implements TargetSourceLifecycleListener
+public class WeatherListener implements OsgiServiceLifecycleListener
 {
   public void bind(Object obj, Map properties) {
     System.out.println("BOUND: " + obj);

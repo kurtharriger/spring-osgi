@@ -37,8 +37,8 @@ import org.springframework.osgi.internal.service.collection.OsgiServiceSortedLis
 import org.springframework.osgi.internal.service.collection.OsgiServiceSortedSet;
 import org.springframework.osgi.internal.service.collection.comparator.OsgiServiceReferenceComparator;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 
 /**
  * @author Costin Leau
@@ -150,7 +150,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		Class[] intfs = getInterfaces(factoryBean);
 		assertTrue(Arrays.equals(new Class[] { Externalizable.class }, intfs));
 
-		TargetSourceLifecycleListener[] listeners = getListeners(factoryBean);
+		OsgiServiceLifecycleListener[] listeners = getListeners(factoryBean);
 		assertEquals(2, listeners.length);
 
 		Object bean = appContext.getBean("sortedSetWithNaturalOrderingOnRefs");
@@ -179,7 +179,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		return (Comparator) TestUtils.getFieldValue(proxy, "comparator");
 	}
 
-	private TargetSourceLifecycleListener[] getListeners(Object proxy) {
-		return (TargetSourceLifecycleListener[]) TestUtils.getFieldValue(proxy, "listeners");
+	private OsgiServiceLifecycleListener[] getListeners(Object proxy) {
+		return (OsgiServiceLifecycleListener[]) TestUtils.getFieldValue(proxy, "listeners");
 	}
 }

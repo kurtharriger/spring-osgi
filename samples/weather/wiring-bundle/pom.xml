@@ -22,6 +22,7 @@
     org.springframework.osgi.context,
     org.springframework.osgi.context.support,
     org.springframework.osgi.service,
+    org.springframework.osgi.service.importer,
     org.springframework.jmx.export
    </spring.osgi.import.pkg>
    

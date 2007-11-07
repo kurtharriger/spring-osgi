@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.mock.MockServiceRegistration;
-import org.springframework.osgi.service.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 
 public class AbstractListenerAwareExporterTest extends TestCase {
 
@@ -62,7 +62,7 @@ public class AbstractListenerAwareExporterTest extends TestCase {
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.UNREGISTERED);
 
 		ServiceRegistration reg = exporter.notifyListeners(new Object(), new HashMap(), new MockServiceRegistration());
-		assertTrue(reg instanceof ServiceRegistrationWrapper);
+		assertTrue(reg instanceof ServiceRegistrationDecorator);
 		reg.unregister();
 
 		assertEquals(1, SimpleOsgiServiceRegistrationListener.REGISTERED);

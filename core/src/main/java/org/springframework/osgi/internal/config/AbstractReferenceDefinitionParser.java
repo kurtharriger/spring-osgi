@@ -277,7 +277,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 			}
 
 			// create serviceListener wrapper
-			RootBeanDefinition wrapperDef = new RootBeanDefinition(TargetSourceLifecycleListenerWrapper.class);
+			RootBeanDefinition wrapperDef = new RootBeanDefinition(OsgiServiceLifecycleListenerAdapter.class);
 
 			ConstructorArgumentValues cav = new ConstructorArgumentValues();
 			cav.addIndexedArgumentValue(0, target);

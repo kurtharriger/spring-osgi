@@ -26,21 +26,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.internal.util.ReflectionUtils;
-import org.springframework.osgi.service.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
  * Adapter/wrapper class that handles listener with custom method invocation.
  * Similar in functionality to
- * {@link  org.springframework.osgi.internal.config.TargetSourceLifecycleListenerWrapper}.
+ * {@link  org.springframework.osgi.internal.config.OsgiServiceLifecycleListenerAdapter}.
  * 
  * @author Costin Leau
  * 
  */
-class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegistrationListener, InitializingBean {
+class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegistrationListener, InitializingBean {
 
-	private static final Log log = LogFactory.getLog(OsgiServiceRegistrationListenerWrapper.class);
+	private static final Log log = LogFactory.getLog(OsgiServiceRegistrationListenerAdapter.class);
 
 	private final Object target;
 
@@ -54,7 +54,7 @@ class OsgiServiceRegistrationListenerWrapper implements OsgiServiceRegistrationL
 	 */
 	private Map registrationMethods, unregistrationMethods;
 
-	public OsgiServiceRegistrationListenerWrapper(Object object) {
+	public OsgiServiceRegistrationListenerAdapter(Object object) {
 		Assert.notNull(object);
 		this.target = object;
 		isListener = target instanceof OsgiServiceRegistrationListener;

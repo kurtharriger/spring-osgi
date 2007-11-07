@@ -30,7 +30,6 @@ import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
@@ -77,8 +76,8 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends TestCase {
 	public void testListenersSetOnCollection() throws Exception {
 		serviceFactoryBean.setCardinality(CardinalityOptions.C_0__N.getLabel());
 
-		TargetSourceLifecycleListener[] listeners = { (TargetSourceLifecycleListener) MockControl.createControl(
-			TargetSourceLifecycleListener.class).getMock() };
+		OsgiServiceLifecycleListener[] listeners = { (OsgiServiceLifecycleListener) MockControl.createControl(
+			OsgiServiceLifecycleListener.class).getMock() };
 		serviceFactoryBean.setListeners(listeners);
 		serviceFactoryBean.afterPropertiesSet();
 

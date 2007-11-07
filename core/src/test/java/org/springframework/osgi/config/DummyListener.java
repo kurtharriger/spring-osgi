@@ -17,13 +17,13 @@ package org.springframework.osgi.config;
 
 import java.util.Map;
 
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 
 /**
  * @author Costin Leau
  * 
  */
-public class DummyListener implements TargetSourceLifecycleListener {
+public class DummyListener implements OsgiServiceLifecycleListener {
 
 	static int BIND_CALLS = 0;
 	static int UNBIND_CALLS = 0;
@@ -31,7 +31,7 @@ public class DummyListener implements TargetSourceLifecycleListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.osgi.service.TargetSourceLifecycleListener#bind(java.lang.String,
+	 * @see org.springframework.osgi.service.OsgiServiceLifecycleListener#bind(java.lang.String,
 	 *      java.lang.Object)
 	 */
 	public void bind(Object service, Map props) {
@@ -41,7 +41,7 @@ public class DummyListener implements TargetSourceLifecycleListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.osgi.service.TargetSourceLifecycleListener#unbind(java.lang.String,
+	 * @see org.springframework.osgi.service.OsgiServiceLifecycleListener#unbind(java.lang.String,
 	 *      java.lang.Object)
 	 */
 	public void unbind(Object service, Map props) {

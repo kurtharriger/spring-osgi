@@ -20,15 +20,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.ServiceReferenceAware;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
 
 public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
@@ -162,12 +161,10 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 			// has to successed
 			Object obj = iter.next();
 
-			assertTrue(obj instanceof ServiceReferenceAware);
+			assertTrue(obj instanceof ServiceReferenceAccessor);
 			assertTrue(obj instanceof Date);
-			Map map = ((ServiceReferenceAware) obj).getServiceProperties();
-			System.out.println(map);
 			// the properties will contain the ObjectClass also
-			assertTrue(map.keySet().containsAll(props.keySet()));
+			assertEquals(((ServiceReferenceAccessor) obj).getServiceReference().getProperty("Moroccan"), "Sunset");
 
 			try {
 				// make sure the service is dead

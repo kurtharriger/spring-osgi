@@ -230,7 +230,7 @@ class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		// create serviceListener wrapper
-		RootBeanDefinition wrapperDef = new RootBeanDefinition(OsgiServiceRegistrationListenerWrapper.class);
+		RootBeanDefinition wrapperDef = new RootBeanDefinition(OsgiServiceRegistrationListenerAdapter.class);
 
 		ConstructorArgumentValues cav = new ConstructorArgumentValues();
 		cav.addIndexedArgumentValue(0, target);

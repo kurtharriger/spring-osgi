@@ -13,35 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service;
-
-import java.util.Map;
+package org.springframework.osgi.service.importer;
 
 import org.osgi.framework.ServiceReference;
 
 /**
- * Aware interface used when importing OSGi services. Gives access to the
- * underlying ServiceReference and its properties.
+ * Infrastructure interface available on Spring-DM managed OSGi services. Gives
+ * read-only access to the proxy backing object service reference.
  * 
  * @author Costin Leau
  * 
  */
-public interface ServiceReferenceAware {
+public interface ServiceReferenceAccessor {
 
 	/**
-	 * Get access to the raw, underlying service reference.
+	 * Get access to the service reference used for accessing the backing
+	 * object.
 	 * 
-	 * @return underlying service reference.
+	 * @return backing object service reference
 	 */
 	ServiceReference getServiceReference();
-
-	/**
-	 * Return a map of service properties.
-	 * 
-	 * <p/> If needed, the map can be cast to a {@link java.util.Dictionary} class.
-	 * 
-	 * @return map containing the service properties.
-	 */
-	Map getServiceProperties();
-
 }

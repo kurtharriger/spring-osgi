@@ -33,7 +33,7 @@ import org.springframework.osgi.internal.service.support.RetryTemplate;
 import org.springframework.osgi.internal.service.support.ServiceWrapper;
 import org.springframework.osgi.internal.service.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.ObjectUtils;
@@ -233,7 +233,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 	private ServiceImporter serviceImporter;
 
 	/** listener that need to be informed of bind/rebind/unbind */
-	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
+	private OsgiServiceLifecycleListener[] listeners = new OsgiServiceLifecycleListener[0];
 
 	public OsgiServiceDynamicInterceptor(BundleContext context, Filter filter, int contextClassLoader,
 			boolean serviceRequiredAtStartup, ClassLoader classLoader) {
@@ -302,11 +302,11 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 		return retryTemplate;
 	}
 
-	public TargetSourceLifecycleListener[] getListeners() {
+	public OsgiServiceLifecycleListener[] getListeners() {
 		return listeners;
 	}
 
-	public void setListeners(TargetSourceLifecycleListener[] listeners) {
+	public void setListeners(OsgiServiceLifecycleListener[] listeners) {
 		this.listeners = listeners;
 	}
 

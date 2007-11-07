@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.ServiceReferenceAware;
+import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
@@ -45,7 +45,7 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
  */
 public class OsgiServiceReferenceComparator implements Comparator, Serializable {
 
-	private static final int hashCode = OsgiServiceReferenceComparator.class.hashCode() * 13;
+	private static final long serialVersionUID = 7552328574956669890L;
 
 	public int compare(Object o1, Object o2) {
 
@@ -56,10 +56,10 @@ public class OsgiServiceReferenceComparator implements Comparator, Serializable 
 			ref1 = (ServiceReference) o1;
 			ref2 = (ServiceReference) o2;
 		}
-		// then for ServiceReferenceAware objects
+		// then for ServiceReferenceAccessor objects
 		else {
-			ServiceReferenceAware obj1 = (ServiceReferenceAware) o1;
-			ServiceReferenceAware obj2 = (ServiceReferenceAware) o2;
+			ServiceReferenceAccessor obj1 = (ServiceReferenceAccessor) o1;
+			ServiceReferenceAccessor obj2 = (ServiceReferenceAccessor) o2;
 
 			ref1 = obj1.getServiceReference();
 			ref2 = obj2.getServiceReference();

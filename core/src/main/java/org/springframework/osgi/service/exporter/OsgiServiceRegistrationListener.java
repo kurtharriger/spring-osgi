@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service;
+package org.springframework.osgi.service.exporter;
 
 import java.util.Map;
 
-import org.springframework.osgi.service.exporter.OsgiServiceFactoryBean;
 
 /**
  * Listener informed of the registration and unregistration of an OSGi service

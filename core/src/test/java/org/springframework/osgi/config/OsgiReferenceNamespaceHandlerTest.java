@@ -32,7 +32,7 @@ import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 
 /**
@@ -100,7 +100,7 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 		factory.getObject(); // required to initialise proxy and hook
 		// listeners into the binding process
 
-		TargetSourceLifecycleListener[] listeners = (TargetSourceLifecycleListener[]) TestUtils.getFieldValue(factory,
+		OsgiServiceLifecycleListener[] listeners = (OsgiServiceLifecycleListener[]) TestUtils.getFieldValue(factory,
 			"listeners");
 		assertNotNull(listeners);
 		assertEquals(5, listeners.length);

@@ -24,14 +24,14 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.service.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.MapBasedDictionary;
 
 /**
  * @author Costin Leau
  * 
  */
-public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
+public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 
 	protected static class JustListener implements OsgiServiceRegistrationListener {
 
@@ -161,7 +161,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 		}
 	}
 
-	private OsgiServiceRegistrationListenerWrapper listener;
+	private OsgiServiceRegistrationListenerAdapter listener;
 
 	private Map props;
 
@@ -184,7 +184,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperOverListener() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new JustListener());
+		listener = new OsgiServiceRegistrationListenerAdapter(new JustListener());
 		listener.afterPropertiesSet();
 
 		Object service = new Object();
@@ -205,7 +205,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperOverNoInvalidClass() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new Object());
+		listener = new OsgiServiceRegistrationListenerAdapter(new Object());
 		try {
 			listener.afterPropertiesSet();
 			fail("should have thrown exception");
@@ -216,7 +216,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithIncorrectCustomMethodNames() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new Object());
+		listener = new OsgiServiceRegistrationListenerAdapter(new Object());
 		listener.setRegistrationMethod("pop");
 		listener.setUnregistrationMethod("corn");
 
@@ -230,7 +230,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithCorrectCustomMethodNamesButIncorrectArgumentTypes() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new CustomListener());
+		listener = new OsgiServiceRegistrationListenerAdapter(new CustomListener());
 		listener.setRegistrationMethod("wrongReg");
 		listener.setUnregistrationMethod("wrongUnreg");
 
@@ -250,7 +250,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithCustomMethods() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new CustomListener());
+		listener = new OsgiServiceRegistrationListenerAdapter(new CustomListener());
 		listener.setRegistrationMethod("myReg");
 		listener.setUnregistrationMethod("myUnreg");
 		listener.afterPropertiesSet();
@@ -279,7 +279,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithCustomMethodsAndNullProperties() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new CustomListener());
+		listener = new OsgiServiceRegistrationListenerAdapter(new CustomListener());
 		listener.setRegistrationMethod("myReg");
 		listener.setUnregistrationMethod("myUnreg");
 		listener.afterPropertiesSet();
@@ -295,7 +295,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testWrapperWithBothCustomAndInterfaceMethods() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new CustomAndListener());
+		listener = new OsgiServiceRegistrationListenerAdapter(new CustomAndListener());
 		listener.setRegistrationMethod("aReg");
 		listener.setUnregistrationMethod("aUnreg");
 		listener.afterPropertiesSet();
@@ -313,7 +313,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testExceptionOnListenerMethod() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new ExceptionListener());
+		listener = new OsgiServiceRegistrationListenerAdapter(new ExceptionListener());
 		listener.setRegistrationMethod("aReg");
 		listener.setUnregistrationMethod("aUnreg");
 		listener.afterPropertiesSet();
@@ -330,7 +330,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testExceptionOnCustomMethods() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new ExceptionCustomListener());
+		listener = new OsgiServiceRegistrationListenerAdapter(new ExceptionCustomListener());
 		listener.setRegistrationMethod("myReg");
 		listener.setUnregistrationMethod("myUnreg");
 		listener.afterPropertiesSet();
@@ -347,7 +347,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testStandardListenerWithListeningMethodsSpecifiedAsCustomOnes() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new JustListener());
+		listener = new OsgiServiceRegistrationListenerAdapter(new JustListener());
 		listener.setRegistrationMethod("registered");
 		listener.setUnregistrationMethod("unregistered");
 		listener.afterPropertiesSet();
@@ -362,7 +362,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testListenerWithOverloadedTypesAndMultipleParameterTypes() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new DictionaryAndMapCustomListener());
+		listener = new OsgiServiceRegistrationListenerAdapter(new DictionaryAndMapCustomListener());
 		listener.setRegistrationMethod("registered");
 		listener.setUnregistrationMethod("unregistered");
 		listener.afterPropertiesSet();
@@ -380,7 +380,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testJustCustomRegMethod() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new JustReg());
+		listener = new OsgiServiceRegistrationListenerAdapter(new JustReg());
 		listener.setRegistrationMethod("myReg");
 		listener.afterPropertiesSet();
 		Object service = new Object();
@@ -394,7 +394,7 @@ public class OsgiServiceRegistrationListenerWrapperTest extends TestCase {
 	}
 
 	public void testJustCustomUnregMethod() throws Exception {
-		listener = new OsgiServiceRegistrationListenerWrapper(new JustUnreg());
+		listener = new OsgiServiceRegistrationListenerAdapter(new JustUnreg());
 		listener.setUnregistrationMethod("myUnreg");
 		listener.afterPropertiesSet();
 		Object service = new Object();

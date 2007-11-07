@@ -5,5 +5,5 @@ Bundle-Name: weather-service-test
 Bundle-Vendor: Spring Framework
 Export-Package: org.springframework.osgi.samples.weather.test
 Import-Package: org.springframework.osgi.samples.weather.service,org.springframework.osgi.service,
- junit.framework
+ junit.framework, org.springframework.osgi.service.importer
 

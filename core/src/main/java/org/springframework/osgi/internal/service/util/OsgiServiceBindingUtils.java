@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.util.ObjectUtils;
@@ -36,7 +36,7 @@ public abstract class OsgiServiceBindingUtils {
 	private static final Log log = LogFactory.getLog(OsgiServiceBindingUtils.class);
 
 	public static void callListenersBind(BundleContext context, ServiceReference reference,
-			TargetSourceLifecycleListener[] listeners) {
+			OsgiServiceLifecycleListener[] listeners) {
 		if (!ObjectUtils.isEmpty(listeners)) {
 			boolean debug = log.isDebugEnabled();
 			Object service = OsgiServiceUtils.getService(context, reference);
@@ -58,7 +58,7 @@ public abstract class OsgiServiceBindingUtils {
 	}
 
 	public static void callListenersUnbind(BundleContext context, ServiceReference reference,
-			TargetSourceLifecycleListener[] listeners) {
+			OsgiServiceLifecycleListener[] listeners) {
 		if (!ObjectUtils.isEmpty(listeners)) {
 			boolean debug = log.isDebugEnabled();
 			Object service = OsgiServiceUtils.getService(context, reference);

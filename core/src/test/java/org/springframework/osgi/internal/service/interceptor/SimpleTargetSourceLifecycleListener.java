@@ -17,13 +17,13 @@ package org.springframework.osgi.internal.service.interceptor;
 
 import java.util.Map;
 
-import org.springframework.osgi.service.TargetSourceLifecycleListener;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 
 /**
  * @author Costin Leau
  * 
  */
-public class SimpleTargetSourceLifecycleListener implements TargetSourceLifecycleListener {
+public class SimpleTargetSourceLifecycleListener implements OsgiServiceLifecycleListener {
 
 	public static int BIND = 0;
 
@@ -31,7 +31,7 @@ public class SimpleTargetSourceLifecycleListener implements TargetSourceLifecycl
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.TargetSourceLifecycleListener#bind(java.lang.Object,
+	 * @see org.springframework.osgi.service.OsgiServiceLifecycleListener#bind(java.lang.Object,
 	 * java.util.Map)
 	 */
 	public void bind(Object service, Map properties) throws Exception {
@@ -40,7 +40,7 @@ public class SimpleTargetSourceLifecycleListener implements TargetSourceLifecycl
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.osgi.service.TargetSourceLifecycleListener#unbind(java.lang.Object,
+	 * @see org.springframework.osgi.service.OsgiServiceLifecycleListener#unbind(java.lang.Object,
 	 * java.util.Map)
 	 */
 	public void unbind(Object service, Map properties) throws Exception {
