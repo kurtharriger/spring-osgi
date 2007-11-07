@@ -1,9 +1,9 @@
 package org.springframework.osgi.iandt.referenceProxy;
 
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.iandt.reference.proxy.ServiceReferer;
 import org.springframework.osgi.iandt.simpleservice.MyService;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
