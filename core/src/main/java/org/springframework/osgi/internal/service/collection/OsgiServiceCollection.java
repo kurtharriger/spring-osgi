@@ -33,13 +33,13 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.internal.service.ImporterProxy;
 import org.springframework.osgi.internal.service.interceptor.OsgiServiceInvoker;
 import org.springframework.osgi.internal.service.interceptor.OsgiServiceStaticInterceptor;
 import org.springframework.osgi.internal.service.interceptor.ServiceReferenceAwareAdvice;
 import org.springframework.osgi.internal.service.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.internal.util.ClassUtils;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 import org.springframework.osgi.util.OsgiListenerUtils;
@@ -243,8 +243,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Impo
 	 */
 	protected void mandatoryServiceCheck() {
 		if (atLeastOneServiceMandatory && serviceProxies.isEmpty())
-			throw new ServiceUnavailableException("Could not find matching service for filter [" + filter.toString()
-					+ "]", null, filter.toString());
+			throw new ServiceUnavailableException(filter);
 	}
 
 	/**

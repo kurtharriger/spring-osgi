@@ -19,9 +19,9 @@ import java.lang.reflect.Method;
 
 import junit.framework.TestCase;
 
+import org.osgi.framework.BundleContext;
 import org.springframework.osgi.context.support.LocalBundleContext;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.osgi.framework.BundleContext;
 import org.springframework.util.ReflectionUtils;
 
 public class LocalBundleContextAdviceTest extends TestCase {

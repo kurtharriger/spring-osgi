@@ -364,7 +364,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		if (getName() == null)
 			throw new IllegalArgumentException("no test specified");
 
-		// write the testname into the System properties
+		// write the test name into the System properties
 		System.getProperties().put(OsgiJUnitTest.OSGI_TEST, osgiJUnitTest.getClass().getName());
 
 		// create streams first to avoid deadlocks in setting up the stream on
@@ -431,19 +431,13 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		BundleContext ctx = getRuntimeBundleContext();
 
 		ServiceReference reference = ctx.getServiceReference(ACTIVATOR_REFERENCE);
-		if (reference == null) {
-			throw new IllegalStateException("no OSGi service reference found at " + ACTIVATOR_REFERENCE);
-		}
+		Assert.notNull(reference, "no OSGi service reference found at " + ACTIVATOR_REFERENCE);
+
 		service = ctx.getService(reference);
-		if (service == null) {
-			throw new IllegalStateException("no service found for reference: " + reference);
-		}
+		Assert.notNull(service, "no service found for reference: " + reference);
 
 		serviceTrigger = service.getClass().getDeclaredMethod("executeTest", null);
-		if (serviceTrigger == null) {
-			throw new IllegalStateException("no executeTest() method found on: " + service.getClass());
-		}
-
+		Assert.notNull(serviceTrigger, "no executeTest() method found on: " + service.getClass());
 	}
 
 	/**

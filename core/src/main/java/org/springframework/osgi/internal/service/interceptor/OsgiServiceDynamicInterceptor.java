@@ -25,7 +25,6 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.internal.service.MandatoryDependencyEvent;
 import org.springframework.osgi.internal.service.MandatoryDependencyListener;
 import org.springframework.osgi.internal.service.ServiceImporter;
@@ -33,6 +32,7 @@ import org.springframework.osgi.internal.service.support.DefaultRetryCallback;
 import org.springframework.osgi.internal.service.support.RetryTemplate;
 import org.springframework.osgi.internal.service.support.ServiceWrapper;
 import org.springframework.osgi.internal.service.util.OsgiServiceBindingUtils;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.TargetSourceLifecycleListener;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
@@ -240,8 +240,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 
 		// nothing found
 		if (target == null) {
-			throw new ServiceUnavailableException("Could not find service [" + wrapper + "], filter [" + filter + "]",
-					null, ObjectUtils.nullSafeToString(filter));
+			throw new ServiceUnavailableException(filter);
 		}
 
 		return target;

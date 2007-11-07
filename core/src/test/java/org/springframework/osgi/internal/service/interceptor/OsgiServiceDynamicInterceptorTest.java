@@ -25,11 +25,10 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.ServiceUnavailableException;
-import org.springframework.osgi.internal.service.interceptor.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
 
 /**

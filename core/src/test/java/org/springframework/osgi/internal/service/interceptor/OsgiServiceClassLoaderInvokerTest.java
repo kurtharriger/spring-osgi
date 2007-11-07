@@ -26,7 +26,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.internal.service.interceptor.OsgiServiceClassLoaderInvoker;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;

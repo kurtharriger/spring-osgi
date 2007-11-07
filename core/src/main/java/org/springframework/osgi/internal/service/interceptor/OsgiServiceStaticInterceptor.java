@@ -17,8 +17,8 @@ package org.springframework.osgi.internal.service.interceptor;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.ServiceUnavailableException;
 import org.springframework.osgi.internal.service.support.ServiceWrapper;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.util.Assert;
 
 /**
@@ -44,7 +44,7 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceClassLoaderInvoker 
 		// service has died, clean up
 		if (!wrapper.isServiceAlive()) {
 			wrapper.cleanup();
-			throw new ServiceUnavailableException("Service n/a", wrapper.getClass(), null);
+			throw new ServiceUnavailableException(wrapper.getReference());
 		}
 
 		return wrapper.getService();
