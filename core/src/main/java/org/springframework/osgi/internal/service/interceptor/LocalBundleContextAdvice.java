@@ -27,6 +27,9 @@ import org.springframework.osgi.util.OsgiBundleUtils;
  * This class also functions as advice for temporarily pushing the thread-local
  * context.
  * 
+ * <strong>Note</strong>: This class is stateless so the same instance can be
+ * used by several proxies at the same time.
+ * 
  * @author Andy Piper
  * @author Costin Leau
  */

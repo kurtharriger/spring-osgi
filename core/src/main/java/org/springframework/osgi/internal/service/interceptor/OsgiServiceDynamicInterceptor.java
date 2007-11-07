@@ -44,14 +44,14 @@ import org.springframework.util.ObjectUtils;
  * down or unavailable. Will dynamically rebound a new service, if one is
  * available with a higher service ranking.
  * 
- * <p/>
+ * <p/> In case no service is available, it will throw an exception.
  * 
  * <strong>Note</strong>: this is a stateful interceptor and should not be
  * shared.
  * 
  * @author Costin Leau
  */
-public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker implements InitializingBean {
+public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements InitializingBean {
 
 	private class Listener implements ServiceListener {
 
@@ -76,7 +76,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 					// same as ServiceEvent.REGISTERED
 					if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
 						// inform listeners
-						OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
+						OsgiServiceBindingUtils.callListenersBind(bundleContext, ref, listeners);
 
 						// update dependency manager
 						if (mandatoryListeners != null) {
@@ -107,7 +107,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 					}
 
 					// discover the new reference
-					ServiceReference newReference = OsgiServiceReferenceUtils.getServiceReference(context,
+					ServiceReference newReference = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
 						(filter == null ? null : filter.toString()));
 
 					// we have a rebind (a new service was binded)
@@ -128,7 +128,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 								}
 							}
 							// inform listeners
-							OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
+							OsgiServiceBindingUtils.callListenersUnbind(bundleContext, ref, listeners);
 
 							if (debug) {
 								String message = "service reference [" + ref + "] was unregistered";
@@ -168,20 +168,20 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 						// we have a new service
 						if (serviceRanking > wrapper.getServiceRanking()) {
 							updated = true;
-							wrapper = new ServiceWrapper(ref, context);
+							updateReferenceHolders(ref);
 						}
 						// if equality, use the service id
 						if (serviceRanking == wrapper.getServiceRanking()) {
 							if (serviceId < wrapper.getServiceId()) {
 								updated = true;
-								wrapper = new ServiceWrapper(ref, context);
+								updateReferenceHolders(ref);
 							}
 						}
 						// FIXME: do bind/unbind when updating the service
 					}
 					else {
-						wrapper = new ServiceWrapper(ref, context);
 						updated = true;
+						updateReferenceHolders(ref);
 					}
 					OsgiServiceDynamicInterceptor.this.notifyAll();
 					return updated;
@@ -196,34 +196,53 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 						message += " not bound to proxy";
 					log.debug(message);
 				}
-
 			}
+		}
+
+		/**
+		 * Update internal holders for the backing ServiceReference.
+		 * 
+		 * @param ref
+		 */
+		private void updateReferenceHolders(ServiceReference ref) {
+			wrapper = new ServiceWrapper(ref, bundleContext);
+			referenceDelegate.swapDelegates(ref);
 		}
 	}
 
-	private ServiceWrapper wrapper;
+	private final BundleContext bundleContext;
 
-	protected RetryTemplate retryTemplate = new RetryTemplate();
-
-	protected Filter filter;
-
-	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
+	private final Filter filter;
 
 	private final boolean serviceRequiredAtStartup;
+
+	private final ClassLoader clientClassLoader;
+
+	private final ServiceReferenceDelegate referenceDelegate;
+
+	/** utility service wrapper */
+	private ServiceWrapper wrapper;
+
+	/** Retry template */
+	private RetryTemplate retryTemplate;
 
 	/** mandatory listeners */
 	private List mandatoryListeners;
 
+	/** depending service importer */
 	private ServiceImporter serviceImporter;
 
-	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader, ClassLoader classLoader) {
-		this(context, contextClassLoader, true, classLoader);
-	}
+	/** listener that need to be informed of bind/rebind/unbind */
+	private TargetSourceLifecycleListener[] listeners = new TargetSourceLifecycleListener[0];
 
-	public OsgiServiceDynamicInterceptor(BundleContext context, int contextClassLoader,
+	public OsgiServiceDynamicInterceptor(BundleContext context, Filter filter, int contextClassLoader,
 			boolean serviceRequiredAtStartup, ClassLoader classLoader) {
-		super(context, null, contextClassLoader, classLoader);
+		this.bundleContext = context;
+		this.filter = filter;
+		this.clientClassLoader = classLoader;
 		this.serviceRequiredAtStartup = serviceRequiredAtStartup;
+
+		referenceDelegate = new ServiceReferenceDelegate();
 	}
 
 	protected void checkServiceWrapper() {
@@ -231,38 +250,37 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 			lookupService();
 	}
 
-	protected Object getTarget() {
-		Object target;
-
-		checkServiceWrapper();
-
-		target = (wrapper != null ? wrapper.getService() : null);
+	public Object getTarget() {
+		Object target = lookupService();
 
 		// nothing found
 		if (target == null) {
 			throw new ServiceUnavailableException(filter);
 		}
-
 		return target;
 	}
 
-	protected synchronized ServiceWrapper lookupService() {
-		return (ServiceWrapper) retryTemplate.execute(new DefaultRetryCallback() {
+	/**
+	 * Look the service by waiting the service to appear.
+	 * 
+	 * @return
+	 */
+	private Object lookupService() {
+		return (Object) retryTemplate.execute(new DefaultRetryCallback() {
 			public Object doWithRetry() {
-				return (wrapper != null && wrapper.isServiceAlive()) ? wrapper : null;
+				return (wrapper != null && wrapper.isServiceAlive()) ? wrapper.getService() : null;
 			}
 		}, this);
 	}
 
-	protected ServiceReference getServiceReference() {
-		return (wrapper != null ? wrapper.getReference() : null);
-	}
-
 	public void afterPropertiesSet() {
 		boolean debug = log.isDebugEnabled();
+		if (retryTemplate == null)
+			retryTemplate = new RetryTemplate();
+
 		if (debug)
 			log.debug("adding osgi mandatoryListeners for services matching [" + filter + "]");
-		OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
+		OsgiListenerUtils.addServiceListener(bundleContext, new Listener(), filter);
 		if (serviceRequiredAtStartup) {
 			if (debug)
 				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
@@ -272,8 +290,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 		}
 	}
 
-	public void setFilter(Filter filter) {
-		this.filter = filter;
+	public ServiceReference getServiceReference() {
+		return referenceDelegate;
 	}
 
 	public void setRetryTemplate(RetryTemplate retryTemplate) {
@@ -307,9 +325,10 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceClassLoaderInvoker
 			OsgiServiceDynamicInterceptor oth = (OsgiServiceDynamicInterceptor) other;
 			return (serviceRequiredAtStartup == oth.serviceRequiredAtStartup
 					&& ObjectUtils.nullSafeEquals(wrapper, oth.wrapper)
-					&& ObjectUtils.nullSafeEquals(filter, oth.filter) && retryTemplate.equals(oth.retryTemplate)
-					&& ObjectUtils.nullSafeEquals(serviceImporter, oth.serviceImporter)
-					&& Arrays.equals(listeners, oth.listeners) && super.equals(other));
+					&& ObjectUtils.nullSafeEquals(filter, oth.filter)
+					&& ObjectUtils.nullSafeEquals(retryTemplate, oth.retryTemplate)
+					&& ObjectUtils.nullSafeEquals(serviceImporter, oth.serviceImporter) && Arrays.equals(listeners,
+				oth.listeners));
 		}
 		else
 			return false;

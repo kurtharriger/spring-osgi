@@ -78,7 +78,7 @@ public abstract class ClassUtils {
 			this.bundle = bundle;
 			this.classLoader = null;
 		}
-		
+
 		public ClassLoaderBridge(ClassLoader classLoader) {
 			Assert.notNull(classLoader);
 			this.classLoader = classLoader;

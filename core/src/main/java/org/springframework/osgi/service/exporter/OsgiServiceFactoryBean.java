@@ -43,7 +43,7 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.internal.context.support.OsgiBundleScope;
 import org.springframework.osgi.internal.service.BeanNameServicePropertiesResolver;
 import org.springframework.osgi.internal.service.exporter.AbstractListenerAwareExporter;
-import org.springframework.osgi.internal.service.interceptor.OsgiServiceTCCLInvoker;
+import org.springframework.osgi.internal.service.interceptor.OsgiServiceTCCLInterceptor;
 import org.springframework.osgi.internal.util.ClassUtils;
 import org.springframework.osgi.internal.util.DebugUtils;
 import org.springframework.osgi.service.OsgiServicePropertiesResolver;
@@ -216,7 +216,7 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 			factory.addInterface(interfaces[i]);
 		}
 
-		factory.addAdvice(new OsgiServiceTCCLInvoker(classLoader));
+		factory.addAdvice(new OsgiServiceTCCLInterceptor(classLoader));
 		factory.setTarget(target);
 
 		try {

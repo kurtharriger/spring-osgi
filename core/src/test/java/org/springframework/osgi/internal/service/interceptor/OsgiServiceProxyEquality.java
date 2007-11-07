@@ -111,7 +111,8 @@ public class OsgiServiceProxyEquality extends TestCase {
 	public void testSameInterceptorEquality() throws Exception {
 		target = new Polygon();
 
-		Advice interceptor = new OsgiServiceDynamicInterceptor(bundleContext, 0, getClass().getClassLoader());
+		Advice interceptor = new OsgiServiceDynamicInterceptor(bundleContext, null, 0, false,
+				getClass().getClassLoader());
 
 		Object proxyA = createProxy(target, Shape.class, new Advice[] { interceptor });
 		Object proxyB = createProxy(target, Shape.class, new Advice[] { interceptor });
@@ -124,8 +125,10 @@ public class OsgiServiceProxyEquality extends TestCase {
 
 		target = new Polygon();
 
-		Advice interceptorA = new OsgiServiceDynamicInterceptor(bundleContext, 0, getClass().getClassLoader());
-		Advice interceptorB = new OsgiServiceDynamicInterceptor(bundleContext, 0, getClass().getClassLoader());
+		Advice interceptorA = new OsgiServiceDynamicInterceptor(bundleContext, null, 0, false,
+				getClass().getClassLoader());
+		Advice interceptorB = new OsgiServiceDynamicInterceptor(bundleContext, null, 0, false,
+				getClass().getClassLoader());
 
 		Object proxyA = createProxy(target, Shape.class, new Advice[] { interceptorA });
 		Object proxyB = createProxy(target, Shape.class, new Advice[] { interceptorB });
@@ -139,13 +142,15 @@ public class OsgiServiceProxyEquality extends TestCase {
 	public void testMultipleInterceptorEquality() throws Exception {
 		target = new Polygon();
 
-		Advice interceptorA1 = new OsgiServiceDynamicInterceptor(bundleContext, 0, getClass().getClassLoader());
+		Advice interceptorA1 = new OsgiServiceDynamicInterceptor(bundleContext, null, 0, false,
+				getClass().getClassLoader());
 		Advice interceptorA2 = new LocalBundleContextAdvice(bundleContext);
-		Advice interceptorA3 = new OsgiServiceTCCLInvoker(null);
+		Advice interceptorA3 = new OsgiServiceTCCLInterceptor(null);
 
-		Advice interceptorB1 = new OsgiServiceDynamicInterceptor(bundleContext, 0, getClass().getClassLoader());
+		Advice interceptorB1 = new OsgiServiceDynamicInterceptor(bundleContext, null, 0, false,
+				getClass().getClassLoader());
 		Advice interceptorB2 = new LocalBundleContextAdvice(bundleContext);
-		Advice interceptorB3 = new OsgiServiceTCCLInvoker(null);
+		Advice interceptorB3 = new OsgiServiceTCCLInterceptor(null);
 
 		Object proxyA = createProxy(target, Shape.class, new Advice[] { interceptorA1, interceptorA2, interceptorA3 });
 		Object proxyB = createProxy(target, Shape.class, new Advice[] { interceptorB1, interceptorB2, interceptorB3 });
@@ -169,12 +174,11 @@ public class OsgiServiceProxyEquality extends TestCase {
 			}
 		};
 
-		OsgiServiceDynamicInterceptor interceptorA1 = new OsgiServiceDynamicInterceptor(bundleContext, 0,
+		OsgiServiceDynamicInterceptor interceptorA1 = new OsgiServiceDynamicInterceptor(bundleContext, null, 0, true,
 				getClass().getClassLoader());
 		interceptorA1.afterPropertiesSet();
 		interceptorA1.setRetryTemplate(new RetryTemplate(1, 10));
-		Advice interceptorB1 = new OsgiServiceStaticInterceptor(bundleContext, new MockServiceReference(), 0,
-				getClass().getClassLoader());
+		Advice interceptorB1 = new OsgiServiceStaticInterceptor(bundleContext, new MockServiceReference());
 
 		InterfaceWithEquals proxyA = (InterfaceWithEquals) createProxy(target, InterfaceWithEquals.class,
 			new Advice[] { interceptorA1 });
@@ -194,7 +198,7 @@ public class OsgiServiceProxyEquality extends TestCase {
 		target = new Implementor();
 
 		Advice interceptorA1 = new LocalBundleContextAdvice(bundleContext);
-		Advice interceptorB1 = new OsgiServiceTCCLInvoker(null);
+		Advice interceptorB1 = new OsgiServiceTCCLInterceptor(null);
 
 		InterfaceWithEquals proxyA = (InterfaceWithEquals) createProxy(target, InterfaceWithEquals.class,
 			new Advice[] { interceptorA1 });

@@ -22,15 +22,25 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
+import org.springframework.aop.TargetSource;
 import org.springframework.util.Assert;
 
 /**
- * Base around interceptor for OSGi service invokers.
+ * Around interceptor for OSGi service invokers. Uses method invocation to
+ * execute the call.
+ * 
+ * <p/> A {@link TargetSource} can be used though it doesn't offer localized
+ * exceptions (unless information is passed around). The biggest difference as
+ * opposed to a target source is that mixins call do not require a service
+ * behind.
+ * 
+ * However, in the future, this interceptor might be replaced with a
+ * TargetSource.
  * 
  * @author Costin Leau
  * 
  */
-public abstract class OsgiServiceInvoker implements MethodInterceptor {
+public abstract class OsgiServiceInvoker implements MethodInterceptor, ServiceReferenceProvider {
 
 	protected transient final Log log = LogFactory.getLog(getClass());
 
@@ -71,7 +81,7 @@ public abstract class OsgiServiceInvoker implements MethodInterceptor {
 	 * 
 	 * @return
 	 */
-	protected ServiceReference getServiceReference() {
+	public ServiceReference getServiceReference() {
 		return null;
 	}
 
