@@ -26,13 +26,13 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
-import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
-import org.springframework.osgi.internal.service.support.RetryTemplate;
+import org.springframework.osgi.context.support.internal.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.importer.CardinalityOptions;
-import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
+import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 
 /**
  * @author Costin Leau
@@ -71,12 +71,12 @@ public class OsgiDefaultsTests extends TestCase {
 
 	public void testLocalDefinitionForCardinalityOnMultiImporter() throws Exception {
 		OsgiMultiServiceProxyFactoryBean fb = (OsgiMultiServiceProxyFactoryBean) appContext.getBean("&colWLocalConfig");
-		assertEquals(CardinalityOptions.C_1__N, getCardinality(fb));
+		assertEquals(Cardinality.C_1__N, getCardinality(fb));
 	}
 
 	public void testLocalDefinitionForCardinalityOnSingleImporter() throws Exception {
 		OsgiServiceProxyFactoryBean fb = (OsgiServiceProxyFactoryBean) appContext.getBean("&refWLocalConfig");
-		assertEquals(CardinalityOptions.C_1__1, getCardinality(fb));
+		assertEquals(Cardinality.C_1__1, getCardinality(fb));
 	}
 
 	public void testTimeoutDefault() throws Exception {
@@ -86,16 +86,16 @@ public class OsgiDefaultsTests extends TestCase {
 
 	public void testCardinalityDefaultOnSingleImporter() throws Exception {
 		OsgiServiceProxyFactoryBean fb = (OsgiServiceProxyFactoryBean) appContext.getBean("&refWDefaults");
-		assertEquals(CardinalityOptions.C_0__1, getCardinality(fb));
+		assertEquals(Cardinality.C_0__1, getCardinality(fb));
 	}
 
 	public void testCardinalityDefaultOnMultiImporter() throws Exception {
 		OsgiMultiServiceProxyFactoryBean fb = (OsgiMultiServiceProxyFactoryBean) appContext.getBean("&colWDefaults");
-		assertEquals(CardinalityOptions.C_0__N, getCardinality(fb));
+		assertEquals(Cardinality.C_0__N, getCardinality(fb));
 	}
 
-	private CardinalityOptions getCardinality(Object obj) {
-		return (CardinalityOptions) TestUtils.getFieldValue(obj, "cardinality");
+	private Cardinality getCardinality(Object obj) {
+		return (Cardinality) TestUtils.getFieldValue(obj, "cardinality");
 	}
 
 	private long getTimeout(Object obj) {

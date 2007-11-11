@@ -20,7 +20,8 @@ import java.util.Iterator;
 import java.util.Properties;
 
 import org.osgi.framework.Constants;
-import org.springframework.osgi.internal.service.collection.OsgiServiceSet;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSet;
 
 /**
  * @author Costin Leau
@@ -28,18 +29,12 @@ import org.springframework.osgi.internal.service.collection.OsgiServiceSet;
  */
 public class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 
-	private OsgiServiceSet col;
-
 	private Iterator iter;
 
 	private Dictionary serviceProps;
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		col = new OsgiServiceSet(null, context, getClass().getClassLoader(), false);
-		col.setInterfaces(new Class[] { Wrapper.class, Comparable.class });
-		col.afterPropertiesSet();
-
 		iter = col.iterator();
 
 		serviceProps = new Properties();
@@ -52,6 +47,11 @@ public class OsgiServiceSetTest extends AbstractOsgiCollectionTest {
 		super.tearDown();
 		col = null;
 		iter = null;
+	}
+
+	OsgiServiceCollection createCollection() {
+		return new OsgiServiceSet(null, context, getClass().getClassLoader(), createProxyCreator(new Class[] {
+				Wrapper.class, Comparable.class }));
 	}
 
 	public void testAddDuplicates() {

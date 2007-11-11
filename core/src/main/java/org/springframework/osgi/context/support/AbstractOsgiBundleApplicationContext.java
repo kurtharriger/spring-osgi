@@ -21,29 +21,25 @@ import java.util.Dictionary;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.PropertyEditorRegistrar;
-import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
-import org.springframework.beans.propertyeditors.PropertiesEditor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
-import org.springframework.osgi.internal.context.support.OsgiBundleScope;
-import org.springframework.osgi.internal.propertyeditors.SingleServiceReferenceEditor;
+import org.springframework.osgi.context.support.internal.BundleContextAwareProcessor;
+import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
-import org.springframework.osgi.util.MapBasedDictionary;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.osgi.util.internal.MapBasedDictionary;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -249,19 +245,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * @param beanFactory beanFactory used for registration.
 	 */
 	protected void registerPropertyEditors(ConfigurableListableBeanFactory beanFactory) {
-		// register Dictionary PropertyEditor (reuse Properties object)
-		beanFactory.addPropertyEditorRegistrar(new PropertyEditorRegistrar() {
-			public void registerCustomEditors(PropertyEditorRegistry registry) {
-				registry.registerCustomEditor(Dictionary.class, new PropertiesEditor());
-			}
-		});
-
-		// register managed service -> ServiceReference editor
-		beanFactory.addPropertyEditorRegistrar(new PropertyEditorRegistrar() {
-			public void registerCustomEditors(PropertyEditorRegistry registry) {
-				registry.registerCustomEditor(ServiceReference.class, new SingleServiceReferenceEditor());
-			}
-		});
+		beanFactory.addPropertyEditorRegistrar(new OsgiPropertyEditorRegistrar(getClassLoader()));
 	}
 
 	protected void cleanOsgiBundleScope(ConfigurableListableBeanFactory beanFactory) {
@@ -288,14 +272,14 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getBundleSymbolicName() + ")");
 			}
 
-			Class[] classes = org.springframework.osgi.internal.util.ClassUtils.getClassHierarchy(getClass(),
-				org.springframework.osgi.internal.util.ClassUtils.INCLUDE_ALL_CLASSES);
+			Class[] classes = org.springframework.osgi.util.internal.ClassUtils.getClassHierarchy(getClass(),
+				org.springframework.osgi.util.internal.ClassUtils.INCLUDE_ALL_CLASSES);
 
 			// filter classes based on visibility
-			Class[] filterClasses = org.springframework.osgi.internal.util.ClassUtils.getVisibleClasses(classes,
+			Class[] filterClasses = org.springframework.osgi.util.internal.ClassUtils.getVisibleClasses(classes,
 				this.getClass().getClassLoader());
 
-			String[] serviceNames = org.springframework.osgi.internal.util.ClassUtils.toStringArray(filterClasses);
+			String[] serviceNames = org.springframework.osgi.util.internal.ClassUtils.toStringArray(filterClasses);
 
 			if (logger.isDebugEnabled())
 				logger.debug("publishing service under classes " + ObjectUtils.nullSafeToString(serviceNames));

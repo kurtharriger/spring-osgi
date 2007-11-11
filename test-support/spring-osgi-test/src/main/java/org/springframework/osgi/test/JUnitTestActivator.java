@@ -23,8 +23,8 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.internal.test.OsgiJUnitTest;
-import org.springframework.osgi.internal.test.TestRunnerService;
+import org.springframework.osgi.test.internal.OsgiJUnitTest;
+import org.springframework.osgi.test.internal.TestRunnerService;
 import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**

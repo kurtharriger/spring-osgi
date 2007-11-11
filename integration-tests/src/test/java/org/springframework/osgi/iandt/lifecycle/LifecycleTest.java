@@ -18,6 +18,7 @@ package org.springframework.osgi.iandt.lifecycle;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.util.tracker.ServiceTracker;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
@@ -54,25 +55,31 @@ public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
 		assertNotNull("Could not find the test bundle", testBundle);
 		StringBuffer filter = new StringBuffer();
 		filter.append("(&");
-		filter.append("(").append(Constants.OBJECTCLASS).append("=").append(
-			AbstractRefreshableApplicationContext.class.getName()).append(")");
+		filter.append("(").append(Constants.OBJECTCLASS).append("=").append(ApplicationContext.class.getName()).append(
+			")");
 		filter.append("(").append(ConfigurableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME);
 		filter.append("=").append(testBundle.getSymbolicName()).append(")");
 		filter.append(")");
 		ServiceTracker tracker = new ServiceTracker(bundleContext, bundleContext.createFilter(filter.toString()), null);
-		tracker.open();
+		try {
 
-		AbstractRefreshableApplicationContext appContext = (AbstractRefreshableApplicationContext) tracker.waitForService(30000);
-		assertNotNull("test application context", appContext);
-		assertTrue("application context is active", appContext.isActive());
+			tracker.open();
 
-		testBundle.stop();
-		while (testBundle.getState() == Bundle.STOPPING) {
-			Thread.sleep(10);
+			AbstractRefreshableApplicationContext appContext = (AbstractRefreshableApplicationContext) tracker.waitForService(30000);
+			assertNotNull("test application context", appContext);
+			assertTrue("application context is active", appContext.isActive());
+
+			testBundle.stop();
+			while (testBundle.getState() == Bundle.STOPPING) {
+				Thread.sleep(10);
+			}
+			assertEquals("Guinea pig didn't shutdown", "true",
+				System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
+
+			assertFalse("application context is inactive", appContext.isActive());
 		}
-		assertEquals("Guinea pig didn't shutdown", "true",
-			System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
-
-		assertFalse("application context is inactive", appContext.isActive());
+		finally {
+			tracker.close();
+		}
 	}
 }

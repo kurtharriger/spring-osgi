@@ -20,9 +20,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.springframework.osgi.internal.service.collection.DynamicCollection;
-
 import junit.framework.TestCase;
+
+import org.springframework.osgi.service.importer.internal.collection.DynamicCollection;
 
 /**
  * Tests related to the dynamic collection iterator (consistency and dynamic

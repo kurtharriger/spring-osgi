@@ -20,9 +20,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 
-import org.springframework.osgi.internal.service.collection.DynamicSortedSet;
-
 import junit.framework.TestCase;
+
+import org.springframework.osgi.service.importer.internal.collection.DynamicSortedSet;
 
 /**
  * 

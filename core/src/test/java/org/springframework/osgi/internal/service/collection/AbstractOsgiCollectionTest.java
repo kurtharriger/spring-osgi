@@ -31,6 +31,8 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -44,6 +46,8 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 	protected MockBundleContext context;
 
 	protected Map services;
+
+	protected OsgiServiceCollection col;
 
 	public static interface Wrapper {
 		Object execute();
@@ -99,6 +103,16 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 				return (service == null ? new Object() : service);
 			}
 		};
+
+		col = createCollection();
+		col.setRequiredAtStartup(false);
+		col.afterPropertiesSet();
+	}
+
+	abstract OsgiServiceCollection createCollection();
+
+	protected ServiceProxyCreator createProxyCreator(Class[] classes) {
+		return new SimpleServiceJDKProxyCreator(context, classes, getClass().getClassLoader());
 	}
 
 	/*

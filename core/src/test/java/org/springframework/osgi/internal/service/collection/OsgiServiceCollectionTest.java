@@ -18,7 +18,7 @@ package org.springframework.osgi.internal.service.collection;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.springframework.osgi.internal.service.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
 
 /**
  * Mock test for OsgiServiceCollection.
@@ -28,17 +28,16 @@ import org.springframework.osgi.internal.service.collection.OsgiServiceCollectio
  */
 public class OsgiServiceCollectionTest extends AbstractOsgiCollectionTest {
 
-	private OsgiServiceCollection col;
-
 	private Iterator iter;
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		col = new OsgiServiceCollection(null, context, getClass().getClassLoader(), false);
-		col.setInterfaces(new Class[] { Wrapper.class, Comparable.class });
-		col.afterPropertiesSet();
-
 		iter = col.iterator();
+	}
+
+	OsgiServiceCollection createCollection() {
+		return new OsgiServiceCollection(null, context, getClass().getClassLoader(), createProxyCreator(new Class[] {
+				Wrapper.class, Comparable.class }));
 	}
 
 	protected void tearDown() throws Exception {

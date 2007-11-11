@@ -1,1 +1,1 @@
-Bundle-Activator: org.springframework.osgi.internal.test.support.Activator
+Bundle-Activator: org.springframework.osgi.test.internal.support.Activator

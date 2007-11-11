@@ -18,20 +18,20 @@ package org.springframework.osgi.io;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
-import org.springframework.core.CollectionFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.osgi.internal.io.OsgiResourceUtils;
+import org.springframework.osgi.io.internal.OsgiResourceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * OSGi-aware subclass of PathMatchingResourcePatternResolver.
@@ -120,7 +120,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		String subPattern = locationPattern.substring(rootDirPath.length());
 		Resource[] rootDirResources = getResources(rootDirPath);
 
-		Set result = CollectionFactory.createLinkedSetIfPossible(16);
+		Set result = new LinkedHashSet(16);
 		for (int i = 0; i < rootDirResources.length; i++) {
 			Resource rootDirResource = rootDirResources[i];
 			if (isJarResource(rootDirResource)) {
@@ -160,7 +160,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		if (rootPath != null) {
 			String cleanPath = OsgiResourceUtils.stripPrefix(rootPath);
 			String fullPattern = cleanPath + subPattern;
-			Set result = CollectionFactory.createLinkedSetIfPossible(16);
+			Set result = new LinkedHashSet(16);
 			doRetrieveMatchingBundleEntries(bundle, fullPattern, cleanPath, result, searchType);
 			return result;
 		}

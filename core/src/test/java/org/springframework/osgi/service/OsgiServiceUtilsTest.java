@@ -150,7 +150,7 @@ public class OsgiServiceUtilsTest extends TestCase {
 	public void testSimpleClassDetermination() throws Exception {
 		Class[] classes = new Class[] { Object.class, Serializable.class, Cloneable.class };
 		Class[] expected = new Class[] { Serializable.class, Cloneable.class };
-		Class[] clazz = org.springframework.osgi.internal.util.ClassUtils.removeParents(classes);
+		Class[] clazz = org.springframework.osgi.util.internal.ClassUtils.removeParents(classes);
 
 		assertTrue(Arrays.equals(expected, clazz));
 	}
@@ -158,7 +158,7 @@ public class OsgiServiceUtilsTest extends TestCase {
 	public void testIntefacesAlreadyContainedInTheSpecifiedClass() throws Exception {
 		Class[] classes = new Class[] { Serializable.class, Number.class, Comparable.class, Object.class };
 		Class[] expected = new Class[] { Number.class, Comparable.class };
-		Class[] clazz = org.springframework.osgi.internal.util.ClassUtils.removeParents(classes);
+		Class[] clazz = org.springframework.osgi.util.internal.ClassUtils.removeParents(classes);
 		assertTrue(Arrays.equals(expected, clazz));
 	}
 
@@ -166,7 +166,7 @@ public class OsgiServiceUtilsTest extends TestCase {
 		Class[] classes = new Class[] { Serializable.class, Number.class, Comparable.class, Object.class, Long.class,
 				Integer.class };
 		Class[] expected = new Class[] { Long.class, Integer.class };
-		Class[] clazz = org.springframework.osgi.internal.util.ClassUtils.removeParents(classes);
+		Class[] clazz = org.springframework.osgi.util.internal.ClassUtils.removeParents(classes);
 		assertTrue(Arrays.equals(expected, clazz));
 	}
 

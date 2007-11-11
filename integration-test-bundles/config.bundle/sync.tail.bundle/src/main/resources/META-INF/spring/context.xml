@@ -8,5 +8,5 @@
     <bean id="area" class="java.awt.geom.Area" lazy-init="false"/>
 
     <!-- export area -->
-    <osgi:service ref="area" auto-export="all"/>
+    <osgi:service ref="area" auto-export="all-classes"/>
 </beans>

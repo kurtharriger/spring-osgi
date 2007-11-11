@@ -16,12 +16,10 @@
 package org.springframework.osgi.test;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -32,9 +30,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.internal.test.storage.MemoryStorage;
-import org.springframework.osgi.internal.test.util.DependencyVisitor;
-import org.springframework.osgi.internal.test.util.JarCreator;
+import org.springframework.osgi.test.internal.storage.MemoryStorage;
+import org.springframework.osgi.test.internal.util.DependencyVisitor;
+import org.springframework.osgi.test.internal.util.JarCreator;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -189,7 +187,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		for (int i = 0; i < rawImports.length; i++) {
 			String pckg = rawImports[i];
 
-			if (!(pckg.startsWith("java.") || pckg.startsWith("org.springframework.osgi.internal.test") || pckg.equals(currentPckg)))
+			if (!(pckg.startsWith("java.") || pckg.startsWith("org.springframework.osgi.test.internal") || pckg.equals(currentPckg)))
 				filteredImports.add(pckg);
 		}
 
@@ -280,7 +278,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		}
 		catch (Exception e) {
 			IllegalStateException ise = new IllegalStateException(
-					"Unable to dynamically start generated bundle for Unit test");
+					"Unable to dynamically start generated unit test bundle");
 			ise.initCause(e);
 			throw ise;
 		}

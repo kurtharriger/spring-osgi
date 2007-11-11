@@ -17,9 +17,9 @@ package org.springframework.osgi.internal.service.collection;
 
 import java.util.Collection;
 
-import org.springframework.osgi.internal.service.collection.DynamicCollection;
-
 import junit.framework.TestCase;
+
+import org.springframework.osgi.service.importer.internal.collection.DynamicCollection;
 
 /**
  * Tests regarding the collection behaviour.

@@ -24,10 +24,11 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
 import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
+import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
 public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
@@ -47,7 +48,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 	// causes CGLIB problems
 	public void tstFactoryBeanForMultipleServicesAsInterfaces() throws Exception {
 
-		fb.setCardinality("0..N");
+		fb.setCardinality(Cardinality.C_0__N);
 		// look for collections
 		fb.setInterface(new Class[] { ArrayList.class });
 		fb.afterPropertiesSet();
@@ -91,7 +92,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 	public void testFactoryBeanForMultipleServicesAsClasses() throws Exception {
 
-		fb.setCardinality("0..N");
+		fb.setCardinality(Cardinality.C_0__N);
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 
@@ -137,7 +138,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 	}
 
 	public void testIteratorWhenServiceGoesDown() throws Exception {
-		fb.setCardinality("0..N");
+		fb.setCardinality(Cardinality.C_0__N);
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 

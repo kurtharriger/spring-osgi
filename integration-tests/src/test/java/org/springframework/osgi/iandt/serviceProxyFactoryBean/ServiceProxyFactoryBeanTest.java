@@ -19,8 +19,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
@@ -29,73 +30,73 @@ import org.springframework.osgi.util.OsgiFilterUtils;
  */
 public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
-    private OsgiServiceProxyFactoryBean fb;
+	private OsgiServiceProxyFactoryBean fb;
 
-    protected void onSetUp() throws Exception {
-        fb = new OsgiServiceProxyFactoryBean();
-        fb.setBundleContext(bundleContext);
-        // execute retries fast
-        fb.setRetryTimes(1);
-        fb.setTimeout(1);
-        ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
-        fb.setBeanClassLoader(classLoader);
-    }
+	protected void onSetUp() throws Exception {
+		fb = new OsgiServiceProxyFactoryBean();
+		fb.setBundleContext(bundleContext);
+		// execute retries fast
+		fb.setRetryTimes(1);
+		fb.setTimeout(1);
+		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
+		fb.setBeanClassLoader(classLoader);
+	}
 
-    protected void onTearDown() throws Exception {
-        fb = null;
-    }
+	protected void onTearDown() throws Exception {
+		fb = null;
+	}
 
-    public void testFactoryBeanForOneServiceAsClass() throws Exception {
-        long time = 1234;
-        Date date = new Date(time);
-        ServiceRegistration reg = publishService(date);
+	public void testFactoryBeanForOneServiceAsClass() throws Exception {
+		long time = 1234;
+		Date date = new Date(time);
+		ServiceRegistration reg = publishService(date);
 
-        fb.setCardinality("1..1");
-        fb.setInterface(new Class[] { Date.class });
-        fb.afterPropertiesSet();
+		fb.setCardinality(Cardinality.C_1__1);
+		fb.setInterface(new Class[] { Date.class });
+		fb.afterPropertiesSet();
 
-        try {
-            Object result = fb.getObject();
-            assertTrue(result instanceof Date);
-            assertEquals(time, ((Date) result).getTime());
-        }
-        finally {
-            if (reg != null)
-                reg.unregister();
-        }
-    }
+		try {
+			Object result = fb.getObject();
+			assertTrue(result instanceof Date);
+			assertEquals(time, ((Date) result).getTime());
+		}
+		finally {
+			if (reg != null)
+				reg.unregister();
+		}
+	}
 
-    public void testFactoryBeanForOneServiceAsInterface() throws Exception {
-        long time = 1234;
-        Date date = new Date(time);
+	public void testFactoryBeanForOneServiceAsInterface() throws Exception {
+		long time = 1234;
+		Date date = new Date(time);
 
-        Class[] intfs = new Class[] { Comparable.class, Serializable.class, Cloneable.class };
+		Class[] intfs = new Class[] { Comparable.class, Serializable.class, Cloneable.class };
 
-        String[] classes = new String[] { Comparable.class.getName(), Serializable.class.getName(),
-                Cloneable.class.getName(), Date.class.getName() };
+		String[] classes = new String[] { Comparable.class.getName(), Serializable.class.getName(),
+				Cloneable.class.getName(), Date.class.getName() };
 
-        ServiceRegistration reg = publishService(date, classes);
+		ServiceRegistration reg = publishService(date, classes);
 
-        fb.setCardinality("1..1");
-        fb.setInterface(intfs);
-        fb.setFilter(OsgiFilterUtils.unifyFilter(Date.class, null));
-        fb.afterPropertiesSet();
+		fb.setCardinality(Cardinality.C_1__1);
+		fb.setInterface(intfs);
+		fb.setFilter(OsgiFilterUtils.unifyFilter(Date.class, null));
+		fb.afterPropertiesSet();
 
-        try {
-            Object result = fb.getObject();
-            // the interfaces are implemented
-            assertTrue(result instanceof Comparable);
-            assertTrue(result instanceof Serializable);
-            assertTrue(result instanceof Cloneable);
-            // but not the class
-            assertFalse(result instanceof Date);
-            // compare the strings
-            assertEquals(result.toString(), date.toString());
-        }
-        finally {
-            if (reg != null)
-                reg.unregister();
-        }
-    }
+		try {
+			Object result = fb.getObject();
+			// the interfaces are implemented
+			assertTrue(result instanceof Comparable);
+			assertTrue(result instanceof Serializable);
+			assertTrue(result instanceof Cloneable);
+			// but not the class
+			assertFalse(result instanceof Date);
+			// compare the strings
+			assertEquals(result.toString(), date.toString());
+		}
+		finally {
+			if (reg != null)
+				reg.unregister();
+		}
+	}
 
 }

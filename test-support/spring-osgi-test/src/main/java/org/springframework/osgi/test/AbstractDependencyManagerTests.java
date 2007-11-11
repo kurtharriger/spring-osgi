@@ -21,9 +21,9 @@ import org.osgi.framework.BundleContext;
 import org.springframework.core.JdkVersion;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.internal.test.provisioning.LocalFileSystemMavenRepository;
-import org.springframework.osgi.internal.test.util.PropertiesUtil;
+import org.springframework.osgi.test.internal.util.PropertiesUtil;
 import org.springframework.osgi.test.provisioning.ArtifactLocator;
+import org.springframework.osgi.test.provisioning.internal.LocalFileSystemMavenRepository;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -37,7 +37,7 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractDependencyManagerTests extends AbstractSynchronizedOsgiTests {
 
-	private static final String TEST_FRRAMEWORK_BUNDLES_CONF_FILE = "/org/springframework/osgi/internal/test/boot-bundles.properties";
+	private static final String TEST_FRRAMEWORK_BUNDLES_CONF_FILE = "/org/springframework/osgi/test/internal/boot-bundles.properties";
 
 	private static final String IGNORE = "ignore";
 

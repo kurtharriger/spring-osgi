@@ -486,7 +486,7 @@
             <xsd:enumeration value="disabled"/>
             <xsd:enumeration value="interfaces"/>
             <xsd:enumeration value="class-hierarchy"/>
-            <xsd:enumeration value="all"/>
+            <xsd:enumeration value="all-classes"/>
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -17,7 +17,8 @@ package org.springframework.osgi.internal.service.collection;
 
 import java.util.Iterator;
 
-import org.springframework.osgi.internal.service.collection.OsgiServiceSortedSet;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedSet;
 
 /**
  * @author Costin Leau
@@ -30,10 +31,7 @@ public class OsgiServiceSortedSetTest extends AbstractOsgiCollectionTest {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		col = new OsgiServiceSortedSet(null, context, getClass().getClassLoader(), false);
-		col.setInterfaces(new Class[] { Wrapper.class, Comparable.class });
-		col.afterPropertiesSet();
-
+		col = (OsgiServiceSortedSet) super.col;
 		iter = col.iterator();
 	}
 
@@ -41,6 +39,11 @@ public class OsgiServiceSortedSetTest extends AbstractOsgiCollectionTest {
 		super.tearDown();
 		col = null;
 		iter = null;
+	}
+
+	OsgiServiceCollection createCollection() {
+		return new OsgiServiceSortedSet(null, context, getClass().getClassLoader(), createProxyCreator(new Class[] {
+				Wrapper.class, Comparable.class }));
 	}
 
 	public void testOrderingWhileAdding() {
@@ -93,12 +96,12 @@ public class OsgiServiceSortedSetTest extends AbstractOsgiCollectionTest {
 		Wrapper date1 = new DateWrapper(1);
 		Wrapper date2 = new DateWrapper(2);
 		Wrapper date3 = new DateWrapper(3);
-		
+
 		addService(date2);
 
 		assertTrue(iter.hasNext());
 		assertEquals(date2.toString(), iter.next().toString());
-		
+
 		addService(date1);
 		assertFalse(iter.hasNext());
 
@@ -106,7 +109,6 @@ public class OsgiServiceSortedSetTest extends AbstractOsgiCollectionTest {
 		assertTrue(iter.hasNext());
 		assertEquals(date3.toString(), iter.next().toString());
 	}
-	
 
 	public void testRemovalWhileIterating() {
 		Wrapper date1 = new DateWrapper(1);
@@ -120,7 +122,7 @@ public class OsgiServiceSortedSetTest extends AbstractOsgiCollectionTest {
 		addService(date1);
 
 		assertEquals("collection should not accept duplicates", 3, col.size());
-		
+
 		// date1
 		assertEquals(date1.toString(), iter.next().toString());
 

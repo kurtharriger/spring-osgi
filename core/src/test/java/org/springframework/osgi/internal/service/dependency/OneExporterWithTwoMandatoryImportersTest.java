@@ -22,10 +22,11 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.osgi.internal.service.MandatoryDependencyEvent;
-import org.springframework.osgi.internal.service.MandatoryDependencyListener;
-import org.springframework.osgi.internal.service.ServiceExporter;
-import org.springframework.osgi.internal.service.importer.AbstractServiceImporter;
+import org.springframework.osgi.service.importer.support.AbstractServiceImporter;
+import org.springframework.osgi.service.internal.MandatoryDependencyEvent;
+import org.springframework.osgi.service.internal.MandatoryDependencyListener;
+import org.springframework.osgi.service.internal.ServiceExporter;
+import org.springframework.osgi.service.internal.dependency.DefaultMandatoryDependencyManager;
 
 /**
  * @author Costin Leau

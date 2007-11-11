@@ -28,7 +28,7 @@
   </reporting>
   
   <properties>
-  	<spring.osgi.private.pkg>org.springframework.osgi.internal.extender*</spring.osgi.private.pkg>
+  	<spring.osgi.private.pkg>org.springframework.osgi.extender.internal*</spring.osgi.private.pkg>
   	<!-- don't export a thing -->
 	<spring.osgi.export.pkg>!*</spring.osgi.export.pkg>
 	<!-- add this until FELIX-390 gets fixed -->

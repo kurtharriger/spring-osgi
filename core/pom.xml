@@ -29,24 +29,18 @@
   
   <properties>
   	<spring.osgi.export.pkg>
-		org.springframework.osgi.internal.config*,
-  	    org.springframework.osgi.internal.context*,
-  	    org.springframework.osgi.internal.util*,
-  	    !org.springframework.osgi.io*, 
-  	    !org.springframework.osgi.internal*, 
-  	    org.springframework.osgi*
+  	    !org.springframework.osgi.io*, !org.springframework.osgi.io.internal, org.springframework.osgi*
   	</spring.osgi.export.pkg>
   	
 	<spring.osgi.import.pkg>
 		org.apache.commons.logging*,
 		org.aopalliance*,
 		org.osgi.service.cm;version=1.2;resolution:=optional,
+		org.osgi.service.startlevel;version=1.0;resolution:=optional,
 		org.w3c.dom;resolution:=optional,
 		org.xml.sax;resolution:=optional,
 		*
 	</spring.osgi.import.pkg>
-	
-	<spring.osgi.private.pkg>org.springframework.osgi.internal*</spring.osgi.private.pkg>
 	
 	<spring.osgi.symbolic.name>${symName.prefix}.core</spring.osgi.symbolic.name>
 	

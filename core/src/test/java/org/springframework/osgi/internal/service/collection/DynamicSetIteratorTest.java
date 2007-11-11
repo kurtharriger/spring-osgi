@@ -20,9 +20,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.osgi.internal.service.collection.DynamicSet;
-
 import junit.framework.TestCase;
+
+import org.springframework.osgi.service.importer.internal.collection.DynamicSet;
 
 public class DynamicSetIteratorTest extends TestCase {
 

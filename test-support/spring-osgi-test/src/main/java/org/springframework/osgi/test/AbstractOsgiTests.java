@@ -32,11 +32,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.osgi.internal.test.OsgiJUnitTest;
-import org.springframework.osgi.internal.test.util.ConfigurableByteArrayOutputStream;
-import org.springframework.osgi.internal.test.util.IOUtils;
-import org.springframework.osgi.internal.test.util.TestUtils;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
+import org.springframework.osgi.test.internal.OsgiJUnitTest;
+import org.springframework.osgi.test.internal.util.ConfigurableByteArrayOutputStream;
+import org.springframework.osgi.test.internal.util.IOUtils;
+import org.springframework.osgi.test.internal.util.TestUtils;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
@@ -393,6 +393,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * @throws Exception
 	 */
 	private void invokeOSGiTestExecution() throws Exception {
+		Assert.notNull(serviceTrigger, "no executeTest() method found on: " + service.getClass());
 		try {
 			serviceTrigger.invoke(service, null);
 		}

@@ -22,9 +22,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
 import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
+import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
 /**
  * @author Costin Leau
@@ -47,7 +48,7 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 
 	// this fails due to some CGLIB problems
 	public void testProxyForMultipleCardinality() throws Exception {
-		fb.setCardinality("0..N");
+		fb.setCardinality(Cardinality.C_0__N);
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 

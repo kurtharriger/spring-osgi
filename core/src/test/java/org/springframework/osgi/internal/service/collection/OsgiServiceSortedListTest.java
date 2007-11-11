@@ -18,7 +18,8 @@ package org.springframework.osgi.internal.service.collection;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import org.springframework.osgi.internal.service.collection.OsgiServiceSortedList;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedList;
 
 /**
  * @author Costin Leau
@@ -32,10 +33,7 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		col = new OsgiServiceSortedList(null, context, getClass().getClassLoader(), false);
-		col.setInterfaces(new Class[] { Wrapper.class, Comparable.class });
-		col.afterPropertiesSet();
-
+		col = (OsgiServiceSortedList) super.col;
 		iter = col.iterator();
 	}
 
@@ -43,6 +41,11 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		super.tearDown();
 		col = null;
 		iter = null;
+	}
+
+	OsgiServiceCollection createCollection() {
+		return new OsgiServiceSortedList(null, context, getClass().getClassLoader(), createProxyCreator(new Class[] {
+				Wrapper.class, Comparable.class }));
 	}
 
 	public void testOrderingWhileAdding() {
@@ -121,11 +124,11 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		assertEquals(date2.toString(), iter.next().toString());
 
 		assertEquals(1, col.size());
-		
+
 		// check next duplicate
 		addService(date2);
 		assertEquals(2, col.size());
-		
+
 		assertEquals(date2.toString(), iter.next().toString());
 
 		addService(date1);
@@ -153,7 +156,7 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		addService(date1);
 
 		assertEquals(5, col.size());
-		
+
 		// date1
 		assertEquals(date1.toString(), iter.next().toString());
 
@@ -174,16 +177,15 @@ public class OsgiServiceSortedListTest extends AbstractOsgiCollectionTest {
 		Wrapper date2 = new DateWrapper(2);
 		Wrapper date3 = new DateWrapper(3);
 
-		
 		addService(date2);
 		addService(date1);
 		addService(date3);
-		
+
 		// date1
 		assertEquals(date1.toString(), iterator.next().toString());
 
 		assertTrue(iterator.hasPrevious());
 		removeService(date1);
 	}
-	
+
 }

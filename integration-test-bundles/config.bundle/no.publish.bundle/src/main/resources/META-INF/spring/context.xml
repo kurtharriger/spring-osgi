@@ -7,5 +7,5 @@
 
     <bean id="point" class="java.awt.Point" lazy-init="false"/>
 
-    <osgi:service ref="point" auto-export="all"/>
+    <osgi:service ref="point" auto-export="all-classes"/>
 </beans>
