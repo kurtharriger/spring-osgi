@@ -56,7 +56,16 @@
        <version>${spring.maven.artifact.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>mx4j.osgi</artifactId>
+      <version>3.0.2-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    
   </dependencies>
+  
   
   <build>
 	 <resources>

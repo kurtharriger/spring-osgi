@@ -20,7 +20,6 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * Test Case for AbstractConfigurableBundleCreatorTests.

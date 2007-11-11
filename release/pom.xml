@@ -192,16 +192,10 @@
      <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>log4j.osgi</artifactId>
-      <version>1.2.13-SNAPSHOT</version>
+      <version>1.2.15-SNAPSHOT</version>
       <scope>provided</scope>
       </dependency>        
-
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>aopalliance.osgi</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
+       <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>asm.osgi</artifactId>
             <version>2.2.3-SNAPSHOT</version>
@@ -279,13 +273,7 @@
             <version>1.2.9-SNAPSHOT</version>
         </dependency>
 
-	<dependency>
-      <groupId>org.aopalliance</groupId>
-      <artifactId>aopalliance</artifactId>
-      <version>1.0</version>
-      <scope>provided</scope>
-    </dependency>
-    
+   
     </dependencies>
 
     <build>

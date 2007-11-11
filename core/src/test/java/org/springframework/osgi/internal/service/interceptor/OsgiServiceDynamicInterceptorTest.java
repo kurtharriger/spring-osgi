@@ -26,12 +26,11 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.internal.service.support.RetryTemplate;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.importer.internal.aop.OsgiServiceDynamicInterceptor;
 
 /**
  * @author Costin Leau
@@ -112,9 +111,9 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 	}
 
 	private void createInterceptor(Filter filter) {
-		interceptor = new OsgiServiceDynamicInterceptor(ctx, filter,
-				ReferenceClassLoadingOptions.UNMANAGED.shortValue(), false, getClass().getClassLoader());
+		interceptor = new OsgiServiceDynamicInterceptor(ctx, filter, getClass().getClassLoader());
 
+		interceptor.setRequiredAtStartup(false);
 		interceptor.afterPropertiesSet();
 
 		interceptor.getRetryTemplate().setRetryNumbers(3);
@@ -261,10 +260,9 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 	 * MockBundleContext() { public ServiceReference[]
 	 * getServiceReferences(String clazz, String filter) throws
 	 * InvalidSyntaxException { return null; } }; interceptor = new
-	 * OsgiServiceDynamicInterceptor(ctx,
-	 * ReferenceClassLoadingOptions.UNMANAGED); interceptor.setFilter(new
-	 * MockFilter()); RetryTemplate template = new RetryTemplate();
-	 * template.setRetryNumbers(1); template.setWaitTime(10);
+	 * OsgiServiceDynamicInterceptor(ctx, ImportContextClassLoader.UNMANAGED);
+	 * interceptor.setFilter(new MockFilter()); RetryTemplate template = new
+	 * RetryTemplate(); template.setRetryNumbers(1); template.setWaitTime(10);
 	 * interceptor.setRetryTemplate(template); try {
 	 * interceptor.afterPropertiesSet(); fail("expected exception"); } catch
 	 * (ServiceUnavailableException sue) { // expected } }

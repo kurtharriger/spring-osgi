@@ -19,11 +19,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
-import org.springframework.osgi.context.support.AbstractOsgiBundleApplicationContext;
-import org.springframework.osgi.internal.context.DelegatedExecutionOsgiBundleApplicationContext;
-import org.springframework.osgi.internal.context.OsgiBundleApplicationContextExecutor;
+import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
+import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -157,7 +157,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	public void preRefresh() {
 
 		// check concurrent collection (which are mandatory)
-		if (!org.springframework.osgi.internal.util.ClassUtils.concurrentLibAvailable())
+		if (!ClassUtils.concurrentLibAvailable())
 			throw new IllegalStateException(
 					"JVM 5+ or backport-concurrent library (for JVM 1.4) required; see the FAQ for more details");
 

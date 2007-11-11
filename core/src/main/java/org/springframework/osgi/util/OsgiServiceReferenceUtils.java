@@ -26,7 +26,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.internal.util.ServiceReferenceBasedMap;
+import org.springframework.osgi.util.internal.MapBasedDictionary;
+import org.springframework.osgi.util.internal.ServiceReferenceBasedMap;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 

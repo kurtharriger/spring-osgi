@@ -35,7 +35,7 @@
     <spring.osgi.private.pkg></spring.osgi.private.pkg>
     
     <!-- complete access to export/import properties -->
-    <spring.osgi.export>${spring.osgi.export.pkg}*;version=${spring.osgi.export.version}</spring.osgi.export>
+    <spring.osgi.export>!${spring.osgi.private.pkg}, ${spring.osgi.export.pkg}*;version=${spring.osgi.export.version}</spring.osgi.export>
     <spring.osgi.import>${spring.osgi.import.pkg}</spring.osgi.import>
 
 
@@ -357,7 +357,7 @@ limitations under the License.
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>org.springframework.osgi.internal.test.platform.EquinoxPlatform</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.internal.EquinoxPlatform</osgi.test.platform>
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
@@ -373,7 +373,7 @@ limitations under the License.
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>org.springframework.osgi.internal.test.platform.KnopflerfishPlatform</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.internal.KnopflerfishPlatform</osgi.test.platform>
 		<log4j.ignoreTCL>true</log4j.ignoreTCL>
 		<org.knopflerfish.osgi.setcontextclassloader>true</org.knopflerfish.osgi.setcontextclassloader>        
       </properties>
@@ -409,7 +409,7 @@ limitations under the License.
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>org.springframework.osgi.internal.test.platform.FelixPlatform</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.internal.FelixPlatform</osgi.test.platform>
 		<log4j.ignoreTCL>true</log4j.ignoreTCL>        
       </properties>
     </profile>
@@ -433,7 +433,7 @@ limitations under the License.
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>org.springframework.osgi.internal.test.platform.EquinoxPlatform</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.internal.EquinoxPlatform</osgi.test.platform>
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
@@ -504,7 +504,7 @@ limitations under the License.
                <packages>org.springframework.osgi.sample*</packages>
             </group>
           </groups>
-          <excludePackageNames>org.springframework.osgi.internal*:org.springframework.osgi.iandt*</excludePackageNames>
+          <excludePackageNames>org.springframework.osgi.*internal*:org.springframework.osgi.iandt*</excludePackageNames>
           
                     
           <breakiterator>true</breakiterator>

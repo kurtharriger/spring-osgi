@@ -19,6 +19,7 @@ import java.util.Arrays;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.osgi.util.internal.BeanFactoryUtils;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.util.ObjectUtils;
 

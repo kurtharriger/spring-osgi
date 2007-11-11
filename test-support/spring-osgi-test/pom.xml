@@ -26,11 +26,11 @@
   </reporting>
   
   <properties>
-    <spring.osgi.export.pkg>
-      !org.springframework.osgi.internal.test*, 
+    <spring.osgi.export>
+      !org.springframework.osgi.test.*internal*,
       org.springframework.osgi.test*
-    </spring.osgi.export.pkg>
-    <spring.osgi.private.pkg>org.springframework.osgi.internal.test*</spring.osgi.private.pkg>
+    </spring.osgi.export>
+    <spring.osgi.private.pkg>org.springframework.osgi.test.*internal*, org.springframework.osgi.extender.internal.util*</spring.osgi.private.pkg>
 	<spring.osgi.import.pkg>
 	  org.apache.commons.logging*,
 	  org.objectweb.asm*;version="[2,3)";resolution:=optional,
@@ -62,12 +62,19 @@
       <version>2.2.3-SNAPSHOT</version>
     </dependency>
         
-     <dependency>
+    <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-core</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
         
+    <!-- used for getting Counter util in -->
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-extender</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.eclipse.osgi</groupId>
       <artifactId>org.eclipse.osgi</artifactId>

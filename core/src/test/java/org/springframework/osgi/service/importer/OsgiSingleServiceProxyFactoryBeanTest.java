@@ -28,6 +28,8 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 
 /**
  * @author Adrian Colyer
@@ -128,9 +130,9 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testClassLoadingOptionsConstant() throws Exception {
-		serviceFactoryBean.setContextClassloader("client");
-		serviceFactoryBean.setContextClassloader("service-provider");
-		serviceFactoryBean.setContextClassloader("unmanaged");
+		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.CLIENT);
+		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.SERVICE_PROVIDER);
+		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.CLIENT.UNMANAGED);
 	}
 
 }

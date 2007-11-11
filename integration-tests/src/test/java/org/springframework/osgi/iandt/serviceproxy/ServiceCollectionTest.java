@@ -22,23 +22,17 @@ import java.util.Iterator;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.internal.service.collection.OsgiServiceCollection;
-import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.util.ClassUtils;
 
 /**
  * @author Costin Leau
  * 
  */
+// discover a way to test internal packages
 public abstract class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTests {
-
-	// private ConfigurableApplicationContext classReference1;
-	//
-	// private DisposableBean classRef2;
-	//
-	// private ConfigurableOsgiBundleApplicationContext context;
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT" };
@@ -61,12 +55,12 @@ public abstract class ServiceCollectionTest extends AbstractConfigurableBundleCr
 	protected Collection createCollection() {
 		BundleDelegatingClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 
-		OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader, false);
-		collection.setContextClassLoader(ReferenceClassLoadingOptions.CLIENT.shortValue());
+		OsgiServiceCollection collection = new OsgiServiceCollection(null, bundleContext, classLoader, null);
 		ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 		try {
 			Thread.currentThread().setContextClassLoader(classLoader);
-			collection.setInterfaces(new Class[] { Date.class });
+			collection.setRequiredAtStartup(false);
+			// collection.setInterfaces(new Class[] { Date.class });
 			collection.afterPropertiesSet();
 		}
 		finally {

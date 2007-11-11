@@ -30,15 +30,15 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
-import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
-import org.springframework.osgi.internal.service.collection.OsgiServiceList;
-import org.springframework.osgi.internal.service.collection.OsgiServiceSet;
-import org.springframework.osgi.internal.service.collection.OsgiServiceSortedList;
-import org.springframework.osgi.internal.service.collection.OsgiServiceSortedSet;
-import org.springframework.osgi.internal.service.collection.comparator.OsgiServiceReferenceComparator;
+import org.springframework.osgi.context.support.internal.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceList;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSet;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedList;
+import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedSet;
+import org.springframework.osgi.service.importer.internal.collection.comparator.OsgiServiceReferenceComparator;
+import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
 
 /**
  * @author Costin Leau

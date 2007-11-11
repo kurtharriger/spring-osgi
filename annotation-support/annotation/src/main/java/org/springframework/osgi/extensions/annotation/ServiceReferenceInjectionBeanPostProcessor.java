@@ -31,40 +31,45 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.util.ReflectionUtils;
 
 /**
  * BeanPostProcessor that injects OSGi services.
- *
+ * 
  * @author Andy Piper
  */
-public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
-	implements BundleContextAware, BeanFactoryAware, BeanClassLoaderAware {
+public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements
+		BundleContextAware, BeanFactoryAware, BeanClassLoaderAware {
 
 	private BundleContext bundleContext;
+
 	private static Log logger = LogFactory.getLog(ServiceReferenceInjectionBeanPostProcessor.class);
+
 	private BeanFactory beanFactory;
-    private ClassLoader classLoader;
 
+	private ClassLoader classLoader;
 
-    public void setBeanClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
+	public void setBeanClassLoader(ClassLoader classLoader) {
+		this.classLoader = classLoader;
+	}
 
-
-    /**
-	 * process FactoryBean created objects, since these will not have had services injected.
-	 *
+	/**
+	 * process FactoryBean created objects, since these will not have had
+	 * services injected.
+	 * 
 	 * @param bean
 	 * @param beanName
 	 */
 	public Object postProcessAfterInitialization(final Object bean, final String beanName) throws BeansException {
-		if (logger.isDebugEnabled()) logger.debug("processing [" + bean.getClass().getName() + ", " + beanName + "]");
+		if (logger.isDebugEnabled())
+			logger.debug("processing [" + bean.getClass().getName() + ", " + beanName + "]");
 		// Catch FactoryBean created instances.
-		if (!(bean instanceof FactoryBean)
-			&& beanFactory.containsBean(BeanFactory.FACTORY_BEAN_PREFIX + beanName)) {
+		if (!(bean instanceof FactoryBean) && beanFactory.containsBean(BeanFactory.FACTORY_BEAN_PREFIX + beanName)) {
 			injectServices(bean, beanName);
 		}
 		return bean;
@@ -72,38 +77,35 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 
 	/* private version of the injector can use */
 	private void injectServices(final Object bean, final String beanName) {
-		ReflectionUtils.doWithMethods(bean.getClass(),
-			new ReflectionUtils.MethodCallback() {
-				public void doWith(Method method) {
-					ServiceReference s = AnnotationUtils.getAnnotation(method, ServiceReference.class);
-					if (s != null && method.getParameterTypes().length == 1) {
-						try {
-							if (logger.isDebugEnabled()) logger.debug("Processing annotation [" + s + "] for ["
-								+ bean.getClass().getName() + "." + method.getName() + "()] on bean [" +
-								beanName + "]");
-							method.invoke(bean, getServiceProperty(s, method, beanName));
-						}
-						catch (Exception e) {
-							throw new IllegalArgumentException("Error processing service annotation", e);
-						}
+		ReflectionUtils.doWithMethods(bean.getClass(), new ReflectionUtils.MethodCallback() {
+			public void doWith(Method method) {
+				ServiceReference s = AnnotationUtils.getAnnotation(method, ServiceReference.class);
+				if (s != null && method.getParameterTypes().length == 1) {
+					try {
+						if (logger.isDebugEnabled())
+							logger.debug("Processing annotation [" + s + "] for [" + bean.getClass().getName() + "."
+									+ method.getName() + "()] on bean [" + beanName + "]");
+						method.invoke(bean, getServiceProperty(s, method, beanName));
+					}
+					catch (Exception e) {
+						throw new IllegalArgumentException("Error processing service annotation", e);
 					}
 				}
-			});
+			}
+		});
 	}
 
-	public PropertyValues postProcessPropertyValues(
-		PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
-		throws BeansException {
+	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean,
+			String beanName) throws BeansException {
 
 		MutablePropertyValues newprops = new MutablePropertyValues(pvs);
 		for (PropertyDescriptor pd : pds) {
 			ServiceReference s = hasServiceProperty(pd);
 			if (s != null && !pvs.contains(pd.getName())) {
 				try {
-					if (logger.isDebugEnabled()) logger.debug("Processing annotation [" + s + "] for ["
-						+ beanName + "." + pd.getName() + "]");
-					newprops.addPropertyValue(pd.getName(), getServiceProperty(s,
-						pd.getWriteMethod(), beanName));
+					if (logger.isDebugEnabled())
+						logger.debug("Processing annotation [" + s + "] for [" + beanName + "." + pd.getName() + "]");
+					newprops.addPropertyValue(pd.getName(), getServiceProperty(s, pd.getWriteMethod(), beanName));
 				}
 				catch (Exception e) {
 					throw new FatalBeanException("Could not create service reference", e);
@@ -114,35 +116,39 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 	}
 
 	private Object getServiceProperty(ServiceReference s, Method writeMethod, String beanName) throws Exception {
-		// Invocations will block here, so although the ApplicationContext is created nothing will
+		// Invocations will block here, so although the ApplicationContext is
+		// created nothing will
 		// proceed until all the dependencies are satisfied.
 		return getServiceProperty(new OsgiServiceProxyFactoryBean(), s, writeMethod, beanName).getObject();
 	}
 
-	/* package */ OsgiServiceProxyFactoryBean getServiceProperty(OsgiServiceProxyFactoryBean pfb, ServiceReference s, Method writeMethod, String beanName) throws Exception {
+	/* package */OsgiServiceProxyFactoryBean getServiceProperty(OsgiServiceProxyFactoryBean pfb, ServiceReference s,
+			Method writeMethod, String beanName) throws Exception {
 		pfb.setTimeout(s.timeout());
 		if (s.filter().length() > 0) {
 			pfb.setFilter(s.filter());
 		}
 		if (s.serviceTypes() == null || s.serviceTypes().length == 0
-                || (s.serviceTypes().length == 1 && s.serviceTypes()[0].equals(ServiceReference.class))) {
+				|| (s.serviceTypes().length == 1 && s.serviceTypes()[0].equals(ServiceReference.class))) {
 			Class[] params = writeMethod.getParameterTypes();
 			if (params.length != 1) {
 				throw new IllegalArgumentException("Setter for [" + beanName + "] must have only one argument");
 			}
-			pfb.setInterface(new Class[]{params[0]});
+			pfb.setInterface(new Class[] { params[0] });
 		}
 		else {
 			pfb.setInterface(s.serviceTypes());
 		}
-		pfb.setCardinality(s.cardinality().toString());
-		pfb.setContextClassloader(s.contextClassloader().toString());
+		pfb.setCardinality((Cardinality) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(Cardinality.class,
+			s.cardinality().toString()));
+		pfb.setContextClassLoader((ImportContextClassLoader) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(
+			ImportContextClassLoader.class, s.contextClassloader().toString().toUpperCase().replace('-', '_')));
 		pfb.setBundleContext(bundleContext);
 		if (s.serviceBeanName().length() > 0) {
 			pfb.setServiceBeanName(s.serviceBeanName());
 		}
-        pfb.setBeanClassLoader(classLoader);
-        pfb.afterPropertiesSet();
+		pfb.setBeanClassLoader(classLoader);
+		pfb.afterPropertiesSet();
 		return pfb;
 	}
 
@@ -160,4 +166,3 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 		this.beanFactory = beanFactory;
 	}
 }
-

@@ -25,16 +25,15 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.service.exporter.ExportClassLoadingOptions;
-import org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
-import org.springframework.osgi.service.importer.ReferenceClassLoadingOptions;
+import org.springframework.osgi.service.exporter.ExportContextClassLoader;
+import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
+import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
 import org.springframework.util.ReflectionUtils.FieldFilter;
@@ -109,14 +108,14 @@ public class OsgiServiceAnnotationTest extends TestCase {
 			new Class[] { AnnotatedBean.class });
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		pfb = new OsgiMultiServiceProxyFactoryBean();
-		//processor.getServiceProperty(pfb, ref, setter, null);
+		// processor.getServiceProperty(pfb, ref, setter, null);
 		assertFalse(pfb.isMandatory());
 
 		setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithCardinality1_N",
 			new Class[] { AnnotatedBean.class });
 		ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		pfb = new OsgiMultiServiceProxyFactoryBean();
-		//processor.getServiceProperty(pfb, ref, setter, null);
+		// processor.getServiceProperty(pfb, ref, setter, null);
 		assertTrue(pfb.isMandatory());
 	}
 
@@ -126,25 +125,22 @@ public class OsgiServiceAnnotationTest extends TestCase {
 			new Class[] { AnnotatedBean.class });
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
-		int ccl = ((Integer) getPrivateProperty(pfb, "contextClassloader")).intValue();
-		assertEquals(ccl, ReferenceClassLoadingOptions.CLIENT.shortValue());
+		assertEquals(pfb.getContextClassLoader(), ImportContextClassLoader.CLIENT);
 
 		pfb = new OsgiServiceProxyFactoryBean();
 		setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithClassLoaderUmanaged",
 			new Class[] { AnnotatedBean.class });
 		ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
-		ccl = ((Integer) getPrivateProperty(pfb, "contextClassloader")).intValue();
 
-		assertEquals(ccl, ExportClassLoadingOptions.UNMANAGED.shortValue());
+		assertEquals(pfb.getContextClassLoader(), ImportContextClassLoader.UNMANAGED);
 
 		pfb = new OsgiServiceProxyFactoryBean();
 		setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithClassLoaderServiceProvider",
 			new Class[] { AnnotatedBean.class });
 		ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
-		ccl = ((Integer) getPrivateProperty(pfb, "contextClassloader")).intValue();
-		assertEquals(ccl, ExportClassLoadingOptions.SERVICE_PROVIDER.shortValue());
+		assertEquals(pfb.getContextClassLoader(), ImportContextClassLoader.SERVICE_PROVIDER);
 	}
 
 	public void testGetServicePropertyBeanName() throws Exception {
@@ -186,12 +182,11 @@ public class OsgiServiceAnnotationTest extends TestCase {
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
 		Class[] intfs = (Class[]) getPrivateProperty(pfb, "interfaces");
-		int ccl = ((Integer) getPrivateProperty(pfb, "contextClassloader")).intValue();
 		String filter = (String) getPrivateProperty(pfb, "filter");
 		String beanName = (String) getPrivateProperty(pfb, "serviceBeanName");
 		assertEquals(intfs[0], AnnotatedBean.class);
 		assertFalse(pfb.isMandatory());
-		assertEquals(ccl, ExportClassLoadingOptions.SERVICE_PROVIDER.shortValue());
+		assertEquals(ImportContextClassLoader.SERVICE_PROVIDER, pfb.getContextClassLoader());
 		assertEquals(filter, "(id=fooey)");
 		assertEquals(beanName, "myBean");
 	}

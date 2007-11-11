@@ -30,7 +30,7 @@ import org.osgi.framework.Bundle;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.osgi.internal.io.OsgiResourceUtils;
+import org.springframework.osgi.io.internal.OsgiResourceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;

@@ -10,7 +10,7 @@
 		class="org.springframework.osgi.iandt.scope.common.HashCodeScopeTestService"
 		scope="bundle" />
 
-	<osgi:service ref="b.service" auto-export="all" />
+	<osgi:service ref="b.service" auto-export="all-classes" />
 	
 	
 	<osgi:reference id="serviceFromA"

@@ -24,10 +24,10 @@ import junit.framework.TestResult;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.springframework.osgi.internal.test.OsgiJUnitTest;
 import org.springframework.osgi.test.AbstractOnTheFlyBundleCreatorTests;
 import org.springframework.osgi.test.AbstractOsgiTests;
 import org.springframework.osgi.test.JUnitTestActivator;
+import org.springframework.osgi.test.internal.OsgiJUnitTest;
 
 /**
  * Tests that AbstractOsgiTests and subclasses can be delegated to rather than

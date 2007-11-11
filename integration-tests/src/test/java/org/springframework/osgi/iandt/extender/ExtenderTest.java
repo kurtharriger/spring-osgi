@@ -7,6 +7,7 @@ import java.util.List;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.util.tracker.ServiceTracker;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
@@ -21,10 +22,8 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
 		return null;
 	}
 
-	
-	
 	// Overridden to remove the spring extender bundle!
-	protected String[] getTestFrameworkBundlesNames(){
+	protected String[] getTestFrameworkBundlesNames() {
 		String[] bundles = super.getTestFrameworkBundlesNames();
 		List list = new ArrayList(bundles.length);
 
@@ -60,15 +59,15 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
 
 		StringBuffer filter = new StringBuffer();
 		filter.append("(&");
-		filter.append("(").append(Constants.OBJECTCLASS).append("=").append(
-			AbstractRefreshableApplicationContext.class.getName()).append(")");
+		filter.append("(").append(Constants.OBJECTCLASS).append("=").append(ApplicationContext.class.getName()).append(
+			")");
 		filter.append("(").append("org.springframework.context.service.name");
 		filter.append("=").append("org.springframework.osgi.iandt.lifecycle").append(")");
 		filter.append(")");
 		ServiceTracker tracker = new ServiceTracker(bundleContext, bundleContext.createFilter(filter.toString()), null);
 		tracker.open();
 
-		AbstractRefreshableApplicationContext appContext = (AbstractRefreshableApplicationContext) tracker.waitForService(1);
+		ApplicationContext appContext = (ApplicationContext) tracker.waitForService(1);
 
 		assertNull("lifecycle application context does not exist", appContext);
 
@@ -82,7 +81,7 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
 
 		tracker.open();
 
-		appContext = (AbstractRefreshableApplicationContext) tracker.waitForService(60000);
+		appContext = (ApplicationContext) tracker.waitForService(60000);
 
 		assertNotNull("lifecycle application context exists", appContext);
 

@@ -31,8 +31,8 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderSupport;
-import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
-import org.springframework.osgi.internal.compendium.OsgiPropertyPlaceholder;
+import org.springframework.osgi.compendium.internal.OsgiPropertyPlaceholder;
+import org.springframework.osgi.context.support.internal.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 
 /**

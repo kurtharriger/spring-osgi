@@ -25,8 +25,6 @@ import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.internal.util.ConfigUtils;
-import org.springframework.osgi.internal.util.TrackingUtil;
 import org.xml.sax.EntityResolver;
 
 /**
@@ -54,6 +52,9 @@ import org.xml.sax.EntityResolver;
  * @author Hal Hildebrand
  */
 public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionApplicationContext {
+
+	/** Default config location for the root context(s) */
+	public static final String DEFAULT_CONFIG_LOCATION = "/META-INF/spring/*.xml";
 
 	/**
 	 * 
@@ -125,12 +126,12 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 
 	private NamespaceHandlerResolver lookupNamespaceHandlerResolver() {
 		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class[] { NamespaceHandlerResolver.class }, null,
-			getClass().getClassLoader(), getBundleContext(), new DefaultNamespaceHandlerResolver(getClassLoader()));
+			getClassLoader(), getBundleContext(), new DefaultNamespaceHandlerResolver(getClassLoader()));
 	}
 
 	private EntityResolver lookupEntityResolver() {
-		return (EntityResolver) TrackingUtil.getService(new Class[] { EntityResolver.class }, null,
-			getClass().getClassLoader(), getBundleContext(), new ResourceEntityResolver(this));
+		return (EntityResolver) TrackingUtil.getService(new Class[] { EntityResolver.class }, null, getClassLoader(),
+			getBundleContext(), new ResourceEntityResolver(this));
 	}
 
 	/**
@@ -183,6 +184,6 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * @return xml default config locations
 	 */
 	protected String[] getDefaultConfigLocations() {
-		return new String[] { ConfigUtils.SPRING_CONTEXT_FILES };
+		return new String[] { DEFAULT_CONFIG_LOCATION };
 	}
 }

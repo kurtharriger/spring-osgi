@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-import org.springframework.osgi.internal.service.collection.DynamicList;
-
 import junit.framework.TestCase;
+
+import org.springframework.osgi.service.importer.internal.collection.DynamicList;
 
 /**
  * @author Costin Leau

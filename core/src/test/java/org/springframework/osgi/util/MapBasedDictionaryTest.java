@@ -22,6 +22,8 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.springframework.osgi.util.internal.MapBasedDictionary;
+
 /**
  * Test for the Dictionary contract of {@link MapBasedDictionary}.
  * 

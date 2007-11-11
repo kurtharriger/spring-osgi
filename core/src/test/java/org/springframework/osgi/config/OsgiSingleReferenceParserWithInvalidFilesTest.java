@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.config;
 
+import junit.framework.TestCase;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -22,10 +24,8 @@ import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.osgi.internal.context.support.BundleContextAwareProcessor;
+import org.springframework.osgi.context.support.internal.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
-
-import junit.framework.TestCase;
 
 /**
  * @author Costin Leau

@@ -21,8 +21,8 @@ import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.internal.test.util.IOUtils;
-import org.springframework.osgi.internal.test.util.JarCreator;
+import org.springframework.osgi.test.internal.util.IOUtils;
+import org.springframework.osgi.test.internal.util.JarCreator;
 import org.springframework.util.StringUtils;
 
 /**

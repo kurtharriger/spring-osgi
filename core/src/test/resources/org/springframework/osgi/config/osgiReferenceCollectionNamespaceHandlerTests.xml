@@ -18,7 +18,7 @@
  
 	<!-- Comparator variants  -->
 	<beans:bean id="defaultComparator"
-		class="org.springframework.osgi.internal.service.collection.comparator.OsgiServiceReferenceComparator" />
+		class="org.springframework.osgi.service.importer.internal.collection.comparator.OsgiServiceReferenceComparator" />
 
 	<osgi:list id="implicitSortedList" interface="java.io.Serializable"
 		comparator-ref="defaultComparator" cardinality="0..N" />

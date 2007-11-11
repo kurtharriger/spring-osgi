@@ -37,18 +37,14 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.core.Constants;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.internal.context.support.OsgiBundleScope;
-import org.springframework.osgi.internal.service.BeanNameServicePropertiesResolver;
-import org.springframework.osgi.internal.service.exporter.AbstractListenerAwareExporter;
-import org.springframework.osgi.internal.service.interceptor.OsgiServiceTCCLInterceptor;
-import org.springframework.osgi.internal.util.ClassUtils;
-import org.springframework.osgi.internal.util.DebugUtils;
-import org.springframework.osgi.service.OsgiServicePropertiesResolver;
-import org.springframework.osgi.util.MapBasedDictionary;
+import org.springframework.osgi.context.support.internal.OsgiBundleScope;
+import org.springframework.osgi.service.importer.internal.aop.OsgiServiceTCCLInterceptor;
+import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
+import org.springframework.osgi.util.internal.ClassUtils;
+import org.springframework.osgi.util.internal.MapBasedDictionary;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -105,7 +101,8 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 				bean = serviceFactory.getService(bundle, serviceRegistration);
 			}
 
-			if (contextClassloaderManagementStrategy == ExportClassLoadingOptions.SERVICE_PROVIDER) {
+			// add TCCL behaviour only if needed
+			if (contextClassloaderManagementStrategy == ExportContextClassLoader.SERVICE_PROVIDER) {
 				return wrapWithClassLoaderManagingProxy(bean, classes);
 			}
 			else {
@@ -120,18 +117,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	}
 
 	private static final Log log = LogFactory.getLog(OsgiServiceFactoryBean.class);
-
-	public static final int AUTO_EXPORT_DISABLED = 0;
-
-	public static final int AUTO_EXPORT_INTERFACES = 1;
-
-	public static final int AUTO_EXPORT_CLASS_HIERARCHY = 2;
-
-	public static final int AUTO_EXPORT_ALL = AUTO_EXPORT_INTERFACES | AUTO_EXPORT_CLASS_HIERARCHY;
-
-	private static final String AUTO_EXPORT_PREFIX = "AUTO_EXPORT_";
-
-	private static final Constants EXPORTING_OPTIONS = new Constants(OsgiServiceFactoryBean.class);
 
 	private BundleContext bundleContext;
 
@@ -151,9 +136,9 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 
 	private Class[] interfaces;
 
-	private int autoExportMode = AUTO_EXPORT_DISABLED;
+	private AutoExport autoExport = AutoExport.DISABLED;
 
-	private ExportClassLoadingOptions contextClassloaderManagementStrategy = ExportClassLoadingOptions.UNMANAGED;
+	private ExportContextClassLoader contextClassloaderManagementStrategy = ExportContextClassLoader.UNMANAGED;
 
 	private Object target;
 
@@ -166,7 +151,7 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	/** exporter bean name */
 	private String beanName;
 
-	// private ClassExporter autoExport = new NoOpExporter();
+	// private AutoExport autoExport = new NoOpExporter();
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
@@ -202,8 +187,8 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	}
 
 	/**
-	 * Proxy the target object with a proxy that manages the context
-	 * classloader.
+	 * Proxy the target object with an interceptor that manages the context
+	 * classloader. This should be applied only if such management is needed.
 	 * 
 	 * @param target
 	 * @return
@@ -212,13 +197,12 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 		ProxyFactory factory = new ProxyFactory();
 
 		// mold the proxy
-		for (int i = 0; i < interfaces.length; i++) {
-			factory.addInterface(interfaces[i]);
-		}
+		ClassUtils.configureFactoryForClass(factory, interfaces);
 
 		factory.addAdvice(new OsgiServiceTCCLInterceptor(classLoader));
 		factory.setTarget(target);
 
+		// TODO : add proxy optimizations (factory)
 		try {
 			return factory.getProxy(classLoader);
 		}
@@ -246,41 +230,6 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	}
 
 	/**
-	 * Return an array of classes for the given bean that have been discovered
-	 * using the autoExportMode.
-	 * 
-	 * @param clazz
-	 * @return
-	 */
-	protected Class[] autoDetectClassesForPublishing(Class clazz) {
-
-		Class[] classes;
-
-		switch (autoExportMode) {
-		case AUTO_EXPORT_ALL:
-			classes = org.springframework.osgi.internal.util.ClassUtils.getClassHierarchy(clazz,
-				org.springframework.osgi.internal.util.ClassUtils.INCLUDE_ALL_CLASSES);
-			break;
-		case AUTO_EXPORT_CLASS_HIERARCHY:
-			classes = org.springframework.osgi.internal.util.ClassUtils.getClassHierarchy(clazz,
-				org.springframework.osgi.internal.util.ClassUtils.INCLUDE_CLASS_HIERARCHY);
-			break;
-		case AUTO_EXPORT_INTERFACES:
-			classes = org.springframework.osgi.internal.util.ClassUtils.getClassHierarchy(clazz,
-				org.springframework.osgi.internal.util.ClassUtils.INCLUDE_INTERFACES);
-			break;
-		default:
-			classes = new Class[0];
-			break;
-		}
-		if (log.isTraceEnabled())
-			log.trace("autodetect mode [" + autoExportMode + "] discovered on class [" + clazz + "] classes "
-					+ ObjectUtils.nullSafeToString(classes));
-
-		return classes;
-	}
-
-	/**
 	 * Publish the given object as an OSGi service. It simply assembles the
 	 * classes required for publishing and then delegates the actual
 	 * registration to a dedicated method.
@@ -296,7 +245,11 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 		Dictionary serviceProperties = mergeServiceProperties(beanName);
 
 		Class[] intfs = interfaces;
-		Class[] autoDetectedClasses = autoDetectClassesForPublishing(targetClass);
+		Class[] autoDetectedClasses = autoExport.getExportedClasses(targetClass);
+
+		if (log.isTraceEnabled())
+			log.trace("autoexport mode [" + autoExport + "] discovered on class [" + targetClass + "] classes "
+					+ ObjectUtils.nullSafeToString(autoDetectedClasses));
 
 		// filter duplicates
 		Set classes = new LinkedHashSet(intfs.length + autoDetectedClasses.length);
@@ -329,7 +282,7 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 		Class[] visibleClasses = ClassUtils.getVisibleClasses(classes, beanClassLoader);
 
 		// create an array of classnames (used for registering the service)
-		String[] names = org.springframework.osgi.internal.util.ClassUtils.toStringArray(visibleClasses);
+		String[] names = ClassUtils.toStringArray(visibleClasses);
 
 		// sort the names in alphabetical order (eases debugging)
 		Arrays.sort(names);
@@ -400,21 +353,16 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	}
 
 	/**
-	 * @deprecated - use {@link #setContextClassLoader(String)} instead.
-	 * @param classloaderManagementOption
-	 */
-	public void setContextClassloader(String classloaderManagementOption) {
-		this.contextClassloaderManagementStrategy = ExportClassLoadingOptions.resolveEnum(classloaderManagementOption);
-	}
-
-	/**
 	 * Set the context classloader management strategy to use when invoking
-	 * operations on the exposed target bean.
+	 * operations on the exposed target bean. By default,
+	 * {@link ExportContextClassLoader#UNMANAGED} is used.
 	 * 
 	 * @param classloaderManagementOption
+	 * @see ExportContextClassLoader
 	 */
-	public void setContextClassLoader(String classloaderManagementOption) {
-		this.contextClassloaderManagementStrategy = ExportClassLoadingOptions.resolveEnum(classloaderManagementOption);
+	public void setContextClassLoader(ExportContextClassLoader ccl) {
+		Assert.notNull(ccl);
+		this.contextClassloaderManagementStrategy = ccl;
 	}
 
 	/**
@@ -441,42 +389,21 @@ public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implem
 	}
 
 	/**
-	 * Set the autoexport mode to use. This allows the exporter to use the
-	 * target class hierarchy and/or interfaces for registering the OSGi
-	 * service. By default, autoExport is disabled (@link
-	 * {@link #AUTO_EXPORT_DISABLED}
+	 * Set the strategy used for automatically publishing classes. This allows
+	 * the exporter to use the target class hierarchy and/or interfaces for
+	 * registering the OSGi service. By default, autoExport is disabled
+	 * {@link AutoExport#DISABLED}.
 	 * 
-	 * @see #setAutoExportName(String)
-	 * @see #AUTO_EXPORT_DISABLED
-	 * @see #AUTO_EXPORT_INTERFACES
-	 * @see #AUTO_EXPORT_CLASS_HIERARCHY
-	 * @see #AUTO_EXPORT_ALL
 	 * 
-	 * @param autoExportMode the auto export mode as an int
+	 * @see AutoExport
+	 * 
+	 * @param autoExport class exporter used for automatically publishing
+	 * service classes.
 	 */
-	public void setAutoExportNumber(int autoExportMode) {
-		if (!EXPORTING_OPTIONS.getValues(AUTO_EXPORT_PREFIX).contains(new Integer(autoExportMode)))
-			throw new IllegalArgumentException("invalid autoExportMode");
-		this.autoExportMode = autoExportMode;
+	public void setAutoExport(AutoExport classExporter) {
+		Assert.notNull(classExporter);
+		this.autoExport = classExporter;
 	}
-
-	/**
-	 * Set the autoexport mode to use.
-	 * @see #setAutoExportNumber(int)
-	 * 
-	 * @param autoExportMode
-	 */
-	public void setAutoExport(String autoExportMode) {
-		if (autoExportMode != null) {
-			if (!autoExportMode.startsWith(AUTO_EXPORT_PREFIX))
-				autoExportMode = AUTO_EXPORT_PREFIX + autoExportMode;
-			this.autoExportMode = EXPORTING_OPTIONS.asNumber(autoExportMode).intValue();
-		}
-	}
-
-	// public void setAutoExport(ClassExporter autoExport) {
-	// this.autoExport = autoExport;
-	// }
 
 	public Map getServiceProperties() {
 		return serviceProperties;

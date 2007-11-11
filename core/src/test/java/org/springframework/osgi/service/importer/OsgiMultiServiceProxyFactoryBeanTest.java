@@ -30,6 +30,8 @@ import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
@@ -74,7 +76,7 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testListenersSetOnCollection() throws Exception {
-		serviceFactoryBean.setCardinality(CardinalityOptions.C_0__N.getLabel());
+		serviceFactoryBean.setCardinality(Cardinality.C_0__N);
 
 		OsgiServiceLifecycleListener[] listeners = { (OsgiServiceLifecycleListener) MockControl.createControl(
 			OsgiServiceLifecycleListener.class).getMock() };
@@ -85,7 +87,7 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testMandatoryServiceAtStartupFailure() throws Exception {
-		serviceFactoryBean.setCardinality(CardinalityOptions.C_1__N.getLabel());
+		serviceFactoryBean.setCardinality(Cardinality.C_1__N);
 
 		try {
 			serviceFactoryBean.afterPropertiesSet();

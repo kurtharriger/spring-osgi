@@ -24,12 +24,10 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.osgi.internal.test.platform.EquinoxPlatform;
-import org.springframework.osgi.internal.test.platform.FelixPlatform;
-import org.springframework.osgi.internal.test.platform.KnopflerfishPlatform;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -73,7 +71,6 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 		return "org/springframework/osgi/iandt/io/FragmentIoTests.MF";
 	}
 
-	
 	/**
 	 * Add a bundle fragment.
 	 */
@@ -98,14 +95,14 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 	}
 
 	protected boolean isKF() {
-		return (createPlatform() instanceof KnopflerfishPlatform);
+		return (createPlatform().toString().endsWith("fish"));
 	}
 
 	protected boolean isEquinox() {
-		return (createPlatform() instanceof EquinoxPlatform);
+		return (createPlatform().toString().endsWith("nox"));
 	}
 
 	protected boolean isFelix() {
-		return (createPlatform() instanceof FelixPlatform);
+		return (createPlatform().toString().endsWith("eix"));
 	}
 }

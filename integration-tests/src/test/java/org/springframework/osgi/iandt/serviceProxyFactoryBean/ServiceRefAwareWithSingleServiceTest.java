@@ -22,10 +22,11 @@ import java.util.Map;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.SpringProxy;
-import org.springframework.osgi.context.support.BundleDelegatingClassLoader;
-import org.springframework.osgi.service.importer.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
-import org.springframework.osgi.util.MapBasedDictionary;
+import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
+import org.springframework.osgi.util.internal.MapBasedDictionary;
 
 /**
  * @author Costin Leau
@@ -56,7 +57,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 		ServiceRegistration reg = publishService(date);
 
 		fb = new OsgiServiceProxyFactoryBean();
-		fb.setCardinality("1..1");
+		fb.setCardinality(Cardinality.C_1__1);
 
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
@@ -108,7 +109,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 
 		ServiceRegistration reg = publishService(date, dict);
 
-		fb.setCardinality("1..1");
+		fb.setCardinality(Cardinality.C_1__1);
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 
