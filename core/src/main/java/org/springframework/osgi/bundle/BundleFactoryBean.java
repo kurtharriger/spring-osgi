@@ -41,17 +41,17 @@ import org.springframework.util.StringUtils;
 
 /**
  * Install Bundles using a FactoryBean.
- * 
+ *
  * This allows customers to use Spring to drive bundle management. Bundles
  * states can be modified using the state parameter. Most commonly this is set
  * to "start". Please see {@link BundleAction} and the relationship between the
  * actions.
- * 
+ *
  * <p/>Pay attention when installing bundles dynamically since classes can be
  * loaded aggressively.
- * 
+ *
  * @see BundleAction
- * 
+ *
  * @author Andy Piper
  * @author Costin Leau
  */
@@ -101,7 +101,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		return bundle;
 	}
 
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(bundleContext, "BundleContext is required");
 
 		// check parameters
@@ -148,30 +148,38 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 			// install/update variants
 			try {
 
-				// apply these actions only if we have a bundle
-				if (bundle != null) {
-					if (BundleAction.STOP == action) {
+				// Apply these actions only if we have a bundle, do not subsequently install a bundle
+				// if none exists
+				if (BundleAction.STOP == action) {
+					if (bundle != null) {
 						bundle.stop();
 					}
+				}
 
-					if (BundleAction.UNINSTALL == action) {
+				else if (BundleAction.UNINSTALL == action) {
+					if (bundle != null) {
 						bundle.uninstall();
 					}
 				}
-
-				// if there is no bundle, then be sure to install one before
-				// executing the following actions
-				if (BundleAction.INSTALL == action || bundle == null) {
+				// Apply these actions and install a bundle if necessary
+				else if (BundleAction.INSTALL == action) {
 					bundle = installBundle();
 				}
 
-				if (BundleAction.START == action) {
+				else if (BundleAction.START == action) {
+					if (bundle == null) {
+						bundle = installBundle();
+					}
 					bundle.start();
 				}
 
-				if (BundleAction.UPDATE == action) {
+				else if (BundleAction.UPDATE == action) {
+					if (bundle == null) {
+						bundle = installBundle();
+					}
 					bundle.update();
 				}
+				// Default is to do nothing
 
 			}
 			catch (BundleException be) {
@@ -188,7 +196,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 
 	/**
 	 * Install bundle - the equivalent of install action.
-	 * 
+	 *
 	 * @return
 	 * @throws BundleException
 	 */
