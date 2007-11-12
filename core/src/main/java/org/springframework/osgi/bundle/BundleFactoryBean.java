@@ -241,12 +241,13 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	}
 
 	/**
-	 * Return the given bundle symbolic name.
+	 * Return the {@link Resource} object (if a {@link ResourceLoader} is
+	 * available) from the given location (if any).
 	 * 
-	 * @return bundle symbolic name
+	 * @return {@link Resource} object for the given location
 	 */
-	public String getSymbolicName() {
-		return symbolicName;
+	public Resource getResource() {
+		return resource;
 	}
 
 	/**
@@ -259,16 +260,6 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	}
 
 	/**
-	 * Return the {@link Resource} object (if a {@link ResourceLoader} is
-	 * available) from the given location (if any).
-	 * 
-	 * @return {@link Resource} object for the given location
-	 */
-	public Resource getResource() {
-		return resource;
-	}
-
-	/**
 	 * Set the bundle location (optional operation).
 	 * 
 	 * @param url bundle location (normally an URL or a Spring Resource)
@@ -276,6 +267,15 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	 */
 	public void setLocation(String url) {
 		location = url;
+	}
+
+	/**
+	 * Return the given bundle symbolic name.
+	 * 
+	 * @return bundle symbolic name
+	 */
+	public String getSymbolicName() {
+		return symbolicName;
 	}
 
 	/**
@@ -292,12 +292,30 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	}
 
 	/**
+	 * Returns the action.
+	 * 
+	 * @return Returns the action
+	 */
+	public BundleAction getAction() {
+		return action;
+	}
+
+	/**
 	 * Action to execute at startup.
 	 * 
 	 * @param action action to execute at startup
 	 */
 	public void setAction(BundleAction action) {
 		this.action = action;
+	}
+
+	/**
+	 * Returns the destroyAction.
+	 * 
+	 * @return Returns the destroyAction
+	 */
+	public BundleAction getDestroyAction() {
+		return destroyAction;
 	}
 
 	/**

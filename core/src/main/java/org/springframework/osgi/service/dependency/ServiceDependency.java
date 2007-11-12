@@ -26,18 +26,18 @@ package org.springframework.osgi.service.dependency;
 public interface ServiceDependency {
 
 	/**
-	 * Does this importer have mandatory dependencies?
+	 * Is this dependency mandatory?
 	 * 
-	 * @return true if dependencies are mandatory, false otherwise.
+	 * @return true if the dependency is mandatory, false otherwise.
 	 */
 	boolean isMandatory();
 
 	/**
-	 * Is this importer satisfied? For optional importers, this will always
-	 * return true, for mandatory importers, will return true if at least one
-	 * service is available or false otherwise.
+	 * Is this dependency satisfied? For optional service imports, this will
+	 * always return true, for mandatory service imports, will return true if at
+	 * least one service is available or false otherwise.
 	 * 
-	 * @return
+	 * @return true if the dependency is satisfied, false otherwise.
 	 */
 	boolean isSatisfied();
 

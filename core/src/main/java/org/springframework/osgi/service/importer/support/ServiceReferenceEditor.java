@@ -19,7 +19,7 @@ import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 
 /**
  * {@link PropertyEditor} that converts an &lt;osgi:reference&gt; element into a
@@ -27,7 +27,7 @@ import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
  * Spring-managed OSGi service to a Spring-managed ServiceReference.
  * 
  * @see ServiceReferenceDelegate
- * @see ServiceReferenceAccessor
+ * @see ImportedOsgiServiceProxy
  * 
  * @author Costin Leau
  * 
@@ -39,7 +39,7 @@ public class ServiceReferenceEditor extends PropertyEditorSupport {
 	 */
 	public void setAsText(String text) throws IllegalArgumentException {
 		throw new IllegalArgumentException("this property editor works only with "
-				+ ServiceReferenceAccessor.class.getName());
+				+ ImportedOsgiServiceProxy.class.getName());
 	}
 
 	/**
@@ -51,11 +51,11 @@ public class ServiceReferenceEditor extends PropertyEditorSupport {
 			return;
 		}
 
-		if (value instanceof ServiceReferenceAccessor) {
-			super.setValue(new ServiceReferenceDelegate((ServiceReferenceAccessor) value));
+		if (value instanceof ImportedOsgiServiceProxy) {
+			super.setValue(new ServiceReferenceDelegate((ImportedOsgiServiceProxy) value));
 			return;
 		}
-		throw new IllegalArgumentException("expected a service of type " + ServiceReferenceAccessor.class.getName());
+		throw new IllegalArgumentException("expected a service of type " + ImportedOsgiServiceProxy.class.getName());
 	}
 
 	/**

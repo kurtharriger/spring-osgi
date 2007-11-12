@@ -19,7 +19,7 @@ package org.springframework.osgi.context;
 /**
  * Interface that redirect the application context crucial methods to a third
  * party executor. This interface splits the refresh method in two:
- * {@link #preRefresh()} and {@link #postRefresh()}.
+ * {@link #startRefresh()} and {@link #completeRefresh()}.
  * 
  * @author Costin Leau
  * 
@@ -43,16 +43,16 @@ public interface DelegatedExecutionOsgiBundleApplicationContext extends Configur
 	/**
 	 * First phase of the refresh. Executes right a certain condition, imposed
 	 * by the executor is checked. Normally, this just prepares the beanFactory
-	 * but does not initialize any beans.
+	 * but does not creates any beans.
 	 */
-	void preRefresh();
+	void startRefresh();
 
 	/**
 	 * The second, last phase of the refresh. Finishes the rest of the refresh
 	 * operation. Normally, this operations performs most of the refresh work,
 	 * such as instantiating singleton.
 	 */
-	void postRefresh();
+	void completeRefresh();
 
 	/**
 	 * Assign the {@link OsgiBundleApplicationContextExecutor} for this delegated context.

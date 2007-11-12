@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
@@ -72,8 +72,8 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 			assertTrue(service instanceof Date);
 			assertEquals(time, ((Date) service).getTime());
 
-			assertTrue(service instanceof ServiceReferenceAccessor);
-			assertNotNull(((ServiceReferenceAccessor) service).getServiceReference());
+			assertTrue(service instanceof ImportedOsgiServiceProxy);
+			assertNotNull(((ImportedOsgiServiceProxy) service).getServiceReference());
 
 			assertFalse(iter.hasNext());
 			time = 111;
@@ -83,8 +83,8 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 			service = iter.next();
 			assertTrue(service instanceof Date);
 			assertEquals(time, ((Date) service).getTime());
-			assertTrue(service instanceof ServiceReferenceAccessor);
-			assertNotNull(((ServiceReferenceAccessor) service).getServiceReference());
+			assertTrue(service instanceof ImportedOsgiServiceProxy);
+			assertNotNull(((ImportedOsgiServiceProxy) service).getServiceReference());
 
 		}
 		finally {

@@ -26,6 +26,9 @@ import org.springframework.osgi.service.dependency.DependentServiceExporter;
 import org.springframework.util.Assert;
 
 /**
+ * BeanPostProcessor registered for detecting the dependency between service
+ * importer and service exporters.
+ * 
  * @author Costin Leau
  * 
  */

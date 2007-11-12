@@ -129,7 +129,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 			// Continue with the refresh process...
 			synchronized (delegateContext.getMonitor()) {
-				delegateContext.postRefresh();
+				delegateContext.completeRefresh();
 			}
 
 		}
@@ -204,7 +204,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			}
 
 			synchronized (delegateContext.getMonitor()) {
-				delegateContext.preRefresh();
+				delegateContext.startRefresh();
 			}
 
 			if (debug)

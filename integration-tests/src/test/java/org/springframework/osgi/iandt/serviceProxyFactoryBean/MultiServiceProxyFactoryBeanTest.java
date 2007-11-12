@@ -25,7 +25,7 @@ import java.util.Properties;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
@@ -162,10 +162,10 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 			// has to successed
 			Object obj = iter.next();
 
-			assertTrue(obj instanceof ServiceReferenceAccessor);
+			assertTrue(obj instanceof ImportedOsgiServiceProxy);
 			assertTrue(obj instanceof Date);
 			// the properties will contain the ObjectClass also
-			assertEquals(((ServiceReferenceAccessor) obj).getServiceReference().getProperty("Moroccan"), "Sunset");
+			assertEquals(((ImportedOsgiServiceProxy) obj).getServiceReference().getProperty("Moroccan"), "Sunset");
 
 			try {
 				// make sure the service is dead

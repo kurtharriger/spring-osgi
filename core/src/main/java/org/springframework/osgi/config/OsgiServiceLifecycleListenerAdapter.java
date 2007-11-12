@@ -22,8 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
-import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
 import org.springframework.osgi.util.internal.ReflectionUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -114,7 +114,7 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 			if (trace)
 				log.trace("invoking listener custom method " + method);
 
-			ServiceReference ref = ((ServiceReferenceAccessor) service).getServiceReference();
+			ServiceReference ref = ((ImportedOsgiServiceProxy) service).getServiceReference();
 
 			try {
 				ReflectionUtils.invokeMethod(method, target, new Object[] { ref });

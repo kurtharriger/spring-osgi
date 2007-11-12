@@ -367,6 +367,15 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	}
 
 	/**
+	 * Returns the target.
+	 * 
+	 * @return Returns the target
+	 */
+	public Object getTarget() {
+		return target;
+	}
+
+	/**
 	 * Set the given object to export as an OSGi service. Normally used when the
 	 * exported service is a nested bean or an object not managed by the Spring
 	 * container. Note that the passed target instance is ignored if
@@ -376,6 +385,15 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 */
 	public void setTarget(Object target) {
 		this.target = target;
+	}
+
+	/**
+	 * Returns the targetBeanName.
+	 * 
+	 * @return Returns the targetBeanName
+	 */
+	public String getTargetBeanName() {
+		return targetBeanName;
 	}
 
 	/**
@@ -444,6 +462,15 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		this.propertiesResolver = resolver;
 	}
 
+	/**
+	 * Returns the interfaces.
+	 * 
+	 * @return Returns the interfaces
+	 */
+	public Class[] getInterfaces() {
+		return interfaces;
+	}
+
 	public void setInterfaces(Class[] serviceInterfaces) {
 		this.interfaces = serviceInterfaces;
 	}
@@ -462,8 +489,16 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		this.order = order;
 	}
 
+	/**
+	 * Returns the beanName.
+	 * 
+	 * @return Returns the beanName
+	 */
+	public String getBeanName() {
+		return beanName;
+	}
+
 	public void setBeanName(String name) {
 		this.beanName = name;
 	}
-
 }

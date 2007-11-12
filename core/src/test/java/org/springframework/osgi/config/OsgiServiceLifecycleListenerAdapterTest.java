@@ -27,8 +27,8 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
-import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 
 /**
@@ -534,7 +534,7 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		assertEquals(1, JustListener.UNBIND_CALLS);
 	}
 	
-	private class ServiceReferenceAwareMock implements ServiceReferenceAccessor {
+	private class ServiceReferenceAwareMock implements ImportedOsgiServiceProxy {
 
 		public Map getServiceProperties() {
 			return new HashMap();

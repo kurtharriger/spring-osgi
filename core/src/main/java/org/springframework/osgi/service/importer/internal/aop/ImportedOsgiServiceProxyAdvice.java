@@ -17,7 +17,7 @@ package org.springframework.osgi.service.importer.internal.aop;
 
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.support.DelegatingIntroductionInterceptor;
-import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.util.Assert;
 
 /**
@@ -26,13 +26,13 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public class ServiceReferenceAwareAdvice extends DelegatingIntroductionInterceptor implements ServiceReferenceAccessor {
+public class ImportedOsgiServiceProxyAdvice extends DelegatingIntroductionInterceptor implements ImportedOsgiServiceProxy {
 
 	private static final long serialVersionUID = 6455437774724678999L;
 
 	private ServiceReference reference;
 
-	public ServiceReferenceAwareAdvice(ServiceReference reference) {
+	public ImportedOsgiServiceProxyAdvice(ServiceReference reference) {
 		Assert.notNull(reference);
 		this.reference = reference;
 	}
@@ -44,8 +44,8 @@ public class ServiceReferenceAwareAdvice extends DelegatingIntroductionIntercept
 	public boolean equals(Object other) {
 		if (this == other)
 			return true;
-		if (other instanceof ServiceReferenceAwareAdvice) {
-			ServiceReferenceAwareAdvice oth = (ServiceReferenceAwareAdvice) other;
+		if (other instanceof ImportedOsgiServiceProxyAdvice) {
+			ImportedOsgiServiceProxyAdvice oth = (ImportedOsgiServiceProxyAdvice) other;
 			return (reference.equals(oth.reference));
 		}
 		else

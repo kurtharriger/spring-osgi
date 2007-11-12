@@ -24,7 +24,7 @@ import org.osgi.framework.ServiceReference;
  * @author Costin Leau
  * 
  */
-public interface ServiceReferenceAccessor {
+public interface ImportedOsgiServiceProxy {
 
 	/**
 	 * Get access to the service reference used for accessing the backing
