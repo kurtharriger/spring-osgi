@@ -25,9 +25,9 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.osgi.service.importer.internal.aop.ImportedOsgiServiceProxyAdvice;
 import org.springframework.osgi.service.importer.internal.aop.OsgiServiceTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
-import org.springframework.osgi.service.importer.internal.aop.ServiceReferenceAwareAdvice;
 import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
@@ -81,7 +81,7 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 		List advices = new ArrayList(4);
 
 		// 1. the ServiceReference-like mixin
-		Advice mixin = new ServiceReferenceAwareAdvice(reference);
+		Advice mixin = new ImportedOsgiServiceProxyAdvice(reference);
 		advices.add(mixin);
 
 		// 2. publication of bundleContext (if there is any)

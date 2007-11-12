@@ -19,7 +19,7 @@ import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.internal.aop.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.OsgiServiceTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
@@ -43,7 +43,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 
 	protected RetryTemplate retryTemplate = new RetryTemplate();
 
-	private ServiceReferenceAccessor proxy;
+	private ImportedOsgiServiceProxy proxy;
 
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(getInterfaces()) ? Object.class

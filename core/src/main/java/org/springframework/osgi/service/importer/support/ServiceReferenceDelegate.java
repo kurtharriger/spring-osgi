@@ -17,20 +17,20 @@ package org.springframework.osgi.service.importer.support;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.util.Assert;
 
 /**
- * {@link ServiceReference} adapter using a {@link ServiceReferenceAccessor}
+ * {@link ServiceReference} adapter using a {@link ImportedOsgiServiceProxy}
  * internally for delegation.
  * 
  * @author Costin Leau
  * 
  */
 class ServiceReferenceDelegate implements ServiceReference {
-	private final ServiceReferenceAccessor delegate;
+	private final ImportedOsgiServiceProxy delegate;
 
-	public ServiceReferenceDelegate(ServiceReferenceAccessor delegate) {
+	public ServiceReferenceDelegate(ImportedOsgiServiceProxy delegate) {
 		Assert.notNull(delegate, "delegate object should not be null");
 		this.delegate = delegate;
 	}

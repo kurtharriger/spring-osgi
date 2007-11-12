@@ -17,7 +17,7 @@ package org.springframework.osgi.service.dependency;
 
 /**
  * Internal framework listener notified when a mandatory service importer comes
- * up or down.
+ * up or down (that is, becomes satisfied or not).
  * 
  * @author Costin Leau
  * 

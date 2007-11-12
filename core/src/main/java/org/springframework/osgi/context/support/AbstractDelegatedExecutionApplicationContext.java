@@ -154,7 +154,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		executor.close();
 	}
 
-	public void preRefresh() {
+	public void startRefresh() {
 
 		// check concurrent collection (which are mandatory)
 		if (!ClassUtils.concurrentLibAvailable())
@@ -212,7 +212,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		}
 	}
 
-	public void postRefresh() {
+	public void completeRefresh() {
 		Thread thread = Thread.currentThread();
 		ClassLoader oldTCCL = thread.getContextClassLoader();
 

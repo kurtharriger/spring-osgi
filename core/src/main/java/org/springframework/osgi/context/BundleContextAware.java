@@ -20,17 +20,14 @@ package org.springframework.osgi.context;
 import org.osgi.framework.BundleContext;
 
 /**
- * Interface that enables beans to find the bundle context they are
- * defined in.
+ * Interface that enables beans to find the bundle context they are defined in.
  * 
- * Note that in most circumstances there is no need for a bean to
- * implement this interface.
+ * Note that in most circumstances there is no need for a bean to implement this
+ * interface.
  * 
  * @author Adrian Colyer
- * @since 2.0
  */
 public interface BundleContextAware {
 
 	public void setBundleContext(BundleContext context);
-	
 }

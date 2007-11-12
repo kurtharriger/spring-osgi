@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.SpringProxy;
-import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
@@ -62,16 +62,16 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 		fb.setInterface(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 
-		ServiceReferenceAccessor refAware = null;
+		ImportedOsgiServiceProxy refAware = null;
 		try {
 			Object result = fb.getObject();
 			assertTrue(result instanceof Date);
 			// check it's our object
 			assertEquals(time, ((Date) result).getTime());
 			assertTrue(result instanceof SpringProxy);
-			assertTrue(result instanceof ServiceReferenceAccessor);
+			assertTrue(result instanceof ImportedOsgiServiceProxy);
 
-			refAware = (ServiceReferenceAccessor) result;
+			refAware = (ImportedOsgiServiceProxy) result;
 			assertNotNull(refAware.getServiceReference());
 		}
 		finally {
@@ -119,7 +119,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 			// check it's our object
 			assertEquals(time, ((Date) result).getTime());
 
-			ServiceReferenceAccessor refAware = (ServiceReferenceAccessor) result;
+			ImportedOsgiServiceProxy refAware = (ImportedOsgiServiceProxy) result;
 
 		}
 		finally {

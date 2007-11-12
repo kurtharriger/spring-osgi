@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.importer.ServiceReferenceAccessor;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
@@ -58,8 +58,8 @@ public class OsgiServiceReferenceComparator implements Comparator, Serializable 
 		}
 		// then for ServiceReferenceAccessor objects
 		else {
-			ServiceReferenceAccessor obj1 = (ServiceReferenceAccessor) o1;
-			ServiceReferenceAccessor obj2 = (ServiceReferenceAccessor) o2;
+			ImportedOsgiServiceProxy obj1 = (ImportedOsgiServiceProxy) o1;
+			ImportedOsgiServiceProxy obj2 = (ImportedOsgiServiceProxy) o2;
 
 			ref1 = obj1.getServiceReference();
 			ref2 = obj2.getServiceReference();
