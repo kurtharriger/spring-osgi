@@ -18,6 +18,8 @@ package org.springframework.osgi.extender.internal.util;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.springframework.osgi.io.OsgiBundleResource;
+
 import junit.framework.TestCase;
 
 /**
@@ -28,7 +30,7 @@ public class ConfigUtilsTest extends TestCase {
 
 	private Dictionary headers;
 
-	private String DEFAULT_LOCATION = "/META-INF/spring/*.xml";
+	private String DEFAULT_LOCATION = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX + "/META-INF/spring/*.xml";
 
 	/*
 	 * (non-Javadoc)
