@@ -15,7 +15,7 @@
  *
  * Created on 23-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.context.support.internal;
+package org.springframework.osgi.context.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,13 +25,11 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.osgi.context.BundleContextAware;
 
 /**
- * For internal use only. Used by OsgiBundleXmlApplicationContext to inject
- * beans implementing BundleContextAware with a reference to the current
- * BundleContext.
+ * {@link BeanPostProcessor} dealing with classes that implement
+ * BundleContextAware interface.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
- * @since 2.0
  */
 public class BundleContextAwareProcessor implements BeanPostProcessor {
 

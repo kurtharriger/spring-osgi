@@ -33,7 +33,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.bundle.BundleAction;
 import org.springframework.osgi.bundle.BundleFactoryBean;
-import org.springframework.osgi.context.support.internal.BundleContextAwareProcessor;
+import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
 
