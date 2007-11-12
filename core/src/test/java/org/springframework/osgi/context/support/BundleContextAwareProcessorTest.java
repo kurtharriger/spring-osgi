@@ -15,14 +15,13 @@
  *
  * Created on 25-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.context.support.internal;
+package org.springframework.osgi.context.support;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.context.support.internal.BundleContextAwareProcessor;
 
 /**
  * 
