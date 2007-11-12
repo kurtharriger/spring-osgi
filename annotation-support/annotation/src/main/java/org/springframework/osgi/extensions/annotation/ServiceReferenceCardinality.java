@@ -15,22 +15,29 @@
  */
 package org.springframework.osgi.extensions.annotation;
 
+import org.springframework.osgi.service.importer.support.Cardinality;
+
 /**
  * @author Andy Piper
  */
 public enum ServiceReferenceCardinality {
-    C0__1("0..1"),
-    C0__N("0..N"),
-    C1__1("1..1"),
-    C1__N("1..N");
+    C0__1 (Cardinality.C_0__1),
+    C0__N (Cardinality.C_0__N),
+    C1__1 (Cardinality.C_1__1),
+    C1__N (Cardinality.C_1__N);
 
-    private String strValue;
+    private Cardinality cardValue;
 
-    ServiceReferenceCardinality(String s) {
-        strValue = s;
+    private ServiceReferenceCardinality(Cardinality c) {
+        cardValue = c;
     }
 
     public String toString() {
-        return strValue;
+        return cardValue.getLabel();
     }
+
+    public Cardinality toCardinality() {
+        return cardValue;
+    }
+
 }
