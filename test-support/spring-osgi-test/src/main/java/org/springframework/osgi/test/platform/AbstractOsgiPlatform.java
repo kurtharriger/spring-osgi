@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.platform.internal;
+package org.springframework.osgi.test.platform;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,6 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.osgi.test.platform.OsgiPlatform;
 
 /**
  * Base class for OsgiPlatform classes. Provides common functionality such as

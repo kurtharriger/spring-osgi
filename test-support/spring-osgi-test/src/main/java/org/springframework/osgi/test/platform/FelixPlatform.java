@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.platform.internal;
+package org.springframework.osgi.test.platform;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -77,7 +77,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	 * 
 	 * @return
 	 */
-	protected Properties getLocalConfiguration() {
+	private Properties getLocalConfiguration() {
 		Properties props = new Properties();
 
 		felixStorageDir = createTempDir("felix");
@@ -97,7 +97,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	 * 
 	 * @return
 	 */
-	protected Properties getFelixConfiguration() {
+	private Properties getFelixConfiguration() {
 		String location = "/".concat(ClassUtils.classPackageAsResourcePath(getClass())).concat("/").concat(
 			FELIX_CONF_FILE);
 		URL url = getClass().getResource(location);
