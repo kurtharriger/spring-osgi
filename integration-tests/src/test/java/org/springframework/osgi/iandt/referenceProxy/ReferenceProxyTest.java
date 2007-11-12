@@ -5,6 +5,7 @@ import org.springframework.osgi.iandt.reference.proxy.ServiceReferer;
 import org.springframework.osgi.iandt.simpleservice.MyService;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**

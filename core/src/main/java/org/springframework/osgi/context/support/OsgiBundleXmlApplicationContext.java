@@ -25,6 +25,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
+import org.springframework.osgi.io.OsgiBundleResource;
 import org.xml.sax.EntityResolver;
 
 /**
@@ -54,7 +55,14 @@ import org.xml.sax.EntityResolver;
 public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionApplicationContext {
 
 	/** Default config location for the root context(s) */
-	public static final String DEFAULT_CONFIG_LOCATION = "/META-INF/spring/*.xml";
+	/**
+	 * Note this location uses {@link OsgiBundleResource#BUNDLE_JAR_URL_PREFIX}
+	 * prefix temporary as a work around for resource acquisition problems(OSGI-210)
+	 * with Felix and Knopflerfish. We expect the prefix to be removed (from jar to
+	 * bundle space) before the final release.
+	 */
+	public static final String DEFAULT_CONFIG_LOCATION = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX
+			+ "/META-INF/spring/*.xml";
 
 	/**
 	 * 
