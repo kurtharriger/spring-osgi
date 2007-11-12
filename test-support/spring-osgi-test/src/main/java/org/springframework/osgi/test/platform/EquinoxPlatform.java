@@ -13,46 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.platform.internal;
+package org.springframework.osgi.test.platform;
 
-import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Properties;
 
-import org.knopflerfish.framework.Framework;
+import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.osgi.framework.BundleContext;
-import org.springframework.osgi.test.internal.util.IOUtils;
 
 /**
- * Knopflerfish 2.x Platform.
+ * Equinox (3.2.x) OSGi platform.
  * 
  * @author Costin Leau
  * 
  */
-public class KnopflerfishPlatform extends AbstractOsgiPlatform {
+public class EquinoxPlatform extends AbstractOsgiPlatform {
 
 	private BundleContext context;
 
-	private Framework framework;
-
-	private File kfStorageDir;
-
-	public KnopflerfishPlatform() {
-		toString = "Knopflerfish OSGi Platform";
+	public EquinoxPlatform() {
+		toString = "Equinox OSGi Platform";
 	}
 
 	protected Properties getPlatformProperties() {
-		kfStorageDir = createTempDir("kf");
-
 		// default properties
 		Properties props = new Properties();
-		props.setProperty("org.osgi.framework.dir", kfStorageDir.getAbsolutePath());
-		props.setProperty("org.knopflerfish.framework.bundlestorage", "file");
-		props.setProperty("org.knopflerfish.framework.bundlestorage.file.reference", "true");
-		props.setProperty("org.knopflerfish.framework.bundlestorage.file.unpack", "false");
-		props.setProperty("org.knopflerfish.startlevel.use", "true");
-		props.setProperty("org.knopflerfish.osgi.setcontextclassloader", "true");
-		// embedded mode
-		props.setProperty("org.knopflerfish.framework.exitonshutdown", "false");
+		props.setProperty("eclipse.ignoreApp", "true");
+		props.setProperty("osgi.clean", "true");
+		props.setProperty("osgi.noShutdown", "true");
+
+		// local temporary folder for running tests
+		// prevents accidental rewrites
+        props.setProperty("osgi.configuration.area", "eclipse_config");
+		props.setProperty("osgi.instance.area", "eclipse_config");
+		props.setProperty("osgi.user.area", "eclipse_config");
+
+		// props.setProperty("eclipse.consoleLog", "true");
+		// props.setProperty("osgi.debug", "");
+		
 		return props;
 	}
 
@@ -71,12 +69,17 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 	 * @see org.springframework.osgi.test.OsgiPlatform#start()
 	 */
 	public void start() throws Exception {
+
 		// copy configuration properties to sys properties
 		System.getProperties().putAll(getConfigurationProperties());
 
-		framework = new Framework(this);
-		framework.launch(0);
-		context = framework.getSystemBundleContext();
+		// Equinox 3.1.x returns void - use of reflection is required
+		// use main since in 3.1.x it sets up some system properties
+		EclipseStarter.main(new String[0]);
+
+		Field field = EclipseStarter.class.getDeclaredField("context");
+		field.setAccessible(true);
+		context = (BundleContext) field.get(null);
 	}
 
 	/*
@@ -85,11 +88,7 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 	 * @see org.springframework.osgi.test.OsgiPlatform#stop()
 	 */
 	public void stop() throws Exception {
-		try {
-			framework.shutdown();
-		}
-		finally {
-			IOUtils.delete(kfStorageDir);
-		}
+		EclipseStarter.shutdown();
 	}
+
 }
