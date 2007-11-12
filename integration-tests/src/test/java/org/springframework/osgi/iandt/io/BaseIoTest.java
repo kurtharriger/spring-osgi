@@ -27,7 +27,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -95,14 +94,14 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 	}
 
 	protected boolean isKF() {
-		return (createPlatform().toString().endsWith("fish"));
+		return (createPlatform().toString().startsWith("Knopflerfish"));
 	}
 
 	protected boolean isEquinox() {
-		return (createPlatform().toString().endsWith("nox"));
+		return (createPlatform().toString().startsWith("Equinox"));
 	}
 
 	protected boolean isFelix() {
-		return (createPlatform().toString().endsWith("eix"));
+		return (createPlatform().toString().startsWith("Felix"));
 	}
 }
