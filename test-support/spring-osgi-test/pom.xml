@@ -28,7 +28,7 @@
   <properties>
     <spring.osgi.export>
       !org.springframework.osgi.test.*internal*,
-      org.springframework.osgi.test*
+      org.springframework.osgi.test*;version=${spring.osgi.export.version}
     </spring.osgi.export>
     <spring.osgi.private.pkg>org.springframework.osgi.test.*internal*, org.springframework.osgi.extender.internal.util*</spring.osgi.private.pkg>
 	<spring.osgi.import.pkg>
