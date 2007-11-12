@@ -17,6 +17,8 @@ package org.springframework.osgi.service.exporter;
 
 import java.util.Map;
 
+import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
+
 
 /**
  * Listener informed of the registration and unregistration of an OSGi service

@@ -22,12 +22,12 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
+import org.springframework.osgi.service.importer.internal.collection.CollectionProxy;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceList;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSet;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedList;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedSet;
-import org.springframework.osgi.service.internal.ImporterProxy;
 import org.springframework.util.Assert;
 
 /**
@@ -43,11 +43,11 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactoryBean {
+public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
 
 	private static final Log log = LogFactory.getLog(OsgiMultiServiceProxyFactoryBean.class);
 
-	private ImporterProxy proxy;
+	private CollectionProxy proxy;
 
 	private ServiceProxyCreator proxyCreator;
 
@@ -65,7 +65,7 @@ public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFa
 	}
 
 	public Object getObject() {
-		proxy = (ImporterProxy) super.getObject();
+		proxy = (CollectionProxy) super.getObject();
 		return proxy;
 	}
 

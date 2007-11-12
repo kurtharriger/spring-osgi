@@ -22,11 +22,11 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.osgi.service.importer.support.AbstractServiceImporter;
-import org.springframework.osgi.service.internal.MandatoryDependencyEvent;
-import org.springframework.osgi.service.internal.MandatoryDependencyListener;
-import org.springframework.osgi.service.internal.ServiceExporter;
-import org.springframework.osgi.service.internal.dependency.DefaultMandatoryDependencyManager;
+import org.springframework.osgi.service.dependency.DependentServiceExporter;
+import org.springframework.osgi.service.dependency.MandatoryDependencyEvent;
+import org.springframework.osgi.service.dependency.MandatoryDependencyListener;
+import org.springframework.osgi.service.dependency.internal.DefaultMandatoryDependencyManager;
+import org.springframework.osgi.service.importer.support.AbstractDependableServiceImporter;
 
 /**
  * @author Costin Leau
@@ -48,24 +48,24 @@ public class OneExporterWithTwoMandatoryImportersTest extends TestCase {
 
 	private ServiceImporterMock importerA, importerB;
 
-	private ServiceExporter exporter;
+	private DependentServiceExporter exporter;
 
 	private static boolean[] mockImporterSatisfied = new boolean[] { true };
 
-	private static class ServiceImporterMock extends AbstractServiceImporter {
+	private static class ServiceImporterMock extends AbstractDependableServiceImporter {
 		private final MandatoryDependencyEvent event = new MandatoryDependencyEvent(this);
 
 		public void signalDependencyDown() {
 			for (Iterator iter = depedencyListeners.iterator(); iter.hasNext();) {
 				MandatoryDependencyListener listener = (MandatoryDependencyListener) iter.next();
-				listener.mandatoryServiceUnsatisfied(event);
+				listener.mandatoryDependencyUnsatisfied(event);
 			}
 		}
 
 		public void signalDependencyUp() {
 			for (Iterator iter = depedencyListeners.iterator(); iter.hasNext();) {
 				MandatoryDependencyListener listener = (MandatoryDependencyListener) iter.next();
-				listener.mandatoryServiceSatisfied(event);
+				listener.mandatoryDependencySatisfied(event);
 			}
 		}
 
@@ -80,8 +80,8 @@ public class OneExporterWithTwoMandatoryImportersTest extends TestCase {
 		importerA = new ServiceImporterMock();
 		importerB = new ServiceImporterMock();
 
-		mc = MockControl.createStrictControl(ServiceExporter.class);
-		exporter = (ServiceExporter) mc.getMock();
+		mc = MockControl.createStrictControl(DependentServiceExporter.class);
+		exporter = (DependentServiceExporter) mc.getMock();
 
 		// register dependencies into the BF
 		bf.registerSingleton(importerAName, importerA);

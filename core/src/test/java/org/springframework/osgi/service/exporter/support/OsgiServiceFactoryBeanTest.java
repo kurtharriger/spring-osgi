@@ -15,7 +15,7 @@
  *
  * Created on 26-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.service.exporter;
+package org.springframework.osgi.service.exporter.support;
 
 import java.io.Serializable;
 import java.util.AbstractMap;

@@ -33,7 +33,6 @@ import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.internal.util.OsgiServiceBindingUtils;
-import org.springframework.osgi.service.internal.ImporterProxy;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.util.Assert;
 
@@ -49,7 +48,7 @@ import org.springframework.util.Assert;
  * @see Collection
  * @author Costin Leau
  */
-public class OsgiServiceCollection implements Collection, InitializingBean, ImporterProxy {
+public class OsgiServiceCollection implements Collection, InitializingBean, CollectionProxy {
 
 	/**
 	 * Listener tracking the OSGi services which form the dynamic collection.

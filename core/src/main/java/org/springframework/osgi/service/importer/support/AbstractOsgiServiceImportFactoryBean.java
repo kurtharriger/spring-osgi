@@ -42,10 +42,10 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public abstract class AbstractOsgiServiceProxyFactoryBean extends AbstractServiceImporter implements SmartFactoryBean,
+public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDependableServiceImporter implements SmartFactoryBean,
 		InitializingBean, DisposableBean, BundleContextAware, BeanClassLoaderAware {
 
-	private static final Log log = LogFactory.getLog(AbstractOsgiServiceProxyFactoryBean.class);
+	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
 
 	private ClassLoader classLoader;
 

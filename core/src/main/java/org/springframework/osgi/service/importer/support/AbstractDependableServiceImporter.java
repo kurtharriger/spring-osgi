@@ -18,19 +18,19 @@ package org.springframework.osgi.service.importer.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.osgi.service.internal.MandatoryDependencyListener;
-import org.springframework.osgi.service.internal.ServiceImporter;
+import org.springframework.osgi.service.dependency.DependableServiceImporter;
+import org.springframework.osgi.service.dependency.MandatoryDependencyListener;
 import org.springframework.util.Assert;
 
 /**
- * Base class implementing the {@link ServiceImporter} interface. Abstract by
+ * Base class implementing the {@link DependableServiceImporter} interface. Abstract by
  * default since it doesn't offer any OSGi specific functionality, which have to
  * be supplied by subclasses.
  * 
  * @author Costin Leau
  * 
  */
-public abstract class AbstractServiceImporter implements ServiceImporter {
+public abstract class AbstractDependableServiceImporter implements DependableServiceImporter {
 
 	/** is at least one service required? */
 	private boolean mandatory = true;

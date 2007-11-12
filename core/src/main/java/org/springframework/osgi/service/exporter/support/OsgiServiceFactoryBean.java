@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.springframework.osgi.service.exporter;
+package org.springframework.osgi.service.exporter.support;
 
 import java.util.Arrays;
 import java.util.Dictionary;
@@ -40,6 +40,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
+import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.importer.internal.aop.OsgiServiceTCCLInterceptor;
 import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
@@ -60,7 +61,7 @@ import org.springframework.util.StringUtils;
  * <ul>
  * <li>BundleSymbolicName=&lt;bundle symbolic name&gt;</li>
  * <li>BundleVersion=&lt;bundle version&gt;</li>
- * <li>org.springframework.osgi.beanname="&lt;bean name&gt;</li>
+ * <li>org.springframework.osgi.bean.name="&lt;bean name&gt;</li>
  * </ul>
  * 
  * @author Adrian Colyer
@@ -69,7 +70,7 @@ import org.springframework.util.StringUtils;
  * @author Andy Piper
  * 
  */
-public class OsgiServiceFactoryBean extends AbstractListenerAwareExporter implements BeanFactoryAware, DisposableBean,
+public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implements BeanFactoryAware, DisposableBean,
 		BundleContextAware, FactoryBean, Ordered, BeanClassLoaderAware, BeanNameAware {
 
 	/**

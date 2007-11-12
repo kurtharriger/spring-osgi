@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.exporter;
+package org.springframework.osgi.service.exporter.support;
 
 import java.util.HashMap;
 
@@ -21,18 +21,18 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.mock.MockServiceRegistration;
-import org.springframework.osgi.service.exporter.AbstractListenerAwareExporter;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.SimpleOsgiServiceRegistrationListener;
 
 public class AbstractListenerAwareExporterTest extends TestCase {
 
-	private AbstractListenerAwareExporter exporter;
+	private AbstractOsgiServiceExporter exporter;
 
 	protected void setUp() throws Exception {
 		SimpleOsgiServiceRegistrationListener.REGISTERED = 0;
 		SimpleOsgiServiceRegistrationListener.UNREGISTERED = 0;
 
-		exporter = new AbstractListenerAwareExporter() {
+		exporter = new AbstractOsgiServiceExporter() {
 
 			protected void registerService() {
 			}

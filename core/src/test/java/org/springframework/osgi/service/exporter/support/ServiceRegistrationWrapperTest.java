@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.exporter;
+package org.springframework.osgi.service.exporter.support;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -25,6 +25,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.SimpleOsgiServiceRegistrationListener;
 
 public class ServiceRegistrationWrapperTest extends TestCase {
 

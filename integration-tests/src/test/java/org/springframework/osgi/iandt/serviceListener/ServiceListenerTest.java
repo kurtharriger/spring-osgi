@@ -3,6 +3,7 @@ package org.springframework.osgi.iandt.serviceListener;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.iandt.service.listener.MyListener;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
@@ -44,7 +45,7 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 		simpleServiceBundle.start();
 		waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
 		// wait some more to let the listener binding propagate
-		Thread.sleep(100);
+		Thread.sleep(1000);
 
 		logger.debug("simple service succesfully restarted");
 		assertTrue("Expected only two bindings of service", MyListener.BOUND_COUNT < 3);
@@ -55,5 +56,4 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 	protected long getDefaultWaitTime() {
 		return 7L;
 	}
-
 }
