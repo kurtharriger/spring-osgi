@@ -101,7 +101,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * infrastructure. Override this method <i>only</i> if you want to change
 	 * the jars used by default, by the testing infrastructure.
 	 * 
-	 * User subclasses should use {@link #getBundles()} instead.
+	 * User subclasses should use {@link #getTestBundles()} instead.
 	 * 
 	 * @return the array of test framework bundle resources
 	 */

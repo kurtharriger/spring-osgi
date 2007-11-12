@@ -221,7 +221,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * @param bundles
 	 * @return
 	 */
-	private Resource[] locateBundles(String[] bundles) {
+	protected Resource[] locateBundles(String[] bundles) {
 		if (bundles == null)
 			bundles = new String[0];
 
