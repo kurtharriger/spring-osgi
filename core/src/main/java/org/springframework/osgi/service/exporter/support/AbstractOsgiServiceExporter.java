@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.exporter;
+package org.springframework.osgi.service.exporter.support;
 
 import java.util.Map;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.internal.ServiceExporter;
+import org.springframework.osgi.service.dependency.DependentServiceExporter;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
+
 
 /**
- * {@link ServiceExporter} extension that takes care of listeners registration
+ * {@link DependentServiceExporter} extension that takes care of listeners registration
  * and notification.
  * 
  * @author Costin Leau
  */
-public abstract class AbstractListenerAwareExporter extends AbstractServiceExporter {
+public abstract class AbstractOsgiServiceExporter extends AbstractDependentServiceExporter {
 
 	private OsgiServiceRegistrationListener[] listeners = new OsgiServiceRegistrationListener[0];
 

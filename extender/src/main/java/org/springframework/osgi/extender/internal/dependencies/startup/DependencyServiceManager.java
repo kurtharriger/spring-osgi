@@ -15,7 +15,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
-import org.springframework.osgi.service.importer.support.AbstractOsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
@@ -183,12 +183,12 @@ public class DependencyServiceManager {
 
 			ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 			String[] beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
-				AbstractOsgiServiceProxyFactoryBean.class, true, false);
+				AbstractOsgiServiceImportFactoryBean.class, true, false);
 			for (int i = 0; i < beans.length; i++) {
 				String beanName = (beans[i].startsWith(BeanFactory.FACTORY_BEAN_PREFIX) ? beans[i]
 						: BeanFactory.FACTORY_BEAN_PREFIX + beans[i]);
 
-				AbstractOsgiServiceProxyFactoryBean reference = (AbstractOsgiServiceProxyFactoryBean) beanFactory.getBean(beanName);
+				AbstractOsgiServiceImportFactoryBean reference = (AbstractOsgiServiceImportFactoryBean) beanFactory.getBean(beanName);
 				ServiceDependency dependency = new ServiceDependency(bundleContext, reference.getUnifiedFilter(),
 						reference.isMandatory());
 

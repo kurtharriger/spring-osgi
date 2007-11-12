@@ -37,7 +37,7 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceProxyFactoryBean {
+public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 

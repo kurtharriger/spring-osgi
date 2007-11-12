@@ -26,6 +26,7 @@ import org.easymock.MockControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.springframework.osgi.service.exporter.support.BeanNameServicePropertiesResolver;
 
 /**
  * @author Adrian Colyer

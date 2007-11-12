@@ -20,7 +20,7 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.service.importer.support.AbstractOsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
 
 /**
  * Helper class indicating a service dependency.
@@ -36,7 +36,7 @@ public class Dependency {
 
 	protected BundleContext bundleContext;
 
-	public Dependency(BundleContext bc, AbstractOsgiServiceProxyFactoryBean reference) {
+	public Dependency(BundleContext bc, AbstractOsgiServiceImportFactoryBean reference) {
 		filter = reference.getUnifiedFilter();
 		filterString = filter.toString();
 		isMandatory = reference.isMandatory();

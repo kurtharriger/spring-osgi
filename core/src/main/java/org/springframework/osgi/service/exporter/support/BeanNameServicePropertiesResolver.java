@@ -15,7 +15,7 @@
  *
  * Created on 25-Jan-2006 by Adrian Colyer
  */
-package org.springframework.osgi.service.exporter;
+package org.springframework.osgi.service.exporter.support;
 
 import java.util.Map;
 
@@ -23,17 +23,18 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * OsgiServicePropertiesResolver that creats a service property set with the
+ * OsgiServicePropertiesResolver that creates a service property set with the
  * following properties:
  * <ul>
  * <li>Bundle-SymbolicName=&lt;bundle symbolic name&gt;</li>
  * <li>Bundle-Version=&lt;bundle version&gt;</li>
- * <li>org.springframework.osgi.beanname="&lt;bean name&gt;</li>
+ * <li>org.springframework.osgi.bean.name="&lt;bean name&gt;</li>
  * </ul>
  * 
  * @see OsgiServicePropertiesResolver
@@ -42,7 +43,7 @@ import org.springframework.util.StringUtils;
  * @author Adrian Colyer
  * @author Hal Hildebrand
  */
-class BeanNameServicePropertiesResolver implements OsgiServicePropertiesResolver, BundleContextAware, InitializingBean {
+public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesResolver, BundleContextAware, InitializingBean {
 
 	private BundleContext bundleContext;
 

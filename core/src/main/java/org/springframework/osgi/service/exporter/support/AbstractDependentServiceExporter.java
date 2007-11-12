@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.exporter;
+package org.springframework.osgi.service.exporter.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.service.internal.ServiceExporter;
+import org.springframework.osgi.service.dependency.DependentServiceExporter;
 
 
 /**
@@ -28,9 +28,9 @@ import org.springframework.osgi.service.internal.ServiceExporter;
  * @author Costin Leau
  * 
  */
-public abstract class AbstractServiceExporter implements ServiceExporter, InitializingBean {
+public abstract class AbstractDependentServiceExporter implements DependentServiceExporter, InitializingBean {
 
-	private static final Log log = LogFactory.getLog(AbstractServiceExporter.class);
+	private static final Log log = LogFactory.getLog(AbstractDependentServiceExporter.class);
 
 	protected boolean publishAtStartup = true;
 

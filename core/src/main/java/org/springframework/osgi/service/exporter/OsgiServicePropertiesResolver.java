@@ -21,17 +21,17 @@ import java.util.Map;
 
 /**
  * An OsgiServicePropertiesResolver is responsible for providing the properties
- * that a bean exposed as a service will be published with. It is used as a
- * collaborator of OsgiServiceFactoryBean.
- * 
- * @see OsgiServiceFactoryBean
- * @see BeanNameServicePropertiesResolver
+ * that a bean exposed as a service will be published with. It is used mainly as
+ * a collaborator of OsgiServiceFactoryBean.
  * 
  * @author Adrian Colyer
  */
 public interface OsgiServicePropertiesResolver {
 
-	/** Predefined property indicating the bean name of an exported Spring managed object */
+	/**
+	 * Predefined property indicating the bean name of an exported Spring
+	 * managed object
+	 */
 	String BEAN_NAME_PROPERTY_KEY = "org.springframework.osgi.beanname";
 
 	/**

@@ -26,14 +26,14 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.service.dependency.DependableServiceImporter;
+import org.springframework.osgi.service.dependency.MandatoryDependencyEvent;
+import org.springframework.osgi.service.dependency.MandatoryDependencyListener;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.internal.support.DefaultRetryCallback;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
 import org.springframework.osgi.service.importer.internal.support.ServiceWrapper;
 import org.springframework.osgi.service.importer.internal.util.OsgiServiceBindingUtils;
-import org.springframework.osgi.service.internal.MandatoryDependencyEvent;
-import org.springframework.osgi.service.internal.MandatoryDependencyListener;
-import org.springframework.osgi.service.internal.ServiceImporter;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.ObjectUtils;
@@ -93,7 +93,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 							for (int i = 0; i < mandatoryListeners.size(); i++) {
 								if (debug)
 									log.debug("calling satisfied on dependency mandatoryListeners");
-								((MandatoryDependencyListener) mandatoryListeners.get(i)).mandatoryServiceSatisfied(new MandatoryDependencyEvent(
+								((MandatoryDependencyListener) mandatoryListeners.get(i)).mandatoryDependencySatisfied(new MandatoryDependencyEvent(
 										serviceImporter));
 							}
 						}
@@ -133,7 +133,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 								for (int i = 0; i < mandatoryListeners.size(); i++) {
 									if (debug)
 										log.debug("calling unsatisfied on dependency mandatoryListeners");
-									((MandatoryDependencyListener) mandatoryListeners.get(i)).mandatoryServiceUnsatisfied(new MandatoryDependencyEvent(
+									((MandatoryDependencyListener) mandatoryListeners.get(i)).mandatoryDependencyUnsatisfied(new MandatoryDependencyEvent(
 											serviceImporter));
 								}
 							}
@@ -241,7 +241,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 	private List mandatoryListeners;
 
 	/** depending service importer */
-	private ServiceImporter serviceImporter;
+	private DependableServiceImporter serviceImporter;
 
 	/** listener that need to be informed of bind/rebind/unbind */
 	private OsgiServiceLifecycleListener[] listeners = new OsgiServiceLifecycleListener[0];
@@ -319,7 +319,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 		this.mandatoryListeners = listeners;
 	}
 
-	public void setServiceImporter(ServiceImporter importer) {
+	public void setServiceImporter(DependableServiceImporter importer) {
 		this.serviceImporter = importer;
 	}
 
