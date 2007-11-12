@@ -139,10 +139,8 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 		else {
 			pfb.setInterface(s.serviceTypes());
 		}
-		pfb.setCardinality((Cardinality) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(Cardinality.class,
-			s.cardinality().toString()));
-		pfb.setContextClassLoader((ImportContextClassLoader) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(
-			ImportContextClassLoader.class, s.contextClassloader().toString().toUpperCase().replace('-', '_')));
+		pfb.setCardinality(s.cardinality().toCardinality());
+		pfb.setContextClassLoader(s.contextClassloader().toImportContextClassLoader());
 		pfb.setBundleContext(bundleContext);
 		if (s.serviceBeanName().length() > 0) {
 			pfb.setServiceBeanName(s.serviceBeanName());

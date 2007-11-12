@@ -15,21 +15,27 @@
  */
 package org.springframework.osgi.extensions.annotation;
 
+import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
+
 /**
  * @author Andy Piper
  */
 public enum ServiceReferenceClassLoader {
-	CLIENT("client"),
-	SERVICE_PROVIDER("service-provider"),
-	UNMANAGED("unmanaged");
+    CLIENT(ImportContextClassLoader.CLIENT),
+    SERVICE_PROVIDER(ImportContextClassLoader.SERVICE_PROVIDER),
+    UNMANAGED(ImportContextClassLoader.UNMANAGED);
 
-	private String strValue;
+    private ImportContextClassLoader icclValue;
 
-	ServiceReferenceClassLoader(String s) {
-		strValue = s;
-	}
+    private ServiceReferenceClassLoader(ImportContextClassLoader iccl) {
+        icclValue = iccl;
+    }
 
-	public String toString() {
-		return strValue;
-	}
+    public String toString() {
+        return icclValue.getLabel();
+    }
+
+    public ImportContextClassLoader toImportContextClassLoader() {
+        return icclValue;
+    }
 }
