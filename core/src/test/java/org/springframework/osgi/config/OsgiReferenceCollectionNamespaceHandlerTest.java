@@ -38,7 +38,7 @@ import org.springframework.osgi.service.importer.internal.collection.OsgiService
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedList;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedSet;
 import org.springframework.osgi.service.importer.internal.collection.comparator.OsgiServiceReferenceComparator;
-import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 
 /**
  * @author Costin Leau
@@ -82,7 +82,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	public void testSimpleList() {
 		Object factoryBean = appContext.getBean("&simpleList");
-		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
+		assertTrue(factoryBean instanceof OsgiServiceCollectionProxyFactoryBean);
 		// get the factory product
 		Object bean = appContext.getBean("simpleList");
 		assertTrue(bean instanceof OsgiServiceList);
@@ -90,7 +90,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	public void testSimpleSet() {
 		Object factoryBean = appContext.getBean("&simpleSet");
-		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
+		assertTrue(factoryBean instanceof OsgiServiceCollectionProxyFactoryBean);
 		// get the factory product
 		Object bean = appContext.getBean("simpleSet");
 		assertTrue(bean instanceof OsgiServiceSet);
@@ -98,7 +98,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	public void testImplicitSortedList() {
 		Object factoryBean = appContext.getBean("&implicitSortedList");
-		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
+		assertTrue(factoryBean instanceof OsgiServiceCollectionProxyFactoryBean);
 		// get the factory product
 		Object bean = appContext.getBean("implicitSortedList");
 		assertTrue(bean instanceof OsgiServiceSortedList);
@@ -108,7 +108,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	public void testImplicitSortedSet() {
 		Object factoryBean = appContext.getBean("&implicitSortedSet");
-		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
+		assertTrue(factoryBean instanceof OsgiServiceCollectionProxyFactoryBean);
 
 		Object bean = appContext.getBean("implicitSortedSet");
 		assertTrue(bean instanceof OsgiServiceSortedSet);
@@ -118,7 +118,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	public void testSimpleSortedList() {
 		Object factoryBean = appContext.getBean("&implicitSortedList");
-		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
+		assertTrue(factoryBean instanceof OsgiServiceCollectionProxyFactoryBean);
 
 		Object bean = appContext.getBean("implicitSortedList");
 		assertTrue(bean instanceof OsgiServiceSortedList);
@@ -129,7 +129,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	public void testSimpleSortedSet() {
 		Object factoryBean = appContext.getBean("&implicitSortedSet");
-		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
+		assertTrue(factoryBean instanceof OsgiServiceCollectionProxyFactoryBean);
 
 		Object bean = appContext.getBean("implicitSortedSet");
 		assertTrue(bean instanceof OsgiServiceSortedSet);
@@ -140,7 +140,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	public void testSortedSetWithNaturalOrderingOnRefs() throws Exception {
 		Object factoryBean = appContext.getBean("&sortedSetWithNaturalOrderingOnRefs");
-		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
+		assertTrue(factoryBean instanceof OsgiServiceCollectionProxyFactoryBean);
 		
 		Comparator comp = getComparator(factoryBean);
 		
@@ -160,7 +160,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	public void testSortedListWithNaturalOrderingOnServs() throws Exception {
 		Object factoryBean = appContext.getBean("&sortedListWithNaturalOrderingOnServs");
-		assertTrue(factoryBean instanceof OsgiMultiServiceProxyFactoryBean);
+		assertTrue(factoryBean instanceof OsgiServiceCollectionProxyFactoryBean);
 
 		assertNull(getComparator(factoryBean));
 

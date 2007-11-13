@@ -77,7 +77,7 @@ public class AnnotatedBean {
 	}
 
 	@ServiceReference(serviceBeanName = "myBean", cardinality = ServiceReferenceCardinality.C0__1,
-		contextClassloader = ServiceReferenceClassLoader.SERVICE_PROVIDER, timeout = 100, filter =  "(id=fooey)")
+		contextClassLoader = ServiceReferenceClassLoader.SERVICE_PROVIDER, timeout = 100, filter =  "(id=fooey)")
 	public void setAnnotatedBeanTypeComplex(AnnotatedBean annotatedBeanTypeComplex) {
 		this.annotatedBeanTypeComplex = annotatedBeanTypeComplex;
 	}
@@ -131,7 +131,7 @@ public class AnnotatedBean {
 		return annotatedBeanTypeWithClassLoaderClient;
 	}
 
-	@ServiceReference(contextClassloader = ServiceReferenceClassLoader.CLIENT)
+	@ServiceReference(contextClassLoader = ServiceReferenceClassLoader.CLIENT)
 	public void setAnnotatedBeanTypeWithClassLoaderClient(AnnotatedBean annotatedBeanTypeWithClassLoaderClient) {
 		this.annotatedBeanTypeWithClassLoaderClient = annotatedBeanTypeWithClassLoaderClient;
 	}
@@ -140,7 +140,7 @@ public class AnnotatedBean {
 		return annotatedBeanTypeWithClassLoaderServiceProvider;
 	}
 
-	@ServiceReference(contextClassloader = ServiceReferenceClassLoader.SERVICE_PROVIDER)
+	@ServiceReference(contextClassLoader = ServiceReferenceClassLoader.SERVICE_PROVIDER)
 	public void setAnnotatedBeanTypeWithClassLoaderServiceProvider(AnnotatedBean annotatedBeanTypeWithClassLoaderServiceProvider) {
 		this.annotatedBeanTypeWithClassLoaderServiceProvider = annotatedBeanTypeWithClassLoaderServiceProvider;
 	}
@@ -149,7 +149,7 @@ public class AnnotatedBean {
 		return annotatedBeanTypeWithClassLoaderUmanaged;
 	}
 
-	@ServiceReference(contextClassloader = ServiceReferenceClassLoader.UNMANAGED)
+	@ServiceReference(contextClassLoader = ServiceReferenceClassLoader.UNMANAGED)
 	public void setAnnotatedBeanTypeWithClassLoaderUmanaged(AnnotatedBean annotatedBeanTypeWithClassLoaderUmanaged) {
 		this.annotatedBeanTypeWithClassLoaderUmanaged = annotatedBeanTypeWithClassLoaderUmanaged;
 	}

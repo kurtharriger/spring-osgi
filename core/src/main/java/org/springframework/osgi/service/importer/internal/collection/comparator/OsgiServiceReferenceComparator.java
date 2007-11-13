@@ -47,6 +47,8 @@ public class OsgiServiceReferenceComparator implements Comparator, Serializable 
 
 	private static final long serialVersionUID = 7552328574956669890L;
 
+	private static final int hashCode = OsgiServiceReferenceComparator.class.hashCode() * 13;
+
 	public int compare(Object o1, Object o2) {
 
 		ServiceReference ref1, ref2;
@@ -87,4 +89,9 @@ public class OsgiServiceReferenceComparator implements Comparator, Serializable 
 	public boolean equals(Object obj) {
 		return (this == obj || obj instanceof OsgiServiceReferenceComparator);
 	}
+
+	public int hashCode() {
+		return hashCode;
+	}
+
 }

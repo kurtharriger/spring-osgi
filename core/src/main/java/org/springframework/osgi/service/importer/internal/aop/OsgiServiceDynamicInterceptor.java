@@ -188,7 +188,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 							}
 						}
 					}
-					// we don't have any services bounded yet so just bind a new one
+					// we don't have any services bounded yet so just bind a new
+					// one
 					else {
 						updated = true;
 						updateReferenceHolders(ref);
@@ -219,6 +220,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 			referenceDelegate.swapDelegates(ref);
 		}
 	}
+
+	private static final int hashCode = OsgiServiceDynamicInterceptor.class.hashCode() * 13;
 
 	private final BundleContext bundleContext;
 
@@ -342,4 +345,9 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 		else
 			return false;
 	}
+
+	public int hashCode() {
+		return hashCode;
+	}
+
 }

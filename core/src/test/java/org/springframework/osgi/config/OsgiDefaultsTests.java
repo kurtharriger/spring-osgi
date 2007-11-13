@@ -31,7 +31,7 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
 import org.springframework.osgi.service.importer.support.Cardinality;
-import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 
 /**
@@ -70,7 +70,7 @@ public class OsgiDefaultsTests extends TestCase {
 	}
 
 	public void testLocalDefinitionForCardinalityOnMultiImporter() throws Exception {
-		OsgiMultiServiceProxyFactoryBean fb = (OsgiMultiServiceProxyFactoryBean) appContext.getBean("&colWLocalConfig");
+		OsgiServiceCollectionProxyFactoryBean fb = (OsgiServiceCollectionProxyFactoryBean) appContext.getBean("&colWLocalConfig");
 		assertEquals(Cardinality.C_1__N, getCardinality(fb));
 	}
 
@@ -90,7 +90,7 @@ public class OsgiDefaultsTests extends TestCase {
 	}
 
 	public void testCardinalityDefaultOnMultiImporter() throws Exception {
-		OsgiMultiServiceProxyFactoryBean fb = (OsgiMultiServiceProxyFactoryBean) appContext.getBean("&colWDefaults");
+		OsgiServiceCollectionProxyFactoryBean fb = (OsgiServiceCollectionProxyFactoryBean) appContext.getBean("&colWDefaults");
 		assertEquals(Cardinality.C_0__N, getCardinality(fb));
 	}
 

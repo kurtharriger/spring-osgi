@@ -73,7 +73,7 @@ class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	private static final String AUTOEXPORT = "auto-export";
 
-	private static final String CONTEXT_CLASSLOADER = "context-classloader";
+	private static final String CONTEXT_CLASSLOADER = "context-class-loader";
 
 	protected Class getBeanClass(Element element) {
 		return OsgiServiceFactoryBean.class;

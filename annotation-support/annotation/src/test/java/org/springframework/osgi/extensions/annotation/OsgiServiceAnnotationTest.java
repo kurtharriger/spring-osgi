@@ -32,7 +32,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.service.exporter.support.ExportContextClassLoader;
 import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
-import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
@@ -102,19 +102,19 @@ public class OsgiServiceAnnotationTest extends TestCase {
 
 	// disabled since there are no annotations for multi-injection
 	public void tstProperMultiCardinality() throws Exception {
-		OsgiMultiServiceProxyFactoryBean pfb = new OsgiMultiServiceProxyFactoryBean();
+		OsgiServiceCollectionProxyFactoryBean pfb = new OsgiServiceCollectionProxyFactoryBean();
 
 		Method setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithCardinality0_N",
 			new Class[] { AnnotatedBean.class });
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
-		pfb = new OsgiMultiServiceProxyFactoryBean();
+		pfb = new OsgiServiceCollectionProxyFactoryBean();
 		// processor.getServiceProperty(pfb, ref, setter, null);
 		assertFalse(pfb.isMandatory());
 
 		setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithCardinality1_N",
 			new Class[] { AnnotatedBean.class });
 		ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
-		pfb = new OsgiMultiServiceProxyFactoryBean();
+		pfb = new OsgiServiceCollectionProxyFactoryBean();
 		// processor.getServiceProperty(pfb, ref, setter, null);
 		assertTrue(pfb.isMandatory());
 	}

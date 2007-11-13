@@ -43,9 +43,9 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public class OsgiMultiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
+public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
 
-	private static final Log log = LogFactory.getLog(OsgiMultiServiceProxyFactoryBean.class);
+	private static final Log log = LogFactory.getLog(OsgiServiceCollectionProxyFactoryBean.class);
 
 	private CollectionProxy proxy;
 

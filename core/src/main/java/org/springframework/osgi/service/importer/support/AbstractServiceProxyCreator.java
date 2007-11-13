@@ -108,8 +108,11 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 				return createServiceProviderTCCLAdvice(reference);
 			}
 			else if (ImportContextClassLoader.UNMANAGED == iccl) {
+				// do nothing
+				return null;
 			}
 			return null;
+
 		}
 		finally {
 			if (log.isTraceEnabled()) {

@@ -18,7 +18,7 @@
 
 	<!-- full options -->
 	<osgi:reference id="full-options" interface="java.lang.Cloneable"
-		cardinality="1..1" context-classloader="service-provider"
+		cardinality="1..1" context-class-loader="service-provider"
 		timeout="2000" filter="(c=*)">
 		<osgi:listener>
 			<bean id="listener"

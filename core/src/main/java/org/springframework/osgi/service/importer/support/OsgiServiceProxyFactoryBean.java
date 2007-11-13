@@ -50,6 +50,11 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 				: getInterfaces()[0]));
 	}
 
+	public Object getObject() {
+		proxy = (ImportedOsgiServiceProxy) super.getObject();
+		return proxy;
+	}
+
 	public void destroy() throws Exception {
 		// FIXME: implement cleanup
 	}

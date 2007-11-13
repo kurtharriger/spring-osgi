@@ -25,11 +25,11 @@
 			]]></xsd:documentation>
 		</xsd:annotation>
  		<!-- attributes -->
- 		<xsd:attribute name="default-timeout" type="xsd:long" default="1000">
+ 		<xsd:attribute name="default-timeout" type="xsd:long" default="30000">
  			<xsd:annotation>
         		<xsd:documentation><![CDATA[
             	Default timeout (in milliseconds) for all reference (service importers) elements that do not explicitly specify one.
-            	Default value is 1000 ms (1 second).
+            	Default value is 300000 ms (5 minutes).
         		]]></xsd:documentation>
     		</xsd:annotation>
 	 	</xsd:attribute>
@@ -132,7 +132,7 @@
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="context-classloader" type="TreferenceClassLoaderOptions" default="client">
+                <xsd:attribute name="context-class-loader" type="TreferenceClassLoaderOptions" default="client">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
                 			Defines how the context class loader is managed when invoking operations on a service
@@ -405,7 +405,7 @@
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="context-classloader" type="TserviceClassLoaderOptions" default="unmanaged">
+                <xsd:attribute name="context-class-loader" type="TserviceClassLoaderOptions" default="unmanaged">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
                 			Defines how the context class loader will be managed when an operation is invoked on the 

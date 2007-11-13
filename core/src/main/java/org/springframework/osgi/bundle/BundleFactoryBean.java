@@ -80,7 +80,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 
 	private int startLevel;
 
-	private ClassLoader classloader;
+	private ClassLoader classLoader;
 
 	/** unused at the moment */
 	private boolean pushBundleAsContextClassLoader = false;
@@ -133,14 +133,14 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		executeAction(destroyAction);
 
 		bundle = null;
-		classloader = null;
+		classLoader = null;
 	}
 
 	private void executeAction(BundleAction action) {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		try {
 			if (pushBundleAsContextClassLoader) {
-				Thread.currentThread().setContextClassLoader(classloader);
+				Thread.currentThread().setContextClassLoader(classLoader);
 			}
 
 			// switch statement
@@ -345,7 +345,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	 * 
 	 * @param pushBundleAsContextClassLoader
 	 */
-	public void setPushBundleAsContextClassloader(boolean pushBundleAsContextClassLoader) {
+	public void setPushBundleAsContextClassLoader(boolean pushBundleAsContextClassLoader) {
 		this.pushBundleAsContextClassLoader = pushBundleAsContextClassLoader;
 	}
 
@@ -354,11 +354,11 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	 * @param classloader
 	 */
 	public void setClassloader(ClassLoader classloader) {
-		this.classloader = classloader;
+		this.classLoader = classloader;
 	}
 
 	public void setClassLoader(ClassLoader classloader) {
-		this.classloader = classloader;
+		this.classLoader = classloader;
 	}
 
 	public void setResourceLoader(ResourceLoader resourceLoader) {

@@ -124,7 +124,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 
 	private static final String SERVICE_BEAN_NAME = "bean-name";
 
-	private static final String CONTEXT_CLASSLOADER = "context-classloader";
+	private static final String CONTEXT_CLASSLOADER = "context-class-loader";
 
 	// document defaults
 	protected OsgiDefaultsDefinition defaults = null;

@@ -504,7 +504,7 @@ limitations under the License.
                <packages>org.springframework.osgi.sample*</packages>
             </group>
           </groups>
-          <excludePackageNames>*.internal:org.springframework.osgi.iandt*</excludePackageNames>
+          <excludePackageNames>*.internal:org.springframework.osgi.iandt*:*samples</excludePackageNames>
           
           <!-- enabled as this is the recommandation on 1.4 -->
           <breakiterator>true</breakiterator>

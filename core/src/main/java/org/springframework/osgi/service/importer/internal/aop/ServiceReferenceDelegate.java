@@ -34,8 +34,8 @@ class ServiceReferenceDelegate implements ServiceReference {
 
 	synchronized ServiceReference swapDelegates(ServiceReference newDelegate) {
 		Assert.notNull(newDelegate);
-		ServiceReference old = delegate;
-		delegate = newDelegate;
+		ServiceReference old = this.delegate;
+		this.delegate = newDelegate;
 
 		return old;
 	}

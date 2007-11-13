@@ -12,6 +12,9 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  */
 public class OsgiServiceTCCLInterceptor implements MethodInterceptor {
+
+	private static final int hashCode = OsgiServiceTCCLInterceptor.class.hashCode() * 13;
+
 	/** classloader to set the TCCL during invocation */
 	private final ClassLoader loader;
 
@@ -44,4 +47,9 @@ public class OsgiServiceTCCLInterceptor implements MethodInterceptor {
 		}
 		return false;
 	}
+
+	public int hashCode() {
+		return hashCode;
+	}
+
 }

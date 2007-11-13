@@ -30,6 +30,8 @@ import org.springframework.util.Assert;
  */
 public class OsgiServiceStaticInterceptor extends OsgiServiceInvoker {
 
+	private static final int hashCode = OsgiServiceStaticInterceptor.class.hashCode() * 13;
+
 	private final ServiceReference reference;
 
 	private final BundleContext bundleContext;
@@ -67,4 +69,9 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceInvoker {
 		}
 		return false;
 	}
+
+	public int hashCode() {
+		return hashCode;
+	}
+
 }
