@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
 
 /**
  * Marks a method (typically a JavaBean setter method) as requiring an OSGi service reference.
+ * 
  * @author Andy Piper
  */
 @Documented
@@ -44,17 +45,17 @@ public @interface ServiceReference {
     /**
 	 * The invocation context classloader setting. Defalts to the classloader of the client.
 	 */
-	ServiceReferenceClassLoader contextClassloader() default ServiceReferenceClassLoader.CLIENT;
+	ServiceReferenceClassLoader contextClassLoader() default ServiceReferenceClassLoader.CLIENT;
 
 	/**
-	 * Timeout for servcie resolution in milliseconds.
+	 * Timeout for service resolution in milliseconds.
 	 */
-	int timeout() default 30000;
+	int timeout() default 300000;
 
 	/**
 	 * Interface (or class) of the service to be injected
 	 */
-	Class[] serviceTypes() default ServiceReference.class;
+	Class<?>[] serviceTypes() default ServiceReference.class;
 
 	/**
 	 * filter used to narrow service matches, may be null

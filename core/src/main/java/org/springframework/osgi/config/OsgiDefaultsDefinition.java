@@ -23,12 +23,7 @@ package org.springframework.osgi.config;
  */
 public class OsgiDefaultsDefinition {
 
-	// TODO: would be nice to be able to read the defaults 
-	// from the schema directly. This seems impossible since
-	// the osgi attribute is not declared on the beans
-	// root element which has no idea about the schema or import
-	
-	private static final String TIMEOUT_DEFAULT = "1000";
+	private static final String TIMEOUT_DEFAULT = "300000";
 	
 	private static final String CARDINALITY_DEFAULT = "1..X";
 	

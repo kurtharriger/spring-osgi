@@ -1002,7 +1002,7 @@ public interface SubInterface extends SuperInterface {}</screen>
       </section>
 
       <section id="service-registry:export:ccl">
-        <title>The context-classloader attribute</title>
+        <title>The context-class-loader attribute</title>
 
         <para>The OSGi Service Platform Core Specification (most current
         version is 4.1 at time of writing) does not specify what types and
@@ -1012,11 +1012,11 @@ public interface SubInterface extends SuperInterface {}</screen>
         about the context class loader, Spring Dynamic Modules enables you to
         explicitly control the context class loader during service execution.
         This is achieved using the option
-        <literal>context-classloader</literal> attribute of the service
+        <literal>context-class-loader</literal> attribute of the service
         element.</para>
 
         <para>The permissible values for the
-        <literal>context-classloader</literal> attribute are
+        <literal>context-class-loader</literal> attribute are
         <literal>unmanaged</literal> (the default) and
         <literal>service-provider</literal>. When the
         <literal>service-provider</literal> value is specified, Spring Dynamic
@@ -1240,7 +1240,7 @@ public interface SubInterface extends SuperInterface {}</screen>
         </section>
 
         <section>
-          <title>4.2.1.5 The context-classloader attribute</title>
+          <title>4.2.1.5 The context-class-loader attribute</title>
 
           <para>The OSGi Service Platform Core Specification (most current
           version is 4.1 at time of writing) does not specify what types and
@@ -1250,11 +1250,11 @@ public interface SubInterface extends SuperInterface {}</screen>
           about the context class loader, Spring Dynamic Modules enables you
           to explicitly control the context class loader during service
           invocation. This is achieved using the option
-          <literal>context-classloader</literal> attribute of the
+          <literal>context-class-loader</literal> attribute of the
           <literal>reference</literal> element.</para>
 
           <para>The permissible values for the
-          <literal>context-classloader</literal> attribute are
+          <literal>context-class-loader</literal> attribute are
           <literal>unmanaged</literal> (the default),
           <literal>client</literal>, and <literal>service-provider</literal>.
           When the <literal>client</literal> value is specified, the context
@@ -1415,7 +1415,7 @@ public void anyMethodName(ServiceReference ref);</screen>
         <para>These elements support the attributes
         <literal>interface</literal>, <literal>filter</literal>,
         <literal>bean-name</literal>, <literal>cardinality</literal>, and
-        <literal>context-classloader</literal>, with the same semantics as for
+        <literal>context-class-loader</literal>, with the same semantics as for
         the <literal>reference</literal> element. The allowable values for the
         <literal>cardinality</literal> attribute are <literal>0..n</literal>
         and <literal>1..n</literal>. A cardinality value of

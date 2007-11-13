@@ -67,7 +67,7 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 	 */
 	public void afterPropertiesSet() {
 		Class clazz = target.getClass();
-		
+
 		if (isLifecycleListener)
 			if (log.isDebugEnabled())
 				log.debug(clazz.getName() + " is a lifecycle listener");
@@ -114,7 +114,8 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 			if (trace)
 				log.trace("invoking listener custom method " + method);
 
-			ServiceReference ref = ((ImportedOsgiServiceProxy) service).getServiceReference();
+			ServiceReference ref = (service != null ? ((ImportedOsgiServiceProxy) service).getServiceReference() : null);
+				
 
 			try {
 				ReflectionUtils.invokeMethod(method, target, new Object[] { ref });

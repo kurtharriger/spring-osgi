@@ -390,7 +390,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * is in the topological order of the dependency graph formed by the service
 	 * references.
 	 */
-	protected synchronized void shutdown() {
+	protected void shutdown() {
 		synchronized (monitor) {
 			// if already closed, bail out
 			if (isClosed)

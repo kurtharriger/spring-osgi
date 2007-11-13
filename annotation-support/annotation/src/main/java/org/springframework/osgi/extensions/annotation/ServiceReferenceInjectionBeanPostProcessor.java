@@ -31,10 +31,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.service.importer.support.Cardinality;
-import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.util.ReflectionUtils;
 
@@ -130,17 +127,17 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 		}
 		if (s.serviceTypes() == null || s.serviceTypes().length == 0
 				|| (s.serviceTypes().length == 1 && s.serviceTypes()[0].equals(ServiceReference.class))) {
-			Class[] params = writeMethod.getParameterTypes();
+			Class<?>[] params = writeMethod.getParameterTypes();
 			if (params.length != 1) {
 				throw new IllegalArgumentException("Setter for [" + beanName + "] must have only one argument");
 			}
-			pfb.setInterface(new Class[] { params[0] });
+			pfb.setInterfaces(new Class<?>[] { params[0] });
 		}
 		else {
-			pfb.setInterface(s.serviceTypes());
+			pfb.setInterfaces(s.serviceTypes());
 		}
 		pfb.setCardinality(s.cardinality().toCardinality());
-		pfb.setContextClassLoader(s.contextClassloader().toImportContextClassLoader());
+		pfb.setContextClassLoader(s.contextClassLoader().toImportContextClassLoader());
 		pfb.setBundleContext(bundleContext);
 		if (s.serviceBeanName().length() > 0) {
 			pfb.setServiceBeanName(s.serviceBeanName());

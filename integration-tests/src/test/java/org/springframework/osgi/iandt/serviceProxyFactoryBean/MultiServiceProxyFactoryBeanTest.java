@@ -27,15 +27,15 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
-import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
 public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
-	private OsgiMultiServiceProxyFactoryBean fb;
+	private OsgiServiceCollectionProxyFactoryBean fb;
 
 	protected void onSetUp() throws Exception {
-		fb = new OsgiMultiServiceProxyFactoryBean();
+		fb = new OsgiServiceCollectionProxyFactoryBean();
 		fb.setBundleContext(bundleContext);
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 		fb.setBeanClassLoader(classLoader);
@@ -50,7 +50,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 		fb.setCardinality(Cardinality.C_0__N);
 		// look for collections
-		fb.setInterface(new Class[] { ArrayList.class });
+		fb.setInterfaces(new Class[] { ArrayList.class });
 		fb.afterPropertiesSet();
 
 		List registrations = new ArrayList(3);
@@ -93,7 +93,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 	public void testFactoryBeanForMultipleServicesAsClasses() throws Exception {
 
 		fb.setCardinality(Cardinality.C_0__N);
-		fb.setInterface(new Class[] { Date.class });
+		fb.setInterfaces(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 
 		List registrations = new ArrayList(3);
@@ -139,7 +139,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 	public void testIteratorWhenServiceGoesDown() throws Exception {
 		fb.setCardinality(Cardinality.C_0__N);
-		fb.setInterface(new Class[] { Date.class });
+		fb.setInterfaces(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 
 		long time = 123;

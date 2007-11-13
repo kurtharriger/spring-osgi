@@ -24,6 +24,8 @@ import org.springframework.util.Assert;
  */
 public class RetryTemplate {
 
+	private static final int hashCode = RetryTemplate.class.hashCode() * 13;
+
 	public static final long DEFAULT_WAIT_TIME = 1000;
 
 	public static final int DEFAULT_RETRY_NUMBER = 3;
@@ -105,4 +107,9 @@ public class RetryTemplate {
 		}
 		return false;
 	}
+
+	public int hashCode() {
+		return hashCode;
+	}
+
 }

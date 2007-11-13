@@ -31,7 +31,7 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.support.Cardinality;
-import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
@@ -40,7 +40,7 @@ import org.springframework.osgi.util.OsgiFilterUtils;
  */
 public class OsgiMultiServiceProxyFactoryBeanTest extends TestCase {
 
-	private OsgiMultiServiceProxyFactoryBean serviceFactoryBean;
+	private OsgiServiceCollectionProxyFactoryBean serviceFactoryBean;
 
 	private MockBundleContext bundleContext;
 
@@ -48,7 +48,7 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.serviceFactoryBean = new OsgiMultiServiceProxyFactoryBean();
+		this.serviceFactoryBean = new OsgiServiceCollectionProxyFactoryBean();
 		// this.serviceFactoryBean.setApplicationContext(new
 		// GenericApplicationContext());
 

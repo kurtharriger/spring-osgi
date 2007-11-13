@@ -21,14 +21,17 @@ import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.util.Assert;
 
 /**
- * Mix-in implementation for ServiceReferenceAccessor.
+ * Mix-in implementation for ImportedOsgiServiceProxy.
  * 
  * @author Costin Leau
  * 
  */
-public class ImportedOsgiServiceProxyAdvice extends DelegatingIntroductionInterceptor implements ImportedOsgiServiceProxy {
+public class ImportedOsgiServiceProxyAdvice extends DelegatingIntroductionInterceptor implements
+		ImportedOsgiServiceProxy {
 
 	private static final long serialVersionUID = 6455437774724678999L;
+
+	private static final int hashCode = ImportedOsgiServiceProxyAdvice.class.hashCode() * 13;
 
 	private ServiceReference reference;
 
@@ -51,4 +54,9 @@ public class ImportedOsgiServiceProxyAdvice extends DelegatingIntroductionInterc
 		else
 			return false;
 	}
+
+	public int hashCode() {
+		return hashCode;
+	}
+
 }

@@ -22,7 +22,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.service.importer.internal.collection.comparator.OsgiServiceReferenceComparator;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.CollectionType;
-import org.springframework.osgi.service.importer.support.OsgiMultiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -57,7 +57,7 @@ abstract class CollectionBeanDefinitionParser extends AbstractReferenceDefinitio
 	private static final String BASIS = "basis";
 
 	protected Class getBeanClass(Element element) {
-		return OsgiMultiServiceProxyFactoryBean.class;
+		return OsgiServiceCollectionProxyFactoryBean.class;
 	}
 
 	protected String mandatoryCardinality() {

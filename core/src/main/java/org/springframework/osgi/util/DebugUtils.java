@@ -57,7 +57,7 @@ public abstract class DebugUtils {
 	 * 
 	 * @param ncdfe NoClassDefFoundException cause
 	 * @param bundleContext running bundle context
-	 * @param interfaces ??? 
+	 * @param interfaces ???
 	 */
 	public static String debugNoClassDefFoundWhenProxying(NoClassDefFoundError ncdfe, BundleContext bundleContext,
 			Class[] interfaces) {
@@ -214,8 +214,9 @@ public abstract class DebugUtils {
 		String cname = name.replace('.', '/') + ".class";
 		for (Enumeration e = bundle.findEntries("/", "*.jar", true); e != null && e.hasMoreElements();) {
 			URL url = (URL) e.nextElement();
+			JarInputStream jin = null;
 			try {
-				JarInputStream jin = new JarInputStream(url.openStream());
+				jin = new JarInputStream(url.openStream());
 				// Copy entries from the real jar to our virtual jar
 				for (JarEntry ze = jin.getNextJarEntry(); ze != null; ze = jin.getNextJarEntry()) {
 					if (ze.getName().equals(cname)) {
@@ -223,11 +224,22 @@ public abstract class DebugUtils {
 						return url;
 					}
 				}
-				jin.close();
 			}
 			catch (IOException e1) {
 				log.trace("Skipped " + url.toString() + ": " + e1.getMessage());
 			}
+
+			finally {
+				if (jin != null) {
+					try {
+						jin.close();
+					}
+					catch (Exception ex) {
+						// don't do a thing
+					}
+				}
+			}
+
 		}
 		return null;
 	}

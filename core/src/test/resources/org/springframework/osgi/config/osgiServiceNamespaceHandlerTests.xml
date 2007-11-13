@@ -22,7 +22,7 @@
 	<osgi:service interface="java.io.Serializable" id="inlineReference"
 		ref="string" />
 
-	<osgi:service context-classloader="service-provider"
+	<osgi:service context-class-loader="service-provider"
 		id="manyOptions">
 		<osgi:interfaces>
 			<value>java.io.Serializable</value>

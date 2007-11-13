@@ -103,7 +103,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			}
 
 			// add TCCL behaviour only if needed
-			if (contextClassloaderManagementStrategy == ExportContextClassLoader.SERVICE_PROVIDER) {
+			if (contextClassLoader == ExportContextClassLoader.SERVICE_PROVIDER) {
 				return wrapWithClassLoaderManagingProxy(bean, classes);
 			}
 			else {
@@ -139,7 +139,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	private AutoExport autoExport = AutoExport.DISABLED;
 
-	private ExportContextClassLoader contextClassloaderManagementStrategy = ExportContextClassLoader.UNMANAGED;
+	private ExportContextClassLoader contextClassLoader = ExportContextClassLoader.UNMANAGED;
 
 	private Object target;
 
@@ -363,7 +363,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 */
 	public void setContextClassLoader(ExportContextClassLoader ccl) {
 		Assert.notNull(ccl);
-		this.contextClassloaderManagementStrategy = ccl;
+		this.contextClassLoader = ccl;
 	}
 
 	/**
