@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created on 25-Jan-2006 by Adrian Colyer
  */
 package org.springframework.osgi.service.exporter;
 
@@ -31,7 +30,6 @@ import org.springframework.osgi.service.exporter.support.BeanNameServiceProperti
 /**
  * @author Adrian Colyer
  * @author Hal Hildebrand
- * @since 2.0
  */
 public class BeanNameServicePropertiesResolverTest extends TestCase {
 
@@ -76,7 +74,7 @@ public class BeanNameServicePropertiesResolverTest extends TestCase {
 		assertEquals("3 properties",3,ret.size());
 		assertEquals("symbolic-name",ret.get("Bundle-SymbolicName"));
 		assertEquals("1.0.0",ret.get("Bundle-Version"));
-		assertEquals("myBean",ret.get("org.springframework.osgi.beanname"));
+		assertEquals("myBean",ret.get("org.springframework.osgi.bean.name"));
 	}
 	
 }

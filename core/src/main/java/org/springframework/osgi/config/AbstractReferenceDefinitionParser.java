@@ -20,17 +20,23 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.BeanReferenceFactoryBean;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.util.Assert;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -48,7 +54,7 @@ import org.w3c.dom.NodeList;
  * @author Costin Leau
  * 
  */
-abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefinitionParser {
+abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionParser {
 
 	/**
 	 * Attribute callback dealing with 'cardinality' attribute.
@@ -141,6 +147,53 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 		return defaults;
 	}
 
+	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
+
+		Class beanClass = getBeanClass(element);
+		Assert.notNull(beanClass);
+
+		if (beanClass != null) {
+			builder.getRawBeanDefinition().setBeanClass(beanClass);
+		}
+
+		builder.setSource(parserContext.extractSource(element));
+		if (parserContext.isNested()) {
+			// Inner bean definition must receive same scope as containing bean.
+			builder.setScope(parserContext.getContainingBeanDefinition().getScope());
+		}
+		if (parserContext.isDefaultLazyInit()) {
+			// Default-lazy-init applies to custom bean definitions as well.
+			builder.setLazyInit(true);
+		}
+		doParse(element, parserContext, builder);
+
+		// check whether the bean is mandatory (and if it is, make it top-level
+		// bean)
+
+		AbstractBeanDefinition def = builder.getBeanDefinition();
+
+// not yet enabled
+//
+//		if (parserContext.isNested()) {
+//			String id = parserContext.getReaderContext().generateBeanName(def);
+//			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, id);
+//			BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());
+//			return createBeanReferenceDefinition(id);
+//		}
+
+		return def;
+	}
+
+	private AbstractBeanDefinition createBeanReferenceDefinition(String beanName) {
+		GenericBeanDefinition def = new GenericBeanDefinition();
+		def.setBeanClass(BeanReferenceFactoryBean.class);
+		MutablePropertyValues mpv = new MutablePropertyValues();
+		mpv.addPropertyValue("targetBeanName", beanName);
+		def.setPropertyValues(mpv);
+		return def;
+	}
+
 	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		if (defaults == null)
 			resolveDefaults(element.getOwnerDocument());
@@ -154,6 +207,21 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 		}
 
 		parseNestedElements(element, context, builder);
+
+		handleNestedDefinition(element, context, builder);
+	}
+
+	/**
+	 * If the reference is a nested bean, make it a top-level bean if it's a
+	 * mandatory dependency. This is done so that the beans can be discovered at
+	 * startup and the appCtx can start waiting.
+	 * 
+	 * @param element
+	 * @param context
+	 * @param builder
+	 */
+	private void handleNestedDefinition(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+
 	}
 
 	/**
@@ -168,7 +236,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 	}
 
 	/**
-	 * Subclasses should overide this method to provide the proper mandatory
+	 * Subclasses should override this method to provide the proper mandatory
 	 * cardinality option/string.
 	 * 
 	 * @return mandatory cardinality as a string.
@@ -182,6 +250,14 @@ abstract class AbstractReferenceDefinitionParser extends AbstractSingleBeanDefin
 	 * @return optional cardinality as a string
 	 */
 	protected abstract String optionalCardinality();
+
+	/**
+	 * Indicate the bean definition class for this element.
+	 * 
+	 * @param element
+	 * @return
+	 */
+	protected abstract Class getBeanClass(Element element);
 
 	/**
 	 * Utility method declared for reusability. It maintains the

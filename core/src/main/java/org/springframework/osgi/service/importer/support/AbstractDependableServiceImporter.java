@@ -57,7 +57,7 @@ public abstract class AbstractDependableServiceImporter implements DependableSer
 	public void setCardinality(Cardinality cardinality) {
 		Assert.notNull(cardinality);
 		this.cardinality = cardinality;
-		this.mandatory = Cardinality.isMandatory(this.cardinality);
+		this.mandatory = cardinality.isMandatory();
 	}
 
 	/**
