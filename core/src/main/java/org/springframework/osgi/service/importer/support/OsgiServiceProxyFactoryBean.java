@@ -133,7 +133,8 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 
 	/* override to check proper cardinality - x..1 */
 	public void setCardinality(Cardinality cardinality) {
-		Assert.isTrue(Cardinality.isSingle(cardinality), "only singular cardinality ('X..1') accepted");
+		Assert.notNull(cardinality);
+		Assert.isTrue(cardinality.isSingle(), "only singular cardinality ('X..1') accepted");
 		super.setCardinality(cardinality);
 	}
 }

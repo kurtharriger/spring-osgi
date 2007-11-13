@@ -54,8 +54,8 @@ public class Cardinality extends StaticLabeledEnum {
 	 * @param cardinality cardinality object
 	 * @return true if the given cardinality is single, false otherwise
 	 */
-	public static boolean isSingle(Cardinality cardinality) {
-		return Cardinality.C_0__1.equals(cardinality) || Cardinality.C_1__1.equals(cardinality);
+	public boolean isSingle() {
+		return Cardinality.C_0__1.equals(this) || Cardinality.C_1__1.equals(this);
 	}
 
 	/**
@@ -64,8 +64,8 @@ public class Cardinality extends StaticLabeledEnum {
 	 * @param cardinality cardinality object
 	 * @return true if the given cardinality is multiple, false otherwise
 	 */
-	public static boolean isMultiple(Cardinality cardinality) {
-		return Cardinality.C_0__N.equals(cardinality) || Cardinality.C_1__N.equals(cardinality);
+	public boolean isMultiple() {
+		return Cardinality.C_0__N.equals(this) || Cardinality.C_1__N.equals(this);
 	}
 
 	/**
@@ -75,8 +75,8 @@ public class Cardinality extends StaticLabeledEnum {
 	 * @param cardinality cardinality object
 	 * @return true if the given cardinality is mandatory, false otherwise
 	 */
-	public static boolean isMandatory(Cardinality cardinality) {
-		return Cardinality.C_1__1.equals(cardinality) || Cardinality.C_1__N.equals(cardinality);
+	public boolean isMandatory() {
+		return Cardinality.C_1__1.equals(this) || Cardinality.C_1__N.equals(this);
 	}
 
 	/**
@@ -85,8 +85,8 @@ public class Cardinality extends StaticLabeledEnum {
 	 * @param cardinality cardinality object
 	 * @return true if the given cardinality is optional, false otherwise
 	 */
-	public static boolean isOptional(Cardinality cardinality) {
-		return Cardinality.C_0__N.equals(cardinality) || Cardinality.C_0__1.equals(cardinality);
+	public boolean isOptional() {
+		return Cardinality.C_0__N.equals(this) || Cardinality.C_0__1.equals(this);
 	}
 
 	/**

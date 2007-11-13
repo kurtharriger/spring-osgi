@@ -32,7 +32,7 @@ public interface OsgiServicePropertiesResolver {
 	 * Predefined property indicating the bean name of an exported Spring
 	 * managed object
 	 */
-	String BEAN_NAME_PROPERTY_KEY = "org.springframework.osgi.beanname";
+	String BEAN_NAME_PROPERTY_KEY = "org.springframework.osgi.bean.name";
 
 	/**
 	 * Return a map containing the service properties associated with the given

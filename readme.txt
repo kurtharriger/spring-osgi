@@ -1,5 +1,5 @@
-SPRING DYNAMIC MODULES FOR OSGI(tm) SERVICE PLATFORMS 1.0-M3 (Oct 2007)
------------------------------------------------------------------------
+SPRING DYNAMIC MODULES FOR OSGI(tm) SERVICE PLATFORMS 1.0-RC1 (Nov 2007)
+------------------------------------------------------------------------
 http://www.springframework.org/osgi
 
 1. INTRODUCTION

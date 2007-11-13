@@ -161,7 +161,8 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 
 	/* override to check proper cardinality - x..N */
 	public void setCardinality(Cardinality cardinality) {
-		Assert.isTrue(Cardinality.isMultiple(cardinality), "only multiple cardinality ('X..N') accepted");
+		Assert.notNull(cardinality);
+		Assert.isTrue(cardinality.isMultiple(), "only multiple cardinality ('X..N') accepted");
 		super.setCardinality(cardinality);
 	}
 
