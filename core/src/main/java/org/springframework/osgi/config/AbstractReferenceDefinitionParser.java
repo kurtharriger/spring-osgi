@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.BeanReferenceFactoryBean;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
@@ -37,6 +38,7 @@ import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.config.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -173,14 +175,19 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 
 		AbstractBeanDefinition def = builder.getBeanDefinition();
 
-// not yet enabled
-//
-//		if (parserContext.isNested()) {
-//			String id = parserContext.getReaderContext().generateBeanName(def);
-//			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, id);
-//			BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());
-//			return createBeanReferenceDefinition(id);
-//		}
+		if (parserContext.isNested()) {
+			StringBuffer id = new StringBuffer();
+			String value = element.getAttribute(AbstractBeanDefinitionParser.ID_ATTRIBUTE);
+			if (StringUtils.hasText(value)) {
+				id.append(value);
+				id.append(BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR);
+			}
+
+			id.append(parserContext.getReaderContext().generateBeanName(def));
+			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, id.toString());
+			BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());
+			return createBeanReferenceDefinition(id.toString());
+		}
 
 		return def;
 	}
