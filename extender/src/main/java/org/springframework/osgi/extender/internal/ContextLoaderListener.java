@@ -35,10 +35,17 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.AbstractDelegatedExecutionApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
@@ -57,9 +64,9 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'.
- * 
  * <p/>
- * 
+ * <p/>
+ * <p/>
  * <p/> The class listens to bundle events and manages the creation and
  * destruction of application contexts for bundles that have one or both of:
  * <ul>
@@ -70,7 +77,7 @@ import org.springframework.util.ObjectUtils;
  * bundles and publishes a namespace resolving service for each.
  * </p>
  * <p/>
- * 
+ * <p/>
  * <p/> If a fragment is attached to the extender bundle that defines a resource
  * META-INF/spring/extender.xml then this file will be used to create an
  * application context for configuring the extender bundle itself. By defining a
@@ -79,7 +86,7 @@ import org.springframework.util.ObjectUtils;
  * during a synchronous OSGi lifecycle callback and should contain only simple
  * bean definitions that will not delay context initialisation.
  * </p>
- * 
+ *
  * @author Bill Gallagher
  * @author Andy Piper
  * @author Hal Hildebrand
@@ -90,9 +97,8 @@ public class ContextLoaderListener implements BundleActivator {
 
 	/**
 	 * Common base class for {@link ContextLoaderListener} listeners.
-	 * 
+	 *
 	 * @author Costin Leau
-	 * 
 	 */
 	private abstract class BaseListener implements SynchronousBundleListener {
 
@@ -100,7 +106,7 @@ public class ContextLoaderListener implements BundleActivator {
 		 * A bundle has been started, stopped, resolved, or unresolved. This
 		 * method is a synchronous callback, do not do any long-running work in
 		 * this thread.
-		 * 
+		 *
 		 * @see org.osgi.framework.SynchronousBundleListener#bundleChanged
 		 */
 		public void bundleChanged(BundleEvent event) {
@@ -117,7 +123,7 @@ public class ContextLoaderListener implements BundleActivator {
 			}
 			if (trace) {
 				log.debug("Processing bundle event [" + OsgiStringUtils.nullSafeToString(event) + "] for bundle ["
-						+ OsgiStringUtils.nullSafeSymbolicName(event.getBundle()) + "]");
+					+ OsgiStringUtils.nullSafeSymbolicName(event.getBundle()) + "]");
 			}
 			try {
 				handleEvent(event);
@@ -137,9 +143,8 @@ public class ContextLoaderListener implements BundleActivator {
 	 * conditions with bundles in INSTALLING state but still to avoid premature
 	 * context creation before the Spring {@link ContextLoaderListener} is not
 	 * fully initialized.
-	 * 
+	 *
 	 * @author Costin Leau
-	 * 
 	 */
 	private class NamespaceBundleLister extends BaseListener {
 		protected void handleEvent(BundleEvent event) {
@@ -147,23 +152,22 @@ public class ContextLoaderListener implements BundleActivator {
 			Bundle bundle = event.getBundle();
 
 			switch (event.getType()) {
-			case BundleEvent.RESOLVED: {
-				maybeAddNamespaceHandlerFor(bundle);
-				break;
-			}
-			case BundleEvent.UNRESOLVED: {
-				maybeRemoveNameSpaceHandlerFor(bundle);
-				break;
-			}
-			default:
-				break;
+				case BundleEvent.RESOLVED: {
+					maybeAddNamespaceHandlerFor(bundle);
+					break;
+				}
+				case BundleEvent.UNRESOLVED: {
+					maybeRemoveNameSpaceHandlerFor(bundle);
+					break;
+				}
+				default:
+					break;
 			}
 		}
 	}
 
 	/**
 	 * Bundle listener used for context creation/destruction.
-	 * 
 	 */
 	private class ContextBundleListener extends BaseListener {
 		protected void handleEvent(BundleEvent event) {
@@ -176,26 +180,26 @@ public class ContextLoaderListener implements BundleActivator {
 			}
 
 			switch (event.getType()) {
-			case BundleEvent.STARTED: {
-				maybeCreateApplicationContextFor(bundle);
-				break;
-			}
-			case BundleEvent.STOPPING: {
-				if (OsgiBundleUtils.isSystemBundle(bundle)) {
-					if (log.isDebugEnabled()) {
-						log.debug("System bundle stopping");
+				case BundleEvent.STARTED: {
+					maybeCreateApplicationContextFor(bundle);
+					break;
+				}
+				case BundleEvent.STOPPING: {
+					if (OsgiBundleUtils.isSystemBundle(bundle)) {
+						if (log.isDebugEnabled()) {
+							log.debug("System bundle stopping");
+						}
+						// System bundle is shutting down; Special handling for
+						// framework shutdown
+						shutdown();
 					}
-					// System bundle is shutting down; Special handling for
-					// framework shutdown
-					shutdown();
+					else {
+						maybeCloseApplicationContextFor(bundle);
+					}
+					break;
 				}
-				else {
-					maybeCloseApplicationContextFor(bundle);
-				}
-				break;
-			}
-			default:
-				break;
+				default:
+					break;
 			}
 		}
 	}
@@ -231,23 +235,30 @@ public class ContextLoaderListener implements BundleActivator {
 	 */
 	protected final Set springBundleListeners = new LinkedHashSet();
 
-	/** Task executor used for bootstraping the Spring contexts in async mode */
+	/**
+	 * Task executor used for bootstraping the Spring contexts in async mode
+	 */
 	protected TaskExecutor taskExecutor;
 
 	/**
 	 * Task executor which uses the same thread for running tasks. Used when
 	 * doing a synchronous wait-for-dependencies.
-	 * 
 	 */
 	private TaskExecutor sameThreadTaskExecutor = new SyncTaskExecutor();
 
-	/** ThreadGroup when the taskExecutor is created internally */
+	/**
+	 * ThreadGroup when the taskExecutor is created internally
+	 */
 	private ThreadGroup threadGroup;
 
-	/** is this class internally managing the task executor */
+	/**
+	 * is this class internally managing the task executor
+	 */
 	protected boolean isTaskExecutorManagedInternally = false;
 
-	/** listener counter - used to properly synchronize shutdown */
+	/**
+	 * listener counter - used to properly synchronize shutdown
+	 */
 	protected Counter contextsStarted = new Counter("contextsStarted");
 
 	/**
@@ -265,13 +276,19 @@ public class ContextLoaderListener implements BundleActivator {
 	 */
 	protected BundleContext context;
 
-	/** Bundle listener interested in context creation */
+	/**
+	 * Bundle listener interested in context creation
+	 */
 	private SynchronousBundleListener contextListener;
 
-	/** Bundle listener interested in namespace resolvers/parsers discovery */
+	/**
+	 * Bundle listener interested in namespace resolvers/parsers discovery
+	 */
 	private SynchronousBundleListener nsListener;
 
-	/** Service-based dependency sorter for shutdown */
+	/**
+	 * Service-based dependency sorter for shutdown
+	 */
 	private ServiceDependencySorter shutdownDependencySorter = new ComparatorServiceDependencySorter();
 
 	/**
@@ -282,13 +299,17 @@ public class ContextLoaderListener implements BundleActivator {
 
 	private boolean isClosed = false;
 
-	/** wait 3 seconds for each context to close */
+	/**
+	 * wait 3 seconds for each context to close
+	 */
 	private static long SHUTDOWN_WAIT_TIME = 3 * 1000;
 
-	/** this extender version */
+	/**
+	 * this extender version
+	 */
 	private Version extenderVersion;
 
-	/*
+	/**
 	 * Required by the BundleActivator contract
 	 */
 	public ContextLoaderListener() {
@@ -305,7 +326,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * <p/> Registers a namespace/entity resolving service for use by web app
 	 * contexts.
 	 * </p>
-	 * 
+	 *
 	 * @see org.osgi.framework.BundleActivator#start
 	 */
 	public void start(BundleContext context) throws Exception {
@@ -366,7 +387,7 @@ public class ContextLoaderListener implements BundleActivator {
 				}
 				catch (Throwable e) {
 					log.warn("Cannot start bundle " + OsgiStringUtils.nullSafeSymbolicName(previousBundles[i])
-							+ " due to", e);
+						+ " due to", e);
 				}
 			}
 		}
@@ -378,7 +399,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * management of application contexts created by this extender prior to
 	 * stopping the bundle occurs after this point (even if the extender bundle
 	 * is subsequently restarted).
-	 * 
+	 *
 	 * @see org.osgi.framework.BundleActivator#stop
 	 */
 	public void stop(BundleContext context) throws Exception {
@@ -504,7 +525,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 	/**
 	 * Shutdown the task executor in case is managed internally by the listener.
-	 * 
 	 */
 	private void stopTaskExecutor() {
 		boolean debug = log.isDebugEnabled();
@@ -522,7 +542,7 @@ public class ContextLoaderListener implements BundleActivator {
 				if (!contextsStarted.isZero()) {
 					if (debug)
 						log.debug(contextsStarted.getValue()
-								+ " service dependency listener(s) did not responded in time; forcing them to shutdown");
+							+ " service dependency listener(s) did not responded in time; forcing them to shutdown");
 					if (threadGroup != null) {
 						threadGroup.stop();
 						threadGroup = null;
@@ -538,18 +558,17 @@ public class ContextLoaderListener implements BundleActivator {
 	/**
 	 * Utility method that does extender range versioning and approapriate
 	 * logging.
-	 * 
+	 *
 	 * @param bundle
-	 * @return
 	 */
 	private boolean handlerBundleMatchesExtenderVersion(Bundle bundle) {
 		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
 			if (log.isDebugEnabled())
 				log.debug("bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
-						+ "] expects an extender w/ version["
-						+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
-						+ "] which does not match current extender w/ version[" + extenderVersion
-						+ "]; skipping bundle from handler detection");
+					+ "] expects an extender w/ version["
+					+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
+					+ "] which does not match current extender w/ version[" + extenderVersion
+					+ "]; skipping bundle from handler detection");
 			return false;
 		}
 		return true;
@@ -567,7 +586,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 	/**
 	 * Register a Spring applicationEvent multicaster for the managed bundles.
-	 * 
+	 *
 	 * @param context
 	 */
 	// TODO: why not move the multicaster into its own class
@@ -597,13 +616,13 @@ public class ContextLoaderListener implements BundleActivator {
 	/**
 	 * Context creation is a potentially long-running activity (certainly more
 	 * than we want to do on the synchronous event callback).
-	 * 
+	 * <p/>
 	 * <p/>Based on our configuration, the context can be started on the same
 	 * thread or on a different one.
-	 * 
+	 * <p/>
 	 * Kick off a background activity to create an application context for the
 	 * given bundle if needed.
-	 * 
+	 *
 	 * @param bundle
 	 */
 	protected void maybeCreateApplicationContextFor(Bundle bundle) {
@@ -611,10 +630,10 @@ public class ContextLoaderListener implements BundleActivator {
 		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
 			if (log.isDebugEnabled())
 				log.debug("bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
-						+ "] expects an extender w/ version["
-						+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
-						+ "] which does not match current extender w/ version[" + extenderVersion
-						+ "]; skipping bundle from context creation");
+					+ "] expects an extender w/ version["
+					+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
+					+ "] which does not match current extender w/ version[" + extenderVersion
+					+ "]; skipping bundle from context creation");
 			return;
 		}
 
@@ -670,7 +689,7 @@ public class ContextLoaderListener implements BundleActivator {
 		// wait/no wait for dependencies behaviour
 		if (config.isWaitForDependencies()) {
 			DependencyWaiterApplicationContextExecutor appCtxExecutor = new DependencyWaiterApplicationContextExecutor(
-					context, !config.isCreateAsynchronously());
+				context, !config.isCreateAsynchronously());
 
 			appCtxExecutor.setTimeout(config.getTimeout());
 			appCtxExecutor.setWatchdog(timer);
@@ -689,6 +708,26 @@ public class ContextLoaderListener implements BundleActivator {
 	protected OsgiBundleXmlApplicationContext createApplicationContext(BundleContext context, String[] locations) {
 		OsgiBundleXmlApplicationContext sdoac = new OsgiBundleXmlApplicationContext(locations);
 		sdoac.setBundleContext(context);
+		// Try and load the annotation code if it exists
+		try {
+			Class annotationBppClass = Class.forName("org.springframework.osgi.extensions.annotation.ServiceReferenceInjectionBeanPostProcessor");
+			final BeanPostProcessor annotationBpp = (BeanPostProcessor) annotationBppClass.newInstance();
+			((BundleContextAware) annotationBpp).setBundleContext(context);
+
+			sdoac.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
+				public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+					((BeanFactoryAware) annotationBpp).setBeanFactory(beanFactory);
+					((BeanClassLoaderAware) annotationBpp).setBeanClassLoader(beanFactory.getBeanClassLoader());
+					beanFactory.addBeanPostProcessor(annotationBpp);
+				}
+			});
+		}
+		catch (ClassNotFoundException e) {
+		}
+		catch (IllegalAccessException e) {
+		}
+		catch (InstantiationException e) {
+		}
 		return sdoac;
 	}
 
@@ -696,12 +735,12 @@ public class ContextLoaderListener implements BundleActivator {
 	 * Closing an application context is a potentially long-running activity,
 	 * however, we *have* to do it synchronously during the event process as the
 	 * BundleContext object is not valid once we return from this method.
-	 * 
+	 *
 	 * @param bundle
 	 */
 	protected void maybeCloseApplicationContextFor(Bundle bundle) {
 		final ConfigurableOsgiBundleApplicationContext context = (ConfigurableOsgiBundleApplicationContext) managedContexts.remove(new Long(
-				bundle.getBundleId()));
+			bundle.getBundleId()));
 		if (context == null) {
 			return;
 		}
@@ -728,7 +767,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * configuration file, and a bean named "taskExecutor" will be looked up by
 	 * name. If such a bean exists, it will be used.
 	 * </p>
-	 * 
+	 *
 	 * @param context
 	 * @return TaskExecutor
 	 */
@@ -738,7 +777,7 @@ public class ContextLoaderListener implements BundleActivator {
 		Bundle extenderBundle = context.getBundle();
 		URL extenderConfigFile = extenderBundle.getResource(EXTENDER_CONFIG_FILE_LOCATION);
 		if (extenderConfigFile != null) {
-			String[] locations = new String[] { extenderConfigFile.toExternalForm() };
+			String[] locations = new String[]{extenderConfigFile.toExternalForm()};
 
 			this.extenderContext = new OsgiBundleXmlApplicationContext(locations);
 			this.extenderContext.setBundleContext(context);
@@ -753,21 +792,21 @@ public class ContextLoaderListener implements BundleActivator {
 				else {
 					if (log.isErrorEnabled()) {
 						log.error("Bean 'taskExecutor' in META-INF/spring/extender.xml configuration file "
-								+ "is not an instance of " + TaskExecutor.class.getName() + ". " + "Using defaults.");
+							+ "is not an instance of " + TaskExecutor.class.getName() + ". " + "Using defaults.");
 					}
 				}
 			}
 			else {
 				if (log.isWarnEnabled()) {
 					log.warn("Found META-INF/spring/extender.xml configuration file, but no bean "
-							+ "named 'taskExecutor' was defined; using defaults.");
+						+ "named 'taskExecutor' was defined; using defaults.");
 				}
 			}
 		}
 
 		synchronized (monitor) {
 			threadGroup = new ThreadGroup("spring-osgi-extender[" + ObjectUtils.getIdentityHexString(this)
-					+ "]-threads");
+				+ "]-threads");
 			threadGroup.setDaemon(false);
 		}
 
