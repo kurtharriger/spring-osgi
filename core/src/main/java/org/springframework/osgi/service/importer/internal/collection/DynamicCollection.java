@@ -153,10 +153,6 @@ public class DynamicCollection extends AbstractCollection {
 		addAll(c);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.AbstractCollection#iterator()
-	 */
 	public Iterator iterator() {
 		Iterator iter = new DynamicIterator();
 
@@ -167,10 +163,11 @@ public class DynamicCollection extends AbstractCollection {
 		return iter;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.AbstractCollection#size()
-	 */
+	
+	public void clear() {
+		storage.clear();
+	}
+
 	public int size() {
 		return storage.size();
 	}

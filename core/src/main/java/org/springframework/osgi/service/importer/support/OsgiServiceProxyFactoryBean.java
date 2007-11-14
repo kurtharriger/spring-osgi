@@ -19,6 +19,7 @@ import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.internal.aop.OsgiServiceDynamicInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.OsgiServiceTCCLInterceptor;
@@ -41,22 +42,17 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
-	protected RetryTemplate retryTemplate = new RetryTemplate();
+	private RetryTemplate retryTemplate = new RetryTemplate();
 
+	/** proxy casted to a specific interface to allow specific method calls */
 	private ImportedOsgiServiceProxy proxy;
+
+	/** proxy infrastructure hook exposed to allow clean up*/
+	private DisposableBean disposable;
 
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(getInterfaces()) ? Object.class
 				: getInterfaces()[0]));
-	}
-
-	public Object getObject() {
-		proxy = (ImportedOsgiServiceProxy) super.getObject();
-		return proxy;
-	}
-
-	public void destroy() throws Exception {
-		// FIXME: implement cleanup
 	}
 
 	public boolean isSatisfied() {
@@ -99,7 +95,14 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 			}
 		};
 
-		return creator.createServiceProxy(lookupAdvice.getServiceReference());
+		disposable = lookupAdvice;
+
+		proxy = (ImportedOsgiServiceProxy) creator.createServiceProxy(lookupAdvice.getServiceReference());
+		return proxy;
+	}
+
+	DisposableBean getDisposable() {
+		return disposable;
 	}
 
 	/**

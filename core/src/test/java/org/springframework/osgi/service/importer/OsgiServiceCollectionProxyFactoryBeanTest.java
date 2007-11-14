@@ -38,7 +38,7 @@ import org.springframework.osgi.util.OsgiFilterUtils;
  * @author Costin Leau
  * 
  */
-public class OsgiMultiServiceProxyFactoryBeanTest extends TestCase {
+public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 
 	private OsgiServiceCollectionProxyFactoryBean serviceFactoryBean;
 
@@ -83,7 +83,9 @@ public class OsgiMultiServiceProxyFactoryBeanTest extends TestCase {
 		serviceFactoryBean.setListeners(listeners);
 		serviceFactoryBean.afterPropertiesSet();
 
-		assertSame(listeners, TestUtils.getFieldValue(serviceFactoryBean.getObject(), "listeners"));
+		serviceFactoryBean.getObject();
+		Object exposedProxy = TestUtils.getFieldValue(serviceFactoryBean, "exposedProxy");
+		assertSame(listeners, TestUtils.getFieldValue(exposedProxy, "listeners"));
 	}
 
 	public void testMandatoryServiceAtStartupFailure() throws Exception {

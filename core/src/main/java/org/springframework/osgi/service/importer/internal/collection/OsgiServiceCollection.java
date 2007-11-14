@@ -28,6 +28,7 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
@@ -48,7 +49,7 @@ import org.springframework.util.Assert;
  * @see Collection
  * @author Costin Leau
  */
-public class OsgiServiceCollection implements Collection, InitializingBean, CollectionProxy {
+public class OsgiServiceCollection implements Collection, InitializingBean, CollectionProxy, DisposableBean {
 
 	/**
 	 * Listener tracking the OSGi services which form the dynamic collection.
@@ -189,6 +190,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	private final ServiceProxyCreator proxyCreator;
 
 	private OsgiServiceLifecycleListener[] listeners = new OsgiServiceLifecycleListener[0];
+	
+	private final ServiceListener listener;
 
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader,
 			ServiceProxyCreator proxyCreator) {
@@ -200,6 +203,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		this.classLoader = classLoader;
 
 		this.proxyCreator = proxyCreator;
+		listener = new Listener();
 	}
 
 	public void afterPropertiesSet() {
@@ -210,13 +214,19 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 		if (trace)
 			log.trace("adding osgi listener for services matching [" + filter + "]");
-		OsgiListenerUtils.addServiceListener(context, new Listener(), filter);
+		OsgiListenerUtils.addServiceListener(context, listener, filter);
 
 		if (serviceRequiredAtStartup) {
 			if (trace)
 				log.trace("1..x cardinality - looking for service [" + filter + "] at startup...");
 			mandatoryServiceCheck();
 		}
+	}
+
+	public void destroy() {
+		OsgiListenerUtils.removeServiceListener(context, listener);
+		serviceProxies.clear();
+		servicesIdMap.clear();
 	}
 
 	/**

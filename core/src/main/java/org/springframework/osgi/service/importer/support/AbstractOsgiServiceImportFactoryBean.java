@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.service.importer.support;
 
+import java.lang.reflect.Proxy;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
@@ -42,8 +44,8 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDependableServiceImporter implements SmartFactoryBean,
-		InitializingBean, DisposableBean, BundleContextAware, BeanClassLoaderAware {
+public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDependableServiceImporter implements
+		SmartFactoryBean, InitializingBean, DisposableBean, BundleContextAware, BeanClassLoaderAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
 
@@ -147,8 +149,21 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 		return unifiedFilter;
 	}
 
-	public abstract void destroy() throws Exception;
+	public void destroy() throws Exception {
+		DisposableBean bean = getDisposable();
+		if (bean != null) {
+			bean.destroy();
+		}
+		proxy = null;
+	}
 
+	/**
+	 * Hook for getting a disposable instance backing the proxy returned to the
+	 * user.
+	 * 
+	 * @return disposable bean for cleaning the proxy
+	 */
+	abstract DisposableBean getDisposable();
 
 	/**
 	 * The type that the OSGi service was registered with.
@@ -257,7 +272,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 
 	/**
 	 * Returns the contextClassLoader.
-	 *
+	 * 
 	 * @return Returns the contextClassLoader
 	 */
 	public ImportContextClassLoader getContextClassLoader() {
