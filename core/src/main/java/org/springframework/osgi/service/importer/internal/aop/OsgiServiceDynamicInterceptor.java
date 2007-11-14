@@ -24,6 +24,7 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.dependency.DependableServiceImporter;
@@ -51,7 +52,7 @@ import org.springframework.util.ObjectUtils;
  * 
  * @author Costin Leau
  */
-public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements InitializingBean {
+public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements InitializingBean, DisposableBean {
 
 	/**
 	 * Listener tracking the OSGi services which form the dynamic reference.
@@ -232,6 +233,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 
 	private final ServiceReferenceDelegate referenceDelegate;
 
+	private final ServiceListener listener;
+
 	private boolean serviceRequiredAtStartup = true;
 
 	/** utility service wrapper */
@@ -255,6 +258,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 		this.classLoader = classLoader;
 
 		referenceDelegate = new ServiceReferenceDelegate();
+		listener = new Listener();
 	}
 
 	public Object getTarget() {
@@ -288,13 +292,21 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 
 		if (debug)
 			log.debug("adding osgi mandatoryListeners for services matching [" + filter + "]");
-		OsgiListenerUtils.addServiceListener(bundleContext, new Listener(), filter);
+		OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
 		if (serviceRequiredAtStartup) {
 			if (debug)
 				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
 			Object target = getTarget();
 			if (debug)
 				log.debug("service retrieved " + target);
+		}
+	}
+
+	public void destroy() throws Exception {
+		OsgiListenerUtils.removeServiceListener(bundleContext, listener);
+		synchronized (this) {
+			if (wrapper != null)
+				wrapper.cleanup();
 		}
 	}
 

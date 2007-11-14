@@ -15,12 +15,18 @@
  */
 package org.springframework.osgi.service.importer.support;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.internal.collection.CollectionProxy;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
@@ -47,8 +53,16 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 
 	private static final Log log = LogFactory.getLog(OsgiServiceCollectionProxyFactoryBean.class);
 
-	private CollectionProxy proxy;
+	/** actual proxy - acts as a shield around the spring managed collection to limit the number of exposed methods */
+	private Collection proxy;
 
+	/** proxy casted to a specific interface to allow specific method calls */
+	private CollectionProxy exposedProxy;
+
+	/** proxy infrastructure hook exposed to allow clean up*/
+	private DisposableBean disposable;
+
+	/** proxy creator */
 	private ServiceProxyCreator proxyCreator;
 
 	private Comparator comparator;
@@ -64,25 +78,18 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 				getContextClassLoader());
 	}
 
-	public Object getObject() {
-		proxy = (CollectionProxy) super.getObject();
-		return proxy;
-	}
-
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : collectionType.getCollectionClass());
 	}
 
 	public boolean isSatisfied() {
-		return (proxy == null ? true : proxy.isSatisfied());
-	}
-
-	public void destroy() throws Exception {
-		// FIXME: do cleanup
+		return (exposedProxy == null ? true : exposedProxy.isSatisfied());
 	}
 
 	/**
-	 * Create the managed-collection given the existing settings.
+	 * Create the managed-collection given the existing settings. This method
+	 * creates the osgi managed collection and wraps it with an unmodifiable map
+	 * to prevent exposing infrastructure methods and write access.
 	 * 
 	 * @param filter OSGi filter
 	 * @return importer proxy
@@ -92,6 +99,8 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 			log.debug("creating a multi-value/collection proxy");
 
 		OsgiServiceCollection collection;
+		Collection delegate;
+
 		BundleContext bundleContext = getBundleContext();
 		ClassLoader classLoader = getBeanClassLoader();
 		Filter filter = getUnifiedFilter();
@@ -99,17 +108,23 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 		if (CollectionType.LIST.equals(collectionType)) {
 			collection = (comparator == null ? new OsgiServiceList(filter, bundleContext, classLoader, proxyCreator)
 					: new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, proxyCreator));
+			delegate = Collections.unmodifiableList((List) collection);
 		}
 		else if (CollectionType.SET.equals(collectionType)) {
 			collection = (comparator == null ? new OsgiServiceSet(filter, bundleContext, classLoader, proxyCreator)
 					: new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, proxyCreator));
+
+			delegate = Collections.unmodifiableSet((Set) collection);
 		}
 		else if (CollectionType.SORTED_LIST.equals(collectionType)) {
 			collection = new OsgiServiceSortedList(filter, bundleContext, classLoader, comparator, proxyCreator);
+
+			delegate = Collections.unmodifiableList((List) collection);
 		}
 
 		else if (CollectionType.SORTED_SET.equals(collectionType)) {
 			collection = new OsgiServiceSortedSet(filter, bundleContext, classLoader, comparator, proxyCreator);
+			delegate = Collections.unmodifiableSortedSet((SortedSet) collection);
 		}
 
 		else {
@@ -120,7 +135,15 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 		collection.setListeners(getListeners());
 		collection.afterPropertiesSet();
 
-		return collection;
+		proxy = delegate;
+		exposedProxy = collection;
+		disposable = collection;
+		
+		return delegate;
+	}
+
+	DisposableBean getDisposable() {
+		return disposable;
 	}
 
 	/**

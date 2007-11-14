@@ -15,11 +15,11 @@
  */
 package org.springframework.osgi.service.importer.support;
 
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+
 import org.springframework.core.enums.StaticLabeledEnum;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceList;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSet;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedList;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedSet;
 
 /**
  * Enumeration-like class which indicates the supported OSGi service collection
@@ -40,13 +40,13 @@ public class CollectionType extends StaticLabeledEnum {
 	 * Spring-managed list.
 	 * @see java.util.List
 	 */
-	public static final CollectionType LIST = new CollectionType(2, "LIST", OsgiServiceList.class);
+	public static final CollectionType LIST = new CollectionType(2, "LIST", List.class);
 
 	/**
 	 * Spring-managed set.
 	 * @see java.util.Set
 	 */
-	public static final CollectionType SET = new CollectionType(3, "SET", OsgiServiceSet.class);
+	public static final CollectionType SET = new CollectionType(3, "SET", Set.class);
 
 	/**
 	 * Spring-managed sorted list.
@@ -56,7 +56,7 @@ public class CollectionType extends StaticLabeledEnum {
 	 * @see java.util.List
 	 * @see java.util.SortedSet
 	 */
-	public static final CollectionType SORTED_LIST = new CollectionType(4, "SORTED_LIST", OsgiServiceSortedList.class);
+	public static final CollectionType SORTED_LIST = new CollectionType(4, "SORTED_LIST", List.class);
 
 	/**
 	 * Spring-managed sorted Set.
@@ -65,7 +65,7 @@ public class CollectionType extends StaticLabeledEnum {
 	 * @see java.util.Comparator
 	 * @see java.util.SortedSet
 	 */
-	public static final CollectionType SORTED_SET = new CollectionType(5, "SORTED_SET", OsgiServiceSortedSet.class);
+	public static final CollectionType SORTED_SET = new CollectionType(5, "SORTED_SET", SortedSet.class);
 
 	/** collection type */
 	private final Class collectionClass;
@@ -75,7 +75,7 @@ public class CollectionType extends StaticLabeledEnum {
 	 * 
 	 * @return collection class
 	 */
-	public Class getCollectionClass() {
+	Class getCollectionClass() {
 		return collectionClass;
 	}
 
