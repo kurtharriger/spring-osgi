@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
@@ -38,7 +39,8 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 		// execute retries fast
 		fb.setRetryTimes(1);
 		fb.setTimeout(1);
-		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
+		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
+			ProxyFactory.class.getClassLoader());
 		fb.setBeanClassLoader(classLoader);
 	}
 

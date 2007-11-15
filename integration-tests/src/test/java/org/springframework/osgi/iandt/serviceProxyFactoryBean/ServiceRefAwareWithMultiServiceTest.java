@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
@@ -38,7 +39,8 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 	protected void onSetUp() throws Exception {
 		fb = new OsgiServiceCollectionProxyFactoryBean();
 		fb.setBundleContext(bundleContext);
-		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
+		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
+			ProxyFactory.class.getClassLoader());
 		fb.setBeanClassLoader(classLoader);
 	}
 

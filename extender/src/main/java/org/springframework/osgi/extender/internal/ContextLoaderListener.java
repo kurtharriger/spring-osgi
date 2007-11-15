@@ -300,9 +300,9 @@ public class ContextLoaderListener implements BundleActivator {
 	private boolean isClosed = false;
 
 	/**
-	 * wait 3 seconds for each context to close
+	 * wait 15 seconds for each context to close
 	 */
-	private static long SHUTDOWN_WAIT_TIME = 3 * 1000;
+	private static long SHUTDOWN_WAIT_TIME = 15 * 1000;
 
 	/**
 	 * this extender version

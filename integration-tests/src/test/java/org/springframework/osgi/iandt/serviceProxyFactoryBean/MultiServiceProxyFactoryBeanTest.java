@@ -24,6 +24,7 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
@@ -37,7 +38,8 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 	protected void onSetUp() throws Exception {
 		fb = new OsgiServiceCollectionProxyFactoryBean();
 		fb.setBundleContext(bundleContext);
-		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
+		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
+			ProxyFactory.class.getClassLoader());
 		fb.setBeanClassLoader(classLoader);
 	}
 

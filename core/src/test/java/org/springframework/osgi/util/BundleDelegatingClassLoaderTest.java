@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.osgi.framework.Bundle;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
 /**
@@ -31,13 +32,16 @@ import org.springframework.osgi.util.BundleDelegatingClassLoader;
 public class BundleDelegatingClassLoaderTest extends TestCase {
 
 	private BundleDelegatingClassLoader classLoader;
+
 	private MockControl bundleCtrl;
+
 	private Bundle bundle;
 
 	protected void setUp() throws Exception {
 		bundleCtrl = MockControl.createStrictControl(Bundle.class);
 		bundle = (Bundle) bundleCtrl.getMock();
-		classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
+		classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle,
+			ProxyFactory.class.getClassLoader());
 		bundleCtrl.reset();
 	}
 
@@ -53,9 +57,10 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 
 		assertFalse(classLoader.equals(new Object()));
 		assertEquals(classLoader, classLoader);
-		assertTrue(classLoader.equals(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle)));
+		assertTrue(classLoader.equals(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle,
+			ProxyFactory.class.getClassLoader())));
 
-		//assertEquals(bundle.hashCode(), clientClassLoader.hashCode());
+		// assertEquals(bundle.hashCode(), clientClassLoader.hashCode());
 	}
 
 	public void testFindClass() throws Exception {
@@ -63,8 +68,8 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 		String anotherClassName = "bar.foo";
 		bundleCtrl.expectAndReturn(bundle.loadClass(className), Object.class);
 		bundleCtrl.expectAndThrow(bundle.loadClass(anotherClassName), new ClassNotFoundException());
-        bundleCtrl.expectAndReturn(bundle.getSymbolicName(), "Test Bundle Symbolic Name");
-        bundleCtrl.replay();
+		bundleCtrl.expectAndReturn(bundle.getSymbolicName(), "Test Bundle Symbolic Name");
+		bundleCtrl.replay();
 
 		assertSame(Object.class, classLoader.findClass(className));
 

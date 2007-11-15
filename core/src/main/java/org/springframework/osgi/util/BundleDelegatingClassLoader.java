@@ -25,11 +25,13 @@ import java.util.Enumeration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
- * ClassLoader backed by an OSGi bundle. Will use the Bundle class loading.
+ * ClassLoader backed by an OSGi bundle. Provides the ability to use a separate
+ * classloader as fallback.
+ * 
  * Contains facilities for tracing class loading behaviour so that issues can be
  * easily resolved.
  * 
@@ -47,10 +49,26 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	private final Bundle backingBundle;
 
+	/**
+	 * Factory method for creating a class loader over the given bundle.
+	 * 
+	 * @param aBundle bundle to use for class loading and resource acquisition
+	 * @return class loader adapter over the given bundle
+	 */
 	public static BundleDelegatingClassLoader createBundleClassLoaderFor(Bundle aBundle) {
-		return createBundleClassLoaderFor(aBundle, ProxyFactory.class.getClassLoader());
+		return createBundleClassLoaderFor(aBundle, null);
 	}
 
+	/**
+	 * Factory method for creating a class loader over the given bundle and with
+	 * a given class loader as fall-back. In case the bundle cannot find a class
+	 * or locate a resource, the given class loader will be used.
+	 * 
+	 * @param bundle bundle used for class loading and resource acquisition
+	 * @param bridge class loader used as fall back in case the bundle cannot
+	 * load a class or find a resource. Can be null
+	 * @return class loader adapter over the given bundle and class loader
+	 */
 	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle bundle, final ClassLoader bridge) {
 		return (BundleDelegatingClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
 			public Object run() {
@@ -59,6 +77,14 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		});
 	}
 
+	/**
+	 * Private constructor.
+	 * 
+	 * Constructs a new <code>BundleDelegatingClassLoader</code> instance.
+	 * 
+	 * @param bundle
+	 * @param bridgeLoader
+	 */
 	private BundleDelegatingClassLoader(Bundle bundle, ClassLoader bridgeLoader) {
 		super(null);
 		Assert.notNull(bundle, "bundle should be non-null");
@@ -75,10 +101,8 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 		final BundleDelegatingClassLoader bundleDelegatingClassLoader = (BundleDelegatingClassLoader) o;
 
-		if (backingBundle.equals(bundleDelegatingClassLoader.backingBundle))
-			return (bridge == null || bridge.equals(bundleDelegatingClassLoader.bridge));
-
-		return false;
+		return (backingBundle.equals(bundleDelegatingClassLoader.backingBundle) && ObjectUtils.nullSafeEquals(bridge,
+			bundleDelegatingClassLoader.bridge));
 	}
 
 	public int hashCode() {
@@ -160,11 +184,6 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 			resolveClass(clazz);
 		}
 		return clazz;
-	}
-
-	// For testing
-	public Bundle getBundle() {
-		return backingBundle;
 	}
 
 	public String toString() {

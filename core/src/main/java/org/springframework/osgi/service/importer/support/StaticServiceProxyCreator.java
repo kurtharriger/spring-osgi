@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
@@ -62,7 +63,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 		if (bundle == null)
 			return null;
 
-		return new ServiceTCCLInterceptor(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle));
+		return new ServiceTCCLInterceptor(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, ProxyFactory.class.getClassLoader()));
 	}
 
 	Class[] discoverProxyClasses(ServiceReference ref) {
