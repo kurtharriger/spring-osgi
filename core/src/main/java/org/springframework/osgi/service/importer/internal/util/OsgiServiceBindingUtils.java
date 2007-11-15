@@ -50,6 +50,8 @@ public abstract class OsgiServiceBindingUtils {
 				catch (Exception ex) {
 					log.warn("bind method on listener " + listeners[i] + " threw exception ", ex);
 				}
+				if (debug)
+					log.debug("called bind on " + listeners[i] + " w/ reference " + reference);
 			}
 		}
 	}
@@ -69,6 +71,8 @@ public abstract class OsgiServiceBindingUtils {
 				catch (Exception ex) {
 					log.warn("unbind method on listener " + listeners[i] + " threw exception ", ex);
 				}
+				if (debug)
+					log.debug("called bind on " + listeners[i] + " w/ reference " + reference);
 			}
 		}
 	}

@@ -106,13 +106,19 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 				case (ServiceEvent.UNREGISTERING): {
 
 					boolean serviceRemoved = false;
+					/** used if the service goes down and there is no replacement */
+					/**
+					 * since the listeners will require a valid proxy, the
+					 * invalidation has to happen *after* calling the listeners
+					 */
+					ServiceWrapper oldWrapper = wrapper;
 
 					synchronized (ServiceDynamicInterceptor.this) {
 						// remove service
 						if (wrapper != null) {
 							if (serviceId == wrapper.getServiceId()) {
 								serviceRemoved = true;
-								wrapper.cleanup();
+								wrapper = null;
 
 							}
 						}
@@ -130,6 +136,10 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 					// if there is no reference left, call listeners
 					else {
 						if (serviceRemoved) {
+							
+							// reuse the old service for the time being
+							wrapper = oldWrapper;
+							
 							// update dependency manager
 							if (mandatoryListeners != null) {
 								for (int i = 0; i < mandatoryListeners.size(); i++) {
@@ -142,6 +152,9 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 							// inform listeners
 							OsgiServiceBindingUtils.callListenersUnbind(bundleContext, proxy, ref, listeners);
 
+							// clean up wrapper
+							wrapper = null;
+							
 							if (debug) {
 								String message = "service reference [" + ref + "] was unregistered";
 								if (serviceRemoved) {

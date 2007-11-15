@@ -19,8 +19,8 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 
 	protected String[] getTestBundlesNames() {
 		return new String[] {
-				"org.springframework.osgi,org.springframework.osgi.iandt.simple.service," + getSpringOsgiVersion(),
-				"org.springframework.osgi, org.springframework.osgi.iandt.service.listener," + getSpringOsgiVersion() };
+				"org.springframework.osgi,org.springframework.osgi.iandt.simple.service," + getSpringDMVersion(),
+				"org.springframework.osgi, org.springframework.osgi.iandt.service.listener," + getSpringDMVersion() };
 	}
 
 	public void testServiceListener() throws Exception {
