@@ -39,7 +39,7 @@ import org.springframework.osgi.service.importer.internal.collection.OsgiService
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSet;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedList;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedSet;
-import org.springframework.osgi.service.importer.internal.collection.comparator.OsgiServiceReferenceComparator;
+import org.springframework.osgi.service.importer.internal.collection.comparator.ServiceReferenceComparator;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 
 /**
@@ -155,7 +155,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		Comparator comp = getComparator(factoryBean);
 
 		assertNotNull(comp);
-		assertSame(OsgiServiceReferenceComparator.class, comp.getClass());
+		assertSame(ServiceReferenceComparator.class, comp.getClass());
 
 		Class[] intfs = getInterfaces(factoryBean);
 		assertTrue(Arrays.equals(new Class[] { Externalizable.class }, intfs));

@@ -26,26 +26,26 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.util.Assert;
 
 /**
  * ClassLoader backed by an OSGi bundle. Will use the Bundle class loading.
- * Contains facilities for tracing classloading behavior so that issues can be
- * easily resolved. Debugging can be enabled by setting the system property
- * <code>org.springframework.osgi.DebugClassLoading</code> to true.
+ * Contains facilities for tracing class loading behaviour so that issues can be
+ * easily resolved.
  * 
+ * For debugging please see {@link DebugUtils}.
  * 
  * @author Adrian Colyer
  * @author Andy Piper
  * @author Costin Leau
- * @since 2.0
  */
-// FIXME: move this out of context.support
 public class BundleDelegatingClassLoader extends ClassLoader {
-	private ClassLoader bridge;
-
-	private Bundle backingBundle;
 
 	private static final Log log = LogFactory.getLog(BundleDelegatingClassLoader.class);
+
+	private final ClassLoader bridge;
+
+	private final Bundle backingBundle;
 
 	public static BundleDelegatingClassLoader createBundleClassLoaderFor(Bundle aBundle) {
 		return createBundleClassLoaderFor(aBundle, ProxyFactory.class.getClassLoader());
@@ -61,6 +61,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	private BundleDelegatingClassLoader(Bundle bundle, ClassLoader bridgeLoader) {
 		super(null);
+		Assert.notNull(bundle, "bundle should be non-null");
 		this.backingBundle = bundle;
 		this.bridge = bridgeLoader;
 	}
@@ -93,20 +94,16 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 			return this.backingBundle.loadClass(name);
 		}
 		catch (ClassNotFoundException cnfe) {
-			if (log.isTraceEnabled()) {
-				DebugUtils.debugClassLoading(backingBundle, name, null);
-			}
+			DebugUtils.debugClassLoading(backingBundle, name, null);
 			throw new ClassNotFoundException(name + " not found from bundle [" + backingBundle.getSymbolicName() + "]",
 					cnfe);
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			// This is almost always an error
-			if (log.isTraceEnabled()) {
-				// This is caused by a dependent class failure,
-				// so make sure we search for the right one.
-				String cname = ncdfe.getMessage().replace('/', '.');
-				DebugUtils.debugClassLoading(backingBundle, cname, name);
-			}
+			// This is caused by a dependent class failure,
+			// so make sure we search for the right one.
+			String cname = ncdfe.getMessage().replace('/', '.');
+			DebugUtils.debugClassLoading(backingBundle, cname, name);
 			NoClassDefFoundError e = new NoClassDefFoundError(name + " not found from bundle ["
 					+ OsgiStringUtils.nullSafeNameAndSymName(backingBundle) + "]");
 			e.initCause(ncdfe);
@@ -142,19 +139,22 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	public URL getResource(String name) {
 		URL resource = findResource(name);
-		if (resource == null) {
+		if (bridge != null && resource == null) {
 			resource = bridge.getResource(name);
 		}
 		return resource;
 	}
 
 	protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
-		Class clazz;
+		Class clazz = null;
 		try {
 			clazz = findClass(name);
 		}
-		catch (ClassNotFoundException e) {
-			clazz = bridge.loadClass(name);
+		catch (ClassNotFoundException cnfe) {
+			if (bridge != null)
+				clazz = bridge.loadClass(name);
+			else
+				throw cnfe;
 		}
 		if (resolve) {
 			resolveClass(clazz);

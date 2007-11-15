@@ -11,9 +11,9 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * @author Costin Leau
  */
-public class OsgiServiceTCCLInterceptor implements MethodInterceptor {
+public class ServiceTCCLInterceptor implements MethodInterceptor {
 
-	private static final int hashCode = OsgiServiceTCCLInterceptor.class.hashCode() * 13;
+	private static final int hashCode = ServiceTCCLInterceptor.class.hashCode() * 13;
 
 	/** classloader to set the TCCL during invocation */
 	private final ClassLoader loader;
@@ -23,7 +23,7 @@ public class OsgiServiceTCCLInterceptor implements MethodInterceptor {
 	 * 
 	 * @param loader classloader to use for TCCL during invocation. Can be null.
 	 */
-	public OsgiServiceTCCLInterceptor(ClassLoader loader) {
+	public ServiceTCCLInterceptor(ClassLoader loader) {
 		this.loader = loader;
 	}
 
@@ -41,8 +41,8 @@ public class OsgiServiceTCCLInterceptor implements MethodInterceptor {
 	public boolean equals(Object other) {
 		if (this == other)
 			return true;
-		if (other instanceof OsgiServiceTCCLInterceptor) {
-			OsgiServiceTCCLInterceptor oth = (OsgiServiceTCCLInterceptor) other;
+		if (other instanceof ServiceTCCLInterceptor) {
+			ServiceTCCLInterceptor oth = (ServiceTCCLInterceptor) other;
 			return (ObjectUtils.nullSafeEquals(loader, oth.loader));
 		}
 		return false;

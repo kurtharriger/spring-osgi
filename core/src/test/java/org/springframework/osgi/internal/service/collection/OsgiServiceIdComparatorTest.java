@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.importer.internal.collection.comparator.OsgiServiceReferenceComparator;
+import org.springframework.osgi.service.importer.internal.collection.comparator.ServiceReferenceComparator;
 
 /**
  * @author Costin Leau
@@ -35,7 +35,7 @@ public class OsgiServiceIdComparatorTest extends TestCase {
 	private Comparator comparator;
 
 	protected void setUp() throws Exception {
-		comparator = new OsgiServiceReferenceComparator();
+		comparator = new ServiceReferenceComparator();
 	}
 
 	protected void tearDown() throws Exception {

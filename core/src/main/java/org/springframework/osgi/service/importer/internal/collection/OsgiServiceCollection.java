@@ -67,6 +67,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				Long serviceId = (Long) ref.getProperty(Constants.SERVICE_ID);
 				boolean collectionModified = false;
 
+				Object proxy = null;
 				switch (event.getType()) {
 
 				case (ServiceEvent.REGISTERED):
@@ -74,7 +75,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 					// same as ServiceEvent.REGISTERED
 					synchronized (serviceProxies) {
 						if (!servicesIdMap.containsKey(serviceId)) {
-							Object proxy = proxyCreator.createServiceProxy(ref);
+							 proxy = proxyCreator.createServiceProxy(ref);
 							// let the dynamic collection decide if the service
 							// is added or not (think set, sorted set)
 							if (serviceProxies.add(proxy)) {
@@ -86,13 +87,13 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 					// inform listeners
 					// TODO: should this be part of the lock also?
 					if (collectionModified)
-						OsgiServiceBindingUtils.callListenersBind(context, ref, listeners);
+						OsgiServiceBindingUtils.callListenersBind(context, proxy, ref, listeners);
 
 					break;
 				case (ServiceEvent.UNREGISTERING):
 					synchronized (serviceProxies) {
 						// remove service id / proxy association
-						Object proxy = servicesIdMap.remove(serviceId);
+						proxy = servicesIdMap.remove(serviceId);
 						if (proxy != null) {
 							// before removal, allow analysis
 							checkDeadProxies(proxy);
@@ -104,7 +105,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 					}
 					// TODO: should this be part of the lock also?
 					if (collectionModified)
-						OsgiServiceBindingUtils.callListenersUnbind(context, ref, listeners);
+						OsgiServiceBindingUtils.callListenersUnbind(context, proxy, ref, listeners);
 					break;
 
 				default:

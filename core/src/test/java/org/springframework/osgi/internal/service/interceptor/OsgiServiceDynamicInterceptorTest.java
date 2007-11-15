@@ -30,7 +30,8 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
 
 /**
  * @author Costin Leau
@@ -38,7 +39,7 @@ import org.springframework.osgi.service.importer.internal.aop.OsgiServiceDynamic
  */
 public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
-	private OsgiServiceDynamicInterceptor interceptor;
+	private ServiceDynamicInterceptor interceptor;
 
 	private ServiceReference reference, ref2, ref3;
 
@@ -111,18 +112,22 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 	}
 
 	private void createInterceptor(Filter filter) {
-		interceptor = new OsgiServiceDynamicInterceptor(ctx, filter, getClass().getClassLoader());
+		interceptor = new ServiceDynamicInterceptor(ctx, filter, getClass().getClassLoader());
 
 		interceptor.setRequiredAtStartup(false);
-		interceptor.afterPropertiesSet();
 
-		interceptor.getRetryTemplate().setRetryNumbers(3);
-		interceptor.getRetryTemplate().setWaitTime(1);
+		RetryTemplate template = new RetryTemplate();
+		template.setRetryNumbers(3);
+		template.setWaitTime(1);
+		interceptor.setRetryTemplate(template);
+		interceptor.setProxy(new Object());
+		
+		interceptor.afterPropertiesSet();
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#OsgiServiceDynamicInterceptor()}.
+	 * {@link org.springframework.osgi.service.interceptor.ServiceDynamicInterceptor#OsgiServiceDynamicInterceptor()}.
 	 */
 	public void testOsgiServiceDynamicInterceptor() {
 		assertNotNull(interceptor.getRetryTemplate());
@@ -130,7 +135,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#lookupService()}.
+	 * {@link org.springframework.osgi.service.interceptor.ServiceDynamicInterceptor#lookupService()}.
 	 */
 	public void testLookupService() throws Throwable {
 		Object serv = interceptor.getTarget();
@@ -139,7 +144,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#doInvoke(java.lang.Object, org.aopalliance.intercept.MethodInvocation)}.
+	 * {@link org.springframework.osgi.service.interceptor.ServiceDynamicInterceptor#doInvoke(java.lang.Object, org.aopalliance.intercept.MethodInvocation)}.
 	 */
 	public void testDoInvoke() throws Throwable {
 		Object target = new Object();
@@ -151,7 +156,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)}.
+	 * {@link org.springframework.osgi.service.interceptor.ServiceDynamicInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)}.
 	 */
 	public void testInvocationWhenServiceNA() throws Throwable {
 		// service n/a
@@ -208,7 +213,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#getTarget()}.
+	 * {@link org.springframework.osgi.service.interceptor.ServiceDynamicInterceptor#getTarget()}.
 	 */
 	public void testGetTarget() throws Throwable {
 		// add service
@@ -246,7 +251,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceDynamicInterceptor#afterPropertiesSet()}.
+	 * {@link org.springframework.osgi.service.interceptor.ServiceDynamicInterceptor#afterPropertiesSet()}.
 	 */
 	public void testAfterPropertiesSet() {
 		assertNotNull("should have initialized listener", listener);

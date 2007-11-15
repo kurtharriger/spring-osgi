@@ -21,9 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceDynamicInterceptor;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceTCCLInterceptor;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceProviderTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
+import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -47,7 +49,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	/** proxy casted to a specific interface to allow specific method calls */
 	private ImportedOsgiServiceProxy proxy;
 
-	/** proxy infrastructure hook exposed to allow clean up*/
+	/** proxy infrastructure hook exposed to allow clean up */
 	private DisposableBean disposable;
 
 	public Class getObjectType() {
@@ -66,20 +68,25 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		if (log.isDebugEnabled())
 			log.debug("creating a single service proxy ...");
 
-		final OsgiServiceDynamicInterceptor lookupAdvice = new OsgiServiceDynamicInterceptor(getBundleContext(),
+		// first create the TCCL interceptor to register its listener with the
+		// dynamic interceptor
+		final ServiceProviderTCCLInterceptor tcclAdvice = new ServiceProviderTCCLInterceptor();
+		final OsgiServiceLifecycleListener tcclListener = tcclAdvice.new ServiceProviderTCCLListener();
+
+		final ServiceDynamicInterceptor lookupAdvice = new ServiceDynamicInterceptor(getBundleContext(),
 				getUnifiedFilter(), getBeanClassLoader());
 
 		lookupAdvice.setRequiredAtStartup(isMandatory());
-		lookupAdvice.setListeners(getListeners());
+
+		OsgiServiceLifecycleListener[] listeners = addListener(getListeners(), tcclListener);
+
+		lookupAdvice.setListeners(listeners);
 		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
 
 		// add the listeners as a list since it might be updated after the proxy
 		// has been created
 		lookupAdvice.setDependencyListeners(this.depedencyListeners);
 		lookupAdvice.setServiceImporter(this);
-
-		// init target-source
-		lookupAdvice.afterPropertiesSet();
 
 		// create a proxy creator using the existing context
 		ServiceProxyCreator creator = new AbstractServiceProxyCreator(getInterfaces(), getBeanClassLoader(),
@@ -91,14 +98,36 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 
 			Advice createServiceProviderTCCLAdvice(ServiceReference reference) {
 				// FIXME: OSGI-276
-				return new OsgiServiceTCCLInterceptor(null);
+				return tcclAdvice;
 			}
 		};
 
 		disposable = lookupAdvice;
 
 		proxy = (ImportedOsgiServiceProxy) creator.createServiceProxy(lookupAdvice.getServiceReference());
+
+		lookupAdvice.setProxy(proxy);
+		// start the lookup only after the proxy has been assembled
+		lookupAdvice.afterPropertiesSet();
+
 		return proxy;
+	}
+
+	/**
+	 * Add the given listener to the array but in the first position.
+	 * 
+	 * @param listeners
+	 * @param listener
+	 * @return
+	 */
+	private OsgiServiceLifecycleListener[] addListener(OsgiServiceLifecycleListener[] listeners,
+			OsgiServiceLifecycleListener listener) {
+
+		int size = (listeners == null ? 1 : listeners.length + 1);
+		OsgiServiceLifecycleListener[] list = new OsgiServiceLifecycleListener[size];
+		list[0] = listener;
+		System.arraycopy(listeners, 0, list, 1, listeners.length);
+		return list;
 	}
 
 	DisposableBean getDisposable() {
