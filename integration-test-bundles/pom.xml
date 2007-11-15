@@ -54,6 +54,7 @@
     <module>configuration.test.bundle</module>
     <module>extender.version.bundle</module>
     <module>config.bundle</module>
+    <module>tccl.bundle</module>
   </modules>
 
 <profiles>
