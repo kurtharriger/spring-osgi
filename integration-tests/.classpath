@@ -28,5 +28,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.0/org.osgi.core-4.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.0-rc1-SNAPSHOT/spring-osgi-core-1.0-rc1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/TCCL Integration Tests"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>

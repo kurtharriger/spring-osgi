@@ -18,7 +18,7 @@ package org.springframework.osgi.internal.service.interceptor;
 import junit.framework.TestCase;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceInvoker;
+import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
 
 /**
  * @author Costin Leau
@@ -26,7 +26,7 @@ import org.springframework.osgi.service.importer.internal.aop.OsgiServiceInvoker
  */
 public class OsgiServiceInvokerTest extends TestCase {
 
-	private OsgiServiceInvoker invoker;
+	private ServiceInvoker invoker;
 
 	private Object target;
 
@@ -36,7 +36,7 @@ public class OsgiServiceInvokerTest extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		target = new Object();
-		invoker = new OsgiServiceInvoker() {
+		invoker = new ServiceInvoker() {
 			protected Object getTarget() {
 				return target;
 			}
@@ -55,7 +55,7 @@ public class OsgiServiceInvokerTest extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.osgi.service.interceptor.OsgiServiceInvoker#invoke(org.aopalliance.intercept.MethodInvocation)}.
+	 * {@link org.springframework.osgi.service.interceptor.ServiceInvoker#invoke(org.aopalliance.intercept.MethodInvocation)}.
 	 */
 	public void testInvoke() throws Throwable {
 		MethodInvocation invocation = new MockMethodInvocation(Object.class.getMethod("hashCode", null));

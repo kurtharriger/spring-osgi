@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public abstract class OsgiServiceInvoker implements MethodInterceptor, ServiceReferenceProvider {
+public abstract class ServiceInvoker implements MethodInterceptor, ServiceReferenceProvider {
 
 	protected transient final Log log = LogFactory.getLog(getClass());
 

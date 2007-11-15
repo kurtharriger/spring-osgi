@@ -26,7 +26,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceStaticInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
 
 /**
  * @author Costin Leau
@@ -34,7 +34,7 @@ import org.springframework.osgi.service.importer.internal.aop.OsgiServiceStaticI
  */
 public class OsgiServiceStaticInterceptorTest extends TestCase {
 
-	private OsgiServiceStaticInterceptor interceptor;
+	private ServiceStaticInterceptor interceptor;
 
 	private Object service;
 
@@ -51,7 +51,7 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 			}
 		};
 
-		interceptor = new OsgiServiceStaticInterceptor(ctx, reference);
+		interceptor = new ServiceStaticInterceptor(ctx, reference);
 	}
 
 	protected void tearDown() throws Exception {
@@ -61,7 +61,7 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 
 	public void testNullWrapper() throws Exception {
 		try {
-			interceptor = new OsgiServiceStaticInterceptor(null, null);
+			interceptor = new ServiceStaticInterceptor(null, null);
 			fail("expected exception");
 		}
 		catch (RuntimeException ex) {
@@ -85,7 +85,7 @@ public class OsgiServiceStaticInterceptorTest extends TestCase {
 			}
 		};
 
-		interceptor = new OsgiServiceStaticInterceptor(new MockBundleContext(), reference);
+		interceptor = new ServiceStaticInterceptor(new MockBundleContext(), reference);
 
 		Object target = new Object();
 		Method m = target.getClass().getDeclaredMethod("hashCode", null);

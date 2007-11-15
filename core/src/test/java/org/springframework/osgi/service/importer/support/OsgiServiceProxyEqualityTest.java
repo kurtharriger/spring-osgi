@@ -26,9 +26,9 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceDynamicInterceptor;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceStaticInterceptor;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceTCCLInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
 import org.springframework.util.ObjectUtils;
 
@@ -36,7 +36,7 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceProxyEquality extends TestCase {
+public class OsgiServiceProxyEqualityTest extends TestCase {
 
 	private Object target;
 
@@ -124,16 +124,18 @@ public class OsgiServiceProxyEquality extends TestCase {
 		return factory.getProxy();
 	}
 
-	private OsgiServiceDynamicInterceptor createInterceptorWServiceRequired() {
-		OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(bundleContext, null, classLoader);
+	private ServiceDynamicInterceptor createInterceptorWServiceRequired() {
+		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext, null, classLoader);
 		interceptor.setRequiredAtStartup(true);
+		interceptor.setProxy(new Object());
 		interceptor.afterPropertiesSet();
 		return interceptor;
 	}
 
-	private OsgiServiceDynamicInterceptor createInterceptorWOServiceRequired() {
-		OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(bundleContext, null, classLoader);
+	private ServiceDynamicInterceptor createInterceptorWOServiceRequired() {
+		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext, null, classLoader);
 		interceptor.setRequiredAtStartup(false);
+		interceptor.setProxy(new Object());
 		interceptor.afterPropertiesSet();
 		return interceptor;
 
@@ -174,11 +176,11 @@ public class OsgiServiceProxyEquality extends TestCase {
 		Advice interceptorA1 = createInterceptorWOServiceRequired();
 
 		Advice interceptorA2 = new LocalBundleContextAdvice(bundleContext);
-		Advice interceptorA3 = new OsgiServiceTCCLInterceptor(null);
+		Advice interceptorA3 = new ServiceTCCLInterceptor(null);
 
 		Advice interceptorB1 = createInterceptorWOServiceRequired();
 		Advice interceptorB2 = new LocalBundleContextAdvice(bundleContext);
-		Advice interceptorB3 = new OsgiServiceTCCLInterceptor(null);
+		Advice interceptorB3 = new ServiceTCCLInterceptor(null);
 
 		Object proxyA = createProxy(target, Shape.class, new Advice[] { interceptorA1, interceptorA2, interceptorA3 });
 		Object proxyB = createProxy(target, Shape.class, new Advice[] { interceptorB1, interceptorB2, interceptorB3 });
@@ -202,10 +204,10 @@ public class OsgiServiceProxyEquality extends TestCase {
 			}
 		};
 
-		OsgiServiceDynamicInterceptor interceptorA1 = createInterceptorWServiceRequired();
+		ServiceDynamicInterceptor interceptorA1 = createInterceptorWServiceRequired();
 		interceptorA1.setRetryTemplate(new RetryTemplate(1, 10));
 
-		Advice interceptorB1 = new OsgiServiceStaticInterceptor(bundleContext, new MockServiceReference());
+		Advice interceptorB1 = new ServiceStaticInterceptor(bundleContext, new MockServiceReference());
 
 		InterfaceWithEquals proxyA = (InterfaceWithEquals) createProxy(target, InterfaceWithEquals.class,
 			new Advice[] { interceptorA1 });
@@ -225,7 +227,7 @@ public class OsgiServiceProxyEquality extends TestCase {
 		target = new Implementor();
 
 		Advice interceptorA1 = new LocalBundleContextAdvice(bundleContext);
-		Advice interceptorB1 = new OsgiServiceTCCLInterceptor(null);
+		Advice interceptorB1 = new ServiceTCCLInterceptor(null);
 
 		InterfaceWithEquals proxyA = (InterfaceWithEquals) createProxy(target, InterfaceWithEquals.class,
 			new Advice[] { interceptorA1 });

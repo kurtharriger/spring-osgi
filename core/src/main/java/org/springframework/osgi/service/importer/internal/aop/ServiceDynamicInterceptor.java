@@ -37,6 +37,7 @@ import org.springframework.osgi.service.importer.internal.support.ServiceWrapper
 import org.springframework.osgi.service.importer.internal.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -52,7 +53,7 @@ import org.springframework.util.ObjectUtils;
  * 
  * @author Costin Leau
  */
-public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements InitializingBean, DisposableBean {
+public class ServiceDynamicInterceptor extends ServiceInvoker implements InitializingBean, DisposableBean {
 
 	/**
 	 * Listener tracking the OSGi services which form the dynamic reference.
@@ -87,7 +88,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 					// same as ServiceEvent.REGISTERED
 					if (updateWrapperIfNecessary(ref, serviceId, ranking)) {
 						// inform listeners
-						OsgiServiceBindingUtils.callListenersBind(bundleContext, ref, listeners);
+						OsgiServiceBindingUtils.callListenersBind(bundleContext, proxy, ref, listeners);
 
 						// update dependency manager
 						if (mandatoryListeners != null) {
@@ -106,7 +107,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 
 					boolean serviceRemoved = false;
 
-					synchronized (OsgiServiceDynamicInterceptor.this) {
+					synchronized (ServiceDynamicInterceptor.this) {
 						// remove service
 						if (wrapper != null) {
 							if (serviceId == wrapper.getServiceId()) {
@@ -139,7 +140,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 								}
 							}
 							// inform listeners
-							OsgiServiceBindingUtils.callListenersUnbind(bundleContext, ref, listeners);
+							OsgiServiceBindingUtils.callListenersUnbind(bundleContext, proxy, ref, listeners);
 
 							if (debug) {
 								String message = "service reference [" + ref + "] was unregistered";
@@ -174,7 +175,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 		private boolean updateWrapperIfNecessary(ServiceReference ref, long serviceId, int serviceRanking) {
 			boolean updated = false;
 			try {
-				synchronized (OsgiServiceDynamicInterceptor.this) {
+				synchronized (ServiceDynamicInterceptor.this) {
 					if (wrapper != null && wrapper.isServiceAlive()) {
 						// we have a new service
 						if (serviceRanking > wrapper.getServiceRanking()) {
@@ -195,7 +196,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 						updated = true;
 						updateReferenceHolders(ref);
 					}
-					OsgiServiceDynamicInterceptor.this.notifyAll();
+					ServiceDynamicInterceptor.this.notifyAll();
 					return updated;
 				}
 			}
@@ -222,7 +223,7 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 		}
 	}
 
-	private static final int hashCode = OsgiServiceDynamicInterceptor.class.hashCode() * 13;
+	private static final int hashCode = ServiceDynamicInterceptor.class.hashCode() * 13;
 
 	private final BundleContext bundleContext;
 
@@ -252,7 +253,10 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 	/** listener that need to be informed of bind/rebind/unbind */
 	private OsgiServiceLifecycleListener[] listeners = new OsgiServiceLifecycleListener[0];
 
-	public OsgiServiceDynamicInterceptor(BundleContext context, Filter filter, ClassLoader classLoader) {
+	/** reference to the created proxy passed to the listeners */
+	private Object proxy;
+
+	public ServiceDynamicInterceptor(BundleContext context, Filter filter, ClassLoader classLoader) {
 		this.bundleContext = context;
 		this.filter = filter;
 		this.classLoader = classLoader;
@@ -286,6 +290,8 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 	}
 
 	public void afterPropertiesSet() {
+		Assert.notNull(proxy);
+		
 		boolean debug = log.isDebugEnabled();
 		if (retryTemplate == null)
 			retryTemplate = new RetryTemplate();
@@ -342,11 +348,15 @@ public class OsgiServiceDynamicInterceptor extends OsgiServiceInvoker implements
 		this.serviceRequiredAtStartup = requiredAtStartup;
 	}
 
+	public void setProxy(Object proxy) {
+		this.proxy = proxy;
+	}
+
 	public boolean equals(Object other) {
 		if (this == other)
 			return true;
-		if (other instanceof OsgiServiceDynamicInterceptor) {
-			OsgiServiceDynamicInterceptor oth = (OsgiServiceDynamicInterceptor) other;
+		if (other instanceof ServiceDynamicInterceptor) {
+			ServiceDynamicInterceptor oth = (ServiceDynamicInterceptor) other;
 			return (serviceRequiredAtStartup == oth.serviceRequiredAtStartup
 					&& ObjectUtils.nullSafeEquals(wrapper, oth.wrapper)
 					&& ObjectUtils.nullSafeEquals(filter, oth.filter)

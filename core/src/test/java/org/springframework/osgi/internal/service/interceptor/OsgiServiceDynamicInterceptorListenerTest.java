@@ -28,7 +28,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
 
 /**
@@ -40,7 +40,7 @@ import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
  */
 public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 
-	private OsgiServiceDynamicInterceptor interceptor;
+	private ServiceDynamicInterceptor interceptor;
 
 	private OsgiServiceLifecycleListener listener;
 
@@ -64,9 +64,11 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 			}
 		};
 
-		interceptor = new OsgiServiceDynamicInterceptor(bundleContext, null, getClass().getClassLoader());
+		interceptor = new ServiceDynamicInterceptor(bundleContext, null, getClass().getClassLoader());
 		interceptor.setListeners(new OsgiServiceLifecycleListener[] { listener });
 		interceptor.setRequiredAtStartup(false);
+		interceptor.setProxy(new Object());
+		
 		RetryTemplate tmpl = new RetryTemplate();
 		tmpl.setRetryNumbers(1);
 		tmpl.setWaitTime(1);

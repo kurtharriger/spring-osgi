@@ -26,7 +26,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.importer.internal.aop.ImportedOsgiServiceProxyAdvice;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceTCCLInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -73,7 +73,7 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 		this.classLoader = classLoader;
 		this.iccl = iccl;
 
-		clientTCCLAdvice = new OsgiServiceTCCLInterceptor(classLoader);
+		clientTCCLAdvice = new ServiceTCCLInterceptor(classLoader);
 		invokerBundleContextAdvice = new LocalBundleContextAdvice(bundleContext);
 	}
 

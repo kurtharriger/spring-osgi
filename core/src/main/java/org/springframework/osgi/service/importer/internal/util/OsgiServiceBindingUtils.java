@@ -35,12 +35,10 @@ public abstract class OsgiServiceBindingUtils {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceBindingUtils.class);
 
-	public static void callListenersBind(BundleContext context, ServiceReference reference,
+	public static void callListenersBind(BundleContext context, Object serviceProxy, ServiceReference reference,
 			OsgiServiceLifecycleListener[] listeners) {
 		if (!ObjectUtils.isEmpty(listeners)) {
 			boolean debug = log.isDebugEnabled();
-			Object service = OsgiServiceUtils.getService(context, reference);
-			// TODO: is snapshot enough or should we use the dynamic lookup?
 
 			// get a Dictionary implementing a Map
 			Dictionary properties = OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
@@ -48,7 +46,7 @@ public abstract class OsgiServiceBindingUtils {
 				if (debug)
 					log.debug("calling bind on " + listeners[i] + " w/ reference " + reference);
 				try {
-					listeners[i].bind(service, (Map) properties);
+					listeners[i].bind(serviceProxy, (Map) properties);
 				}
 				catch (Exception ex) {
 					log.warn("bind method on listener " + listeners[i] + " threw exception ", ex);
@@ -57,18 +55,17 @@ public abstract class OsgiServiceBindingUtils {
 		}
 	}
 
-	public static void callListenersUnbind(BundleContext context, ServiceReference reference,
+	public static void callListenersUnbind(BundleContext context, Object serviceProxy, ServiceReference reference,
 			OsgiServiceLifecycleListener[] listeners) {
 		if (!ObjectUtils.isEmpty(listeners)) {
 			boolean debug = log.isDebugEnabled();
-			Object service = OsgiServiceUtils.getService(context, reference);
 			// get a Dictionary implementing a Map
 			Dictionary properties = OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
 			for (int i = 0; i < listeners.length; i++) {
 				if (debug)
 					log.debug("calling unbind on " + listeners[i] + " w/ reference " + reference);
 				try {
-					listeners[i].unbind(service, (Map) properties);
+					listeners[i].unbind(serviceProxy, (Map) properties);
 				}
 				catch (Exception ex) {
 					log.warn("unbind method on listener " + listeners[i] + " threw exception ", ex);

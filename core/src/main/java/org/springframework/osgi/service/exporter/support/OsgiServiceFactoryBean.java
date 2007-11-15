@@ -41,7 +41,7 @@ import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceTCCLInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
@@ -200,7 +200,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		// mold the proxy
 		ClassUtils.configureFactoryForClass(factory, interfaces);
 
-		factory.addAdvice(new OsgiServiceTCCLInterceptor(classLoader));
+		factory.addAdvice(new ServiceTCCLInterceptor(classLoader));
 		factory.setTarget(target);
 
 		// TODO : add proxy optimizations (factory)

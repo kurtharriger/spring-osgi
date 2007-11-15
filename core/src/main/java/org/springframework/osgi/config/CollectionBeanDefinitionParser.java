@@ -19,7 +19,7 @@ import java.util.Comparator;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.osgi.service.importer.internal.collection.comparator.OsgiServiceReferenceComparator;
+import org.springframework.osgi.service.importer.internal.collection.comparator.ServiceReferenceComparator;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
@@ -50,7 +50,7 @@ abstract class CollectionBeanDefinitionParser extends AbstractReferenceDefinitio
 
 	private static final String SERVICE_REFERENCE_ORDER = "service-reference";
 
-	private static final Comparator SERVICE_REFERENCE_COMPARATOR = new OsgiServiceReferenceComparator();
+	private static final Comparator SERVICE_REFERENCE_COMPARATOR = new ServiceReferenceComparator();
 
 	private static final String NATURAL = "natural";
 

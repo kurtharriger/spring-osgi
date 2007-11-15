@@ -28,15 +28,15 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceStaticInterceptor extends OsgiServiceInvoker {
+public class ServiceStaticInterceptor extends ServiceInvoker {
 
-	private static final int hashCode = OsgiServiceStaticInterceptor.class.hashCode() * 13;
+	private static final int hashCode = ServiceStaticInterceptor.class.hashCode() * 13;
 
 	private final ServiceReference reference;
 
 	private final BundleContext bundleContext;
 
-	public OsgiServiceStaticInterceptor(BundleContext context, ServiceReference reference) {
+	public ServiceStaticInterceptor(BundleContext context, ServiceReference reference) {
 		Assert.notNull(context);
 		Assert.notNull(reference, "a not null service reference is required");
 		this.bundleContext = context;
@@ -63,8 +63,8 @@ public class OsgiServiceStaticInterceptor extends OsgiServiceInvoker {
 	public boolean equals(Object other) {
 		if (this == other)
 			return true;
-		if (other instanceof OsgiServiceStaticInterceptor) {
-			OsgiServiceStaticInterceptor oth = (OsgiServiceStaticInterceptor) other;
+		if (other instanceof ServiceStaticInterceptor) {
+			ServiceStaticInterceptor oth = (ServiceStaticInterceptor) other;
 			return reference.equals(oth.reference) && bundleContext.equals(bundleContext);
 		}
 		return false;

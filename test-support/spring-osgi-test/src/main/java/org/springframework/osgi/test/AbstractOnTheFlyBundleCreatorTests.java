@@ -183,13 +183,19 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		String currentPckg = ClassUtils.classPackageAsResourcePath(getClass()).replace('/', '.');
 
 		Set filteredImports = new LinkedHashSet(rawImports.length);
+		Set eliminatedImports = new LinkedHashSet(4);
 
 		for (int i = 0; i < rawImports.length; i++) {
 			String pckg = rawImports[i];
 
 			if (!(pckg.startsWith("java.") || pckg.startsWith("org.springframework.osgi.test.internal") || pckg.equals(currentPckg)))
 				filteredImports.add(pckg);
+			else
+				eliminatedImports.add(pckg);
 		}
+
+		if (!eliminatedImports.isEmpty() && logger.isTraceEnabled())
+			logger.trace("eliminated packages " + eliminatedImports);
 
 		return filteredImports;
 	}
