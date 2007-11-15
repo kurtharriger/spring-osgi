@@ -23,7 +23,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.importer.internal.aop.OsgiServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiFilterUtils;
@@ -61,7 +61,7 @@ public abstract class ServiceProxyTst extends AbstractConfigurableBundleCreatorT
 
 	private Advice createCardinalityAdvice(Class clazz) {
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
-		OsgiServiceDynamicInterceptor interceptor = new OsgiServiceDynamicInterceptor(bundleContext,
+		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext,
 				OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null)), classLoader);
 		// fast retry
 		interceptor.setRequiredAtStartup(true);

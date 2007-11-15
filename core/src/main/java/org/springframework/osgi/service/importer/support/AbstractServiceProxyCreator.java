@@ -131,9 +131,10 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 			factory.addAdvice(advice);
 		}
 
-		// FIXME: why not add these?
-		// factory.setOptimize(true);
-		// factory.setFrozen(true);
+		// no need to add optimize since it means implicit usage of CGLib always
+		// which is determined automatically anyway
+		//factory.setOptimize(true);
+		factory.setFrozen(true);
 		try {
 			return factory.getProxy(classLoader);
 		}

@@ -513,7 +513,7 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		assertEquals(0, JustListener.BIND_CALLS);
 		assertEquals(0, JustListener.UNBIND_CALLS);
 
-		listener.bind(new ServiceReferenceAwareMock(), null);
+		listener.bind(new ImportedOsgiServiceProxyMock(), null);
 
 		assertEquals(1, JustListener.BIND_CALLS);
 		assertEquals(0, JustListener.UNBIND_CALLS);
@@ -528,13 +528,13 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		assertEquals(0, JustListener.BIND_CALLS);
 		assertEquals(0, JustListener.UNBIND_CALLS);
 
-		listener.unbind(new ServiceReferenceAwareMock(), null);
+		listener.unbind(new ImportedOsgiServiceProxyMock(), null);
 
 		assertEquals(0, JustListener.BIND_CALLS);
 		assertEquals(1, JustListener.UNBIND_CALLS);
 	}
 	
-	private class ServiceReferenceAwareMock implements ImportedOsgiServiceProxy {
+	private class ImportedOsgiServiceProxyMock implements ImportedOsgiServiceProxy {
 
 		public Map getServiceProperties() {
 			return new HashMap();

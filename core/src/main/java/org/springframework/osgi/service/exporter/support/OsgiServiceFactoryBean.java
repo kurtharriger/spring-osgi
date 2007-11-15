@@ -104,7 +104,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 			// add TCCL behaviour only if needed
 			if (contextClassLoader == ExportContextClassLoader.SERVICE_PROVIDER) {
-				return wrapWithClassLoaderManagingProxy(bean, classes);
+				Object proxy = wrapWithClassLoaderManagingProxy(bean, classes);
+				return proxy;
 			}
 			else {
 				return bean;
@@ -203,16 +204,23 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		factory.addAdvice(new ServiceTCCLInterceptor(classLoader));
 		factory.setTarget(target);
 
-		// TODO : add proxy optimizations (factory)
+		factory.setFrozen(true);
 		try {
 			return factory.getProxy(classLoader);
 		}
-		catch (NoClassDefFoundError ncdfe) {
-			if (log.isWarnEnabled()) {
-				DebugUtils.debugNoClassDefFoundWhenProxying(ncdfe, bundleContext, this.interfaces);
+		catch (Throwable th) {
+
+			log.error("cannot create TCCL managed proxy; falling back to the naked object", th);
+
+			if (th instanceof NoClassDefFoundError) {
+				NoClassDefFoundError ncdfe = (NoClassDefFoundError) th;
+				if (log.isWarnEnabled()) {
+					DebugUtils.debugNoClassDefFoundWhenProxying(ncdfe, bundleContext, this.interfaces);
+				}
+				throw ncdfe;
 			}
-			throw ncdfe;
 		}
+		return target;
 	}
 
 	private Dictionary mergeServiceProperties(String beanName) {

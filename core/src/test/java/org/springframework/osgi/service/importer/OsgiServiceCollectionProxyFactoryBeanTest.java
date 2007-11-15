@@ -67,7 +67,7 @@ public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 
 		serviceFactoryBean.setBundleContext(this.bundleContext);
 		serviceFactoryBean.setBeanClassLoader(getClass().getClassLoader());
-		serviceFactoryBean.setInterface(new Class[] { TestCase.class });
+		serviceFactoryBean.setInterfaces(new Class[] { TestCase.class });
 
 	}
 
@@ -102,14 +102,14 @@ public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testMandatoryServiceAvailableAtStartup() {
-		serviceFactoryBean.setInterface(new Class[] { Serializable.class });
+		serviceFactoryBean.setInterfaces(new Class[] { Serializable.class });
 		serviceFactoryBean.afterPropertiesSet();
 
 		assertNotNull(serviceFactoryBean.getObject());
 	}
 
 	public void testMandatoryServiceUnAvailableWhileWorking() {
-		serviceFactoryBean.setInterface(new Class[] { Serializable.class });
+		serviceFactoryBean.setInterfaces(new Class[] { Serializable.class });
 		serviceFactoryBean.afterPropertiesSet();
 
 		Collection col = (Collection) serviceFactoryBean.getObject();

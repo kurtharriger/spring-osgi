@@ -177,7 +177,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			try {
 				synchronized (ServiceDynamicInterceptor.this) {
 					if (wrapper != null && wrapper.isServiceAlive()) {
-						// we have a new service
+						// if have a higher rank service
 						if (serviceRanking > wrapper.getServiceRanking()) {
 							updated = true;
 							updateReferenceHolders(ref);
@@ -190,7 +190,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 							}
 						}
 					}
-					// we don't have any services bounded yet so just bind a new
+					// we don't have any valid services bounded yet so just bind
+					// the new
 					// one
 					else {
 						updated = true;
@@ -284,14 +285,14 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private Object lookupService() {
 		return (Object) retryTemplate.execute(new DefaultRetryCallback() {
 			public Object doWithRetry() {
-				return (wrapper != null && wrapper.isServiceAlive()) ? wrapper.getService() : null;
+				return (wrapper != null) ? wrapper.getService() : null;
 			}
 		}, this);
 	}
 
 	public void afterPropertiesSet() {
 		Assert.notNull(proxy);
-		
+
 		boolean debug = log.isDebugEnabled();
 		if (retryTemplate == null)
 			retryTemplate = new RetryTemplate();
