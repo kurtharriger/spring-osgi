@@ -62,9 +62,18 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 		private Plugin(Bundle bundle) {
 			this.bundle = bundle;
 
+			ClassLoader springAopClassLoader = null;
+			try {
+				springAopClassLoader = BundleDelegatingClassLoader.class.getClassLoader().loadClass(
+					"org.springframework.aop.framework.ProxyFactory").getClassLoader();
+			}
+			catch (ClassNotFoundException ex) {
+				throw new RuntimeException("cannot detect Spring AOP jar", ex);
+			}
+
 			// the bundle classloader used for the namespace parser/resolver
 			// discovery and instantiation
-			ClassLoader loader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
+			ClassLoader loader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, springAopClassLoader);
 
 			entity = new DelegatingEntityResolver(loader);
 			namespace = new DefaultNamespaceHandlerResolver(loader);

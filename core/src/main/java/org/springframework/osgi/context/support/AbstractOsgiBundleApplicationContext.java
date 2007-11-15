@@ -22,6 +22,7 @@ import java.util.Dictionary;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
@@ -341,6 +342,6 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * @return
 	 */
 	protected ClassLoader createBundleClassLoader(Bundle bundle) {
-		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
+		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, ProxyFactory.class.getClassLoader());
 	}
 }
