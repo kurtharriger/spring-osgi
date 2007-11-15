@@ -57,6 +57,21 @@ public class ServiceWrapper implements Comparable {
 		toString = "ServiceWrapper[serviceId=" + serviceId + "|ref=" + reference + "]";
 	}
 
+	/**
+	 * Constructs a new <code>ServiceWrapper</code> instance. Clone-like
+	 * constructor.
+	 * 
+	 * @param wrapper
+	 */
+	public ServiceWrapper(ServiceWrapper wrapper) {
+		Assert.notNull(wrapper);
+		this.reference = wrapper.reference;
+		this.serviceId = wrapper.serviceId;
+		this.serviceRanking = wrapper.serviceRanking;
+		this.toString = wrapper.toString;
+		this.context = wrapper.context;
+	}
+
 	public boolean isServiceAlive() {
 		return (!(context == null || reference.getBundle() == null));
 	}
