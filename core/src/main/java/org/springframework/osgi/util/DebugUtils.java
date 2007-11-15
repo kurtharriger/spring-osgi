@@ -30,6 +30,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Utility class used for debugging exceptions in OSGi environment, such as
@@ -40,12 +41,12 @@ import org.springframework.util.ClassUtils;
  * which will try to determine the cause by trying to load the given interfaces
  * using the given bundle.
  * 
- * The search can be potentially expensive.
+ * <p/>
+ * The debugging process can be potentially expensive.
  * 
  * @author Costin Leau
  * @author Andy Piper
  */
-// FIXME: clarify class usage contract
 public abstract class DebugUtils {
 
 	private static final Log log = LogFactory.getLog(DebugUtils.class);
@@ -59,58 +60,59 @@ public abstract class DebugUtils {
 	 * @param bundleContext running bundle context
 	 * @param interfaces ???
 	 */
-	public static String debugNoClassDefFoundWhenProxying(NoClassDefFoundError ncdfe, BundleContext bundleContext,
+	public static void debugNoClassDefFoundWhenProxying(NoClassDefFoundError ncdfe, BundleContext bundleContext,
 			Class[] interfaces) {
 
 		String cname = ncdfe.getMessage().replace('/', '.');
 		debugClassLoading(bundleContext.getBundle(), cname, null);
 
-		StringBuffer message = new StringBuffer();
-		// Check out all the classes.
-		for (int i = 0; i < interfaces.length; i++) {
-			ClassLoader cl = interfaces[i].getClassLoader();
-			String cansee = "cannot";
-			if (ClassUtils.isPresent(cname, cl))
-				cansee = "can";
-			message.append(interfaces[i] + " is loaded by " + cl + " which " + cansee + " see " + cname);
+		if (!ObjectUtils.isEmpty(interfaces) && log.isDebugEnabled()) {
+			StringBuffer message = new StringBuffer();
+			// Check out all the classes.
+			for (int i = 0; i < interfaces.length; i++) {
+				ClassLoader cl = interfaces[i].getClassLoader();
+				String cansee = "cannot";
+				if (ClassUtils.isPresent(cname, cl))
+					cansee = "can";
+				message.append(interfaces[i] + " is loaded by " + cl + " which " + cansee + " see " + cname);
+			}
+			log.debug(message);
 		}
-		log.debug(message);
-		return message.toString();
 	}
 
 	/**
 	 * A best-guess attempt at figuring out why the class could not be found.
 	 * 
-	 * @param backingBundle ???
-	 * @param name of the class we are trying to find.
+	 * @param bundle bundle to look into
+	 * @param className the name of the class that will be searched (i.e. java.lang.Thread)
 	 * @param root ???
 	 */
-	public static void debugClassLoading(Bundle backingBundle, String name, String root) {
+	static void debugClassLoading(Bundle bundle, String className, String root) {
 		boolean trace = log.isTraceEnabled();
 		if (!trace)
 			return;
 
-		Dictionary dict = backingBundle.getHeaders();
+		Dictionary dict = bundle.getHeaders();
 		String bname = dict.get(Constants.BUNDLE_NAME) + "(" + dict.get(Constants.BUNDLE_SYMBOLICNAME) + ")";
 		if (trace)
-			log.trace("Could not find class [" + name + "] required by [" + bname + "] scanning available bundles");
+			log.trace("Could not find class [" + className + "] required by [" + bname + "] scanning available bundles");
 
-		BundleContext context = OsgiBundleUtils.getBundleContext(backingBundle);
-		String packageName = name.substring(0, name.lastIndexOf('.'));
+		BundleContext context = OsgiBundleUtils.getBundleContext(bundle);
+		String packageName = className.substring(0, className.lastIndexOf('.'));
 		// Reject global packages
-		if (name.indexOf('.') < 0) {
+		if (className.indexOf('.') < 0) {
 			if (trace)
 				log.trace("Class is not in a package, its unlikely that this will work");
 			return;
 		}
-		Version iversion = hasImport(backingBundle, packageName);
+		Version iversion = hasImport(bundle, packageName);
 		if (iversion != null && context != null) {
 			if (trace)
 				log.trace("Class is correctly imported as version [" + iversion + "], checking providing bundles");
 			Bundle[] bundles = context.getBundles();
 			for (int i = 0; i < bundles.length; i++) {
-				if (bundles[i].getBundleId() != backingBundle.getBundleId()) {
-					Version exported = checkBundleForClass(bundles[i], name, iversion);
+				if (bundles[i].getBundleId() != bundle.getBundleId()) {
+					Version exported = checkBundleForClass(bundles[i], className, iversion);
 					// Everything looks ok, but is the root bundle importing the
 					// dependent class also?
 					if (exported != null && exported.equals(iversion) && root != null) {
@@ -133,10 +135,10 @@ public abstract class DebugUtils {
 				}
 			}
 		}
-		if (hasExport(backingBundle, packageName) != null) {
+		if (hasExport(bundle, packageName) != null) {
 			if (trace)
 				log.trace("Class is exported, checking this bundle");
-			checkBundleForClass(backingBundle, name, iversion);
+			checkBundleForClass(bundle, className, iversion);
 		}
 	}
 

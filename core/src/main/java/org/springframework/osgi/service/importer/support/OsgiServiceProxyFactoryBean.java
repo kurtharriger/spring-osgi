@@ -97,7 +97,6 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 			}
 
 			Advice createServiceProviderTCCLAdvice(ServiceReference reference) {
-				// FIXME: OSGI-276
 				return tcclAdvice;
 			}
 		};

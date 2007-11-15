@@ -9,6 +9,18 @@
 		class="org.springframework.osgi.iandt.tccl.internal.PrivateTCCLServiceImplementation"
 		lazy-init="false" />
 
-	<osgi:service ref="service" auto-export="all-classes" />
+	<!-- export service with unmanaged tccl -->
+	<osgi:service ref="service" auto-export="interfaces" context-class-loader="unmanaged">
+		<osgi:service-properties>
+			<entry key="tccl" value="unmanaged"/>
+		</osgi:service-properties>
+	</osgi:service>
+
+	<!-- export service with managed tccl -->
+	<osgi:service ref="service" auto-export="interfaces" context-class-loader="service-provider">
+		<osgi:service-properties>
+			<entry key="tccl" value="service-provider"/>
+		</osgi:service-properties>
+	</osgi:service>
 
 </beans>

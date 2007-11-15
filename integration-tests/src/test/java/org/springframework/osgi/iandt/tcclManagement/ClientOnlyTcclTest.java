@@ -22,27 +22,28 @@ import org.springframework.osgi.iandt.tccl.TCCLService;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
- * Test for TCCL handling.
+ * Test for TCCL handling only on the client side. That is the service doesn't
+ * provide any handling.
  * 
  * @author Costin Leau
  * 
  */
-public class TcclTest extends AbstractConfigurableBundleCreatorTests {
+public class ClientOnlyTcclTest extends AbstractConfigurableBundleCreatorTests {
 
 	private static final String CLIENT_RESOURCE = "/org/springframework/osgi/iandt/tcclManagement/client-resource.properties";
 
 	private static final String SERVICE_RESOURCE = "/org/springframework/osgi/iandt/tccl/internal/internal-resource.file";
-	
+
 	private static final String SERVICE_PUBLIC_RESOURCE = "/org/springframework/osgi/iandt/tccl/service-resource.file";
 
-	private static final String CLIENT_CLASS = "org.springframework.osgi.iandt.tcclManagement.TcclTest";
+	private static final String CLIENT_CLASS = "org.springframework.osgi.iandt.tcclManagement.ClientOnlyTcclTest";
 
 	private static final String SERVICE_CLASS = "org.springframework.osgi.iandt.tccl.internal.PrivateTCCLServiceImplementation";
 
 	private static final String SERVICE_PUBLIC_CLASS = "org.springframework.osgi.iandt.tccl.TCCLService";
 
 	protected String[] getConfigLocations() {
-		return new String[] { "/org/springframework/osgi/iandt/tcclManagement/context.xml" };
+		return new String[] { "/org/springframework/osgi/iandt/tcclManagement/client-context.xml" };
 	}
 
 	protected String[] getTestBundlesNames() {

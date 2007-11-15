@@ -95,8 +95,7 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 
 	}
 
-	// FIXME: this fails after the proxy change
-	public void tstFullReference() throws Exception {
+	public void testFullReference() throws Exception {
 		OsgiServiceProxyFactoryBean factory = (OsgiServiceProxyFactoryBean) appContext.getBean("&full-options");
 		factory.getObject(); // required to initialise proxy and hook
 		// listeners into the binding process
@@ -116,16 +115,20 @@ public class OsgiReferenceNamespaceHandlerTest extends TestCase {
 		listeners[1].unbind(null, null);
 		assertEquals(2, DummyListener.UNBIND_CALLS);
 
-		listeners[3].bind(null, null);
 		assertEquals(1, DummyListenerServiceSignature.BIND_CALLS);
+		listeners[4].bind(null, null);
+		assertEquals(2, DummyListenerServiceSignature.BIND_CALLS);
 
-		listeners[3].unbind(null, null);
+		assertEquals(0, DummyListenerServiceSignature.UNBIND_CALLS);
+		listeners[4].unbind(null, null);
 		assertEquals(1, DummyListenerServiceSignature.UNBIND_CALLS);
 
-		listeners[4].bind(null, null);
 		assertEquals(1, DummyListenerServiceSignature2.BIND_CALLS);
-
-		listeners[4].unbind(null, null);
+		listeners[3].bind(null, null);
+		assertEquals(2, DummyListenerServiceSignature2.BIND_CALLS);
+		
+		assertEquals(0, DummyListenerServiceSignature2.UNBIND_CALLS);
+		listeners[3].unbind(null, null);
 		assertEquals(1, DummyListenerServiceSignature2.UNBIND_CALLS);
 	}
 

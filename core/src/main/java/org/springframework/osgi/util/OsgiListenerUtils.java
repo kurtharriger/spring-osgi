@@ -27,9 +27,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Utility class for various types of listeners used inside Spring/OSGi. This
- * class contains common functionality such as broadcasting events or safely
- * registering an OSGi {@link ServiceListener}.
+ * Utility class for dealing with {@link ServiceListener}s. This class contains
+ * common functionality such as broadcasting events or safely registering an
+ * OSGi listener.
  * 
  * @author Costin Leau
  * 

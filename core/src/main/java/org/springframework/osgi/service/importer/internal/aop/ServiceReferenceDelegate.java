@@ -41,19 +41,19 @@ class ServiceReferenceDelegate implements ServiceReference {
 	}
 
 	public synchronized Bundle getBundle() {
-		return delegate.getBundle();
+		return (delegate == null ? null : delegate.getBundle());
 	}
 
 	public synchronized Object getProperty(String key) {
-		return delegate.getProperty(key);
+		return (delegate == null ? null : delegate.getProperty(key));
 	}
 
 	public synchronized String[] getPropertyKeys() {
-		return delegate.getPropertyKeys();
+		return (delegate == null ? new String[0] : delegate.getPropertyKeys());
 	}
 
 	public synchronized Bundle[] getUsingBundles() {
-		return delegate.getUsingBundles();
+		return (delegate == null ? new Bundle[0] : delegate.getUsingBundles());
 	}
 
 	public synchronized boolean isAssignableTo(Bundle bundle, String className) {

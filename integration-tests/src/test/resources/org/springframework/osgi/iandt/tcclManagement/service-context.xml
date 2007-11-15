@@ -5,18 +5,18 @@
 	xmlns:osgi="http://www.springframework.org/schema/osgi"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi-1.0-rc1.xsd"
-	osgi:default-cardinality="0..X">
+	osgi:default-cardinality="0..X" osgi:default-timeout="10000">
 
+	<!-- make sure to import the service unmanaged test -->
 	<osgi:reference id="unmanaged"
 		interface="org.springframework.osgi.iandt.tccl.TCCLService"
-		context-class-loader="unmanaged" />
+		context-class-loader="unmanaged" filter="(tccl=service-provider)" />
 
 	<osgi:reference id="service-provider"
 		interface="org.springframework.osgi.iandt.tccl.TCCLService"
-		context-class-loader="service-provider" />
+		context-class-loader="service-provider" filter="(tccl=service-provider)" />
 
 	<osgi:reference id="client"
 		interface="org.springframework.osgi.iandt.tccl.TCCLService"
-		context-class-loader="client" />
-
+		context-class-loader="client" filter="(tccl=service-provider)" />
 </beans:beans>
