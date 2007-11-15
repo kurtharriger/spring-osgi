@@ -433,7 +433,7 @@ limitations under the License.
         </dependency>
       </dependencies>
       <properties>
-        <osgi.test.platform>org.springframework.osgi.test.platform.internal.EquinoxPlatform</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.EquinoxPlatform</osgi.test.platform>
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
@@ -672,14 +672,13 @@ limitations under the License.
       <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
     </repository>
     
-    <!-- temporary repository until moving to S3 -->
     <repository>
-      <id>i21-temp-maven-repo</id>
-      <name>i21 temporary repo</name>
+      <id>i21-s3-osgi-repo</id>
+      <name>i21 osgi artifacts repo</name>
       <snapshots>
          <enabled>true</enabled>
       </snapshots>
-      <url>http://static.springframework.org/maven2-snapshots</url>
+      <url>http://s3.amazonaws.com/maven.springframework.org/osgi</url>
     </repository>
     
   </repositories>

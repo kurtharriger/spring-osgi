@@ -72,7 +72,7 @@ public abstract class OsgiServiceBindingUtils {
 					log.warn("unbind method on listener " + listeners[i] + " threw exception ", ex);
 				}
 				if (debug)
-					log.debug("called bind on " + listeners[i] + " w/ reference " + reference);
+					log.debug("called unbind on " + listeners[i] + " w/ reference " + reference);
 			}
 		}
 	}
