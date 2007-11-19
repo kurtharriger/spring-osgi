@@ -96,7 +96,7 @@ abstract class TrackingUtil {
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			if (log.isWarnEnabled()) {
-				DebugUtils.debugNoClassDefFoundWhenProxying(ncdfe, context, classes);
+				DebugUtils.debugClassLoadingThrowable(ncdfe, context.getBundle(), classes);
 			}
 			throw ncdfe;
 		}

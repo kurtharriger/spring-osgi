@@ -39,7 +39,7 @@ public class LocalBundleContextAdviceTest extends TestCase {
 		
 		invocation = new MockMethodInvocation(m) {
 			public Object proceed() throws Throwable {
-				assertSame("bundle context not set", context, LocalBundleContext.getContext());
+				assertSame("bundle context not set", context, LocalBundleContext.getInvokerBundleContext());
 				return null;
 			}
 		};
@@ -53,7 +53,7 @@ public class LocalBundleContextAdviceTest extends TestCase {
 	}
 
 	public void testInvoke() throws Throwable {
-		assertNull(LocalBundleContext.getContext());
+		assertNull(LocalBundleContext.getInvokerBundleContext());
 		interceptor.invoke(invocation);
 	}
 

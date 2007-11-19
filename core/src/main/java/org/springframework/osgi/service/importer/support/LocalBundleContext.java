@@ -19,29 +19,53 @@ package org.springframework.osgi.service.importer.support;
 import org.osgi.framework.BundleContext;
 
 /**
- * ThreadLocal management of the BundleContext. <p/> <strong>Note</strong>:
- * this is a stateful component.
+ * Class containing static methods used to obtain information about the current
+ * OSGi service invocation.
+ * 
+ * <p>
+ * The <code>getInvokerBundleContext()</code> method offers access to the
+ * {@link BundleContext} of the entity accessing an OSGi service. The invoked
+ * entity can thus discover information about the caller context.
+ * 
+ * <p>
+ * The functionality in this class might be used by a target object that needed
+ * access to resources on the invocation. However, this approach should not be
+ * used when there is a reasonable alternative, as it makes application code
+ * dependent on usage under AOP and the Spring Dynamic Modules and AOP framework
+ * in particular.
  * 
  * @author Andy Piper
  * @author Costin Leau
  */
-// FIXME: is this the proper place?
-// FIXME: rename and define proper semantics/restrict setter
-public class LocalBundleContext {
-
-	private final static InheritableThreadLocal contextLocal = new InheritableThreadLocal();
+public abstract class LocalBundleContext {
 
 	/**
-	 * Get the local bundle's BundleContext.
+	 * ThreadLocal holder for the invoker context.
 	 */
-	public static BundleContext getContext() {
-		return (BundleContext) contextLocal.get();
+	private final static ThreadLocal invokerBundleContext = new InheritableThreadLocal();
+
+	/**
+	 * Try to get the current invoker bundle context. Note that this can be
+	 * <code>null</code> if the caller is not a Spring-DM importer.
+	 * 
+	 * @return the invoker bundle context (can be null)
+	 */
+	public static BundleContext getInvokerBundleContext() {
+		return (BundleContext) invokerBundleContext.get();
 	}
 
-	static void setContext(BundleContext bundle) {
-		contextLocal.set(bundle);
+	/**
+	 * Set the invoker bundle context. Note that callers should take care in
+	 * cleaning up the thread-local when the invocation ends.
+	 * 
+	 * @param bundleContext invoker bundle context
+	 * @return the old context in case there was one; maybe <code>null</code>
+	 * is none is set
+	 */
+	static BundleContext setInvokerBundleContext(BundleContext bundleContext) {
+		BundleContext old = (BundleContext) invokerBundleContext.get();
+		invokerBundleContext.set(bundleContext);
+		return old;
 	}
 
-	private LocalBundleContext() {
-	}
 }

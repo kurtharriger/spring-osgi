@@ -215,7 +215,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			if (th instanceof NoClassDefFoundError) {
 				NoClassDefFoundError ncdfe = (NoClassDefFoundError) th;
 				if (log.isWarnEnabled()) {
-					DebugUtils.debugNoClassDefFoundWhenProxying(ncdfe, bundleContext, this.interfaces);
+					DebugUtils.debugClassLoadingThrowable(ncdfe, bundleContext.getBundle(), this.interfaces);
 				}
 				throw ncdfe;
 			}
