@@ -30,13 +30,14 @@ import org.springframework.util.ObjectUtils;
  * bundles which depend on the node and then, the ones on which the node depends
  * on.
  * 
- * The algorithm travers each node/bundle (and its dependencies) only once.
- * <p/>
+ * The algorithm travers each node/bundle (and its dependencies) only once. <p/>
  * <strong>Note</strong> This class is thread-safe.
  * 
  * @author Costin Leau
  * 
  */
+
+// TODO: this class is not used at the moment - decide whether we keep it or not
 public class RecursiveServiceDependencySorter implements ServiceDependencySorter {
 
 	private static final Bundle[] EMPTY_BUNDLE_ARRAY = new Bundle[0];

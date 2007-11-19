@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;
@@ -33,7 +34,7 @@ import org.springframework.util.ObjectUtils;
 public class BundleDependencyComparator implements Comparator, Serializable {
 
 	private static final long serialVersionUID = -108354908478230663L;
-	
+
 	private static final Log log = LogFactory.getLog(BundleDependencyComparator.class);
 
 	public int compare(Object a, Object b) {
@@ -112,20 +113,62 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 			return false;
 		}
 		for (int i = 0; i < services.length; i++) {
-			Bundle[] referingBundles = services[i].getUsingBundles();
-			if (referingBundles != null) {
-				for (int j = 0; j < referingBundles.length; j++) {
-					if (a.equals(referingBundles[j])) {
-						return true;
-					}
-					else if (references(a, referingBundles[j], seen)) {
-						return true;
+			// filter on spring managed services
+			if (isSpringManagedService(services[i])) {
+				Bundle[] referingBundles = services[i].getUsingBundles();
+				if (referingBundles != null) {
+					for (int j = 0; j < referingBundles.length; j++) {
+						if (a.equals(referingBundles[j])) {
+							return true;
+						}
+						else if (references(a, referingBundles[j], seen)) {
+							return true;
+						}
 					}
 				}
 			}
 		}
 		return false;
+	}
 
+	/**
+	 * Simple method checking whether the given service reference points to a
+	 * spring managed service or not. Checks for
+	 * 
+	 * @param reference reference to the OSGi service
+	 * @return true if the service is spring managed, false otherwise
+	 */
+	private boolean isSpringManagedService(ServiceReference reference) {
+		if (reference == null)
+			return false;
+		return (reference.getProperty(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY) != null);
+	}
+
+	private ServiceReference[] excludeNonSpringManagedServices(ServiceReference[] references) {
+		if (ObjectUtils.isEmpty(references))
+			return references;
+
+		int count = 0;
+		for (int i = 0; i < references.length; i++) {
+			if (!isSpringManagedService(references[i]))
+				references[i] = null;
+			else
+				count++;
+		}
+
+		if (count == references.length)
+			return references;
+
+		ServiceReference[] refs = new ServiceReference[count];
+		int j = 0;
+		for (int i = 0; i < references.length; i++) {
+			if (references[i] != null) {
+				refs[j] = references[i];
+				j++;
+			}
+		}
+
+		return refs;
 	}
 
 	/**
@@ -134,15 +177,15 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 	 * references.
 	 */
 	protected int compareUsingServiceRankingAndId(Bundle a, Bundle b) {
-		ServiceReference[] aservices = a.getRegisteredServices();
-		ServiceReference[] bservices = b.getRegisteredServices();
+		ServiceReference[] aservices = excludeNonSpringManagedServices(a.getRegisteredServices());
+		ServiceReference[] bservices = excludeNonSpringManagedServices(b.getRegisteredServices());
 
 		boolean trace = log.isTraceEnabled();
 
 		// this case should not occur
 		if (ObjectUtils.isEmpty(aservices) && ObjectUtils.isEmpty(bservices)) {
 			if (trace)
-				log.trace("both services have 0 services; sorting based on symName");
+				log.trace("both services have 0 services; sorting based on id");
 			return (int) (a.getBundleId() - b.getBundleId());
 		}
 		else if (aservices == null) {

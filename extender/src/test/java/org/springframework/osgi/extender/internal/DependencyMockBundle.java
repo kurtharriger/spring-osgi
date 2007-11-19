@@ -24,6 +24,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 
 /**
  * Mock bundle useful for testing service dependencies.
@@ -72,6 +73,8 @@ public class DependencyMockBundle extends MockBundle {
 		long id = (index < serviceId.length ? serviceId[index] : serviceId[0]);
 		if (id >= 0)
 			props.put(Constants.SERVICE_ID, new Long(id));
+
+		props.put(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY, new Long(id));
 
 		return props;
 	}
@@ -130,6 +133,11 @@ public class DependencyMockBundle extends MockBundle {
 				((DependencyMockBundle) dependencyBundle).setDependentOn(this);
 			}
 
+			Properties props = new Properties();
+			
+			props.put(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY, new Long(
+					System.identityHashCode(dependencyBundle)));
+			
 			inUseServices[i] = new MockServiceReference() {
 				public Bundle getBundle() {
 					return dependencyBundle;

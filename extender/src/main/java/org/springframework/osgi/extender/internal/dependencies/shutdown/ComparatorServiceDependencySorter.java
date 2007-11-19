@@ -30,13 +30,9 @@ public class ComparatorServiceDependencySorter implements ServiceDependencySorte
 
 	private Comparator comparator = new BundleDependencyComparator();
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.extender.dependencies.shutdown.ServiceDependencySorter#computeServiceDependencyGraph(org.osgi.framework.Bundle[])
-	 */
 	public Bundle[] computeServiceDependencyGraph(Bundle[] bundles) {
 		Bundle[] bndls = new Bundle[bundles.length];
-		System.arraycopy(bundles, 0, bndls,0, bundles.length);
+		System.arraycopy(bundles, 0, bndls, 0, bundles.length);
 		Arrays.sort(bndls, comparator);
 		return bndls;
 	}
