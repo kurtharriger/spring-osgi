@@ -34,15 +34,14 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * Utility class used for debugging exceptions in OSGi environment, such as
- * classloading errors.
+ * class loading errors.
  * 
  * The main entry point is
- * {@link #debugNoClassDefFoundWhenProxying(NoClassDefFoundError, BundleContext, Class[])}
+ * {@link #debugClassLoadingThrowable(NoClassDefFoundError, BundleContext, Class[])}
  * which will try to determine the cause by trying to load the given interfaces
  * using the given bundle.
  * 
- * <p/>
- * The debugging process can be potentially expensive.
+ * <p/> The debugging process can be potentially expensive.
  * 
  * @author Costin Leau
  * @author Andy Piper
@@ -52,42 +51,74 @@ public abstract class DebugUtils {
 	private static final Log log = LogFactory.getLog(DebugUtils.class);
 
 	/**
-	 * Debug NCDFE that occurs when creating proxies. Looks at what classes are
-	 * visible by signature classes classloaders, logging a summary on debug
-	 * level and the entire discovery process on trace level.
+	 * Try to debug the cause of the Throwables that can appear when loading
+	 * classes in OSGi environments (for example when creating proxies).
 	 * 
-	 * @param ncdfe NoClassDefFoundException cause
-	 * @param bundleContext running bundle context
-	 * @param interfaces ???
+	 * This method will try to determine the class that caused the problem and
+	 * to search for it in the given bundle or through the classloaders of the
+	 * given classes.
+	 * 
+	 * It will look at the classes are visible by the given bundle on debug
+	 * level and do a bundle discovery process on trace level.
+	 * 
+	 * The method accepts also an array of classes which will be used for
+	 * loading the 'problematic' class that caused the exception on debug level.
+	 * 
+	 * @param loadingThrowable class loading {@link Throwable} (such as
+	 * {@link NoClassDefFoundError} or {@link ClassNotFoundException})
+	 * @param bundle bundle used for loading the classes
+	 * @param classes (optional) array of classes that will be used for loading
+	 * the problematic class
 	 */
-	public static void debugNoClassDefFoundWhenProxying(NoClassDefFoundError ncdfe, BundleContext bundleContext,
-			Class[] interfaces) {
+	public static void debugClassLoadingThrowable(Throwable loadingThrowable, Bundle bundle, Class[] classes) {
 
-		String cname = ncdfe.getMessage().replace('/', '.');
-		debugClassLoading(bundleContext.getBundle(), cname, null);
+		String className = null;
+		// NoClassDefFoundError
+		if (loadingThrowable instanceof NoClassDefFoundError) {
+			className = loadingThrowable.getMessage().replace('/', '.');
+		}
+		// ClassNotFound
+		else if (loadingThrowable instanceof ClassNotFoundException) {
+			className = loadingThrowable.getMessage().replace('/', '.');
+		}
 
-		if (!ObjectUtils.isEmpty(interfaces) && log.isDebugEnabled()) {
-			StringBuffer message = new StringBuffer();
-			// Check out all the classes.
-			for (int i = 0; i < interfaces.length; i++) {
-				ClassLoader cl = interfaces[i].getClassLoader();
-				String cansee = "cannot";
-				if (ClassUtils.isPresent(cname, cl))
-					cansee = "can";
-				message.append(interfaces[i] + " is loaded by " + cl + " which " + cansee + " see " + cname);
+		if (className != null) {
+
+			debugClassLoading(bundle, className, null);
+
+			if (!ObjectUtils.isEmpty(classes) && log.isDebugEnabled()) {
+				StringBuffer message = new StringBuffer();
+
+				// Check out all the classes.
+				for (int i = 0; i < classes.length; i++) {
+					ClassLoader cl = classes[i].getClassLoader();
+					String cansee = "cannot";
+					if (ClassUtils.isPresent(className, cl))
+						cansee = "can";
+					message.append(classes[i] + " is loaded by " + cl + " which " + cansee + " see " + className);
+				}
+				log.debug(message);
 			}
-			log.debug(message);
 		}
 	}
 
 	/**
-	 * A best-guess attempt at figuring out why the class could not be found.
+	 * A best-guess attempt at figuring out why a given class could not be
+	 * found. This method will search the given bundle and its classpath to
+	 * determine the reason for which the class cannot be loaded.
 	 * 
-	 * @param bundle bundle to look into
-	 * @param className the name of the class that will be searched (i.e. java.lang.Thread)
-	 * @param root ???
+	 * <p/> This method tries to be effective especially when the dealing with
+	 * {@link NoClassDefFoundError} caused by failure of loading transitive
+	 * classes (such as getting a NCDFE when loading <code>foo.A</code>
+	 * because <code>bar.B</code> cannot be found).
+	 * 
+	 * @param bundle the bundle to search for (and which should do the loading)
+	 * @param className the name of the class that failed to be loaded in dot
+	 * format (i.e. java.lang.Thread)
+	 * @param rootClassName the name of the class that triggered the loading
+	 * (i.e. java.lang.Runnable)
 	 */
-	static void debugClassLoading(Bundle bundle, String className, String root) {
+	public static void debugClassLoading(Bundle bundle, String className, String rootClassName) {
 		boolean trace = log.isTraceEnabled();
 		if (!trace)
 			return;
@@ -115,9 +146,10 @@ public abstract class DebugUtils {
 					Version exported = checkBundleForClass(bundles[i], className, iversion);
 					// Everything looks ok, but is the root bundle importing the
 					// dependent class also?
-					if (exported != null && exported.equals(iversion) && root != null) {
+					if (exported != null && exported.equals(iversion) && rootClassName != null) {
 						for (int j = 0; j < bundles.length; j++) {
-							Version rootexport = hasExport(bundles[j], root.substring(0, root.lastIndexOf('.')));
+							Version rootexport = hasExport(bundles[j], rootClassName.substring(0,
+								rootClassName.lastIndexOf('.')));
 							if (rootexport != null) {
 								// TODO -- this is very rough, check the bundle
 								// classpath also.
@@ -125,7 +157,7 @@ public abstract class DebugUtils {
 								if (rootimport == null || !rootimport.equals(iversion)) {
 									if (trace)
 										log.trace("Bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundles[j])
-												+ "] exports [" + root + "] as version [" + rootexport
+												+ "] exports [" + rootClassName + "] as version [" + rootexport
 												+ "] but does not import dependent package [" + packageName
 												+ "] at version [" + iversion + "]");
 								}

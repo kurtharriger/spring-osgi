@@ -39,25 +39,24 @@ class LocalBundleContextAdvice implements MethodInterceptor {
 
 	private final BundleContext context;
 
-	public LocalBundleContextAdvice(Bundle bundle) {
+	LocalBundleContextAdvice(Bundle bundle) {
 		this(OsgiBundleUtils.getBundleContext(bundle));
 	}
 
-	public LocalBundleContextAdvice(BundleContext bundle) {
+	LocalBundleContextAdvice(BundleContext bundle) {
 		this.context = bundle;
 	}
 
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		// save the old context
-		BundleContext oldContext = LocalBundleContext.getContext();
+		BundleContext oldContext = LocalBundleContext.setInvokerBundleContext(context);
 
 		try {
-			LocalBundleContext.setContext(context);
 			return invocation.proceed();
 		}
 		finally {
 			// restore old context
-			LocalBundleContext.setContext(oldContext);
+			LocalBundleContext.setInvokerBundleContext(oldContext);
 		}
 	}
 

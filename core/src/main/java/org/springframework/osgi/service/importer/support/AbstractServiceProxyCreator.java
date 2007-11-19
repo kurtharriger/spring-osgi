@@ -133,13 +133,13 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 
 		// no need to add optimize since it means implicit usage of CGLib always
 		// which is determined automatically anyway
-		//factory.setOptimize(true);
+		// factory.setOptimize(true);
 		factory.setFrozen(true);
 		try {
 			return factory.getProxy(classLoader);
 		}
 		catch (NoClassDefFoundError ncdfe) {
-			DebugUtils.debugNoClassDefFoundWhenProxying(ncdfe, bundleContext, classes);
+			DebugUtils.debugClassLoadingThrowable(ncdfe, bundleContext.getBundle(), classes);
 			throw ncdfe;
 		}
 	}
