@@ -51,8 +51,13 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		props.setProperty("org.knopflerfish.framework.bundlestorage.file.unpack", "false");
 		props.setProperty("org.knopflerfish.startlevel.use", "true");
 		props.setProperty("org.knopflerfish.osgi.setcontextclassloader", "true");
+		// TODO: set this to false for the moment since it causes NPEs
+		// let service be available during unregistration
+		props.setProperty("org.knopflerfish.servicereference.valid.during.unregistering", "false");
 		// embedded mode
 		props.setProperty("org.knopflerfish.framework.exitonshutdown", "false");
+		// disable patch CL
+		props.setProperty("org.knopflerfish.framework.patch", "false");
 		return props;
 	}
 

@@ -1,0 +1,364 @@
+  <chapter id="app-deploy">
+    <title>Packaging and Deploying Spring-based OSGi applications</title>
+
+    <para>A traditional Spring application uses either a single application
+    context, or a parent context containing service layer, data layer, and
+    domain objects with a child context containing web layer components. The
+    application context may well be formed by aggregating the contents of
+    multiple configuration files.</para>
+
+    <para>When deploying an application to OSGi the more natural structure is
+    to package the application as a set of peer bundles (application contexts)
+    interacting via the OSGi service registry. Independent subsystems should
+    be packaged as independent bundles or sets of bundles (vertical
+    partitioning). A subsystem may be package in a single bundle, or divided
+    into several bundles partitioned by layer (horizontal partitioning). A
+    straightforward web application may for example be divided into four
+    modules (bundles): a web bundle, service layer bundle, data layer bundle,
+    and domain model bundle. Such an application would look like this:</para>
+
+    <para><inlinemediaobject>
+        <imageobject>
+          <objectinfo>
+            <title>Bundles and Application Contexts</title>
+          </objectinfo>
+
+          <imagedata fileref="spring-osgi-model.png" />
+        </imageobject>
+      </inlinemediaobject></para>
+
+    <para>In this example the data layer bundle yields a data layer
+    application context that contains a number of internal components (beans).
+    Two of those beans are made publicly available outside of the application
+    context by publishing them as services in the OSGi service
+    registry.</para>
+
+    <para>The service layer bundle yields a service layer application context
+    that contains a number of internal components (beans). Some of those
+    components depend on data layer services, and import those services from
+    the OSGi service registry. Two of the service layer components are made
+    externally available as services in the OSGi service registry.</para>
+
+    <para>The web component bundle yields a web application context that
+    contains a number of internal components (beans). Some of those components
+    depend on application services, and import those services from the OSGi
+    service registry. Since the domain model bundle contributes only domain
+    model types, but does not need to create any components of its own, it has
+    no associated application context.</para>
+
+    <section id="app-deploy:headers">
+      <title>Bundle format and Manifest headers</title>
+
+      <para>Each application module should be packaged as an OSGi bundle. A
+      bundle is essentially a jar file with a
+      <literal>META-INF/MANIFEST.MF</literal> file containing a series of
+      headers recognized by the OSGi Service Platform. See the OSGi Service
+      Platform Core Specification section 3.2 for details. Some OSGi
+      implementations may support exploded jar files, but the format remains
+      the same.</para>
+
+      <para>The Spring extender recognizes a bundle as "Spring-powered" and
+      will create an associated application context when the bundle is started
+      if one or both of the following conditions is true:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>The bundle classpath contains a folder
+          <literal>META-INF/spring</literal> with one or more files in that
+          folder with a '.xml' extension.</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>META-INF/MANIFEST.MF</literal> contains a manifest
+          header <literal>Spring-Context</literal>.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>In addition, if the optional
+      <literal>SpringExtender-Version</literal> header is declared in the
+      bundle manifest, then the extender will only recognize bundles where the
+      specified version constraints are satisfied by the version of the
+      extender bundle (<literal>Bundle-Version</literal>). The value of the
+      <literal>SpringExtender-Version</literal> header must follow the syntax
+      for a version range as specified in section 3.2.5 of the OSGi Service
+      Platform Core Specification.</para>
+
+      <para>In the absence of the <literal>Spring-Context</literal> header the
+      extender expects every ".xml" file in the
+      <literal>META-INF/spring</literal> folder to be a valid Spring
+      configuration file, and all directives (see below) take on their default
+      values.</para>
+
+      <para>An application context is constructed from this set of files. A
+      suggested practice is to split the application context configuration
+      into at least two files, named by convention
+      <emphasis>modulename</emphasis>-context.xml and
+      <emphasis>modulename</emphasis>-osgi-context.xml. The
+      <emphasis>modulename</emphasis>-context.xml file contains regular bean
+      definitions independent of any knowledge of OSGi. The
+      <emphasis>modulename</emphasis>-osgi-context.xml file contains the bean
+      definitions for importing and exporting OSGi services. It may (but is
+      not required to) use the Spring Dynamic Modules OSGi schema as the
+      top-level namespace instead of the Spring 'beans' namespace.</para>
+
+      <para>The <literal>Spring-Context</literal> manifest header may be used
+      to specify an alternate set of configuration files. The resource paths
+      are treated as relative resource paths and resolve to entries defined in
+      the bundle and the set of attached fragments. When the
+      <literal>Spring-Context</literal> header defines at least one
+      configuration file location, any files in
+      <literal>META-INF/spring</literal> are ignored unless directly
+      referenced from the <literal>Spring-Context</literal> header.</para>
+
+      <para>The syntax for the <literal>Spring-Context</literal> header value
+      is:</para>
+
+      <screen>Spring-Context-Value ::= context ( ',' context ) *
+context ::= path ( ';' path ) * (';' directive) *
+</screen>
+
+      <para>This syntax is consistent with the OSGi Service Platform common
+      header syntax defined in section 3.2.3 of the OSGi Service Platform Core
+      Specification.</para>
+
+      <para>For example, the manifest entry:</para>
+
+      <screen>Spring-Context: config/account-data-context.xml, config/account-security-context.xml
+</screen>
+
+      <para>will cause an application context to be instantiated using the
+      configuration found in the files
+      <literal>account-data-context.xml</literal> and
+      <literal>account-security-context.xml</literal> in the bundle jar
+      file.</para>
+
+      <para>A number of directives are available for use with the
+      <literal>Spring-Context</literal> header. These directives are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>create-asynchronously</emphasis> (false|true):
+          controls whether the application context is created asynchronously
+          (the default), or synchronously.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>For example:</para>
+
+      <screen>Spring-Context: *;create-asynchronously=false 
+</screen>
+
+      <para>Creates an application context synchronously, using all of the
+      "*.xml" files contained in the <literal>META-INF/spring</literal>
+      folder.</para>
+
+      <screen>Spring-Context: config/account-data-context.xml;create-asynchrously:=false
+</screen>
+
+      <para>Creates an application context synchronously using the
+      <literal>config/account-data-context.xml</literal> configuration file.
+      Care must be taken when specifying synchronous context creation as the
+      application context will be created on the OSGi event thread, blocking
+      further event delivery until the context is fully initialized. If an
+      error occurs during the synchronous creation of the application context
+      then a FrameworkEvent.ERROR event is raised. The bundle will still
+      proceed to the ACTIVE state.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>wait-for-dependencies</emphasis> (true|false):
+          controls whether or not application context creation should wait for
+          any mandatory service dependencies to be satisfied before proceeding
+          (the default), or proceed immediately without waiting if
+          dependencies are not satisfied upon startup.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>For example:</para>
+
+      <screen>Spring-Context: config/osgi-*.xml;wait-for-dependencies:=false
+</screen>
+
+      <para>Creates an application context using all the files matching
+      "osgi-*.xml" in the config directory. Context creation will begin
+      immediately even if dependencies are not satisfied. This essentially
+      means that mandatory service references are treated as though they were
+      optional - clients will be injected with a service object that may not
+      be backed by an actual service in the registry initially. See section
+      4.2 for more details.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>timeout</emphasis> (300): the time to wait (in
+          seconds) for mandatory dependencies to be satisfied before giving up
+          and failing application context creation. This setting is ignored if
+          <literal>wait-for-dependencies:=false</literal> is specified. The
+          default is 5 minutes (300 seconds).</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>For example:</para>
+
+      <screen>Spring-Context: *;timeout:=60
+</screen>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>publish-context</emphasis> (true|false): controls
+          whether or not the application context object itself should be
+          published in the OSGi service registry. The default is to publish
+          the context.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>For example:</para>
+
+      <screen>Spring-Context: *;publish-context:=false
+</screen>
+
+      <para>If there is no Spring-Context manifest entry, or no value is
+      specified for a given directive in that entry, then the directive takes
+      on its default value.</para>
+    </section>
+
+    <section>
+      <title>3.2 Required Spring Framework and Spring Dynamic Modules
+      Bundles</title>
+
+      <para>The Spring Dynamic Modules project provides an number of bundle
+      artifacts that must be installed in your OSGi platform in order for the
+      Spring extender to function correctly:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>The extender bundle itself,
+          <literal>org.springframework.osgi.extender</literal></para>
+        </listitem>
+
+        <listitem>
+          <para>The core implementation bundle for the Spring Dynamic Modules
+          support, <literal>org.springframework.osgi.core</literal></para>
+        </listitem>
+
+        <listitem>
+          <para>The Spring Dynamic Modules i/o support library bundle, '
+          <literal>org.springframework.osgi.io</literal></para>
+        </listitem>
+      </itemizedlist>
+
+      <para>In addition the Spring Framework provides a number of bundles that
+      are required to be installed. As of release 2.5 of the Spring Framework,
+      the Spring jars included in the Spring distribution are valid OSGi
+      bundles and can be installed directly into an OSGi platform. The minimum
+      required set of bundles is:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>spring-core.jar (bundle symbolic name
+          <literal>org.springframework.bundle.spring.core</literal>)</para>
+        </listitem>
+
+        <listitem>
+          <para>spring-context.jar (bundle symbolic name
+          <literal>org.springframework.bundle.spring.context</literal>)</para>
+        </listitem>
+
+        <listitem>
+          <para>spring-beans.jar (bundle symbolic name
+          <literal>org.springframework.bundle.spring.beans</literal>)</para>
+        </listitem>
+
+        <listitem>
+          <para>spring-aop.jar (bundle symbolic name
+          <literal>org.springframework.bundle.spring.aop</literal>)</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>In additional the following supporting library bundles are
+      required. OSGi-ready versions of these libraries are shipped with the
+      Spring Dynamic Modules distribution.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>aopalliance</para>
+        </listitem>
+
+        <listitem>
+          <para>backport-util (when running on JDK 1.4)</para>
+        </listitem>
+
+        <listitem>
+          <para>cglib-nodep (when proxying classes rather then
+          interfaces)</para>
+        </listitem>
+
+        <listitem>
+          <para>commons-logging (SLF4J version highly recommended)</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section id="app-deploy:imports-exports">
+      <title>Importing and Exporting packages</title>
+
+      <para>Refer to the OSGi Service Platform for details of the
+      <literal>Import-Package</literal> and <literal>Export-Package</literal>
+      manifest headers. Your bundle will need an
+      <literal>Import-Package</literal> entry for every external package that
+      the bundle depends on. If your bundle provides types that other bundles
+      need access to, you will need <literal>Export-Package</literal> entries
+      for every package that should be available from outside of the
+      bundle.</para>
+    </section>
+
+    <section id="app-deploy:ext-libs">
+      <title>Considerations when using external libraries</title>
+
+      <para>Many enterprise application libraries assume that all of the types
+      and resources that comprise the application are accessible through the
+      context class loader. In OSGi R4, the set of types and resources
+      available through the context class loader is undefined. Libraries that
+      generate new classes dynamically can also cause problems in an OSGi
+      environment.</para>
+
+      <para>Spring Dynamic Modules guarantees that during the creation of an
+      application context on behalf of a given bundle, all of that types and
+      resources on the bundle's classpath are accessible via the context class
+      loader. Spring Dynamic Modules also allows you to control what is
+      accessible through the context class loader when invoking external
+      services and when servicing requests on exported services. See section 4
+      for details on this.</para>
+
+      <para>Work is underway in the OSGi R5 timeframe to provide standardized
+      support for dealing with generated classes and implicit class path
+      dependencies introduced by third-party libraries. In the interim you may
+      need to rely on workarounds such as the
+      <literal>DynamicImport-Package</literal> manifest header, or the
+      facilities provided by specific OSGi implementations such as Equinox's
+      buddy mechanism. The Spring Dynamic Modules tutorial contains more
+      detail on known issues with common enterprise libraries and the
+      workarounds.</para>
+    </section>
+
+    <section id="app-deploy:troubleshoot">
+      <title>Diagnosing problems</title>
+
+      <para>Your chosen OSGi platform implementation should be able to provide
+      you with a good deal of information about the current status of the OSGi
+      environment. For example, starting Equinox with the
+      <literal>-console</literal> argument provides a command-line console
+      through which you can determine which bundles are installed and their
+      states, the packages and services exported by bundles, find out why a
+      bundle has failed to resolve, and drive bundles through the
+      lifecycle.</para>
+
+      <para>In addition, Spring itself and the Spring Dynamic Modules bundles
+      contain extensive logging instrumentation that can help you diagnose
+      problems. The recommended approach is to deploy the Simple Logging
+      Facade for Java (<ulink url="http://www.slf4j.org/">slf4j</ulink>)
+      slf4j-api.jar and slf4j-log4j13.jar bundles (the jar files distributed
+      by the project are valid OSGi bundles). Then you simply need to create a
+      <literal>log4j.properties</literal> file in the root of your bundle
+      classpath.</para>
+    </section>
+  </chapter>

@@ -63,6 +63,7 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 		return createPlatform().toString().startsWith("Knopflerfish");
 	}
 	
-	
-	
+//	protected String getPlatformName() {
+//		return Platforms.KNOPFLEFISH;
+//	}
 }

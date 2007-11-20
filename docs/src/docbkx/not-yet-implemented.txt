@@ -1,0 +1,32 @@
+h1. Not yet implemented features (based on 1.0 M3)
+
+we never touch the bundle lifecycle  (2.2.1 needs to change - we don't leave the bundle in RESOLVED state)
+
+2.4 The Resource abstraction
+
+The new "osgibundle" prefix is not yet in place - use "bundle" for the time being. See OSGI-199
+
+2.6 Stopping the extender bundle
+
+The shutdown algorithm considers all services exporter/imported by a bundle not just the ones managed
+by the application context. see OSGI-203
+
+4.1.6 Service registration and unregistration lifecyle
+
+the listener interface contract is not implemented yet.
+
+4.2.1 Referencing an individual service
+
+Conversion from service to service reference is not yet supported.
+
+4.2.1.6.
+
+osgi: default-timeout not supported yet
+
+4.2.2 Referencing collections of services
+
+Comparator based on natural ordering of services is n/a. See OSGI-215.
+Comparable interface is not yet used for sorting - see OSGI-216
+
+
+
