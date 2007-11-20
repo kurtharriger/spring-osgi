@@ -1,0 +1,53 @@
+      <partintro>
+      <title>Structure of this document</title>
+
+      <para>Chapter <link linkend="bundle-app-context">Bundles and Application 
+      Contexts</link> describes the relationship between an OSGi Bundle and a 
+      Spring Application Context,
+      and introduces the Spring Extender Bundle support for instantiating
+      application contexts automatically.</para>
+
+      <para>Chapter <link linkend="app-deploy">Packaging and Deploying Spring-based 
+      OSGi applications</link> describes how to deploy the Spring Framework jar files in
+      an OSGi environment, and how to reference external APIs from your
+      application bundles should you need to do so. This chapter also explains
+      some of the issues to be aware of when using existing enterprise
+      libraries not designed for OSGi in an OSGi environment.</para>
+
+      <para>Chapter 4, "The Service Registry" describes how to export Spring
+      beans as services in the OSGi service registry, and how to inject
+      references to OSGi services into beans. This chapter also defines how
+      the dynamic life-cycle of OSGi services and bundles is supported.</para>
+
+      <para>Chapter 5, "Working with Bundles" describes how to declare a bean
+      that represents an OSGi bundle, including support for installing new
+      bundles into the OSGi platform.</para>
+
+      <para>Chapter 6, "Compendium Services" describes the support provided
+      for the <ulink url="http://www2.osgi.org/Release4/Download">OSGi
+      Compendium Services</ulink>, including the Configuration Admin
+      service.</para>
+
+      <para>Chapter 7, "Testing OSGi based Applications" explains the
+      integration testing support provided by Spring Dynamic Modules. This
+      support enables you to write simple JUnit integration tests that can
+      start up an OSGi environment, install the bundles needed for the
+      integration test, execute the test case(s) inside of OSGi, and return
+      the results to the runner. This support makes it easy to integrate OSGi
+      integration testing into any environment that can work with
+      JUnit.</para>
+
+      <para>Appendix A, "Extensions" describes extensions that are included in
+      the 1.0 distribution, but are not guaranteed to be maintained in a
+      backward-compatible form in future point releases. We anticipate these
+      features moving into the core specification over time.</para>
+
+      <para>Appendix B, "Roadmap" describes some features that are included in
+      the 1.0 distribution but are still considered early-access. The
+      externals of these features may change in future releases. This appendix
+      also discusses other planned features for which no implementation yet
+      exists.</para>
+
+      <para>Appendix C defines the schemas provided by Spring Dynamic
+      Modules.</para>
+      </partintro>

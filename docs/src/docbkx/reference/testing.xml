@@ -1,0 +1,107 @@
+  <chapter id="testing">
+    <title>Testing OSGi based Applications</title>
+
+    <para>By following best practices and using the Spring Dynamic Modules
+    support, your bean classes should be easy to unit test as they will have
+    no hard dependencies on OSGi, and the few OSGi APIs that you may interact
+    with (such as BundleContext) are interface-based and easy to mock. For
+    integration testing (making sure that your application behaves as expected
+    when running under OSGi) some support is needed.</para>
+
+    <para>The Spring Dynamic Modules project provides a test class hierarchy
+    (based on
+    <literal>org.springframework.osgi.test.AbstractOsgiTests</literal>) that
+    provides support for writing regular JUnit test cases that are then
+    automatically executed in an OSGi environment. The test support:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>starts the OSGi framework</para>
+      </listitem>
+
+      <listitem>
+        <para>installs and starts any specified bundles required for the
+        test</para>
+      </listitem>
+
+      <listitem>
+        <para>packages the test case itself into a 'virtual bundle' and
+        installs it in the OSGi framework</para>
+      </listitem>
+
+      <listitem>
+        <para>executes the test case inside the OSGi framework</para>
+      </listitem>
+
+      <listitem>
+        <para>shuts down the framework</para>
+      </listitem>
+
+      <listitem>
+        <para>passes the test results back to the originating test case
+        instance that is running outside of OSGi</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>By following this sequence it is trivial to write JUnit-based
+    integration tests for OSGi and have them integration into any environment
+    (IDE, build, etc.) that can work with JUnit.</para>
+
+    <para>It is most likely that your test cases will extend
+    <literal>AbstractConfigurableBundleCreatorTests</literal>. Within your
+    test case, access to the <literal>BundleContext</literal> is readily
+    available through the inherited <literal>getBundleContext()</literal>
+    method. From here it is easy to verify service publication, drive bundles
+    through the lifecycle and verify that components react as expected, and so
+    on.</para>
+
+    <para>Here's a simple test that verifies a service has been published as
+    expected:</para>
+
+    <screen>public class ServicePublicationTest extends AbstractConfigurableBundleCreatorTests {
+
+  protected String[] getBundles() {
+    return new String[] { "org.xyz.someapp, application-layer, 1.0-SNAPSHOT" };
+  }
+
+  public void testServicePublication() {
+     assertNotNull("MyService should be published in tthe registry", 
+                   getBundleContext().getServiceReference("org.xyz.MyService"));
+  }
+}</screen>
+
+    <para>All of the bundles required by Spring Dynamic Modules will be
+    installed by default. By overriding the <literal>getBundles</literal>
+    method you can specify additional application bundles to be installed for
+    the test. In this example we install one bundle, with group id
+    <literal>org.xyz.someapp</literal>, module id
+    <literal>application-layer</literal>, and version
+    <literal>1.0-SNAPSHOT</literal>. The default behavior of the test support
+    is to look up this dependency in your local maven repository. It is
+    possible to change the lookup strategy using a pluggable
+    <literal>ArtifactLocator</literal> (see the javadocs for more
+    information). Support for Ivy-based repositories is planned for a future
+    release.</para>
+
+    <para>The test support has been integrated with Equinox, Knopflerfish, and
+    Felix. You can configure the platform used to run the tests in one of two
+    ways:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Set the
+        <literal>org.springframework.osgi.test.framework</literal> system
+        property to one of <literal>equinox</literal>,
+        <literal>knopflerfish</literal>, or <literal>felix</literal>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Override the AbstractConfigurableOsgiTests#getPlatformName()
+        operation to return one of the constants: EQUINOX_PLATFORM,
+        KNOPFLERFISH_PLATFORM, or FELIX_PLATFORM.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>By default the test harness will attempt to use Equinox.</para>
+  </chapter>
+

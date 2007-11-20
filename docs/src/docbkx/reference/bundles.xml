@@ -1,0 +1,115 @@
+  <chapter id="bundles">
+    <title>Working with Bundles</title>
+
+    <para>The <literal>bundle</literal> element defines a bean of type
+    <literal>org.osgi.framework.Bundle</literal>. It provides a simple way to
+    work directly with bundles, including driving their lifecycle. In the
+    simplest case all you need to do is specify the
+    <literal>symbolic-name</literal> of the bundle you are interested
+    in:</para>
+
+    <screen>&lt;bundle id="aBundle" symbolic-name="org.xyz.abundle"/&gt;</screen>
+
+    <para>The bean <literal>aBundle</literal> can now be dependency injected
+    into any property of type <literal>Bundle</literal>.</para>
+
+    <para>The optional <literal>location</literal> and
+    <literal>action</literal> attributes provide declarative control over the
+    bundle's lifecycle. The <literal>location</literal> attribute is used to
+    specify a URL where the bundle jar file artifact can be found. The
+    <literal>action</literal> attribute specifies the lifecycle operation to
+    be invoked on the bundle object. The supported action values are
+    <literal>install</literal>, <literal>start</literal>,
+    <literal>update</literal>, <literal>stop</literal>, and
+    <literal>uninstall</literal>. These actions have the same semantics as the
+    operations of the corresponding names defined on the
+    <literal>Bundle</literal> interface (see the OSGi Service Platform Core
+    Specification), with the exception that pre-conditions are weakened to
+    allow for example a 'start' action to be specified against a bundle that
+    is not currently installed (it will be installed first).</para>
+
+    <para>The following table shows how actions are interpreted for the given
+    Bundle states:</para>
+
+    <table border="1" cellspacing="5">
+      <tr>
+        <th>action</th>
+
+        <th>UNINSTALLED</th>
+
+        <th>INSTALLED/RESOLVED</th>
+
+        <th>ACTIVE</th>
+      </tr>
+
+      <tr>
+        <th>install</th>
+
+        <td>installs the bundle</td>
+
+        <td>no action taken, bundle already installed</td>
+
+        <td>no action taken, bundle already installed</td>
+      </tr>
+
+      <tr>
+        <th>start</th>
+
+        <td>installs and starts the bundle</td>
+
+        <td>starts the bundle</td>
+
+        <td>no action taken, bundle already started</td>
+      </tr>
+
+      <tr>
+        <th>update</th>
+
+        <td>installs the bundle and then updates it (`Bundle.update()`)</td>
+
+        <td>updates the bundle</td>
+
+        <td>updates the bundle</td>
+      </tr>
+
+      <tr>
+        <th>stop</th>
+
+        <td>no action taken</td>
+
+        <td>no action taken</td>
+
+        <td>bundle is stopped</td>
+      </tr>
+
+      <tr>
+        <th>uninstall</th>
+
+        <td>no action taken</td>
+
+        <td>bundle is uninstalled</td>
+
+        <td>bundle is stopped and then uninstalled</td>
+      </tr>
+    </table>
+
+    <para>For example:</para>
+
+    <screen>&lt;!-- ensure this bundle is installed and started --&gt;
+&lt;bundle id="aBundle" symbolic-name="org.xyz.abundle"
+   location="http://www.xyz.com/bundles/org.xyz.abundle.jar"
+   action="start"/&gt;</screen>
+
+    <para>The 'start-level' attribute can be used to set the start level of
+    the bundle.</para>
+
+    <para>Finally, the <literal>bundle</literal> element also supports a
+    <literal>depends-on</literal> attribute which can be used to ensure that
+    the bundle bean is not created before a named bean on which it depends is
+    fully instantiated.</para>
+
+    <para>The samples that ship with the Spring Dynamic Modules project
+    further include support for a <literal>virtual-bundle</literal> element
+    that can be used to create and install OSGi bundles on the fly from
+    existing artifacts.</para>
+  </chapter>
