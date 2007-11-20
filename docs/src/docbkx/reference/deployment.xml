@@ -218,7 +218,7 @@ context ::= path ( ';' path ) * (';' directive) *
     </section>
 
     <section>
-      <title>3.2 Required Spring Framework and Spring Dynamic Modules
+      <title>Required Spring Framework and Spring Dynamic Modules
       Bundles</title>
 
       <para>The Spring Dynamic Modules project provides an number of bundle
@@ -237,7 +237,7 @@ context ::= path ( ';' path ) * (';' directive) *
         </listitem>
 
         <listitem>
-          <para>The Spring Dynamic Modules i/o support library bundle, '
+          <para>The Spring Dynamic Modules I/O support library bundle, '
           <literal>org.springframework.osgi.io</literal></para>
         </listitem>
       </itemizedlist>
@@ -285,12 +285,17 @@ context ::= path ( ';' path ) * (';' directive) *
 
         <listitem>
           <para>cglib-nodep (when proxying classes rather then
-          interfaces)</para>
+          interfaces, needed in most cases)</para>
         </listitem>
 
         <listitem>
-          <para>commons-logging (SLF4J version highly recommended)</para>
+          <para>commons-logging API (SLF4J version highly recommended)</para>
         </listitem>
+        
+        <listitem>
+          <para>logging implementation such as log4j</para>
+        </listitem>
+        
       </itemizedlist>
     </section>
 
@@ -310,19 +315,48 @@ context ::= path ( ';' path ) * (';' directive) *
     <section id="app-deploy:ext-libs">
       <title>Considerations when using external libraries</title>
 
+      <sidebar>
+      	<title>What is the context class loader?</title>
+      	
+      	<para>
+      	The thread context class loader was introduced in J2SE without much fanfare.
+      	Below is a short definition for it, quoted from <ulink url="http://java.sun.com/products/jndi/tutorial/beyond/misc/classloader.html">one
+      	</ulink> of the tutorials available on <ulink url="http://java.sun.com/">Java</ulink> site:
+      	</para>
+      	<para>
+      	The Java 2 platform also introduced the notion of <emphasis>context class loader</emphasis>. A thread's context class loader is, by default, 
+      	set to the context class loader of the thread's parent. The hierarchy of threads is rooted at the primordial thread (the one that runs the program). 
+      	The context class loader of the primordial thread is set to the class loader that loaded the application. So unless you explicitly change 
+      	the thread's context class loader, its context class loader will be the application's class loader. That is, the context class loader can 
+      	load the classes that the application can load. This loader is used by the Java runtime such as the RMI (Java Remote Method Invocation) to 
+      	load classes and resources on behalf of the user application. The context class loader, like any Java 2 platform class loader, has a parent 
+      	class loader and supports the same delegation model for class loading described previously.
+      	</para>
+      </sidebar>
+      
       <para>Many enterprise application libraries assume that all of the types
       and resources that comprise the application are accessible through the
-      context class loader. In OSGi R4, the set of types and resources
-      available through the context class loader is undefined. Libraries that
-      generate new classes dynamically can also cause problems in an OSGi
-      environment.</para>
+      context class loader. While most developers do not use the context class 
+      loader, the loader is used heavily by application servers, containers or 
+      applications that are multi-threaded.</para>
 
+	  <para>		      
+      In OSGi R4, the set of types and resources
+      available through the context class loader is undefined. 
+      This means that the OSGi platform does not make a guarantee of the thread context 
+      class loader value or in other words, it does not manage it.
+      </para>
+      <para>
+      Thus code (for example libraries) that performs manual class loading or that generates 
+      new classes dynamically can cause problems when executed inside an OSGi environment.
+      </para>
+      
       <para>Spring Dynamic Modules guarantees that during the creation of an
-      application context on behalf of a given bundle, all of that types and
+      application context on behalf of a given bundle, all of the types and
       resources on the bundle's classpath are accessible via the context class
       loader. Spring Dynamic Modules also allows you to control what is
       accessible through the context class loader when invoking external
-      services and when servicing requests on exported services. See section 4
+      services and when servicing requests on exported services. See section 5
       for details on this.</para>
 
       <para>Work is underway in the OSGi R5 timeframe to provide standardized
@@ -331,8 +365,8 @@ context ::= path ( ';' path ) * (';' directive) *
       need to rely on workarounds such as the
       <literal>DynamicImport-Package</literal> manifest header, or the
       facilities provided by specific OSGi implementations such as Equinox's
-      buddy mechanism. The Spring Dynamic Modules tutorial contains more
-      detail on known issues with common enterprise libraries and the
+      buddy mechanism. The Spring Dynamic Modules documentation contains more
+      details on known issues with common enterprise libraries and the
       workarounds.</para>
     </section>
 
@@ -356,5 +390,11 @@ context ::= path ( ';' path ) * (';' directive) *
       by the project are valid OSGi bundles). Then you simply need to create a
       <literal>log4j.properties</literal> file in the root of your bundle
       classpath.</para>
+      
+      <para>Note that Spring Dynamic Modules uses commons-logging API internally
+      which means that its logging implementation is fully pluggable. Please see
+      the FAQ and Resources pages for more informations on other logging libraries
+      besides log4j.
+      </para>
     </section>
   </chapter>
