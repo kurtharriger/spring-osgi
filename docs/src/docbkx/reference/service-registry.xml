@@ -24,7 +24,7 @@
    xsi:schemaLocation="http://www.springframework.org/schema/beans   
        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.springframework.org/schema/osgi  
-       http://www.springframework.org/schema/osgi/spring-osgi-2.5.xsd">
+       http://www.springframework.org/schema/osgi/spring-osgi-1.0.xsd">
 
     <!-- use the OSGi namespace elements qualified with 'osgi:' -->
     <osgi:service id="simpleServiceOsgi" ref="simpleService"
@@ -40,7 +40,7 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:beans="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/osgi  
-       http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://www.springframework.org/schema/osgi/spring-osgi-1.0.xsd
        http://www.springframework.org/schema/beans   
        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
@@ -141,6 +141,12 @@
   </osgi:interfaces>
 </osgi:service>]]></programlisting>
 
+		<para>It is illegal to use both <literal>interface</literal> attribute and
+		<literal>interfaces</literal> element at the same time - use only one of them.
+		</para>
+	  
+	  <section id="service-registry:export:auto-export">
+	    <title>Detecting the advertised interfaces at runtime</title>
 		<sidebar>
 			<title>Hierarchy visibility</title>
 			
@@ -151,10 +157,10 @@
         	<literal>auto-export="interfaces"</literal> if <literal>SI</literal>
         	was not on the exporting bundle's classpath.</para>
         	
-        	<para>Even if exported service class does implement the class transitively based
-        	on its parent, if the declaring bundle doesn't import the <literal>SI</literal>
+        	<para>Even if exported service class does implement <literal>SI</literal> transitively based
+        	on its parent, if the declaring bundle doesn't import the 
         	interface, the class is unknown to the exported service. While this 
-        	might seem counter intuitive is actually one of the most powerful features of OSGi
+        	might seem counter intuitive, it is actually one of the most powerful features of OSGi
         	which give the bundle authors control over the class visibility and path.
         	</para>
         	
@@ -162,8 +168,10 @@
         </sidebar>
 
         <para>Using the <literal>auto-export</literal> attribute you can avoid
-        the need to explicitly declare the service interfaces at all. The
-        <literal>auto-export</literal> attribute can have one of four
+        the need to explicitly declare the service interfaces at all by analyzing the
+        object class hierarchy and its interfaces.</para>
+        <para> 
+        The <literal>auto-export</literal> attribute can have one of four
         values:</para>
 
         <itemizedlist>
@@ -191,6 +199,11 @@
           </listitem>
         </itemizedlist>
 
+		<para>
+		<literal>auto-export</literal> and <literal>interface(s)</literal> option are not exclusive; both
+		can be used at the same time for fine grained control over the advertised interfaces if there is such
+		a need. However, the former	option should be enough for most cases. 
+		</para>
         <para>For example, to automatically register a bean under all of the
         interfaces that it supports you would declare:</para>
 
@@ -212,6 +225,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <literal>auto-export="interfaces"</literal>.</para>
 
       </section>
+      </section>
+      
 
       <section id="service-registry:export:props">
         <title>Controlling the set of advertised properties for an
@@ -243,7 +258,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <para>The Spring Dynamic Modules roadmap includes support for
         exporting properties registered in the OSGi Configuration
         Administration service as properties of the registered service. See
-        <link linkend="appendix-roadmap">Appendix B</link> for more details.</para>
+        <link linkend="appendix-roadmap">this</link> appendix for more details.</para>
+        
       </section>
 
       <section id="service-registry:export:depends-on">
@@ -260,22 +276,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <programlisting><![CDATA[<service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"
      depends-on="myOtherComponent"/>]]></programlisting>
       </section>
-
-      <section id="service-registry:export:ranking">
-        <title>The ranking attribute</title>
-
-        <para>When registering a service with the service registry, you may
-        optionally specify a service ranking (see section 5.2.5 of the OSGi
-        Service Platform Core Specification). When a bundle looks up a service
-        in the service registry, given two or more matching services the one
-        with the highest ranking will be returned. The default ranking value
-        is zero. To explicitly specify a ranking value for the registered
-        service, use the optional <literal>ranking</literal> attribute.</para>
-
-        <programlisting><![CDATA[<service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"
-  ranking="9"/>]]></programlisting>
-      </section>
-
+      
       <section id="service-registry:export:ccl">
         <title>The context-class-loader attribute</title>
 
@@ -298,6 +299,79 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         Modules ensures that the context class loader can see all of the
         resources on the class path of the bundle exporting the service.</para>
       </section>
+      
+      <section id="service-registry:export:ranking">
+        <title>The ranking attribute</title>
+
+        <para>When registering a service with the service registry, you may
+        optionally specify a service ranking (see section 5.2.5 of the OSGi
+        Service Platform Core Specification). When a bundle looks up a service
+        in the service registry, given two or more matching services the one
+        with the highest ranking will be returned. The default ranking value
+        is zero. To explicitly specify a ranking value for the registered
+        service, use the optional <literal>ranking</literal> attribute.</para>
+
+        <programlisting><![CDATA[<service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"
+  ranking="9"/>]]></programlisting>
+      </section>
+
+
+      <section id="service-registry:export:service:attributes">
+       <para>
+       As a summary, the following table lists the attributes names, possible values and
+       a short description for each of them.
+       </para>
+       <table id="service-export-options" pgwide="1">
+          <title>OSGi &lt;service&gt; attributes</title>
+          <tgroup cols="3">
+            <colspec align="center" />
+            <thead>
+              <row>
+                <entry>Name</entry>
+                <entry>Values</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>interface</entry>
+                <entry>fully qualified class name (such as <literal>java.lang.Thread</literal>)</entry>
+                <entry>the fully qualified name of the class under which the object will be exported</entry>
+              </row>
+              <row>
+                <entry>ref</entry>
+                <entry>any bean name</entry>
+                <entry>Reference to the named bean to be exported as a service in the service registry.</entry>
+              </row>
+              <row>
+                <entry>context-class-loader</entry>
+                <entry>unmanaged | service-provider</entry>
+                <entry>Defines how the context class loader will be managed when an operation is invoked on the 
+                exported service. The default value is <literal>unmanaged</literal> which means that no management of 
+                the context class loader is attempted. A value of <literal>service-provider</literal> guarantees that
+                the context class loader will have visibility of all the resources on the class path of 
+                bundle exporting the service.</entry>
+              </row>
+              <row>
+                <entry>auto-export</entry>
+                <entry>disabled | interfaces | class-hierarchy | all-classes</entry>
+                <entry>Enables Spring to automatically manage the set of service interfaces advertised for the
+				service. By default this facility is <literal>disabled</literal>. A value of <literal>interfaces</literal> advertises all 
+                of the Java interfaces supported by the exported service. A value of <literal>class-hierarchy</literal> 
+                advertises all the Java classes in the hierarchy of the exported service. A value of 
+                <literal>all-classes</literal> advertises all Java interfaces and classes.</entry>
+              </row>
+              <row>
+                <entry>ranking</entry>
+                <entry>any integer value</entry>
+                <entry>Specify the service ranking to be used when advertising the service. Default value is 0.</entry>
+              </row>
+              
+            </tbody>
+          </tgroup>
+      </table>        
+      
+      </section>
 
       <section id="service-registry:export:lifecycle">
         <title>Service registration and unregistration lifecycle</title>
@@ -307,46 +381,6 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         is first created. It will be unregistered automatically when the
         bundle is stopped and the application context is disposed.</para>
 
-        <para>An exported service may depend, either directly or indirectly,
-        on other services in order to perform its function. If one of these
-        services is considered a <emphasis>mandatory</emphasis> dependency
-        (see section 5.2) and the dependency can no longer be satisfied
-        (because the backing service has gone away and there is no suitable
-        replacement available) then the exported service that depends on it
-        will be automatically unregistered from the service registry - meaning
-        that it is no longer available to clients. If the mandatory dependency
-        becomes satisfied once more (by registration of a suitable service),
-        then the exported service will be re-registered in the service
-        registry.</para>
-
-        <para>This automatic unregistering and re-registering of exported
-        services based on the availability of mandatory dependencies only
-        takes into account declarative dependencies. If exported service
-        <literal>S</literal> depends on bean <literal>A</literal>, which in
-        turn depends on mandatory imported service <literal>M</literal>, and
-        these dependencies are explicit in the Spring configuration file as
-        per the example below, then when <literal>M</literal> becomes
-        unsatisfied <literal>S</literal> will be unregistered. When
-        <literal>M</literal> becomes satisfied again, <literal>S</literal>
-        will be re-registered.</para>
-
-        <programlisting><![CDATA[<osgi:service id="S" ref="A" interface="SomeInterface"/>
-
-<bean id="A" class="SomeImplementation">
-   <property name="helperService" ref="M"/>
-</bean> 
-
-<!-- the reference element is used to refer to a service
-     in the service registry -->
-<osgi:reference id="M" interface="HelperService"
-     cardinality="1..1"/>]]></programlisting>
-
-        <para>If however the dependency from <literal>A</literal> on
-        <literal>M</literal> is not established through configuration as shown
-        above, but instead at runtime through for example passing a reference
-        to <literal>M</literal> to <literal>A</literal> without any
-        involvement from the Spring container, then Spring Dynamic Modules
-        will <emphasis>not</emphasis> track this dependency.</para>
 
         <para>If you need to take some action when a service is unregistered
         because its dependencies are not satisfied (or when it is registered),
@@ -471,7 +505,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section>
 
         <section id="service-registry:refs:singular:bean-name">
-          <title>The bean-name attribute</title>
+          <title>The <literal>bean-name</literal> attribute</title>
 
           <para>The <literal>bean-name</literal> attribute is a convenient
           short-cut for specifying a filter expression that matches on the
@@ -788,5 +822,54 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
           will be thrown.</para>
         </section>
       </section>
+      
+    </section>
+    
+    <section id="service-registry:export-import-relationship">
+    
+     <title>Relationship between the service exporter and service importer</title>
+       	
+        <para>An exported service may depend, either directly or indirectly,
+        on other services in order to perform its function. If one of these
+        services is considered a <emphasis>mandatory</emphasis> dependency
+        (see <xref linkend="service-registry:refs:singular:dynamics"/>) and the 
+        dependency can no longer be satisfied
+        (because the backing service has gone away and there is no suitable
+        replacement available) then the exported service that depends on it
+        will be automatically unregistered from the service registry - meaning
+        that it is no longer available to clients. If the mandatory dependency
+        becomes satisfied once more (by registration of a suitable service),
+        then the exported service will be re-registered in the service
+        registry.</para>
+
+        <para>This automatic unregistering and re-registering of exported
+        services based on the availability of mandatory dependencies only
+        takes into account declarative dependencies. If exported service
+        <literal>S</literal> depends on bean <literal>A</literal>, which in
+        turn depends on mandatory imported service <literal>M</literal>, and
+        these dependencies are explicit in the Spring configuration file as
+        per the example below, then when <literal>M</literal> becomes
+        unsatisfied <literal>S</literal> will be unregistered. When
+        <literal>M</literal> becomes satisfied again, <literal>S</literal>
+        will be re-registered.</para>
+
+        <programlisting><![CDATA[<osgi:service id="S" ref="A" interface="SomeInterface"/>
+
+<bean id="A" class="SomeImplementation">
+   <property name="helperService" ref="M"/>
+</bean> 
+
+<!-- the reference element is used to refer to a service
+     in the service registry -->
+<osgi:reference id="M" interface="HelperService"
+     cardinality="1..1"/>]]></programlisting>
+
+        <para>If however the dependency from <literal>A</literal> on
+        <literal>M</literal> is not established through configuration as shown
+        above, but instead at runtime through for example passing a reference
+        to <literal>M</literal> to <literal>A</literal> without any
+        involvement from the Spring container, then Spring Dynamic Modules
+        will <emphasis>not</emphasis> track this dependency.</para>
+    
     </section>
   </chapter>
