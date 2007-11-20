@@ -27,7 +27,7 @@
     be transparently injected with references to OSGi services.</para>
 
     <section id="bnd-app-ctx:extender">
-      <title> The Spring Dynamic Modules Extender bundle</title>
+      <title>The Spring Dynamic Modules Extender bundle</title>
 
       <para>Spring Dynamic Modules provides an OSGi bundle
       <literal>org.springframework.osgi.spring-osgi-extender</literal>. This
@@ -36,10 +36,10 @@
       url="http://www.springframework.org/docs/reference/webintegration.html">ContextLoaderListener</ulink>
       does for Spring web applications. Once the extender bundle is installed
       and started it looks for any existing Spring-powered bundles that are
-      already in the ACTIVE state and creates application contexts on their
+      already in the <emphasis>ACTIVE</emphasis> state and creates application contexts on their
       behalf. In addition, it listens for bundle starting events and
       automatically creates an application context for any Spring-powered
-      bundle that is subsequently started. Section <link linkend="app-deploy:headers">4.1</link> 
+      bundle that is subsequently started. <xref linkend="app-deploy:headers"/>
       describes what the extender recognizes as a "Spring-powered bundle".</para>
     </section>
 
@@ -52,7 +52,7 @@
       startup. A Spring-powered bundle may therefore transition to the STARTED
       state before its application context has been created. It is possible to
       force synchronous creation of application contexts on a bundle-by-bundle
-      basis. See <link linkend="app-deploy:headers">section 4</link> for information on how to specify this
+      basis. See <xref linkend="app-deploy:headers"/> for information on how to specify this
       behaviour.</para>
 
       <para>If application context creation fails for any reason then the
@@ -64,7 +64,7 @@
         <title>Mandatory Service Dependencies</title>
 
         <para>If an application context declares mandatory dependencies on the
-        availability of certain OSGi services (see section 4.0) then creation
+        availability of certain OSGi services (see <xref linkend="service-registry"/>) then creation
         of the application context is blocked until all mandatory dependencies
         can be satisfied through matching services available in the OSGi
         service registry. Since a service may come and go at any moment in an
@@ -72,7 +72,7 @@
         services were available at the moment creation of the application
         context began. One or more services may subsequently become
         unavailable again during the process of application context creation.
-        Section 5.0 describes what happens when a mandatory service reference
+        <xref linkend="service-registry"/> describes what happens when a mandatory service reference
         becomes unsatisfied. In practice, for most enterprise applications
         built using Spring Dynamic Modules services, the set of available
         services and bundles will reach a steady state once the platform and
@@ -84,14 +84,14 @@
         <para>A timeout applies to the wait for mandatory dependencies to be
         satisfied. By default the timeout is set to 5 minutes, but this value
         can be configured using the <literal>timeout</literal> directive. See
-        section 4 for details.</para>
+        <xref linkend="app-deploy:headers"/> for details.</para>
 
         <para>It is possible to change the application context creation
         semantics so that application context creation fails if all mandatory
         services are not immediately available upon startup (see section 4.1).
         When configured to not wait for dependencies, a bundle with
         unsatisfied mandatory dependencies will be stopped, leaving the bundle
-        in the RESOLVED state.</para>
+        in the <emphasis>RESOLVED</emphasis> state.</para>
       </section>
 
       <section id="bnd-app-ctx:app-creation:app-ctx-publication">
@@ -108,7 +108,7 @@
         value is set to the bundle symbolic name of the bundle hosting the
         application context. It is possible to prevent publication of the
         application context as a service using a directive in the bundle's
-        manifest. See section 4.2 for details.</para>
+        manifest. See <xref linkend="app-deploy:headers"/> for details.</para>
 
         <para>Note: the application context is published as a service
         primarily to facilitate testing, administration, and management.
