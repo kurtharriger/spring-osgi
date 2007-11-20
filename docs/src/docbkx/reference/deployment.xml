@@ -59,11 +59,11 @@
 
       <para>The Spring extender recognizes a bundle as "Spring-powered" and
       will create an associated application context when the bundle is started
-      if one or both of the following conditions is true:</para>
+      and one or both of the following conditions is true:</para>
 
       <itemizedlist>
         <listitem>
-          <para>The bundle classpath contains a folder
+          <para>The bundle path contains a folder
           <literal>META-INF/spring</literal> with one or more files in that
           folder with a '.xml' extension.</para>
         </listitem>
@@ -113,9 +113,9 @@
       <para>The syntax for the <literal>Spring-Context</literal> header value
       is:</para>
 
-      <screen>Spring-Context-Value ::= context ( ',' context ) *
+      <programlisting><![CDATA[Spring-Context-Value ::= context ( ',' context ) *
 context ::= path ( ';' path ) * (';' directive) *
-</screen>
+]]></programlisting>
 
       <para>This syntax is consistent with the OSGi Service Platform common
       header syntax defined in section 3.2.3 of the OSGi Service Platform Core
@@ -123,8 +123,8 @@ context ::= path ( ';' path ) * (';' directive) *
 
       <para>For example, the manifest entry:</para>
 
-      <screen>Spring-Context: config/account-data-context.xml, config/account-security-context.xml
-</screen>
+      <programlisting><![CDATA[Spring-Context: config/account-data-context.xml, config/account-security-context.xml
+]]></programlisting>
 
       <para>will cause an application context to be instantiated using the
       configuration found in the files
@@ -140,20 +140,18 @@ context ::= path ( ';' path ) * (';' directive) *
           <para><emphasis>create-asynchronously</emphasis> (false|true):
           controls whether the application context is created asynchronously
           (the default), or synchronously.</para>
-        </listitem>
-      </itemizedlist>
 
       <para>For example:</para>
 
-      <screen>Spring-Context: *;create-asynchronously=false 
-</screen>
+      <programlisting><![CDATA[Spring-Context: *;create-asynchronously=false 
+]]></programlisting>
 
       <para>Creates an application context synchronously, using all of the
       "*.xml" files contained in the <literal>META-INF/spring</literal>
       folder.</para>
 
-      <screen>Spring-Context: config/account-data-context.xml;create-asynchrously:=false
-</screen>
+      <programlisting><![CDATA[Spring-Context: config/account-data-context.xml;create-asynchrously:=false
+]]></programlisting>
 
       <para>Creates an application context synchronously using the
       <literal>config/account-data-context.xml</literal> configuration file.
@@ -161,23 +159,21 @@ context ::= path ( ';' path ) * (';' directive) *
       application context will be created on the OSGi event thread, blocking
       further event delivery until the context is fully initialized. If an
       error occurs during the synchronous creation of the application context
-      then a FrameworkEvent.ERROR event is raised. The bundle will still
-      proceed to the ACTIVE state.</para>
+      then a <literal>FrameworkEvent.ERROR</literal> event is raised. The bundle will still
+      proceed to the <literal>ACTIVE</literal> state.</para>
+        </listitem>
 
-      <itemizedlist>
         <listitem>
           <para><emphasis>wait-for-dependencies</emphasis> (true|false):
           controls whether or not application context creation should wait for
           any mandatory service dependencies to be satisfied before proceeding
           (the default), or proceed immediately without waiting if
           dependencies are not satisfied upon startup.</para>
-        </listitem>
-      </itemizedlist>
 
       <para>For example:</para>
 
-      <screen>Spring-Context: config/osgi-*.xml;wait-for-dependencies:=false
-</screen>
+      <programlisting><![CDATA[Spring-Context: config/osgi-*.xml;wait-for-dependencies:=false
+]]></programlisting>
 
       <para>Creates an application context using all the files matching
       "osgi-*.xml" in the config directory. Context creation will begin
@@ -185,40 +181,40 @@ context ::= path ( ';' path ) * (';' directive) *
       means that mandatory service references are treated as though they were
       optional - clients will be injected with a service object that may not
       be backed by an actual service in the registry initially. See section
-      4.2 for more details.</para>
-
-      <itemizedlist>
+      5.2 for more details.</para>
+        </listitem>
+        
         <listitem>
           <para><emphasis>timeout</emphasis> (300): the time to wait (in
           seconds) for mandatory dependencies to be satisfied before giving up
           and failing application context creation. This setting is ignored if
           <literal>wait-for-dependencies:=false</literal> is specified. The
           default is 5 minutes (300 seconds).</para>
-        </listitem>
-      </itemizedlist>
 
       <para>For example:</para>
 
-      <screen>Spring-Context: *;timeout:=60
-</screen>
-
-      <itemizedlist>
+      <programlisting><![CDATA[Spring-Context: *;timeout:=60
+]]></programlisting>
+	  <para>Creates an application context that waits up to 1 minute (60 seconds)
+	  for its mandatory dependencies to appear.
+	  </para>
+        </listitem>
         <listitem>
           <para><emphasis>publish-context</emphasis> (true|false): controls
           whether or not the application context object itself should be
           published in the OSGi service registry. The default is to publish
           the context.</para>
-        </listitem>
-      </itemizedlist>
 
       <para>For example:</para>
 
-      <screen>Spring-Context: *;publish-context:=false
-</screen>
+      <programlisting><![CDATA[Spring-Context: *;publish-context:=false
+]]></programlisting>
 
       <para>If there is no Spring-Context manifest entry, or no value is
       specified for a given directive in that entry, then the directive takes
       on its default value.</para>
+        </listitem>
+      </itemizedlist>
     </section>
 
     <section>

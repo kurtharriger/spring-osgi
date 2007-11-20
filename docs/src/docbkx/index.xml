@@ -42,14 +42,14 @@
   <toc />
 
   <xi:include href="preface.xml"/>
-  <part>
+  <part id="introduction">
       <title>Introduction</title>
 
 	  <xi:include href="introduction/introduction.xml"/>
       <xi:include href="introduction/why-spring-dm.xml"/>
       <xi:include href="introduction/requirements.xml"/>
   </part>
-  <part>
+  <part id="reference">
 	  <title>Reference Documentation</title>
 
       <xi:include href="reference/introduction.xml"/>
@@ -60,13 +60,9 @@
 	  <xi:include href="reference/compendium.xml"/>
 	  <xi:include href="reference/testing.xml"/>
   </part>
-  <part id="appendix">
+  <part id="appendixes">
       <title>Appendixes</title>
-      <partintro>
-          <para>
-			  Various appendixes outside the reference documentation.
-          </para>
-      </partintro>
+      <xi:include href="appendix/introduction.xml"/>
       <xi:include href="appendix/appendix-extensions.xml"/>
       <xi:include href="appendix/appendix-roadmap.xml"/>
       <xi:include href="appendix/appendix-schema.xml"/>

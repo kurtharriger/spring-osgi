@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<chapter id="appendix-roadmap">
+<appendix id="appendix-roadmap">
     <title>Appendix B: Roadmap</title>
 
     <para>This appendix documents features on the Spring Dynamic Modules
@@ -236,4 +236,4 @@ public void anyMethodName(Dictionary properties);</screen>
       url="http://www.osgi.org/blog/2007/06/osgi-and-hibernate.html">blog
       entry</ulink> on the topic for an insight into the issues.</para>
     </section>
-</chapter>
+</appendix>
