@@ -411,7 +411,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         during registration and unregistration. A registration callback method
         must have a signature matching the following format</para>
 
-        <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance);]]></programlisting>
+        <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Map serviceProperties);]]></programlisting>
 
         <para>where <literal>ServiceType</literal> can be any type compatible
         with the exported service interface of the service.</para>
@@ -419,16 +419,31 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <para>An unregistration callback method must have a signature of the
         form</para>
 
-        <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance);]]></programlisting>
+        <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Map serviceProperties);]]></programlisting>
 
         <para>where <literal>ServiceType</literal> can be any type compatible
         with the exported service interface of the service.</para>
 
         <para>The register callback is invoked when the service is initially
         registered at startup, and whenever it is subsequently re-registered.
-        The unregister callback is invoked immediately after the service is
-        unregistered, including when the service is unregistered because the
-        bundle is stopping.</para>
+        The unregister callback is invoked during the service unregistration process, 
+        no matter the cause (such as the owning bundle stopping).</para>
+        
+        <para>Spring-DM will use the declared <literal>ServiceType</literal> argument type
+        and invoke the registration/unregistration method only when a service of a compatible type
+        will be registered/unregistered.</para>
+        
+        <para><literal>serviceProperties</literal> represents a map holding all the properties
+        of the registered/unregistered service. To preserve compatibility with the OSGi specification
+        this argument can be cast, if needed, to a <literal>java.util.Dictionary</literal>.</para>
+        
+        <section id="service-registry:export:lifecycle:interface">
+        While we discourage, it is possible to implement a Spring-DM specific interface, namely 
+        <interfacename>org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener</interfacename> which avoids the need
+        to declare the <literal>registration-method</literal> and <literal>unregistration-method</literal>.
+        However, by implementing <interfacename>OsgiServiceRegistrationListener</interfacename>, your code
+        becomes Spring-DM aware (which goes against the POJO philosophy). 
+        </section>
       </section>
     </section>
 
@@ -451,8 +466,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       url="www.osgi.org/documents/osgi_technology/whiteboard.pdf">whiteboard
       pattern</ulink>, references to <emphasis>all available</emphasis>
       matching services are required. Spring Dynamic Modules supports the
-      management of this set of references as a <literal>List</literal>,
-      <literal>Set</literal>.</para>
+      management of this set of references as a <interfacename>List</interfacename>,
+      <interfacename>Set</interfacename> collection.</para>
 
       <section id="service-registry:refs:singular">
         <title>Referencing an individual service</title>
@@ -464,7 +479,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         following declaration creates a bean
         <literal>messageService</literal>, which is backed by the service
         returned from the service registry when querying it for a service
-        offering the <literal>MessageService</literal> interface.</para>
+        offering the <interfacename>MessageService</interfacename> interface.</para>
 
         <programlisting><![CDATA[<reference id="messageService" interface="com.xyz.MessageService"/>]]></programlisting>
 
@@ -473,25 +488,54 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <literal>BundleContext.getServiceReference</literal>. This means that
         the service with the highest ranking will be returned, or if there is
         a tie in ranking, the service with the lowest service id (the service
-        registered first with the framework) is returned.</para>
+        registered first with the framework) is returned (please see Section 5
+        from the OSGi spec for more information on the service selection algorithm).</para>
 
         <para>The bean defined by the reference element implements all of the
-        registered interfaces of the service that are visible to the bundle.
+        advertised interfaces of the service that are visible to the bundle.
         If the registered service interfaces include Java class types (as
         opposed to interface types) then support for these types is subject to
         the restrictions of Spring's AOP implementation (see the Spring
-        Reference Guide). In short, <literal>cglib</literal> must be
+        Reference Guide). In short, <literal>cglib</literal> library must be
         available, and <literal>final</literal> methods are not
         supported.</para>
 
-        <para>If the property into which a reference bean is to be injected
-        has type <literal>ServiceReference</literal> (instead of the service
-        interface supported by the reference), then the OSGi
-        <literal>ServiceReference</literal> for the service will be injected
-        in place of the service itself.</para>
+		<section id="service-registry:refs:singular:property-editor">
+		<title>Getting a hold of the managed service service reference</title>
+        
+        <para>Spring-DM can automatically convert a managed OSGi service to 
+        service reference. That is, if the property into which a reference bean 
+        is to be injected, has type <interfacename>ServiceReference</interfacename> (instead of the service
+        interface supported by the reference), then the managed OSGi
+        <interfacename>ServiceReference</interfacename> for the service will be injected
+        in place of the service itself:</para>
 
+		<programlisting><![CDATA[
+public class BeanWithServiceReference {
+	private ServiceReference serviceReference;
+	private SomeService service;
+			
+	// getters/setters ommitted
+}]]></programlisting>
+		
+		<programlisting><![CDATA[
+<reference id="service" interface="com.xyz.SomeService"/>
+		
+<bean id="someBean" class="BeanWithServiceReference">
+  <!-- the managed service is converted into a ServiceReference -->
+  <property name="serviceReference" ref="service"/> 
+  <!-- the managed service is injected as is -->
+  <property name="service" ref="service"/>
+</bean>]]></programlisting>
+		
+		<note>
+		The injected ServiceReference is managed by Spring-DM and will change
+		at the same time as the referenced backing OSGi service instance.  
+		</note>
+		</section>
+		
         <section id="service-registry:refs:singular:filter">
-          <title>The filter attribute</title>
+          <title>The <literal>filter</literal> attribute</title>
 
           <para>The optional <literal>filter</literal> attribute can be used
           to specify an OSGi filter expression and constrains the service
@@ -502,6 +546,10 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 
           <programlisting><![CDATA[<reference id="asyncMessageService" interface="com.xyz.MessageService"
   filter="(asynchronous-delivery=true)"/>]]></programlisting>
+  
+  		  <para>will match only OSGi services that advertise <interfacename>MessageService</interfacename>
+  		  interface and have the property named <literal>asynchronous-delivery</literal> set to value <literal>true</literal>.
+  		  </para>
         </section>
 
         <section id="service-registry:refs:singular:bean-name">
@@ -509,17 +557,32 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 
           <para>The <literal>bean-name</literal> attribute is a convenient
           short-cut for specifying a filter expression that matches on the
-          bean-name property automatically set when exporting a bean using the
-          <literal>service</literal> element (see section 4.1).</para>
+          <literal>bean-name</literal> property automatically set when exporting a bean using the
+          <literal>service</literal> element (see <xref linkend="service-registry:export"/>).</para>
 
           <para>For example:</para>
 
           <programlisting><![CDATA[<reference id="messageService" interface="com.xyz.MessageService"
    bean-name="defaultMessageService"/>]]></programlisting>
+   
+   		  <para>will match only OSGi services that advertise <interfacename>MessageService</interfacename>
+   		  interface and have the property named <literal>org.springframework.osgi.bean.name</literal> set
+   		  to value <literal>defaultMessageService</literal>. In short, this means finding all Spring-DM exported
+   		  beans that implement interface <interfacename>MessageService</interfacename> and are named
+   		  <literal>defaultMessageService</literal>.</para>
+   		  
         </section>
 
         <section id="service-registry:refs:singular:cardinality">
-          <title>The cardinality attribute</title>
+          <title>The <literal>cardinality</literal> attribute</title>
+
+		  <sidebar>
+		    <title><![CDATA[Nested <reference> declarations]]></title>
+		    <para>In order for Spring-DM to detect mandatory dependencies, any
+		    <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-inner-beans">nested/inner</ulink>
+		    reference declaration will be transformed into top-level
+		    one with a generated name.</para>
+		  </sidebar>
 
           <para>The <literal>cardinality</literal> attribute is used to
           specify whether or not a matching service is required at all times.
@@ -529,14 +592,14 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
           matching service is not required at all times (see section 4.2.1.6
           for more details). A <literal>reference</literal> with cardinality
           <literal>1..1</literal> is also known as a
-          <emphasis>mandatory</emphasis> service reference and by default
+          <emphasis>mandatory</emphasis> service reference and, by default,
           application context creation is deferred until the reference is
           satisfied.</para>
 
-          <para>Note: it is an error to declare a mandatory reference to a
+          <note>It is an error to declare a mandatory reference to a
           service that is also exported by the same bundle, this behavior can
           cause application context creation to fail through either deadlock
-          or timeout.</para>
+          or timeout.</note>
         </section>
 
         <section id="service-registry:refs:singular:depends-on">
@@ -562,16 +625,42 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
           <literal>context-class-loader</literal> attribute of the
           <literal>reference</literal> element.</para>
 
+		  <sidebar>
+		    <title>context class loader management on the importer and exporter</title>
+		    <para>
+		      Spring-DM has the ability to do context class loader management on both
+		      the importer and exporter side. Normally, if Spring-DM works on both sides,
+		      only one side should have this feature enabled. However, if both sides 
+		      (importer and exporter) take advantage of this capability, the last
+		      entity in the call chain will win. This means that the exporter setting,
+		      if enabled, will always override the importer setting (whatever that is). 
+		    </para>
+		  </sidebar>
+		  
           <para>The permissible values for the
-          <literal>context-class-loader</literal> attribute are
-          <literal>unmanaged</literal> (the default),
-          <literal>client</literal>, and <literal>service-provider</literal>.
-          When the <literal>client</literal> value is specified, the context
-          class loader at the point of service invocation is guaranteed to be
-          able to see types on the classpath of the invoking bundle. When the
-          <literal>service-provider</literal> value is specified, the context
-          class loader is guaranteed to be able to see types on the classpath
-          of the bundle that exported the service.</para>
+          <literal>context-class-loader</literal> attribute are:</para>
+          
+          <itemizedlist>
+          	<listitem>
+          	<para><literal>client</literal> - during the service invocation,
+          	the context	class loader is guaranteed to be
+          	able to see types on the classpath of the invoking bundle.
+          	This is the default option.</para>
+          	</listitem>
+
+          	<listitem>
+          	<para><literal>service-provider</literal> - during the service invocation,
+          	the context	class loader is guaranteed to be
+          	able to see types on the classpath of the bundle exporting
+          	the service.</para>
+          	</listitem>
+
+          	<listitem>
+          	<para><literal>unmanaged</literal> - no context class loader
+          	management will occur during the service invocation</para>
+          	</listitem>
+          </itemizedlist>
+          
         </section>
 
         <section id="service-registry:refs:singular:dynamics">
@@ -607,26 +696,6 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
           no matching service becomes available within the timeout period, an
           unchecked <literal>ServiceUnavailableException</literal> is
           thrown.</para>
-
-          <para>When using the <literal>osgi</literal> element to enclose
-          <literal>service</literal> and <literal>reference</literal>
-          elements, the <literal>default-timeout</literal> attribute may be
-          used to specify a default timeout (in milliseconds) for all
-          reference elements that do not explicitly specify one. For
-          example:</para>
-
-          <programlisting><![CDATA[<beans:beans osgi:default-timeout="5000">
-
-  <!-- we will wait up to 5 seconds for a matching service on
-       invocation -->
-  <reference id="someService" interface="com.xyz.AService"/>
-
-  <!-- we will wait only 1 second for a matching service on 
-       invocation -->
-  <reference id="someOtherService" interface="com.xyz.BService"
-       timeout="1000"/>
-
-</beans:beans>]]></programlisting>
 
           <para>For applications that need to be aware of when the service
           backing a <literal>reference</literal> bean is bound and unbound, it
@@ -698,6 +767,71 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
           delivers the corresponding OSGi
           <literal>ServiceEvent</literal>.</para>
         </section>
+        
+      	<section id="service-registry:refs:singular:reference:attributes">
+       	<para>
+       	As a summary, the following table lists the <literal>reference</literal> element 
+       	attributes names, possible values and a short description for each of them.
+        </para>
+       	<table id="reference-import-options" pgwide="1">
+          <title><![CDATA[OSGi <service> attributes]]></title>
+          <tgroup cols="3">
+            <colspec align="center" />
+            <thead>
+              <row>
+                <entry>Name</entry>
+                <entry>Values</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>interface</entry>
+                <entry>fully qualified class name (such as <classname>java.lang.Thread</classname>)</entry>
+                <entry>The fully qualified name of the class under which the object will be exported.</entry>
+              </row>
+              <row>
+                <entry>filter</entry>
+                <entry>OSGi filter expression (such as <literal>((asynchronous-delivery=true)</literal>)</entry>
+                <entry>OSGi filter expression that is used to constrain the set of matching services
+                in the service registry.</entry>
+              </row>
+              <row>
+                <entry>bean-name</entry>
+                <entry>any string value</entry>
+                <entry>Convenient shortcut for specifying a filter expression that matches on the bean-name property 
+                that is automatically advertised for beans published using the &lt;service&gt; element.</entry>
+              </row>
+              <row>
+                <entry>context-class-loader</entry>
+                <entry>client |  service-provider | unmanaged</entry>
+                <entry>Defines how the context class loader is managed when invoking operations on a service
+                backing this service reference. The default value is <literal>client</literal> which means that the context
+                class loader has visibility of the resources on this bundle's classpath. Alternate
+                options are <literal>service-provider</literal> which means that the context class loader has visibility of 
+                resources on the bundle classpath of the bundle that exported the service, and <literal>unmanaged</literal>
+               	which does not do any management of the context class loader.</entry>
+              </row>
+              <row>
+                <entry>cardinality</entry>
+                <entry>0..1 | 1..1</entry>
+                <entry>Defines the required cardinality of the relationship to the backing service. If not specified, 
+                the <literal>default-cardinality</literal> attribute will apply. A value is '1..1' means that a backing service 
+                must exist (this is a mandatory service reference). A value of '0..1' indicates that it is 
+                acceptable to be no backing service (an optional service reference).</entry>
+              </row>
+              <row>
+                <entry>timeout</entry>
+                <entry>any positive long</entry>
+                <entry>The amount of time (in milliseconds) to wait for a backing service to be 
+				available when an operation is invoked. If not specified, the <literal>default-timeout</literal> attribute will apply.
+                </entry>
+              </row>              
+            </tbody>
+          </tgroup>
+	     </table>        
+    	</section>
+              
       </section>
 
       <section id="service-registry:refs:multi">
@@ -823,6 +957,69 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
         </section>
       </section>
       
+    </section>
+    
+    <section id="service-registry:refs:global-defaults">
+      <title>Service importer global defaults</title>
+
+  	  <para>The <literal>osgi</literal> namespace allows offers two
+  	  global attributes for specifying default behaviours for all
+  	  importers declared in that file.</para>
+  	        
+      <para>Thus, when using the <literal>osgi</literal> namespace to enclose
+      <literal>set</literal>, <literal>list</literal> or 
+      <literal>reference</literal> elements, one can use:</para>
+      
+      <itemizedlist>
+        <listitem>
+        <para><literal>default-timeout</literal> - 
+      can be used to specify the default timeout (in milliseconds) for all
+      importer elements that do not explicitly specify one. For
+      example:</para>
+
+      <programlisting><![CDATA[<beans:beans osgi:default-timeout="5000">
+
+  <!-- we will wait up to 5 seconds for a matching service on
+       invocation -->
+  <reference id="someService" interface="com.xyz.AService" .../>
+
+  <!-- we will wait only 1 second for a matching service on 
+       invocation -->
+  <reference id="someOtherService" interface="com.xyz.BService"
+       timeout="1000" .../>
+
+</beans:beans>]]></programlisting>
+
+		</listitem>
+
+		<listitem>
+		<para><literal>default-cardinality</literal> -
+		can be used to specify the default cardinality for all
+      	importer elements that do not explicitly specify one.
+      	Possible values are <literal>0..X</literal> and <literal>1..X</literal>
+      	where <literal>X</literal> is substituted at runtime to <literal>1</literal>
+      	for <literal>reference</literal> elements or <literal>N</literal>
+      	for collection types such as <literal>set</literal> or <literal>list</literal>.
+      	</para>
+      	
+      	<para>Consider the following example:</para>
+      <programlisting><![CDATA[<beans:beans osgi:default-cardinality="0..X">
+
+  <!-- no cardinality specified, global cardinality inherited = 0..1 -->
+  <reference id="someService" interface="com.xyz.AService"/>
+
+  <!-- no cardinality specified, global cardinality inherited = 0..N -->
+  <set id="someSetOfService" interface="com.xyz.BService"/>
+
+  <!-- local cardinality cardinality specified, override global attribute -->
+  <list id="anotherListOfServices" interface="com.xyz.CService" cardinality="1..N"/>
+
+</beans:beans>]]></programlisting>
+		</listitem>
+      </itemizedlist>
+      
+      <para>The <literal>default-*</literal> attributes allow for concise and shorter declarations as well
+      as easy propagation of changes (such as increasing or decreasing the timeout).</para>
     </section>
     
     <section id="service-registry:export-import-relationship">
