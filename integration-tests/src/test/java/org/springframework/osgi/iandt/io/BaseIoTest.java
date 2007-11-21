@@ -61,10 +61,6 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 		thisClass = null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests#getManifestLocation()
-	 */
 	protected String getManifestLocation() {
 		// reuse the manifest from Fragment Io Tests
 		return "org/springframework/osgi/iandt/io/FragmentIoTests.MF";
@@ -76,9 +72,9 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 	protected String[] getTestBundlesNames() {
 		return new String[] {
 				"org.springframework.osgi,org.springframework.osgi.iandt.io.fragment.1.bundle,"
-						+ getSpringOsgiVersion(),
+						+ getSpringDMVersion(),
 				"org.springframework.osgi,org.springframework.osgi.iandt.io.fragment.2.bundle,"
-						+ getSpringOsgiVersion() };
+						+ getSpringDMVersion() };
 	}
 
 	protected Object[] copyEnumeration(Enumeration enm) {
