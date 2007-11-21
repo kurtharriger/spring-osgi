@@ -18,7 +18,6 @@ package org.springframework.osgi.iandt.io;
 import java.net.URL;
 import java.util.Enumeration;
 
-import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -42,21 +41,20 @@ public class RawIoTest extends BaseIoTest {
 		assertNotNull(url);
 	}
 
-	// fails on Felix & KF
+	// fails on Felix
 	public void testGetResourceOnRoot() throws Exception {
 		URL url = bundle.getResource("/");
 		System.out.println(url);
 		assertNotNull(url);
 	}
 
-	// fails on Felix & KF
+	// fails on Felix
 	public void testGetResourceSOnRoot() throws Exception {
 		Enumeration enm = bundle.getResources("/");
 		Object[] res = copyEnumeration(enm);
 		assertEquals("root folder not validated" + ObjectUtils.nullSafeToString(res), 1, res.length);
 	}
 
-	// fails on KF
 	public void testFindEntriesOnFolders() throws Exception {
 		Enumeration enm = bundle.findEntries("/", null, false);
 		// should get 3 entries - META-INF/, org/ and log4j.properties
@@ -74,7 +72,6 @@ public class RawIoTest extends BaseIoTest {
 
 	// Valid jars do not have entries for root folder / - in fact it doesn't
 	// even exist
-	// fails on KF
 	public void testGetEntryOnRoot() throws Exception {
 		URL url = bundle.getEntry("/");
 		assertNotNull(url);
@@ -107,6 +104,6 @@ public class RawIoTest extends BaseIoTest {
 	}
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (!(isEquinox()));
+		return (!(isEquinox() && isKF()));
 	}
 }

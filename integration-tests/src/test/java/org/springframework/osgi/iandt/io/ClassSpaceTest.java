@@ -65,12 +65,4 @@ public class ClassSpaceTest extends BaseIoTest {
 			// expected
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.ConditionalTestCase#isDisabledInThisEnvironment(java.lang.String)
-	 */
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return isKF() && ("testFolder".equals(testMethodName) || "testMetaInfFolder".equals(testMethodName));
-	}
 }

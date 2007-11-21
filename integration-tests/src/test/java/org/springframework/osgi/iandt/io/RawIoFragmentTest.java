@@ -33,7 +33,7 @@ public class RawIoFragmentTest extends BaseIoTest {
 	//
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return !(isEquinox());
+		return !(isEquinox() || isKF());
 	}
 
 	/**

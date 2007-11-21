@@ -124,5 +124,4 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		return isKF();
 	}
-
 }

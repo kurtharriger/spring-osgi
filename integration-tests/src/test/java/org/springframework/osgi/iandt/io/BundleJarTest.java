@@ -53,7 +53,4 @@ public class BundleJarTest extends BaseIoTest {
 		assertEquals(0, res.length);
 	}
 
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return isKF();
-	}
 }

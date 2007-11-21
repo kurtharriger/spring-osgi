@@ -53,7 +53,7 @@
    
    <!-- platform versions -->
    <equinox.ver>3.2.2</equinox.ver>
-   <kf.ver>2.0.1</kf.ver>
+   <kf.ver>2.0.2</kf.ver>
    <felix.ver>1.0.1</felix.ver>
   </properties>
 

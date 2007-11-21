@@ -3,7 +3,6 @@ package org.springframework.osgi.iandt.serviceListener;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.iandt.service.listener.MyListener;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
@@ -54,16 +53,13 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 	}
 
 	protected long getDefaultWaitTime() {
-		return 7L;
+		return 10L;
 	}
 
 	// disable this on KF
-	// TODO: double check on KF 2.0.2
+	// TODO: double check on KF 2.0.3
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		return createPlatform().toString().startsWith("Knopflerfish");
 	}
-	
-//	protected String getPlatformName() {
-//		return Platforms.KNOPFLEFISH;
-//	}
+
 }
