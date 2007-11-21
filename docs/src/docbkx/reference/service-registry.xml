@@ -1016,12 +1016,11 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
 		  the user so it is possible to safely traverse the collection while it is being modified. Moreover, the 
 		  <interfacename>Iterator</interfacename> will reflect all the changes made to the collection, even if 
 		  they occurred after the <interfacename>Iterator</interfacename> was created or during the iteration.
-		  Consider the case where iteration is started over a collection that right after the
-		  iteration is started, is shrunk significantly (for example a big number of OSGi
-		  services are shutdown).
+		  Consider a case where a collection shrinks significantly (for example a big number of OSGi
+		  services are shutdown) right after an iteration started.
 		  To avoid dealing with a lot of 'dead' service references that throw exceptions on usage,
 		  Spring-DM iterators do not take collection snapshots but rather are updated on each service
-		  event so they reflect the latest collection state no matter how fast or slow the iteration is.</para>
+		  event so they reflect the latest collection state, no matter how fast or slow the iteration is.</para>
 		  
 		  <para>Please note that the <interfacename>Iterator</interfacename> contract is guaranteed meaning that 
 		  <literal>next()</literal> method <emphasis>always</emphasis> obey the result of the previous 
@@ -1080,6 +1079,95 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
           such a service, a <literal>ServiceUnavailableException</literal>
           will be thrown.</para>
         </section>
+        
+        
+        <section id="service-registry:refs:singular:collection:attributes">
+       	<para>
+       	As a summary, the following table lists the <literal>set</literal> and <literal>list</literal> element 
+       	attributes names, possible values and a short description for each of them.
+        </para>
+       	<table id="collection-import-options" pgwide="1">
+          <title><![CDATA[OSGi <reference> attributes]]></title>
+          <tgroup cols="3">
+            <colspec align="center" />
+            <thead>
+              <row>
+                <entry>Name</entry>
+                <entry>Values</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>interface</entry>
+                <entry>fully qualified class name (such as <classname>java.lang.Thread</classname>)</entry>
+                <entry>The fully qualified name of the class under which the object will be exported.</entry>
+              </row>
+              <row>
+                <entry>filter</entry>
+                <entry>OSGi filter expression (such as <literal>((asynchronous-delivery=true)</literal>)</entry>
+                <entry>OSGi filter expression that is used to constrain the set of matching services
+                in the service registry.</entry>
+              </row>
+              <row>
+                <entry>bean-name</entry>
+                <entry>any string value</entry>
+                <entry>Convenient shortcut for specifying a filter expression that matches on the bean-name property 
+                that is automatically advertised for beans published using the &lt;service&gt; element.</entry>
+              </row>
+              <row>
+                <entry>context-class-loader</entry>
+                <entry>client |  service-provider | unmanaged</entry>
+                <entry>Defines how the context class loader is managed when invoking operations on a service
+                backing this service reference. The default value is <literal>client</literal> which means that the context
+                class loader has visibility of the resources on this bundle's classpath. Alternate
+                options are <literal>service-provider</literal> which means that the context class loader has visibility of 
+                resources on the bundle classpath of the bundle that exported the service, and <literal>unmanaged</literal>
+               	which does not do any management of the context class loader.</entry>
+              </row>
+              <row>
+                <entry>cardinality</entry>
+                <entry>0..N | 1..N</entry>
+                <entry>Defines the required cardinality of the relationship to the backing service. If not specified, 
+                the <literal>default-cardinality</literal> attribute will apply. A value is '1..N' means that a backing service 
+                must exist (this is a mandatory service reference). A value of '0..N' indicates that it is 
+                acceptable to be no backing service (an optional service reference).</entry>
+              </row>
+              <row>
+                <entry>comparator-ref</entry>
+                <entry>any string value</entry>
+                <entry>Named reference to a bean acting as comparator for the declaring collection. Declaring a comparator automatically
+                makes the declaring collection sorted.</entry>
+              </row>              
+            </tbody>
+          </tgroup>
+	     </table>
+	     
+	     <para>The table below lists the attributes available for the <literal>comparator/natural</literal> sub element.</para>
+
+       	 <table id="collection-import-comparator-options" pgwide="1">
+          <title><![CDATA[OSGi <listener> attributes]]></title>
+          <tgroup cols="3">
+            <colspec align="center" />
+            <thead>
+              <row>
+                <entry>Name</entry>
+                <entry>Values</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>basis</entry>
+                <entry>service | service-reference</entry>
+                <entry>Indicate the element on which <emphasis>natural ordering</emphasis> should apply - <literal>service</literal> for considering
+                the service instance and <literal>service-reference</literal> for considering the service reference instead of the service.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+	     </table>	          
+    	</section>
+              
       </section>
       
     </section>
