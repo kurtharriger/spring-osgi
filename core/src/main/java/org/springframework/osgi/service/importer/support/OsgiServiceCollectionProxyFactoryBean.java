@@ -153,7 +153,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	 * ordering. <p/> Thus, instead of list a sorted list will be created and
 	 * instead of a set, a sorted set.
 	 * 
-	 * @see #setCollectionType(String)
+	 * @see #setCollectionType(CollectionType)
 	 * 
 	 * @param comparator Comparator (can be null) used for ordering the
 	 * resulting collection.

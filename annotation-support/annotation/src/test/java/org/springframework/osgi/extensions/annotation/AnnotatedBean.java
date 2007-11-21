@@ -18,9 +18,10 @@
  */
 package org.springframework.osgi.extensions.annotation;
 
+import java.util.List;
+import java.util.SortedSet;
+
 import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.extensions.annotation.ServiceReferenceCardinality;
-import org.springframework.osgi.extensions.annotation.ServiceReferenceClassLoader;
 
 /**
  * @author Andy Piper
@@ -35,8 +36,8 @@ public class AnnotatedBean {
 	private ApplicationContext applicatonContextType;
 	private AnnotatedBean annotatedBeanTypeWithCardinality1_1;
 	private AnnotatedBean annotatedBeanTypeWithCardinality0_1;
-	private AnnotatedBean annotatedBeanTypeWithCardinality0_N;
-	private AnnotatedBean annotatedBeanTypeWithCardinality1_N;
+	private List<AnnotatedBean> annotatedBeanTypeWithCardinality0_N;
+	private SortedSet<AnnotatedBean> annotatedBeanTypeWithCardinality1_N;
 	private AnnotatedBean annotatedBeanTypeWithClassLoaderClient;
 	private AnnotatedBean annotatedBeanTypeWithClassLoaderServiceProvider;
 	private AnnotatedBean annotatedBeanTypeWithClassLoaderUmanaged;
@@ -109,21 +110,21 @@ public class AnnotatedBean {
 		this.annotatedBeanTypeWithCardinality0_1 = annotatedBeanTypeWithCardinality0_1;
 	}
 
-	public AnnotatedBean getAnnotatedBeanTypeWithCardinality0_N() {
+	public List<AnnotatedBean> getAnnotatedBeanTypeWithCardinality0_N() {
 		return annotatedBeanTypeWithCardinality0_N;
 	}
 
 	@ServiceReference(cardinality = ServiceReferenceCardinality.C0__N)
-	public void setAnnotatedBeanTypeWithCardinality0_N(AnnotatedBean annotatedBeanTypeWithCardinality0_N) {
+	public void setAnnotatedBeanTypeWithCardinality0_N(List<AnnotatedBean> annotatedBeanTypeWithCardinality0_N) {
 		this.annotatedBeanTypeWithCardinality0_N = annotatedBeanTypeWithCardinality0_N;
 	}
 
-	public AnnotatedBean getAnnotatedBeanTypeWithCardinality1_N() {
+	public SortedSet<AnnotatedBean> getAnnotatedBeanTypeWithCardinality1_N() {
 		return annotatedBeanTypeWithCardinality1_N;
 	}
 
 	@ServiceReference(cardinality = ServiceReferenceCardinality.C1__N)
-	public void setAnnotatedBeanTypeWithCardinality1_N(AnnotatedBean annotatedBeanTypeWithCardinality1_N) {
+	public void setAnnotatedBeanTypeWithCardinality1_N(SortedSet<AnnotatedBean> annotatedBeanTypeWithCardinality1_N) {
 		this.annotatedBeanTypeWithCardinality1_N = annotatedBeanTypeWithCardinality1_N;
 	}
 

@@ -17,6 +17,10 @@ package org.springframework.osgi.extensions.annotation;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,16 +36,19 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
+import org.springframework.osgi.service.importer.support.CollectionType;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.util.ReflectionUtils;
 
 /**
  * BeanPostProcessor that injects OSGi services.
- * 
+ *
  * @author Andy Piper
  */
 public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements
-		BundleContextAware, BeanFactoryAware, BeanClassLoaderAware {
+	BundleContextAware, BeanFactoryAware, BeanClassLoaderAware {
 
 	private BundleContext bundleContext;
 
@@ -58,7 +65,7 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 	/**
 	 * process FactoryBean created objects, since these will not have had
 	 * services injected.
-	 * 
+	 *
 	 * @param bean
 	 * @param beanName
 	 */
@@ -81,7 +88,7 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 					try {
 						if (logger.isDebugEnabled())
 							logger.debug("Processing annotation [" + s + "] for [" + bean.getClass().getName() + "."
-									+ method.getName() + "()] on bean [" + beanName + "]");
+								+ method.getName() + "()] on bean [" + beanName + "]");
 						method.invoke(bean, getServiceProperty(s, method, beanName));
 					}
 					catch (Exception e) {
@@ -93,7 +100,7 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 	}
 
 	public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean,
-			String beanName) throws BeansException {
+	                                                String beanName) throws BeansException {
 
 		MutablePropertyValues newprops = new MutablePropertyValues(pvs);
 		for (PropertyDescriptor pd : pds) {
@@ -116,22 +123,31 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 		// Invocations will block here, so although the ApplicationContext is
 		// created nothing will
 		// proceed until all the dependencies are satisfied.
-		return getServiceProperty(new OsgiServiceProxyFactoryBean(), s, writeMethod, beanName).getObject();
+		Class<?>[] params = writeMethod.getParameterTypes();
+		if (params.length != 1) {
+			throw new IllegalArgumentException("Setter for [" + beanName + "] must have only one argument");
+		}
+		if (Collection.class.isAssignableFrom(params[0])) {
+			return getServiceProperty(new OsgiServiceCollectionProxyFactoryBean(), s, writeMethod, beanName).getObject();
+		}
+		else {
+			return getServiceProperty(new OsgiServiceProxyFactoryBean(), s, writeMethod, beanName).getObject();
+		}
 	}
 
-	/* package */OsgiServiceProxyFactoryBean getServiceProperty(OsgiServiceProxyFactoryBean pfb, ServiceReference s,
-			Method writeMethod, String beanName) throws Exception {
-		pfb.setTimeout(s.timeout());
+	// Package protected for testing
+	private AbstractOsgiServiceImportFactoryBean getServicePropertyInternal(AbstractOsgiServiceImportFactoryBean pfb, ServiceReference s,
+	                                                                        Method writeMethod, String beanName) throws Exception {
 		if (s.filter().length() > 0) {
 			pfb.setFilter(s.filter());
 		}
 		if (s.serviceTypes() == null || s.serviceTypes().length == 0
-				|| (s.serviceTypes().length == 1 && s.serviceTypes()[0].equals(ServiceReference.class))) {
+			|| (s.serviceTypes().length == 1 && s.serviceTypes()[0].equals(ServiceReference.class))) {
 			Class<?>[] params = writeMethod.getParameterTypes();
 			if (params.length != 1) {
 				throw new IllegalArgumentException("Setter for [" + beanName + "] must have only one argument");
 			}
-			pfb.setInterfaces(new Class<?>[] { params[0] });
+			pfb.setInterfaces(new Class<?>[]{params[0]});
 		}
 		else {
 			pfb.setInterfaces(s.serviceTypes());
@@ -145,6 +161,30 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 		pfb.setBeanClassLoader(classLoader);
 		pfb.afterPropertiesSet();
 		return pfb;
+	}
+
+	/* package */ AbstractOsgiServiceImportFactoryBean getServiceProperty(OsgiServiceProxyFactoryBean pfb, ServiceReference s,
+	                                                                      Method writeMethod, String beanName) throws Exception {
+		pfb.setTimeout(s.timeout());
+		return getServicePropertyInternal(pfb, s, writeMethod, beanName);
+	}
+
+	/* package */ AbstractOsgiServiceImportFactoryBean getServiceProperty(OsgiServiceCollectionProxyFactoryBean pfb, ServiceReference s,
+	                                                                      Method writeMethod, String beanName) throws Exception {
+		Class<?>[] params = writeMethod.getParameterTypes();
+		if (SortedSet.class.isAssignableFrom(params[0])) {
+			pfb.setCollectionType(CollectionType.SORTED_SET);
+		}
+		else if (Set.class.isAssignableFrom(params[0])) {
+			pfb.setCollectionType(CollectionType.SET);
+		}
+		else if (List.class.isAssignableFrom(params[0])) {
+			pfb.setCollectionType(CollectionType.LIST);
+		}
+		else {
+			throw new IllegalArgumentException("Setter for [" + beanName + "] does not have a valid Collection type argument");
+		}
+		return getServicePropertyInternal(pfb, s, writeMethod, beanName);
 	}
 
 	protected ServiceReference hasServiceProperty(PropertyDescriptor propertyDescriptor) {

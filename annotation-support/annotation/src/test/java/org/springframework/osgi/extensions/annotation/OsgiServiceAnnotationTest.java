@@ -19,6 +19,8 @@ import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.SortedSet;
 
 import junit.framework.TestCase;
 
@@ -101,21 +103,20 @@ public class OsgiServiceAnnotationTest extends TestCase {
 	}
 
 	// disabled since there are no annotations for multi-injection
-	public void tstProperMultiCardinality() throws Exception {
+	public void testProperMultiCardinality() throws Exception {
 		OsgiServiceCollectionProxyFactoryBean pfb = new OsgiServiceCollectionProxyFactoryBean();
 
 		Method setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithCardinality0_N",
-			new Class[] { AnnotatedBean.class });
+			new Class[] { List.class });
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
-		pfb = new OsgiServiceCollectionProxyFactoryBean();
-		// processor.getServiceProperty(pfb, ref, setter, null);
+		processor.getServiceProperty(pfb, ref, setter, null);
 		assertFalse(pfb.isMandatory());
 
 		setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithCardinality1_N",
-			new Class[] { AnnotatedBean.class });
+			new Class[] { SortedSet.class });
 		ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		pfb = new OsgiServiceCollectionProxyFactoryBean();
-		// processor.getServiceProperty(pfb, ref, setter, null);
+		processor.getServiceProperty(pfb, ref, setter, null);
 		assertTrue(pfb.isMandatory());
 	}
 
