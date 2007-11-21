@@ -140,7 +140,7 @@
                 			class loader has visibility of the resources on this bundle's classpath. Alternate
                 			options are 'service-provider' which means that the context class loader has visibility of 
                 			resources on the bundle classpath of the bundle that exported the service, and 'unmanaged'
-                			which does not do any manage of the context class loader.
+                			which does not do any management of the context class loader.
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
@@ -423,7 +423,7 @@
                 			service. By default this facility is disabled. A value of 'interfaces' advertises all 
                 			of the Java interfaces supported by the exported service. A value of 'class-hierarchy' 
                 			advertises all the Java classes in the hierarchy of the exported service. A value of 
-                			'all' advertises all Java interfaces and classes. 
+                			'all-classes' advertises all Java interfaces and classes. 
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
