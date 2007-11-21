@@ -30,7 +30,6 @@ public class BundleJarTest extends BaseIoTest {
 		assertEquals(1, res.length);
 	}
 
-	// fails under KF with StackOverflow since getEntryPaths() returns "" ?
 	public void testResourceFromJarOnlyWithFolderLevelWildcard() throws Exception {
 		Resource[] res = patternLoader.getResources("osgibundlejar:/**/duplicat*.file");
 		assertEquals(1, res.length);

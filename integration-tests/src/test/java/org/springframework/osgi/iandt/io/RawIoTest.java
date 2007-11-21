@@ -18,6 +18,7 @@ package org.springframework.osgi.iandt.io;
 import java.net.URL;
 import java.util.Enumeration;
 
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -41,14 +42,14 @@ public class RawIoTest extends BaseIoTest {
 		assertNotNull(url);
 	}
 
-	// fails on Felix
+	// fails on Felix && KF
 	public void testGetResourceOnRoot() throws Exception {
 		URL url = bundle.getResource("/");
 		System.out.println(url);
 		assertNotNull(url);
 	}
 
-	// fails on Felix
+	// fails on Felix && KF
 	public void testGetResourceSOnRoot() throws Exception {
 		Enumeration enm = bundle.getResources("/");
 		Object[] res = copyEnumeration(enm);
@@ -104,6 +105,6 @@ public class RawIoTest extends BaseIoTest {
 	}
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (!(isEquinox() && isKF()));
+		return (isFelix() || (isKF() && ("testGetResourceOnRoot".equals(testMethodName) || "testGetResourceSOnRoot".equals(testMethodName))));
 	}
 }
