@@ -409,9 +409,11 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <literal>unregistration-method</literal> attributes specify the names
         of the methods defined on the listener bean that are to be invoked
         during registration and unregistration. A registration callback method
-        must have a signature matching the following format</para>
+        must have a signature matching one of the following formats:</para>
 
         <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Map serviceProperties);]]></programlisting>
+        
+        <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Dictionary serviceProperties);]]></programlisting>
 
         <para>where <literal>ServiceType</literal> can be any type compatible
         with the exported service interface of the service.</para>
@@ -420,6 +422,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         form</para>
 
         <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Map serviceProperties);]]></programlisting>
+        
+        <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Dictionary serviceProperties);]]></programlisting>
 
         <para>where <literal>ServiceType</literal> can be any type compatible
         with the exported service interface of the service.</para>
@@ -438,11 +442,18 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         this argument can be cast, if needed, to a <literal>java.util.Dictionary</literal>.</para>
         
         <section id="service-registry:export:lifecycle:interface">
+        <title>Using <interfacename>OsgiServiceRegistrationListener</interfacename> interface</title>
+        <para>
         While we discourage, it is possible to implement a Spring-DM specific interface, namely 
         <interfacename>org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener</interfacename> which avoids the need
         to declare the <literal>registration-method</literal> and <literal>unregistration-method</literal>.
         However, by implementing <interfacename>OsgiServiceRegistrationListener</interfacename>, your code
-        becomes Spring-DM aware (which goes against the POJO philosophy). 
+        becomes Spring-DM aware (which goes against the POJO philosophy).
+        </para>
+        
+        <para>It is possible for a listener to implement <interfacename>OsgiServiceRegistrationListener</interfacename> interface and
+        declare custom methods. In this case, the Spring-DM interface methods will be called first, followed by the custom methods.
+        </para>
         </section>
       </section>
     </section>
@@ -463,7 +474,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       <literal>reference</literal> element defines a reference to a single
       service that meets the required specification. In other scenarios,
       especially when using the OSGi <ulink
-      url="www.osgi.org/documents/osgi_technology/whiteboard.pdf">whiteboard
+      url="http://www.osgi.org/documents/osgi_technology/whiteboard.pdf">whiteboard
       pattern</ulink>, references to <emphasis>all available</emphasis>
       matching services are required. Spring Dynamic Modules supports the
       management of this set of references as a <interfacename>List</interfacename>,
@@ -529,7 +540,7 @@ public class BeanWithServiceReference {
 </bean>]]></programlisting>
 		
 		<note>
-		The injected ServiceReference is managed by Spring-DM and will change
+		The injected <interfacename>ServiceReference</interfacename> is managed by Spring-DM and will change
 		at the same time as the referenced backing OSGi service instance.  
 		</note>
 		</section>
@@ -694,7 +705,7 @@ public class BeanWithServiceReference {
           <literal>reference</literal> element enables a timeout value (in
           milliseconds) to be specified. If a timeout value is specified and
           no matching service becomes available within the timeout period, an
-          unchecked <literal>ServiceUnavailableException</literal> is
+          unchecked <classname>ServiceUnavailableException</classname> is
           thrown.</para>
 
           <para>For applications that need to be aware of when the service
@@ -704,14 +715,14 @@ public class BeanWithServiceReference {
           element refers to a bean (either by name, or by defining one inline)
           that will receive bind and unbind notifications. If this bean
           implements Spring's
-          <literal>org.springframework.osgi.service.TargetSourceLifecycleListener</literal>
+          <interfacename>org.springframework.osgi.service.importer.OsgiServiceLifecycleListener</interfacename>
           interface, then the <literal>bind</literal> and
           <literal>unbind</literal> operations in this interface will be
           invoked. Instead of implementing this interface (or in addition),
           custom bind and unbind callback methods may be named.</para>
 
           <para>An example of declaring a listener that implements
-          <literal>TargetSourceLifecycleListener</literal>:</para>
+          <interfacename>OsgiServiceLifecycleListener</interfacename>:</para>
 
           <programlisting><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
   <listener ref="aListenerBean"/>
@@ -727,10 +738,10 @@ public class BeanWithServiceReference {
 </reference>]]></programlisting>
 
           <para>If the listener bean implements the
-          <literal>TargetSourceLifecyleListener</literal> interface
+          <interfacename>OsgiServiceLifecycleListener</interfacename> interface
           <emphasis>and</emphasis> the listener definition specifies custom
           bind and unbind operations then both the
-          <literal>TargetSourceLifecycleListener</literal> operation and the
+          <literal>OsgiServiceLifecycleListener</literal> operation and the
           custom operation will be invoked, in that order.</para>
 
           <para>The signature of a custom bind or unbind method must be one
@@ -741,11 +752,6 @@ public class BeanWithServiceReference {
 public void anyMethodName(ServiceType service, Map properties);
 
 public void anyMethodName(ServiceReference ref);]]></programlisting>
-
-          <para>If the method signature has a single argument of type
-          <literal>ServiceReference</literal> then the
-          <literal>ServiceReference</literal> of the service will be passed to
-          the callback in place of the service object itself.</para>
 
           <para>where <literal>ServiceType</literal> can be any type that is
           assignable from the <literal>reference</literal> interface type. The
@@ -760,12 +766,24 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
           service is unregistered, and no replacement service is immediately
           available (i.e., the <literal>reference</literal> becomes
           unsatisfied).</para>
+          
+          <para>In both cases, bind and unbind callbacks will be called <emphasis>only</emphasis>
+          if the backing service matches the type declared in the method signature.
+          If you want the callbacks to be called no matter the type, 
+          use <classname>java.lang.Object</classname> as a <literal>ServiceType</literal>.
+          </para>
 
           <para>Bind and unbind callbacks are made synchronously as part of
           processing an OSGi <literal>serviceChanged</literal> event for the
           backing OSGi service, and are invoked on the OSGi thread that
           delivers the corresponding OSGi
-          <literal>ServiceEvent</literal>.</para>
+          <classname>ServiceEvent</classname>.</para>
+          
+          <para>If the method signature has a single argument of type
+          <interfacename>ServiceReference</interfacename> then the
+          <interfacename>ServiceReference</interfacename> of the service will be passed to
+          the callback in place of the service object itself.</para>
+
         </section>
         
       	<section id="service-registry:refs:singular:reference:attributes">
@@ -774,7 +792,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
        	attributes names, possible values and a short description for each of them.
         </para>
        	<table id="reference-import-options" pgwide="1">
-          <title><![CDATA[OSGi <service> attributes]]></title>
+          <title><![CDATA[OSGi <reference> attributes]]></title>
           <tgroup cols="3">
             <colspec align="center" />
             <thead>
@@ -829,29 +847,84 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
               </row>              
             </tbody>
           </tgroup>
-	     </table>        
+	     </table>
+	     
+	     <para>The table below lists the attributes available for the <literal>reference</literal> <literal>listener</literal> sub element.</para>
+
+       	 <table id="reference-import-listener-options" pgwide="1">
+          <title><![CDATA[OSGi <listener> attributes]]></title>
+          <tgroup cols="3">
+            <colspec align="center" />
+            <thead>
+              <row>
+                <entry>Name</entry>
+                <entry>Values</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>ref</entry>
+                <entry>bean name reference</entry>
+                <entry>Name based reference to another bean acting as listener.</entry>
+              </row>
+              <row>
+                <entry>bind-method</entry>
+                <entry>string representing a valid method name</entry>
+                <entry>The name of the method to be invoked when a backing service is bound.</entry>
+              </row>
+              <row>
+                <entry>unbind-method</entry>
+                <entry>string representing a valid method name</entry>
+                <entry>The name of the method to be invoked when a backing service is bound.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+	     </table>	          
     	</section>
               
       </section>
 
-      <section id="service-registry:refs:multi">
+      <section id="service-registry:refs:collection">
         <title>Referencing collections of services</title>
 
+		<sidebar>
+		 <title>Natural vs custom ordering</title>
+		 <para>
+		 Java collection API defines two interfaces for ordering objects -
+		 <interfacename>Comparable</interfacename> and <interface>Comparator</interface>.
+		 The first is meant to be implemented by objects for providing <emphasis>natural 
+		 ordering</emphasis>. <classname>String</classname>, <classname>Long</classname>
+		 or <classname>Date</classname> are good examples of objects that implement the
+		 <interfacename>Comparable</interfacename> interface.</para>
+		 <para>
+		 However, there are cases where sorting is different then the natural ordering or,
+		 the objects meant to be sort do not implement <interface>Comparable</interface>. To
+		 address this cases, <interfacename>Comparator</interfacename> interface was designed. 
+		 </para>
+		 <para>For more information on this subject, please consult the <ulink url="http://java.sun.com/docs/books/tutorial/collections/interfaces/order.html">
+		 Object ordering</ulink> chapter from Java 
+		 <ulink url="http://java.sun.com/docs/books/tutorial/collections/">collection</ulink> tutorial,
+		 </para>
+		</sidebar>
+		
         <para>Sometimes an application needs access not simply to any service
         meeting some criteria, but to <emphasis>all</emphasis> services
-        meeting some criteria. The matching services may be held in a
-        <literal>List</literal> or <literal>Set</literal> (optionally
-        sorted).</para>
+        meeting some criteria. Spring-DM allows the matching services may be held in a
+        <interfacename>List</interfacename> or <interfacename>Set</interfacename> 
+        (optionally sorted).</para>
 
-        <para>The difference between using a <literal>List</literal> and a
-        <literal>Set</literal> to manage the collection is one of equality.
+        <para>The difference between using a <interfacename>List</interfacename> and a
+        <interfacename>Set</interfacename> to manage the collection is one of equality.
         Two or more services published in the registry (and with distinct
         service ids) may be "equal" to each other, depending on the
         implementation of equals used by the service implementations. Only one
         such service will be present in a set, whereas all services returned
-        from the registry will be present in a list.</para>
-
-        <para>The <literal>set</literal> and <literal>list</literal> elements
+        from the registry will be present in a list. For more details on collections,
+        see <ulink url="http://java.sun.com/docs/books/tutorial/collections/interfaces/index.html">this</ulink> 
+        tutorial.</para>
+        
+        <para>The <literal>set</literal> and <literal>list</literal> schema elements
         are used to define collections of services with set or list semantics
         respectively.</para>
 
@@ -860,8 +933,10 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
         <literal>bean-name</literal>, <literal>cardinality</literal>, and
         <literal>context-class-loader</literal>, with the same semantics as for
         the <literal>reference</literal> element. The allowable values for the
-        <literal>cardinality</literal> attribute are <literal>0..n</literal>
-        and <literal>1..n</literal>. A cardinality value of
+        <literal>cardinality</literal> attribute are <literal>0..N</literal>
+        and <literal>1..N</literal>.</para>
+        
+        <para>A cardinality value of
         <literal>0..n</literal> indicates that it is permissible for their to
         be no matching services. A cardinality value of
         <literal>1..n</literal> indicates that at least one matching service
@@ -873,12 +948,12 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
         reference becomes satisfied again.</para>
 
         <para>The bean defined by a <literal>list</literal> element is of type
-        <literal>java.util.List</literal>. The bean defined by a
+        <interfacename>java.util.List</interfacename>. The bean defined by a
         <literal>set</literal> element is of type
-        <literal>java.util.Set</literal>.</para>
+        <interfacename>java.util.Set</interfacename>.</para>
 
-        <para>The following example defines a bean of type List that will
-        contain all registered services supporting the
+        <para>The following example defines a bean of type <interfacename>List</interfacename> that 
+        will contain all registered services supporting the
         <literal>EventListener</literal> interface:</para>
 
         <programlisting><![CDATA[<list id="myEventListeners" 
@@ -891,11 +966,12 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
         interfaces that the corresponding service was registered with and that
         are visible to the bundle.</para>
 
+		<para>Spring-DM supports sorted collections as well, both for set and list.</para>
         <para>It is possible to specify a sorting order using either the
         <literal>comparator-ref</literal> attribute, or the nested
         <literal>comparator</literal> element. The
         <literal>comparator-ref</literal> attribute is used to refer to a
-        named bean implementing <literal>java.util.Comparator</literal>. The
+        named bean implementing <interfacename>java.util.Comparator</interfacename>. The
         <literal>comparator</literal> element can be used to define an inline
         bean. For example:</para>
 
@@ -909,14 +985,15 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
   </comparator>
 </list>]]></programlisting>
 
+	
         <para>To sort using a natural ordering instead of an explicit
         comparator, you can use the <literal>natural-ordering</literal>
         element inside of <literal>comparator</literal>. You need to specify
         the basis for the natural ordering: based on the service references,
-        following the <literal>ServiceReference</literal> natural ordering
+        following the <interfacename>ServiceReference</interfacename> natural ordering
         defined in the OSGi Core Specification section 6.1.2.3; or based on
         the services themselves (in which case the services must be
-        <literal>Comparable</literal>).</para>
+        <interfacename>Comparable</interfacename>).</para>
 
         <programlisting><![CDATA[<list id="myServices" interface"com.xyz.MyService">
   <comparator><natural-ordering basis="services"/></comparator>
@@ -926,19 +1003,67 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
   <comparator><natural-ordering basis="service-references"/></comparator>
 </set>]]></programlisting>
 
-        <para></para>
+		<para>For a sorted set, a <interfacename>SortedSet</interfacename> implementation will be created.
+		However, since JDK API do not provide a <interfacename>SortedList</interfacename>, a sorted list
+		will still be returned as a <interfacename>List</interfacename> implementation.</para>
 
-        <para>When iterating over the collection, the semantics of
-        <literal>Iterator</literal> are guaranteed to be observed (if
-        <literal>hasNext()</literal> returns true, then
-        <literal>next()</literal> will return a service, if
-        <literal>hasNext()</literal> returns false then
-        <literal>next()</literal> will throw an exception.). In addition any
-        elements added to the collection during iteration over a sorted
-        collection will only be visible if the iterator has not already passed
-        their sort point.</para>
+		<section id="service-registry:refs:collection:iterator">
+		  <title><interfacename>Iterator</interfacename> contract and dynamic collections</title>
 
-        <section id="service-registry:refs:multi:dynamics">
+		  <para>The recommend way of traversing a collection is by using an <interfacename>Iterator</interfacename>.
+		  However, since OSGi services can come and go, the content of the managed service collection will be adjusted
+		  accordingly. Spring-DM will transparently update any collection <interfacename>Iterator</interfacename>s held by 
+		  the user so it is possible to safely traverse the collection while it is being modified. Moreover, the 
+		  <interfacename>Iterator</interfacename> will reflect all the changes made to the collection, even if 
+		  they occurred after the <interfacename>Iterator</interfacename> was created or during the iteration.
+		  Consider the case where iteration is started over a collection that right after the
+		  iteration is started, is shrunk significantly (for example a big number of OSGi
+		  services are shutdown).
+		  To avoid dealing with a lot of 'dead' service references that throw exceptions on usage,
+		  Spring-DM iterators do not take collection snapshots but rather are updated on each service
+		  event so they reflect the latest collection state no matter how fast or slow the iteration is.</para>
+		  
+		  <para>Please note that the <interfacename>Iterator</interfacename> contract is guaranteed meaning that 
+		  <literal>next()</literal> method <emphasis>always</emphasis> obey the result of the previous 
+		  <literal>hasNext()</literal> invocation.</para>
+
+		  <table id="collection-iterator-contract" pgwide="1">
+           <title>Dynamic service collection <interfacename>Iterator</interfacename> contract</title>
+           <tgroup cols="2">
+            <colspec align="center" />
+            <thead>
+              <row>
+                <entry>hasNext() returned value</entry>
+                <entry>next() behaviour</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>true</entry>
+                <entry><emphasis>Always</emphasis> return a non-null value, even when the collection has shrunk as services when away.
+                </entry>
+              </row>
+              <row>
+                <entry>false</entry>
+                <entry>per <interfacename>Iterator</interfacename> contract, <classname>NoSuchElementException</classname> is thrown.
+                This applies even if other services are added to the collection</entry>
+              </row>
+            </tbody>
+           </tgroup>
+	      </table>
+	      
+	      <para>
+	      The behaviour described above, offers a consistent view over the collection even if its structure changes during iteration.
+	      To simply <emphasis>refresh</emphasis> the iterator, call <literal>hasNext()</literal> again. This will force the
+	      <literal>Iterator</literal> to check again the collection status for its particular entry in the iteration.</para>
+	      	
+	 	  <para>
+	 	  In addition, any elements added to the collection during iteration over a <emphasis>sorted</emphasis>
+          collection will only be visible if the iterator has not already passed
+          their sort point.</para>
+        </section>
+        
+        <section id="service-registry:refs:collection:dynamics">
           <title>Dealing with Service dynamics</title>
 
           <para>Collection membership is automatically managed as matching
@@ -1020,6 +1145,40 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       
       <para>The <literal>default-*</literal> attributes allow for concise and shorter declarations as well
       as easy propagation of changes (such as increasing or decreasing the timeout).</para>
+    </section>
+    
+    <section id="service-registry:refs:listener-best-practices">
+      <title>Exporter/Importer listener best practices</title>
+      
+      <para>As mentioned above, Spring-DM exporter and importer allow listeners to be
+      used for receiving notifications on when services are bound, unbound, registered or 
+      unregistered. Below you can find some guidance advices when working with listeners:
+      </para>
+      
+      <itemizedlist>
+       	<listitem>
+       	Do <emphasis>not</emphasis> execute long activity tasks inside the listener. If you really
+       	have to, use a separate thread for executing the work. The listener are called synchronously
+       	and so try to be as fast as possible. Doing work inside the listener prevents other the event
+       	to be sent to other listeners and the OSGi service to resume activity. 
+      	</listitem>
+      
+      
+      	<listitem>Use listener custom declaration as much as possible - it doesn't tie your code
+      	to Spring-DM API and it doesn't enforce certain signature names.</listitem>
+      	
+      	<listitem>If find yourself repeating bind/unbind method declarations for your listener definitions,
+      	consider using Spring <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-child-bean-definitions">
+      	bean definition inheritance</ulink> to define a common definition that can be reused and customized
+      	accordingly.
+      	</listitem>
+      	
+      	<listitem>Prefer <interfacename>java.util.Map</interfacename> instead of <classname>java.util.Dictionary</classname>
+      	class. The first is an interface while the latter is a deprecated, abstract class. To preserve compatibility, Spring-DM
+      	will pass to the listeners a <interfacename>Map</interfacename> implementation that can be casted, if needed, to a 
+      	<classname>Dictionary</classname>.</listitem>
+      </itemizedlist> 
+      
     </section>
     
     <section id="service-registry:export-import-relationship">
