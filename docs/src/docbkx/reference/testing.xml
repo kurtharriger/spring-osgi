@@ -1,40 +1,120 @@
   <chapter id="testing">
     <title>Testing OSGi based Applications</title>
 
+    <sidebar>
+     <title>Mocks vs Stubs</title>
+     <para>There are various strategies to unit test code
+     that requires colaborators. The two most popular strategies
+     are <emphasis>stubs</emphasis> and <emphasis>mocks</emphasis>.
+     </para>
+     Please see <ulink url="http://martinfowler.com/articles/mocksArentStubs.html">
+     this</ulink> article by Martin Fowler which describes in detail the difference 
+     between them. 
+    </sidebar>
+
     <para>By following best practices and using the Spring Dynamic Modules
     support, your bean classes should be easy to unit test as they will have
     no hard dependencies on OSGi, and the few OSGi APIs that you may interact
-    with (such as BundleContext) are interface-based and easy to mock. For
-    integration testing (making sure that your application behaves as expected
-    when running under OSGi) some support is needed.</para>
+    with (such as <interfacename>BundleContext</interfacename>) are interface-based 
+    and easy to mock. Whether you want to do unit testing or <ulink url="http://en.wikipedia.org/wiki/Integration_testing">
+    integration</ulink> testing, Spring-DM can ease your task.</para> 
+    
+    <section id="testing:mocks">
+    
+    <para>
+    Even though most OSGi API are interfaces and creating mocks using a specialized
+    library like <ulink url="http://www.easymock.org/">EasyMock</ulink> is fairly
+    simple, in practice the amount of code of setting the code (especially on JDK 1.4)
+    becomes cumbersome. To keep the tests short and concise, Spring-DM provides OSGi
+    mocks under <literal>org.springframework.osgi.mock</literal> package.</para>
+    
+    <para>It's up to you to decide whether they are useful however, we make extensive
+    use of them inside Spring-DM test suite. Below you can find a code snippet that you
+    are likely to encounter in our code base:</para>
+    
+    <programlisting><![CDATA[private ServiceReference reference;
+private BundleContext bundleContext;
+private Object service;
+    
+protected void setUp() throws Exception {
+	reference = new MockServiceReference();
+	bundleContext = new MockBundleContext() {
 
-    <para>The Spring Dynamic Modules project provides a test class hierarchy
-    (based on
-    <literal>org.springframework.osgi.test.AbstractOsgiTests</literal>) that
-    provides support for writing regular JUnit test cases that are then
-    automatically executed in an OSGi environment. The test support:</para>
+		public ServiceReference getServiceReference(String clazz) {
+			return reference;
+		}
+
+		public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+			return new ServiceReference[] { reference };
+		}
+		
+		public Object getService(ServiceReference ref) {
+		    if (reference == ref)
+		       return service;
+		    super.getService(ref);
+		}
+	};
+
+	...
+}
+	
+public void testComponent() throws Exception {
+    OsgiComponent comp = new OsgiComponent(bundleContext);
+    
+    assertSame(reference, comp.getReference());
+    assertSame(object, comp.getTarget());
+}]]></programlisting>
+    
+    <para>As ending words, experiment with them and choose whatever style or library you feel most confortable with.
+    In our test suite we use the aforementioned mocks, EasyMock library and plenty of integration testing (see below).</para>
+    </section>
+    
+    <section id="testing:integration">
+    
+    <sidebar>
+     <title>What about JUnit4/TestNG?</title>
+    
+     <para>While JUnit4/TestNG overcome the class inheritance
+     problem that appears when building base JUnit classes, by decoupling
+     the runner from the test through annotations, Spring-DM cannot use
+     them since it has to support Java 1.4.</para>
+     <para>Running the tests on JDK 1.5 is not an option since the differences
+     between 1.4 and 1.5 are quite subtle especially when dealing with synchronization.
+     </para>
+    </sidebar>
+    
+    <para>In a restricted environment such as OSGi, it's important to test the visibility and versioning of your classes, 
+    the manifests or how your bundles interact with each other (just to name a few).</para>
+
+    <para> To ease integration testing, the Spring Dynamic Modules project provides a test class hierarchy
+    (based on <classname>org.springframework.osgi.test.AbstractOsgiTests</classname>) that
+    provides support for writing regular <literal>JUnit</literal> test cases that are then
+    automatically executed in an OSGi environment.</para>
+    
+    <para>In general, the scenario supported by Spring-DM testing framework is:</para>
 
     <itemizedlist>
       <listitem>
-        <para>starts the OSGi framework</para>
+        <para>start the OSGi framework (Equinox, Knopflerfish, Felix)</para>
       </listitem>
 
       <listitem>
-        <para>installs and starts any specified bundles required for the
+        <para>install and start any specified bundles required for the
         test</para>
       </listitem>
 
       <listitem>
-        <para>packages the test case itself into a 'virtual bundle' and
-        installs it in the OSGi framework</para>
+        <para>package the test case itself into a <literal>on the fly</literal> bundle,
+        generate the manifest (if none is provided) and install it in the OSGi 
+        framework</para>
       </listitem>
 
       <listitem>
-        <para>executes the test case inside the OSGi framework</para>
+        <para>execute the test case inside the OSGi framework</para>
       </listitem>
 
       <listitem>
-        <para>shuts down the framework</para>
+        <para>shut down the framework</para>
       </listitem>
 
       <listitem>
@@ -45,31 +125,193 @@
 
     <para>By following this sequence it is trivial to write JUnit-based
     integration tests for OSGi and have them integration into any environment
-    (IDE, build, etc.) that can work with JUnit.</para>
+    (IDE, build (ant, maven), etc.) that can work with JUnit.</para>
 
-    <para>It is most likely that your test cases will extend
-    <literal>AbstractConfigurableBundleCreatorTests</literal>. Within your
-    test case, access to the <literal>BundleContext</literal> is readily
-    available through the inherited <literal>getBundleContext()</literal>
-    method. From here it is easy to verify service publication, drive bundles
-    through the lifecycle and verify that components react as expected, and so
-    on.</para>
+    <para>The rest of this chapter details (with examples) the features
+    offered by Spring-DM testing suite.</para>
+    
+    <section id="testing:integration:simple-test">
+      <title>Creating a simple OSGi integration test</title>
+     
+      <para>
+      While the testing framework contains several classes that offer specific
+      features, it is most likely that your test cases will extend
+      <classname>org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests</classname> (at least
+      this is what we use in practice).
+      </para>
+      <para>Let's extend this class and interact with the OSGi platform through
+      the <literal>bundleContext</literal> field:</para>
 
-    <para>Here's a simple test that verifies a service has been published as
-    expected:</para>
 
-    <screen>public class ServicePublicationTest extends AbstractConfigurableBundleCreatorTests {
+    <programlisting><![CDATA[public class SimpleOsgiTest extends AbstractConfigurableBundleCreatorTests {
 
-  protected String[] getBundles() {
-    return new String[] { "org.xyz.someapp, application-layer, 1.0-SNAPSHOT" };
-  }
+	public void testOsgiPlatformStarts() throws Exception {
+		System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VENDOR));
+		System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VERSION));
+		System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_EXECUTIONENVIRONMENT));
+	}
+}]]></programlisting>
+      
+    <para>Simply execute the test as you normally do with any JUnit test. On Equinox 3.2.x,
+    the output is similar to:</para>
 
-  public void testServicePublication() {
-     assertNotNull("MyService should be published in tthe registry", 
-                   getBundleContext().getServiceReference("org.xyz.MyService"));
-  }
-}</screen>
+    <programlisting><![CDATA[Eclipse
+1.3.0
+OSGi/Minimum-1.0,OSGi/Minimum-1.1,JRE-1.1,J2SE-1.2,J2SE-1.3,J2SE-1.4}]]></programlisting>    
+    
+    <remark>It's likely that you will see other log statements made by the testing
+    framework during your test execution by these can be disabled and have only an informative
+    value as they don't affect your test execution.</remark>
+    
+    <para>Note that you did not have to create any bundle, write any MANIFEST or
+    bother with imports or exports, let alone starting and shutting down the OSGi
+    platform. The testing framework takes care of these automatically
+    when the test is executed.</para>
+    
+    <para>Let's do some quering and figure out what the environment in which the tests run is.
+    A simple way to do that is to query the <interfacename>BundleContext</interfacename>
+    for the installed bundles:</para>
+    <programlisting><![CDATA[public void testOsgiEnvironment() throws Exception {
+	Bundle[] bundles = bundleContext.getBundles();
+	for (int i = 0; i < bundles.length; i++) {
+		System.out.print(OsgiStringUtils.nullSafeName(bundles[i]));
+		System.out.print(", ");
+	}
+	System.out.println();
+}]]></programlisting> 
+    <para>The output should be similar to:</para>
+    <programlisting><![CDATA[OSGi System Bundle, asm.osgi, log4j.osgi, spring-test, spring-osgi-test, spring-osgi-core, spring-aop, spring-osgi-io, slf4j-api, 
+spring-osgi-extender, etc... TestBundle-testOsgiPlatformStarts-com.your.package.SimpleOsgiTest, 
+]]></programlisting>
 
+    <para>As you can see, the testing framework installs the mandatory requirements required for running the 
+    test such as the Spring, Spring-DM, slf4j jars among others.</para>
+    </section>
+
+    <section id="testing:integration:provisioning">
+     <title>Installing test prerequisites</title>
+     
+     <sidebar>
+       <title>OSGi-friendly libraries</title>
+       <para>To work on OSGi environments, jars need to declare in their
+       <literal>MANIFEST.MF</literal>, Export or Import packages; that is
+       declare what classes they need or offer to other bundles.
+       Most libraries are OSGi unaware and do not provide the proper manifest
+       entries which means they are unusable in an OSGi environment.</para>
+       <para>At the moment, there are several initiatives in the open source space
+       to provide the proper manifest - please see the FAQ for more information.
+       </para>
+     </sidebar>
+      
+     <para>Besides the Spring-DM jars and the test itself is highly likely that you depend on 
+     several libraries or your own code for the integration test.</para> 
+     
+     <para>Consider the following test that relies on Apache Commons 
+     <ulink url="http://commons.apache.org/lang/">Lang</ulink>:</para>
+     <programlisting><![CDATA[import org.apache.commons.lang.time.DateFormatUtils;
+    ...
+  	public void testCommonsLangDateFormat() throws Exception {
+		System.out.println(DateFormatUtils.format(new Date(), "HH:mm:ssZZ"));
+	}
+}]]></programlisting>
+    
+     <para>Running the test however yields an exception:</para>
+    <programlisting><![CDATA[java.lang.IllegalStateException: Unable to dynamically start generated unit test bundle
+     ...
+Caused by: org.osgi.framework.BundleException: The bundle could not be resolved. 
+Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; version="0.0.0"
+    ...
+	... 15 more
+	]]></programlisting>
+
+     <para>The test requires <literal>org.apache.commons.lang.time</literal> package but there is no bundle
+     that exports it. Let's fix this by installing a commons-lang bundle.</para>
+
+     <para>One can specify the bundles that she wants
+     to be installed using <literal>getTestBundlesNames</literal> or <literal>getTestBundles
+     </literal> method. The first one returns an array of String that indicate the bundle
+     name, package and versioning through as a String while the latter returns an array of
+     <literal>Resource</literal>s that can be used directly for installing the bundles.
+     That is, use <literal>getTestBundlesNames</literal> when you rely on somebody else to locate
+     (the most common case) the bundles and <literal>getTestBundles</literal> when you want to 
+     locate the bundles yourself.
+     </para>
+     
+     <para>By default, the test suite uses the local <ulink url="http://maven.apache.org">maven2</ulink> 
+     repository to locate the artifacts. The locator expects the bundle String to be a comma separated
+     values containing the artifact group, name, version and (optionally) type.
+     
+     It's likely that in the future, various other locators will be available. One can plug in their own 
+     locator through the <interfacename>org.springframework.osgi.test.provisioning.ArtifactLocator</interfacename> interface.
+     </para>
+     
+     <para>Let's fix our integration test by installing the required bundle (and some extra osgi libraries):</para>
+     <programlisting><![CDATA[protected String[] getTestBundlesNames() {
+	 return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT",
+	 	"org.springframework.osgi, jta.osgi, 1.1-SNAPSHOT",
+	 	"org.springframework.osgi, commons-lang.osgi, 2.3-SNAPSHOT" };
+	 };
+}]]></programlisting>
+ 	 
+ 	 <para>Rerunning the test should show that these bundles are now installed in the OSGi platform.</para>
+ 	 <note>The artifacts mentioned above have to exist in your local maven repository.</note>        
+    </section>
+
+    <section id="testing:integration:advanced-topics">
+      <title>Advanced testing framework topics</title>
+      
+      <para>The testing framework allows a lot of customization to be made. This chapter
+      details some of the existing hooks that you might want to know about. However, these
+      are advanced topics as they increase the complexity of your test infrastructure.
+      </para>
+    
+    <section id="testing:integration:specify-manifest">
+      <title>Customizing test manifest</title>
+      <para>There are cases where the auto-generated test manifest does not suite the needs of the test.
+      For example the manifest requires some different headers or a certain package needs to be an optional import.
+      To provide your own manifest, simply override <literal>getManifestLocations()</literal>:</para>
+      <programlisting><![CDATA[protected String getManifestLocation() {
+	return "classpath:com/xyz/abc/test/MyTestTest.MF";
+}}]]></programlisting>
+	  
+	  <para>However, the manifest requires some the folowing entry:</para>
+	  <quote>Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator</quote>
+	  <para>since without it, the testing infrastructure cannot function properly. Also, one needs to 
+	  import JUnit, Spring and Spring-DM specific packages used by the base test suite:</para>
+      <programlisting><![CDATA[Import-Package: junit.framework,
+  org.osgi.framework,
+  org.apache.commons.logging,
+  org.springframework.util,
+  org.springframework.osgi.service,
+  org.springframework.osgi.util,
+  org.springframework.osgi.test,
+  org.springframework.context]]></programlisting>
+   
+	  <para>Failing to import a package used by the test class will cause the test to fail with a 
+	  <literal>NoDefClassFoundError</literal> error.</para>
+	   
+    </section>
+    <!-- end of advanced topics -->
+    </section>
+    
+    <section id="testing:integration:specify-test-jar-content">
+    </section>
+
+
+    <section id="testing:integration:appContext">
+      <title>Installing bundle</title>
+      
+
+    </section>
+    
+    <section id="testing:integration:specify-platform">
+    </section>
+
+
+    <section id="testing:integration:specify-test-wait-time">
+    </section>
+    
+    
     <para>All of the bundles required by Spring Dynamic Modules will be
     installed by default. By overriding the <literal>getBundles</literal>
     method you can specify additional application bundles to be installed for
@@ -103,5 +345,6 @@
     </orderedlist>
 
     <para>By default the test harness will attempt to use Equinox.</para>
-  </chapter>
+  </section>
+</chapter>
 
