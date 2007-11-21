@@ -6,10 +6,10 @@
      <para>There are various strategies to unit test code
      that requires colaborators. The two most popular strategies
      are <emphasis>stubs</emphasis> and <emphasis>mocks</emphasis>.
-     </para>
-     Please see <ulink url="http://martinfowler.com/articles/mocksArentStubs.html">
+     </para><para>
+     See <ulink url="http://martinfowler.com/articles/mocksArentStubs.html">
      this</ulink> article by Martin Fowler which describes in detail the difference 
-     between them. 
+     between them.</para> 
     </sidebar>
 
     <para>By following best practices and using the Spring Dynamic Modules
@@ -289,62 +289,158 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
    
 	  <para>Failing to import a package used by the test class will cause the test to fail with a 
 	  <literal>NoDefClassFoundError</literal> error.</para>
-	   
-    </section>
-    <!-- end of advanced topics -->
     </section>
     
     <section id="testing:integration:specify-test-jar-content">
+      <title>Customizing test bundle content</title>
+      
+      <para>By default, for the on-the-fly bundle, the testing infrastructure uses all the classes, xml and properties files
+      found under <literal>./target/test-classes</literal> folder. This matches the project layout for maven which is used 
+      (at the moment by Spring-DM). These settings can be configured in two ways:</para>
+   
+      <orderedlist>
+      
+        <listitem><para>programmatically by overriding <classname>AbstractConfigurableBundleCreatorTests</classname> <literal>getXXX</literal>
+         methods.</para>
+        </listitem>
+      
+        <listitem><para>declaratively by creating a properties file having a similar name with the test case. For example, test
+        <literal>com.xyz.MyTest</literal> will have the properties file named <literal>com/xyz/MyTest-bundle.properties</literal>.
+        If found, the following properties will be read from the file:</para>
+        
+	    <table id ="integration-test-jar-setting-file" border="1" pgwide="1">
+	      <title>Default test jar content settings</title>
+	     	<tgroup cols="3">
+	         <colspec align="center" />
+	         <thead>
+	          <row>
+	           <entry>Property Name</entry>
+	           <entry>Default Value</entry>
+	           <entry>Description</entry>
+	         </row>
+	        </thead>
+	        <tbody>
+	         <row>
+	            <entry>root.dir</entry>
+	            <entry>file:./target/test-classes</entry>
+		        <entry>the root folder considered as the jar root</entry>
+	    	</row>
+	
+	    	<row>
+		        <entry>include.patterns</entry>
+		        <entry>/**/*.class, /**/*.xml, /**/*.properties</entry>
+		        <entry>Comma-separated string of Ant-style patterns</entry>
+	       </row>
+	
+	      <row>
+	        <entry>manifest</entry>
+	        <entry>(empty)</entry>
+	        <entry>manifest location given as a String. By default it's empty meaning the manifest
+	        will be created by the test framework rather then being supplied by the user.</entry>
+	      </row>
+	     </tbody>
+	     </tgroup>      
+	    </table>
+		
+		<para>This option is handy when creating specific tests that need to include certain resources (such as localization files 
+		or images).</para>
+	   </listitem>
+      </orderedlist>
+
+		<para>Please consult <classname>AbstractConfigurableBundleCreatorTests</classname> and 
+		<classname>AbstractOnTheFlyBundleCreatorTests</classname> tests for more customization hooks.
+        </para>
+      
     </section>
+    
+    <!-- end of advanced topics -->
+    </section>
+    
 
 
     <section id="testing:integration:appContext">
-      <title>Installing bundle</title>
+      <title>Creating an OSGi application context</title>
       
-
+	  <para>Spring-DM testing suite builds on top of Spring testing classes. To create an application context
+	  (OSGi specific), one should just override <literal>getConfigLocations[]</literal> method and indicate
+	  the location of the application context configuration. At runtime, an OSGi application context will be created
+	  and cached for the lifetime of the test case.</para>
+	  <programlisting><![CDATA[protected String[] getConfigLocations() {
+   return new String[] { "/com/xyz/abc/test/MyTestContext.xml" };
+}]]></programlisting>
+	  
     </section>
     
     <section id="testing:integration:specify-platform">
+      <title>Specifying the OSGi platform to use</title>
+      
+      <para>The testing framework supports out of the box, three OSGi 4.0 implementations namely:
+      Equinox, Knopflerfish and Felix. To be used, these should be in the test classpath. By default,
+      the testing framework will try to use Equinox platform. This can be configured in several ways:</para>
+     
+      <orderedlist>
+      
+      <listitem><para>programmatically through <literal>getPlatformName()</literal> method</para>.
+      <para>Override the aforementioned method and indicate the fully qualified name of
+      the <interfacename>Platform</interfacename> interface implementation. Users can use the <classname>Platforms</classname> 
+      class to specify one of the supported platforms:</para>
+      
+	  <programlisting><![CDATA[protected String getPlatformName() {
+   return Platforms.FELIX;
+}]]></programlisting>      
+
+      </listitem>
+      
+      <listitem><para>declaratively 
+      through <literal>org.springframework.osgi.test.framework</literal> system property.</para>
+      <para>If this property is set, 
+      the testing framework will use its value as a fully qualified name of a Platform implementation. 
+      It that fails, it will fall back to Equinox after logging a warning message.
+      This option is useful for building tools (such as ant or maven) since it indicates a certain
+      target environment without changing and test code.</para>
+      
+      </listitem>
+      
+      </orderedlist>  
     </section>
 
 
     <section id="testing:integration:specify-test-wait-time">
+      <title>Waiting for the test dependencies</title>
+      
+      <para>A built-in feature of the testing framework is the ability to wait until all dependencies are deployed before
+      starting the test execution. Since the OSGi platforms are concurrent by nature, installing a bundle doesn't mean that
+      all its services are running. By running a test before its dependency services are fully initialized can cause sporadic
+      errors that pollute the test results. By default, the testing framework inspects all bundles installed by the user and,
+      if they are Spring-powered bundles, waits until they are fully started (that is their application context is published
+      as an OSGi service). This behaviour can be disabled by overriding <literal>shouldWaitForSpringBundlesContextCreation</literal>
+      method. Consult <classname>AbstractSynchronizedOsgiTests</classname> for more details.</para>
     </section>
     
+    <section id="testing:integration:performance">
+      <title>Testing framework performance</title>
+      
+      <para>Considering all the functionality offered by the testing framework, one might wonder if this doesn't become a 
+      performance bottleneck. First, it's worth noting that all the work done automatically by the testing infrastructure 
+      has to be done anyway (such as creating the manifest or creating a bundle for the test or installing the bundles).
+      Doing it manually simply simply does not work as it's too error prone and time consuming. 
+      In fact, the current infrastructure started as way to do efficient, automatic testing without worrying 
+      about deployment problems and redundancy.</para> 
+      <para>As for the numbers, the current infrastructure has been used internally for the last half a year - our integration tests
+      (around 120) run in about 3:30 on a laptop. Most of this time is spent on starting and stopping the OSGi platform: the "testing 
+      framework" takes around 10% (as shown in our profiling so far).
+      For example, the manifest generation has proved to take less then 0.5 seconds in general, while the jar creation around 1
+      second.</para>
+      <para>However, we are working on making it even faster and smarter so that less configuration options are needed and
+      the contextual information available in your tests is used as much as possible. If you have any ideas or suggestion,
+      feel free to use our issue tracker or/and mailing list.     
+      </para>
+    </section>
     
-    <para>All of the bundles required by Spring Dynamic Modules will be
-    installed by default. By overriding the <literal>getBundles</literal>
-    method you can specify additional application bundles to be installed for
-    the test. In this example we install one bundle, with group id
-    <literal>org.xyz.someapp</literal>, module id
-    <literal>application-layer</literal>, and version
-    <literal>1.0-SNAPSHOT</literal>. The default behavior of the test support
-    is to look up this dependency in your local maven repository. It is
-    possible to change the lookup strategy using a pluggable
-    <literal>ArtifactLocator</literal> (see the javadocs for more
-    information). Support for Ivy-based repositories is planned for a future
-    release.</para>
-
-    <para>The test support has been integrated with Equinox, Knopflerfish, and
-    Felix. You can configure the platform used to run the tests in one of two
-    ways:</para>
-
-    <orderedlist>
-      <listitem>
-        <para>Set the
-        <literal>org.springframework.osgi.test.framework</literal> system
-        property to one of <literal>equinox</literal>,
-        <literal>knopflerfish</literal>, or <literal>felix</literal>.</para>
-      </listitem>
-
-      <listitem>
-        <para>Override the AbstractConfigurableOsgiTests#getPlatformName()
-        operation to return one of the constants: EQUINOX_PLATFORM,
-        KNOPFLERFISH_PLATFORM, or FELIX_PLATFORM.</para>
-      </listitem>
-    </orderedlist>
-
-    <para>By default the test harness will attempt to use Equinox.</para>
+    <para>Hopefully this chapter showed how Spring-DM testing infrastructure can simplify OSGi integration testing and 
+    how it can be customized. Consider consulting the javadocs for more information.
+    </para>
   </section>
+  
 </chapter>
 
