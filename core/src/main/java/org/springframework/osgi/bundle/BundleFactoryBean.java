@@ -118,6 +118,8 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 			bundle = findBundle();
 		}
 
+		updateStartLevel(getStartLevel());
+
 		if (log.isDebugEnabled())
 			log.debug("working with bundle[" + OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
@@ -242,8 +244,6 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		if (StringUtils.hasText(symbolicName))
 			bundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, symbolicName);
 
-		// TODO: keep the start-level or not?
-		// updateStartLevel(getStartLevel());
 
 		return bundle;
 	}
@@ -335,6 +335,11 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		this.destroyAction = action;
 	}
 
+	
+	public int getStartLevel() {
+		return startLevel;
+	}
+
 	public void setStartLevel(int startLevel) {
 		this.startLevel = startLevel;
 	}
@@ -365,7 +370,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		this.resourceLoader = resourceLoader;
 	}
 
-	// TODO: we don't support start-levels yet
+	// TODO: improve startlevel handling
 	private void updateStartLevel(int level) {
 		if (level == 0 || bundle == null)
 			return;

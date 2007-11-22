@@ -2,10 +2,10 @@
 <!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <appendix id="appendix-ack">
-    <title>Appendix D: Acknowledgments</title>
+    <title>Acknowledgments</title>
 
-    <para>Thanks to Peter Kriens, Jeff McAffer, Richard S. Hall, Glyn Normington, 
-    Martin Lippert, Gerd Wuetherich, Bill Gallagher, BJ Hargrave, and 
-    Olivier Gruber for their contributions in the development of this 
-    specification.</para>
+    <para>Spring Dynamic Modules would like to thank (in alphabetical order) to :
+    Bill Gallagher, Olivier Gruber, Richard S. Hall, BJ Hargrave, Peter Kriens,
+    Martin Lippert, Jeff McAffer, Glyn Normington, Gerd Wuetherich 
+    for their contributions in the development of this specification.</para>
 </appendix>

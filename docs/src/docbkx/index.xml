@@ -57,12 +57,12 @@
       <xi:include href="reference/deployment.xml"/>
 	  <xi:include href="reference/service-registry.xml"/>
 	  <xi:include href="reference/bundles.xml"/>
-	  <xi:include href="reference/compendium.xml"/>
 	  <xi:include href="reference/testing.xml"/>
   </part>
   <part id="appendixes">
       <title>Appendixes</title>
       <xi:include href="appendix/introduction.xml"/>
+	  <xi:include href="appendix/appendix-compendium.xml"/>
       <xi:include href="appendix/appendix-extensions.xml"/>
       <xi:include href="appendix/appendix-roadmap.xml"/>
       <xi:include href="appendix/appendix-schema.xml"/>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-
 <xsd:schema xmlns="http://www.springframework.org/schema/osgi"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:beans="http://www.springframework.org/schema/beans"
@@ -17,36 +16,35 @@
             Namespace support for the core services provided by Spring Dynamic Modules, version 1.0-rc1.
         ]]></xsd:documentation>
     </xsd:annotation>
-
-	<xsd:attributeGroup name="defaults">
-		<xsd:annotation>
-			<xsd:documentation><![CDATA[
-			Defaults for Spring-DM OSGi declarations.
-			]]></xsd:documentation>
-		</xsd:annotation>
- 		<!-- attributes -->
- 		<xsd:attribute name="default-timeout" type="xsd:long" default="30000">
- 			<xsd:annotation>
-        		<xsd:documentation><![CDATA[
-            	Default timeout (in milliseconds) for all reference (service importers) elements that do not explicitly specify one.
-            	Default value is 300000 ms (5 minutes).
-        		]]></xsd:documentation>
+    
+    <xsd:attributeGroup name="defaults">
+    	<xsd:annotation>
+    		<xsd:documentation><![CDATA[Defaults for Spring-DM OSGi declarations.]]>
+    		</xsd:documentation>
+    	</xsd:annotation>
+    	<!-- attributes -->
+    	<xsd:attribute name="default-timeout" type="xsd:long" default="30000">
+    		<xsd:annotation>
+    			<xsd:documentation><![CDATA[
+    			Default timeout (in milliseconds) for all reference (service importers) elements that do not explicitly specify one.
+    			Default value is 300000 ms (5 minutes).
+    			]]></xsd:documentation>
     		</xsd:annotation>
-	 	</xsd:attribute>
- 		<xsd:attribute name="default-cardinality" type="TdefaultCardinalityOptions" default="1..X">
- 			<xsd:annotation>
-        		<xsd:documentation><![CDATA[
+    	</xsd:attribute>
+    	<xsd:attribute name="default-cardinality" type="TdefaultCardinalityOptions" default="1..X">
+    		<xsd:annotation>
+    			<xsd:documentation><![CDATA[
             	Default cardinality (of the relationship to the backing service(s)) for all OSGi references (singular or collections) 
             	elements that do not explicitly specify one.
             	Default value is '1..X' (resolved to '1..1' for osgi:reference and '1..N' for osgi:list/set) which means that a backing 
             	service must exist (this is a mandatory service reference). A value of '0..X' (resolved to '0..1' for osgi:reference 
             	and '0..N' for osgi:list/set) indicates that it is acceptable to be no backing service (an optional service reference).
         		]]></xsd:documentation>
-    		</xsd:annotation>
-	 	</xsd:attribute>
-	</xsd:attributeGroup>	 	
-	
-	<xsd:simpleType name="TdefaultCardinalityOptions">
+        	</xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+    
+    <xsd:simpleType name="TdefaultCardinalityOptions">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="1..X">
             	<xsd:annotation>
@@ -78,10 +76,10 @@
         <xsd:complexContent>
             <xsd:extension base="beans:identifiedType">
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-				    <xsd:element name="interfaces" type="beans:listOrSetType" minOccurs="0" maxOccurs="1">
+                	<xsd:element name="interfaces" type="beans:listOrSetType" minOccurs="0" maxOccurs="1">
                     	<xsd:annotation>
                     		<xsd:documentation><![CDATA[
-                    			The set of service interfaces to advertise in the service registry.
+                    		The set of service interfaces to advertise in the service registry.
                     		]]></xsd:documentation>
                     	</xsd:annotation>
                     </xsd:element>                
@@ -95,17 +93,17 @@
                     </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="interface" use="optional" type="xsd:token">
-                      <xsd:annotation>
-                      	<xsd:documentation><![CDATA[
-                      	  The service interface that the services obtained via the registry are required to support.
-                      	  By convention this is a Java interface type, but may also be a (non-final) class type.
-                      	]]></xsd:documentation>
-						<xsd:appinfo>
-							<tool:annotation>
-  								<tool:expected-type type="java.lang.Class" />
-  							</tool:annotation>
-						</xsd:appinfo>  							
-                      </xsd:annotation>
+                	<xsd:annotation>
+                		<xsd:documentation><![CDATA[
+                		The service interface that the services obtained via the registry are required to support.
+                		By convention this is a Java interface type, but may also be a (non-final) class type.
+                		]]></xsd:documentation>
+                		<xsd:appinfo>
+                			<tool:annotation>
+                				<tool:expected-type type="java.lang.Class" />
+                			</tool:annotation>
+                		</xsd:appinfo>
+                	</xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="filter" use="optional" type="xsd:string">
                       <xsd:annotation>
@@ -567,7 +565,7 @@
                 		'update' installs the bundle if needed, and then invokes the Bundle.update() operation.
                 		]]></xsd:documentation>
                 	</xsd:annotation>
-                </xsd:attribute>                
+                </xsd:attribute>
                 <xsd:attribute name="start-level" type="xsd:int" use="optional" default="0">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[

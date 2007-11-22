@@ -1,5 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+
   <chapter id="testing">
     <title>Testing OSGi based Applications</title>
+
+    <para>By following best practices and using the Spring Dynamic Modules
+    support, your bean classes should be easy to unit test as they will have
+    no hard dependencies on OSGi, and the few OSGi APIs that you may interact
+    with (such as <interfacename>BundleContext</interfacename>) are interface-based 
+    and easy to mock. Whether you want to do unit testing or <ulink url="http://en.wikipedia.org/wiki/Integration_testing">
+    integration</ulink> testing, Spring-DM can ease your task.</para> 
+    
+    <section id="testing:mocks">
+
+	<title>OSGi Mocks</title>
 
     <sidebar>
      <title>Mocks vs Stubs</title>
@@ -11,16 +26,7 @@
      this</ulink> article by Martin Fowler which describes in detail the difference 
      between them.</para> 
     </sidebar>
-
-    <para>By following best practices and using the Spring Dynamic Modules
-    support, your bean classes should be easy to unit test as they will have
-    no hard dependencies on OSGi, and the few OSGi APIs that you may interact
-    with (such as <interfacename>BundleContext</interfacename>) are interface-based 
-    and easy to mock. Whether you want to do unit testing or <ulink url="http://en.wikipedia.org/wiki/Integration_testing">
-    integration</ulink> testing, Spring-DM can ease your task.</para> 
-    
-    <section id="testing:mocks">
-    
+	    
     <para>
     Even though most OSGi API are interfaces and creating mocks using a specialized
     library like <ulink url="http://www.easymock.org/">EasyMock</ulink> is fairly
@@ -28,7 +34,7 @@
     becomes cumbersome. To keep the tests short and concise, Spring-DM provides OSGi
     mocks under <literal>org.springframework.osgi.mock</literal> package.</para>
     
-    <para>It's up to you to decide whether they are useful however, we make extensive
+    <para>It's up to you to decide whether they are useful or not however, we make extensive
     use of them inside Spring-DM test suite. Below you can find a code snippet that you
     are likely to encounter in our code base:</para>
     
@@ -70,6 +76,7 @@ public void testComponent() throws Exception {
     </section>
     
     <section id="testing:integration">
+     <title>Integration Testing</title>
     
     <sidebar>
      <title>What about JUnit4/TestNG?</title>

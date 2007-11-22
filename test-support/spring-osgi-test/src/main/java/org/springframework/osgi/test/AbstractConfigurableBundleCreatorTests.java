@@ -105,7 +105,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 
 	/**
 	 * Returns the settings location (by default, the test name; i.e.
-	 * foo.bar.SomeTest will try to load foo/bar/SomeTest.properties).
+	 * foo.bar.SomeTest will try to load foo/bar/SomeTest-bundle.properties).
 	 * 
 	 * @return
 	 */
