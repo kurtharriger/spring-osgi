@@ -24,9 +24,9 @@
 	<programlistingco>
 	   <areaspec>
 	   	  <area id="service-registry.xml.ns.default.beans" coords="2"/>
-          <area id="service-registry.xml.ns.osgi" coords="4"/>
-          <area id="service-registry.xml.ns.beans.25" coords="6"/>
-          <area id="service-registry.xml.osgi.service" coords="11"/>
+          <area id="service-registry.xml.ns.default.beans.osgi" coords="4"/>
+          <area id="service-registry.xml.ns.default.beans.beans.25" coords="6"/>
+          <area id="service-registry.xml.ns.default.beans.osgi.service" coords="11"/>
        </areaspec>
        <programlisting><![CDATA[<xml version="1.0" encoding="UTF-8"?>;
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -41,6 +41,7 @@
     <osgi:service id="simpleServiceOsgi" ref="simpleService"
       interface="org.xyz.MyService" />
 
+
 </beans>]]></programlisting>
        <calloutlist>
          <callout arearefs="service-registry.xml.ns.default.beans">
@@ -48,27 +49,40 @@
             </para>
          </callout>
        
-         <callout arearefs="service-registry.xml.ns.osgi">
+         <callout arearefs="service-registry.xml.ns.default.beans.osgi">
             <para>Import Spring Dynamic Modules schema and associate a prefix with its namespace (<literal>osgi</literal> in this example).
             </para>
          </callout>
-         <callout arearefs="service-registry.xml.ns.beans.25">
+         <callout arearefs="service-registry.xml.ns.default.beans.beans.25">
          	<para>Make sure to import Spring beans schema version <emphasis>2.5</emphasis>.</para>
          </callout>
-         <callout arearefs="service-registry.xml.osgi.service">
+         <callout arearefs="service-registry.xml.ns.default.beans.osgi.service">
          	<para>Use Spring Dynamic Modules elements using the declared namespace prefix (in this example <literal>osgi</literal>).</para>
          </callout>
        </calloutlist>
 	</programlistingco>
 
-    <para>Using the OSGi namespace as a top-level namespace the same service
+    <para>Using the OSGi namespace as a top-level namespace, the same service
     would be declared as follows:</para>
 
+	<programlistingco>
+	   <areaspec>
+	   	  <areaset id="service-registry.xml.ns.default.osgi.beans.root.element" coords="">
+	   	  	<area id="service-registry.xml.ns.default.osgi.beans.root.element.1" coords="2"/>
+	   	  	<area id="service-registry.xml.ns.default.osgi.beans.root.element.2" coords="15"/>
+	   	  </areaset>
+	   
+	   	  <area id="service-registry.xml.ns.default.osgi" coords="3"/>
+          <area id="service-registry.xml.ns.default.osgi.beans" coords="5"/>
+          <area id="service-registry.xml.ns.default.osgi.beans.25" coords="9"/>
+          <area id="service-registry.xml.ns.default.osgi.service" coords="12"/>
+       </areaspec>
     <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/osgi"
+<beans:beans 
+   xmlns="http://www.springframework.org/schema/osgi"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:beans="http://www.springframework.org/schema/beans"
-       xsi:schemaLocation="http://www.springframework.org/schema/osgi  
+   xsi:schemaLocation="http://www.springframework.org/schema/osgi  
        http://www.springframework.org/schema/osgi/spring-osgi-1.0.xsd
        http://www.springframework.org/schema/beans   
        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
@@ -77,7 +91,34 @@
   <service id="simpleServiceOsgi" ref="simpleService"
        interface="org.xyz.MyService" />
 
-</beans:beans>]]></programlisting>
+</beans:beans>
+]]></programlisting>
+
+       <calloutlist>
+         <callout arearefs="service-registry.xml.ns.default.osgi.beans.root.element">
+            <para><literal>beans</literal> root element has to be prefixed with Spring Framework beans schema prefix (<literal>beans</literal> in this example).
+            </para>
+         </callout>
+
+         <callout arearefs="service-registry.xml.ns.default.osgi">
+            <para>Use Spring Dynamic Modules schema as the default namespace.
+            </para>
+         </callout>
+       
+         <callout arearefs="service-registry.xml.ns.default.osgi.beans">
+            <para>Import Spring Framework <literal>beans</literal> schema and associate a prefix with its namespace (<literal>beans</literal> in this example).
+            </para>
+         </callout>
+         
+         <callout arearefs="service-registry.xml.ns.default.osgi.beans.25">
+         	<para>Make sure to import Spring beans schema version <emphasis>2.5</emphasis>.</para>
+         </callout>
+         
+         <callout arearefs="service-registry.xml.ns.default.osgi.service">
+         	<para>Use Spring Dynamic Modules elements without any prefix.</para>
+         </callout>
+       </calloutlist>
+	</programlistingco>
 
     <para>Using the OSGi namespace as a top-level namespace is particularly
     convenient when following the recommendation of section <link linkend="app-deploy:headers">4.1</link> to use a
@@ -421,18 +462,46 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         definition, or declare an anonymous listener bean inline. For
         example:</para>
 
-        <programlisting><![CDATA[<!-- example service declaration with two listeners -->
-
-<service ref="beanToBeExported" interface="SomeInterface">
+	<programlistingco>
+	   <areaspec>
+	   	  <area id="service-registry.exporter.listener.ref" coords="2"/>
+	   	  
+	   	  <areaset id="service-registry.exporter.listener.ref.custom" coords="">
+            <area id="service-registry.exporter.listener.ref.custom.1" coords="3"/>
+            <area id="service-registry.exporter.listener.ref.custom.2" coords="4"/>
+          </areaset>
+	   	  
+          <area id="service-registry.exporter.listener.nested" coords="6"/>
+          <area id="service-registry.exporter.listener.nested.decl" coords="7"/>
+       </areaspec>
+       
+        <programlisting><![CDATA[<service ref="beanToBeExported" interface="SomeInterface">
   <registration-listener ref="myListener"
     registration-method="serviceRegistered"
     unregistration-method="serviceUnregistered"/>
   <registration-listener
-     registration-method="register"
-     unregistration-method="unregister">
+     registration-method="register">
      <bean class="SomeListenerClass"/>
   </registration-listener>
 </service>]]></programlisting>
+
+       <calloutlist>
+         <callout arearefs="service-registry.exporter.listener.ref">
+            <para>Listener declaration referring to a top-level bean declaration.
+            </para>
+         </callout>
+       
+         <callout arearefs="service-registry.exporter.listener.ref.custom">
+            <para>Indicate the <literal>registration</literal> and <literal>unregistration</literal> methods.</para>
+         </callout>
+         <callout arearefs="service-registry.exporter.listener.nested">
+         	<para>Declare only a <literal>registration</literal> custom method for this listener.</para>
+         </callout>
+         <callout arearefs="service-registry.exporter.listener.nested.decl">
+         	<para>Nested listener bean declaration.</para>
+         </callout>
+       </calloutlist>
+	</programlistingco>
 
         <para>The optional <literal>registration-method</literal> and
         <literal>unregistration-method</literal> attributes specify the names
@@ -550,6 +619,9 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <interfacename>ServiceReference</interfacename> for the service will be injected
         in place of the service itself:</para>
 
+
+
+       
 		<programlisting><![CDATA[
 public class BeanWithServiceReference {
 	private ServiceReference serviceReference;
@@ -557,16 +629,30 @@ public class BeanWithServiceReference {
 			
 	// getters/setters ommitted
 }]]></programlisting>
-		
-		<programlisting><![CDATA[
-<reference id="service" interface="com.xyz.SomeService"/>
+	
+	<programlistingco>
+	   <areaspec>
+	   	  <area id="service-registry.exporter.ref.conversion" coords="4"/>
+          <area id="service-registry.exporter.normal.injection" coords="5"/>
+       </areaspec>
+       	
+		<programlisting><![CDATA[<reference id="service" interface="com.xyz.SomeService"/>
 		
 <bean id="someBean" class="BeanWithServiceReference">
-  <!-- the managed service is converted into a ServiceReference -->
   <property name="serviceReference" ref="service"/> 
-  <!-- the managed service is injected as is -->
   <property name="service" ref="service"/>
 </bean>]]></programlisting>
+       <calloutlist>
+         <callout arearefs="service-registry.exporter.ref.conversion">
+            <para>Automatic managed service to <interfacename>ServiceReference</interfacename> conversion.
+            </para>
+         </callout>
+       
+         <callout arearefs="service-registry.exporter.normal.injection">
+            <para>Managed service is injected without any conversion</para>
+         </callout>
+       </calloutlist>
+	</programlistingco>
 		
 		<note>
 		The injected <interfacename>ServiceReference</interfacename> is managed by Spring-DM and will change
@@ -703,117 +789,6 @@ public class BeanWithServiceReference {
           
         </section>
 
-        <section id="service-registry:refs:singular:dynamics">
-          <title>Dealing with Service dynamics</title>
-
-          <para>The bean defined by the <literal>reference</literal> element
-          is unchanging throughout the lifetime of the application context
-          (the object reference remains constant). However, the OSGi service
-          that backs the reference may come and go at any time. For a
-          mandatory service reference (cardinality <literal>1..1</literal>),
-          creation of the application context will block until a matching
-          service is available. For an optional service reference, the
-          reference bean will be created immediately, regardless of whether or
-          not there is currently a matching service.</para>
-
-          <para>When the service backing a <literal>reference</literal> bean
-          goes away, Spring Dynamic Modules tries to replace the backing
-          service with another service matching the reference criteria. An
-          application may be notified of a change in backing service by
-          registering a <literal>listener</literal>. If no matching service is
-          available, then the <literal>reference</literal> is said to be
-          <emphasis>unsatisfied</emphasis>. An unsatisfied mandatory service
-          causes any exported service (<literal>service</literal> bean) that
-          depends on it to be unregistered from the service registry until
-          such time as the reference is satisfied again.</para>
-
-          <para>When an operation is invoked on an unsatisfied
-          <literal>reference</literal> bean (either optional or mandatory),
-          the invocation blocks until the reference becomes satisfied. The
-          optional <literal>timeout</literal> attribute of the
-          <literal>reference</literal> element enables a timeout value (in
-          milliseconds) to be specified. If a timeout value is specified and
-          no matching service becomes available within the timeout period, an
-          unchecked <classname>ServiceUnavailableException</classname> is
-          thrown.</para>
-
-          <para>For applications that need to be aware of when the service
-          backing a <literal>reference</literal> bean is bound and unbound, it
-          is possible to register one or more listeners using the nested
-          <literal>listener</literal> element. The <literal>listener</literal>
-          element refers to a bean (either by name, or by defining one inline)
-          that will receive bind and unbind notifications. If this bean
-          implements Spring's
-          <interfacename>org.springframework.osgi.service.importer.OsgiServiceLifecycleListener</interfacename>
-          interface, then the <literal>bind</literal> and
-          <literal>unbind</literal> operations in this interface will be
-          invoked. Instead of implementing this interface (or in addition),
-          custom bind and unbind callback methods may be named.</para>
-
-          <para>An example of declaring a listener that implements
-          <interfacename>OsgiServiceLifecycleListener</interfacename>:</para>
-
-          <programlisting><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
-  <listener ref="aListenerBean"/>
-</reference>]]></programlisting>
-
-          <para>An example of declaring an inline listener bean with custom
-          bind and unbind methods:</para>
-
-          <programlisting><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
-  <listener bind-method="onBind" unbind-method="onUnbind">
-     <beans:bean class="MyCustomListener"/>
-  </listener>
-</reference>]]></programlisting>
-
-          <para>If the listener bean implements the
-          <interfacename>OsgiServiceLifecycleListener</interfacename> interface
-          <emphasis>and</emphasis> the listener definition specifies custom
-          bind and unbind operations then both the
-          <literal>OsgiServiceLifecycleListener</literal> operation and the
-          custom operation will be invoked, in that order.</para>
-
-          <para>The signature of a custom bind or unbind method must be one
-          of:</para>
-
-          <programlisting><![CDATA[public void anyMethodName(ServiceType service, Dictionary properties);
-
-public void anyMethodName(ServiceType service, Map properties);
-
-public void anyMethodName(ServiceReference ref);]]></programlisting>
-
-          <para>where <literal>ServiceType</literal> can be any type that is
-          assignable from the <literal>reference</literal> interface type. The
-          properties parameter contains the set of properties that the service
-          was registered with.</para>
-
-          <para>A bind callback is invoked when the reference is initially
-          bound to a backing service, and whenever the backing service is
-          replaced by a new backing service.</para>
-
-          <para>An unbind callback is only invoked when the current backing
-          service is unregistered, and no replacement service is immediately
-          available (i.e., the <literal>reference</literal> becomes
-          unsatisfied).</para>
-          
-          <para>In both cases, bind and unbind callbacks will be called <emphasis>only</emphasis>
-          if the backing service matches the type declared in the method signature.
-          If you want the callbacks to be called no matter the type, 
-          use <classname>java.lang.Object</classname> as a <literal>ServiceType</literal>.
-          </para>
-
-          <para>Bind and unbind callbacks are made synchronously as part of
-          processing an OSGi <literal>serviceChanged</literal> event for the
-          backing OSGi service, and are invoked on the OSGi thread that
-          delivers the corresponding OSGi
-          <classname>ServiceEvent</classname>.</para>
-          
-          <para>If the method signature has a single argument of type
-          <interfacename>ServiceReference</interfacename> then the
-          <interfacename>ServiceReference</interfacename> of the service will be passed to
-          the callback in place of the service object itself.</para>
-
-        </section>
         
       	<section id="service-registry:refs:singular:reference:attributes">
        	<para>
@@ -1047,9 +1022,23 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
 		  they occurred after the <interfacename>Iterator</interfacename> was created or during the iteration.
 		  Consider a case where a collection shrinks significantly (for example a big number of OSGi
 		  services are shutdown) right after an iteration started.
-		  To avoid dealing with a lot of 'dead' service references that throw exceptions on usage,
-		  Spring-DM iterators do not take collection snapshots but rather are updated on each service
-		  event so they reflect the latest collection state, no matter how fast or slow the iteration is.</para>
+		  To avoid dealing with the resulting 'dead' service references,
+		  Spring-DM iterators do not take collection snapshots (that can be inaccurate) 
+		  but rather are updated on each service event so they reflect the latest collection state, 
+		  no matter how fast or slow the iteration is.</para>
+		  
+		  <para>It is important to note that a service update will only influence <interfacename>Iterator</interfacename>
+		  operations that are executed after the event occurred. Services already returned by the iterator will not be
+		  updated even if the backing service has been unregistered. As a side note, if an operation is invoked on
+          such a service that has been unregistered, a <literal>ServiceUnavailableException</literal> will be thrown. 
+		  </para>
+		  
+		  <para>To conclude, while a <literal>reference</literal> declaration searches for another candidate in case the
+		  backing service has been unregistered, a service collections will not replace unregistered services returned
+		  to the user. However, it will remove the unregistered services from the collection so future iterations will not
+		  encounter them.
+		  </para>
+		  
 		  
 		  <para>Please note that the <interfacename>Iterator</interfacename> contract is guaranteed meaning that 
 		  <literal>next()</literal> method <emphasis>always</emphasis> obey the result of the previous 
@@ -1084,6 +1073,8 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
 	      The behaviour described above, offers a consistent view over the collection even if its structure changes during iteration.
 	      To simply <emphasis>refresh</emphasis> the iterator, call <literal>hasNext()</literal> again. This will force the
 	      <literal>Iterator</literal> to check again the collection status for its particular entry in the iteration.</para>
+	      
+	      
 	      	
 	 	  <para>
 	 	  In addition, any elements added to the collection during iteration over a <emphasis>sorted</emphasis>
@@ -1101,12 +1092,6 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
           service is added to the collection, and the unbind callback is
           invoked whenever a service is removed from the collection.</para>
 
-          <para>When iterating over the members of a collection, it is always
-          possible that the service backing a collection member is
-          unregistered after it has been returned from an invocation of
-          <literal>Iterator.next()</literal>. If an operation is invoked on
-          such a service, a <literal>ServiceUnavailableException</literal>
-          will be thrown.</para>
         </section>
         
         
@@ -1201,6 +1186,119 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       
     </section>
     
+     <section id="service-registry:refs:dynamics">
+      <title>Dealing with Service dynamics</title>
+
+      <para>The bean defined by the <literal>reference</literal> element
+      is unchanging throughout the lifetime of the application context
+      (the object reference remains constant). However, the OSGi service
+      that backs the reference may come and go at any time. For a
+      mandatory service reference (cardinality <literal>1..1</literal>),
+      creation of the application context will block until a matching
+      service is available. For an optional service reference, the
+      reference bean will be created immediately, regardless of whether or
+      not there is currently a matching service.</para>
+
+      <para>When the service backing a <literal>reference</literal> bean
+      goes away, Spring Dynamic Modules tries to replace the backing
+      service with another service matching the reference criteria. An
+      application may be notified of a change in backing service by
+      registering a <literal>listener</literal>. If no matching service is
+      available, then the <literal>reference</literal> is said to be
+      <emphasis>unsatisfied</emphasis>. An unsatisfied mandatory service
+      causes any exported service (<literal>service</literal> bean) that
+      depends on it to be unregistered from the service registry until
+      such time as the reference is satisfied again.</para>
+
+      <para>When an operation is invoked on an unsatisfied
+      <literal>reference</literal> bean (either optional or mandatory),
+      the invocation blocks until the reference becomes satisfied. The
+      optional <literal>timeout</literal> attribute of the
+      <literal>reference</literal> element enables a timeout value (in
+      milliseconds) to be specified. If a timeout value is specified and
+      no matching service becomes available within the timeout period, an
+      unchecked <classname>ServiceUnavailableException</classname> is
+      thrown.</para>
+
+      <para>For applications that need to be aware of when the service
+      backing a <literal>reference</literal> bean is bound and unbound, it
+      is possible to register one or more listeners using the nested
+      <literal>listener</literal> element. The <literal>listener</literal>
+      element refers to a bean (either by name, or by defining one inline)
+      that will receive bind and unbind notifications. If this bean
+      implements Spring's
+      <interfacename>org.springframework.osgi.service.importer.OsgiServiceLifecycleListener</interfacename>
+      interface, then the <literal>bind</literal> and
+      <literal>unbind</literal> operations in this interface will be
+      invoked. Instead of implementing this interface (or in addition),
+      custom bind and unbind callback methods may be named.</para>
+
+      <para>An example of declaring a listener that implements
+      <interfacename>OsgiServiceLifecycleListener</interfacename>:</para>
+
+      <programlisting><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
+  <listener ref="aListenerBean"/>
+</reference>]]></programlisting>
+
+      <para>An example of declaring an inline listener bean with custom
+      bind and unbind methods:</para>
+
+      <programlisting><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
+  <listener bind-method="onBind" unbind-method="onUnbind">
+     <beans:bean class="MyCustomListener"/>
+  </listener>
+</reference>]]></programlisting>
+
+      <para>If the listener bean implements the
+      <interfacename>OsgiServiceLifecycleListener</interfacename> interface
+      <emphasis>and</emphasis> the listener definition specifies custom
+      bind and unbind operations then both the
+      <literal>OsgiServiceLifecycleListener</literal> operation and the
+      custom operation will be invoked, in that order.</para>
+
+      <para>The signature of a custom bind or unbind method must be one
+      of:</para>
+
+      <programlisting><![CDATA[public void anyMethodName(ServiceType service, Dictionary properties);
+
+public void anyMethodName(ServiceType service, Map properties);
+
+public void anyMethodName(ServiceReference ref);]]></programlisting>
+
+      <para>where <literal>ServiceType</literal> can be any type that is
+      assignable from the <literal>reference</literal> interface type. The
+      properties parameter contains the set of properties that the service
+      was registered with.</para>
+
+      <para>A bind callback is invoked when the reference is initially
+      bound to a backing service, and whenever the backing service is
+      replaced by a new backing service.</para>
+
+      <para>An unbind callback is only invoked when the current backing
+      service is unregistered, and no replacement service is immediately
+      available (i.e., the <literal>reference</literal> becomes
+      unsatisfied).</para>
+      
+      <para>In both cases, bind and unbind callbacks will be called <emphasis>only</emphasis>
+      if the backing service matches the type declared in the method signature.
+      If you want the callbacks to be called no matter the type, 
+      use <classname>java.lang.Object</classname> as a <literal>ServiceType</literal>.
+      </para>
+
+      <para>Bind and unbind callbacks are made synchronously as part of
+      processing an OSGi <literal>serviceChanged</literal> event for the
+      backing OSGi service, and are invoked on the OSGi thread that
+      delivers the corresponding OSGi
+      <classname>ServiceEvent</classname>.</para>
+      
+      <para>If the method signature has a single argument of type
+      <interfacename>ServiceReference</interfacename> then the
+      <interfacename>ServiceReference</interfacename> of the service will be passed to
+      the callback in place of the service object itself.</para>
+
+    </section>
+    
+    
     <section id="service-registry:refs:global-defaults">
       <title>Service importer global defaults</title>
 
@@ -1219,18 +1317,50 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       importer elements that do not explicitly specify one. For
       example:</para>
 
-      <programlisting><![CDATA[<beans:beans osgi:default-timeout="5000">
+	<programlistingco>
+	   <areaspec>
+	   	  <area id="service-registry.global.ns.defaults.osgi.ns" coords="3"/>
+          <area id="service-registry.global.ns.defaults.timeout" coords="4"/>
+          <area id="service-registry.global.ns.default.serv.wo.timeout" coords="6"/>
+          <area id="service-registry.global.ns.default.serv.w.timeout" coords="9"/>
+       </areaspec>
+       
+      <programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:osgi="http://www.springframework.org/schema/osgi"
+          osgi:default-timeout="5000">
 
-  <!-- we will wait up to 5 seconds for a matching service on
-       invocation -->
   <reference id="someService" interface="com.xyz.AService" .../>
 
-  <!-- we will wait only 1 second for a matching service on 
-       invocation -->
   <reference id="someOtherService" interface="com.xyz.BService"
        timeout="1000" .../>
 
 </beans:beans>]]></programlisting>
+
+	<calloutlist>
+		<callout arearefs="service-registry.global.ns.defaults.osgi.ns">
+			<para>Declare <literal>osgi</literal> namespace prefix.</para>
+		</callout>
+
+		<callout arearefs="service-registry.global.ns.defaults.timeout">
+			<para>Declare <literal>default-timeout</literal>(in miliseconds) on the root element. 
+			If the default is not set, it will have a value of 5 minutes. In this example, the 
+			default value is 5 seconds.</para>
+		</callout>
+
+		<callout arearefs="service-registry.global.ns.default.serv.wo.timeout">
+			<para>This <literal>reference</literal> will inherit the default timeout value since 
+			it does not specify one. 
+			This service reference will have a timeout of 5 seconds.</para>
+		</callout>
+
+		<callout arearefs="service-registry.global.ns.default.serv.w.timeout">
+			<para>This <literal>reference</literal> declares a timeout, overriding the default value.
+			 This service reference will have a timeout of 1 second.</para>
+		</callout>	
+	</calloutlist>
+
+	</programlistingco>
 
 		</listitem>
 
@@ -1245,18 +1375,89 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       	</para>
       	
       	<para>Consider the following example:</para>
-      <programlisting><![CDATA[<beans:beans osgi:default-cardinality="0..X">
+	
+	<programlistingco>
+	   <areaspec>
+	   	  <area id="service-registry.global.ns.defaults.osgi" coords="2"/>
+          <area id="service-registry.global.ns.defaults.osgi.beans.ns" coords="4"/>
+          <area id="service-registry.global.ns.defaults.osgi.ns.again" coords="5"/>
+          <area id="service-registry.global.ns.defaults.osgi.cardinality" coords="6"/>
+          <area id="service-registry.global.ns.defaults.osgi.beans.defaults" coords="7"/>
 
-  <!-- no cardinality specified, global cardinality inherited = 0..1 -->
+          <area id="service-registry.global.ns.defaults.osgi.ref.wo.cardinality" coords="9"/>
+          <area id="service-registry.global.ns.defaults.osgi.collection.wo.cardinality" coords="11"/>
+         
+          <area id="service-registry.global.ns.defaults.osgi.collection.w.cardinality" coords="13"/>
+       </areaspec>      	
+      <programlisting><![CDATA[<beans:beans
+      xmlns="http://www.springframework.org/schema/osgi"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:beans="http://www.springframework.org/schema/beans"
+      xmlns:osgi="http://www.springframework.org/schema/osgi"
+         osgi:default-cardinality="0..X"
+         default-lazy-init="false">
+
   <reference id="someService" interface="com.xyz.AService"/>
 
-  <!-- no cardinality specified, global cardinality inherited = 0..N -->
   <set id="someSetOfService" interface="com.xyz.BService"/>
 
-  <!-- local cardinality cardinality specified, override global attribute -->
   <list id="anotherListOfServices" interface="com.xyz.CService" cardinality="1..N"/>
 
 </beans:beans>]]></programlisting>
+
+		<calloutlist>
+		
+		<callout arearefs="service-registry.global.ns.defaults.osgi">
+			<para>Declare Spring Dynamic Modules schema as the default namespace.</para>
+		</callout>
+
+		<callout arearefs="service-registry.global.ns.defaults.osgi.beans.ns">
+		    <para>Import Spring Framework beans schema and associate a prefix with its namespace 
+		    (<literal>beans</literal> in this example).</para>  
+		</callout>
+
+		<callout arearefs="service-registry.global.ns.defaults.osgi.ns.again">
+		    <para>Import Spring Dynamic Modules schema and associate a prefix with its namespace 
+		    (<literal>osgi</literal> in this example). This is requires since the global attributes
+		    have to be declared to an element (<literal>beans</literal>) belonging to another schema.
+		    To avoid ambiguity, the Spring-DM schema is imported under a specified prefix as well.</para>  
+		</callout>
+
+		<callout arearefs="service-registry.global.ns.defaults.osgi.cardinality">
+			<para>Declare <literal>default-cardinality</literal> on the root element. 
+			If the default is not set, it will have a value of <literal>1..N</literal>. In this example, the 
+			default value is <literal>0..N</literal>. Note the <literal>osgi</literal> prefix added to
+			the global attribute.</para>
+		</callout>
+
+		<callout arearefs="service-registry.global.ns.defaults.osgi.beans.defaults">
+			<para><literal>beans</literal> element attributes (such as <literal>default-lazy-init</literal>) 
+			do not need a prefix since they are declared as being local and unqualified 
+			(see the beans schema for more information).</para>
+		</callout>	
+
+		<callout arearefs="service-registry.global.ns.defaults.osgi.ref.wo.cardinality">
+			<para>
+			The <literal>reference</literal> declaration will inherit the default cardinality value since it does not specify one.
+			As <literal>reference</literal> represents a single service, its cardinality will be <literal>0..1</literal>.
+			</para>
+		</callout>	
+
+		<callout arearefs="service-registry.global.ns.defaults.osgi.collection.wo.cardinality">
+			<para>
+			The <literal>set</literal> declaration will inherit the default cardinality value since it does not specify one.
+			As <literal>set</literal> (or <literal>list</literal>) represents a collection of service, 
+			its cardinality will be <literal>0..N</literal>.
+			</para>
+		</callout>	
+		
+		<callout arearefs="service-registry.global.ns.defaults.osgi.collection.w.cardinality">
+			<para>The <literal>list</literal> declaration specifies its cardinality (<literal>1..N</literal>),
+			 overriding the default value.</para>
+		</callout>	
+		</calloutlist>
+	</programlistingco>
+	
 		</listitem>
       </itemizedlist>
       
