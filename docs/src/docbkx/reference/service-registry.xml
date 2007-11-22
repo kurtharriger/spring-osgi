@@ -26,7 +26,7 @@
 	   	  <area id="service-registry.xml.ns.default.beans" coords="2"/>
           <area id="service-registry.xml.ns.default.beans.osgi" coords="4"/>
           <area id="service-registry.xml.ns.default.beans.beans.25" coords="6"/>
-          <area id="service-registry.xml.ns.default.beans.osgi.service" coords="11"/>
+          <area id="service-registry.xml.ns.default.beans.osgi.service" coords="10"/>
        </areaspec>
        <programlisting><![CDATA[<xml version="1.0" encoding="UTF-8"?>;
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -37,11 +37,8 @@
        http://www.springframework.org/schema/osgi  
        http://www.springframework.org/schema/osgi/spring-osgi-1.0.xsd">
 
-    <!-- use the OSGi namespace elements qualified with 'osgi:' -->
     <osgi:service id="simpleServiceOsgi" ref="simpleService"
       interface="org.xyz.MyService" />
-
-
 </beans>]]></programlisting>
        <calloutlist>
          <callout arearefs="service-registry.xml.ns.default.beans">
@@ -69,13 +66,13 @@
 	   <areaspec>
 	   	  <areaset id="service-registry.xml.ns.default.osgi.beans.root.element" coords="">
 	   	  	<area id="service-registry.xml.ns.default.osgi.beans.root.element.1" coords="2"/>
-	   	  	<area id="service-registry.xml.ns.default.osgi.beans.root.element.2" coords="15"/>
+	   	  	<area id="service-registry.xml.ns.default.osgi.beans.root.element.2" coords="14"/>
 	   	  </areaset>
 	   
 	   	  <area id="service-registry.xml.ns.default.osgi" coords="3"/>
           <area id="service-registry.xml.ns.default.osgi.beans" coords="5"/>
           <area id="service-registry.xml.ns.default.osgi.beans.25" coords="9"/>
-          <area id="service-registry.xml.ns.default.osgi.service" coords="12"/>
+          <area id="service-registry.xml.ns.default.osgi.service" coords="11"/>
        </areaspec>
     <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans:beans 
@@ -87,8 +84,7 @@
        http://www.springframework.org/schema/beans   
        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-  <!-- use the OSGi namespace elements directly -->
-  <service id="simpleServiceOsgi" ref="simpleService"
+    <service id="simpleServiceOsgi" ref="simpleService"
        interface="org.xyz.MyService" />
 
 </beans:beans>
@@ -130,7 +126,7 @@
       <para>The <literal>service</literal> element is used to define a bean
       representing an exported OSGi service. At a minimum you must specify the
       bean to be exported, and the <emphasis>service interface</emphasis> that
-      the service offers.</para>
+      the service advertises.</para>
 
       <para>For example, the declaration</para>
 
@@ -440,7 +436,6 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
             </tbody>
           </tgroup>
       </table>        
-      
       </section>
 
       <section id="service-registry:export:lifecycle">
@@ -506,18 +501,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <para>The optional <literal>registration-method</literal> and
         <literal>unregistration-method</literal> attributes specify the names
         of the methods defined on the listener bean that are to be invoked
-        during registration and unregistration. A registration callback method
-        must have a signature matching one of the following formats:</para>
-
-        <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Map serviceProperties);]]></programlisting>
-        
-        <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Dictionary serviceProperties);]]></programlisting>
-
-        <para>where <literal>ServiceType</literal> can be any type compatible
-        with the exported service interface of the service.</para>
-
-        <para>An unregistration callback method must have a signature of the
-        form</para>
+        during registration and unregistration. A registration and unregistration 
+        callback methods must have a signature matching one of the following formats:</para>
 
         <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Map serviceProperties);]]></programlisting>
         
@@ -578,88 +563,62 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       management of this set of references as a <interfacename>List</interfacename>,
       <interfacename>Set</interfacename> collection.</para>
 
+
       <section id="service-registry:refs:singular">
         <title>Referencing an individual service</title>
 
-        <para>The <literal>reference</literal> element is used to define a
-        reference to a service in the service registry. The
-        <literal>interface</literal> attribute identifies the service
-        interface that a matching service must implement. For example, the
-        following declaration creates a bean
-        <literal>messageService</literal>, which is backed by the service
-        returned from the service registry when querying it for a service
-        offering the <interfacename>MessageService</interfacename> interface.</para>
-
-        <programlisting><![CDATA[<reference id="messageService" interface="com.xyz.MessageService"/>]]></programlisting>
-
-        <para>If there are several services in the service registry then the
-        service returned is the service that would be returned by a call to
+      	<para>The <literal>reference</literal> element is used to define a
+        reference to a service in the service registry.</para>
+         
+        <para>Since there can be multiple service matching a given description,
+        the service returned is the service that would be returned by a call to
         <literal>BundleContext.getServiceReference</literal>. This means that
         the service with the highest ranking will be returned, or if there is
         a tie in ranking, the service with the lowest service id (the service
         registered first with the framework) is returned (please see Section 5
         from the OSGi spec for more information on the service selection algorithm).</para>
-
-        <para>The bean defined by the reference element implements all of the
-        advertised interfaces of the service that are visible to the bundle.
-        If the registered service interfaces include Java class types (as
-        opposed to interface types) then support for these types is subject to
-        the restrictions of Spring's AOP implementation (see the Spring
-        Reference Guide). In short, <literal>cglib</literal> library must be
-        available, and <literal>final</literal> methods are not
-        supported.</para>
-
-		<section id="service-registry:refs:singular:property-editor">
-		<title>Getting a hold of the managed service service reference</title>
         
-        <para>Spring-DM can automatically convert a managed OSGi service to 
-        service reference. That is, if the property into which a reference bean 
-        is to be injected, has type <interfacename>ServiceReference</interfacename> (instead of the service
-        interface supported by the reference), then the managed OSGi
-        <interfacename>ServiceReference</interfacename> for the service will be injected
-        in place of the service itself:</para>
-
-
-
-       
-		<programlisting><![CDATA[
-public class BeanWithServiceReference {
-	private ServiceReference serviceReference;
-	private SomeService service;
-			
-	// getters/setters ommitted
-}]]></programlisting>
+        <section id="service-registry:refs:singular:interface">
+          <title>Controlling the set of advertised interfaces for the imported service</title>
+          
+	        <para>The <literal>interface</literal> attribute identifies the service
+	        interface that a matching service must implement. For example, the
+	        following declaration creates a bean
+	        <literal>messageService</literal>, which is backed by the service
+	        returned from the service registry when querying it for a service
+	        offering the <interfacename>MessageService</interfacename> interface.</para>
 	
-	<programlistingco>
-	   <areaspec>
-	   	  <area id="service-registry.exporter.ref.conversion" coords="4"/>
-          <area id="service-registry.exporter.normal.injection" coords="5"/>
-       </areaspec>
-       	
-		<programlisting><![CDATA[<reference id="service" interface="com.xyz.SomeService"/>
-		
-<bean id="someBean" class="BeanWithServiceReference">
-  <property name="serviceReference" ref="service"/> 
-  <property name="service" ref="service"/>
-</bean>]]></programlisting>
-       <calloutlist>
-         <callout arearefs="service-registry.exporter.ref.conversion">
-            <para>Automatic managed service to <interfacename>ServiceReference</interfacename> conversion.
-            </para>
-         </callout>
-       
-         <callout arearefs="service-registry.exporter.normal.injection">
-            <para>Managed service is injected without any conversion</para>
-         </callout>
-       </calloutlist>
-	</programlistingco>
-		
-		<note>
-		The injected <interfacename>ServiceReference</interfacename> is managed by Spring-DM and will change
-		at the same time as the referenced backing OSGi service instance.  
-		</note>
-		</section>
-		
+	        <programlisting><![CDATA[<reference id="messageService" interface="com.xyz.MessageService"/>]]></programlisting>
+	        
+	        <para>Just like the <literal>service</literal> declaration, when specifying
+	        multiple interfaces, use the nested <literal>interfaces</literal> element instead
+	        of <literal>interface</literal> attribute:
+	        </para>
+	        
+	        <programlisting><![CDATA[<osgi:reference id="importedOsgiService">
+  <osgi:interfaces>
+     <value>com.xyz.MessageService</value>
+     <value>com.xyz.MarkerInterface</value>
+  </osgi:interfaces>
+</osgi:reference>]]></programlisting>
+
+			<para>It is illegal to use both <literal>interface</literal> attribute and
+			<literal>interfaces</literal> element at the same time - use only one of them.
+			</para>
+
+	        <para>The bean defined by reference element implements all of the
+	        advertised interfaces of the service that are visible to the bundle (called
+	        <emphasis>greedy proxying</emphasis>).
+	        If the registered service interfaces include Java class types (as
+	        opposed to interface types) then support for these types is subject to
+	        the restrictions of Spring's AOP implementation (see the Spring
+	        Reference Guide). In short, if the specified interfaces are classes
+	        (rather then interfaces), then <literal>cglib</literal> library must be
+	        available, and <literal>final</literal> methods are not
+	        supported.</para>
+        </section>
+        
+          
         <section id="service-registry:refs:singular:filter">
           <title>The <literal>filter</literal> attribute</title>
 
@@ -788,7 +747,7 @@ public class BeanWithServiceReference {
           </itemizedlist>
           
         </section>
-
+        
         
       	<section id="service-registry:refs:singular:reference:attributes">
        	<para>
@@ -852,42 +811,95 @@ public class BeanWithServiceReference {
             </tbody>
           </tgroup>
 	     </table>
+       </section>
 	     
-	     <para>The table below lists the attributes available for the <literal>reference</literal> <literal>listener</literal> sub element.</para>
+	          
+       <section id="service-registry:refs:singular:dynamics">
+         <title><literal>reference</literal> and OSGi Service Dynamics</title>
+         <para>
+	      The bean defined by the <literal>reference</literal> element
+	      is unchanged throughout the lifetime of the application context
+	      (the object reference remains constant). However, the OSGi service
+	      that backs the reference may come and go at any time. For a
+	      mandatory service reference (cardinality <literal>1..1</literal>),
+	      creation of the application context will block until a matching
+	      service is available. For an optional service reference 
+	      (cardinality <literal>0..1</literal>), the
+	      reference bean will be created immediately, regardless of whether or
+	      not there is currently a matching service.</para>
+	
+	      <para>When the service backing a <literal>reference</literal> bean
+	      goes away, Spring Dynamic Modules tries to replace the backing
+	      service with another service matching the reference criteria. An
+	      application may be notified of a change in backing service by
+	      registering a <literal>listener</literal>. If no matching service is
+	      available, then the <literal>reference</literal> is said to be
+	      <emphasis>unsatisfied</emphasis>. An unsatisfied mandatory service
+	      causes any exported service (<literal>service</literal> bean) that
+	      depends on it to be unregistered from the service registry until
+	      such time as the reference is satisfied again. See
+	      <xref linkend="service-registry:export-import-relationship"/> for more information.</para>
+	
+	      <para>When an operation is invoked on an unsatisfied
+	      <literal>reference</literal> bean (either optional or mandatory),
+	      the invocation blocks until the reference becomes satisfied. The
+	      optional <literal>timeout</literal> attribute of the
+	      <literal>reference</literal> element enables a timeout value (in
+	      milliseconds) to be specified. If a timeout value is specified and
+	      no matching service becomes available within the timeout period, an
+	      unchecked <classname>ServiceUnavailableException</classname> is
+	      thrown.</para>
+        </section>        
 
-       	 <table id="reference-import-listener-options" pgwide="1">
-          <title><![CDATA[OSGi <listener> attributes]]></title>
-          <tgroup cols="3">
-            <colspec align="center" />
-            <thead>
-              <row>
-                <entry>Name</entry>
-                <entry>Values</entry>
-                <entry>Description</entry>
-              </row>
-            </thead>
-            <tbody>
-              <row>
-                <entry>ref</entry>
-                <entry>bean name reference</entry>
-                <entry>Name based reference to another bean acting as listener.</entry>
-              </row>
-              <row>
-                <entry>bind-method</entry>
-                <entry>string representing a valid method name</entry>
-                <entry>The name of the method to be invoked when a backing service is bound.</entry>
-              </row>
-              <row>
-                <entry>unbind-method</entry>
-                <entry>string representing a valid method name</entry>
-                <entry>The name of the method to be invoked when a backing service is bound.</entry>
-              </row>
-            </tbody>
-          </tgroup>
-	     </table>	          
-    	</section>
-              
-      </section>
+		<section id="service-registry:refs:singular:property-editor">
+		<title>Getting a hold of the managed service service reference</title>
+        
+        <para>Spring-DM can automatically convert a managed OSGi service to 
+        service reference. That is, if the property into which a reference bean 
+        is to be injected, has type <interfacename>ServiceReference</interfacename> (instead of the service
+        interface supported by the reference), then the managed OSGi
+        <interfacename>ServiceReference</interfacename> for the service will be injected
+        in place of the service itself:</para>
+
+
+		<programlisting><![CDATA[
+public class BeanWithServiceReference {
+	private ServiceReference serviceReference;
+	private SomeService service;
+			
+	// getters/setters ommitted
+}]]></programlisting>
+	
+	<programlistingco>
+	   <areaspec>
+	   	  <area id="service-registry.importer.single.ref.conversion" coords="4"/>
+          <area id="service-registry.importer.single.ref.normal.injection" coords="5"/>
+       </areaspec>
+       	
+		<programlisting><![CDATA[<reference id="service" interface="com.xyz.SomeService"/>
+		
+<bean id="someBean" class="BeanWithServiceReference">
+  <property name="serviceReference" ref="service"/> 
+  <property name="service" ref="service"/>
+</bean>]]></programlisting>
+       <calloutlist>
+         <callout arearefs="service-registry.importer.single.ref.conversion">
+            <para>Automatic managed service to <interfacename>ServiceReference</interfacename> conversion.
+            </para>
+         </callout>
+       
+         <callout arearefs="service-registry.importer.single.ref.normal.injection">
+            <para>Managed service is injected without any conversion</para>
+         </callout>
+       </calloutlist>
+	</programlistingco>
+		
+		<note>
+		The injected <interfacename>ServiceReference</interfacename> is managed by Spring-DM and will change
+		at the same time as the referenced backing OSGi service instance.  
+		</note>
+		</section>
+   	</section>
 
       <section id="service-registry:refs:collection">
         <title>Referencing collections of services</title>
@@ -1007,101 +1019,21 @@ public class BeanWithServiceReference {
   <comparator><natural-ordering basis="service-references"/></comparator>
 </set>]]></programlisting>
 
-		<para>For a sorted set, a <interfacename>SortedSet</interfacename> implementation will be created.
-		However, since JDK API do not provide a <interfacename>SortedList</interfacename>, a sorted list
-		will still be returned as a <interfacename>List</interfacename> implementation.</para>
-
-		<section id="service-registry:refs:collection:iterator">
-		  <title><interfacename>Iterator</interfacename> contract and dynamic collections</title>
-
-		  <para>The recommend way of traversing a collection is by using an <interfacename>Iterator</interfacename>.
-		  However, since OSGi services can come and go, the content of the managed service collection will be adjusted
-		  accordingly. Spring-DM will transparently update any collection <interfacename>Iterator</interfacename>s held by 
-		  the user so it is possible to safely traverse the collection while it is being modified. Moreover, the 
-		  <interfacename>Iterator</interfacename> will reflect all the changes made to the collection, even if 
-		  they occurred after the <interfacename>Iterator</interfacename> was created or during the iteration.
-		  Consider a case where a collection shrinks significantly (for example a big number of OSGi
-		  services are shutdown) right after an iteration started.
-		  To avoid dealing with the resulting 'dead' service references,
-		  Spring-DM iterators do not take collection snapshots (that can be inaccurate) 
-		  but rather are updated on each service event so they reflect the latest collection state, 
-		  no matter how fast or slow the iteration is.</para>
-		  
-		  <para>It is important to note that a service update will only influence <interfacename>Iterator</interfacename>
-		  operations that are executed after the event occurred. Services already returned by the iterator will not be
-		  updated even if the backing service has been unregistered. As a side note, if an operation is invoked on
-          such a service that has been unregistered, a <literal>ServiceUnavailableException</literal> will be thrown. 
-		  </para>
-		  
-		  <para>To conclude, while a <literal>reference</literal> declaration searches for another candidate in case the
-		  backing service has been unregistered, a service collections will not replace unregistered services returned
-		  to the user. However, it will remove the unregistered services from the collection so future iterations will not
-		  encounter them.
-		  </para>
-		  
-		  
-		  <para>Please note that the <interfacename>Iterator</interfacename> contract is guaranteed meaning that 
-		  <literal>next()</literal> method <emphasis>always</emphasis> obey the result of the previous 
-		  <literal>hasNext()</literal> invocation.</para>
-
-		  <table id="collection-iterator-contract" pgwide="1">
-           <title>Dynamic service collection <interfacename>Iterator</interfacename> contract</title>
-           <tgroup cols="2">
-            <colspec align="center" />
-            <thead>
-              <row>
-                <entry>hasNext() returned value</entry>
-                <entry>next() behaviour</entry>
-              </row>
-            </thead>
-            <tbody>
-              <row>
-                <entry>true</entry>
-                <entry><emphasis>Always</emphasis> return a non-null value, even when the collection has shrunk as services when away.
-                </entry>
-              </row>
-              <row>
-                <entry>false</entry>
-                <entry>per <interfacename>Iterator</interfacename> contract, <classname>NoSuchElementException</classname> is thrown.
-                This applies even if other services are added to the collection</entry>
-              </row>
-            </tbody>
-           </tgroup>
-	      </table>
-	      
-	      <para>
-	      The behaviour described above, offers a consistent view over the collection even if its structure changes during iteration.
-	      To simply <emphasis>refresh</emphasis> the iterator, call <literal>hasNext()</literal> again. This will force the
-	      <literal>Iterator</literal> to check again the collection status for its particular entry in the iteration.</para>
-	      
-	      
-	      	
-	 	  <para>
-	 	  In addition, any elements added to the collection during iteration over a <emphasis>sorted</emphasis>
-          collection will only be visible if the iterator has not already passed
-          their sort point.</para>
-        </section>
-        
-        <section id="service-registry:refs:collection:dynamics">
-          <title>Dealing with Service dynamics</title>
-
-          <para>Collection membership is automatically managed as matching
-          services are registered or unregistered. The nested
-          <literal>listener</literal> element is supported with all of the
-          reference collection beans. The bind callback is invoked whenever a
-          service is added to the collection, and the unbind callback is
-          invoked whenever a service is removed from the collection.</para>
-
-        </section>
-        
-        
-        <section id="service-registry:refs:singular:collection:attributes">
-       	<para>
-       	As a summary, the following table lists the <literal>set</literal> and <literal>list</literal> element 
-       	attributes names, possible values and a short description for each of them.
+		<remark>For a sorted set, a <interfacename>SortedSet</interfacename> implementation will be created.
+		However, since JDK API do not provide a dedicated <interfacename>SortedList</interfacename>interface, 
+		the sorted list will implement only the <interfacename>List</interfacename> interface.</remark>
+		
+		<section id="service-registry:refs:collection:attributes">
+			<title>Collection (<literal>list</literal> and <literal>set</literal>) declaration attributes</title>
+		<para>
+		<literal>list</literal> and <literal>set</literal> elements support all the attributes available to
+		<literal>reference</literal> element except the <literal>timeout</literal> attribute.
+		
+       	See the following table as a summary of the <literal>list</literal> and <literal>set</literal> element 
+       	attribute names, possible values and a short description for each of them.
         </para>
        	<table id="collection-import-options" pgwide="1">
-          <title><![CDATA[OSGi <reference> attributes]]></title>
+          <title><![CDATA[<list>/<set> attributes]]></title>
           <tgroup cols="3">
             <colspec align="center" />
             <thead>
@@ -1160,7 +1092,7 @@ public class BeanWithServiceReference {
 	     <para>The table below lists the attributes available for the <literal>comparator/natural</literal> sub element.</para>
 
        	 <table id="collection-import-comparator-options" pgwide="1">
-          <title><![CDATA[OSGi <listener> attributes]]></title>
+          <title><![CDATA[collection <comparator> attributes]]></title>
           <tgroup cols="3">
             <colspec align="center" />
             <thead>
@@ -1180,53 +1112,137 @@ public class BeanWithServiceReference {
             </tbody>
           </tgroup>
 	     </table>	          
-    	</section>
-              
+		</section>
+		
+		<section id="service-registry:refs:collection:dynamics">
+         <title><literal>list</literal> / <literal>set</literal> and OSGi Service Dynamics</title>
+         <para>
+          A collection of OSGi services will change its content during the lifetime
+          of the application context since it needs to reflect the state of the OSGi
+          space. As service are registered and unregistered, they will be added or
+          removed from the collection.</para>
+          
+          <para>While a <literal>reference</literal> declaration will try to
+          find a replacement if the backing service is unregistered, the collection
+          will simply remove the service from the collection. 
+          Like <literal>reference</literal>, a collection with cardinality <literal>1..N</literal>
+          is said to be mandatory while a collection with cardinality <literal>0..N</literal>
+          is referred to as being optional.
+          If no matching service is available then only mandatory collections become 
+          <emphasis>unsatisfied</emphasis>.
+          That is if no service is available invoking an operation on:
+          </para>
+          
+          <itemizedlist>
+          	<listitem>mandatory collection - will throw an unchecked <classname>ServiceUnavailableException</classname>.</listitem>
+          	<listitem>optional collection - will <emphasis>not</emphasis> throw any exceptions (however the collection will be empty).</listitem>
+          </itemizedlist> 
+          
+          <para>Just like <literal>reference</literal>, mandatory collections
+          will trigger the unregistration of any exported service that depends
+          upon it. See
+	      <xref linkend="service-registry:export-import-relationship"/> for more information.
+          </para>   
+          
+        </section> 
+		
+		<section id="service-registry:refs:collection:iterator">
+		  <title><interfacename>Iterator</interfacename> contract and service collections</title>
+
+		  <para>The recommend way of traversing a collection is by using an <interfacename>Iterator</interfacename>.
+		  However, since OSGi services can come and go, the content of the managed service collection will be adjusted
+		  accordingly. Spring-DM will transparently update all <interfacename>Iterator</interfacename>s held by 
+		  the user so it is possible to safely traverse the collection while it is being modified. Moreover, the 
+		  <interfacename>Iterator</interfacename>s will reflect all the changes made to the collection, even if 
+		  they occurred after the <interfacename>Iterator</interfacename>s were created (that is during the iteration).
+		  Consider a case where a collection shrinks significantly (for example a big number of OSGi
+		  services are shutdown) right after an iteration started.
+		  To avoid dealing with the resulting 'dead' service references,
+		  Spring-DM iterators do not take collection snapshots (that can be inaccurate) 
+		  but rather are updated on each service event so they reflect the latest collection state, 
+		  no matter how fast or slow the iteration is.</para>
+		  
+		  <para>It is important to note that a service update will only influence <interfacename>Iterator</interfacename>
+		  operations that are executed after the event occurred. Services already returned by the iterator will not be
+		  updated even if the backing service has been unregistered. As a side note, if an operation is invoked on
+          such a service that has been unregistered, a <literal>ServiceUnavailableException</literal> will be thrown. 
+		  </para>
+		  
+		  <para>To conclude, while a <literal>reference</literal> declaration will search for candidates in case the
+		  backing service has been unregistered, a service collections will not replace unregistered services returned
+		  to the user. However, it will remove the unregistered services from the collection so future iterations will not
+		  encounter them.
+		  </para>
+		  
+		  
+		  <para>Please note that the <interfacename>Iterator</interfacename> contract is guaranteed meaning that 
+		  <literal>next()</literal> method <emphasis>always</emphasis> obey the result of the previous 
+		  <literal>hasNext()</literal> invocation.</para>
+
+		  <table id="collection-iterator-contract" pgwide="1">
+           <title>Dynamic service collection <interfacename>Iterator</interfacename> contract</title>
+           <tgroup cols="2">
+            <colspec align="center" />
+            <thead>
+              <row>
+                <entry>hasNext() returned value</entry>
+                <entry>next() behaviour</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>true</entry>
+                <entry><emphasis>Always</emphasis> return a non-null value, even when the collection has shrunk as services when away.
+                </entry>
+              </row>
+              <row>
+                <entry>false</entry>
+                <entry>per <interfacename>Iterator</interfacename> contract, <classname>NoSuchElementException</classname> is thrown.
+                This applies even if other services are added to the collection</entry>
+              </row>
+            </tbody>
+           </tgroup>
+	      </table>
+	      
+	      <para>
+	      The behaviour described above, offers a consistent view over the collection even if its structure changes during iteration.
+	      To simply <emphasis>refresh</emphasis> the iterator, call <literal>hasNext()</literal> again. This will force the
+	      <literal>Iterator</literal> to check again the collection status for its particular entry in the iteration.</para>
+	      
+	      
+	      	
+	 	  <para>
+	 	  In addition, any elements added to the collection during iteration over a <emphasis>sorted</emphasis>
+          collection will only be visible if the iterator has not already passed
+          their sort point.</para>
+        </section>
+        
       </section>
       
-    </section>
-    
+      
      <section id="service-registry:refs:dynamics">
-      <title>Dealing with Service dynamics</title>
+      <title>Dealing with the dynamics of OSGi imported services</title>
 
-      <para>The bean defined by the <literal>reference</literal> element
-      is unchanging throughout the lifetime of the application context
-      (the object reference remains constant). However, the OSGi service
-      that backs the reference may come and go at any time. For a
-      mandatory service reference (cardinality <literal>1..1</literal>),
-      creation of the application context will block until a matching
-      service is available. For an optional service reference, the
-      reference bean will be created immediately, regardless of whether or
-      not there is currently a matching service.</para>
-
-      <para>When the service backing a <literal>reference</literal> bean
-      goes away, Spring Dynamic Modules tries to replace the backing
-      service with another service matching the reference criteria. An
-      application may be notified of a change in backing service by
-      registering a <literal>listener</literal>. If no matching service is
-      available, then the <literal>reference</literal> is said to be
-      <emphasis>unsatisfied</emphasis>. An unsatisfied mandatory service
-      causes any exported service (<literal>service</literal> bean) that
-      depends on it to be unregistered from the service registry until
-      such time as the reference is satisfied again.</para>
-
-      <para>When an operation is invoked on an unsatisfied
-      <literal>reference</literal> bean (either optional or mandatory),
-      the invocation blocks until the reference becomes satisfied. The
-      optional <literal>timeout</literal> attribute of the
-      <literal>reference</literal> element enables a timeout value (in
-      milliseconds) to be specified. If a timeout value is specified and
-      no matching service becomes available within the timeout period, an
-      unchecked <classname>ServiceUnavailableException</classname> is
-      thrown.</para>
-
-      <para>For applications that need to be aware of when the service
-      backing a <literal>reference</literal> bean is bound and unbound, it
-      is possible to register one or more listeners using the nested
-      <literal>listener</literal> element. The <literal>listener</literal>
-      element refers to a bean (either by name, or by defining one inline)
+      <para>Whether you are using <literal>reference</literal>
+      or <literal>set</literal> or <literal>list</literal>, Spring Dynamic
+      Modules will manage the backing service. However there are cases
+      where the application needs to be aware when the backing service
+      is updated.</para>
+         
+      <para>Such applications, that need to be aware of when the service
+      backing a <literal>reference</literal> bean is bound and unbound, can
+      register one or more listeners using the nested
+      <literal>listener</literal> element.
+      This element is available on both <literal>reference</literal> and
+      <literal>set</literal>, <literal>list</literal> declarations.
+      In many respects, the service importer listener declaration 
+      is similar to the service exporter listener declaration 
+      (<xref linkend="service-registry:export:lifecycle"/>).
+      
+      The <literal>listener</literal> element refers to a bean (either by name, 
+      or by defining one inline)
       that will receive bind and unbind notifications. If this bean
-      implements Spring's
+      implements Spring-DM's
       <interfacename>org.springframework.osgi.service.importer.OsgiServiceLifecycleListener</interfacename>
       interface, then the <literal>bind</literal> and
       <literal>unbind</literal> operations in this interface will be
@@ -1265,25 +1281,54 @@ public void anyMethodName(ServiceType service, Map properties);
 
 public void anyMethodName(ServiceReference ref);]]></programlisting>
 
-      <para>where <literal>ServiceType</literal> can be any type that is
-      assignable from the <literal>reference</literal> interface type. The
-      properties parameter contains the set of properties that the service
-      was registered with.</para>
-
-      <para>A bind callback is invoked when the reference is initially
-      bound to a backing service, and whenever the backing service is
-      replaced by a new backing service.</para>
-
-      <para>An unbind callback is only invoked when the current backing
-      service is unregistered, and no replacement service is immediately
-      available (i.e., the <literal>reference</literal> becomes
-      unsatisfied).</para>
+      <para>where <literal>ServiceType</literal> can be any type. Please note that
+      bind and unbind callbacks are invoked <emphasis>only</emphasis>
+      if the backing service matches the type declared in the method signature(
+      <classname>ServiceType</classname>). If you want the callbacks to be called 
+      no matter the type, use <classname>java.lang.Object</classname> as a 
+      <literal>ServiceType</literal>.</para>
       
-      <para>In both cases, bind and unbind callbacks will be called <emphasis>only</emphasis>
-      if the backing service matches the type declared in the method signature.
-      If you want the callbacks to be called no matter the type, 
-      use <classname>java.lang.Object</classname> as a <literal>ServiceType</literal>.
-      </para>
+      <para>
+      The <literal>properties</literal> parameter contains the set of properties 
+      that the service was registered with.</para>
+      
+      <para>If the method signature has a single argument of type
+      <interfacename>ServiceReference</interfacename> then the
+      <interfacename>ServiceReference</interfacename> of the service will be passed to
+      the callback in place of the service object itself.</para>
+      
+	  
+      <para>When the listener is used with a <literal>reference</literal> declaration:</para>
+      	<itemizedlist>
+      		<listitem>A <emphasis>bind</emphasis> callback is invoked 
+      when the reference is initially bound to a backing service, 
+      and whenever the backing service is replaced by a new backing service.
+      </listitem>
+      
+      		<listitem>An <emphasis>unbind</emphasis> callback is only 
+      invoked when the current backing service is unregistered, and no 
+      replacement service is immediately available 
+      (i.e., the <literal>reference</literal> becomes unsatisfied).</listitem>
+      	</itemizedlist>
+     
+
+	  <para>When the listener is used with a collection declaration (<literal>set</literal> or 
+	  <literal>list</literal>):</para>
+	
+      	<itemizedlist>
+      		<listitem>A <emphasis>bind</emphasis> callback is invoked 
+      		when a new service is added to the collection.
+      		</listitem>
+      
+      		<listitem>An <emphasis>unbind</emphasis> callback is 
+      		invoked when a service is unregistered and is removed
+      		from the collection.</listitem>
+      	</itemizedlist>
+     
+      <para>Again note that service collections there is <emphasis>no</emphasis> 
+      notion of <emphasis>service rebind</emphasis>:
+      services are added or removed from the collection.</para>
+
 
       <para>Bind and unbind callbacks are made synchronously as part of
       processing an OSGi <literal>serviceChanged</literal> event for the
@@ -1291,13 +1336,75 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       delivers the corresponding OSGi
       <classname>ServiceEvent</classname>.</para>
       
-      <para>If the method signature has a single argument of type
-      <interfacename>ServiceReference</interfacename> then the
-      <interfacename>ServiceReference</interfacename> of the service will be passed to
-      the callback in place of the service object itself.</para>
+	     <para>The table below lists the attributes available for the <literal>reference</literal> <literal>listener</literal> sub element.</para>
 
+       	 <table id="reference-import-listener-options" pgwide="1">
+          <title><![CDATA[OSGi <listener> attributes]]></title>
+          <tgroup cols="3">
+            <colspec align="center" />
+            <thead>
+              <row>
+                <entry>Name</entry>
+                <entry>Values</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>ref</entry>
+                <entry>bean name reference</entry>
+                <entry>Name based reference to another bean acting as listener.</entry>
+              </row>
+              <row>
+                <entry>bind-method</entry>
+                <entry>string representing a valid method name</entry>
+                <entry>The name of the method to be invoked when a backing service is bound.</entry>
+              </row>
+              <row>
+                <entry>unbind-method</entry>
+                <entry>string representing a valid method name</entry>
+                <entry>The name of the method to be invoked when a backing service is bound.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+	     </table>      
+      
+    </section>
     </section>
     
+    <section id="service-registry:refs:listener-best-practices">
+      <title>Exporter/Importer listener best practices</title>
+      
+      <para>As mentioned above, Spring-DM exporter and importer allow listeners to be
+      used for receiving notifications on when services are bound, unbound, registered or 
+      unregistered. Below you can find some guidance advices when working with listeners:
+      </para>
+      
+      <itemizedlist>
+       	<listitem>
+       	Do <emphasis>not</emphasis> execute long activity tasks inside the listener. If you really
+       	have to, use a separate thread for executing the work. The listener are called synchronously
+       	and so try to be as fast as possible. Doing work inside the listener prevents other the event
+       	to be sent to other listeners and the OSGi service to resume activity. 
+      	</listitem>
+      
+      
+      	<listitem>Use listener custom declaration as much as possible - it doesn't tie your code
+      	to Spring-DM API and it doesn't enforce certain signature names.</listitem>
+      	
+      	<listitem>If find yourself repeating bind/unbind method declarations for your listener definitions,
+      	consider using Spring <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-child-bean-definitions">
+      	bean definition inheritance</ulink> to define a common definition that can be reused and customized
+      	accordingly.
+      	</listitem>
+      	
+      	<listitem>Prefer <interfacename>java.util.Map</interfacename> instead of <classname>java.util.Dictionary</classname>
+      	class. The first is an interface while the latter is a deprecated, abstract class. To preserve compatibility, Spring-DM
+      	will pass to the listeners a <interfacename>Map</interfacename> implementation that can be casted, if needed, to a 
+      	<classname>Dictionary</classname>.</listitem>
+      </itemizedlist> 
+      
+    </section> 
     
     <section id="service-registry:refs:global-defaults">
       <title>Service importer global defaults</title>
@@ -1465,40 +1572,6 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       as easy propagation of changes (such as increasing or decreasing the timeout).</para>
     </section>
     
-    <section id="service-registry:refs:listener-best-practices">
-      <title>Exporter/Importer listener best practices</title>
-      
-      <para>As mentioned above, Spring-DM exporter and importer allow listeners to be
-      used for receiving notifications on when services are bound, unbound, registered or 
-      unregistered. Below you can find some guidance advices when working with listeners:
-      </para>
-      
-      <itemizedlist>
-       	<listitem>
-       	Do <emphasis>not</emphasis> execute long activity tasks inside the listener. If you really
-       	have to, use a separate thread for executing the work. The listener are called synchronously
-       	and so try to be as fast as possible. Doing work inside the listener prevents other the event
-       	to be sent to other listeners and the OSGi service to resume activity. 
-      	</listitem>
-      
-      
-      	<listitem>Use listener custom declaration as much as possible - it doesn't tie your code
-      	to Spring-DM API and it doesn't enforce certain signature names.</listitem>
-      	
-      	<listitem>If find yourself repeating bind/unbind method declarations for your listener definitions,
-      	consider using Spring <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-child-bean-definitions">
-      	bean definition inheritance</ulink> to define a common definition that can be reused and customized
-      	accordingly.
-      	</listitem>
-      	
-      	<listitem>Prefer <interfacename>java.util.Map</interfacename> instead of <classname>java.util.Dictionary</classname>
-      	class. The first is an interface while the latter is a deprecated, abstract class. To preserve compatibility, Spring-DM
-      	will pass to the listeners a <interfacename>Map</interfacename> implementation that can be casted, if needed, to a 
-      	<classname>Dictionary</classname>.</listitem>
-      </itemizedlist> 
-      
-    </section>
-    
     <section id="service-registry:export-import-relationship">
     
      <title>Relationship between the service exporter and service importer</title>
@@ -1506,7 +1579,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
         <para>An exported service may depend, either directly or indirectly,
         on other services in order to perform its function. If one of these
         services is considered a <emphasis>mandatory</emphasis> dependency
-        (see <xref linkend="service-registry:refs:singular:dynamics"/>) and the 
+        (has cardinality <literal>1..x</literal>) and the 
         dependency can no longer be satisfied
         (because the backing service has gone away and there is no suitable
         replacement available) then the exported service that depends on it
