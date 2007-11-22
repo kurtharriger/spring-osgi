@@ -2,17 +2,18 @@
 <!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <appendix id="appendix-roadmap">
-    <title>Appendix B: Roadmap</title>
+    <title>Roadmap</title>
 
     <para>This appendix documents features on the Spring Dynamic Modules
     roadmap. The design of these features specified here is subject to
-    change.</para>
+    change. As a most up to date source, please see <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI">
+    our</ulink> issue tracker.</para>
 
     <section>
-      <title>B.1 Enhanced Configuration Admin Support</title>
+      <title>Enhanced Configuration Admin Support</title>
 
       <section>
-        <title>B.1.1 Managed Services</title>
+        <title>Managed Services</title>
 
         <para>It should be possible to easily instantiate a bean from the
         configuration information stored for a
@@ -34,8 +35,8 @@
         <para>A simple declaration of a managed service bean would look as
         follows:</para>
 
-        <screen> &lt;osgix:managed-service id="myService" class="com.xyz.MessageService" 
-   persistent-id="com.xyz.messageservice"/&gt;</screen>
+        <programlisting><![CDATA[<osgix:managed-service id="myService" class="com.xyz.MessageService" 
+   persistent-id="com.xyz.messageservice"/>]]></programlisting>
 
         <para>The properties of the <literal>managed-service</literal> bean
         are autowired by name based on the configuration found under the given
@@ -66,9 +67,9 @@
         invoked if the configuration for the bean is updated. The update
         method must have one of the following signatures:</para>
 
-        <screen>public void anyMethodName(Map properties)
-public void anyMethodName(Map&lt;String,?&gt; properties); // for Java 5
-public void anyMethodName(Dictionary properties);</screen>
+        <programlisting><![CDATA[public void anyMethodName(Map properties)
+public void anyMethodName(Map<String,?> properties); // for Java 5
+public void anyMethodName(Dictionary properties);]]></programlisting>
 
         <para>When an update strategy of <literal>container-managed</literal>
         is specified then the container will autowire the bean instance by
@@ -84,7 +85,7 @@ public void anyMethodName(Dictionary properties);</screen>
       </section>
 
       <section>
-        <title>B.1.2 Managed Service Factories</title>
+        <title>Managed Service Factories</title>
 
         <para>The <literal>managed-service-factory</literal> element is
         similar to the <literal>managed-service</literal> element, but instead
@@ -95,8 +96,8 @@ public void anyMethodName(Dictionary properties);</screen>
         <para>A simple <literal>managed-service-factory</literal> declaration
         would look as follows:</para>
 
-        <screen>&lt;osgix:managed-service-factory id="someId" factory-pid="org.xzy.services" 
-           class="MyServiceClass"/&gt;</screen>
+        <programlisting><![CDATA[<osgix:managed-service-factory id="someId" factory-pid="org.xzy.services" 
+           class="MyServiceClass"/>]]></programlisting>
 
         <para>This declaration results in the creation of zero or more beans,
         one bean for each configuration registered under the given factory
@@ -119,7 +120,7 @@ public void anyMethodName(Dictionary properties);</screen>
         specify a destroy callback to be invoked on the bean instance. Such a
         method must have a signature:</para>
 
-        <screen>public void anyMethodName();</screen>
+        <programlisting><![CDATA[public void anyMethodName();]]></programlisting>
 
         <para>It is also possible for the configuration of an existing bean to
         be updated. The same <literal>update-strategy</literal> and
@@ -132,7 +133,7 @@ public void anyMethodName(Dictionary properties);</screen>
       </section>
 
       <section>
-        <title>B.1.3 Direct access to configuration data</title>
+        <title>Direct access to configuration data</title>
 
         <para>If you need to work directly with the configuration data stored
         under a given persistent id or factory persistent id, the easiest way
@@ -141,13 +142,13 @@ public void anyMethodName(Dictionary properties);</screen>
         <literal>ManagedServiceFactory</literal> interface and specify the pid
         that you are interested in as a service property. For example:</para>
 
-        <screen>&lt;service interface="org.osgi.service.cm.ManagedService" ref="MyManagedService"&gt;
-  &lt;service-properties&gt;
-    &lt;entry key="service.pid" value="my.managed.service.pid"/&gt;
-  &lt;/service-properties&gt;
-&lt;/service&gt;
+        <programlisting><![CDATA[<service interface="org.osgi.service.cm.ManagedService" ref="MyManagedService">
+  <service-properties>
+    <entry key="service.pid" value="my.managed.service.pid"/>
+  </service-properties>
+</service>
 
-&lt;bean id="myManagedService" class="com.xyz.MyManagedService"/&gt;</screen>
+<bean id="myManagedService" class="com.xyz.MyManagedService"/>]]></programlisting>
 
         <para>and where the class <literal>MyManagedService</literal>
         implements
@@ -155,7 +156,7 @@ public void anyMethodName(Dictionary properties);</screen>
       </section>
 
       <section>
-        <title>B.1.4 Publishing configuration administration properties with
+        <title>Publishing configuration administration properties with
         exported services</title>
 
         <para>We intend to provide support for automatic publication of
@@ -163,9 +164,9 @@ public void anyMethodName(Dictionary properties);</screen>
         a given persistent id. This support has yet to be designed but may
         look as follows:</para>
 
-        <screen>&lt;service ref="toBeExported" interface="SomeInterface"&gt;
-   &lt;osgix:config-properties persistent-id="pid"/&gt;
-&lt;/service&gt;</screen>
+        <programlisting><![CDATA[<service ref="toBeExported" interface="SomeInterface">
+   <osgix:config-properties persistent-id="pid"/>
+</service>]]></programlisting>
 
         <para>Issues to be considered are scoping of a subset of properties to
         be published (public/private), and automatic updates to published
@@ -178,7 +179,7 @@ public void anyMethodName(Dictionary properties);</screen>
     </section>
 
     <section>
-      <title>B.2 Access to Service References for Collections</title>
+      <title>Access to Service References for Collections</title>
 
       <para>The current specification does not provide for access to the
       <literal>ServiceReference</literal> objects for services in a managed
@@ -189,7 +190,7 @@ public void anyMethodName(Dictionary properties);</screen>
     </section>
 
     <section>
-      <title>B.3 Start level integration</title>
+      <title>Start level integration</title>
 
       <para>A future release of Spring Dynamic Modules may offer the following
       additional guarantee with respect to application context creation and
@@ -199,7 +200,7 @@ public void anyMethodName(Dictionary properties);</screen>
       extender bundle does guarantee that the creation of all application
       contexts for bundles at start level <literal>n</literal> will be
       complete before the creation of any application context at start level
-      <literal>m</literal>, where <literal>m &gt; n</literal>. Care must
+      <literal>m</literal>, where <literal>m > n</literal>. Care must
       therefore be taken not to introduce any mandatory dependencies on
       services exported by bundles with higher start levels or a deadlock will
       be introduced.</para>
@@ -207,26 +208,27 @@ public void anyMethodName(Dictionary properties);</screen>
       <para>In a similar vein, when shutting down the extender bundle,
       application contexts at start level <literal>m</literal> will be shut
       down before application contexts at start level <literal>n</literal>,
-      where <literal>m &gt; n</literal>.</para>
+      where <literal>m > n</literal>.</para>
     </section>
 
     <section>
-      <title>B.4 Web application support</title>
+      <title>Web application support</title>
 
       <para>A key part of the roadmap for the next release of Spring Dynamic
       Modules is built-in support for building web applications out of OSGi
-      bundles. This will be supported using both an HttpService provided by a
-      bundle installed into the running OSGi framework, and also by embedding
+      bundles. This will be supported using both an <interfacename>HttpService</interfacename> 
+      provided by a bundle installed into the running OSGi framework, and also by embedding
       an OSGi container inside an existing servlet container. Pioneering work
       has been done by <ulink
       url="http://martinlippert.blogspot.com/2007/06/slides-and-examples-from-springone-2007.html">Martin
       Lippert</ulink>, <ulink
       url="http://thegoodthebadtheugly.wordpress.com/2007/05/20/springosgi/">Bernd
-      Kolb</ulink>, and Gerd Wutherich amongst others</para>
+      Kolb</ulink>, and Gerd Wutherich amongst others. Please see our mailing list archive
+      for more information.</para>
     </section>
 
     <section>
-      <title>B.5 ORM support</title>
+      <title>ORM/Persistence support</title>
 
       <para>Care needs to be taken when using JPA or Hibernate under OSGi as
       the persistence engines must have visibility of the persistent types and
@@ -235,5 +237,7 @@ public void anyMethodName(Dictionary properties);</screen>
       configuration is split across several bundles. See Peter Krien's <ulink
       url="http://www.osgi.org/blog/2007/06/osgi-and-hibernate.html">blog
       entry</ulink> on the topic for an insight into the issues.</para>
+      <para>Also, the project aims to simplify deployment of JDBC drivers and
+      pooling libraries that at the moment require special <literal>DynamicImport-Package</literal>.</para>
     </section>
 </appendix>

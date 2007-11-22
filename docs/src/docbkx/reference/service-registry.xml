@@ -1,3 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+
   <chapter id="service-registry">
     <title>The Service Registry</title>
 
@@ -7,7 +11,7 @@
     registry.</para>
 
     <para>Spring Dynamic Modules provides an <literal>osgi</literal> namespace for Spring (see
-    <link linkend="appendix-schema">Appendix C</link>) that can be used to export 
+    <xref linkend="appendix-schema"/>) that can be used to export 
     Spring beans as OSGi services, and
     to define references to services obtained via the service registry. The
     namespace elements may be used nested inside another top-level namespace
@@ -17,7 +21,14 @@
     <para>The following example shows the use of the <literal>osgi</literal>
     namespace within the familiar Spring beans element:</para>
 
-     <programlisting><![CDATA[<xml version="1.0" encoding="UTF-8"?>;
+	<programlistingco>
+	   <areaspec>
+	   	  <area id="service-registry.xml.ns.default.beans" coords="2"/>
+          <area id="service-registry.xml.ns.osgi" coords="4"/>
+          <area id="service-registry.xml.ns.beans.25" coords="6"/>
+          <area id="service-registry.xml.osgi.service" coords="11"/>
+       </areaspec>
+       <programlisting><![CDATA[<xml version="1.0" encoding="UTF-8"?>;
 <beans xmlns="http://www.springframework.org/schema/beans"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:osgi="http://www.springframework.org/schema/osgi"
@@ -31,6 +42,24 @@
       interface="org.xyz.MyService" />
 
 </beans>]]></programlisting>
+       <calloutlist>
+         <callout arearefs="service-registry.xml.ns.default.beans">
+            <para>Use Spring Framework <literal>beans</literal> schema as the default namespace.
+            </para>
+         </callout>
+       
+         <callout arearefs="service-registry.xml.ns.osgi">
+            <para>Import Spring Dynamic Modules schema and associate a prefix with its namespace (<literal>osgi</literal> in this example).
+            </para>
+         </callout>
+         <callout arearefs="service-registry.xml.ns.beans.25">
+         	<para>Make sure to import Spring beans schema version <emphasis>2.5</emphasis>.</para>
+         </callout>
+         <callout arearefs="service-registry.xml.osgi.service">
+         	<para>Use Spring Dynamic Modules elements using the declared namespace prefix (in this example <literal>osgi</literal>).</para>
+         </callout>
+       </calloutlist>
+	</programlistingco>
 
     <para>Using the OSGi namespace as a top-level namespace the same service
     would be declared as follows:</para>

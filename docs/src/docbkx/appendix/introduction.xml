@@ -4,18 +4,23 @@
       <para>
 	  Various appendixes outside the reference documentation.
       </para>
-	  
-      <para>Appendix A, "Extensions" describes extensions that are included in
+
+      <para><xref linkend="appendix-compendium"/> describes OSGi compendium services support 
+      that are included in the 1.0 distribution, but are not guaranteed to be maintained in a
+      backward-compatible form in future point releases. We anticipate these
+      features moving into the core specification over time.</para>
+      	  
+      <para><xref linkend="appendix-extensions"/> describes extensions that are included in
       the 1.0 distribution, but are not guaranteed to be maintained in a
       backward-compatible form in future point releases. We anticipate these
       features moving into the core specification over time.</para>
 
-      <para>Appendix B, "Roadmap" describes some features that are included in
+      <para><xref linkend="appendix-roadmap"/> describes some features that are included in
       the 1.0 distribution but are still considered early-access. The
       externals of these features may change in future releases. This appendix
       also discusses other planned features for which no implementation yet
       exists.</para>
 
-      <para>Appendix C defines the schemas provided by Spring Dynamic
+      <para><xref linkend="appendix-schema"/> defines the schemas provided by Spring Dynamic
       Modules.</para>
    </partintro>

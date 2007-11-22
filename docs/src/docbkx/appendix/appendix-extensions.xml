@@ -2,7 +2,7 @@
 <!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <appendix id="appendix-extensions">
-    <title>Appendix A: Extensions</title>
+    <title>Extensions</title>
 
     <para>This appendix describes extensions to the core functionality that
     are shipped with the 1.0 distribution, but are not guaranteed to have
@@ -10,7 +10,7 @@
     features migrating into the core specification in future releases.</para>
 
     <section>
-      <title>A.1 Annotation-based injection</title>
+      <title>Annotation-based injection</title>
 
       <para>The
       <literal>org.springframework.osgi.extensions.annotation</literal> bundle
@@ -25,23 +25,24 @@
       registry and inject the result. For example, given the
       configuration:</para>
 
-      <screen>&lt;bean id="annotationDriven" class="MyAnnotationDrivenBeanClass"/&gt;</screen>
+      <programlisting><![CDATA[<bean id="annotationDriven" class="MyAnnotationDrivenBeanClass">
+      ]]></programlisting>
 
       <para>and the class declaration:</para>
 
-      <screen>public class MyAnnotationDrivenBeanClass {
+      <programlisting><![CDATA[public class MyAnnotationDrivenBeanClass {
 
   @ServiceReference
   public void setMessageService(MessageService aService) { ... }
 
-}</screen>
+}]]></programlisting>
 
       <para>then a service lookup for services implementing the
-      <literal>MessageService</literal> interface will be performed, and the
+      <interfacename>MessageService</interfacename> interface will be performed, and the
       best match (using the same algorithm as documented for the
       <literal>reference</literal> element) will be injected.</para>
 
-      <para>The <literal>ServiceReference</literal> annotation class has a
+      <para>The <classname>ServiceReference</classname> annotation class has a
       number of attributes that can be used to control the service lookup (for
       example, to specify a filter string) that mirror the options provided by
       the <literal>reference</literal> element. See the javadoc for more

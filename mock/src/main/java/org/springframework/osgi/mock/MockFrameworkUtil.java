@@ -33,7 +33,7 @@ import org.osgi.framework.Filter;
  * 
  * @author Costin Leau
  */
-class MockFrameworkUtil {
+public class MockFrameworkUtil {
 
 	private static final String EQUINOX_CLS = "org.eclipse.osgi.framework.internal.core.FilterImpl";
 
