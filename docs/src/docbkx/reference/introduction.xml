@@ -24,11 +24,6 @@
       that represents an OSGi bundle, including support for installing new
       bundles into the OSGi platform.</para>
 
-      <para><xref linkend="compendium"/> describes the support provided
-      for the <ulink url="http://www2.osgi.org/Release4/Download">OSGi
-      Compendium Services</ulink>, including the Configuration Admin
-      service.</para>
-
       <para><xref linkend="testing"/> explains the
       integration testing support provided by Spring Dynamic Modules. This
       support enables you to write simple JUnit integration tests that can
