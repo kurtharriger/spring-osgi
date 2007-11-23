@@ -10,7 +10,7 @@
   
   <properties>
 	<slf4j.version>1.4.3</slf4j.version>
-	<spring.maven.artifact.version>2.1-m4</spring.maven.artifact.version>
+	<spring.maven.artifact.version>2.5</spring.maven.artifact.version>
   </properties>
   
   <dependencies>
@@ -21,23 +21,23 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-mock</artifactId>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
       <version>${spring.maven.artifact.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
       <version>${spring.maven.artifact.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
       <version>${spring.maven.artifact.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
       <version>${spring.maven.artifact.version}</version>
     </dependency>
@@ -114,6 +114,20 @@
         https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
     </repository>
+    <repository>
+      <id>i21-s3-maven-repo</id>
+      <name>i21 S3 milestone repo</name>
+      <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+    </repository>
+    
+    <repository>
+      <id>i21-s3-osgi-repo</id>
+      <name>i21 osgi artifacts repo</name>
+      <snapshots>
+         <enabled>true</enabled>
+      </snapshots>
+      <url>http://s3.amazonaws.com/maven.springframework.org/osgi</url>
+    </repository>    
   </repositories>
 
   <pluginRepositories>
