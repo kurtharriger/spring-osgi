@@ -5,7 +5,7 @@
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi-1.0-rc1.xsd">
+		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
 	<bean osgi:default-timeout="10" class="java.util.HashMap"/>
 </beans>
