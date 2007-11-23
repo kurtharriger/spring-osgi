@@ -397,7 +397,7 @@ context ::= path ( ';' path ) * (';' directive) *
       
       <para>Note that Spring Dynamic Modules uses commons-logging API internally
       which means that its logging implementation is fully pluggable. Please see
-      the FAQ and Resources pages for more informations on other logging libraries
+      the FAQ and Resources pages for more information on other logging libraries
       besides log4j.
       </para>
     </section>
