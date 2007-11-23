@@ -33,7 +33,7 @@
       <title>The Spring Dynamic Modules Extender bundle</title>
 
       <para>Spring Dynamic Modules provides an OSGi bundle
-      <literal>org.springframework.osgi.spring-osgi-extender</literal>. This
+      <literal>org.springframework.osgi.bundles.extender</literal>. This
       bundle is responsible for instantiating the Spring application contexts
       for your application bundles. It serves the same purpose as the <ulink
       url="http://www.springframework.org/docs/reference/webintegration.html">ContextLoaderListener</ulink>
