@@ -383,6 +383,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 
 
       <section id="service-registry:export:service:attributes">
+       <title><literal>service</literal> element attribute</title>
        <para>
        As a summary, the following table lists the attributes names, possible values and
        a short description for each of them.
@@ -750,6 +751,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         
         
       	<section id="service-registry:refs:singular:reference:attributes">
+      	<title><literal>reference</literal> element attributes</title>
        	<para>
        	As a summary, the following table lists the <literal>reference</literal> element 
        	attributes names, possible values and a short description for each of them.
@@ -902,7 +904,7 @@ public class BeanWithServiceReference {
    	</section>
 
       <section id="service-registry:refs:collection">
-        <title>Referencing collections of services</title>
+        <title>Referencing a collection of services</title>
 
 		<sidebar>
 		 <title>Natural vs custom ordering</title>
@@ -1024,7 +1026,7 @@ public class BeanWithServiceReference {
 		the sorted list will implement only the <interfacename>List</interfacename> interface.</remark>
 		
 		<section id="service-registry:refs:collection:attributes">
-			<title>Collection (<literal>list</literal> and <literal>set</literal>) declaration attributes</title>
+			<title>Collection (<literal>list</literal> and <literal>set</literal>) element attributes</title>
 		<para>
 		<literal>list</literal> and <literal>set</literal> elements support all the attributes available to
 		<literal>reference</literal> element except the <literal>timeout</literal> attribute.
@@ -1370,6 +1372,20 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
 	     </table>      
       
     </section>
+    
+    <section id="service-registry:refs:invoker-bundle-context">
+      <title>Accessing the caller <interfacename>BundleContext</interfacename></title>
+      
+      <para>It is sometime useful for an imported service to know which bundle is using it
+      at a certain time. To help with this scenarion, in Spring-DM imported services publish
+      the importing bundle <interfacename>BundleContext</interfacename> through 
+      <classname>LocalBundleContext</classname> class. Each time a method on the importer is invoked,
+      the caller <interfacename>BundleContext</interfacename> will be made available, using
+      a <classname>ThreadLocal</classname>, through <methodname>getInvokerBundleContext()</methodname>.
+      </para>
+      <para>Please be careful when using this class since it ties your code to Spring-DM API.</para>
+    </section>
+    
     </section>
     
     <section id="service-registry:refs:listener-best-practices">

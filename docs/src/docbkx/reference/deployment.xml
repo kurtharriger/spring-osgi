@@ -27,7 +27,7 @@
             <title>Bundles and Application Contexts</title>
           </objectinfo>
 
-          <imagedata fileref="spring-osgi-model.png" />
+          <imagedata fileref="images/spring-osgi-model.png" />
         </imageobject>
       </inlinemediaobject></para>
 
