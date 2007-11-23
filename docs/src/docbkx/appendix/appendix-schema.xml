@@ -5,7 +5,7 @@
 <appendix id="appendix-schema">
     <title>Spring Dynamic Modules Schema</title>
 
-    <programlisting><xi:include href="../../../../core/src/main/resources/org/springframework/osgi/config/spring-osgi-1.0-rc1.xsd" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <programlisting><xi:include href="../../../../core/src/main/resources/org/springframework/osgi/config/spring-osgi.xsd" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude">
        <xi:fallback>
     	<para><emphasis>FIXME:  SCHEMA LOCATION/NAME CHANGED</emphasis></para>
   	   </xi:fallback>
