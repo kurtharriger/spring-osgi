@@ -31,50 +31,70 @@
 	  documentation that explain the behaviour along with the associated
 	  <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI">JIRA</ulink> entry which
 	  provides an estimate on when it will be solved.
-	  As a rule, Spring Dynamic Modules 1.0 RC1 aims to solve most, if not all of them.
+	  As a rule, the next release Spring Dynamic Modules aims to solve most, if not all of them.
 	</para>
   </preface>
   
   <chapter id="known-issues">
     <title>Known Issues</title>
 
-    <section id="resource-prefix">
-      <title>2.4 The Resource abstraction</title>
+	<para>As a side note, it worth pointing out that the issues below are not really bugs but rather improvements.</para>		
 
-        <para>The new <literal>osgibundle</literal> prefix is not yet in place - use <literal>bundle</literal> for the time being.</para>
-        <para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-199">OSGI-199</ulink></para>
+	<section id="OSGI-110">
+      <title>CGLIB proxying fails with NPE from time to time</title>
+      	<para>During our tests, we have encountered a strange cglib behaviour; when trying to proxy <literal>java.*</literal> classes
+      	the process fails with a NullPointerException. Further more, the bug cannot be reproduce constantly, depending a lot on the
+      	number of runs and JVM platform used. We believe the cause is a <literal>Weak</literal> reference - see 
+      	<ulink url=" http://www.nabble.com/cglib-2.1_3-no-dep-and-NPE-in-AbstractClassGenerator-tf3645088.html#a10179844">this</ulink> discussion. 
+      	</para> 
+      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-110">OSGI-110</ulink></para> 
+	</section>	
+
+	<section id="OSGI-167">
+      <title>Support for cyclic imports, listener references</title>
+      	<para>Currently there is no support for importer/listener cyclic references. While this is not a bug, it is a powerful feature to be able
+      	to declare nested listeners that have a reference to the importer bean dependencies.</para><para>As a work around, do not create cycles
+      	between bean definition references.</para>
+      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-167">OSGI-167</ulink></para> 
+	</section>
+
+    <section id="OSGI-210">
+      <title>Using <literal>classpath</literal> prefix on the root classpath (<literal>/</literal>) fails </title>
+      	<para>Calling <methodname>getResource()/getResources()</methodname> from a Bundle, on the root folder (<literal>/</literal>) fails. Currently,
+      	only Equinox supports this behaviour. The issue has been reported to Felix and Knopflerfish projects and work in underway to resolve the problem.
+      	At the moment of writing this document, Felix provides support for this in the upcoming 1.1.0 release while KF aims for 2.0.3</para>
+      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-210">OSGI-210</ulink></para> 
+	</section>
+
+	<section id="OSGI-237">
+      <title>Publishing prototypes as OSGi services</title>
+      	<para>Due to the way OSGi platform deals with OSGi services (it caches the instance and returns it every time), prototypes are not fully supported.
+      	Spring-DM publishes a proxy that on each call, delegates back to the target application context for retrieving the instance. While with other beans
+      	this works, in case of prototypes, this results in one-instance-per-invocation which is incorrect. Additional functionality needs to be added
+      	to fully support prototypes even though, as pointed out, this involves a knowledge between Client/Server regarding the publication contract.</para>
+      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-237">OSGI-237</ulink></para> 
+	</section>	
+	
+	<section id="OSGI-245">
+      <title>Service proxy/object equality</title>
+      	<para>Since Spring-DM uses run-time proxies, equality between objects that rely on private field comparison tends to fail. The problem becomes
+      	more apparent when dealing with sets that use service rather then service reference equality. Since the proxy does only method interception it
+      	does not seem to exist any practical solution at the moment. As a workaround, consider modifying your equality method or relying on the reference
+      	equality.</para>
+      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-245">OSGI-245</ulink></para> 
 	</section>
 	
-	<section id="shutdown-algo">
-      <title>2.6 Stopping the extender bundle</title>
 
-        <para>The shutdown algorithm considers all services exporter/imported by a bundle not just the ones managed	by the application context.</para>
-        <para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-203">OSGI-203</ulink></para>
-	</section>
-    <section id="registration-listener-custom-methods">
-      <title>4.1.6 Service registration and unregistration lifecyle</title>
-
-        <para>Custom methods for the service registration listeners are not supported yet.</para>
-        <para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-204">OSGI-204</ulink></para>
-	</section>
-	<section id="service-reference-conversion">
-      <title>4.2.1 Referencing an individual service</title>
-        <para>Conversion from service instance to <literal>ServiceReference</literal> is not supported yet.</para>
-        <para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-218">OSGI-218</ulink></para>
+	<section id="OSGI-291">
+      <title>Invalid service references during unregistration on Knopflerfish</title>
+      	<para>On KF, during unregistration, the service becomes unavailable before the even tis propagated. 
+      	After investigation it seems that to support this behaviour, property "org.knopflerfish.servicereference.valid.during.unregistering" needs 
+      	should be set to "true". However, with this enabled, we found strange behaviour in the framework such as unregistration events not being 
+      	propagated while registration events being propagated twice (on 2.0.2).
+		In 2.0.1, a NPE is thrown during unregistration. The problem has been reported to KF team and we hope that the upcoming 2.0.3 will address 
+		this issue.</para>
+      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-91">OSGI-291</ulink></para> 
 	</section>
 	
-    <section id="sorted-collection">
-      <title>4.2.2 Referencing collections of services</title>
-      	<para><literal>Comparator</literal>-based sorting, applying natural ordering of services is not yet supported.</para>
-      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-215">OSGI-215</ulink></para> 
-		<para><literal>java.util.Comparable</literal> interface is not yet used for sorting.</para>
-		<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-216">OSGI-216</ulink></para>
-	</section>
-	
-	<section id="annotations">
-      <title>A.1 Annotation-based injection</title>
-      	<para>Annotation extension does not appear under <literal>org.springframework.osgi.extensions.annotation</literal>.</para>
-      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-220">OSGI-220</ulink></para> 
-	</section>		
   </chapter>
 </book>

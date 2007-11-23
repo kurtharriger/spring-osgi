@@ -1,11 +1,11 @@
       <partintro>
           <para>
             <para>This document is the reference guide for Spring Dynamic Modules. It
-			defines the syntax and semantics for the <ulink url="http://www.osgi.org">
-			OSGi Service Platform</ulink> based namespaces; the Dynamic Modules extender bundle; 
+			defines Spring Dynamic Modules concepts and semantics, the syntax for the <ulink url="http://www.osgi.org">
+			OSGi Service Platform</ulink> based namespaces, the Dynamic Modules extender bundle
 			and the OSGi manifest header entries defined by Dynamic Modules. 
 			For a tutorial introduction to building OSGi-based applications with Spring Dynamic 
-			Modules see the online tutorials and user guide.</para>
+			Modules see our online <ulink url="http://www.springframework.org/osgi">page</ulink>.</para>
 
 			<para>OSGi developers looking for an introduction to Spring should review
 			the <ulink url="http://www.springframework.org/documentation">introductory
@@ -18,16 +18,6 @@
 			url="http://static.springframework.org/spring-osgi/docs/current/reference/html_single/issues.html">known
 			issues</ulink> page for Spring Dynamic Modules ${version}
 			release.</emphasis></para>
-            This first part of the reference documentation
-            <link linkend="why-spring-dm">is an overview</link> of
-            Spring Dynamic Modules and the underlying concepts.
           </para>
           
-          <para>
-          While every effort has been made to ensure that this documentation is comprehensive and there are no errors, 
-          nevertheless some topics might require more explanation and some typos might have crept in. If you do spot any 
-          mistakes or even more serious errors, and you can spare a few cycles during lunch, please do bring the error 
-          to the attention of the Spring Dynamic Modules team by raising an 
-          <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI">issue</ulink>.
-          </para>
       </partintro>

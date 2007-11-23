@@ -1,14 +1,14 @@
   <chapter id="requirements">
       <title>Requirements</title>
 
-      <para>Spring Dynamic Modules supports <ulink
-      url="http://www2.osgi.org/Specifications/HomePage?section=2">OSGi
-      R4</ulink> and above, and JDK level 1.4 and above. Bundles deployed for
+      <para>Spring Dynamic Modules 1.0 supports JDK level 1.4 and above 
+      and <ulink url="http://www2.osgi.org/Specifications/HomePage?section=2">OSGi
+      R4</ulink> and above. Bundles deployed for
       use with Spring Dynamic Modules should specify
-      <literal>"Bundle-ManifestVersion: 2"</literal> in their manifest. We
-      test against <ulink
-      url="http://www.eclipse.org/equinox/">Equinox</ulink>, <ulink
-      url="http://felix.apache.org/">Felix</ulink>, and <ulink type=""
-      url="http://www.knopflerfish.org/">Knopflerfish</ulink> as part of our
+      <literal>"Bundle-ManifestVersion: 2"</literal> in their manifest (OSGi R4). 
+      We test against <ulink
+      url="http://www.eclipse.org/equinox/">Equinox</ulink> 3.2.2, <ulink
+      url="http://felix.apache.org/">Felix</ulink> 1.0.1, and <ulink
+      url="http://www.knopflerfish.org/">Knopflerfish</ulink> 2.0.2 as part of our
       continuous integration process.</para>
   </chapter>

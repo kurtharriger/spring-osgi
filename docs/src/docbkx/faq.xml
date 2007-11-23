@@ -49,17 +49,13 @@
 	</section>
 	
 	<section id="internal-package">
-      <title>Why doesn't <literal>internal</literal> package have any
-        javadocs?</title>
+      <title>Why aren't there any javadocs on <literal>*.internal.*</literal>?</title>
 
-        <para>Package <literal>org.springframework.osgi.internal</literal> is
-        meant (as the name implies) to be a private, non-public package. Thus,
+        <para><literal>org.springframework.osgi.*.internal</literal> packages are
+        meant (as the name implies) to be private and non-public package. Thus,
         there is no documentation, support or compatibility guarantee for
         them. In fact, the Spring Dynamic Modules bundle does not even export
-        them to prevent accidental usage. Some module bundles (such as 
-        <literal>spring-osgi-core</literal>) do export some packages but these 
-        are for internal usage within the rest of Spring-DM (such as
-        <literal>spring-osgi-extender</literal>).</para>
+        them to prevent accidental usage.</para>
 
         <para>If you find classes under this package, which you really, really
         depend on, then consider raising an issue on <ulink type=""
@@ -104,17 +100,8 @@
 	   The best place to start is The Osgi Alliance <ulink url="http://www.osgi.org/">home</ulink> and 
 	   <ulink url="http://www2.osgi.org/Main/HomePage">developer</ulink> pages which
 	   provide the OSGi specifications, introductions and many links and blogs on the topic.
-	   Below you can find a list (by no means comprehensive) of links to help you get started with OSGi: 
-	  </para>
-	  
-	  <itemizedlist>
-	   <listitem>Neil Bartlett's "Getting Started with OSGi" - <ulink url="http://neilbartlett.name/blog/osgi-articles/">here</ulink> and 
-	   	<ulink url="http://www.eclipse.org/resources/?author=Neil%20Bartlett">here</ulink>.
-	   </listitem>
-	   <listitem>
-   	    Equinox Documents - <ulink url="http://www.eclipse.org/equinox/documents/">here</ulink>
-	   </listitem>
-	  </itemizedlist>
+	   Please see the reference documentation appendix for more information.
+ 	  </para>
 	  
 	  <para>
 	   In addition, all OSGi implementation websites host detailed, step-by-step tutorials and introduction.
@@ -345,6 +332,17 @@
         <literal>BeanFactory</literal>. In fact, exporting the object as a
         <literal>BeanFactory</literal> will fail since the bundle doesn't see
         this interface and thus doesn't know how to handle its contract.</para>
+      </section>
+      
+      <section id="junit382-serialization">
+      	<title>When using Spring-DM integration testing I get an exception about serialVersionUID. What is the problem?</title>
+      	
+      	<para>
+      	When running an integration test, Spring-DM will duplicate the test instance and execute it inside OSGi. To avoid problems
+      	like this one, make sure you are using the same libraries (with the same version) as Spring-DM when running your test. This
+      	particular problem for example is caused by a JUnit 3.8.2 vs 3.8.x serialization compatibility. Make sure that you are using
+      	at least JUnit 3.8.2 for the execution of your tests. 
+      	</para>
       </section>
     </chapter>
 </book>
