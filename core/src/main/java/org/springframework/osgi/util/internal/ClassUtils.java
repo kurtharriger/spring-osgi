@@ -113,7 +113,6 @@ public abstract class ClassUtils {
 	 * 
 	 * @param clazz
 	 * @param mode
-	 * @param classLoader
 	 * 
 	 * @return array of classes extended or implemented by the given class
 	 */

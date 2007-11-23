@@ -149,10 +149,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * Normally, this method is called only one during the lifecycle of a test
 	 * suite.
 	 * 
-	 * <p/> Note that at this point, {@link #getBundleContext()} returns null
-	 * since the OSGi test execution hasn't started yet - the only BundleContext
-	 * available is that of the OSGi framework.
-	 * 
 	 * @see #preProcessBundleContext(BundleContext)
 	 * @param platformBundleContext
 	 */

@@ -31,17 +31,17 @@ import org.apache.commons.logging.LogFactory;
  * @author Costin Leau
  * 
  */
-public abstract class AbstractOsgiPlatform implements OsgiPlatform {
+abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
-	protected Log log = LogFactory.getLog(getClass());
+	Log log = LogFactory.getLog(getClass());
 
 	/**
 	 * Subclasses should override this field.
 	 */
-	protected String toString = getClass().getName();
+	String toString = getClass().getName();
 
 	
-	protected Properties configurationProperties = new Properties();
+	Properties configurationProperties = new Properties();
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.osgi.test.platform.OsgiPlatform#getConfigurationProperties()
@@ -59,13 +59,13 @@ public abstract class AbstractOsgiPlatform implements OsgiPlatform {
 	 * 
 	 * @return
 	 */
-	protected abstract Properties getPlatformProperties();
+	abstract Properties getPlatformProperties();
 
 	public String toString() {
 		return toString;
 	}
 
-	protected File createTempDir(String suffix) {
+	File createTempDir(String suffix) {
 		if (suffix == null)
 			suffix = "osgi";
 		File tempFileName;

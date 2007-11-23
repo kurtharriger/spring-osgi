@@ -23,9 +23,9 @@ import org.springframework.osgi.service.dependency.MandatoryDependencyListener;
 import org.springframework.util.Assert;
 
 /**
- * Base class implementing the {@link DependableServiceImporter} interface. Abstract by
- * default since it doesn't offer any OSGi specific functionality, which have to
- * be supplied by subclasses.
+ * Base class implementing the {@link DependableServiceImporter} interface.
+ * Abstract by default since it doesn't offer any OSGi specific functionality,
+ * which have to be supplied by subclasses.
  * 
  * @author Costin Leau
  * 
@@ -37,7 +37,17 @@ public abstract class AbstractDependableServiceImporter implements DependableSer
 
 	private Cardinality cardinality;
 
-	protected List depedencyListeners = new ArrayList(2);
+	private List depedencyListeners = new ArrayList(2);
+
+	/**
+	 * Returns the registered dependency listeners. Meant to be used only by
+	 * subclasses.
+	 * 
+	 * @return registered dependency listeners.
+	 */
+	List getDepedencyListeners() {
+		return depedencyListeners;
+	}
 
 	public void registerListener(MandatoryDependencyListener listener) {
 		Assert.notNull(listener);

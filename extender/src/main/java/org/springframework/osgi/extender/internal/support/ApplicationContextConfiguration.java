@@ -164,10 +164,6 @@ public class ApplicationContextConfiguration {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	public String toString() {
 		return toString;
 	}

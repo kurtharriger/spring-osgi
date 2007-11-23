@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
@@ -153,8 +154,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	/** exporter bean name */
 	private String beanName;
 
-	// private AutoExport autoExport = new NoOpExporter();
-
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
 		Assert.notNull(bundleContext, "required property 'bundleContext' has not been set");
@@ -280,7 +279,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * @param serviceProperties
 	 * @return the ServiceRegistration
 	 */
-	protected ServiceRegistration registerService(Class[] classes, Dictionary serviceProperties) {
+	ServiceRegistration registerService(Class[] classes, Dictionary serviceProperties) {
 		Assert.notEmpty(
 			classes,
 			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
@@ -306,7 +305,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		return bundleContext.registerService(names, serviceFactory, serviceProperties);
 	}
 
-	protected boolean isBeanBundleScoped() {
+	boolean isBeanBundleScoped() {
 		boolean bundleScoped = false;
 		// if we do have a bundle scope, use ServiceFactory decoration
 		if (targetBeanName != null) {
@@ -355,7 +354,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * 
 	 * @param registration
 	 */
-	protected void unregisterService(ServiceRegistration registration) {
+	void unregisterService(ServiceRegistration registration) {
 		if (OsgiServiceUtils.unregisterService(registration)) {
 			log.info("Unregistered service [" + registration + "]");
 		}
@@ -440,10 +439,21 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		this.serviceProperties = serviceProperties;
 	}
 
+	/**
+	 * Returns the OSGi ranking used when publishing the service.
+	 * 
+	 * @return service ranking
+	 */
 	public int getRanking() {
 		return ranking;
 	}
 
+	/**
+	 * Shortcut for setting the ranking property of the published service.
+	 * 
+	 * @see Constants#SERVICE_RANKING
+	 * @param ranking service ranking
+	 */
 	public void setRanking(int ranking) {
 		this.ranking = ranking;
 	}
@@ -457,6 +467,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	}
 
 	/**
+	 * Returns the property resolver used for publishing the service.
+	 * 
 	 * @return Returns the resolver.
 	 */
 	public OsgiServicePropertiesResolver getResolver() {
@@ -464,6 +476,9 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	}
 
 	/**
+	 * Sets the property resolver used when publishing the bean as an OSGi
+	 * service.
+	 * 
 	 * @param resolver The resolver to set.
 	 */
 	public void setResolver(OsgiServicePropertiesResolver resolver) {
@@ -479,6 +494,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		return interfaces;
 	}
 
+	/**
+	 * Specify the interfaces advertised by the service.
+	 * 
+	 * @param serviceInterfaces array of classes to advertise
+	 */
 	public void setInterfaces(Class[] serviceInterfaces) {
 		this.interfaces = serviceInterfaces;
 	}

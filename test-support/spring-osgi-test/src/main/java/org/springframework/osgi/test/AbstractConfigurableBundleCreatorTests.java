@@ -52,15 +52,15 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnTheFlyBundleCreatorTests {
 
-	protected static final String ROOT_DIR = "root.dir";
+	private static final String ROOT_DIR = "root.dir";
 
-	protected static final String INCLUDE_PATTERNS = "include.patterns";
+	static final String INCLUDE_PATTERNS = "include.patterns";
 
-	protected static final String LIBS = "libs";
+	private static final String LIBS = "libs";
 
-	protected static final String MANIFEST = "manifest";
+	static final String MANIFEST = "manifest";
 
-	public static final Properties DEFAULT_SETTINGS = new Properties();
+	private static final Properties DEFAULT_SETTINGS = new Properties();
 
 	static {
 		DEFAULT_SETTINGS.setProperty(ROOT_DIR, "file:./target/test-classes");

@@ -81,12 +81,14 @@
     </xsl:param>
 	<xsl:template match="author" mode="titlepage.mode">
 		<xsl:if test="name(preceding-sibling::*[1]) = 'author'">
-			<xsl:text>, </xsl:text>
+			<xsl:text></xsl:text>
 		</xsl:if>
 		<span class="{name(.)}">
 			<xsl:call-template name="person.name" />
 			<xsl:apply-templates mode="titlepage.mode" select="./contrib" />
+			<xsl:text>(</xsl:text>
 			<xsl:apply-templates mode="titlepage.mode" select="./affiliation" />
+			<xsl:text>)</xsl:text>
 		</span>
 	</xsl:template>
 	<xsl:template match="authorgroup" mode="titlepage.mode">

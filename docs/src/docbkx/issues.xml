@@ -93,8 +93,15 @@
       	propagated while registration events being propagated twice (on 2.0.2).
 		In 2.0.1, a NPE is thrown during unregistration. The problem has been reported to KF team and we hope that the upcoming 2.0.3 will address 
 		this issue.</para>
-      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-91">OSGI-291</ulink></para> 
+      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-291">OSGI-291</ulink></para> 
 	</section>
-	
+
+	<section id="OSGI-292">
+      <title><classname>AbstractOsgiTest</classname> depends on internal interface</title>
+      	<para><classname>AbstractOsgiTest</classname> depends on <interfacename>org.springframework.osgi.test.internal.OsgiJUnitTest</interfacename>. 
+      	This will be fixed in the next release - please do not rely on any methods published by <interfacename>OsgiJUnitTest</interfacename>
+      	since they will be removed in the next release.</para>
+      	<para>See <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI-292">OSGI-292</ulink></para> 
+	</section>	
   </chapter>
 </book>

@@ -37,7 +37,7 @@ import org.springframework.util.ObjectUtils;
  * class loading errors.
  * 
  * The main entry point is
- * {@link #debugClassLoadingThrowable(NoClassDefFoundError, BundleContext, Class[])}
+ * {@link #debugClassLoadingThrowable(Throwable, Bundle, Class[])}
  * which will try to determine the cause by trying to load the given interfaces
  * using the given bundle.
  * 

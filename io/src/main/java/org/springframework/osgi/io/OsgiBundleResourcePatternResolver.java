@@ -115,7 +115,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	/**
 	 * Override it to pass in the searchType parameter.
 	 */
-	protected Resource[] findPathMatchingResources(String locationPattern, int searchType) throws IOException {
+	private Resource[] findPathMatchingResources(String locationPattern, int searchType) throws IOException {
 		String rootDirPath = determineRootDir(locationPattern);
 		String subPattern = locationPattern.substring(rootDirPath.length());
 		Resource[] rootDirResources = getResources(rootDirPath);
@@ -143,7 +143,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver#getResources(java.lang.String)
 	 */
 
-	protected Set doFindPathMatchingFileResources(Resource rootDirResource, String subPattern, int searchType)
+	private Set doFindPathMatchingFileResources(Resource rootDirResource, String subPattern, int searchType)
 			throws IOException {
 
 		String rootPath = null;
@@ -180,7 +180,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @param searchType the search strategy to use
 	 * @throws IOException
 	 */
-	protected void doRetrieveMatchingBundleEntries(Bundle bundle, String fullPattern, String dir, Set result,
+	private void doRetrieveMatchingBundleEntries(Bundle bundle, String fullPattern, String dir, Set result,
 			int searchType) throws IOException {
 
 		Enumeration candidates;
@@ -249,7 +249,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @param path
 	 * @return
 	 */
-	protected String handleURL(URL path) {
+	private String handleURL(URL path) {
 		return path.getPath();
 	}
 
@@ -259,7 +259,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @param path
 	 * @return
 	 */
-	protected String handleString(String path) {
+	private String handleString(String path) {
 		return FOLDER_SEPARATOR.concat(path);
 	}
 }

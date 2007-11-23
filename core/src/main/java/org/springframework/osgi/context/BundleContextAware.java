@@ -29,5 +29,12 @@ import org.osgi.framework.BundleContext;
  */
 public interface BundleContextAware {
 
-	public void setBundleContext(BundleContext context);
+	/**
+	 * Set the {@link BundleContext} that this bean
+	 * runs in. Normally this can be used to initialize
+	 * an object.
+	 * 
+	 * @param bundleContext the BundleContext object to be used by this object
+	 */
+	public void setBundleContext(BundleContext bundleContext);
 }

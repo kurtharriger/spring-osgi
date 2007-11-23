@@ -41,12 +41,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Default implementation of {@see MandatoryServiceDependencyManager} which
+ * Default implementation of {@link MandatoryServiceDependencyManager} which
  * determines the relationship between importers and exporters and unpublishes
  * exported service if they dependent, transitively, on imported OSGi services
  * that are mandatory and cannot be satisfied.
  * 
  * <strong>Note:</strong> aimed for singleton beans only
+ * 
  * @author Costin Leau
  * 
  */
