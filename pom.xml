@@ -75,13 +75,13 @@
       <notifier>
         <type>mail</type>
         <configuration>
-          <address>adrian.colyer@interface21.com</address>
+          <address>adrian.colyer@SpringSource.com</address>
         </configuration>
       </notifier>
       <notifier>
         <type>mail</type>
         <configuration>
-          <address>costin.leau@interface21.com</address>
+          <address>costin.leau@SpringSource.com</address>
         </configuration>
       </notifier>
     </notifiers>
@@ -110,32 +110,9 @@
     <developer>
       <id>adrian-colyer</id>
       <name>Adrian Colyer</name>
-      <email>adrian.colyer at interface21.com</email>
-      <organization>Interface21</organization>
-      <organizationUrl>http://www.interface21.com</organizationUrl>
-      <roles>
-        <role>Project Admin</role>
-        <role>Developer</role>
-      </roles>
-      <timezone>0</timezone>
-    </developer>
-    <developer>
-      <id>costin_leau</id>
-      <name>Costin Leau</name>
-      <email>costin.leau at interface21.com</email>
-      <organization>Interface21</organization>
-      <organizationUrl>http://www.interface21.com</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+2</timezone>
-    </developer>
-    <developer>
-      <id>andypiper</id>
-      <name>Andy Piper</name>
-      <email>andy at bea.com</email>
-      <organization>BEA</organization>
-      <organizationUrl>http://www.bea.com</organizationUrl>
+      <email>adrian.colyer at SpringSource.com</email>
+      <organization>SpringSource</organization>
+      <organizationUrl>http://www.SpringSource.com</organizationUrl>
       <roles>
         <role>Developer</role>
       </roles>
@@ -151,7 +128,31 @@
         <role>Developer</role>
       </roles>
       <timezone>-8</timezone>
+    </developer>    
+    <developer>
+      <id>costin_leau</id>
+      <name>Costin Leau</name>
+      <email>costin.leau at SpringSource.com</email>
+      <organization>SpringSource</organization>
+      <organizationUrl>http://www.SpringSource.com</organizationUrl>
+      <roles>
+        <role>Project Admin</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>+2</timezone>
     </developer>
+    <developer>
+      <id>andypiper</id>
+      <name>Andy Piper</name>
+      <email>andy at bea.com</email>
+      <organization>BEA</organization>
+      <organizationUrl>http://www.bea.com</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
+
   </developers>
 
   <licenses>
@@ -503,11 +504,12 @@ limitations under the License.
                <packages>org.springframework.osgi.sample*</packages>
             </group>
           </groups>
-          <excludePackageNames>*.internal:org.springframework.osgi.iandt*:*samples</excludePackageNames>
+          <excludePackageNames>*internal:org.springframework.osgi.iandt*:*samples</excludePackageNames>
           
           <!-- enabled as this is the recommandation on 1.4 -->
           <breakiterator>true</breakiterator>
           <quiet>true</quiet>
+          <verbose>false</verbose>
           <show>protected</show>
           <source>1.5</source>
           <links>
@@ -522,8 +524,10 @@ limitations under the License.
             <link>http://jakarta.apache.org/commons/logging/apidocs/</link>
             <link>http://junit.sourceforge.net/javadoc/</link>
             <link>http://aopalliance.sourceforge.net/doc</link>
+            <!--
             <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
             <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
+            -->
           </links>
         </configuration>
       </plugin>
@@ -573,14 +577,23 @@ limitations under the License.
    </reporting>
 
   <distributionManagement>
+
+    <repository>
+      <id>local</id>
+      <url>
+        file://e:/tmp/osgi-repo
+      </url>
+    </repository>
+
+    <!--  
     <repository>
       <id>static.springframework.org</id>
       <url>
         scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2-snapshots/
       </url>
     </repository>
-    
-    <!-- disable the repo for now
+    -->
+	<!--
         <snapshotRepository>
             <id>spring-snapshot</id>
             <name>Spring Snapshot Repository</name>
@@ -595,6 +608,7 @@ limitations under the License.
       </url>
     </site>
   </distributionManagement>
+
 
   <!-- ================================================ -->
   <!--            Repository Configuration              -->

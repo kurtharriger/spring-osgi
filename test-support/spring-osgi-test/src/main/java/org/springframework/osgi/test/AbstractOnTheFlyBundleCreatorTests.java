@@ -55,7 +55,7 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDependencyManagerTests {
 
-	protected JarCreator jarCreator;
+	JarCreator jarCreator;
 
 	public AbstractOnTheFlyBundleCreatorTests() {
 		initializeJarCreator();

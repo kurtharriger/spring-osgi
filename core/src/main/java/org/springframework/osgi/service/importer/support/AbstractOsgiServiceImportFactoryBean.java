@@ -86,7 +86,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 		return proxy;
 	}
 
-	protected abstract Object createProxy();
+	abstract Object createProxy();
 
 	public boolean isSingleton() {
 		return true;
@@ -175,6 +175,11 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 		this.interfaces = serviceType;
 	}
 
+	/**
+	 * Sets the classes that the imported service advertises.
+	 * 
+	 * @param serviceType array of advertised classes.
+	 */
 	public void setInterfaces(Class[] serviceType) {
 		this.interfaces = serviceType;
 	}
@@ -197,6 +202,9 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	}
 
 	/**
+	 * Sets the OSGi service filter. The filter will be concatenated with the
+	 * interfaces specified so there is no need to include them in the filter.
+	 * 
 	 * @param filter The filter to set.
 	 */
 	public void setFilter(String filter) {
@@ -204,6 +212,8 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	}
 
 	/**
+	 * Sets the listeners interested in receiving events for this importer.
+	 * 
 	 * @param listeners The listeners to set.
 	 */
 	public void setListeners(OsgiServiceLifecycleListener[] listeners) {

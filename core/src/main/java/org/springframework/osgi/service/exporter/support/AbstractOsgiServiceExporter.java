@@ -21,10 +21,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.service.dependency.DependentServiceExporter;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 
-
 /**
- * {@link DependentServiceExporter} extension that takes care of listeners registration
- * and notification.
+ * {@link DependentServiceExporter} extension that takes care of listeners
+ * registration and notification.
  * 
  * @author Costin Leau
  */
@@ -39,7 +38,7 @@ public abstract class AbstractOsgiServiceExporter extends AbstractDependentServi
 	 * @param properties
 	 * @return
 	 */
-	protected ServiceRegistration notifyListeners(Object service, Map properties, ServiceRegistration registration) {
+	ServiceRegistration notifyListeners(Object service, Map properties, ServiceRegistration registration) {
 		// notify listeners
 		callRegisteredOnListeners(service, properties);
 		// wrap registration to be notified of unregistration
@@ -65,6 +64,11 @@ public abstract class AbstractOsgiServiceExporter extends AbstractDependentServi
 		}
 	}
 
+	/**
+	 * Sets the listeners interested in registration and unregistration events.
+	 * 
+	 * @param listeners registration/unregistration listeners.
+	 */
 	public void setListeners(OsgiServiceRegistrationListener[] listeners) {
 		if (listeners != null)
 			this.listeners = listeners;

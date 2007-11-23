@@ -52,7 +52,6 @@
                     <fo:table-row>
                         <fo:table-cell text-align="center">
                             <fo:block font-family="Helvetica" font-size="12pt" padding="10mm">
-                                <xsl:text>Copyright &#xA9; 2006-2007 </xsl:text>
                                 <xsl:for-each select="bookinfo/authorgroup/author">
                                     <xsl:if test="position() > 1">
                                         <xsl:text>, </xsl:text>
@@ -60,8 +59,15 @@
                                     <xsl:value-of select="firstname"/>
                                     <xsl:text> </xsl:text>
                                     <xsl:value-of select="surname"/>
+                                    <xsl:text> (</xsl:text>
+                                    <xsl:value-of select="affiliation"/>
+                                    <xsl:text>)</xsl:text>
                                 </xsl:for-each>
                             </fo:block>
+                            <fo:block font-family="Helvetica" font-size="12pt" padding="10mm">
+								<xsl:text>Copyright &#xA9; 2006-2007</xsl:text>
+							</fo:block>
+
                             <fo:block font-family="Helvetica" font-size="10pt" padding="1mm">
                                 <xsl:value-of select="bookinfo/legalnotice"/>
                             </fo:block>

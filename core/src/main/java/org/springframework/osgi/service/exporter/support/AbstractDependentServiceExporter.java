@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.dependency.DependentServiceExporter;
 
-
 /**
  * Base class for ServiceExporters taking care of service registration and
  * unregistration.
@@ -32,7 +31,7 @@ public abstract class AbstractDependentServiceExporter implements DependentServi
 
 	private static final Log log = LogFactory.getLog(AbstractDependentServiceExporter.class);
 
-	protected boolean publishAtStartup = true;
+	private boolean publishAtStartup = true;
 
 	/** running monitor */
 	private final Object monitor = new Object();
@@ -40,6 +39,17 @@ public abstract class AbstractDependentServiceExporter implements DependentServi
 	private boolean running = false;
 
 	private boolean initialized = false;
+
+	/**
+	 * Indicates whether the service publication should happen at startup or
+	 * not.
+	 * 
+	 * @return true if the publication should happen at startup, false
+	 * otherwise.
+	 */
+	protected boolean shouldPublishAtStartup() {
+		return publishAtStartup;
+	}
 
 	public void setPublishAtStartup(boolean publish) {
 		this.publishAtStartup = publish;
@@ -90,11 +100,11 @@ public abstract class AbstractDependentServiceExporter implements DependentServi
 	/**
 	 * Register/Export the OSGi service.
 	 */
-	protected abstract void registerService();
+	abstract void registerService();
 
 	/**
 	 * Unregister/de-export the OSGi service.
 	 */
-	protected abstract void unregisterService();
+	abstract void unregisterService();
 
 }

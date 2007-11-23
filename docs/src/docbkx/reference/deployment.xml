@@ -21,15 +21,15 @@
     modules (bundles): a web bundle, service layer bundle, data layer bundle,
     and domain model bundle. Such an application would look like this:</para>
 
-    <para><inlinemediaobject>
-        <imageobject>
+    <para><mediaobject>
+		<imageobject>
           <objectinfo>
             <title>Bundles and Application Contexts</title>
           </objectinfo>
 
-          <imagedata fileref="images/spring-osgi-model.png" />
+          <imagedata fileref="images/spring-osgi-model.png" format="PNG" align="center"/>
         </imageobject>
-      </inlinemediaobject></para>
+       </mediaobject></para>
 
     <para>In this example the data layer bundle yields a data layer
     application context that contains a number of internal components (beans).

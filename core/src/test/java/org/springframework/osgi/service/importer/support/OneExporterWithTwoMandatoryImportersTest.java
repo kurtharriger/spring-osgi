@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.internal.service.dependency;
+package org.springframework.osgi.service.importer.support;
 
 import java.util.Iterator;
 
@@ -56,14 +56,14 @@ public class OneExporterWithTwoMandatoryImportersTest extends TestCase {
 		private final MandatoryDependencyEvent event = new MandatoryDependencyEvent(this);
 
 		public void signalDependencyDown() {
-			for (Iterator iter = depedencyListeners.iterator(); iter.hasNext();) {
+			for (Iterator iter = getDepedencyListeners().iterator(); iter.hasNext();) {
 				MandatoryDependencyListener listener = (MandatoryDependencyListener) iter.next();
 				listener.mandatoryDependencyUnsatisfied(event);
 			}
 		}
 
 		public void signalDependencyUp() {
-			for (Iterator iter = depedencyListeners.iterator(); iter.hasNext();) {
+			for (Iterator iter = getDepedencyListeners().iterator(); iter.hasNext();) {
 				MandatoryDependencyListener listener = (MandatoryDependencyListener) iter.next();
 				listener.mandatoryDependencySatisfied(event);
 			}

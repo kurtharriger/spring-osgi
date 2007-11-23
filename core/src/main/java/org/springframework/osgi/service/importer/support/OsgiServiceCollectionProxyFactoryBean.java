@@ -91,10 +91,9 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	 * creates the osgi managed collection and wraps it with an unmodifiable map
 	 * to prevent exposing infrastructure methods and write access.
 	 * 
-	 * @param filter OSGi filter
 	 * @return importer proxy
 	 */
-	protected Object createProxy() {
+	Object createProxy() {
 		if (log.isDebugEnabled())
 			log.debug("creating a multi-value/collection proxy");
 

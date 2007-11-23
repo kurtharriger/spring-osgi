@@ -61,7 +61,6 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	 * @return the OSGi platform
 	 */
 	protected OsgiPlatform createPlatform() {
-
 		boolean trace = logger.isTraceEnabled();
 		String platformClassName = getPlatformName();
 

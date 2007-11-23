@@ -26,7 +26,10 @@ import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
  * {@link ServiceReference}. That is, it allows conversion between a
  * Spring-managed OSGi service to a Spring-managed ServiceReference.
  * 
- * @see ServiceReferenceDelegate
+ * <p/> Automatically registered by
+ * {@link org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext}
+ * implementations.
+ * 
  * @see ImportedOsgiServiceProxy
  * 
  * @author Costin Leau

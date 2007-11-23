@@ -46,7 +46,7 @@ import org.springframework.util.StringUtils;
  * <li>bundle space - if {@link #BUNDLE_URL_PREFIX} prefix is being used or
  * none is specified</li>
  * <li>bundle jar - if {@link #BUNDLE_JAR_URL_PREFIX} is specified</li>
- * <li>class space - if {@link ResourceLoader.CLASSPATH_URL_PREFIX} is
+ * <li>class space - if {@link org.springframework.util.ResourceUtils#CLASSPATH_URL_PREFIX} is
  * encountered</li>
  * </ul>
  * 
@@ -107,14 +107,14 @@ public class OsgiBundleResource extends AbstractResource {
 	/**
 	 * Return the path for this resource.
 	 */
-	public final String getPath() {
+	final String getPath() {
 		return path;
 	}
 
 	/**
 	 * Return the bundle for this resource.
 	 */
-	public final Bundle getBundle() {
+	final Bundle getBundle() {
 		return bundle;
 	}
 
@@ -189,7 +189,7 @@ public class OsgiBundleResource extends AbstractResource {
 	 * @param fileName
 	 * @return a URL to the returned resource or null if none is found
 	 */
-	protected URL getResourceFromFilesystem(String fileName) {
+	URL getResourceFromFilesystem(String fileName) {
 		File f = new File(fileName);
 		if (!f.exists()) {
 			return null;
@@ -214,7 +214,7 @@ public class OsgiBundleResource extends AbstractResource {
 	 * 
 	 * @see {@link org.osgi.framework.Bundle#findEntries(String, String, boolean)}
 	 */
-	protected URL getResourceFromBundleSpace(String bundlePath) throws IOException {
+	URL getResourceFromBundleSpace(String bundlePath) throws IOException {
 		URL[] res = getAllUrlsFromBundleSpace(bundlePath);
 		return (ObjectUtils.isEmpty(res) ? null : res[0]);
 	}
@@ -229,7 +229,7 @@ public class OsgiBundleResource extends AbstractResource {
 	 * 
 	 * @see {@link Bundle#getEntry(String)}
 	 */
-	protected URL getResourceFromBundleJar(String bundlePath) throws IOException {
+	URL getResourceFromBundleJar(String bundlePath) throws IOException {
 		return bundle.getEntry(bundlePath);
 	}
 
@@ -242,7 +242,7 @@ public class OsgiBundleResource extends AbstractResource {
 	 * 
 	 * @see org.osgi.framework.Bundle#getResource(String)
 	 */
-	protected URL getResourceFromBundleClasspath(String bundlePath) {
+	URL getResourceFromBundleClasspath(String bundlePath) {
 		return bundle.getResource(bundlePath);
 	}
 
@@ -252,7 +252,7 @@ public class OsgiBundleResource extends AbstractResource {
 	 * @param locationPath
 	 * @return
 	 */
-	protected boolean isRelativePath(String locationPath) {
+	boolean isRelativePath(String locationPath) {
 		return ((locationPath.indexOf(PREFIX_SEPARATOR) == -1) && !locationPath.startsWith(ABSOLUTE_PATH_PREFIX));
 	}
 
@@ -332,7 +332,7 @@ public class OsgiBundleResource extends AbstractResource {
 	/**
 	 * @return Returns the searchType.
 	 */
-	public int getSearchType() {
+	int getSearchType() {
 		return searchType;
 	}
 

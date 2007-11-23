@@ -244,11 +244,11 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * 
 	 * @param beanFactory beanFactory used for registration.
 	 */
-	protected void registerPropertyEditors(ConfigurableListableBeanFactory beanFactory) {
+	private void registerPropertyEditors(ConfigurableListableBeanFactory beanFactory) {
 		beanFactory.addPropertyEditorRegistrar(new OsgiPropertyEditorRegistrar(getClassLoader()));
 	}
 
-	protected void cleanOsgiBundleScope(ConfigurableListableBeanFactory beanFactory) {
+	private void cleanOsgiBundleScope(ConfigurableListableBeanFactory beanFactory) {
 		Scope scope = beanFactory.getRegisteredScope(OsgiBundleScope.SCOPE_NAME);
 		if (scope != null && scope instanceof OsgiBundleScope) {
 			if (logger.isDebugEnabled())
@@ -263,7 +263,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * publishing is required or not.
 	 * 
 	 */
-	protected void publishContextAsOsgiServiceIfNecessary() {
+	void publishContextAsOsgiServiceIfNecessary() {
 		if (publishContextAsService) {
 			Dictionary serviceProperties = new MapBasedDictionary();
 			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getBundleSymbolicName());
@@ -295,7 +295,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		}
 	}
 
-	public String getBundleSymbolicName() {
+	private String getBundleSymbolicName() {
 		return OsgiStringUtils.nullSafeSymbolicName(getBundle());
 	}
 
@@ -341,7 +341,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * @param bundle
 	 * @return
 	 */
-	protected ClassLoader createBundleClassLoader(Bundle bundle) {
+	private ClassLoader createBundleClassLoader(Bundle bundle) {
 		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, ProxyFactory.class.getClassLoader());
 	}
 }

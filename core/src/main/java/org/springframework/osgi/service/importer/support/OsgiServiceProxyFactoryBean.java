@@ -25,7 +25,6 @@ import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProviderTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
-import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -64,7 +63,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 			return (proxy == null ? true : proxy.getServiceReference().getBundle() != null);
 	}
 
-	protected Object createProxy() {
+	Object createProxy() {
 		if (log.isDebugEnabled())
 			log.debug("creating a single service proxy ...");
 
@@ -85,7 +84,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 
 		// add the listeners as a list since it might be updated after the proxy
 		// has been created
-		lookupAdvice.setDependencyListeners(this.depedencyListeners);
+		lookupAdvice.setDependencyListeners(getDepedencyListeners());
 		lookupAdvice.setServiceImporter(this);
 
 		// create a proxy creator using the existing context
@@ -134,8 +133,8 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	}
 
 	/**
-	 * How many times should we attempt to rebind to a target service if the
-	 * service we are currently using is unregistered. Default is 3 times. <p/>
+	 * Sets how many times should this importer attempt to rebind to a target service if the
+	 * backing service currently used is unregistered. Default is 3 times. <p/>
 	 * Changing this property after initialization is complete has no effect.
 	 * 
 	 * @param maxRetries The maxRetries to set.
@@ -144,12 +143,17 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		this.retryTemplate.setRetryNumbers(maxRetries);
 	}
 
+	/**
+	 * Returns the number of attempts to rebind a target service before giving up.
+	 * 
+	 * @return number of retries to find a matching service before failing
+	 */
 	public int getRetryTimes() {
 		return this.retryTemplate.getRetryNumbers();
 	}
 
 	/**
-	 * How long should we wait between failed attempts at rebinding to a service
+	 * Sets how long (in milliseconds) should this importer wait between failed attempts at rebinding to a service
 	 * that has been unregistered. <p/>
 	 * 
 	 * @param millisBetweenRetries The millisBetweenRetries to set.
@@ -158,6 +162,11 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		this.retryTemplate.setWaitTime(millisBetweenRetries);
 	}
 
+	/**
+	 * Returns the timeout (in milliseconds) this importer waits while trying to find a backing service.
+	 * 
+	 * @return timeout in milliseconds
+	 */
 	public long getTimeout() {
 		return this.retryTemplate.getWaitTime();
 	}

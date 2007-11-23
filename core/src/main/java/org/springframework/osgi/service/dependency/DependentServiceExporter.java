@@ -23,7 +23,7 @@ package org.springframework.osgi.service.dependency;
 public interface DependentServiceExporter {
 
 	/**
-	 * Should this exporter, publish the service at startup or not. This method
+	 * Instructs the exporter whether to publish the service at startup or not. This method
 	 * is used internally inside the framework to prevent the exporter for
 	 * publishing a service if it depends on importers with mandatory service
 	 * import.
@@ -34,21 +34,21 @@ public interface DependentServiceExporter {
 	void setPublishAtStartup(boolean publish);
 
 	/**
-	 * Start the OSGi lifecycle.
+	 * Starts the OSGi lifecycle.
 	 * 
 	 * Should not throw an exception if the component is already running.
 	 */
 	void start();
 
 	/**
-	 * Stop the OSGi lifecycle.
+	 * Stops the OSGi lifecycle.
 	 * 
 	 * Should not throw an exception if the component is already stopped.
 	 */
 	void stop();
 
 	/**
-	 * Check whether this OSGi component is currently running.
+	 * Indicates whether this OSGi component is currently running.
 	 * 
 	 * @return
 	 */

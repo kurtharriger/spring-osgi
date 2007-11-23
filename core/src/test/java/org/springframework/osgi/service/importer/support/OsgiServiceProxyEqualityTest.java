@@ -91,8 +91,9 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 		}
 	}
 
+	ServiceReference ref; 
 	protected void setUp() throws Exception {
-		final ServiceReference ref = new MockServiceReference();
+		ref = new MockServiceReference();
 		bundleContext = new MockBundleContext() {
 
 			public ServiceReference getServiceReference(String clazz) {

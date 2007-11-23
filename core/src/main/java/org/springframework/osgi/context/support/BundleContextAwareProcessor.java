@@ -35,7 +35,7 @@ public class BundleContextAwareProcessor implements BeanPostProcessor {
 
 	private final BundleContext bundleContext;
 
-	protected final Log logger = LogFactory.getLog(getClass());
+	private static final Log logger = LogFactory.getLog(BundleContextAwareProcessor.class);
 
 	public BundleContextAwareProcessor(BundleContext aContext) {
 		this.bundleContext = aContext;

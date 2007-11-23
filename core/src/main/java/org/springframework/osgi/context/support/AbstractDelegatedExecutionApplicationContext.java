@@ -100,7 +100,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		super(parent);
 	}
 
-	public boolean isAvailable() {
+	boolean isAvailable() {
 		synchronized (availableMonitor) {
 			return available;
 		}
