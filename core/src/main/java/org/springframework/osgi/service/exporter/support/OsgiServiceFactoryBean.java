@@ -241,9 +241,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * Publish the given object as an OSGi service. It simply assembles the
 	 * classes required for publishing and then delegates the actual
 	 * registration to a dedicated method.
-	 * 
-	 * @param beanClass
-	 * @param serviceProperties
 	 */
 	public void registerService() {
 

@@ -21,21 +21,23 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.internal.ReflectionUtils;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
  * OsgiServiceLifecycleListener wrapper for custom beans, useful when custom
  * methods are being used.
- * 
+ *
  * @author Costin Leau
- * 
  */
-class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean {
+class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean,
+	BeanFactoryAware {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceLifecycleListenerAdapter.class);
 
@@ -52,22 +54,23 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 
 	private String bindMethod, unbindMethod;
 
-	private final Object target;
+	private String targetBeanName;
 
-	private final boolean isLifecycleListener;
+	private boolean isLifecycleListener;
+	private BeanFactory beanFactory;
+	private Object target;
+	private boolean initialized;
 
-	OsgiServiceLifecycleListenerAdapter(Object object) {
-		Assert.notNull(object);
-		this.target = object;
-		isLifecycleListener = target instanceof OsgiServiceLifecycleListener;
+	OsgiServiceLifecycleListenerAdapter() {
 	}
 
 	/**
 	 * Initialise adapter. Determine custom methods and do validation.
 	 */
-	public void afterPropertiesSet() {
-		Class clazz = target.getClass();
+	public void initialize() {
+		Class clazz = target != null ? target.getClass() : beanFactory.getType(targetBeanName);
 
+		isLifecycleListener = OsgiServiceLifecycleListener.class.isAssignableFrom(clazz);
 		if (isLifecycleListener)
 			if (log.isDebugEnabled())
 				log.debug(clazz.getName() + " is a lifecycle listener");
@@ -78,29 +81,30 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 		if (StringUtils.hasText(bindMethod)) {
 			// determine methods using ServiceReference signature
 			bindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, bindMethod,
-				new Class[] { ServiceReference.class });
+				new Class[]{ServiceReference.class});
 
 			if (bindReference != null)
 				org.springframework.util.ReflectionUtils.makeAccessible(bindReference);
 		}
 		if (StringUtils.hasText(unbindMethod)) {
 			unbindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, unbindMethod,
-				new Class[] { ServiceReference.class });
+				new Class[]{ServiceReference.class});
 
 			if (unbindReference != null)
 				org.springframework.util.ReflectionUtils.makeAccessible(unbindReference);
 		}
+		initialized = true;
 
 		if (!isLifecycleListener
-				&& (bindMethods.isEmpty() && unbindMethods.isEmpty() && bindReference == null && unbindReference == null))
+			&& (bindMethods.isEmpty() && unbindMethods.isEmpty() && bindReference == null && unbindReference == null))
 			throw new IllegalArgumentException("target object needs to implement "
-					+ OsgiServiceLifecycleListener.class.getName()
-					+ " or custom bind/unbind methods have to be specified");
+				+ OsgiServiceLifecycleListener.class.getName()
+				+ " or custom bind/unbind methods have to be specified");
 	}
 
 	/**
 	 * Invoke method with signature bla(ServiceReference ref).
-	 * 
+	 *
 	 * @param target
 	 * @param method
 	 * @param service
@@ -115,10 +119,10 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 				log.trace("invoking listener custom method " + method);
 
 			ServiceReference ref = (service != null ? ((ImportedOsgiServiceProxy) service).getServiceReference() : null);
-				
+
 
 			try {
-				ReflectionUtils.invokeMethod(method, target, new Object[] { ref });
+				ReflectionUtils.invokeMethod(method, target, new Object[]{ref});
 			}
 			// make sure to log exceptions and continue with the
 			// rest of
@@ -126,13 +130,17 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 			catch (Exception ex) {
 				Exception cause = ReflectionUtils.getInvocationException(ex);
 				log.warn("custom method [" + method + "] threw exception when passing service reference ["
-						+ (service != null ? service.getClass().getName() : null) + "]", cause);
+					+ (service != null ? service.getClass().getName() : null) + "]", cause);
 			}
 		}
 	}
 
 	public void bind(Object service, Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
+		if (!initialized) {
+			initialize();
+		}
+		Object target = this.target == null ? beanFactory.getBean(targetBeanName) : this.target;
 
 		if (trace)
 			log.trace("invoking bind method for service " + service + " with props=" + properties);
@@ -156,6 +164,10 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 
 	public void unbind(Object service, Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
+		if (!initialized) {
+			initialize();
+		}
+		Object target = this.target == null ? beanFactory.getBean(targetBeanName) : this.target;
 
 		if (trace)
 			log.trace("invoking unbind method for service " + service + " with props=" + properties);
@@ -188,5 +200,25 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 	 */
 	public void setUnbindMethod(String unbindMethod) {
 		this.unbindMethod = unbindMethod;
+	}
+
+	public void setTarget(Object target) {
+		if (target instanceof String) {
+			this.targetBeanName = (String) target;
+		}
+		else {
+			this.target = target;
+		}
+	}
+
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		if (target != null) {
+			initialize();
+		}
+
 	}
 }

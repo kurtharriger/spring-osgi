@@ -23,7 +23,6 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.BeanReferenceFactoryBean;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -350,7 +349,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 		for (Iterator iter = listeners.iterator(); iter.hasNext();) {
 			Element listnr = (Element) iter.next();
 
-			// wrapper target object
+			// wrapper target object or beanName
 			Object target = null;
 
 			// filter elements
@@ -367,7 +366,10 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 							"nested bean declaration is not allowed if 'ref' attribute has been specified", beanDef);
 
 					target = context.getDelegate().parsePropertySubElement(beanDef, builder.getBeanDefinition());
-				}
+                    if (target instanceof RuntimeBeanReference) {
+                        target = ((RuntimeBeanReference)target).getBeanName();
+                    }
+                }
 			}
 
 			// extract bind/unbind attributes from <osgi:listener>
@@ -381,19 +383,15 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 				String name = attribute.getLocalName();
 
 				if (REF.equals(name))
-					target = new RuntimeBeanReference(attribute.getValue());
+					target = attribute.getValue();
 				else
 					vals.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
 			}
 
 			// create serviceListener wrapper
 			RootBeanDefinition wrapperDef = new RootBeanDefinition(OsgiServiceLifecycleListenerAdapter.class);
-
-			ConstructorArgumentValues cav = new ConstructorArgumentValues();
-			cav.addIndexedArgumentValue(0, target);
-
-			wrapperDef.setConstructorArgumentValues(cav);
-			wrapperDef.setPropertyValues(vals);
+            vals.addPropertyValue("target", target);
+            wrapperDef.setPropertyValues(vals);
 			listenersRef.add(wrapperDef);
 
 		}

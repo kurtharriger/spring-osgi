@@ -6,9 +6,7 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
     <bean id="listener" class="org.springframework.osgi.iandt.service.listener.MyListener">
-        <!-- remove circular dependency
         <property name="simpleService" ref="simpleServiceOsgi"/>
-        -->
     </bean>
 
 	
