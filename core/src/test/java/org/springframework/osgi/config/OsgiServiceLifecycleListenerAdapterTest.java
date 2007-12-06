@@ -24,17 +24,17 @@ import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
-
 import org.osgi.framework.ServiceReference;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 
 /**
- * 
  * @author Costin Leau
- * 
  */
 public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 
@@ -108,9 +108,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 
 	/**
 	 * Override standard methods with ones that throw exceptions.
-	 * 
+	 *
 	 * @author Costin Leau
-	 * 
 	 */
 	protected static class ExceptionListener extends CustomAndListener {
 
@@ -218,7 +217,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperOverListener() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new JustListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new JustListener()));
 		listener.afterPropertiesSet();
 
 		assertEquals(0, JustListener.BIND_CALLS);
@@ -238,7 +238,9 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperOverNoInvalidClass() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new Object());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setTarget(new Object());
+		listener.setBeanFactory(new BeanFactoryListenerMock(null));
 		try {
 			listener.afterPropertiesSet();
 			fail("should have thrown exception");
@@ -249,7 +251,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithIncorrectCustomMethodNames() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new Object());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setTarget(new Object());
 		listener.setBindMethod("pop");
 		listener.setUnbindMethod("corn");
 
@@ -263,7 +266,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithCorrectCustomMethodNamesButIncorrectArgumentTypes() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new CustomListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setTarget(new CustomListener());
 		listener.setBindMethod("wrongBind");
 		listener.setUnbindMethod("wrongUnbind");
 
@@ -283,7 +287,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithCustomMethods() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new CustomListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new CustomListener()));
 		listener.setBindMethod("myBind");
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
@@ -309,7 +314,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithCustomMethodsAndNullParameters() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new CustomListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new CustomListener()));
 		listener.setBindMethod("myBind");
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
@@ -325,7 +331,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithBothCustomAndInterfaceMethods() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new CustomAndListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new CustomAndListener()));
 		listener.setBindMethod("aBind");
 		listener.setUnbindMethod("aUnbind");
 		listener.afterPropertiesSet();
@@ -345,7 +352,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithCustomOverloadedMethodsAndDifferentServiceTypes() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new OverloadedCustomMethods());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new OverloadedCustomMethods()));
 		listener.setBindMethod("myBind");
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
@@ -384,7 +392,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testExceptionOnListenerMethod() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new ExceptionListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new ExceptionListener()));
 		listener.setBindMethod("aBind");
 		listener.setUnbindMethod("aUnbind");
 		listener.afterPropertiesSet();
@@ -402,7 +411,9 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testExceptionOnCustomMethods() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new ExceptionCustomListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new ExceptionCustomListener()));
+
 		listener.setBindMethod("myBind");
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
@@ -420,7 +431,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testStandardListenerWithListeningMethodsSpecifiedAsCustomOnes() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new JustListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new JustListener()));
 		listener.setBindMethod("bind");
 		listener.setUnbindMethod("unbind");
 		listener.afterPropertiesSet();
@@ -438,7 +450,9 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testListenerWithOverloadedTypesAndMultipleParameterTypes() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new DictionaryAndMapCustomListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new DictionaryAndMapCustomListener()));
+
 		listener.setBindMethod("bind");
 		listener.setUnbindMethod("unbind");
 		listener.afterPropertiesSet();
@@ -459,7 +473,9 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testOverridingMethodsDiscovery() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new OverridingMethodListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new OverridingMethodListener()));
+
 		listener.setBindMethod("myBind");
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
@@ -478,7 +494,9 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testJustCustomBindMethod() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new JustBind());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new JustBind()));
+
 		listener.setBindMethod("myBind");
 		listener.afterPropertiesSet();
 
@@ -492,7 +510,8 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testJustCustomUnbindMethod() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new JustUnbind());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new JustUnbind()));
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
 
@@ -506,7 +525,9 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testCustomServiceRefBind() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new CustomServiceRefListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new CustomServiceRefListener()));
+
 		listener.setBindMethod("myBind");
 		listener.afterPropertiesSet();
 
@@ -521,7 +542,9 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 	}
 
 	public void testCustomServiceRefUnbind() throws Exception {
-		listener = new OsgiServiceLifecycleListenerAdapter(new CustomServiceRefListener());
+		listener = new OsgiServiceLifecycleListenerAdapter();
+		listener.setBeanFactory(new BeanFactoryListenerMock(new CustomServiceRefListener()));
+
 		listener.setUnbindMethod("myUnbind");
 		listener.afterPropertiesSet();
 
@@ -533,7 +556,7 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		assertEquals(0, JustListener.BIND_CALLS);
 		assertEquals(1, JustListener.UNBIND_CALLS);
 	}
-	
+
 	private class ImportedOsgiServiceProxyMock implements ImportedOsgiServiceProxy {
 
 		public Map getServiceProperties() {
@@ -543,6 +566,50 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		public ServiceReference getServiceReference() {
 			return new MockServiceReference();
 		}
-		
+
+	}
+
+	private static class BeanFactoryListenerMock implements BeanFactory {
+		private Object target;
+
+		private BeanFactoryListenerMock(Object target) {
+			this.target = target;
+		}
+
+		public Object getBean(String name) throws BeansException {
+			return target;
+		}
+
+		public Object getBean(String name, Class requiredType) throws BeansException {
+			return null;
+		}
+
+		public Object getBean(String name, Object[] args) throws BeansException {
+			return null;
+		}
+
+		public boolean containsBean(String name) {
+			return false;
+		}
+
+		public boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
+			return false;
+		}
+
+		public boolean isPrototype(String name) throws NoSuchBeanDefinitionException {
+			return false;
+		}
+
+		public boolean isTypeMatch(String name, Class targetType) throws NoSuchBeanDefinitionException {
+			return false;
+		}
+
+		public Class getType(String name) throws NoSuchBeanDefinitionException {
+			return target.getClass();
+		}
+
+		public String[] getAliases(String name) {
+			return new String[0];
+		}
 	}
 }
