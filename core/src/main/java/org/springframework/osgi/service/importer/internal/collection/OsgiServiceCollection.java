@@ -225,7 +225,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	}
 
 	public void destroy() {
-		OsgiListenerUtils.removeServiceListener(context, listener);
+		OsgiListenerUtils.removeServiceListener(context, listener, filter);
 		serviceProxies.clear();
 		servicesIdMap.clear();
 	}
