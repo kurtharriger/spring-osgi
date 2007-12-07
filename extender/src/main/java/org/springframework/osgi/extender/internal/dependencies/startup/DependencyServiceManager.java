@@ -263,7 +263,7 @@ public class DependencyServiceManager {
 			log.debug("deregistering service dependency dependencyDetector for " + context.getDisplayName());
 		}
 
-		OsgiListenerUtils.removeServiceListener(bundleContext, listener);
+		OsgiListenerUtils.removeServiceListener(bundleContext, listener, (String)null);
 	}
 
 }

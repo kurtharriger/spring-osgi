@@ -24,10 +24,13 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.internal.ReflectionUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -37,7 +40,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  */
 class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean,
-	BeanFactoryAware {
+	BeanFactoryAware, BeanNameAware {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceLifecycleListenerAdapter.class);
 
@@ -60,6 +63,7 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 	private BeanFactory beanFactory;
 	private Object target;
 	private boolean initialized;
+	private String beanName;
 
 	OsgiServiceLifecycleListenerAdapter() {
 	}
@@ -92,6 +96,9 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 
 			if (unbindReference != null)
 				org.springframework.util.ReflectionUtils.makeAccessible(unbindReference);
+		}
+		if (target == null) {
+			target = beanFactory.getBean(targetBeanName);
 		}
 		initialized = true;
 
@@ -140,7 +147,6 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 		if (!initialized) {
 			initialize();
 		}
-		Object target = this.target == null ? beanFactory.getBean(targetBeanName) : this.target;
 
 		if (trace)
 			log.trace("invoking bind method for service " + service + " with props=" + properties);
@@ -164,10 +170,8 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 
 	public void unbind(Object service, Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
-		if (!initialized) {
-			initialize();
-		}
-		Object target = this.target == null ? beanFactory.getBean(targetBeanName) : this.target;
+		// We guarantee that bind() will have already been called at this point.
+		Assert.isTrue(initialized);
 
 		if (trace)
 			log.trace("invoking unbind method for service " + service + " with props=" + properties);
@@ -219,6 +223,12 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 		if (target != null) {
 			initialize();
 		}
+		else if (beanFactory instanceof ConfigurableBeanFactory) {
+			((ConfigurableBeanFactory) beanFactory).registerDependentBean(beanName, targetBeanName);
+		}
+	}
 
+	public void setBeanName(String string) {
+		this.beanName = string;
 	}
 }

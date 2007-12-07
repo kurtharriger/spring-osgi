@@ -513,6 +513,7 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		listener = new OsgiServiceLifecycleListenerAdapter();
 		listener.setBeanFactory(new BeanFactoryListenerMock(new JustUnbind()));
 		listener.setUnbindMethod("myUnbind");
+		listener.initialize();
 		listener.afterPropertiesSet();
 
 		assertEquals(0, JustListener.BIND_CALLS);
@@ -546,6 +547,7 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		listener.setBeanFactory(new BeanFactoryListenerMock(new CustomServiceRefListener()));
 
 		listener.setUnbindMethod("myUnbind");
+		listener.initialize();
 		listener.afterPropertiesSet();
 
 		assertEquals(0, JustListener.BIND_CALLS);

@@ -30,9 +30,8 @@ import org.springframework.util.ObjectUtils;
  * Utility class for dealing with {@link ServiceListener}s. This class contains
  * common functionality such as broadcasting events or safely registering an
  * OSGi listener.
- * 
+ *
  * @author Costin Leau
- * 
  */
 public abstract class OsgiListenerUtils {
 
@@ -41,11 +40,11 @@ public abstract class OsgiListenerUtils {
 	/**
 	 * Add a service listener to the given application context, under the
 	 * specified filter.
-	 * 
-	 * @see #addServiceListener(BundleContext, ServiceListener, String)
+	 *
 	 * @param context
 	 * @param listener
 	 * @param filter
+	 * @see #addServiceListener(BundleContext, ServiceListener, String)
 	 */
 	public static void addServiceListener(BundleContext context, ServiceListener listener, Filter filter) {
 		String toStringFilter = (filter == null ? null : filter.toString());
@@ -60,10 +59,10 @@ public abstract class OsgiListenerUtils {
 	 * problems in case a service is being registered between the listener
 	 * registration and the retrieval of existing services and thus, can cause
 	 * event duplication to occur on the listener.
-	 * 
+	 * <p/>
 	 * <p/> For most implementations this is not a problem; if it is then do not
 	 * use this method.
-	 * 
+	 *
 	 * @param context
 	 * @param listener
 	 * @param filter
@@ -86,7 +85,7 @@ public abstract class OsgiListenerUtils {
 
 		if (log.isTraceEnabled())
 			log.trace("calling listener on already registered services: "
-					+ ObjectUtils.nullSafeToString(alreadyRegistered));
+				+ ObjectUtils.nullSafeToString(alreadyRegistered));
 
 		if (alreadyRegistered != null) {
 			for (int i = 0; i < alreadyRegistered.length; i++) {
@@ -95,9 +94,38 @@ public abstract class OsgiListenerUtils {
 		}
 	}
 
-	public static boolean removeServiceListener(BundleContext bundleContext, ServiceListener listener) {
+	/**
+	 * Remove a service listener from the given application context, under the
+	 * specified filter.
+	 *
+	 * @param context
+	 * @param listener
+	 * @param filter
+	 * @see #removeServiceListener(BundleContext, ServiceListener, String)
+	 */
+	public static void removeServiceListener(BundleContext context, ServiceListener listener, Filter filter) {
+		String toStringFilter = (filter == null ? null : filter.toString());
+		removeServiceListener(context, listener, toStringFilter);
+	}
+
+	public static boolean removeServiceListener(BundleContext bundleContext, ServiceListener listener, String filter) {
 		if (bundleContext == null || listener == null)
 			return false;
+		// Now get the already registered services and call the listener.
+		// Note that this is necessary because when a context is closed the listeners get unregistered
+		// (and the proxies destroyed) before the listeners' destroy() methods get called. This makes
+		// it impossible to do the correct thing by the listener without help from the framework.
+		ServiceReference[] alreadyRegistered = OsgiServiceReferenceUtils.getServiceReferences(bundleContext, filter);
+
+		if (log.isTraceEnabled())
+			log.trace("calling listener on already registered services: "
+				+ ObjectUtils.nullSafeToString(alreadyRegistered));
+
+		if (alreadyRegistered != null) {
+			for (int i = 0; i < alreadyRegistered.length; i++) {
+				listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, alreadyRegistered[i]));
+			}
+		}
 
 		try {
 			bundleContext.removeServiceListener(listener);
