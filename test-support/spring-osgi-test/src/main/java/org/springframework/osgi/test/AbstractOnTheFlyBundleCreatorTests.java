@@ -115,7 +115,9 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 				return new Manifest(res.getInputStream());
 			}
 			catch (IOException ex) {
-				throw new RuntimeException("cannot retrieve manifest from " + res);
+			    IllegalStateException re = new IllegalStateException("cannot retrieve manifest from " + res);
+			    re.initCause(ex);
+			    throw re;
 			}
 		}
 
