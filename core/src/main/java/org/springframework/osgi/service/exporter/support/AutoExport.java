@@ -27,7 +27,7 @@ import org.springframework.osgi.util.internal.ClassUtils;
  */
 public abstract class AutoExport extends StaticLabeledEnum {
 
-	/** Do not export nothing */
+	/** Do not export anything */
 	public static final AutoExport DISABLED = new AutoExport(0, "DISABLED") {
 		private final Class[] clazz = new Class[0];
 
