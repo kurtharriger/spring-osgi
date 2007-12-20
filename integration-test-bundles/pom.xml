@@ -55,6 +55,7 @@
     <module>extender.version.bundle</module>
     <module>config.bundle</module>
     <module>tccl.bundle</module>
+    <module>config.file.with.dots.bundle</module>
   </modules>
 
 <profiles>
