@@ -15,10 +15,12 @@
  */
 package org.springframework.osgi.extender.internal.util;
 
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.springframework.osgi.io.OsgiBundleResource;
+import org.springframework.util.ObjectUtils;
 
 import junit.framework.TestCase;
 
@@ -93,5 +95,11 @@ public class ConfigUtilsTest extends TestCase {
 		assertEquals(2, locations.length);
 		assertEquals(location1, locations[0]);
 		assertEquals(location2, locations[1]);
+	}
+	
+	public void testLocationWithMultipleDots() throws Exception {
+		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, "META-INF/file.with.multiple.dots.xml, META-INF/another.file.xml");
+		String[] locations = ConfigUtils.getConfigLocations(headers);
+		assertEquals(2, locations.length);
 	}
 }
