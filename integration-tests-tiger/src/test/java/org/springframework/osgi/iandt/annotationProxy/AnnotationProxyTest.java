@@ -22,9 +22,9 @@ public class AnnotationProxyTest extends AbstractConfigurableBundleCreatorTests 
     protected String[] getTestBundlesNames() {
 	return new String[] {
                     "org.springframework.osgi, org.springframework.osgi.iandt.simple.service, "+
-                            getSpringOsgiVersion(),
+                            getSpringDMVersion(),
                     "org.springframework.osgi, org.springframework.osgi.iandt.annotation.proxy,"+
-                            getSpringOsgiVersion()};
+                            getSpringDMVersion()};
     }
 
     public void testReferenceProxyLifecycle() throws Exception {

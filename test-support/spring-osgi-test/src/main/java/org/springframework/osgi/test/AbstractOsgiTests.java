@@ -51,7 +51,7 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInjectionTests implements OsgiJUnitTest {
+public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInjectionTests {
 
 	// JVM shutdown hook
 	private static Thread shutdownHook;
@@ -205,34 +205,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 				completeTestExecution();
 			}
 		}
-	}
-
-	//
-	// OsgiJUnitTest execution hooks.
-	//
-
-	/**
-	 * the setUp version for the OSGi environment.
-	 * 
-	 * @throws Exception
-	 */
-	public final void osgiSetUp() throws Exception {
-		// call the normal onSetUp
-		setUp();
-	}
-
-	public final void osgiTearDown() throws Exception {
-		// call the normal tearDown
-		tearDown();
-	}
-
-	/**
-	 * Actual test execution (delegates to the superclass implementation).
-	 * 
-	 * @throws Throwable
-	 */
-	public final void osgiRunTest() throws Throwable {
-		super.runTest();
 	}
 
 	//
@@ -550,20 +522,20 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 	}
 
+	//
+	// OsgiJUnitTest execution hooks. Used by the test framework.
+	//
+
 	/**
 	 * Set the bundle context to be used by this test.
 	 * 
 	 * <p/> This method is called automatically by the test infrastructure after
 	 * the OSGi platform is being setup.
 	 */
-	public final void injectBundleContext(BundleContext bundleContext) {
+	private void injectBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 		// instantiate ResourceLoader
 		this.resourceLoader = new OsgiBundleResourceLoader(bundleContext.getBundle());
-	}
-
-	public void setName(String name) {
-		super.setName(name);
 	}
 
 	/**
@@ -573,8 +545,32 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * the OSGi platform is being setup.
 	 * @param test
 	 */
-	public final void injectOsgiJUnitTest(OsgiJUnitTest test) {
-		Assert.isInstanceOf(TestCase.class, test);
-		this.osgiJUnitTest = (TestCase) test;
+	private void injectOsgiJUnitTest(TestCase test) {
+		this.osgiJUnitTest = test;
 	}
+
+	/**
+	 * the setUp version for the OSGi environment.
+	 * 
+	 * @throws Exception
+	 */
+	private void osgiSetUp() throws Exception {
+		// call the normal onSetUp
+		setUp();
+	}
+
+	private void osgiTearDown() throws Exception {
+		// call the normal tearDown
+		tearDown();
+	}
+
+	/**
+	 * Actual test execution (delegates to the superclass implementation).
+	 * 
+	 * @throws Throwable
+	 */
+	private void osgiRunTest() throws Throwable {
+		super.runTest();
+	}
+
 }

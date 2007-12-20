@@ -32,14 +32,14 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 		// waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
 
 		Bundle dependencyTestBundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.dependencies", getSpringOsgiVersion()).getURL().toExternalForm());
+			"org.springframework.osgi", "org.springframework.osgi.iandt.dependencies", getSpringDMVersion()).getURL().toExternalForm());
 
 		Bundle simpleService2Bundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service2", getSpringOsgiVersion()).getURL().toExternalForm());
+			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service2", getSpringDMVersion()).getURL().toExternalForm());
 		Bundle simpleService3Bundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service3", getSpringOsgiVersion()).getURL().toExternalForm());
+			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service3", getSpringDMVersion()).getURL().toExternalForm());
 		Bundle simpleServiceBundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service", getSpringOsgiVersion()).getURL().toExternalForm());
+			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service", getSpringDMVersion()).getURL().toExternalForm());
 
 		assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
 		assertNotNull("Cannot find the simple service 2 bundle", simpleService2Bundle);

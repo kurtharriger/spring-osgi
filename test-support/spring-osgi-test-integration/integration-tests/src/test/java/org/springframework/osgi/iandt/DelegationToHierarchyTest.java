@@ -27,7 +27,7 @@ import org.osgi.framework.Constants;
 import org.springframework.osgi.test.AbstractOnTheFlyBundleCreatorTests;
 import org.springframework.osgi.test.AbstractOsgiTests;
 import org.springframework.osgi.test.JUnitTestActivator;
-import org.springframework.osgi.test.internal.OsgiJUnitTest;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Tests that AbstractOsgiTests and subclasses can be delegated to rather than
@@ -36,7 +36,7 @@ import org.springframework.osgi.test.internal.OsgiJUnitTest;
  * @author Jeremy Wales
  * @author Costin Leau
  */
-public abstract class DelegationToHierarchyTest extends TestCase implements OsgiJUnitTest {
+public abstract class DelegationToHierarchyTest extends TestCase {
 
 	private AbstractOsgiTests osgiDelegate = new AbstractOnTheFlyBundleCreatorTests() {
 		protected Manifest getManifest() {
@@ -49,7 +49,7 @@ public abstract class DelegationToHierarchyTest extends TestCase implements Osgi
 					+ "org.osgi.framework;specification-version=\"1.3.0\"," + "org.springframework.core.io,"
 					+ "org.springframework.osgi.test");
 			return manifest;
-			
+
 		}
 	};
 
@@ -66,7 +66,10 @@ public abstract class DelegationToHierarchyTest extends TestCase implements Osgi
 	}
 
 	public void injectBundleContext(BundleContext bundleContext) {
-		osgiDelegate.injectBundleContext(bundleContext);
+		Method mt = ReflectionUtils.findMethod(osgiDelegate.getClass(), "injectBundleContext",
+			new Class[] { BundleContext.class });
+
+		ReflectionUtils.invokeMethod(mt, osgiDelegate, new Object[] { bundleContext });
 	}
 
 	public void testBundleContextIsAvailable() throws Exception {
@@ -85,7 +88,12 @@ public abstract class DelegationToHierarchyTest extends TestCase implements Osgi
 	}
 
 	public void run(TestResult result) {
-		osgiDelegate.injectOsgiJUnitTest(this);
+
+		Method mt = ReflectionUtils.findMethod(osgiDelegate.getClass(), "injectOsgiJUnitTest",
+			new Class[] { TestCase.class });
+
+		ReflectionUtils.invokeMethod(mt, osgiDelegate, new Object[] { this });
+
 		osgiDelegate.setName(getName());
 		osgiDelegate.run(result);
 	}

@@ -109,37 +109,39 @@ public class OsgiJUnitService implements TestRunnerService {
 	/**
 	 * Run fixture setup, test from the given test case and fixture teardown.
 	 * 
-	 * @param testCase
+	 * @param osgiTestExtensions
 	 * @param testName
 	 */
-	protected TestResult runTest(final OsgiJUnitTest testCase, String testName) {
+	protected TestResult runTest(final OsgiJUnitTest osgiTestExtensions, String testName) {
 
-		log.debug("running test [" + testName + "] on testCase " + testCase);
+		log.debug("running test [" + testName + "] on testCase " + osgiTestExtensions);
 		final TestResult result = new TestResult();
-		testCase.setName(testName);
+		TestCase rawTest = osgiTestExtensions.getTestCase();
+		
+		rawTest.setName(testName);
 
 		try {
-			testCase.osgiSetUp();
+			osgiTestExtensions.osgiSetUp();
 
 			try {
 				// use TestResult method to bypass the setUp/tearDown methods
-				result.runProtected((TestCase) testCase, new Protectable() {
+				result.runProtected(rawTest, new Protectable() {
 
 					public void protect() throws Throwable {
-						testCase.osgiRunTest();
+						osgiTestExtensions.osgiRunTest();
 					}
 
 				});
 			}
 			finally {
-				testCase.osgiTearDown();
+				osgiTestExtensions.osgiTearDown();
 			}
 
 		}
 		// exceptions thrown by osgiSetUp/osgiTearDown
 		catch (Exception ex) {
 			log.error("test exception threw exception ", ex);
-			result.addError((Test) testCase, ex);
+			result.addError((Test) rawTest, ex);
 		}
 		return result;
 	}

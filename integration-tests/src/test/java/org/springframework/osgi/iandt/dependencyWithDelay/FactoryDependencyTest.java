@@ -28,15 +28,15 @@ public class FactoryDependencyTest extends AbstractConfigurableBundleCreatorTest
 		System.setProperty(DELAY_PROP, "10000");
 
 		Bundle dependencyTestBundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.dependencies", getSpringOsgiVersion()).getURL().toExternalForm());
+			"org.springframework.osgi", "org.springframework.osgi.iandt.dependencies", getSpringDMVersion()).getURL().toExternalForm());
 
 		Bundle simpleService2Bundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service2", getSpringOsgiVersion()).getURL().toExternalForm());
+			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service2", getSpringDMVersion()).getURL().toExternalForm());
 		Bundle simpleService3Bundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service3", getSpringOsgiVersion()).getURL().toExternalForm());
+			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service3", getSpringDMVersion()).getURL().toExternalForm());
 		Bundle factoryServiceBundle = bundleContext.installBundle(getLocator().locateArtifact(
 			"org.springframework.osgi", "org.springframework.osgi.iandt.dependendencies.factory",
-			getSpringOsgiVersion()).getURL().toExternalForm());
+			getSpringDMVersion()).getURL().toExternalForm());
 
 		assertNotNull("Cannot find the factory service bundle", factoryServiceBundle);
 		assertNotNull("Cannot find the simple service 2 bundle", simpleService2Bundle);

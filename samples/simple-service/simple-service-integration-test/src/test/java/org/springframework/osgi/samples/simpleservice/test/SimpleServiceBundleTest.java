@@ -64,7 +64,7 @@ public class SimpleServiceBundleTest extends AbstractConfigurableBundleCreatorTe
 	 */
 	protected String[] getTestBundlesNames() {
 		return new String[] {
-			"org.springframework.osgi.samples, simple-service-bundle," +getSpringOsgiVersion()
+			"org.springframework.osgi.samples, simple-service-bundle," +getSpringDMVersion()
 		};
 	}
 	

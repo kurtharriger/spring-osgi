@@ -30,10 +30,10 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 public class SyncNoWaitWithReverseQueueTest extends BehaviorBaseTest {
 
 	private String tailBundleId = "org.springframework.osgi, org.springframework.osgi.iandt.sync-tail-bundle,"
-			+ getSpringOsgiVersion();
+			+ getSpringDMVersion();
 
 	private String bundleId = "org.springframework.osgi, org.springframework.osgi.iandt.sync-nowait-bundle,"
-			+ getSpringOsgiVersion();
+			+ getSpringDMVersion();
 
 	public void testBehaviour() throws Exception {
 

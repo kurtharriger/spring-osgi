@@ -17,6 +17,8 @@ package org.springframework.osgi.test;
 
 import java.util.Hashtable;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleActivator;
@@ -25,6 +27,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.test.internal.OsgiJUnitTest;
 import org.springframework.osgi.test.internal.TestRunnerService;
+import org.springframework.osgi.test.internal.support.OsgiJUnitTestAdapter;
 import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
@@ -75,9 +78,11 @@ public class JUnitTestActivator implements BundleActivator {
 		try {
 			// use bundle to load the classes
 			Class clazz = context.getBundle().loadClass(testClass);
-			OsgiJUnitTest test = (OsgiJUnitTest) clazz.newInstance();
-			test.injectBundleContext(context);
-			return test;
+			TestCase test = (TestCase) clazz.newInstance();
+			// wrap the test with the OsgiJUnitTestAdapter
+			OsgiJUnitTest osgiTest = new OsgiJUnitTestAdapter(test);
+			osgiTest.injectBundleContext(context);
+			return osgiTest;
 
 		}
 		catch (Exception ex) {
