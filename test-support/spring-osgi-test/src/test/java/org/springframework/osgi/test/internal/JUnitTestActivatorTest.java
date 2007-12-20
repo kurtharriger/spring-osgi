@@ -31,10 +31,11 @@ import org.springframework.osgi.test.JUnitTestActivator;
 public class JUnitTestActivatorTest extends TestCase {
 
 	private JUnitTestActivator activator;
-//	private ServiceRegistration registration;
-//	private ServiceReference reference;
 
-	public static class TestExample implements OsgiJUnitTest {
+	// private ServiceRegistration registration;
+	// private ServiceReference reference;
+
+	public static class TestExample extends TestCase implements OsgiJUnitTest {
 		private static BundleContext context;
 
 		public void osgiSetUp() throws Exception {
@@ -57,21 +58,24 @@ public class JUnitTestActivatorTest extends TestCase {
 		public void setName(String name) {
 		}
 
+		public Bundle findBundleByLocation(String bundleLocation) {
+			return null;
+		}
 
-        public Bundle findBundleByLocation(String bundleLocation) {
-            return null;
-        }
+		public Bundle findBundleBySymbolicName(String bundleSymbolicName) {
+			return null;
+		}
 
-
-        public Bundle findBundleBySymbolicName(String bundleSymbolicName) {
-            return null;
-        }
-    }
+		public TestCase getTestCase() {
+			return this;
+		}
+		
+	}
 
 	protected void setUp() throws Exception {
 		activator = new JUnitTestActivator();
-		//reference = new MockServiceReference();
-		//registration = new MockServiceRegistration();
+		// reference = new MockServiceReference();
+		// registration = new MockServiceRegistration();
 	}
 
 	protected void tearDown() throws Exception {
@@ -106,20 +110,20 @@ public class JUnitTestActivatorTest extends TestCase {
 		ServiceReference ref = new MockServiceReference();
 		MockControl regCtrl = MockControl.createControl(ServiceRegistration.class);
 		ServiceRegistration reg = (ServiceRegistration) regCtrl.getMock();
-		
+
 		MockControl ctxCtrl = MockControl.createControl(BundleContext.class);
 		BundleContext ctx = (BundleContext) ctxCtrl.getMock();
-		
+
 		reg.unregister();
-		
+
 		ctxCtrl.replay();
 		regCtrl.replay();
-		
+
 		setActivatorField("reference", ref);
 		setActivatorField("registration", reg);
-		
+
 		activator.stop(ctx);
-		
+
 		regCtrl.verify();
 		ctxCtrl.verify();
 	}

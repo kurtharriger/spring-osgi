@@ -77,15 +77,6 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * @deprecated use {@link #getSpringDMVersion()} instead.
-	 * 
-	 * @return
-	 */
-	protected String getSpringOsgiVersion() {
-		return getSpringDMVersion();
-	}
-
-	/**
 	 * Return the Spring osgified version used by the test core bundles.
 	 * 
 	 * @return
@@ -95,14 +86,6 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 			springBundledVersion = System.getProperty(SPRING_VERSION_PROP_KEY);
 		}
 		return springBundledVersion;
-	}
-
-	/**
-	 * @deprecated - use {@link #getSpringVersion()} instead
-	 * @return
-	 */
-	protected String getSpringBundledVersion() {
-		return getSpringVersion();
 	}
 
 	/**

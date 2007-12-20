@@ -35,10 +35,10 @@ public class SyncWaitTest extends BehaviorBaseTest {
 
 		// locate bundle
 		String tailBundleId = "org.springframework.osgi, org.springframework.osgi.iandt.sync-tail-bundle,"
-				+ getSpringOsgiVersion();
+				+ getSpringDMVersion();
 
 		String bundleId = "org.springframework.osgi, org.springframework.osgi.iandt.sync-wait-bundle,"
-				+ getSpringOsgiVersion();
+				+ getSpringDMVersion();
 
 		// start dependency first
 		Bundle tail = installBundle(tailBundleId);

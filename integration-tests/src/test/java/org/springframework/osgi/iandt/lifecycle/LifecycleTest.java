@@ -34,7 +34,7 @@ public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi,org.springframework.osgi.iandt.lifecycle,"
-				+ getSpringOsgiVersion() };
+				+ getSpringDMVersion() };
 	}
 
 	public void testLifecycle() throws Exception {

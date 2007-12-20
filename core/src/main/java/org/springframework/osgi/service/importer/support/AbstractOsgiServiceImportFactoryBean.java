@@ -166,16 +166,6 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	abstract DisposableBean getDisposable();
 
 	/**
-	 * The type that the OSGi service was registered with.
-	 * 
-	 * @deprecated use {@link #setInterfaces(Class[])}. this method will be
-	 * removed after RC1.
-	 */
-	public void setInterface(Class[] serviceType) {
-		this.interfaces = serviceType;
-	}
-
-	/**
 	 * Sets the classes that the imported service advertises.
 	 * 
 	 * @param serviceType array of advertised classes.

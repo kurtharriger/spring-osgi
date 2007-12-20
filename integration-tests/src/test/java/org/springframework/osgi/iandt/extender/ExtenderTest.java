@@ -50,7 +50,7 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi, org.springframework.osgi.iandt.lifecycle,"
-				+ getSpringOsgiVersion() };
+				+ getSpringDMVersion() };
 	}
 
 	public void testLifecycle() throws Exception {
@@ -72,7 +72,7 @@ public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
 		assertNull("lifecycle application context does not exist", appContext);
 
 		Resource extenderResource = getLocator().locateArtifact("org.springframework.osgi", "spring-osgi-extender",
-			getSpringOsgiVersion());
+			getSpringDMVersion());
 		assertNotNull("Extender bundle resource", extenderResource);
 		Bundle extenderBundle = bundleContext.installBundle(extenderResource.getURL().toExternalForm());
 		assertNotNull("Extender bundle", extenderBundle);

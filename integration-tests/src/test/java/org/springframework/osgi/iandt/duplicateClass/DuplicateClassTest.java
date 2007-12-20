@@ -24,7 +24,7 @@ public class DuplicateClassTest extends AbstractConfigurableBundleCreatorTests {
 
 		// Simple Service bundle (provides the base package + 1 service)
 		Bundle simpleServiceBundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service", getSpringOsgiVersion()).getURL().toExternalForm());
+			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service", getSpringDMVersion()).getURL().toExternalForm());
 		assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
 
 		assertNotSame("simple service bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
@@ -34,7 +34,7 @@ public class DuplicateClassTest extends AbstractConfigurableBundleCreatorTests {
 		// Identical Simple Service bundle (+1 service)
 		Bundle simpleServiceDuplicateBundle = bundleContext.installBundle(getLocator().locateArtifact(
 			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service.identical",
-			getSpringOsgiVersion()).getURL().toExternalForm());
+			getSpringDMVersion()).getURL().toExternalForm());
 		assertNotNull("Cannot find the simple service duplicate bundle", simpleServiceDuplicateBundle);
 		assertNotSame("simple service 2 bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
 				simpleServiceDuplicateBundle.getState()));
@@ -73,7 +73,7 @@ public class DuplicateClassTest extends AbstractConfigurableBundleCreatorTests {
 		// Install something subtley different
 		simpleServiceDuplicateBundle = bundleContext.installBundle(getLocator().locateArtifact(
 			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service.2.identical",
-			getSpringOsgiVersion()).getURL().toExternalForm());
+			getSpringDMVersion()).getURL().toExternalForm());
 		assertNotNull("Cannot find the simple service duplicate 2 bundle", simpleServiceDuplicateBundle);
 		startDependency(simpleServiceDuplicateBundle);
 

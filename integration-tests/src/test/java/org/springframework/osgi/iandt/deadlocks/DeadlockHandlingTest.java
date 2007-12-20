@@ -29,7 +29,7 @@ public class DeadlockHandlingTest extends AbstractConfigurableBundleCreatorTests
     public void testErrorHandling() throws Exception {
         Resource errorResource = getLocator()
                 .locateArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.deadlock",
-                                getSpringOsgiVersion());
+                                getSpringDMVersion());
         assertNotNull("bundle resource exists", errorResource);
         Bundle errorBundle = bundleContext.installBundle(errorResource.getURL().toExternalForm());
         assertNotNull("bundle exists", errorBundle);

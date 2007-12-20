@@ -37,7 +37,7 @@ public class ExtenderVersionTest extends AbstractConfigurableBundleCreatorTests 
 	public void testBundleIgnoredBasedOnSpringExtenderVersion() throws Exception {
 
 		String bundleId = "org.springframework.osgi, org.springframework.osgi.iandt.extender-version-bundle,"
-				+ getSpringOsgiVersion();
+				+ getSpringDMVersion();
 		Resource location = locateBundle(bundleId);
 
 		Bundle bundle = bundleContext.installBundle(location.getURL().toString());

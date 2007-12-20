@@ -30,7 +30,7 @@ public class NoPublishTest extends BehaviorBaseTest {
 
 	public void testBehaviour() throws Exception {
 		String bundleId = "org.springframework.osgi, org.springframework.osgi.iandt.nopublish-bundle,"
-				+ getSpringOsgiVersion();
+				+ getSpringDMVersion();
 
 		// start it
 		Bundle bundle = installBundle(bundleId);

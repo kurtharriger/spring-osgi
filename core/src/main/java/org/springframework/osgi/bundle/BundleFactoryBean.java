@@ -354,14 +354,6 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		this.pushBundleAsContextClassLoader = pushBundleAsContextClassLoader;
 	}
 
-	/**
-	 * @deprecated use {@link #setClassLoader(ClassLoader)} instead.
-	 * @param classloader
-	 */
-	public void setClassloader(ClassLoader classloader) {
-		this.classLoader = classloader;
-	}
-
 	public void setClassLoader(ClassLoader classloader) {
 		this.classLoader = classloader;
 	}

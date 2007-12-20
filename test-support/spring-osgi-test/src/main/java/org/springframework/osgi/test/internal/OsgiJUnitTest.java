@@ -15,6 +15,8 @@
  */
 package org.springframework.osgi.test.internal;
 
+import junit.framework.TestCase;
+
 import org.osgi.framework.BundleContext;
 
 /**
@@ -71,16 +73,17 @@ public interface OsgiJUnitTest {
 	void osgiRunTest() throws Throwable;
 
 	/**
-	 * TestCase method added to the interface for usage by the OSGi test runner
-	 * service.
-	 * 
-	 * @param name
-	 */
-	void setName(String name);
-
-	/**
 	 * Provides the OSGi bundle context to the test
 	 * @param bundleContext
 	 */
 	void injectBundleContext(BundleContext bundleContext);
+
+	/**
+	 * Simple getter that returns the raw TestCase class. Used mainly when
+	 * applying OsgiJUnit functionality through decoration rather then
+	 * inheritance.
+	 * 
+	 * @return
+	 */
+	TestCase getTestCase();
 }
