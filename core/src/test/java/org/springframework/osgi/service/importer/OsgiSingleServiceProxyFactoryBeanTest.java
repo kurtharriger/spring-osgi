@@ -88,7 +88,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 
 	public void testAfterPropertiesSetBadFilter() throws Exception {
 		this.serviceFactoryBean.setBundleContext(this.bundleContext);
-		this.serviceFactoryBean.setInterface(new Class[] { ApplicationContext.class });
+		this.serviceFactoryBean.setInterfaces(new Class[] { ApplicationContext.class });
 		this.serviceFactoryBean.setFilter("this is not a valid filter expression");
 		try {
 			this.serviceFactoryBean.afterPropertiesSet();
@@ -100,7 +100,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testGetObjectType() {
-		this.serviceFactoryBean.setInterface(new Class[] { ApplicationContext.class });
+		this.serviceFactoryBean.setInterfaces(new Class[] { ApplicationContext.class });
 		assertEquals(ApplicationContext.class, this.serviceFactoryBean.getObjectType());
 	}
 
@@ -111,7 +111,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 	// finds the service.
 	public void testGetObjectWithFilterOnly() throws Exception {
 		this.serviceFactoryBean.setBundleContext(new MockBundleContext());
-		this.serviceFactoryBean.setInterface(new Class[] { Serializable.class });
+		this.serviceFactoryBean.setInterfaces(new Class[] { Serializable.class });
 		String filter = "(beanName=myBean)";
 		this.serviceFactoryBean.setFilter(filter);
 
