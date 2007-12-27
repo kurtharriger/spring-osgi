@@ -44,7 +44,7 @@ above, and JDK level 1.4 and above.
 
 Release contents:
 * "src" contains the Java source files for the framework
-* "src/samples" contains the samples Java source files
+* "samples" contains various demo applications and showcases
 * "dist" contains various Spring DM distribution jar files
 * "lib" contains all third-party libraries needed for running the samples and/or building the framework
 * "docs" contains general documentation and API javadocs
