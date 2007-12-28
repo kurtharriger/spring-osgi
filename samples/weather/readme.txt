@@ -25,7 +25,8 @@ after installing this bundle.
 Provides the actual service implementation
 
 * weather-service-test
-JUnit test for the weather service
+Simple consumer (acting as a test) for the weather service. Once installed, the bundle
+will query the Weather Service which was retrieved and binded using Spring-DM.
 
 * wiring-bundle
 Project that does the OSGi assembly and service publishing/consumption as well as bundle

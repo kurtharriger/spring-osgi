@@ -16,6 +16,7 @@
   </description>
   
   <properties>
+    <spring.osgi.license.loc>../..</spring.osgi.license.loc>
 	<spring.osgi.export.pkg>org.springframework.osgi.extensions.annotation</spring.osgi.export.pkg>
   </properties>
   

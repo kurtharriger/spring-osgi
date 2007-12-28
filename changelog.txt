@@ -9,6 +9,7 @@ General
 * removed deprecated methods
 * circular references between service importers and listeners are now supported
 * internal OsgiJUnitTest interface has been removed from AbstractOsgiTest hierarchy and methods
+* distributable bundles include Apache 2 license (META-INF/license.txt and META-INF/notice.txt)
 
 Package org.springframework.osgi.bundle
 * removed deprecated method BundleFactoryBean#setClassloader
