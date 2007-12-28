@@ -28,6 +28,7 @@
 
   
   <properties>
+    
   	<spring.osgi.export.pkg>
   	    !org.springframework.osgi.io*, !org.springframework.osgi.io.internal, org.springframework.osgi*
   	</spring.osgi.export.pkg>

@@ -26,6 +26,8 @@
   </reporting>
   
   <properties>
+    <spring.osgi.license.loc>../..</spring.osgi.license.loc>
+  
     <spring.osgi.export>
       !org.springframework.osgi.test.*internal*,
       org.springframework.osgi.test*;version=${spring.osgi.export.version}

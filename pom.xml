@@ -42,8 +42,17 @@
     <symName.prefix>org.springframework.osgi.bundle</symName.prefix>
     <spring.osgi.symbolic.name>${groupId}.${artifactId}</spring.osgi.symbolic.name>
 
-    <!-- the default-->
-    <spring.osgi.include.res>src/main/resources</spring.osgi.include.res>
+    <!-- add license.txt to the resulting bundle -->
+    
+    <!-- this property should be defined in each project and indicates the location of the licenses 
+         relative to the submodule/subproject -->
+         
+    <spring.osgi.license.loc>..</spring.osgi.license.loc>
+    <spring.osgi.include.res>
+      src/main/resources, 
+      META-INF/license.txt=${spring.osgi.license.loc}/license.txt, 
+      META-INF/notice.txt=${spring.osgi.license.loc}/notice.txt
+    </spring.osgi.include.res>
     
     <!-- End Felix BND plugin settings -->
 

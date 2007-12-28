@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-Name: weather-integration-tests
 Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.springframework.osgi.samples.weather.test
+Bundle-SymbolicName: org.springframework.osgi.samples.weather.integration.test
 Bundle-Vendor: Spring Framework
 Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator
 Import-Package: junit.framework,
