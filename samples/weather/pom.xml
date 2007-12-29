@@ -9,7 +9,7 @@
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>weather</artifactId>
   <packaging>pom</packaging>
-  <name>Spring OSGi Weather Sample</name>
+  <name>Spring OSGi Samples: Weather Service</name>
   <url>http://www.springframework.org/osgi</url>
   
   <properties>

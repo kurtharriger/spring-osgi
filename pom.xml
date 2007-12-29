@@ -200,11 +200,7 @@ limitations under the License.
 	<module>io</module>    
     <module>core</module>
     <module>extender</module>
-    <module>annotation-support</module>
     <module>test-support</module>
-    <module>integration-test-bundles</module>
-    <module>integration-tests</module>
-    <module>samples</module>
     <module>bundle-archetype</module>
     <!-- unused at the moment
     <module>release</module>
@@ -373,6 +369,7 @@ limitations under the License.
         <log4j.ignoreTCL>true</log4j.ignoreTCL>
       </properties>
     </profile>
+    
     <profile>
       <id>knopflerfish</id>
       <dependencies>
@@ -390,6 +387,7 @@ limitations under the License.
 		<org.knopflerfish.osgi.setcontextclassloader>true</org.knopflerfish.osgi.setcontextclassloader>        
       </properties>
     </profile>
+    
     <profile>
       <id>felix</id>
       <dependencies>  
@@ -425,25 +423,25 @@ limitations under the License.
 		<log4j.ignoreTCL>true</log4j.ignoreTCL>        
       </properties>
     </profile>
-    
-    <!-- requires java 5 -->
+
+    <!-- VM 1.5/tiger source files (such as annotations) -->
     <profile>
       <id>jdk-1.5</id>
-      <activation>
+        <activation>
           <jdk>1.5+</jdk>
-      </activation>
-      <modules>
-       <module>integration-tests-tiger</module>
-      </modules>
+        </activation>
+        <modules>
+          <module>tiger</module>
+        </modules>
     </profile>
-    
+  
+          
     <!-- integration testing profile -->
     <profile>
       <id>it</id>
       <activation>
         <property>
-          <name>env</name>
-          <value>test</value>
+          <name>env-test</name>
         </property>
       </activation>
       <modules>
@@ -452,6 +450,19 @@ limitations under the License.
     </profile>
 
 
+	<!-- samples profile -->
+    <profile>
+      <id>samples</id>
+      <activation>
+        <property>
+          <name>env-samples</name>
+        </property>
+      </activation>
+      <modules>
+      	<module>samples</module>
+      </modules>
+    </profile>
+    
   </profiles>
        
        

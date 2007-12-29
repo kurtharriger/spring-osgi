@@ -9,7 +9,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>spring-osgi-annotation.app</artifactId>
     <packaging>pom</packaging>
-    <name>Spring OSGi annotation support</name>
+    <name>Spring OSGi Annotation</name>
     <url>http://www.springframework.org/osgi</url>
 
 

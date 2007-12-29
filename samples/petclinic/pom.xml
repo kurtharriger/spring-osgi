@@ -9,7 +9,7 @@
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>petclinic</artifactId>
   <packaging>pom</packaging>
-  <name>Spring OSGi Petclinic Sample</name>
+  <name>Spring OSGi Samples: Simple Petclinic</name>
   <url>http://www.springframework.org/osgi</url>
   
   <modules>

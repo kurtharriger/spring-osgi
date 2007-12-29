@@ -11,7 +11,7 @@
 	
 	<!-- if bundle is used, resource filtering will not work -->
 	<packaging>jar</packaging>
-	<name>Spring OSGi Sample Wiring Bundle</name>
+	<name>Spring OSGi Samples: Weather Service Wiring Bundle</name>
 	<url>http://www.springframework.org/osgi</url>
 
   <properties>

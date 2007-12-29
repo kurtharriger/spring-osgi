@@ -9,7 +9,7 @@
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>weather-extension</artifactId>
   <packaging>bundle</packaging>
-  <name>Spring OSGi Weather Sample Extension</name>
+  <name>Spring OSGi Samples: Weather Service Extension</name>
   <url>http://www.springframework.org/osgi</url>
 
   <properties>
