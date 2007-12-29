@@ -10,7 +10,7 @@
   <artifactId>spring-osgi-core</artifactId>
   <packaging>bundle</packaging>
   <url>http://www.springframework.org/osgi</url>
-  <name>Spring/OSGi core</name>
+  <name>Spring OSGi Core</name>
   <description>
   Spring/OSGi core classes. Offers OSGi-based application context and importer/exporter functionality.
   </description>

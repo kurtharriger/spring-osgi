@@ -9,7 +9,7 @@
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>weather-service-integration-test</artifactId>
   <packaging>jar</packaging>
-  <name>Spring OSGi Samples: Weather Service Integration Tests</name>
+  <name>Spring OSGi Samples: Weather Service Integration Test</name>
   <url>http://www.springframework.org/osgi</url>
   
   <dependencies>

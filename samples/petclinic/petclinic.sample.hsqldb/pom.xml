@@ -10,7 +10,7 @@
   <groupId>org.springframework.osgi.samples.petclinic</groupId>
   <artifactId>hsqldb-impl</artifactId>
   	<packaging>jar</packaging>
-  <name>Spring OSGi Petclinic Hsqldb</name>
+  <name>Spring OSGi Samples: Simple Petclinic HSQLDB</name>
   <version>1.0-rc2-SNAPSHOT</version>
   <url>http://www.springframework.org/osgi</url>
   

@@ -9,7 +9,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-bundle-archetype</artifactId>
   <packaging>maven-plugin</packaging>
-  <name>Archetype for creating Spring OSGi Bundle Projects</name>
+  <name>Spring OSGi Archetype</name>
   <url>http://www.springframework.org/osgi</url>
   
   

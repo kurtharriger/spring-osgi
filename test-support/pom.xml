@@ -8,7 +8,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-test</artifactId>
   <packaging>bundle</packaging>
-  <name>Spring OSGi JUnit testing bundle</name>
+  <name>Spring OSGi Testing Framework</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
   Spring/OSGi testing framework. Provides JUnit based integration testing inside OSGi containers.
