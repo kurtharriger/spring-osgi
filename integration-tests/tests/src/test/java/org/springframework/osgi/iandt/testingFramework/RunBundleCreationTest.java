@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.iandt;
+package org.springframework.osgi.iandt.testingFramework;
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
