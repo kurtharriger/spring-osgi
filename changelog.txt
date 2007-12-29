@@ -10,6 +10,7 @@ General
 * circular references between service importers and listeners are now supported
 * internal OsgiJUnitTest interface has been removed from AbstractOsgiTest hierarchy and methods
 * distributable bundles include Apache 2 license (META-INF/license.txt and META-INF/notice.txt)
+* Maven 2.0.7 is required for properly building the project under JDK 1.6
 
 Package org.springframework.osgi.bundle
 * removed deprecated method BundleFactoryBean#setClassloader

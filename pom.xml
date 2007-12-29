@@ -64,6 +64,9 @@
    <equinox.ver>3.2.2</equinox.ver>
    <kf.ver>2.0.2</kf.ver>
    <felix.ver>1.0.1</felix.ver>
+   
+   <!-- javadoc configuration -->
+   <javadoc.loc>${basedir}/docs/src/javadoc</javadoc.loc>
   </properties>
 
   <!-- ============================================= -->
@@ -73,7 +76,7 @@
   <issueManagement>
     <system>JIRA</system>
     <url>
-      http://opensource.atlassian.com/projects/spring/browse/OSGI
+      http://jira.springframework.org/projects/spring/browse/OSGI
     </url>
   </issueManagement>
 
@@ -425,26 +428,27 @@ limitations under the License.
     
     <!-- requires java 5 -->
     <profile>
-      <id>equinox-1.5</id>
+      <id>jdk-1.5</id>
       <activation>
-           <jdk>1.5</jdk>
+          <jdk>1.5+</jdk>
       </activation>
       <modules>
        <module>integration-tests-tiger</module>
       </modules>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.osgi</groupId>
-          <artifactId>org.eclipse.osgi</artifactId>
-          <version>${equinox.ver}</version>
-          <type>jar</type>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
-      <properties>
-        <osgi.test.platform>org.springframework.osgi.test.platform.EquinoxPlatform</osgi.test.platform>
-        <log4j.ignoreTCL>true</log4j.ignoreTCL>
-      </properties>
+    </profile>
+    
+    <!-- integration testing profile -->
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>test</value>
+        </property>
+      </activation>
+      <modules>
+      	<module>integration-tests</module>
+      </modules>
     </profile>
 
 
@@ -481,8 +485,8 @@ limitations under the License.
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
           <aggregate>true</aggregate>
-		  <stylesheetfile>${basedir}/docs/src/javadoc/javadoc.css</stylesheetfile>
-          <overview>${basedir}/docs/src/javadoc/overview.html</overview>
+		  <stylesheetfile>${javadoc.loc}/javadoc.css</stylesheetfile>
+          <overview>${javadoc.loc}/overview.html</overview>
           <groups>
             <group>
               <title>Spring Dynamic Modules Core</title>
