@@ -431,7 +431,7 @@ limitations under the License.
           <jdk>1.5+</jdk>
         </activation>
         <modules>
-          <module>tiger</module>
+          <module>annotation</module>
         </modules>
     </profile>
   
