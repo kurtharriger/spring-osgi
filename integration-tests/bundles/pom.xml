@@ -60,7 +60,7 @@
 
 <profiles>
     <profile>
-      <id>equinox-1.5</id>
+      <id>jdk-1.5</id>
       <activation>
            <jdk>1.5</jdk>
       </activation>
@@ -86,26 +86,4 @@
     
  </build>
 
-   <!-- the above doesn't work, so we spell it out in full below
-  <reporting>
-   <excludeDefaults>true</excludeDefaults>
-   <plugins>
-     <plugin>
-       <groupId>org.apache.maven.plugins</groupId>
-       <artifactId>maven-project-info-reports-plugin</artifactId>
-       <inherited>true</inherited>
-       <reportSets>
-        <reportSet></reportSet>
-       </reportSets>
-     </plugin>   
-	<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-        <excludePackageNames>*</excludePackageNames>
-        </configuration>
-     </plugin>   
-   </plugins>
-  </reporting>
-  -->
 </project>

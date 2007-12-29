@@ -16,18 +16,11 @@
   for OSGi environments.
   </description>
   
-  <reporting>
-    <plugins>
-       <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-             <stylesheetfile>${basedir}/../docs/src/javadoc/javadoc.css</stylesheetfile>
-          </configuration>
-       </plugin>
-    </plugins>
-  </reporting>
-  
+ 
   <properties>
+  
+    <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
+  
     <spring.osgi.private.pkg>org.springframework.osgi.io.internal</spring.osgi.private.pkg>
 	<spring.osgi.export.pkg>!${spring.osgi.private.pkg}, org.springframework.osgi.io</spring.osgi.export.pkg>
 	

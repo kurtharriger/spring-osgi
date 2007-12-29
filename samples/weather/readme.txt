@@ -42,4 +42,18 @@ the service.
 2. BUILD AND DEPLOYMENT
 
 This directory contains the source files.
-For build, Maven 2 and JDK 1.4 are required.
+For building, Maven 2 and JDK 1.4 are required.
+
+This samples uses Apache Felix BND plugin (http://felix.apache.org/site/maven-bundle-plugin-bnd.html)
+which automatically generates the OSGi entries inside the MANIFEST.MF file. While the file
+can be created and maintained by hand, using the plugin eases the task considerabily.
+
+Most submodules rely on this plugin with two exceptions:
+
+* weather-service-integration-test
+this module doesn't produce any artifact, is just an integration test and thus does not have
+to be wrapped as an OSGi bundle
+
+* wiring-bundle
+due to some problems regarding resource filtering, normal packaging is used. It is expected
+that this module will also rely on the bundle plugin, once it allows more advanced features.
