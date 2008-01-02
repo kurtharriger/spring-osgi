@@ -337,7 +337,7 @@
 
     <xsd:complexType name="Tservice">
     	<xsd:annotation>
-    		<xsd:documentation source="java:org.springframework.osgi.service.exporter.OsgiServiceFactoryBean"><![CDATA[
+    		<xsd:documentation source="java:org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean"><![CDATA[
     			Exports the reference bean as a service in the OSGi service registry. The bean defined by this element is of 
     			type org.osgi.framework.ServiceRegistration.
     		]]></xsd:documentation>
@@ -492,7 +492,7 @@
 
     <xsd:element name="bundle" type="Tbundle">
     	<xsd:annotation>
-    		<xsd:documentation><![CDATA[
+    		<xsd:documentation source="java:org.springframework.osgi.bundle.BundleFactoryBean"><![CDATA[
     			Defines a bean representing a Bundle object. May be used to drive bean lifecycle transitions.
     		]]></xsd:documentation>
 			<xsd:appinfo>
@@ -506,7 +506,6 @@
     <xsd:complexType name="Tbundle">
         <xsd:complexContent>
             <xsd:extension base="beans:identifiedType">
-              	
               	<!-- optional nested bean declaration -->
                 <xsd:sequence minOccurs="0" maxOccurs="1">
 		    		<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="lax">
@@ -516,7 +515,7 @@
                     		]]></xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation>
-  									<tool:exports type="org.osgi.framework.Bundle" />
+  									<tool:expected-type type="org.osgi.framework.Bundle" />
   								</tool:annotation>
 							</xsd:appinfo>  							
                     	</xsd:annotation>
