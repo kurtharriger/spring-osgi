@@ -12,7 +12,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.nopublish-bundle</artifactId>
     <packaging>jar</packaging>
-    <name>NoPublish-Bundle</name>
+    <name>Spring OSGi Test Bundle: NoPublish-Bundle</name>
     <description>Test bundle for NoPublish behaviour</description>
     <url>http://www.springframework.org/osgi</url>
 </project>

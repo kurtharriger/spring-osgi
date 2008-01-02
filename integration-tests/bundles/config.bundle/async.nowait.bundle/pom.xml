@@ -12,7 +12,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.async-nowait-bundle</artifactId>
     <packaging>jar</packaging>
-    <name>Async-NoWait-Bundle</name>
+    <name>Spring OSGi Test Bundle: Async-NoWait-Bundle</name>
     <description>Test bundle for Async NoWait behaviour</description>
     <url>http://www.springframework.org/osgi</url>
 </project>

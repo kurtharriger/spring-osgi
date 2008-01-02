@@ -9,7 +9,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>spring-osgi-integration-tests</artifactId>
     <packaging>jar</packaging>
-    <name>Spring OSGi integration in-framework testing</name>
+    <name>Spring OSGi Integration Tests</name>
     <url>http://www.springframework.org/osgi</url>
   
     <dependencies>

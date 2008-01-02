@@ -11,7 +11,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.simple.service3</artifactId>
 	<packaging>jar</packaging>
-    <name>Simple service test bundle 3</name>
+    <name>Spring OSGi Test Bundle: Simple service test bundle 3</name>
     <description>An OSGi bundle that provides yet another simple service</description>
     <url>http://www.springframework.org/osgi</url>
 </project>

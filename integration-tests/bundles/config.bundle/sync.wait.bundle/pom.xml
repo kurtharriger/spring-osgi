@@ -12,7 +12,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.sync-wait-bundle</artifactId>
     <packaging>jar</packaging>
-    <name>Sync-Wait-Bundle</name>
+    <name>Spring OSGi Test Bundle: Sync-Wait-Bundle</name>
     <description>Wait test bundle</description>
     <url>http://www.springframework.org/osgi</url>
 </project>

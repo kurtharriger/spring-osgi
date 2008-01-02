@@ -11,7 +11,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.dependencies</artifactId>
     <packaging>jar</packaging>
-    <name>Spring context dependencies test bundle</name>
+    <name>Spring OSGi Test Bundle: Spring context dependencies test bundle</name>
     <description>An OSGi bundle that tests the service dependency mechanism</description>
     <url>http://www.springframework.org/osgi</url>
 
