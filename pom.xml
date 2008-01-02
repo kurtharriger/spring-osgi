@@ -24,11 +24,11 @@
     <!-- Felix BND plugin settings -->
     
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
-    <spring.osgi.import.version>1.0.0.rc1</spring.osgi.import.version>
+    <spring.osgi.import.version>1.0.0.rc2</spring.osgi.import.version>
     
     <!--- Spring OSGi packages exported version -->
-    <spring.osgi.export.version>1.0.0.rc1</spring.osgi.export.version>
-    <spring.osgi.bundle.version>1.0.0.rc1</spring.osgi.bundle.version>
+    <spring.osgi.export.version>1.0.0.rc2</spring.osgi.export.version>
+    <spring.osgi.bundle.version>1.0.0.rc2</spring.osgi.bundle.version>
 
    
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
@@ -338,7 +338,7 @@ limitations under the License.
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
-             <descriptor>src/assembly/bin.xml</descriptor>
+             <descriptor>release/src/assembly/bin.xml</descriptor>
           </descriptors>
         </configuration>
       </plugin>
@@ -352,9 +352,6 @@ limitations under the License.
   <profiles>
     <profile>
       <id>equinox</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <dependencies>
         <dependency>
           <groupId>org.eclipse.osgi</groupId>
@@ -426,9 +423,9 @@ limitations under the License.
 
     <!-- VM 1.5/tiger source files (such as annotations) -->
     <profile>
-      <id>jdk-1.5</id>
+      <id>jdk-1.5+</id>
         <activation>
-          <jdk>1.5+</jdk>
+          <jdk>!1.4</jdk>
         </activation>
         <modules>
           <module>annotation</module>
@@ -581,9 +578,9 @@ limitations under the License.
     </configuration>
   </plugin>
   
-      <!-- ========= -->
-      <!--         PMD      -->
-      <!-- ========= -->
+      <!-- =========== -->
+      <!--     PMD     -->
+      <!-- =========== -->
       
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project>
   <parent>
-    <artifactId>spring-osgi-annotation.app</artifactId>
+    <artifactId>spring-osgi</artifactId>
     <groupId>org.springframework.osgi</groupId>
     <version>1.0-rc2-SNAPSHOT</version>
   </parent>
@@ -9,14 +9,13 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-annotation</artifactId>
   <packaging>bundle</packaging>
-  <name>Spring OSGi Annotation Support</name>
+  <name>Spring OSGi Annotations</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
   Provides OSGi service injection via annotations.
   </description>
   
   <properties>
-    <spring.osgi.license.loc>../..</spring.osgi.license.loc>
 	<spring.osgi.export.pkg>org.springframework.osgi.extensions.annotation</spring.osgi.export.pkg>
   </properties>
   

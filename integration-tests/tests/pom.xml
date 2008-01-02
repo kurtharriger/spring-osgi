@@ -140,9 +140,9 @@
 
     <profiles>
         <profile>
-            <id>equinox-1.5</id>
+            <id>jdk-1.5+</id>
             <activation>
-                <jdk>1.5</jdk>
+                <jdk>!1.4</jdk>
             </activation>
             <dependencies>
                 <dependency>
