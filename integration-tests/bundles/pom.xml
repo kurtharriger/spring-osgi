@@ -60,14 +60,14 @@
 
 <profiles>
     <profile>
-      <id>jdk-1.5</id>
+      <id>jdk-1.5+</id>
       <activation>
-           <jdk>1.5</jdk>
+        <jdk>!1.4</jdk>
       </activation>
       <modules>
        <module>annotation.test.bundle</module>
        <module>annotation.dependency.test.bundle</module>
-</modules>
+	  </modules>
    </profile>
 </profiles>
 

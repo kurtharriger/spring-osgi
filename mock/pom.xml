@@ -23,7 +23,4 @@
 	<spring.osgi.symbolic.name>${symName.prefix}.mock</spring.osgi.symbolic.name>
   </properties>
 
-  <dependencies>
-  </dependencies>
-
 </project>

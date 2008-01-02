@@ -1,6 +1,6 @@
 <?xml version="1.0"?><project>
   <parent>
-    <artifactId>spring-osgi-test-support</artifactId>
+    <artifactId>spring-osgi</artifactId>
     <groupId>org.springframework.osgi</groupId>
     <version>1.0-rc2-SNAPSHOT</version>
   </parent>
@@ -145,22 +145,5 @@
         </plugin>    
     </plugins>
   </build>
-
-<profiles>
-    <profile>
-      <id>jdk-1.5</id>
-      <activation>
-           <jdk>1.5</jdk>
-      </activation>
-       <dependencies>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>spring-osgi-annotation</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
-      </dependencies>
-   </profile>
-</profiles>
 
 </project>
