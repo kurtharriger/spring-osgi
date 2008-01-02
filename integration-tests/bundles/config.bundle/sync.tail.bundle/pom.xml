@@ -12,7 +12,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.sync-tail-bundle</artifactId>
     <packaging>jar</packaging>
-    <name>Sync-Tail-Bundle</name>
+    <name>Spring OSGi Test Bundle: Sync-Tail-Bundle</name>
     <description>Utililty test bundle for synch testing</description>
     <url>http://www.springframework.org/osgi</url>
 </project>

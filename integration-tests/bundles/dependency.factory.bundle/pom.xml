@@ -11,7 +11,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.dependendencies.factory</artifactId>
     <packaging>jar</packaging>
-    <name>Simple service created by a factory which has a non trivial delay in createObject()</name>
+    <name>Spring OSGi Test Bundle: Simple service created by a factory which has a non trivial delay in createObject()</name>
     <description>Simple service created by a factory which has a non trivial delay in createObject()</description>
     <url>http://www.springframework.org/osgi</url> 
 

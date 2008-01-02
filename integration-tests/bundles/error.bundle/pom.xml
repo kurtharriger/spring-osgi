@@ -11,7 +11,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.error</artifactId>
     <packaging>jar</packaging>
-    <name>Error bundle</name>
+    <name>Spring OSGi Test Bundle: Error bundle</name>
     <description>An OSGi bundle with an error in imports which will force an error</description>
     <url>http://www.springframework.org/osgi</url>
 

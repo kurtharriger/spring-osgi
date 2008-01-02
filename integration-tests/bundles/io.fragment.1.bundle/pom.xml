@@ -11,7 +11,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.io.fragment.1.bundle</artifactId>
 	<packaging>jar</packaging>
-    <name>IO fragment 1 bundle</name>
+    <name>Spring OSGi Test Bundle: IO fragment 1 bundle</name>
     <description>An OSGi bundle that provides a simple service</description>
     <url>http://www.springframework.org/osgi</url>
 </project>

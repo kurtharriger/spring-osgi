@@ -11,7 +11,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.scoped.bundle.b</artifactId>
 	<packaging>jar</packaging>
-    <name>Bundle scoping test bundle - B</name>
+    <name>Spring OSGi Test Bundle: Bundle scoping test bundle - B</name>
     <description>An OSGi bundle which tests 'bundle' scoped beans</description>
     <url>http://www.springframework.org/osgi</url>
 

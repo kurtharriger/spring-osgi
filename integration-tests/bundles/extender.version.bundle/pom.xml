@@ -11,7 +11,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.extender-version-bundle</artifactId>
     <packaging>jar</packaging>
-    <name>ExtenderVersion-Test-Bundle</name>
+    <name>Spring OSGi Test Bundle: ExtenderVersion-Test-Bundle</name>
     <description>Testing bundle for checking the SpringExtender-Version manifest entry</description>
     <url>http://www.springframework.org/osgi</url>
 </project>

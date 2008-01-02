@@ -11,7 +11,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.deadlock</artifactId>
     <packaging>jar</packaging>
-    <name>Deadlock bundle</name>
+    <name>Spring OSGi Test Bundle: Deadlock bundle</name>
     <description>A test bundle which will force a deadlock in context creation</description>
     <url>http://www.springframework.org/osgi</url>
 </project>

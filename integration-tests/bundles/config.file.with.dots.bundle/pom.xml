@@ -11,7 +11,7 @@
     <groupId>org.springframework.osgi</groupId>
     <artifactId>org.springframework.osgi.iandt.config-with-dots.bundle</artifactId>
     <packaging>jar</packaging>
-    <name>Config File With Dots bundle</name>
+    <name>Spring OSGi Test Bundle: Config File With Dots bundle</name>
     <description>Simple bundle that uses a configuration file containing dots</description>
     <url>http://www.springframework.org/osgi</url>
 </project>

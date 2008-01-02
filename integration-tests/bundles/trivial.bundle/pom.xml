@@ -8,7 +8,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>org.springframework.osgi.iandt.trivial</artifactId>
   <packaging>jar</packaging>
-  <name>Trivial OSGi bundle</name>
+  <name>Spring OSGi Test Bundle: Trivial OSGi bundle</name>
   <description>An OSGi bundle that contains and exports just one class
   </description>
   <url>http://www.springframework.org/osgi</url>

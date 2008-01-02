@@ -9,7 +9,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-integration-tests-module</artifactId>
   <packaging>pom</packaging>
-  <name>Spring OSGi integration tests module</name>
+  <name>Spring OSGi Integration Tests Module</name>
   <url>http://www.springframework.org/osgi</url>
   
   <modules>

@@ -9,7 +9,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>org.springframework.osgi.iandt.config.bundle</artifactId>
   <packaging>pom</packaging>
-  <name>Integration testing bundles for configuration options</name>
+  <name>Spring OSGi Test Bundle: Integration testing bundles for configuration options</name>
   <url>http://www.springframework.org/osgi</url>
   
   <properties>
