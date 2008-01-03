@@ -46,6 +46,13 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
       <version>${spring.maven.artifact.version}</version>
+      <exclusions>
+      	<!-- exclude spring-test junit (3.8.1) -->
+      	<exclusion>
+      		<groupId>junit</groupId>
+      		<artifactId>junit</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
