@@ -252,15 +252,13 @@ limitations under the License.
   </dependencies>
   
  <build>
- <!--
-        <extensions>
-            <extension>
-                <groupId>org.springframework.aws</groupId>
-                <artifactId>spring-aws-maven</artifactId>
-                <version>1.1.1</version>
-            </extension>
-        </extensions>
--->
+   <extensions>
+      <extension>
+         <groupId>org.springframework.aws</groupId>
+         <artifactId>spring-aws-maven</artifactId>
+         <version>1.2</version>
+       </extension>
+    </extensions>
     <resources>
       <resource>
         <!-- Bug MRESOURCES-35 means we can't use absolute paths -->
@@ -599,14 +597,13 @@ limitations under the License.
    </reporting>
 
   <distributionManagement>
-    <downloadUrl>http://www.springframework.org/osgi/releases.html</downloadUrl>
+    <downloadUrl>http://www.springframework.org/osgi/</downloadUrl>
     <repository>
-      <id>local</id>
-      <url>
-        file://e:/tmp/osgi-repo
-      </url>
-    </repository>
-
+      <id>spring-milestone</id>
+      <name>Spring Milestone Repository</name>
+      <url>s3://maven.springframework.org/milestone</url>
+    </repository>    
+    
     <snapshotRepository>
       <id>spring-snapshot</id>
       <name>Spring Snapshot Repository</name>
