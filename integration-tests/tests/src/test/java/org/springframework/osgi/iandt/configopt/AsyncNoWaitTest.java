@@ -58,6 +58,6 @@ public class AsyncNoWaitTest extends BehaviorBaseTest {
 		assertTrue("bundle " + bundle + "hasn't been fully started", OsgiBundleUtils.isBundleActive(bundle));
 
 		// check that the appCtx is *not* published
-		assertContextServiceIs(bundle, false);
+		assertContextServiceIs(bundle, false, 1000);
 	}
 }

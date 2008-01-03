@@ -38,9 +38,9 @@ public class SyncWaitWithoutDependencyTest extends BehaviorBaseTest {
 
 		// start bundle first (no dependency)
 		Bundle bundle = installBundle(bundleId);
-		
+
 		bundle.start();
-		
+
 		assertTrue("bundle " + bundle + "should have started", OsgiBundleUtils.isBundleActive(bundle));
 		// start bundle dependency
 		Bundle tailBundle = installBundle(tailBundleId);
@@ -49,15 +49,15 @@ public class SyncWaitWithoutDependencyTest extends BehaviorBaseTest {
 		assertTrue("bundle " + tailBundle + "hasn't been fully started", OsgiBundleUtils.isBundleActive(tailBundle));
 
 		// check appCtx hasn't been published
-		assertContextServiceIs(bundle, false);
+		assertContextServiceIs(bundle, false, 500);
 		// check the dependency ctx
-		assertContextServiceIs(tailBundle, true);
+		assertContextServiceIs(tailBundle, true, 500);
 
 		// restart the bundle (to catch the tail)
 		bundle.stop();
 		bundle.start();
 
 		// check appCtx has been published
-		assertContextServiceIs(bundle, true);
+		assertContextServiceIs(bundle, true, 500);
 	}
 }

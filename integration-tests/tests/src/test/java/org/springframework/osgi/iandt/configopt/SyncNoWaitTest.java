@@ -53,15 +53,14 @@ public class SyncNoWaitTest extends BehaviorBaseTest {
 		assertTrue("bundle " + tail + "hasn't been fully started", OsgiBundleUtils.isBundleActive(tail));
 
 		// wait for the listener to get the bundles and wait for timeout
-		Thread.sleep(500);
 
 		// make sure the appCtx is not up
 		// check that the appCtx is *not* published (it waits for the service to
 		// appear)
-		assertContextServiceIs(bundle, false);
+		assertContextServiceIs(bundle, false, 3000);
 
 		// wait for appCtx to timeout
-		Thread.sleep(3000);
+		//Thread.sleep(3000);
 
 		// check that the dependency service is actually started as the
 		// dependency

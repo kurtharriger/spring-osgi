@@ -52,13 +52,13 @@ public class SyncWaitTest extends BehaviorBaseTest {
 		assertTrue("bundle " + bundle + "hasn't been fully started", OsgiBundleUtils.isBundleActive(bundle));
 
 		// wait for the listener to get the bundles
-		Thread.sleep(1500);
+
+		assertContextServiceIs(bundle, true, 2000);
 
 		// check that the dependency service is actually started as the
 		// dependency bundle has started
 		assertNotNull(bundleContext.getServiceReference(Shape.class.getName()));
 
-		assertContextServiceIs(bundle, true);
 	}
 
 }

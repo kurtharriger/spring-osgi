@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry combineaccessrules="false" kind="src" path="/Cardinality 0..1 Integration Tests"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/osgi_reference Integration Tests"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Bundle Scoped Common Integration Test"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Bundle Scoped A Integration Test"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Bundle Scoped B Integration Test"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/TCCL Integration Tests"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Configuration Test Bundle"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5-rc1/spring-context-2.5-rc1.jar"/>
@@ -25,7 +18,7 @@
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.0-rc2-SNAPSHOT/spring-osgi-core-1.0-rc2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/1.0-rc2-SNAPSHOT/spring-osgi-test-1.0-rc2-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/1.0-rc2-SNAPSHOT/spring-osgi-test-1.0-rc2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/test-support/src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/1.0-rc2-SNAPSHOT/spring-osgi-io-1.0-rc2-SNAPSHOT.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/asm.osgi/2.2.3-SNAPSHOT/asm.osgi-2.2.3-SNAPSHOT.jar"/>
@@ -33,5 +26,12 @@
 	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.0.2/framework-2.0.2.jar" sourcepath="/KF_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.0/org.osgi.core-4.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Bundle-Scope A Bundle"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Bundle-Scope B Bundle"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Bundle-Scope Common Bundle"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Cardinality 0..1 Bundle"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/TCCL Bundle"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Service Reference Bundle"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ManagedFactory Configuration Bundle"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>
