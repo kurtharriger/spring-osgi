@@ -82,7 +82,7 @@
 
   <ciManagement>
     <system>bamboo</system>
-    <url>http://build.springframework.org:8085/bamboo/browse/OSGI-TRUNK</url>
+    <url>http://build.springframework.org/bamboo/browse/OSGI-TRUNK</url>
     <notifiers>
       <notifier>
         <type>mail</type>
@@ -107,7 +107,7 @@
       scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
     </developerConnection>
     <url>
-      http://springframework.svn.sourceforge.net/viewcvs.cgi/springframework/spring-osgi/trunk
+      http://fisheye3.cenqua.com/browse/springframework/spring-osgi
     </url>
   </scm>
 
@@ -599,7 +599,7 @@ limitations under the License.
    </reporting>
 
   <distributionManagement>
-
+    <downloadUrl>http://www.springframework.org/osgi/releases.html</downloadUrl>
     <repository>
       <id>local</id>
       <url>
@@ -607,21 +607,11 @@ limitations under the License.
       </url>
     </repository>
 
-    <!--  
-    <repository>
-      <id>static.springframework.org</id>
-      <url>
-        scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/maven2-snapshots/
-      </url>
-    </repository>
-    -->
-	<!--
-        <snapshotRepository>
-            <id>spring-snapshot</id>
-            <name>Spring Snapshot Repository</name>
-            <url>s3://maven.springframework.org/snapshot</url>
-        </snapshotRepository>
-        -->
+    <snapshotRepository>
+      <id>spring-snapshot</id>
+      <name>Spring Snapshot Repository</name>
+      <url>s3://maven.springframework.org/snapshot</url>
+    </snapshotRepository>
     <site>
       <id>static.springframework.org</id>
       <name>SpringFramework.org</name>
