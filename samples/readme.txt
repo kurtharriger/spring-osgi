@@ -18,9 +18,13 @@ Each module should be run from its top folder using maven:
 
 # mvn clean install
 
+
+Alternatively, one can run only the samples and compile the project by
+using the existing Maven profiles. See the Spring-DM root folder readme.txt.
+
 Notice that all modules part of the demo must be installed locally as
 the integration tests rely on the local maven repository (at the moment)
-for installing the demo dependencies.
+for installing the demo dependencies, at least for SNAPSHOT repositories.
 This requirement might be discarded in the future.
 
 The demos themselves can be deployed individually to an OSGi platform
