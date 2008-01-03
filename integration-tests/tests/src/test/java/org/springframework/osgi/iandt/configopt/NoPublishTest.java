@@ -40,7 +40,7 @@ public class NoPublishTest extends BehaviorBaseTest {
 		assertTrue("bundle " + bundle + "hasn't been fully started", OsgiBundleUtils.isBundleActive(bundle));
 
 		// check that the appCtx is not publish
-		assertContextServiceIs(bundle, false);
+		assertContextServiceIs(bundle, false, 1000);
 
 		// but the point service is
 		assertNotNull("point service should have been published"

@@ -16,11 +16,8 @@
 package org.springframework.osgi.iandt.configopt;
 
 import org.osgi.framework.Bundle;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 
@@ -37,24 +34,19 @@ public abstract class BehaviorBaseTest extends AbstractConfigurableBundleCreator
 	 * 
 	 * @param alive
 	 */
-	protected void assertContextServiceIs(Bundle bundle, boolean alive) {
+	protected void assertContextServiceIs(Bundle bundle, boolean alive, long maxWait) {
 		Assert.notNull(bundle);
 
-		// generate filter
-		String query = "(" + ConfigurableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "="
-				+ bundle.getSymbolicName() + ")";
-
-		// do query
-		Object refs = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
-			ApplicationContext.class.getName(), query);
-		// make sure the appCtx is up
-		if (alive)
-			assertNotNull("appCtx should have been published for bundle "
-					+ OsgiStringUtils.nullSafeNameAndSymName(bundle), refs);
-		else
-			assertNull("appCtx should not have been published for bundle "
-					+ OsgiStringUtils.nullSafeNameAndSymName(bundle), refs);
-
+		try {
+			waitOnContextCreation(bundle.getSymbolicName(), maxWait / 1000 + 1);
+			if (!alive)
+				fail("appCtx should have NOT been published for bundle "
+						+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
+		}
+		catch (RuntimeException timeout) {
+			if (alive)
+				fail("appCtx should have been published for bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
+		}
 	}
 
 	protected Bundle installBundle(String bundleId) throws Exception {

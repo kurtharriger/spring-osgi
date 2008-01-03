@@ -39,7 +39,7 @@
     <spring.osgi.import>${spring.osgi.import.pkg}</spring.osgi.import>
 
 
-    <symName.prefix>org.springframework.osgi.bundle</symName.prefix>
+    <symName.prefix>org.springframework.bundle.osgi</symName.prefix>
     <spring.osgi.symbolic.name>${groupId}.${artifactId}</spring.osgi.symbolic.name>
 
     <!-- add license.txt to the resulting bundle -->
@@ -242,6 +242,7 @@ limitations under the License.
       <version>${slf4j.version}</version>
       <scope>provided</scope>
     </dependency>
+    
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>log4j.osgi</artifactId>

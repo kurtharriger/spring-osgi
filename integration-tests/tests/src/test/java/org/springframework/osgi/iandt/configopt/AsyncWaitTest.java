@@ -50,22 +50,17 @@ public class AsyncWaitTest extends BehaviorBaseTest {
 
 		assertTrue("bundle " + bundle + "hasn't been fully started", OsgiBundleUtils.isBundleActive(bundle));
 
-		// wait for the listener to get the bundle and start it
-		Thread.sleep(500);
-
 		// make sure the appCtx is not up
 		// check that the appCtx is *not* published (it waits for the service to
 		// appear)
-		assertContextServiceIs(bundle, false);
+		assertContextServiceIs(bundle, false, 500);
 
 		// put service up
 		registration = bundleContext.registerService(Shape.class.getName(), new Area(), null);
 
 		// do wait a bit to let the appCtx to fully start
-		Thread.sleep(2000);
-
 		// check the appCtx again (should be published)
-		assertContextServiceIs(bundle, true);
+		assertContextServiceIs(bundle, true, 4000);
 
 	}
 }
