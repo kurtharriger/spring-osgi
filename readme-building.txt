@@ -35,13 +35,13 @@ By default the project builds only the distributable modules without running any
 integration tests. To run them, one should select the 'it' profile.
 Note that 1a) applies, so an OSGi platform still has to be specified:
 
-# mvn -Pequinox,it clean install
+# mvn -P equinox,it clean install
 
 1c. Running the samples
 
 To compile and install the samples, use the 'samples' profile:
 
-# mvn -Pequinox,samples clean install
+# mvn -P equinox,samples clean install
 
 1d. Using JDK 1.5 +
 

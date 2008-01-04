@@ -67,6 +67,9 @@
    
    <!-- javadoc configuration -->
    <javadoc.loc>${basedir}/docs/src/javadoc</javadoc.loc>
+   
+   <!-- JDK classifier property -->
+   <jdk-classifier>jdk14</jdk-classifier>
   </properties>
 
   <!-- ============================================= -->
@@ -211,9 +214,9 @@ limitations under the License.
   <dependencies>
     <!-- junit -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.2</version>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>junit.osgi</artifactId>
+      <version>3.8.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 	<dependency>
@@ -241,6 +244,12 @@ limitations under the License.
       <artifactId>slf4j-log4j12</artifactId>
       <version>${slf4j.version}</version>
       <scope>provided</scope>
+	  <exclusions>
+		<exclusion>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</exclusion>
+	  </exclusions>      
     </dependency>
     
     <dependency>
@@ -429,6 +438,10 @@ limitations under the License.
         <modules>
           <module>annotation</module>
         </modules>
+        <properties>
+          <!-- use default mtc version for core -->
+          <jdk-classifier></jdk-classifier>
+        </properties>
     </profile>
   
           
@@ -678,7 +691,7 @@ limitations under the License.
       <id>spring-ext</id>
       <name>Spring External Dependencies Repository</name>
       <url>
-        https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+        http://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
       </url>
     </repository>
 	<repository>
