@@ -154,6 +154,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	/** exporter bean name */
 	private String beanName;
 
+
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
 		Assert.notNull(bundleContext, "required property 'bundleContext' has not been set");

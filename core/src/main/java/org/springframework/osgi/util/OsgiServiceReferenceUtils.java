@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.util;
 
 import java.util.Collections;
@@ -49,6 +50,7 @@ public abstract class OsgiServiceReferenceUtils {
 
 	private static Log log = LogFactory.getLog(OsgiServiceReferenceUtils.class);
 
+
 	public static ServiceReference getServiceReference(BundleContext bundleContext, String[] classes) {
 		return getServiceReference(bundleContext, classes, null);
 	}
@@ -56,7 +58,7 @@ public abstract class OsgiServiceReferenceUtils {
 	public static ServiceReference getServiceReference(BundleContext bundleContext, String clazz, String filter) {
 		ServiceReference[] refs = getServiceReferences(bundleContext, clazz, filter);
 
-		// pick one service
+		// pick the first service
 		ServiceReference winningReference = (refs.length > 0 ? refs[0] : null);
 
 		if (winningReference == null)
@@ -65,6 +67,7 @@ public abstract class OsgiServiceReferenceUtils {
 		long winningId = getServiceId(winningReference);
 		int winningRanking = getServiceRanking(winningReference);
 
+		// start iterating in order to find the best match
 		for (int i = 1; i < refs.length; i++) {
 			ServiceReference reference = refs[i];
 			int serviceRanking = getServiceRanking(reference);
@@ -74,11 +77,6 @@ public abstract class OsgiServiceReferenceUtils {
 				winningReference = reference;
 				winningId = serviceId;
 				winningRanking = serviceRanking;
-			}
-			// Multiple identical matches is probably not what the user
-			// intended.
-			if (serviceRanking == winningRanking) {
-				log.warn("Mutiple identical matches for single service filtered on [" + filter + "]");
 			}
 		}
 

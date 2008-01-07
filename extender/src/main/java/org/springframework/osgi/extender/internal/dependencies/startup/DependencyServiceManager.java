@@ -1,3 +1,4 @@
+
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
 import java.util.Collections;
@@ -48,6 +49,7 @@ public class DependencyServiceManager {
 	 */
 	private final Runnable executeIfDone;
 
+
 	/**
 	 * Actual ServiceListener.
 	 * 
@@ -55,6 +57,7 @@ public class DependencyServiceManager {
 	 * @author Hal Hildebrand
 	 */
 	private class DependencyServiceListener implements ServiceListener {
+
 		/**
 		 * Process serviceChanged events, completing context initialization if
 		 * all the required dependencies are satisfied.
@@ -123,25 +126,25 @@ public class DependencyServiceManager {
 				if (dependency.matches(serviceEvent)) {
 					switch (serviceEvent.getType()) {
 
-					case ServiceEvent.REGISTERED:
-					case ServiceEvent.MODIFIED:
-						unsatisfiedDependencies.remove(dependency);
-						if (debug) {
-							log.debug("found service; eliminating " + dependency);
-						}
-						break;
+						case ServiceEvent.REGISTERED:
+						case ServiceEvent.MODIFIED:
+							unsatisfiedDependencies.remove(dependency);
+							if (debug) {
+								log.debug("found service; eliminating " + dependency);
+							}
+							break;
 
-					case ServiceEvent.UNREGISTERING:
-						unsatisfiedDependencies.add(dependency);
-						if (debug) {
-							log.debug("service unregistered; adding " + dependency);
-						}
-						break;
-					default: // do nothing
-						if (debug) {
-							log.debug("Unknown service event type for: " + dependency);
-						}
-						break;
+						case ServiceEvent.UNREGISTERING:
+							unsatisfiedDependencies.add(dependency);
+							if (debug) {
+								log.debug("service unregistered; adding " + dependency);
+							}
+							break;
+						default: // do nothing
+							if (debug) {
+								log.debug("Unknown service event type for: " + dependency);
+							}
+							break;
 					}
 				}
 				else {
@@ -153,6 +156,7 @@ public class DependencyServiceManager {
 			}
 		}
 	}
+
 
 	/**
 	 * Create a dependency manager, indicating the executor bound to, the
@@ -190,7 +194,7 @@ public class DependencyServiceManager {
 
 				AbstractOsgiServiceImportFactoryBean reference = (AbstractOsgiServiceImportFactoryBean) beanFactory.getBean(beanName);
 				ServiceDependency dependency = new ServiceDependency(bundleContext, reference.getUnifiedFilter(),
-						reference.isMandatory());
+					reference.isMandatory());
 
 				String realBean = beanName.substring(1);
 
@@ -263,7 +267,7 @@ public class DependencyServiceManager {
 			log.debug("deregistering service dependency dependencyDetector for " + context.getDisplayName());
 		}
 
-		OsgiListenerUtils.removeServiceListener(bundleContext, listener, (String)null);
+		OsgiListenerUtils.removeServiceListener(bundleContext, listener);
 	}
 
 }

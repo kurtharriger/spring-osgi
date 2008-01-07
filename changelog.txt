@@ -2,7 +2,7 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.0 RC2 (2007-12-xx)
+Changes in version 1.0 RC2 (2008-01-xx)
 ---------------------------------------
 
 General
@@ -22,9 +22,15 @@ Package org.springframework.osgi
 Package org.springframework.osgi.bundle
 * Removed deprecated method BundleFactoryBean#setClassloader
 
+Package org.springframework.osgi.context
+* AbstractDelegatedExecutionApplicationContext throws clearer exception when the mandatory BundleContext 
+  is not set
+
 Package org.springframework.osgi.service
 * Fixed double negation in AutoExport.DISABLED javadoc
 * Removed deprecated method AbstractOsgiServiceImportFactoryBean#setInterface 
+* Service reference importers receive only one event (that of the best matching service) when registered/
+  unregistered into the OSGi space rather then events of all existing services
 
 
 Package org.springframework.osgi.test
@@ -32,3 +38,6 @@ Package org.springframework.osgi.test
 * Fixed mispelled KNOPFLERFISH constant in Platform class
 * Default settings and properties in AbstractConfigurableBundleCreatorTests are now protected
 * AbstractOsgiTests does not implement any more, internal interface OsgiJUnitTest.
+
+Package org.springframework.osgi.util
+* discuss remove/add methods

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.aop;
 
 import java.util.Arrays;
@@ -44,13 +45,10 @@ import org.springframework.util.ObjectUtils;
  * Interceptor adding dynamic behaviour for unary service (..1 cardinality). It
  * will look for a service using the given filter, retrying if the service is
  * down or unavailable. Will dynamically rebound a new service, if one is
- * available with a higher service ranking.
- * <p/>
- * <p/> In case no service is available, it will throw an exception.
- * <p/>
- * <strong>Note</strong>: this is a stateful interceptor and should not be
- * shared.
- *
+ * available with a higher service ranking. <p/> <p/> In case no service is
+ * available, it will throw an exception. <p/> <strong>Note</strong>: this is a
+ * stateful interceptor and should not be shared.
+ * 
  * @author Costin Leau
  */
 public class ServiceDynamicInterceptor extends ServiceInvoker implements InitializingBean, DisposableBean {
@@ -105,10 +103,14 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 					case (ServiceEvent.UNREGISTERING): {
 
 						boolean serviceRemoved = false;
-						/** used if the service goes down and there is no replacement */
+						/**
+						 * used if the service goes down and there is no
+						 * replacement
+						 */
 						/**
 						 * since the listeners will require a valid proxy, the
-						 * invalidation has to happen *after* calling the listeners
+						 * invalidation has to happen *after* calling the
+						 * listeners
 						 */
 						ServiceWrapper oldWrapper = wrapper;
 
@@ -123,52 +125,56 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 							}
 						}
 
-						// discover the new reference
-						ServiceReference newReference = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
-							(filter == null ? null : filter.toString()));
+						ServiceReference newReference = null;
 
-						// we have a rebind (a new service was bound)
-						// REVIEW andyp -- this seems kind of bogus to me, we should just respect the
-						// events the framework feeds us. Also surely we are simply interested in the
-						// lifecycle of the service we actually bound to, not others that might exist.
-						if (newReference != null && !destroyed) {
-							// update the listeners
-							serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, newReference));
-						}
-						// if there is no reference left, call listeners
-						else {
-							if (serviceRemoved) {
+						// discover a new reference only if we are still running
+						if (!destroyed) {
+							newReference = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
+								(filter == null ? null : filter.toString()));
 
-								// reuse the old service for the time being
-								wrapper = oldWrapper;
-
-								// update dependency manager
-								if (mandatoryListeners != null) {
-									for (int i = 0; i < mandatoryListeners.size(); i++) {
-										if (debug)
-											log.debug("calling unsatisfied on dependency mandatoryListeners");
-										((MandatoryDependencyListener) mandatoryListeners.get(i)).mandatoryDependencyUnsatisfied(new MandatoryDependencyEvent(
-											serviceImporter));
-									}
-								}
-								// inform listeners
-								OsgiServiceBindingUtils.callListenersUnbind(bundleContext, proxy, ref, listeners);
-
-								// clean up wrapper
-								wrapper = null;
-
-								if (debug) {
-									String message = "service reference [" + ref + "] was unregistered";
-									if (serviceRemoved) {
-										message += " and was unbound from the service proxy";
-									}
-									else {
-										message += " but did not affect the service proxy";
-									}
-									log.debug(message);
-								}
-
+							// we have a rebind (a new service was bound)
+							// REVIEW andyp -- this seems kind of bogus to me, we should just respect the
+							// events the framework feeds us. Also surely we are simply interested in the
+							// lifecycle of the service we actually bound to, not others that might exist.
+							if (newReference != null) {
+								// update the listeners
+								serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, newReference));
 							}
+						}
+
+						// if no new reference was found and the service was indeed removed (it was bound to the interceptor)
+						// then do an unbind
+						if (newReference == null && serviceRemoved) {
+
+							// reuse the old service for the time being
+							wrapper = oldWrapper;
+
+							// update dependency manager
+							if (mandatoryListeners != null) {
+								for (int i = 0; i < mandatoryListeners.size(); i++) {
+									if (debug)
+										log.debug("calling unsatisfied on dependency mandatoryListeners");
+									((MandatoryDependencyListener) mandatoryListeners.get(i)).mandatoryDependencyUnsatisfied(new MandatoryDependencyEvent(
+										serviceImporter));
+								}
+							}
+							// inform listeners
+							OsgiServiceBindingUtils.callListenersUnbind(bundleContext, proxy, ref, listeners);
+
+							// clean up wrapper
+							wrapper = null;
+
+							if (debug) {
+								String message = "service reference [" + ref + "] was unregistered";
+								if (serviceRemoved) {
+									message += " and was unbound from the service proxy";
+								}
+								else {
+									message += " but did not affect the service proxy";
+								}
+								log.debug(message);
+							}
+
 						}
 
 						break;
@@ -230,7 +236,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 		/**
 		 * Update internal holders for the backing ServiceReference.
-		 *
+		 * 
 		 * @param ref
 		 */
 		private void updateReferenceHolders(ServiceReference ref) {
@@ -238,6 +244,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			referenceDelegate.swapDelegates(ref);
 		}
 	}
+
 
 	private static final int hashCode = ServiceDynamicInterceptor.class.hashCode() * 13;
 
@@ -288,6 +295,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 */
 	private Object proxy;
 
+
 	public ServiceDynamicInterceptor(BundleContext context, Filter filter, ClassLoader classLoader) {
 		this.bundleContext = context;
 		this.filter = filter;
@@ -313,6 +321,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 */
 	private Object lookupService() {
 		return (Object) retryTemplate.execute(new DefaultRetryCallback() {
+
 			public Object doWithRetry() {
 				return (wrapper != null) ? wrapper.getService() : null;
 			}
@@ -328,7 +337,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 		if (debug)
 			log.debug("adding osgi mandatoryListeners for services matching [" + filter + "]");
-		OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
+		OsgiListenerUtils.addSingleServiceListener(bundleContext, listener, filter);
 		if (serviceRequiredAtStartup) {
 			if (debug)
 				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
@@ -340,10 +349,15 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	public void destroy() throws Exception {
 		destroyed = true;
-		OsgiListenerUtils.removeServiceListener(bundleContext, listener, filter);
+		OsgiListenerUtils.removeServiceListener(bundleContext, listener);
 		synchronized (this) {
-			if (wrapper != null)
-				wrapper.cleanup();
+			if (wrapper != null) {
+				ServiceReference ref = wrapper.getReference();
+				if (ref != null) {
+					// send unregistration event to the listener
+					listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
+				}
+			}
 		}
 	}
 
@@ -389,10 +403,10 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		if (other instanceof ServiceDynamicInterceptor) {
 			ServiceDynamicInterceptor oth = (ServiceDynamicInterceptor) other;
 			return (serviceRequiredAtStartup == oth.serviceRequiredAtStartup
-				&& ObjectUtils.nullSafeEquals(wrapper, oth.wrapper)
-				&& ObjectUtils.nullSafeEquals(filter, oth.filter)
-				&& ObjectUtils.nullSafeEquals(retryTemplate, oth.retryTemplate)
-				&& ObjectUtils.nullSafeEquals(serviceImporter, oth.serviceImporter) && Arrays.equals(listeners,
+					&& ObjectUtils.nullSafeEquals(wrapper, oth.wrapper)
+					&& ObjectUtils.nullSafeEquals(filter, oth.filter)
+					&& ObjectUtils.nullSafeEquals(retryTemplate, oth.retryTemplate)
+					&& ObjectUtils.nullSafeEquals(serviceImporter, oth.serviceImporter) && Arrays.equals(listeners,
 				oth.listeners));
 		}
 		else

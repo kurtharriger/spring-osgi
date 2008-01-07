@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.collection;
 
 import java.util.Collection;
@@ -31,6 +32,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.internal.util.OsgiServiceBindingUtils;
@@ -70,46 +72,46 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				Object proxy = null;
 				switch (event.getType()) {
 
-				case (ServiceEvent.REGISTERED):
-				case (ServiceEvent.MODIFIED):
-					// same as ServiceEvent.REGISTERED
-					synchronized (serviceProxies) {
-						if (!servicesIdMap.containsKey(serviceId)) {
-							 proxy = proxyCreator.createServiceProxy(ref);
-							// let the dynamic collection decide if the service
-							// is added or not (think set, sorted set)
-							if (serviceProxies.add(proxy)) {
-								collectionModified = true;
-								servicesIdMap.put(serviceId, proxy);
+					case (ServiceEvent.REGISTERED):
+					case (ServiceEvent.MODIFIED):
+						// same as ServiceEvent.REGISTERED
+						synchronized (serviceProxies) {
+							if (!servicesIdMap.containsKey(serviceId)) {
+								proxy = proxyCreator.createServiceProxy(ref);
+								// let the dynamic collection decide if the service
+								// is added or not (think set, sorted set)
+								if (serviceProxies.add(proxy)) {
+									collectionModified = true;
+									servicesIdMap.put(serviceId, proxy);
+								}
 							}
 						}
-					}
-					// inform listeners
-					// TODO: should this be part of the lock also?
-					if (collectionModified)
-						OsgiServiceBindingUtils.callListenersBind(context, proxy, ref, listeners);
+						// inform listeners
+						// TODO: should this be part of the lock also?
+						if (collectionModified)
+							OsgiServiceBindingUtils.callListenersBind(context, proxy, ref, listeners);
 
-					break;
-				case (ServiceEvent.UNREGISTERING):
-					synchronized (serviceProxies) {
-						// remove service id / proxy association
-						proxy = servicesIdMap.remove(serviceId);
-						if (proxy != null) {
-							// before removal, allow analysis
-							checkDeadProxies(proxy);
-							// remove service proxy
-							collectionModified = serviceProxies.remove(proxy);
-							// invalidate it
-							invalidateProxy(proxy);
+						break;
+					case (ServiceEvent.UNREGISTERING):
+						synchronized (serviceProxies) {
+							// remove service id / proxy association
+							proxy = servicesIdMap.remove(serviceId);
+							if (proxy != null) {
+								// before removal, allow analysis
+								checkDeadProxies(proxy);
+								// remove service proxy
+								collectionModified = serviceProxies.remove(proxy);
+								// invalidate it
+								invalidateProxy(proxy);
+							}
 						}
-					}
-					// TODO: should this be part of the lock also?
-					if (collectionModified)
-						OsgiServiceBindingUtils.callListenersUnbind(context, proxy, ref, listeners);
-					break;
+						// TODO: should this be part of the lock also?
+						if (collectionModified)
+							OsgiServiceBindingUtils.callListenersUnbind(context, proxy, ref, listeners);
+						break;
 
-				default:
-					throw new IllegalArgumentException("unsupported event type:" + event);
+					default:
+						throw new IllegalArgumentException("unsupported event type:" + event);
 				}
 			}
 			// OSGi swallows these exceptions so make sure we get a chance to
@@ -132,8 +134,10 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	 * 
 	 */
 	protected class OsgiServiceIterator implements Iterator {
+
 		// dynamic thread-safe iterator
 		private final Iterator iter = serviceProxies.iterator();
+
 
 		public boolean hasNext() {
 			mandatoryServiceCheck();
@@ -153,6 +157,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 			throw new UnsupportedOperationException();
 		}
 	}
+
 
 	private static final Log log = LogFactory.getLog(OsgiServiceCollection.class);
 
@@ -191,8 +196,9 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	private final ServiceProxyCreator proxyCreator;
 
 	private OsgiServiceLifecycleListener[] listeners = new OsgiServiceLifecycleListener[0];
-	
+
 	private final ServiceListener listener;
+
 
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader,
 			ServiceProxyCreator proxyCreator) {
@@ -225,8 +231,15 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	}
 
 	public void destroy() {
-		OsgiListenerUtils.removeServiceListener(context, listener, filter);
-		serviceProxies.clear();
+		OsgiListenerUtils.removeServiceListener(context, listener);
+
+		synchronized (serviceProxies) {
+			for (Iterator iterator = serviceProxies.iterator(); iterator.hasNext();) {
+				ImportedOsgiServiceProxy serviceProxy = (ImportedOsgiServiceProxy) iterator.next();
+				listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, serviceProxy.getServiceReference()));
+			}
+			serviceProxies.clear();
+		}
 		servicesIdMap.clear();
 	}
 
@@ -271,6 +284,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	/**
 	 * Private method, computing the index and share it with subclasses.
+	 * 
 	 * @param proxy
 	 */
 	private void checkDeadProxies(Object proxy) {

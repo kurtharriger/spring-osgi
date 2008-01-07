@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.context.support;
 
 import org.springframework.beans.BeansException;
@@ -57,6 +58,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 		private final DelegatedExecutionOsgiBundleApplicationContext context;
 
+
 		private NoDependenciesWaitRefreshExecutor(DelegatedExecutionOsgiBundleApplicationContext ctx) {
 			context = ctx;
 		}
@@ -70,6 +72,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		}
 	}
 
+
 	/** Default executor */
 	private OsgiBundleApplicationContextExecutor executor = new NoDependenciesWaitRefreshExecutor(this);
 
@@ -80,6 +83,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	private final Object availableMonitor = new Object();
 
 	private boolean available = false;
+
 
 	/**
 	 * 
@@ -116,11 +120,12 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * executes the refresh method in one go (normal behavior).
 	 */
 	public void refresh() throws BeansException, IllegalStateException {
-		Assert.notNull(getBundleContext(), "bundle context should be set before refreshing the application context");
 		executor.refresh();
 	}
 
 	public void normalRefresh() {
+		Assert.notNull(getBundleContext(), "bundle context should be set before refreshing the application context");
+
 		Thread currentThread = Thread.currentThread();
 		ClassLoader oldTCCL = currentThread.getContextClassLoader();
 
@@ -138,7 +143,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		ClassLoader oldTCCL = currentThread.getContextClassLoader();
 
 		try {
-			currentThread.setContextClassLoader(getClassLoader());
+			if (getBundleContext() != null)
+				currentThread.setContextClassLoader(getClassLoader());
 			super.doClose();
 		}
 		finally {
@@ -159,7 +165,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		// check concurrent collection (which are mandatory)
 		if (!ClassUtils.concurrentLibAvailable())
 			throw new IllegalStateException(
-					"JVM 5+ or backport-concurrent library (for JVM 1.4) required; see the FAQ for more details");
+				"JVM 5+ or backport-concurrent library (for JVM 1.4) required; see the FAQ for more details");
 
 		Thread thread = Thread.currentThread();
 		ClassLoader oldTCCL = thread.getContextClassLoader();

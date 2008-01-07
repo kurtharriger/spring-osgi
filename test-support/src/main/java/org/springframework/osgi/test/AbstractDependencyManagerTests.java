@@ -251,6 +251,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	/**
 	 * @param locator The locator to set.
 	 */
+	//TODO: change to protected
 	public void injectLocator(ArtifactLocator locator) {
 		this.locator = locator;
 	}
@@ -258,6 +259,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	/**
 	 * @return Returns the locator.
 	 */
+	//TODO: change to protected
 	public ArtifactLocator getLocator() {
 		return locator;
 	}
