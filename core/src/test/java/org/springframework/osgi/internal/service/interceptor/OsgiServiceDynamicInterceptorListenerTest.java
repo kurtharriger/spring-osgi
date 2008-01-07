@@ -153,4 +153,5 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 		assertEquals(2, SimpleTargetSourceLifecycleListener.BIND);
 		assertEquals(0, SimpleTargetSourceLifecycleListener.UNBIND);
 	}
+
 }
