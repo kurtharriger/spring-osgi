@@ -227,7 +227,7 @@
 	<!-- reference collections (set, list) -->
 	<xsd:element name="list" type="TreferenceCollection">
 		<xsd:annotation>
-			<xsd:documentation source="java:org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean"><![CDATA[
+			<xsd:documentation source="java:org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean"><![CDATA[
 			  Defines a bean of type 'List' that contains all of the services matching the given criteria.
 			  The list members are managed dynamically as matching backing services come and go.
 			]]></xsd:documentation>
@@ -241,7 +241,7 @@
 
 	<xsd:element name="set" type="TreferenceCollection">
 		<xsd:annotation>
-			<xsd:documentation source="java:org.springframework.osgi.service.importer.OsgiMultiServiceProxyFactoryBean"><![CDATA[
+			<xsd:documentation source="java:org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean"><![CDATA[
 			  Defines a bean of type 'Set' that contains all of the services matching the given criteria.
 			  The set members are managed dynamically as matching backing services come and go.
 			]]></xsd:documentation>

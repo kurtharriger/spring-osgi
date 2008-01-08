@@ -73,8 +73,9 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 
 	/**
 	 * Settings for the jar creation.
+	 * Static as it has to be cached between test runs.
 	 */
-	protected static Properties jarSettings;
+	private static Properties jarSettings;
 
 
 	/**
@@ -121,21 +122,37 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 	 * Returns the settings location (by default, the test name; i.e.
 	 * foo.bar.SomeTest will try to load foo/bar/SomeTest-bundle.properties).
 	 * 
-	 * @return
+	 * @return settings location for this test
 	 */
 	protected String getSettingsLocation() {
 		return getClass().getName().replace('.', '/') + "-bundle.properties";
 	}
 
 	/**
-	 * Load the settings (if they are found). A non-null properties object will
-	 * always be returned.
+	 * Returns the default settings used when creating the jar, in case the no
+	 * customisations have been applied. Unless the base class is used as a
+	 * testing framework, consider using a properties file for specifying
+	 * specific properties for a test case.
 	 * 
-	 * @return
-	 * @throws Exception
+	 * @return default settings for creating the jar
+	 * @see #getSettingsLocation()
+	 */
+	protected Properties getDefaultSettings() {
+		return DEFAULT_SETTINGS;
+	}
+
+	/**
+	 * Return the settings used for creating this jar. This method tries to
+	 * locate and load the settings from the location indicated by
+	 * {@link #getSettingsLocation()}. If no file is found, the default
+	 * settings will be used. <p/> A non-null properties object will always be
+	 * returned.
+	 * 
+	 * @return settings for creating the on the fly jar
+	 * @throws Exception if loading the settings file fails
 	 */
 	protected Properties getSettings() throws Exception {
-		Properties settings = new Properties(DEFAULT_SETTINGS);
+		Properties settings = new Properties(getDefaultSettings());
 		// settings.setProperty(ROOT_DIR, getRootPath());
 		Resource resource = new ClassPathResource(getSettingsLocation());
 
