@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test;
 
 import java.util.Properties;
@@ -46,6 +47,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 */
 	private ArtifactLocator locator = new LocalFileSystemMavenRepository();
 
+
 	public AbstractDependencyManagerTests() {
 		super();
 	}
@@ -53,6 +55,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	public AbstractDependencyManagerTests(String name) {
 		super(name);
 	}
+
 
 	private static final String SPRING_OSGI_VERSION_PROP_KEY = "ignore.spring.osgi.version";
 
@@ -64,8 +67,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	/** uninitialised - read from the properties file */
 	private String springBundledVersion = null;
 
+
 	/**
 	 * Return the Spring-DM version used by the core bundles.
+	 * 
 	 * @return
 	 */
 	protected String getSpringDMVersion() {
@@ -249,18 +254,14 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * @param locator The locator to set.
-	 */
-	//TODO: change to protected
-	public void injectLocator(ArtifactLocator locator) {
-		this.locator = locator;
-	}
-
-	/**
+	 * Returns the ArtifactLocator used by this test suite.
+	 * Subclasses should override this method if the default
+	 * locator (searching the local Maven2 repository) is not
+	 * enough.
+	 * 
 	 * @return Returns the locator.
 	 */
-	//TODO: change to protected
-	public ArtifactLocator getLocator() {
+	protected ArtifactLocator getLocator() {
 		return locator;
 	}
 }

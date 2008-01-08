@@ -98,7 +98,6 @@ public class ContextState extends StaticLabeledEnum {
 	 * @return
 	 */
 	public boolean isUnresolved() {
-		// TODO: check whether initialized should be included
 		return (this == RESOLVING_DEPENDENCIES || this == INITIALIZED);
 	}
 

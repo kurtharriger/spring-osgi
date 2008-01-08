@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test;
 
 import java.io.InputStream;
@@ -64,7 +65,8 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 
 	static {
 		DEFAULT_SETTINGS.setProperty(ROOT_DIR, "file:./target/test-classes");
-		DEFAULT_SETTINGS.setProperty(INCLUDE_PATTERNS, StringUtils.arrayToCommaDelimitedString(JarCreator.DEFAULT_CONTENT_PATTERN));
+		DEFAULT_SETTINGS.setProperty(INCLUDE_PATTERNS,
+			StringUtils.arrayToCommaDelimitedString(JarCreator.DEFAULT_CONTENT_PATTERN));
 		DEFAULT_SETTINGS.setProperty(LIBS, "");
 		DEFAULT_SETTINGS.setProperty(MANIFEST, "");
 	}
@@ -73,6 +75,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 	 * Settings for the jar creation.
 	 */
 	protected static Properties jarSettings;
+
 
 	/**
 	 * Resources' root path (the root path does not become part of the jar).
@@ -84,10 +87,21 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 	}
 
 	/**
-	 * Patterns for identifying the resources added to the jar. The patterns are
-	 * added to the root path when performing the search.
+	 * Ant-style patterns for identifying the resources added to the jar.The
+	 * patterns are considered from the root path when performing the search.
 	 * 
-	 * @return the patterns
+	 * <p/> By default, the content pattern contains 3 patterns:
+	 * 
+	 * <ol>
+	 * <li>Classes - <code>*&#42;/*.class</code>
+	 * <li>XML files - <code>*&#42;/*.xml</code>
+	 * <li>Properties files - <code>*&#42;/*.properties</code>
+	 * </ol>
+	 * 
+	 * which means all classes, XML and properties files found in the root
+	 * folder and its sub-folders.
+	 * 
+	 * @return array of Ant-style pattern
 	 */
 	protected String[] getBundleContentPattern() {
 		return StringUtils.commaDelimitedListToStringArray(jarSettings.getProperty(INCLUDE_PATTERNS));
@@ -154,10 +168,10 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 		jarSettings = null;
 		// load settings
 		jarSettings = getSettings();
-        // Somehow the JarCreator needs to get this
-        jarCreator.setRootPath(getRootPath());
+		// Somehow the JarCreator needs to get this
+		jarCreator.setRootPath(getRootPath());
 
-        super.postProcessBundleContext(context);
+		super.postProcessBundleContext(context);
 	}
 
 }

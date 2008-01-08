@@ -94,8 +94,6 @@ public class ServiceWrapper implements Comparable {
 	}
 
 	public Object getService() {
-		// TODO: check synch and service cleanup
-		// synchronized (reference) {
 		if (isServiceAlive()) {
 			try {
 				return context.getService(reference);
@@ -104,7 +102,6 @@ public class ServiceWrapper implements Comparable {
 				// context.ungetService(reference);
 			}
 		}
-		// }
 		return null;
 	}
 

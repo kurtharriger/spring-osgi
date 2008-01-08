@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.io;
 
 import org.springframework.core.io.Resource;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Classpath tests.
@@ -40,29 +42,32 @@ public class ClassSpaceTest extends BaseIoTest {
 		assertTrue(res.length >= 1);
 	}
 
-	public void testWildcardAtFolderLevel() throws Exception {
-		try {
-			Resource res[] = patternLoader.getResources("classpath:/META-INF/*");
-			fail("should have thrown exception; pattern matching is not supported for class space lookups");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
-
-	}
-
 	public void testClass() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath:/org/springframework/osgi/iandt/io/ClassSpaceTest.class");
 		assertEquals(1, res.length);
 	}
 
-	public void testSingleClassWithWildcardAtFileLevel() throws Exception {
-		try {
-			Resource res[] = patternLoader.getResources("classpath:/**/io/**/Class*Test.class");
-			fail("should have thrown exception");
-		}
-		catch (RuntimeException ex) {
-			// expected
-		}
+	//
+	// Wild-card tests
+	//
+
+	public void testWildcardAtFolderLevel() throws Exception {
+		Resource res[] = patternLoader.getResources("classpath:/META-INF/*");
+		System.out.println(ObjectUtils.nullSafeToString(res));
 	}
+
+	public void testSingleClassWithWildcardAtFileLevel() throws Exception {
+		Resource res[] = patternLoader.getResources("classpath:/**/io/**/Class*Test.class");
+		System.out.println(ObjectUtils.nullSafeToString(res));
+	}
+
+	public void testClassPathRootWildcard() throws Exception {
+		Resource res[] = patternLoader.getResources("classpath:/**/io/**/Class*Test.class");
+		System.out.println(ObjectUtils.nullSafeToString(res));
+	}
+
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return (testMethodName.indexOf("Wildcard") > 0);
+	}
+
 }
