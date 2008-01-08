@@ -15,11 +15,13 @@
  */
 package org.springframework.osgi.test;
 
+import java.lang.reflect.Field;
 import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Test Case for AbstractConfigurableBundleCreatorTests.
@@ -49,7 +51,9 @@ public class ConfigurableBundleCreatorTestsTest extends TestCase {
 	public void testDefaultJarSettings() throws Exception {
 
 		Properties defaultSettings = bundleCreator.getSettings();
-		AbstractConfigurableBundleCreatorTests.jarSettings = defaultSettings;
+		Field field = ReflectionUtils.findField(AbstractConfigurableBundleCreatorTests.class, "jarSettings" , Properties.class);
+		ReflectionUtils.makeAccessible(field);
+		ReflectionUtils.setField(field, null, defaultSettings);
 		assertNotNull(defaultSettings);
 		assertNotNull(bundleCreator.getRootPath());
 		assertNotNull(bundleCreator.getBundleContentPattern());
