@@ -33,9 +33,6 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-
-// TODO: add generic capability to add other items beside classes (such as
-// BEAN_NAME_PROPERTY_KEY)
 public abstract class OsgiFilterUtils {
 
 	private static final char FILTER_BEGIN = '(';

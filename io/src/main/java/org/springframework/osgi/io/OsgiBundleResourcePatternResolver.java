@@ -137,7 +137,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	}
 
 	/**
-	 * Based on the search type, use the approapriate method
+	 * Based on the search type, use the appropriate method
 	 * 
 	 * @see OsgiBundleResource#BUNDLE_URL_PREFIX
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver#getResources(java.lang.String)
@@ -198,7 +198,6 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		case OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE:
 			// returns an enumeration of URLs
 			throw new IllegalArgumentException("class space does not support pattern matching");
-
 		default:
 			throw new IllegalArgumentException("unknown searchType " + searchType);
 		}

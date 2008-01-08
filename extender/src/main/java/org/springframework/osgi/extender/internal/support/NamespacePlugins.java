@@ -42,7 +42,6 @@ import org.xml.sax.SAXException;
  * @author Costin Leau
  * 
  */
-// TODO: add versioning for namespaces
 public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolver, DisposableBean {
 
 	/**

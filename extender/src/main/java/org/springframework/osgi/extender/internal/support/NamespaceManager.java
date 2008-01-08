@@ -84,7 +84,6 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	 * 
 	 * @param bundle
 	 */
-	// TODO: what about custom locations (outside of META-INF/spring)
 	// FIXME: rely on OSGI-IO here
 	public void maybeAddNamespaceHandlerFor(Bundle bundle) {
 		// Ignore system bundle

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.io;
 
 import java.net.URL;
@@ -53,6 +54,7 @@ public class RawIoTest extends BaseIoTest {
 	public void testGetResourceSOnRoot() throws Exception {
 		Enumeration enm = bundle.getResources("/");
 		Object[] res = copyEnumeration(enm);
+		System.out.println(ObjectUtils.nullSafeToString(res));
 		assertEquals("root folder not validated" + ObjectUtils.nullSafeToString(res), 1, res.length);
 	}
 
