@@ -19,19 +19,6 @@
 
 	<bean id="initializer" class="java.util.Properties" depends-on="weatherTest"/>
 
-	<osgi:reference id="weatherService" interface="org.springframework.osgi.samples.weather.service.WeatherService"
-	                bean-name="weatherService" timeout="2000" depends-on="weatherServiceBundle">
-		<osgi:listener ref="weatherListener"/>
-	</osgi:reference>
-
-	<bean id="weatherTest" class="org.springframework.osgi.samples.weather.test.WeatherServiceTest"
-	      init-method="testSample2" lazy-init="true" depends-on="weatherTestBundle">
-		<property name="weatherService" ref="weatherService"/>
-	</bean>
-
-	<bean id="weatherListener" class="org.springframework.osgi.samples.weather.test.WeatherListener" lazy-init="true"
-	      depends-on="weatherTestBundle"/>
-	      
 	<osgi:bundle id="weatherTestBundle" depends-on="weatherServiceBundle" symbolic-name="org.springframework.osgi.samples.weather.service.test"
 	             location="file:${localRepository}/org/springframework/osgi/samples/weather-service-test/${pom.version}/weather-service-test-${pom.version}.jar" action="start"/>
 
@@ -57,6 +44,18 @@
 			<extension:package name="org.springframework.osgi.samples.weather.service" version="${spring.osgi.bundle.version}"/>
 		</extension:exports>
 	</extension:virtual-bundle>
+	
+	<osgi:reference id="weatherService" interface="org.springframework.osgi.samples.weather.service.WeatherService"
+	                bean-name="weatherService" timeout="2000" depends-on="weatherServiceBundle,weatherTestBundle">
+		<osgi:listener ref="weatherListener"/>
+	</osgi:reference>
+
+	<bean id="weatherListener" class="org.springframework.osgi.samples.weather.test.WeatherListener" lazy-init="true"/>
+	
+	<bean id="weatherTest" class="org.springframework.osgi.samples.weather.test.WeatherServiceTest"
+	      init-method="testSample2" lazy-init="true" depends-on="weatherTestBundle">
+		<property name="weatherService" ref="weatherService"/>
+	</bean>
 
 	<!--bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
 		<property name="beans">
