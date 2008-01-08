@@ -27,7 +27,7 @@ import org.springframework.osgi.util.OsgiServiceUtils;
  * @author Costin Leau
  * 
  */
-public class BaseImporterCycleTest extends AbstractConfigurableBundleCreatorTests {
+public abstract class BaseImporterCycleTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected ListenerA listenerA;
 	protected ListenerB listenerB;
