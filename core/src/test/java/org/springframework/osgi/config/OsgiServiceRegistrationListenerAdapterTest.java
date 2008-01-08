@@ -24,6 +24,8 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.easymock.MockControl;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 
@@ -164,6 +166,8 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	private OsgiServiceRegistrationListenerAdapter listener;
 
 	private Map props;
+	
+	private static final String BEAN_NAME = "bla";
 
 	protected void setUp() throws Exception {
 		JustListener.REG_CALLS = 0;
@@ -184,7 +188,9 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperOverListener() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new JustListener());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new JustListener());
+		listener.setBeanFactory(createMockBF());
 		listener.afterPropertiesSet();
 
 		Object service = new Object();
@@ -205,7 +211,8 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperOverNoInvalidClass() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new Object());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new Object());
 		try {
 			listener.afterPropertiesSet();
 			fail("should have thrown exception");
@@ -216,7 +223,8 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithIncorrectCustomMethodNames() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new Object());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new Object());
 		listener.setRegistrationMethod("pop");
 		listener.setUnregistrationMethod("corn");
 
@@ -230,7 +238,8 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithCorrectCustomMethodNamesButIncorrectArgumentTypes() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new CustomListener());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new CustomListener());
 		listener.setRegistrationMethod("wrongReg");
 		listener.setUnregistrationMethod("wrongUnreg");
 
@@ -250,9 +259,11 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithCustomMethods() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new CustomListener());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new CustomListener());
 		listener.setRegistrationMethod("myReg");
 		listener.setUnregistrationMethod("myUnreg");
+		listener.setBeanFactory(createMockBF());
 		listener.afterPropertiesSet();
 
 		Map props = Collections.EMPTY_MAP;
@@ -279,9 +290,11 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithCustomMethodsAndNullProperties() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new CustomListener());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new CustomListener());
 		listener.setRegistrationMethod("myReg");
 		listener.setUnregistrationMethod("myUnreg");
+		listener.setBeanFactory(createMockBF());
 		listener.afterPropertiesSet();
 		Object service = new Object();
 		assertEquals(0, CustomListener.REG_CALLS);
@@ -295,9 +308,11 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testWrapperWithBothCustomAndInterfaceMethods() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new CustomAndListener());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new CustomAndListener());
 		listener.setRegistrationMethod("aReg");
 		listener.setUnregistrationMethod("aUnreg");
+		listener.setBeanFactory(createMockBF());
 		listener.afterPropertiesSet();
 		Object service = new Object();
 		assertEquals(0, CustomAndListener.REG_CALLS);
@@ -313,9 +328,11 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testExceptionOnListenerMethod() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new ExceptionListener());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new ExceptionListener());
 		listener.setRegistrationMethod("aReg");
 		listener.setUnregistrationMethod("aUnreg");
+		listener.setBeanFactory(createMockBF());
 		listener.afterPropertiesSet();
 		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
@@ -330,9 +347,12 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testExceptionOnCustomMethods() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new ExceptionCustomListener());
+		listener = new OsgiServiceRegistrationListenerAdapter(
+			);
+		listener.setTarget(new ExceptionCustomListener());
 		listener.setRegistrationMethod("myReg");
 		listener.setUnregistrationMethod("myUnreg");
+		listener.setBeanFactory(createMockBF());
 		listener.afterPropertiesSet();
 		Object service = new Object();
 		assertEquals(0, ExceptionCustomListener.REG_CALLS);
@@ -347,9 +367,11 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testStandardListenerWithListeningMethodsSpecifiedAsCustomOnes() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new JustListener());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new JustListener());
 		listener.setRegistrationMethod("registered");
 		listener.setUnregistrationMethod("unregistered");
+		listener.setBeanFactory(createMockBF());
 		listener.afterPropertiesSet();
 		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
@@ -362,9 +384,11 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testListenerWithOverloadedTypesAndMultipleParameterTypes() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new DictionaryAndMapCustomListener());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new DictionaryAndMapCustomListener());
 		listener.setRegistrationMethod("registered");
 		listener.setUnregistrationMethod("unregistered");
+		listener.setBeanFactory(createMockBF());
 		listener.afterPropertiesSet();
 		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
@@ -380,8 +404,10 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testJustCustomRegMethod() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new JustReg());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new JustReg());
 		listener.setRegistrationMethod("myReg");
+		listener.setBeanFactory(createMockBF());
 		listener.afterPropertiesSet();
 		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
@@ -394,8 +420,10 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 	}
 
 	public void testJustCustomUnregMethod() throws Exception {
-		listener = new OsgiServiceRegistrationListenerAdapter(new JustUnreg());
+		listener = new OsgiServiceRegistrationListenerAdapter();
+		listener.setTarget(new JustUnreg());
 		listener.setUnregistrationMethod("myUnreg");
+		listener.setBeanFactory(createMockBF());
 		listener.afterPropertiesSet();
 		Object service = new Object();
 		assertEquals(0, JustListener.REG_CALLS);
@@ -405,5 +433,16 @@ public class OsgiServiceRegistrationListenerAdapterTest extends TestCase {
 
 		assertEquals(0, JustListener.REG_CALLS);
 		assertEquals(1, JustListener.UNREG_CALLS);
+	}
+	
+	private BeanFactory createMockBF() {
+		MockControl ctrl = MockControl.createNiceControl(BeanFactory.class);
+		BeanFactory cbf = (BeanFactory) ctrl.getMock();
+
+		//ctrl.expectAndReturn(cbf.getBean(BEAN_NAME), target);
+		//ctrl.expectAndReturn(cbf.getType(BEAN_NAME), target.getClass());
+
+		ctrl.replay();
+		return cbf;
 	}
 }

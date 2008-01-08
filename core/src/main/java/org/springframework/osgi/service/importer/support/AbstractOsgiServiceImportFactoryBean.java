@@ -15,8 +15,6 @@
  */
 package org.springframework.osgi.service.importer.support;
 
-import java.lang.reflect.Proxy;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
