@@ -26,12 +26,12 @@
 	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.0.2/framework-2.0.2.jar" sourcepath="/KF_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.0/org.osgi.core-4.0.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Bundle-Scope A Bundle"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Bundle-Scope B Bundle"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Bundle-Scope Common Bundle"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Cardinality 0..1 Bundle"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/TCCL Bundle"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Service Reference Bundle"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ManagedFactory Configuration Bundle"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.scoped.bundle.a/1.0-rc2-SNAPSHOT/org.springframework.osgi.iandt.scoped.bundle.a-1.0-rc2-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.scoped.bundle.b/1.0-rc2-SNAPSHOT/org.springframework.osgi.iandt.scoped.bundle.b-1.0-rc2-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.scoped.bundle.common/1.0-rc2-SNAPSHOT/org.springframework.osgi.iandt.scoped.bundle.common-1.0-rc2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.config;
 
 import java.lang.reflect.Method;
@@ -24,6 +25,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.internal.ReflectionUtils;
@@ -38,15 +41,27 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegistrationListener, InitializingBean {
+class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegistrationListener, InitializingBean,
+		BeanFactoryAware {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceRegistrationListenerAdapter.class);
 
-	private final Object target;
-
-	private final boolean isListener;
+	/** does the target implement the listener interface */
+	private boolean isListener;
 
 	private String registrationMethod, unregistrationMethod;
+
+	/** actual target */
+	private Object target;
+
+	/** target bean name (when dealing with cycles) */
+	private String targetBeanName;
+
+	/** bean factory used for retrieving the target when dealing with cycles */
+	private BeanFactory beanFactory;
+
+	/** init flag */
+	private boolean initialized;
 
 	/**
 	 * Map of methods keyed by the first parameter which indicates the service
@@ -54,18 +69,32 @@ class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegistrationL
 	 */
 	private Map registrationMethods, unregistrationMethods;
 
-	public OsgiServiceRegistrationListenerAdapter(Object object) {
-		Assert.notNull(object);
-		this.target = object;
-		isListener = target instanceof OsgiServiceRegistrationListener;
+
+	public void afterPropertiesSet() {
+		Assert.notNull(beanFactory);
+		Assert.isTrue(target != null || StringUtils.hasText(targetBeanName),
+			"one of 'target' or 'targetBeanName' properties has to be set");
+
+		if (target != null)
+			initialized = true;
+
+		// do validation (on the target type)
+		initialize();
+		// postpone target initialization until one of bind/unbind method is called
+	}
+
+	private void retrieveTarget() {
+		target = beanFactory.getBean(targetBeanName);
+		initialized = true;
 	}
 
 	/**
 	 * Initialise adapter. Determine custom methods and do validation.
 	 */
-	public void afterPropertiesSet() {
+	private void initialize() {
+		Class clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
 
-		Class clazz = target.getClass();
+		isListener = OsgiServiceRegistrationListener.class.isAssignableFrom(clazz);
 		if (isListener)
 			if (log.isDebugEnabled())
 				log.debug(clazz.getName() + " is a registration listener");
@@ -144,6 +173,9 @@ class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegistrationL
 		if (trace)
 			log.trace("invoking registered method with props=" + serviceProperties);
 
+		if (!initialized)
+			retrieveTarget();
+
 		// first call interface method (if it exists)
 		if (isListener) {
 			if (trace)
@@ -166,6 +198,9 @@ class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegistrationL
 
 		if (trace)
 			log.trace("invoking unregistered method with props=" + serviceProperties);
+
+		if (!initialized)
+			retrieveTarget();
 
 		// first call interface method (if it exists)
 		if (isListener) {
@@ -191,7 +226,7 @@ class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegistrationL
 	 * @param service
 	 * @param properties
 	 */
-	// the properties field is Dictionary implementing a Map interface
+	// the properties field is a Dictionary implementing a Map interface
 	protected void invokeCustomMethods(Object target, Map methods, Map properties) {
 		if (methods != null && !methods.isEmpty()) {
 			boolean trace = log.isTraceEnabled();
@@ -231,6 +266,24 @@ class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegistrationL
 	 */
 	public void setUnregistrationMethod(String unregistrationMethod) {
 		this.unregistrationMethod = unregistrationMethod;
+	}
+
+	public void setBeanFactory(BeanFactory beanFactory) {
+		this.beanFactory = beanFactory;
+	}
+
+	/**
+	 * @param target The target to set.
+	 */
+	public void setTarget(Object target) {
+		this.target = target;
+	}
+
+	/**
+	 * @param targetBeanName The targetBeanName to set.
+	 */
+	public void setTargetBeanName(String targetBeanName) {
+		this.targetBeanName = targetBeanName;
 	}
 
 }

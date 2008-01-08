@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.config;
 
 import java.util.Iterator;
@@ -51,6 +52,12 @@ import org.w3c.dom.NodeList;
  * such as adding listeners (and their custom methods), interfaces, cardinality
  * and so on.
  * 
+ * <p/>
+ * 
+ * <strong>Note:</strong> This parser also handles the cyclic injection between
+ * an importer and its listeners by breaking the chain by creating an adapter
+ * instead of the listener. The adapter will then do dependency lookup for the
+ * listener.
  * 
  * @author Costin Leau
  * 
@@ -63,8 +70,10 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	 * @author Costin Leau
 	 */
 	class ReferenceAttributesCallback implements AttributeCallback {
+
 		/** global cardinality setting */
 		public boolean isCardinalitySpecified = false;
+
 
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
@@ -99,6 +108,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 		}
 	};
 
+
 	// Class properties
 	private static final String LISTENERS_PROP = "listeners";
 
@@ -109,6 +119,10 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	private static final String INTERFACES_PROP = "interfaces";
 
 	private static final String CCL_PROP = "contextClassLoader";
+
+	private static final String TARGET_BEAN_NAME_PROP = "targetBeanName";
+
+	private static final String TARGET_PROP = "target";
 
 	// XML attributes/elements
 	private static final String LISTENER = "listener";
@@ -136,8 +150,10 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	// document defaults
 	protected OsgiDefaultsDefinition defaults = null;
 
+
 	/**
 	 * Get OSGi defaults (in case they haven't been resolved).
+	 * 
 	 * @param document
 	 * @return
 	 */
@@ -226,7 +242,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	 * @param context
 	 * @param builder
 	 */
-	private void handleNestedDefinition(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+	protected void handleNestedDefinition(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 
 	}
 
@@ -349,8 +365,11 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 		for (Iterator iter = listeners.iterator(); iter.hasNext();) {
 			Element listnr = (Element) iter.next();
 
-			// wrapper target object or beanName
+			// wrapper target object
 			Object target = null;
+
+			// target bean name (in case of a reference)
+			String targetName = null;
 
 			// filter elements
 			NodeList nl = listnr.getChildNodes();
@@ -366,15 +385,16 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 							"nested bean declaration is not allowed if 'ref' attribute has been specified", beanDef);
 
 					target = context.getDelegate().parsePropertySubElement(beanDef, builder.getBeanDefinition());
-                    if (target instanceof RuntimeBeanReference) {
-                        target = ((RuntimeBeanReference)target).getBeanName();
-                    }
-                }
+
+					// if this is a bean reference (nested <ref>), extract the name
+					if (target instanceof RuntimeBeanReference) {
+						targetName = ((RuntimeBeanReference) target).getBeanName();
+					}
+				}
 			}
 
 			// extract bind/unbind attributes from <osgi:listener>
 			// Element
-
 			MutablePropertyValues vals = new MutablePropertyValues();
 
 			NamedNodeMap attrs = listnr.getAttributes();
@@ -382,18 +402,26 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 				Attr attribute = (Attr) attrs.item(x);
 				String name = attribute.getLocalName();
 
+				// extract ref value
 				if (REF.equals(name))
-					target = attribute.getValue();
+					targetName = attribute.getValue();
 				else
 					vals.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
 			}
 
-			// create serviceListener wrapper
+			// create serviceListener adapter
 			RootBeanDefinition wrapperDef = new RootBeanDefinition(OsgiServiceLifecycleListenerAdapter.class);
-            vals.addPropertyValue("target", target);
-            wrapperDef.setPropertyValues(vals);
-			listenersRef.add(wrapperDef);
 
+			// set the target name (if we have one)
+			if (targetName != null)
+				vals.addPropertyValue(TARGET_BEAN_NAME_PROP, targetName);
+			// else set the actual target
+			else
+				vals.addPropertyValue(TARGET_PROP, target);
+
+			wrapperDef.setPropertyValues(vals);
+			// add listener to list
+			listenersRef.add(wrapperDef);
 		}
 
 		builder.addPropertyValue(LISTENERS_PROP, listenersRef);

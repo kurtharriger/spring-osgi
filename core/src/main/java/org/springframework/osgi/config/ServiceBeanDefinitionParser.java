@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.config;
 
 import java.util.Set;
@@ -74,6 +75,7 @@ class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	private static final String AUTOEXPORT = "auto-export";
 
 	private static final String CONTEXT_CLASSLOADER = "context-class-loader";
+
 
 	protected Class getBeanClass(Element element) {
 		return OsgiServiceFactoryBean.class;
@@ -222,19 +224,25 @@ class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 		// wrapped object
 		Object target = null;
+		// target bean name (used for cycles)
+		String targetName = null;
 
 		// discover if we have listener with ref and nested bean declaration
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
 			if (node instanceof Element) {
 				Element nestedDefinition = (Element) node;
-				// check shortcut on the pparent
+				// check shortcut on the parent
 				if (element.hasAttribute(REF))
 					context.getReaderContext().error(
 						"nested bean declaration is not allowed if 'ref' attribute has been specified",
 						nestedDefinition);
 
 				target = context.getDelegate().parsePropertySubElement(nestedDefinition, builder.getBeanDefinition());
+				// if this is a bean reference (nested <ref>), extract the name
+				if (target instanceof RuntimeBeanReference) {
+					targetName = ((RuntimeBeanReference) target).getBeanName();
+				}
 			}
 		}
 
@@ -248,7 +256,7 @@ class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 			String name = attribute.getLocalName();
 
 			if (REF.equals(name))
-				target = new RuntimeBeanReference(StringUtils.trimWhitespace(attribute.getValue()));
+				targetName = attribute.getValue();
 			else
 				vals.addPropertyValue(Conventions.attributeNameToPropertyName(name), attribute.getValue());
 		}
@@ -256,10 +264,13 @@ class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		// create serviceListener wrapper
 		RootBeanDefinition wrapperDef = new RootBeanDefinition(OsgiServiceRegistrationListenerAdapter.class);
 
-		ConstructorArgumentValues cav = new ConstructorArgumentValues();
-		cav.addIndexedArgumentValue(0, target);
+		// set the target name (if we have one)
+		if (targetName != null)
+			vals.addPropertyValue(TARGET_BEAN_NAME_PROP, targetName);
+		// else set the actual target
+		else
+			vals.addPropertyValue(TARGET_PROP, target);
 
-		wrapperDef.setConstructorArgumentValues(cav);
 		wrapperDef.setPropertyValues(vals);
 
 		return wrapperDef;

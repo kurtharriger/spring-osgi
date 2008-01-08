@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.config;
 
 import java.lang.reflect.Method;
@@ -24,9 +25,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.internal.ReflectionUtils;
@@ -36,11 +35,13 @@ import org.springframework.util.StringUtils;
 /**
  * OsgiServiceLifecycleListener wrapper for custom beans, useful when custom
  * methods are being used.
- *
+ * 
+ * <p/> <strong>Note:</strong> To support cyclic injection, this adapter does
+ * dependency lookup for the actual listener.
+ * 
  * @author Costin Leau
  */
-class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean,
-	BeanFactoryAware, BeanNameAware {
+class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean, BeanFactoryAware {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceLifecycleListenerAdapter.class);
 
@@ -57,22 +58,46 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 
 	private String bindMethod, unbindMethod;
 
+	/** does the target implement the listener interface */
+	private boolean isLifecycleListener;
+
+	/** target bean factory */
+	private BeanFactory beanFactory;
+
+	/** used when dealing with a cycle */
 	private String targetBeanName;
 
-	private boolean isLifecycleListener;
-	private BeanFactory beanFactory;
+	/** target object (can be null at first when dealing with a cycle */
 	private Object target;
-	private boolean initialized;
-	private String beanName;
 
-	OsgiServiceLifecycleListenerAdapter() {
+	/** init flag */
+	private boolean initialized;
+
+
+	public void afterPropertiesSet() {
+		Assert.notNull(beanFactory);
+		Assert.isTrue(target != null || StringUtils.hasText(targetBeanName),
+			"one of 'target' or 'targetBeanName' properties has to be set");
+
+		if (target != null)
+			initialized = true;
+
+		// do validation (on the target type)
+		initialize();
+		// postpone target initialization until one of bind/unbind method is called
+	}
+
+	private void retrieveTarget() {
+		target = beanFactory.getBean(targetBeanName);
+		initialized = true;
 	}
 
 	/**
 	 * Initialise adapter. Determine custom methods and do validation.
 	 */
-	public void initialize() {
-		Class clazz = target != null ? target.getClass() : beanFactory.getType(targetBeanName);
+	private void initialize() {
+
+		Class clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
 
 		isLifecycleListener = OsgiServiceLifecycleListener.class.isAssignableFrom(clazz);
 		if (isLifecycleListener)
@@ -85,33 +110,29 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 		if (StringUtils.hasText(bindMethod)) {
 			// determine methods using ServiceReference signature
 			bindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, bindMethod,
-				new Class[]{ServiceReference.class});
+				new Class[] { ServiceReference.class });
 
 			if (bindReference != null)
 				org.springframework.util.ReflectionUtils.makeAccessible(bindReference);
 		}
 		if (StringUtils.hasText(unbindMethod)) {
 			unbindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, unbindMethod,
-				new Class[]{ServiceReference.class});
+				new Class[] { ServiceReference.class });
 
 			if (unbindReference != null)
 				org.springframework.util.ReflectionUtils.makeAccessible(unbindReference);
 		}
-		if (target == null) {
-			target = beanFactory.getBean(targetBeanName);
-		}
-		initialized = true;
 
 		if (!isLifecycleListener
-			&& (bindMethods.isEmpty() && unbindMethods.isEmpty() && bindReference == null && unbindReference == null))
+				&& (bindMethods.isEmpty() && unbindMethods.isEmpty() && bindReference == null && unbindReference == null))
 			throw new IllegalArgumentException("target object needs to implement "
-				+ OsgiServiceLifecycleListener.class.getName()
-				+ " or custom bind/unbind methods have to be specified");
+					+ OsgiServiceLifecycleListener.class.getName()
+					+ " or custom bind/unbind methods have to be specified");
 	}
 
 	/**
-	 * Invoke method with signature bla(ServiceReference ref).
-	 *
+	 * Invoke method with signature <code>bla(ServiceReference ref)</code>.
+	 * 
 	 * @param target
 	 * @param method
 	 * @param service
@@ -127,9 +148,8 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 
 			ServiceReference ref = (service != null ? ((ImportedOsgiServiceProxy) service).getServiceReference() : null);
 
-
 			try {
-				ReflectionUtils.invokeMethod(method, target, new Object[]{ref});
+				ReflectionUtils.invokeMethod(method, target, new Object[] { ref });
 			}
 			// make sure to log exceptions and continue with the
 			// rest of
@@ -137,19 +157,18 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 			catch (Exception ex) {
 				Exception cause = ReflectionUtils.getInvocationException(ex);
 				log.warn("custom method [" + method + "] threw exception when passing service reference ["
-					+ (service != null ? service.getClass().getName() : null) + "]", cause);
+						+ (service != null ? service.getClass().getName() : null) + "]", cause);
 			}
 		}
 	}
 
 	public void bind(Object service, Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
-		if (!initialized) {
-			initialize();
-		}
-
 		if (trace)
 			log.trace("invoking bind method for service " + service + " with props=" + properties);
+
+		if (!initialized)
+			retrieveTarget();
 
 		// first call interface method (if it exists)
 		if (isLifecycleListener) {
@@ -170,8 +189,8 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 
 	public void unbind(Object service, Map properties) throws Exception {
 		boolean trace = log.isTraceEnabled();
-		// We guarantee that bind() will have already been called at this point.
-		Assert.isTrue(initialized);
+		if (!initialized)
+			retrieveTarget();
 
 		if (trace)
 			log.trace("invoking unbind method for service " + service + " with props=" + properties);
@@ -207,28 +226,14 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 	}
 
 	public void setTarget(Object target) {
-		if (target instanceof String) {
-			this.targetBeanName = (String) target;
-		}
-		else {
-			this.target = target;
-		}
+		this.target = target;
+	}
+
+	public void setTargetBeanName(String targetName) {
+		this.targetBeanName = targetName;
 	}
 
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = beanFactory;
-	}
-
-	public void afterPropertiesSet() throws Exception {
-		if (target != null) {
-			initialize();
-		}
-		else if (beanFactory instanceof ConfigurableBeanFactory) {
-			((ConfigurableBeanFactory) beanFactory).registerDependentBean(beanName, targetBeanName);
-		}
-	}
-
-	public void setBeanName(String string) {
-		this.beanName = string;
 	}
 }
