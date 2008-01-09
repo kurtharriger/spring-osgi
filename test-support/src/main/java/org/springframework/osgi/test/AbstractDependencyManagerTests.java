@@ -176,7 +176,8 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * @return location of the test framework bundles configuration
 	 */
 	protected Resource getTestingFrameworkBundlesConfiguration() {
-		return new InputStreamResource(getClass().getResourceAsStream(TEST_FRRAMEWORK_BUNDLES_CONF_FILE));
+		return new InputStreamResource(
+			AbstractDependencyManagerTests.class.getResourceAsStream(TEST_FRRAMEWORK_BUNDLES_CONF_FILE));
 	}
 
 	/**
@@ -254,10 +255,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * Returns the ArtifactLocator used by this test suite.
-	 * Subclasses should override this method if the default
-	 * locator (searching the local Maven2 repository) is not
-	 * enough.
+	 * Returns the ArtifactLocator used by this test suite. Subclasses should
+	 * override this method if the default locator (searching the local Maven2
+	 * repository) is not enough.
 	 * 
 	 * @return Returns the locator.
 	 */

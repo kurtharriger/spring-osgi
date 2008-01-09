@@ -84,6 +84,6 @@ public abstract class IOUtils {
 		}
 
 		// The directory is now empty so delete it
-		return success &= file.delete();
+		return (success &= file.delete());
 	}
 }

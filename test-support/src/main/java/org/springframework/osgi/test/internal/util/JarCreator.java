@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.internal.util;
 
 import java.io.IOException;
@@ -55,11 +56,11 @@ public class JarCreator {
 
 	public static final String EVERYTHING_PATTERN = "/**/*";
 
-	public static final String[] DEFAULT_CONTENT_PATTERN = new String[] { CLASS_PATTERN, XML_PATTERN, PROPS_PATTERN };
+	private static final String[] LIMITED_PATTERN = new String[] { CLASS_PATTERN, XML_PATTERN, PROPS_PATTERN };
 
 	private String TEST_CLASSES_DIR = "test-classes";
 
-	private String[] contentPattern = DEFAULT_CONTENT_PATTERN;
+	private String[] contentPattern = new String[] { EVERYTHING_PATTERN };
 
 	private ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
 
@@ -68,6 +69,7 @@ public class JarCreator {
 	private String rootPath = determineRootPath();
 
 	private boolean addFolders = true;
+
 
 	/**
 	 * Resources' root path (the root path does not become part of the jar).
@@ -158,7 +160,7 @@ public class JarCreator {
 
 			// add a jar stream on top
 			jarStream = (manifest != null ? new JarOutputStream(outputStream, manifest) : new JarOutputStream(
-					outputStream));
+				outputStream));
 
 			// add deps
 			for (Iterator iter = entries.entrySet().iterator(); iter.hasNext();) {
@@ -284,7 +286,7 @@ public class JarCreator {
 	}
 
 	/**
-	 * @param 
+	 * @param
 	 */
 	public String getRootPath() {
 		return rootPath;

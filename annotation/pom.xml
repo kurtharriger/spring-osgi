@@ -16,6 +16,7 @@
   </description>
   
   <properties>
+	<javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 	<spring.osgi.export.pkg>org.springframework.osgi.extensions.annotation</spring.osgi.export.pkg>
   </properties>
   

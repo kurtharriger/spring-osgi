@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.context.support;
 
 import java.lang.reflect.Method;
@@ -26,7 +27,6 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
-import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
 
 /**
@@ -59,6 +59,7 @@ abstract class TrackingUtil {
 
 		private final String filter;
 
+
 		public MethodInvocationServiceAdvice(Object fallbackObject, BundleContext bundleContext, String filter) {
 			this.fallbackObject = fallbackObject;
 			this.context = bundleContext;
@@ -68,8 +69,7 @@ abstract class TrackingUtil {
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			Method m = invocation.getMethod();
 
-			Object target = OsgiServiceUtils.getService(context, OsgiServiceReferenceUtils.getServiceReference(context,
-				filter));
+			Object target = context.getService(OsgiServiceReferenceUtils.getServiceReference(context, filter));
 
 			if (target == null)
 				target = fallbackObject;
@@ -79,7 +79,9 @@ abstract class TrackingUtil {
 		}
 	}
 
+
 	private static final Log log = LogFactory.getLog(TrackingUtil.class);
+
 
 	public static Object getService(Class[] classes, String filter, ClassLoader classLoader, BundleContext context,
 			Object fallbackObject) {

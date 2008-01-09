@@ -72,7 +72,8 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 
 	/**
 	 * Settings for the jar creation. Static as it has to be cached between test
-	 * runs.
+	 * runs and it is being initialized once in
+	 * {@link #postProcessBundleContext(BundleContext)}.
 	 */
 	private static Properties jarSettings;
 

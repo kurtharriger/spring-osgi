@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
 import java.util.Iterator;
@@ -92,12 +93,14 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 */
 	private final Counter waitBarrier = new Counter("syncCounterWait");
 
+
 	/**
 	 * The task for the watch dog.
 	 * 
 	 * @author Hal Hildebrand
 	 */
 	private class WatchDogTask extends TimerTask {
+
 		public void run() {
 			timeout();
 		}
@@ -113,6 +116,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 * 
 	 */
 	private class CompleteRefreshTask implements Runnable {
+
 		public void run() {
 			boolean debug = log.isDebugEnabled();
 			if (debug)
@@ -134,6 +138,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 		}
 	}
+
 
 	public DependencyWaiterApplicationContextExecutor(DelegatedExecutionOsgiBundleApplicationContext delegateContext,
 			boolean syncWait) {
@@ -214,6 +219,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 			if (synchronousWait) {
 				task = new Runnable() {
+
 					public void run() {
 						// inform the waiting thread through the counter
 						waitBarrier.decrement();
@@ -222,6 +228,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			}
 			else
 				task = new Runnable() {
+
 					public void run() {
 						// no waiting involved, just call stageTwo
 						stageTwo();
@@ -284,6 +291,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 		synchronized (monitor) {
 
+//			if (state == ContextState.DEPENDENCIES_RESOLVED) {
+//				if (debug)
+//					log.debug("context [" + getDisplayName() + "]  already in state (" + state + "); bailing out");
+//				return;
+//			}
 			if (state != ContextState.RESOLVING_DEPENDENCIES) {
 				logWrongState(ContextState.RESOLVING_DEPENDENCIES);
 				return;
@@ -482,6 +494,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 	/**
 	 * Reduce the code pollution.
+	 * 
 	 * @param expected the expected value for the context state.
 	 */
 	private void logWrongState(ContextState expected) {

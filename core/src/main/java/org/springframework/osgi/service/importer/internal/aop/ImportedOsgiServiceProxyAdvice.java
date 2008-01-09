@@ -33,7 +33,7 @@ public class ImportedOsgiServiceProxyAdvice extends DelegatingIntroductionInterc
 
 	private static final int hashCode = ImportedOsgiServiceProxyAdvice.class.hashCode() * 13;
 
-	private ServiceReference reference;
+	private transient ServiceReference reference;
 
 	public ImportedOsgiServiceProxyAdvice(ServiceReference reference) {
 		Assert.notNull(reference);

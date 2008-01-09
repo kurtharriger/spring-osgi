@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import org.aopalliance.aop.Advice;
@@ -51,6 +52,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	/** proxy infrastructure hook exposed to allow clean up */
 	private DisposableBean disposable;
 
+
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(getInterfaces()) ? Object.class
 				: getInterfaces()[0]));
@@ -73,7 +75,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		final OsgiServiceLifecycleListener tcclListener = tcclAdvice.new ServiceProviderTCCLListener();
 
 		final ServiceDynamicInterceptor lookupAdvice = new ServiceDynamicInterceptor(getBundleContext(),
-				getUnifiedFilter(), getBeanClassLoader());
+			getUnifiedFilter(), getBeanClassLoader());
 
 		lookupAdvice.setRequiredAtStartup(isMandatory());
 
@@ -89,7 +91,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 
 		// create a proxy creator using the existing context
 		ServiceProxyCreator creator = new AbstractServiceProxyCreator(getInterfaces(), getBeanClassLoader(),
-				getBundleContext(), getContextClassLoader()) {
+			getBundleContext(), getContextClassLoader()) {
 
 			Advice createDispatcherInterceptor(ServiceReference reference) {
 				return lookupAdvice;
@@ -124,7 +126,8 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		int size = (listeners == null ? 1 : listeners.length + 1);
 		OsgiServiceLifecycleListener[] list = new OsgiServiceLifecycleListener[size];
 		list[0] = listener;
-		System.arraycopy(listeners, 0, list, 1, listeners.length);
+		if (listeners != null)
+			System.arraycopy(listeners, 0, list, 1, listeners.length);
 		return list;
 	}
 
@@ -133,9 +136,10 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	}
 
 	/**
-	 * Sets how many times should this importer attempt to rebind to a target service if the
-	 * backing service currently used is unregistered. Default is 3 times. <p/>
-	 * Changing this property after initialization is complete has no effect.
+	 * Sets how many times should this importer attempt to rebind to a target
+	 * service if the backing service currently used is unregistered. Default is
+	 * 3 times. <p/> Changing this property after initialization is complete has
+	 * no effect.
 	 * 
 	 * @param maxRetries The maxRetries to set.
 	 */
@@ -144,7 +148,8 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	}
 
 	/**
-	 * Returns the number of attempts to rebind a target service before giving up.
+	 * Returns the number of attempts to rebind a target service before giving
+	 * up.
 	 * 
 	 * @return number of retries to find a matching service before failing
 	 */
@@ -153,8 +158,8 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	}
 
 	/**
-	 * Sets how long (in milliseconds) should this importer wait between failed attempts at rebinding to a service
-	 * that has been unregistered. <p/>
+	 * Sets how long (in milliseconds) should this importer wait between failed
+	 * attempts at rebinding to a service that has been unregistered. <p/>
 	 * 
 	 * @param millisBetweenRetries The millisBetweenRetries to set.
 	 */
@@ -163,7 +168,8 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	}
 
 	/**
-	 * Returns the timeout (in milliseconds) this importer waits while trying to find a backing service.
+	 * Returns the timeout (in milliseconds) this importer waits while trying to
+	 * find a backing service.
 	 * 
 	 * @return timeout in milliseconds
 	 */

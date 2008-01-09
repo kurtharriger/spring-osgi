@@ -50,7 +50,7 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 	 * @author Costin Leau
 	 * 
 	 */
-	private class EmptyOsgiApplicationContext extends AbstractDelegatedExecutionApplicationContext {
+	private static class EmptyOsgiApplicationContext extends AbstractDelegatedExecutionApplicationContext {
 
 		protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException, BeansException {
 		}

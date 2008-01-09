@@ -24,7 +24,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
-import org.springframework.beans.factory.xml.PluggableSchemaResolver;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.osgi.util.OsgiServiceUtils;
@@ -42,13 +41,6 @@ import org.xml.sax.EntityResolver;
 public class NamespaceManager implements InitializingBean, DisposableBean {
 
 	private static final Log log = LogFactory.getLog(NamespaceManager.class);
-
-	/**
-	 * Are we running under knoplerfish? Required for bug workaround with
-	 * calling getResource under KF (bug #1581187 confirmed and tested in our
-	 * test suite).
-	 */
-	private final boolean isKnopflerfish;
 
 	/**
 	 * The set of all namespace plugins known to the extender
@@ -72,6 +64,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 
 	private static final String SPRING_SCHEMAS = "spring.schemas";
 
+
 	/**
 	 * Constructor.
 	 * 
@@ -79,7 +72,6 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	 */
 	public NamespaceManager(BundleContext context) {
 		this.context = context;
-		this.isKnopflerfish = OsgiPlatformDetector.isKnopflerfish(context);
 		this.namespacePlugins = new NamespacePlugins();
 	}
 

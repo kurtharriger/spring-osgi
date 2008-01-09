@@ -14,12 +14,14 @@
  * limitations under the License.
  *
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
@@ -37,7 +39,10 @@ import org.springframework.osgi.util.OsgiBundleUtils;
  */
 class LocalBundleContextAdvice implements MethodInterceptor {
 
+	private static final int hashCode = LocalBundleContextAdvice.class.hashCode() * 13;
+
 	private final BundleContext context;
+
 
 	LocalBundleContextAdvice(Bundle bundle) {
 		this(OsgiBundleUtils.getBundleContext(bundle));
@@ -70,4 +75,7 @@ class LocalBundleContextAdvice implements MethodInterceptor {
 		return false;
 	}
 
+	public int hashCode() {
+		return hashCode;
+	}
 }

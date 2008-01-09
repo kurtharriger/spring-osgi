@@ -38,7 +38,7 @@ class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionParser {
 	 * 
 	 * @author Costin Leau
 	 */
-	class TimeoutAttributeCallback implements AttributeCallback {
+	static class TimeoutAttributeCallback implements AttributeCallback {
 		boolean isTimeoutSpecified = false;
 
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {

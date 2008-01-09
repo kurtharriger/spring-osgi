@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test;
 
 import java.io.IOException;
@@ -57,6 +58,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 	JarCreator jarCreator;
 
+
 	public AbstractOnTheFlyBundleCreatorTests() {
 		initializeJarCreator();
 	}
@@ -78,7 +80,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	 * @return the patterns
 	 */
 	protected String[] getBundleContentPattern() {
-		return JarCreator.DEFAULT_CONTENT_PATTERN;
+		return new String[] { JarCreator.EVERYTHING_PATTERN };
 	}
 
 	/**
@@ -115,9 +117,9 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 				return new Manifest(res.getInputStream());
 			}
 			catch (IOException ex) {
-			    IllegalStateException re = new IllegalStateException("cannot retrieve manifest from " + res);
-			    re.initCause(ex);
-			    throw re;
+				IllegalStateException re = new IllegalStateException("cannot retrieve manifest from " + res);
+				re.initCause(ex);
+				throw re;
 			}
 		}
 
@@ -286,7 +288,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		}
 		catch (Exception e) {
 			IllegalStateException ise = new IllegalStateException(
-					"Unable to dynamically start generated unit test bundle");
+				"Unable to dynamically start generated unit test bundle");
 			ise.initCause(e);
 			throw ise;
 		}
