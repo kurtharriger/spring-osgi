@@ -50,7 +50,7 @@ public class AsyncNoWaitTest extends BehaviorBaseTest {
 		bundle.start();
 
 		// wait for the bundle to start and fail
-		Thread.sleep(2000);
+		Thread.sleep(3000);
 
 		// put service up
 		registration = bundleContext.registerService(Shape.class.getName(), new Area(), null);

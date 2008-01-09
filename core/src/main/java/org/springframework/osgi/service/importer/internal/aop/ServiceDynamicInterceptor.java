@@ -133,12 +133,12 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 								(filter == null ? null : filter.toString()));
 
 							// we have a rebind (a new service was bound)
-							// REVIEW andyp -- this seems kind of bogus to me, we should just respect the
-							// events the framework feeds us. Also surely we are simply interested in the
-							// lifecycle of the service we actually bound to, not others that might exist.
+							// so another candidate has to be searched from the existing candidates
+							// - as they are alive already, we have to send an event for them ourselves
+							// MODIFIED will be used for clarity
 							if (newReference != null) {
-								// update the listeners
-								serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, newReference));
+								// update the listeners (through a MODIFIED event
+								serviceChanged(new ServiceEvent(ServiceEvent.MODIFIED, newReference));
 							}
 						}
 

@@ -61,6 +61,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * with Felix and Knopflerfish. We expect the prefix to be removed (from jar to
 	 * bundle space) before the final release.
 	 */
+	// FIXME: change this to bundle space once KF 2.0.3 is out
 	public static final String DEFAULT_CONFIG_LOCATION = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX
 			+ "/META-INF/spring/*.xml";
 

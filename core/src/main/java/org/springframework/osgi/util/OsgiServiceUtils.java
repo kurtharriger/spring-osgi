@@ -43,6 +43,9 @@ public abstract class OsgiServiceUtils {
 	 * @throws IllegalArgumentException if the filter string is non-null and is
 	 * not well-formed
 	 */
+	/**
+	 * @deprecated - will be removed in 1.0 final.
+	 */
 	public static ServiceReference[] getAllServices(BundleContext context, Class serviceClass, String filter)
 			throws IllegalArgumentException {
 		try {
@@ -54,6 +57,9 @@ public abstract class OsgiServiceUtils {
 		}
 	}
 
+	/**
+	 * @deprecated - will be removed in 1.0 final.
+	 */
 	public static Object getService(BundleContext context, ServiceReference reference) {
 		Assert.notNull(context);
 

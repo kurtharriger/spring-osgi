@@ -176,6 +176,7 @@ public abstract class OsgiListenerUtils {
 	 * @return true if the listnener unregistration has succeeded, false
 	 * otherwise (for example the bundle context is invalid)
 	 */
+	//TODO: method is not used in the project, consider remove it
 	public static boolean removeServiceListener(BundleContext context, ServiceListener listener, Filter filter) {
 		String toStringFilter = (filter == null ? null : filter.toString());
 		return removeServiceListener(context, listener, toStringFilter);
@@ -192,6 +193,7 @@ public abstract class OsgiListenerUtils {
 	 * @return true if the listener unregistration has succeeded, false
 	 * otherwise (for example the bundle context is invalid)
 	 */
+	//TODO: method is not used in the project, consider remove it
 	public static boolean removeServiceListener(BundleContext context, ServiceListener listener, String filter) {
 		if (context == null || listener == null)
 			return false;
