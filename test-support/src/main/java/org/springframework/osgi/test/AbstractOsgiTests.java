@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test;
 
 import java.io.ByteArrayInputStream;
@@ -87,6 +88,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	private TestCase osgiJUnitTest = this;
 
 	private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
+
 
 	public AbstractOsgiTests() {
 		super();
@@ -173,6 +175,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		// testResult?)
 		result.startTest(osgiJUnitTest);
 		result.runProtected(osgiJUnitTest, new Protectable() {
+
 			public void protect() throws Throwable {
 				AbstractOsgiTests.this.runBare();
 			}
@@ -192,9 +195,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 					+ "Total disabled tests=" + getDisabledTestCount());
 			return;
 		}
-		else
-
-		{
+		else {
 			prepareTestExecution();
 			try {
 				// invoke OSGi test run
@@ -415,6 +416,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * doesn't behave like a normal context.
 	 * 
 	 * Will fallback to {@link #platformContext}.
+	 * 
 	 * @return
 	 */
 	private BundleContext getRuntimeBundleContext() {
@@ -452,6 +454,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		if (shutdownHook == null) {
 			// No shutdown hook registered yet.
 			shutdownHook = new Thread() {
+
 				public void run() {
 					shutdownTest();
 				}
@@ -543,6 +546,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * 
 	 * <p/> This method is called automatically by the test infrastructure after
 	 * the OSGi platform is being setup.
+	 * 
 	 * @param test
 	 */
 	private void injectOsgiJUnitTest(TestCase test) {
