@@ -91,16 +91,16 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 	 * Ant-style patterns for identifying the resources added to the jar.The
 	 * patterns are considered from the root path when performing the search.
 	 * 
-	 * <p/> By default, the content pattern contains 3 patterns:
-	 * 
+	 * <p/> By default, the content pattern is <code>*&#42;/*</code> which
+	 * includes all sources from the root. One can configure the pattern
+	 * to include specific files by using different patterns.
+	 * For example, to include just the classes, XML and properties files
+	 * one can use the following patterns:
 	 * <ol>
-	 * <li>Classes - <code>*&#42;/*.class</code>
-	 * <li>XML files - <code>*&#42;/*.xml</code>
-	 * <li>Properties files - <code>*&#42;/*.properties</code>
+	 * <li><code>*&#42;/*.class</code> for classes
+	 * <li><code>*&#42;/*.xml</code> for XML files
+	 * <li><code>*&#42;/*.properties</code> for properties files
 	 * </ol>
-	 * 
-	 * which means all classes, XML and properties files found in the root
-	 * folder and its sub-folders.
 	 * 
 	 * @return array of Ant-style pattern
 	 */

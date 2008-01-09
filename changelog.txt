@@ -39,7 +39,7 @@ Package org.springframework.osgi.service
 
 Package org.springframework.osgi.test
 * AbstractOnTheFlyBundleCreatorTests rethrows actual exception when creating/loading MANIFEST.MF
-* Fixed mispelled KNOPFLERFISH constant in Platform class
+* Fixed mispelled KNOPFLERFISH constant in Platforms class (was KNOPFLEFISH)
 * Default settings and properties in AbstractConfigurableBundleCreatorTests are now protected
 * AbstractOsgiTests does not implement any more, internal interface OsgiJUnitTest
 * AbstractConfigurableBundleCreatorTests exposes the default jar creation settings through 
@@ -50,4 +50,5 @@ Package org.springframework.osgi.test
   **/*.class, **/*.xml, **/*.properties)
 
 Package org.springframework.osgi.util
-* discuss remove/add methods
+* Deprecated OsgiServiceUtils#getAllServices()
+* Deprecated OsgiServiceUtils#getService()
