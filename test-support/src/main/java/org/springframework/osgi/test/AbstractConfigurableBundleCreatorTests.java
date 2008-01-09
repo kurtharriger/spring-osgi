@@ -65,15 +65,14 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 
 	static {
 		DEFAULT_SETTINGS.setProperty(ROOT_DIR, "file:./target/test-classes");
-		DEFAULT_SETTINGS.setProperty(INCLUDE_PATTERNS,
-			StringUtils.arrayToCommaDelimitedString(JarCreator.DEFAULT_CONTENT_PATTERN));
+		DEFAULT_SETTINGS.setProperty(INCLUDE_PATTERNS, JarCreator.EVERYTHING_PATTERN);
 		DEFAULT_SETTINGS.setProperty(LIBS, "");
 		DEFAULT_SETTINGS.setProperty(MANIFEST, "");
 	}
 
 	/**
-	 * Settings for the jar creation.
-	 * Static as it has to be cached between test runs.
+	 * Settings for the jar creation. Static as it has to be cached between test
+	 * runs.
 	 */
 	private static Properties jarSettings;
 
@@ -92,10 +91,10 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 	 * patterns are considered from the root path when performing the search.
 	 * 
 	 * <p/> By default, the content pattern is <code>*&#42;/*</code> which
-	 * includes all sources from the root. One can configure the pattern
-	 * to include specific files by using different patterns.
-	 * For example, to include just the classes, XML and properties files
-	 * one can use the following patterns:
+	 * includes all sources from the root. One can configure the pattern to
+	 * include specific files by using different patterns. For example, to
+	 * include just the classes, XML and properties files one can use the
+	 * following patterns:
 	 * <ol>
 	 * <li><code>*&#42;/*.class</code> for classes
 	 * <li><code>*&#42;/*.xml</code> for XML files
