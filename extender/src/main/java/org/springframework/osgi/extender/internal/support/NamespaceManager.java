@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extender.internal.support;
 
 import org.apache.commons.logging.Log;
@@ -65,7 +66,11 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	 */
 	private final BundleContext context;
 
-	private static final String SPRING_HANDLER_MAPPINGS_LOCATION = "META-INF/spring.handlers";
+	private static final String META_INF = "META-INF/";
+
+	private static final String SPRING_HANDLERS = "spring.handlers";
+
+	private static final String SPRING_SCHEMAS = "spring.schemas";
 
 	/**
 	 * Constructor.
@@ -82,27 +87,19 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	 * If this bundle defines handler mapping or schema mapping resources, then
 	 * register it with the namespace plugin handler.
 	 * 
+	 * <p/> This method considers only the bundle space and not the class space.
+	 * 
 	 * @param bundle
 	 */
-	// FIXME: rely on OSGI-IO here
 	public void maybeAddNamespaceHandlerFor(Bundle bundle) {
 		// Ignore system bundle
 		if (OsgiBundleUtils.isSystemBundle(bundle)) {
 			return;
 		}
-		if (isKnopflerfish) {
-			// KF (2.0.0-2.0.1) throws a ClassCastException
-			// http://sourceforge.net/tracker/index.php?func=detail&aid=1581187&group_id=82798&atid=567241
-			if (bundle.getEntry(SPRING_HANDLER_MAPPINGS_LOCATION) != null
-					|| bundle.getEntry(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
-				addHandler(bundle);
-			}
-		}
-		else {
-			if (bundle.getResource(SPRING_HANDLER_MAPPINGS_LOCATION) != null
-					|| bundle.getResource(PluggableSchemaResolver.DEFAULT_SCHEMA_MAPPINGS_LOCATION) != null) {
-				addHandler(bundle);
-			}
+
+		if (bundle.findEntries(META_INF, SPRING_HANDLERS, false) != null
+				|| bundle.findEntries(META_INF, SPRING_SCHEMAS, false) != null) {
+			addHandler(bundle);
 		}
 	}
 

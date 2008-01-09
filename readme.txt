@@ -60,6 +60,41 @@ Spring Dynamic Modules is released under the terms of the Apache Software Licens
 All libraries included in the "-with-dependencies" download are subject to their respective licenses.
 This product includes software developed by the Apache Software Foundation (http://www.apache.org).
 
+3. DISTRIBUTION JAR FILES
+
+The following distinct jar files are included in the distribution. This list specifies the respective contents and
+third-party dependencies. Libraries in [brackets] are optional, i.e. just necessary for certain functionality. For an 
+exact list of Spring-DM project dependencies see the respective Maven2 pom.xml files.
+
+* spring-osgi-core-1.0.jar
+- Contents: The Spring Dynamic Modules Core
+- Dependencies: slf4j, spring-aop, spring-beans, spring-core, spring-context, aop-alliance, spring-osgi-io
+                [Log4J]
+
+* spring-osgi-extender-1.0.jar
+- Contents: The Spring Dynamic Modules Extender
+- Dependencies: sl4fj, spring-osgi-core 
+			    [Log4J]
+
+* spring-osgi-io-1.0.jar
+- Contents: The Spring Dynamic Modules IO library
+- Dependencies: sl4fj, spring-core
+                [Log4J]
+
+* spring-osgi-mock-1.0.jar
+- Contents: The Spring Dynamic Modules Mock library
+- Dependencies: OSGi API
+
+* spring-osgi-test-1.0.jar
+- Contents: The Spring Dynamic Modules Integration Testing framework
+- Dependencies: asm, junit, slf4j, spring-osgi-core, spring-osgi-extender
+                [Equinox, Felix, Knopflerfish, Log4J]
+
+* extensions / spring-osgi-annotation-1.0.jar
+- Contents: The Spring Dynamic Modules Annotation Extension
+- Dependencies: slf4j, spring-beans, spring-core, spring-osgi-core
+				[Log4J]
+          
 4. WHERE TO START
 
 This distribution contains API documentation and two sample applications illustrating the current features of Spring DM.

@@ -33,12 +33,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-	    <groupId>org.osgi</groupId>
-	    <artifactId>osgi_R4_compendium</artifactId>
-	    <version>1.0</version>
-	    <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>aopalliance.osgi</artifactId>
       <version>1.0-SNAPSHOT</version>

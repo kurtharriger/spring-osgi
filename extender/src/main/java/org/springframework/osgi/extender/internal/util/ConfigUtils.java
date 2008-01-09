@@ -363,8 +363,7 @@ public abstract class ConfigUtils {
 		if (getSpringContextHeader(bundle.getHeaders()) != null)
 			return true;
 
-		// check the default locations now
-		// TODO: use IO or getResource() to find the default configuration files
+		// check the default locations if the manifest doesn't give any info
 		Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
 		return (defaultConfig != null && defaultConfig.hasMoreElements());
 	}

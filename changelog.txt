@@ -7,15 +7,16 @@ Changes in version 1.0 RC2 (2008-01-xx)
 
 General
 * Removed deprecated methods
-* Circular references between service importers and listeners are now supported
-* Internal OsgiJUnitTest interface has been removed from AbstractOsgiTest hierarchy and methods
+* Circular references between service importers, exporter and listeners are now supported
 * Distributable bundles include Apache 2 license (META-INF/license.txt and META-INF/notice.txt)
-* Maven 2.0.7 is required for properly building the project under JDK 1.6
 * All integration tests have been moved under integration-test/ folder
 * By default, the samples and integration tests are not executed (use Maven profiles to include them)
+* Maven 2.0.7 is required for properly building the project under JDK 1.6
 
 Package org.springframework.osgi
 * Updated spring-osgi.xsd Tservice to properly reflect OsgiServiceFactoryBean package
+* Updated spring-osgi.xsd list,set to properly reflect OsgiServiceCollectionFactoryBean package
+
 * Updated bundles symbolic name to follow Spring bundle conventions (org.springframework.bundle.osgi
   instead of org.springframework.osgi.bundle)
 
@@ -26,18 +27,27 @@ Package org.springframework.osgi.context
 * AbstractDelegatedExecutionApplicationContext throws clearer exception when the mandatory BundleContext 
   is not set
 
+Package org.springframework.osgi.extender
+* META-INF/spring.handlers, META-INF/spring.schemas files are searched in the bundle space instead of the
+  class space
+
 Package org.springframework.osgi.service
 * Fixed double negation in AutoExport.DISABLED javadoc
 * Removed deprecated method AbstractOsgiServiceImportFactoryBean#setInterface 
 * Service reference importers receive only one event (that of the best matching service) when registered/
   unregistered into the OSGi space rather then events of all existing services
 
-
 Package org.springframework.osgi.test
 * AbstractOnTheFlyBundleCreatorTests rethrows actual exception when creating/loading MANIFEST.MF
 * Fixed mispelled KNOPFLERFISH constant in Platform class
 * Default settings and properties in AbstractConfigurableBundleCreatorTests are now protected
-* AbstractOsgiTests does not implement any more, internal interface OsgiJUnitTest.
+* AbstractOsgiTests does not implement any more, internal interface OsgiJUnitTest
+* AbstractConfigurableBundleCreatorTests exposes the default jar creation settings through 
+  #getDefaultSettings()
+* Removed method AbstractDependencyManagerTests#injectArtifactLocator 
+* AbstractDependencyManagerTests#getLocator visibility changed from public to protected
+* AbstractConfigurableBundleCreatorTests jar content pattern has been changed to **/* (from
+  **/*.class, **/*.xml, **/*.properties)
 
 Package org.springframework.osgi.util
 * discuss remove/add methods
