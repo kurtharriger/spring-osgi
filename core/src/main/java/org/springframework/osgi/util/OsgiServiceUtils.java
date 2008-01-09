@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * @author Adrian Colyer
  * @author Costin Leau
  */
-// FIXME: clear this class
+// FIXME: removed deprecated methods
 public abstract class OsgiServiceUtils {
 
 	/**

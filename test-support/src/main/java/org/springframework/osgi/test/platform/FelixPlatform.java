@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.platform;
 
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -51,6 +54,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 
 	private File felixStorageDir;
 
+
 	public FelixPlatform() {
 		toString = "Felix OSGi Platform";
 	}
@@ -63,11 +67,6 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		return props;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.platform.OsgiPlatform#getBundleContext()
-	 */
 	public BundleContext getBundleContext() {
 		return context;
 	}
@@ -98,9 +97,9 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	 * @return
 	 */
 	private Properties getFelixConfiguration() {
-		String location = "/".concat(ClassUtils.classPackageAsResourcePath(getClass())).concat("/").concat(
+		String location = "/".concat(ClassUtils.classPackageAsResourcePath(FelixPlatform.class)).concat("/").concat(
 			FELIX_CONF_FILE);
-		URL url = getClass().getResource(location);
+		URL url = FelixPlatform.class.getResource(location);
 		if (url == null)
 			throw new RuntimeException("cannot find felix configuration properties file:" + location);
 
@@ -111,11 +110,6 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		return Main.loadConfigProperties();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.platform.OsgiPlatform#start()
-	 */
 	public void start() throws Exception {
 
 		platform = new Felix(getConfigurationProperties(), null);
@@ -124,16 +118,18 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		Bundle systemBundle = platform;
 
 		// call getBundleContext
-		Method getContext = systemBundle.getClass().getDeclaredMethod("getBundleContext", null);
-		getContext.setAccessible(true);
+		final Method getContext = systemBundle.getClass().getDeclaredMethod("getBundleContext", null);
+
+		AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				getContext.setAccessible(true);
+				return null;
+			}
+		});
 		context = (BundleContext) getContext.invoke(systemBundle, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.platform.OsgiPlatform#stop()
-	 */
 	public void stop() throws Exception {
 		try {
 			platform.stop();

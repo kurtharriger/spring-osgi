@@ -38,8 +38,6 @@ public class MandatoryDependencyBeanPostProcessor implements BeanPostProcessor, 
 
 	private MandatoryServiceDependencyManager manager;
 
-	private ConfigurableListableBeanFactory beanFactory;
-
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
@@ -52,8 +50,6 @@ public class MandatoryDependencyBeanPostProcessor implements BeanPostProcessor, 
 	}
 
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		Assert.isInstanceOf(ConfigurableListableBeanFactory.class, beanFactory);
-		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
 		DefaultMandatoryDependencyManager manager = new DefaultMandatoryDependencyManager();
 		manager.setBeanFactory(beanFactory);
 		this.manager = manager;

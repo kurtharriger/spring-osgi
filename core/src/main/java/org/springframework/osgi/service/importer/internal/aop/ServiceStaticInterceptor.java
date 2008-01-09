@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.aop;
 
 import org.osgi.framework.BundleContext;
@@ -35,6 +36,7 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 	private final ServiceReference reference;
 
 	private final BundleContext bundleContext;
+
 
 	public ServiceStaticInterceptor(BundleContext context, ServiceReference reference) {
 		Assert.notNull(context);
@@ -65,7 +67,7 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 			return true;
 		if (other instanceof ServiceStaticInterceptor) {
 			ServiceStaticInterceptor oth = (ServiceStaticInterceptor) other;
-			return reference.equals(oth.reference) && bundleContext.equals(bundleContext);
+			return reference.equals(oth.reference) && bundleContext.equals(oth.bundleContext);
 		}
 		return false;
 	}
@@ -73,5 +75,4 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 	public int hashCode() {
 		return hashCode;
 	}
-
 }

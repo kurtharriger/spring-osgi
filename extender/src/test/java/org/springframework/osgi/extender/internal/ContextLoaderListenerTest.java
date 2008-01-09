@@ -52,8 +52,6 @@ public class ContextLoaderListenerTest extends TestCase {
 		MockControl bundleContextControl = MockControl.createControl(BundleContext.class);
 		BundleContext context = (BundleContext) bundleContextControl.getMock();
 		// platform determination
-		context.getProperty(Constants.FRAMEWORK_VENDOR);
-		bundleContextControl.setReturnValue(null);
 
 		// extracting bundle id from bundle
 		bundleContextControl.expectAndReturn(context.getBundle(), new MockBundle());

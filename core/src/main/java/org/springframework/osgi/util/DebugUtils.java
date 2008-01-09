@@ -269,7 +269,7 @@ public abstract class DebugUtils {
 						jin.close();
 					}
 					catch (Exception ex) {
-						// don't do a thing
+						// ignore it
 					}
 				}
 			}

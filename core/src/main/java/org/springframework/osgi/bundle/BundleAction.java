@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.bundle;
 
-import org.osgi.framework.Bundle;
 import org.springframework.core.enums.StaticLabeledEnum;
 
 /**
@@ -41,7 +41,7 @@ public class BundleAction extends StaticLabeledEnum {
 	 * Start bundle. If no bundle is found, it will try first to install one
 	 * based on the existing configuration.
 	 * 
-	 * @see Bundle#start()
+	 * @see org.osgi.framework.Bundle#start()
 	 */
 	public static final BundleAction START = new BundleAction(2, "start");
 
@@ -49,7 +49,7 @@ public class BundleAction extends StaticLabeledEnum {
 	 * Update bundle. If no bundle is found, it will try first to install one
 	 * based on the existing configuration.
 	 * 
-	 * @see Bundle#update()
+	 * @see org.osgi.framework.Bundle#update()
 	 */
 	public static final BundleAction UPDATE = new BundleAction(3, "update");
 
@@ -57,7 +57,7 @@ public class BundleAction extends StaticLabeledEnum {
 	 * Stop bundle. If no bundle is found, this action does nothing (it will
 	 * trigger loading).
 	 * 
-	 * @see Bundle#stop()
+	 * @see org.osgi.framework.Bundle#stop()
 	 */
 	public static final BundleAction STOP = new BundleAction(4, "stop");
 
@@ -65,9 +65,10 @@ public class BundleAction extends StaticLabeledEnum {
 	 * Uninstall bundle. If no bundle is found, this action does nothing (it
 	 * will trigger loading).
 	 * 
-	 * @see Bundle#uninstall()
+	 * @see org.osgi.framework.Bundle#uninstall()
 	 */
 	public static final BundleAction UNINSTALL = new BundleAction(5, "uninstall");
+
 
 	/**
 	 * Constructs a new <code>BundleAction</code> instance.

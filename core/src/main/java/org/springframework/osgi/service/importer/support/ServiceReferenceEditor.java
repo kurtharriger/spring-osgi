@@ -49,8 +49,9 @@ public class ServiceReferenceEditor extends PropertyEditorSupport {
 	 * Convert the given value to a ServiceReference.
 	 */
 	public void setValue(Object value) {
+		// nulls allowed
 		if (value == null) {
-			super.setValue(value);
+			super.setValue(null);
 			return;
 		}
 

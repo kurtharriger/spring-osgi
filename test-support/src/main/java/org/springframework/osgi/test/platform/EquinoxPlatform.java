@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.platform;
 
 import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
@@ -31,6 +34,7 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 
 	private BundleContext context;
 
+
 	public EquinoxPlatform() {
 		toString = "Equinox OSGi Platform";
 	}
@@ -44,30 +48,20 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 
 		// local temporary folder for running tests
 		// prevents accidental rewrites
-        props.setProperty("osgi.configuration.area", "eclipse_config");
+		props.setProperty("osgi.configuration.area", "eclipse_config");
 		props.setProperty("osgi.instance.area", "eclipse_config");
 		props.setProperty("osgi.user.area", "eclipse_config");
 
 		// props.setProperty("eclipse.consoleLog", "true");
 		// props.setProperty("osgi.debug", "");
-		
+
 		return props;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.OsgiPlatform#getBundleContext()
-	 */
 	public BundleContext getBundleContext() {
 		return context;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.OsgiPlatform#start()
-	 */
 	public void start() throws Exception {
 
 		// copy configuration properties to sys properties
@@ -77,16 +71,18 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 		// use main since in 3.1.x it sets up some system properties
 		EclipseStarter.main(new String[0]);
 
-		Field field = EclipseStarter.class.getDeclaredField("context");
-		field.setAccessible(true);
+		final Field field = EclipseStarter.class.getDeclaredField("context");
+
+		AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				field.setAccessible(true);
+				return null;
+			}
+		});
 		context = (BundleContext) field.get(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.OsgiPlatform#stop()
-	 */
 	public void stop() throws Exception {
 		EclipseStarter.shutdown();
 	}
