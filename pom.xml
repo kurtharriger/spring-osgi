@@ -261,23 +261,16 @@ limitations under the License.
   </dependencies>
   
  <build>
-   <extensions>
+    
+    <extensions>
       <extension>
          <groupId>org.springframework.aws</groupId>
          <artifactId>spring-aws-maven</artifactId>
          <version>1.2</version>
        </extension>
     </extensions>
+    
     <resources>
-      <resource>
-        <!-- Bug MRESOURCES-35 means we can't use absolute paths -->
-        <targetPath>../../META-INF</targetPath>
-        <filtering>true</filtering>
-        <includes>
-          <include>MANIFEST.MF</include>
-        </includes>
-        <directory>src/main/resources/META-INF</directory>
-      </resource>
       <resource>
         <filtering>true</filtering>
         <directory>src/main/resources</directory>
@@ -301,12 +294,12 @@ limitations under the License.
            <Import-Package>${spring.osgi.import}</Import-Package>
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
            <Include-Resource>${spring.osgi.include.res}</Include-Resource>
-           
+           <!-- jar entries -->
            <Implementation-Title>Spring Dynamic Modules Framework</Implementation-Title>
 		   <Implementation-Version>${pom.version}</Implementation-Version>
 		   <Implementation-Vendor>Spring Dynamic Modules Framework</Implementation-Vendor>
 		   <Implementation-Vendor-Id>org.springframework.osgi</Implementation-Vendor-Id>
-		   
+		   <!-- Spring specific entries -->
 		   <Spring-DM-Version>${pom.version}</Spring-DM-Version>
 		   <Spring-Version>${spring.maven.artifact.version}</Spring-Version>
 		   
