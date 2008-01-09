@@ -59,7 +59,7 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 	// disable this on KF
 	// TODO: double check on KF 2.0.3
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return createPlatform().toString().startsWith("Knopflerfish");
+//		return createPlatform().toString().startsWith("Knopflerfish");
+		return false;
 	}
-
 }

@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.iandt.io;
+
+package org.springframework.osgi.iandt.compliance.io;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,9 +23,7 @@ import java.util.Enumeration;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.SynchronousBundleListener;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.osgi.io.OsgiBundleResource;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
@@ -38,9 +37,10 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * @author Costin Leau
  * 
  */
-public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
+public class CallingResourceOnDifferentBundlesTest extends AbstractConfigurableBundleCreatorTests {
 
 	private static final String LOCATION = "META-INF/";
+
 
 	protected String getManifestLocation() {
 		return null;
@@ -55,17 +55,6 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 			URL url = bundle.getResource(LOCATION);
 			if (!OsgiBundleUtils.isFragment(bundle))
 				assertNotNull(url);
-		}
-	}
-
-	public void testGetResourceThroughSpringResourceAbstraction() throws Exception {
-		Bundle[] bundles = bundleContext.getBundles();
-		for (int i = 1; i < bundles.length; i++) {
-			Bundle bundle = bundles[i];
-
-			Resource res = new OsgiBundleResource(bundle, ResourceLoader.CLASSPATH_URL_PREFIX + LOCATION);
-			if (!OsgiBundleUtils.isFragment(bundle))
-				assertTrue(res.exists());
 		}
 	}
 
@@ -100,6 +89,7 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 
 		// register listener
 		bundleContext.addBundleListener(new SynchronousBundleListener() {
+
 			public void bundleChanged(BundleEvent event) {
 				// call getResource
 				event.getBundle().getResource(LOCATION);
@@ -122,6 +112,6 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIoTest {
 	}
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return isKF();
+		return (createPlatform().toString().startsWith("Knopflerfish"));
 	}
 }

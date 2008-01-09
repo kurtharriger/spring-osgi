@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.io;
+package org.springframework.osgi.iandt.compliance.io;
 
 import java.net.URL;
 import java.util.Enumeration;
 
-import org.springframework.osgi.test.platform.Platforms;
+import org.springframework.osgi.iandt.io.BaseIoTest;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -30,7 +30,7 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * 
  */
-public class RawIoTest extends BaseIoTest {
+public class IoTest extends BaseIoTest {
 
 	// don't use any extra bundles - just the test jar
 	protected String[] getTestBundlesNames() {

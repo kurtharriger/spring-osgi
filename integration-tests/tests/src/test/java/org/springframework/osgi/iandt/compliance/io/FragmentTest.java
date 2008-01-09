@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.iandt.io;
+package org.springframework.osgi.iandt.compliance.io;
 
 import org.osgi.framework.Bundle;
+import org.springframework.osgi.iandt.io.BaseIoTest;
 
 /**
  * Raw test for discovering the fragments support for each platform. The native
@@ -26,7 +27,7 @@ import org.osgi.framework.Bundle;
  * @author Costin Leau
  * 
  */
-public class RawIoFragmentTest extends BaseIoTest {
+public class FragmentTest extends BaseIoTest {
 
 	//
 	// Folder tests
@@ -136,7 +137,7 @@ public class RawIoFragmentTest extends BaseIoTest {
 
 	public void testDuplicateFilesInHostAndFragments() {
 		Object[] res = copyEnumeration(bundle.findEntries("/org/springframework/osgi/iandt/io", "duplicate.file", false));
-		assertResourceArray(res, 2);
+		assertResourceArray(res, 3);
 	}
 
 }

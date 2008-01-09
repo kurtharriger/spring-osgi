@@ -5,6 +5,7 @@ http://www.springframework.org/osgi
 1. Spring DM BUILDING REQUIREMENT
 
 Spring DM 1.x requires at least JDK 1.4 and Maven 2 for building.
+Currently, Maven 2.0.8 is used for building the framework.
 
 1. BUILDING Spring DM
 
