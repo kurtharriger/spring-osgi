@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
 
-    This is the XSL FO (PDF) stylesheet for the Spring reference
+    This is the XSL FO (PDF) stylesheet for the Spring DM reference
     documentation.
     
     Thanks are due to Christian Bauer of the Hibernate project
@@ -65,7 +65,7 @@
                                 </xsl:for-each>
                             </fo:block>
                             <fo:block font-family="Helvetica" font-size="12pt" padding="10mm">
-								<xsl:text>Copyright &#xA9; 2006-2007</xsl:text>
+								<xsl:text>Copyright &#xA9; 2006-2008</xsl:text>
 							</fo:block>
 
                             <fo:block font-family="Helvetica" font-size="10pt" padding="1mm">
@@ -421,5 +421,21 @@
             </xsl:choose>
         </fo:basic-link>
     </xsl:template>
+
+    <xsl:template match="link">
+        <fo:basic-link internal-destination="{@linkend}"
+                xsl:use-attribute-sets="xref.properties"
+                text-decoration="underline"
+                color="blue">
+            <xsl:choose>
+                <xsl:when test="count(child::node())=0">
+                    <xsl:value-of select="@linkend"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </fo:basic-link>
+    </xsl:template>    
 
 </xsl:stylesheet>

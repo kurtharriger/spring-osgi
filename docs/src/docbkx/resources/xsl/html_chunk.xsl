@@ -83,7 +83,7 @@
                 <img style="border:none;" src="images/xdev-spring_logo.jpg"/>
             </a>
             <a style="border:none;" href="http://www.SpringSource.com/" title="SpringSource - Spring from the Source">
-                <img style="border:none;position:absolute;padding-top:5px;right:42px;" src="images/ss-banner-rhs.png"/>
+                <img style="border:none;position:absolute;padding-top:5px;right:42px;" src="images/s2-banner-rhs.png"/>
             </a>
         </div>
     </xsl:template>
