@@ -43,18 +43,18 @@ public class IoTest extends BaseIoTest {
 		assertNotNull(url);
 	}
 
-	// fails on Felix && KF
+	// fails on Felix 1.0.1 && KF 2.0.2
 	public void testGetResourceOnRoot() throws Exception {
 		URL url = bundle.getResource("/");
-		System.out.println(url);
-		assertNotNull(url);
+		System.out.println("getResource('/') = " + url);
+		assertNotNull("root folder not validated " + url);
 	}
 
-	// fails on Felix && KF
+	// fails on Felix 1.0.1 && KF 2.0.2
 	public void testGetResourceSOnRoot() throws Exception {
 		Enumeration enm = bundle.getResources("/");
 		Object[] res = copyEnumeration(enm);
-		System.out.println(ObjectUtils.nullSafeToString(res));
+		System.out.println("getResources('/') = " + ObjectUtils.nullSafeToString(res));
 		assertEquals("root folder not validated" + ObjectUtils.nullSafeToString(res), 1, res.length);
 	}
 
@@ -107,6 +107,6 @@ public class IoTest extends BaseIoTest {
 	}
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (isFelix() || (isKF() && ("testGetResourceOnRoot".equals(testMethodName) || "testGetResourceSOnRoot".equals(testMethodName))));
+		return ((isFelix() || isKF()) && (testMethodName.equalsIgnoreCase("testGetResourceOnRoot") || testMethodName.equalsIgnoreCase("testGetResourceSOnRoot")));
 	}
 }

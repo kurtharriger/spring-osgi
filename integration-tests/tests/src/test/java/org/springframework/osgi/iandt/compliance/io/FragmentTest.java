@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.compliance.io;
+
+import java.net.URL;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.iandt.io.BaseIoTest;
@@ -33,8 +36,9 @@ public class FragmentTest extends BaseIoTest {
 	// Folder tests
 	//
 
+	// TODO: remove after KF 2.0.3
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return isFelix();
+		return (isFelix() || (isKF() && (testMethodName.equalsIgnoreCase("testGetResourceOnRootDir") || testMethodName.equalsIgnoreCase("testGetResourceSOnRootDir"))));
 	}
 
 	/**
@@ -140,4 +144,19 @@ public class FragmentTest extends BaseIoTest {
 		assertResourceArray(res, 3);
 	}
 
+	//
+	// Classpath tests
+	//
+
+	public void testGetResourceOnRootDir() throws Exception {
+		URL root = bundle.getResource("/");
+		System.out.println(root);
+		assertNotNull("root path not considered", root);
+	}
+
+	public void testGetResourceSOnRootDir() throws Exception {
+		Object[] res = copyEnumeration(bundle.getResources("/"));
+		// 3 paths should be found (1 host + 2 fragments)
+		assertResourceArray(res, 3);
+	}
 }

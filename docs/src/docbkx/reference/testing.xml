@@ -50,7 +50,8 @@ protected void setUp() throws Exception {
 			return reference;
 		}
 
-		public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+		public ServiceReference[] getServiceReferences(String clazz, String filter) 
+				throws InvalidSyntaxException {
 			return new ServiceReference[] { reference };
 		}
 		
@@ -152,11 +153,11 @@ public void testComponent() throws Exception {
 
     <programlisting><![CDATA[public class SimpleOsgiTest extends AbstractConfigurableBundleCreatorTests {
 
-	public void testOsgiPlatformStarts() throws Exception {
-		System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VENDOR));
-		System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VERSION));
-		System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_EXECUTIONENVIRONMENT));
-	}
+public void testOsgiPlatformStarts() throws Exception {
+	System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VENDOR));
+	System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VERSION));
+	System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_EXECUTIONENVIRONMENT));
+}
 }]]></programlisting>
       
     <para>Simply execute the test as you normally do with any JUnit test. On Equinox 3.2.x,
@@ -187,7 +188,8 @@ OSGi/Minimum-1.0,OSGi/Minimum-1.1,JRE-1.1,J2SE-1.2,J2SE-1.3,J2SE-1.4}]]></progra
 	System.out.println();
 }]]></programlisting> 
     <para>The output should be similar to:</para>
-    <programlisting><![CDATA[OSGi System Bundle, asm.osgi, log4j.osgi, spring-test, spring-osgi-test, spring-osgi-core, spring-aop, spring-osgi-io, slf4j-api, 
+    <programlisting><![CDATA[OSGi System Bundle, asm.osgi, log4j.osgi, spring-test, spring-osgi-test, spring-osgi-core, 
+    spring-aop, spring-osgi-io, slf4j-api, 
 spring-osgi-extender, etc... TestBundle-testOsgiPlatformStarts-com.your.package.SimpleOsgiTest, 
 ]]></programlisting>
 

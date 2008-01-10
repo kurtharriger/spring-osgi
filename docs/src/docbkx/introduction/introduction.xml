@@ -12,8 +12,8 @@
 			Modules see our online <ulink url="http://www.springframework.org/osgi">page</ulink>.</para>
 
 			<para>OSGi developers looking for an introduction to Spring should review
-			the <ulink url="http://www.springframework.org/documentation">introductory
-			articles</ulink> on the springframework.org site.</para>
+			the introductory <ulink url="http://www.springframework.org/documentation">articles</ulink> 
+			on the springframework.org site.</para>
 
 			<para><emphasis>Note: OSGi is a trademark of the OSGi Alliance. Project
 			name is pending final approval from the Alliance.</emphasis></para>

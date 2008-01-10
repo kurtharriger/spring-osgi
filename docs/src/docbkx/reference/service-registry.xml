@@ -703,7 +703,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <section id="service-registry:refs:singular:tccl">
           <title>The context-class-loader attribute</title>
 
-          <para>The OSGi Service Platform Core Specification (most current
+          <para>The OSGi Service Platform Core Specification (latest
           version is 4.1 at time of writing) does not specify what types and
           resources are visible through the context class loader when an
           operation is invoked on a service obtained via the service registry.
