@@ -15,8 +15,8 @@ General
 * Knopflerfish 2.0.3 is required for correctly building and running Spring-DM
 
 Package org.springframework.osgi
-* Updated spring-osgi.xsd Tservice to properly reflect OsgiServiceFactoryBean package
-* Updated spring-osgi.xsd list,set to properly reflect OsgiServiceCollectionFactoryBean package
+* Updated spring-osgi.xsd Tservice type to properly reflect OsgiServiceFactoryBean package
+* Updated spring-osgi.xsd list, set elements to properly reflect OsgiServiceCollectionFactoryBean package               
 
 * Updated bundles symbolic name to follow Spring bundle conventions (org.springframework.bundle.osgi
   instead of org.springframework.osgi.bundle)
@@ -30,30 +30,27 @@ Package org.springframework.osgi.config
 * ParserUtils visibility changed from public to default
 
 Package org.springframework.osgi.context
-* AbstractDelegatedExecutionApplicationContext throws clearer exception when the mandatory BundleContext 
-  is not set
+* AbstractDelegatedExecutionApplicationContext throws clearer exception when the mandatory BundleContext is not set
 
 Package org.springframework.osgi.extender
-* META-INF/spring.handlers, META-INF/spring.schemas files are searched in the bundle space instead of the
-  class space
+* META-INF/spring.handlers, META-INF/spring.schemas files are searched in the bundle space instead of the class space
 
 Package org.springframework.osgi.service
 * Fixed double negation in AutoExport.DISABLED javadoc
 * Removed deprecated method AbstractOsgiServiceImportFactoryBean#setInterface 
-* Service reference importers receive only one event (that of the best matching service) when registered/
-  unregistered into the OSGi space rather then events of all existing services
+* Service reference importers receive only one event (that of the best matching service) when registered/unregistered 
+  into the OSGi space rather then events of all existing services
 
 Package org.springframework.osgi.test
 * AbstractOnTheFlyBundleCreatorTests rethrows actual exception when creating/loading MANIFEST.MF
 * Fixed mispelled KNOPFLERFISH constant in Platforms class (was KNOPFLEFISH)
 * Default settings and properties in AbstractConfigurableBundleCreatorTests are now protected
 * AbstractOsgiTests does not implement any more, internal interface OsgiJUnitTest
-* AbstractConfigurableBundleCreatorTests exposes the default jar creation settings through 
-  #getDefaultSettings()
+* AbstractConfigurableBundleCreatorTests exposes the default jar creation settings through #getDefaultSettings()
 * Removed method AbstractDependencyManagerTests#injectArtifactLocator 
 * AbstractDependencyManagerTests#getLocator visibility changed from public to protected
-* AbstractConfigurableBundleCreatorTests jar content pattern has been changed to **/* (from
-  **/*.class, **/*.xml, **/*.properties)
+* AbstractConfigurableBundleCreatorTests jar content pattern has been changed to **/* (from **/*.class, **/*.xml, 
+  **/*.properties)
 
 Package org.springframework.osgi.util
 * Deprecated OsgiServiceUtils#getAllServices()
