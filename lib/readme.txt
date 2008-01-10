@@ -85,29 +85,29 @@ distribution/website before using any of them in your own applications.
 - required for running the framework's test suite
 
 * spring-aop.jar
-- Spring Framework 2.5 AOP library (http://www.springframework.org)
+- Spring Framework 2.5.1 AOP library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-beans.jar
-- Spring Framework 2.5 beans library (http://www.springframework.org)
+- Spring Framework 2.5.1 beans library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-context.jar
-- Spring Framework 2.5 beans library (http://www.springframework.org)
+- Spring Framework 2.5.1 beans library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-core.jar
-- Spring Framework 2.5 beans library (http://www.springframework.org)
+- Spring Framework 2.5.1 beans library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-jdbc.jar
-- Spring Framework 2.5 beans library (http://www.springframework.org)
+- Spring Framework 2.5.1 beans library (http://www.springframework.org)
 - required for running the samples
 
 * spring-test.jar
-- Spring Framework 2.5 test library (http://www.springframework.org)
+- Spring Framework 2.5.1 test library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-tx.jar
-- Spring Framework 2.5 transaction library (http://www.springframework.org)
+- Spring Framework 2.5.1 transaction library (http://www.springframework.org)
 - required for running the samples

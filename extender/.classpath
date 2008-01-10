@@ -10,10 +10,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-mock"/>
 	<classpathentry kind="var" path="M2_REPO/easymock/easymock/1.2_Java1.3/easymock-1.2_Java1.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.0/org.osgi.core-4.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5-rc1/spring-context-2.5-rc1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5-rc1/spring-core-2.5-rc1.jar" sourcepath="/SPRING_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5-rc1/spring-beans-2.5-rc1.jar" sourcepath="/SPRING_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.1/spring-context-2.5.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.1/spring-core-2.5.1.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.1/spring-beans-2.5.1.jar" sourcepath="/SPRING_SRC"/>
+		<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/aopalliance.osgi/1.0-SNAPSHOT/aopalliance.osgi-1.0-SNAPSHOT.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
