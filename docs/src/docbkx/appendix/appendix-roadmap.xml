@@ -6,7 +6,7 @@
 
     <para>This appendix documents features on the Spring Dynamic Modules
     roadmap. The design of these features specified here is subject to
-    change. As a most up to date source, please see <ulink url="http://opensource.atlassian.com/projects/spring/browse/OSGI">
+    change. As a most up to date source, please see <ulink url="http://jira.springframework.org/browse/OSGI">
     our</ulink> issue tracker.</para>
 
     <section>

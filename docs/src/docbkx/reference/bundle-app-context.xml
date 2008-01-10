@@ -36,7 +36,7 @@
       <literal>org.springframework.osgi.bundles.extender</literal>. This
       bundle is responsible for instantiating the Spring application contexts
       for your application bundles. It serves the same purpose as the <ulink
-      url="http://www.springframework.org/docs/reference/webintegration.html">ContextLoaderListener</ulink>
+      url="http://static.springframework.org/spring/docs/2.5.x/reference/webintegration.html">ContextLoaderListener</ulink>
       does for Spring web applications. Once the extender bundle is installed
       and started it looks for any existing Spring-powered bundles that are
       already in the <emphasis>ACTIVE</emphasis> state and creates application contexts on their
@@ -177,7 +177,7 @@
 
       <para>The Spring Framework defines a resource abstraction for loading
       resources within an application context (see <ulink
-      url="http://www.springframework.org/docs/reference/resources.html">Spring's
+      url="http://static.springframework.org/spring/docs/2.5.x/reference/resources.html">Spring's
       resource abstraction</ulink>). All resource loading is done through the
       <interfacename>org.springframework.core.io.ResourceLoader</interfacename> associated with the application
       context. The <interfacename>org.springframework.core.io.ResourceLoader</interfacename> is also 

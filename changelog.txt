@@ -12,6 +12,7 @@ General
 * All integration tests have been moved under integration-test/ folder
 * By default, the samples and integration tests are not executed (use Maven profiles to include them)
 * Maven 2.0.7 is required for properly building the project under JDK 1.6
+* Knopflerfish 2.0.3 is required for correctly building and running Spring-DM
 
 Package org.springframework.osgi
 * Updated spring-osgi.xsd Tservice to properly reflect OsgiServiceFactoryBean package

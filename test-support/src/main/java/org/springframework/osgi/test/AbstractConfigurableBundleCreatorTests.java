@@ -61,7 +61,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 
 	protected static final String MANIFEST = "manifest";
 
-	protected static final Properties DEFAULT_SETTINGS = new Properties();
+	private static final Properties DEFAULT_SETTINGS = new Properties();
 
 	static {
 		DEFAULT_SETTINGS.setProperty(ROOT_DIR, "file:./target/test-classes");

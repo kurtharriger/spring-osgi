@@ -9,6 +9,6 @@
       We test against <ulink
       url="http://www.eclipse.org/equinox/">Equinox</ulink> 3.2.2, <ulink
       url="http://felix.apache.org/">Felix</ulink> 1.0.1, and <ulink
-      url="http://www.knopflerfish.org/">Knopflerfish</ulink> 2.0.2 as part of our
+      url="http://www.knopflerfish.org/">Knopflerfish</ulink> 2.0.3 as part of our
       continuous integration process.</para>
   </chapter>

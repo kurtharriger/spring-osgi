@@ -241,7 +241,7 @@ context ::= path ( ';' path ) * (';' directive) *
         </listitem>
 
         <listitem>
-          <para>The Spring Dynamic Modules I/O support library bundle, '
+          <para>The Spring Dynamic Modules I/O support library bundle,
           <literal>org.springframework.osgi.io</literal></para>
         </listitem>
       </itemizedlist>
