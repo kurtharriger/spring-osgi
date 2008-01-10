@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.io;
 
 import java.io.IOException;
@@ -28,16 +29,22 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.io.internal.OsgiResourceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * OSGi-aware subclass of PathMatchingResourcePatternResolver.
+ * OSGi-aware {@link ResourcePatternResolver}.
  * 
- * Can find resources in the bundle jar, bundle space or class space. See
- * {@link OsgiBundleResource} for more information.
+ * Can find resources in the <em>bundle jar</em> and <em>bundle space</em>.
+ * See {@link OsgiBundleResource} for more information.
+ * 
+ * <p/> <strong>Note:</strong> <code>classpath:</code> and
+ * <code>classpath*:</code> prefixes are not (yet) supported as there are no
+ * methods for doing classpath discovery. A future version might add such
+ * functionality.
  * 
  * @see Bundle
  * @see OsgiBundleResource
@@ -60,6 +67,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	private static final String FOLDER_SEPARATOR = "/";
 
 	private static final String FOLDER_WILDCARD = "**";
+
 
 	public OsgiBundleResourcePatternResolver(Bundle bundle) {
 		this(new OsgiBundleResourceLoader(bundle));
@@ -186,20 +194,20 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		Enumeration candidates;
 
 		switch (searchType) {
-		case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
-		case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
-			// returns an enumeration of URLs
-			candidates = bundle.findEntries(dir, null, false);
-			break;
-		case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_JAR:
-			// returns an enumeration of Strings
-			candidates = bundle.getEntryPaths(dir);
-			break;
-		case OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE:
-			// returns an enumeration of URLs
-			throw new IllegalArgumentException("class space does not support pattern matching");
-		default:
-			throw new IllegalArgumentException("unknown searchType " + searchType);
+			case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
+			case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
+				// returns an enumeration of URLs
+				candidates = bundle.findEntries(dir, null, false);
+				break;
+			case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_JAR:
+				// returns an enumeration of Strings
+				candidates = bundle.getEntryPaths(dir);
+				break;
+			case OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE:
+				// returns an enumeration of URLs
+				throw new IllegalArgumentException("class space does not support pattern matching");
+			default:
+				throw new IllegalArgumentException("unknown searchType " + searchType);
 		}
 
 		// entries are relative to the root path - miss the leading /
@@ -245,6 +253,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 
 	/**
 	 * Handle candidates returned as URLs.
+	 * 
 	 * @param path
 	 * @return
 	 */

@@ -19,7 +19,8 @@ package org.springframework.osgi.bundle;
 import org.springframework.core.enums.StaticLabeledEnum;
 
 /**
- * {@link Bundle} actions supported by {@link BundleFactoryBean}.
+ * Enum-like class for the {@link Bundle} actions supported by
+ * {@link BundleFactoryBean}.
  * 
  * @author Costin Leau
  * 

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.io;
 
 import org.osgi.framework.Bundle;
@@ -21,30 +22,31 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
- * OSGi specific ResourceLoader implementation.
+ * OSGi specific {@link org.springframework.core.io.ResourceLoader}
+ * implementation.
  * 
- * The loader resolves paths inside an OSGi bundle using the bundle entries for
- * resource loading for any unqualified resource string.
- * 
- * Also understands the "osgibundle:" resource prefix for explicit loading of
- * resources from the bundle. When the bundle prefix is used the target resource
- * must be contained within the bundle (or attached fragments), the classpath is
- * not searched.
- * 
- * @see org.osgi.framework.Bundle
- * @see org.springframework.osgi.io.OsgiBundleResource
+ * This loader resolves paths inside an OSGi bundle using the bundle native
+ * methods. Please see {@link OsgiBundleResource} javadoc for information on
+ * what prefixes are supported.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
  * 
+ * @see org.osgi.framework.Bundle
+ * @see org.springframework.osgi.io.OsgiBundleResource
+ * 
  */
 public class OsgiBundleResourceLoader extends DefaultResourceLoader {
 
-	private Bundle bundle;
+	private final Bundle bundle;
+
 
 	/**
-	 * Creates a OSGi aware ResourceLoader using the given bundle.
-	 * @param bundle
+	 * Creates a OSGi aware <code>ResourceLoader</code> using the given
+	 * bundle.
+	 * 
+	 * @param bundle OSGi <code>Bundle</code> to be used by this loader
+	 * loader.
 	 */
 	public OsgiBundleResourceLoader(Bundle bundle) {
 		this.bundle = bundle;
@@ -55,17 +57,15 @@ public class OsgiBundleResourceLoader extends DefaultResourceLoader {
 		return new OsgiBundleResource(this.bundle, path);
 	}
 
-	/**
-	 * Implementation of getResource that delegates to the bundle for any
-	 * unqualified resource reference or a reference starting with "osgibundle:"
-	 */
 	public Resource getResource(String location) {
 		Assert.notNull(location, "location is required");
 		return new OsgiBundleResource(bundle, location);
 	}
 
 	/**
-	 * Return the bundle for this resource.
+	 * Returns the bundle used by this loader.
+	 * 
+	 * @return OSGi <code>Bundle</code> used by this resource
 	 */
 	public final Bundle getBundle() {
 		return bundle;

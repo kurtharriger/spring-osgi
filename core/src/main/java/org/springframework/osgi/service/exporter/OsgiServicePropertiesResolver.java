@@ -15,27 +15,30 @@
  *
  * Created on 25-Jan-2006 by Adrian Colyer
  */
+
 package org.springframework.osgi.service.exporter;
 
 import java.util.Map;
 
 /**
  * An OsgiServicePropertiesResolver is responsible for providing the properties
- * that a bean exposed as a service will be published with. It is used mainly as
- * a collaborator of OsgiServiceFactoryBean.
+ * that a bean exposed as a service will be published with.
  * 
  * @author Adrian Colyer
+ * 
+ * @see org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean
  */
 public interface OsgiServicePropertiesResolver {
 
 	/**
 	 * Predefined property indicating the bean name of an exported Spring
-	 * managed object
+	 * managed object.
 	 */
 	String BEAN_NAME_PROPERTY_KEY = "org.springframework.osgi.bean.name";
 
+
 	/**
-	 * Return a map containing the service properties associated with the given
+	 * Returns a map containing the service properties associated with the given
 	 * Spring managed bean identified by its name.
 	 * 
 	 * @param beanName Spring managed bean name

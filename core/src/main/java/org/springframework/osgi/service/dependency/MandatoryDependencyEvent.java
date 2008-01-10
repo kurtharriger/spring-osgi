@@ -27,10 +27,20 @@ public class MandatoryDependencyEvent extends EventObject {
 
 	private static final long serialVersionUID = -5653734359406600399L;
 
+	/**
+	 * Constructs a new <code>MandatoryDependencyEvent</code> instance.
+	 *
+	 * @param source event source
+	 */
 	public MandatoryDependencyEvent(ServiceDependency source) {
 		super(source);
 	}
 
+	/**
+	 * Returns the source of the event.
+	 * 
+	 * @return the source of the event
+	 */
 	public ServiceDependency getServiceImporter() {
 		return (ServiceDependency) super.getSource();
 	}

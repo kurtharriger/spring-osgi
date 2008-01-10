@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.dependency;
 
 /**
@@ -20,13 +21,14 @@ package org.springframework.osgi.service.dependency;
  * up or down (that is, becomes satisfied or not).
  * 
  * @author Costin Leau
- * 
  */
 public interface MandatoryDependencyListener {
 
 	/**
-	 * Called when the mandatory dependency for an importer has been satisfied.
+	 * Called when a mandatory dependency for an importer has been satisfied.
 	 * This method is called only if the dependency has been unsatisfied before.
+	 * 
+	 * @param event mandatory dependency notification
 	 * 
 	 * @see #mandatoryDependencyUnsatisfied(MandatoryDependencyEvent)
 	 */
@@ -36,6 +38,7 @@ public interface MandatoryDependencyListener {
 	 * Called when a mandatory dependency for an importer has been unsatisfied.
 	 * This method is called only if the dependency was satisfied before.
 	 * 
+	 * @param mandatory dependency notification
 	 * @see #mandatoryDependencySatisfied(MandatoryDependencyEvent)
 	 */
 	void mandatoryDependencyUnsatisfied(MandatoryDependencyEvent event);

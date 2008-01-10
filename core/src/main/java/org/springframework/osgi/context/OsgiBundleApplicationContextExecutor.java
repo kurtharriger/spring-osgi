@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.context;
 
 import org.springframework.beans.BeansException;
 
 /**
- * Executor of {@link DelegatedExecutionOsgiBundleApplicationContext}s. Decides
- * how and when the application context will be refreshed/closed.
+ * {@link DelegatedExecutionOsgiBundleApplicationContext} executor. Decides how
+ * and when the application context will be refreshed/closed.
  * 
  * @author Costin Leau
- * 
+ * @see DelegatedExecutionOsgiBundleApplicationContext
  */
 public interface OsgiBundleApplicationContextExecutor {
 
@@ -33,11 +34,11 @@ public interface OsgiBundleApplicationContextExecutor {
 	 * @throws BeansException
 	 * @throws IllegalStateException
 	 */
-	public void refresh() throws BeansException, IllegalStateException;
+	void refresh() throws BeansException, IllegalStateException;
 
 	/**
 	 * Execute the delegated
 	 * {@link org.springframework.context.ConfigurableApplicationContext#close()}.
 	 */
-	public void close();
+	void close();
 }

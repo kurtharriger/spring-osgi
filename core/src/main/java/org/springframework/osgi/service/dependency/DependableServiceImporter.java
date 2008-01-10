@@ -27,7 +27,7 @@ public interface DependableServiceImporter extends ServiceDependency {
 	/**
 	 * Register a {@link MandatoryDependencyListener} on this importer.
 	 * 
-	 * @param listener
+	 * @param listener dependency listener to register.
 	 */
 	void registerListener(MandatoryDependencyListener listener);
 

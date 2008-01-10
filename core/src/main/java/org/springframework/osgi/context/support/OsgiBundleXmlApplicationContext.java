@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package org.springframework.osgi.context.support;
 
 import java.io.IOException;
@@ -32,17 +33,18 @@ import org.xml.sax.EntityResolver;
  * Standalone XML application context, backed by an OSGi bundle.
  * 
  * <p>
- * The config location defaults can be overridden via
- * {@link #getDefaultConfigLocations()}, Config locations can either denote
- * concrete files like "/myfiles/context.xml" or Ant-style patterns like
- * "/myfiles/*-context.xml" (see the
+ * The configuration location defaults can be overridden via
+ * {@link #getDefaultConfigLocations()}. Note that locations can either denote
+ * concrete files like <code>/myfiles/context.xml</code> or <em>Ant-style</em>
+ * patterns like <code>/myfiles/*-context.xml</code> (see the
  * {@link org.springframework.util.AntPathMatcher} javadoc for pattern details).
  * </p>
  * 
  * <p>
- * Note: In case of multiple config locations, later bean definitions will
- * override ones defined in earlier loaded files. This can be leveraged to
- * deliberately override certain bean definitions via an extra XML file.
+ * <strong>Note:</strong> In case of multiple configuration locations, later
+ * bean definitions will override ones defined in earlier loaded files. This can
+ * be leveraged to deliberately override certain bean definitions via an extra
+ * XML file.
  * </p>
  * 
  * <p/> <b>This is the main ApplicationContext class for OSGi environments.</b>
@@ -57,17 +59,19 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	/** Default config location for the root context(s) */
 	/**
 	 * Note this location uses {@link OsgiBundleResource#BUNDLE_JAR_URL_PREFIX}
-	 * prefix temporary as a work around for resource acquisition problems(OSGI-210)
-	 * with Felix and Knopflerfish. We expect the prefix to be removed (from jar to
-	 * bundle space) before the final release.
+	 * prefix temporary as a work around for resource acquisition
+	 * problems(OSGI-210) with Felix and Knopflerfish. We expect the prefix to
+	 * be removed (from jar to bundle space) before the final release.
 	 */
 	// FIXME: change this to bundle space once KF 2.0.3 is out
 	public static final String DEFAULT_CONFIG_LOCATION = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX
 			+ "/META-INF/spring/*.xml";
 
+
 	/**
 	 * 
-	 * Create a new OsgiBundleXmlApplicationContext with no parent.
+	 * Creates a new <code>OsgiBundleXmlApplicationContext</code> with no
+	 * parent.
 	 * 
 	 */
 	public OsgiBundleXmlApplicationContext() {
@@ -75,8 +79,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * Create a new OsgiBundleXmlApplicationContext with the given parent
-	 * context.
+	 * Creates a new <code>OsgiBundleXmlApplicationContext</code> with the
+	 * given parent context.
 	 * 
 	 * @param parent the parent context
 	 */
@@ -85,8 +89,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * Create a new OsgiBundleXmlApplicationContext with the given
-	 * configLocations.
+	 * Creates a new <code>OsgiBundleXmlApplicationContext</code> with the
+	 * given configLocations.
 	 * 
 	 * @param configLocations array of configuration resources
 	 */
@@ -95,8 +99,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * Create a new OsgiBundleXmlApplicationContext with the given
-	 * configLocations and parent context.
+	 * Creates a new <code>OsgiBundleXmlApplicationContext</code> with the
+	 * given configLocations and parent context.
 	 * 
 	 * @param configLocations array of configuration resources
 	 * @param parent the parent context
@@ -107,11 +111,10 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * Loads the bean definitions via an XmlBeanDefinitionReader.
+	 * {@inheritDoc}
 	 * 
-	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
-	 * @see #initBeanDefinitionReader
-	 * @see #loadBeanDefinitions
+	 * <p/> Loads the bean definitions via an
+	 * <code>XmlBeanDefinitionReader</code>.
 	 */
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
 		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
@@ -152,7 +155,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * Load the bean definitions with the given XmlBeanDefinitionReader.
+	 * Loads the bean definitions with the given
+	 * <code>XmlBeanDefinitionReader</code>.
 	 * <p>
 	 * The lifecycle of the bean factory is handled by the refreshBeanFactory
 	 * method; therefore this method is just supposed to load and/or register
@@ -180,17 +184,14 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 
 	/**
 	 * Provide default locations for XML files. This implementation returns
+	 * <code>META-INF/spring/*.xml</code> relying on the default resource
+	 * environment for actual localisation. By default, the bundle space will be
+	 * used for locating the resources.
 	 * 
-	 * <em>
-	 * META-INF/spring/*.xml
-	 * </em>
+	 * <p/> <strong>Note:</strong> Instead of overriding this method, consider
+	 * using the Spring-DM specific header inside your manifest bundle.
 	 * 
-	 * relying on the default resource environment for actual localisation.
-	 * 
-	 * <p/> By default, the bundle space will be used for locating the
-	 * resources.
-	 * 
-	 * @return xml default config locations
+	 * @return default XML configuration locations
 	 */
 	protected String[] getDefaultConfigLocations() {
 		return new String[] { DEFAULT_CONFIG_LOCATION };

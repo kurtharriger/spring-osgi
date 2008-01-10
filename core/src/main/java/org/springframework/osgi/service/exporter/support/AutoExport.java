@@ -19,11 +19,10 @@ import org.springframework.core.enums.StaticLabeledEnum;
 import org.springframework.osgi.util.internal.ClassUtils;
 
 /**
- * Class exporters available to {@link OsgiServiceFactoryBean} for registering
+ * Enum-like class indicatin class exporters available to {@link OsgiServiceFactoryBean} for registering
  * object as OSGi services.
  * 
  * @author Costin Leau
- * 
  */
 public abstract class AutoExport extends StaticLabeledEnum {
 
@@ -49,7 +48,7 @@ public abstract class AutoExport extends StaticLabeledEnum {
 
 	/**
 	 * Export the class hierarchy (all classes inherited by the given target
-	 * until Object.class)
+	 * excluding Object.class)
 	 */
 	public static final AutoExport CLASS_HIERARCHY = new AutoExport(2, "CLASS_HIERARCHY") {
 		public Class[] getExportedClasses(Class targetClass) {
@@ -70,7 +69,7 @@ public abstract class AutoExport extends StaticLabeledEnum {
 	};
 
 	/**
-	 * Determine the exported classes given a certain target class.
+	 * Determines the exported classes given a certain target class.
 	 * 
 	 * @param targetClass class to be exported into OSGi
 	 * @return array of classes that will be published for the OSGi service.

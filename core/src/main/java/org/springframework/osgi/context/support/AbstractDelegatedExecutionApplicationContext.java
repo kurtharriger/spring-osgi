@@ -31,28 +31,28 @@ import org.springframework.util.ObjectUtils;
 /**
  * OSGi-specific application context that delegates the execution of its
  * lifecycle methods to a different class. The main reason behind this is to
- * 'break' the startup of the application context in steps that can be executed
- * asynchronously.
+ * <em>break</em> the startup of the application context in steps that can be
+ * executed asynchronously.
  * 
  * <p/> The {@link #refresh()} and {@link #close()} methods delegate their
  * execution to an {@link OsgiBundleApplicationContextExecutor} class that
- * choses how to call the lifecycle submethods.
+ * chooses how to call the lifecycle methods.
  * 
  * <p/> One can still call the 'traditional' lifecycle methods through
  * {@link #normalRefresh()} and {@link #normalClose()}.
  * 
- * @see DelegatedExecutionOsgiBundleApplicationContext
  * @author Costin Leau
- * 
+ * @see DelegatedExecutionOsgiBundleApplicationContext
  */
 public abstract class AbstractDelegatedExecutionApplicationContext extends AbstractOsgiBundleApplicationContext
 		implements DelegatedExecutionOsgiBundleApplicationContext {
 
 	/**
-	 * Executor that doesn't wait for dependencies.
+	 * Executor that offers the traditional way of <code>refreshing</code>/<code>closing</code>
+	 * of an ApplicationContext (no conditions have to be met and the refresh
+	 * happens in only one step).
 	 * 
 	 * @author Costin Leau
-	 * 
 	 */
 	private static class NoDependenciesWaitRefreshExecutor implements OsgiBundleApplicationContextExecutor {
 

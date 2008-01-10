@@ -24,6 +24,11 @@ Package org.springframework.osgi
 Package org.springframework.osgi.bundle
 * Removed deprecated method BundleFactoryBean#setClassloader
 
+Package org.springframework.osgi.config
+* OsgiConfigDefinitionParser visibility changed from public to default
+* OsgiDefaultsDefinition visibility changed from public to default
+* ParserUtils visibility changed from public to default
+
 Package org.springframework.osgi.context
 * AbstractDelegatedExecutionApplicationContext throws clearer exception when the mandatory BundleContext 
   is not set

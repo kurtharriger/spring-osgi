@@ -50,7 +50,7 @@ public interface DependentServiceExporter {
 	/**
 	 * Indicates whether this OSGi component is currently running.
 	 * 
-	 * @return
+	 * @return true if the component is running, false otherwise
 	 */
 	boolean isRunning();
 }

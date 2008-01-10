@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package org.springframework.osgi.bundle;
 
 import java.io.IOException;
@@ -40,20 +41,30 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Install Bundles using a FactoryBean.
- *
- * This allows customers to use Spring to drive bundle management. Bundles
- * states can be modified using the state parameter. Most commonly this is set
- * to "start". Please see {@link BundleAction} and the relationship between the
- * actions.
- *
- * <p/>Pay attention when installing bundles dynamically since classes can be
- * loaded aggressively.
- *
- * @see BundleAction
- *
+ * {@link Bundle} installer.
+ * 
+ * <p/> This {@link FactoryBean} allows customers to use Spring to drive bundle
+ * management. Bundles states can be modified using the <code>action</code>
+ * (defaults to <em>start</em>) and <code>destroyAction</code> (not set by
+ * default) parameters.
+ * 
+ * <p/> For example, to automatically install and start a bundle from the local
+ * maven repository (assuming the bundle has been already retrieved), one can
+ * use the following configuration:
+ * 
+ * <pre class="code">
+ * &lt;osgi:bundle id=&quot;aBundle&quot; symbolic-name=&quot;org.company.bundles.a&quot;
+ *  location=&quot;file:${localRepository}/org/company/bundles/a/${pom.version}/a-${pom.version}.jar&quot; 
+ *  action=&quot;start&quot;/&gt;
+ * </pre>
+ * 
+ * 
+ * <p/><strong>Note:</strong> Pay attention when installing bundles
+ * dynamically since classes can be loaded aggressively.
+ * 
  * @author Andy Piper
  * @author Costin Leau
+ * @see BundleAction
  */
 public class BundleFactoryBean implements FactoryBean, BundleContextAware, InitializingBean, DisposableBean,
 		ResourceLoaderAware {
@@ -85,8 +96,6 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	/** unused at the moment */
 	private boolean pushBundleAsContextClassLoader = false;
 
-	/** wait until the operation invoked completes */
-	private boolean waitToComplete = false;
 
 	// FactoryBean methods
 	public Class getObjectType() {
@@ -198,7 +207,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 
 	/**
 	 * Install bundle - the equivalent of install action.
-	 *
+	 * 
 	 * @return
 	 * @throws BundleException
 	 */
@@ -243,7 +252,6 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		// try to find the bundle
 		if (StringUtils.hasText(symbolicName))
 			bundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, symbolicName);
-
 
 		return bundle;
 	}
@@ -335,20 +343,31 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		this.destroyAction = action;
 	}
 
-	
+	/**
+	 * Gets the bundle start level.
+	 * 
+	 * @return bundle start level
+	 */
 	public int getStartLevel() {
 		return startLevel;
 	}
 
+	/**
+	 * Sets the bundle start level.
+	 * 
+	 * @param startLevel bundle start level.
+	 */
 	public void setStartLevel(int startLevel) {
 		this.startLevel = startLevel;
 	}
 
 	/**
 	 * Determines whether invocations on the remote service should be performed
-	 * in the context of the target bundle's ClassLoader. The default is false.
+	 * in the context (thread context class loader) of the target bundle's
+	 * ClassLoader. The default is <code>false</code>.
 	 * 
-	 * @param pushBundleAsContextClassLoader
+	 * @param pushBundleAsContextClassLoader true if the thread context class
+	 * loader will be set to the target bundle or false otherwise
 	 */
 	public void setPushBundleAsContextClassLoader(boolean pushBundleAsContextClassLoader) {
 		this.pushBundleAsContextClassLoader = pushBundleAsContextClassLoader;
@@ -380,7 +399,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	/**
 	 * Returns the bundle with which the class interacts.
 	 * 
-	 * @return Returns the bundle
+	 * @return Returns this factory backing bundle
 	 */
 	public Bundle getBundle() {
 		return bundle;
@@ -390,7 +409,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	 * Set the backing bundle used by this class. Allows programmatic
 	 * configuration of already retrieved/created bundle.
 	 * 
-	 * @param bundle The bundle to set.
+	 * @param bundle The bundle to set
 	 */
 	public void setBundle(Bundle bundle) {
 		this.bundle = bundle;

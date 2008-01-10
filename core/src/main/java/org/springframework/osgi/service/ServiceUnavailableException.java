@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service;
 
 import org.osgi.framework.Filter;
@@ -20,17 +21,17 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
- * Thrown when an obtained OSGi service becomes unavailable/unregistered.
+ * Exception indicating that an OSGi service became unavailable/unregistered.
  * Normally this exception is used to indicate that no suitable replacement is
  * found (in case service rebinding is actually performed).
  * 
  * @author Adrian Colyer
  * @author Costin Leau
- * 
  */
 public class ServiceUnavailableException extends ServiceException {
 
 	private static final long serialVersionUID = -3479837278220329490L;
+
 
 	/**
 	 * Constructs a new <code>ServiceUnavailableException</code> instance.

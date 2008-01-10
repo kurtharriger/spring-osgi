@@ -20,7 +20,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.config.OsgiConfigDefinitionParser;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
@@ -233,7 +232,7 @@ public class OsgiConfig implements InitializingBean, BeanFactoryAware, BundleCon
 	private static final Log log = LogFactory.getLog(OsgiConfig.class);
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(pid, OsgiConfigDefinitionParser.PERSISTENT_ID + " property is required");
+		Assert.notNull(pid, "persistence id property is required");
 		for (Iterator l = listeners.iterator(); l.hasNext();) {
 			ConfigListener listener = (ConfigListener) l.next();
 			listener.resolve(beanFactory, factory);

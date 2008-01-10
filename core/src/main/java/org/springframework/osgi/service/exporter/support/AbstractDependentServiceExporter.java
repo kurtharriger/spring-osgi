@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.exporter.support;
 
 import org.apache.commons.logging.Log;
@@ -39,6 +40,7 @@ public abstract class AbstractDependentServiceExporter implements DependentServi
 	private boolean running = false;
 
 	private boolean initialized = false;
+
 
 	/**
 	 * Indicates whether the service publication should happen at startup or
@@ -98,12 +100,12 @@ public abstract class AbstractDependentServiceExporter implements DependentServi
 	}
 
 	/**
-	 * Register/Export the OSGi service.
+	 * Registers/Exports the OSGi service.
 	 */
 	abstract void registerService();
 
 	/**
-	 * Unregister/de-export the OSGi service.
+	 * Unregisters/de-exports the OSGi service.
 	 */
 	abstract void unregisterService();
 
