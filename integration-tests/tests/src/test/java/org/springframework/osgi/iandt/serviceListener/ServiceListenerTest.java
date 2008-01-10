@@ -1,3 +1,4 @@
+
 package org.springframework.osgi.iandt.serviceListener;
 
 import org.osgi.framework.Bundle;
@@ -18,8 +19,8 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 
 	protected String[] getTestBundlesNames() {
 		return new String[] {
-				"org.springframework.osgi,org.springframework.osgi.iandt.simple.service," + getSpringDMVersion(),
-				"org.springframework.osgi, org.springframework.osgi.iandt.service.listener," + getSpringDMVersion() };
+			"org.springframework.osgi,org.springframework.osgi.iandt.simple.service," + getSpringDMVersion(),
+			"org.springframework.osgi, org.springframework.osgi.iandt.service.listener," + getSpringDMVersion() };
 	}
 
 	public void testServiceListener() throws Exception {
@@ -56,10 +57,7 @@ public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests 
 		return 10L;
 	}
 
-	// disable this on KF
-	// TODO: double check on KF 2.0.3
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-//		return createPlatform().toString().startsWith("Knopflerfish");
 		return false;
 	}
 }
