@@ -10,7 +10,7 @@
   
   <properties>
 	<slf4j.version>1.4.3</slf4j.version>
-	<spring.maven.artifact.version>2.5</spring.maven.artifact.version>
+	<spring.maven.artifact.version>2.5.1</spring.maven.artifact.version>
   </properties>
   
   <dependencies>
