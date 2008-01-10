@@ -15,6 +15,7 @@
  *
  * Created on 25-Jan-2006 by Adrian Colyer
  */
+
 package org.springframework.osgi.service.exporter.support;
 
 import java.util.Map;
@@ -29,26 +30,27 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * OsgiServicePropertiesResolver that creates a service property set with the
- * following properties:
+ * {@link OsgiServicePropertiesResolver} that creates a service property set
+ * with the following properties:
  * <ul>
  * <li>Bundle-SymbolicName=&lt;bundle symbolic name&gt;</li>
  * <li>Bundle-Version=&lt;bundle version&gt;</li>
  * <li>org.springframework.osgi.bean.name="&lt;bean name&gt;</li>
  * </ul>
  * 
- * @see OsgiServicePropertiesResolver
- * @see OsgiServiceFactoryBean
  * 
  * @author Adrian Colyer
  * @author Hal Hildebrand
+ * 
+ * @see OsgiServicePropertiesResolver
+ * @see OsgiServiceFactoryBean
+ * 
  */
-public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesResolver, BundleContextAware, InitializingBean {
+public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesResolver, BundleContextAware,
+		InitializingBean {
 
 	private BundleContext bundleContext;
 
-	public BeanNameServicePropertiesResolver() {
-	}
 
 	public Map getServiceProperties(String beanName) {
 		Map p = new MapBasedDictionary();

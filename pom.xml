@@ -514,23 +514,23 @@ limitations under the License.
                <packages>org.springframework.osgi.io*</packages>
             </group>
             <group>
-               <title>Spring Dynamic Modules JUnit Support</title>
+               <title>Spring Dynamic Modules Integration Testing Framework</title>
                <packages>org.springframework.osgi.test*</packages>
             </group>
-            <!--
-            :org.springframework.osgi.test.platform:org.springframework.osgi.test.support:org.springframework.osgi.test.util:org.springframework.osgi.test.storage
-            -->
             <group>
                 <title>Spring Dynamic Modules Mock</title>
                <packages>org.springframework.osgi.mock*</packages>
             </group>
-            
+            <group>
+                <title>Spring Dynamic Modules Extensions</title>
+               <packages>org.springframework.osgi.extensions*</packages>
+            </group>
             <group>
                <title>Samples</title>
                <packages>org.springframework.osgi.sample*</packages>
             </group>
           </groups>
-          <excludePackageNames>*internal:org.springframework.osgi.iandt*:*samples</excludePackageNames>
+          <excludePackageNames>*internal:*samples:org.springframework.osgi.config:org.springframework.osgi.iandt*</excludePackageNames>
           
           <!-- enabled as this is the recommandation on 1.4 -->
           <breakiterator>true</breakiterator>
@@ -539,7 +539,7 @@ limitations under the License.
           <show>protected</show>
           <source>1.5</source>
           <links>
-            <link>http://java.sun.com/j2se/1.4.2/docs/api/</link>
+            <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
             <link>
               http://static.springframework.org/spring/docs/2.5.x/api/
             </link>

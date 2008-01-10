@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.dependency;
 
 /**
@@ -26,16 +27,17 @@ package org.springframework.osgi.service.dependency;
 public interface ServiceDependency {
 
 	/**
-	 * Is this dependency mandatory?
+	 * Indicates if this dependency is mandatory or not.
 	 * 
 	 * @return true if the dependency is mandatory, false otherwise.
 	 */
 	boolean isMandatory();
 
 	/**
-	 * Is this dependency satisfied? For optional service imports, this will
-	 * always return true, for mandatory service imports, will return true if at
-	 * least one service is available or false otherwise.
+	 * Indicates if the dependency is satisified or not. For optional service
+	 * imports, this should always return true while for mandatory service
+	 * imports, should return true if at least one service is available or false
+	 * otherwise.
 	 * 
 	 * @return true if the dependency is satisfied, false otherwise.
 	 */

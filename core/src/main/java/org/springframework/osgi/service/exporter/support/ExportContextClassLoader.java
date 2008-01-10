@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.exporter.support;
 
 import org.springframework.core.enums.StaticLabeledEnum;
 
 /**
- * Exporter thread context-classLoader (TCCL) management options.
+ * Enum-like class for the exporter thread context-classLoader (TCCL) management
+ * options.
  * 
- * Used by {@link OsgiServiceFactoryBean} for exported services that depend on
- * certain TCCL to be set.
+ * <p/> Used by {@link OsgiServiceFactoryBean} for exported services that depend
+ * on certain TCCL to be set.
  * 
  * @author Costin Leau
- * 
  */
 public class ExportContextClassLoader extends StaticLabeledEnum {
 
@@ -39,6 +40,7 @@ public class ExportContextClassLoader extends StaticLabeledEnum {
 	 * The TCCL will be set to the service provider upon service invocation.
 	 */
 	public static final ExportContextClassLoader SERVICE_PROVIDER = new ExportContextClassLoader(1, "SERVICE_PROVIDER");
+
 
 	/**
 	 * Constructs a new <code>ExportContextClassLoader</code> instance.

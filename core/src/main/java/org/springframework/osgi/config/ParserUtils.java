@@ -37,7 +37,7 @@ import org.w3c.dom.NamedNodeMap;
  * @author Andy Piper
  * @author Costin Leau
  */
-public abstract class ParserUtils {
+abstract class ParserUtils {
 
 	/**
 	 * Standard attribute callback. Deals with ID, DEPENDS-ON and LAZY-INIT
@@ -46,7 +46,7 @@ public abstract class ParserUtils {
 	 * @author Costin Leau
 	 * 
 	 */
-	public static class StandardAttributeCallback implements AttributeCallback {
+	static class StandardAttributeCallback implements AttributeCallback {
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
 
@@ -82,7 +82,7 @@ public abstract class ParserUtils {
 	 * @author Costin Leau
 	 * 
 	 */
-	public static class PropertyRefAttributeCallback implements AttributeCallback {
+	static class PropertyRefAttributeCallback implements AttributeCallback {
 		private static final String PROPERTY_REF = "-ref";
 
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
@@ -106,7 +106,7 @@ public abstract class ParserUtils {
 	 * 
 	 * @author Costin Leau
 	 */
-	public static class ConventionCallback implements AttributeCallback {
+	static class ConventionCallback implements AttributeCallback {
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
 			String propertyName = Conventions.attributeNameToPropertyName(name);
@@ -134,7 +134,7 @@ public abstract class ParserUtils {
 	 * @author Costin Leau
 	 * 
 	 */
-	public static interface AttributeCallback {
+	static interface AttributeCallback {
 
 		/**
 		 * Process the given attribute using the contextual element and bean
@@ -149,7 +149,7 @@ public abstract class ParserUtils {
 		 * @return true if the rest of the callbacks should be called or false
 		 * otherwise.
 		 */
-		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder);
+		boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder);
 	}
 
 	/**

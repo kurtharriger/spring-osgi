@@ -13,31 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extensions.annotation;
 
 import org.springframework.osgi.service.importer.support.Cardinality;
 
 /**
+ * Spring-DM managed service cardinality.
+ * 
  * @author Andy Piper
  */
 public enum ServiceReferenceCardinality {
-    C0__1 (Cardinality.C_0__1),
-    C0__N (Cardinality.C_0__N),
-    C1__1 (Cardinality.C_1__1),
-    C1__N (Cardinality.C_1__N);
+	/** @see Cardinality#C_0__1 */
+	C0__1(Cardinality.C_0__1),
+	/** @see Cardinality#C_0__N */
+	C0__N(Cardinality.C_0__N),
+	/** @see Cardinality#C_1__1 */
+	C1__1(Cardinality.C_1__1),
+	/** @see Cardinality#C_1__N */
+	C1__N(Cardinality.C_1__N);
 
-    private Cardinality cardValue;
+	private Cardinality cardValue;
 
-    private ServiceReferenceCardinality(Cardinality c) {
-        cardValue = c;
-    }
 
-    public String toString() {
-        return cardValue.getLabel();
-    }
+	private ServiceReferenceCardinality(Cardinality c) {
+		cardValue = c;
+	}
 
-    public Cardinality toCardinality() {
-        return cardValue;
-    }
+	public String toString() {
+		return cardValue.getLabel();
+	}
+
+	public Cardinality toCardinality() {
+		return cardValue;
+	}
 
 }

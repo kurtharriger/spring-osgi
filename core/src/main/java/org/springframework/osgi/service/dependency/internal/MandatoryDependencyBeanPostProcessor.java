@@ -21,9 +21,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.service.dependency.DependentServiceExporter;
-import org.springframework.util.Assert;
 
 /**
  * BeanPostProcessor registered for detecting the dependency between service

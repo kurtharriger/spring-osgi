@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.context;
 
 import org.osgi.framework.Bundle;
@@ -20,15 +21,15 @@ import org.osgi.framework.BundleContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * Interface to be implemented by configurable OSGi bundle application contexts.
+ * Interface that extends <code>ConfigurableApplicationContext</code> to
+ * provides OSGi specific functionality.
  * 
  * <p>
- * Note: The setters of this interface need to be called before an invocation of
- * the refresh method inherited from ConfigurableApplicationContext. They do not
- * cause an initialization of the context on their own.
+ * <strong>Note:</strong> Just like its ancestors,the setters of this interface
+ * should be called before <code>refresh</code>ing the
+ * <code>ApplicationContext</code>
  * 
  * @author Costin Leau
- * 
  */
 public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableApplicationContext {
 
@@ -44,44 +45,58 @@ public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableAp
 	 */
 	static final String BUNDLE_CONTEXT_BEAN_NAME = "bundleContext";
 
+
 	/**
-	 * Set the config locations for this OSGi bundle application context. If not
-	 * set, the implementation is supposed to use a default for the given
-	 * namespace.
+	 * Sets the config locations for this OSGi bundle application context. If
+	 * not set, the implementation is supposed to use a default for the given
+	 * bundle.
+	 * 
+	 * @param configLocations array of configuration locations
 	 */
 	void setConfigLocations(String[] configLocations);
 
 	/**
-	 * Set the BundleContext for this OSGi bundle application context.
-	 * <p>
-	 * Does not cause an initialization of the context: refresh needs to be
-	 * called after the setting of all configuration properties.
+	 * Sets the <code>BundleContext</code> used by this OSGi bundle
+	 * application context. Normally it's the <code>BundleContext</code> in
+	 * which the context runs.
 	 * 
+	 * <p>
+	 * Does not cause an initialization of the context: {@link #refresh()} needs
+	 * to be called after the setting of all configuration properties.
+	 * 
+	 * @param bundleContext the <code>BundleContext</code> used by this
+	 * application context.
 	 * @see #refresh()
 	 */
 	void setBundleContext(BundleContext bundleContext);
 
 	/**
-	 * Return the bundle context for this application context. This method is
-	 * offered as a helper since as of OSGi 4.1, the bundle context can be
-	 * discovered from a given bundle.
+	 * Return the <code>BundleContext</code> for this application context.
+	 * This method is offered as a helper since as of OSGi 4.1, the bundle
+	 * context can be discovered directly from the given bundle.
+	 * 
+	 * @return the <code>BundleContext</code> in which this application
+	 * context runs
 	 * 
 	 * @see #getBundle()
-	 * @return
 	 */
 	BundleContext getBundleContext();
 
 	/**
-	 * Return the OSGi bundle for this application context.
+	 * Returns the OSGi <code>Bundle</code> for this application context.
 	 * 
-	 * @return the Bundle for this OSGi bundle application context.
+	 * @return the <code>Bundle</code> for this OSGi bundle application
+	 * context.
 	 */
 	Bundle getBundle();
 
 	/**
-	 * Publish the application context as an OSGi service.
+	 * Indicates whether this application context should be publish as an OSGi
+	 * service if successfully started. By default, this is set to
+	 * <code>true</code>.
 	 * 
-	 * @param publishContextAsService The publishContextAsService to set.
+	 * @param publishContextAsService true if the application context should be
+	 * published as a service, false otherwise
 	 */
 	void setPublishContextAsService(boolean publishContextAsService);
 }

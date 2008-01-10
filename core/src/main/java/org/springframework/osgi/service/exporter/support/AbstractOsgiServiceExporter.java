@@ -32,10 +32,12 @@ public abstract class AbstractOsgiServiceExporter extends AbstractDependentServi
 	private OsgiServiceRegistrationListener[] listeners = new OsgiServiceRegistrationListener[0];
 
 	/**
-	 * Take care of notifying the listeners on both startup and shutdown (by
-	 * wrapping with a special service registration).
+	 * Takes care of notifying the listeners on both startup and shutdown (by
+	 * wrapping the service registration).
 	 * 
-	 * @param properties
+	 * @param service object published as OSGi service
+	 * @param properties exported OSGi service properties
+	 * @param registration original service registration
 	 * @return
 	 */
 	ServiceRegistration notifyListeners(Object service, Map properties, ServiceRegistration registration) {

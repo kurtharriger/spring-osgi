@@ -13,51 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.context;
 
+package org.springframework.osgi.context;
 
 /**
  * Interface that redirect the application context crucial methods to a third
- * party executor. This interface splits the refresh method in two:
+ * party executor to allow the initialization to be executed in stages.
+ * 
+ * The interface splits the <code>refresh</code> method in two parts:
  * {@link #startRefresh()} and {@link #completeRefresh()}.
  * 
- * @author Costin Leau
+ * <p/><strong>Note:</strong> This interface is intended for usage only inside
+ * Spring-DM framework. Relying on this interface is highly discouraged.
  * 
+ * @author Costin Leau
  */
 public interface DelegatedExecutionOsgiBundleApplicationContext extends ConfigurableOsgiBundleApplicationContext {
 
 	/**
-	 * The non-delegated refresh operation.
+	 * Non-delegated refresh operation (execute {@link #refresh} in the
+	 * <em>traditional</em> way).
 	 * 
 	 * @see org.springframework.context.ConfigurableApplicationContext#refresh()
 	 */
 	void normalRefresh();
 
 	/**
-	 * The non-delegated close operation.
+	 * Non-delegated close operation (execute {@link #close} in the
+	 * <em>traditional</em> way).
 	 * 
 	 * @see org.springframework.context.ConfigurableApplicationContext#close()
 	 */
 	void normalClose();
 
 	/**
-	 * First phase of the refresh. Executes right a certain condition, imposed
-	 * by the executor is checked. Normally, this just prepares the beanFactory
-	 * but does not creates any beans.
+	 * First phase of the refresh. Normally, this just prepares the
+	 * <code>beanFactory</code> but does not instantiates any beans.
 	 */
 	void startRefresh();
 
 	/**
-	 * The second, last phase of the refresh. Finishes the rest of the refresh
-	 * operation. Normally, this operations performs most of the refresh work,
-	 * such as instantiating singleton.
+	 * The second, last phase of the refresh. Executes after a certain
+	 * condition, imposed by the executor, has been met. Finishes the rest of
+	 * the <code>refresh</code> operation. Normally, this operations performs
+	 * most of the <code>refresh work</code>, such as instantiating
+	 * singletons.
 	 */
 	void completeRefresh();
 
 	/**
-	 * Assign the {@link OsgiBundleApplicationContextExecutor} for this delegated context.
+	 * Assigns the {@link OsgiBundleApplicationContextExecutor} for this
+	 * delegated context.
 	 * 
-	 * @param executor
+	 * @param executor the executor of this application context, to which the
+	 * <code>refresh</code> method is delegated to
 	 */
 	void setExecutor(OsgiBundleApplicationContextExecutor executor);
 

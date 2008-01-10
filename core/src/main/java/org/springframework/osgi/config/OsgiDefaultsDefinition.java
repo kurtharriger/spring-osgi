@@ -21,7 +21,7 @@ package org.springframework.osgi.config;
  * @author Costin Leau
  * 
  */
-public class OsgiDefaultsDefinition {
+class OsgiDefaultsDefinition {
 
 	private static final String TIMEOUT_DEFAULT = "300000";
 	

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.io;
 
 import java.io.File;
@@ -43,19 +44,32 @@ import org.springframework.util.StringUtils;
  * This implementation allows resource location inside:
  * 
  * <ul>
- * <li>bundle space - if {@link #BUNDLE_URL_PREFIX} prefix is being used or
- * none is specified</li>
- * <li>bundle jar - if {@link #BUNDLE_JAR_URL_PREFIX} is specified</li>
- * <li>class space - if {@link org.springframework.util.ResourceUtils#CLASSPATH_URL_PREFIX} is
- * encountered</li>
+ * <li><em>bundle space</em> - if <code>osgibundle:</code>/{@link #BUNDLE_URL_PREFIX}
+ * prefix is being used or none is specified. This space cotnains the bundle jar
+ * and its attached fragments.</li>
+ * <li><em>bundle jar</em> - if <code>osgibundlejar:</code>/{@link #BUNDLE_JAR_URL_PREFIX}
+ * is specified. This space contains just the bundle jar.</li>
+ * <li><em>class space</em> - if
+ * {@link org.springframework.util.ResourceUtils#CLASSPATH_URL_PREFIX} is
+ * encountered. This space contains the bundle classpath, namely the bundle jar,
+ * its attached fragments and imported packages.</li>
  * </ul>
  * 
- * As fall back, the path is transformed to an URL thus supporting the underlying
- * OSGi framework specific prefixes.
+ * For more explanations on resource locations in OSGi, please see the
+ * <em>Access to Resources</em> chapter from the OSGi spec.
  * 
- * Note that when the bundle space (bundle jar and its attached fragments) is
- * being searched, multiple URLs can be found but this implementation will
- * return only the first one. Consider using
+ * <p/> OSGi framework specific prefixes (such as <code>bundleentry:</code>
+ * and <code>bundleresource:</code>under Equinox, <code>bundle:</code>
+ * under Knopflefish and Felix, etc..) are supported. Resources outside the OSGi
+ * space (<code>file:</code>, <code>http:</code>, etc..) are supported as
+ * well as the path is being resolved to an <code>URL</code>.
+ * 
+ * <p/>If no prefix is specified, the <em>bundle space</em> will be used for
+ * locating a resource.
+ * 
+ * <p/> <strong>Note:</strong> When the <em>bundle space</em> (bundle jar and
+ * its attached fragments) is being searched, multiple URLs can be found but
+ * this implementation will return only the first one. Consider using
  * {@link OsgiBundleResourcePatternResolver} to retrieve all entries.
  * 
  * @author Costin Leau
@@ -92,6 +106,14 @@ public class OsgiBundleResource extends AbstractResource {
 
 	private int searchType = OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED;
 
+
+	/**
+	 * 
+	 * Constructs a new <code>OsgiBundleResource</code> instance.
+	 * 
+	 * @param bundle OSGi bundle used by this resource
+	 * @param path resource path inside the bundle.
+	 */
 	public OsgiBundleResource(Bundle bundle, String path) {
 		Assert.notNull(bundle, "Bundle must not be null");
 		this.bundle = bundle;
@@ -105,27 +127,36 @@ public class OsgiBundleResource extends AbstractResource {
 	}
 
 	/**
-	 * Return the path for this resource.
+	 * Returns the path for this resource.
+	 * 
+	 * @return this resource path
 	 */
 	final String getPath() {
 		return path;
 	}
 
 	/**
-	 * Return the bundle for this resource.
+	 * Returns the bundle for this resource.
+	 * 
+	 * @return the resource bundle
 	 */
 	final Bundle getBundle() {
 		return bundle;
 	}
 
 	/**
-	 * This implementation opens an InputStream for the given URL. It sets the
-	 * "UseCaches" flag to <code>false</code>, mainly to avoid jar file
+	 * Returns an <code>InputStream</code> to this resource. This
+	 * implementation opens an
+	 * <code>InputStream<code> for the given <code>URL</code>. It sets the
+	 * <em>UseCaches</em> flag to <code>false</code>, mainly to avoid jar file
 	 * locking on Windows.
 	 * 
+	 * @return input stream to the underlying resource
+	 * @throws IOException if the stream could not be opened
 	 * @see java.net.URL#openConnection()
 	 * @see java.net.URLConnection#setUseCaches(boolean)
 	 * @see java.net.URLConnection#getInputStream()
+	 *
 	 */
 	public InputStream getInputStream() throws IOException {
 		URLConnection con = getURL().openConnection();
@@ -135,9 +166,13 @@ public class OsgiBundleResource extends AbstractResource {
 
 	/**
 	 * Locates the resource in the underlying bundle based on the prefix, if it
-	 * exists. Note that the location happens per call since the classpath of
-	 * the bundle for example can change during a bundle lifecycle (depending on
-	 * its imports).
+	 * exists. Note that the location happens per call since due to the dynamic
+	 * nature of OSGi, the classpath of the bundle (among others) can change
+	 * during a bundle lifecycle (depending on its imports).
+	 * 
+	 * @return URL to this resource
+	 * @throws IOException if the resource cannot be resolved as URL, i.e. if
+	 * the resource is not available as descriptor
 	 * 
 	 * @see org.osgi.framework.Bundle#getEntry(String)
 	 * @see org.osgi.framework.Bundle#getResource(String)
@@ -146,34 +181,34 @@ public class OsgiBundleResource extends AbstractResource {
 		URL url = null;
 
 		switch (searchType) {
-		// same as bundle space but with a different string
-		case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
-			if (pathWithoutPrefix == null)
-				pathWithoutPrefix = path;
-			url = getResourceFromBundleSpace(pathWithoutPrefix);
-			break;
-		case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
-			if (pathWithoutPrefix == null)
-				pathWithoutPrefix = path.substring(BUNDLE_URL_PREFIX.length());
-			url = getResourceFromBundleSpace(pathWithoutPrefix);
-			break;
-		case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_JAR:
-			if (pathWithoutPrefix == null)
-				pathWithoutPrefix = path.substring(BUNDLE_JAR_URL_PREFIX.length());
+			// same as bundle space but with a different string
+			case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
+				if (pathWithoutPrefix == null)
+					pathWithoutPrefix = path;
+				url = getResourceFromBundleSpace(pathWithoutPrefix);
+				break;
+			case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
+				if (pathWithoutPrefix == null)
+					pathWithoutPrefix = path.substring(BUNDLE_URL_PREFIX.length());
+				url = getResourceFromBundleSpace(pathWithoutPrefix);
+				break;
+			case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_JAR:
+				if (pathWithoutPrefix == null)
+					pathWithoutPrefix = path.substring(BUNDLE_JAR_URL_PREFIX.length());
 
-			url = getResourceFromBundleJar(pathWithoutPrefix);
-			break;
-		case OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE:
-			if (pathWithoutPrefix == null)
-				pathWithoutPrefix = path.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length());
+				url = getResourceFromBundleJar(pathWithoutPrefix);
+				break;
+			case OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE:
+				if (pathWithoutPrefix == null)
+					pathWithoutPrefix = path.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length());
 
-			url = getResourceFromBundleClasspath(pathWithoutPrefix);
-			break;
-		// fallback
-		default:
-			// just try to convert it to an URL
-			url = new URL(path);
-			break;
+				url = getResourceFromBundleClasspath(pathWithoutPrefix);
+				break;
+			// fallback
+			default:
+				// just try to convert it to an URL
+				url = new URL(path);
+				break;
 		}
 
 		if (url == null) {
@@ -186,7 +221,7 @@ public class OsgiBundleResource extends AbstractResource {
 	/**
 	 * Resolves a resource from the file system.
 	 * 
-	 * @param fileName
+	 * @param fileName resource file name
 	 * @return a URL to the returned resource or null if none is found
 	 */
 	URL getResourceFromFilesystem(String fileName) {
@@ -257,9 +292,13 @@ public class OsgiBundleResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation creates a OsgiBundleResource, applying the given path
-	 * relative to the path of the underlying resource of this descriptor.
+	 * Returns a resource relative to this resource. This implementation creates
+	 * an <code>OsgiBundleResource</code>, applying the given path relative
+	 * to the path of the underlying resource of this descriptor.
 	 * 
+	 * @param relativePath the relative path (relative to this resource)
+	 * @return the resource handle for the relative resource
+	 * @throws IOException if the relative resource cannot be determined
 	 * @see org.springframework.util.StringUtils#applyRelativePath(String,
 	 * String)
 	 */
@@ -269,29 +308,38 @@ public class OsgiBundleResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation returns the name of the file that this bundle path
-	 * resource refers to.
+	 * Returns the filename of this resources. This implementation returns the
+	 * name of the file that this bundle path resource refers to.
 	 * 
+	 * @return resource filename
 	 * @see org.springframework.util.StringUtils#getFilename(String)
 	 */
 	public String getFilename() {
 		return StringUtils.getFilename(this.path);
 	}
 
-    public File getFile() throws IOException {
-        if (searchType != OsgiResourceUtils.PREFIX_TYPE_UNKNOWN) {
-            return super.getFile();
-        }
-        try {
-            URL url = new URL(path);
-            return new File(url.getPath());
-        } catch (MalformedURLException mue) {
-            throw new FileNotFoundException(getDescription() + " cannot be resolved to absolute file path");
-        }
-    }
+	/**
+	 * Returns a <code>File</code> handle for this resource.
+	 * 
+	 * @return File handle to this resource
+	 * @throws IOException if the resource cannot be resolved as absolute file
+	 * path, i.e. if the resource is not available in a file system
+	 */
+	public File getFile() throws IOException {
+		if (searchType != OsgiResourceUtils.PREFIX_TYPE_UNKNOWN) {
+			return super.getFile();
+		}
+		try {
+			URL url = new URL(path);
+			return new File(url.getPath());
+		}
+		catch (MalformedURLException mue) {
+			throw new FileNotFoundException(getDescription() + " cannot be resolved to absolute file path");
+		}
+	}
 
-    /**
-	 * This implementation returns a description that includes the bundle
+	/**
+	 * <p/> This implementation returns a description that includes the bundle
 	 * location.
 	 */
 	public String getDescription() {
@@ -308,7 +356,8 @@ public class OsgiBundleResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation compares the underlying bundle and path locations.
+	 * <p/> This implementation compares the underlying bundle and path
+	 * locations.
 	 */
 	public boolean equals(Object obj) {
 		if (obj == this) {
@@ -322,8 +371,8 @@ public class OsgiBundleResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation returns the hash code of the underlying class path
-	 * location.
+	 * <p/> This implementation returns the hash code of the underlying class
+	 * path location.
 	 */
 	public int hashCode() {
 		return this.path.hashCode();
@@ -337,9 +386,9 @@ public class OsgiBundleResource extends AbstractResource {
 	}
 
 	/**
-	 * Used internally to get all the URLs matching a certain location.
-	 * The method is required to extract the folder from the given location 
-	 * as well the file.
+	 * Used internally to get all the URLs matching a certain location. The
+	 * method is required to extract the folder from the given location as well
+	 * the file.
 	 * 
 	 * @param location location to look for
 	 * @return an array of URLs
@@ -348,7 +397,7 @@ public class OsgiBundleResource extends AbstractResource {
 	URL[] getAllUrlsFromBundleSpace(String location) throws IOException {
 		if (bundle == null)
 			throw new IllegalArgumentException(
-					"cannot locate items in bundle-space w/o a bundle; specify one when creating this resolver");
+				"cannot locate items in bundle-space w/o a bundle; specify one when creating this resolver");
 
 		Assert.notNull(location);
 		Set resources = new LinkedHashSet(5);

@@ -17,7 +17,7 @@ import org.w3c.dom.Element;
  * 
  * @author Hal Hildebrand Date: Nov 2, 2006 Time: 8:06:32 AM
  */
-public class OsgiConfigDefinitionParser extends AbstractSingleBeanDefinitionParser {
+class OsgiConfigDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	public static final String PERSISTENT_ID = "persistent-id";
 

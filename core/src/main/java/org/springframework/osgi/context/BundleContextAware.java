@@ -15,6 +15,7 @@
  *
  * Created on 23-Jan-2006 by Adrian Colyer
  */
+
 package org.springframework.osgi.context;
 
 import org.osgi.framework.BundleContext;
@@ -30,11 +31,11 @@ import org.osgi.framework.BundleContext;
 public interface BundleContextAware {
 
 	/**
-	 * Set the {@link BundleContext} that this bean
-	 * runs in. Normally this can be used to initialize
-	 * an object.
+	 * Set the {@link BundleContext} that this bean runs in. Normally this can
+	 * be used to initialize an object.
 	 * 
-	 * @param bundleContext the BundleContext object to be used by this object
+	 * @param bundleContext the <code>BundleContext</code> object to be used
+	 * by this object
 	 */
 	public void setBundleContext(BundleContext bundleContext);
 }

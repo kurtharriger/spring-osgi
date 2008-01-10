@@ -15,6 +15,7 @@
  *
  * Created on 23-Jan-2006 by Adrian Colyer
  */
+
 package org.springframework.osgi.context.support;
 
 import org.apache.commons.logging.Log;
@@ -25,8 +26,8 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.osgi.context.BundleContextAware;
 
 /**
- * {@link BeanPostProcessor} dealing with classes that implement
- * BundleContextAware interface.
+ * {@link BeanPostProcessor} handling classes that implement
+ * <code>BundleContextAware</code> interface.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -36,6 +37,7 @@ public class BundleContextAwareProcessor implements BeanPostProcessor {
 	private final BundleContext bundleContext;
 
 	private static final Log logger = LogFactory.getLog(BundleContextAwareProcessor.class);
+
 
 	public BundleContextAwareProcessor(BundleContext aContext) {
 		this.bundleContext = aContext;
