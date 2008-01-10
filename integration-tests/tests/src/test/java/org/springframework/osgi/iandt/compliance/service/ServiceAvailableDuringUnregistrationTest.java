@@ -30,6 +30,7 @@ import org.springframework.osgi.util.OsgiFilterUtils;
  * @author Costin Leau
  * 
  */
+// works on KF 2.0.3+
 public class ServiceAvailableDuringUnregistrationTest extends AbstractConfigurableBundleCreatorTests {
 
 	private Shape service;
@@ -62,9 +63,4 @@ public class ServiceAvailableDuringUnregistrationTest extends AbstractConfigurab
 			bundleContext.removeServiceListener(listener);
 		}
 	}
-
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (createPlatform().toString().startsWith("Knopflerfish"));
-	}
-
 }

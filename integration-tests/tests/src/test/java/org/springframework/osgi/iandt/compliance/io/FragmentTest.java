@@ -36,9 +36,8 @@ public class FragmentTest extends BaseIoTest {
 	// Folder tests
 	//
 
-	// TODO: remove after KF 2.0.3
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (isFelix() || (isKF() && (testMethodName.equalsIgnoreCase("testGetResourceOnRootDir") || testMethodName.equalsIgnoreCase("testGetResourceSOnRootDir"))));
+		return isFelix();
 	}
 
 	/**
