@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import java.util.Collection;
@@ -37,29 +38,78 @@ import org.springframework.osgi.service.importer.internal.collection.OsgiService
 import org.springframework.util.Assert;
 
 /**
- * Specialized single-service proxy creator. Will return a proxy that will
- * select only one OSGi service which matches the configuration criteria. If the
- * selected service goes away, the proxy will search for a replacement.
+ * OSGi service (collection) importer. This implementation creates a managed
+ * (read-only) collection of OSGi services. The returned collection
+ * automatically handles the OSGi services dynamics. If a new service that
+ * matches the configuration criteria appears, it will be automatically added to
+ * the collection. If a service that matches the criteria disappears (is
+ * unregistered), it will be automatically removed from the collection.
  * 
+ * <p/>Due to the dynamic nature of OSGi services, the collection content can
+ * change at runtime, even during iteration. This implementation will correctly
+ * update all the collection <code>Iterator</code>s so they reflect the
+ * collection content. This approach (as opposed to the 'snapshot' strategy)
+ * prevents dealing with <em>dead</em> services which can appear when imported
+ * services go down while iterating. This means that iterating while the
+ * collection is being changed is safe.
+ * 
+ * <p/>Note that the <code>Iterator</code> still has to be fulfilled meaning
+ * the <code>next()</code> method always obey the result of the previous
+ * <code>hasNext()</code> invocation:
+ * 
+ * <p/>
+ * <table border="1">
+ * <tr>
+ * <th><code>hasNext()</code> returned value</th>
+ * <th><code>next()</code> behaviour</th>
+ * </th>
+ * <tr>
+ * <td> <code>true</code> </td>
+ * <td><em>Always</em> return a non-null value, even when the collection has
+ * shrunk as services when away. This means returning a proxy that will throw an
+ * exception on an invocation that requires the backing service to be present.</td>
+ * </tr>
+ * <tr>
+ * <td><code>false</code></td>
+ * <td>per <code>Iterator</code> contract,
+ * <code>NoSuchElementException</code> is thrown. This applies even if other
+ * services are added to the collection.</td>
+ * </tr>
+ * </table>
+ * 
+ * <p/>
+ * Due to the dynamic nature of OSGi, <code>hasNext()</code> invocation made
+ * on the same <code>Iterator</code> can return different values based on the
+ * services availability. However, as explained above, <code>next()</code>
+ * will always obey the result of the last <code>hasNext()</code> method.
+ * 
+ * <p/><strong>Note:</strong> Even though the collection and its iterators
+ * communicate in a thread-safe manner, iterators themselves are not
+ * thread-safe. Concurrent access on the iterators should be properly
+ * synchronized. Due to the light nature of the iterators, consider creating a
+ * new one rather then reusing or sharing.
+ * 
+ * @author Costin Leau
+ * @see java.util.Iterator
  * @see java.util.Collection
  * @see java.util.List
  * @see java.util.Set
  * @see java.util.SortedSet
- * 
- * @author Costin Leau
- * 
  */
 public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceCollectionProxyFactoryBean.class);
 
-	/** actual proxy - acts as a shield around the spring managed collection to limit the number of exposed methods */
+	/**
+	 * actual proxy - acts as a shield around the spring managed collection to
+	 * limit the number of exposed methods
+	 */
 	private Collection proxy;
 
 	/** proxy casted to a specific interface to allow specific method calls */
 	private CollectionProxy exposedProxy;
 
-	/** proxy infrastructure hook exposed to allow clean up*/
+	/** proxy infrastructure hook exposed to allow clean up */
 	private DisposableBean disposable;
 
 	/** proxy creator */
@@ -69,13 +119,14 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 
 	private CollectionType collectionType = CollectionType.LIST;
 
+
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 
 		// create shared proxy creator ( reused for each new service
 		// joining the collection)
 		proxyCreator = new StaticServiceProxyCreator(getInterfaces(), getBeanClassLoader(), getBundleContext(),
-				getContextClassLoader());
+			getContextClassLoader());
 	}
 
 	public Class getObjectType() {
@@ -137,7 +188,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 		proxy = delegate;
 		exposedProxy = collection;
 		disposable = collection;
-		
+
 		return delegate;
 	}
 
@@ -146,11 +197,13 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	}
 
 	/**
-	 * Set the (optional) comparator for ordering the resulting collection. The
-	 * presence of a comparator will force the FactoryBean to use a 'sorted'
-	 * collection even though, the specified collection type does not imply
-	 * ordering. <p/> Thus, instead of list a sorted list will be created and
-	 * instead of a set, a sorted set.
+	 * Sets the (optional) comparator for ordering the resulting collection. The
+	 * presence of a comparator will force the FactoryBean to use a
+	 * <em>sorted</em> collection even though, the specified collection type
+	 * does not imply ordering.
+	 * 
+	 * <p/> Thus, instead of list a sorted list will be created and instead of a
+	 * set, a sorted set.
 	 * 
 	 * @see #setCollectionType(CollectionType)
 	 * 
@@ -162,7 +215,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	}
 
 	/**
-	 * Set the collection type this FactoryBean will produce. Note that if a
+	 * Sets the collection type this FactoryBean will produce. Note that if a
 	 * comparator is set, a sorted collection will be created even if the
 	 * specified type is does not imply ordering. If no comparator is set but
 	 * the collection type implies ordering, the natural order of the elements
@@ -182,6 +235,12 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	}
 
 	/* override to check proper cardinality - x..N */
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p/>Since this implementation creates a managed collection, only
+	 * <em>multiple</em> cardinalities are accepted.
+	 */
 	public void setCardinality(Cardinality cardinality) {
 		Assert.notNull(cardinality);
 		Assert.isTrue(cardinality.isMultiple(), "only multiple cardinality ('X..N') accepted");
