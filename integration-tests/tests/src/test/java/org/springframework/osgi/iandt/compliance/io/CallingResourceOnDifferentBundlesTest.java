@@ -42,10 +42,6 @@ public class CallingResourceOnDifferentBundlesTest extends AbstractConfigurableB
 	private static final String LOCATION = "META-INF/";
 
 
-	protected String getManifestLocation() {
-		return null;
-	}
-
 	public void testCallGetResourceOnADifferentBundle() throws Exception {
 		// find bundles
 		Bundle[] bundles = bundleContext.getBundles();
@@ -109,9 +105,5 @@ public class CallingResourceOnDifferentBundlesTest extends AbstractConfigurableB
 		sampleBundle.stop();
 
 		assertTrue("bundle listener hasn't been called", listenerCalled[0]);
-	}
-
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (createPlatform().toString().startsWith("Knopflerfish"));
 	}
 }
