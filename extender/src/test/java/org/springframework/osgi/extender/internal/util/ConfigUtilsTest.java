@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extender.internal.util;
 
-import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.springframework.osgi.io.OsgiBundleResource;
-import org.springframework.util.ObjectUtils;
-
 import junit.framework.TestCase;
+
+import org.springframework.osgi.io.OsgiBundleResource;
 
 /**
  * @author Costin Leau
@@ -32,10 +31,12 @@ public class ConfigUtilsTest extends TestCase {
 
 	private Dictionary headers;
 
-	private String DEFAULT_LOCATION = OsgiBundleResource.BUNDLE_JAR_URL_PREFIX + "/META-INF/spring/*.xml";
+	private String DEFAULT_LOCATION = OsgiBundleResource.BUNDLE_URL_PREFIX + "/META-INF/spring/*.xml";
+
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
@@ -44,6 +45,7 @@ public class ConfigUtilsTest extends TestCase {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	protected void tearDown() throws Exception {
@@ -96,9 +98,10 @@ public class ConfigUtilsTest extends TestCase {
 		assertEquals(location1, locations[0]);
 		assertEquals(location2, locations[1]);
 	}
-	
+
 	public void testLocationWithMultipleDots() throws Exception {
-		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, "META-INF/file.with.multiple.dots.xml, META-INF/another.file.xml");
+		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER,
+			"META-INF/file.with.multiple.dots.xml, META-INF/another.file.xml");
 		String[] locations = ConfigUtils.getConfigLocations(headers);
 		assertEquals(2, locations.length);
 	}
