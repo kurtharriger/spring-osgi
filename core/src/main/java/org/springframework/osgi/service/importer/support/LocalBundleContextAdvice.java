@@ -21,7 +21,6 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**

@@ -31,9 +31,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Specialized single-service proxy creator. Will return a proxy that will
- * select only one OSGi service which matches the configuration criteria. If the
- * selected service goes away, the proxy will search for a replacement.
+ * OSGi (single) service importer. This implementation creates a managed OSGi
+ * service proxy that handles the OSGi service dynamics. The returned proxy will
+ * select only the best matching OSGi service for the configuration criteria. If
+ * the select service goes away (at any point in time), the proxy will
+ * automatically search for a replacement without the user intervention.
+ * 
+ * Note that the proxy instance remains the same and only the backing OSGi
+ * service changes. Due to the dynamic nature of OSGi, the backing object can
+ * change during method invocations.
  * 
  * @author Costin Leau
  * @author Adrian Colyer
@@ -178,6 +184,12 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	}
 
 	/* override to check proper cardinality - x..1 */
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p/>Since this implementation creates a managed proxy, only
+	 * <em>single</em> cardinalities are accepted.
+	 */
 	public void setCardinality(Cardinality cardinality) {
 		Assert.notNull(cardinality);
 		Assert.isTrue(cardinality.isSingle(), "only singular cardinality ('X..1') accepted");

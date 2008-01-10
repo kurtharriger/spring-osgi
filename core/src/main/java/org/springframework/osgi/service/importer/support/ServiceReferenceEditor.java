@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import java.beans.PropertyEditor;
@@ -30,15 +31,15 @@ import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
  * {@link org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext}
  * implementations.
  * 
- * @see ImportedOsgiServiceProxy
- * 
  * @author Costin Leau
- * 
+ * @see ImportedOsgiServiceProxy
  */
 public class ServiceReferenceEditor extends PropertyEditorSupport {
 
 	/**
-	 * Convert the given text value to a ServiceReference.
+	 * {@inheritDoc}
+	 * 
+	 * <p/> Converts the given text value to a ServiceReference.
 	 */
 	public void setAsText(String text) throws IllegalArgumentException {
 		throw new IllegalArgumentException("this property editor works only with "
@@ -46,7 +47,9 @@ public class ServiceReferenceEditor extends PropertyEditorSupport {
 	}
 
 	/**
-	 * Convert the given value to a ServiceReference.
+	 * {@inheritDoc}
+	 * 
+	 * <p/> Converts the given value to a ServiceReference.
 	 */
 	public void setValue(Object value) {
 		// nulls allowed
@@ -63,8 +66,10 @@ public class ServiceReferenceEditor extends PropertyEditorSupport {
 	}
 
 	/**
-	 * This implementation returns <code>null</code> to indicate that there is
-	 * no appropriate text representation.
+	 * {@inheritDoc}
+	 * 
+	 * <p/> This implementation returns <code>null</code> to indicate that
+	 * there is no appropriate text representation.
 	 */
 	public String getAsText() {
 		return null;

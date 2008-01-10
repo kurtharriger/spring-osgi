@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import org.springframework.core.enums.StaticLabeledEnum;
 
 /**
- * Imported OSGi services thread context classloader (TCCL) management options.
+ * Enum-like class containing the OSGi service importer thread context class
+ * loader (TCCL) management options.
  * 
  * @author Costin Leau
- * 
  */
 public class ImportContextClassLoader extends StaticLabeledEnum {
 
@@ -41,6 +42,7 @@ public class ImportContextClassLoader extends StaticLabeledEnum {
 	 * The TCCL will be set to the service provider upon service invocation.
 	 */
 	public static final ImportContextClassLoader CLIENT = new ImportContextClassLoader(2, "CLIENT");
+
 
 	/**
 	 * Constructs a new <code>ImportContextClassLoader</code> instance.

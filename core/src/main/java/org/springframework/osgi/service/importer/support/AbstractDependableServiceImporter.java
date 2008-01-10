@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public abstract class AbstractDependableServiceImporter implements DependableSer
 
 	private List depedencyListeners = new ArrayList(2);
 
+
 	/**
 	 * Returns the registered dependency listeners. Meant to be used only by
 	 * subclasses.
@@ -59,10 +61,10 @@ public abstract class AbstractDependableServiceImporter implements DependableSer
 	}
 
 	/**
-	 * The optional cardinality attribute allows a reference cardinality to be
-	 * specified (0..1, 1..1, 0..N, or 1..N). The default is '1..X'.
+	 * Sets the importer cardinality (0..1, 1..1, 0..N, or 1..N). Default is
+	 * 1..X.
 	 * 
-	 * @param cardinality
+	 * @param cardinality importer cardinality.
 	 */
 	public void setCardinality(Cardinality cardinality) {
 		Assert.notNull(cardinality);
@@ -73,7 +75,7 @@ public abstract class AbstractDependableServiceImporter implements DependableSer
 	/**
 	 * Returns the cardinality used by this importer.
 	 * 
-	 * @return Returns the importer cardinality
+	 * @return importer cardinality
 	 */
 	public Cardinality getCardinality() {
 		return cardinality;

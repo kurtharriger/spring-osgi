@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import java.util.List;
@@ -22,12 +23,11 @@ import java.util.SortedSet;
 import org.springframework.core.enums.StaticLabeledEnum;
 
 /**
- * Enumeration-like class which indicates the supported OSGi service collection
- * types. This class is used mainly for configuration purposes (such as parsing
- * the OSGi namespace).
+ * Enumeration-like class which indicates the supported Spring DM managed OSGi
+ * service collection types. This class is used mainly for configuration
+ * purposes (such as parsing the OSGi namespace).
  * 
  * @author Costin Leau
- * 
  */
 public class CollectionType extends StaticLabeledEnum {
 
@@ -37,19 +37,24 @@ public class CollectionType extends StaticLabeledEnum {
 	// public static final CollectionType COLLECTION = new CollectionType(1,
 	// "collection", OsgiServiceCollection.class);
 	/**
-	 * Spring-managed list.
+	 * Spring-managed list. The returned collection with implement the
+	 * {@link List} interface.
+	 * 
 	 * @see java.util.List
 	 */
 	public static final CollectionType LIST = new CollectionType(2, "LIST", List.class);
 
 	/**
-	 * Spring-managed set.
+	 * Spring-managed set. The returned collection with implement the
+	 * {@link Set} interface.
+	 * 
 	 * @see java.util.Set
 	 */
 	public static final CollectionType SET = new CollectionType(3, "SET", Set.class);
 
 	/**
-	 * Spring-managed sorted list.
+	 * Spring-managed sorted list. The returned collection with implement the
+	 * {@link List} interface.
 	 * 
 	 * @see java.lang.Comparable
 	 * @see java.util.Comparator
@@ -59,7 +64,8 @@ public class CollectionType extends StaticLabeledEnum {
 	public static final CollectionType SORTED_LIST = new CollectionType(4, "SORTED_LIST", List.class);
 
 	/**
-	 * Spring-managed sorted Set.
+	 * Spring-managed sorted Set. The returned collection with implement the
+	 * {@link SortedSet} interface.
 	 * 
 	 * @see java.lang.Comparable
 	 * @see java.util.Comparator
@@ -70,8 +76,9 @@ public class CollectionType extends StaticLabeledEnum {
 	/** collection type */
 	private final Class collectionClass;
 
+
 	/**
-	 * Return the actual collection class used underneath.
+	 * Returns the actual collection class used underneath.
 	 * 
 	 * @return collection class
 	 */

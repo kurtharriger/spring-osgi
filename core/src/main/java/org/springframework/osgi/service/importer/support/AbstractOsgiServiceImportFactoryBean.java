@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import org.apache.commons.logging.Log;
@@ -73,6 +74,14 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 
 	private Object proxy;
 
+	/**
+	 * Returns a managed hook to access OSGi service(s).
+	 * Subclasses can decide to create either a proxy managing only
+	 * one OSGi service type or a collection of services matching a certain
+	 * criteri
+	 * 
+	 * @return managed OSGi service(s)
+	 */
 	public Object getObject() {
 		if (!initialized)
 			throw new FactoryBeanNotInitializedException();
@@ -116,11 +125,11 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	}
 
 	/**
-	 * Assemble configuration properties to create an OSGi filter. Manages
-	 * internally the unifiedFilter field as a cache, so the filter creation
-	 * happens only once.
+	 * Assembles the configuration properties into one unified OSGi filter. Note
+	 * that this implementation creates the filter on the first call and caches
+	 * it afterwards.
 	 * 
-	 * @return osgi filter
+	 * @return unified filter based on this factory bean configuration
 	 */
 	public Filter getUnifiedFilter() {
 		if (unifiedFilter != null) {
@@ -166,18 +175,18 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	/**
 	 * Sets the classes that the imported service advertises.
 	 * 
-	 * @param serviceType array of advertised classes.
+	 * @param interfaces array of advertised classes.
 	 */
-	public void setInterfaces(Class[] serviceType) {
-		this.interfaces = serviceType;
+	public void setInterfaces(Class[] interfaces) {
+		this.interfaces = interfaces;
 	}
 
 	/**
-	 * Set the thread context class loader strategy to use for services imported
-	 * by this service. By default {@link ImportContextClassLoader#CLIENT} is
-	 * used.
+	 * Sets the thread context class loader management strategy to use for
+	 * services imported by this service. By default
+	 * {@link ImportContextClassLoader#CLIENT} is used.
 	 * 
-	 * @param contextClassLoader import context classloader strategy
+	 * @param contextClassLoader import context class loader management strategy
 	 * @see ImportContextClassLoader
 	 */
 	public void setContextClassLoader(ImportContextClassLoader contextClassLoader) {
@@ -191,29 +200,32 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 
 	/**
 	 * Sets the OSGi service filter. The filter will be concatenated with the
-	 * interfaces specified so there is no need to include them in the filter.
+	 * rest of the configuration properties specified (such as interfaces) so
+	 * there is no need to include them in the filter.
 	 * 
-	 * @param filter The filter to set.
+	 * @param filter OSGi filter describing the importing OSGi service
 	 */
 	public void setFilter(String filter) {
 		this.filter = filter;
 	}
 
 	/**
-	 * Sets the listeners interested in receiving events for this importer.
+	 * Sets the lifecycle listeners interested in receiving events for this
+	 * importer.
 	 * 
-	 * @param listeners The listeners to set.
+	 * @param listeners importer listeners
 	 */
 	public void setListeners(OsgiServiceLifecycleListener[] listeners) {
 		this.listeners = listeners;
 	}
 
 	/**
-	 * To find a bean published as a service by the OsgiServiceExporter, simply
-	 * set this property. You may specify additional filtering criteria if
-	 * needed (using the filter property) but this is not required.
+	 * Sets the OSGi service bean name. This setting should be normally used
+	 * when the imported service has been exported by Spring DM exporter. You
+	 * may specify additional filtering criteria if needed (using the filter
+	 * property) but this is not required.
 	 * 
-	 * @param serviceBeanName The serviceBeanName to set.
+	 * @param serviceBeanName importer service bean name
 	 */
 	public void setServiceBeanName(String serviceBeanName) {
 		this.serviceBeanName = serviceBeanName;
@@ -224,54 +236,54 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	}
 
 	/**
-	 * Returns the classLoader.
+	 * Returns the class loader used by this FactoryBean.
 	 * 
-	 * @return Returns the classLoader
+	 * @return factory bean class loader
 	 */
 	public ClassLoader getBeanClassLoader() {
 		return classLoader;
 	}
 
 	/**
-	 * Returns the bundleContext.
+	 * Returns the bundleContext used by this FactoryBean.
 	 * 
-	 * @return Returns the bundleContext
+	 * @return factory bean class loader
 	 */
 	public BundleContext getBundleContext() {
 		return bundleContext;
 	}
 
 	/**
-	 * Returns the interfaces.
+	 * Returns the interfaces used for discovering the imported service(s).
 	 * 
-	 * @return Returns the interfaces
+	 * @return interfaces advertised by services in the OSGi space
 	 */
 	public Class[] getInterfaces() {
 		return interfaces;
 	}
 
 	/**
-	 * Returns the filter.
+	 * Returns the filter describing the imported service(s).
 	 * 
-	 * @return Returns the filter
+	 * @return filter describing the imported service(s)
 	 */
 	public String getFilter() {
 		return filter;
 	}
 
 	/**
-	 * Returns the listeners.
+	 * Returns the listeners interested in receiving events for this importer.
 	 * 
-	 * @return Returns the listeners
+	 * @return lifecycle listeners used by this importer
 	 */
 	public OsgiServiceLifecycleListener[] getListeners() {
 		return listeners;
 	}
 
 	/**
-	 * Returns the contextClassLoader.
+	 * Returns the context class loader management strategy.
 	 * 
-	 * @return Returns the contextClassLoader
+	 * @return the context class loader management strategy
 	 */
 	public ImportContextClassLoader getContextClassLoader() {
 		return contextClassLoader;
