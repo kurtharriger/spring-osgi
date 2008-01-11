@@ -42,6 +42,7 @@ import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Base test for OSGi environments. Takes care of configuring the chosen OSGi
@@ -419,6 +420,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		Assert.notNull(service, "no service found for reference: " + reference);
 
 		serviceTrigger = service.getClass().getDeclaredMethod("executeTest", null);
+		ReflectionUtils.makeAccessible(serviceTrigger);
 		Assert.notNull(serviceTrigger, "no executeTest() method found on: " + service.getClass());
 	}
 

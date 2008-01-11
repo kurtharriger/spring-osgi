@@ -18,8 +18,6 @@ package org.springframework.osgi.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -60,15 +58,9 @@ public abstract class OsgiBundleUtils {
 			meth = ReflectionUtils.findMethod(bundle.getClass(), "getBundleContext", new Class[0]);
 
 		final Method m = meth;
+
 		if (meth != null) {
-			AccessController.doPrivileged(new PrivilegedAction() {
-
-				public Object run() {
-					m.setAccessible(true);
-					return null;
-				}
-			});
-
+			ReflectionUtils.makeAccessible(meth);
 			return (BundleContext) ReflectionUtils.invokeMethod(m, bundle);
 		}
 
@@ -78,13 +70,7 @@ public abstract class OsgiBundleUtils {
 		ReflectionUtils.doWithFields(bundle.getClass(), new FieldCallback() {
 
 			public void doWith(final Field field) throws IllegalArgumentException, IllegalAccessException {
-				AccessController.doPrivileged(new PrivilegedAction() {
-
-					public Object run() {
-						field.setAccessible(true);
-						return null;
-					}
-				});
+				ReflectionUtils.makeAccessible(field);
 				ctx[0] = (BundleContext) field.get(bundle);
 			}
 		}, new FieldFilter() {
