@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.platform;
 
 import java.io.File;
@@ -23,10 +24,9 @@ import org.osgi.framework.BundleContext;
 import org.springframework.osgi.test.internal.util.IOUtils;
 
 /**
- * Knopflerfish 2.x Platform.
+ * Knopflerfish 2.0.x Platform.
  * 
  * @author Costin Leau
- * 
  */
 public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 
@@ -35,6 +35,7 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 	private Framework framework;
 
 	private File kfStorageDir;
+
 
 	public KnopflerfishPlatform() {
 		toString = "Knopflerfish OSGi Platform";
@@ -58,20 +59,10 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		return props;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.OsgiPlatform#getBundleContext()
-	 */
 	public BundleContext getBundleContext() {
 		return context;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.OsgiPlatform#start()
-	 */
 	public void start() throws Exception {
 		// copy configuration properties to sys properties
 		System.getProperties().putAll(getConfigurationProperties());
@@ -81,11 +72,6 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		context = framework.getSystemBundleContext();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.OsgiPlatform#stop()
-	 */
 	public void stop() throws Exception {
 		try {
 			framework.shutdown();

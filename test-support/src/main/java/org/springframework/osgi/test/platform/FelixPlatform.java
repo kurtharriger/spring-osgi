@@ -33,7 +33,7 @@ import org.springframework.osgi.test.internal.util.IOUtils;
 import org.springframework.util.ClassUtils;
 
 /**
- * Apache's Felix OSGi platform.
+ * Apache Felix (1.0.x) OSGi platform.
  * 
  * @author Costin Leau
  * 
@@ -88,7 +88,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	}
 
 	/**
-	 * Load Felix config.properties.
+	 * Loads Felix config.properties.
 	 * 
 	 * <strong>Note</strong> the current implementation uses Felix's Main class
 	 * to resolve placeholders as opposed to loading the properties manually
@@ -96,6 +96,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	 * 
 	 * @return
 	 */
+	// TODO: this method should be removed once Felix 1.0.2 is released
 	private Properties getFelixConfiguration() {
 		String location = "/".concat(ClassUtils.classPackageAsResourcePath(FelixPlatform.class)).concat("/").concat(
 			FELIX_CONF_FILE);

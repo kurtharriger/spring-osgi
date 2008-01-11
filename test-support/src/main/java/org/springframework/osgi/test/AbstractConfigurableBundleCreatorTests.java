@@ -27,15 +27,46 @@ import org.springframework.osgi.test.internal.util.JarCreator;
 import org.springframework.util.StringUtils;
 
 /**
- * Subclass of AbstractOnTheFlyBundleCreatorTests which adds extra functionality
- * for configuring the jar creation. The created bundle (jar) can be configured
- * by indicating the locations for:
+ * Abstract JUnit base class that allows easy OSGi integration testing. It
+ * builds on its super classes to allow full configuration of the underlying
+ * OSGi platform implementation, of the test bundle creation (including the
+ * manifest automatic generation).
+ * 
+ * <p/>This class follows the <em>traditional</em> Spring style of integration
+ * testing in which the test simply indicates the dependencies, leaving the rest
+ * of the work to be done by its super classes. Consider the following simple
+ * example:
+ * 
+ * <pre class="code">
+ * public class SimpleOsgiTest extends AbstractConfigurableBundleCreatorTests {
+ * 
+ * 	public void testOsgiPlatformStarts() throws Exception {
+ * 		System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VENDOR));
+ * 		System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VERSION));
+ * 		System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_EXECUTIONENVIRONMENT));
+ * 	}
+ * }
+ * </pre>
+ * 
+ * <p/> The above class can be ran just like any other JUnit test. Equinox
+ * platform will be automatically started, the test will packed in an OSGi
+ * bundle (with its manifest created automatically) which will be deployed
+ * inside the OSGi platform. After running the test inside the OSGi environment,
+ * the test results (whether they are exceptions or failures) will be reported
+ * back to the running tool transparently. Please see the reference
+ * documentation for more examples, customization tips and help on how to do
+ * efficient and fast integration testing.
+ * 
+ * <p/> This class allows the test on-the-fly bundle (jar) can be configured
+ * declaratively by indicating the locations for:
  * <ul>
- * <li>root folder - the starting point on which the resource patterns are
- * applied</li>
- * <li>inclusion patterns - comma separated strings which identify the
- * resources that should be included into the archive.</li>
- * <li>manifest - the location of the manifest used for testing.</li>
+ * <li>root folder ({@value #ROOT_DIR}) - the starting point on which the
+ * resource patterns are applied</li>
+ * <li>inclusion patterns ({@value #INCLUDE_PATTERNS})- comma separated
+ * strings which identify the resources that should be included into the
+ * archive.</li>
+ * <li>manifest ({@value #MANIFEST})- the location of the manifest used for
+ * testing.</li>
  * </ul>
  * <p/> These settings can be configured by:
  * <ul>
@@ -47,6 +78,8 @@ import org.springframework.util.StringUtils;
  * <li>overriding the default getXXX methods and providing an alternative
  * implementation.</li>
  * </ul>
+ * 
+ * <p/><b>Note:</b> This class is the main testing framework entry point
  * 
  * @author Costin Leau
  * 
@@ -79,16 +112,19 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 
 
 	/**
-	 * Resources' root path (the root path does not become part of the jar).
+	 * Returns the root path used for locating the resources that will be packed
+	 * in the test bundle (the root path does not become part of the jar).
 	 * 
-	 * @return the root path
+	 * @return root path given as a String
 	 */
 	protected String getRootPath() {
 		return jarSettings.getProperty(ROOT_DIR);
 	}
 
 	/**
-	 * Ant-style patterns for identifying the resources added to the jar.The
+	 * {@inheritDoc}
+	 * 
+	 * <p/>Ant-style patterns for identifying the resources added to the jar.The
 	 * patterns are considered from the root path when performing the search.
 	 * 
 	 * <p/> By default, the content pattern is <code>*&#42;/*</code> which
@@ -108,19 +144,14 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 		return StringUtils.commaDelimitedListToStringArray(jarSettings.getProperty(INCLUDE_PATTERNS));
 	}
 
-	/**
-	 * Return the location (in Spring resource style) of the manifest location
-	 * to be used.
-	 * 
-	 * @return the manifest location
-	 */
 	protected String getManifestLocation() {
 		return jarSettings.getProperty(MANIFEST);
 	}
 
 	/**
 	 * Returns the settings location (by default, the test name; i.e.
-	 * foo.bar.SomeTest will try to load foo/bar/SomeTest-bundle.properties).
+	 * <code>foo.bar.SomeTest</code> will try to load
+	 * <code>foo/bar/SomeTest-bundle.properties</code>).
 	 * 
 	 * @return settings location for this test
 	 */
@@ -129,7 +160,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 	}
 
 	/**
-	 * Returns the default settings used when creating the jar, in case the no
+	 * Returns the default settings used when creating the jar, in case no
 	 * customisations have been applied. Unless the base class is used as a
 	 * testing framework, consider using a properties file for specifying
 	 * specific properties for a test case.
@@ -142,11 +173,12 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 	}
 
 	/**
-	 * Return the settings used for creating this jar. This method tries to
+	 * Returns the settings used for creating this jar. This method tries to
 	 * locate and load the settings from the location indicated by
 	 * {@link #getSettingsLocation()}. If no file is found, the default
-	 * settings will be used. <p/> A non-null properties object will always be
-	 * returned.
+	 * settings will be used.
+	 * 
+	 * <p/> A non-null properties object will always be returned.
 	 * 
 	 * @return settings for creating the on the fly jar
 	 * @throws Exception if loading the settings file fails
@@ -174,8 +206,8 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 		return settings;
 	}
 
-	/**
-	 * Load the jar settings, first from the disk falling back to the default
+	/*
+	 * Loads the jar settings, first from the disk falling back to the default
 	 * settings, if none is found.
 	 */
 	protected void postProcessBundleContext(BundleContext context) throws Exception {

@@ -42,14 +42,17 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Enhanced subclass of {@link AbstractDependencyManagerTests} which facilitates
+ * Enhanced subclass of {@link AbstractDependencyManagerTests} that facilitates
  * OSGi testing by creating at runtime, on the fly, a jar using the indicated
  * manifest and resource patterns (by default all files found under the root
  * path).
  * 
+ * <p/>The test class can automatically determine the imports required by the
+ * test, create the OSGi bundle manifest and pack the test and its resources in
+ * a jar that can be installed inside an OSGi platform.
+ * 
  * <p/> Note that in more complex scenarios, dedicated packaging tools (such as
  * ant scripts or maven2) should be used.
- * 
  * 
  * @author Costin Leau
  * 
@@ -74,39 +77,42 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	}
 
 	/**
-	 * Patterns for identifying the resources added to the jar. The patterns are
-	 * added to the root path when performing the search.
+	 * Returns the patterns used for identifying the resources added to the jar.
+	 * The patterns are added to the root path when performing the search. By
+	 * default, the pattern is <code>*&#42;/*</code>.
 	 * 
-	 * @return the patterns
+	 * @return the patterns idenfying the resources added to the jar
 	 */
 	protected String[] getBundleContentPattern() {
 		return new String[] { JarCreator.EVERYTHING_PATTERN };
 	}
 
 	/**
-	 * Return the location (in Spring resource style) of the manifest location
-	 * to be used. If the manifest is created programatically (the default),
-	 * return a null string and use {@link #getManifest()} and
-	 * {@link #createDefaultManifest()}.
+	 * Returns the location (in Spring resource style) of the manifest location
+	 * to be used. By default <code>null</code> is returned, indicating that
+	 * the manifest is created programatically (by default by the test
+	 * framework).
 	 * 
 	 * @return the manifest location
+	 * @see #getManifest()
+	 * @see #createDefaultManifest()
 	 */
 	protected String getManifestLocation() {
 		return null;
 	}
 
 	/**
-	 * Return the current test bundle manifest. The method tries to read the
-	 * manifest from the given location; in case the location is null, will
-	 * create a <code>Manifest</code> object containing default entries.
+	 * Returns the current test bundle manifest. The method tries to read the
+	 * manifest from the given location; in case the location is
+	 * <code>null</code> (default), will <em>automatically</em> create a
+	 * <code>Manifest</code> object containing default entries.
 	 * 
-	 * 
-	 * Subclasses should override this method to enhance the returned Manifest.
+	 * <p/> Subclasses can override this method to enhance the returned
+	 * Manifest.
 	 * 
 	 * @return Manifest used for this test suite.
 	 * 
 	 * @see #createDefaultManifest()
-	 * @throws Exception
 	 */
 	protected Manifest getManifest() {
 		String manifestLocation = getManifestLocation();
@@ -129,7 +135,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	}
 
 	/**
-	 * Create the default manifest in case none if found on the disk. By
+	 * Creates the default manifest in case none if found on the disk. By
 	 * default, the imports are synthetised based on the test class bytecode.
 	 * 
 	 * @return default manifest for the jar created on the fly

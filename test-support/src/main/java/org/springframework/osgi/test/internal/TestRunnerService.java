@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.internal;
 
-
 /**
- * Service contract for running OSGified JUnit test cases. 
+ * Service contract for running OSGified JUnit test cases.
  * 
  * @author Costin Leau
  * 
  */
 public interface TestRunnerService {
 
-	public void runTest(OsgiJUnitTest test);
+	void runTest(OsgiJUnitTest test);
 }

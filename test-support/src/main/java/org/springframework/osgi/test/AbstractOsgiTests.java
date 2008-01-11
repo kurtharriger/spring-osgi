@@ -44,13 +44,11 @@ import org.springframework.osgi.util.OsgiPlatformDetector;
 import org.springframework.util.Assert;
 
 /**
- * 
- * Base test for OSGi environments. Takes care of starting the OSGi platform,
- * installing the given bundles and delegating the test execution to a copy
- * which runs inside OSGi.
+ * Base test for OSGi environments. Takes care of configuring the chosen OSGi
+ * platform, starting it, installing a number of bundles and delegating the test
+ * execution to a test copy that runs inside OSGi.
  * 
  * @author Costin Leau
- * 
  */
 public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInjectionTests {
 
@@ -90,18 +88,27 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	private static final String ACTIVATOR_REFERENCE = "org.springframework.osgi.test.JUnitTestActivator";
 
 
+	/**
+	 * Default constructor. Constructs a new <code>AbstractOsgiTests</code>
+	 * instance.
+	 */
 	public AbstractOsgiTests() {
 		super();
 	}
 
+	/**
+	 * Constructs a new <code>AbstractOsgiTests</code> instance.
+	 * 
+	 * @param name test name
+	 */
 	public AbstractOsgiTests(String name) {
 		super(name);
 	}
 
 	/**
-	 * Test framework bundles (part of the test setup). Used by the test
-	 * infrastructure. Override this method <i>only</i> if you want to change
-	 * the jars used by default, by the testing infrastructure.
+	 * Returns the test framework bundles (part of the test setup). Used by the
+	 * test infrastructure. Override this method <i>only</i> if you want to
+	 * change the jars used by default, by the testing infrastructure.
 	 * 
 	 * User subclasses should use {@link #getTestBundles()} instead.
 	 * 
@@ -110,49 +117,52 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	protected abstract Resource[] getTestFrameworkBundles();
 
 	/**
-	 * Bundles required for the the test execution.
+	 * Returns the bundles required for the test execution.
 	 * 
 	 * @return the array of bundles to install
 	 */
 	protected abstract Resource[] getTestBundles();
 
 	/**
-	 * Create (and configure) the OSGi platform.
+	 * Creates (and configures) the OSGi platform.
 	 * 
-	 * @return OSGi platform.
-	 * @throws Exception
+	 * @return OSGi platform instance
+	 * @throws Exception if the platform creation fails
 	 */
 	protected abstract OsgiPlatform createPlatform() throws Exception;
 
 	/**
-	 * Callback for processing the platform bundle context before any bundles
-	 * have been installed. The method is invoked <b>after</b> starting the
-	 * OSGi environment but <b>before</b> any bundles are installed in the OSGi
-	 * framework.
+	 * Pre-processes the bundle context. This call back gives access to the
+	 * platform bundle context before any bundles have been installed. The
+	 * method is invoked <b>after</b> starting the OSGi environment but
+	 * <b>before</b> any bundles are installed in the OSGi framework.
 	 * 
-	 * Normally, this method is called only one during the lifecycle of a test
-	 * suite.
+	 * <p/> Normally, this method is called only once during the lifecycle of a
+	 * test suite.
 	 * 
+	 * @param platformBundleContext the platform bundle context
+	 * @throws Exception if processing the bundle context fails
 	 * @see #postProcessBundleContext(BundleContext)
-	 * @param platformBundleContext
-	 * @throws Exception
+	 * 
 	 */
 	protected void preProcessBundleContext(BundleContext platformBundleContext) throws Exception {
 	}
 
 	/**
-	 * Callback for processing the platform bundle context after the critical
-	 * test infrastructure bundles have been installed and started. The method
-	 * is invoked <b>after</b> preparing the OSGi environment for the test
-	 * execution but <b>before</b> any test is executed.
+	 * Post-processes the bundle context. This call back gives access to the
+	 * platform bundle context after the critical test infrastructure bundles
+	 * have been installed and started. The method is invoked <b>after</b>
+	 * preparing the OSGi environment for the test execution but <b>before</b>
+	 * any test is executed.
 	 * 
-	 * The given BundleContext belongs to the underlying OSGi framework.
+	 * The given <code>BundleContext</code> belongs to the underlying OSGi
+	 * framework.
 	 * 
-	 * Normally, this method is called only one during the lifecycle of a test
-	 * suite.
+	 * <p/> Normally, this method is called only one during the lifecycle of a
+	 * test suite.
 	 * 
+	 * @param platformBundleContext the platform bundle context
 	 * @see #preProcessBundleContext(BundleContext)
-	 * @param platformBundleContext
 	 */
 	protected void postProcessBundleContext(BundleContext platformBundleContext) throws Exception {
 	}
@@ -162,9 +172,11 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	//
 
 	/**
-	 * Replacement run method. Get a hold of the TestRunner used for running
-	 * this test so it can populate it with the results retrieved from OSGi.
+	 * {@inheritDoc}
 	 * 
+	 * <p/> Replacement run method. Gets a hold of the TestRunner used for
+	 * running this test so it can populate it with the results retrieved from
+	 * OSGi.
 	 */
 	public final void run(TestResult result) {
 
@@ -213,7 +225,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	//
 
 	/**
-	 * Start the OSGi platform and install/start the bundles (happens once for
+	 * Starts the OSGi platform and install/start the bundles (happens once for
 	 * the all test runs)
 	 * 
 	 * @throws Exception
@@ -289,7 +301,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Log the underlying OSGi information (which can be tricky).
+	 * Logs the underlying OSGi information (which can be tricky).
 	 * 
 	 */
 	private void logPlatformInfo(BundleContext context) {
@@ -305,7 +317,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Install an OSGi bundle from the given location.
+	 * Installs an OSGi bundle from the given location.
 	 * 
 	 * @param location
 	 * @return
@@ -324,7 +336,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	//
 
 	/**
-	 * Prepare test execution - the OSGi platform will be started (if needed)
+	 * Prepares test execution - the OSGi platform will be started (if needed)
 	 * and cached for the test suite execution.
 	 * 
 	 */
@@ -357,7 +369,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Delegate the test execution to the OSGi copy.
+	 * Delegates the test execution to the OSGi copy.
 	 * 
 	 * @throws Exception
 	 */
@@ -376,7 +388,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Finish the test execution - read back the result from the OSGi copy and
+	 * Finishes the test execution - read back the result from the OSGi copy and
 	 * closes up the streams.
 	 * 
 	 * @throws Exception
@@ -387,7 +399,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Determine through reflection the methods used for invoking the
+	 * Determines through reflection the methods used for invoking the
 	 * TestRunnerService.
 	 * 
 	 * @throws Exception
@@ -411,7 +423,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	/**
-	 * Try to get the bundle context for spring-osgi-test-support bundle. This
+	 * Tries to get the bundle context for spring-osgi-test-support bundle. This
 	 * is useful on platform where the platformContext or system BundleContext
 	 * doesn't behave like a normal context.
 	 * 

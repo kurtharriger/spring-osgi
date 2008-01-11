@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test;
 
 import java.util.Hashtable;
@@ -32,19 +33,24 @@ import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
  * Test bundle activator - looks for a predefined JUnit test runner and triggers
- * the test execution.
+ * the test execution. This class is used by the testing framework to run
+ * integration tests inside the OSGi framework.
+ * 
+ * <strong>Note:</strong> Programatic usage of this class is strongly
+ * discouraged as its semantics might change in the future - in fact, the only
+ * reason this class is public is because the OSGi specification requires this.
  * 
  * @author Costin Leau
- * 
  */
 public class JUnitTestActivator implements BundleActivator {
 
 	private static final Log log = LogFactory.getLog(JUnitTestActivator.class);
-	
+
 	private BundleContext context;
 	private ServiceReference reference;
 	private ServiceRegistration registration;
 	private TestRunnerService service;
+
 
 	public void start(BundleContext bc) throws Exception {
 		this.context = bc;
@@ -59,14 +65,14 @@ public class JUnitTestActivator implements BundleActivator {
 	}
 
 	/**
-	 * Start executing an instance of OSGiJUnitTest on the TestRunnerService. 
+	 * Starts executing an instance of OSGiJUnitTest on the TestRunnerService.
 	 */
-	public void executeTest() {
+	void executeTest() {
 		service.runTest(loadTest());
 	}
 
 	/**
-	 * Loads the test instance inside OSGi and prepares it for execution. 
+	 * Loads the test instance inside OSGi and prepares it for execution.
 	 * 
 	 * @return
 	 */

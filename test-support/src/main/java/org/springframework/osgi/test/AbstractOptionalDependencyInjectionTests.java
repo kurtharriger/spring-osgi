@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 	// The OSGi BundleContext (when executing the test as a bundle inside OSGi)
 	protected BundleContext bundleContext;
 
+
 	/**
 	 * Empty OSGi application context that doesn't require any files to be
 	 * specified.
@@ -57,10 +59,23 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 
 	}
 
+
+	/**
+	 * Default constructor. Constructs a new
+	 * <code>AbstractOptionalDependencyInjectionTests</code> instance.
+	 * 
+	 */
 	public AbstractOptionalDependencyInjectionTests() {
 		super();
 	}
 
+	/**
+	 * 
+	 * Constructs a new <code>AbstractOptionalDependencyInjectionTests</code>
+	 * instance.
+	 * 
+	 * @param name test name
+	 */
 	public AbstractOptionalDependencyInjectionTests(String name) {
 		super(name);
 	}
@@ -68,7 +83,13 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 	protected boolean isContextKeyEmpty(Object key) {
 		return false;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p/>This implementation will create an empty bundle context in case no
+	 * locations are specified.
+	 */
 	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
 		ConfigurableOsgiBundleApplicationContext context = null;
 
@@ -81,5 +102,5 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 		context.refresh();
 		return context;
 	}
-	
+
 }

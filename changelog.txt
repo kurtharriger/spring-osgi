@@ -51,6 +51,8 @@ Package org.springframework.osgi.test
 * AbstractDependencyManagerTests#getLocator visibility changed from public to protected
 * AbstractConfigurableBundleCreatorTests jar content pattern has been changed to **/* (from **/*.class, **/*.xml, 
   **/*.properties)
+* waitOnContextCreation methods visibility changed from public to protected (to be consistent with the rest of the
+  test methods)
 
 Package org.springframework.osgi.util
 * Deprecated OsgiServiceUtils#getAllServices()

@@ -30,8 +30,17 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Dependency manager layer - uses internally an {@link ArtifactLocator} to
- * retrieve the required dependencies for the running test.
+ * Dependency manager class - deals with locating of various artifacts required
+ * by the OSGi test. The artifacts are considered to be OSGi bundles that will
+ * be installed during the OSGi platform startup. Additionally this class
+ * installs the testing framework required bundles (such as Spring, Spring-DM).
+ * 
+ * <p/>This implementation uses internally an {@link ArtifactLocator} to
+ * retrieve the required dependencies for the running test. By default, the
+ * artifact locator uses the local maven 2 repository. Currently, no Maven
+ * configurations (such as &lt;settings.xml&gt;) are supported. If the maven
+ * repository is located in a non-default location, use the
+ * <code>localRepository</code> system property to specify the folder URL.
  * 
  * @author Costin Leau
  * 
@@ -48,10 +57,22 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	private ArtifactLocator locator = new LocalFileSystemMavenRepository();
 
 
+	/**
+	 * 
+	 * Default constructor. Constructs a new
+	 * <code>AbstractDependencyManagerTests</code> instance.
+	 * 
+	 */
 	public AbstractDependencyManagerTests() {
 		super();
 	}
 
+	/**
+	 * 
+	 * Constructs a new <code>AbstractDependencyManagerTests</code> instance.
+	 * 
+	 * @param name test name
+	 */
 	public AbstractDependencyManagerTests(String name) {
 		super(name);
 	}
@@ -69,7 +90,8 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 
 	/**
-	 * Return the Spring-DM version used by the core bundles.
+	 * Returns the version of the Spring-DM bundles installed by the testing
+	 * framework.
 	 * 
 	 * @return Spring-DM bundles version
 	 */
@@ -82,9 +104,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * Returns the Spring osgified version used by the test core bundles.
+	 * Returns the version of the Spring bundles installed by the testing
+	 * framework.
 	 * 
-	 * @return Spring framework dependency version 
+	 * @return Spring framework dependency version
 	 */
 	protected String getSpringVersion() {
 		if (springBundledVersion == null) {
@@ -94,38 +117,41 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * Bundles that have to be installed as part of the test setup. This method
-	 * provides an alternative to {@link #getTestBundles()} as it allows
-	 * subclasses to specify just the bundle name w/o worrying about locating
-	 * the artifact (which is resolved through the {@link ArtifactLocator}).
+	 * Returns the bundles that have to be installed as part of the test setup.
+	 * This method provides an alternative to {@link #getTestBundles()} as it
+	 * allows subclasses to specify just the bundle name w/o worrying about
+	 * locating the artifact (which is resolved through the
+	 * {@link ArtifactLocator}).
 	 * 
-	 * <p/> A bundle name can have any value and depends on the format expected
-	 * by the {@link ArtifactLocator} implementation. By default, a CSV format
-	 * is expected.
+	 * <p/>A bundle name can have any value and depends on the format expected
+	 * by the {@link ArtifactLocator} implementation. By default, a CSV (Comma
+	 * Separated Values) format is expected.
 	 * 
-	 * <p/> This method allows a declarative approach in declaring bundles as
+	 * <p/>This method allows a declarative approach in declaring bundles as
 	 * opposed to {@link #getTestBundles()} which provides a programmatic one.
 	 * 
+	 * @return an array of testing framework bundle identifiers
 	 * @see #locateBundle(String)
-	 * @return an array of bundle identifiers
 	 */
 	protected String[] getTestBundlesNames() {
 		return new String[0];
 	}
 
 	/**
-	 * Declarative method indicating the bundles required by the test framework,
-	 * by their names rather then as {@link Resource}s.
+	 * Returns the bundles that have to be installed as part of the test setup.
+	 * This method is preferred as the bundles are by their names rather then as
+	 * {@link Resource}s. It allows for a <em>declarative</em> approach for
+	 * specifying bundles as opposed to {@link #getTestBundles()} which provides
+	 * a programmatic one.
 	 * 
-	 * <p/> This implementation reads a predefined properties file to determine
-	 * the bundles needed.
+	 * <p/>This implementation reads a predefined properties file to determine
+	 * the bundles needed. If the configuration needs to be changed, consider
+	 * changing the configuration location.
 	 * 
-	 * <p/> This method allows a declarative approach in declaring bundles as
-	 * opposed to {@link #getTestBundles()} which provides a programmatic one.
-	 * 
+	 * @return an array of testing framework bundle identifiers
 	 * @see #getTestingFrameworkBundlesConfiguration()
 	 * @see #locateBundle(String)
-	 * @return an array of bundle identifiers
+	 * 
 	 */
 	protected String[] getTestFrameworkBundlesNames() {
 		// load properties file
@@ -171,9 +197,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * Return the location of the test framework bundles configuration.
+	 * Returns the location of the test framework bundles configuration.
 	 * 
-	 * @return location of the test framework bundles configuration
+	 * @return the location of the test framework bundles configuration
 	 */
 	protected Resource getTestingFrameworkBundlesConfiguration() {
 		return new InputStreamResource(
@@ -181,8 +207,10 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * Default implementation that uses the {@link ArtifactLocator} to resolve
-	 * the bundles specified in {@link #getTestBundlesNames()}.
+	 * {@inheritDoc}
+	 * 
+	 * <p/>Default implementation that uses the {@link ArtifactLocator} to
+	 * resolve the bundles specified in {@link #getTestBundlesNames()}.
 	 * 
 	 * Subclasses that override this method should decide whether they want to
 	 * support {@link #getTestBundlesNames()} or not.
@@ -194,8 +222,11 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * Default implementation that uses {@link #getTestFrameworkBundlesNames()}
-	 * to discover the bundles part of the testing framework.
+	 * {@inheritDoc}
+	 * 
+	 * <p/> Default implementation that uses
+	 * {@link #getTestFrameworkBundlesNames()} to discover the bundles part of
+	 * the testing framework.
 	 * 
 	 * @see org.springframework.osgi.test.AbstractOsgiTests#getTestFrameworkBundles()
 	 */
@@ -204,11 +235,11 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * Utility method that loads the bundles given as strings. Will delegate to
+	 * Locates the given bundle identifiers. Will delegate to
 	 * {@link #locateBundle(String)}.
 	 * 
-	 * @param bundles
-	 * @return array of Spring resources for the given bundles
+	 * @param bundles bundle identifiers
+	 * @return an array of Spring resources for the given bundle indentifiers
 	 */
 	protected Resource[] locateBundles(String[] bundles) {
 		if (bundles == null)
@@ -222,13 +253,19 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	// Set log4j property to avoid TCCL problems during startup
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p/>Sets specific log4j propety to avoid class loading problems during
+	 * start up related to the thread context class loader.
+	 */
 	protected void preProcessBundleContext(BundleContext platformBundleContext) throws Exception {
 		System.setProperty("log4j.ignoreTCL", "true");
 		super.preProcessBundleContext(platformBundleContext);
 	}
 
 	/**
-	 * Locate (through the {@link ArtifactLocator}) an OSGi bundle given as a
+	 * Locates (through the {@link ArtifactLocator}) an OSGi bundle given as a
 	 * String.
 	 * 
 	 * The default implementation expects the argument to be in Comma Separated
@@ -259,7 +296,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * override this method if the default locator (searching the local Maven2
 	 * repository) is not enough.
 	 * 
-	 * @return Returns the locator.
+	 * @return artifact locator used by this test.
 	 */
 	protected ArtifactLocator getLocator() {
 		return locator;

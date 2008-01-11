@@ -25,12 +25,10 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for OsgiPlatform classes. Provides common functionality such as
- * creation a temporary folder on startup and removal on shutdown. The system
- * properties will be used also to allow easy configuration from the command
- * line.
+ * creation a temporary folder on startup and deletion on shutdown. Uses system
+ * properties to allow easy configuration from the command line.
  * 
  * @author Costin Leau
- * 
  */
 abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
