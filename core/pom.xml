@@ -3,7 +3,7 @@
   <parent>
     <artifactId>spring-osgi</artifactId>
     <groupId>org.springframework.osgi</groupId>
-    <version>1.0-rc2-SNAPSHOT</version>
+    <version>1.0-rc2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
@@ -162,6 +162,12 @@
 		<artifactId>retrotranslator-runtime</artifactId>
 		<version>1.2.3</version>
 		<scope>test</scope>
+		<exclusions>      
+      	 <exclusion>
+          <groupId>backport-util-concurrent</groupId>
+	      <artifactId>backport-util-concurrent</artifactId>
+      	 </exclusion>
+		</exclusions> 
 	</dependency> 
     
     

@@ -51,14 +51,6 @@
       	<para>See <ulink url="http://jira.springframework.org/browse/OSGI-110">OSGI-110</ulink></para> 
 	</section>	
 
-	<section id="OSGI-167">
-      <title>Support for cyclic imports, listener references</title>
-      	<para>Currently there is no support for importer/listener cyclic references. While this is not a bug, it is a powerful feature to be able
-      	to declare nested listeners that have a reference to the importer bean dependencies.</para><para>As a work around, do not create cycles
-      	between bean definition references.</para>
-      	<para>See <ulink url="http://jira.springframework.org/browse/OSGI-167">OSGI-167</ulink></para> 
-	</section>
-
     <section id="OSGI-210">
       <title>Using <literal>classpath</literal> prefix on the root classpath (<literal>/</literal>) fails </title>
       	<para>Calling <methodname>getResource()/getResources()</methodname> from a Bundle, on the root folder (<literal>/</literal>) fails. Currently,

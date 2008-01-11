@@ -3,7 +3,7 @@
   <parent>
     <artifactId>spring-osgi</artifactId>
     <groupId>org.springframework.osgi</groupId>
-    <version>1.0-rc2-SNAPSHOT</version>
+    <version>1.0-rc2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
@@ -39,9 +39,14 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
       <version>${spring.maven.artifact.version}</version>
-      
       <!-- assume it's there since io is usually ran as part of a suite -->
       <scope>provided</scope>
+      <exclusions>      
+      	<exclusion>
+          <groupId>commons-logging</groupId>
+	      <artifactId>commons-logging</artifactId>
+      	</exclusion>
+      </exclusions>        
     </dependency> 
 
     
