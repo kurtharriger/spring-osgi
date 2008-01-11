@@ -39,7 +39,7 @@ public interface OsgiServiceLifecycleListener {
 	 * @throws Exception custom exception that is logged but not propagated to
 	 * other listeners
 	 */
-	public void bind(Object service, Map properties) throws Exception;
+	 void bind(Object service, Map properties) throws Exception;
 
 	/**
 	 * Called when a service is being unbinded inside the proxy (be it single or
@@ -51,5 +51,5 @@ public interface OsgiServiceLifecycleListener {
 	 * @throws Exception custom exception that is logged but not propagated to
 	 * other listeners
 	 */
-	public void unbind(Object service, Map properties) throws Exception;
+	 void unbind(Object service, Map properties) throws Exception;
 }

@@ -49,7 +49,7 @@ import org.springframework.util.StringUtils;
 /**
  * 
  * <code>AbstractRefreshableApplicationContext</code> subclass that implements
- * the {@link ConfigurableOsgiApplicationContext} interface for OSGi
+ * the {@link ConfigurableOsgiBundleApplicationContext} interface for OSGi
  * environments. Pre-implements a <code>configLocation</code> property, to be
  * populated through the <code>ConfigurableOsgiApplicationContext</code>
  * interface after OSGi bundle startup.

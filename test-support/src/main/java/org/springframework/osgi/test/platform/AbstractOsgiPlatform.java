@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.platform;
 
 import java.io.File;
@@ -40,12 +41,9 @@ abstract class AbstractOsgiPlatform implements OsgiPlatform {
 	 */
 	String toString = getClass().getName();
 
-	
 	Properties configurationProperties = new Properties();
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.test.platform.OsgiPlatform#getConfigurationProperties()
-	 */
+
+
 	public Properties getConfigurationProperties() {
 		// local properties
 		configurationProperties.putAll(getPlatformProperties());
@@ -57,7 +55,7 @@ abstract class AbstractOsgiPlatform implements OsgiPlatform {
 	/**
 	 * Subclasses can override this to provide special platform properties.
 	 * 
-	 * @return
+	 * @return platform implementation specific properties.
 	 */
 	abstract Properties getPlatformProperties();
 

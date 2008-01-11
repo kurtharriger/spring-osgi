@@ -116,8 +116,9 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * continuation-like behavior or completion of the refresh method on several
 	 * threads, in a asynch manner.
 	 * 
-	 * By default, a {@link NoDependenciesWaitRefreshExecutor} is used which
-	 * executes the refresh method in one go (normal behavior).
+	 * By default, the refresh method in executed in <em>one go</em> (normal behavior).
+	 * 
+	 * {@inheritDoc}
 	 */
 	public void refresh() throws BeansException, IllegalStateException {
 		executor.refresh();

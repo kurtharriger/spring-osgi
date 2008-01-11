@@ -132,7 +132,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	 * Create the default manifest in case none if found on the disk. By
 	 * default, the imports are synthetised based on the test class bytecode.
 	 * 
-	 * @return
+	 * @return default manifest for the jar created on the fly
 	 */
 	protected Manifest createDefaultManifest() {
 		Manifest manifest = new Manifest();

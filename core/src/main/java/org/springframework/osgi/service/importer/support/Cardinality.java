@@ -58,7 +58,6 @@ public class Cardinality extends StaticLabeledEnum {
 	 * Indicates if this cardinality implies that at most one service is
 	 * expected.
 	 * 
-	 * @param cardinality cardinality object
 	 * @return true if the given cardinality is single, false otherwise
 	 */
 	public boolean isSingle() {
@@ -69,8 +68,7 @@ public class Cardinality extends StaticLabeledEnum {
 	 * Indicates if this cardinality implies that multiple services are
 	 * expected.
 	 * 
-	 * @param cardinality cardinality object
-	 * @return true if the given cardinality is multiple, false otherwise
+	 * @return true if this cardinality is multiple, false otherwise
 	 */
 	public boolean isMultiple() {
 		return Cardinality.C_0__N.equals(this) || Cardinality.C_1__N.equals(this);
@@ -80,8 +78,7 @@ public class Cardinality extends StaticLabeledEnum {
 	 * Indicates if this cardinality implies that at least one service is
 	 * expected (mandatory cardinality).
 	 * 
-	 * @param cardinality cardinality object
-	 * @return true if the given cardinality is mandatory, false otherwise
+	 * @return true if this cardinality is mandatory, false otherwise
 	 */
 	public boolean isMandatory() {
 		return Cardinality.C_1__1.equals(this) || Cardinality.C_1__N.equals(this);
@@ -91,8 +88,7 @@ public class Cardinality extends StaticLabeledEnum {
 	 * Indicates if this cardinality implies that is acceptable for no matching
 	 * services to be found.
 	 * 
-	 * @param cardinality cardinality object
-	 * @return true if the given cardinality is optional, false otherwise
+	 * @return true if this cardinality is optional, false otherwise
 	 */
 	public boolean isOptional() {
 		return Cardinality.C_0__N.equals(this) || Cardinality.C_0__1.equals(this);

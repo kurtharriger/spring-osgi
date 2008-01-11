@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.lang.reflect.Constructor;
@@ -42,6 +43,7 @@ public class MockFrameworkUtil {
 	private static final String FELIX_CLS = "org.apache.felix.framework.FilterImpl";
 
 	private final Constructor filterConstructor;
+
 
 	/**
 	 * Constructs a new <code>MockFrameworkUtil</code> instance.
@@ -91,9 +93,8 @@ public class MockFrameworkUtil {
 	 * Create a mock filter that is _might_ be valid. This method does not throw
 	 * an checked exception and will always return a filter implementation.
 	 * 
-	 * 
-	 * @param filter
-	 * @return
+	 * @param filter OSGi filter given as a String.
+	 * @return actual OSGi filter using the underlying OSGi platform
 	 */
 	public Filter createFilter(String filter) {
 		try {
