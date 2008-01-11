@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package org.springframework.osgi.util;
 
 import org.osgi.framework.Bundle;
@@ -22,36 +23,56 @@ import org.osgi.framework.Constants;
 import org.springframework.util.Assert;
 
 /**
- * Regrettably we sometimes need to know which Osgi platform we are currently
- * running on in order to work around quirks and differences in the different
- * implementations.
+ * Utility class that detects the running platform. Useful when certain quirks
+ * or tweaks have to made for a specific implementations.
  * 
- * Currently we can detect equinox, knopflerfish, and felix.
+ * Currently we can detect Equinox, Knopflerfish and Felix platforms.
  * 
  * @author Adrian Colyer
+ * @author Costin Leau
  */
 public abstract class OsgiPlatformDetector {
 
-    private static final String[] EQUINOX_LABELS = new String[] { "Eclipse", "eclipse", "Equinox", "equinox", };
+	private static final String[] EQUINOX_LABELS = new String[] { "Eclipse", "eclipse", "Equinox", "equinox", };
 
 	private static final String[] KF_LABELS = new String[] { "Knopflerfish", "knopflerfish" };
 
 	private static final String[] FELIX_LABELS = new String[] { "Apache Software Foundation", "Felix", "felix" };
 
 
-    public static boolean isEquinox(BundleContext aContext) {
-		return determinePlatform(aContext, EQUINOX_LABELS);
+	/**
+	 * Returns true if the given bundle context belongs to the Equinox platform.
+	 * 
+	 * @param bundleContext OSGi bundle context
+	 * @return true if the context indicates Equinox platform, false otherwise
+	 */
+	public static boolean isEquinox(BundleContext bundleContext) {
+		return determinePlatform(bundleContext, EQUINOX_LABELS);
 	}
 
-	public static boolean isKnopflerfish(BundleContext aContext) {
-		return determinePlatform(aContext, KF_LABELS);
+	/**
+	 * Returns true if the given bundle context belongs to the Knopflerfish
+	 * platform.
+	 * 
+	 * @param bundleContext OSGi bundle context
+	 * @return true if the context indicates Knopflerfish platform, false
+	 * otherwise
+	 */
+	public static boolean isKnopflerfish(BundleContext bundleContext) {
+		return determinePlatform(bundleContext, KF_LABELS);
 	}
 
-	public static boolean isFelix(BundleContext aContext) {
-		return determinePlatform(aContext, FELIX_LABELS);
+	/**
+	 * Returns true if the given bundle context belongs to the Felix platform.
+	 * 
+	 * @param bundleContext OSGi bundle context
+	 * @return true if the context indicates Felix platform, false otherwise
+	 */
+	public static boolean isFelix(BundleContext bundleContext) {
+		return determinePlatform(bundleContext, FELIX_LABELS);
 	}
 
-    private static boolean determinePlatform(BundleContext context, String[] labels) {
+	private static boolean determinePlatform(BundleContext context, String[] labels) {
 		Assert.notNull(context);
 		Assert.notNull(labels);
 
@@ -79,21 +100,18 @@ public abstract class OsgiPlatformDetector {
 	}
 
 	/**
-	 * Return the OSGi platform version (using the manifest entries from the
-	 * system bundle). Can be null or empty.
+	 * Returns the OSGi platform version (using the manifest entries from the
+	 * system bundle). The version can be empty.
 	 * 
-	 * Subclasses should extend this if a different detection mechanism is
-	 * required.
-	 * 
-	 * @param ctx bundle context to inspect
-	 * @return system bundle version.
+	 * @param bundleContext bundle context to inspect
+	 * @return not-null system bundle version
 	 */
-	public static String getVersion(BundleContext ctx) {
-		if (ctx == null)
+	public static String getVersion(BundleContext bundleContext) {
+		if (bundleContext == null)
 			return "";
 
 		// get system bundle
-		Bundle sysBundle = ctx.getBundle(0);
+		Bundle sysBundle = bundleContext.getBundle(0);
 		// force string conversion instead of casting just to be safe
 		return "" + sysBundle.getHeaders().get(Constants.BUNDLE_VERSION);
 	}

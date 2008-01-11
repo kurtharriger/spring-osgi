@@ -15,6 +15,7 @@
  *
  * Created on 25-Jan-2006 by Adrian Colyer
  */
+
 package org.springframework.osgi.util;
 
 import org.osgi.framework.BundleContext;
@@ -24,7 +25,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.util.Assert;
 
 /**
- * Utility class offering easy access to OSGi services
+ * Utility class offering easy access to OSGi services.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -83,8 +84,8 @@ public abstract class OsgiServiceUtils {
 	 * Unregisters the given service registration from the given bundle. Returns
 	 * true if the unregistration process succeeded, false otherwise.
 	 * 
-	 * @param registration
-	 * @return
+	 * @param registration service registration (can be null)
+	 * @return true if the unregistration successeded, false otherwise
 	 */
 	public static boolean unregisterService(ServiceRegistration registration) {
 		try {

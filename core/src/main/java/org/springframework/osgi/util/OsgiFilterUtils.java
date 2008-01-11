@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.util;
 
 import org.osgi.framework.Constants;
@@ -24,14 +25,10 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Utility class for OSGi filters.
- * 
- * <p/>
- * 
- * Allows filter creation(as well as modication) using multiple classnames.
+ * Utility class for creating OSGi filters. This class allows filter creation
+ * and concatenation from common parameters such as class names.
  * 
  * @author Costin Leau
- * 
  */
 public abstract class OsgiFilterUtils {
 
@@ -43,28 +40,29 @@ public abstract class OsgiFilterUtils {
 
 	private static final String EQUALS = "=";
 
+
 	/**
-	 * Add the given class as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
+	 * Adds the given class as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
 	 * constraint to the given filter. At least one parameter must be valid
-	 * (non-null).
+	 * (non-<code>null</code>).
 	 * 
-	 * @param clazz class name - can be null
-	 * @param filter an existing, valid filter
-	 * @return updated filter containg the {@link Constants.OBJECTCLASS}
-	 * constraint
+	 * @param clazz class name (can be <code>null</code>)
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return OSGi filter containing the {@link Constants.OBJECTCLASS}
+	 * constraint and the given filter
 	 */
 	public static String unifyFilter(String clazz, String filter) {
 		return unifyFilter(new String[] { clazz }, filter);
 	}
 
 	/**
-	 * Add the given class to the given filter. At least one parameter must be
-	 * valid.
+	 * Adds the given class to the given filter. At least one parameter must be
+	 * valid (non-<code>null</code>).
 	 * 
+	 * @param clazz fully qualified class name (can be <code>null</code>)
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return an OSGi filter concatenating the given parameters
 	 * @see #unifyFilter(String, String)
-	 * @param clazz
-	 * @param filter
-	 * @return
 	 */
 	public static String unifyFilter(Class clazz, String filter) {
 		if (clazz != null)
@@ -73,13 +71,14 @@ public abstract class OsgiFilterUtils {
 	}
 
 	/**
-	 * Add the given classes to the given filter. At least one parameter must be
-	 * valid.
+	 * Adds the given classes to the given filter. At least one parameter must
+	 * be valid (non-<code>null</code>).
 	 * 
+	 * @param classes array of fully qualified class names (can be
+	 * <code>null</code>/empty)
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return an OSGi filter concatenating the given parameters
 	 * @see #unifyFilter(String[], String)
-	 * @param classes
-	 * @param filter
-	 * @return
 	 */
 	public static String unifyFilter(Class[] classes, String filter) {
 		if (ObjectUtils.isEmpty(classes))
@@ -94,14 +93,14 @@ public abstract class OsgiFilterUtils {
 	}
 
 	/**
-	 * Add the given classese as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
+	 * Adds the given classes as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
 	 * constraint to the given filter. At least one parameter must be valid
-	 * (non-null).
+	 * (non-<code>null</code>).
 	 * 
-	 * @param classes array of classes name - can be null/empty
-	 * @param filter an existing, valid filter
-	 * @return updated filter containg the {@link Constants.OBJECTCLASS}
-	 * constraint
+	 * @param classes array of fully qualified class names (can be
+	 * <code>null</code>/empty)
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return an OSGi filter concatenating the given parameters
 	 */
 	public static String unifyFilter(String[] classes, String filter) {
 		return unifyFilter(Constants.OBJECTCLASS, classes, filter);
@@ -109,14 +108,14 @@ public abstract class OsgiFilterUtils {
 
 	/**
 	 * Concatenates the given strings with an 'and'(&amp;) constraint under the
-	 * given key to the given filter. At least one parameter must be valid
-	 * (non-null). At least the filter or the key and the items have to be not
-	 * null.
+	 * given key to the given filter. At least one of the items/filter
+	 * parameters must be valid (non-<code>null</code>).
 	 * 
 	 * @param key the key under which the items are being concatenated
+	 * (required)
 	 * @param items an array of strings concatenated to the existing filter
-	 * @param filter an existing, valid filter
-	 * @return updated filter containg the new constraint
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return an OSGi filter concatenating the given parameters
 	 */
 	public static String unifyFilter(String key, String[] items, String filter) {
 		boolean filterHasText = StringUtils.hasText(filter);
@@ -125,14 +124,14 @@ public abstract class OsgiFilterUtils {
 			items = new String[0];
 
 		// number of valid (not-null) classes
-		int validClassNames = items.length;
+		int itemName = items.length;
 
 		for (int i = 0; i < items.length; i++) {
 			if (items[i] == null)
-				validClassNames--;
+				itemName--;
 		}
 
-		if (validClassNames == 0)
+		if (itemName == 0)
 			// just return the filter
 			if (filterHasText)
 				return filter;
@@ -146,13 +145,13 @@ public abstract class OsgiFilterUtils {
 			throw new IllegalArgumentException("invalid filter: " + filter);
 		}
 
-		// the classes will be added in a subfilter which does searching only
-		// after the key
+		// the item will be added in a sub-filter which does searching only
+		// after the key. For classes these will look like:
 		// 
 		// i.e.
 		// (&(objectClass=java.lang.Object)(objectClass=java.lang.Cloneable))
 		//
-		// this subfilter will be added with a & constraint to the given filter
+		// this sub filter will be added with a & constraint to the given filter
 		// if
 		// that one exists
 		// i.e. (&(&(objectClass=MegaObject)(objectClass=SuperObject))(<given
@@ -165,15 +164,15 @@ public abstract class OsgiFilterUtils {
 		if (filterHasText)
 			buffer.append(FILTER_AND_CONSTRAINT);
 
-		boolean moreThenOneClass = validClassNames > 1;
+		boolean moreThenOneClass = itemName > 1;
 
-		// b. create objectClass subfilter (only if we have more then one class
+		// b. create key sub filter (only if we have more then one class
 		// (&(&
 		if (moreThenOneClass) {
 			buffer.append(FILTER_AND_CONSTRAINT);
 		}
 
-		// parse the classes and add the classname under objectClass
+		// parse the classes and add the item name under the given key
 		for (int i = 0; i < items.length; i++) {
 			if (items[i] != null) {
 				// (objectClass=
@@ -187,7 +186,7 @@ public abstract class OsgiFilterUtils {
 			}
 		}
 
-		// c. close the classes subfilter
+		// c. close the classes sub filter
 		// )
 		if (moreThenOneClass) {
 			buffer.append(FILTER_END);
@@ -205,9 +204,9 @@ public abstract class OsgiFilterUtils {
 	}
 
 	/**
-	 * Validate the given String as a OSGi filter.
+	 * Validates the given String as a OSGi filter.
 	 * 
-	 * @param filter the filter expression
+	 * @param filter OSGi filter
 	 * @return true if the filter is valid, false otherwise
 	 */
 	public static boolean isValidFilter(String filter) {
@@ -221,12 +220,12 @@ public abstract class OsgiFilterUtils {
 	}
 
 	/**
-	 * Create an OSGi filter from the given String. Translates the
+	 * Creates an OSGi {@link Filter} from the given String. Translates the
 	 * {@link InvalidSyntaxException} checked exception into an unchecked
 	 * {@link IllegalArgumentException}.
 	 * 
-	 * @param filter filter string representation
-	 * @return OSGi filter
+	 * @param filter OSGi filter given as a String
+	 * @return OSGi filter (as <code>Filter</code>)
 	 */
 	public static Filter createFilter(String filter) {
 		Assert.hasText(filter, "invalid filter");

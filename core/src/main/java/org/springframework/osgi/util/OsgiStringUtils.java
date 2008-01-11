@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.util;
 
 import java.util.Dictionary;
@@ -36,24 +37,24 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class OsgiStringUtils {
 
+	/** Constant over the Bundle events */
 	public static final Constants BUNDLE_EVENTS = new Constants(BundleEvent.class);
-
+	/** Constant over the Framework events */
 	public static final Constants FRAMEWORK_EVENTS = new Constants(FrameworkEvent.class);
-
+	/** Constant over the Service events */
 	public static final Constants SERVICE_EVENTS = new Constants(ServiceEvent.class);
-
+	/** Constant over the Bundle states */
 	public static final Constants BUNDLE_STATES = new Constants(Bundle.class);
 
 	private static final String UNKNOWN_EVENT_TYPE = "UNKNOWN EVENT TYPE";
-
 	private static final String NULL_STRING = "null";
-
 	private static final String EMPTY_STRING = "";
 
+
 	/**
-	 * Return a null-safe String representation for the given bundle event.
+	 * Returns a String representation for the given bundle event.
 	 * 
-	 * @param eventType bundle event given as an int
+	 * @param eventType OSGi <code>BundleEvent</code> given as an int
 	 * @return String representation for the bundle event
 	 */
 	public static String nullSafeBundleEventToString(int eventType) {
@@ -67,9 +68,9 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Return a null-safe String representation for the given bundle event.
+	 * Returns a String representation for the given bundle event.
 	 * 
-	 * @param event OSGi BundleEvent
+	 * @param event OSGi <code>BundleEvent</code> (can be <code>null</code>)
 	 * @return String representation for the given bundle event
 	 */
 	public static String nullSafeToString(BundleEvent event) {
@@ -84,10 +85,10 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Return a null-safe String representation for the given ServiceEvent.
+	 * Returns a String representation for the given <code>ServiceEvent</code>.
 	 * 
-	 * @param event OSGi ServiceEvent
-	 * @return String representation for the given ServiceEvent
+	 * @param event OSGi <code>ServiceEvent</code> (can be <code>null</code>)
+	 * @return String representation for the given event
 	 */
 	public static String nullSafeToString(ServiceEvent event) {
 		if (event == null)
@@ -102,10 +103,10 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Return a null-safe String representation for the given FrameworkEvent.
+	 * Returns a String representation for the given <code>FrameworkEvent</code>.
 	 * 
-	 * @param event OSGi FrameworkEvent
-	 * @return String representation for the given FrameworkEvent
+	 * @param event OSGi <code>FrameworkEvent</code> (can be <code>null</code>)
+	 * @return String representation of the given event
 	 */
 	public static String nullSafeToString(FrameworkEvent event) {
 		if (event == null)
@@ -119,10 +120,11 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Produce a nice string representation of the given ServiceReference.
+	 * Returns a String representation of the given
+	 * <code>ServiceReference</code>.
 	 * 
-	 * @param reference OSGi service reference
-	 * @return String representation for the ServiceReference
+	 * @param reference OSGi service reference (can be <code>null</code>)
+	 * @return String representation of the given service reference
 	 */
 	public static String nullSafeToString(ServiceReference reference) {
 		if (reference == null)
@@ -151,9 +153,9 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Return the Bundle state as a String.
+	 * Returns a String representation of the <code>Bundle</code> state.
 	 * 
-	 * @param bundle OSGi bundle
+	 * @param bundle OSGi bundle (can be <code>null</code>)
 	 * @return bundle state as a string
 	 */
 	public static String bundleStateAsString(Bundle bundle) {
@@ -169,10 +171,9 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Return the bundle symbolic name in a null safe manner (null will never be
-	 * returned).
+	 * Returns the given <code>Bundle</code> symbolic name.
 	 * 
-	 * @param bundle OSGi bundle
+	 * @param bundle OSGi bundle (can be <code>null</code>)
 	 * @return the bundle, symbolic name
 	 */
 	public static String nullSafeSymbolicName(Bundle bundle) {
@@ -187,6 +188,13 @@ public abstract class OsgiStringUtils {
 		return (String) (bundle.getSymbolicName() == null ? NULL_STRING : bundle.getSymbolicName());
 	}
 
+	/**
+	 * Returns the name of the given <code>Bundle</code> in a null-safe
+	 * manner.
+	 * 
+	 * @param bundle OSGi bundle (can be <code>null</code>)
+	 * @return bundle name
+	 */
 	public static String nullSafeName(Bundle bundle) {
 		if (bundle == null)
 			return NULL_STRING;
@@ -203,10 +211,10 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Return the bundle name and symbolic name - useful when logging bundle
+	 * Returns the bundle name and symbolic name - useful when logging bundle
 	 * info.
 	 * 
-	 * @param bundle OSGi bundle
+	 * @param bundle OSGi bundle (can be null)
 	 * @return the bundle name and symbolic name
 	 */
 	public static String nullSafeNameAndSymName(Bundle bundle) {

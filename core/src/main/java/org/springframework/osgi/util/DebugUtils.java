@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.util;
 
 import java.io.IOException;
@@ -37,9 +38,9 @@ import org.springframework.util.ObjectUtils;
  * class loading errors.
  * 
  * The main entry point is
- * {@link #debugClassLoadingThrowable(Throwable, Bundle, Class[])}
- * which will try to determine the cause by trying to load the given interfaces
- * using the given bundle.
+ * {@link #debugClassLoadingThrowable(Throwable, Bundle, Class[])} which will
+ * try to determine the cause by trying to load the given interfaces using the
+ * given bundle.
  * 
  * <p/> The debugging process can be potentially expensive.
  * 
@@ -50,13 +51,14 @@ public abstract class DebugUtils {
 
 	private static final Log log = LogFactory.getLog(DebugUtils.class);
 
+
 	/**
-	 * Try to debug the cause of the Throwables that can appear when loading
-	 * classes in OSGi environments (for example when creating proxies).
+	 * Tries to debug the cause of the {@link Throwable}s that can appear when
+	 * loading classes in OSGi environments (for example when creating proxies).
 	 * 
-	 * This method will try to determine the class that caused the problem and
-	 * to search for it in the given bundle or through the classloaders of the
-	 * given classes.
+	 * <p/> This method will try to determine the class that caused the problem
+	 * and to search for it in the given bundle or through the classloaders of
+	 * the given classes.
 	 * 
 	 * It will look at the classes are visible by the given bundle on debug
 	 * level and do a bundle discovery process on trace level.
@@ -103,9 +105,9 @@ public abstract class DebugUtils {
 	}
 
 	/**
-	 * A best-guess attempt at figuring out why a given class could not be
-	 * found. This method will search the given bundle and its classpath to
-	 * determine the reason for which the class cannot be loaded.
+	 * Tries (through a best-guess attempt) to figure out why a given class
+	 * could not be found. This method will search the given bundle and its
+	 * classpath to determine the reason for which the class cannot be loaded.
 	 * 
 	 * <p/> This method tries to be effective especially when the dealing with
 	 * {@link NoClassDefFoundError} caused by failure of loading transitive
