@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.provisioning;
 
 import org.springframework.core.io.Resource;
@@ -28,7 +29,8 @@ import org.springframework.core.io.Resource;
 public interface ArtifactLocator {
 
 	String DEFAULT_ARTIFACT_TYPE = "jar";
-	
+
+
 	/**
 	 * Locate the artifact under the given group, with the given id, version and
 	 * type. Implementations are free to provide defaults, in case null values
@@ -39,7 +41,7 @@ public interface ArtifactLocator {
 	 * @param version artifact version
 	 * @param type artifact type
 	 * 
-	 * @return
+	 * @return Spring resource to the located artifact
 	 */
 	Resource locateArtifact(String group, String id, String version, String type);
 
@@ -47,10 +49,10 @@ public interface ArtifactLocator {
 	 * Shortcut version which uses the implementation default artifact type
 	 * {@link #DEFAULT_ARTIFACT_TYPE}.
 	 * 
-	 * @param group
-	 * @param id
-	 * @param version
-	 * @return
+	 * @param group artifact group
+	 * @param id artifact id or name
+	 * @param version artifact version
+	 * @return Spring resource to the located artifact
 	 */
 	Resource locateArtifact(String group, String id, String version);
 }

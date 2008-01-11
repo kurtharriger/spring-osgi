@@ -42,13 +42,13 @@ public abstract class OsgiFilterUtils {
 
 
 	/**
-	 * Adds the given class as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
+	 * Adds the given class as an 'and'(&amp;) {@link Constants#OBJECTCLASS}
 	 * constraint to the given filter. At least one parameter must be valid
 	 * (non-<code>null</code>).
 	 * 
 	 * @param clazz class name (can be <code>null</code>)
 	 * @param filter valid OSGi filter (can be <code>null</code>)
-	 * @return OSGi filter containing the {@link Constants.OBJECTCLASS}
+	 * @return OSGi filter containing the {@link Constants#OBJECTCLASS}
 	 * constraint and the given filter
 	 */
 	public static String unifyFilter(String clazz, String filter) {
@@ -93,7 +93,7 @@ public abstract class OsgiFilterUtils {
 	}
 
 	/**
-	 * Adds the given classes as an 'and'(&amp;) {@link Constants.OBJECTCLASS}
+	 * Adds the given classes as an 'and'(&amp;) {@link Constants#OBJECTCLASS}
 	 * constraint to the given filter. At least one parameter must be valid
 	 * (non-<code>null</code>).
 	 * 

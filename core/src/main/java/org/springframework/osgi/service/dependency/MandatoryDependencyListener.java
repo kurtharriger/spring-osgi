@@ -38,7 +38,7 @@ public interface MandatoryDependencyListener {
 	 * Called when a mandatory dependency for an importer has been unsatisfied.
 	 * This method is called only if the dependency was satisfied before.
 	 * 
-	 * @param mandatory dependency notification
+	 * @param event dependency notification
 	 * @see #mandatoryDependencySatisfied(MandatoryDependencyEvent)
 	 */
 	void mandatoryDependencyUnsatisfied(MandatoryDependencyEvent event);

@@ -126,7 +126,7 @@ public abstract class OsgiBundleUtils {
 	 * 
 	 * @param bundle OSGi bundle
 	 * @return true if the given bundle is a fragment, false otherwise
-	 * @see Constants.FRAGMENT_HOST
+	 * @see Constants#FRAGMENT_HOST
 	 */
 	public static boolean isFragment(Bundle bundle) {
 		Assert.notNull(bundle, "bundle is required");
@@ -149,7 +149,7 @@ public abstract class OsgiBundleUtils {
 	 * 
 	 * @param bundle OSGi bundle
 	 * @return bundle version
-	 * @see Constants.BUNDLE_VERSION
+	 * @see Constants#BUNDLE_VERSION
 	 */
 	public static Version getBundleVersion(Bundle bundle) {
 		return getHeaderAsVersion(bundle, Constants.BUNDLE_VERSION);

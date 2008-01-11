@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test;
 
 import org.osgi.framework.Bundle;
@@ -39,6 +40,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 
 	private static final long SECOND = 1000;
 
+
 	public AbstractSynchronizedOsgiTests() {
 		super();
 	}
@@ -53,9 +55,9 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	 * waiting for full initialization of Spring OSGi bundles before starting
 	 * the actual test execution.
 	 * 
-	 * @param context
 	 * @param forBundleWithSymbolicName
-	 * @param timeout time to wait (in seconds) for the application context to be published
+	 * @param timeout time to wait (in seconds) for the application context to
+	 * be published
 	 */
 	public void waitOnContextCreation(String forBundleWithSymbolicName, long timeout) {
 		waitOnContextCreation(bundleContext, forBundleWithSymbolicName, timeout);
@@ -84,6 +86,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 		String filter = "(org.springframework.context.service.name=" + forBundleWithSymbolicName + ")";
 
 		ServiceListener listener = new ServiceListener() {
+
 			public void serviceChanged(ServiceEvent event) {
 				if (event.getType() == ServiceEvent.REGISTERED)
 					counter.decrement();
@@ -110,7 +113,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	}
 
 	/**
-	 * 'Sugar' method - identical to waitOnContextCreation({@link #getBundleContext()},
+	 * 'Sugar' method - identical to waitOnContextCreation(bundleContext,
 	 * forBundleWithSymbolicName, {@link #getDefaultWaitTime()}).
 	 * 
 	 * @param forBundleWithSymbolicName

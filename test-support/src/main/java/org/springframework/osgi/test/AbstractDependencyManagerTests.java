@@ -71,7 +71,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	/**
 	 * Return the Spring-DM version used by the core bundles.
 	 * 
-	 * @return
+	 * @return Spring-DM bundles version
 	 */
 	protected String getSpringDMVersion() {
 		if (springOsgiVersion == null) {
@@ -82,9 +82,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	}
 
 	/**
-	 * Return the Spring osgified version used by the test core bundles.
+	 * Returns the Spring osgified version used by the test core bundles.
 	 * 
-	 * @return
+	 * @return Spring framework dependency version 
 	 */
 	protected String getSpringVersion() {
 		if (springBundledVersion == null) {
@@ -208,7 +208,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * {@link #locateBundle(String)}.
 	 * 
 	 * @param bundles
-	 * @return
+	 * @return array of Spring resources for the given bundles
 	 */
 	protected Resource[] locateBundles(String[] bundles) {
 		if (bundles == null)

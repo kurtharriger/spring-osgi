@@ -28,30 +28,31 @@ import org.osgi.framework.BundleContext;
 public interface OsgiPlatform {
 
 	/**
-	 * Start the OSGi platform.
+	 * Starts the OSGi platform.
 	 * 
 	 * @throws Exception
 	 */
 	void start() throws Exception;
 
 	/**
-	 * Stop the OSGi platform.
+	 * Stops the OSGi platform.
 	 * 
 	 * @throws Exception
 	 */
 	void stop() throws Exception;
 
 	/**
-	 * Return the {@link java.util.Properties} object used for configuring the
+	 * Returns the {@link java.util.Properties} object used for configuring the
 	 * underlying OSGi implementation before starting it.
 	 * 
-	 * @return
+	 * @return platform implementation specific properties
 	 */
 	Properties getConfigurationProperties();
 
 	/**
-	 * Get a hold of the bundle context of the returned platform.
-	 * @return
+	 * Returns hold of the bundle context of the returned platform.
+	 * 
+	 * @return platform bundle context
 	 */
 	BundleContext getBundleContext();
 }

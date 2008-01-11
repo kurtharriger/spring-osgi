@@ -37,5 +37,5 @@ public interface BundleContextAware {
 	 * @param bundleContext the <code>BundleContext</code> object to be used
 	 * by this object
 	 */
-	public void setBundleContext(BundleContext bundleContext);
+	 void setBundleContext(BundleContext bundleContext);
 }
