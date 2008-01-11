@@ -27,8 +27,19 @@ import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
- * JUnit superclass which offers synchronization for bundle initialization. It
- * provides utility waiting methods for bundle initialization.
+ * JUnit superclass which offers synchronization for application context
+ * initialization. The class <b>automatically</b> determines
+ * <em>Spring powered</em> bundles that are installed by the testing framework
+ * and (by default), will wait for their application context to fully start.
+ * Only after all the application contexts have been fully refreshed, the actual
+ * test execution will commence.
+ * 
+ * <p/>The class also provides utility waiting methods for discovering Spring
+ * application context (published as OSGi services) in case programmatic waiting
+ * is required (for example, when installing bundles manually).
+ * 
+ * <p/>As the rest of the other classes, the behaviour of this class can be
+ * customized by extending its methods.
  * 
  * @author Costin Leau
  * @author Adrian Colyer
@@ -41,40 +52,59 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	private static final long SECOND = 1000;
 
 
+	/**
+	 * 
+	 * Default constructor. Constructs a new
+	 * <code>AbstractSynchronizedOsgiTests</code> instance.
+	 * 
+	 */
 	public AbstractSynchronizedOsgiTests() {
 		super();
 	}
 
+	/**
+	 * Constructs a new <code>AbstractSynchronizedOsgiTests</code> instance.
+	 * 
+	 * @param name test name
+	 */
 	public AbstractSynchronizedOsgiTests(String name) {
 		super(name);
 	}
 
 	/**
-	 * Place the current (test) thread to wait for the a Spring application
+	 * Waits for a <em>Spring powered</em> bundle, given by its symbolic name
+	 * to be fully started.
+	 * 
+	 * <p/>Forces the current (test) thread to wait for the a Spring application
 	 * context to be published under the given symbolic name. This method allows
 	 * waiting for full initialization of Spring OSGi bundles before starting
-	 * the actual test execution.
+	 * the actual test execution. This method will use the test bundle context
+	 * for service lookup.
 	 * 
-	 * @param forBundleWithSymbolicName
-	 * @param timeout time to wait (in seconds) for the application context to
-	 * be published
+	 * @param forBundleWithSymbolicName bundle symbolic name
+	 * @param timeout maximum time to wait (in seconds) for the application
+	 * context to be published
 	 */
-	public void waitOnContextCreation(String forBundleWithSymbolicName, long timeout) {
+	protected void waitOnContextCreation(String forBundleWithSymbolicName, long timeout) {
 		waitOnContextCreation(bundleContext, forBundleWithSymbolicName, timeout);
 
 	}
 
 	/**
-	 * Place the current (test) thread to wait for the a Spring application
+	 * Waits for a <em>Spring powered</em> bundle, given by its symbolic name,
+	 * to be fully started.
+	 * 
+	 * <p/>Forces the current (test) thread to wait for the a Spring application
 	 * context to be published under the given symbolic name. This method allows
 	 * waiting for full initialization of Spring OSGi bundles before starting
 	 * the actual test execution.
 	 * 
-	 * @param context
-	 * @param forBundleWithSymbolicName
-	 * @param timeout
+	 * @param context bundle context to use for service lookup
+	 * @param forBundleWithSymbolicName bundle symbolic name
+	 * @param timeout maximum time to wait (in seconds) for the application
+	 * context to be published
 	 */
-	public void waitOnContextCreation(BundleContext context, String forBundleWithSymbolicName, long timeout) {
+	protected void waitOnContextCreation(BundleContext context, String forBundleWithSymbolicName, long timeout) {
 		// translate from seconds to milliseconds
 		long time = timeout * SECOND;
 
@@ -113,12 +143,21 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	}
 
 	/**
-	 * 'Sugar' method - identical to waitOnContextCreation(bundleContext,
+	 * Waits for a <em>Spring powered</em> bundle, given by its symbolic name,
+	 * to be fully started.
+	 * 
+	 * <p/>This method uses the default wait time and test bundle context and is
+	 * identical to #waitOnContextCreation(bundleContext,
 	 * forBundleWithSymbolicName, {@link #getDefaultWaitTime()}).
 	 * 
-	 * @param forBundleWithSymbolicName
+	 * <p/>This method is used by the testing framework at startup before
+	 * executing the actual tests.
+	 * 
+	 * @param forBundleWithSymbolicName bundle symbolic name
+	 * @see #getDefaultWaitTime()
+	 * @see #waitOnContextCreation(BundleContext, String, long)
 	 */
-	public void waitOnContextCreation(String forBundleWithSymbolicName) {
+	protected void waitOnContextCreation(String forBundleWithSymbolicName) {
 		waitOnContextCreation(forBundleWithSymbolicName, getDefaultWaitTime());
 	}
 
@@ -129,10 +168,9 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	}
 
 	/**
-	 * Return the default waiting time in seconds for
-	 * {@link #waitOnContextCreation(String)}. Subclasses should override this
-	 * method if the {@link #DEFAULT_WAIT_TIME} is not enough. For more
-	 * customization, consider setting
+	 * Returns the test default waiting time (in seconds). Subclasses should
+	 * override this method if the {@link #DEFAULT_WAIT_TIME} is not enough. For
+	 * more customization, consider setting
 	 * {@link #shouldWaitForSpringBundlesContextCreation()} to false and using
 	 * {@link #waitOnContextCreation(BundleContext, String, long)}.
 	 * 
@@ -144,19 +182,20 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	}
 
 	/**
-	 * Should the test class wait for the context creation of Spring/OSGi
-	 * bundles before executing the tests or not? Default is true.
+	 * Indicates whether the test class should wait or not for the context
+	 * creation of Spring/OSGi bundles before executing the tests. Default is
+	 * true.
 	 * 
-	 * @return true if the test will wait for spring bundle context creation or
-	 * false otherwise
+	 * @return true (the default) if the test will wait for spring bundle
+	 * context creation or false otherwise
 	 */
 	protected boolean shouldWaitForSpringBundlesContextCreation() {
 		return true;
 	}
 
-	/**
-	 * Take care of waiting for Spring powered bundle application context
-	 * creation.
+	/*
+	 * Takes care of automatically waiting for the application context creation
+	 * of <em>Spring powered</em> bundles.
 	 */
 	protected void postProcessBundleContext(BundleContext platformBundleContext) throws Exception {
 		if (shouldWaitForSpringBundlesContextCreation()) {

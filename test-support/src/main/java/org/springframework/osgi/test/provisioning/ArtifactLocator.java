@@ -24,34 +24,35 @@ import org.springframework.core.io.Resource;
  * artifacts (i.e. Maven, Ant, Ivy, etc...)
  * 
  * @author Costin Leau
- * 
  */
 public interface ArtifactLocator {
 
+	/** default artifact type */
 	String DEFAULT_ARTIFACT_TYPE = "jar";
 
 
 	/**
-	 * Locate the artifact under the given group, with the given id, version and
-	 * type. Implementations are free to provide defaults, in case null values
-	 * are passed in. The only required field is #id.
+	 * Locates the artifact under the given group, with the given id, version
+	 * and type. Implementations are free to provide defaults, in case
+	 * <code>null</code> values are passed in. The only required field is #id.
 	 * 
-	 * @param group artifact group
-	 * @param id artifact id or name
-	 * @param version artifact version
-	 * @param type artifact type
+	 * @param group artifact group (can be <code>null</code>)
+	 * @param id artifact id or name (required)
+	 * @param version artifact version (can be <code>null</code>)
+	 * @param type artifact type (can be <code>null</code>)
 	 * 
 	 * @return Spring resource to the located artifact
 	 */
 	Resource locateArtifact(String group, String id, String version, String type);
 
 	/**
-	 * Shortcut version which uses the implementation default artifact type
-	 * {@link #DEFAULT_ARTIFACT_TYPE}.
+	 * Locates the artifact under the given group, with the given id, version
+	 * and type. This is a shortcut version which uses the implementation
+	 * default artifact type {@link #DEFAULT_ARTIFACT_TYPE}.
 	 * 
-	 * @param group artifact group
-	 * @param id artifact id or name
-	 * @param version artifact version
+	 * @param group artifact group (can be <code>null</code>)
+	 * @param id artifact id or name (required)
+	 * @param version artifact version (can be <code>null</code>)
 	 * @return Spring resource to the located artifact
 	 */
 	Resource locateArtifact(String group, String id, String version);

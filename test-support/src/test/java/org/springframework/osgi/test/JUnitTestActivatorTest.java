@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.internal;
+package org.springframework.osgi.test;
 
 import java.lang.reflect.Field;
 
@@ -26,7 +26,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.test.JUnitTestActivator;
+import org.springframework.osgi.test.internal.OsgiJUnitTest;
+import org.springframework.osgi.test.internal.TestRunnerService;
 
 public class JUnitTestActivatorTest extends TestCase {
 

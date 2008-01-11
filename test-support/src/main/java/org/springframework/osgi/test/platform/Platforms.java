@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.platform;
 
-
 /**
- * Convenience class used for holding the OSGi platforms provided out of the
- * box.
+ * Convenience constants class for OSGi platforms supported out of the box.
  * 
  * @author Costin Leau
- * 
  */
 public abstract class Platforms {
 
@@ -32,11 +30,12 @@ public abstract class Platforms {
 	public static final String EQUINOX = EquinoxPlatform.class.getName();
 
 	/**
-	 * @deprecated - use {@link #KNOPFLERFISH} instead. Will be removed before final 
-	 * release.
+	 * @deprecated - use {@link #KNOPFLERFISH} instead. Will be removed before
+	 * final release.
 	 */
+	//FIXME: remove before 1.0 final
 	public static final String KNOPFLEFISH = KnopflerfishPlatform.class.getName();
-	
+
 	/**
 	 * <a href="http://www.knopflerfish.org/">Knopflerfish</a> OSGi platform
 	 * constant.

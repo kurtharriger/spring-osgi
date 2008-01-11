@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.platform;
 
 import java.util.Properties;
@@ -30,14 +31,14 @@ public interface OsgiPlatform {
 	/**
 	 * Starts the OSGi platform.
 	 * 
-	 * @throws Exception
+	 * @throws Exception if starting the platform fails
 	 */
 	void start() throws Exception;
 
 	/**
 	 * Stops the OSGi platform.
 	 * 
-	 * @throws Exception
+	 * @throws Exception if stopping the platform fails.
 	 */
 	void stop() throws Exception;
 
@@ -50,7 +51,8 @@ public interface OsgiPlatform {
 	Properties getConfigurationProperties();
 
 	/**
-	 * Returns hold of the bundle context of the returned platform.
+	 * Returns the bundle context of the returned platform. Useful during
+	 * startup for installing bundles and interacting with the OSGi instance.
 	 * 
 	 * @return platform bundle context
 	 */

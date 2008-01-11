@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test;
 
 import java.util.ArrayList;
@@ -35,13 +36,24 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 
+	/**
+	 * 
+	 * Default constructor. Constructs a new
+	 * <code>AbstractConfigurableOsgiTests</code> instance.
+	 */
 	public AbstractConfigurableOsgiTests() {
 		super();
 	}
 
+	/**
+	 * Constructs a new <code>AbstractConfigurableOsgiTests</code> instance.
+	 * 
+	 * @param name test name
+	 */
 	public AbstractConfigurableOsgiTests(String name) {
 		super(name);
 	}
+
 
 	/**
 	 * System property for selecting the appropriate OSGi implementation.
@@ -53,12 +65,16 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	 */
 	private static final String ORG_OSGI_FRAMEWORK_BOOTDELEGATION = "org.osgi.framework.bootdelegation";
 
+
 	/**
-	 * OSGi platform creation. This method is used to determine and create the
-	 * OSGi platform used by the test suite (Equinox by default). See
-	 * {@link #getPlatformName()} for an easier alternative.
+	 * {@inheritDoc}
 	 * 
-	 * @return the OSGi platform
+	 * <p/>This implementation determines and creates the OSGi platform used by
+	 * the test suite (Equinox by default). It will try to create a Platform
+	 * instance based on the <code>getPlatformName</code>, falling back to
+	 * Equinox in case of a failure.
+	 * 
+	 * @see #getPlatformName() for an easier alternative.
 	 */
 	protected OsgiPlatform createPlatform() {
 		boolean trace = logger.isTraceEnabled();
@@ -92,7 +108,7 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 		else
 			logger.trace("no platform specified; using default");
 
-		// fallback
+		// fall back
 		if (platform == null)
 			platform = new EquinoxPlatform();
 
@@ -104,13 +120,14 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	}
 
 	/**
-	 * Indicate what OSGi platform to be used by the test suite. By default,
-	 * {@link #OSGI_FRAMEWORK_SELECTOR} system property is used. Subclasses can
-	 * override this and provide directly the OSGi platform name.
+	 * Indicates what OSGi platform should be used by the test suite. By
+	 * default, {@link #OSGI_FRAMEWORK_SELECTOR} system property is used.
+	 * Subclasses can override this and provide directly the OSGi platform name.
+	 * By default, the platform name holds the fully qualified name of the OSGi
+	 * platform class.
 	 * 
-	 * 
+	 * @return platform platform name
 	 * @see Platforms
-	 * @return platform
 	 */
 	protected String getPlatformName() {
 		String systemProperty = System.getProperty(OSGI_FRAMEWORK_SELECTOR);
@@ -121,9 +138,9 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	}
 
 	/**
-	 * Return a String representation for the boot delegation packages list.
+	 * Returns a String representation of the boot delegation packages list.
 	 * 
-	 * @return
+	 * @return boot delegation path
 	 */
 	private String getBootDelegationPackageString() {
 		StringBuffer buf = new StringBuffer();
@@ -139,9 +156,9 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	}
 
 	/**
-	 * List of OSGi packages that are delegated to the boot classpath. See the
-	 * OSGi specification regarding the format of the package string
-	 * representation.
+	 * Returns the list of OSGi packages that are delegated to the boot
+	 * classpath. See the OSGi specification regarding the format of the package
+	 * string representation.
 	 * 
 	 * @return the list of strings representing the packages that the OSGi
 	 * platform will delegate to the boot class path.
