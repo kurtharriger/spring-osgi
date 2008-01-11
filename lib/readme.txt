@@ -12,7 +12,7 @@ distribution/website before using any of them in your own applications.
 - required for building the framework
 
 * asm.jar
-- ObjectWeb ASM bytecode library (http://asm.objectweb.org)
+- ObjectWeb ASM bytecode library 2.2.3 (http://asm.objectweb.org)
 - required for building the testing framework
 - required for running the framework's test suite
 
@@ -25,7 +25,7 @@ distribution/website before using any of them in your own applications.
 - required at runtime when proxying full target classes via Spring AOP
 
 * cm_all.jar
-- Knopflerfish Configuration Admin implementation (http://www.knopflerfish.org) 
+- Knopflerfish Configuration Admin implementation 2.0.0 (http://www.knopflerfish.org) 
 - required for running the framework's test suite
 
 * commons-lang.jar
@@ -73,7 +73,7 @@ distribution/website before using any of them in your own applications.
 - required for building and running the framework's test suite
 
 * retrotranslator-runtime.jar
-- Retrotranslator backporting library (http://retrotranslator.sourceforge.net)
+- Retrotranslator backporting library 1.2.3 (http://retrotranslator.sourceforge.net)
 - required for running the framework's test suite on JDK 1.4
 
 * slf4j-api.jar
