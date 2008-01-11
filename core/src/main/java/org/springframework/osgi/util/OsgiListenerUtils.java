@@ -40,15 +40,21 @@ public abstract class OsgiListenerUtils {
 
 
 	/**
-	 * Add a service listener to the given application context, under the
-	 * specified filter. This method will deliver <em>synthetic</em> events
-	 * for <em>all</em> existing services as if the services were registered
-	 * after the listener registration.
+	 * Adds a service listener to the given bundle context under the specified
+	 * filter. This method will deliver <em>synthetic</em> events of type
+	 * <code>REGISTERED</code> for <em>all</em> existing services (that
+	 * match the given filter) as if the services were registered after the
+	 * listener registration.
+	 * 
+	 * <p/> This might cause problems if a service is registered between the
+	 * listener registration and the retrieval of existing services since the
+	 * listener will receive two events for the same service. For most listeners
+	 * implementations however, this should not be a problem
 	 * 
 	 * @param context bundle context to register the listener with
 	 * @param listener service listener to be registered
 	 * @param filter OSGi filter (given as a Filter) for registering the
-	 * listener
+	 * listener (can be <code>null</code>)
 	 * @see #addServiceListener(BundleContext, ServiceListener, String)
 	 */
 	public static void addServiceListener(BundleContext context, ServiceListener listener, Filter filter) {
@@ -57,24 +63,24 @@ public abstract class OsgiListenerUtils {
 	}
 
 	/**
-	 * Add a service listener to the given application context, under the
-	 * specified filter given as a String. The method will also retrieve
-	 * <em>all</em> the services registered before the listener registration
-	 * and will inform the listener through service events of type
-	 * <code>REGISTERED</code>. This might cause problems in case a service
-	 * is being registered between the listener registration and the retrieval
-	 * of existing services and thus, can cause event duplication to occur on
-	 * the listener.For most implementations this is not a problem; if there is
-	 * then do not use this method.
-	 * </p>
+	 * Adds a service listener to the given bundle context under the specified
+	 * filter given as a String. The method will also retrieve <em>all</em>
+	 * the services registered before the listener registration (that match the
+	 * given filter) and will inform the listener through service events of type
+	 * <code>REGISTERED</code>.
+	 * 
+	 * <p/> This might cause problems if a service is registered between the
+	 * listener registration and the retrieval of existing services since the
+	 * listener will receive two events for the same service. For most listeners
+	 * implementations however, this should not be a problem
+	 * 
 	 * 
 	 * @param context bundle context to register the listener with
 	 * @param listener service listener to be registered
 	 * @param filter OSGi filter (given as a String) for registering the
-	 * listener
+	 * listener (can be <code>null</code>)
 	 * @see BundleContext#getServiceReference(String)
 	 * @see BundleContext#getServiceReferences(String, String)
-	 * 
 	 */
 	public static void addServiceListener(BundleContext context, ServiceListener listener, String filter) {
 		registerListener(context, listener, filter);
@@ -110,15 +116,23 @@ public abstract class OsgiListenerUtils {
 	}
 
 	/**
-	 * Add a service listener to the given application context, under the
-	 * specified filter. This method will deliver at most one<em>synthetic</em>
-	 * event for the <em>best matching</em> existing service as if the
-	 * services were registered after the listener registration.
+	 * Adds a service listener to the given bundle context, under the specified
+	 * filter. This method will deliver at most one <em>synthetic</em> event
+	 * of type <code>REGISTERED</code> for the <em>best matching</em>
+	 * existing service as if the services were registered after the listener
+	 * registration.
+	 * 
+	 * 
+	 * <p/> This might cause problems if a service is registered between the
+	 * listener registration and the retrieval of existing services since the
+	 * listener will receive two events for the same service. For most listeners
+	 * implementations however, this should not be a problem
+	 * 
 	 * 
 	 * @param context bundle context to register the listener with
 	 * @param listener service listener to be registered
 	 * @param filter OSGi filter (given as a Filter) for registering the
-	 * listener
+	 * listener (can be <code>null</code>)
 	 * @see #addSingleServiceListener(BundleContext, ServiceListener, String)
 	 */
 	public static void addSingleServiceListener(BundleContext context, ServiceListener listener, Filter filter) {
@@ -127,7 +141,7 @@ public abstract class OsgiListenerUtils {
 	}
 
 	/**
-	 * Add a service listener to the given application context, under the
+	 * Adds a service listener to the given application context, under the
 	 * specified filter given as a String. The method will also retrieve the
 	 * <em>best matching</em> service registered before the listener
 	 * registration and will inform the listener through a service event of type
@@ -135,16 +149,16 @@ public abstract class OsgiListenerUtils {
 	 * {@link #addServiceListener(BundleContext, ServiceListener, Filter)} which
 	 * considers all services, not just the best match.
 	 * 
-	 * <p/> This method cause problems in case a service is being registered
-	 * between the listener registration and the retrieval of existing services
-	 * and thus, can cause event duplication to occur on the listener. For most
-	 * implementations this is not a problem; if there is then do not use this
-	 * method. <p/>
+	 * <p/> This might cause problems if a service is registered between the
+	 * listener registration and the retrieval of existing services since the
+	 * listener will receive two events for the same service. For most listeners
+	 * implementations however, this should not be a problem
+	 * 
 	 * 
 	 * @param context bundle context to register the listener with
 	 * @param listener service listener to be registered
 	 * @param filter OSGi filter (given as a String) for registering the
-	 * listener
+	 * listener (can be <code>null</code>)
 	 * @see BundleContext#getServiceReference(String)
 	 * @see BundleContext#getServiceReferences(String, String)
 	 */
@@ -159,14 +173,14 @@ public abstract class OsgiListenerUtils {
 	}
 
 	/**
-	 * Remove a service listener from the given application context. This method
+	 * Removes a service listener from the given bundle context. This method
 	 * simply takes care of any exceptions that might be thrown (in case the
 	 * context is invalid).
 	 * 
 	 * @param context bundle context to unregister the listener from
 	 * @param listener service listener to unregister
 	 * @return true if the listener unregistration has succeeded, false
-	 * otherwise (for example the bundle context is invalid)
+	 * otherwise (for example if the bundle context is invalid)
 	 */
 	public static boolean removeServiceListener(BundleContext context, ServiceListener listener) {
 		if (context == null || listener == null)

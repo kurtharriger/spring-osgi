@@ -39,8 +39,8 @@ import org.springframework.util.ObjectUtils;
  * 
  * <p/>
  * 
- * This classes uses {@link OsgiFilterUtils} underneath to allow multiple
- * classnames to be used for service reference lookup.
+ * This classes uses {@link OsgiFilterUtils} underneath to allow multiple class
+ * names to be used for service reference lookup.
  * 
  * @see OsgiFilterUtils
  * @author Costin Leau
@@ -51,10 +51,27 @@ public abstract class OsgiServiceReferenceUtils {
 	private static Log log = LogFactory.getLog(OsgiServiceReferenceUtils.class);
 
 
+	/**
+	 * Returns a reference to the <em>best matching</em> service for the given
+	 * class names.
+	 * 
+	 * @param bundleContext OSGi bundle context
+	 * @param classes array of fully qualified class names
+	 * @return reference to the <em>best matching</em> service
+	 */
 	public static ServiceReference getServiceReference(BundleContext bundleContext, String[] classes) {
 		return getServiceReference(bundleContext, classes, null);
 	}
 
+	/**
+	 * Returns a reference to the <em>best matching</em> service for the given
+	 * class and OSGi filter.
+	 * 
+	 * @param bundleContext OSGi bundle context
+	 * @param clazz fully qualified class name (can be <code>null</code>)
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return reference to the <em>best matching</em> service
+	 */
 	public static ServiceReference getServiceReference(BundleContext bundleContext, String clazz, String filter) {
 		ServiceReference[] refs = getServiceReferences(bundleContext, clazz, filter);
 
@@ -83,6 +100,15 @@ public abstract class OsgiServiceReferenceUtils {
 		return winningReference;
 	}
 
+	/**
+	 * Returns a reference to the <em>best matching</em> service for the given
+	 * classes and OSGi filter.
+	 * 
+	 * @param bundleContext OSGi bundle context
+	 * @param classes array of fully qualified class names
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return reference to the <em>best matching</em> service
+	 */
 	public static ServiceReference getServiceReference(BundleContext bundleContext, String[] classes, String filter) {
 		// use #getServiceReference(BundleContext, String, String) method to
 		// speed the service lookup process by
@@ -93,14 +119,39 @@ public abstract class OsgiServiceReferenceUtils {
 		return getServiceReference(bundleContext, clazz, OsgiFilterUtils.unifyFilter(classes, filter));
 	}
 
+	/**
+	 * Returns a reference to the <em>best matching</em> service for the given
+	 * OSGi filter.
+	 * 
+	 * @param bundleContext OSGi bundle context
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return reference to the <em>best matching</em> service
+	 */
 	public static ServiceReference getServiceReference(BundleContext bundleContext, String filter) {
 		return getServiceReference(bundleContext, (String) null, filter);
 	}
 
+	/**
+	 * Returns references to <em>all</em> services matching the given class
+	 * names.
+	 * 
+	 * @param bundleContext OSGi bundle context
+	 * @param classes array of fully qualified class names
+	 * @return non-<code>null</code> array of references to matching services
+	 */
 	public static ServiceReference[] getServiceReferences(BundleContext bundleContext, String[] classes) {
 		return getServiceReferences(bundleContext, classes, null);
 	}
 
+	/**
+	 * Returns references to <em>all</em> services matching the given class
+	 * name and OSGi filter.
+	 * 
+	 * @param bundleContext OSGi bundle context
+	 * @param clazz fully qualified class name (can be <code>null</code>)
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return non-<code>null</code> array of references to matching services
+	 */
 	public static ServiceReference[] getServiceReferences(BundleContext bundleContext, String clazz, String filter) {
 		Assert.notNull(bundleContext, "bundleContext should be not null");
 
@@ -114,6 +165,15 @@ public abstract class OsgiServiceReferenceUtils {
 
 	}
 
+	/**
+	 * Returns references to <em>all</em> services matching the given class
+	 * names and OSGi filter.
+	 * 
+	 * @param bundleContext OSGi bundle context
+	 * @param classes array of fully qualified class names
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return non-<code>null</code> array of references to matching services
+	 */
 	public static ServiceReference[] getServiceReferences(BundleContext bundleContext, String[] classes, String filter) {
 		// use #getServiceReferences(BundleContext, String, String) method to
 		// speed the service lookup process by
@@ -124,23 +184,35 @@ public abstract class OsgiServiceReferenceUtils {
 	}
 
 	/**
-	 * Return the service reference that match the given filter. This method
-	 * never return null - if no service is found an empty array will be
-	 * returned.
+	 * Returns references to <em>all</em> services matching the OSGi filter.
 	 * 
-	 * @param bundleContext
-	 * @param filter
-	 * @return an array of service references that match the given filter.
+	 * @param bundleContext OSGi bundle context
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return non-<code>null</code> array of references to matching services
 	 */
 	public static ServiceReference[] getServiceReferences(BundleContext bundleContext, String filter) {
 		return getServiceReferences(bundleContext, (String) null, filter);
 	}
 
+	/**
+	 * Returns the service id ({@link Constants#SERVICE_ID}) of the given
+	 * service reference.
+	 * 
+	 * @param reference OSGi service reference
+	 * @return service id
+	 */
 	public static long getServiceId(ServiceReference reference) {
 		Assert.notNull(reference);
 		return ((Long) reference.getProperty(Constants.SERVICE_ID)).longValue();
 	}
 
+	/**
+	 * Returns the service ranking ({@link Constants#SERVICE_RANKING}) of the
+	 * given service reference.
+	 * 
+	 * @param reference OSGi service reference
+	 * @return service ranking
+	 */
 	public static int getServiceRanking(ServiceReference reference) {
 		Assert.notNull(reference);
 
@@ -150,26 +222,45 @@ public abstract class OsgiServiceReferenceUtils {
 		return ((ranking != null && ranking instanceof Integer) ? ((Integer) ranking).intValue() : 0);
 	}
 
+	/**
+	 * Returns the advertised class names ({@link Constants#OBJECTCLASS}) of
+	 * the given service reference.
+	 * 
+	 * @param reference OSGi service reference
+	 * @return service advertised class names
+	 */
 	public static String[] getServiceObjectClasses(ServiceReference reference) {
 		Assert.notNull(reference);
 		return (String[]) reference.getProperty(Constants.OBJECTCLASS);
 	}
 
 	/**
-	 * Return a dict containing the properties available for the given service
-	 * reference. This method takes a snapshot of the properties; future changes
-	 * to the service properties will not be reflected in the returned dict.
+	 * Returns a {@link Map} containing the properties available for the given
+	 * service reference. This method takes a snapshot of the properties; future
+	 * changes to the service properties will not be reflected in the returned
+	 * dictionary.
 	 * 
-	 * <p/> Note that the returned type implements the Map interface also.
+	 * <p/> Note that the returned type implements the {@link java.util.Map}
+	 * interface also.
 	 * 
-	 * @param reference service reference
-	 * @return dict containing the service reference properties taken as a
-	 * snapshot
+	 * @param reference OSGi service reference
+	 * @return a <code>Dictionary</code> containing the service reference
+	 * properties taken as a snapshot
 	 */
 	public static Dictionary getServicePropertiesSnapshot(ServiceReference reference) {
 		return new MapBasedDictionary(getServicePropertiesSnapshotAsMap(reference));
 	}
 
+	/**
+	 * Returns a {@link Map} containing the properties available for the given
+	 * service reference. This method takes a snapshot of the properties; future
+	 * changes to the service properties will not be reflected in the returned
+	 * dictionary.
+	 * 
+	 * @param reference OSGi service reference
+	 * @return a <code>Map</code> containing the service reference properties
+	 * taken as a snapshot
+	 */
 	public static Map getServicePropertiesSnapshotAsMap(ServiceReference reference) {
 		Assert.notNull(reference);
 		String[] keys = reference.getPropertyKeys();
@@ -186,29 +277,36 @@ public abstract class OsgiServiceReferenceUtils {
 	}
 
 	/**
-	 * Return a dictionary containing the properties available for the given
-	 * service reference. The returned object will reflect any updates made to
-	 * to the ServiceReference through the owning ServiceRegistration.
+	 * Returns a {@link Dictionary} containing the properties available for the
+	 * given service reference. The returned object will reflect any updates
+	 * made to to the <code>ServiceReference</code> through the owning
+	 * <code>ServiceRegistration</code>.
 	 * 
 	 * 
-	 * <p/> Note that the returned type implements the Map interface also.
+	 * <p/> Note that the returned type implements the {@link java.util.Map}
+	 * interface also.
 	 * 
-	 * @param reference an OSGi service reference
-	 * @return dict of properties which will reflect future reference changes
+	 * @param reference OSGi service reference
+	 * @return a <code>Dictionary</code> containing the latest service
+	 * reference properties
 	 */
 	public static Dictionary getServiceProperties(ServiceReference reference) {
 		return new MapBasedDictionary(getServicePropertiesAsMap(reference));
 	}
 
 	/**
-	 * Return a map containing the properties for the given service reference.
-	 * Consider using {@link #getServiceProperties(ServiceReference)} which
-	 * returns an object that extends {@link Dictionary} as well as implements
-	 * the {@link Map} interface.
+	 * Returns a {@link Map} containing the properties available for the given
+	 * service reference. The returned object will reflect any updates made to
+	 * to the <code>ServiceReference</code> through the owning
+	 * <code>ServiceRegistration</code>. Consider using
+	 * {@link #getServiceProperties(ServiceReference)} which returns an object
+	 * that extends {@link Dictionary} as well as implements the {@link Map}
+	 * interface.
 	 * 
+	 * @param reference OSGi service reference
+	 * @return a <code>Map</code> containing the latest service reference
+	 * properties
 	 * @see #getServiceProperties(ServiceReference)
-	 * @param reference
-	 * @return
 	 */
 	public static Map getServicePropertiesAsMap(ServiceReference reference) {
 		Assert.notNull(reference);
@@ -217,13 +315,14 @@ public abstract class OsgiServiceReferenceUtils {
 	}
 
 	/**
-	 * Check if the given serviceFilter returns at least one match or not.
+	 * Checks if the given filter matches at least one OSGi service or not.
 	 * 
-	 * @param context
-	 * @param serviceFilter
-	 * @return
+	 * @param bundleContext OSGi bundle context
+	 * @param filter valid OSGi filter (can be <code>null</code>)
+	 * @return true if the filter matches at least one OSGi service, false
+	 * otherwise
 	 */
-	public static boolean isServicePresent(BundleContext context, String serviceFilter) {
-		return !ObjectUtils.isEmpty(getServiceReferences(context, serviceFilter));
+	public static boolean isServicePresent(BundleContext bundleContext, String filter) {
+		return !ObjectUtils.isEmpty(getServiceReferences(bundleContext, filter));
 	}
 }

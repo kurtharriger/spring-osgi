@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package org.springframework.osgi.util;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * ClassLoader backed by an OSGi bundle. Provides the ability to use a separate
- * classloader as fallback.
+ * class loader as fall back.
  * 
  * Contains facilities for tracing class loading behaviour so that issues can be
  * easily resolved.
@@ -49,6 +50,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 
 	private final Bundle backingBundle;
 
+
 	/**
 	 * Factory method for creating a class loader over the given bundle.
 	 * 
@@ -62,15 +64,16 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	/**
 	 * Factory method for creating a class loader over the given bundle and with
 	 * a given class loader as fall-back. In case the bundle cannot find a class
-	 * or locate a resource, the given class loader will be used.
+	 * or locate a resource, the given class loader will be used as fall back.
 	 * 
 	 * @param bundle bundle used for class loading and resource acquisition
 	 * @param bridge class loader used as fall back in case the bundle cannot
-	 * load a class or find a resource. Can be null
+	 * load a class or find a resource. Can be <code>null</code>
 	 * @return class loader adapter over the given bundle and class loader
 	 */
 	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle bundle, final ClassLoader bridge) {
 		return (BundleDelegatingClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
+
 			public Object run() {
 				return new BundleDelegatingClassLoader(bundle, bridge);
 			}
@@ -120,7 +123,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		catch (ClassNotFoundException cnfe) {
 			DebugUtils.debugClassLoading(backingBundle, name, null);
 			throw new ClassNotFoundException(name + " not found from bundle [" + backingBundle.getSymbolicName() + "]",
-					cnfe);
+				cnfe);
 		}
 		catch (NoClassDefFoundError ncdfe) {
 			// This is almost always an error

@@ -16,7 +16,7 @@
 package org.springframework.osgi;
 
 /**
- * Spring DM exception hierarchy root exception.
+ * Root of the Spring DM exception hierarchy.
  * 
  * @author Costin Leau
  * 
@@ -33,7 +33,7 @@ public class OsgiException extends RuntimeException {
 	}
 
 	/**
-	 * Construct a new <code>OsgiException</code> instance.
+	 * Constructs a new <code>OsgiException</code> instance.
 	 * 
 	 * @param message detailed message
 	 * @param cause exception cause
@@ -43,7 +43,7 @@ public class OsgiException extends RuntimeException {
 	}
 
 	/**
-	 * Construct a new <code>OsgiException</code> instance.
+	 * Constructs a new <code>OsgiException</code> instance.
 	 * 
 	 * @param message detailed message
 	 */
@@ -52,7 +52,7 @@ public class OsgiException extends RuntimeException {
 	}
 
 	/**
-	 * Construct a new <code>OsgiException</code> instance.
+	 * Constructs a new <code>OsgiException</code> instance.
 	 * 
 	 * @param cause exception cause
 	 */
