@@ -17,10 +17,14 @@
 package org.springframework.osgi.test.platform;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.Properties;
 
 import org.knopflerfish.framework.Framework;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.springframework.core.JdkVersion;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.test.internal.util.IOUtils;
 
 /**
@@ -35,6 +39,12 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 	private Framework framework;
 
 	private File kfStorageDir;
+
+	private static final String ROOT = "/org/springframework/osgi/test/platform/";
+
+	private static final String PKGS_1_4 = ROOT + "kf.packages1.4.txt";
+
+	private static final String PKGS_1_5 = ROOT + "kf.packages1.5.txt";
 
 
 	public KnopflerfishPlatform() {
@@ -56,7 +66,37 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		props.setProperty("org.knopflerfish.framework.exitonshutdown", "false");
 		// disable patch CL
 		props.setProperty("org.knopflerfish.framework.patch", "false");
+
+		// load system packages
+		props.setProperty(Constants.FRAMEWORK_SYSTEMPACKAGES, loadSystemPackages());
 		return props;
+	}
+
+	protected String loadSystemPackages() {
+		Properties pckgs = new Properties();
+		String pckgFile = PKGS_1_4;
+
+		if (JdkVersion.isAtLeastJava15())
+			pckgFile = PKGS_1_5;
+
+		try {
+			pckgs.load(new ClassPathResource(pckgFile).getInputStream());
+		}
+		catch (Exception ex) {
+			log.warn("cannot load system packages", ex);
+		}
+		StringBuffer bf = new StringBuffer();
+
+		for (Iterator iterator = pckgs.keySet().iterator(); iterator.hasNext();) {
+			bf.append(iterator.next());
+
+			if (iterator.hasNext())
+				bf.append(",");
+		}
+
+		if (log.isTraceEnabled())
+			log.trace("loaded system properties [" + bf + "]");
+		return bf.toString();
 	}
 
 	public BundleContext getBundleContext() {

@@ -7,6 +7,7 @@ Changes in version 1.0 final (2008-01-1x)
 
 Package org.springframework.osgi.test
 * Removed deprecated mispelled Platforms#KNOPFLEFISH constant
+* KnopflerfishPlatform exports automatically system packages for JDK 1.4/1.5
 
 Package org.springframework.osgi.util
 * OsgiServiceUtils#getAllServices() deprecated method has been removed
