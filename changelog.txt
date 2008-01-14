@@ -11,6 +11,7 @@ Package org.springframework.osgi.test
 Package org.springframework.osgi.util
 * OsgiServiceUtils#getAllServices() deprecated method has been removed
 * OsgiServiceUtils#getService() deprecated method has been removed
+* Default artifact locator picks up Maven 2 ~/.m2/settings.xml localRepository configuration
 
 Changes in version 1.0 RC2 (2008-01-11)
 ---------------------------------------
