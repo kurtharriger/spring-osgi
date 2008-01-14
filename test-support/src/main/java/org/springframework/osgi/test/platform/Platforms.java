@@ -30,13 +30,6 @@ public abstract class Platforms {
 	public static final String EQUINOX = EquinoxPlatform.class.getName();
 
 	/**
-	 * @deprecated - use {@link #KNOPFLERFISH} instead. Will be removed before
-	 * final release.
-	 */
-	//FIXME: remove before 1.0 final
-	public static final String KNOPFLEFISH = KnopflerfishPlatform.class.getName();
-
-	/**
 	 * <a href="http://www.knopflerfish.org/">Knopflerfish</a> OSGi platform
 	 * constant.
 	 */
