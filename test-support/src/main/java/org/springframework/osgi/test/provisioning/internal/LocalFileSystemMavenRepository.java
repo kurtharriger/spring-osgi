@@ -57,18 +57,24 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 	/** default local repository */
 	private static final String DEFAULT_DIR = M2_DIR.concat("/repository");
 	/** discovered local m2 repository home */
-	private final String repositoryHome;
+	private String repositoryHome;
 
 
 	/**
-	 * Default constructor. Constructs a new
-	 * <code>LocalFileSystemMavenRepository</code> instance. This constructor
-	 * will also determine the repository path by checking the existence of
-	 * <code>localRepository</code> system property and falling back to the
-	 * <code>settings.xml</code> file and then the traditional
+	 * Initialization method It determines the repository path by checking the
+	 * existence of <code>localRepository</code> system property and falling
+	 * back to the <code>settings.xml</code> file and then the traditional
 	 * <code>user.home/.m2/repository</code>.
+	 * 
+	 * <p/> This method is used to postpone initialization until an artifact is
+	 * actually located. As the test class is instantiated on each test run, the
+	 * init() method prevents repetitive, waste-less initialization.
+	 * 
 	 */
-	public LocalFileSystemMavenRepository() {
+	private void init() {
+		// already discovered a repository home, bailing out
+		if (repositoryHome != null)
+			return;
 
 		boolean trace = log.isDebugEnabled();
 
@@ -146,6 +152,8 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 	 * @return
 	 */
 	public Resource locateArtifact(String groupId, String artifactId, String version, String type) {
+		init();
+
 		try {
 			return localMavenBuildArtifact(artifactId, version, type);
 		}

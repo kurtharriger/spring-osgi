@@ -46,6 +46,8 @@ import org.springframework.util.StringUtils;
  */
 public class JarCreator {
 
+	private static final String MANIFEST_JAR_LOCATION = "/META-INF/MANIFEST.MF";
+
 	private static final Log log = LogFactory.getLog(JarCreator.class);
 
 	public static final String CLASS_PATTERN = "/**/*.class";
@@ -96,11 +98,13 @@ public class JarCreator {
 	/**
 	 * Actual jar creation.
 	 * 
+	 * @param manifest to use
+	 * @param content array of resource to include in the jar
 	 * @return the number of bytes written to the underlying stream.
 	 * 
-	 * @throws Exception
+	 * @throws IOException
 	 */
-	protected int addJarContent(Manifest manifest) throws IOException {
+	protected int addJarContent(Manifest manifest, Resource[][] resources) throws IOException {
 		int writtenBytes = 0;
 
 		// load manifest
@@ -110,8 +114,6 @@ public class JarCreator {
 
 		URL rootURL = new URL(getRootPath());
 		String rootPath = StringUtils.cleanPath(rootURL.getPath());
-
-		Resource[][] resources = resolveResources();
 
 		// remove duplicates
 		Map entries = new TreeMap();
@@ -165,8 +167,15 @@ public class JarCreator {
 			// add deps
 			for (Iterator iter = entries.entrySet().iterator(); iter.hasNext();) {
 				Map.Entry element = (Map.Entry) iter.next();
-				// write jar entry
-				writtenBytes += JarUtils.writeToJar((Resource) element.getValue(), (String) element.getKey(), jarStream);
+				// skip special/duplicate entries (like MANIFEST.MF)
+				if (MANIFEST_JAR_LOCATION.equals(element.getKey())) {
+					iter.remove();
+				}
+				else {
+					// write jar entry
+					writtenBytes += JarUtils.writeToJar((Resource) element.getValue(), (String) element.getKey(),
+						jarStream);
+				}
 			}
 		}
 		finally {
@@ -195,8 +204,18 @@ public class JarCreator {
 	 * @param manifest
 	 */
 	public Resource createJar(Manifest manifest) {
+		return createJar(manifest, resolveResources());
+	}
+
+	/**
+	 * Create a jar using the current settings and return a {@link Resource}
+	 * pointing to the jar.
+	 * 
+	 * @param manifest
+	 */
+	public Resource createJar(Manifest manifest, Resource[][] resources) {
 		try {
-			addJarContent(manifest);
+			addJarContent(manifest, resources);
 			return storage.getResource();
 		}
 		catch (IOException ex) {
@@ -224,7 +243,7 @@ public class JarCreator {
 	 * @return
 	 * @throws Exception
 	 */
-	private Resource[][] resolveResources() throws IOException {
+	public Resource[][] resolveResources() {
 		ResourcePatternResolver resolver = getPatternResolver();
 
 		String[] patterns = getContentPattern();
@@ -234,7 +253,14 @@ public class JarCreator {
 		for (int i = 0; i < patterns.length; i++) {
 			StringBuffer buffer = new StringBuffer(rootPath);
 			buffer.append(patterns[i]);
-			resources[i] = resolver.getResources(buffer.toString());
+			try {
+				resources[i] = resolver.getResources(buffer.toString());
+			}
+			catch (IOException ex) {
+				IllegalStateException re = new IllegalStateException("cannot resolve pattern " + buffer.toString());
+				re.initCause(ex);
+				throw re;
+			}
 		}
 
 		return resources;
