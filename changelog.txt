@@ -5,6 +5,13 @@ http://www.springframework.org/osgi
 Changes in version 1.0 final (2008-01-1x)
 -----------------------------------------
 
+Package org.springframework.osgi.test
+* Removed deprecated mispelled Platforms#KNOPFLEFISH constant
+
+Package org.springframework.osgi.util
+* OsgiServiceUtils#getAllServices() deprecated method has been removed
+* OsgiServiceUtils#getService() deprecated method has been removed
+
 Changes in version 1.0 RC2 (2008-01-11)
 ---------------------------------------
 

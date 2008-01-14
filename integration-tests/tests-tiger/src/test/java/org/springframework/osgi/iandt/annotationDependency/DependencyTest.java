@@ -1,7 +1,6 @@
 package org.springframework.osgi.iandt.annotationDependency;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
@@ -67,8 +66,7 @@ public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
 
 		startDependency(simpleServiceBundle);
 
-        // FIXME currently does not work
-        // assertNull("Service with unsatisfied dependencies has been started!", dependentRef);
+        assertNull("Service with unsatisfied dependencies has been started!", dependentRef);
 
 		waitOnContextCreation("org.springframework.osgi.iandt.annotation.dependencies");
 
