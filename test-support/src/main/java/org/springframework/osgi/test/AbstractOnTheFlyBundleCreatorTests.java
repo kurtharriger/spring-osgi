@@ -61,6 +61,9 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 	JarCreator jarCreator;
 
+	/** field used for caching jar content */
+	private Resource[][] jarContent;
+
 
 	public AbstractOnTheFlyBundleCreatorTests() {
 		initializeJarCreator();
@@ -77,6 +80,18 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	}
 
 	/**
+	 * Returns the root path used for locating the resources that will be packed
+	 * in the test bundle (the root path does not become part of the jar).
+	 * <p/>By default, a Maven2 test class folder is used:
+	 * <code>"file:./target/test-classes"</code>
+	 * 
+	 * @return root path given as a String
+	 */
+	protected String getRootPath() {
+		return "file:./target/test-classes";
+	}
+
+	/**
 	 * Returns the patterns used for identifying the resources added to the jar.
 	 * The patterns are added to the root path when performing the search. By
 	 * default, the pattern is <code>*&#42;/*</code>.
@@ -90,8 +105,8 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	/**
 	 * Returns the location (in Spring resource style) of the manifest location
 	 * to be used. By default <code>null</code> is returned, indicating that
-	 * the manifest is created programatically (by default by the test
-	 * framework).
+	 * the manifest should be picked up from the classpath or be automatically
+	 * created (by default by the test framework) if no file is found.
 	 * 
 	 * @return the manifest location
 	 * @see #getManifest()
@@ -104,8 +119,11 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	/**
 	 * Returns the current test bundle manifest. The method tries to read the
 	 * manifest from the given location; in case the location is
-	 * <code>null</code> (default), will <em>automatically</em> create a
-	 * <code>Manifest</code> object containing default entries.
+	 * <code>null</code> (default), it will search for
+	 * <code>META-INF/MANIFEST.MF</code> file in jar content (as specified
+	 * through the patterns) and, if it cannot find the file,
+	 * <em>automatically</em> create a <code>Manifest</code> object
+	 * containing default entries.
 	 * 
 	 * <p/> Subclasses can override this method to enhance the returned
 	 * Manifest.
@@ -130,6 +148,16 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		}
 
 		else {
+			// set root path
+			jarCreator.setRootPath(getRootPath());
+			// add the content pattern
+			jarCreator.setContentPattern(getBundleContentPattern());
+
+			// see if the manifest already exists in the classpath
+			// to resolve the patterns
+			jarContent = jarCreator.resolveResources();
+
+			// fallback to default manifest creation
 			return createDefaultManifest();
 		}
 	}
@@ -283,11 +311,26 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	protected void postProcessBundleContext(BundleContext context) throws Exception {
 		logger.debug("post processing: creating test bundle");
 
-		// add the content pattern
-		jarCreator.setContentPattern(getBundleContentPattern());
+		Resource jar;
 
-		// create the actual jar
-		Resource jar = jarCreator.createJar(getManifest());
+		Manifest mf = getManifest();
+
+		// if the jar content hasn't been discovered yet (while creating the manifest)
+		// do so know
+		if (jarContent == null) {
+			// set root path
+			jarCreator.setRootPath(getRootPath());
+			// add the content pattern
+			jarCreator.setContentPattern(getBundleContentPattern());
+
+			// use jar creator for pattern discovery
+			jar = jarCreator.createJar(mf);
+		}
+
+		// otherwise use the cached resources
+		else {
+			jar = jarCreator.createJar(mf, jarContent);
+		}
 
 		try {
 			installAndStartBundle(context, jar);

@@ -20,7 +20,6 @@ import java.util.Properties;
 import org.osgi.framework.ServiceReference;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.iandt.scope.a.BeanReference;
 import org.springframework.osgi.iandt.scope.common.ScopeTestService;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiFilterUtils;

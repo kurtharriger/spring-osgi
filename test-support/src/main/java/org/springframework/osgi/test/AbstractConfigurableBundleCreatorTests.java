@@ -111,12 +111,6 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 	private static Properties jarSettings;
 
 
-	/**
-	 * Returns the root path used for locating the resources that will be packed
-	 * in the test bundle (the root path does not become part of the jar).
-	 * 
-	 * @return root path given as a String
-	 */
 	protected String getRootPath() {
 		return jarSettings.getProperty(ROOT_DIR);
 	}
