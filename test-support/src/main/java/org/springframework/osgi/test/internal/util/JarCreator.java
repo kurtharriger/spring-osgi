@@ -18,6 +18,7 @@ package org.springframework.osgi.test.internal.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.zip.Deflater;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,47 +106,13 @@ public class JarCreator {
 	 * 
 	 * @throws IOException
 	 */
-	protected int addJarContent(Manifest manifest, Resource[][] resources) throws IOException {
+	protected int addJarContent(Manifest manifest, Map entries) throws IOException {
 		int writtenBytes = 0;
 
 		// load manifest
 		// add it to the jar
 		if (log.isTraceEnabled() && manifest != null)
 			log.trace("adding MANIFEST.MF [" + manifest.getMainAttributes().entrySet() + "]");
-
-		URL rootURL = new URL(getRootPath());
-		String rootPath = StringUtils.cleanPath(rootURL.getPath());
-
-		// remove duplicates
-		Map entries = new TreeMap();
-
-		// empty stream used for folders
-		Resource folderResource = new ByteArrayResource(new byte[0]);
-
-		// add folder entries also
-		for (int i = 0; i < resources.length; i++) {
-			for (int j = 0; j < resources[i].length; j++) {
-				String relativeName = determineRelativeName(rootPath, resources[i][j]);
-				entries.put(relativeName, resources[i][j]);
-
-				String token = relativeName;
-				// get folder and walk up to the root
-				if (addFolders) {
-					// add META-INF
-					entries.put("/META-INF/", folderResource);
-					int slashIndex;
-					// stop at root folder
-					while ((slashIndex = token.lastIndexOf('/')) > 1) {
-						// add the folder with trailing /
-						entries.put(token.substring(0, slashIndex + 1), folderResource);
-						// walk the tree
-						token = token.substring(0, slashIndex);
-					}
-					// add root folder
-					//entries.put("/", folderResource);
-				}
-			}
-		}
 
 		if (log.isTraceEnabled()) {
 			log.trace("adding entries:");
@@ -163,6 +131,9 @@ public class JarCreator {
 			// add a jar stream on top
 			jarStream = (manifest != null ? new JarOutputStream(outputStream, manifest) : new JarOutputStream(
 				outputStream));
+
+			// select fastest level (no compression)
+			jarStream.setLevel(Deflater.NO_COMPRESSION);
 
 			// add deps
 			for (Iterator iter = entries.entrySet().iterator(); iter.hasNext();) {
@@ -204,7 +175,7 @@ public class JarCreator {
 	 * @param manifest
 	 */
 	public Resource createJar(Manifest manifest) {
-		return createJar(manifest, resolveResources());
+		return createJar(manifest, resolveContent());
 	}
 
 	/**
@@ -213,9 +184,9 @@ public class JarCreator {
 	 * 
 	 * @param manifest
 	 */
-	public Resource createJar(Manifest manifest, Resource[][] resources) {
+	public Resource createJar(Manifest manifest, Map content) {
 		try {
-			addJarContent(manifest, resources);
+			addJarContent(manifest, content);
 			return storage.getResource();
 		}
 		catch (IOException ex) {
@@ -230,11 +201,15 @@ public class JarCreator {
 	 * @param rootPath
 	 * @param resource
 	 * @return
-	 * @throws Exception
 	 */
-	private String determineRelativeName(String rootPath, Resource resource) throws IOException {
-		String path = StringUtils.cleanPath(resource.getURL().toExternalForm());
-		return path.substring(path.indexOf(rootPath) + rootPath.length());
+	private String determineRelativeName(String rootPath, Resource resource) {
+		try {
+			String path = StringUtils.cleanPath(resource.getURL().toExternalForm());
+			return path.substring(path.indexOf(rootPath) + rootPath.length());
+		}
+		catch (IOException ex) {
+			throw (RuntimeException) new IllegalArgumentException("illegal resource " + resource.toString()).initCause(ex);
+		}
 	}
 
 	/**
@@ -243,7 +218,7 @@ public class JarCreator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Resource[][] resolveResources() {
+	private Resource[][] resolveResources() {
 		ResourcePatternResolver resolver = getPatternResolver();
 
 		String[] patterns = getContentPattern();
@@ -264,6 +239,59 @@ public class JarCreator {
 		}
 
 		return resources;
+	}
+
+	/**
+	 * Resolve the jar content based on its path. Will return a map containing
+	 * the entries relative to the jar root path.
+	 * 
+	 * @return
+	 */
+	public Map resolveContent() {
+		Resource[][] resources = resolveResources();
+
+		URL rootURL;
+		String rootP = getRootPath();
+		try {
+			rootURL = new URL(rootP);
+		}
+		catch (MalformedURLException ex) {
+			throw (RuntimeException) new IllegalArgumentException("illegal root path given " + rootP).initCause(ex);
+		}
+		String rootPath = StringUtils.cleanPath(rootURL.getPath());
+
+		// remove duplicates
+		Map entries = new TreeMap();
+
+		// empty stream used for folders
+		Resource folderResource = new ByteArrayResource(new byte[0]);
+
+		// add folder entries also
+		for (int i = 0; i < resources.length; i++) {
+			for (int j = 0; j < resources[i].length; j++) {
+				String relativeName = determineRelativeName(rootPath, resources[i][j]);
+				entries.put(relativeName, resources[i][j]);
+
+				String token = relativeName;
+				// get folder and walk up to the root
+				if (addFolders) {
+					// add META-INF
+					entries.put("/META-INF/", folderResource);
+					int slashIndex;
+					// stop at root folder
+					while ((slashIndex = token.lastIndexOf('/')) > 1) {
+						// add the folder with trailing /
+						entries.put(token.substring(0, slashIndex + 1), folderResource);
+						// walk the tree
+						token = token.substring(0, slashIndex);
+					}
+					// add root folder
+					//entries.put("/", folderResource);
+				}
+			}
+		}
+
+		return entries;
 	}
 
 	/**
