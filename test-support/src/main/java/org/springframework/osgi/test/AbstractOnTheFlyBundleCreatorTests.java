@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -59,10 +60,14 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDependencyManagerTests {
 
+	private static final String META_INF_JAR_LOCATION = "/META-INF/MANIFEST.MF";
+
 	JarCreator jarCreator;
 
 	/** field used for caching jar content */
-	private Resource[][] jarContent;
+	private Map jarEntries;
+	/** discovered manifest */
+	private Manifest manifest;
 
 
 	public AbstractOnTheFlyBundleCreatorTests() {
@@ -82,7 +87,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	/**
 	 * Returns the root path used for locating the resources that will be packed
 	 * in the test bundle (the root path does not become part of the jar).
-	 * <p/>By default, a Maven2 test class folder is used:
+	 * <p/>By default, the Maven2 test layout is used:
 	 * <code>"file:./target/test-classes"</code>
 	 * 
 	 * @return root path given as a String
@@ -96,7 +101,12 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	 * The patterns are added to the root path when performing the search. By
 	 * default, the pattern is <code>*&#42;/*</code>.
 	 * 
-	 * @return the patterns idenfying the resources added to the jar
+	 * <p/>In large test environments, performance can be improved by limiting
+	 * the resource added to the bundle by selecting only certain packages or
+	 * classes. This results in a small test bundle which is faster to create,
+	 * deploy and install.
+	 * 
+	 * @return the patterns identifying the resources added to the jar
 	 */
 	protected String[] getBundleContentPattern() {
 		return new String[] { JarCreator.EVERYTHING_PATTERN };
@@ -105,8 +115,8 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	/**
 	 * Returns the location (in Spring resource style) of the manifest location
 	 * to be used. By default <code>null</code> is returned, indicating that
-	 * the manifest should be picked up from the classpath or be automatically
-	 * created (by default by the test framework) if no file is found.
+	 * the manifest should be picked up from the bundle content (if it's
+	 * available) or be automatically created based on the test class imports.
 	 * 
 	 * @return the manifest location
 	 * @see #getManifest()
@@ -133,18 +143,15 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	 * @see #createDefaultManifest()
 	 */
 	protected Manifest getManifest() {
+		// return cached manifest
+		if (manifest != null)
+			return manifest;
+
 		String manifestLocation = getManifestLocation();
 		if (StringUtils.hasText(manifestLocation)) {
+			logger.info("using Manifest from specified location=[" + getManifestLocation() + "]");
 			DefaultResourceLoader loader = new DefaultResourceLoader();
-			Resource res = loader.getResource(manifestLocation);
-			try {
-				return new Manifest(res.getInputStream());
-			}
-			catch (IOException ex) {
-				IllegalStateException re = new IllegalStateException("cannot retrieve manifest from " + res);
-				re.initCause(ex);
-				throw re;
-			}
+			manifest = createManifestFrom(loader.getResource(manifestLocation));
 		}
 
 		else {
@@ -155,10 +162,33 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 			// see if the manifest already exists in the classpath
 			// to resolve the patterns
-			jarContent = jarCreator.resolveResources();
+			jarEntries = jarCreator.resolveContent();
 
+			for (Iterator iterator = jarEntries.entrySet().iterator(); iterator.hasNext();) {
+				Map.Entry entry = (Map.Entry) iterator.next();
+				if (META_INF_JAR_LOCATION.equals(entry.getKey())) {
+					logger.info("using Manifest from the test bundle content=[/META-INF/MANIFEST.MF]");
+					manifest = createManifestFrom((Resource) entry.getValue());
+				}
+			}
 			// fallback to default manifest creation
-			return createDefaultManifest();
+
+			if (manifest == null) {
+				logger.info("automatically creating Manifest for the test bundle");
+				manifest = createDefaultManifest();
+			}
+		}
+
+		return manifest;
+	}
+
+	private Manifest createManifestFrom(Resource resource) {
+		Assert.notNull(resource);
+		try {
+			return new Manifest(resource.getInputStream());
+		}
+		catch (IOException ex) {
+			throw (RuntimeException) new IllegalArgumentException("cannot create manifest from " + resource).initCause(ex);
 		}
 	}
 
@@ -316,8 +346,8 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		Manifest mf = getManifest();
 
 		// if the jar content hasn't been discovered yet (while creating the manifest)
-		// do so know
-		if (jarContent == null) {
+		// do so now
+		if (jarEntries == null) {
 			// set root path
 			jarCreator.setRootPath(getRootPath());
 			// add the content pattern
@@ -329,7 +359,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 		// otherwise use the cached resources
 		else {
-			jar = jarCreator.createJar(mf, jarContent);
+			jar = jarCreator.createJar(mf, jarEntries);
 		}
 
 		try {
