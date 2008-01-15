@@ -266,7 +266,7 @@ limitations under the License.
       <extension>
          <groupId>org.springframework.aws</groupId>
          <artifactId>spring-aws-maven</artifactId>
-         <version>1.2</version>
+         <version>1.2.2</version>
        </extension>
     </extensions>
     
@@ -685,11 +685,22 @@ limitations under the License.
       </url>
     </repository>
 
-    <repository>
-      <id>i21-s3-maven-repo</id>
-      <name>i21 S3 milestone repo</name>
-      <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
-    </repository>
+
+		<repository>
+			<id>spring-release</id>
+			<name>Spring Portfolio Release Repository</name>
+			<url>http://s3.amazonaws.com/maven.springframework.org/release</url>
+		</repository>
+		<repository>
+			<id>spring-external</id>
+			<name>Spring Portfolio Release Repository</name>
+			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
+		</repository>
+		<repository>
+			<id>spring-milestone</id>
+			<name>Spring Portfolio Milestone Repository</name>
+			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+		</repository>
     
     <repository>
       <id>i21-s3-osgi-repo</id>
