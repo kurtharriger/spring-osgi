@@ -21,12 +21,12 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 
 /**
  * @author Hal Hildebrand Date: Oct 15, 2006 Time: 5:51:36 PM
  */
-public class LifecycleTest extends AbstractConfigurableBundleCreatorTests {
+public class LifecycleTest extends BaseIntegrationTest {
 
 	protected String getManifestLocation() {
 		return null;

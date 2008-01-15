@@ -3,7 +3,7 @@ package org.springframework.osgi.iandt.dependencyWithDelay;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
@@ -14,7 +14,7 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * @author Hal Hildebrand Date: Dec 1, 2006 Time: 3:56:43 PM
  * @author Costin Leau
  */
-public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
+public class DependencyTest extends BaseIntegrationTest {
 	private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.dependencies.Dependent";
 
 	// private static final String SERVICE_2_FILTER = "(service=2)";

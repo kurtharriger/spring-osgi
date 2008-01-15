@@ -19,8 +19,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.tccl.TCCLService;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * Test for TCCL handling from the server side. This test checks that the
@@ -29,7 +29,7 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  * @author Costin Leau
  * 
  */
-public class ServiceTcclTest extends AbstractConfigurableBundleCreatorTests {
+public class ServiceTcclTest extends BaseIntegrationTest {
 
 	private static final String CLIENT_RESOURCE = "/org/springframework/osgi/iandt/tcclManagement/client-resource.properties";
 

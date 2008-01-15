@@ -23,7 +23,7 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
@@ -31,7 +31,7 @@ import org.springframework.osgi.util.OsgiFilterUtils;
  * 
  */
 // works on KF 2.0.3+
-public class ServiceAvailableDuringUnregistrationTest extends AbstractConfigurableBundleCreatorTests {
+public class ServiceAvailableDuringUnregistrationTest extends BaseIntegrationTest {
 
 	private Shape service;
 

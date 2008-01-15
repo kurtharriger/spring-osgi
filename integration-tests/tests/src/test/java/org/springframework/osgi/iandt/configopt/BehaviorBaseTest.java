@@ -17,7 +17,7 @@ package org.springframework.osgi.iandt.configopt;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 
@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public abstract class BehaviorBaseTest extends AbstractConfigurableBundleCreatorTests {
+public abstract class BehaviorBaseTest extends BaseIntegrationTest {
 
 	/**
 	 * Does the given bundle, publish an application context or not?

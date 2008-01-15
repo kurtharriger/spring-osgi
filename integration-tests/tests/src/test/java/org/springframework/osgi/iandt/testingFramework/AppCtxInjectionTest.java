@@ -17,7 +17,7 @@ package org.springframework.osgi.iandt.testingFramework;
 
 import java.io.Serializable;
 
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 
 /**
  * Test the injection executed on the current test. This verifies that the
@@ -26,7 +26,7 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  * @author Costin Leau
  * 
  */
-public class AppCtxInjectionTest extends AbstractConfigurableBundleCreatorTests {
+public class AppCtxInjectionTest extends BaseIntegrationTest {
 
 	private Serializable serializable;
 

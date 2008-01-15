@@ -97,7 +97,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 	private static final Properties DEFAULT_SETTINGS = new Properties();
 
 	static {
-		DEFAULT_SETTINGS.setProperty(ROOT_DIR, "file:./target/test-classes");
+		DEFAULT_SETTINGS.setProperty(ROOT_DIR, "file:./target/test-classes/");
 		DEFAULT_SETTINGS.setProperty(INCLUDE_PATTERNS, JarCreator.EVERYTHING_PATTERN);
 		DEFAULT_SETTINGS.setProperty(LIBS, "");
 		DEFAULT_SETTINGS.setProperty(MANIFEST, "");

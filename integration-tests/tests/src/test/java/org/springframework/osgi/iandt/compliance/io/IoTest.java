@@ -32,6 +32,10 @@ import org.springframework.util.ObjectUtils;
  */
 public class IoTest extends BaseIoTest {
 
+	protected String[] getBundleContentPattern() {
+		return super.getBundleContentPattern();
+	}
+
 	// don't use any extra bundles - just the test jar
 	protected String[] getTestBundlesNames() {
 		return null;
@@ -63,7 +67,7 @@ public class IoTest extends BaseIoTest {
 		// should get 3 entries - META-INF/, org/ and log4j.properties
 
 		Object[] res = copyEnumeration(enm);
-		assertEquals("folders ignored; found " + ObjectUtils.nullSafeToString(res), 3, res.length);
+		assertEquals("folders ignored; found " + ObjectUtils.nullSafeToString(res), 2, res.length);
 	}
 
 	public void testFindEntriesOnSubFolders() throws Exception {
@@ -84,7 +88,7 @@ public class IoTest extends BaseIoTest {
 	public void testGetEntriesShouldReturnFoldersOnRoot() throws Exception {
 		Enumeration enm = bundle.getEntryPaths("/");
 		Object[] res = copyEnumeration(enm);
-		assertEquals("folders ignored; found " + ObjectUtils.nullSafeToString(res), 3, res.length);
+		assertEquals("folders ignored; found " + ObjectUtils.nullSafeToString(res), 2, res.length);
 	}
 
 	public void testGetFolderEntry() throws Exception {

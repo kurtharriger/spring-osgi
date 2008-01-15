@@ -1,3 +1,4 @@
+
 package org.springframework.osgi.iandt.extender;
 
 import java.util.ArrayList;
@@ -8,15 +9,14 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.util.CollectionUtils;
 
 /**
  * @author Hal Hildebrand Date: May 21, 2007 Time: 4:43:52 PM
  */
-public class ExtenderTest extends AbstractConfigurableBundleCreatorTests {
+public class ExtenderTest extends BaseIntegrationTest {
 
 	protected String getManifestLocation() {
 		return null;

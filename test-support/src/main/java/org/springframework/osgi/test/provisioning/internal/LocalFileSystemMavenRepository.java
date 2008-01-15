@@ -81,7 +81,7 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 		// check system property
 		String localRepository = System.getProperty(SYS_PROPERTY);
 		if (trace)
-			log.trace("m2 sys property [" + SYS_PROPERTY + "] has value=" + localRepository);
+			log.trace("M2 system property [" + SYS_PROPERTY + "] has value=" + localRepository);
 
 		if (localRepository == null) {
 			// if it's not present then check settings.xml local repository property
@@ -93,7 +93,7 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 				// fall back to the default location
 				localRepository = new File(System.getProperty(USER_HOME_PROPERTY), DEFAULT_DIR).getAbsolutePath();
 				if (trace)
-					log.trace("no custom setting found; using defualt M2 local repository=" + localRepository);
+					log.trace("no custom setting found; using default M2 local repository=" + localRepository);
 
 			}
 		}

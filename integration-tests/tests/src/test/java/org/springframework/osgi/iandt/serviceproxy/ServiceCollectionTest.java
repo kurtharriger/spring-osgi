@@ -22,8 +22,8 @@ import java.util.Iterator;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.util.ClassUtils;
 
@@ -32,18 +32,11 @@ import org.springframework.util.ClassUtils;
  * 
  */
 // discover a way to test internal packages
-public abstract class ServiceCollectionTest extends AbstractConfigurableBundleCreatorTests {
+public abstract class ServiceCollectionTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT" };
 	}
-
-	protected String getManifestLocation() {
-		// return
-		// "org/springframework/osgi/test/serviceproxy/ServiceCollectionTest.MF";
-		return null;
-	}
-
 	protected ServiceRegistration publishService(Object obj) throws Exception {
 		return bundleContext.registerService(obj.getClass().getName(), obj, null);
 	}

@@ -19,14 +19,14 @@ import java.awt.Point;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
  * @author Costin Leau
  * 
  */
-public class ExtenderVersionTest extends AbstractConfigurableBundleCreatorTests {
+public class ExtenderVersionTest extends BaseIntegrationTest {
 
 	protected String getManifestLocation() {
 		return null;

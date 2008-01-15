@@ -2,10 +2,10 @@ package org.springframework.osgi.iandt.mavenArtifact;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.cardinality0to1.test.MyListener;
 import org.springframework.osgi.iandt.cardinality0to1.test.ReferenceContainer;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * @author Hal Hildebrand
@@ -18,7 +18,7 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  * Maven artifact lookups are explicity using the type of the artifact - a
  * property of the artifact resolution that we need to preserve.
  */
-public class MavenArtifactLookupTest extends AbstractConfigurableBundleCreatorTests {
+public class MavenArtifactLookupTest extends BaseIntegrationTest {
 
 	protected String getManifestLocation() {
 		// return

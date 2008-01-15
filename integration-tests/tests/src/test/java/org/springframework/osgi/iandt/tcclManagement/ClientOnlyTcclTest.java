@@ -18,8 +18,8 @@ package org.springframework.osgi.iandt.tcclManagement;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.tccl.TCCLService;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * Test for TCCL handling only on the client side. That is the service doesn't
@@ -28,7 +28,7 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  * @author Costin Leau
  * 
  */
-public class ClientOnlyTcclTest extends AbstractConfigurableBundleCreatorTests {
+public class ClientOnlyTcclTest extends BaseIntegrationTest {
 
 	private static final String CLIENT_RESOURCE = "/org/springframework/osgi/iandt/tcclManagement/client-resource.properties";
 

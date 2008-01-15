@@ -22,14 +22,14 @@ import java.util.Set;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
  * @author Costin Leau
  * 
  */
-public class ServiceComparatorTest extends AbstractConfigurableBundleCreatorTests {
+public class ServiceComparatorTest extends BaseIntegrationTest {
 
 	private ServiceRegistration registration1, registration2, reg3;
 

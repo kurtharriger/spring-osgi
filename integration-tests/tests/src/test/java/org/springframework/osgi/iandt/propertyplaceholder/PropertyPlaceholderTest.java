@@ -24,7 +24,7 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
@@ -34,7 +34,7 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
  * @author Costin Leau
  * 
  */
-public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTests {
+public class PropertyPlaceholderTest extends BaseIntegrationTest {
 
 	private final static String ID = "PropertyPlaceholderTest-123";
 
@@ -93,14 +93,6 @@ public class PropertyPlaceholderTest extends AbstractConfigurableBundleCreatorTe
 	protected void onTearDown() throws Exception {
 		if (ctx != null)
 			ctx.close();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.iandt.AbstractConfigurableBundleCreatorTests#getBundleContentPattern()
-	 */
-	protected String[] getBundleContentPattern() {
-		return super.getBundleContentPattern();
 	}
 
 	// add a default table into OSGi

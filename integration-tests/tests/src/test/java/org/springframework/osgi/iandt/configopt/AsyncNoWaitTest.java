@@ -33,10 +33,6 @@ public class AsyncNoWaitTest extends BehaviorBaseTest {
 
 	private ServiceRegistration registration;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#onTearDown()
-	 */
 	protected void onTearDown() throws Exception {
 		OsgiServiceUtils.unregisterService(registration);
 	}
