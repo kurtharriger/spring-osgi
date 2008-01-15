@@ -17,15 +17,15 @@ package org.springframework.osgi.iandt.context;
 
 import org.osgi.framework.BundleContext;
 import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 /**
  * Integration test on the functionality offered by OSGi app context.
  * 
  * @author Costin Leau
  * 
  */
-public class OsgiAppContextTest extends AbstractConfigurableBundleCreatorTests {
+public class OsgiAppContextTest extends BaseIntegrationTest {
 
 	private BundleContext bundleContext;
 

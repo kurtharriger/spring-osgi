@@ -20,7 +20,7 @@ import java.io.Serializable;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 
 /**
  * Test injection of BundleContextAware.
@@ -28,7 +28,7 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  * @author Costin Leau
  * 
  */
-public class BundleContextAwareTest extends AbstractConfigurableBundleCreatorTests {
+public class BundleContextAwareTest extends BaseIntegrationTest {
 
 	public static class BundleContextAwareHolder implements BundleContextAware {
 

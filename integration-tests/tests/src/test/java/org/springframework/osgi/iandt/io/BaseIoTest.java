@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.io;
 
 import java.util.ArrayList;
@@ -24,9 +25,9 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -35,7 +36,7 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * 
  */
-public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests {
+public abstract class BaseIoTest extends BaseIntegrationTest {
 
 	protected final static String PACKAGE = "org/springframework/osgi/iandt/io/";
 
@@ -46,6 +47,12 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 	protected ResourcePatternResolver patternLoader;
 
 	protected Bundle bundle;
+
+
+	protected String[] getBundleContentPattern() {
+		return (String[]) ObjectUtils.addObjectToArray(super.getBundleContentPattern(),
+			"org/springframework/osgi/iandt/io/BaseIoTest.class");
+	}
 
 	protected void onSetUp() throws Exception {
 		// load file using absolute path
@@ -71,10 +78,8 @@ public abstract class BaseIoTest extends AbstractConfigurableBundleCreatorTests 
 	 */
 	protected String[] getTestBundlesNames() {
 		return new String[] {
-				"org.springframework.osgi,org.springframework.osgi.iandt.io.fragment.1.bundle,"
-						+ getSpringDMVersion(),
-				"org.springframework.osgi,org.springframework.osgi.iandt.io.fragment.2.bundle,"
-						+ getSpringDMVersion() };
+			"org.springframework.osgi,org.springframework.osgi.iandt.io.fragment.1.bundle," + getSpringDMVersion(),
+			"org.springframework.osgi,org.springframework.osgi.iandt.io.fragment.2.bundle," + getSpringDMVersion() };
 	}
 
 	protected Object[] copyEnumeration(Enumeration enm) {

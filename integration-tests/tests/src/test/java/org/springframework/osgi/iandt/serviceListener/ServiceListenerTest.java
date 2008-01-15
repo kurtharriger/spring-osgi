@@ -2,20 +2,14 @@
 package org.springframework.osgi.iandt.serviceListener;
 
 import org.osgi.framework.Bundle;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.service.listener.MyListener;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
  * @author Hal Hildebrand Date: Nov 14, 2006 Time: 8:18:15 AM
  */
-public class ServiceListenerTest extends AbstractConfigurableBundleCreatorTests {
-
-	protected String getManifestLocation() {
-		// return
-		// "classpath:org/springframework/osgi/test/serviceListener/ServiceListenerTest.MF";
-		return null;
-	}
+public class ServiceListenerTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] {

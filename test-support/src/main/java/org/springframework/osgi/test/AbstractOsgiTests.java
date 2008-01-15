@@ -184,8 +184,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		// get a hold of the test result
 		originalResult = result;
 
-		// TODO: can this be actually improved (can we still reuse the
-		// testResult?)
 		result.startTest(osgiJUnitTest);
 		result.runProtected(osgiJUnitTest, new Protectable() {
 

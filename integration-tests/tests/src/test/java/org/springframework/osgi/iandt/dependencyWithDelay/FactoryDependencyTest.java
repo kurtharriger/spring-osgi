@@ -3,14 +3,14 @@ package org.springframework.osgi.iandt.dependencyWithDelay;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * @author Hal Hildebrand Date: Aug 27, 2007 Time: 9:36:23 AM
  */
 
-public class FactoryDependencyTest extends AbstractConfigurableBundleCreatorTests {
+public class FactoryDependencyTest extends BaseIntegrationTest {
 	private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.dependencies.Dependent";
 
 	private static final String DELAY_PROP = "org.springframework.osgi.iandt.dependencies.factory.delay";

@@ -3,8 +3,8 @@ package org.springframework.osgi.iandt.duplicateClass;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.simpleservice.MyService;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
@@ -13,7 +13,7 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * 
  * @author Andy Piper
  */
-public class DuplicateClassTest extends AbstractConfigurableBundleCreatorTests {
+public class DuplicateClassTest extends BaseIntegrationTest {
 	private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.simpleservice.MyService";
 
 	protected String getManifestLocation() {

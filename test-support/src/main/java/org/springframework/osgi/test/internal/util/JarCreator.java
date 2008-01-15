@@ -20,10 +20,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.zip.Deflater;
@@ -62,7 +64,11 @@ public class JarCreator {
 
 	private static final String[] LIMITED_PATTERN = new String[] { CLASS_PATTERN, XML_PATTERN, PROPS_PATTERN };
 
-	private String TEST_CLASSES_DIR = "test-classes";
+	private static final String CLASS_EXT = ".class";
+
+	private static final String TEST_CLASSES_DIR = "test-classes";
+
+	private static final String SLASH = "/";
 
 	private String[] contentPattern = new String[] { EVERYTHING_PATTERN };
 
@@ -73,6 +79,9 @@ public class JarCreator {
 	private String rootPath = determineRootPath();
 
 	private boolean addFolders = true;
+
+	/** collection of packages contained by this jar */
+	private Collection containedPackages = new TreeSet();
 
 
 	/**
@@ -227,6 +236,11 @@ public class JarCreator {
 		// transform Strings into Resources
 		for (int i = 0; i < patterns.length; i++) {
 			StringBuffer buffer = new StringBuffer(rootPath);
+			
+			// do checking on lost slashes
+			if (!rootPath.endsWith(SLASH) && !patterns[i].startsWith(SLASH))
+				buffer.append(SLASH);
+
 			buffer.append(patterns[i]);
 			try {
 				resources[i] = resolver.getResources(buffer.toString());
@@ -243,7 +257,8 @@ public class JarCreator {
 
 	/**
 	 * Resolve the jar content based on its path. Will return a map containing
-	 * the entries relative to the jar root path.
+	 * the entries relative to the jar root path. It will also determine the
+	 * packages contained by this package.
 	 * 
 	 * @return
 	 */
@@ -262,6 +277,8 @@ public class JarCreator {
 
 		// remove duplicates
 		Map entries = new TreeMap();
+		// save contained bundle packages
+		containedPackages.clear();
 
 		// empty stream used for folders
 		Resource folderResource = new ByteArrayResource(new byte[0]);
@@ -270,7 +287,24 @@ public class JarCreator {
 		for (int i = 0; i < resources.length; i++) {
 			for (int j = 0; j < resources[i].length; j++) {
 				String relativeName = determineRelativeName(rootPath, resources[i][j]);
+				// be consistent when adding resources to jar
+				if (!relativeName.startsWith("/"))
+					relativeName = "/" + relativeName;
 				entries.put(relativeName, resources[i][j]);
+
+				// look for class entries
+				if (relativeName.endsWith(CLASS_EXT)) {
+
+					// determine package (exclude first char)
+					String clazzName = relativeName.substring(1, relativeName.length() - CLASS_EXT.length()).replace(
+						'/', '.');
+					// remove class name
+					int index = clazzName.lastIndexOf('.');
+					if (index > 0)
+						clazzName = clazzName.substring(0, index);
+					// add it to the collection
+					containedPackages.add(clazzName);
+				}
 
 				String token = relativeName;
 				// get folder and walk up to the root
@@ -291,7 +325,14 @@ public class JarCreator {
 			}
 		}
 
+		if (log.isTraceEnabled())
+			log.trace("following packages discovered in the bundle: " + containedPackages);
+
 		return entries;
+	}
+
+	public Collection getContainedPackages() {
+		return containedPackages;
 	}
 
 	/**

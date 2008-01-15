@@ -93,7 +93,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	 * @return root path given as a String
 	 */
 	protected String getRootPath() {
-		return "file:./target/test-classes";
+		return "file:./target/test-classes/";
 	}
 
 	/**
@@ -231,7 +231,8 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		if (trace)
 			logger.trace("Discovered raw imports " + ObjectUtils.nullSafeToString(rawImports));
 
-		Collection imports = eliminateSpecialPackages(rawImports);
+		Collection specialImportsOut = eliminateSpecialPackages(rawImports);
+		Collection imports = eliminatePackagesAvailableInTheJar(specialImportsOut);
 
 		if (trace)
 			logger.trace("Filtered imports are " + imports);
@@ -263,7 +264,36 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		}
 
 		if (!eliminatedImports.isEmpty() && logger.isTraceEnabled())
-			logger.trace("eliminated packages " + eliminatedImports);
+			logger.trace("eliminated special packages " + eliminatedImports);
+
+		return filteredImports;
+	}
+
+	/**
+	 * Eliminates imports for packages already included in the bundle. Works
+	 * only if the jar content is known (variable 'jarEntries' set).
+	 * 
+	 * @param imports
+	 * @return
+	 */
+	private Collection eliminatePackagesAvailableInTheJar(Collection imports) {
+		// no jar entry present, bail out.
+		if (jarEntries == null || jarEntries.isEmpty())
+			return imports;
+
+		Set filteredImports = new LinkedHashSet(imports.size());
+		Collection eliminatedImports = new LinkedHashSet(2);
+
+		Collection jarPackages = jarCreator.getContainedPackages();
+		for (Iterator iterator = imports.iterator(); iterator.hasNext();) {
+			String pckg = (String) iterator.next();
+			if (jarPackages.contains(pckg))
+				eliminatedImports.add(pckg);
+			else
+				filteredImports.add(pckg);
+		}
+		if (!eliminatedImports.isEmpty() && logger.isTraceEnabled())
+			logger.trace("eliminated packages already present in the bundle " + eliminatedImports);
 
 		return filteredImports;
 	}

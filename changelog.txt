@@ -2,7 +2,7 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.0 final (2008-01-1x)
+Changes in version 1.0 final (2008-01-2x)
 -----------------------------------------
 
 Package org.springframework.osgi.test
@@ -10,6 +10,8 @@ Package org.springframework.osgi.test
 * KnopflerfishPlatform exports automatically system packages for JDK 1.4/1.5
 * refined test bundle creation to ignore duplicate META-INF/MANIFEST.MF
 * optimized test bundle creation by using no compression
+* AbstractOnTheFlyBundleCreatorTests automatic manifest generation does not add OSGi import entries for packages
+  contained in the test bundle
 
 Package org.springframework.osgi.util
 * OsgiServiceUtils#getAllServices() deprecated method has been removed

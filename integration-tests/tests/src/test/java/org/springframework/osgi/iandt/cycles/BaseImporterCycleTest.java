@@ -20,14 +20,14 @@ import java.awt.Polygon;
 import java.awt.Shape;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
  * @author Costin Leau
  * 
  */
-public abstract class BaseImporterCycleTest extends AbstractConfigurableBundleCreatorTests {
+public abstract class BaseImporterCycleTest extends BaseIntegrationTest {
 
 	protected ListenerA listenerA;
 	protected ListenerB listenerB;

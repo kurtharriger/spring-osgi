@@ -40,6 +40,10 @@ public class FragmentTest extends BaseIoTest {
 		return isFelix();
 	}
 
+	protected String[] getBundleContentPattern() {
+		return new String[] { "**/*" };
+	}
+
 	/**
 	 * Check META-INF folders.
 	 * 

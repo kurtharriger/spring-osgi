@@ -1,15 +1,15 @@
 package org.springframework.osgi.iandt.errors;
 
-import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.osgi.framework.Bundle;
+import org.springframework.core.io.Resource;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 
 /**
  * @author Hal Hildebrand
  *         Date: May 29, 2007
  *         Time: 5:07:01 PM
  */
-public class ErrorHandlingTest extends AbstractConfigurableBundleCreatorTests {
+public class ErrorHandlingTest extends BaseIntegrationTest {
 
     protected String getManifestLocation() {
         return null;

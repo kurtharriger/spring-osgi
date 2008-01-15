@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.bundleScope;
 
 import java.util.Properties;
@@ -20,8 +21,8 @@ import java.util.Properties;
 import org.osgi.framework.ServiceReference;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.scope.common.ScopeTestService;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.ObjectUtils;
@@ -32,15 +33,13 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * 
  */
-public class ScopingTest extends AbstractConfigurableBundleCreatorTests {
+public class ScopingTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
-		return new String[] {
-				"org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT",
-				"org.springframework.osgi, org.springframework.osgi.iandt.scoped.bundle.common,"
-						+ getSpringDMVersion(),
-				"org.springframework.osgi, org.springframework.osgi.iandt.scoped.bundle.a," + getSpringDMVersion(),
-				"org.springframework.osgi, org.springframework.osgi.iandt.scoped.bundle.b," + getSpringDMVersion() };
+		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT",
+			"org.springframework.osgi, org.springframework.osgi.iandt.scoped.bundle.common," + getSpringDMVersion(),
+			"org.springframework.osgi, org.springframework.osgi.iandt.scoped.bundle.a," + getSpringDMVersion(),
+			"org.springframework.osgi, org.springframework.osgi.iandt.scoped.bundle.b," + getSpringDMVersion() };
 	}
 
 	protected String getManifestLocation() {

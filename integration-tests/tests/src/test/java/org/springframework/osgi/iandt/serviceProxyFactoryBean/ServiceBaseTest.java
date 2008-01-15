@@ -18,13 +18,13 @@ package org.springframework.osgi.iandt.serviceProxyFactoryBean;
 import java.util.Dictionary;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 
 /**
  * @author Costin Leau
  * 
  */
-public abstract class ServiceBaseTest extends AbstractConfigurableBundleCreatorTests {
+public abstract class ServiceBaseTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT" };

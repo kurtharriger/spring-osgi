@@ -267,7 +267,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	}
 
 	private void invalidateProxy(Object proxy) {
-		// TODO: add proxy invalidation
+		// TODO: add proxy invalidation (if it makes sense)
 	}
 
 	/**

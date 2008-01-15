@@ -29,7 +29,7 @@ import java.util.Properties;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
@@ -39,7 +39,7 @@ import org.springframework.osgi.util.OsgiServiceUtils;
  * @author Costin Leau
  * 
  */
-public class ServiceListenerSyntheticEvents extends AbstractConfigurableBundleCreatorTests {
+public class ServiceListenerSyntheticEvents extends BaseIntegrationTest {
 
 	private Shape area, rectangle, polygon;
 

@@ -6,12 +6,12 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 
 /**
  * @author Hal Hildebrand Date: Jun 5, 2007 Time: 9:10:11 PM
  */
-public class DeadlockHandlingTest extends AbstractConfigurableBundleCreatorTests {
+public class DeadlockHandlingTest extends BaseIntegrationTest {
 
 	// Specifically do not wait
 	protected boolean shouldWaitForSpringBundlesContextCreation() {
