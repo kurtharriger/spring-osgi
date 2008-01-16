@@ -25,7 +25,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -49,7 +48,7 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class DebugUtils {
 
-	private static final Log log = LogFactory.getLog(DebugUtils.class);
+	private static final Log log = LogUtils.createLogger(DebugUtils.class);
 
 
 	/**
