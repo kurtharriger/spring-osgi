@@ -5,6 +5,9 @@ http://www.springframework.org/osgi
 Changes in version 1.0 final (2008-01-2x)
 -----------------------------------------
 
+Package org.springframework.osgi.service
+* refined the service proxy returned by OsgiServiceProxyFactoryBean so it doesn't allow usage after being destroyed
+
 Package org.springframework.osgi.test
 * removed deprecated mispelled Platforms#KNOPFLEFISH constant
 * KnopflerfishPlatform exports automatically system packages for JDK 1.4/1.5

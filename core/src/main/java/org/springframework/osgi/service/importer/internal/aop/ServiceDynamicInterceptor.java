@@ -114,7 +114,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 						 */
 						ServiceWrapper oldWrapper = wrapper;
 
-						synchronized (ServiceDynamicInterceptor.this) {
+						synchronized (lock) {
 							// remove service
 							if (wrapper != null) {
 								if (serviceId == wrapper.getServiceId()) {
@@ -127,8 +127,13 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 						ServiceReference newReference = null;
 
+						boolean isDestroyed = false;
 						// discover a new reference only if we are still running
-						if (!destroyed) {
+						synchronized (lock) {
+							isDestroyed = destroyed;
+						}
+
+						if (!isDestroyed) {
 							newReference = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
 								(filter == null ? null : filter.toString()));
 
@@ -147,7 +152,9 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 						if (newReference == null && serviceRemoved) {
 
 							// reuse the old service for the time being
-							wrapper = oldWrapper;
+							synchronized (lock) {
+								wrapper = oldWrapper;
+							}
 
 							// update dependency manager
 							if (mandatoryListeners != null) {
@@ -162,7 +169,9 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 							OsgiServiceBindingUtils.callListenersUnbind(bundleContext, proxy, ref, listeners);
 
 							// clean up wrapper
-							wrapper = null;
+							synchronized (lock) {
+								wrapper = null;
+							}
 
 							if (debug) {
 								String message = "service reference [" + ref + "] was unregistered";
@@ -196,7 +205,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		private boolean updateWrapperIfNecessary(ServiceReference ref, long serviceId, int serviceRanking) {
 			boolean updated = false;
 			try {
-				synchronized (ServiceDynamicInterceptor.this) {
+				synchronized (lock) {
 					if (wrapper != null && wrapper.isServiceAlive()) {
 						// if have a higher rank service
 						if (serviceRanking > wrapper.getServiceRanking()) {
@@ -218,7 +227,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 						updated = true;
 						updateReferenceHolders(ref);
 					}
-					ServiceDynamicInterceptor.this.notifyAll();
+					lock.notifyAll();
 					return updated;
 				}
 			}
@@ -240,6 +249,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		 * @param ref
 		 */
 		private void updateReferenceHolders(ServiceReference ref) {
+			// no need for a lock since this method is called from a synchronized block
 			wrapper = new ServiceWrapper(ref, bundleContext);
 			referenceDelegate.swapDelegates(ref);
 		}
@@ -264,6 +274,9 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private boolean serviceRequiredAtStartup = true;
 
 	private boolean destroyed = false;
+
+	/** private lock */
+	private final Object lock = new Object();
 
 	/**
 	 * utility service wrapper
@@ -320,12 +333,17 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 * should use the same lock as the listener handling the service reference.
 	 */
 	private Object lookupService() {
+		synchronized (lock) {
+			if (destroyed)
+				throw new IllegalStateException("the service proxy has been destroyed!");
+		}
+
 		return (Object) retryTemplate.execute(new DefaultRetryCallback() {
 
 			public Object doWithRetry() {
 				return (wrapper != null) ? wrapper.getService() : null;
 			}
-		}, this);
+		}, lock);
 	}
 
 	public void afterPropertiesSet() {
@@ -348,9 +366,10 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	}
 
 	public void destroy() throws Exception {
-		destroyed = true;
 		OsgiListenerUtils.removeServiceListener(bundleContext, listener);
-		synchronized (this) {
+		synchronized (lock) {
+			// set this flag first to make sure no rebind is done
+			destroyed = true;
 			if (wrapper != null) {
 				ServiceReference ref = wrapper.getReference();
 				if (ref != null) {
