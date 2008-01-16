@@ -592,11 +592,17 @@ limitations under the License.
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
       
-      <!-- cobertura -->
+      <!-- cobertura  (disabled for now)
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.1</version>
+      </plugin>
+	  -->
+	  <!-- jdepend -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jdepend-maven-plugin</artifactId>
       </plugin>
       
     </plugins>
