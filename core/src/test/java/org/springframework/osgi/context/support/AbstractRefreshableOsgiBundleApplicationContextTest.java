@@ -16,6 +16,8 @@
 package org.springframework.osgi.context.support;
 
 import java.io.IOException;
+import java.util.Dictionary;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -76,6 +78,9 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 		String location = "osgibundle://someLocation";
 		Resource bundleResource = new OsgiBundleResource(bundle, location);
 
+		Dictionary dict = new Properties();
+		bundleCtrl.expectAndReturn(bundle.getHeaders(), dict);
+		bundleCtrl.expectAndReturn(bundle.getSymbolicName(), "symName", MockControl.ONE_OR_MORE);
 		bundleCtrl.replay();
 		bundleCtxCtrl.replay();
 

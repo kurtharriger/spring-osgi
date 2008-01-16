@@ -100,7 +100,7 @@ public class AbstractBundleXmlApplicationContextTest extends TestCase {
 		createContext();
 
 		// use the 2 symbolic name calls
-		assertEquals(title, OsgiStringUtils.nullSafeSymbolicName(bundle));
+		assertEquals(title, OsgiStringUtils.nullSafeName(bundle));
 	}
 
 	public void testGetServiceName() {
