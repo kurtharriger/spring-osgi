@@ -43,6 +43,7 @@ import org.springframework.util.ObjectUtils;
  */
 public class BundleDelegatingClassLoader extends ClassLoader {
 
+	/** use degradable logger */
 	private static final Log log = LogUtils.createLogger(BundleDelegatingClassLoader.class);
 
 	private final ClassLoader bridge;
