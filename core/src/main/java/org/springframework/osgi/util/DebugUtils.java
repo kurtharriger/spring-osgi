@@ -48,6 +48,7 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class DebugUtils {
 
+	/** use degradable logger */
 	private static final Log log = LogUtils.createLogger(DebugUtils.class);
 
 

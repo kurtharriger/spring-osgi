@@ -43,6 +43,9 @@ class LogUtils {
 		}
 		catch (Throwable th) {
 			logger = new SimpleLogger();
+			logger.fatal(
+				"logger infrastructure not properly set up. If commons-logging jar is used try switching to slf4j (see the FAQ for more info).",
+				th);
 		}
 		return logger;
 	}

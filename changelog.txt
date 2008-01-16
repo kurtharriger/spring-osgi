@@ -5,6 +5,9 @@ http://www.springframework.org/osgi
 Changes in version 1.0 final (2008-01-2x)
 -----------------------------------------
 
+Package org.springframework.osgi.extensions.annotation
+* aligned bundle symbolic name with the rest of the bundles
+
 Package org.springframework.osgi.service
 * refined the service proxy returned by OsgiServiceProxyFactoryBean so it doesn't allow usage after being destroyed
 
@@ -20,6 +23,9 @@ Package org.springframework.osgi.util
 * OsgiServiceUtils#getAllServices() deprecated method has been removed
 * OsgiServiceUtils#getService() deprecated method has been removed
 * default artifact locator picks up Maven 2 ~/.m2/settings.xml localRepository configuration
+* DebugUtils uses a degradable logger to properly report error messages when the logging implementation is misconfigured
+* BundleDelegatingClassLoader uses a degradable logger to properly report error messages when the logging implementation
+  is misconfigured
 
 Changes in version 1.0 RC2 (2008-01-11)
 ---------------------------------------
