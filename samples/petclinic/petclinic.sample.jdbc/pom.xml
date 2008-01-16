@@ -49,20 +49,6 @@
   </dependencies>
 
 
-   <build> 
-	<plugins>
-	<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
-	</plugins>
-	</build>
-
   <repositories>
     <repository>
     <id>i21-s3-maven-repo</id>
