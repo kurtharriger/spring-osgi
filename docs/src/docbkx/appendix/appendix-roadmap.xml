@@ -2,40 +2,59 @@
 <!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <appendix id="appendix-roadmap">
-    <title>Roadmap</title>
+	<title>Roadmap</title>
 
-    <para>This appendix documents features on the Spring Dynamic Modules
-    roadmap. The design of these features specified here is subject to
-    change. As a most up to date source, please see <ulink url="http://jira.springframework.org/browse/OSGI">
-    our</ulink> issue tracker.</para>
+	<para>
+		This appendix documents features on the Spring Dynamic Modules
+		roadmap. The design of these features specified here is subject
+		to change. As a most up to date source, please see
+		<ulink url="http://jira.springframework.org/browse/OSGI">
+			our
+		</ulink>
+		issue tracker.
+	</para>
 
-    <section>
-      <title>Enhanced Configuration Admin Support</title>
+	<section>
+		<title>Enhanced Configuration Admin Support</title>
 
-      <section>
-        <title>Managed Services</title>
+		<section>
+			<title>Managed Services</title>
 
-        <para>It should be possible to easily instantiate a bean from the
-        configuration information stored for a
-        <literal>ManagedService</literal>, and a set of beans from the
-        configuration information stored for a
-        <literal>ManagedServiceFactory</literal>. In addition, updates to the
-        configuration information should be propagated to beans created in
-        this way.</para>
+			<para>
+				It should be possible to easily instantiate a bean from
+				the configuration information stored for a
+				<literal>ManagedService</literal>
+				, and a set of beans from the configuration information
+				stored for a
+				<literal>ManagedServiceFactory</literal>
+				. In addition, updates to the configuration information
+				should be propagated to beans created in this way.
+			</para>
 
-        <para>The <literal>managed-service</literal> element is used to define
-        a bean based on the configuration information stored under a given
-        persistent id. It has two mandatory attributes,
-        <literal>class</literal> and <literal>persistent-id</literal>. The
-        <literal>persistent-id</literal> attribute is used to specify the
-        persistent id to be looked up in the configuration administration
-        service, <literal>class</literal> indicates the Java class of the bean
-        that will be instantiated.</para>
+			<para>
+				The
+				<literal>managed-service</literal>
+				element is used to define a bean based on the
+				configuration information stored under a given
+				persistent id. It has two mandatory attributes,
+				<literal>class</literal>
+				and
+				<literal>persistent-id</literal>
+				. The
+				<literal>persistent-id</literal>
+				attribute is used to specify the persistent id to be
+				looked up in the configuration administration service,
+				<literal>class</literal>
+				indicates the Java class of the bean that will be
+				instantiated.
+			</para>
 
-        <para>A simple declaration of a managed service bean would look as
-        follows:</para>
+			<para>
+				A simple declaration of a managed service bean would
+				look as follows:
+			</para>
 
-        <programlisting><![CDATA[<osgix:managed-service id="myService" class="com.xyz.MessageService" 
+			<programlisting><![CDATA[<osgix:managed-service id="myService" class="com.xyz.MessageService" 
    persistent-id="com.xyz.messageservice"/>]]></programlisting>
 
         <para>The properties of the <literal>managed-service</literal> bean
@@ -240,4 +259,17 @@ public void anyMethodName(Dictionary properties);]]></programlisting>
       <para>Also, the project aims to simplify deployment of JDBC drivers and
       pooling libraries that at the moment require special <literal>DynamicImport-Package</literal>.</para>
     </section>
+
+	<section>
+	  <title>OSGi standards</title>
+	
+	  <para>While OSGi 4.0 is currently required, work is underway to take advantage of the
+	  new features available in 4.1. SpringSource is an active participant in the 
+	  <ulink url="http://www2.osgi.org/EEG/HomePage">OSGi Enterprise Expert Group</ulink> 
+	  and we hope to help many of the ideas found in the Spring Dynamic Modules project 
+	  to make their way into the OSGi R5 specification.
+	  Spring Dynamic Modules would obviously seek to support any such standards at that 
+	  point in time.</para>
+	</section>
+    
 </appendix>
