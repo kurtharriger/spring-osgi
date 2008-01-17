@@ -53,7 +53,7 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 	/** m2 local user settings */
 	private static final String M2_DIR = ".m2";
 	/** maven settings xml */
-	private static final String M2_SETTINGS = M2_DIR.concat("settings.xml");
+	private static final String M2_SETTINGS = M2_DIR.concat("/settings.xml");
 	/** default local repository */
 	private static final String DEFAULT_DIR = M2_DIR.concat("/repository");
 	/** discovered local m2 repository home */
@@ -80,18 +80,19 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 
 		// check system property
 		String localRepository = System.getProperty(SYS_PROPERTY);
+		String userHome = System.getProperty(USER_HOME_PROPERTY);
 		if (trace)
 			log.trace("M2 system property [" + SYS_PROPERTY + "] has value=" + localRepository);
 
 		if (localRepository == null) {
 			// if it's not present then check settings.xml local repository property
-			localRepository = getMavenSettingsLocalRepository(new FileSystemResource(new File(
-				System.getProperty(USER_HOME_PROPERTY), M2_SETTINGS)));
+			Resource settingsFile = new FileSystemResource(new File(userHome, M2_SETTINGS));
+			localRepository = getMavenSettingsLocalRepository(settingsFile);
 			if (trace)
-				log.trace("falling back to M2 settings.xml file; found value=" + localRepository);
+				log.trace("falling back to M2 settings.xml [" + settingsFile + "]; found value=" + localRepository);
 			if (localRepository == null) {
 				// fall back to the default location
-				localRepository = new File(System.getProperty(USER_HOME_PROPERTY), DEFAULT_DIR).getAbsolutePath();
+				localRepository = new File(userHome, DEFAULT_DIR).getAbsolutePath();
 				if (trace)
 					log.trace("no custom setting found; using default M2 local repository=" + localRepository);
 

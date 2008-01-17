@@ -83,7 +83,26 @@
 	    is welcomed - please use our mailing list.
 	  </para>
     </section>
-    
+
+	<section id="other-module-frameworks">
+	  <title>Are there plans to support other dynamic module frameworks (such as the JSR 277 extensions in Java 7)?</title>
+	  <para>There are no current plans to support other dynamic module frameworks.</para>
+	</section>
+	
+	<section id="restricted-environments">
+	  <title>Will Spring-DM work in restricted environments (such as small/mobile devices)?</title>
+	  <para>See the <link linkend="requirements">requirements</link> entry. The OSGi Service Platform is designed to run in 
+	  very constrained environments however, Spring Dynamic Modules depends on the Spring Framework v2.5 which in turn depends on 
+	  JDK 1.4. Thus Spring Dynamic Modules cannot run on more constrained environments (such as the OSGi Minimum Execution Environment) 
+	  unless Spring itself also runs in those environments. There are no current plans to make such a version of Spring. 
+	  However as existing OSGi developers adopt Spring Dynamic Modules to simplify creation of OSGi applications and the user
+	  base expands, the target audience can cover domains much broader than <em>enterprise Java applications</em>. 
+	  In time this could create a large enough demand to justify the investment needed to allow Spring and Spring-DM to run in
+	  restricted environments.</para>
+	</section>
+
+ 
+
     <section id="supported-osgi-platforms">
 	  <title>What OSGi platforms are supported?</title>
 	  <para>
@@ -94,6 +113,7 @@
 	  against all of them as part of our continuous integration process.
 	  </para>
 	</section>
+	
 	
 	<section id="osgi-intro">
 	  <title>Where can I learn about OSGi?</title>
@@ -114,7 +134,12 @@
 	  </para>
 	</section>
 	
-	
+	<section id="building-the-sources">
+      <title>I have problems building the sources. What can I do?</title>
+      <para>Please see the file called <literal>readme-building.txt</literal> found in the source tree.
+      </para>
+    </section>
+    
 	<section id="backport-util-concurrent">
 	  <title>I get an exception about backport-util-concurrent library being required. Why is that?</title>
 
@@ -160,16 +185,8 @@
         library is required.</para>
       </section>
 
-	  <section id="maven-jdk6">
-	    <title>I cannot build the sources when using JDK 6+. What can I do?</title>
 
-        <para>The problem is caused by Maven <a href="http://maven.apache.org/guides/introduction/introduction-to-profiles.html">profiles</a> 
-        feature which considers only a certain JDK version rather then all compatible versions. 
-        As a workaround, one can build the sources, using JDK 5.0 (if annotations are needed) or 
-        JDK 1.4.2 (without annotations or other JDK 5 specific features).
-        </para>
-      </section>
-    
+      
       <section id="logging">
         <title>How can I use logging in OSGi?</title>
 
@@ -209,7 +226,7 @@
       </section>
 
       <section id="commons-logging">
-        <title>If you use commons-logging API, why rely on SLF4J and
+        <title>If you use the commons-logging API, why rely on SLF4J and
         not the commons-logging jar?</title>
 
         <para>The commons-logging project provides the commons-logging API
