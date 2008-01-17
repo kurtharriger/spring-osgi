@@ -26,6 +26,8 @@ Package org.springframework.osgi.util
 * DebugUtils uses a degradable logger to properly report error messages when the logging implementation is misconfigured
 * BundleDelegatingClassLoader uses a degradable logger to properly report error messages when the logging implementation
   is misconfigured
+* LogUtils new class use by BundleDelegatingClassLoader and DebugUtils. The logger is
+loaded in the context of the provided classes classloader rather than BundleDelegatingClassLoader. This fixes issues with recursive calls to findClass().
 
 Changes in version 1.0 RC2 (2008-01-11)
 ---------------------------------------
