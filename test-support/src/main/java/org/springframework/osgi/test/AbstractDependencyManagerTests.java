@@ -191,7 +191,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 		String[] bundles = (String[]) props.keySet().toArray(new String[props.size()]);
 		if (logger.isDebugEnabled())
-			logger.debug("loaded bundles " + ObjectUtils.nullSafeToString(bundles));
+			logger.debug("default framework bundles :" + ObjectUtils.nullSafeToString(bundles));
 
 		return bundles;
 	}

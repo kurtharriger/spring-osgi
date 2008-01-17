@@ -42,6 +42,7 @@
   <toc />
 
   <xi:include href="preface.xml"/>
+  
   <part id="introduction">
       <title>Introduction</title>
 
@@ -64,6 +65,7 @@
       <xi:include href="appendix/introduction.xml"/>
 	  <xi:include href="appendix/appendix-compendium.xml"/>
       <xi:include href="appendix/appendix-extensions.xml"/>
+      <xi:include href="appendix/appendix-pde.xml"/>
       <xi:include href="appendix/appendix-roadmap.xml"/>
       <xi:include href="appendix/appendix-schema.xml"/>
       <xi:include href="appendix/appendix-ack.xml"/>
@@ -78,9 +80,10 @@
               section.
           </para>
       </partintro>
-      <xi:include href="links.xml"/>
+      <xi:include href="links.xml"/> -->
       <!-- 
       <xi:include href="bibliography.xml"/>
        -->
+
   </part>
 </book>

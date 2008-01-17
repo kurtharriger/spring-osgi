@@ -159,9 +159,20 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 			return localMavenBuildArtifact(artifactId, version, type);
 		}
 		catch (IllegalStateException illStateEx) {
-			if (log.isDebugEnabled())
-				log.debug("local maven build artifact detection failed, falling back to local maven bundle");
-			return localMavenBundle(groupId, artifactId, version, type);
+			Resource localMavenBundle = localMavenBundle(groupId, artifactId, version, type);
+			if (log.isDebugEnabled()) {
+				StringBuffer buf = new StringBuffer();
+				buf.append("[");
+				buf.append(groupId);
+				buf.append("|");
+				buf.append(artifactId);
+				buf.append("|");
+				buf.append(version);
+				buf.append("]");
+				log.debug(buf + " local maven build artifact detection failed, falling back to local maven bundle "
+						+ localMavenBundle.getDescription());
+			}
+			return localMavenBundle;
 		}
 	}
 
@@ -203,7 +214,8 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 			File found = new MavenPackagedArtifactFinder(artifactId, version, type).findPackagedArtifact(new File("."));
 			Resource res = new FileSystemResource(found);
 			if (log.isDebugEnabled()) {
-				log.debug("found local maven artifact:" + res.getDescription() + " for " + artifactId + "|" + version);
+				log.debug("[" + artifactId + "|" + version + "] resolved to " + res.getDescription()
+						+ " as a local maven artifact");
 			}
 			return res;
 		}
