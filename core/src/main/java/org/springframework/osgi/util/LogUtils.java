@@ -30,8 +30,15 @@ import org.apache.commons.logging.LogFactory;
 class LogUtils {
 
 	/**
-	 * Create the logger using LogFactory but use a simple implementation if
-	 * something goes wrong.
+	 * Set the TCCL of the bundle before creating the logger. This helps if
+	 * commons-logging is used since it looks at the existing TCCL before
+	 * associating a LogFactory with it and since the TCCL can be the
+	 * BundleDelegatingClassLoader, loading a LogFactory using the
+	 * BundleDelegatingClassLoader will result in an infinite cycle or chained
+	 * failures that would be swallowed.
+	 * 
+	 * <p/> Create the logger using LogFactory but use a simple implementation
+	 * if something goes wrong.
 	 * 
 	 * @param logName log name
 	 * @return logger implementation
@@ -39,7 +46,17 @@ class LogUtils {
 	public static Log createLogger(Class logName) {
 		Log logger;
 		try {
-			logger = LogFactory.getLog(DebugUtils.class);
+			Thread currentThread = Thread.currentThread();
+			// set the TCCL first to the bundle
+			ClassLoader oldTCCL = currentThread.getContextClassLoader();
+			try {
+				// push the logger class classloader (useful when dealing with commons-logging 1.0.x
+				//currentThread.setContextClassLoader(logName.getClassLoader());
+				logger = LogFactory.getLog(logName);
+			}
+			finally {
+				currentThread.setContextClassLoader(oldTCCL);
+			}
 		}
 		catch (Throwable th) {
 			logger = new SimpleLogger();

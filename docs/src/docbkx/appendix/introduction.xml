@@ -17,6 +17,9 @@
       backward-compatible form in future point releases. We anticipate these
       features moving into the core specification over time.</para>
 
+      <para><xref linkend="appendix-pde-integration"/> describes how to integrate Spring-DM
+      with Eclipse Plug-in Development Environment.</para>
+
       <para><xref linkend="appendix-roadmap"/> describes some features that are included in
       the 1.0 distribution but are still considered early-access. The
       externals of these features may change in future releases. This appendix
