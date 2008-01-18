@@ -26,9 +26,9 @@
                 <fo:table-body>
                     <fo:table-row>
                         <fo:table-cell text-align="center">
-							<!-- Logo
+							<!-- Logo 
                             <fo:block>
-                                <fo:external-graphic src="file:src/docbkx/resources/images/spring-dm-logo.png"/>
+                                <fo:external-graphic src="file:src/docbkx/resources/images/s2_box_logo.png"/>
                             </fo:block>
                             -->
                             <fo:block font-family="Helvetica" font-size="22pt" padding-before="10mm">

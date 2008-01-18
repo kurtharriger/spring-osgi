@@ -36,29 +36,20 @@ class LogUtils {
 	 * BundleDelegatingClassLoader, loading a LogFactory using the
 	 * BundleDelegatingClassLoader will result in an infinite cycle or chained
 	 * failures that would be swallowed.
-	 *
+	 * 
 	 * <p/> Create the logger using LogFactory but use a simple implementation
 	 * if something goes wrong.
-	 *
+	 * 
 	 * @param logName log name
 	 * @return logger implementation
 	 */
 	public static Log createLogger(Class logName) {
 		Log logger;
-        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(logName.getClassLoader());
+		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+		// push the logger class classloader (useful when dealing with commons-logging 1.0.x
+		Thread.currentThread().setContextClassLoader(logName.getClassLoader());
 		try {
-			Thread currentThread = Thread.currentThread();
-			// set the TCCL first to the bundle
-			ClassLoader oldTCCL = currentThread.getContextClassLoader();
-			try {
-				// push the logger class classloader (useful when dealing with commons-logging 1.0.x
-				//currentThread.setContextClassLoader(logName.getClassLoader());
-				logger = LogFactory.getLog(logName);
-			}
-			finally {
-				currentThread.setContextClassLoader(oldTCCL);
-			}
+			logger = LogFactory.getLog(logName);
 		}
 		catch (Throwable th) {
 			logger = new SimpleLogger();
@@ -66,9 +57,9 @@ class LogUtils {
 				"logger infrastructure not properly set up. If commons-logging jar is used try switching to slf4j (see the FAQ for more info).",
 				th);
 		}
-        finally {
-            Thread.currentThread().setContextClassLoader(ccl);
-        }
-        return logger;
+		finally {
+			Thread.currentThread().setContextClassLoader(ccl);
+		}
+		return logger;
 	}
 }
