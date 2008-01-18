@@ -7,7 +7,7 @@
 	<classpathentry exported="true" kind="lib" path="target/classes" sourcepath="src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/easymock/easymock/1.2_Java1.3/easymock-1.2_Java1.3.jar"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/1.0-SNAPSHOT/spring-osgi-mock-1.0-SNAPSHOT.jar" sourcepath="/OSGI_MOCK"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/1.1.0-SNAPSHOT/spring-osgi-mock-1.1.0-SNAPSHOT.jar" sourcepath="/OSGI_MOCK"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.1/spring-core-2.5.1.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.1/spring-beans-2.5.1.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/2.5.1/spring-aop-2.5.1.jar" sourcepath="/SPRING_SRC"/>
