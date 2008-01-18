@@ -5,6 +5,6 @@
 	<classpathentry exported="true" kind="lib" path="target/classes" sourcepath="target/classes"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Simple Service Bundle"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-annotation/1.0-SNAPSHOT/spring-osgi-annotation-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-annotation/1.0/spring-osgi-annotation-1.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
