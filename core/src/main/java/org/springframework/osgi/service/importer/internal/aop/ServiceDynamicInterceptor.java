@@ -128,11 +128,12 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 						ServiceReference newReference = null;
 
 						boolean isDestroyed = false;
-						// discover a new reference only if we are still running
+						
 						synchronized (lock) {
 							isDestroyed = destroyed;
 						}
 
+						// discover a new reference only if we are still running
 						if (!isDestroyed) {
 							newReference = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
 								(filter == null ? null : filter.toString()));
@@ -273,6 +274,9 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	private boolean serviceRequiredAtStartup = true;
 
+	/** flag indicating whether the destruction has started or not */
+	private boolean isDuringDestruction = false;
+	
 	private boolean destroyed = false;
 
 	/** private lock */
@@ -334,7 +338,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 */
 	private Object lookupService() {
 		synchronized (lock) {
-			if (destroyed)
+			if (destroyed && !isDuringDestruction)
 				throw new IllegalStateException("the service proxy has been destroyed!");
 		}
 
@@ -370,6 +374,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		synchronized (lock) {
 			// set this flag first to make sure no rebind is done
 			destroyed = true;
+			isDuringDestruction = true;
 			if (wrapper != null) {
 				ServiceReference ref = wrapper.getReference();
 				if (ref != null) {
@@ -377,6 +382,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 					listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
 				}
 			}
+			/** destruction process has ended */
+			isDuringDestruction = false;
 		}
 	}
 
