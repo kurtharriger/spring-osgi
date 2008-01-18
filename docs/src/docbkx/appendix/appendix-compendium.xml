@@ -18,11 +18,11 @@
    xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
    xmlns:beans="http://www.springframework.org/schema/beans"
    xsi:schemaLocation="http://www.springframework.org/schema/osgi  
-        http://www.springframework.org/schema/osgi/spring-osgi-1.0.xsd
+        http://www.springframework.org/schema/osgi/spring-osgi.xsd
         http://www.springframework.org/schema/osgi-compendium
-        http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium-1.0.xsd
+        http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
         http://www.springframework.org/schema/beans   
-        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
 
    <!-- use the OSGi namespace elements directly -->
    <service id="simpleServiceOsgi" ref="simpleService"
