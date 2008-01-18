@@ -259,7 +259,7 @@
       interface
       <interfacename>org.springframework.osgi.context.BundleContextAware</interfacename>:</para>
 
-      <programlisting>public interface BundleContextAware {
+      <programlisting language="java">public interface BundleContextAware {
   public void setBundleContext(BundleContext context);
 }</programlisting>
 

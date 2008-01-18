@@ -30,7 +30,7 @@
 
       <para>and the class declaration:</para>
 
-      <programlisting><![CDATA[public class MyAnnotationDrivenBeanClass {
+      <programlisting language="java"><![CDATA[public class MyAnnotationDrivenBeanClass {
 
   @ServiceReference
   public void setMessageService(MessageService aService) { ... }
