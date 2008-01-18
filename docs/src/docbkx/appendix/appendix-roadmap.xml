@@ -86,7 +86,7 @@
         invoked if the configuration for the bean is updated. The update
         method must have one of the following signatures:</para>
 
-        <programlisting><![CDATA[public void anyMethodName(Map properties)
+        <programlisting language="java"><![CDATA[public void anyMethodName(Map properties)
 public void anyMethodName(Map<String,?> properties); // for Java 5
 public void anyMethodName(Dictionary properties);]]></programlisting>
 
@@ -139,7 +139,7 @@ public void anyMethodName(Dictionary properties);]]></programlisting>
         specify a destroy callback to be invoked on the bean instance. Such a
         method must have a signature:</para>
 
-        <programlisting><![CDATA[public void anyMethodName();]]></programlisting>
+        <programlisting language="java"><![CDATA[public void anyMethodName();]]></programlisting>
 
         <para>It is also possible for the configuration of an existing bean to
         be updated. The same <literal>update-strategy</literal> and

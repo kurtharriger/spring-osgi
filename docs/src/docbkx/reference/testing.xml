@@ -38,7 +38,7 @@
     use of them inside Spring-DM test suite. Below you can find a code snippet that you
     are likely to encounter in our code base:</para>
     
-    <programlisting><![CDATA[private ServiceReference reference;
+    <programlisting language="java"><![CDATA[private ServiceReference reference;
 private BundleContext bundleContext;
 private Object service;
     
@@ -151,7 +151,7 @@ public void testComponent() throws Exception {
       the <literal>bundleContext</literal> field:</para>
 
 
-    <programlisting><![CDATA[public class SimpleOsgiTest extends AbstractConfigurableBundleCreatorTests {
+    <programlisting language="java"><![CDATA[public class SimpleOsgiTest extends AbstractConfigurableBundleCreatorTests {
 
 public void testOsgiPlatformStarts() throws Exception {
 	System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VENDOR));
@@ -179,7 +179,7 @@ OSGi/Minimum-1.0,OSGi/Minimum-1.1,JRE-1.1,J2SE-1.2,J2SE-1.3,J2SE-1.4}]]></progra
     <para>Let's do some quering and figure out what the environment in which the tests run is.
     A simple way to do that is to query the <interfacename>BundleContext</interfacename>
     for the installed bundles:</para>
-    <programlisting><![CDATA[public void testOsgiEnvironment() throws Exception {
+    <programlisting language="java"><![CDATA[public void testOsgiEnvironment() throws Exception {
 	Bundle[] bundles = bundleContext.getBundles();
 	for (int i = 0; i < bundles.length; i++) {
 		System.out.print(OsgiStringUtils.nullSafeName(bundles[i]));
@@ -217,7 +217,7 @@ spring-osgi-extender, etc... TestBundle-testOsgiPlatformStarts-com.your.package.
      
      <para>Consider the following test that relies on Apache Commons 
      <ulink url="http://commons.apache.org/lang/">Lang</ulink>:</para>
-     <programlisting><![CDATA[import org.apache.commons.lang.time.DateFormatUtils;
+     <programlisting language="java"><![CDATA[import org.apache.commons.lang.time.DateFormatUtils;
     ...
   	public void testCommonsLangDateFormat() throws Exception {
 		System.out.println(DateFormatUtils.format(new Date(), "HH:mm:ssZZ"));
@@ -255,7 +255,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
      </para>
      
      <para>Let's fix our integration test by installing the required bundle (and some extra osgi libraries):</para>
-     <programlisting><![CDATA[protected String[] getTestBundlesNames() {
+     <programlisting language="java"><![CDATA[protected String[] getTestBundlesNames() {
 	 return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT",
 	 	"org.springframework.osgi, jta.osgi, 1.1-SNAPSHOT",
 	 	"org.springframework.osgi, commons-lang.osgi, 2.3-SNAPSHOT" };
@@ -279,7 +279,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       <para>There are cases where the auto-generated test manifest does not suite the needs of the test.
       For example the manifest requires some different headers or a certain package needs to be an optional import.
       To provide your own manifest, simply override <literal>getManifestLocations()</literal>:</para>
-      <programlisting><![CDATA[protected String getManifestLocation() {
+      <programlisting language="java"><![CDATA[protected String getManifestLocation() {
 	return "classpath:com/xyz/abc/test/MyTestTest.MF";
 }}]]></programlisting>
 	  
@@ -374,7 +374,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
 	  (OSGi specific), one should just override <literal>getConfigLocations[]</literal> method and indicate
 	  the location of the application context configuration. At runtime, an OSGi application context will be created
 	  and cached for the lifetime of the test case.</para>
-	  <programlisting><![CDATA[protected String[] getConfigLocations() {
+	  <programlisting language="java"><![CDATA[protected String[] getConfigLocations() {
    return new String[] { "/com/xyz/abc/test/MyTestContext.xml" };
 }]]></programlisting>
 	  
@@ -394,7 +394,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       the <interfacename>Platform</interfacename> interface implementation. Users can use the <classname>Platforms</classname> 
       class to specify one of the supported platforms:</para>
       
-	  <programlisting><![CDATA[protected String getPlatformName() {
+	  <programlisting language="java"><![CDATA[protected String getPlatformName() {
    return Platforms.FELIX;
 }]]></programlisting>      
 

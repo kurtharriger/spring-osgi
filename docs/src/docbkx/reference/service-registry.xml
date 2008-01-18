@@ -277,7 +277,7 @@
 
         <para>Given the interface hierarchy:</para>
 
-        <programlisting><![CDATA[public interface SuperInterface {}
+        <programlisting language="java"><![CDATA[public interface SuperInterface {}
 
 public interface SubInterface extends SuperInterface {}]]></programlisting>
 
@@ -508,9 +508,9 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         during registration and unregistration. A registration and unregistration 
         callback methods must have a signature matching one of the following formats:</para>
 
-        <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Map serviceProperties);]]></programlisting>
+        <programlisting language="java"><![CDATA[public void anyMethodName(ServiceType serviceInstance, Map serviceProperties);]]></programlisting>
         
-        <programlisting><![CDATA[public void anyMethodName(ServiceType serviceInstance, Dictionary serviceProperties);]]></programlisting>
+        <programlisting language="java"><![CDATA[public void anyMethodName(ServiceType serviceInstance, Dictionary serviceProperties);]]></programlisting>
 
         <para>where <literal>ServiceType</literal> can be any type compatible
         with the exported service interface of the service.</para>
@@ -867,7 +867,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         in place of the service itself:</para>
 
 
-		<programlisting><![CDATA[
+		<programlisting language="java"><![CDATA[
 public class BeanWithServiceReference {
 	private ServiceReference serviceReference;
 	private SomeService service;
@@ -1280,7 +1280,7 @@ public class BeanWithServiceReference {
       <para>The signature of a custom bind or unbind method must be one
       of:</para>
 
-      <programlisting><![CDATA[public void anyMethodName(ServiceType service, Dictionary properties);
+      <programlisting language="java"><![CDATA[public void anyMethodName(ServiceType service, Dictionary properties);
 
 public void anyMethodName(ServiceType service, Map properties);
 
