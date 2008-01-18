@@ -1376,6 +1376,20 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       
     </section>
     
+    <section id="service-registry:refs:listener-and-proxies">
+       <title>Listener and service proxies</title>
+       <para>While the importer listener provides access to the OSGi service bound at a certain point, it is important to note that the given argument is <emphasis>not</emphasis> 
+       the actual service but a <emphasis>proxy</emphasis>. This can have subtle side effects especially with regards to service class name 
+       and identity. The reason behind using a proxy is to prevent the listener from holding strong reference to the service (which can disappear
+       at any point). Listeners interested in tracking certain services should not rely on instance equality (<literal>==</literal>). Object equality
+       (<methodname>equals</methodname>/<methodname>hashcode</methodname>) can be used but only if the backing service has exposed the aforementioned methods
+       as part of its contract (normally by declaring them on a certain published interface/class). If these methods are not published, the proxy will invoke its own method, not the targets. This is on purpose since, 
+       while the proxy tries to be as transparent as possible, it is up to the developer to define the desired semantics. 
+       </para>
+       <para>Thus, it is recommended (especially for <literal>reference</literal> importers) to do tracking based on just the service interface/contract 
+       (not identity), service properties (see <constant>org.osgi.framework.Constants#SERVICE_ID</constant>) or service notification (bind/unbind).</para>
+    </section>
+    
     <section id="service-registry:refs:invoker-bundle-context">
       <title>Accessing the caller <interfacename>BundleContext</interfacename></title>
       
@@ -1421,7 +1435,120 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       	class. The first is an interface while the latter is a deprecated, abstract class. To preserve compatibility, Spring-DM
       	will pass to the listeners a <interfacename>Map</interfacename> implementation that can be casted, if needed, to a 
       	<classname>Dictionary</classname>.</listitem>
-      </itemizedlist> 
+      </itemizedlist>
+      
+      <section id="service-registry:refs:listener-best-practices:cycles">
+         <title>Listener and cyclic dependencies</title>
+         
+         <para>There are cases where an exporter/importer listener needs a reference back to the bean it is defined on:</para>
+         
+         <programlistingco>
+         
+          <areaspec>
+	   	  	<area id="service-registry.listener.cycles.listener" coords="1"/>
+	   	  	<area id="service-registry.listener.cycles.listener.cycle" coords="2"/>
+          	<area id="service-registry.listener.cycles.bean" coords="5"/>
+          	<area id="service-registry.listener.cycles.bean.cycle" coords="6"/>
+       	  </areaspec>
+          <programlisting><![CDATA[<bean id="listener" class="cycle.Listener">
+    <property name="target" ref="importer" />
+</bean>
+	
+<osgi:reference id="service" interface="SomeService">
+    <osgi:listener bind-method="bind" ref="listener" />
+</osgi:reference>]]></programlisting>
+
+		  <calloutlist>
+			<callout arearefs="service-registry.listener.cycles.listener">
+				<para>Listener bean</para>
+			</callout>
+			<callout arearefs="service-registry.listener.cycles.listener.cycle">
+				<para>Dependency listener -> importer</para>
+			</callout>
+			<callout arearefs="service-registry.listener.cycles.bean">
+				<para>Importer declaration</para>
+			</callout>
+			<callout arearefs="service-registry.listener.cycles.bean.cycle">
+				<para>Dependency importer -> listener</para>
+			</callout>
+		  </calloutlist>	         
+	    </programlistingco>
+
+         <para>
+         The declaration above while valid, creates a dependecy between the <literal>listener</literal> and the importer it is defined upon. 
+         In order to create the importer, the <literal>listener</literal> has to be resolved and created but in order to do that, 
+         the importer called <literal>service</literal> needs to be retrieved (instantiated and configured). This cycle needs to be broken
+         down so that at least one bean can be fully created and configured. This scenario is supported is supported by Spring-DM
+         for both exporter and importers however, if the listener is defined as a nested bean, the cycle cannot be resolved:</para> 
+
+        <programlistingco>
+         
+          <areaspec>
+	   	  	<area id="service-registry.listener.bad.cycles.bean" coords="1"/>
+	   	  	<area id="service-registry.listener.bad.cycles.bean.cycle" coords="2"/>
+          	<area id="service-registry.listener.bad.cycles.listener" coords="3"/>
+          	<area id="service-registry.listener.bad.cycles.listener.cycle" coords="4"/>
+       	  </areaspec>
+       	  
+          <programlisting><![CDATA[<osgi:reference id="service" interface="SomeService">
+    <osgi:listener bind-method="bind">
+        <bean class="cycle.Listener">
+            <property name="target" ref="importer" />
+        </bean>
+    </osgi:listener>
+</osgi:reference>]]></programlisting>
+	         
+		  <calloutlist>
+			<callout arearefs="service-registry.listener.bad.cycles.bean">
+				<para>OSGi service importer</para>
+			</callout>
+			<callout arearefs="service-registry.listener.bad.cycles.bean.cycle">
+				<para>Dependency between importer -> listener</para>
+			</callout>
+			<callout arearefs="service-registry.listener.bad.cycles.listener">
+				<para>Nested listener declaration</para>
+			</callout>
+			<callout arearefs="service-registry.listener.bad.cycles.listener.cycle">
+				<para>Dependency nested listener -> importer</para>
+			</callout>
+			
+		  </calloutlist>
+		</programlistingco>
+
+		<sidebar>
+		 <title>Beans and Cycles</title>		
+		 <para>
+         Cyclic dependencies (A depends on B which depends back on A) increase the complexity of your configuration
+         and in most cases indicate a design issue. What beans should be created and destroyed first for example? 
+         While they are a bad practice, the Spring container makes a best attempt to solve the cyclic configurations 
+         when singletons are involved (since the instances can be cached). However this does not work all the time and
+         depends heavily on your specific configuration (Can the bean class be partially initialized ? Does it rely on
+         special <interfacename>Aware</interfacename> interfaces?  Are <interfacename>BeanPostProcessor</interfacename>s involved?)
+         </para>
+		</sidebar>
+				
+		<para>The example above will fail since <literal>service</literal> bean cannot be initialized as it depends on the 
+		listener. The same cycle was seen before but in this case there is subtle yet big different from
+		the container perspective - the listener is declared as a nested/inner-bean (hence the missing bean <literal>id</literal>).
+		Inner beans have the same life cycle as their declaring parents and do not have any name. By definition, they are not tracked
+		by the container and are simply created on demand. Since the importer cannot be partially created and the nested listener cannot
+		be cached, the container cannot break the cycle and create the beans. While the two configurations shown above seem similar, one works
+		while the other does not. Another reason to not use cycles unless you really, really have to.</para>
+		
+		<para>To conclude, if you need inside the listener to hold a reference to the exporter/importer on which the listener is declared,
+		either declare the listener as a <emphasis>top-level</emphasis> bean (as shown before) or consider doing <emphasis>dependency lookup</emphasis>.
+		However, the latter approach requires extra contextual information such as the <interfacename>BeanFactory</interfacename> to use and the bean
+		name and is more fragile then <emphasis>dependency injection</emphasis>.</para>
+
+		<note>
+			<para>For those interested in the technical details, neither the exporter and importer cannot be partially initialized since 
+			they require the application context <classname>ClassLoader</classname> which is requested through the 
+			<interfacename>BeanClassLoaderAware</interfacename> which relies on a buit-in <interfacename>BeanPostProcessor</interfacename>
+			which is applied only after the bean has been configured and is ready for initialization. If the <classname>ClassLoader</classname>
+			was not required then the exporter/importer could have been partially initialized and the case above supported.</para>
+		</note>
+	    	                  
+      </section>
       
     </section> 
     

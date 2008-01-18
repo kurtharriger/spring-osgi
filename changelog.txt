@@ -25,9 +25,7 @@ Package org.springframework.osgi.util
 * default artifact locator picks up Maven 2 ~/.m2/settings.xml localRepository configuration
 * DebugUtils uses a degradable logger to properly report error messages when the logging implementation is misconfigured
 * BundleDelegatingClassLoader uses a degradable logger to properly report error messages when the logging implementation
-  is misconfigured
-* LogUtils new class use by BundleDelegatingClassLoader and DebugUtils. The logger is
-loaded in the context of the provided classes classloader rather than BundleDelegatingClassLoader. This fixes issues with recursive calls to findClass().
+  is misconfigured or the logging classes are not loaded yet
 
 Changes in version 1.0 RC2 (2008-01-11)
 ---------------------------------------

@@ -28,15 +28,15 @@
 		  <mediaobject>
             <imageobject role="fo">
               <imagedata align="left"
-                         fileref="../src/docbkx/resources/images/pde/find-install.jpg"
-                         format="JPG"
-                         contentwidth="50%" contentdepth="50%"
+                         fileref="../src/docbkx/resources/images/pde/find-install.png"
+                         format="PNG" 
+                         width="272" depth="155"
                          />
             </imageobject>
 
             <imageobject role="html">
               <imagedata align="left" fileref="images/pde/find-install.png"
-                         format="PNG"/>
+                         format="PNG" />
             </imageobject>
 
           </mediaobject>
@@ -46,8 +46,7 @@
               <imagedata align="central"
                          fileref="../src/docbkx/resources/images/pde/springide-site.png"
                          format="PNG"
-                         scalefit="0"
-                         scale="30"/>
+                         width="199" depth="99"/>
             </imageobject>
 
             <imageobject role="html">
@@ -69,7 +68,8 @@
             <imageobject role="fo">
               <imagedata align="center"
                          fileref="../src/docbkx/resources/images/pde/spring-osgi-plugin.png"
-                         format="PNG"/>
+                         format="PNG"
+                         width="388" depth="335"/>
             </imageobject>
 
             <imageobject role="html">
@@ -130,7 +130,7 @@
               <imagedata align="left"
                          fileref="../src/docbkx/resources/images/pde/select-pde-1.png"
                          format="PNG" 
-                         scale="50"/>
+                         width="173" depth="176"/>
             </imageobject>
 
             <imageobject role="html">
@@ -143,7 +143,8 @@
             <imageobject role="fo">
               <imagedata align="central"
                          fileref="../src/docbkx/resources/images/pde/select-pde-2.png"
-                         format="PNG"/>
+                         format="PNG"
+                         width="157" depth="197"/>
             </imageobject>
 
             <imageobject role="html">
@@ -160,7 +161,8 @@
             <imageobject role="fo">
               <imagedata align="left"
                          fileref="../src/docbkx/resources/images/pde/select-plugins-view.png"
-                         format="PNG"/>
+                         format="PNG"
+                         width="243" depth="176"/>
             </imageobject>
 
             <imageobject role="html">
@@ -175,7 +177,8 @@
             <imageobject role="fo">
               <imagedata align="central"
                          fileref="../src/docbkx/resources/images/pde/show-plugins.png"
-                         format="PNG"/>
+                         format="PNG"
+                         width="266" depth="257"/>
             </imageobject>
 
             <imageobject role="html">

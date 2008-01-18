@@ -22,13 +22,17 @@
     and domain model bundle. Such an application would look like this:</para>
 
     <para><mediaobject>
-		<imageobject>
-          <objectinfo>
-            <title>Bundles and Application Contexts</title>
-          </objectinfo>
-
+        <imageobject role="fo">
+		  <imagedata fileref="../src/docbkx/resources/images/spring-osgi-model.png" format="PNG" align="center"/>
+        </imageobject>
+		<imageobject role="html">
           <imagedata fileref="images/spring-osgi-model.png" format="PNG" align="center"/>
         </imageobject>
+        
+          <textobject>
+            <phrase>Bundles and Application Contexts</phrase>
+          </textobject>
+        
        </mediaobject></para>
 
     <para>In this example the data layer bundle yields a data layer
