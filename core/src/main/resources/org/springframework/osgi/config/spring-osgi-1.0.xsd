@@ -13,7 +13,7 @@
 
     <xsd:annotation>
         <xsd:documentation><![CDATA[
-            Namespace support for the core services provided by Spring Dynamic Modules, version 1.0-rc1.
+            Namespace support for the core services provided by Spring Dynamic Modules.
         ]]></xsd:documentation>
     </xsd:annotation>
     
