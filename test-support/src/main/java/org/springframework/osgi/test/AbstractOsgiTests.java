@@ -30,6 +30,7 @@ import junit.framework.TestResult;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -41,6 +42,7 @@ import org.springframework.osgi.test.internal.util.TestUtils;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
@@ -262,18 +264,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 			// start bundles
 			for (int i = 0; i < bundles.length; i++) {
-				String info = null;
-				if (debug)
-					info = "bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]";
-
-				if (!OsgiBundleUtils.isFragment(bundles[i])) {
-					if (debug)
-						logger.debug("starting " + info);
-					bundles[i].start();
-				}
-
-				else if (debug)
-					logger.debug(info + " is a fragment; start not invoked");
+				startBundle(bundles[i]);
 			}
 
 			// hook after the OSGi platform has been setup
@@ -328,6 +319,33 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		if (logger.isDebugEnabled())
 			logger.debug("installing bundle from location " + location.getDescription());
 		return platformContext.installBundle(location.getDescription(), location.getInputStream());
+	}
+
+	/**
+	 * Starts a bundle and prints a nice logging message in case of failure.
+	 * 
+	 * @param bundle
+	 * @return
+	 * @throws BundleException
+	 */
+	private void startBundle(Bundle bundle) throws BundleException {
+		boolean debug = logger.isDebugEnabled();
+		String info = "[" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "|" + bundle.getLocation() + "]";
+
+		if (!OsgiBundleUtils.isFragment(bundle)) {
+			if (debug)
+				logger.debug("starting " + info);
+			try {
+				bundle.start();
+			}
+			catch (BundleException ex) {
+				logger.error("cannot start bundle " + info, ex);
+				throw ex;
+			}
+		}
+
+		else if (debug)
+			logger.debug(info + " is a fragment; start not invoked");
 	}
 
 	//

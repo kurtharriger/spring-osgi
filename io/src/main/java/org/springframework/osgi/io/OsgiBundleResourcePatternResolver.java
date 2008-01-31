@@ -18,20 +18,29 @@ package org.springframework.osgi.io;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.osgi.io.internal.DependencyResolver;
 import org.springframework.osgi.io.internal.OsgiResourceUtils;
+import org.springframework.osgi.io.internal.OsgiUtils;
+import org.springframework.osgi.io.internal.PackageAdminResolver;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -62,11 +71,19 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	/**
 	 * The bundle on which this resolver works on.
 	 */
-	private Bundle bundle;
+	private final Bundle bundle;
+
+	/**
+	 * The bundle context associated with this bundle.
+	 */
+	private final BundleContext bundleContext;
 
 	private static final String FOLDER_SEPARATOR = "/";
 
 	private static final String FOLDER_WILDCARD = "**";
+
+	// use the default package admin version
+	private final DependencyResolver resolver;
 
 
 	public OsgiBundleResourcePatternResolver(Bundle bundle) {
@@ -77,8 +94,13 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		super(resourceLoader);
 		if (resourceLoader instanceof OsgiBundleResourceLoader) {
 			this.bundle = ((OsgiBundleResourceLoader) resourceLoader).getBundle();
-
 		}
+		else {
+			this.bundle = null;
+		}
+
+		this.bundleContext = (bundle != null ? OsgiUtils.getBundleContext(this.bundle) : null);
+		this.resolver = (bundleContext != null ? new PackageAdminResolver(bundleContext) : null);
 	}
 
 	public Resource[] getResources(String locationPattern) throws IOException {
@@ -87,8 +109,10 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 
 		// look for patterns
 		if (getPathMatcher().isPattern(locationPattern)) {
-			if (type == OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE)
-				throw new IllegalArgumentException("pattern matching is unsupported for class space lookups");
+			// treat classpath as a special case
+			if (OsgiResourceUtils.isClassPathType(type))
+				return findClassPathMatchingResources(locationPattern, type);
+
 			return findPathMatchingResources(locationPattern, type);
 		}
 		// even though we have no pattern
@@ -121,6 +145,68 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	}
 
 	/**
+	 * Special classpath method. Will try to detect the bundles imported (which
+	 * are part of the classpath) and look for resources in all of them. This
+	 * implementation will try to determine the bundles that compose the current
+	 * bundle classpath and then it will inspect the bundle space of each of
+	 * them individually.
+	 * 
+	 * <p/> Since the bundle space is considered, runtime classpath entries such
+	 * as bundle-classpath entries are not supported (yet).
+	 * 
+	 * @param locationPattern
+	 * @param type
+	 * @return classpath resources
+	 */
+	private Resource[] findClassPathMatchingResources(String locationPattern, int type) throws IOException {
+
+		if (resolver == null)
+			throw new IllegalArgumentException("an OSGi bundle is required for classpath matching");
+
+		Bundle[] importedBundles = resolver.getImportedBundle(bundle);
+
+		// eliminate classpath path
+		String path = OsgiResourceUtils.stripPrefix(locationPattern);
+
+		System.out.println("looking for path " + path);
+
+		Collection paths = new LinkedHashSet();
+
+		// do a bundle-space lookup on all imported bundles
+		for (int i = 0; i < importedBundles.length; i++) {
+			Bundle importedBundle = importedBundles[i];
+			// use the bundle space lookup
+			ResourcePatternResolver rpr = new OsgiBundleResourcePatternResolver(importedBundle);
+			Resource[] foundResources = rpr.getResources(path);
+			for (int j = 0; j < foundResources.length; j++) {
+				// assemble only the OSGi paths
+				paths.add(foundResources[j].getURL().getPath());
+			}
+		}
+
+		// resolve the entries from the classpath (as some of them might be hidden)
+		List resources = new ArrayList(paths.size());
+
+		for (Iterator iterator = paths.iterator(); iterator.hasNext();) {
+			// classpath*: -> getResources()
+			String resourcePath = (String) iterator.next();
+			if (OsgiResourceUtils.PREFIX_TYPE_CLASS_ALL_SPACE == type) {
+				CollectionUtils.mergeArrayIntoCollection(
+					OsgiResourceUtils.convertURLEnumerationToResourceArray(bundle.getResources(resourcePath)),
+					resources);
+			}
+			// classpath -> getResource()
+			else {
+				URL url = bundle.getResource(resourcePath);
+				if (url != null)
+					resources.add(new UrlResource(url));
+			}
+		}
+
+		return (Resource[]) resources.toArray(new Resource[resources.size()]);
+	}
+
+	/**
 	 * Override it to pass in the searchType parameter.
 	 */
 	private Resource[] findPathMatchingResources(String locationPattern, int searchType) throws IOException {
@@ -142,6 +228,26 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			logger.trace("Resolved location pattern [" + locationPattern + "] to resources " + result);
 		}
 		return (Resource[]) result.toArray(new Resource[result.size()]);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p/>
+	 * Overrides the default check up since computing the URL can be fairly
+	 * expensive operation as there is no caching (due to the framework dynamic nature).
+	 */
+	protected boolean isJarResource(Resource resource) throws IOException {
+		if (resource instanceof OsgiBundleResource) {
+			// check the resource type
+			OsgiBundleResource bundleResource = (OsgiBundleResource) resource;
+			// if it's known, then it's not a jar
+			if (bundleResource.getSearchType() != OsgiResourceUtils.PREFIX_TYPE_UNKNOWN) {
+				return false;
+			}
+			// otherwise the normal parsing occur
+		}
+		return super.isJarResource(resource);
 	}
 
 	/**
@@ -178,7 +284,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	}
 
 	/**
-	 * Seach each level inside the bundle for entries based on the search
+	 * Search each level inside the bundle for entries based on the search
 	 * strategy chosen.
 	 * 
 	 * @param bundle the bundle to do the lookup

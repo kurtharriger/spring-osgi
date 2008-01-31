@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.io.internal;
 
 import java.net.URL;
@@ -48,16 +49,20 @@ public abstract class OsgiResourceUtils {
 	public static final int PREFIX_TYPE_UNKNOWN = -1;
 
 	// no prefix
-	public static final int PREFIX_TYPE_NOT_SPECIFIED = 0;
+	public static final int PREFIX_TYPE_NOT_SPECIFIED = 0x00000000;
+
+	// osgibundlejar:
+	public static final int PREFIX_TYPE_BUNDLE_JAR = 0x00000001;
 
 	// osgibundle:
-	public static final int PREFIX_TYPE_BUNDLE_SPACE = 1;
+	public static final int PREFIX_TYPE_BUNDLE_SPACE = 0x00000010;
 
 	// classpath:
-	public static final int PREFIX_TYPE_CLASS_SPACE = 2;
+	public static final int PREFIX_TYPE_CLASS_SPACE = 0x00000100;
 
-	// osgibundlejar::
-	public static final int PREFIX_TYPE_BUNDLE_JAR = 4;
+	// classpath*:
+	public static final int PREFIX_TYPE_CLASS_ALL_SPACE = 0x00000200;
+
 
 	/**
 	 * Return the path prefix if there is any or {@link #EMPTY_PREFIX}
@@ -95,12 +100,16 @@ public abstract class OsgiResourceUtils {
 		else if (prefix.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX))
 			type = PREFIX_TYPE_CLASS_SPACE;
 		else if (prefix.startsWith(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX))
-			type = PREFIX_TYPE_CLASS_SPACE;
+			type = PREFIX_TYPE_CLASS_ALL_SPACE;
 
 		else
 			type = PREFIX_TYPE_UNKNOWN;
 
 		return type;
+	}
+
+	public static boolean isClassPathType(int type) {
+		return (type == PREFIX_TYPE_CLASS_SPACE || type == PREFIX_TYPE_CLASS_ALL_SPACE);
 	}
 
 	public static String stripPrefix(String path) {
@@ -111,6 +120,10 @@ public abstract class OsgiResourceUtils {
 	}
 
 	public static Resource[] convertURLArraytoResourceArray(URL[] urls) {
+		if (urls == null) {
+			return new Resource[0];
+		}
+
 		// convert this into a resource array
 		Resource[] res = new Resource[urls.length];
 		for (int i = 0; i < urls.length; i++) {
@@ -120,10 +133,10 @@ public abstract class OsgiResourceUtils {
 	}
 
 	public static Resource[] convertURLEnumerationToResourceArray(Enumeration enm) {
-		Set resources = new LinkedHashSet(5);
+		Set resources = new LinkedHashSet(4);
 		while (enm != null && enm.hasMoreElements()) {
-			resources.add((URL) enm.nextElement());
+			resources.add(new UrlResource((URL) enm.nextElement()));
 		}
-		return convertURLArraytoResourceArray((URL[]) resources.toArray(new URL[resources.size()]));
+		return (Resource[]) resources.toArray(new Resource[resources.size()]);
 	}
 }

@@ -408,17 +408,31 @@ public class OsgiBundleResource extends AbstractResource {
 		if (!StringUtils.hasText(location))
 			location = OsgiResourceUtils.FOLDER_DELIMITER;
 
-		// the root folder is requested (special case
+		// the root folder is requested (special case)
 		if (OsgiResourceUtils.FOLDER_DELIMITER.equals(location)) {
-			Enumeration candidates = bundle.findEntries(location, null, false);
+			// there is no way to determine the URL to the root directly
+			// through findEntries so we'll have to use another way
 
+			// getEntry can't be used since it doesn't consider fragments
+			// so we have to rely on findEntries 
+
+			// we could ask for a known entry (such as META-INF)
+			// but not all jars have a dedicated entry for it
+			// so we'll just ask for whatever is present in the root
+			Enumeration candidates = bundle.findEntries("/", null, false);
+
+			// since there can be multiple root paths (when fragments are present)
+			// iterate on all candidates
 			while (candidates != null && candidates.hasMoreElements()) {
-				// extract the root URLs
+
 				URL url = (URL) candidates.nextElement();
 
-				// if it's not a folder, consider it as a root
+				// it's a file
 				if (!url.getFile().endsWith(OsgiResourceUtils.FOLDER_DELIMITER))
 					resources.add(new URL(url, "."));
+				// it's a folder
+				else
+					resources.add(new URL(url, "../"));
 			}
 		}
 		else {
