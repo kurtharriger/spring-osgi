@@ -423,7 +423,7 @@ public class ContextLoaderListener implements BundleActivator {
 		// first stop the watchdog
 		stopTimer();
 
-		// remove the bundle listeners (we are closing down0
+		// remove the bundle listeners (we are closing down)
 		if (contextListener != null) {
 			context.removeBundleListener(contextListener);
 			contextListener = null;
