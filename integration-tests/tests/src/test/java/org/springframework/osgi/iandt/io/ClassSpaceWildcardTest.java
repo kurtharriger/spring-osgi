@@ -115,6 +115,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		return isKF()
 				&& (testMethodName.equals("testMatchingABulkOfResources")
-						|| testMethodName.equals("testMatchingABulkOfResources") || testMethodName.equals("testAllClassPathRootWithWildcard"));
+						|| testMethodName.equals("testMatchingABulkOfResources")
+						|| testMethodName.equals("testAllClassPathRootWithWildcard") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel"));
 	}
 }
