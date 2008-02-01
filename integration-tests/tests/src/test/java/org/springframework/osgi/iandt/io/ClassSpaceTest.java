@@ -17,7 +17,6 @@
 package org.springframework.osgi.iandt.io;
 
 import org.springframework.core.io.Resource;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Classpath tests.
@@ -45,29 +44,6 @@ public class ClassSpaceTest extends BaseIoTest {
 	public void testClass() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath:/org/springframework/osgi/iandt/io/ClassSpaceTest.class");
 		assertEquals(1, res.length);
-	}
-
-	//
-	// Wild-card tests
-	//
-
-	public void testWildcardAtFolderLevel() throws Exception {
-		Resource res[] = patternLoader.getResources("classpath:/META-INF/*");
-		System.out.println(ObjectUtils.nullSafeToString(res));
-	}
-
-	public void testSingleClassWithWildcardAtFileLevel() throws Exception {
-		Resource res[] = patternLoader.getResources("classpath:/**/io/**/Class*Test.class");
-		System.out.println(ObjectUtils.nullSafeToString(res));
-	}
-
-	public void testClassPathRootWildcard() throws Exception {
-		Resource res[] = patternLoader.getResources("classpath:/**/io/**/Class*Test.class");
-		System.out.println(ObjectUtils.nullSafeToString(res));
-	}
-
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (testMethodName.indexOf("Wildcard") > 0);
 	}
 
 }

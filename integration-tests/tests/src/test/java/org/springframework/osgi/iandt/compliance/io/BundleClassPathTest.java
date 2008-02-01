@@ -17,6 +17,7 @@
 package org.springframework.osgi.iandt.compliance.io;
 
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
 
@@ -124,6 +125,23 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 		System.out.println("running test" + this.getName());
 		URL url = bundle.getEntry("jar.file");
 		assertNull("findEntries doesn't work on bundle classpath entries", url);
+	}
+
+	public void testConnectionToJarOnClassPath() throws Exception {
+		URL url = bundle.getEntry("bundleclasspath/simple.jar");
+		System.out.println("jar url is " + url);
+		URLConnection con = url.openConnection();
+		System.out.println(con);
+		System.out.println(con.getContentType());
+		//		BundleURLConnection eclispeCon = (BundleURLConnection) con;
+		//		System.out.println(eclispeCon.getLocalURL());
+		//		URLConnection localCon = eclispeCon.getLocalURL().openConnection();
+		//		System.out.println(localCon);
+
+	}
+
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return getPlatformName().indexOf("fish") > -1;
 	}
 
 }
