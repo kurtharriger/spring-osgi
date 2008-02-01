@@ -79,6 +79,7 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 	}
 
 	public void testGetResourcesOnFilePresentMultipleTimesOnTheClassPathAndInsideTheBundle() throws Exception {
+		System.out.println("running test" + this.getName());
 		Enumeration enm = bundle.getResources("org/springframework/osgi/iandt/compliance/io/test.file");
 		int count = 0;
 		while (enm.hasMoreElements()) {
@@ -90,16 +91,19 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 	}
 
 	public void testFindEntriesOnFileJustInsideFolderOnClassPath() throws Exception {
+		System.out.println("running test" + this.getName());
 		Enumeration enm = bundle.findEntries("org/springframework/osgi/iandt/compliance/io/", "folder-test.file", false);
 		assertNull("findEntries doesn't work on bundle classpath entries", enm);
 	}
 
 	public void testFindEntriesOnFileJustInsideJarOnClassPath() throws Exception {
+		System.out.println("running test" + this.getName());
 		Enumeration enm = bundle.findEntries("/", "jar.file", false);
 		assertNull("findEntries doesn't work on bundle classpath entries", enm);
 	}
 
 	public void testFindEntriesOnFilePresentMultipleTimesOnTheClassPathAndInsideTheBundle() throws Exception {
+		System.out.println("running test" + this.getName());
 		Enumeration enm = bundle.findEntries("org/springframework/osgi/iandt/compliance/io/", "test.file", false);
 		int count = 0;
 		while (enm.hasMoreElements()) {
@@ -109,11 +113,13 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 	}
 
 	public void testGetEntryOnFileJustInsideFolderOnClassPath() throws Exception {
+		System.out.println("running test" + this.getName());
 		URL url = bundle.getEntry("org/springframework/osgi/iandt/compliance/io/folder-test.file");
 		assertNull("findEntries doesn't work on bundle classpath entries", url);
 	}
 
 	public void testGetEntryOnFileJustInsideJarOnClassPath() throws Exception {
+		System.out.println("running test" + this.getName());
 		URL url = bundle.getEntry("jar.file");
 		assertNull("findEntries doesn't work on bundle classpath entries", url);
 	}
