@@ -16,9 +16,11 @@
 
 package org.springframework.osgi.iandt.compliance.io;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
+import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 import org.osgi.framework.Bundle;
@@ -103,7 +105,7 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 		assertNull("findEntries doesn't work on bundle classpath entries", enm);
 	}
 
-	// disabled as it fails on teh server for some reason (linux + equinox)
+	// disabled as it fails on the server for some reason (linux + equinox)
 	// TODO: investigate
 	public void tstFindEntriesOnFilePresentMultipleTimesOnTheClassPathAndInsideTheBundle() throws Exception {
 		System.out.println("running test" + this.getName());
@@ -133,10 +135,16 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 		URLConnection con = url.openConnection();
 		System.out.println(con);
 		System.out.println(con.getContentType());
-		//		BundleURLConnection eclispeCon = (BundleURLConnection) con;
-		//		System.out.println(eclispeCon.getLocalURL());
-		//		URLConnection localCon = eclispeCon.getLocalURL().openConnection();
-		//		System.out.println(localCon);
+		InputStream stream = con.getInputStream();
+		JarInputStream jis = new JarInputStream(con.getInputStream());
+		System.out.println(jis);
+		System.out.println(jis.available());
+		System.out.println(jis.getNextJarEntry());
+		System.out.println(jis.getNextJarEntry());
+		System.out.println(jis.getNextJarEntry());
+		System.out.println(jis.available());
+		System.out.println(jis.getNextJarEntry());
+		System.out.println(jis.available());
 
 	}
 

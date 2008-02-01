@@ -21,6 +21,8 @@ import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
@@ -138,5 +140,13 @@ public abstract class OsgiResourceUtils {
 			resources.add(new UrlResource((URL) enm.nextElement()));
 		}
 		return (Resource[]) resources.toArray(new Resource[resources.size()]);
+	}
+
+	public static String[] getBundleClassPath(Bundle bundle) {
+		if (bundle == null)
+			return new String[0];
+
+		String classpath = (String) bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH);
+		return StringUtils.commaDelimitedListToStringArray(classpath);
 	}
 }

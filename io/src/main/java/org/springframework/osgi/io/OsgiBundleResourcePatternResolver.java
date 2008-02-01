@@ -25,11 +25,14 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
@@ -58,23 +61,27 @@ import org.springframework.util.StringUtils;
  * is problematic as the bundles can be loaded in memory directly from input
  * streams. To avoid relying on each platform bundle storage structure, this
  * implementation tries to determine the bundles that assemble the given bundle
- * class-path and analyze each of them individually. Depending on the running
- * environment, this might cause significant IO activity which can affect
- * performance.
+ * class-path and analyze each of them individually. This involves the bundle
+ * archive (including special handling of the <code>Bundle-ClassPath</code> as
+ * it is computed at runtime), the bundle required packages and its attached
+ * fragments.
  * 
- * <p/><b>Note:</b> Currently only <em>static</em> imports are supported.
- * Runtime class-path entries such as <code>Bundle-ClassPath</code> are not
- * supported. Support for <code>DynamicPackage-Import</code> depends on
+ * Depending on the configuration of running environment, this might cause
+ * significant IO activity which can affect performance.
+ * 
+ * <p/><b>Note:</b> Currently, <em>static</em> imports as well as
+ * <code>Bundle-ClassPath</code> and <code>Required-Bundle</code> entries
+ * are supported. Support for <code>DynamicPackage-Import</code> depends on
  * how/when the underlying platform does the wiring between the dynamically
  * imported bundle and the given bundle.
  * 
- * <p/><b>Portability Notes:</b> Since it relies only on the OSGi API, this
+ * <p/><b>Portability Note:</b> Since it relies only on the OSGi API, this
  * implementation depends heavily on how closely the platform implements the
  * OSGi spec. While significant tests have been made to ensure compatibility one
  * <em>might</em> experience different behaviour especially when dealing with
- * jars that do not provide entries for folders or boot-path delegation. It is
- * strongly recommended that wild-card resolution be thoroughly tested before
- * switching to a different environment before you rely on it.
+ * jars with missing folder entries or boot-path delegation. It is strongly
+ * recommended that wildcard resolution be thoroughly tested before switching to
+ * a different platform before you rely on it.
  * 
  * @see Bundle
  * @see OsgiBundleResource
@@ -103,6 +110,10 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	private static final String FOLDER_SEPARATOR = "/";
 
 	private static final String FOLDER_WILDCARD = "**";
+
+	private static final String JAR_EXTENSION = ".jar";
+
+	private static final String BUNDLE_DEFAULT_CP = ".";
 
 	// use the default package admin version
 	private final DependencyResolver resolver;
@@ -190,26 +201,26 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		// eliminate classpath path
 		String path = OsgiResourceUtils.stripPrefix(locationPattern);
 
-		System.out.println("looking for path " + path);
+		Collection foundPaths = new LinkedHashSet();
 
-		Collection paths = new LinkedHashSet();
+		boolean targetBundleIncluded = false;
 
-		// do a bundle-space lookup on all imported bundles
+		// do a synthetic class-path analysis
 		for (int i = 0; i < importedBundles.length; i++) {
 			Bundle importedBundle = importedBundles[i];
-			// use the bundle space lookup
-			ResourcePatternResolver rpr = new OsgiBundleResourcePatternResolver(importedBundle);
-			Resource[] foundResources = rpr.getResources(path);
-			for (int j = 0; j < foundResources.length; j++) {
-				// assemble only the OSGi paths
-				paths.add(foundResources[j].getURL().getPath());
-			}
+			if (bundle.equals(importedBundle))
+				targetBundleIncluded = true;
+			findSyntheticClassPathMatchingResource(importedBundle, path, foundPaths);
 		}
 
-		// resolve the entries from the classpath (as some of them might be hidden)
-		List resources = new ArrayList(paths.size());
+		// consider the bundle itself (if it hasn't been included)
+		if (!targetBundleIncluded)
+			findSyntheticClassPathMatchingResource(bundle, path, foundPaths);
 
-		for (Iterator iterator = paths.iterator(); iterator.hasNext();) {
+		// resolve the entries using the official class-path method (as some of them might be hidden)
+		List resources = new ArrayList(foundPaths.size());
+
+		for (Iterator iterator = foundPaths.iterator(); iterator.hasNext();) {
 			// classpath*: -> getResources()
 			String resourcePath = (String) iterator.next();
 			if (OsgiResourceUtils.PREFIX_TYPE_CLASS_ALL_SPACE == type) {
@@ -226,6 +237,144 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		}
 
 		return (Resource[]) resources.toArray(new Resource[resources.size()]);
+	}
+
+	/**
+	 * Apply synthetic class-path analysis. That is, search the bundle space and
+	 * the bundle class-path for entries matching the given path.
+	 * 
+	 * @param bundle
+	 * @param path
+	 * @param foundPaths
+	 * @throws IOException
+	 */
+	private void findSyntheticClassPathMatchingResource(Bundle bundle, String path, Collection foundPaths)
+			throws IOException {
+		// 1. bundle space lookup
+		ResourcePatternResolver localPatternResolver = new OsgiBundleResourcePatternResolver(bundle);
+		Resource[] foundResources = localPatternResolver.getResources(path);
+		for (int j = 0; j < foundResources.length; j++) {
+			// assemble only the OSGi paths
+			foundPaths.add(foundResources[j].getURL().getPath());
+		}
+		// 2. Bundle-ClassPath lookup (on the path stripped of the prefix)
+		foundPaths.addAll(findBundleClassPathMatchingPaths(bundle, path));
+	}
+
+	private Collection findBundleClassPathMatchingPaths(Bundle bundle, String pattern) throws IOException {
+		// list of strings pointing to the matching resources 
+		List list = new ArrayList(4);
+
+		boolean trace = logger.isTraceEnabled();
+		if (trace)
+			logger.trace("analyzing " + Constants.BUNDLE_CLASSPATH + " entries for bundle [" + bundle.getBundleId()
+					+ "|" + bundle.getSymbolicName() + "]");
+		// see if there is a bundle class-path defined
+		String[] entries = OsgiResourceUtils.getBundleClassPath(bundle);
+
+		if (trace)
+			logger.trace("found entries " + ObjectUtils.nullSafeToString(entries));
+
+		// 1. if so, look at the entries
+		for (int i = 0; i < entries.length; i++) {
+			String entry = entries[i];
+
+			// make sure to exclude the default entry
+			if (!entry.equals(BUNDLE_DEFAULT_CP)) {
+
+				// locate resource first from the bundle space (since it might not exist)
+				OsgiBundleResource entryResource = new OsgiBundleResource(bundle, entry);
+				// call the internal method to avoid catching an exception
+				URL url = entryResource.getResourceFromBundleSpace(entry);
+
+				if (trace)
+					logger.trace("classpath entry [" + entry + "] resolves to [" + url + "]");
+				// we've got a valid entry so let's parse it
+				if (url != null) {
+					// is it a jar ?
+					if (entry.endsWith(JAR_EXTENSION))
+						findBundleClassPathMatchingJarEntries(list, url, pattern);
+					// then it must be a folder
+					else
+						findBundleClassPathMatchingFolders(list, bundle, entry, pattern);
+				}
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Check the jar entries from the class-path.
+	 * 
+	 * @param list
+	 * @param ur
+	 */
+	private void findBundleClassPathMatchingJarEntries(List list, URL url, String pattern) throws IOException {
+		// get the stream to the resource and read it as a jar
+		JarInputStream jis = new JarInputStream(url.openStream());
+		Set result = new LinkedHashSet(8);
+
+		// parse the jar and do pattern matching
+		try {
+			while (jis.available() > 0) {
+				JarEntry jarEntry = jis.getNextJarEntry();
+				// if the jar has ended, the entry can be null (on Sun JDK at least)
+				if (jarEntry != null) {
+					String entryPath = jarEntry.getName();
+					System.out.println("jar entry: " + entryPath);
+					System.out.println("pattern is " + pattern);
+
+					// strip leading "/" if it does exist
+					if (entryPath.startsWith(FOLDER_SEPARATOR)) {
+						entryPath = entryPath.substring(FOLDER_SEPARATOR.length());
+					}
+					if (getPathMatcher().match(pattern, entryPath)) {
+						result.add(entryPath);
+					}
+				}
+			}
+		}
+		finally {
+			try {
+				jis.close();
+			}
+			catch (IOException io) {
+				// ignore it - nothing we can't do about it
+			}
+		}
+
+		list.addAll(result);
+	}
+
+	private void findBundleClassPathMatchingFolders(List list, Bundle bundle, String entry, String pattern)
+			throws IOException {
+		// append path to the pattern and do a normal search
+		// folder/<pattern> starts being applied
+
+		String bundlePathPattern;
+
+		boolean entryWithFolderSlash = entry.endsWith(FOLDER_SEPARATOR);
+		boolean patternWithFolderSlash = pattern.startsWith(FOLDER_SEPARATOR);
+		// avoid double slashes
+		if (entryWithFolderSlash) {
+			if (patternWithFolderSlash)
+				bundlePathPattern = entry + pattern.substring(1, pattern.length());
+			else
+				bundlePathPattern = entry + pattern;
+		}
+		else {
+			if (patternWithFolderSlash)
+				bundlePathPattern = entry + pattern;
+			else
+				bundlePathPattern = entry + FOLDER_SEPARATOR + pattern;
+		}
+
+		OsgiBundleResourcePatternResolver localResolver = new OsgiBundleResourcePatternResolver(bundle);
+		Resource[] resources = localResolver.getResources(bundlePathPattern);
+		for (int i = 0; i < resources.length; i++) {
+			list.add(resources[i].getURL().getPath());
+		}
 	}
 
 	/**

@@ -111,9 +111,9 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		assertTrue("not enough packages found", res.length > 100);
 	}
 
+	// disabled some tests on KF
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		//return (testMethodName.indexOf("Wildcard") > 0);
-		return false;
+		return isKF()
+				&& (testMethodName.equals("testMatchingABulkOfResources") || testMethodName.equals("testMatchingABulkOfResources"));
 	}
-
 }
