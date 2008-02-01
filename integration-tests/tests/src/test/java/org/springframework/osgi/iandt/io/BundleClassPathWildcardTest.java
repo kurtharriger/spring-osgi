@@ -87,4 +87,10 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		}
 		return false;
 	}
+
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return isKF();
+	}
+	
+	
 }
