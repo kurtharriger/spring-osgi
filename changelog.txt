@@ -8,7 +8,7 @@ Changes in version 1.1.0 (200y-mm-dd)
 Package org.springframework.osgi.io
 * OsgiBundleResource has improved handling of jars with missing jar entries for folders
 * improved OsgiBundleResourcePatternResolver performance when checking for jar resources
-* classpath: and classpath*: wildcards are supported
+* added support for classpath: and classpath*: patterns
 
 Package org.springframework.osgi.test
 * AbstractOsgiTest provides better error messages for bundle that fail to start

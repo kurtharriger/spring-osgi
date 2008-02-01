@@ -67,7 +67,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		assertEquals("not enough packages found", 1, res.length);
 	}
 
-	public void testAllClassPathWithWOWildcardAtFileLevel() throws Exception {
+	public void testAllClassPathWithWithWildcardAtFileLevel() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath*:/org/springframework/osgi/iandt/io/Class*WildcardTest.class");
 		assertEquals("not enough packages found", 1, res.length);
 	}
@@ -77,7 +77,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		assertEquals("not enough packages found", 1, res.length);
 	}
 
-	public void testAllClassPathRootWOWildcard() throws Exception {
+	public void testAllClassPathRootWithWildcard() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath*:/**/springframework/osgi/**/ClassSpaceWildcardTest.class");
 		assertEquals("not enough packages found", 1, res.length);
 	}
@@ -114,6 +114,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 	// disabled some tests on KF
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		return isKF()
-				&& (testMethodName.equals("testMatchingABulkOfResources") || testMethodName.equals("testMatchingABulkOfResources"));
+				&& (testMethodName.equals("testMatchingABulkOfResources")
+						|| testMethodName.equals("testMatchingABulkOfResources") || testMethodName.equals("testAllClassPathRootWithWildcard"));
 	}
 }
