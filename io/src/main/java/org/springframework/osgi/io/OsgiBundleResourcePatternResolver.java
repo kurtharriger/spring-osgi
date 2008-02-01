@@ -50,13 +50,35 @@ import org.springframework.util.StringUtils;
  * Can find resources in the <em>bundle jar</em> and <em>bundle space</em>.
  * See {@link OsgiBundleResource} for more information.
  * 
- * <p/> <strong>Note:</strong> <code>classpath:</code> and
- * <code>classpath*:</code> prefixes are not (yet) supported as there are no
- * methods for doing classpath discovery. A future version might add such
- * functionality.
+ * <p/><b>ClassPath support</b>
+ * 
+ * <p/>As mentioned by {@link PathMatchingResourcePatternResolver} class-path
+ * pattern matching needs to resolve the class-path structure to a file-system
+ * location (be it an actual folder or a jar). Inside the OSGi environment this
+ * is problematic as the bundles can be loaded in memory directly from input
+ * streams. To avoid relying on each platform bundle storage structure, this
+ * implementation tries to determine the bundles that assemble the given bundle
+ * class-path and analyze each of them individually. Depending on the running
+ * environment, this might cause significant IO activity which can affect
+ * performance.
+ * 
+ * <p/><b>Note:</b> Currently only <em>static</em> imports are supported.
+ * Runtime class-path entries such as <code>Bundle-ClassPath</code> are not
+ * supported. Support for <code>DynamicPackage-Import</code> depends on
+ * how/when the underlying platform does the wiring between the dynamically
+ * imported bundle and the given bundle.
+ * 
+ * <p/><b>Portability Notes:</b> Since it relies only on the OSGi API, this
+ * implementation depends heavily on how closely the platform implements the
+ * OSGi spec. While significant tests have been made to ensure compatibility one
+ * <em>might</em> experience different behaviour especially when dealing with
+ * jars that do not provide entries for folders or boot-path delegation. It is
+ * strongly recommended that wild-card resolution be thoroughly tested before
+ * switching to a different environment before you rely on it.
  * 
  * @see Bundle
  * @see OsgiBundleResource
+ * @see PathMatchingResourcePatternResolver
  * 
  * @author Costin Leau
  * 
@@ -233,9 +255,9 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p/>
-	 * Overrides the default check up since computing the URL can be fairly
-	 * expensive operation as there is no caching (due to the framework dynamic nature).
+	 * <p/> Overrides the default check up since computing the URL can be fairly
+	 * expensive operation as there is no caching (due to the framework dynamic
+	 * nature).
 	 */
 	protected boolean isJarResource(Resource resource) throws IOException {
 		if (resource instanceof OsgiBundleResource) {
