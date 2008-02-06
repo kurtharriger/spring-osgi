@@ -125,8 +125,9 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		// felix doesn't support fragments yet
+		// waiting for KF 2.0.4 to be released
 		return (isFelix() && (testMethodName.equals("testAllClassPathWildcardAtFolderLevel")
-				|| testMethodName.equals("testWildcardAtRootFileLevel") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel")));
+				|| testMethodName.equals("testWildcardAtRootFileLevel") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel")) || isKF());
 	}
 
 }
