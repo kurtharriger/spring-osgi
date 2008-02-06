@@ -26,6 +26,7 @@ import java.util.jar.Manifest;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
+import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * IO compliance test for bundles containing Bundle ClassPath entries.
@@ -129,14 +130,29 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 		assertNull("findEntries doesn't work on bundle classpath entries", url);
 	}
 
-	public void testConnectionToJarOnClassPath() throws Exception {
+	// fails on Felix + KF
+	public void tstFindEntriesOnMetaInfEntryOnSystemBundle() throws Exception {
+		Bundle sysBundle = bundleContext.getBundle(0);
+		Enumeration enm = sysBundle.findEntries("/", "META-INF", false);
+		assertNotNull("system bundle doesn't return META-INF", enm);
+	}
+
+	// fails on Felix + KF
+	public void tstGetEntryOnMetaInfEntryOnSystemBundle() throws Exception {
+		Bundle sysBundle = bundleContext.getBundle(0);
+		URL url = sysBundle.getEntry("/META-INF");
+		assertNotNull("system bundle doesn't consider META-INF on classpath", url);
+	}
+
+	// simple debugging test (no need to keep it running)
+	public void tstConnectionToJarOnClassPath() throws Exception {
 		URL url = bundle.getEntry("bundleclasspath/simple.jar");
 		System.out.println("jar url is " + url);
 		URLConnection con = url.openConnection();
 		System.out.println(con);
 		System.out.println(con.getContentType());
 		InputStream stream = con.getInputStream();
-		JarInputStream jis = new JarInputStream(con.getInputStream());
+		JarInputStream jis = new JarInputStream(stream);
 		System.out.println(jis);
 		System.out.println(jis.available());
 		System.out.println(jis.getNextJarEntry());
@@ -145,11 +161,12 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 		System.out.println(jis.available());
 		System.out.println(jis.getNextJarEntry());
 		System.out.println(jis.available());
+		jis.close();
 
 	}
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return getPlatformName().indexOf("fish") > -1;
+		//return getPlatformName().indexOf("fish") > -1;
+		return false;
 	}
-
 }
