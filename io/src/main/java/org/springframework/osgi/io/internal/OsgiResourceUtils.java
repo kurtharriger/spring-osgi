@@ -26,6 +26,7 @@ import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.util.Assert;
@@ -148,5 +149,29 @@ public abstract class OsgiResourceUtils {
 
 		String classpath = (String) bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH);
 		return StringUtils.commaDelimitedListToStringArray(classpath);
+	}
+
+	/**
+	 * Similar to /path/path1/ -> /path/, /path/file -> /path/
+	 * 
+	 * @return
+	 */
+	public static String findUpperFolder(String path) {
+		if (path.length() < 2)
+			return path;
+
+		String newPath = path;
+		// if it's a folder
+		if (path.endsWith(FOLDER_DELIMITER)) {
+			newPath = path.substring(0, path.length() - 1);
+		}
+
+		int index = newPath.lastIndexOf(FOLDER_DELIMITER);
+		if (index > 0)
+			return newPath.substring(0, index + 1);
+
+		else
+			// fallback to defaults
+			return path;
 	}
 }
