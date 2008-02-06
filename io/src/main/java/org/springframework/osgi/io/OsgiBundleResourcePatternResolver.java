@@ -185,7 +185,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 
 		// check whether we found something or we should fall-back to a
 		// non-existing resource
-		if (ObjectUtils.isEmpty(resources) && getPathMatcher().isPattern(locationPattern)) {
+		if (ObjectUtils.isEmpty(resources) && (!getPathMatcher().isPattern(locationPattern))) {
 			return new Resource[] { getResourceLoader().getResource(locationPattern) };
 		}
 		// return the original array
