@@ -166,7 +166,8 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 	}
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		//return getPlatformName().indexOf("fish") > -1;
-		return false;
+		// waiting for KF 2.0.4 to be released
+		return getPlatformName().indexOf("fish") > -1;
+		//return false;
 	}
 }
