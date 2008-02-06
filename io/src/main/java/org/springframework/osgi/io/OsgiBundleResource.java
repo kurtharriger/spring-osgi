@@ -427,12 +427,11 @@ public class OsgiBundleResource extends AbstractResource {
 
 				URL url = (URL) candidates.nextElement();
 
-				// it's a file
-				if (!url.getFile().endsWith(OsgiResourceUtils.FOLDER_DELIMITER))
-					resources.add(new URL(url, "."));
-				// it's a folder
-				else
-					resources.add(new URL(url, "../"));
+				// determined the root path
+				// we'll have to parse the string since some implementations
+				// do not normalize the resulting URL resulting in mismatches
+				String rootPath = OsgiResourceUtils.findUpperFolder(url.toExternalForm());
+				resources.add(new URL(rootPath));
 			}
 		}
 		else {

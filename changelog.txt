@@ -9,6 +9,7 @@ Package org.springframework.osgi.io
 * improved OsgiBundleResource handling of jars with missing archive entries for folders
 * improved OsgiBundleResourcePatternResolver performance when checking for jar resources
 * added support for classpath: and classpath*: patterns
+* improved detection of relative OSGi URLs
 
 Package org.springframework.osgi.test
 * AbstractOsgiTest provides better error messages for bundle that fail to start

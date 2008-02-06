@@ -17,6 +17,7 @@
 package org.springframework.osgi.iandt.io;
 
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * @author Costin Leau
@@ -93,15 +94,19 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		assertTrue("not enough packages found", res.length > 1);
 	}
 
+	// EQ = 48
+	// KF = 48
+	// FX = 38
 	public void testMatchingALotOfFolders() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath*:/**/springframework/osgi/**");
+		System.out.println("resources count " + res.length);
 		assertTrue("not enough packages found", res.length > 10);
 	}
 
 	// ask for everything springframework :)
-	// Equinox returns around 147+ resources are found
-	// KF only 32....
-	// Felix 135+ (as it doesn't support fragments yet)
+	// EQ = 147
+	// KF = 147
+	// FX = 135 (no fragment support)
 	public void testMatchingABulkOfResources() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath*:**/springframework/**");
 		System.out.println("resources count " + res.length);
@@ -109,23 +114,19 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 	}
 
 	// ask for everything org :)
-	// normally around 250+ resources are found
+	// EQ = 271 (since it considers the system bundle also)
+	// KF = 147 (doesn't consider system bundle)
+	// FX = 135
 	public void testMatchingAHugeSetOfResources() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath*:org/**");
+		System.out.println("resources count " + res.length);
 		assertTrue("not enough packages found", res.length > 100);
 	}
 
-	// disabled some tests on KF
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		//		return isKF()
-		//				&& (testMethodName.equals("testMatchingABulkOfResources")
-		//						|| testMethodName.equals("testMatchingABulkOfResources")
-		//						|| testMethodName.equals("testAllClassPathRootWithWildcard") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel"));
-
 		// felix doesn't support fragments yet
 		return (isFelix() && (testMethodName.equals("testAllClassPathWildcardAtFolderLevel")
-				|| testMethodName.equals("testWildcardAtRootFileLevel") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel")))
-				|| (isKF() && testMethodName.equals("testMatchingABulkOfResources"));
+				|| testMethodName.equals("testWildcardAtRootFileLevel") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel")));
 	}
 
 }
