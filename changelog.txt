@@ -6,7 +6,7 @@ Changes in version 1.1.0 (200y-mm-dd)
 -----------------------------------------
 
 Package org.springframework.osgi.io
-* OsgiBundleResource has improved handling of jars with missing jar entries for folders
+* improved OsgiBundleResource handling of jars with missing archive entries for folders
 * improved OsgiBundleResourcePatternResolver performance when checking for jar resources
 * added support for classpath: and classpath*: patterns
 

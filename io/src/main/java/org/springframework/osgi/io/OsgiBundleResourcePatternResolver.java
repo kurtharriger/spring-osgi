@@ -136,7 +136,15 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		this.resolver = (bundleContext != null ? new PackageAdminResolver(bundleContext) : null);
 	}
 
-	public Resource[] getResources(String locationPattern) throws IOException {
+	/**
+	 * Find existing resources. This method returns the actual resources found
+	 * w/o adding any extra decoration (such as non-existing resources).
+	 * 
+	 * @param locationPattern
+	 * @return
+	 * @throws IOException
+	 */
+	Resource[] findResources(String locationPattern) throws IOException {
 		Assert.notNull(locationPattern, "Location pattern must not be null");
 		int type = OsgiResourceUtils.getSearchType(locationPattern);
 
@@ -167,14 +175,21 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				result = OsgiResourceUtils.convertURLEnumerationToResourceArray(bundle.getResources(location));
 			}
 
-			// check whether we found something or we should fallback to a
-			// non-existing resource
-			if (ObjectUtils.isEmpty(result)) {
-				result = new Resource[] { getResourceLoader().getResource(locationPattern) };
-			}
-
 			return result;
 		}
+	}
+
+	// add a non-existing resource, if none was found and no pattern was specified
+	public Resource[] getResources(String locationPattern) throws IOException {
+		Resource[] resources = findResources(locationPattern);
+
+		// check whether we found something or we should fall-back to a
+		// non-existing resource
+		if (ObjectUtils.isEmpty(resources) && getPathMatcher().isPattern(locationPattern)) {
+			return new Resource[] { getResourceLoader().getResource(locationPattern) };
+		}
+		// return the original array
+		return resources;
 	}
 
 	/**
@@ -251,8 +266,8 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	private void findSyntheticClassPathMatchingResource(Bundle bundle, String path, Collection foundPaths)
 			throws IOException {
 		// 1. bundle space lookup
-		ResourcePatternResolver localPatternResolver = new OsgiBundleResourcePatternResolver(bundle);
-		Resource[] foundResources = localPatternResolver.getResources(path);
+		OsgiBundleResourcePatternResolver localPatternResolver = new OsgiBundleResourcePatternResolver(bundle);
+		Resource[] foundResources = localPatternResolver.findResources(path);
 		for (int j = 0; j < foundResources.length; j++) {
 			// assemble only the OSGi paths
 			foundPaths.add(foundResources[j].getURL().getPath());
@@ -322,8 +337,6 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				// if the jar has ended, the entry can be null (on Sun JDK at least)
 				if (jarEntry != null) {
 					String entryPath = jarEntry.getName();
-					System.out.println("jar entry: " + entryPath);
-					System.out.println("pattern is " + pattern);
 
 					// strip leading "/" if it does exist
 					if (entryPath.startsWith(FOLDER_SEPARATOR)) {

@@ -28,6 +28,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 	// Wild-card tests
 	//
 
+	// finds all files at root level
 	public void testWildcardAtRootFileLevel() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath:/*");
 		// only the bundle and its fragments should be considered (since no other META-INF/ is available on the classpath)
@@ -57,7 +58,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 	}
 
 	public void testAllClassPathWOWildcardAtFolderLevel() throws Exception {
-		Resource res[] = patternLoader.getResources("classpath*:/META-INF/");
+		Resource res[] = patternLoader.getResources("classpath*:META-INF/");
 		// only the bundle and its fragments should be considered (since no other META-INF/ is available on the classpath)
 		assertEquals("not enough packages found", 3, res.length);
 	}
@@ -98,24 +99,33 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 	}
 
 	// ask for everything springframework :)
-	// normally around 147+ resources are found
+	// Equinox returns around 147+ resources are found
+	// KF only 32....
+	// Felix 135+ (as it doesn't support fragments yet)
 	public void testMatchingABulkOfResources() throws Exception {
-		Resource res[] = patternLoader.getResources("classpath*:/**/springframework/**");
+		Resource res[] = patternLoader.getResources("classpath*:**/springframework/**");
+		System.out.println("resources count " + res.length);
 		assertTrue("not enough packages found", res.length > 50);
 	}
 
 	// ask for everything org :)
 	// normally around 250+ resources are found
 	public void testMatchingAHugeSetOfResources() throws Exception {
-		Resource res[] = patternLoader.getResources("classpath*:/org/**");
+		Resource res[] = patternLoader.getResources("classpath*:org/**");
 		assertTrue("not enough packages found", res.length > 100);
 	}
 
 	// disabled some tests on KF
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return isKF()
-				&& (testMethodName.equals("testMatchingABulkOfResources")
-						|| testMethodName.equals("testMatchingABulkOfResources")
-						|| testMethodName.equals("testAllClassPathRootWithWildcard") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel"));
+		//		return isKF()
+		//				&& (testMethodName.equals("testMatchingABulkOfResources")
+		//						|| testMethodName.equals("testMatchingABulkOfResources")
+		//						|| testMethodName.equals("testAllClassPathRootWithWildcard") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel"));
+
+		// felix doesn't support fragments yet
+		return (isFelix() && (testMethodName.equals("testAllClassPathWildcardAtFolderLevel")
+				|| testMethodName.equals("testWildcardAtRootFileLevel") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel")))
+				|| (isKF() && testMethodName.equals("testMatchingABulkOfResources"));
 	}
+
 }
