@@ -107,7 +107,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	/**
-	 * Crete the Runnable action which will complete the context creation
+	 * Create the Runnable action which will complete the context creation
 	 * process. This process can be called synchronously or asynchronously,
 	 * depending on context configuration and availability of dependencies.
 	 * 

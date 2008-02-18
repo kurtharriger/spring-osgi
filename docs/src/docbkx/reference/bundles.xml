@@ -25,7 +25,7 @@
     type <interfacename>Bundle</interfacename>.</para>
 
     <para>If the needed bundle is not installed, one can use <literal>location</literal> attribute
-    to indicate install or/and the <literal>action</literal>/<literal>dispose-action</literal> attributes
+    to indicate install or/and the <literal>action</literal>/<literal>destroy-action</literal> attributes
     provide declarative control over the bundle's lifecycle. The <literal>location</literal> attribute is 
     used to specify a URL where the bundle jar file artifact can be found. The
     <literal>action</literal> attribute specifies the lifecycle operation to
