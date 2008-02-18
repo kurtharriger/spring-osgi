@@ -5,6 +5,9 @@ http://www.springframework.org/osgi
 Changes in version 1.0.1 (200y-mm-dd)
 -----------------------------------------
 
+Package org.springframework.osgi.test
+* custom artifact locators can be used with AbstractDependencyManagerTests
+
 Changes in version 1.0 final (2008-01-25)
 -----------------------------------------
 
