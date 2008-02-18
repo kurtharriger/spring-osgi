@@ -287,14 +287,21 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 			artifactId[i] = StringUtils.trimWhitespace(artifactId[i]);
 		}
 
-		return (artifactId.length == 3 ? locator.locateArtifact(artifactId[0], artifactId[1], artifactId[2])
-				: locator.locateArtifact(artifactId[0], artifactId[1], artifactId[2], artifactId[3]));
+		ArtifactLocator aLocator = getLocator();
+
+		return (artifactId.length == 3 ? aLocator.locateArtifact(artifactId[0], artifactId[1], artifactId[2])
+				: aLocator.locateArtifact(artifactId[0], artifactId[1], artifactId[2], artifactId[3]));
 	}
 
 	/**
 	 * Returns the ArtifactLocator used by this test suite. Subclasses should
 	 * override this method if the default locator (searching the local Maven2
 	 * repository) is not enough.
+	 * 
+	 * <p>
+	 * <b>Note</b>: This method will be used each time a bundle has to be
+	 * retrieved; it is highly recommended to return a cached instance instead
+	 * of a new one each time.
 	 * 
 	 * @return artifact locator used by this test.
 	 */

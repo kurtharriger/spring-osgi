@@ -857,7 +857,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section>        
 
 		<section id="service-registry:refs:singular:property-editor">
-		<title>Getting a hold of the managed service service reference</title>
+		<title>Getting a hold of the managed service reference</title>
         
         <para>Spring-DM can automatically convert a managed OSGi service to 
         service reference. That is, if the property into which a reference bean 
