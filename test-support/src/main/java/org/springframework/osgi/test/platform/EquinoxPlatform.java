@@ -52,6 +52,8 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 		props.setProperty("osgi.instance.area", "eclipse_config");
 		props.setProperty("osgi.user.area", "eclipse_config");
 
+		// props.setProperty("osgi.java.profile.bootdelegation", "ignore");
+
 		// props.setProperty("eclipse.consoleLog", "true");
 		// props.setProperty("osgi.debug", "");
 

@@ -19,7 +19,9 @@ package org.springframework.osgi.test;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
+import org.osgi.framework.Constants;
 import org.springframework.osgi.test.platform.EquinoxPlatform;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.test.platform.Platforms;
@@ -59,12 +61,6 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	 * System property for selecting the appropriate OSGi implementation.
 	 */
 	public static final String OSGI_FRAMEWORK_SELECTOR = "org.springframework.osgi.test.framework";
-
-	/**
-	 * 
-	 */
-	private static final String ORG_OSGI_FRAMEWORK_BOOTDELEGATION = "org.osgi.framework.bootdelegation";
-
 
 	/**
 	 * {@inheritDoc}
@@ -112,8 +108,9 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 		if (platform == null)
 			platform = new EquinoxPlatform();
 
+		Properties config = platform.getConfigurationProperties();
 		// add boot delegation
-		platform.getConfigurationProperties().setProperty(ORG_OSGI_FRAMEWORK_BOOTDELEGATION,
+		config.setProperty(Constants.FRAMEWORK_BOOTDELEGATION,
 			getBootDelegationPackageString());
 
 		return platform;
@@ -165,11 +162,16 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	 */
 	protected List getBootDelegationPackages() {
 		List defaults = new ArrayList();
+		// javax packages
 		defaults.add("javax.*");
+		// XML API available in JDK 1.4
 		defaults.add("org.w3c.*");
-		defaults.add("sun.*");
 		defaults.add("org.xml.*");
+
+		// sun packages
+		defaults.add("sun.*");
 		defaults.add("com.sun.*");
+
 		// FIXME: the JAXP package (for 1.4 VMs) should be discovered in an OSGi
 		// manner
 		defaults.add("org.apache.xerces.jaxp.*");

@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.internal.support;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Properties;
+package org.springframework.osgi.test.internal.support;
 
 import junit.framework.Protectable;
 import junit.framework.Test;
@@ -29,8 +25,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.osgi.test.internal.OsgiJUnitTest;
 import org.springframework.osgi.test.internal.TestRunnerService;
-import org.springframework.osgi.test.internal.util.ConfigurableByteArrayOutputStream;
-import org.springframework.osgi.test.internal.util.IOUtils;
+import org.springframework.osgi.test.internal.holder.HolderLoader;
+import org.springframework.osgi.test.internal.holder.OsgiTestInfoHolder;
 import org.springframework.osgi.test.internal.util.TestUtils;
 
 /**
@@ -43,31 +39,6 @@ public class OsgiJUnitService implements TestRunnerService {
 
 	private static final Log log = LogFactory.getLog(OsgiJUnitService.class);
 
-	/**
-	 * Write the test result.
-	 */
-	private ObjectOutputStream outStream;
-
-	/**
-	 * Read the test name to execute.
-	 */
-	private ObjectInputStream inStream;
-
-	protected void setupStreams() throws Exception {
-		Properties props = System.getProperties();
-
-		byte[] outSource = (byte[]) props.get(OsgiJUnitTest.FROM_OSGI);
-		this.outStream = new ObjectOutputStream(new ConfigurableByteArrayOutputStream(outSource));
-		// write header
-		this.outStream.flush();
-
-		log.debug("opened writer to OSGi-outside");
-
-		byte[] inSource = (byte[]) props.get(OsgiJUnitTest.FOR_OSGI);
-		this.inStream = new ObjectInputStream(new ByteArrayInputStream(inSource));
-
-		log.debug("opened reader for OSGi");
-	}
 
 	public void runTest(OsgiJUnitTest test) {
 		try {
@@ -88,22 +59,21 @@ public class OsgiJUnitService implements TestRunnerService {
 	 * @throws Exception
 	 */
 	protected void executeTest(OsgiJUnitTest test) throws Exception {
-		try {
-			setupStreams();
+		// create holder
+		// since we're inside OSGi, we have to use the special loading procedure
+		OsgiTestInfoHolder holder = HolderLoader.INSTANCE.getHolder();
 
-			// read the test to be executed
-			String testName = inStream.readUTF();
-			// execute the test
-			TestResult result = runTest(test, testName);
+		// read the test to be executed
+		String testName = holder.getTestMethodName();
+		if (log.isDebugEnabled())
+			log.debug("reading test [" + testName + "] for execution inside OSGi");
+		// execute the test
+		TestResult result = runTest(test, testName);
 
+		if (log.isDebugEnabled())
 			log.debug("sending test results from OSGi");
-			// write result back to the stream
-			TestUtils.sendTestResult(result, outStream);
-		}
-		finally {
-			IOUtils.closeStream(outStream);
-			IOUtils.closeStream(inStream);
-		}
+		// write result back to the outside world
+		TestUtils.unpackProblems(result, holder);
 	}
 
 	/**
@@ -113,11 +83,11 @@ public class OsgiJUnitService implements TestRunnerService {
 	 * @param testName
 	 */
 	protected TestResult runTest(final OsgiJUnitTest osgiTestExtensions, String testName) {
-
-		log.debug("running test [" + testName + "] on testCase " + osgiTestExtensions);
+		if (log.isDebugEnabled())
+			log.debug("running test [" + testName + "] on testCase " + osgiTestExtensions);
 		final TestResult result = new TestResult();
 		TestCase rawTest = osgiTestExtensions.getTestCase();
-		
+
 		rawTest.setName(testName);
 
 		try {
