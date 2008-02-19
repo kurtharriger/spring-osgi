@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.internal;
 
 import junit.framework.TestCase;
@@ -28,27 +29,6 @@ import org.osgi.framework.BundleContext;
  * 
  */
 public interface OsgiJUnitTest {
-
-	/**
-	 * Lookup marker for "to-OSGi" communication channel.
-	 */
-	static final String FOR_OSGI = OsgiJUnitTest.class.getName() + "-osgi[in]";
-
-	/**
-	 * Lookup marker for "from-OSGi" communication channel.
-	 */
-	static final String FROM_OSGI = OsgiJUnitTest.class.getName() + "-osgi[out]";
-
-	/**
-	 * Lookup marker for the test suite that is executed inside the OSGi
-	 * container.
-	 */
-	static final String OSGI_TEST = OsgiJUnitTest.class.getName() + "-test";
-
-	/**
-	 * System property name used to pass around the spring-osgi-test bundle id.
-	 */
-	static final String OSGI_TEST_BUNDLE_ID = OsgiJUnitTest.class.getName() + "-bundle.id";
 
 	/**
 	 * Replacement for the 'traditional' setUp. Called by TestRunnerService.
@@ -68,12 +48,14 @@ public interface OsgiJUnitTest {
 
 	/**
 	 * Replacement for the 'traditional' runTest. Called by TestRunnerService.
+	 * 
 	 * @throws Throwable
 	 */
 	void osgiRunTest() throws Throwable;
 
 	/**
 	 * Provides the OSGi bundle context to the test
+	 * 
 	 * @param bundleContext
 	 */
 	void injectBundleContext(BundleContext bundleContext);

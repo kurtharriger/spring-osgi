@@ -28,6 +28,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.test.internal.OsgiJUnitTest;
 import org.springframework.osgi.test.internal.TestRunnerService;
+import org.springframework.osgi.test.internal.holder.HolderLoader;
+import org.springframework.osgi.test.internal.holder.OsgiTestInfoHolder;
 import org.springframework.osgi.test.internal.support.OsgiJUnitTestAdapter;
 import org.springframework.osgi.util.OsgiServiceUtils;
 
@@ -77,9 +79,10 @@ public class JUnitTestActivator implements BundleActivator {
 	 * @return
 	 */
 	private OsgiJUnitTest loadTest() {
-		String testClass = System.getProperty(OsgiJUnitTest.OSGI_TEST);
+		OsgiTestInfoHolder holder = HolderLoader.INSTANCE.getHolder();
+		String testClass = holder.getTestClassName();
 		if (testClass == null)
-			throw new IllegalArgumentException("no test class specified under " + OsgiJUnitTest.OSGI_TEST);
+			throw new IllegalArgumentException("no test class specified");
 
 		try {
 			// use bundle to load the classes
