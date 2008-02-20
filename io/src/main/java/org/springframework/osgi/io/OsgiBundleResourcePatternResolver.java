@@ -145,6 +145,26 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p/> Overrides the default check up since computing the URL can be fairly
+	 * expensive operation as there is no caching (due to the framework dynamic
+	 * nature).
+	 */
+	protected boolean isJarResource(Resource resource) throws IOException {
+		if (resource instanceof OsgiBundleResource) {
+			// check the resource type
+			OsgiBundleResource bundleResource = (OsgiBundleResource) resource;
+			// if it's known, then it's not a jar
+			if (bundleResource.getSearchType() != OsgiResourceUtils.PREFIX_TYPE_UNKNOWN) {
+				return false;
+			}
+			// otherwise the normal parsing occur
+		}
+		return super.isJarResource(resource);
+	}
+	
+	/**
 	 * Based on the search type, use the appropriate method
 	 * 
 	 * @see OsgiBundleResource#BUNDLE_URL_PREFIX

@@ -239,7 +239,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * {@link #locateBundle(String)}.
 	 * 
 	 * @param bundles bundle identifiers
-	 * @return an array of Spring resources for the given bundle indentifiers
+	 * @return an array of Spring resources for the given bundle identifiers
 	 */
 	protected Resource[] locateBundles(String[] bundles) {
 		if (bundles == null)
@@ -287,6 +287,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 			artifactId[i] = StringUtils.trimWhitespace(artifactId[i]);
 		}
 
+		
 		ArtifactLocator aLocator = getLocator();
 
 		return (artifactId.length == 3 ? aLocator.locateArtifact(artifactId[0], artifactId[1], artifactId[2])

@@ -11,21 +11,11 @@
   <properties>
 	<slf4j.version>1.4.3</slf4j.version>
 	<spring.maven.artifact.version>2.5.1</spring.maven.artifact.version>
+	<spring.osgi.version>1.0.1-SNAPSHOT</spring.osgi.version>
   </properties>
   
   <dependencies>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>junit.osgi</artifactId>
-      <version>3.8.2-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <version>${spring.maven.artifact.version}</version>
-      <scope>test</scope>
-    </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
@@ -65,6 +55,42 @@
      <artifactId>org.osgi.core</artifactId>
      <version>4.0</version>
     </dependency>
+
+	<!-- test scoped dependencies -->
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>junit.osgi</artifactId>
+      <version>3.8.2-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${spring.maven.artifact.version}</version>
+      <scope>test</scope>
+    </dependency>
+    	
+    <dependency>
+	  <groupId>org.springframework.osgi</groupId>
+	  <artifactId>spring-osgi-test</artifactId>
+	  <version>${spring.osgi.version}</version>
+	  <scope>test</scope>
+	</dependency>
+
+	<dependency>
+	  <groupId>org.springframework.osgi</groupId>
+	  <artifactId>spring-osgi-annotation</artifactId>
+	  <version>${spring.osgi.version}</version>
+	  <scope>test</scope>
+	</dependency>
+
+	<dependency>
+	  <groupId>org.springframework.osgi</groupId>
+	  <artifactId>aopalliance.osgi</artifactId>
+	  <version>1.0-SNAPSHOT</version>
+	  <scope>test</scope>
+	</dependency>
+
   </dependencies>
 
   <!-- for packaging as an OSGi bundle, we use the maven-bundle-plugin -->

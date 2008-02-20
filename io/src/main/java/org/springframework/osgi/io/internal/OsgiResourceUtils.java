@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.io.internal;
 
 import java.net.URL;
@@ -56,8 +57,9 @@ public abstract class OsgiResourceUtils {
 	// classpath:
 	public static final int PREFIX_TYPE_CLASS_SPACE = 2;
 
-	// osgibundlejar::
+	// osgibundlejar:
 	public static final int PREFIX_TYPE_BUNDLE_JAR = 4;
+
 
 	/**
 	 * Return the path prefix if there is any or {@link #EMPTY_PREFIX}
@@ -111,6 +113,10 @@ public abstract class OsgiResourceUtils {
 	}
 
 	public static Resource[] convertURLArraytoResourceArray(URL[] urls) {
+		if (urls == null) {
+			return new Resource[0];
+		}
+
 		// convert this into a resource array
 		Resource[] res = new Resource[urls.length];
 		for (int i = 0; i < urls.length; i++) {
@@ -120,10 +126,34 @@ public abstract class OsgiResourceUtils {
 	}
 
 	public static Resource[] convertURLEnumerationToResourceArray(Enumeration enm) {
-		Set resources = new LinkedHashSet(5);
+		Set resources = new LinkedHashSet(4);
 		while (enm != null && enm.hasMoreElements()) {
-			resources.add((URL) enm.nextElement());
+			resources.add(new UrlResource((URL) enm.nextElement()));
 		}
-		return convertURLArraytoResourceArray((URL[]) resources.toArray(new URL[resources.size()]));
+		return (Resource[]) resources.toArray(new Resource[resources.size()]);
+	}
+
+	/**
+	 * Similar to /path/path1/ -> /path/, /path/file -> /path/
+	 * 
+	 * @return
+	 */
+	public static String findUpperFolder(String path) {
+		if (path.length() < 2)
+			return path;
+
+		String newPath = path;
+		// if it's a folder
+		if (path.endsWith(FOLDER_DELIMITER)) {
+			newPath = path.substring(0, path.length() - 1);
+		}
+
+		int index = newPath.lastIndexOf(FOLDER_DELIMITER);
+		if (index > 0)
+			return newPath.substring(0, index + 1);
+
+		else
+			// fallback to defaults
+			return path;
 	}
 }
