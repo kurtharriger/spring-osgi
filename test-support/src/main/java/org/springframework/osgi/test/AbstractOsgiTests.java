@@ -16,13 +16,8 @@
 
 package org.springframework.osgi.test;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Properties;
 
 import junit.framework.Protectable;
 import junit.framework.TestCase;
@@ -30,17 +25,17 @@ import junit.framework.TestResult;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
-import org.springframework.osgi.test.internal.OsgiJUnitTest;
-import org.springframework.osgi.test.internal.util.ConfigurableByteArrayOutputStream;
-import org.springframework.osgi.test.internal.util.IOUtils;
+import org.springframework.osgi.test.internal.holder.OsgiTestInfoHolder;
 import org.springframework.osgi.test.internal.util.TestUtils;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiPlatformDetector;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
@@ -67,11 +62,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 	// JUnitService trigger
 	private static Method serviceTrigger;
-
-	// streams for communicating with the OSGi realm.
-	private ObjectInputStream inputStream;
-
-	private ObjectOutputStream outputStream;
 
 	// the test results used by the triggering test runner
 	private TestResult originalResult;
@@ -169,7 +159,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	}
 
 	//
-	// JUnit overriden methods.
+	// JUnit overridden methods.
 	//
 
 	/**
@@ -214,7 +204,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 				readTestResult();
 			}
 			finally {
-				completeTestExecution();
+				// nothing to clean up
 			}
 		}
 	}
@@ -240,7 +230,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			osgiPlatform = createPlatform();
 			// start platform
 			if (debug)
-				logger.debug("about to start " + osgiPlatform);
+				logger.debug("About to start " + osgiPlatform);
 			osgiPlatform.start();
 			// platform context
 			platformContext = osgiPlatform.getBundleContext();
@@ -262,18 +252,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 			// start bundles
 			for (int i = 0; i < bundles.length; i++) {
-				String info = null;
-				if (debug)
-					info = "bundle " + bundles[i].getBundleId() + "[" + bundles[i].getSymbolicName() + "]";
-
-				if (!OsgiBundleUtils.isFragment(bundles[i])) {
-					if (debug)
-						logger.debug("starting " + info);
-					bundles[i].start();
-				}
-
-				else if (debug)
-					logger.debug(info + " is a fragment; start not invoked");
+				startBundle(bundles[i]);
 			}
 
 			// hook after the OSGi platform has been setup
@@ -326,30 +305,55 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		Assert.notNull(platformContext);
 		Assert.notNull(location);
 		if (logger.isDebugEnabled())
-			logger.debug("installing bundle from location " + location.getDescription());
+			logger.debug("Installing bundle from location " + location.getDescription());
 		return platformContext.installBundle(location.getDescription(), location.getInputStream());
+	}
+
+	/**
+	 * Starts a bundle and prints a nice logging message in case of failure.
+	 * 
+	 * @param bundle
+	 * @return
+	 * @throws BundleException
+	 */
+	private void startBundle(Bundle bundle) throws BundleException {
+		boolean debug = logger.isDebugEnabled();
+		String info = "[" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "|" + bundle.getLocation() + "]";
+
+		if (!OsgiBundleUtils.isFragment(bundle)) {
+			if (debug)
+				logger.debug("Starting " + info);
+			try {
+				bundle.start();
+			}
+			catch (BundleException ex) {
+				logger.error("cannot start bundle " + info, ex);
+				throw ex;
+			}
+		}
+
+		else if (debug)
+			logger.debug(info + " is a fragment; start not invoked");
 	}
 
 	//
 	// Delegation methods for OSGi execution and initialization
 	//
 
+	// runs outside OSGi
 	/**
 	 * Prepares test execution - the OSGi platform will be started (if needed)
 	 * and cached for the test suite execution.
-	 * 
 	 */
 	private void prepareTestExecution() throws Exception {
 
 		if (getName() == null)
 			throw new IllegalArgumentException("no test specified");
 
-		// write the test name into the System properties
-		System.getProperties().put(OsgiJUnitTest.OSGI_TEST, osgiJUnitTest.getClass().getName());
-
-		// create streams first to avoid deadlocks in setting up the stream on
-		// the OSGi side
-		setupStreams();
+		// clear test results
+		OsgiTestInfoHolder.INSTANCE.clearResults();
+		// set test class
+		OsgiTestInfoHolder.INSTANCE.setTestClassName(osgiJUnitTest.getClass().getName());
 
 		// start OSGi platform (the caching is done inside the method).
 		try {
@@ -360,11 +364,12 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			throw e;
 		}
 
-		logger.debug("writing test name [" + getName() + "] to OSGi");
-		// write test name to OSGi
-		outputStream.writeUTF(getName());
-		outputStream.flush();
+		if (logger.isTraceEnabled())
+			logger.trace("Writing test name [" + getName() + "] to OSGi");
 
+		// write test name to OSGi
+		// set test method name
+		OsgiTestInfoHolder.INSTANCE.setTestMethodName(getName());
 	}
 
 	/**
@@ -384,17 +389,6 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			else
 				throw ((Error) th);
 		}
-	}
-
-	/**
-	 * Finishes the test execution - read back the result from the OSGi copy and
-	 * closes up the streams.
-	 * 
-	 * @throws Exception
-	 */
-	private void completeTestExecution() {
-		IOUtils.closeStream(inputStream);
-		IOUtils.closeStream(outputStream);
 	}
 
 	/**
@@ -433,8 +427,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 */
 	private BundleContext getRuntimeBundleContext() {
 
-		// read the system property
-		Long id = (Long) System.getProperties().get(OsgiJUnitTest.OSGI_TEST_BUNDLE_ID);
+		// read test bundle id property
+		Long id = OsgiTestInfoHolder.INSTANCE.getTestBundleId();
 
 		BundleContext ctx = null;
 		if (id != null)
@@ -448,15 +442,16 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		return (ctx == null ? platformContext : ctx);
 	}
 
+	// runs outside OSGi
 	private void readTestResult() {
-		// finish stream creation (to avoid circular dependencies)
-		createInStream();
+		if (logger.isTraceEnabled())
+			logger.trace("Reading OSGi results for test [" + getName() + "]");
 
-		logger.debug("reading OSGi results for test [" + getName() + "]");
+		// copy results from OSGi into existing test result
+		TestUtils.cloneTestResults(OsgiTestInfoHolder.INSTANCE, originalResult, osgiJUnitTest);
 
-		TestUtils.receiveTestResult(this.originalResult, osgiJUnitTest, inputStream);
-
-		logger.debug("test[" + getName() + "]'s result read");
+		if (logger.isTraceEnabled())
+			logger.debug("Test[" + getName() + "]'s result read");
 	}
 
 	/**
@@ -479,62 +474,17 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * Cleanup for the test suite.
 	 */
 	private void shutdownTest() {
-		IOUtils.closeStream(inputStream);
-		IOUtils.closeStream(outputStream);
-
-		logger.info("shutting down OSGi platform");
+		logger.info("Shutting down OSGi platform");
 		if (osgiPlatform != null) {
 			try {
 				osgiPlatform.stop();
 			}
 			catch (Exception ex) {
 				// swallow
-				logger.warn("shutdown procedure threw exception " + ex);
+				logger.warn("Shutdown procedure threw exception " + ex);
 			}
 			osgiPlatform = null;
 		}
-	}
-
-	/**
-	 * Setup the piped streams to get the results out from the OSGi world.
-	 * 
-	 * @throws IOException
-	 */
-	private void setupStreams() throws IOException {
-
-		byte[] inArray = new byte[1024 * 2];
-		// 16K seems to be enough
-		byte[] outArray = new byte[1024 * 16];
-
-		Properties systemProps = System.getProperties();
-
-		// put information for OSGi
-		systemProps.put(OsgiJUnitTest.FOR_OSGI, inArray);
-
-		// get information from OSGi
-		systemProps.put(OsgiJUnitTest.FROM_OSGI, outArray);
-
-		// setup output stream to prevent blocking
-		outputStream = new ObjectOutputStream(new ConfigurableByteArrayOutputStream(inArray));
-		// flush header right away
-		outputStream.flush();
-
-		logger.debug("opened writer to OSGi");
-	}
-
-	/**
-	 * Utility method for creating the input communication stream.
-	 */
-	private void createInStream() {
-		try {
-			byte[] inputSource = (byte[]) System.getProperties().get(OsgiJUnitTest.FROM_OSGI);
-			inputStream = new ObjectInputStream(new ByteArrayInputStream(inputSource));
-			logger.debug("opened reader from OSGi");
-		}
-		catch (IOException ex) {
-			throw new RuntimeException("cannot open streams; it's likely the osgi test execution failed;" + ex);
-		}
-
 	}
 
 	//

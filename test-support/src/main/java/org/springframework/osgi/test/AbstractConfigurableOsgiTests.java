@@ -19,7 +19,9 @@ package org.springframework.osgi.test;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
+import org.osgi.framework.Constants;
 import org.springframework.osgi.test.platform.EquinoxPlatform;
 import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.test.platform.Platforms;
@@ -61,12 +63,6 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	public static final String OSGI_FRAMEWORK_SELECTOR = "org.springframework.osgi.test.framework";
 
 	/**
-	 * 
-	 */
-	private static final String ORG_OSGI_FRAMEWORK_BOOTDELEGATION = "org.osgi.framework.bootdelegation";
-
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 * <p/>This implementation determines and creates the OSGi platform used by
@@ -88,7 +84,7 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 				Class platformClass = ClassUtils.resolveClassName(platformClassName, currentCL);
 				if (OsgiPlatform.class.isAssignableFrom(platformClass)) {
 					if (trace)
-						logger.trace("instantiating platform wrapper...");
+						logger.trace("Instantiating platform wrapper...");
 					try {
 						platform = (OsgiPlatform) platformClass.newInstance();
 					}
@@ -97,7 +93,7 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 					}
 				}
 				else
-					logger.warn("class [" + platformClass + "] does not implement " + OsgiPlatform.class.getName()
+					logger.warn("Class [" + platformClass + "] does not implement " + OsgiPlatform.class.getName()
 							+ " interface; falling back to defaults");
 			}
 			else {
@@ -106,14 +102,15 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 
 		}
 		else
-			logger.trace("no platform specified; using default");
+			logger.trace("No platform specified; using default");
 
 		// fall back
 		if (platform == null)
 			platform = new EquinoxPlatform();
 
+		Properties config = platform.getConfigurationProperties();
 		// add boot delegation
-		platform.getConfigurationProperties().setProperty(ORG_OSGI_FRAMEWORK_BOOTDELEGATION,
+		config.setProperty(Constants.FRAMEWORK_BOOTDELEGATION,
 			getBootDelegationPackageString());
 
 		return platform;
@@ -132,7 +129,7 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	protected String getPlatformName() {
 		String systemProperty = System.getProperty(OSGI_FRAMEWORK_SELECTOR);
 		if (logger.isTraceEnabled())
-			logger.trace("system property [" + OSGI_FRAMEWORK_SELECTOR + "] has value=" + systemProperty);
+			logger.trace("System property [" + OSGI_FRAMEWORK_SELECTOR + "] has value=" + systemProperty);
 
 		return (systemProperty == null ? Platforms.EQUINOX : systemProperty);
 	}
@@ -165,11 +162,16 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	 */
 	protected List getBootDelegationPackages() {
 		List defaults = new ArrayList();
+		// javax packages
 		defaults.add("javax.*");
+		// XML API available in JDK 1.4
 		defaults.add("org.w3c.*");
-		defaults.add("sun.*");
 		defaults.add("org.xml.*");
+
+		// sun packages
+		defaults.add("sun.*");
 		defaults.add("com.sun.*");
+
 		// FIXME: the JAXP package (for 1.4 VMs) should be discovered in an OSGi
 		// manner
 		defaults.add("org.apache.xerces.jaxp.*");

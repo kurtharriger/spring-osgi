@@ -13,20 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.internal.util;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
 import junit.framework.TestFailure;
 import junit.framework.TestResult;
+
+import org.springframework.osgi.test.internal.holder.OsgiTestInfoHolder;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Utility class for running OSGi-JUnit tests.
@@ -38,6 +44,9 @@ public abstract class TestUtils {
 
 	/**
 	 * Serialize the test result using the given OutputStream.
+	 * 
+	 * @deprecated will be removed in 1.1.0 w/o a replacement. the test
+	 * framework relies on classloading instead of serialization.
 	 * 
 	 * @param result
 	 * @param stream
@@ -71,6 +80,9 @@ public abstract class TestUtils {
 	 * Deserialize testResult from the given ObjectInputStream. The loaded
 	 * failures/errors are added to the given testResult.
 	 * 
+	 * @deprecated will be removed in 1.1.0 w/o a replacement. the test
+	 * framework relies on classloading instead of serialization.
+	 * 
 	 * @param testResult the test result to which the properties are added
 	 * @param stream the stream used to load the test result
 	 * @param test the test used for adding the TestResult errors/failures
@@ -96,6 +108,73 @@ public abstract class TestUtils {
 		} // get failures
 		for (Iterator iter = failures.iterator(); iter.hasNext();) {
 			testResult.addFailure(test, (AssertionFailedError) iter.next());
+		}
+	}
+
+	/**
+	 * Clones the test result from a TestResult loaded through a different
+	 * classloader.
+	 * 
+	 * @param source test result loaded through a different classloader
+	 * @param destination test result reported to the outside framework
+	 * @param test initial test used for bootstrapping the integration framework
+	 * @return cloned test result
+	 */
+	public static TestResult cloneTestResults(OsgiTestInfoHolder source, TestResult destination, Test test) {
+		// since we cannot cast, we have to use reflection
+
+		//		List errors;
+		//		List failures;
+		//
+		//		{
+		//			Field errorsField = ReflectionUtils.findField(source.getClass(), "fErrors", Vector.class);
+		//			ReflectionUtils.makeAccessible(errorsField);
+		//			Field failuresField = ReflectionUtils.findField(source.getClass(), "fFailures", Vector.class);
+		//			ReflectionUtils.makeAccessible(failuresField);
+		//			try {
+		//				errors = (List) errorsField.get(source);
+		//				failures = (List) failuresField.get(source);
+		//			}
+		//			catch (IllegalAccessException iae) {
+		//				throw (RuntimeException) new IllegalStateException("cannot access test results fields").initCause(iae);
+		//			}
+		//		}
+
+		// get errors
+		for (Iterator iter = source.getTestErrors().iterator(); iter.hasNext();) {
+			destination.addError(test, (Throwable) iter.next());
+		}
+
+		// get failures
+		// since failures are a special JUnit error, we have to clone the stack
+		for (Iterator iter = source.getTestFailures().iterator(); iter.hasNext();) {
+			Throwable originalFailure = (Throwable) iter.next();
+			AssertionFailedError clonedFailure = new AssertionFailedError(originalFailure.getMessage());
+			clonedFailure.setStackTrace(originalFailure.getStackTrace());
+			destination.addFailure(test, clonedFailure);
+		}
+
+		return destination;
+	}
+
+	/**
+	 * Utility method which extracts the information from a TestResult and
+	 * stores it as primordial classes. This avoids the use of reflection when
+	 * reading the results outside OSGi.
+	 * 
+	 * @param result
+	 * @param holder
+	 */
+	public static void unpackProblems(TestResult result, OsgiTestInfoHolder holder) {
+		Enumeration errors = result.errors();
+		while (errors.hasMoreElements()) {
+			TestFailure failure = (TestFailure) errors.nextElement();
+			holder.addTestError(failure.thrownException());
+		}
+		Enumeration failures = result.failures();
+		while (failures.hasMoreElements()) {
+			TestFailure failure = (TestFailure) failures.nextElement();
+			holder.addTestFailure(failure.thrownException());
 		}
 	}
 }

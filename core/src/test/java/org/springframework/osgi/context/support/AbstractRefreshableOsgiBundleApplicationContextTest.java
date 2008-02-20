@@ -67,7 +67,7 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 	}
 
 	public void testBundleContext() throws Exception {
-		MockControl bundleCtxCtrl = MockControl.createStrictControl(BundleContext.class);
+		MockControl bundleCtxCtrl = MockControl.createNiceControl(BundleContext.class);
 		BundleContext bundleCtx = (BundleContext) bundleCtxCtrl.getMock();
 
 		MockControl bundleCtrl = MockControl.createStrictControl(Bundle.class);
