@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test;
 
 import java.lang.reflect.Field;
@@ -28,16 +29,20 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.test.internal.OsgiJUnitTest;
 import org.springframework.osgi.test.internal.TestRunnerService;
+import org.springframework.osgi.test.internal.holder.OsgiTestInfoHolder;
 
 public class JUnitTestActivatorTest extends TestCase {
 
 	private JUnitTestActivator activator;
 
+
 	// private ServiceRegistration registration;
 	// private ServiceReference reference;
 
 	public static class TestExample extends TestCase implements OsgiJUnitTest {
+
 		private static BundleContext context;
+
 
 		public void osgiSetUp() throws Exception {
 		}
@@ -70,8 +75,9 @@ public class JUnitTestActivatorTest extends TestCase {
 		public TestCase getTestCase() {
 			return this;
 		}
-		
+
 	}
+
 
 	protected void setUp() throws Exception {
 		activator = new JUnitTestActivator();
@@ -149,7 +155,7 @@ public class JUnitTestActivatorTest extends TestCase {
 		servCtrl.replay();
 
 		setActivatorField("context", ctx);
-		System.setProperty(OsgiJUnitTest.OSGI_TEST, TestExample.class.getName());
+		OsgiTestInfoHolder.INSTANCE.setTestClassName(TestExample.class.getName());
 
 		activator.executeTest();
 		assertSame(ctx, TestExample.context);

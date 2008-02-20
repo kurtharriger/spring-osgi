@@ -107,7 +107,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	/**
-	 * Crete the Runnable action which will complete the context creation
+	 * Create the Runnable action which will complete the context creation
 	 * process. This process can be called synchronously or asynchronously,
 	 * depending on context configuration and availability of dependencies.
 	 * 
@@ -195,7 +195,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 		try {
 			if (debug)
-				log.debug("calling preRefresh on " + getDisplayName());
+				log.debug("Calling preRefresh on " + getDisplayName());
 
 			synchronized (monitor) {
 
@@ -213,7 +213,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			}
 
 			if (debug)
-				log.debug("prerefresh completed; determining dependencies...");
+				log.debug("Pre-refresh completed; determining dependencies...");
 
 			Runnable task = null;
 
@@ -251,13 +251,13 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				// register a listener to look for them
 				dependencyDetector = dl;
 				if (debug)
-					log.debug("registering service dependency dependencyDetector for " + getDisplayName());
+					log.debug("Registering service dependency dependencyDetector for " + getDisplayName());
 				dependencyDetector.register();
 
 				if (synchronousWait) {
 					waitBarrier.increment();
 					if (debug)
-						log.debug("synchronous wait-for-dependencies; waiting...");
+						log.debug("Synchronous wait-for-dependencies; waiting...");
 
 					// if waiting times out...
 					if (waitBarrier.waitForZero(timeout)) {
@@ -272,7 +272,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 					startWatchDog();
 
 					if (debug)
-						log.debug("asynch wait-for-dependencies; ending method");
+						log.debug("Asynch wait-for-dependencies; ending method");
 				}
 
 			}
@@ -287,7 +287,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		boolean debug = log.isDebugEnabled();
 
 		if (debug)
-			log.debug("starting stage two for " + getDisplayName());
+			log.debug("Starting stage two for " + getDisplayName());
 
 		synchronized (monitor) {
 
@@ -327,7 +327,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			}
 
 			if (debug)
-				log.debug("closing appCtx for " + getDisplayName());
+				log.debug("Closing appCtx for " + getDisplayName());
 
 			if (dependencyDetector != null) {
 				dependencyDetector.deregister();
@@ -335,14 +335,14 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 			if (state == ContextState.STARTED) {
 				if (debug)
-					log.debug("shutting down normaly appCtx " + getDisplayName());
+					log.debug("Shutting down normaly appCtx " + getDisplayName());
 				// close the context only if it was actually started
 				state = ContextState.STOPPED;
 				normalShutdown = true;
 			}
 			else {
 				if (debug)
-					log.debug("no need to stop context (it hasn't been started yet)");
+					log.debug("No need to stop context (it hasn't been started yet)");
 				state = ContextState.INTERRUPTED;
 			}
 		}
@@ -353,7 +353,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			}
 		}
 		catch (Exception ex) {
-			log.fatal("could not succesfully close context " + delegateContext, ex);
+			log.fatal("Could not succesfully close context " + delegateContext, ex);
 		}
 		finally {
 			monitorCounter.decrement();
@@ -412,7 +412,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				dependencyDetector.deregister();
 			}
 
-			log.warn("timeout occured before finding service dependencies for [" + delegateContext.getDisplayName()
+			log.warn("Timeout occured before finding service dependencies for [" + delegateContext.getDisplayName()
 					+ "]");
 
 			ApplicationContextException e = new ApplicationContextException("Application context initializition for '"
@@ -498,7 +498,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 * @param expected the expected value for the context state.
 	 */
 	private void logWrongState(ContextState expected) {
-		log.error("expecting state (" + expected + ") not (" + state + ") for context [" + getDisplayName()
+		log.error("Expecting state (" + expected + ") not (" + state + ") for context [" + getDisplayName()
 				+ "]; assuming an interruption and bailing out");
 	}
 

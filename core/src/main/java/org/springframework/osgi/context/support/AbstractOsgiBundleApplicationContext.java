@@ -186,7 +186,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 */
 	protected void doClose() {
 		if (!OsgiServiceUtils.unregisterService(serviceRegistration)) {
-			logger.info("the application context service has been already unregistered");
+			logger.info("The application context service has been already unregistered");
 			serviceRegistration = null;
 		}
 
@@ -230,11 +230,11 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 
 		// add bundleContext bean
 		if (!beanFactory.containsLocalBean(BUNDLE_CONTEXT_BEAN_NAME)) {
-			logger.debug("registering BundleContext as a bean named " + BUNDLE_CONTEXT_BEAN_NAME);
+			logger.debug("Registering BundleContext as a bean named " + BUNDLE_CONTEXT_BEAN_NAME);
 			beanFactory.registerSingleton(BUNDLE_CONTEXT_BEAN_NAME, this.bundleContext);
 		}
 		else {
-			logger.warn("a bean named " + BUNDLE_CONTEXT_BEAN_NAME
+			logger.warn("A bean named " + BUNDLE_CONTEXT_BEAN_NAME
 					+ " already exists; the bundleContext will not be registered as a bean");
 		}
 
@@ -258,7 +258,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		Scope scope = beanFactory.getRegisteredScope(OsgiBundleScope.SCOPE_NAME);
 		if (scope != null && scope instanceof OsgiBundleScope) {
 			if (logger.isDebugEnabled())
-				logger.debug("destroying existing bundle scope beans...");
+				logger.debug("Destroying existing bundle scope beans...");
 			((OsgiBundleScope) scope).destroy();
 		}
 	}
@@ -288,7 +288,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 			String[] serviceNames = org.springframework.osgi.util.internal.ClassUtils.toStringArray(filterClasses);
 
 			if (logger.isDebugEnabled())
-				logger.debug("publishing service under classes " + ObjectUtils.nullSafeToString(serviceNames));
+				logger.debug("Publishing service under classes " + ObjectUtils.nullSafeToString(serviceNames));
 
 			// Publish under all the significant interfaces we see
 			this.serviceRegistration = getBundleContext().registerService(serviceNames, this, serviceProperties);

@@ -14,9 +14,11 @@ Package org.springframework.osgi.io
 * improved detection of relative OSGi URLs
 
 Package org.springframework.osgi.test
+* AbstractOsgiTest provides better error messages for bundle that fail to start
 * custom artifact locators can be used with AbstractDependencyManagerTests
 * removed all internal usage of system properties by the testing infrastructure
 * removed the use of serialization inside the testing framework
+
 
 Changes in version 1.0 final (2008-01-25)
 -----------------------------------------

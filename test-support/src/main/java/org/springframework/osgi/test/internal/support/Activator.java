@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.internal.support;
 
 import java.util.Hashtable;
@@ -20,12 +21,12 @@ import java.util.Hashtable;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.test.internal.OsgiJUnitTest;
 import org.springframework.osgi.test.internal.TestRunnerService;
+import org.springframework.osgi.test.internal.holder.HolderLoader;
 
 /**
- * Default activator for Spring/OSGi test support. This class can be seen as the 'server-side' of the framework,
- * which register the OsgiJUnitTest executor.
+ * Default activator for Spring/OSGi test support. This class can be seen as the
+ * 'server-side' of the framework, which register the OsgiJUnitTest executor.
  * 
  * @author Costin Leau
  * 
@@ -34,23 +35,16 @@ public class Activator implements BundleActivator {
 
 	private ServiceRegistration registration;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		registration = context.registerService(TestRunnerService.class.getName(), new OsgiJUnitService(), new Hashtable());
-		
-		// add also the bundle id so that AbstractOsgiTest can determine its BundleContext when used in an environment
-		// where the system bundle is treated as a special case (such as mBeddedServer).
-		System.getProperties().put(OsgiJUnitTest.OSGI_TEST_BUNDLE_ID, new Long(context.getBundle().getBundleId()));
 
+	public void start(BundleContext context) throws Exception {
+		registration = context.registerService(TestRunnerService.class.getName(), new OsgiJUnitService(),
+			new Hashtable());
+
+		// add also the bundle id so that AbstractOsgiTest can determine its BundleContext when used in an environment
+		// where the system bundle is treated as a special case.
+		HolderLoader.INSTANCE.getHolder().setTestBundleId(new Long(context.getBundle().getBundleId()));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
 	public void stop(BundleContext context) throws Exception {
 		// unregister the service even though the framework should do this automatically
 		if (registration != null)
