@@ -5,8 +5,18 @@ http://www.springframework.org/osgi
 Changes in version 1.0.1 (200y-mm-dd)
 -----------------------------------------
 
+Package org.springframework.context.support
+* the namespace resolver mechanism first checks the local bundle classpath before using the extender namespace service
+
+Package org.springframework.osgi.io
+* improved OsgiBundleResource handling of jars with missing archive entries for folders
+* improved OsgiBundleResourcePatternResolver performance when checking for jar resources
+* improved detection of relative OSGi URLs
+
 Package org.springframework.osgi.test
 * custom artifact locators can be used with AbstractDependencyManagerTests
+* removed all internal usage of system properties by the testing infrastructure
+* removed the use of serialization inside the testing framework
 
 Changes in version 1.0 final (2008-01-25)
 -----------------------------------------
