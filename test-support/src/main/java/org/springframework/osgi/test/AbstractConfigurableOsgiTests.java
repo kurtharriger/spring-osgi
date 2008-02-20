@@ -84,7 +84,7 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 				Class platformClass = ClassUtils.resolveClassName(platformClassName, currentCL);
 				if (OsgiPlatform.class.isAssignableFrom(platformClass)) {
 					if (trace)
-						logger.trace("instantiating platform wrapper...");
+						logger.trace("Instantiating platform wrapper...");
 					try {
 						platform = (OsgiPlatform) platformClass.newInstance();
 					}
@@ -93,7 +93,7 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 					}
 				}
 				else
-					logger.warn("class [" + platformClass + "] does not implement " + OsgiPlatform.class.getName()
+					logger.warn("Class [" + platformClass + "] does not implement " + OsgiPlatform.class.getName()
 							+ " interface; falling back to defaults");
 			}
 			else {
@@ -102,7 +102,7 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 
 		}
 		else
-			logger.trace("no platform specified; using default");
+			logger.trace("No platform specified; using default");
 
 		// fall back
 		if (platform == null)
@@ -129,7 +129,7 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 	protected String getPlatformName() {
 		String systemProperty = System.getProperty(OSGI_FRAMEWORK_SELECTOR);
 		if (logger.isTraceEnabled())
-			logger.trace("system property [" + OSGI_FRAMEWORK_SELECTOR + "] has value=" + systemProperty);
+			logger.trace("System property [" + OSGI_FRAMEWORK_SELECTOR + "] has value=" + systemProperty);
 
 		return (systemProperty == null ? Platforms.EQUINOX : systemProperty);
 	}

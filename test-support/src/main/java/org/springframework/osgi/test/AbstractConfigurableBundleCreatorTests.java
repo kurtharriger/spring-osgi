@@ -187,7 +187,7 @@ public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnT
 			try {
 				if (stream != null) {
 					settings.load(stream);
-					logger.debug("loaded jar settings from " + getSettingsLocation());
+					logger.debug("Loaded jar settings from " + getSettingsLocation());
 				}
 			}
 			finally {

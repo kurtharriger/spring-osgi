@@ -230,7 +230,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			osgiPlatform = createPlatform();
 			// start platform
 			if (debug)
-				logger.debug("about to start " + osgiPlatform);
+				logger.debug("About to start " + osgiPlatform);
 			osgiPlatform.start();
 			// platform context
 			platformContext = osgiPlatform.getBundleContext();
@@ -305,7 +305,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		Assert.notNull(platformContext);
 		Assert.notNull(location);
 		if (logger.isDebugEnabled())
-			logger.debug("installing bundle from location " + location.getDescription());
+			logger.debug("Installing bundle from location " + location.getDescription());
 		return platformContext.installBundle(location.getDescription(), location.getInputStream());
 	}
 
@@ -322,7 +322,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 		if (!OsgiBundleUtils.isFragment(bundle)) {
 			if (debug)
-				logger.debug("starting " + info);
+				logger.debug("Starting " + info);
 			try {
 				bundle.start();
 			}
@@ -364,7 +364,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			throw e;
 		}
 
-		logger.debug("writing test name [" + getName() + "] to OSGi");
+		if (logger.isTraceEnabled())
+			logger.trace("Writing test name [" + getName() + "] to OSGi");
 
 		// write test name to OSGi
 		// set test method name
@@ -443,14 +444,14 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 
 	// runs outside OSGi
 	private void readTestResult() {
-		if (logger.isDebugEnabled())
-			logger.debug("reading OSGi results for test [" + getName() + "]");
+		if (logger.isTraceEnabled())
+			logger.trace("Reading OSGi results for test [" + getName() + "]");
 
 		// copy results from OSGi into existing test result
 		TestUtils.cloneTestResults(OsgiTestInfoHolder.INSTANCE, originalResult, osgiJUnitTest);
 
-		if (logger.isDebugEnabled())
-			logger.debug("test[" + getName() + "]'s result read");
+		if (logger.isTraceEnabled())
+			logger.debug("Test[" + getName() + "]'s result read");
 	}
 
 	/**
@@ -473,14 +474,14 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * Cleanup for the test suite.
 	 */
 	private void shutdownTest() {
-		logger.info("shutting down OSGi platform");
+		logger.info("Shutting down OSGi platform");
 		if (osgiPlatform != null) {
 			try {
 				osgiPlatform.stop();
 			}
 			catch (Exception ex) {
 				// swallow
-				logger.warn("shutdown procedure threw exception " + ex);
+				logger.warn("Shutdown procedure threw exception " + ex);
 			}
 			osgiPlatform = null;
 		}

@@ -60,7 +60,7 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 		}
 
 		if (log.isTraceEnabled())
-			log.trace("loaded property editors configuration " + editorsConfig);
+			log.trace("Loaded property editors configuration " + editorsConfig);
 		editors = new LinkedHashMap(editorsConfig.size());
 
 		createEditors(classLoader, editorsConfig);
@@ -87,7 +87,7 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 			Assert.isAssignable(PropertyEditor.class, editorClass);
 
 			if (trace)
-				log.trace("adding property editor[" + editorClass + "] for type[" + key + "]");
+				log.trace("Adding property editor[" + editorClass + "] for type[" + key + "]");
 			editors.put(key, editorClass);
 		}
 	}
