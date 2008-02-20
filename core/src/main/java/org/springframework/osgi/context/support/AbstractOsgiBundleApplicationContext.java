@@ -258,7 +258,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		Scope scope = beanFactory.getRegisteredScope(OsgiBundleScope.SCOPE_NAME);
 		if (scope != null && scope instanceof OsgiBundleScope) {
 			if (logger.isDebugEnabled())
-				logger.debug("destroying existing bundle scope beans...");
+				logger.debug("Destroying existing bundle scope beans...");
 			((OsgiBundleScope) scope).destroy();
 		}
 	}
