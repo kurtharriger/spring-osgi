@@ -126,14 +126,14 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 		OsgiListenerUtils.addServiceListener(context, listener, filter);
 
 		if (logger.isDebugEnabled())
-			logger.debug("start waiting for Spring/OSGi bundle=" + forBundleWithSymbolicName);
+			logger.debug("Start waiting for Spring/OSGi bundle=" + forBundleWithSymbolicName);
 
 		try {
 			if (counter.waitForZero(time)) {
 				waitingFailed(forBundleWithSymbolicName);
 			}
 			else if (logger.isDebugEnabled()) {
-				logger.debug("found applicationContext for bundle=" + forBundleWithSymbolicName);
+				logger.debug("Found applicationContext for bundle=" + forBundleWithSymbolicName);
 			}
 		}
 		finally {
@@ -162,7 +162,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 	}
 
 	private void waitingFailed(String bundleName) {
-		logger.warn("waiting for applicationContext for bundle=" + bundleName + " timed out");
+		logger.warn("Waiting for applicationContext for bundle=" + bundleName + " timed out");
 
 		throw new RuntimeException("Gave up waiting for application context for '" + bundleName + "' to be created");
 	}
@@ -202,7 +202,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 			boolean debug = logger.isDebugEnabled();
 			boolean trace = logger.isTraceEnabled();
 			if (debug)
-				logger.debug("looking for Spring/OSGi powered bundles to wait for...");
+				logger.debug("Looking for Spring/OSGi powered bundles to wait for...");
 
 			// determine Spring/OSGi bundles
 			Bundle[] bundles = platformBundleContext.getBundles();

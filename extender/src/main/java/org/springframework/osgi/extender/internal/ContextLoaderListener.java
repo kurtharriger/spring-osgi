@@ -112,7 +112,7 @@ public class ContextLoaderListener implements BundleActivator {
 			synchronized (monitor) {
 				if (isClosed) {
 					if (trace)
-						log.trace("listener is closed; events are being ignored");
+						log.trace("Listener is closed; events are being ignored");
 					return;
 				}
 			}
@@ -125,7 +125,7 @@ public class ContextLoaderListener implements BundleActivator {
 			}
 			catch (Exception ex) {
 				/* log exceptions before swallowing */
-				log.warn("got exception while handling event " + event, ex);
+				log.warn("Got exception while handling event " + event, ex);
 			}
 		}
 
@@ -472,7 +472,7 @@ public class ContextLoaderListener implements BundleActivator {
 						// eliminate context
 						closedContexts.remove(context);
 						if (log.isDebugEnabled())
-							log.debug("closing appCtx " + context.getDisplayName());
+							log.debug("Closing appCtx " + context.getDisplayName());
 						context.close();
 					}
 				});
@@ -547,7 +547,7 @@ public class ContextLoaderListener implements BundleActivator {
 				}
 
 				else
-					log.debug("all listeners closed");
+					log.debug("All listeners closed");
 			}
 		}
 	}
@@ -561,7 +561,7 @@ public class ContextLoaderListener implements BundleActivator {
 	private boolean handlerBundleMatchesExtenderVersion(Bundle bundle) {
 		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
 			if (log.isDebugEnabled())
-				log.debug("bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
+				log.debug("Bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
 						+ "] expects an extender w/ version["
 						+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
 						+ "] which does not match current extender w/ version[" + extenderVersion
@@ -594,7 +594,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
 			if (log.isDebugEnabled())
-				log.debug("bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
+				log.debug("Bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
 						+ "] expects an extender w/ version["
 						+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
 						+ "] which does not match current extender w/ version[" + extenderVersion
@@ -604,7 +604,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
 		if (log.isDebugEnabled())
-			log.debug("created config " + config);
+			log.debug("Created config " + config);
 
 		if (!config.isSpringPoweredBundle()) {
 			return;
@@ -709,7 +709,7 @@ public class ContextLoaderListener implements BundleActivator {
 		Object setting = config.get(AUTO_ANNOTATION_PROCESSING);
 		if (setting != null && setting instanceof String && Boolean.getBoolean((String) setting)) {
 
-			log.info("enabled automatic Spring-DM annotation processing; [" + AUTO_ANNOTATION_PROCESSING + "="
+			log.info("Enabled automatic Spring-DM annotation processing; [" + AUTO_ANNOTATION_PROCESSING + "="
 					+ setting + "]");
 
 			// Try and load the annotation code if it exists
@@ -729,13 +729,13 @@ public class ContextLoaderListener implements BundleActivator {
 				});
 			}
 			catch (ClassNotFoundException exception) {
-				log.info("spring-dm annotation package cannot be found; automatic annotation processing is disabled");
+				log.info("Spring-dm annotation package cannot be found; automatic annotation processing is disabled");
 				if (log.isDebugEnabled())
-					log.debug("cannot load annotatoin bpp", exception);
+					log.debug("Cannot load annotatoin bpp", exception);
 			}
 		}
 		else {
-			log.info("disabled automatic Spring-DM annotation processing; [ " + AUTO_ANNOTATION_PROCESSING + "="
+			log.info("Disabled automatic Spring-DM annotation processing; [ " + AUTO_ANNOTATION_PROCESSING + "="
 					+ setting + "]");
 		}
 

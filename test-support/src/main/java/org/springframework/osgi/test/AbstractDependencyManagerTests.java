@@ -164,7 +164,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		boolean trace = logger.isTraceEnabled();
 
 		if (trace)
-			logger.trace("loaded properties " + props);
+			logger.trace("Loaded properties " + props);
 
 		// pass properties to test instance running inside OSGi space
 		System.getProperties().put(SPRING_OSGI_VERSION_PROP_KEY, props.get(SPRING_OSGI_VERSION_PROP_KEY));
@@ -173,7 +173,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		Properties excluded = PropertiesUtil.filterKeysStartingWith(props, IGNORE);
 
 		if (trace) {
-			logger.trace("excluded ignored properties " + excluded);
+			logger.trace("Excluded ignored properties " + excluded);
 		}
 
 		// filter bundles which are Tiger/JDK 1.5 specific
@@ -191,7 +191,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 		String[] bundles = (String[]) props.keySet().toArray(new String[props.size()]);
 		if (logger.isDebugEnabled())
-			logger.debug("default framework bundles :" + ObjectUtils.nullSafeToString(bundles));
+			logger.debug("Default framework bundles :" + ObjectUtils.nullSafeToString(bundles));
 
 		return bundles;
 	}

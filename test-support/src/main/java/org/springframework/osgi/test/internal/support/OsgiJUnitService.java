@@ -66,12 +66,12 @@ public class OsgiJUnitService implements TestRunnerService {
 		// read the test to be executed
 		String testName = holder.getTestMethodName();
 		if (log.isDebugEnabled())
-			log.debug("reading test [" + testName + "] for execution inside OSGi");
+			log.debug("Reading test [" + testName + "] for execution inside OSGi");
 		// execute the test
 		TestResult result = runTest(test, testName);
 
 		if (log.isDebugEnabled())
-			log.debug("sending test results from OSGi");
+			log.debug("Sending test results from OSGi");
 		// write result back to the outside world
 		TestUtils.unpackProblems(result, holder);
 	}
@@ -84,7 +84,7 @@ public class OsgiJUnitService implements TestRunnerService {
 	 */
 	protected TestResult runTest(final OsgiJUnitTest osgiTestExtensions, String testName) {
 		if (log.isDebugEnabled())
-			log.debug("running test [" + testName + "] on testCase " + osgiTestExtensions);
+			log.debug("Running test [" + testName + "] on testCase " + osgiTestExtensions);
 		final TestResult result = new TestResult();
 		TestCase rawTest = osgiTestExtensions.getTestCase();
 
