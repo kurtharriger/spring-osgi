@@ -138,7 +138,18 @@
 			<artifactId>osgi_R4_compendium</artifactId>
 			<version>1.0</version>
 			<scope>provided</scope>
-		</dependency>         
+		</dependency>
+
+
+		<!-- this dependency exists only to test clogging 1.0.4 behaviour -->
+		<!-- slf4j is strongly recommended as a replacement for clogging at least for OSGi environments -->
+		<dependency>
+			<groupId>org.eclipse.bundles</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>20070611</version>
+			<scope>provided</scope>
+		</dependency>
+		
     </dependencies>
 
     <profiles>
