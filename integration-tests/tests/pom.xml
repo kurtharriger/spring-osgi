@@ -145,7 +145,7 @@
 		<!-- slf4j is strongly recommended as a replacement for clogging at least for OSGi environments -->
 		<dependency>
 			<groupId>org.eclipse.bundles</groupId>
-			<artifactId>commons-logging</artifactId>
+			<artifactId>commons-logging.osgi</artifactId>
 			<version>20070611</version>
 			<scope>provided</scope>
 		</dependency>

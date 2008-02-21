@@ -26,7 +26,6 @@ import java.util.jar.Manifest;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
-import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * IO compliance test for bundles containing Bundle ClassPath entries.
@@ -163,11 +162,5 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 		System.out.println(jis.available());
 		jis.close();
 
-	}
-
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		// waiting for KF 2.0.4 to be released
-		return getPlatformName().indexOf("fish") > -1;
-		//return false;
 	}
 }

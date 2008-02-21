@@ -20,7 +20,6 @@ import java.net.URL;
 import java.util.Enumeration;
 
 import org.springframework.osgi.iandt.io.BaseIoTest;
-import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -108,6 +107,5 @@ public class IoTest extends BaseIoTest {
 		assertNotNull(enm);
 		assertTrue(enm.hasMoreElements());
 		assertTrue(((URL) enm.nextElement()).getPath().endsWith("/"));
-
 	}
 }

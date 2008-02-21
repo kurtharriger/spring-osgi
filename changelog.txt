@@ -12,6 +12,10 @@ General
 Package org.springframework.osgi.io
 * added support for classpath: and classpath*: patterns
 
+Package org.springframework.osgi.test
+* FelixPlatform uses the Felix distribution default system packages
+* KnopflerfishPlatform uses the KF distribution default system packages
+
 Changes in version 1.0.1 (2008-0m-dd)
 -------------------------------------
 

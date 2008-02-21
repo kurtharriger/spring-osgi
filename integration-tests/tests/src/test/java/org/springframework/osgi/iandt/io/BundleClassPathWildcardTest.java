@@ -21,6 +21,7 @@ import java.util.jar.Manifest;
 
 import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -88,9 +89,4 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		return false;
 	}
 
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return isKF();
-	}
-	
-	
 }
