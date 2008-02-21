@@ -32,13 +32,13 @@ import org.springframework.util.CollectionUtils;
  * @author Costin Leau
  * 
  */
-public class CommonsLogging104Test extends BaseIntegrationTest {
+public abstract class CommonsLogging104Test extends BaseIntegrationTest {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(CommonsLogging104Test.class);
 
 
-	protected String[] getTstFrameworkBundlesNames() {
+	protected String[] getTestFrameworkBundlesNames() {
 		String[] bundles = super.getTestFrameworkBundlesNames();
 
 		// remove slf4j
@@ -61,14 +61,15 @@ public class CommonsLogging104Test extends BaseIntegrationTest {
 		log.info("logging statement");
 	}
 
-	protected void prProcessBundleContext(BundleContext platformBundleContext) throws Exception {
+	protected void preProcessBundleContext(BundleContext platformBundleContext) throws Exception {
 
-//		LogFactory.releaseAll();
-//		System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.NoOpLog");
+		// all below fail
+		LogFactory.releaseAll();
+		System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.NoOpLog");
 		
-//		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 //		System.out.println("TCCL is " + cl);
-//		Thread.currentThread().setContextClassLoader(null);
+		Thread.currentThread().setContextClassLoader(null);
 		super.preProcessBundleContext(platformBundleContext);	
 	}
 
