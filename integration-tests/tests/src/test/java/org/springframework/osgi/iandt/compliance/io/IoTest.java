@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.Enumeration;
 
 import org.springframework.osgi.iandt.io.BaseIoTest;
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -47,14 +48,14 @@ public class IoTest extends BaseIoTest {
 		assertNotNull(url);
 	}
 
-	// fails on Felix 1.0.1 (fixed in KF 2.0.3)
+	// fails on Felix 1.0.1 (fixed in 1.0.3 and KF 2.0.3)
 	public void testGetResourceOnRoot() throws Exception {
 		URL url = bundle.getResource("/");
 		System.out.println("getResource('/') = " + url);
 		assertNotNull("root folder not validated " + url);
 	}
 
-	// fails on Felix 1.0.1 (fixed in KF 2.0.3)
+	// fails on Felix 1.0.1 (fixed in 1.0.3 and KF 2.0.3)
 	public void testGetResourceSOnRoot() throws Exception {
 		Enumeration enm = bundle.getResources("/");
 		Object[] res = copyEnumeration(enm);
@@ -108,9 +109,5 @@ public class IoTest extends BaseIoTest {
 		assertTrue(enm.hasMoreElements());
 		assertTrue(((URL) enm.nextElement()).getPath().endsWith("/"));
 
-	}
-
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return (isFelix() && (testMethodName.equalsIgnoreCase("testGetResourceOnRoot") || testMethodName.equalsIgnoreCase("testGetResourceSOnRoot")));
 	}
 }
