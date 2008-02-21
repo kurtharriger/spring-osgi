@@ -32,7 +32,7 @@ import org.springframework.util.CollectionUtils;
  * @author Costin Leau
  * 
  */
-public abstract class CommonsLogging104Test extends BaseIntegrationTest {
+public class CommonsLogging104Test extends BaseIntegrationTest {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(CommonsLogging104Test.class);
@@ -65,7 +65,8 @@ public abstract class CommonsLogging104Test extends BaseIntegrationTest {
 
 		// all below fail
 		LogFactory.releaseAll();
-		System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.NoOpLog");
+		//System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.NoOpLog");
+		System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
 		
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 //		System.out.println("TCCL is " + cl);
