@@ -6,8 +6,8 @@ Changes in version 1.1.0 (200y-mm-dd)
 -----------------------------------------
 
 General
-* changed requirement to Knopflerfish 2.0.4+
-* changed requirement to Felix 1.0.3+
+* Knopflerfish 2.0.4+ required
+* Felix 1.0.3+ required
 
 Package org.springframework.osgi.io
 * added support for classpath: and classpath*: patterns

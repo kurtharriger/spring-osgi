@@ -17,7 +17,6 @@
 package org.springframework.osgi.iandt.io;
 
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * @author Costin Leau
@@ -125,9 +124,8 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		// felix doesn't support fragments yet
-		// waiting for KF 2.0.4 to be released
 		return (isFelix() && (testMethodName.equals("testAllClassPathWildcardAtFolderLevel")
-				|| testMethodName.equals("testWildcardAtRootFileLevel") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel")) || isKF());
+				|| testMethodName.equals("testWildcardAtRootFileLevel") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel")));
 	}
 
 }
