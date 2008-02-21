@@ -52,7 +52,7 @@ public class CommonsLogging104Test extends BaseIntegrationTest {
 				iterator.remove();
 		}
 		// add commons logging
-		 bnds.add("commons-logging,commons-logging.osgi,1.0.4");
+		bnds.add("org.eclipse.bundles,commons-logging.osgi,20070611");
 
 		return (String[]) bnds.toArray(new String[bnds.size()]);
 	}
@@ -67,11 +67,11 @@ public class CommonsLogging104Test extends BaseIntegrationTest {
 		LogFactory.releaseAll();
 		//System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.NoOpLog");
 		System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
-		
+
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-//		System.out.println("TCCL is " + cl);
+		//		System.out.println("TCCL is " + cl);
 		Thread.currentThread().setContextClassLoader(null);
-		super.preProcessBundleContext(platformBundleContext);	
+		super.preProcessBundleContext(platformBundleContext);
 	}
 
 }
