@@ -43,10 +43,6 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 
 	private static final Log log = LogFactory.getLog(FelixPlatform.class);
 
-	private static final String FELIX_LOG_LEVEL = "felix.log.level";
-
-	private static final String FELIX_LOG_LEVEL_VALUE = "0";
-
 	private static final String FELIX_PROFILE_DIR_PROPERTY = "felix.cache.profiledir";
 
 	private BundleContext context;
@@ -64,8 +60,10 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		// load Felix configuration
 		Properties props = new Properties();
 		createStorageDir(props);
-		// add logging
-		props.put(FELIX_LOG_LEVEL, FELIX_LOG_LEVEL_VALUE);
+		// disable logging
+		props.put("felix.log.level", "0");
+		// use embedded mode
+		props.put("felix.embedded.execution", "true");
 		return props;
 	}
 
