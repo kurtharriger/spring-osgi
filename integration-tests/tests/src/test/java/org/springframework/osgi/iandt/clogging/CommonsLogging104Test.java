@@ -52,7 +52,7 @@ public class CommonsLogging104Test extends BaseIntegrationTest {
 				iterator.remove();
 		}
 		// add commons logging
-		bnds.add("org.eclipse.bundles,commons-logging.osgi,20070611");
+		bnds.add("org.eclipse.bundles,commons-logging,20070611");
 
 		return (String[]) bnds.toArray(new String[bnds.size()]);
 	}
