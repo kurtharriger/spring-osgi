@@ -18,6 +18,7 @@ Package org.springframework.osgi.test
 * custom artifact locators can be used with AbstractDependencyManagerTests
 * removed all internal usage of system properties by the testing infrastructure
 * removed the use of serialization inside the testing framework
+* improved automatic manifest generation by parsing only the test parents that are available in the test bundle
 
 
 Changes in version 1.0 final (2008-01-25)
@@ -44,6 +45,7 @@ Package org.springframework.osgi.util
 * DebugUtils uses a degradable logger to properly report error messages when the logging implementation is misconfigured
 * BundleDelegatingClassLoader uses a degradable logger to properly report error messages when the logging implementation
   is misconfigured or the logging classes are not loaded yet
+
 
 Changes in version 1.0 RC2 (2008-01-11)
 ---------------------------------------

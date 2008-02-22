@@ -89,18 +89,18 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 			Resource settingsFile = new FileSystemResource(new File(userHome, M2_SETTINGS));
 			localRepository = getMavenSettingsLocalRepository(settingsFile);
 			if (trace)
-				log.trace("falling back to M2 settings.xml [" + settingsFile + "]; found value=" + localRepository);
+				log.trace("Falling back to M2 settings.xml [" + settingsFile + "]; found value=" + localRepository);
 			if (localRepository == null) {
 				// fall back to the default location
 				localRepository = new File(userHome, DEFAULT_DIR).getAbsolutePath();
 				if (trace)
-					log.trace("no custom setting found; using default M2 local repository=" + localRepository);
+					log.trace("No custom setting found; using default M2 local repository=" + localRepository);
 
 			}
 		}
 
 		repositoryHome = localRepository;
-		log.info("local Maven2 repository used: [" + repositoryHome + "]");
+		log.info("Local Maven2 repository used: [" + repositoryHome + "]");
 	}
 
 	/**
