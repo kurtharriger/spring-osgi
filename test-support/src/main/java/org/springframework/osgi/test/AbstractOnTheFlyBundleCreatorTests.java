@@ -300,23 +300,51 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 	/**
 	 * Determine imports by walking a class hierarchy until the current package
-	 * is found.
+	 * is found. Currently, the parsers checks only the test class hierarchy
+	 * available in the bundle. note that split packages are not supported.
+	 * 
 	 * 
 	 * @return
 	 */
 	private String[] determineImports(Class clazz) {
 		Assert.notNull(clazz, "a not-null class is required");
+
+		boolean trace = logger.isTraceEnabled();
+
 		String endPackage = ClassUtils.classPackageAsResourcePath(AbstractOnTheFlyBundleCreatorTests.class).replace(
 			'/', '.');
 
 		Set cumulatedPackages = new LinkedHashSet();
 
+		// get contained packages to do matching on the test hierarchy
+		Collection containedPackages = jarCreator.getContainedPackages();
+
+		// make sure the collection package is valid
+		boolean validPackageCollection = !containedPackages.isEmpty();
+
 		String clazzPackage;
 
+		// start parsing the test class hierarchy
 		do {
-			cumulatedPackages.addAll(determineImportsForClass(clazz));
 			clazzPackage = ClassUtils.classPackageAsResourcePath(clazz).replace('/', '.');
+			// check if the class package is inside this jar or not
+			// parse the class only for available packages otherwise
+
+			// if we don't have the package, add it
+			if (validPackageCollection && !containedPackages.contains(clazzPackage)) {
+				logger.trace("Package [" + clazzPackage + "] is NOT part of the test archive; adding an import for it");
+				cumulatedPackages.add(clazzPackage);
+			}
+
+			// otherwise parse the class byte-code
+			else {
+				if (trace)
+					logger.trace("Package [" + clazzPackage + "] is part of the test archive; parsing " + clazz
+							+ " bytecode to determine imports...");
+				cumulatedPackages.addAll(determineImportsForClass(clazz));
+			}
 			clazz = clazz.getSuperclass();
+			// work until the testing framework packages are reached 
 		} while (!endPackage.equals(clazzPackage));
 
 		String[] packages = (String[]) cumulatedPackages.toArray(new String[cumulatedPackages.size()]);
