@@ -318,7 +318,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
   <service-properties>
     <beans:entry key="myOtherKey" value="aStringValue"/>
     <beans:entry key="aThirdKey" value-ref="beanToExposeAsProperty"/>
-  <service-properties>
+  </service-properties>
 </service>]]></programlisting>
 
         <para>The Spring Dynamic Modules roadmap includes support for
