@@ -306,6 +306,26 @@ context ::= path ( ';' path ) * (';' directive) *
         
       </itemizedlist>
     </section>
+    
+    <section id="app-deploy:spring-namespaces">
+    	<title>Spring XML authoring support</title>
+    	
+    	<para>Spring 2.0 introduced (among other things) <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/xsd-config.html">
+    	easier</ulink> XML configuration and <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/extensible-xml.html">
+    	extensible</ulink> XML authoring. The latter gives the ability of creating custom schemas that are discovered automatically (in non-OSGi environment)
+    	by the Spring XML infrastructure by including them in the classpath. Spring-DM is aware of this process and supports it in OSGi environments so
+    	that custom schemas are available to bundles that use them without any extra code or manifest declaration.</para>
+    	<para>All bundles deployed in the OSGi space (whether they are <literal>Spring-powered</literal> or not) are scanned by Spring-DM for 
+    	custom Spring namespace declaration (by checking the bundle space for<literal>META-INF/spring.handlers</literal> and 
+    	<literal>META-INF/spring.schemas</literal>). If these are found, Spring-DM will make the schemas and the namespaces available through an OSGi
+    	service that will be automatically used by Spring-powered bundles. This mean that if you deploy a bundle that uses a custom schema, all you have to do
+    	is deploy the library that provides the namespace parser and the schema.
+    	Bundles that embedded inside their classpath libraries that provide custom schemas will use these over those available in the OSGi space. However,
+    	the namespaces of the embedded libraries will not shared with other bundles, that is, they will not be seen by any other bundle.</para>
+    	<para>
+    	In short, with using Spring-DM, custom Spring namespaces are supported transparently without any additional work. Embedded namespace providers will
+    	have priority but will not be shared, as opposed to providers deployed as bundles which will be seen (and used) by others.</para>
+    </section>
 
     <section id="app-deploy:imports-exports">
       <title>Importing and Exporting packages</title>
@@ -378,7 +398,7 @@ context ::= path ( ';' path ) * (';' directive) *
       workarounds.</para>
     </section>
 
-    <section id="app-deploy:troubleshoot">
+    <section id="app-deploy:troubleshooting">
       <title>Diagnosing problems</title>
 
       <para>Your chosen OSGi platform implementation should be able to provide
@@ -405,4 +425,5 @@ context ::= path ( ';' path ) * (';' directive) *
       besides log4j.
       </para>
     </section>
+    
   </chapter>
