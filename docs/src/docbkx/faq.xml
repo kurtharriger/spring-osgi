@@ -247,6 +247,44 @@
         <ulink
         url="http://www.qos.ch/logging/thinkAgain.jsp">#2</ulink></para>
       </section>
+      
+      <section id="getting-commons-logging-to-work">
+        <title>I have to use commons-logging, what can I do?</title>
+
+        <para>If you have to use commons-logging (for example the jar is required by certain bundles)
+        then try using the most recent version commons-logging version (1.1+) as it provides more options
+        on the discovery process. Below are some settings that can be used to make commons-logging work
+        inside an OSGi environment:</para>
+        
+        <itemizedlist>
+          <listitem>
+          	<para>1.0.x</para>
+          	<para>
+          	Unfortunately, commons-logging 1.0.x uses the thread context class loader (TCCL) always for <ulink 
+          	url="http://commons.apache.org/logging/commons-logging-1.1/tech.html#A_Short_Theory_Guide_To_JCL">loading
+          	loggers</ulink> implementations. Inside an OSGi environment, the TCCL is undefined and cannot be relied upon.
+          	Since managing the TCCL is almost impossible as most loggers are defined as static fields that need to
+          	resolved on class loading, using a different <classname>LogFactory</classname> is advised. One can use
+          	the <emphasis>org.apache.commons.logging.LogFactory</emphasis> system property to specify a different
+          	log factory however, the commons-logging bundle should be able to load this class.</para>
+          </listitem>
+          <listitem>
+          	<para>1.1.x</para>
+          	<para>If using commons logging 1.1.x, one can turn off the tccl usage through <emphasis>use_tccl</emphasis>
+          	property, part of the <emphasis>commons-logging.properties</emphasis> file.
+          	<ulink url="http://commons.apache.org/logging/commons-logging-1.1/troubleshooting.html"/>. Additionally,
+          	1.1.x provides several system properties (such as <emphasis>org.apache.commons.logging.Log.allowFlawedContext</emphasis>,
+          	<emphasis>org.apache.commons.logging.Log.allowFlawedDiscovery</emphasis> and 
+          	<emphasis>org.apache.commons.logging.Log.allowFlawedHierarchy</emphasis>) that can change the behavious of the discovery process.
+          	See the <ulink url="http://commons.apache.org/logging/apidocs/org/apache/commons/logging/impl/LogFactoryImpl.html">LogFactoryImpl</ulink>
+          	javadoc for more details.</para>
+          </listitem>
+        </itemizedlist>
+         
+        <para>In our tests, commons logging 1.1.x can be used with reasonable success inside OSGi. We haven't been able to find a generic
+        configuration for commons logging 1.0.x that works and that does not rely on fragile hacks dependent on the running environment.</para>
+        
+      </section>
 
       <section id="logging-impl-choice">
         <title>Why don't you use the OSGi logging service/[insert your favourite
@@ -356,10 +394,21 @@
       	<title>When using Spring-DM integration testing I get an exception about serialVersionUID. What is the problem?</title>
       	
       	<para>
+      	This problem occurs on Spring DM versions up to 1.0 - consider upgrading to 1.0.1 or better. If you are stuck with 1.0 see below.
       	When running an integration test, Spring-DM will duplicate the test instance and execute it inside OSGi. To avoid problems
       	like this one, make sure you are using the same libraries (with the same version) as Spring-DM when running your test. This
       	particular problem for example is caused by a JUnit 3.8.2 vs 3.8.x serialization compatibility. Make sure that you are using
       	at least JUnit 3.8.2 for the execution of your tests. 
+      	</para>
+      </section>
+      
+      <section id="linkage-error">
+      	<title>I've just updated my Spring DM library and now I get a <emphasis>LinkageError</emphasis>. How can I solve this? </title>
+      	
+      	<para>
+      	The above error indicates that some classes, dependend on by others, have a different, incompatible version then the one required.
+      	Normally this occur with workspaces (such as Eclipse) that are corrupt or stale. Consider doing a complete clean build or, in case of
+      	Eclipse, creating a new workspace. 
       	</para>
       </section>
     </chapter>
