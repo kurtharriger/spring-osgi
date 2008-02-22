@@ -149,7 +149,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 		String manifestLocation = getManifestLocation();
 		if (StringUtils.hasText(manifestLocation)) {
-			logger.info("using Manifest from specified location=[" + getManifestLocation() + "]");
+			logger.info("Using Manifest from specified location=[" + getManifestLocation() + "]");
 			DefaultResourceLoader loader = new DefaultResourceLoader();
 			manifest = createManifestFrom(loader.getResource(manifestLocation));
 		}
@@ -167,14 +167,14 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 			for (Iterator iterator = jarEntries.entrySet().iterator(); iterator.hasNext();) {
 				Map.Entry entry = (Map.Entry) iterator.next();
 				if (META_INF_JAR_LOCATION.equals(entry.getKey())) {
-					logger.info("using Manifest from the test bundle content=[/META-INF/MANIFEST.MF]");
+					logger.info("Using Manifest from the test bundle content=[/META-INF/MANIFEST.MF]");
 					manifest = createManifestFrom((Resource) entry.getValue());
 				}
 			}
 			// fallback to default manifest creation
 
 			if (manifest == null) {
-				logger.info("automatically creating Manifest for the test bundle");
+				logger.info("Automatically creating Manifest for the test bundle");
 				manifest = createDefaultManifest();
 			}
 		}
@@ -219,7 +219,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		addImportPackage(manifest);
 
 		if (logger.isDebugEnabled())
-			logger.debug("created manifest:" + manifest.getMainAttributes().entrySet());
+			logger.debug("Created manifest:" + manifest.getMainAttributes().entrySet());
 		return manifest;
 	}
 
@@ -264,7 +264,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		}
 
 		if (!eliminatedImports.isEmpty() && logger.isTraceEnabled())
-			logger.trace("eliminated special packages " + eliminatedImports);
+			logger.trace("Eliminated special packages " + eliminatedImports);
 
 		return filteredImports;
 	}
@@ -293,30 +293,58 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 				filteredImports.add(pckg);
 		}
 		if (!eliminatedImports.isEmpty() && logger.isTraceEnabled())
-			logger.trace("eliminated packages already present in the bundle " + eliminatedImports);
+			logger.trace("Eliminated packages already present in the bundle " + eliminatedImports);
 
 		return filteredImports;
 	}
 
 	/**
 	 * Determine imports by walking a class hierarchy until the current package
-	 * is found.
+	 * is found. Currently, the parsers checks only the test class hierarchy
+	 * available in the bundle. note that split packages are not supported.
+	 * 
 	 * 
 	 * @return
 	 */
 	private String[] determineImports(Class clazz) {
 		Assert.notNull(clazz, "a not-null class is required");
+
+		boolean trace = logger.isTraceEnabled();
+
 		String endPackage = ClassUtils.classPackageAsResourcePath(AbstractOnTheFlyBundleCreatorTests.class).replace(
 			'/', '.');
 
 		Set cumulatedPackages = new LinkedHashSet();
 
+		// get contained packages to do matching on the test hierarchy
+		Collection containedPackages = jarCreator.getContainedPackages();
+
+		// make sure the collection package is valid
+		boolean validPackageCollection = !containedPackages.isEmpty();
+
 		String clazzPackage;
 
+		// start parsing the test class hierarchy
 		do {
-			cumulatedPackages.addAll(determineImportsForClass(clazz));
 			clazzPackage = ClassUtils.classPackageAsResourcePath(clazz).replace('/', '.');
+			// check if the class package is inside this jar or not
+			// parse the class only for available packages otherwise
+
+			// if we don't have the package, add it
+			if (validPackageCollection && !containedPackages.contains(clazzPackage)) {
+				logger.trace("Package [" + clazzPackage + "] is NOT part of the test archive; adding an import for it");
+				cumulatedPackages.add(clazzPackage);
+			}
+
+			// otherwise parse the class byte-code
+			else {
+				if (trace)
+					logger.trace("Package [" + clazzPackage + "] is part of the test archive; parsing " + clazz
+							+ " bytecode to determine imports...");
+				cumulatedPackages.addAll(determineImportsForClass(clazz));
+			}
 			clazz = clazz.getSuperclass();
+			// work until the testing framework packages are reached 
 		} while (!endPackage.equals(clazzPackage));
 
 		String[] packages = (String[]) cumulatedPackages.toArray(new String[cumulatedPackages.size()]);
@@ -348,7 +376,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		boolean trace = logger.isTraceEnabled();
 
 		if (trace)
-			logger.trace("discovered classes to analyze " + allClasses);
+			logger.trace("Discovered classes to analyze " + allClasses);
 
 		ClassReader reader;
 
@@ -356,7 +384,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 			Class classToVisit = (Class) iterator.next();
 			try {
 				if (trace)
-					logger.trace("visiting class " + classToVisit);
+					logger.trace("Visiting class " + classToVisit);
 				reader = new ClassReader(clazz.getResourceAsStream(ClassUtils.getClassFileName(classToVisit)));
 			}
 			catch (Exception ex) {
@@ -369,7 +397,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	}
 
 	protected void postProcessBundleContext(BundleContext context) throws Exception {
-		logger.debug("post processing: creating test bundle");
+		logger.debug("Post processing: creating test bundle");
 
 		Resource jar;
 
@@ -415,10 +443,10 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		boolean debug = logger.isDebugEnabled();
 
 		if (debug)
-			logger.debug("test bundle [" + bundleString + "] succesfully installed");
+			logger.debug("Test bundle [" + bundleString + "] succesfully installed");
 		bundle.start();
 		if (debug)
-			logger.debug("test bundle [" + bundleString + "] succesfully started");
+			logger.debug("Test bundle [" + bundleString + "] succesfully started");
 	}
 
 }
