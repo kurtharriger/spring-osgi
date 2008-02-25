@@ -845,22 +845,24 @@ public class ContextLoaderListener implements BundleActivator {
 	// TODO: can we simplify this somewhat further so there is no need for a
 	// different XML file
 	protected TaskExecutor createTaskExecutor(BundleContext context) {
-		if (extenderContext.containsBean(TASK_EXECUTOR_BEAN_NAME)) {
-			Object taskExecutor = extenderContext.getBean(TASK_EXECUTOR_BEAN_NAME);
-			if (taskExecutor instanceof TaskExecutor) {
-				return (TaskExecutor) taskExecutor;
-			}
-			else {
-				if (log.isErrorEnabled()) {
-					log.error("Bean 'taskExecutor' in META-INF/spring/extender.xml configuration file "
-							+ "is not an instance of " + TaskExecutor.class.getName() + ". " + "Using defaults.");
+		if (extenderContext != null) {
+			if (extenderContext.containsBean(TASK_EXECUTOR_BEAN_NAME)) {
+				Object taskExecutor = extenderContext.getBean(TASK_EXECUTOR_BEAN_NAME);
+				if (taskExecutor instanceof TaskExecutor) {
+					return (TaskExecutor) taskExecutor;
+				}
+				else {
+					if (log.isErrorEnabled()) {
+						log.error("Bean 'taskExecutor' in META-INF/spring/extender.xml configuration file "
+								+ "is not an instance of " + TaskExecutor.class.getName() + ". " + "Using defaults.");
+					}
 				}
 			}
-		}
-		else {
-			if (log.isWarnEnabled()) {
-				log.warn("Found META-INF/spring/extender.xml configuration file, but no bean "
-						+ "named 'taskExecutor' was defined; using defaults.");
+			else {
+				if (log.isWarnEnabled()) {
+					log.warn("Found META-INF/spring/extender.xml configuration file, but no bean "
+							+ "named 'taskExecutor' was defined; using defaults.");
+				}
 			}
 		}
 
