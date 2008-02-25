@@ -5,12 +5,11 @@
     <source>src/main/java/impl/BeanImpl.java</source>
   </sources>
   <resources>
-    <!--
-    <resource>META-INF/MANIFEST.MF</resource>
-    -->
+    <resource>META-INF/readme.txt</resource>
     <resource>readme.txt</resource>
     <resource>src/main/resources/META-INF/spring/bundle-context.xml</resource>
     <resource>src/main/resources/META-INF/spring/bundle-context-osgi.xml</resource>
+    <resource>src/main/resources/log4j.properties</resource>
     <resource>.classpath</resource>
     <resource>.project</resource>
     <resource>build.properties</resource>
@@ -20,6 +19,6 @@
     <source>src/test/java/impl/BeanIntegrationTest.java</source>
   </testSources>
   <testResources>
-    <resource>src/test/resources/readme.txt</resource>
+    <resource>src/test/resources/log4j.properties</resource>
   </testResources>
 </archetype>

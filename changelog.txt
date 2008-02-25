@@ -23,8 +23,15 @@ Package org.springframework.osgi.test
 Changes in version 1.0.1 (2008-0m-dd)
 -------------------------------------
 
+General
+* fixed nested Eclipse classpath entry in spring-osgi bundle archetype
+* added log4j.properties to spring-osgi bundle archetype
+
 Package org.springframework.context.support
 * the namespace resolver mechanism first checks the local bundle classpath before using the extender namespace service
+
+Package org.springframework.osgi.context
+* fixed AbstractDelegatedExecutionApplicationContext to log errors that occur during the bean factory startup
 
 Package org.springframework.osgi.io
 * improved OsgiBundleResource handling of jars with missing archive entries for folders

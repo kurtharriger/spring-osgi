@@ -15,7 +15,7 @@
   </properties>
   
   <dependencies>
-  
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
@@ -56,14 +56,13 @@
      <version>4.0</version>
     </dependency>
 
-	<!-- test scoped dependencies -->    
+	<!-- test scoped dependencies -->
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>junit.osgi</artifactId>
       <version>3.8.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
@@ -74,14 +73,14 @@
     <dependency>
 	  <groupId>org.springframework.osgi</groupId>
 	  <artifactId>spring-osgi-test</artifactId>
-	  <version>${spring.osg.version}</version>
+	  <version>${spring.osgi.version}</version>
 	  <scope>test</scope>
 	</dependency>
 
 	<dependency>
 	  <groupId>org.springframework.osgi</groupId>
 	  <artifactId>spring-osgi-annotation</artifactId>
-	  <version>${spring.osg.version}</version>
+	  <version>${spring.osgi.version}</version>
 	  <scope>test</scope>
 	</dependency>
 
@@ -90,13 +89,29 @@
 	  <artifactId>aopalliance.osgi</artifactId>
 	  <version>1.0-SNAPSHOT</version>
 	  <scope>test</scope>
-	</dependency>    
+	</dependency>
+
   </dependencies>
 
   <!-- for packaging as an OSGi bundle, we use the maven-bundle-plugin -->
   
   <!-- see http://felix.apache.org/site/maven-bundle-plugin-bnd.html for more info -->
   <build>
+    <resources>
+      <!-- standard Maven folder -->
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <!-- plus root folder -->
+      <resource>
+        <directory>.</directory>
+        <includes>
+          <include>plugin.xml</include>
+          <include>META-INF/*</include>
+        </includes>
+      </resource>
+    </resources>  
+    
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -104,13 +119,33 @@
         <extensions>true</extensions>
         <version>1.0.0</version>
         <configuration>
+		   <manifestLocation>META-INF</manifestLocation>
            <instructions>
-               <manifestLocation>META-INF</manifestLocation>
-               <Export-Package>${package}*</Export-Package>
+               <Export-Package>${package}*;version=${version}</Export-Package>
                <Import-Package>*</Import-Package>
+               <!-- 
+                  add ,plugin.xml if it's present i.e.
+                  src/main/resources,plugin.xml
+               -->
+               <Include-Resource>src/main/resources</Include-Resource>
            </instructions>
         </configuration>
       </plugin>
+      
+      <!-- generate manifest automatically once the classes are processed -->
+	  <plugin>   
+		<groupId>org.apache.felix</groupId>
+		<artifactId>maven-bundle-plugin</artifactId>
+		<executions>
+		  <execution>
+			<id>bundle-manifest</id>
+			<phase>process-classes</phase>
+			<goals>    
+			  <goal>manifest</goal>
+			</goals>   
+		  </execution>
+		</executions>
+	   </plugin>      
     </plugins>
   </build>
   
