@@ -20,8 +20,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
+import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
+import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
@@ -84,6 +87,9 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 	private boolean available = false;
 
+	/** delegated multicaster */
+	private ApplicationEventMulticaster delegatedMulticaster;
+
 
 	/**
 	 * 
@@ -116,7 +122,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * continuation-like behavior or completion of the refresh method on several
 	 * threads, in a asynch manner.
 	 * 
-	 * By default, the refresh method in executed in <em>one go</em> (normal behavior).
+	 * By default, the refresh method in executed in <em>one go</em> (normal
+	 * behavior).
 	 * 
 	 * {@inheritDoc}
 	 */
@@ -153,7 +160,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		}
 	}
 
-	// Adds behavior for isAvailable flag.
+	// Adds behaviour for isAvailable flag.
 	protected void doClose() {
 		synchronized (availableMonitor) {
 			available = false;
@@ -183,11 +190,12 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 							+ OsgiStringUtils.bundleStateAsString(getBundle()));
 				}
 
+				ConfigurableListableBeanFactory beanFactory = null;
 				// Prepare this context for refreshing.
 				prepareRefresh();
 
 				// Tell the subclass to refresh the internal bean factory.
-				ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+				beanFactory = obtainFreshBeanFactory();
 
 				// Prepare the bean factory for use in this context.
 				prepareBeanFactory(beanFactory);
@@ -209,10 +217,15 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// Destroy already created singletons to avoid dangling
 					// resources.
 					beanFactory.destroySingletons();
-					logger.error("Post refresh error", ex);
-					throw ex;
+					cancelRefresh(ex);
 				}
 			}
+		}
+		catch (RuntimeException ex) {
+			logger.error("Pre refresh error", ex);
+			// send failure event
+			sendFailedEvent(ex);
+			throw ex;
 		}
 		finally {
 			thread.setContextClassLoader(oldTCCL);
@@ -249,15 +262,23 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 					// Last step: publish corresponding event.
 					finishRefresh();
+					
+					// everything went okay, post notification
+					sendRefreshedEvent();
 				}
 				catch (BeansException ex) {
 					// Destroy already created singletons to avoid dangling
 					// resources.
 					getBeanFactory().destroySingletons();
-					logger.error("Post refresh error", ex);
-					throw ex;
+					cancelRefresh(ex);
 				}
 			}
+		}
+		catch (RuntimeException ex) {
+			logger.error("Post refresh error", ex);
+			// post notification
+			sendFailedEvent(ex);
+			throw ex;
 		}
 		finally {
 			thread.setContextClassLoader(oldTCCL);
@@ -280,6 +301,20 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 	public void setExecutor(OsgiBundleApplicationContextExecutor executor) {
 		this.executor = executor;
+	}
+
+	public void setDelegatedEventMulticaster(ApplicationEventMulticaster multicaster) {
+		this.delegatedMulticaster = multicaster;
+	}
+
+	private void sendFailedEvent(Throwable cause) {
+		if (delegatedMulticaster != null)
+			delegatedMulticaster.multicastEvent(new OsgiBundleContextFailedEvent(this, cause));
+	}
+
+	private void sendRefreshedEvent() {
+		if (delegatedMulticaster != null)
+			delegatedMulticaster.multicastEvent(new OsgiBundleContextRefreshedEvent(this));
 	}
 
 }

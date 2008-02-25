@@ -9,6 +9,9 @@ General
 * Knopflerfish 2.0.4+ required
 * Felix 1.0.3+ required
 
+Package org.springframework.osgi.context
+* AbstractDelegatedExecutionApplicationContext calls "cancelRefresh" if exceptions appear during the delegeted refresh
+
 Package org.springframework.osgi.io
 * added support for classpath: and classpath*: patterns
 
