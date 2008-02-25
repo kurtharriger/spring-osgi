@@ -116,7 +116,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * continuation-like behavior or completion of the refresh method on several
 	 * threads, in a asynch manner.
 	 * 
-	 * By default, the refresh method in executed in <em>one go</em> (normal behavior).
+	 * By default, the refresh method in executed in <em>one go</em> (normal
+	 * behavior).
 	 * 
 	 * {@inheritDoc}
 	 */
@@ -209,10 +210,12 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// Destroy already created singletons to avoid dangling
 					// resources.
 					beanFactory.destroySingletons();
-					logger.error("Post refresh error", ex);
-					throw ex;
 				}
 			}
+		}
+		catch (RuntimeException ex) {
+			logger.error("Pre refresh error", ex);
+			throw ex;
 		}
 		finally {
 			thread.setContextClassLoader(oldTCCL);
