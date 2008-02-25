@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extender.internal;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -27,21 +29,21 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.osgi.extender.internal.ContextLoaderListener;
 import org.springframework.osgi.extender.internal.support.TestTaskExecutor;
 import org.springframework.osgi.extender.internal.util.ConfigUtils;
 import org.springframework.osgi.mock.EntryLookupControllingMockBundle;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
-
+import org.springframework.osgi.mock.MockServiceRegistration;
 
 /**
  * @author Adrian Colyer
  * 
  */
-public class ContextLoaderListenerTest extends TestCase {
+public abstract class ContextLoaderListenerTest extends TestCase {
 
 	private ContextLoaderListener listener;
+
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -78,12 +80,14 @@ public class ContextLoaderListenerTest extends TestCase {
 		context.addBundleListener(null);
 		bundleContextControl.setMatcher(MockControl.ALWAYS_MATCHER);
 		bundleContextControl.setVoidCallable(2);
-		
+
+		bundleContextControl.expectAndReturn(context.registerService(new String[0], null, new Properties()),
+			new MockServiceRegistration(), MockControl.ONE_OR_MORE);
+		bundleContextControl.setMatcher(MockControl.ALWAYS_MATCHER);
 
 		bundleContextControl.replay();
 
 		this.listener.start(context);
-
 		bundleContextControl.verify();
 	}
 
@@ -94,6 +98,7 @@ public class ContextLoaderListenerTest extends TestCase {
 		aBundle.setEntryReturnOnNextCallToGetEntry(new ClassPathResource("META-INF/spring/moved-extender.xml").getURL());
 
 		MockBundleContext ctx = new MockBundleContext() {
+
 			public Bundle getBundle() {
 				return aBundle;
 			}
