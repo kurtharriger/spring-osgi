@@ -97,6 +97,21 @@
   
   <!-- see http://felix.apache.org/site/maven-bundle-plugin-bnd.html for more info -->
   <build>
+    <resources>
+      <!-- standard Maven folder -->
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <!-- plus root folder -->
+      <resource>
+        <directory>.</directory>
+        <includes>
+          <include>plugin.xml</include>
+          <include>META-INF/*</include>
+        </includes>
+      </resource>
+    </resources>  
+    
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -104,13 +119,33 @@
         <extensions>true</extensions>
         <version>1.0.0</version>
         <configuration>
+		   <manifestLocation>META-INF</manifestLocation>
            <instructions>
-               <manifestLocation>META-INF</manifestLocation>
-               <Export-Package>${package}*</Export-Package>
+               <Export-Package>${package}*;version=${version}</Export-Package>
                <Import-Package>*</Import-Package>
+               <!-- 
+                  add ,plugin.xml if it's present i.e.
+                  src/main/resources,plugin.xml
+               -->
+               <Include-Resource>src/main/resources</Include-Resource>
            </instructions>
         </configuration>
       </plugin>
+      
+      <!-- generate manifest automatically once the classes are processed -->
+	  <plugin>   
+		<groupId>org.apache.felix</groupId>
+		<artifactId>maven-bundle-plugin</artifactId>
+		<executions>
+		  <execution>
+			<id>bundle-manifest</id>
+			<phase>process-classes</phase>
+			<goals>    
+			  <goal>manifest</goal>
+			</goals>   
+		  </execution>
+		</executions>
+	   </plugin>      
     </plugins>
   </build>
   
