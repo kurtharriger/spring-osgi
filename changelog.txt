@@ -8,6 +8,9 @@ Changes in version 1.0.1 (200y-mm-dd)
 Package org.springframework.context.support
 * the namespace resolver mechanism first checks the local bundle classpath before using the extender namespace service
 
+Package org.springframework.osgi.context
+* fixed AbstractDelegatedExecutionApplicationContext to log errors that occur during the bean factory startup
+
 Package org.springframework.osgi.io
 * improved OsgiBundleResource handling of jars with missing archive entries for folders
 * improved OsgiBundleResourcePatternResolver performance when checking for jar resources
