@@ -19,6 +19,9 @@
 
       <para><xref linkend="appendix-pde-integration"/> describes how to integrate Spring-DM
       with Eclipse Plug-in Development Environment.</para>
+      
+      <para><xref linkend="appendix-archetype"/> describes the Spring-DM Maven 2 archetype
+      usage.</para>
 
       <para><xref linkend="appendix-roadmap"/> describes some features that are included in
       the 1.0 distribution but are still considered early-access. The
