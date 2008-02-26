@@ -12,6 +12,7 @@
 	<slf4j.version>1.4.3</slf4j.version>
 	<spring.maven.artifact.version>2.5.1</spring.maven.artifact.version>
 	<spring.osgi.version>1.1.0-m1-SNAPSHOT</spring.osgi.version>
+	<equinox.ver>3.2.2</equinox.ver>
   </properties>
   
   <dependencies>
@@ -49,6 +50,7 @@
       <artifactId>slf4j-log4j12</artifactId>
       <version>${slf4j.version}</version>
     </dependency>
+
     
     <dependency>
      <groupId>org.osgi</groupId>
@@ -90,7 +92,23 @@
 	  <version>1.0-SNAPSHOT</version>
 	  <scope>test</scope>
 	</dependency>
-
+	  
+	<!-- Equinox OSGi platform -->
+    <dependency>
+      <groupId>org.eclipse.osgi</groupId>
+      <artifactId>org.eclipse.osgi</artifactId>
+      <version>${equinox.ver}</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>log4j.osgi</artifactId>
+      <version>1.2.15-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>    
+    
   </dependencies>
 
   <!-- for packaging as an OSGi bundle, we use the maven-bundle-plugin -->
@@ -121,7 +139,7 @@
         <configuration>
 		   <manifestLocation>META-INF</manifestLocation>
            <instructions>
-               <Export-Package>${package}*;version=${version}</Export-Package>
+               <Export-Package>!${package}.impl,${package}*</Export-Package>
                <Import-Package>*</Import-Package>
                <!-- 
                   add ,plugin.xml if it's present i.e.
