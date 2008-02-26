@@ -4,9 +4,8 @@ import ${package}.Bean;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
- * Integration test the bundle locally (outside of OSGi).
- * Use AbstractOsgiTests and a separate integration test project
- * for testing inside of OSGi.
+ * Local integration test (outside of OSGi).
+ * @see BeanOsgiIntegrationTest for integration test inside OSGi.
  */
 public class BeanIntegrationTest extends AbstractDependencyInjectionSpringContextTests {
 
