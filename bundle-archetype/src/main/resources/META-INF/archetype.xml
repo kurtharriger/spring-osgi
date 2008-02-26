@@ -17,6 +17,7 @@
   <testSources>
     <source>src/test/java/impl/BeanImplTest.java</source>
     <source>src/test/java/impl/BeanIntegrationTest.java</source>
+    <source>src/test/java/impl/BeanOsgiIntegrationTest.java</source>
   </testSources>
   <testResources>
     <resource>src/test/resources/log4j.properties</resource>
