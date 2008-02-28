@@ -11,7 +11,7 @@
   <properties>
 	<slf4j.version>1.4.3</slf4j.version>
 	<spring.maven.artifact.version>2.5.1</spring.maven.artifact.version>
-	<spring.osgi.version>1.0.1</spring.osgi.version>
+	<spring.osgi.version>1.0.2-SNAPSHOT</spring.osgi.version>
 	<equinox.ver>3.2.2</equinox.ver>
   </properties>
   

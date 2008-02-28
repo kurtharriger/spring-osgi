@@ -13,7 +13,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.1/spring-context-2.5.1.jar" sourcepath="/M2_REPO/org/springframework/spring/2.0/spring-2.0-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.1/spring-beans-2.5.1.jar" sourcepath="/M2_REPO/org/springframework/spring/2.0/spring-2.0-sources.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Weather Sample Service Bundle"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/1.0.1/spring-osgi-test-1.0.1.jar" sourcepath="/OSGI_SRC_ROOT/test-support/src/main/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.0.1/spring-osgi-core-1.0.1.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/1.0.2-SNAPSHOT/spring-osgi-test-1.0.2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/test-support/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.0.2-SNAPSHOT/spring-osgi-core-1.0.2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
