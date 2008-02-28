@@ -4,7 +4,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>Spring OSGi</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
@@ -26,6 +26,7 @@
 				<executions>
 					<execution>
 						<id>single-page</id>
+						<phase>pre-site</phase>
 						<goals>
 							<goal>generate-html</goal>
 							<goal>generate-pdf</goal>
@@ -58,10 +59,10 @@
 								<move file="target/site/reference/pdf/issues.pdf" tofile="target/site/reference/pdf/spring-dm-issues.pdf" failonerror="false" />
 							</postProcess>							
 						</configuration>
-						<phase>pre-site</phase>
 					</execution>
 					<execution>
 						<id>multi-page</id>
+						<phase>pre-site</phase>						
 						<goals>
 							<goal>generate-html</goal>
 						</goals>
@@ -84,7 +85,6 @@
 								</copy>
 							</postProcess>							
 						</configuration>
-						<phase>pre-site</phase>
 					</execution>
 				</executions>
                 <dependencies>
@@ -96,8 +96,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <includes>index.xml,faq.xml,issues.xml</includes>
-                    <chunkedOutput>true</chunkedOutput>
+					<includes>index.xml,faq.xml,issues.xml</includes>
                     <htmlStylesheet>css/html.css</htmlStylesheet>
                     <xincludeSupported>true</xincludeSupported>
                     <sourceDirectory>${basedir}/src/docbkx</sourceDirectory>
