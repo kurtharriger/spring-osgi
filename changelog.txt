@@ -20,7 +20,7 @@ Package org.springframework.osgi.test
 * KnopflerfishPlatform uses the KF distribution default system packages
 
 
-Changes in version 1.0.1 (2008-0m-dd)
+Changes in version 1.0.1 (2008-02-29)
 -------------------------------------
 
 General
