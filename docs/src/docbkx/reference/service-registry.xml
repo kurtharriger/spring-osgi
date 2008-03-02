@@ -1454,7 +1454,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
     <property name="target" ref="importer" />
 </bean>
 	
-<osgi:reference id="service" interface="SomeService">
+<osgi:reference id="importer" interface="SomeService">
     <osgi:listener bind-method="bind" ref="listener" />
 </osgi:reference>]]></programlisting>
 
@@ -1490,7 +1490,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
           	<area id="service-registry.listener.bad.cycles.listener.cycle" coords="4"/>
        	  </areaspec>
        	  
-          <programlisting><![CDATA[<osgi:reference id="service" interface="SomeService">
+          <programlisting><![CDATA[<osgi:reference id="importer" interface="SomeService">
     <osgi:listener bind-method="bind">
         <bean class="cycle.Listener">
             <property name="target" ref="importer" />

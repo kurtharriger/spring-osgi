@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<project>
+  <parent>
+    <artifactId>spring-osgi</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>1.1.0-m1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi</groupId>
+  <artifactId>spring-osgi-web</artifactId>
+  <packaging>bundle</packaging>
+  <url>http://www.springframework.org/osgi</url>
+  <name>Spring OSGi Web Support</name>
+  <description>
+  Spring/OSGi web support. Allows web applications to transparently run on OSGi platforms.
+  </description>
+  
+  
+  <properties>
+	<!-- jetty version used in the OSGi manifests -->
+    <jetty.osgi.version>6.1</jetty.osgi.version>
+    
+    <!-- jetty artifact version -->
+	<jetty.version>6.1.7</jetty.version>
+
+    <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
+	
+
+  	<spring.osgi.export.pkg>org.springframework.osgi.web.extender</spring.osgi.export.pkg>
+
+  	<spring.osgi.private.pkg>
+		org.springframework.osgi.web.extender.internal*
+  	</spring.osgi.private.pkg>
+
+	<spring.osgi.import.pkg>
+		org.apache.commons.logging*,
+		org.springframework.osgi.service.importer,
+		org.springframework.aop.framework,
+		org.osgi.service.cm;version=1.2;resolution:=optional,
+		org.mortbay.jetty*;version=${jetty.osgi.version};resolution:=optional,
+		org.w3c.dom;resolution:=optional,
+		org.xml.sax;resolution:=optional,
+		*;resolution:=optional
+	</spring.osgi.import.pkg>
+	
+	<spring.osgi.symbolic.name>${symName.prefix}.web</spring.osgi.symbolic.name>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-core</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+    
+   <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-mock</artifactId>
+      <version>${project.parent.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+   <!-- we add this dependencies so that the BND plugin can determine their versions -->
+   <!-- they are transitive so it makes sense to use a property instead -->
+   <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aop</artifactId>
+      <version>${spring.maven.artifact.version}</version>
+      <exclusions>
+      	<exclusion>
+          <groupId>aopalliance</groupId>
+	      <artifactId>aopalliance</artifactId>
+      	</exclusion>
+      	<exclusion>
+          <groupId>commons-logging</groupId>
+	      <artifactId>commons-logging</artifactId>
+      	</exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>${spring.maven.artifact.version}</version>
+      <exclusions>      
+      	<exclusion>
+          <groupId>commons-logging</groupId>
+	      <artifactId>commons-logging</artifactId>
+      	</exclusion>
+      </exclusions>      
+    </dependency>    
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi_R4_compendium</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty</artifactId>
+      <version>${jetty.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty-util</artifactId>
+      <version>${jetty.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    
+  </dependencies>
+
+
+</project>

@@ -310,7 +310,7 @@
           	  <para>Use a repository of pre-wrapped libraries such as <ulink url="http://www.eclipse.org/orbit/">Orbit</ulink>,
           	  <ulink url="http://felix.apache.org/site/apache-felix-commons.html">Felix Commons</ulink> or Knopflerfish <ulink 
           	  url="http://www.knopflerfish.org/repo/index.html">repository</ulink>.
-          	  Spring-DM also provides a small <ulink url="http://static.springframework.org/maven2-snapshots/org/springframework/osgi">
+          	  Spring-DM also provides a small (Amazon S3) <ulink url="http://s3.amazonaws.com/maven.springframework.org/osgi">
           	  repository</ulink> for its internal usage, which you might find helpful.</para> 
           	</listitem>
           	<listitem>
