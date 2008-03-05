@@ -17,18 +17,12 @@
 package org.springframework.osgi.web.extender.internal.jetty;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandler;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.webapp.WebAppClassLoader;
@@ -43,9 +37,9 @@ import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactory
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.WarDeployer;
-import org.springframework.util.FileCopyUtils;
+import org.springframework.osgi.web.extender.internal.util.ChainedClassLoader;
+import org.springframework.osgi.web.extender.internal.util.Utils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * <a href="http://jetty.mortbay.org">Jetty</a> 6.1.x specific war deployer.
@@ -54,21 +48,23 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-
-//TODO: TDL (JSTL) discovery - part of TagLibConfiguration
 public class JettyWarDeployer implements WarDeployer {
+
+	private static final String JASPER_CLASS = "org.apache.jasper.JspC";
+
+	private static final String JSP_CLASS = "javax.servlet.jsp.JspPage";
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(JettyWarDeployer.class);
 
 	/** Jetty system classes */
+	// these are loaded by the war parent classloader
 	private static final String[] systemClasses = { "java.", "javax.servlet.", "javax.xml.", "org.mortbay." };
+
 	/** Jetty server classes */
+	// these aren't loaded by the war classloader
 	private static final String[] serverClasses = { "-org.mortbay.jetty.plus.jaas.", "org.mortbay.jetty." };
 
-	private ContextHandler contextHandler;
-	private ClassLoader customClassLoader;
-	private WebAppClassLoader jettyClassLoader;
 	/** access to Jetty server service */
 	private Server serverService;
 	/** OSGi context */
@@ -139,28 +135,30 @@ public class JettyWarDeployer implements WarDeployer {
 		// create a jetty web app context
 		WebAppContext wac = new WebAppContext();
 
-		// apparently the server is being used to generate the temp folder
+		// the server is being used to generate the temp folder (so we have to set it)
 		wac.setServer(serverService);
 		// set the war string since it's used to generate the temp path
 		wac.setWar(OsgiStringUtils.nullSafeName(bundle));
+		// same goes for the context path (add leading "/" -> w/o the context will not work)
+		wac.setContextPath("/".concat(Utils.getWarContextPath(bundle)));
 
 		//
 		// resource settings
 		//
 
-		// start with the slow, IO activity
+		// 1. start with the slow, IO activity
+
+		// first add the context path (used to determine the temporary path)
+		// 
 
 		// unpack the war somewhere
 		// TODO: add support for fragments that can start/stop during the life of a war
 		// TODO: save the folder (to support fragments) into the map
 		File unpackFolder = unpackBundle(bundle, wac);
 
-		// wac needs access to the WAR root
-		// we have to make sure we don't trigger any direct file lookup
-		// so instead of calling .setWar()
-		// we set the base resource directly
 		//Resource rootResource = new BundleSpaceJettyResource(bundle, "/");
 		Resource rootResource = Resource.newResource(unpackFolder.getCanonicalPath());
+
 		if (log.isDebugEnabled())
 			log.debug("the root resources are " + ObjectUtils.nullSafeToString(rootResource.list()));
 
@@ -168,10 +166,12 @@ public class JettyWarDeployer implements WarDeployer {
 		wac.setCopyWebDir(false);
 		// TODO: should this be configurable ?
 		wac.setExtractWAR(true);
-		// add leading "/" -> w/o the context will not work
-		wac.setContextPath("/".concat(getContextPath(bundle)));
-		wac.setBaseResource(rootResource);
 
+		// wac needs access to the WAR root
+		// we have to make sure we don't trigger any direct file lookup
+		// so instead of calling .setWar()
+		// we set the base resource directly
+		wac.setBaseResource(rootResource);
 		// reset the war setting (so that the base resource is used)
 		wac.setWar(null);
 
@@ -183,14 +183,23 @@ public class JettyWarDeployer implements WarDeployer {
 		wac.setSystemClasses(systemClasses);
 		wac.setServerClasses(serverClasses);
 
-		// jetty classloader
+		// create jetty classloader
 		ClassLoader jettyClassLoader = Server.class.getClassLoader();
+
+		ClassLoader jspClassLoader = Utils.getClassLoader(JSP_CLASS, jettyClassLoader);
+
+		ClassLoader jasperClassLoader = Utils.getClassLoader(JASPER_CLASS, jettyClassLoader);
+
+		// chain the jasper and jsp classloader (so JSPs can work even if they are not declared)
+		ChainedClassLoader chainedCL = new ChainedClassLoader(new ClassLoader[] { jettyClassLoader, jspClassLoader,
+			jasperClassLoader });
+
 		// use the bundle classloader as a parent
-		ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, jettyClassLoader);
+		ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, chainedCL);
 
 		// use the Jetty default classloader to access the WEB-INF/lib and WEB-INF/classes folder
 		// TODO: the generic OSGi can used if the WEB/lib and WEB-INF/classes are part of the class-path
-		WebAppClassLoader warClassLoader = new WebAppClassLoader(jettyClassLoader, wac);
+		WebAppClassLoader warClassLoader = new WebAppClassLoader(bundleClassLoader, wac);
 		warClassLoader.setName("Jetty OSGi ClassLoader");
 
 		wac.setClassLoader(warClassLoader);
@@ -246,34 +255,6 @@ public class JettyWarDeployer implements WarDeployer {
 			}
 	}
 
-	/**
-	 * Determines the context path. Will try to return a string representation
-	 * by first looking at the bundle location, followed by the bundle symbolic
-	 * name and then name. If none can be used (for non-OSGi artifacts for
-	 * example) then an arbitrary name will be used.
-	 * 
-	 * 
-	 * @param bundle
-	 * @return
-	 */
-	private String getContextPath(Bundle bundle) {
-		// get only the file (be sure to normalize just in case)
-		String context = StringUtils.getFilename(StringUtils.cleanPath(bundle.getLocation()));
-		// remove extension
-		context = StringUtils.stripFilenameExtension(context);
-
-		if (StringUtils.hasText(context))
-			return context;
-
-		// fall-back to bundle symbolic name
-		context = bundle.getSymbolicName();
-		if (StringUtils.hasText(context))
-			return context;
-		// fall-back to bundle name
-		context = OsgiStringUtils.nullSafeName(bundle);
-		return context;
-	}
-
 	private File unpackBundle(Bundle bundle, WebAppContext wac) {
 
 		File extractedWebAppDir = new File(wac.getTempDirectory(), "webapp");
@@ -283,43 +264,9 @@ public class JettyWarDeployer implements WarDeployer {
 		log.info("unpacking bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " to folder ["
 				+ extractedWebAppDir + "] ...");
 		// copy the bundle content into the target folder
-		copyBundleContent(bundle, extractedWebAppDir);
+		Utils.unpackBundle(bundle, extractedWebAppDir);
 
 		return extractedWebAppDir;
 	}
 
-	// might have to improve this method to cope with missing folder entries ...
-	private void copyBundleContent(Bundle bundle, File targetFolder) {
-		// no need to use a recursive method since we get all resources directly
-		Enumeration enm = bundle.findEntries("/", null, true);
-		while (enm != null && enm.hasMoreElements()) {
-			boolean trace = log.isTraceEnabled();
-
-			// get only the path
-			URL url = (URL) enm.nextElement();
-			String entryPath = url.getPath();
-			if (entryPath.startsWith("/"))
-				entryPath = entryPath.substring(1);
-
-			File targetFile = new File(targetFolder, entryPath);
-			// folder are a special case, we have to create them rather then copy
-			if (entryPath.endsWith("/"))
-				targetFile.mkdir();
-			else {
-				try {
-					OutputStream targetStream = new FileOutputStream(targetFile);
-					if (trace)
-						log.trace("copying " + url + " to " + targetFile);
-					FileCopyUtils.copy(url.openStream(), targetStream);
-				}
-				catch (IOException ex) {
-					//
-					log.error("cannot copy resource " + entryPath, ex);
-					throw (RuntimeException) new IllegalStateException("IO exception while unpacking bundle "
-							+ OsgiStringUtils.nullSafeNameAndSymName(bundle)).initCause(ex);
-				}
-				// no need to close the streams - the utils already handles that
-			}
-		}
-	}
 }
