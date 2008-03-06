@@ -520,6 +520,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		this.monitorCounter = contextsStarted;
 	}
 
+	/**
+	 * Sets the multicaster for delegating failing events.
+	 * 
+	 * @param multicaster
+	 */
 	public void setDelegatedMulticaster(ApplicationEventMulticaster multicaster) {
 		this.delegatedMulticaster = multicaster;
 	}

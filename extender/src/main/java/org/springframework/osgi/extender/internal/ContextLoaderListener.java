@@ -40,10 +40,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -51,9 +51,11 @@ import org.springframework.core.CollectionFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.osgi.OsgiException;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceDependencySorter;
@@ -63,10 +65,11 @@ import org.springframework.osgi.extender.internal.support.NamespaceManager;
 import org.springframework.osgi.extender.internal.util.ConfigUtils;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.extender.internal.util.concurrent.RunnableTimedExecution;
-import org.springframework.osgi.service.exporter.support.AutoExport;
-import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
+import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.osgi.service.importer.support.CollectionType;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiBundleUtils;
-import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -323,10 +326,13 @@ public class ContextLoaderListener implements BundleActivator {
 	 */
 	private Version extenderVersion;
 
-	/** extender event multicaster */
 	private ApplicationEventMulticaster multicaster;
 
-	private ServiceRegistration multiCasterRegistration;
+	/** listeners interested in monitoring managed OSGi appCtxs */
+	private List applicationListeners;
+
+	/** dynamicList clean up hook */
+	private DisposableBean applicationListenersCleaner;
 
 
 	/**
@@ -383,8 +389,8 @@ public class ContextLoaderListener implements BundleActivator {
 		// do this once namespace handlers have been detected
 		this.taskExecutor = createTaskExecutor(context);
 
-		// init multicaster
-		initMultiCaster(context);
+		// init the OSGi event dispatch/listening system
+		initListenerService();
 
 		// make sure to register this before any listening starts
 		// registerShutdownHook();
@@ -457,10 +463,7 @@ public class ContextLoaderListener implements BundleActivator {
 			nsListener = null;
 		}
 
-		// remove published services
-		OsgiServiceUtils.unregisterService(multiCasterRegistration);
-		multiCasterRegistration = null;
-
+		// destroy bundles
 		Bundle[] bundles = new Bundle[managedContexts.size()];
 
 		int i = 0;
@@ -522,6 +525,23 @@ public class ContextLoaderListener implements BundleActivator {
 		this.managedContexts.clear();
 		// clear the namespace registry
 		nsManager.destroy();
+
+		// release listeners
+		if (applicationListeners != null) {
+			applicationListeners = null;
+			try {
+				applicationListenersCleaner.destroy();
+			}
+			catch (Exception ex) {
+				log.warn("exception thrown while releasing OSGi event listeners", ex);
+			}
+		}
+
+		// release multicaster
+		if (multicaster != null) {
+			multicaster.removeAllListeners();
+			multicaster = null;
+		}
 
 		this.taskExecutor = null;
 		if (this.extenderContext != null) {
@@ -613,8 +633,10 @@ public class ContextLoaderListener implements BundleActivator {
 	 * Context creation is a potentially long-running activity (certainly more
 	 * than we want to do on the synchronous event callback). <p/> <p/>Based on
 	 * our configuration, the context can be started on the same thread or on a
-	 * different one. <p/> Kick off a background activity to create an
-	 * application context for the given bundle if needed.
+	 * different one.
+	 * 
+	 * <p/> Kick off a background activity to create an application context for
+	 * the given bundle if needed.
 	 * 
 	 * @param bundle
 	 */
@@ -649,9 +671,12 @@ public class ContextLoaderListener implements BundleActivator {
 			}
 			return;
 		}
+
 		managedContexts.put(bundleId, context);
 
+		// initialize context
 		context.setPublishContextAsService(config.isPublishContextAsService());
+		context.setDelegatedEventMulticaster(multicaster);
 
 		// create refresh runnable
 		Runnable contextRefresh = new Runnable() {
@@ -879,29 +904,45 @@ public class ContextLoaderListener implements BundleActivator {
 		return taskExecutor;
 	}
 
-	/**
-	 * Initialize multicaster service (as well as publish it as an OSGi
-	 * service).
-	 * 
-	 * @param OSGi bundle context
-	 */
-	private void initMultiCaster(BundleContext context) throws Exception {
+	private void initListenerService() {
 		multicaster = createMultiCaster();
 
-		OsgiServiceFactoryBean exporterFB = new OsgiServiceFactoryBean();
-		exporterFB.setBundleContext(context);
-		exporterFB.setAutoExport(AutoExport.ALL_CLASSES);
+		createListenersList();
+		// register the listener that does the dispatching
+		multicaster.addApplicationListener(new OsgiListenerWrapper(applicationListeners));
 
-		if (extenderContext != null) {
-			exporterFB.setBeanFactory(extenderContext);
-			exporterFB.setTargetBeanName(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME);
-		}
-		else {
-			exporterFB.setTarget(multicaster);
-		}
-		exporterFB.afterPropertiesSet();
+		if (log.isDebugEnabled())
+			log.debug("Iitializing OSGi listeners service completed...");
+	}
 
-		multiCasterRegistration = (ServiceRegistration) exporterFB.getObject();
+	/**
+	 * Creates a dynamic OSGi list of OSGi services interested in receiving
+	 * events for OSGi application contexts.
+	 */
+	private void createListenersList() {
+		OsgiServiceCollectionProxyFactoryBean fb = new OsgiServiceCollectionProxyFactoryBean();
+		fb.setBundleContext(context);
+		fb.setCardinality(Cardinality.C_0__N);
+		fb.setCollectionType(CollectionType.LIST);
+		fb.setInterfaces(new Class[] { OsgiBundleApplicationContextListener.class });
+
+		// load the aop class loader used by spring core
+		ClassLoader coreCL = OsgiServiceCollectionProxyFactoryBean.class.getClassLoader();
+		ClassLoader aopCL;
+		try {
+			Class clazz = coreCL.loadClass("org.springframework.aop.framework.ProxyFactory");
+			aopCL = clazz.getClassLoader();
+		}
+		catch (Exception ex) {
+			throw new OsgiException("cannot create dynamic listener list", ex);
+		}
+		ClassLoader loader = BundleDelegatingClassLoader.createBundleClassLoaderFor(context.getBundle(), aopCL);
+
+		fb.setBeanClassLoader(loader);
+		fb.afterPropertiesSet();
+
+		applicationListenersCleaner = fb;
+		applicationListeners = (List) fb.getObject();
 	}
 
 	/**

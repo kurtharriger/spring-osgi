@@ -74,11 +74,11 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 
 	private Object proxy;
 
+
 	/**
-	 * Returns a managed hook to access OSGi service(s).
-	 * Subclasses can decide to create either a proxy managing only
-	 * one OSGi service type or a collection of services matching a certain
-	 * criteri
+	 * Returns a managed hook to access OSGi service(s). Subclasses can decide
+	 * to create either a proxy managing only one OSGi service type or a
+	 * collection of services matching a certain criteri
 	 * 
 	 * @return managed OSGi service(s)
 	 */
@@ -231,6 +231,13 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 		this.serviceBeanName = serviceBeanName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * This method is called automatically by the container. For programmatic
+	 * usage, make sure that the class loader is able to see the AOP
+	 * infrastructure interfaces that are used during the proxy creation.
+	 */
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}
