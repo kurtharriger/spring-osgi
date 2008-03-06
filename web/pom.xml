@@ -112,6 +112,18 @@
     </dependency>
     
   </dependencies>
+  
+  <repositories>
+    <repository>
+      <id>codehaus-repo</id>
+      <name>Jetty Repository at CodeHaus</name>
+      <snapshots>
+         <enabled>true</enabled>
+      </snapshots>
+      <url>http://snapshots.repository.codehaus.org/</url>
+    </repository>
+    
+  </repositories>
 
 
 </project>
