@@ -139,7 +139,15 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 		try {
 			currentThread.setContextClassLoader(getClassLoader());
-			super.refresh();
+			try {
+				super.refresh();
+				sendRefreshedEvent();
+			}
+			catch (RuntimeException ex) {
+				logger.error("Refresh error", ex);
+				sendFailedEvent(ex);
+			}
+
 		}
 		finally {
 			currentThread.setContextClassLoader(oldTCCL);
@@ -262,7 +270,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 					// Last step: publish corresponding event.
 					finishRefresh();
-					
+
 					// everything went okay, post notification
 					sendRefreshedEvent();
 				}
@@ -293,6 +301,13 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		}
 		// publish the context only after all the beans have been published
 		publishContextAsOsgiServiceIfNecessary();
+	}
+
+	protected void cancelRefresh(BeansException ex) {
+		super.cancelRefresh(ex);
+		logger.error("Canceling refresh", ex);
+		// send notification event
+		sendFailedEvent(ex);
 	}
 
 	public Object getMonitor() {
