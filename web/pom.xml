@@ -21,7 +21,7 @@
     <jetty.osgi.version>6.2</jetty.osgi.version>
     
     <!-- jetty artifact version -->
-	<jetty.version>6.2-SNAPSHOT</jetty.version>
+	<jetty.version>6.1.8</jetty.version>
 
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 	
