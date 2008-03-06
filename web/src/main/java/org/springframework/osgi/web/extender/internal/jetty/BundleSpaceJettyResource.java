@@ -38,7 +38,6 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-// TODO: does it make sense to use the Spring IO API instead?
 public class BundleSpaceJettyResource extends URLResource {
 
 	private static final String FOLDER_SEPARATOR = "/";
@@ -50,23 +49,12 @@ public class BundleSpaceJettyResource extends URLResource {
 	private final String pathLeafEntry;
 
 
-	private static URL craftURL(Bundle bundle, String path) {
-		Assert.notNull(bundle);
-		Assert.notNull(path);
-
-		URL url = bundle.getResource(FOLDER_SEPARATOR);
-
-		if (path.startsWith(FOLDER_SEPARATOR))
-			path = path.substring(1, path.length());
-		try {
-			url = new URL(url.toExternalForm() + path);
-		}
-		catch (MalformedURLException ex) {
-			throw (RuntimeException) new IllegalArgumentException("invalid url " + path).initCause(ex);
-		}
-		return url;
-	}
-
+	/**
+	 * Constructs a new <code>BundleSpaceJettyResource</code> instance.
+	 * 
+	 * @param bundle
+	 * @param path
+	 */
 	public BundleSpaceJettyResource(Bundle bundle, String path) {
 		super(craftURL(bundle, path), null, false);
 
@@ -83,7 +71,25 @@ public class BundleSpaceJettyResource extends URLResource {
 		// dis-assemble the path into folders and file (useful when checking
 		// for the existence of the resource
 		pathLeafEntry = StringUtils.getFilename(tempPath);
-		pathTreeEntry = (pathLeafEntry == null ? null : tempPath.substring(0, tempPath.length() - pathLeafEntry.length()));
+		pathTreeEntry = (pathLeafEntry == null ? null : tempPath.substring(0, tempPath.length()
+				- pathLeafEntry.length()));
+	}
+
+	private static URL craftURL(Bundle bundle, String path) {
+		Assert.notNull(bundle);
+		Assert.notNull(path);
+
+		URL url = bundle.getResource(FOLDER_SEPARATOR);
+
+		if (path.startsWith(FOLDER_SEPARATOR))
+			path = path.substring(1, path.length());
+		try {
+			url = new URL(url.toExternalForm() + path);
+		}
+		catch (MalformedURLException ex) {
+			throw (RuntimeException) new IllegalArgumentException("invalid url " + path).initCause(ex);
+		}
+		return url;
 	}
 
 	public File getFile() throws IOException {

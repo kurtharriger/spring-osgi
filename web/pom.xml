@@ -18,10 +18,10 @@
   
   <properties>
 	<!-- jetty version used in the OSGi manifests -->
-    <jetty.osgi.version>6.1</jetty.osgi.version>
+    <jetty.osgi.version>6.2</jetty.osgi.version>
     
     <!-- jetty artifact version -->
-	<jetty.version>6.1.7</jetty.version>
+	<jetty.version>6.2-SNAPSHOT</jetty.version>
 
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 	

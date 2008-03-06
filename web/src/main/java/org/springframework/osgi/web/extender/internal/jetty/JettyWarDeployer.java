@@ -17,6 +17,7 @@
 package org.springframework.osgi.web.extender.internal.jetty;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -48,7 +49,10 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * 
  */
+// TODO: add support for fragments that can start/stop during the life of a war
 public class JettyWarDeployer implements WarDeployer {
+
+	private static final String SLASH = "/";
 
 	private static final String JASPER_CLASS = "org.apache.jasper.JspC";
 
@@ -72,6 +76,9 @@ public class JettyWarDeployer implements WarDeployer {
 
 	/** web-apps deployed */
 	private Map deployed = new LinkedHashMap(4);
+
+	// TODO: make this configurable
+	private boolean shouldUnpackWar = true;
 
 
 	/**
@@ -132,40 +139,31 @@ public class JettyWarDeployer implements WarDeployer {
 	 * @throws Exception
 	 */
 	private WebAppContext createJettyWebContext(Bundle bundle) throws Exception {
+
+		// plug in our custom class only if needed
+		WebAppContext wac = (shouldUnpackWar ? new WebAppContext() : new OsgiWebAppContext());
+
 		// create a jetty web app context
-		WebAppContext wac = new WebAppContext();
 
 		// the server is being used to generate the temp folder (so we have to set it)
 		wac.setServer(serverService);
 		// set the war string since it's used to generate the temp path
 		wac.setWar(OsgiStringUtils.nullSafeName(bundle));
 		// same goes for the context path (add leading "/" -> w/o the context will not work)
-		wac.setContextPath("/".concat(Utils.getWarContextPath(bundle)));
+		wac.setContextPath(SLASH.concat(Utils.getWarContextPath(bundle)));
+		// no hot deployment (at least not through directly Jetty)
+		wac.setCopyWebDir(false);
+		wac.setExtractWAR(shouldUnpackWar);
 
 		//
 		// resource settings
 		//
 
 		// 1. start with the slow, IO activity
-
-		// first add the context path (used to determine the temporary path)
-		// 
-
-		// unpack the war somewhere
-		// TODO: add support for fragments that can start/stop during the life of a war
-		// TODO: save the folder (to support fragments) into the map
-		File unpackFolder = unpackBundle(bundle, wac);
-
-		//Resource rootResource = new BundleSpaceJettyResource(bundle, "/");
-		Resource rootResource = Resource.newResource(unpackFolder.getCanonicalPath());
+		Resource rootResource = getRootResource(bundle, wac);
 
 		if (log.isDebugEnabled())
 			log.debug("the root resources are " + ObjectUtils.nullSafeToString(rootResource.list()));
-
-		// no hot deployment (at least not through directly Jetty)
-		wac.setCopyWebDir(false);
-		// TODO: should this be configurable ?
-		wac.setExtractWAR(true);
 
 		// wac needs access to the WAR root
 		// we have to make sure we don't trigger any direct file lookup
@@ -198,7 +196,8 @@ public class JettyWarDeployer implements WarDeployer {
 		ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, chainedCL);
 
 		// use the Jetty default classloader to access the WEB-INF/lib and WEB-INF/classes folder
-		// TODO: the generic OSGi can used if the WEB/lib and WEB-INF/classes are part of the class-path
+		// TODO: the generic OSGi can be used if the WEB/lib and WEB-INF/classes are part of the class-path
+		// TODO: check Jetty behaviour when using a non URL classloader
 		WebAppClassLoader warClassLoader = new WebAppClassLoader(bundleClassLoader, wac);
 		warClassLoader.setName("Jetty OSGi ClassLoader");
 
@@ -208,6 +207,21 @@ public class JettyWarDeployer implements WarDeployer {
 
 		// we're done
 		return wac;
+	}
+
+	private Resource getRootResource(Bundle bundle, WebAppContext wac) throws IOException {
+		// decide whether we unpack or not
+		if (shouldUnpackWar) {
+			// unpack the war somewhere
+			File unpackFolder = unpackBundle(bundle, wac);
+
+			return Resource.newResource(unpackFolder.getCanonicalPath());
+		}
+		else {
+			((OsgiWebAppContext) wac).setBundle(bundle);
+			// if it's unpacked, use the bundle API directly
+			return new BundleSpaceJettyResource(bundle, SLASH);
+		}
 	}
 
 	/**
