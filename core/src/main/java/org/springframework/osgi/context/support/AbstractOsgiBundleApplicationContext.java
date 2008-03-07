@@ -186,8 +186,13 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 */
 	protected void doClose() {
 		if (!OsgiServiceUtils.unregisterService(serviceRegistration)) {
-			logger.info("The application context service has been already unregistered");
+			logger.info("Unpublishing application context with properties ("
+					+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getBundleSymbolicName() + ")");
 			serviceRegistration = null;
+		}
+		else {
+			if (publishContextAsService)
+				logger.info("Application Context service already unpublished");
 		}
 
 		// call super class
@@ -278,8 +283,9 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getBundleSymbolicName() + ")");
 			}
 
+			// export only interfaces
 			Class[] classes = org.springframework.osgi.util.internal.ClassUtils.getClassHierarchy(getClass(),
-				org.springframework.osgi.util.internal.ClassUtils.INCLUDE_ALL_CLASSES);
+				org.springframework.osgi.util.internal.ClassUtils.INCLUDE_INTERFACES);
 
 			// filter classes based on visibility
 			Class[] filterClasses = org.springframework.osgi.util.internal.ClassUtils.getVisibleClasses(classes,
