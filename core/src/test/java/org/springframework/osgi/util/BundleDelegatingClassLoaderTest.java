@@ -52,7 +52,7 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 		bundle = null;
 	}
 
-	public void testEquals() {
+	public void tstEquals() {
 		bundleCtrl.replay();
 
 		assertFalse(classLoader.equals(new Object()));
