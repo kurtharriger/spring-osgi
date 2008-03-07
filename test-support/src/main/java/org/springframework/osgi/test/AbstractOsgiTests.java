@@ -306,7 +306,18 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		Assert.notNull(location);
 		if (logger.isDebugEnabled())
 			logger.debug("Installing bundle from location " + location.getDescription());
-		return platformContext.installBundle(location.getDescription(), location.getInputStream());
+
+		String bundleLocation;
+
+		try {
+			bundleLocation = location.getURL().toExternalForm();
+		}
+		catch (Exception ex) {
+			// the URL cannot be created, fall back to the description
+			bundleLocation = location.getDescription();
+		}
+
+		return platformContext.installBundle(bundleLocation, location.getInputStream());
 	}
 
 	/**
