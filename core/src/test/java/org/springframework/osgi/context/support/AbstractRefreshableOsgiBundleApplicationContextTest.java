@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.context.support;
 
 import java.io.IOException;
@@ -24,7 +25,6 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.io.Resource;
@@ -38,6 +38,7 @@ import org.springframework.osgi.util.BundleDelegatingClassLoader;
 public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCase {
 
 	private AbstractOsgiBundleApplicationContext context;
+
 
 	/*
 	 * (non-Javadoc)
@@ -90,8 +91,6 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 
 		ClassLoader loader = context.getClassLoader();
 		assertTrue(loader instanceof BundleDelegatingClassLoader);
-		assertEquals(
-			BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, ProxyFactory.class.getClassLoader()), loader);
 
 		// do some resource loading
 		assertEquals(bundleResource, context.getResource(location));
@@ -99,6 +98,5 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 		bundleCtrl.verify();
 		bundleCtxCtrl.verify();
 	}
-	
 
 }

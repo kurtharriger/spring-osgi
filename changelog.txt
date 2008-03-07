@@ -19,6 +19,12 @@ Package org.springframework.osgi.test
 * FelixPlatform uses the Felix distribution default system packages
 * KnopflerfishPlatform uses the KF distribution default system packages
 
+Changes in version 1.0.2 (2008-03-xx)
+-------------------------------------
+
+Package org.springframework.osgi.util
+* BundleDelegatingClassLoader relies on default hashCode/equals methods to prevent caching proxies on bundle updates
+
 
 Changes in version 1.0.1 (2008-02-29)
 -------------------------------------
