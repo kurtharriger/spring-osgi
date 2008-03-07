@@ -95,27 +95,6 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		this.bridge = bridgeLoader;
 	}
 
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-
-		if (!(o instanceof BundleDelegatingClassLoader))
-			return false;
-
-		final BundleDelegatingClassLoader bundleDelegatingClassLoader = (BundleDelegatingClassLoader) o;
-
-		return (backingBundle.equals(bundleDelegatingClassLoader.backingBundle) && ObjectUtils.nullSafeEquals(bridge,
-			bundleDelegatingClassLoader.bridge));
-	}
-
-	public int hashCode() {
-		int hashCode = backingBundle.hashCode();
-		if (bridge != null)
-			hashCode |= bridge.hashCode();
-
-		return hashCode;
-	}
-
 	protected Class findClass(String name) throws ClassNotFoundException {
 		try {
 			return this.backingBundle.loadClass(name);

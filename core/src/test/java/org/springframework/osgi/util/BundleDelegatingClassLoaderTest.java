@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.util;
 
 import java.net.URL;
@@ -37,6 +38,7 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 
 	private Bundle bundle;
 
+
 	protected void setUp() throws Exception {
 		bundleCtrl = MockControl.createStrictControl(Bundle.class);
 		bundle = (Bundle) bundleCtrl.getMock();
@@ -57,10 +59,9 @@ public class BundleDelegatingClassLoaderTest extends TestCase {
 
 		assertFalse(classLoader.equals(new Object()));
 		assertEquals(classLoader, classLoader);
-		assertTrue(classLoader.equals(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle,
+		assertFalse(classLoader.equals(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle,
 			ProxyFactory.class.getClassLoader())));
 
-		// assertEquals(bundle.hashCode(), clientClassLoader.hashCode());
 	}
 
 	public void testFindClass() throws Exception {
