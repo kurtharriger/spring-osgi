@@ -5,6 +5,9 @@ http://www.springframework.org/osgi
 Changes in version 1.0.2 (2008-03-xx)
 -------------------------------------
 
+Package org.springframework.osgi.context
+* AbstractOsgiBundleApplicationContext registers the application context as an OSGi service using just the interfaces
+
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader relies on default hashCode/equals methods to prevent caching proxies on bundle updates
 
