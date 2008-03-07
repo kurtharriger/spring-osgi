@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
@@ -52,7 +53,9 @@ public abstract class AbstractOptionalDependencyInjectionTests extends AbstractD
 	 * @author Costin Leau
 	 * 
 	 */
-	private static class EmptyOsgiApplicationContext extends AbstractDelegatedExecutionApplicationContext {
+	// the disposable interface is added just so that byte code detect the org.springframework.beans.factory package
+	private static class EmptyOsgiApplicationContext extends AbstractDelegatedExecutionApplicationContext implements
+			DisposableBean {
 
 		protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException, BeansException {
 		}

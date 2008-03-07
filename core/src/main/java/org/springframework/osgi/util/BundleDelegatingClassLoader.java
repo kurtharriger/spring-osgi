@@ -26,7 +26,6 @@ import java.util.Enumeration;
 import org.apache.commons.logging.Log;
 import org.osgi.framework.Bundle;
 import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 
 /**
  * ClassLoader backed by an OSGi bundle. Provides the ability to use a separate
