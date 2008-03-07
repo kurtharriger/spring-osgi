@@ -22,8 +22,14 @@ Package org.springframework.osgi.test
 Changes in version 1.0.2 (2008-03-xx)
 -------------------------------------
 
+Package org.springframework.osgi.context
+* AbstractOsgiBundleApplicationContext registers the application context as an OSGi service using just the interfaces
+
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader relies on default hashCode/equals methods to prevent caching proxies on bundle updates
+
+Package org.springframework.osgi.test
+* Instalation bundles have the location set to the backing resource URL if possible, falling back to the description
 
 
 Changes in version 1.0.1 (2008-02-29)

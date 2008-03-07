@@ -21,6 +21,10 @@ import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
+ * Integration test that checks that a new classloader is created when the bundle is refreshed.
+ * The test updates a bundle that internally creates JDK and CGLIB proxies which, will fail in case
+ * the old CL is preserved.
+ *
  * @author Costin Leau
  * 
  */
