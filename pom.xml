@@ -20,9 +20,12 @@
   <properties>
     <!-- Spring version -->   
     <spring.maven.artifact.version>2.5.1</spring.maven.artifact.version>
+    <spring.base.version>2.5</spring.base.version>
     
     <!-- Felix BND plugin settings -->
-    
+    <!-- Spring OSGi base version -->
+    <spring.osgi.base.version>1.0</spring.osgi.base.version>
+   
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
     <spring.osgi.import.version>1.0.2</spring.osgi.import.version>
     
