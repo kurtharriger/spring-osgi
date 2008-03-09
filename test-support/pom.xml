@@ -30,6 +30,8 @@
 	  org.eclipse.*;resolution:=optional,
 	  org.knopflerfish*;resolution:=optional,
 	  org.apache.felix.*;resolution:=optional,
+	  org.springframework.osgi*;version=${spring.osgi.import.version},
+	  org.springframework*;version=${spring.base.version},
 	  *
 	</spring.osgi.import.pkg>
 	<spring.osgi.symbolic.name>${symName.prefix}.test</spring.osgi.symbolic.name>
