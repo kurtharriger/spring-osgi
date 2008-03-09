@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Properties;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.SpringProxy;
@@ -27,7 +28,6 @@ import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
-import org.springframework.osgi.util.internal.MapBasedDictionary;
 
 /**
  * @author Costin Leau
@@ -55,7 +55,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 	public void tstProxyForUnaryCardinality() throws Exception {
 		long time = 1234;
 		Date date = new Date(time);
-		Dictionary dict = new MapBasedDictionary();
+		Dictionary dict = new Properties();
 		ServiceRegistration reg = publishService(date);
 
 		fb = new OsgiServiceProxyFactoryBean();
@@ -105,7 +105,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 
 		long time = 1234;
 		Date date = new Date(time);
-		Dictionary dict = new MapBasedDictionary();
+		Dictionary dict = new Properties();
 		dict.put("foo", "bar");
 		dict.put("george", "michael");
 
