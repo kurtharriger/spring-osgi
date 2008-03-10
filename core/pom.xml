@@ -20,9 +20,11 @@
     
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 
-  	<spring.osgi.export.pkg>
-  	    !org.springframework.osgi.io*, !org.springframework.osgi.io.internal, org.springframework.osgi*
-  	</spring.osgi.export.pkg>
+  	<spring.osgi.export>
+  	    !org.springframework.osgi.io*,
+  	    !org.springframework.osgi*internal*,
+  	    org.springframework.osgi*;version=${spring.osgi.export.version}
+  	</spring.osgi.export>
   	
 	<spring.osgi.import.pkg>
 		org.apache.commons.logging*,
@@ -31,9 +33,13 @@
 		org.osgi.service.startlevel;version=1.0;resolution:=optional,
 		org.w3c.dom;resolution:=optional,
 		org.xml.sax;resolution:=optional,
-		*
 	</spring.osgi.import.pkg>
 	
+	<spring.osgi.private.pkg>
+		!org.springframework.osgi.io*,
+  	    org.springframework.osgi*internal*
+	</spring.osgi.private.pkg>
+			
 	<spring.osgi.symbolic.name>${symName.prefix}.core</spring.osgi.symbolic.name>
   </properties>
   

@@ -12,8 +12,7 @@
   <name>Spring OSGi IO</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
-  Spring/OSGi IO abstract classes. Provides Resource, ResourceLoader and ResourcePatternResolver
-  for OSGi environments.
+  Spring/OSGi IO abstract classes. Provides Resource, ResourceLoader and ResourcePatternResolver for OSGi environments.
   </description>
   
  
@@ -24,8 +23,7 @@
     <spring.osgi.private.pkg>org.springframework.osgi.io.internal</spring.osgi.private.pkg>
 	<spring.osgi.export.pkg>!${spring.osgi.private.pkg}, org.springframework.osgi.io</spring.osgi.export.pkg>
 	<spring.osgi.import.pkg>
-		org.osgi.service.packageadmin;version=1.2;resolution:=optional,
-		*
+		org.osgi.service.packageadmin;version=1.2;resolution:=optional
 	</spring.osgi.import.pkg>
 	
 	<spring.osgi.symbolic.name>${symName.prefix}.io</spring.osgi.symbolic.name>

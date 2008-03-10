@@ -110,9 +110,9 @@
       <version>${jetty.version}</version>
       <scope>provided</scope>
     </dependency>
-    
+   
   </dependencies>
-  
+
   <repositories>
     <repository>
       <id>codehaus-repo</id>
@@ -122,8 +122,8 @@
       </snapshots>
       <url>http://snapshots.repository.codehaus.org/</url>
     </repository>
+  </repositories>    
     
-  </repositories>
-
+   
 
 </project>

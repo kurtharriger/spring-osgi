@@ -19,6 +19,12 @@
 	<javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 	<spring.osgi.export.pkg>org.springframework.osgi.extensions.annotation</spring.osgi.export.pkg>
 	<spring.osgi.symbolic.name>${symName.prefix}.extensions.annotations</spring.osgi.symbolic.name>
+	<spring.osgi.import.pkg>
+	org.springframework.osgi*;version=${spring.osgi.import.version},
+	org.springframework*;version=${spring.base.version},
+	*
+	</spring.osgi.import.pkg>
+
   </properties>
   
   <dependencies>
