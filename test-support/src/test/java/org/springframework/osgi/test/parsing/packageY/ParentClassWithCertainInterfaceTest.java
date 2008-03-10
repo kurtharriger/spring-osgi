@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.test.parsing.packageB;
+package org.springframework.osgi.test.parsing.packageY;
 
-import javax.naming.CompositeName;
-import javax.naming.Name;
+import javax.security.auth.callback.Callback;
 
-import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackage;
+import org.springframework.osgi.test.parsing.packageX.BaseClassInACertainPackage;
 
 /**
+ * Test class that implements an interface.
+ * 
  * @author Costin Leau
  * 
  */
-// add an interface just to check the behaviour
-public class BaseClassFromAnotherPackageAndBundle extends BaseClassFromAnotherPackage {
-
-	private Name context = new CompositeName();
+public abstract class ParentClassWithCertainInterfaceTest extends BaseClassInACertainPackage implements Callback {
 
 }
