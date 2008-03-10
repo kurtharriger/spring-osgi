@@ -14,20 +14,34 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.test.parsing.packageB;
+package org.springframework.osgi.test.parsing;
 
-import javax.naming.CompositeName;
-import javax.naming.Name;
+import java.util.Properties;
+import java.util.jar.Manifest;
 
-import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackage;
+import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * @author Costin Leau
  * 
  */
-// add an interface just to check the behaviour
-public class BaseClassFromAnotherPackageAndBundle extends BaseClassFromAnotherPackage {
+public class BaseTestCaseWithVisibleMethods extends AbstractConfigurableBundleCreatorTests {
 
-	private Name context = new CompositeName();
+	public String getRootPath() {
+		return super.getRootPath();
+	}
 
+	public Manifest getManifest() {
+		return super.getManifest();
+	}
+
+	public Properties getSettings() throws Exception {
+		return super.getSettings();
+	}
+
+	public String[] getBundleContentPattern() {
+		return super.getBundleContentPattern();
+	}
+	
+	
 }
