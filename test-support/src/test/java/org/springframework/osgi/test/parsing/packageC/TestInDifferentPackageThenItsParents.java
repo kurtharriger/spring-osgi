@@ -16,16 +16,18 @@
 
 package org.springframework.osgi.test.parsing.packageC;
 
-import java.util.Properties;
 import java.util.jar.Manifest;
 
 import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackage;
 import org.springframework.osgi.test.parsing.packageB.BaseClassFromAnotherPackageAndBundle;
 
 /**
+ * Abstract since we don't want to execute the test per se.
+ * 
  * @author Costin Leau
  * 
  */
+// callback interface (no exception or custom method signature pulled in)
 public abstract class TestInDifferentPackageThenItsParents extends BaseClassFromAnotherPackageAndBundle {
 
 	public void testCheckBaseClassesHierarchy() throws Exception {
@@ -33,23 +35,10 @@ public abstract class TestInDifferentPackageThenItsParents extends BaseClassFrom
 		System.out.println(mf.getMainAttributes().entrySet());
 	}
 
-	protected String[] getBundleContentPattern() {
-		String pkg = getClass().getPackage().getName().replace('.', '/').concat("/");
+	public String[] getBundleContentPattern() {
+		String pkg = TestInDifferentPackageThenItsParents.class.getPackage().getName().replace('.', '/').concat("/");
 		String[] patterns = new String[] { pkg + "**/*",
 			BaseClassFromAnotherPackage.class.getName().replace('.', '/').concat(".class") };
 		return patterns;
 	}
-
-	protected String getRootPath() {
-		return super.getRootPath();
-	}
-
-	protected Manifest getManifest() {
-		return super.getManifest();
-	}
-
-	protected Properties getSettings() throws Exception {
-		return super.getSettings();
-	}
-
 }

@@ -20,7 +20,7 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.parsing.BaseTestCaseWithVisibleMethods;
 
 /**
  * Simple base class from a different class that will be included in the
@@ -29,7 +29,7 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  * @author Costin Leau
  * 
  */
-public class BaseClassFromAnotherPackage extends AbstractConfigurableBundleCreatorTests {
+public class BaseClassFromAnotherPackage extends BaseTestCaseWithVisibleMethods {
 
 	// strange import that doesn't do anything
 	private static File file = ImageIO.getCacheDirectory();

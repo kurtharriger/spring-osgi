@@ -245,9 +245,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 			// all dependencies are met, just go with stageTwo
 			if (dl.isSatisfied()) {
-				if (debug) {
-					log.debug("No outstanding dependencies, completing initialization for " + getDisplayName());
-				}
+				log.info("No outstanding OSGi service dependencies, completing initialization for " + getDisplayName());
 				stageTwo();
 			}
 
