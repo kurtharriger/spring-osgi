@@ -5,8 +5,14 @@ http://www.springframework.org/osgi
 Changes in version 1.0.2 (2008-03-xx)
 -------------------------------------
 
+General
+* adjusted the manifests so no internal packages are exposed and the versions both spring and spring-osgi are present
+
 Package org.springframework.osgi.context
 * AbstractOsgiBundleApplicationContext registers the application context as an OSGi service using just the interfaces
+
+Package org.springframework.osgi.extender
+* raised service dependency waiting logging level to INFO (from DEBUG)
 
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader relies on default hashCode/equals methods to prevent caching proxies on bundle updates

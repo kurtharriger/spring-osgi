@@ -240,9 +240,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 			// all dependencies are met, just go with stageTwo
 			if (dl.isSatisfied()) {
-				if (debug) {
-					log.debug("No outstanding dependencies, completing initialization for " + getDisplayName());
-				}
+
+				log.info("No outstanding OSGi service dependencies, completing initialization for " + getDisplayName());
 				stageTwo();
 			}
 
@@ -291,11 +290,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 		synchronized (monitor) {
 
-//			if (state == ContextState.DEPENDENCIES_RESOLVED) {
-//				if (debug)
-//					log.debug("context [" + getDisplayName() + "]  already in state (" + state + "); bailing out");
-//				return;
-//			}
+			//			if (state == ContextState.DEPENDENCIES_RESOLVED) {
+			//				if (debug)
+			//					log.debug("context [" + getDisplayName() + "]  already in state (" + state + "); bailing out");
+			//				return;
+			//			}
 			if (state != ContextState.RESOLVING_DEPENDENCIES) {
 				logWrongState(ContextState.RESOLVING_DEPENDENCIES);
 				return;
