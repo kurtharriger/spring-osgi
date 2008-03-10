@@ -19,7 +19,8 @@
 
   <properties>
     <!-- Spring version -->   
-    <spring.maven.artifact.version>2.5.1</spring.maven.artifact.version>
+    <spring.maven.artifact.version>2.5.2</spring.maven.artifact.version>
+    <spring.base.version>2.5</spring.base.version>
     
     <!-- Felix BND plugin settings -->
     
@@ -36,7 +37,15 @@
     
     <!-- complete access to export/import properties -->
     <spring.osgi.export>!${spring.osgi.private.pkg}, ${spring.osgi.export.pkg}*;version=${spring.osgi.export.version}</spring.osgi.export>
-    <spring.osgi.import>${spring.osgi.import.pkg}</spring.osgi.import>
+    
+    <!-- add spring packages since the tool doesn't always picks up the versions -->
+    <spring.osgi.import>
+		${spring.osgi.import.pkg},
+		org.springframework.osgi*;version=${spring.osgi.import.version},
+		org.springframework*;version=${spring.base.version},
+		org.osgi.framework;version=1.3,
+		*
+	</spring.osgi.import>
 
 
     <symName.prefix>org.springframework.bundle.osgi</symName.prefix>
@@ -284,10 +293,12 @@ limitations under the License.
        <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.4.0</version>
+        <extensions>true</extensions>
+
         <configuration>
+          <obrRepository>NONE</obrRepository>        
           <instructions>
-           
            <!-- bundle specific conf -->      
            <Bundle-Name>${artifactId}</Bundle-Name>
            <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
@@ -303,10 +314,8 @@ limitations under the License.
 		   <!-- Spring specific entries -->
 		   <Spring-DM-Version>${pom.version}</Spring-DM-Version>
 		   <Spring-Version>${spring.maven.artifact.version}</Spring-Version>
-		   
 		  </instructions>
         </configuration>
-        <extensions>true</extensions>
       </plugin> 
       
 
@@ -690,21 +699,21 @@ limitations under the License.
     </repository>
 
 
-		<repository>
-			<id>spring-release</id>
-			<name>Spring Portfolio Release Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/release</url>
-		</repository>
-		<repository>
-			<id>spring-external</id>
-			<name>Spring Portfolio Release Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
-		</repository>
-		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Portfolio Milestone Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
-		</repository>
+	<repository>
+		<id>spring-release</id>
+		<name>Spring Portfolio Release Repository</name>
+		<url>http://s3.amazonaws.com/maven.springframework.org/release</url>
+	</repository>
+	<repository>
+		<id>spring-external</id>
+		<name>Spring Portfolio Release Repository</name>
+		<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
+	</repository>
+	<repository>
+		<id>spring-milestone</id>
+		<name>Spring Portfolio Milestone Repository</name>
+		<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+	</repository>
     
     <repository>
       <id>i21-s3-osgi-repo</id>
@@ -714,7 +723,6 @@ limitations under the License.
       </snapshots>
       <url>http://s3.amazonaws.com/maven.springframework.org/osgi</url>
     </repository>
-    
   </repositories>
 
 </project>
