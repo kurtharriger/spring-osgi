@@ -97,10 +97,8 @@ public class DependencyServiceManager {
 				if (unsatisfiedDependencies.isEmpty()) {
 					deregister();
 					// context.listener = null;
-					if (debug) {
-						log.debug("No outstanding dependencies, completing initialization for "
-								+ context.getDisplayName());
-					}
+					log.info("No outstanding OSGi service dependencies, completing initialization for "
+							+ context.getDisplayName());
 
 					// execute task to complete initialization
 					// NOTE: the runnable should be able to delegate any long
@@ -208,7 +206,7 @@ public class DependencyServiceManager {
 				dependencies.add(dependency);
 				if (!dependency.isServicePresent()) {
 					if (debug)
-						log.debug("adding dependency for importer " + beanName);
+						log.debug("adding OSGi service dependency for importer " + beanName);
 					unsatisfiedDependencies.add(dependency);
 				}
 			}
@@ -217,10 +215,8 @@ public class DependencyServiceManager {
 			currentThread.setContextClassLoader(oldTCCL);
 		}
 
-		if (debug) {
-			log.debug(dependencies.size() + " dependencies, " + unsatisfiedDependencies.size() + " unsatisfied for "
-					+ context.getDisplayName());
-		}
+		log.info(dependencies.size() + " OSGi service dependencies, " + unsatisfiedDependencies.size()
+				+ " unsatisfied for " + context.getDisplayName());
 
 	}
 
