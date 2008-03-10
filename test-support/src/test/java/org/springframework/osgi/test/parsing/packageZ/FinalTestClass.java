@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.test.parsing.packageB;
+package org.springframework.osgi.test.parsing.packageZ;
 
-import javax.naming.CompositeName;
-import javax.naming.Name;
+import javax.swing.text.Position;
 
-import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackage;
+import org.springframework.osgi.test.parsing.packageY.ParentClassWithCertainInterfaceTest;
 
 /**
  * @author Costin Leau
  * 
  */
-// add an interface just to check the behaviour
-public class BaseClassFromAnotherPackageAndBundle extends BaseClassFromAnotherPackage {
+public abstract class FinalTestClass extends ParentClassWithCertainInterfaceTest implements Position {
 
-	private Name context = new CompositeName();
-
+	public int getOffset() {
+		throw new UnsupportedOperationException();
+	}
 }

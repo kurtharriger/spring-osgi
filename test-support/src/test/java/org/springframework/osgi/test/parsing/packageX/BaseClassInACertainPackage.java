@@ -14,20 +14,31 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.test.parsing.packageB;
+package org.springframework.osgi.test.parsing.packageX;
 
-import javax.naming.CompositeName;
-import javax.naming.Name;
+import java.io.File;
+import java.net.URI;
 
-import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackage;
+import javax.imageio.ImageIO;
+import javax.print.URIException;
+
+import org.springframework.osgi.test.parsing.BaseTestCaseWithVisibleMethods;
 
 /**
  * @author Costin Leau
  * 
  */
-// add an interface just to check the behaviour
-public class BaseClassFromAnotherPackageAndBundle extends BaseClassFromAnotherPackage {
+public abstract class BaseClassInACertainPackage extends BaseTestCaseWithVisibleMethods implements URIException {
 
-	private Name context = new CompositeName();
+	// strange import that doesn't do anything
+	private static File file = ImageIO.getCacheDirectory();
 
+
+	public int getReason() {
+		throw new UnsupportedOperationException();
+	}
+
+	public URI getUnsupportedURI() {
+		throw new UnsupportedOperationException();
+	}
 }
