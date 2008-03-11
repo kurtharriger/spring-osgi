@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <artifactId>web-bundles</artifactId>
+    <groupId>org.springframework.osgi.iandt.web</groupId>
+    <version>1.1.0-m1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi.iandt.web</groupId>
+  <artifactId>resources.only</artifactId>
+  <packaging>jar</packaging>
+  <name>Spring OSGi Web Test:Static Resource Only Bundle</name>
+  <url>http://www.springframework.org/osgi</url>
+  
+</project>

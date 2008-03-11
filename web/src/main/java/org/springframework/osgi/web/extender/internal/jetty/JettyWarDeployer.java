@@ -18,7 +18,9 @@ package org.springframework.osgi.web.extender.internal.jetty;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -186,11 +188,20 @@ public class JettyWarDeployer implements WarDeployer {
 
 		ClassLoader jspClassLoader = Utils.getClassLoader(JSP_CLASS, jettyClassLoader);
 
+		// TODO: use a different classloader
 		ClassLoader jasperClassLoader = Utils.getClassLoader(JASPER_CLASS, jettyClassLoader);
 
+		List classLoaders = new ArrayList();
+
+		classLoaders.add(jettyClassLoader);
+		if (jspClassLoader != null)
+			classLoaders.add(jspClassLoader);
+		if (jasperClassLoader != null)
+			classLoaders.add(jasperClassLoader);
+
 		// chain the jasper and jsp classloader (so JSPs can work even if they are not declared)
-		ChainedClassLoader chainedCL = new ChainedClassLoader(new ClassLoader[] { jettyClassLoader, jspClassLoader,
-			jasperClassLoader });
+		ChainedClassLoader chainedCL = new ChainedClassLoader(
+			(ClassLoader[]) classLoaders.toArray(new ClassLoader[classLoaders.size()]));
 
 		// use the bundle classloader as a parent
 		ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, chainedCL);
