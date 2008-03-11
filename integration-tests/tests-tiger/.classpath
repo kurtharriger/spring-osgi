@@ -21,7 +21,8 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.service.listener/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.service.listener-1.1.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.simple.service/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.simple.service-1.1.0-m1-SNAPSHOT.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Annotation Bundle"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Annotation Service Dependency Bundle"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.annotation.dependencies/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.annotation.dependencies-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.annotation.proxy/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.annotation.proxy-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.component.scan.bundle/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.component.scan.bundle-1.1.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>
