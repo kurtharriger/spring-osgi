@@ -57,9 +57,7 @@
     <module>tccl.bundle</module>
     <module>config.file.with.dots.bundle</module>
     <module>proxy.creator.bundle</module>
-    <!--
     <module>web.bundles</module>
-    -->
   </modules>
 
 <profiles>
