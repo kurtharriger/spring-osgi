@@ -45,8 +45,8 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 
 	private final Object lock = new Object();
 
-	/** wait 10 seconds max */
-	private final long TIME_OUT = 10 * 000;
+	/** wait 30 seconds max */
+	private final long TIME_OUT = 30 * 000;
 
 
 	protected void onSetUp() throws Exception {
