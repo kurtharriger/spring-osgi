@@ -16,10 +16,8 @@
 
 package org.springframework.osgi.iandt.io;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.io.component.ComponentBean;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Integration test for Spring 2.5 component scan.
