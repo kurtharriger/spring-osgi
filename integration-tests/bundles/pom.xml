@@ -71,6 +71,7 @@
       <modules>
        <module>annotation.test.bundle</module>
        <module>annotation.dependency.test.bundle</module>
+       <module>jdk5/component.scan.bundle</module>
 	  </modules>
    </profile>
 </profiles>
