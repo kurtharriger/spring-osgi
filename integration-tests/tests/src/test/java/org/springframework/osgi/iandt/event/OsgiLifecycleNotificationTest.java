@@ -46,7 +46,7 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 	private final Object lock = new Object();
 
 	/** wait 30 seconds max */
-	private final long TIME_OUT = 30 * 000;
+	private final long TIME_OUT = 30 * 1000;
 
 
 	protected void onSetUp() throws Exception {
@@ -132,7 +132,8 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 				return false;
 			}
 			long awakenTime = System.currentTimeMillis();
-			return (awakenTime - current < maxWait);
+			boolean waitSuccessed = (awakenTime - current < maxWait);
+			return waitSuccessed;
 		}
 	}
 }
