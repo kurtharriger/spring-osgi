@@ -34,7 +34,11 @@ public class ChainedClassLoader extends ClassLoader {
 
 	public ChainedClassLoader(ClassLoader[] loaders) {
 		Assert.notEmpty(loaders);
-		this.loaders = loaders;
+		for (int i = 0; i < loaders.length; i++) {
+			ClassLoader classLoader = loaders[i];
+			Assert.notNull(classLoader, "null classloaders not allowed");
+		}
+		this.loaders = (ClassLoader[]) loaders.clone();
 	}
 
 	public URL getResource(String name) {

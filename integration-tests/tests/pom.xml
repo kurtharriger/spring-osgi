@@ -14,7 +14,7 @@
   
     <dependencies>
 
-        <!-- Configuration Admin -->
+        <!-- Configuration Admin (might be removed with the Felix bundle) -->
         <dependency>
             <groupId>org.knopflerfish.bundles</groupId>
             <artifactId>cm_all</artifactId>
@@ -28,6 +28,14 @@
             <version>2.0.0</version>
             <scope>compile</scope>
         </dependency>
+        
+        <!-- config admin (from Felix) -->
+        <dependency>
+		   <groupId>org.apache.felix</groupId>
+		   <artifactId>org.apache.felix.configadmin</artifactId>
+		   <version>1.0.0</version>
+		   <scope>provided</scope>
+		</dependency>
   
 	
 	    <dependency>
@@ -147,6 +155,13 @@
 			<groupId>org.eclipse.bundles</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>20070611</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>servlet-api.osgi</artifactId>
+			<version>2.5-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		
