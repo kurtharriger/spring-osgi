@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>servlet-api.osgi</artifactId>
-            <version>2.4-SNAPSHOT</version>
+            <version>2.5-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
@@ -48,8 +48,8 @@
   
   <modules>
     <module>static.resource.only.bundle</module>
-    <!--
     <module>simple.servlet.bundle</module>
+    <!--
     <module>simple.jsp.bundle</module>    
     -->
   </modules>

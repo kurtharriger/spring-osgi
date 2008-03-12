@@ -1,1 +1,3 @@
-Key: Value
+Bundle-ManifestVersion: 2
+Bundle-Name: Resource Only War
+Bundle-SymbolicName: org.springframework.osgi.iadnt.web.static.resource.only
