@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.web.servlet;
+package org.springframework.osgi.iandt.web.war;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

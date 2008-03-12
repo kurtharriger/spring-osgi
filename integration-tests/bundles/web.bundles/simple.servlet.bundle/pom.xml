@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   <parent>
-    <artifactId>spring-osgi-integration-web-bundles</artifactId>
-    <groupId>org.springframework.osgi</groupId>
+    <artifactId>web-bundles</artifactId>
+    <groupId>org.springframework.osgi.iandt.web</groupId>
     <version>1.1.0-m1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.springframework.osgi</groupId>
-  <artifactId>org.springframework.osgi.iandt.web.simple.servlet</artifactId>
+  <groupId>org.springframework.osgi.iandt.web</groupId>
+  <artifactId>simple.servlet</artifactId>
   <packaging>jar</packaging>
   <name>Spring OSGi Web Test:Simple Servlet Bundle</name>
   <url>http://www.springframework.org/osgi</url>

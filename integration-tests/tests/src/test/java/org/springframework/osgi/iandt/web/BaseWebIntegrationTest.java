@@ -24,7 +24,7 @@ import java.util.List;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.util.CollectionUtils;
 
-public class BaseWebIntegrationTest extends BaseIntegrationTest {
+public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 
 	protected static final String WEB_TESTS_GROUP = "org.springframework.osgi.iandt.web";
 
