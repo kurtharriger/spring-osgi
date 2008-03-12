@@ -19,6 +19,9 @@ Package org.springframework.osgi.test
 * FelixPlatform uses the Felix distribution default system packages
 * KnopflerfishPlatform uses the KF distribution default system packages
 
+Package org.springframework.osgi.util
+* BundleDelegatingClassLoader exposes the internal Bundle through getBundle() method
+
 Changes in version 1.0.2 (2008-03-xx)
 -------------------------------------
 
