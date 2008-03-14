@@ -1,0 +1,4 @@
+Bundle-ManifestVersion: 2
+Bundle-Name: Simple JSP War
+Bundle-SymbolicName: org.springframework.osgi.iadnt.web.simple.jsp.bundle
+Bundle-Classpath: WEB-INF/classes

@@ -9,7 +9,7 @@
   <groupId>org.springframework.osgi.iandt.web</groupId>
   <artifactId>resources.only</artifactId>
   <packaging>jar</packaging>
-  <name>Spring OSGi Web Test:Static Resource Only Bundle</name>
+  <name>Spring OSGi Web Test: Static Resource Only Bundle</name>
   <url>http://www.springframework.org/osgi</url>
   
 </project>

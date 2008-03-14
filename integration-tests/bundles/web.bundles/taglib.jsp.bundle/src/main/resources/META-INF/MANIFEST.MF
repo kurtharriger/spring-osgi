@@ -1,0 +1,4 @@
+Bundle-ManifestVersion: 2
+Bundle-Name: JSP Taglib War
+Bundle-SymbolicName: org.springframework.osgi.iadnt.web.taglib.jsp.bundle
+Bundle-Classpath: WEB-INF/classes,WEB-INF/lib/jstl.jar

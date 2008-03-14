@@ -14,28 +14,21 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.web.war;
+package org.springframework.osgi.iandt.web.servlet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.osgi.iandt.web.BaseWebIntegrationTest;
 import org.springframework.osgi.iandt.web.HttpClient;
 import org.springframework.osgi.iandt.web.HttpResponse;
 
 /**
- * Integration test for the simple servlet bundle.
- * 
  * @author Costin Leau
  * 
  */
-public abstract class StaticResourceTest extends BaseWebIntegrationTest {
-
-	/** logger */
-	private static final Log log = LogFactory.getLog(StaticResourceTest.class);
+public abstract class SimpleServletTest extends BaseWebIntegrationTest {
 
 	private String BASE;
 
-	private final String GROUP_ID = "resources.only";
+	private final String GROUP_ID = "simple.servlet";
 
 
 	protected void onSetUp() throws Exception {
@@ -43,7 +36,7 @@ public abstract class StaticResourceTest extends BaseWebIntegrationTest {
 	}
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { WEB_TESTS_GROUP + "," + GROUP_ID + "," + getSpringDMVersion() };
+		return new String[] { WEB_TESTS_GROUP + "," + GROUP_ID + "," + getSpringDMVersion() + ",war" };
 	}
 
 	public void testWarIndexPage() throws Exception {
@@ -51,24 +44,13 @@ public abstract class StaticResourceTest extends BaseWebIntegrationTest {
 		assertTrue(response.toString(), response.isOk());
 	}
 
-	public void testIndexRedirect() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "");
+	public void testWarServletMapping() throws Exception {
+		HttpResponse response = HttpClient.getLocalResponse(BASE, "servlet");
 		assertTrue(response.toString(), response.isOk());
 	}
 
-	public void testOtherPage() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "other.html");
-		assertTrue(response.toString(), response.isOk());
-	}
-
-	public void testNestedPage() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "nested/page.html");
-		assertTrue(response.toString(), response.isOk());
-	}
-
-	public void testUnexistingNestedPage() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "nested/no-such-page.html");
+	public void testWarUnexistingServletMapping() throws Exception {
+		HttpResponse response = HttpClient.getLocalResponse(BASE, "serv");
 		assertTrue(response.toString(), response.isNotFound());
 	}
-
 }

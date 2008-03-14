@@ -9,7 +9,7 @@
   <groupId>org.springframework.osgi.iandt.web</groupId>
   <artifactId>simple.servlet</artifactId>
   <packaging>war</packaging>
-  <name>Spring OSGi Web Test:Simple Servlet Bundle</name>
+  <name>Spring OSGi Web Test: Simple Servlet Bundle</name>
   <url>http://www.springframework.org/osgi</url>
   
 </project>
