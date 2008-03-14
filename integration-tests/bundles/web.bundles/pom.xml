@@ -49,9 +49,8 @@
   <modules>
     <module>static.resource.only.bundle</module>
     <module>simple.servlet.bundle</module>
-    <!--
     <module>simple.jsp.bundle</module>    
-    -->
+	<module>taglib.jsp.bundle</module>        
   </modules>
 
  <build>
@@ -65,6 +64,16 @@
           </archive>
         </configuration>
       </plugin>
+      
+      <plugin>
+         <artifactId>maven-war-plugin</artifactId>
+         <configuration>
+           <archive>
+             <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+           </archive>
+         </configuration>       
+      </plugin>
+      
     </plugins>
     
  </build>

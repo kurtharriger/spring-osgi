@@ -26,7 +26,13 @@ import java.util.Enumeration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.springframework.aop.framework.DefaultAopProxyFactory;
+import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
@@ -40,6 +46,12 @@ public abstract class Utils {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(Utils.class);
+
+	private static final String SLASH = "/";
+
+	/** Jasper class */
+	// org.apache.jasper.JspC
+	private static final String JASPER_CLASS = "org.apache.jasper.servlet.JspServlet";
 
 
 	// might have to improve this method to cope with missing folder entries ...
@@ -103,16 +115,15 @@ public abstract class Utils {
 		// remove extension
 		path = StringUtils.stripFilenameExtension(path);
 
-		if (StringUtils.hasText(path))
-			return path;
-
-		// fall-back to bundle symbolic name
-		path = bundle.getSymbolicName();
-		if (StringUtils.hasText(path))
-			return path;
-		// fall-back to bundle name
-		path = OsgiStringUtils.nullSafeName(bundle);
-		return path;
+		if (!StringUtils.hasText(path)) {
+			// fall-back to bundle symbolic name
+			path = bundle.getSymbolicName();
+			if (!StringUtils.hasText(path)) {
+				// fall-back to bundle name
+				path = OsgiStringUtils.nullSafeName(bundle);
+			}
+		}
+		return (path.startsWith(SLASH) ? path : SLASH.concat(path));
 	}
 
 	/**
@@ -134,4 +145,58 @@ public abstract class Utils {
 		}
 	}
 
+	/**
+	 * Dedicated utility method used for creating an OSGi reference to
+	 * Jetty/Tomcat/XXX server service.
+	 * 
+	 * @return proxy to the found OSGi service
+	 */
+	public static Object createServerServiceProxy(BundleContext bundleContext, Class proxyType, String serviceName) {
+
+		OsgiServiceProxyFactoryBean proxyFB = new OsgiServiceProxyFactoryBean();
+
+		// create a bridged classloader so that all the proxy dependencies are considered
+
+		// first between the extender bundle and spring-aop (so that the proxy infrastructure classes are seen)
+		// TODO: OSGI-350
+		BundleDelegatingClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(
+			bundleContext.getBundle(), DefaultAopProxyFactory.class.getClassLoader());
+
+		proxyFB.setBeanClassLoader(cl);
+		proxyFB.setBundleContext(bundleContext);
+		proxyFB.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
+		proxyFB.setInterfaces(new Class[] { proxyType });
+		if (StringUtils.hasText(serviceName))
+			proxyFB.setServiceBeanName(serviceName);
+		proxyFB.afterPropertiesSet();
+
+		return proxyFB.getObject();
+	}
+
+	/**
+	 * Detects the Jasper/JSP parser (used by the server) and returns a chained
+	 * class-loader which incorporates them all. This allows the web application
+	 * to use servlets and JSP w/o importing them (just like in traditional
+	 * environments).
+	 * 
+	 * @return chained classloader containing javax. packages and the sever
+	 * classes + Jasper/JSP compiler (if present)
+	 */
+	public static ClassLoader chainedWebClassLoaders(Class serverClass) {
+		Assert.notNull(serverClass);
+		ClassLoader serverLoader = serverClass.getClassLoader();
+		ClassLoader jasperLoader = getClassLoader(JASPER_CLASS, serverLoader);
+
+		if (serverLoader == jasperLoader)
+			return serverLoader;
+		else {
+			// use the extender classloader
+			jasperLoader = getClassLoader(JASPER_CLASS, Utils.class.getClassLoader());
+			if (jasperLoader == null)
+				return serverLoader;
+			else {
+				return new ChainedClassLoader(new ClassLoader[] { serverLoader, jasperLoader });
+			}
+		}
+	}
 }

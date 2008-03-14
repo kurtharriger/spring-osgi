@@ -33,10 +33,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.resource.Resource;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.aop.framework.DefaultAopProxyFactory;
 import org.springframework.osgi.OsgiException;
-import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
-import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.WarDeployer;
@@ -54,27 +51,22 @@ import org.springframework.util.ObjectUtils;
 // TODO: add support for fragments that can start/stop during the life of a war
 public class JettyWarDeployer implements WarDeployer {
 
-	private static final String SLASH = "/";
-
-	private static final String JASPER_CLASS = "org.apache.jasper.JspC";
-
-	private static final String JSP_CLASS = "javax.servlet.jsp.JspPage";
-
 	/** logger */
 	private static final Log log = LogFactory.getLog(JettyWarDeployer.class);
 
 	/** Jetty system classes */
-	// these are loaded by the war parent classloader
+	// these are loaded by the war parent class-loader
 	private static final String[] systemClasses = { "java.", "javax.servlet.", "javax.xml.", "org.mortbay." };
 
 	/** Jetty server classes */
-	// these aren't loaded by the war classloader
+	// these aren't loaded by the war class-loader
 	private static final String[] serverClasses = { "-org.mortbay.jetty.plus.jaas.", "org.mortbay.jetty." };
 
 	/** access to Jetty server service */
 	private Server serverService;
+
 	/** OSGi context */
-	private BundleContext bundleContext;
+	private final BundleContext bundleContext;
 
 	/** web-apps deployed */
 	private Map deployed = new LinkedHashMap(4);
@@ -89,26 +81,7 @@ public class JettyWarDeployer implements WarDeployer {
 	 */
 	public JettyWarDeployer(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
-
-		// make a server proxy first
-		OsgiServiceProxyFactoryBean proxyFB = new OsgiServiceProxyFactoryBean();
-
-		// create a bridged classloader so that all the proxy dependencies are considered
-
-		// first between the extender bundle and spring-aop (so that the proxy infrastructure classes are seen)
-		// TODO: OSGI-350
-		BundleDelegatingClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(
-			bundleContext.getBundle(), DefaultAopProxyFactory.class.getClassLoader());
-
-		proxyFB.setBeanClassLoader(cl);
-		proxyFB.setBundleContext(bundleContext);
-		proxyFB.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
-		proxyFB.setInterfaces(new Class[] { Server.class });
-		proxyFB.setServiceBeanName("jetty-server");
-		proxyFB.afterPropertiesSet();
-
-		// get the proxy
-		serverService = (Server) proxyFB.getObject();
+		serverService = (Server) Utils.createServerServiceProxy(bundleContext, Server.class, "jetty-server");
 	}
 
 	public void deploy(Bundle bundle) {
@@ -152,7 +125,7 @@ public class JettyWarDeployer implements WarDeployer {
 		// set the war string since it's used to generate the temp path
 		wac.setWar(OsgiStringUtils.nullSafeName(bundle));
 		// same goes for the context path (add leading "/" -> w/o the context will not work)
-		wac.setContextPath(SLASH.concat(Utils.getWarContextPath(bundle)));
+		wac.setContextPath(Utils.getWarContextPath(bundle));
 		// no hot deployment (at least not through directly Jetty)
 		wac.setCopyWebDir(false);
 		wac.setExtractWAR(shouldUnpackWar);
@@ -183,28 +156,12 @@ public class JettyWarDeployer implements WarDeployer {
 		wac.setSystemClasses(systemClasses);
 		wac.setServerClasses(serverClasses);
 
-		// create jetty classloader
-		ClassLoader jettyClassLoader = Server.class.getClassLoader();
-
-		ClassLoader jspClassLoader = Utils.getClassLoader(JSP_CLASS, jettyClassLoader);
-
-		// TODO: use a different classloader
-		ClassLoader jasperClassLoader = Utils.getClassLoader(JASPER_CLASS, jettyClassLoader);
-
 		List classLoaders = new ArrayList();
 
-		classLoaders.add(jettyClassLoader);
-		if (jspClassLoader != null)
-			classLoaders.add(jspClassLoader);
-		if (jasperClassLoader != null)
-			classLoaders.add(jasperClassLoader);
-
-		// chain the jasper and jsp classloader (so JSPs can work even if they are not declared)
-		ChainedClassLoader chainedCL = new ChainedClassLoader(
-			(ClassLoader[]) classLoaders.toArray(new ClassLoader[classLoaders.size()]));
+		ClassLoader serverLoader = Utils.chainedWebClassLoaders(Server.class);
 
 		// use the bundle classloader as a parent
-		ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, chainedCL);
+		ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, serverLoader);
 
 		// use the Jetty default classloader to access the WEB-INF/lib and WEB-INF/classes folder
 		// TODO: the generic OSGi can be used if the WEB/lib and WEB-INF/classes are part of the class-path
@@ -231,7 +188,7 @@ public class JettyWarDeployer implements WarDeployer {
 		else {
 			((OsgiWebAppContext) wac).setBundle(bundle);
 			// if it's unpacked, use the bundle API directly
-			return new BundleSpaceJettyResource(bundle, SLASH);
+			return new BundleSpaceJettyResource(bundle, "/");
 		}
 	}
 

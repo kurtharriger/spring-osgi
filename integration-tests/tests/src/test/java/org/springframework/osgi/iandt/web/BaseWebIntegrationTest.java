@@ -49,7 +49,7 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		//col.add("org.eclipse.bundles, org.eclipse.equinox.http, 20070423");
 		//
 
-		//System.setProperty("DEBUG", "true");
+		System.setProperty("DEBUG", "true");
 		//System.setProperty("VERBOSE", "true");
 
 		// FIXME: can the creation of the logging folder be optional ?
@@ -73,6 +73,9 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		col.add("org.springframework.osgi, jsp-api.osgi, 2.0-SNAPSHOT");
 		col.add("org.springframework.osgi, jasper.osgi, 5.5.23-SNAPSHOT");
 		col.add("org.springframework.osgi, commons-el.osgi, 1.0-SNAPSHOT");
+		
+		// standard tag library
+		col.add("org.springframework.osgi, jstl.osgi, 1.1.2-SNAPSHOT");
 
 		// Jetty server
 		col.add("org.mortbay.jetty, jetty-util, 6.2-SNAPSHOT");
