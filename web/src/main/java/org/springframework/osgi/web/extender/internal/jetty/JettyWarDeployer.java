@@ -19,9 +19,7 @@ package org.springframework.osgi.web.extender.internal.jetty;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,11 +31,9 @@ import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.resource.Resource;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.osgi.OsgiException;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.web.extender.WarDeployer;
-import org.springframework.osgi.web.extender.internal.util.ChainedClassLoader;
+import org.springframework.osgi.web.extender.internal.AbstractWarDeployer;
 import org.springframework.osgi.web.extender.internal.util.Utils;
 import org.springframework.util.ObjectUtils;
 
@@ -49,7 +45,7 @@ import org.springframework.util.ObjectUtils;
  * 
  */
 // TODO: add support for fragments that can start/stop during the life of a war
-public class JettyWarDeployer implements WarDeployer {
+public class JettyWarDeployer extends AbstractWarDeployer {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(JettyWarDeployer.class);
@@ -65,12 +61,6 @@ public class JettyWarDeployer implements WarDeployer {
 	/** access to Jetty server service */
 	private Server serverService;
 
-	/** OSGi context */
-	private final BundleContext bundleContext;
-
-	/** web-apps deployed */
-	private Map deployed = new LinkedHashMap(4);
-
 	// TODO: make this configurable
 	private boolean shouldUnpackWar = true;
 
@@ -80,30 +70,34 @@ public class JettyWarDeployer implements WarDeployer {
 	 * 
 	 */
 	public JettyWarDeployer(BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
 		serverService = (Server) Utils.createServerServiceProxy(bundleContext, Server.class, "jetty-server");
 	}
 
-	public void deploy(Bundle bundle) {
-		try {
-			if (log.isDebugEnabled())
-				log.debug("about to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
-						+ serverService.getVersion());
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Creates an OSGi-specific Jetty {@link WebAppContext}.
+	 */
+	protected Object createDeployment(Bundle bundle) throws Exception {
+		if (log.isDebugEnabled())
+			log.debug("About to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
+					+ Server.getVersion());
 
-			// create wac (and classloader)
-			WebAppContext wac = createJettyWebContext(bundle);
+		return createJettyWebContext(bundle);
+	}
 
-			// save web context
-			deployed.put(bundle, wac);
+	protected void startDeployment(Object deployment) throws Exception {
+		startWebContext((WebAppContext) deployment);
+	}
 
-			// start web context
-			startWebContext(wac);
-		}
-		catch (Exception ex) {
-			log.error("cannot deploy", ex);
-			// TODO: add dedicated exception
-			throw new OsgiException(ex);
-		}
+	protected void stopDeployment(Bundle bundle, Object deployment) throws Exception {
+		if (log.isDebugEnabled())
+			log.debug("about to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
+					+ Server.getVersion());
+
+		WebAppContext wac = (WebAppContext) deployment;
+		wac.stop();
+		// FIX: remove the handler from the server as well
 	}
 
 	/**
@@ -220,23 +214,6 @@ public class JettyWarDeployer implements WarDeployer {
 			log.debug("started context " + wac);
 	}
 
-	public void undeploy(Bundle bundle) {
-		log.debug("about to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
-				+ serverService.getVersion());
-
-		WebAppContext wac = (WebAppContext) deployed.get(bundle);
-		// if the bundle has been actually deployed
-		if (wac != null)
-			try {
-				wac.stop();
-				// TODO: remove the handler from the server as well
-			}
-			catch (Exception ex) {
-				//TODO: add dedicated exception
-				throw new OsgiException(ex);
-			}
-	}
-
 	private File unpackBundle(Bundle bundle, WebAppContext wac) {
 
 		File extractedWebAppDir = new File(wac.getTempDirectory(), "webapp");
@@ -250,5 +227,4 @@ public class JettyWarDeployer implements WarDeployer {
 
 		return extractedWebAppDir;
 	}
-
 }

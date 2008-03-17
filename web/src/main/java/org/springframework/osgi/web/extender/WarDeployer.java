@@ -20,8 +20,14 @@ import org.osgi.framework.Bundle;
 
 /**
  * OSGi WAR bundle deployer. Implementations are free to use specific
- * environments for the actual deployment process, such as Apache Tomcat, 
- * OSGi HttpService, Jetty or other web containers.
+ * environments for the actual deployment process, such as Apache Tomcat, OSGi
+ * HttpService, Jetty or other web containers.
+ * 
+ * <p/>As the war listener handles the detection, start up and shutdown of
+ * bundles, the deployer should be concerned only with the deployment process.
+ * It is recommend that no tracking is performed inside the deployer (unless
+ * necessary) and that the thrown exceptions (if any) are not wrapped (the
+ * extender will take care of logging and wrapping them).
  * 
  * @author Costin Leau
  * 
@@ -30,18 +36,20 @@ public interface WarDeployer {
 
 	/**
 	 * Deploys the given bundle as a WAR. It is assumed that the given bundle is
-	 * a WAR meaning that it contains a <code>WEB-INF/web.xml</code> file in
+	 * a WAR, meaning that it contains a <code>WEB-INF/web.xml</code> file in
 	 * its bundle space.
 	 * 
 	 * @param bundle war bundle
+	 * @throws Exception if something went wrong during deployment
 	 */
-	void deploy(Bundle bundle);
+	void deploy(Bundle bundle) throws Exception;
 
 	/**
 	 * Un-deploys the given bundle. Undeploying a WAR makes sense only if it has
 	 * been previously deployed.
 	 * 
-	 * @param bundle
+	 * @param bundle war bundle.
+	 * @throws Exception if something went wrong during undeployment.
 	 */
-	void undeploy(Bundle bundle);
+	void undeploy(Bundle bundle) throws Exception;
 }

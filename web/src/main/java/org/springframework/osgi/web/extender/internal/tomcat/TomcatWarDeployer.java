@@ -18,8 +18,8 @@ package org.springframework.osgi.web.extender.internal.tomcat;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -29,10 +29,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.osgi.OsgiException;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.web.extender.WarDeployer;
+import org.springframework.osgi.web.extender.internal.AbstractWarDeployer;
 import org.springframework.osgi.web.extender.internal.util.Utils;
 
 /**
@@ -42,72 +41,52 @@ import org.springframework.osgi.web.extender.internal.util.Utils;
  * 
  * @author Costin Leau
  */
-public class TomcatWarDeployer implements WarDeployer {
+public class TomcatWarDeployer extends AbstractWarDeployer {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(TomcatWarDeployer.class);
 
-	/** OSGi context */
-	private final BundleContext bundleContext;
-
 	/** Catalina OSGi service */
 	private final Embedded serverService;
 
-	/** web-apps deployed */
-	private Map deployed = new LinkedHashMap(4);
-
-	/** context lock */
-	private final Object lock = new Object();
-
 
 	public TomcatWarDeployer(BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
 		serverService = (Embedded) Utils.createServerServiceProxy(bundleContext, Embedded.class, "tomcat-server");
 	}
 
-	public void deploy(Bundle bundle) {
-		try {
-			if (log.isDebugEnabled())
-				log.debug("about to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
-						+ serverService.getInfo());
+	protected Object createDeployment(Bundle bundle) throws Exception {
+		if (log.isDebugEnabled())
+			log.debug("about to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
+					+ serverService.getInfo());
 
-			Context context = createCatalinaContext(bundle);
-
-			// save web
-			deployed.put(bundle, context);
-
-			// start web context
-			startCatalinaContext(context);
-
-		}
-		catch (Exception ex) {
-			log.error("cannot deploy", ex);
-			// TODO: add dedicated exception
-			throw new OsgiException(ex);
-		}
+		return createCatalinaContext(bundle);
 	}
 
-	public void undeploy(Bundle bundle) {
-		log.debug("about to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
-				+ serverService.getInfo());
+	protected void startDeployment(Object deployment) throws Exception {
+		// start web context
+		startCatalinaContext((Context) deployment);
+	}
 
-		Context context = (Context) deployed.get(bundle);
-		// if the bundle has been actually deployed
-		if (context != null)
-			try {
-				// simply add the context to the engine
-				serverService.removeContext(context);
-
-				// TODO: remove the handler from the server as well
-			}
-			catch (Exception ex) {
-				//TODO: add dedicated exception
-				throw new OsgiException(ex);
-			}
+	protected void stopDeployment(Bundle bundle, Object deployment) throws Exception {
+		if (log.isDebugEnabled())
+			log.debug("about to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
+					+ serverService.getInfo());
+		serverService.removeContext((Context) deployment);
 	}
 
 	private void startCatalinaContext(Context context) {
-		getHost().addChild(context);
+		Thread currentThread = Thread.currentThread();
+
+		ClassLoader old = currentThread.getContextClassLoader();
+		try {
+			// TODO: this seemed to be ignored and another TCCL used instead
+			//			ClassLoader jasperTCCLLoader = createJasperClassLoader(context.getLoader().getClassLoader());
+			currentThread.setContextClassLoader(null);
+			getHost().addChild(context);
+		}
+		finally {
+			currentThread.setContextClassLoader(old);
+		}
 	}
 
 	private Context createCatalinaContext(Bundle bundle) throws IOException {
@@ -135,7 +114,8 @@ public class TomcatWarDeployer implements WarDeployer {
 		ClassLoader serverLoader = Utils.chainedWebClassLoaders(Embedded.class);
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, serverLoader);
 		OsgiCatalinaLoader loader = new OsgiCatalinaLoader();
-		loader.setClassLoader(classLoader);
+		ClassLoader urlClassLoader = createJasperClassLoader(classLoader);
+		loader.setClassLoader(urlClassLoader);
 		return loader;
 	}
 
@@ -156,4 +136,14 @@ public class TomcatWarDeployer implements WarDeployer {
 		// pick the first one and associate the context with it
 		return children[0];
 	}
+
+	/**
+	 * Creates the URLClassLoader that Jasper expects.
+	 * 
+	 * @return
+	 */
+	private ClassLoader createJasperClassLoader(ClassLoader parent) {
+		return URLClassLoader.newInstance(new URL[0], parent);
+	}
+
 }
