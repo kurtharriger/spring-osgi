@@ -18,8 +18,6 @@ package org.springframework.osgi.web.extender.internal;
 
 import java.net.URL;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +33,7 @@ import org.springframework.core.ConcurrentMap;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.WarDeployer;
-import org.springframework.osgi.web.extender.internal.jetty.JettyWarDeployer;
+import org.springframework.osgi.web.extender.internal.tomcat.TomcatWarDeployer;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 
 /**
@@ -93,19 +91,30 @@ public class WarLoaderListener implements BundleActivator {
 		/** bundle to deploy */
 		private final Bundle bundle;
 
+		private final String bundleName;
+
 
 		public DeployTask(Bundle bundle) {
 			this.bundle = bundle;
+			this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
 		}
 
 		public void run() {
-			if (log.isDebugEnabled())
-				log.debug("deploying bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
-			managedWARs.put(bundle, new Date());
-			warDeployer.deploy(bundle);
+			boolean debug = log.isDebugEnabled();
+			if (debug)
+				log.debug("deploying bundle " + bundleName);
+			managedBundles.put(bundle, new Date());
+			try {
+				warDeployer.deploy(bundle);
 
-			if (log.isDebugEnabled())
-				log.debug("bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "successfully deployed");
+				if (debug)
+					log.debug("bundle " + bundleName + "successfully deployed");
+
+			}
+			catch (Exception ex) {
+				// log exception
+				log.error("war deployment of bundle " + bundleName + " failed", ex);
+			}
 		}
 	}
 
@@ -115,43 +124,38 @@ public class WarLoaderListener implements BundleActivator {
 		/** bundle to deploy */
 		private final Bundle bundle;
 
+		private final String bundleName;
+
 
 		public UndeployTask(Bundle bundle) {
 			this.bundle = bundle;
+			this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
 		}
 
 		public void run() {
-			if (log.isDebugEnabled())
-				log.debug("undeploying bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
-			managedWARs.remove(bundle);
-			warDeployer.undeploy(bundle);
-			if (log.isDebugEnabled())
-				log.debug("bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "successfully undeployed");
+			boolean debug = log.isDebugEnabled();
+
+			if (debug)
+				log.debug("undeploying bundle " + bundleName);
+			managedBundles.remove(bundle);
+			try {
+				warDeployer.undeploy(bundle);
+				if (debug)
+					log.debug("bundle " + bundleName + "successfully undeployed");
+			}
+			catch (Exception ex) {
+				// log exception
+				log.error("war undeployment of bundle " + bundleName + " failed", ex);
+			}
 		}
 	}
 
 	/**
 	 * Simple WAR deployment manager. Handles the IO process involved in
 	 * deploying and undeploying the war.
-	 * 
 	 */
+	// TODO: make this pluggable so that smarter managers can be used
 	private class DeploymentManager implements DisposableBean {
-
-		/** queue lock */
-		private final Object queueLock = new Object();
-
-		// processing queue
-		// TODO: replace this with a JDK5/backport concurrent queue
-		// we actually need a map since we're using the same queue for bundles that get deployed, undeployed
-		// as we process them in the arrival order. It also makes it simple to eliminate deploy/undeploy events
-		// that haven't been processed yet
-
-		// TODO: can replace this with a concurrent map (if order is not important)
-		/**
-		 * queue of bundles to deploy/undeploy (since the process takes some
-		 * time)
-		 */
-		private final Map deploymentQueue = new LinkedHashMap();
 
 		// the timer class is directly used since we need access to the TimerTask
 		/** thread for deploying/undeploying bundles */
@@ -172,7 +176,6 @@ public class WarLoaderListener implements BundleActivator {
 
 		public void destroy() throws Exception {
 			executor.destroy();
-			deploymentQueue.clear();
 		}
 	}
 
@@ -190,16 +193,10 @@ public class WarLoaderListener implements BundleActivator {
 	private long bundleId;
 
 	/**
-	 * Monitor used for dealing with the bundle activator and synchronous bundle
-	 * threads
-	 */
-	private transient final Object monitor = new Object();
-
-	/**
 	 * Concurrent map of managed OSGi bundles considered wars. The keys are the
 	 * bundle ID while the values actual bundle references.
 	 */
-	protected final ConcurrentMap managedWARs;
+	protected final ConcurrentMap managedBundles;
 
 	/**
 	 * Bundle listener for WARs.
@@ -220,7 +217,7 @@ public class WarLoaderListener implements BundleActivator {
 	 * 
 	 */
 	public WarLoaderListener() {
-		this.managedWARs = CollectionFactory.createConcurrentMap(16);
+		this.managedBundles = CollectionFactory.createConcurrentMap(16);
 		deploymentManager = new DeploymentManager();
 	}
 
@@ -246,7 +243,7 @@ public class WarLoaderListener implements BundleActivator {
 		warScanner = new DefaultWarScanner();
 
 		// TODO: make war deployer plug-able
-		warDeployer = new JettyWarDeployer(bundleContext);
+		warDeployer = new TomcatWarDeployer(bundleContext);
 
 		// register war listener
 		warListener = new WarBundleListener();
@@ -293,12 +290,9 @@ public class WarLoaderListener implements BundleActivator {
 	private void maybeUndeployWar(Bundle bundle) {
 		boolean debug = log.isDebugEnabled();
 
-		// TODO: use a separate thread
-		Object value = managedWARs.get(bundle);
-
 		// do a fast look-up to see if the bundle has already been deployed
 		// if it has, then undeploy it
-		if (value != null) {
+		if (managedBundles.containsKey(bundle)) {
 			if (debug)
 				log.debug(OsgiStringUtils.nullSafeNameAndSymName(bundle) + " is a WAR, scheduling war undeployment ...");
 
