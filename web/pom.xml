@@ -140,7 +140,22 @@
       <scope>provided</scope>
     </dependency>   
   </dependencies>
-
+  
+  <!--
+  <build>
+  <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+	      <groupId>org.apache.maven.plugins</groupId>
+          <configuration>
+            <source>1.5</source>
+            <target>1.5</target>
+            <debug>true</debug>
+          </configuration>
+      </plugin>
+  </plugins>
+  </build>
+  -->
   <repositories>
     <repository>
       <id>codehaus-repo</id>
