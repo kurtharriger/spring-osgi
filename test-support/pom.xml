@@ -16,7 +16,7 @@
   
   
   <properties>
-    <javadoc.loc>${basedir}/../../docs/src/javadoc</javadoc.loc>
+    <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
   
     <spring.osgi.export>
       !org.springframework.osgi.test.*internal*,
