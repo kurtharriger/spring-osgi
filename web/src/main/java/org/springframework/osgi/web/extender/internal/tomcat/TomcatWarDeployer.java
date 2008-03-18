@@ -56,7 +56,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 
 	protected Object createDeployment(Bundle bundle) throws Exception {
 		if (log.isDebugEnabled())
-			log.debug("about to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
+			log.debug("About to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
 					+ serverService.getInfo());
 
 		return createCatalinaContext(bundle);
@@ -69,7 +69,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 
 	protected void stopDeployment(Bundle bundle, Object deployment) throws Exception {
 		if (log.isDebugEnabled())
-			log.debug("about to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
+			log.debug("About to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
 					+ serverService.getInfo());
 		serverService.removeContext((Context) deployment);
 	}
@@ -104,7 +104,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	}
 
 	/**
-	 * Create a dedicated Catalina Loader plus a special, chained, OSGi
+	 * Creates a dedicated Catalina Loader plus a special, chained, OSGi
 	 * classloader.
 	 * 
 	 * @param bundle
@@ -138,7 +138,9 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	}
 
 	/**
-	 * Creates the URLClassLoader that Jasper expects.
+	 * Creates the URLClassLoader that Jasper expects. This one is just a
+	 * wrapper around the OSGi classloader so all its calls will be delegated to
+	 * its OSGi brother.
 	 * 
 	 * @return
 	 */

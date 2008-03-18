@@ -64,7 +64,7 @@ public class WarLoaderListener implements BundleActivator {
 			switch (event.getType()) {
 				case BundleEvent.STARTED: {
 					if (trace)
-						log.trace("processing " + OsgiStringUtils.nullSafeToString(event) + " event for bundle "
+						log.trace("Processing " + OsgiStringUtils.nullSafeToString(event) + " event for bundle "
 								+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
 					maybeDeployWar(bundle);
@@ -72,7 +72,7 @@ public class WarLoaderListener implements BundleActivator {
 				}
 				case BundleEvent.STOPPING: {
 					if (trace)
-						log.trace("processing " + OsgiStringUtils.nullSafeToString(event) + " event for bundle "
+						log.trace("Processing " + OsgiStringUtils.nullSafeToString(event) + " event for bundle "
 								+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
 					maybeUndeployWar(bundle);
@@ -102,18 +102,18 @@ public class WarLoaderListener implements BundleActivator {
 		public void run() {
 			boolean debug = log.isDebugEnabled();
 			if (debug)
-				log.debug("deploying bundle " + bundleName);
+				log.debug("Deploying bundle " + bundleName);
 			managedBundles.put(bundle, new Date());
 			try {
 				warDeployer.deploy(bundle);
 
 				if (debug)
-					log.debug("bundle " + bundleName + "successfully deployed");
+					log.debug("Bundle " + bundleName + "successfully deployed");
 
 			}
 			catch (Exception ex) {
 				// log exception
-				log.error("war deployment of bundle " + bundleName + " failed", ex);
+				log.error("War deployment of bundle " + bundleName + " failed", ex);
 			}
 		}
 	}
@@ -136,16 +136,16 @@ public class WarLoaderListener implements BundleActivator {
 			boolean debug = log.isDebugEnabled();
 
 			if (debug)
-				log.debug("undeploying bundle " + bundleName);
+				log.debug("Undeploying bundle " + bundleName);
 			managedBundles.remove(bundle);
 			try {
 				warDeployer.undeploy(bundle);
 				if (debug)
-					log.debug("bundle " + bundleName + "successfully undeployed");
+					log.debug("Bundle " + bundleName + "successfully undeployed");
 			}
 			catch (Exception ex) {
 				// log exception
-				log.error("war undeployment of bundle " + bundleName + " failed", ex);
+				log.error("War undeployment of bundle " + bundleName + " failed", ex);
 			}
 		}
 	}
@@ -257,7 +257,7 @@ public class WarLoaderListener implements BundleActivator {
 			Bundle bundle = bnds[i];
 			if (OsgiBundleUtils.isBundleActive(bundle)) {
 				if (trace)
-					log.trace("checking if bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " is a war..");
+					log.trace("Checking if bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " is a war..");
 				maybeDeployWar(bundle);
 			}
 		}

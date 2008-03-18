@@ -18,15 +18,12 @@ package org.springframework.osgi.web.extender.internal.jetty;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.webapp.WebAppClassLoader;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.resource.Resource;
 import org.osgi.framework.Bundle;
@@ -35,7 +32,6 @@ import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.internal.AbstractWarDeployer;
 import org.springframework.osgi.web.extender.internal.util.Utils;
-import org.springframework.util.ObjectUtils;
 
 /**
  * <a href="http://jetty.mortbay.org">Jetty</a> 6.1.x specific war deployer.
@@ -44,7 +40,6 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * 
  */
-// TODO: add support for fragments that can start/stop during the life of a war
 public class JettyWarDeployer extends AbstractWarDeployer {
 
 	/** logger */
@@ -92,12 +87,11 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 
 	protected void stopDeployment(Bundle bundle, Object deployment) throws Exception {
 		if (log.isDebugEnabled())
-			log.debug("about to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
+			log.debug("About to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
 					+ Server.getVersion());
 
 		WebAppContext wac = (WebAppContext) deployment;
-		wac.stop();
-		// FIX: remove the handler from the server as well
+		stopWebContext(wac);
 	}
 
 	/**
@@ -131,9 +125,6 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 		// 1. start with the slow, IO activity
 		Resource rootResource = getRootResource(bundle, wac);
 
-		if (log.isDebugEnabled())
-			log.debug("the root resources are " + ObjectUtils.nullSafeToString(rootResource.list()));
-
 		// wac needs access to the WAR root
 		// we have to make sure we don't trigger any direct file lookup
 		// so instead of calling .setWar()
@@ -146,28 +137,19 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 		// class-loading behaviour
 		//
 
-		// respect the servlet spec class-loading contract
+		// obey the servlet spec class-loading contract
 		wac.setSystemClasses(systemClasses);
 		wac.setServerClasses(serverClasses);
-
-		List classLoaders = new ArrayList();
+		// no java 2 loading compliance
+		wac.setParentLoaderPriority(false);
 
 		ClassLoader serverLoader = Utils.chainedWebClassLoaders(Server.class);
 
 		// use the bundle classloader as a parent
 		ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, serverLoader);
 
-		// use the Jetty default classloader to access the WEB-INF/lib and WEB-INF/classes folder
-		// TODO: the generic OSGi can be used if the WEB/lib and WEB-INF/classes are part of the class-path
-		// TODO: check Jetty behaviour when using a non URL classloader
-		WebAppClassLoader warClassLoader = new WebAppClassLoader(bundleClassLoader, wac);
-		warClassLoader.setName("Jetty OSGi ClassLoader");
+		wac.setClassLoader(bundleClassLoader);
 
-		wac.setClassLoader(warClassLoader);
-		// no java 2 loading compliance
-		wac.setParentLoaderPriority(false);
-
-		// we're done
 		return wac;
 	}
 
@@ -194,24 +176,50 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	 */
 	private void startWebContext(WebAppContext wac) throws Exception {
 		//TODO: is there any way to simplify this ?
-		HandlerCollection contexts = (HandlerCollection) serverService.getChildHandlerByClass(ContextHandlerCollection.class);
-		if (contexts == null)
-			contexts = (HandlerCollection) serverService.getChildHandlerByClass(HandlerCollection.class);
-		contexts.addHandler(wac);
+		HandlerCollection contexts = getJettyContexts();
 
 		// set the TCCL since it's used internally by Jetty
 		Thread current = Thread.currentThread();
 		ClassLoader old = current.getContextClassLoader();
 		try {
 			current.setContextClassLoader(wac.getClassLoader());
+			contexts.addHandler(wac);
 			wac.start();
 			contexts.start();
+
+			if (log.isDebugEnabled())
+				log.debug("Started context " + wac);
 		}
 		finally {
 			current.setContextClassLoader(old);
 		}
-		if (log.isDebugEnabled())
-			log.debug("started context " + wac);
+	}
+
+	private void stopWebContext(WebAppContext wac) throws Exception {
+		HandlerCollection contexts = getJettyContexts();
+
+		Thread current = Thread.currentThread();
+		ClassLoader old = current.getContextClassLoader();
+		try {
+			current.setContextClassLoader(wac.getClassLoader());
+			wac.stop();
+			contexts.removeHandler(wac);
+
+			if (log.isDebugEnabled())
+				log.debug("Stopped context " + wac);
+
+		}
+		finally {
+			current.setContextClassLoader(old);
+		}
+	}
+
+	private HandlerCollection getJettyContexts() {
+		HandlerCollection contexts = (HandlerCollection) serverService.getChildHandlerByClass(ContextHandlerCollection.class);
+		if (contexts == null)
+			contexts = (HandlerCollection) serverService.getChildHandlerByClass(HandlerCollection.class);
+
+		return contexts;
 	}
 
 	private File unpackBundle(Bundle bundle, WebAppContext wac) {
