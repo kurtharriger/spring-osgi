@@ -23,11 +23,11 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
 import org.apache.catalina.startup.Embedded;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.catalina.startup.ExpandWar;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.internal.AbstractWarDeployer;
 import org.springframework.osgi.web.extender.internal.util.Utils;
 
@@ -49,7 +49,14 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	}
 
 	protected Object createDeployment(Bundle bundle, String contextPath) throws Exception {
-		return createCatalinaContext(bundle, contextPath);
+		String docBase = createDocBase(bundle, contextPath);
+
+		Context catalinaContext = serverService.createContext(contextPath, docBase);
+		catalinaContext.setLoader(createCatalinaLoader(bundle));
+		catalinaContext.setPrivileged(false);
+		catalinaContext.setReloadable(false);
+
+		return catalinaContext;
 	}
 
 	protected void startDeployment(Object deployment) throws Exception {
@@ -58,7 +65,15 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	}
 
 	protected void stopDeployment(Bundle bundle, Object deployment) throws Exception {
-		serverService.removeContext((Context) deployment);
+		Context context = (Context) deployment;
+		String docBase = context.getDocBase();
+		// remove context
+		serverService.removeContext(context);
+
+		if (log.isDebugEnabled())
+			log.debug("Cleaning unpacked folder " + docBase);
+		// clean unpacked folder
+		ExpandWar.delete(new File(docBase));
 	}
 
 	private void startCatalinaContext(Context context) {
@@ -74,18 +89,6 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		finally {
 			currentThread.setContextClassLoader(old);
 		}
-	}
-
-	private Context createCatalinaContext(Bundle bundle, String contextPath) throws IOException {
-		String docBase = createDocBase(bundle);
-
-		// TODO: can be the docBase be null ?
-		Context catalinaContext = serverService.createContext(contextPath, docBase);
-		catalinaContext.setLoader(createCatalinaLoader(bundle));
-		catalinaContext.setPrivileged(false);
-		catalinaContext.setReloadable(false);
-
-		return catalinaContext;
 	}
 
 	/**
@@ -104,13 +107,19 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		return loader;
 	}
 
-	private String createDocBase(Bundle bundle) throws IOException {
-		File tmpFile = File.createTempFile("tomcat-war-", ".osgi");
+	private String createDocBase(Bundle bundle, String contextPath) throws IOException {
+		File tmpFile = File.createTempFile("tomcat-" + contextPath, ".osgi");
 		tmpFile.delete();
 		tmpFile.mkdir();
+
+		String path = tmpFile.getCanonicalPath();
+		if (log.isDebugEnabled())
+			log.debug("Unpacking bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] to folder [" + path
+					+ "]...");
+
 		Utils.unpackBundle(bundle, tmpFile);
 
-		return tmpFile.getCanonicalPath();
+		return path;
 	}
 
 	private Container getHost() {

@@ -83,12 +83,12 @@ public abstract class Utils {
 				try {
 					OutputStream targetStream = new FileOutputStream(targetFile);
 					if (trace)
-						log.trace("copying " + url + " to " + targetFile);
+						log.trace("Copying " + url + " to " + targetFile);
 					FileCopyUtils.copy(url.openStream(), targetStream);
 				}
 				catch (IOException ex) {
 					//
-					log.error("cannot copy resource " + entryPath, ex);
+					log.error("Cannot copy resource " + entryPath, ex);
 					throw (RuntimeException) new IllegalStateException("IO exception while unpacking bundle "
 							+ OsgiStringUtils.nullSafeNameAndSymName(bundle)).initCause(ex);
 				}
@@ -96,7 +96,7 @@ public abstract class Utils {
 			}
 		}
 	}
-
+	
 	/**
 	 * Returns the defining classloader of the given class. As we're running
 	 * inside an OSGi classloader, the classloaders that are able to load the
