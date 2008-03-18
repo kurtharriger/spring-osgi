@@ -17,7 +17,6 @@
 package org.springframework.osgi.web.extender.internal.jetty;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,12 +72,12 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	 * 
 	 * Creates an OSGi-specific Jetty {@link WebAppContext}.
 	 */
-	protected Object createDeployment(Bundle bundle) throws Exception {
+	protected Object createDeployment(Bundle bundle, String contextPath) throws Exception {
 		if (log.isDebugEnabled())
-			log.debug("About to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
-					+ Server.getVersion());
+			log.debug("About to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] to [" + contextPath
+					+ "] on server " + Server.getVersion());
 
-		return createJettyWebContext(bundle);
+		return createJettyWebContext(bundle, contextPath);
 	}
 
 	protected void startDeployment(Object deployment) throws Exception {
@@ -101,7 +100,7 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	 * @return
 	 * @throws Exception
 	 */
-	private WebAppContext createJettyWebContext(Bundle bundle) throws Exception {
+	private WebAppContext createJettyWebContext(Bundle bundle, String contextPath) throws Exception {
 
 		// plug in our custom class only if needed
 		WebAppContext wac = (shouldUnpackWar ? new WebAppContext() : new OsgiWebAppContext());
@@ -113,7 +112,7 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 		// set the war string since it's used to generate the temp path
 		wac.setWar(OsgiStringUtils.nullSafeName(bundle));
 		// same goes for the context path (add leading "/" -> w/o the context will not work)
-		wac.setContextPath(Utils.getWarContextPath(bundle));
+		wac.setContextPath(contextPath);
 		// no hot deployment (at least not through directly Jetty)
 		wac.setCopyWebDir(false);
 		wac.setExtractWAR(shouldUnpackWar);
@@ -140,6 +139,7 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 		// obey the servlet spec class-loading contract
 		wac.setSystemClasses(systemClasses);
 		wac.setServerClasses(serverClasses);
+
 		// no java 2 loading compliance
 		wac.setParentLoaderPriority(false);
 
@@ -147,13 +147,12 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 
 		// use the bundle classloader as a parent
 		ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, serverLoader);
-
-		wac.setClassLoader(bundleClassLoader);
+		wac.setClassLoader(Utils.createURLClassLoaderWrapper(bundleClassLoader));
 
 		return wac;
 	}
 
-	private Resource getRootResource(Bundle bundle, WebAppContext wac) throws IOException {
+	private Resource getRootResource(Bundle bundle, WebAppContext wac) throws Exception {
 		// decide whether we unpack or not
 		if (shouldUnpackWar) {
 			// unpack the war somewhere
@@ -171,7 +170,7 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	/**
 	 * Starts the Jetty web context class.
 	 * 
-	 * @param wac
+	 * @param wac,
 	 * @throws Exception
 	 */
 	private void startWebContext(WebAppContext wac) throws Exception {
@@ -222,17 +221,22 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 		return contexts;
 	}
 
-	private File unpackBundle(Bundle bundle, WebAppContext wac) {
+	private File unpackBundle(Bundle bundle, WebAppContext wac) throws Exception {
+		// TODO: seems that the default jetty temp folder causes problems when loading JSPs
+		//		File extractedWebAppDir = new File(wac.getTempDirectory(), "webapp");
 
-		File extractedWebAppDir = new File(wac.getTempDirectory(), "webapp");
-		if (!extractedWebAppDir.exists())
-			extractedWebAppDir.mkdir();
+		File tmpFile = File.createTempFile("jetty-war-", ".osgi");
+		tmpFile.delete();
+		tmpFile.mkdir();
 
-		log.info("unpacking bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " to folder ["
-				+ extractedWebAppDir + "] ...");
+		//		if (!extractedWebAppDir.exists())
+		//			extractedWebAppDir.mkdir();
+
+		log.info("unpacking bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " to folder [" + tmpFile
+				+ "] ...");
 		// copy the bundle content into the target folder
-		Utils.unpackBundle(bundle, extractedWebAppDir);
+		Utils.unpackBundle(bundle, tmpFile);
 
-		return extractedWebAppDir;
+		return tmpFile;
 	}
 }

@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Enumeration;
 
 import org.apache.commons.logging.Log;
@@ -46,8 +47,6 @@ public abstract class Utils {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(Utils.class);
-
-	private static final String SLASH = "/";
 
 	/** Jasper class */
 	// org.apache.jasper.JspC
@@ -99,34 +98,6 @@ public abstract class Utils {
 	}
 
 	/**
-	 * Determines the context path assuming the given bundle is a war.. Will try
-	 * to return a string representation by first looking at the bundle
-	 * location, followed by the bundle symbolic name and then name. If none can
-	 * be used (for non-OSGi artifacts for example) then an arbitrary name will
-	 * be used.
-	 * 
-	 * 
-	 * @param bundle
-	 * @return
-	 */
-	public static String getWarContextPath(Bundle bundle) {
-		// get only the file (be sure to normalize just in case)
-		String path = StringUtils.getFilename(StringUtils.cleanPath(bundle.getLocation()));
-		// remove extension
-		path = StringUtils.stripFilenameExtension(path);
-
-		if (!StringUtils.hasText(path)) {
-			// fall-back to bundle symbolic name
-			path = bundle.getSymbolicName();
-			if (!StringUtils.hasText(path)) {
-				// fall-back to bundle name
-				path = OsgiStringUtils.nullSafeName(bundle);
-			}
-		}
-		return (path.startsWith(SLASH) ? path : SLASH.concat(path));
-	}
-
-	/**
 	 * Returns the defining classloader of the given class. As we're running
 	 * inside an OSGi classloader, the classloaders that are able to load the
 	 * resource, are not always the defining classloader.
@@ -166,6 +137,8 @@ public abstract class Utils {
 		proxyFB.setBundleContext(bundleContext);
 		proxyFB.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
 		proxyFB.setInterfaces(new Class[] { proxyType });
+		// wait 5 seconds
+		proxyFB.setTimeout(5 * 1000);
 		if (StringUtils.hasText(serviceName))
 			proxyFB.setServiceBeanName(serviceName);
 		proxyFB.afterPropertiesSet();
@@ -198,5 +171,16 @@ public abstract class Utils {
 				return new ChainedClassLoader(new ClassLoader[] { serverLoader, jasperLoader });
 			}
 		}
+	}
+
+	/**
+	 * Creates an URLClassLoader that wraps the given class loader meaning that
+	 * all its calls will be delegated to the backing class loader. This type of
+	 * loader is normally used with Tomcat Jasper 2.
+	 * 
+	 * @return URLClassLoader wrapper around the given class loader.
+	 */
+	public static ClassLoader createURLClassLoaderWrapper(ClassLoader parent) {
+		return URLClassLoader.newInstance(new URL[0], parent);
 	}
 }

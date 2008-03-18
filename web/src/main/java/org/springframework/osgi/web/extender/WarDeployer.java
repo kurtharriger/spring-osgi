@@ -28,9 +28,9 @@ import org.osgi.framework.Bundle;
  * It is recommend that no tracking is performed inside the deployer (unless
  * necessary) and that the thrown exceptions (if any) are not wrapped (the
  * extender will take care of logging and wrapping them).
- * 
+ *
  * @author Costin Leau
- * 
+ * @see ContextPathStrategy
  */
 public interface WarDeployer {
 
@@ -40,16 +40,18 @@ public interface WarDeployer {
 	 * its bundle space.
 	 * 
 	 * @param bundle war bundle
+	 * @param context path the war context path
 	 * @throws Exception if something went wrong during deployment
 	 */
-	void deploy(Bundle bundle) throws Exception;
+	void deploy(Bundle bundle, String contextPath) throws Exception;
 
 	/**
 	 * Un-deploys the given bundle. Undeploying a WAR makes sense only if it has
 	 * been previously deployed.
 	 * 
-	 * @param bundle war bundle.
-	 * @throws Exception if something went wrong during undeployment.
+	 * @param bundle war bundle
+	 * @param context path the war context path
+	 * @throws Exception if something went wrong during undeployment
 	 */
-	void undeploy(Bundle bundle) throws Exception;
+	void undeploy(Bundle bundle, String contextPath) throws Exception;
 }

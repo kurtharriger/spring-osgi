@@ -32,9 +32,11 @@ import org.springframework.core.CollectionFactory;
 import org.springframework.core.ConcurrentMap;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.osgi.web.extender.ContextPathStrategy;
 import org.springframework.osgi.web.extender.WarDeployer;
-import org.springframework.osgi.web.extender.internal.tomcat.TomcatWarDeployer;
+import org.springframework.osgi.web.extender.internal.jetty.JettyWarDeployer;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
+import org.springframework.util.Assert;
 
 /**
  * OSGi specific listener that bootstraps web applications packed as WARs (Web
@@ -82,7 +84,6 @@ public class WarLoaderListener implements BundleActivator {
 					break;
 			}
 		}
-
 	}
 
 	/** deploy war task */
@@ -91,11 +92,14 @@ public class WarLoaderListener implements BundleActivator {
 		/** bundle to deploy */
 		private final Bundle bundle;
 
+		private final String contextPath;
+
 		private final String bundleName;
 
 
-		public DeployTask(Bundle bundle) {
+		public DeployTask(Bundle bundle, String contextPath) {
 			this.bundle = bundle;
+			this.contextPath = contextPath;
 			this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
 		}
 
@@ -105,7 +109,7 @@ public class WarLoaderListener implements BundleActivator {
 				log.debug("Deploying bundle " + bundleName);
 			managedBundles.put(bundle, new Date());
 			try {
-				warDeployer.deploy(bundle);
+				warDeployer.deploy(bundle, contextPath);
 
 				if (debug)
 					log.debug("Bundle " + bundleName + "successfully deployed");
@@ -124,11 +128,14 @@ public class WarLoaderListener implements BundleActivator {
 		/** bundle to deploy */
 		private final Bundle bundle;
 
+		private final String contextPath;
+
 		private final String bundleName;
 
 
-		public UndeployTask(Bundle bundle) {
+		public UndeployTask(Bundle bundle, String contextPath) {
 			this.bundle = bundle;
+			this.contextPath = contextPath;
 			this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
 		}
 
@@ -139,7 +146,7 @@ public class WarLoaderListener implements BundleActivator {
 				log.debug("Undeploying bundle " + bundleName);
 			managedBundles.remove(bundle);
 			try {
-				warDeployer.undeploy(bundle);
+				warDeployer.undeploy(bundle, contextPath);
 				if (debug)
 					log.debug("Bundle " + bundleName + "successfully undeployed");
 			}
@@ -166,12 +173,12 @@ public class WarLoaderListener implements BundleActivator {
 			executor.afterPropertiesSet();
 		}
 
-		public void deployBundle(Bundle bundle) {
-			executor.execute(new DeployTask(bundle));
+		public void deployBundle(Bundle bundle, String contextPath) {
+			executor.execute(new DeployTask(bundle, contextPath));
 		}
 
-		public void undeployBundle(Bundle bundle) {
-			executor.execute(new UndeployTask(bundle));
+		public void undeployBundle(Bundle bundle, String contextPath) {
+			executor.execute(new UndeployTask(bundle, contextPath));
 		}
 
 		public void destroy() throws Exception {
@@ -209,6 +216,9 @@ public class WarLoaderListener implements BundleActivator {
 	/** war deployer */
 	private WarDeployer warDeployer;
 
+	/** contextPath strategy */
+	private ContextPathStrategy contextPathStrategy;
+
 	private DeploymentManager deploymentManager;
 
 
@@ -243,7 +253,10 @@ public class WarLoaderListener implements BundleActivator {
 		warScanner = new DefaultWarScanner();
 
 		// TODO: make war deployer plug-able
-		warDeployer = new TomcatWarDeployer(bundleContext);
+		warDeployer = new JettyWarDeployer(bundleContext);
+
+		// TODO: make context path plug-able
+		contextPathStrategy = new DefaultContextPathStrategy();
 
 		// register war listener
 		warListener = new WarBundleListener();
@@ -279,11 +292,17 @@ public class WarLoaderListener implements BundleActivator {
 		boolean debug = log.isDebugEnabled();
 
 		if (webXml != null) {
+			// get bundle name
+			String contextPath = contextPathStrategy.getContextPath(bundle);
+			// make sure it doesn't contain spaces (causes subtle problems with Tomcat Jasper)
+			Assert.doesNotContain(contextPath, " ", "context path should not contain whitespaces");
 			if (debug)
 				log.debug(OsgiStringUtils.nullSafeNameAndSymName(bundle)
-						+ " is a WAR, scheduling war deployment ... (detected web.xml at " + webXml + ")");
+						+ " is a WAR, scheduling war deployment on context path + [" + contextPath
+						+ "] (detected web.xml at " + webXml + ")");
 
-			deploymentManager.deployBundle(bundle);
+			managedBundles.put(bundle, contextPath);
+			deploymentManager.deployBundle(bundle, contextPath);
 		}
 	}
 
@@ -292,11 +311,13 @@ public class WarLoaderListener implements BundleActivator {
 
 		// do a fast look-up to see if the bundle has already been deployed
 		// if it has, then undeploy it
-		if (managedBundles.containsKey(bundle)) {
+		String contextPath = (String) managedBundles.remove(bundle);
+		if (contextPath != null) {
 			if (debug)
-				log.debug(OsgiStringUtils.nullSafeNameAndSymName(bundle) + " is a WAR, scheduling war undeployment ...");
+				log.debug(OsgiStringUtils.nullSafeNameAndSymName(bundle)
+						+ " is a WAR, scheduling war undeployment with context path [" + contextPath + "]");
 
-			deploymentManager.undeployBundle(bundle);
+			deploymentManager.undeployBundle(bundle, contextPath);
 		}
 	}
 
@@ -310,5 +331,7 @@ public class WarLoaderListener implements BundleActivator {
 
 		// destroy any tasks that have to be processed
 		deploymentManager.destroy();
+
+		// TODO: should we undeploy as well (?)
 	}
 }
