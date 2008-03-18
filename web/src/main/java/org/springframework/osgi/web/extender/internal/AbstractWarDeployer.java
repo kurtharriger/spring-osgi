@@ -34,13 +34,13 @@ public abstract class AbstractWarDeployer implements WarDeployer {
 	private final Map deployments = CollectionFactory.createConcurrentMap(4);
 
 
-	public void deploy(Bundle bundle) throws Exception {
-		Object deployment = createDeployment(bundle);
+	public void deploy(Bundle bundle, String contextPath) throws Exception {
+		Object deployment = createDeployment(bundle, contextPath);
 		deployments.put(bundle, deployment);
 		startDeployment(deployment);
 	}
 
-	public void undeploy(Bundle bundle) throws Exception {
+	public void undeploy(Bundle bundle, String contextPath) throws Exception {
 		Object deployment = deployments.remove(bundle);
 		if (deployment != null)
 			stopDeployment(bundle, deployment);
@@ -54,10 +54,11 @@ public abstract class AbstractWarDeployer implements WarDeployer {
 	 * {@link #undeploy(Bundle)}.
 	 * 
 	 * @param bundle OSGi bundle deployed as war
+	 * @param contextPath WAR context path
 	 * @return web deployment artifact
 	 * @throws Exception if something goes wrong
 	 */
-	protected Object createDeployment(Bundle bundle) throws Exception {
+	protected Object createDeployment(Bundle bundle, String contextPath) throws Exception {
 		return null;
 	}
 

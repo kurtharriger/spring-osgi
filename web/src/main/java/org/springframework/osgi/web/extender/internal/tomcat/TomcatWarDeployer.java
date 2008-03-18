@@ -18,8 +18,6 @@ package org.springframework.osgi.web.extender.internal.tomcat;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -54,12 +52,12 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		serverService = (Embedded) Utils.createServerServiceProxy(bundleContext, Embedded.class, "tomcat-server");
 	}
 
-	protected Object createDeployment(Bundle bundle) throws Exception {
+	protected Object createDeployment(Bundle bundle, String contextPath) throws Exception {
 		if (log.isDebugEnabled())
-			log.debug("About to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
-					+ serverService.getInfo());
+			log.debug("About to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] to [" + contextPath
+					+ "] on server " + serverService.getInfo());
 
-		return createCatalinaContext(bundle);
+		return createCatalinaContext(bundle, contextPath);
 	}
 
 	protected void startDeployment(Object deployment) throws Exception {
@@ -89,9 +87,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		}
 	}
 
-	private Context createCatalinaContext(Bundle bundle) throws IOException {
-		String contextPath = Utils.getWarContextPath(bundle);
-
+	private Context createCatalinaContext(Bundle bundle, String contextPath) throws IOException {
 		String docBase = createDocBase(bundle);
 
 		// TODO: can be the docBase be null ?
@@ -114,7 +110,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		ClassLoader serverLoader = Utils.chainedWebClassLoaders(Embedded.class);
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, serverLoader);
 		OsgiCatalinaLoader loader = new OsgiCatalinaLoader();
-		ClassLoader urlClassLoader = createJasperClassLoader(classLoader);
+		ClassLoader urlClassLoader = Utils.createURLClassLoaderWrapper(classLoader);
 		loader.setClassLoader(urlClassLoader);
 		return loader;
 	}
@@ -135,17 +131,6 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		Container[] children = container.findChildren();
 		// pick the first one and associate the context with it
 		return children[0];
-	}
-
-	/**
-	 * Creates the URLClassLoader that Jasper expects. This one is just a
-	 * wrapper around the OSGi classloader so all its calls will be delegated to
-	 * its OSGi brother.
-	 * 
-	 * @return
-	 */
-	private ClassLoader createJasperClassLoader(ClassLoader parent) {
-		return URLClassLoader.newInstance(new URL[0], parent);
 	}
 
 }
