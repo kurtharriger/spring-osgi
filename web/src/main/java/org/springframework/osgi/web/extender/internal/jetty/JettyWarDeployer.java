@@ -18,8 +18,6 @@ package org.springframework.osgi.web.extender.internal.jetty;
 
 import java.io.File;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.HandlerCollection;
@@ -40,9 +38,6 @@ import org.springframework.osgi.web.extender.internal.util.Utils;
  * 
  */
 public class JettyWarDeployer extends AbstractWarDeployer {
-
-	/** logger */
-	private static final Log log = LogFactory.getLog(JettyWarDeployer.class);
 
 	/** Jetty system classes */
 	// these are loaded by the war parent class-loader
@@ -73,10 +68,6 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	 * Creates an OSGi-specific Jetty {@link WebAppContext}.
 	 */
 	protected Object createDeployment(Bundle bundle, String contextPath) throws Exception {
-		if (log.isDebugEnabled())
-			log.debug("About to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] to [" + contextPath
-					+ "] on server " + Server.getVersion());
-
 		return createJettyWebContext(bundle, contextPath);
 	}
 
@@ -85,10 +76,6 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	}
 
 	protected void stopDeployment(Bundle bundle, Object deployment) throws Exception {
-		if (log.isDebugEnabled())
-			log.debug("About to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
-					+ Server.getVersion());
-
 		WebAppContext wac = (WebAppContext) deployment;
 		stopWebContext(wac);
 	}
@@ -239,4 +226,9 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 
 		return tmpFile;
 	}
+
+	protected String getServerInfo() {
+		return "Jetty-" + Server.getVersion();
+	}
+
 }

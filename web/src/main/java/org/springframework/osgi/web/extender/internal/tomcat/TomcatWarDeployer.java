@@ -28,7 +28,6 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
-import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.internal.AbstractWarDeployer;
 import org.springframework.osgi.web.extender.internal.util.Utils;
 
@@ -41,9 +40,6 @@ import org.springframework.osgi.web.extender.internal.util.Utils;
  */
 public class TomcatWarDeployer extends AbstractWarDeployer {
 
-	/** logger */
-	private static final Log log = LogFactory.getLog(TomcatWarDeployer.class);
-
 	/** Catalina OSGi service */
 	private final Embedded serverService;
 
@@ -53,10 +49,6 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	}
 
 	protected Object createDeployment(Bundle bundle, String contextPath) throws Exception {
-		if (log.isDebugEnabled())
-			log.debug("About to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] to [" + contextPath
-					+ "] on server " + serverService.getInfo());
-
 		return createCatalinaContext(bundle, contextPath);
 	}
 
@@ -66,9 +58,6 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	}
 
 	protected void stopDeployment(Bundle bundle, Object deployment) throws Exception {
-		if (log.isDebugEnabled())
-			log.debug("About to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
-					+ serverService.getInfo());
 		serverService.removeContext((Context) deployment);
 	}
 
@@ -131,6 +120,10 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		Container[] children = container.findChildren();
 		// pick the first one and associate the context with it
 		return children[0];
+	}
+
+	protected String getServerInfo() {
+		return serverService.getInfo();
 	}
 
 }
