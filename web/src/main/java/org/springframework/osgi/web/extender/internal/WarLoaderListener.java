@@ -34,7 +34,7 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.ContextPathStrategy;
 import org.springframework.osgi.web.extender.WarDeployer;
-import org.springframework.osgi.web.extender.internal.jetty.JettyWarDeployer;
+import org.springframework.osgi.web.extender.internal.tomcat.TomcatWarDeployer;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
 
@@ -253,7 +253,7 @@ public class WarLoaderListener implements BundleActivator {
 		warScanner = new DefaultWarScanner();
 
 		// TODO: make war deployer plug-able
-		warDeployer = new JettyWarDeployer(bundleContext);
+		warDeployer = new TomcatWarDeployer(bundleContext);
 
 		// TODO: make context path plug-able
 		contextPathStrategy = new DefaultContextPathStrategy();

@@ -23,6 +23,7 @@ import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.resource.Resource;
+import org.mortbay.util.IO;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
@@ -194,6 +195,13 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 			if (log.isDebugEnabled())
 				log.debug("Stopped context " + wac);
 
+			// clean up unpacked folder
+			if (shouldUnpackWar) {
+				Resource rootResource = wac.getBaseResource();
+				if (log.isDebugEnabled())
+					log.debug("Cleaning unpacked folder " + rootResource);
+				IO.delete(rootResource.getFile());
+			}
 		}
 		finally {
 			current.setContextClassLoader(old);
@@ -209,19 +217,16 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	}
 
 	private File unpackBundle(Bundle bundle, WebAppContext wac) throws Exception {
-		// TODO: seems that the default jetty temp folder causes problems when loading JSPs
-		//		File extractedWebAppDir = new File(wac.getTempDirectory(), "webapp");
+		// Could use Jetty temporary folder
+		// File extractedWebAppDir = new File(wac.getTempDirectory(), "webapp");
 
-		File tmpFile = File.createTempFile("jetty-war-", ".osgi");
+		File tmpFile = File.createTempFile("jetty-" + wac.getContextPath(), ".osgi");
 		tmpFile.delete();
 		tmpFile.mkdir();
 
-		//		if (!extractedWebAppDir.exists())
-		//			extractedWebAppDir.mkdir();
-
-		log.info("unpacking bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " to folder [" + tmpFile
-				+ "] ...");
-		// copy the bundle content into the target folder
+		if (log.isDebugEnabled())
+			log.debug("Unpacking bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " to folder ["
+					+ tmpFile.getCanonicalPath() + "] ...");
 		Utils.unpackBundle(bundle, tmpFile);
 
 		return tmpFile;
