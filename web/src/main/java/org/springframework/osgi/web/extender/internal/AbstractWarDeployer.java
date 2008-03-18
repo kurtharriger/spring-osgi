@@ -18,8 +18,11 @@ package org.springframework.osgi.web.extender.internal;
 
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.core.CollectionFactory;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.WarDeployer;
 
 /**
@@ -30,17 +33,32 @@ import org.springframework.osgi.web.extender.WarDeployer;
  */
 public abstract class AbstractWarDeployer implements WarDeployer {
 
+	/** logger */
+	protected final Log log = LogFactory.getLog(getClass());
+
 	/** map associating bundles with specific deployment artifacts */
 	private final Map deployments = CollectionFactory.createConcurrentMap(4);
 
 
 	public void deploy(Bundle bundle, String contextPath) throws Exception {
+		if (log.isDebugEnabled())
+			log.debug("Creating deployment for [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] at ["
+					+ contextPath + "] on server " + getServerInfo());
 		Object deployment = createDeployment(bundle, contextPath);
 		deployments.put(bundle, deployment);
+
+		if (log.isDebugEnabled())
+			log.debug("About to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] to [" + contextPath
+					+ "] on server " + getServerInfo());
+
 		startDeployment(deployment);
 	}
 
 	public void undeploy(Bundle bundle, String contextPath) throws Exception {
+		if (log.isDebugEnabled())
+			log.debug("About to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
+					+ getServerInfo());
+
 		Object deployment = deployments.remove(bundle);
 		if (deployment != null)
 			stopDeployment(bundle, deployment);
@@ -58,9 +76,7 @@ public abstract class AbstractWarDeployer implements WarDeployer {
 	 * @return web deployment artifact
 	 * @throws Exception if something goes wrong
 	 */
-	protected Object createDeployment(Bundle bundle, String contextPath) throws Exception {
-		return null;
-	}
+	protected abstract Object createDeployment(Bundle bundle, String contextPath) throws Exception;
 
 	/**
 	 * Starts the deployment artifact.
@@ -68,8 +84,7 @@ public abstract class AbstractWarDeployer implements WarDeployer {
 	 * @param deployment web deployment artifact
 	 * @throws Exception if something goes wrong
 	 */
-	protected void startDeployment(Object deployment) throws Exception {
-	}
+	protected abstract void startDeployment(Object deployment) throws Exception;
 
 	/**
 	 * Stops the deployment artifact.
@@ -78,6 +93,13 @@ public abstract class AbstractWarDeployer implements WarDeployer {
 	 * @param deployment web deployment artifact
 	 * @throws Exception if something goes wrong
 	 */
-	protected void stopDeployment(Bundle bundle, Object deployment) throws Exception {
-	}
+	protected abstract void stopDeployment(Bundle bundle, Object deployment) throws Exception;
+
+	/**
+	 * Returns a nice String representation of the underlying server for logging
+	 * messages.
+	 * 
+	 * @return toString for the running environment
+	 */
+	protected abstract String getServerInfo();
 }
