@@ -15,7 +15,7 @@ Package org.springframework.osgi.extender
 * raised service dependency waiting logging level to INFO (from DEBUG)
 
 Package org.springframework.osgi.util
-* BundleDelegatingClassLoader relies on default hashCode/equals methods to prevent caching proxies on bundle updates
+* BundleDelegatingClassLoader relies on default hashCode/equals methods to prevent class caching on bundle updates
 
 Package org.springframework.osgi.test
 * Instalation bundles have the location set to the backing resource URL if possible, falling back to the description
