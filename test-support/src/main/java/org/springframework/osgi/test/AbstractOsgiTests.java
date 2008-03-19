@@ -18,6 +18,7 @@ package org.springframework.osgi.test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
 
 import junit.framework.Protectable;
 import junit.framework.TestCase;
@@ -47,6 +48,8 @@ import org.springframework.util.ReflectionUtils;
  * @author Costin Leau
  */
 public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInjectionTests {
+
+	private static final String UTF_8_CHARSET = "UTF-8";
 
 	// JVM shutdown hook
 	private static Thread shutdownHook;
@@ -310,7 +313,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		String bundleLocation;
 
 		try {
-			bundleLocation = location.getURL().toExternalForm();
+			bundleLocation = URLDecoder.decode(location.getURL().toExternalForm(), UTF_8_CHARSET);
 		}
 		catch (Exception ex) {
 			// the URL cannot be created, fall back to the description
