@@ -10,17 +10,16 @@
   <artifactId>spring-osgi-bundle-archetype</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Spring OSGi Archetype</name>
+  <description>Spring OSGi Maven2 Archetype</description>  
   <url>http://www.springframework.org/osgi</url>
   
   
- <build>
+  <build>
     <resources>
-    
       <resource>
         <filtering>false</filtering>
         <directory>src/main/resources</directory>
       </resource>
-    
     </resources>
   </build>
 </project>
