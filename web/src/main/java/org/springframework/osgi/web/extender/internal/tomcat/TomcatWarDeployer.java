@@ -18,6 +18,7 @@ package org.springframework.osgi.web.extender.internal.tomcat;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLClassLoader;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -29,6 +30,7 @@ import org.osgi.framework.BundleContext;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.internal.AbstractWarDeployer;
+import org.springframework.osgi.web.extender.internal.util.JasperUtils;
 import org.springframework.osgi.web.extender.internal.util.Utils;
 
 /**
@@ -52,7 +54,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		String docBase = createDocBase(bundle, contextPath);
 
 		Context catalinaContext = serverService.createContext(contextPath, docBase);
-		catalinaContext.setLoader(createCatalinaLoader(bundle));
+		catalinaContext.setLoader(createCatalinaLoader(bundle, docBase));
 		catalinaContext.setPrivileged(false);
 		catalinaContext.setReloadable(false);
 
@@ -98,17 +100,18 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	 * @param bundle
 	 * @return
 	 */
-	private Loader createCatalinaLoader(Bundle bundle) {
+	private Loader createCatalinaLoader(Bundle bundle, String unpackLocation) {
 		ClassLoader serverLoader = Utils.chainedWebClassLoaders(Embedded.class);
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, serverLoader);
 		OsgiCatalinaLoader loader = new OsgiCatalinaLoader();
-		ClassLoader urlClassLoader = Utils.createURLClassLoaderWrapper(classLoader);
+		URLClassLoader urlClassLoader = JasperUtils.createJasperClassLoader(bundle, classLoader);
+
 		loader.setClassLoader(urlClassLoader);
 		return loader;
 	}
 
 	private String createDocBase(Bundle bundle, String contextPath) throws IOException {
-		File tmpFile = File.createTempFile("tomcat-" + contextPath, ".osgi");
+		File tmpFile = File.createTempFile("tomcat-" + contextPath.substring(1), ".osgi");
 		tmpFile.delete();
 		tmpFile.mkdir();
 

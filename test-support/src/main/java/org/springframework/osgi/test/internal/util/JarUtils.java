@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.test.internal.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 
 import org.springframework.core.io.Resource;
@@ -35,11 +40,16 @@ import org.springframework.core.io.Resource;
  */
 public abstract class JarUtils {
 
-	private static final int DEFAULT_BUFFER_SIZE = 1024;
+	private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+
+	private static final String MANIFEST_JAR_LOCATION = "/META-INF/MANIFEST.MF";
+
+	static final String SLASH = "/";
+
 
 	/**
-	 * Dump the entries of a jar and return them as a String. This method can be
-	 * memory expensive depending on the jar size.
+	 * Dumps the entries of a jar and return them as a String. This method can
+	 * be memory expensive depending on the jar size.
 	 * 
 	 * @param jis
 	 * @return
@@ -82,7 +92,7 @@ public abstract class JarUtils {
 	}
 
 	/**
-	 * Write a resource content to a jar.
+	 * Writes a resource content to a jar.
 	 * 
 	 * @param res
 	 * @param entryName
@@ -96,7 +106,7 @@ public abstract class JarUtils {
 
 	/**
 	 * 
-	 * Write a resource content to a jar.
+	 * Writes a resource content to a jar.
 	 * 
 	 * @param res
 	 * @param entryName
@@ -166,4 +176,68 @@ public abstract class JarUtils {
 		return null;
 	}
 
+	/**
+	 * Creates a jar based on the given entries and manifest. This method will
+	 * always close the given output stream.
+	 * 
+	 * @param manifest jar manifest
+	 * @param entries map of resources keyed by the jar entry named
+	 * @param outputStream output stream for writing the jar
+	 * @return number of byte written to the jar
+	 */
+	public static int createJar(Manifest manifest, Map entries, OutputStream outputStream) throws IOException {
+		int writtenBytes = 0;
+
+		// load manifest
+		// add it to the jar
+		JarOutputStream jarStream = null;
+
+		try {
+			// add a jar stream on top
+			jarStream = (manifest != null ? new JarOutputStream(outputStream, manifest) : new JarOutputStream(
+				outputStream));
+
+			// select fastest level (no compression)
+			jarStream.setLevel(Deflater.NO_COMPRESSION);
+
+			// add deps
+			for (Iterator iter = entries.entrySet().iterator(); iter.hasNext();) {
+				Map.Entry element = (Map.Entry) iter.next();
+
+				String entryName = (String) element.getKey();
+
+				// safety check - all entries must start with /
+				if (!entryName.startsWith(SLASH))
+					entryName = SLASH + entryName;
+
+				Resource entryValue = (Resource) element.getValue();
+
+				// skip special/duplicate entries (like MANIFEST.MF)
+				if (MANIFEST_JAR_LOCATION.equals(entryName)) {
+					iter.remove();
+				}
+				else {
+					// write jar entry
+					writtenBytes += JarUtils.writeToJar(entryValue, entryName, jarStream);
+				}
+			}
+		}
+		finally {
+			try {
+				jarStream.flush();
+			}
+			catch (IOException ex) {
+				// ignore
+			}
+			try {
+				jarStream.finish();
+			}
+			catch (IOException ex) {
+				// ignore
+			}
+			IOUtils.closeStream(jarStream);
+		}
+
+		return writtenBytes;
+	}
 }

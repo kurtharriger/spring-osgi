@@ -17,7 +17,6 @@
 package org.springframework.osgi.test.internal.util;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -26,9 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
-import java.util.zip.Deflater;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,8 +47,6 @@ import org.springframework.util.StringUtils;
  */
 public class JarCreator {
 
-	private static final String MANIFEST_JAR_LOCATION = "/META-INF/MANIFEST.MF";
-
 	private static final Log log = LogFactory.getLog(JarCreator.class);
 
 	public static final String CLASS_PATTERN = "/**/*.class";
@@ -67,8 +62,6 @@ public class JarCreator {
 	private static final String CLASS_EXT = ".class";
 
 	private static final String TEST_CLASSES_DIR = "test-classes";
-
-	private static final String SLASH = "/";
 
 	private String[] contentPattern = new String[] { EVERYTHING_PATTERN };
 
@@ -116,65 +109,19 @@ public class JarCreator {
 	 * @throws IOException
 	 */
 	protected int addJarContent(Manifest manifest, Map entries) throws IOException {
-		int writtenBytes = 0;
-
 		// load manifest
 		// add it to the jar
-		if (log.isTraceEnabled() && manifest != null)
-			log.trace("adding MANIFEST.MF [" + manifest.getMainAttributes().entrySet() + "]");
-
 		if (log.isTraceEnabled()) {
-			log.trace("adding entries:");
+			if (manifest != null)
+				log.trace("Adding MANIFEST.MF [" + manifest.getMainAttributes().entrySet() + "]");
+			log.trace("Adding entries:");
 			Set key = entries.keySet();
 			for (Iterator iter = key.iterator(); iter.hasNext();) {
 				log.trace(iter.next());
 			}
 		}
 
-		JarOutputStream jarStream = null;
-
-		try {
-			// get the output stream
-			OutputStream outputStream = storage.getOutputStream();
-
-			// add a jar stream on top
-			jarStream = (manifest != null ? new JarOutputStream(outputStream, manifest) : new JarOutputStream(
-				outputStream));
-
-			// select fastest level (no compression)
-			jarStream.setLevel(Deflater.NO_COMPRESSION);
-
-			// add deps
-			for (Iterator iter = entries.entrySet().iterator(); iter.hasNext();) {
-				Map.Entry element = (Map.Entry) iter.next();
-				// skip special/duplicate entries (like MANIFEST.MF)
-				if (MANIFEST_JAR_LOCATION.equals(element.getKey())) {
-					iter.remove();
-				}
-				else {
-					// write jar entry
-					writtenBytes += JarUtils.writeToJar((Resource) element.getValue(), (String) element.getKey(),
-						jarStream);
-				}
-			}
-		}
-		finally {
-			try {
-				jarStream.closeEntry();
-			}
-			catch (Exception ex) {
-				// ignore
-			}
-			try {
-				jarStream.finish();
-			}
-			catch (Exception ex) {
-				// ignore
-			}
-			IOUtils.closeStream(jarStream);
-		}
-
-		return writtenBytes;
+		return JarUtils.createJar(manifest, entries, storage.getOutputStream());
 	}
 
 	/**
@@ -199,7 +146,7 @@ public class JarCreator {
 			return storage.getResource();
 		}
 		catch (IOException ex) {
-			throw new RuntimeException("can't return input stream", ex);
+			throw (RuntimeException) new IllegalStateException("Cannot create jar").initCause(ex);
 		}
 	}
 
@@ -236,10 +183,10 @@ public class JarCreator {
 		// transform Strings into Resources
 		for (int i = 0; i < patterns.length; i++) {
 			StringBuffer buffer = new StringBuffer(rootPath);
-			
+
 			// do checking on lost slashes
-			if (!rootPath.endsWith(SLASH) && !patterns[i].startsWith(SLASH))
-				buffer.append(SLASH);
+			if (!rootPath.endsWith(JarUtils.SLASH) && !patterns[i].startsWith(JarUtils.SLASH))
+				buffer.append(JarUtils.SLASH);
 
 			buffer.append(patterns[i]);
 			try {

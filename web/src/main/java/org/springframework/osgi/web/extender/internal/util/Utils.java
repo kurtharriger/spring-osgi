@@ -20,14 +20,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLStreamHandler;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
 import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
@@ -52,6 +57,8 @@ public abstract class Utils {
 	// org.apache.jasper.JspC
 	private static final String JASPER_CLASS = "org.apache.jasper.servlet.JspServlet";
 
+	private static final String SLASH = "/";
+
 
 	// might have to improve this method to cope with missing folder entries ...
 
@@ -65,14 +72,14 @@ public abstract class Utils {
 	 */
 	public static void unpackBundle(Bundle bundle, File targetFolder) {
 		// no need to use a recursive method since we get all resources directly
-		Enumeration enm = bundle.findEntries("/", null, true);
+		Enumeration enm = bundle.findEntries(SLASH, null, true);
 		while (enm != null && enm.hasMoreElements()) {
 			boolean trace = log.isTraceEnabled();
 
 			// get only the path
 			URL url = (URL) enm.nextElement();
 			String entryPath = url.getPath();
-			if (entryPath.startsWith("/"))
+			if (entryPath.startsWith(SLASH))
 				entryPath = entryPath.substring(1);
 
 			File targetFile = new File(targetFolder, entryPath);
@@ -96,7 +103,7 @@ public abstract class Utils {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns the defining classloader of the given class. As we're running
 	 * inside an OSGi classloader, the classloaders that are able to load the
@@ -173,14 +180,5 @@ public abstract class Utils {
 		}
 	}
 
-	/**
-	 * Creates an URLClassLoader that wraps the given class loader meaning that
-	 * all its calls will be delegated to the backing class loader. This type of
-	 * loader is normally used with Tomcat Jasper 2.
-	 * 
-	 * @return URLClassLoader wrapper around the given class loader.
-	 */
-	public static ClassLoader createURLClassLoaderWrapper(ClassLoader parent) {
-		return URLClassLoader.newInstance(new URL[0], parent);
-	}
+
 }

@@ -9,7 +9,7 @@
   <groupId>org.springframework.osgi.iandt.web</groupId>
   <artifactId>taglib.jsp</artifactId>
   <packaging>war</packaging>
-  <name>Spring OSGi Web Test: JSP and Taglib Bundle</name>
+  <name>Spring OSGi Web Test: Core Taglib Bundle</name>
   <url>http://www.springframework.org/osgi</url>
       
 </project>
