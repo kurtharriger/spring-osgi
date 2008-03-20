@@ -108,7 +108,10 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 	// FX = 135 (no fragment support)
 	public void testMatchingABulkOfResources() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath*:**/springframework/**");
-		System.out.println("resources count " + res.length);
+		Resource resWitSlash[] = patternLoader.getResources("classpath*:/**/springframework/**");
+		System.out.println("resources w/o slash count " + res.length);
+		System.out.println("resources w/ slash count " + resWitSlash.length);
+		assertEquals("slash should not make a difference", res.length, resWitSlash.length);
 		assertTrue("not enough packages found", res.length > 50);
 	}
 
@@ -118,7 +121,10 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 	// FX = 135
 	public void testMatchingAHugeSetOfResources() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath*:org/**");
-		System.out.println("resources count " + res.length);
+		Resource resWitSlash[] = patternLoader.getResources("classpath*:/org/**");
+		System.out.println("resources w/o slash count " + res.length);
+		System.out.println("resources w/ slash count " + resWitSlash.length);
+		assertEquals("slash should not make a difference", res.length, resWitSlash.length);
 		assertTrue("not enough packages found", res.length > 100);
 	}
 
