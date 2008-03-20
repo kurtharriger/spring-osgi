@@ -14,29 +14,45 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.io.internal;
+package org.springframework.osgi.io.internal.resolver;
 
 import org.osgi.framework.Bundle;
 
 /**
- * Simple interface offering utility methods for OSGi dependencies, mainly
- * bundles.
+ * Importing bundle information.
  * 
  * @author Costin Leau
  * 
  */
-public interface DependencyResolver {
+public class ImportedBundle {
+
+	private final Bundle importingBundle;
+
+	private final String[] importedPackages;
+
+
+	public ImportedBundle(Bundle importingBundle, String[] importedPackages) {
+		super();
+		this.importingBundle = importingBundle;
+		this.importedPackages = importedPackages;
+	}
 
 	/**
-	 * Returns the bundles imported by the given bundle. It's up to the
-	 * implementation to consider required bundles, bundle classpath and dyanmic
-	 * imports.
+	 * Returns the imported bundle.
 	 * 
-	 * <p/> In general it is not expected to have knowledge about runtime
-	 * loading (such as dynamic imports).
-	 * 
-	 * @param bundle
-	 * @return
+	 * @return importing bundle
 	 */
-	Bundle[] getImportedBundle(Bundle bundle);
+	public Bundle getBundle() {
+		return importingBundle;
+	}
+
+	/**
+	 * 
+	 * Returns an array of imported packages.
+	 * 
+	 * @return a non-null array of String representing the imported packages
+	 */
+	public String[] getImportedPackages() {
+		return importedPackages;
+	}
 }
