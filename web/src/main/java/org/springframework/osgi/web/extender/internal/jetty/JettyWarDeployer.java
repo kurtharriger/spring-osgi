@@ -17,6 +17,7 @@
 package org.springframework.osgi.web.extender.internal.jetty;
 
 import java.io.File;
+import java.net.URLClassLoader;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
@@ -29,6 +30,7 @@ import org.osgi.framework.BundleContext;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.internal.AbstractWarDeployer;
+import org.springframework.osgi.web.extender.internal.util.JasperUtils;
 import org.springframework.osgi.web.extender.internal.util.Utils;
 
 /**
@@ -50,9 +52,6 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 
 	/** access to Jetty server service */
 	private Server serverService;
-
-	// TODO: make this configurable
-	private boolean shouldUnpackWar = true;
 
 
 	/**
@@ -90,8 +89,7 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	 */
 	private WebAppContext createJettyWebContext(Bundle bundle, String contextPath) throws Exception {
 
-		// plug in our custom class only if needed
-		WebAppContext wac = (shouldUnpackWar ? new WebAppContext() : new OsgiWebAppContext());
+		WebAppContext wac = new WebAppContext();
 
 		// create a jetty web app context
 
@@ -103,7 +101,7 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 		wac.setContextPath(contextPath);
 		// no hot deployment (at least not through directly Jetty)
 		wac.setCopyWebDir(false);
-		wac.setExtractWAR(shouldUnpackWar);
+		wac.setExtractWAR(true);
 
 		//
 		// resource settings
@@ -135,24 +133,23 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 
 		// use the bundle classloader as a parent
 		ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, serverLoader);
-		wac.setClassLoader(Utils.createURLClassLoaderWrapper(bundleClassLoader));
-
+		URLClassLoader urlClassLoader = JasperUtils.createJasperClassLoader(bundle, bundleClassLoader);
+		wac.setClassLoader(urlClassLoader);
 		return wac;
 	}
 
 	private Resource getRootResource(Bundle bundle, WebAppContext wac) throws Exception {
 		// decide whether we unpack or not
-		if (shouldUnpackWar) {
-			// unpack the war somewhere
-			File unpackFolder = unpackBundle(bundle, wac);
+		// unpack the war somewhere
+		File unpackFolder = unpackBundle(bundle, wac);
 
-			return Resource.newResource(unpackFolder.getCanonicalPath());
-		}
-		else {
-			((OsgiWebAppContext) wac).setBundle(bundle);
-			// if it's unpacked, use the bundle API directly
-			return new BundleSpaceJettyResource(bundle, "/");
-		}
+		return Resource.newResource(unpackFolder.getCanonicalPath());
+
+		//		else {
+		//			((OsgiWebAppContext) wac).setBundle(bundle);
+		//			// if it's unpacked, use the bundle API directly
+		//			return new BundleSpaceJettyResource(bundle, "/");
+		//		}
 	}
 
 	/**
@@ -196,12 +193,10 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 				log.debug("Stopped context " + wac);
 
 			// clean up unpacked folder
-			if (shouldUnpackWar) {
-				Resource rootResource = wac.getBaseResource();
-				if (log.isDebugEnabled())
-					log.debug("Cleaning unpacked folder " + rootResource);
-				IO.delete(rootResource.getFile());
-			}
+			Resource rootResource = wac.getBaseResource();
+			if (log.isDebugEnabled())
+				log.debug("Cleaning unpacked folder " + rootResource);
+			IO.delete(rootResource.getFile());
 		}
 		finally {
 			current.setContextClassLoader(old);
@@ -220,7 +215,7 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 		// Could use Jetty temporary folder
 		// File extractedWebAppDir = new File(wac.getTempDirectory(), "webapp");
 
-		File tmpFile = File.createTempFile("jetty-" + wac.getContextPath(), ".osgi");
+		File tmpFile = File.createTempFile("jetty-" + wac.getContextPath().substring(1), ".osgi");
 		tmpFile.delete();
 		tmpFile.mkdir();
 

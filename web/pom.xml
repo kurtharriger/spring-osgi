@@ -28,11 +28,16 @@
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 	
 
-  	<spring.osgi.export.pkg>org.springframework.osgi.web.extender</spring.osgi.export.pkg>
-
+    <spring.osgi.export>
+      !org.springframework.osgi.web.*internal*,
+      org.springframework.osgi.web.extender*;version=${spring.osgi.export.version}
+    </spring.osgi.export>
+    
   	<spring.osgi.private.pkg>
+		org.springframework.osgi.test.internal.util*,
+		org.springframework.osgi.io.internal*,
 		org.springframework.osgi.web.extender.internal*
-  	</spring.osgi.private.pkg>
+	</spring.osgi.private.pkg>
 
 	<spring.osgi.import.pkg>
 		org.apache.commons.logging*,
@@ -55,6 +60,20 @@
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-core</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+	<!-- required for JarUtils & co. -->
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-test</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+	<!-- required for Depedency resolver -->
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-io</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     
