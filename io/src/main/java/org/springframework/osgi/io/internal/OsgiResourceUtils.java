@@ -144,11 +144,24 @@ public abstract class OsgiResourceUtils {
 	}
 
 	public static String[] getBundleClassPath(Bundle bundle) {
-		if (bundle == null)
+		return getHeaderAsTrimmedStringArray(bundle, Constants.BUNDLE_CLASSPATH);
+	}
+
+	public static String[] getRequiredBundle(Bundle bundle) {
+		return getHeaderAsTrimmedStringArray(bundle, Constants.REQUIRE_BUNDLE);
+	}
+
+	private static String[] getHeaderAsTrimmedStringArray(Bundle bundle, String header) {
+		if (bundle == null || !StringUtils.hasText(header))
 			return new String[0];
 
-		String classpath = (String) bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH);
-		return StringUtils.commaDelimitedListToStringArray(classpath);
+		String headerContent = (String) bundle.getHeaders().get(header);
+		String[] entries = StringUtils.commaDelimitedListToStringArray(headerContent);
+		for (int i = 0; i < entries.length; i++) {
+			entries[i] = entries[i].trim();
+		}
+
+		return entries;
 	}
 
 	/**
@@ -174,4 +187,5 @@ public abstract class OsgiResourceUtils {
 			// fallback to defaults
 			return path;
 	}
+
 }
