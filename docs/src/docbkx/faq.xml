@@ -96,7 +96,7 @@
 	  JDK 1.4. Thus Spring Dynamic Modules cannot run on more constrained environments (such as the OSGi Minimum Execution Environment) 
 	  unless Spring itself also runs in those environments. There are no current plans to make such a version of Spring. 
 	  However as existing OSGi developers adopt Spring Dynamic Modules to simplify creation of OSGi applications and the user
-	  base expands, the target audience can cover domains much broader than <em>enterprise Java applications</em>. 
+	  base expands, the target audience can cover domains much broader than <emphasis>enterprise Java applications</emphasis>. 
 	  In time this could create a large enough demand to justify the investment needed to allow Spring and Spring-DM to run in
 	  restricted environments.</para>
 	</section>
