@@ -402,13 +402,15 @@
       	</para>
       </section>
       
-      <section id="linkage-error">
-      	<title>I've just updated my Spring DM library and now I get a <emphasis>LinkageError</emphasis>. How can I solve this? </title>
+      <section id="pde-errors">
+      	<title>I'm using Eclipse PDE and I started getting some weird exceptions/behaviour. What's the matter?</title>
       	
       	<para>
-      	The above error indicates that some classes, dependend on by others, have a different, incompatible version then the one required.
-      	Normally this occur with workspaces (such as Eclipse) that are corrupt or stale. Consider doing a complete clean build or, in case of
-      	Eclipse, creating a new workspace. 
+      	Eclipse PDE uses Equinox OSGi platform underneath which (like other OSGi platforms) caches the bundles between re-runs. When
+      	the cache is not properly updated, one can encounter strange behaviour (such as the new services/code being picked up)
+      	or errors ranging from class versioning to linkage. Consider doing a complete clean build or, in case of Eclipse, 
+      	creating a new workspace or deleting the bundle folder (depends on each project settings but most users should find it at:
+      	<code>[workspace_dir]\.metadata\.plugins\org.eclipse.pde.core\OSGi\org.eclipse.osgi\bundles</code>).
       	</para>
       </section>
     </chapter>
