@@ -6,11 +6,10 @@
                 <include>../changelog.txt</include>                
                 <include>../license.txt</include>
                 <include>../notice.txt</include>
-                <include>../notice.txt</include>                
                 <include>../readme.txt</include>                                
                 <include>../readme-building.txt</include>
             </includes>
-        </fileSet>
         <lineEnding>dos</lineEnding>
+        </fileSet>
     </fileSets>
 </component>

@@ -9,6 +9,7 @@
 	</componentDescriptors>
 	<includeBaseDirectory>true</includeBaseDirectory>
 	<moduleSets>
+		<!--
 		<moduleSet>
 			<includes>
 				<include>org.springframework.osgi:spring-osgi-io</include>
@@ -24,6 +25,7 @@
 				<unpack>false</unpack>
 			</binaries>
 		</moduleSet>
+		-->
 		<moduleSet>
 			<includes>
 				<include>org.springframework.osgi:spring-osgi-io</include>
@@ -35,22 +37,19 @@
 			</includes>
 			<binaries>
 				<includeDependencies>false</includeDependencies>
-				<outputFileNameMapping>dist/${artifactId}-${version}-sources.${extension}</outputFileNameMapping>
+				<outputFileNameMapping>dist/${artifactId}-${version}.${extension}</outputFileNameMapping>
 				<unpack>false</unpack>
-				<includes>
-					<include>target/${artifactId}-${version}-sources.${extension}</include>
-				</includes>
 				<dependencySets>
 					<dependencySet>
 						<outputFileNameMapping>sources/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
 						<scope>runtime</scope>
 						<excludes>
-							<include>org.springframework.osgi:spring-osgi-io</include>
-							<include>org.springframework.osgi:spring-osgi-mock</include>
-							<include>org.springframework.osgi:spring-osgi-core</include>
-							<include>org.springframework.osgi:spring-osgi-extender</include>											
-							<include>org.springframework.osgi:spring-osgi-test</include>
-							<include>org.springframework.osgi:spring-osgi-annotation</include>				
+							<exclude>org.springframework.osgi:spring-osgi-io</exclude>
+							<exclude>org.springframework.osgi:spring-osgi-mock</exclude>
+							<exclude>org.springframework.osgi:spring-osgi-core</exclude>
+							<exclude>org.springframework.osgi:spring-osgi-extender</exclude>											
+							<exclude>org.springframework.osgi:spring-osgi-test</exclude>
+							<exclude>org.springframework.osgi:spring-osgi-annotation</exclude>				
 						</excludes>
 					</dependencySet>
 					<dependencySet>
@@ -63,13 +62,14 @@
 				<outputDirectoryMapping>sources/${artifactId}</outputDirectoryMapping>
 				<fileSets>
 					<fileSet>
+						<directory>src/main/java</directory>
 						<excludes>
 							<exclude>bin/**</exclude>
 							<exclude>target/**</exclude>
 						</excludes>
 					</fileSet>
 				</fileSets>
-			</sources>
+			</sources>				
 		</moduleSet>
 		<moduleSet>
 			<includes>
@@ -84,12 +84,12 @@
 						<outputFileNameMapping>samples/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
 						<scope>runtime</scope>
 						<excludes>
-							<include>org.springframework.osgi:spring-osgi-io</include>
-							<include>org.springframework.osgi:spring-osgi-mock</include>
-							<include>org.springframework.osgi:spring-osgi-core</include>
-							<include>org.springframework.osgi:spring-osgi-extender</include>											
-							<include>org.springframework.osgi:spring-osgi-test</include>
-							<include>org.springframework.osgi:spring-osgi-annotation</include>				
+							<exclude>org.springframework.osgi:spring-osgi-io</exclude>
+							<exclude>org.springframework.osgi:spring-osgi-mock</exclude>
+							<exclude>org.springframework.osgi:spring-osgi-core</exclude>
+							<exclude>org.springframework.osgi:spring-osgi-extender</exclude>											
+							<exclude>org.springframework.osgi:spring-osgi-test</exclude>
+							<exclude>org.springframework.osgi:spring-osgi-annotation</exclude>				
 						</excludes>
 					</dependencySet>
 					<dependencySet>
@@ -111,4 +111,54 @@
 			</sources>
 		</moduleSet>
 	</moduleSets>
+    <files>
+        <file>
+            <source>target/${artifactId}-${version}.jar</source>
+            <outputDirectory>dist</outputDirectory>
+        </file>
+    </files>
+    <fileSets>
+        <!-- Documentation -->
+        <fileSet>
+            <directory>target/site/apidocs</directory>
+            <outputDirectory>docs/api</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>target/site/reference</directory>
+            <outputDirectory>docs/reference</outputDirectory>
+        </fileSet>
+        <!-- Dependencies -->
+        <fileSet>
+            <directory>target/dependency</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>**/*.jar</include>
+            </includes>
+        </fileSet>
+        <!-- Samples -->
+        <fileSet>
+            <directory>samples</directory>
+            <outputDirectory>samples</outputDirectory>
+            <includes>
+                <include>**/readme.txt</include>
+            </includes>
+            <lineEnding>dos</lineEnding>
+        </fileSet>
+        <fileSet>
+            <directory>samples</directory>
+            <outputDirectory>samples</outputDirectory>
+            <includes>
+                <include>**/src/**</include>
+                <include>**/build*.xml</include>
+                <include>**/*.bat</include>
+                <include>**/pom.xml</include>
+            </includes>
+            <excludes>
+                <exclude>**/target</exclude>
+                <exclude>**/target/**</exclude>
+                <exclude>**/bin</exclude>
+                <exclude>**/bin/**</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
 </assembly>
