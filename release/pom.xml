@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.osgi</groupId>
 	<artifactId>spring-osgi-dist</artifactId>
-	<name>Spring OSGi distribution</name>
+	<name>Spring OSGi Distribution</name>
     <packaging>pom</packaging>
 	<description>
 		<!--  Use CDATA to keep it on a single line in the manifest -->
@@ -28,34 +28,38 @@
 
 	<build>
 		<plugins>
+       
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2-beta-1</version>
+				<version>2.2-beta-2</version>
 				<inherited>false</inherited>
 				<executions>
+					<!-- w/o dependencies -->
 					<execution>
-						<id>zip-files</id>
+						<id>wo-dependencies</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
 						<configuration>
-						<!--
 							<appendAssemblyId>false</appendAssemblyId>
-							-->
-                            <archive>
-                                <manifest>
-                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                </manifest>
-                                <manifestEntries>
-                                    <Spring-DM-Version>${pom.version}</Spring-DM-Version>
-                                </manifestEntries>
-                            </archive>
 							<descriptors>
 								<descriptor>src/assembly/no-dependencies.xml</descriptor>
-								<!--
+							</descriptors>
+						</configuration>
+					</execution>
+
+					<!-- with dependencies -->
+					<execution>
+						<id>with-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<appendAssemblyId>true</appendAssemblyId>
+							<descriptors>
 								<descriptor>src/assembly/with-dependencies.xml</descriptor>
-								-->
 							</descriptors>
 						</configuration>
 					</execution>
