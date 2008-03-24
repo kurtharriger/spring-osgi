@@ -117,7 +117,7 @@
         <para>Support for directly accessing configuration objects and their
         associated dictionaries, and for instantiating beans directly from
         configuration objects is on the Spring Dynamic Modules road map. See
-        <xref ulink="appendix-roadmap"/> for more information.</para>
+        <xref linkend="appendix-roadmap"/> for more information.</para>
       </section>
     </section>
   </appendix>
