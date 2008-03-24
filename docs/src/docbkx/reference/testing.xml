@@ -378,7 +378,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
     </section>
     
     <section id="testing:integration:understanding-manifest-creator">
-      <title>Understanding the automatic <code>MANIFEST.MF</code> creator</title>
+      <title>Understanding the <code>MANIFEST.MF</code> generation</title>
       
       <para>A useful feature of the testing framework represents the automatic creation of the test manifest based on the test bundle content. The manifest 
       creator component uses byte-code analysis to determine the packages imported by the test classes so that it can generate the proper OSGi directives for them.

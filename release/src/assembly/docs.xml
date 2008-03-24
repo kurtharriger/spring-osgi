@@ -21,7 +21,7 @@
             <outputDirectory>docs/api</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>../docs/target/docbkx</directory>
+            <directory>../docs/target/site/reference</directory>
             <outputDirectory>docs/reference</outputDirectory>
         </fileSet>
     </fileSets>

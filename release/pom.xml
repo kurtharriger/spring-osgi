@@ -1,21 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.springframework.osgi</groupId>
-	<artifactId>spring-osgi-dist</artifactId>
+	<groupId>org.springframework.osgi.release</groupId>
+	<artifactId>spring-osgi</artifactId>
 	<name>Spring OSGi Distribution</name>
     <packaging>pom</packaging>
 	<description>
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring OSGi Distribution - used to create a .zip package for distribution of the main sub modules.]]>
 	</description>
+
 	<parent>
 		<groupId>org.springframework.osgi</groupId>
 		<artifactId>spring-osgi</artifactId>
 		<version>1.0.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
-
+	
 	<modules>
 		<module>../mock</module>	
 		<module>../io</module>		
@@ -23,7 +24,6 @@
 		<module>../extender</module>
 		<module>../test-support</module>		
 		<module>../annotation</module>
-		<module>../samples</module>
 	</modules>
 
 	<build>
