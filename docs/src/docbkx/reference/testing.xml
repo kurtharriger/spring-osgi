@@ -386,7 +386,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       
       <itemizedlist>
       	<listitem><para>No packages will be exported.</para> <para>The <emphasis>on-the-fly</emphasis> bundle is used for running a test which 
-      	(usually) consumes OSGi packages for its execution. This behaviour can be changed by <xref linkend="testing:integration:customize-manifest">customizing</xref> 
+      	(usually) consumes OSGi packages for its execution. This behaviour can be changed by <link linkend="testing:integration:customize-manifest">customizing</link> 
       	the manifest.</para>
       	</listitem>
       	
