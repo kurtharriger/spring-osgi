@@ -1,3 +1,4 @@
+<!-- identical to wo-dependencies except the extra dependencies component -->
 <assembly>
 	<id>with-dependencies</id>
 	<formats>
@@ -5,11 +6,11 @@
 	</formats>
 	<componentDescriptors>
 		<componentDescriptor>src/assembly/docs.xml</componentDescriptor>
-		<componentDescriptor>src/assembly/parent.xml</componentDescriptor>
+		<componentDescriptor>src/assembly/dependencies.xml</componentDescriptor>
 	</componentDescriptors>
 	<includeBaseDirectory>true</includeBaseDirectory>
 	<moduleSets>
-		<!--
+		<!-- mandatory jars -->
 		<moduleSet>
 			<includes>
 				<include>org.springframework.osgi:spring-osgi-io</include>
@@ -17,148 +18,39 @@
 				<include>org.springframework.osgi:spring-osgi-core</include>
 				<include>org.springframework.osgi:spring-osgi-extender</include>											
 				<include>org.springframework.osgi:spring-osgi-test</include>
-				<include>org.springframework.osgi:spring-osgi-annotation</include>				
 			</includes>
-			<binaries>
-				<includeDependencies>false</includeDependencies>
-				<outputFileNameMapping>dist/${artifactId}-${version}.${extension}</outputFileNameMapping>
-				<unpack>false</unpack>
-			</binaries>
-		</moduleSet>
-		-->
-		<moduleSet>
-			<includes>
-				<include>org.springframework.osgi:spring-osgi-io</include>
-				<include>org.springframework.osgi:spring-osgi-mock</include>
-				<include>org.springframework.osgi:spring-osgi-core</include>
-				<include>org.springframework.osgi:spring-osgi-extender</include>											
-				<include>org.springframework.osgi:spring-osgi-test</include>
-				<include>org.springframework.osgi:spring-osgi-annotation</include>				
-			</includes>
-			<binaries>
-				<includeDependencies>false</includeDependencies>
-				<outputFileNameMapping>dist/${artifactId}-${version}.${extension}</outputFileNameMapping>
-				<unpack>false</unpack>
-				<dependencySets>
-					<dependencySet>
-						<outputFileNameMapping>sources/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
-						<scope>runtime</scope>
-						<excludes>
-							<exclude>org.springframework.osgi:spring-osgi-io</exclude>
-							<exclude>org.springframework.osgi:spring-osgi-mock</exclude>
-							<exclude>org.springframework.osgi:spring-osgi-core</exclude>
-							<exclude>org.springframework.osgi:spring-osgi-extender</exclude>											
-							<exclude>org.springframework.osgi:spring-osgi-test</exclude>
-							<exclude>org.springframework.osgi:spring-osgi-annotation</exclude>				
-						</excludes>
-					</dependencySet>
-					<dependencySet>
-						<outputFileNameMapping>sources/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
-						<scope>provided</scope>
-					</dependencySet>
-				</dependencySets>
-			</binaries>
+			<!-- the .jar and -sources.jar will be included here -->
 			<sources>
-				<outputDirectoryMapping>sources/${artifactId}</outputDirectoryMapping>
+				<includeModuleDirectory>false</includeModuleDirectory>				
 				<fileSets>
 					<fileSet>
-						<directory>src/main/java</directory>
-						<excludes>
-							<exclude>bin/**</exclude>
-							<exclude>target/**</exclude>
-						</excludes>
+						<directory>target</directory>
+						<outputDirectory>dist</outputDirectory>
+						<includes>
+							<include>*.jar</include>
+						</includes>
 					</fileSet>
 				</fileSets>
-			</sources>				
+			</sources>
 		</moduleSet>
+		<!-- extensions -->
 		<moduleSet>
 			<includes>
-				<include>org.springframework.osgi.samples:samples</include>
+				<include>org.springframework.osgi:spring-osgi-annotation</include>
 			</includes>
-			<binaries>
-				<includeDependencies>false</includeDependencies>
-				<outputFileNameMapping>samples/${artifactId}-${version}.${extension}</outputFileNameMapping>
-				<unpack>false</unpack>
-				<dependencySets>
-					<dependencySet>
-						<outputFileNameMapping>samples/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
-						<scope>runtime</scope>
-						<excludes>
-							<exclude>org.springframework.osgi:spring-osgi-io</exclude>
-							<exclude>org.springframework.osgi:spring-osgi-mock</exclude>
-							<exclude>org.springframework.osgi:spring-osgi-core</exclude>
-							<exclude>org.springframework.osgi:spring-osgi-extender</exclude>											
-							<exclude>org.springframework.osgi:spring-osgi-test</exclude>
-							<exclude>org.springframework.osgi:spring-osgi-annotation</exclude>				
-						</excludes>
-					</dependencySet>
-					<dependencySet>
-						<outputFileNameMapping>sources/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
-						<scope>provided</scope>
-					</dependencySet>
-				</dependencySets>
-			</binaries>
+			<!-- the .jar and -sources.jar will be included here -->
 			<sources>
-				<outputDirectoryMapping>samples/${artifactId}</outputDirectoryMapping>
+				<includeModuleDirectory>false</includeModuleDirectory>				
 				<fileSets>
 					<fileSet>
-						<excludes>
-							<exclude>bin/**</exclude>
-							<exclude>target/**</exclude>
-						</excludes>
+						<directory>target</directory>
+						<outputDirectory>dist/extensions</outputDirectory>
+						<includes>
+							<include>*.jar</include>
+						</includes>
 					</fileSet>
 				</fileSets>
 			</sources>
 		</moduleSet>
 	</moduleSets>
-    <files>
-        <file>
-            <source>target/${artifactId}-${version}.jar</source>
-            <outputDirectory>dist</outputDirectory>
-        </file>
-    </files>
-    <fileSets>
-        <!-- Documentation -->
-        <fileSet>
-            <directory>target/site/apidocs</directory>
-            <outputDirectory>docs/api</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>target/site/reference</directory>
-            <outputDirectory>docs/reference</outputDirectory>
-        </fileSet>
-        <!-- Dependencies -->
-        <fileSet>
-            <directory>target/dependency</directory>
-            <outputDirectory>lib</outputDirectory>
-            <includes>
-                <include>**/*.jar</include>
-            </includes>
-        </fileSet>
-        <!-- Samples -->
-        <fileSet>
-            <directory>samples</directory>
-            <outputDirectory>samples</outputDirectory>
-            <includes>
-                <include>**/readme.txt</include>
-            </includes>
-            <lineEnding>dos</lineEnding>
-        </fileSet>
-        <fileSet>
-            <directory>samples</directory>
-            <outputDirectory>samples</outputDirectory>
-            <includes>
-                <include>**/src/**</include>
-                <include>**/build*.xml</include>
-                <include>**/*.bat</include>
-                <include>**/pom.xml</include>
-            </includes>
-            <excludes>
-                <exclude>**/target</exclude>
-                <exclude>**/target/**</exclude>
-                <exclude>**/bin</exclude>
-                <exclude>**/bin/**</exclude>
-            </excludes>
-        </fileSet>
-    </fileSets>
 </assembly>
