@@ -66,31 +66,31 @@ The following distinct jar files are included in the distribution. This list spe
 third-party dependencies. Libraries in [brackets] are optional, i.e. just necessary for certain functionality. For an 
 exact list of Spring-DM project dependencies see the respective Maven2 pom.xml files.
 
-* spring-osgi-core-1.0.jar
+* spring-osgi-core-${version}.jar
 - Contents: The Spring Dynamic Modules Core
 - Dependencies: slf4j, spring-aop, spring-beans, spring-core, spring-context, aop-alliance, spring-osgi-io
                 [Log4J]
 
-* spring-osgi-extender-1.0.jar
+* spring-osgi-extender-${version}.jar
 - Contents: The Spring Dynamic Modules Extender
 - Dependencies: sl4fj, spring-osgi-core 
 			    [Log4J]
 
-* spring-osgi-io-1.0.jar
+* spring-osgi-io-${version}.jar
 - Contents: The Spring Dynamic Modules IO library
 - Dependencies: sl4fj, spring-core
                 [Log4J]
 
-* spring-osgi-mock-1.0.jar
+* spring-osgi-mock-${version}.jar
 - Contents: The Spring Dynamic Modules Mock library
 - Dependencies: OSGi API
 
-* spring-osgi-test-1.0.jar
+* spring-osgi-test-${version}.jar
 - Contents: The Spring Dynamic Modules Integration Testing framework
 - Dependencies: asm, junit, slf4j, spring-osgi-core, spring-osgi-extender
                 [Equinox, Felix, Knopflerfish, Log4J]
 
-* extensions / spring-osgi-annotation-1.0.jar
+* extensions / spring-osgi-annotation-${version}.jar
 - Contents: The Spring Dynamic Modules Annotation Extension
 - Dependencies: slf4j, spring-beans, spring-core, spring-osgi-core
 				[Log4J]

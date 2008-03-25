@@ -22,11 +22,13 @@ Package org.springframework.osgi.test
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader exposes the internal Bundle through getBundle() method
 
-Changes in version 1.0.2 (2008-03-xx)
+
+Changes in version 1.0.2 (2008-03-25)
 -------------------------------------
 
 General
-* adjusted the manifests so no internal packages are exposed and the versions both spring and spring-osgi are present
+* adjusted the manifests so internal packages are not exported and the versions for both spring and spring-osgi are
+  present
 
 Package org.springframework.osgi.context
 * AbstractOsgiBundleApplicationContext registers the application context as an OSGi service using just the interfaces
@@ -38,7 +40,7 @@ Package org.springframework.osgi.util
 * BundleDelegatingClassLoader relies on default hashCode/equals methods to prevent class caching on bundle updates
 
 Package org.springframework.osgi.test
-* Instalation bundles have the location set to the backing resource URL if possible, falling back to the description
+* Installed bundles have the location set to the backing resource URL if possible, falling back to the description
 
 
 Changes in version 1.0.1 (2008-02-29)

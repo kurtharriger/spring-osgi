@@ -86,8 +86,9 @@ public void testComponent() throws Exception {
      problem that appears when building base JUnit classes, by decoupling
      the runner from the test through annotations, Spring-DM cannot use
      them since it has to support Java 1.4.</para>
-     <para>Running the tests on JDK 1.5 is not an option since the differences
-     between 1.4 and 1.5 are quite subtle especially when dealing with synchronization.
+     <para>However, it is planned for the future to provide an optional,
+     JVM 5-based testing extension to integrate the existing testing framework
+     with the aforementioned libraries.
      </para>
     </sidebar>
     
@@ -195,6 +196,7 @@ spring-osgi-extender, etc... TestBundle-testOsgiPlatformStarts-com.your.package.
 
     <para>As you can see, the testing framework installs the mandatory requirements required for running the 
     test such as the Spring, Spring-DM, slf4j jars among others.</para>
+    
     </section>
 
     <section id="testing:integration:provisioning">
@@ -274,16 +276,29 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       are advanced topics as they increase the complexity of your test infrastructure.
       </para>
     
-    <section id="testing:integration:specify-manifest">
-      <title>Customizing test manifest</title>
+    <section id="testing:integration:customize-manifest">
+      <title>Customizing the test manifest</title>
       <para>There are cases where the auto-generated test manifest does not suite the needs of the test.
-      For example the manifest requires some different headers or a certain package needs to be an optional import.
-      To provide your own manifest, simply override <literal>getManifestLocations()</literal>:</para>
+      For example the manifest requires some different headers or a certain package needs to be an optional import.</para>
+      <para>
+      For simple cases, one can work directly with the generated manifest - in the example below, the bundle class path
+      is being specified:
+      </para>
+      <programlisting language="java"><![CDATA[protected Manifest getManifest() {
+      // let the testing framework create/load the manifest
+      Manifest mf = super.getManifest();
+      // add Bundle-Classpath:
+      mf.getMainAttributes().putValue(Constants.BUNDLE_CLASSPATH, ".,bundleclasspath/simple.jar");
+      return mf;
+}]]></programlisting>
+
+	  <para>      
+      Another alternative is to provide your own manifest by overriding <literal>getManifestLocations()</literal>:</para>
       <programlisting language="java"><![CDATA[protected String getManifestLocation() {
-	return "classpath:com/xyz/abc/test/MyTestTest.MF";
-}}]]></programlisting>
+      return "classpath:com/xyz/abc/test/MyTestTest.MF";
+}]]></programlisting>
 	  
-	  <para>However, the manifest requires some the folowing entry:</para>
+	  <para>However each manifest needs the following entry:</para>
 	  <quote>Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator</quote>
 	  <para>since without it, the testing infrastructure cannot function properly. Also, one needs to 
 	  import JUnit, Spring and Spring-DM specific packages used by the base test suite:</para>
@@ -360,6 +375,41 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
 		<classname>AbstractOnTheFlyBundleCreatorTests</classname> tests for more customization hooks.
         </para>
       
+    </section>
+    
+    <section id="testing:integration:understanding-manifest-creator">
+      <title>Understanding the <code>MANIFEST.MF</code> generation</title>
+      
+      <para>A useful feature of the testing framework represents the automatic creation of the test manifest based on the test bundle content. The manifest 
+      creator component uses byte-code analysis to determine the packages imported by the test classes so that it can generate the proper OSGi directives for them.
+      Since the generated bundle is used for running a test, the creator will use the following assumptions:</para>
+      
+      <itemizedlist>
+      	<listitem><para>No packages will be exported.</para> <para>The <emphasis>on-the-fly</emphasis> bundle is used for running a test which 
+      	(usually) consumes OSGi packages for its execution. This behaviour can be changed by <link linkend="testing:integration:customize-manifest">customizing</link> 
+      	the manifest.</para>
+      	</listitem>
+      	
+      	<listitem><para>Split packages (i.e. classes from the same package can come from different bundles) are not supported.</para>
+      	
+      	<para> 
+      	This means that packages present in the test framework are considered complete and no <code>Import-Package</code> entry will be generated for them. 
+      	To avoid this problem, consider using sub-packages or moving the classes inside one bundle. Note that split packages are discouraged due to the
+      	issues associated with them (see the OSGi Core spec, Chapter 3.13 - Required Bundles).</para>
+      	</listitem>
+      	
+      	<listitem>
+      	<para>The test bundle contains only test classes.</para>
+      	<para>The byte-code parser will look only at the test classes hierarchy. Any other class included in the bundle, will not be considered so no imports
+      	will be generated for it. Consider customizing the manifest yourself or attaching the extra code as inner classes to the test class. A future version
+      	of Spring-DM might alleviate this problem by inspecting all classes included in the test bundle.</para>
+      	</listitem>
+      </itemizedlist>
+      
+      <para>
+      The reason behind <emphasis>the lack of such features</emphasis> is the byte-code parser is aimed to be simple and fast at creating test manifests - 
+      it is not meant as a general-purpose tool for creating OSGi artifacts.  
+      </para>  
     </section>
     
     <!-- end of advanced topics -->
