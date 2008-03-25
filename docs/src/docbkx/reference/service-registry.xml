@@ -117,7 +117,7 @@
 	</programlistingco>
 
     <para>Using the OSGi namespace as a top-level namespace is particularly
-    convenient when following the recommendation of section <link linkend="app-deploy:headers">4.1</link> to use a
+    convenient when following the recommendation of <xref linkend="app-deploy:headers"/> to use a
     dedicated configuration file for all OSGi-related declarations.</para>
 
     <section id="service-registry:export">
@@ -324,7 +324,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <para>The Spring Dynamic Modules roadmap includes support for
         exporting properties registered in the OSGi Configuration
         Administration service as properties of the registered service. See
-        <link linkend="appendix-roadmap">this</link> appendix for more details.</para>
+        <xref linkend="appendix-roadmap"/> for more details.</para>
         
       </section>
 

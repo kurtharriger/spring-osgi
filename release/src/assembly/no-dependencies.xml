@@ -8,29 +8,18 @@
 	</componentDescriptors>
 	<includeBaseDirectory>true</includeBaseDirectory>
 	<moduleSets>
+		<!-- mandatory jars -->
 		<moduleSet>
 			<includes>
-				<include>
-					org.springframework.osgi:spring-osgi-mock
-				</include>
-				<include>
-					org.springframework.osgi:spring-osgi-io
-				</include>
-				<include>
-					org.springframework.osgi:spring-osgi-core
-				</include>
-				<include>
-					org.springframework.osgi:spring-osgi-extender
-				</include>
-				<include>
-					org.springframework.osgi:spring-osgi-test
-				</include>
-				<include>
-					org.springframework.osgi:spring-osgi-annotation
-				</include>
+				<include>org.springframework.osgi:spring-osgi-io</include>
+				<include>org.springframework.osgi:spring-osgi-mock</include>
+				<include>org.springframework.osgi:spring-osgi-core</include>
+				<include>org.springframework.osgi:spring-osgi-extender</include>											
+				<include>org.springframework.osgi:spring-osgi-test</include>
 			</includes>
+			<!-- the .jar and -sources.jar will be included here -->
 			<sources>
-				<includeModuleDirectory>false</includeModuleDirectory>
+				<includeModuleDirectory>false</includeModuleDirectory>				
 				<fileSets>
 					<fileSet>
 						<directory>target</directory>
@@ -42,29 +31,21 @@
 				</fileSets>
 			</sources>
 		</moduleSet>
+		<!-- extensions -->
 		<moduleSet>
 			<includes>
-				<include>
-					org.springframework.osgi.samples:samples
-				</include>
+				<include>org.springframework.osgi:spring-osgi-annotation</include>
 			</includes>
+			<!-- the .jar and -sources.jar will be included here -->
 			<sources>
-				<outputDirectoryMapping>
-					samples/${artifactId}
-				</outputDirectoryMapping>
+				<includeModuleDirectory>false</includeModuleDirectory>				
 				<fileSets>
 					<fileSet>
+						<directory>target</directory>
+						<outputDirectory>dist/extensions</outputDirectory>
 						<includes>
-							<include>pom.xml</include>
+							<include>*.jar</include>
 						</includes>
-						<excludes>
-							<exclude>bin/**</exclude>
-							<exclude>target/**</exclude>
-							<exclude>**/clover.license</exclude>
-							<!--
-							<exclude>*.xml</exclude>
-							-->
-						</excludes>
 					</fileSet>
 				</fileSets>
 			</sources>
