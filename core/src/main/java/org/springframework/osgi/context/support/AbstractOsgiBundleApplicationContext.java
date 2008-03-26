@@ -22,6 +22,7 @@ import java.util.Dictionary;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
@@ -38,6 +39,7 @@ import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
@@ -186,8 +188,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 */
 	protected void doClose() {
 		if (!OsgiServiceUtils.unregisterService(serviceRegistration)) {
-			logger.info("Unpublishing application context with properties ("
-					+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getBundleSymbolicName() + ")");
+			logger.info("Unpublishing application context OSGi service for bundle "
+					+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			serviceRegistration = null;
 		}
 		else {
@@ -278,9 +280,12 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		if (publishContextAsService) {
 			Dictionary serviceProperties = new MapBasedDictionary();
 			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getBundleSymbolicName());
+			
+			serviceProperties.put(Constants.BUNDLE_SYMBOLICNAME, getBundleSymbolicName());
+			serviceProperties.put(Constants.BUNDLE_VERSION, OsgiBundleUtils.getBundleVersion(bundle));
+			
 			if (logger.isInfoEnabled()) {
-				logger.info("Publishing application context with properties ("
-						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getBundleSymbolicName() + ")");
+				logger.info("Publishing application context as OSGi service with properties " + serviceProperties);
 			}
 
 			// export only interfaces
@@ -301,8 +306,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		}
 		else {
 			if (logger.isInfoEnabled()) {
-				logger.info("Not publishing application context with properties ("
-						+ APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME + "=" + getBundleSymbolicName() + ")");
+				logger.info("Not publishing application context OSGi service for bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			}
 		}
 	}
