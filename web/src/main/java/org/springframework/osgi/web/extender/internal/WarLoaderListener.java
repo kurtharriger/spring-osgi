@@ -18,7 +18,6 @@ package org.springframework.osgi.web.extender.internal;
 
 import java.net.URL;
 import java.util.Date;
-import java.util.Timer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -167,12 +166,7 @@ public class WarLoaderListener implements BundleActivator {
 
 		// the timer class is directly used since we need access to the TimerTask
 		/** thread for deploying/undeploying bundles */
-		private TimerTaskExecutor executor = new TimerTaskExecutor() {
-
-			protected Timer createTimer() {
-				return new Timer("Spring OSGi War Deployer", true);
-			}
-		};
+		private TimerTaskExecutor executor = new TimerTaskExecutor();
 
 
 		public DeploymentManager() {
