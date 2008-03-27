@@ -26,6 +26,8 @@ Package org.springframework.osgi.io
 Package org.springframework.osgi.test
 * FelixPlatform uses the Felix distribution default system packages
 * KnopflerfishPlatform uses the KF distribution default system packages
+* AbstractOnTheFlyBundleCreatorTests can now generate imports based on all classes available in the jar not just the 
+  test hierarchy
 
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader exposes the internal Bundle through getBundle() method
