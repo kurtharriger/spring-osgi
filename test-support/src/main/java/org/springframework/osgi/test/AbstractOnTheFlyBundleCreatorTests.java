@@ -32,9 +32,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.internal.storage.MemoryStorage;
 import org.springframework.osgi.test.internal.util.DependencyVisitor;
-import org.springframework.osgi.test.internal.util.JarCreator;
+import org.springframework.osgi.test.internal.util.jar.JarCreator;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -81,7 +80,6 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 	private void initializeJarCreator() {
 		jarCreator = new JarCreator();
-		jarCreator.setStorage(new MemoryStorage());
 	}
 
 	/**

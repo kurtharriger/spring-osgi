@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.test.internal.util;
+package org.springframework.osgi.test.internal.util.jar;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -35,12 +35,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.osgi.test.internal.storage.MemoryStorage;
-import org.springframework.osgi.test.internal.storage.Storage;
+import org.springframework.osgi.test.internal.util.jar.storage.MemoryStorage;
+import org.springframework.osgi.test.internal.util.jar.storage.Storage;
 import org.springframework.util.StringUtils;
 
 /**
- * Helper class for creating Jar files.
+ * Helper class for creating Jar files. Note that this class is stateful and the
+ * same instance should not be reused.
  * 
  * @author Costin Leau
  * 

@@ -34,7 +34,7 @@
     </spring.osgi.export>
     
   	<spring.osgi.private.pkg>
-		org.springframework.osgi.test.internal.util*,
+		org.springframework.osgi.test.internal.util.jar*,
 		org.springframework.osgi.io.internal*,
 		org.springframework.osgi.web.extender.internal*
 	</spring.osgi.private.pkg>

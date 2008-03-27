@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.test.internal.util;
+package org.springframework.osgi.test.internal.util.jar;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,9 +31,8 @@ import java.util.zip.ZipEntry;
 import org.springframework.core.io.Resource;
 
 /**
- * Utility class for Jar files. As opposed to {@link JarCreator}, this class
- * contains only static methods (hence the abstract class).
- * 
+ * Utility class for Jar files. As opposed to {@link JarCreator}, this class is
+ * stateless and contains only static methods (hence the abstract qualifier).
  * 
  * @author Costin Leau
  * 
@@ -69,7 +68,7 @@ public abstract class JarUtils {
 			buffer.append("reading from stream failed");
 		}
 		finally {
-			IOUtils.closeStream(jis);
+			closeStream(jis);
 		}
 
 		return buffer.toString();
@@ -152,7 +151,7 @@ public abstract class JarUtils {
 			// just ignore it
 		}
 		finally {
-			IOUtils.closeStream(myStream);
+			closeStream(myStream);
 		}
 
 		// return (man != null ? man : new Manifest());
@@ -235,9 +234,19 @@ public abstract class JarUtils {
 			catch (IOException ex) {
 				// ignore
 			}
-			IOUtils.closeStream(jarStream);
+
 		}
 
 		return writtenBytes;
+	}
+
+	private static void closeStream(InputStream stream) {
+		if (stream != null)
+			try {
+				stream.close();
+			}
+			catch (IOException ex) {
+				// ignore
+			}
 	}
 }

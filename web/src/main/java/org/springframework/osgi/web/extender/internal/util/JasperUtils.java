@@ -42,7 +42,7 @@ import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 import org.springframework.osgi.io.internal.resolver.DependencyResolver;
 import org.springframework.osgi.io.internal.resolver.ImportedBundle;
 import org.springframework.osgi.io.internal.resolver.PackageAdminResolver;
-import org.springframework.osgi.test.internal.util.JarUtils;
+import org.springframework.osgi.test.internal.util.jar.JarUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;

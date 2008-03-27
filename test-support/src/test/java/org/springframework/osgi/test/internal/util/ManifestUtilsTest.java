@@ -24,8 +24,10 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.internal.storage.MemoryStorage;
-import org.springframework.osgi.test.internal.storage.Storage;
+import org.springframework.osgi.test.internal.util.jar.JarUtils;
+import org.springframework.osgi.test.internal.util.jar.ManifestUtils;
+import org.springframework.osgi.test.internal.util.jar.storage.MemoryStorage;
+import org.springframework.osgi.test.internal.util.jar.storage.Storage;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
