@@ -205,7 +205,8 @@ public class JarCreator {
 
 	/**
 	 * Resolve the jar content based on its path. Will return a map containing
-	 * the entries relative to the jar root path. It will also determine the
+	 * the entries relative to the jar root path as keys and Spring Resource
+	 * pointing to the actual resources as values. It will also determine the
 	 * packages contained by this package.
 	 * 
 	 * @return
@@ -274,7 +275,7 @@ public class JarCreator {
 		}
 
 		if (log.isTraceEnabled())
-			log.trace("following packages discovered in the bundle: " + containedPackages);
+			log.trace("The following packages were discovered in the bundle: " + containedPackages);
 
 		return entries;
 	}

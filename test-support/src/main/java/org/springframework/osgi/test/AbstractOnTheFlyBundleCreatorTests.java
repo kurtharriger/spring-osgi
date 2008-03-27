@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -31,13 +32,13 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.internal.util.DependencyVisitor;
 import org.springframework.osgi.test.internal.util.jar.JarCreator;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -180,6 +181,22 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 		return manifest;
 	}
 
+	/**
+	 * Indicates if the automatic manifest creation should consider only the
+	 * test class (<code>true</code>) or all classes included in the test
+	 * bundle(<code>false</code>). The latter should be used when the test
+	 * bundle contains additional classes that help with the test case.
+	 * 
+	 * <p/> By default, this method returns <code>true</code>, meaning that
+	 * only the test class will be searched for dependencies.
+	 * 
+	 * @return true if only the test hierarchy is searched for dependencies or
+	 * false if all classes discovered in the test archive need to be parsed.
+	 */
+	protected boolean createManifestOnlyFromTestClass() {
+		return true;
+	}
+
 	private Manifest createManifestFrom(Resource resource) {
 		Assert.notNull(resource);
 		try {
@@ -222,7 +239,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	}
 
 	private void addImportPackage(Manifest manifest) {
-		String[] rawImports = determineImports(getClass());
+		String[] rawImports = determineImports();
 
 		boolean trace = logger.isTraceEnabled();
 
@@ -297,101 +314,144 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	}
 
 	/**
-	 * Determine imports by walking a class hierarchy until the current package
-	 * is found. Currently, the parsers checks only the test class hierarchy
-	 * available in the bundle. note that split packages are not supported.
-	 * 
+	 * Determine imports for the given bundle. Based on the user settings, this
+	 * method will consider only the the test hierarchy until the testing
+	 * framework is found or all classes available inside the test bundle. <p/>
+	 * Note that split packages are not supported.
 	 * 
 	 * @return
 	 */
-	private String[] determineImports(Class clazz) {
-		Assert.notNull(clazz, "a not-null class is required");
+	private String[] determineImports() {
 
-		boolean trace = logger.isTraceEnabled();
+		boolean useTestClassOnly = false;
 
-		String endPackage = ClassUtils.classPackageAsResourcePath(AbstractOnTheFlyBundleCreatorTests.class).replace(
-			'/', '.');
+		// no jar entry present, bail out.
+		if (jarEntries == null || jarEntries.isEmpty()) {
+			logger.debug("No test jar content detected, generating bundle imports from the test class");
+			useTestClassOnly = true;
+		}
 
-		Set cumulatedPackages = new LinkedHashSet();
+		else if (createManifestOnlyFromTestClass()) {
+			logger.info("Using the test class for generating bundle imports");
+			useTestClassOnly = true;
+		}
+		else
+			logger.info("Using all classes in the jar for the generation of bundle imports");
 
+		// className, class resource
+		Map entries;
+
+		if (useTestClassOnly) {
+
+			entries = new LinkedHashMap(4);
+
+			// get current class (test class that bootstraps the OSGi infrastructure)
+			Class clazz = getClass();
+			String clazzPackage;
+			String endPackage = AbstractOnTheFlyBundleCreatorTests.class.getPackage().getName();
+
+			do {
+				clazzPackage = clazz.getPackage().getName();
+				String clazzName = ClassUtils.getClassFileName(clazz);
+				entries.put(clazzName, new InputStreamResource(clazz.getResourceAsStream(clazzName)));
+				clazz = clazz.getSuperclass();
+
+			} while (!endPackage.equals(clazzPackage));
+		}
+		else
+			entries = jarEntries;
+
+		return determineImportsFor(entries);
+
+	}
+
+	private String[] determineImportsFor(Map entries) {
 		// get contained packages to do matching on the test hierarchy
 		Collection containedPackages = jarCreator.getContainedPackages();
+		Set cumulatedPackages = new LinkedHashSet();
 
 		// make sure the collection package is valid
 		boolean validPackageCollection = !containedPackages.isEmpty();
 
-		String clazzPackage;
+		boolean trace = logger.isTraceEnabled();
 
-		// start parsing the test class hierarchy
-		do {
-			clazzPackage = ClassUtils.classPackageAsResourcePath(clazz).replace('/', '.');
-			// check if the class package is inside this jar or not
-			// parse the class only for available packages otherwise
+		for (Iterator iterator = entries.entrySet().iterator(); iterator.hasNext();) {
+			Map.Entry entry = (Map.Entry) iterator.next();
+			String resourceName = (String) entry.getKey();
 
-			// if we don't have the package, add it
-			if (validPackageCollection && !containedPackages.contains(clazzPackage)) {
-				logger.trace("Package [" + clazzPackage + "] is NOT part of the test archive; adding an import for it");
-				cumulatedPackages.add(clazzPackage);
-			}
-
-			// otherwise parse the class byte-code
-			else {
+			// filter out the test hierarchy
+			if (resourceName.endsWith(ClassUtils.CLASS_FILE_SUFFIX)) {
 				if (trace)
-					logger.trace("Package [" + clazzPackage + "] is part of the test archive; parsing " + clazz
-							+ " bytecode to determine imports...");
-				cumulatedPackages.addAll(determineImportsForClass(clazz));
+					logger.trace("Analyze imports for test bundle resource " + resourceName);
+				String classFileName = StringUtils.getFilename(resourceName);
+				String className = classFileName.substring(0, classFileName.length()
+						- ClassUtils.CLASS_FILE_SUFFIX.length());
+				String classPkg = resourceName.substring(0, resourceName.length() - classFileName.length()).replace(
+					'/', '.');
+
+				if (classPkg.startsWith("."))
+					classPkg = classPkg.substring(1);
+
+				if (classPkg.endsWith("."))
+					classPkg = classPkg.substring(0, classPkg.length() - 1);
+
+				// if we don't have the package, add it
+				if (validPackageCollection && StringUtils.hasText(classPkg) && !containedPackages.contains(classPkg)) {
+					logger.trace("Package [" + classPkg + "] is NOT part of the test archive; adding an import for it");
+					cumulatedPackages.add(classPkg);
+				}
+
+				// otherwise parse the class byte-code
+				else {
+					if (trace)
+						logger.trace("Package [" + classPkg + "] is part of the test archive; parsing " + className
+								+ " bytecode to determine imports...");
+					cumulatedPackages.addAll(determineImportsForClass(className, (Resource) entry.getValue()));
+				}
 			}
-			clazz = clazz.getSuperclass();
-			// work until the testing framework packages are reached 
-		} while (!endPackage.equals(clazzPackage));
-
-		String[] packages = (String[]) cumulatedPackages.toArray(new String[cumulatedPackages.size()]);
-		// sort the array
-		Arrays.sort(packages);
-
-		for (int i = 0; i < packages.length; i++) {
-			packages[i] = packages[i].replace('/', '.');
 		}
 
-		return packages;
+		return (String[]) cumulatedPackages.toArray(new String[cumulatedPackages.size()]);
 	}
 
-	private Set determineImportsForClass(Class clazz) {
-		Assert.notNull(clazz, "a not-null class is required");
+	/**
+	 * Determine imports for a class given as a String resource. This method
+	 * doesn't do any search for the enclosing/inner classes as it considers
+	 * that these should be handled at a higher level.
+	 * 
+	 * The returned set contains the packages in string format (i.e. java.io)
+	 * 
+	 * @param className
+	 * @param resource
+	 * @return
+	 */
+	private Set determineImportsForClass(String className, Resource resource) {
+		Assert.notNull(resource, "a not-null class is required");
 		DependencyVisitor visitor = new DependencyVisitor();
-
-		// find inner classes
-		Set allClasses = new LinkedHashSet(4);
-
-		allClasses.add(clazz);
-		CollectionUtils.mergeArrayIntoCollection(clazz.getDeclaredClasses(), allClasses);
-
-		for (Iterator iterator = allClasses.iterator(); iterator.hasNext();) {
-			Class innerClazz = (Class) iterator.next();
-			CollectionUtils.mergeArrayIntoCollection(innerClazz.getDeclaredClasses(), allClasses);
-		}
 
 		boolean trace = logger.isTraceEnabled();
 
-		if (trace)
-			logger.trace("Discovered classes to analyze " + allClasses);
-
 		ClassReader reader;
 
-		for (Iterator iterator = allClasses.iterator(); iterator.hasNext();) {
-			Class classToVisit = (Class) iterator.next();
-			try {
-				if (trace)
-					logger.trace("Visiting class " + classToVisit);
-				reader = new ClassReader(clazz.getResourceAsStream(ClassUtils.getClassFileName(classToVisit)));
-			}
-			catch (Exception ex) {
-				throw (RuntimeException) new IllegalArgumentException("cannot read class " + clazz).initCause(ex);
-			}
-			reader.accept(visitor, false);
+		try {
+			if (trace)
+				logger.trace("Visiting class " + className);
+			reader = new ClassReader(resource.getInputStream());
 		}
+		catch (Exception ex) {
+			throw (RuntimeException) new IllegalArgumentException("Cannot read class " + className).initCause(ex);
+		}
+		reader.accept(visitor, false);
 
-		return visitor.getPackages();
+		// convert from / to . format
+		Set originalPackages = visitor.getPackages();
+		Set pkgs = new LinkedHashSet(originalPackages.size());
+
+		for (Iterator iterator = originalPackages.iterator(); iterator.hasNext();) {
+			String pkg = (String) iterator.next();
+			pkgs.add(pkg.replace('/', '.'));
+		}
+		return pkgs;
 	}
 
 	protected void postProcessBundleContext(BundleContext context) throws Exception {
