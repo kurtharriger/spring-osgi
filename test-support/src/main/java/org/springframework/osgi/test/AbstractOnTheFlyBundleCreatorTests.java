@@ -17,11 +17,12 @@
 package org.springframework.osgi.test;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.Attributes;
@@ -39,6 +40,7 @@ import org.springframework.osgi.test.internal.util.jar.JarCreator;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -347,13 +349,25 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 
 			// get current class (test class that bootstraps the OSGi infrastructure)
 			Class clazz = getClass();
-			String clazzPackage;
+			String clazzPackage = null;
 			String endPackage = AbstractOnTheFlyBundleCreatorTests.class.getPackage().getName();
 
 			do {
-				clazzPackage = clazz.getPackage().getName();
-				String clazzName = ClassUtils.getClassFileName(clazz);
-				entries.put(clazzName, new InputStreamResource(clazz.getResourceAsStream(clazzName)));
+
+				// consider inner classes as well
+				List classes = new ArrayList(4);
+				classes.add(clazz);
+				CollectionUtils.mergeArrayIntoCollection(clazz.getDeclaredClasses(), classes);
+
+				for (Iterator iterator = classes.iterator(); iterator.hasNext();) {
+					Class classToInspect = (Class) iterator.next();
+
+					clazzPackage = classToInspect.getPackage().getName();
+					String classFile = ClassUtils.getClassFileName(classToInspect);
+					entries.put(classToInspect.getName().replace('.', '/').concat(ClassUtils.CLASS_FILE_SUFFIX),
+						new InputStreamResource(classToInspect.getResourceAsStream(classFile)));
+				}
+
 				clazz = clazz.getSuperclass();
 
 			} while (!endPackage.equals(clazzPackage));
