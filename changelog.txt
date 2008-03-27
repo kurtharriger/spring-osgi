@@ -2,15 +2,23 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.1.0 (200y-mm-dd)
+Changes in version 1.1.0 (2008-mm-dd)
 -----------------------------------------
 
 General
 * Knopflerfish 2.0.4+ required
 * Felix 1.0.3+ required
+* introduced new module dedicated to web application running on OSGi platforms
 
 Package org.springframework.osgi.context
 * AbstractDelegatedExecutionApplicationContext calls "cancelRefresh" if exceptions appear during the delegeted refresh
+* introduced events specific to OSGi application contexts
+* introduced listener interface OsgiBundleApplicationContextListener for OSGi context events
+* added bundle version to the application context OSGi service
+
+Package org.springframework.osgi.extender
+* ContextLoaderListener automatically detects and notifies OSGi services registered as 
+  OsgiBundleApplicationContextListener classes
 
 Package org.springframework.osgi.io
 * added support for classpath: and classpath*: patterns

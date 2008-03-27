@@ -213,9 +213,7 @@ limitations under the License.
     <module>core</module>
     <module>extender</module>
     <module>test-support</module>
-    <!--
     <module>web</module>
-    -->
     <module>bundle-archetype</module>
     <!-- unused at the moment
     <module>release</module>
@@ -452,8 +450,6 @@ limitations under the License.
         </activation>
         <modules>
           <module>annotation</module>
-          <!-- should change in the long term -->
-          <module>web</module>
         </modules>
         <properties>
           <!-- use default mtc version for core -->
