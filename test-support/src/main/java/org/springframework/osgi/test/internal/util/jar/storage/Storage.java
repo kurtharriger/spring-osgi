@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.internal.storage;
+package org.springframework.osgi.test.internal.util.jar.storage;
 
 import java.io.InputStream;
 import java.io.OutputStream;

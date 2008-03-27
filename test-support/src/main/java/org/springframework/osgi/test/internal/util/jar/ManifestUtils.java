@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.internal.util;
+package org.springframework.osgi.test.internal.util.jar;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -25,7 +25,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 /**
- * Utility class for creating Manifest objects on various criterias.
+ * Utility class for creating Manifest objects on various criterions.
  * 
  * @author Costin Leau
  * 
