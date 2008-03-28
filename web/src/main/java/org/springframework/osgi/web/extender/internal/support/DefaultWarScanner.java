@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal;
+package org.springframework.osgi.web.extender.internal.support;
 
 import java.net.URL;
 import java.util.Enumeration;
@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
+import org.springframework.osgi.web.extender.WarScanner;
 
 /**
  * Scanner for WAR applications. Looks for the presence of

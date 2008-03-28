@@ -29,7 +29,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.web.extender.internal.AbstractWarDeployer;
+import org.springframework.osgi.web.extender.internal.support.AbstractWarDeployer;
 import org.springframework.osgi.web.extender.internal.util.JasperUtils;
 import org.springframework.osgi.web.extender.internal.util.Utils;
 

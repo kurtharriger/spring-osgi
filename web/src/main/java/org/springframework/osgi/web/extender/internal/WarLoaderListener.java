@@ -34,7 +34,8 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.ContextPathStrategy;
 import org.springframework.osgi.web.extender.WarDeployer;
-import org.springframework.osgi.web.extender.internal.tomcat.TomcatWarDeployer;
+import org.springframework.osgi.web.extender.WarScanner;
+import org.springframework.osgi.web.extender.internal.config.WarListenerConfiguration;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
 
@@ -221,6 +222,8 @@ public class WarLoaderListener implements BundleActivator {
 
 	private DeploymentManager deploymentManager;
 
+	private WarListenerConfiguration configuration;
+
 
 	/**
 	 * Constructs a new <code>WarLoaderListener</code> instance.
@@ -248,15 +251,13 @@ public class WarLoaderListener implements BundleActivator {
 
 		log.info("Starting org.springframework.osgi.web.extender bundle v.[" + extenderVersion + "]");
 
+		// read configuration
+		configuration = new WarListenerConfiguration(context);
+
 		// instantiate fields
-		// TODO: make this configurable through an XML file
-		warScanner = new DefaultWarScanner();
-
-		// TODO: make war deployer plug-able
-		warDeployer = new TomcatWarDeployer(bundleContext);
-
-		// TODO: make context path plug-able
-		contextPathStrategy = new DefaultContextPathStrategy();
+		warScanner = configuration.getWarScanner();
+		warDeployer = configuration.getWarDeployer();
+		contextPathStrategy = configuration.getContextPathStrategy();
 
 		// register war listener
 		warListener = new WarBundleListener();
@@ -332,6 +333,6 @@ public class WarLoaderListener implements BundleActivator {
 		// destroy any tasks that have to be processed
 		deploymentManager.destroy();
 
-		// TODO: should we undeploy as well (?)
+		configuration.destroy();
 	}
 }
