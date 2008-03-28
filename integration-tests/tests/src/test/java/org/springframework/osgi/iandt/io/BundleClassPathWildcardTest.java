@@ -17,11 +17,15 @@
 package org.springframework.osgi.iandt.io;
 
 import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Enumeration;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -89,4 +93,27 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		return false;
 	}
 
+	public void testURLConnectionToJarInsideBundle() throws Exception {
+		Resource jar = patternLoader.getResource("bundleclasspath/simple.jar");
+		testJarConnectionOn(jar);
+	}
+
+	private void testJarConnectionOn(Resource jar) throws Exception {
+		String toString = jar.getURL().toExternalForm();
+		// force JarURLConnection
+		String urlString = "jar:" + toString + "!/";
+		URL newURL = new URL(urlString);
+		System.out.println(newURL);
+		System.out.println(newURL.toExternalForm());
+		URLConnection con = newURL.openConnection();
+		System.out.println(con);
+		System.out.println(con instanceof JarURLConnection);
+		JarURLConnection jarCon = (JarURLConnection) con;
+
+		JarFile jarFile = jarCon.getJarFile();
+		System.out.println(jarFile.getName());
+		Enumeration enm = jarFile.entries();
+		while (enm.hasMoreElements())
+			System.out.println(enm.nextElement());
+	}
 }
