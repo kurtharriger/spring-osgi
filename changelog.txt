@@ -19,6 +19,8 @@ Package org.springframework.osgi.context
 Package org.springframework.osgi.extender
 * ContextLoaderListener automatically detects and notifies OSGi services registered as 
   OsgiBundleApplicationContextListener classes
+* ContextLoaderListener can be configured externally through META-INF/spring/*.xml files from fragments attached to its
+  bundle
 
 Package org.springframework.osgi.io
 * added support for classpath: and classpath*: patterns
