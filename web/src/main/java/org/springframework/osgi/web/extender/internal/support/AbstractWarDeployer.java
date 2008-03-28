@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal;
+package org.springframework.osgi.web.extender.internal.support;
 
 import java.util.Map;
 
