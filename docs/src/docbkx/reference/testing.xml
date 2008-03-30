@@ -482,7 +482,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       <para>Considering all the functionality offered by the testing framework, one might wonder if this doesn't become a 
       performance bottleneck. First, it's worth noting that all the work done automatically by the testing infrastructure 
       has to be done anyway (such as creating the manifest or creating a bundle for the test or installing the bundles).
-      Doing it manually simply simply does not work as it's too error prone and time consuming. 
+      Doing it manually simply does not work as it's too error prone and time consuming. 
       In fact, the current infrastructure started as way to do efficient, automatic testing without worrying 
       about deployment problems and redundancy.</para> 
       <para>As for the numbers, the current infrastructure has been used internally for the last half a year - our integration tests

@@ -1555,7 +1555,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
     <section id="service-registry:refs:global-defaults">
       <title>Service importer global defaults</title>
 
-  	  <para>The <literal>osgi</literal> namespace allows offers two
+  	  <para>The <literal>osgi</literal> namespace offers two
   	  global attributes for specifying default behaviours for all
   	  importers declared in that file.</para>
   	        
@@ -1671,7 +1671,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
 
 		<callout arearefs="service-registry.global.ns.defaults.osgi.ns.again">
 		    <para>Import Spring Dynamic Modules schema and associate a prefix with its namespace 
-		    (<literal>osgi</literal> in this example). This is requires since the global attributes
+		    (<literal>osgi</literal> in this example). This is required since the global attributes
 		    have to be declared to an element (<literal>beans</literal>) belonging to another schema.
 		    To avoid ambiguity, the Spring-DM schema is imported under a specified prefix as well.</para>  
 		</callout>
