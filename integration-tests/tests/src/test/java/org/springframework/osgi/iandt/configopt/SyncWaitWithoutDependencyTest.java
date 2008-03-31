@@ -29,11 +29,11 @@ public class SyncWaitWithoutDependencyTest extends BehaviorBaseTest {
 
 	public void testBehaviour() throws Exception {
 
-		String bundleId = "org.springframework.osgi, org.springframework.osgi.iandt.sync-wait-bundle,"
+		String bundleId = "org.springframework.osgi.iandt, sync-wait-bundle,"
 				+ getSpringDMVersion();
 
 		// locate bundle
-		String tailBundleId = "org.springframework.osgi, org.springframework.osgi.iandt.sync-tail-bundle,"
+		String tailBundleId = "org.springframework.osgi.iandt, sync-tail-bundle,"
 				+ getSpringDMVersion();
 
 		// start bundle first (no dependency)

@@ -42,7 +42,7 @@ public class ErrorHandlingTest extends BaseIntegrationTest {
      */
     public void testErrorHandling() throws Exception {
         Resource errorResource = getLocator()
-                .locateArtifact("org.springframework.osgi", "org.springframework.osgi.iandt.error",
+                .locateArtifact("org.springframework.osgi.iandt", "error",
                                 getSpringDMVersion());
         assertNotNull("Error bundle resource exists", errorResource);
         Bundle errorBundle = bundleContext.installBundle(errorResource.getURL().toExternalForm());

@@ -38,7 +38,7 @@ public class AsyncNoWaitTest extends BehaviorBaseTest {
 	}
 
 	public void testBehaviour() throws Exception {
-		String bundleId = "org.springframework.osgi, org.springframework.osgi.iandt.async-nowait-bundle,"
+		String bundleId = "org.springframework.osgi.iandt, async-nowait-bundle,"
 				+ getSpringDMVersion();
 
 		// start it

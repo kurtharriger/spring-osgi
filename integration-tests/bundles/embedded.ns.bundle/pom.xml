@@ -4,12 +4,12 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>spring-osgi-integration-test-bundles</artifactId>
-        <groupId>org.springframework.osgi</groupId>
+        <groupId>org.springframework.osgi.iandt</groupId>
         <version>1.1.0-m1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.springframework.osgi</groupId>
-    <artifactId>org.springframework.osgi.iandt.ns.embedded</artifactId>
+    <groupId>org.springframework.osgi.iandt</groupId>
+    <artifactId>ns.embedded</artifactId>
 	<packaging>jar</packaging>
     <name>Spring OSGi Test Bundle: namespace test bundle</name>
     <description>A simple namespace library (which gets embedded inside a bundle classpath)</description>

@@ -4,12 +4,12 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>spring-osgi-integration-test-bundles</artifactId>
-        <groupId>org.springframework.osgi</groupId>
+        <groupId>org.springframework.osgi.iandt</groupId>
         <version>1.1.0-m1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.springframework.osgi</groupId>
-    <artifactId>org.springframework.osgi.iandt.component.scan.bundle</artifactId>
+    <groupId>org.springframework.osgi.iandt</groupId>
+    <artifactId>component.scan.bundle</artifactId>
     <packaging>jar</packaging>
     <name>Spring OSGi Test Bundle: @Component beans bundle</name>
     <description>An OSGi bundle with Spring annotated components</description>

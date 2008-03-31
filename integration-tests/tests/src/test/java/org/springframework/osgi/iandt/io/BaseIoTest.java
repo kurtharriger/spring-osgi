@@ -77,9 +77,8 @@ public abstract class BaseIoTest extends BaseIntegrationTest {
 	 * Add a bundle fragment.
 	 */
 	protected String[] getTestBundlesNames() {
-		return new String[] {
-			"org.springframework.osgi,org.springframework.osgi.iandt.io.fragment.1.bundle," + getSpringDMVersion(),
-			"org.springframework.osgi,org.springframework.osgi.iandt.io.fragment.2.bundle," + getSpringDMVersion() };
+		return new String[] { "org.springframework.osgi.iandt,io.fragment.1.bundle," + getSpringDMVersion(),
+			"org.springframework.osgi.iandt,io.fragment.2.bundle," + getSpringDMVersion() };
 	}
 
 	protected Object[] copyEnumeration(Enumeration enm) {

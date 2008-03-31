@@ -29,10 +29,10 @@ import org.springframework.osgi.util.OsgiBundleUtils;
  */
 public class SyncNoWaitWithReverseQueueTest extends BehaviorBaseTest {
 
-	private String tailBundleId = "org.springframework.osgi, org.springframework.osgi.iandt.sync-tail-bundle,"
+	private String tailBundleId = "org.springframework.osgi.iandt, sync-tail-bundle,"
 			+ getSpringDMVersion();
 
-	private String bundleId = "org.springframework.osgi, org.springframework.osgi.iandt.sync-nowait-bundle,"
+	private String bundleId = "org.springframework.osgi.iandt, sync-nowait-bundle,"
 			+ getSpringDMVersion();
 
 	public void testBehaviour() throws Exception {

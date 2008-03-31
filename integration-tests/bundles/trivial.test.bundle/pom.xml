@@ -1,12 +1,12 @@
 <?xml version="1.0"?><project>
   <parent>
     <artifactId>spring-osgi-integration-test-bundles</artifactId>
-    <groupId>org.springframework.osgi</groupId>
+    <groupId>org.springframework.osgi.iandt</groupId>
     <version>1.1.0-m1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.springframework.osgi</groupId>
-  <artifactId>org.springframework.osgi.iandt.trivial.tests</artifactId>
+  <groupId>org.springframework.osgi.iandt</groupId>
+  <artifactId>trivial.tests</artifactId>
   <packaging>jar</packaging>
   <name>Spring OSGi Test Bundle: Simple test that uses trivial bundle</name>
   <description>Contains a single test case that exercises function in 
@@ -16,8 +16,8 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>org.springframework.osgi.iandt.trivial</artifactId>
+      <groupId>org.springframework.osgi.iandt</groupId>
+      <artifactId>trivial</artifactId>
       <version>${project.parent.version}</version>
       <scope>provided</scope>
     </dependency>

@@ -13,8 +13,8 @@ public class ServiceListenerTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] {
-			"org.springframework.osgi,org.springframework.osgi.iandt.simple.service," + getSpringDMVersion(),
-			"org.springframework.osgi, org.springframework.osgi.iandt.service.listener," + getSpringDMVersion() };
+			"org.springframework.osgi.iandt,simple.service," + getSpringDMVersion(),
+			"org.springframework.osgi.iandt, service.listener," + getSpringDMVersion() };
 	}
 
 	public void testServiceListener() throws Exception {

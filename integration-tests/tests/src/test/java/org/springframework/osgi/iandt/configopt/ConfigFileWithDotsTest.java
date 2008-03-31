@@ -28,7 +28,7 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 public class ConfigFileWithDotsTest extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { "org.springframework.osgi.iandt, org.springframework.osgi.iandt.config-with-dots.bundle,"
+		return new String[] { "org.springframework.osgi.iandt, config-with-dots.bundle,"
 				+ getSpringDMVersion() };
 	}
 
