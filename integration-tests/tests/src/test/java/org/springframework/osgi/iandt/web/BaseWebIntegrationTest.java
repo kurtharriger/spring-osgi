@@ -26,6 +26,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.core.JdkVersion;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.CollectionUtils;
 
 public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
@@ -142,4 +143,10 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 	protected boolean createManifestOnlyFromTestClass() {
 		return false;
 	}
+
+	// disable tests on KF for the time being
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return getPlatformName().equalsIgnoreCase(Platforms.KNOPFLERFISH);
+	}
+
 }

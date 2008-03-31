@@ -11,9 +11,9 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-test/2.5.2/spring-test-2.5.2.jar" sourcepath="/SPRING_MOCK_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.4.3/slf4j-log4j12-1.4.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.lifecycle/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.lifecycle-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.service.listener/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.service.listener-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.simple.service/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.simple.service-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/lifecycle/1.1.0-m1-SNAPSHOT/lifecycle-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/service.listener/1.1.0-m1-SNAPSHOT/service.listener-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/simple.service/1.1.0-m1-SNAPSHOT/simple.service-1.1.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/cglib-nodep.osgi/2.1.3-SNAPSHOT/cglib-nodep.osgi-2.1.3-SNAPSHOT.jar" sourcepath="/CGLIB_SRC"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/1.0.3/org.apache.felix.main-1.0.3.jar" sourcepath="/FELIX_SRC"/>
@@ -24,15 +24,15 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/asm.osgi/2.2.3-SNAPSHOT/asm.osgi-2.2.3-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.0.4/framework-2.0.4.jar" sourcepath="/KF_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.0.5/framework-2.0.5.jar" sourcepath="/KF_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.0/org.osgi.core-4.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.scoped.bundle.a/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.scoped.bundle.a-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.scoped.bundle.b/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.scoped.bundle.b-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.scoped.bundle.common/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.scoped.bundle.common-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.cardinality0to1/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.cardinality0to1-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.tccl/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.tccl-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.configuration/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.configuration-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.reference.proxy/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.reference.proxy-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/scoped.bundle.a/1.1.0-m1-SNAPSHOT/scoped.bundle.a-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/scoped.bundle.b/1.1.0-m1-SNAPSHOT/scoped.bundle.b-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/scoped.bundle.common/1.1.0-m1-SNAPSHOT/scoped.bundle.common-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/cardinality0to1/1.1.0-m1-SNAPSHOT/cardinality0to1-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/tccl/1.1.0-m1-SNAPSHOT/tccl-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/configuration/1.1.0-m1-SNAPSHOT/configuration-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/reference.proxy/1.1.0-m1-SNAPSHOT/reference.proxy-1.1.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/servlet-api.osgi/2.4-SNAPSHOT/servlet-api.osgi-2.4-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/bundles/org.eclipse.equinox.common/20060603/org.eclipse.equinox.common-20060603.jar"/>
