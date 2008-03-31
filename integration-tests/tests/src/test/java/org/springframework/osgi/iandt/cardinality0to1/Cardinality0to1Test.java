@@ -15,13 +15,13 @@ public class Cardinality0to1Test extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] {
-			"org.springframework.osgi, org.springframework.osgi.iandt.simple.service," + getSpringDMVersion(),
-			"org.springframework.osgi, org.springframework.osgi.iandt.cardinality0to1," + getSpringDMVersion() };
+			"org.springframework.osgi.iandt, simple.service," + getSpringDMVersion(),
+			"org.springframework.osgi.iandt, cardinality0to1," + getSpringDMVersion() };
 	}
 
 	public void test0to1Cardinality() throws Exception {
 		Bundle simpleService2Bundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service2", getSpringDMVersion()).getURL().toExternalForm());
+			"org.springframework.osgi.iandt", "simple.service2", getSpringDMVersion()).getURL().toExternalForm());
 
 		assertNotNull("Cannot find the simple service 2 bundle", simpleService2Bundle);
 

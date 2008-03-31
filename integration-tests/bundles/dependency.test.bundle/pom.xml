@@ -4,12 +4,12 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>spring-osgi-integration-test-bundles</artifactId>
-        <groupId>org.springframework.osgi</groupId>
+        <groupId>org.springframework.osgi.iandt</groupId>
         <version>1.1.0-m1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.springframework.osgi</groupId>
-    <artifactId>org.springframework.osgi.iandt.dependencies</artifactId>
+    <groupId>org.springframework.osgi.iandt</groupId>
+    <artifactId>dependencies</artifactId>
     <packaging>jar</packaging>
     <name>Spring OSGi Test Bundle: Spring context dependencies test bundle</name>
     <description>An OSGi bundle that tests the service dependency mechanism</description>
@@ -18,14 +18,14 @@
     <dependencies>
   
         <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.simple.service</artifactId>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>simple.service</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.simple.service2</artifactId>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>simple.service2</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>

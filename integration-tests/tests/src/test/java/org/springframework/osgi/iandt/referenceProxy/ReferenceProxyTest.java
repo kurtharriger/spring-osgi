@@ -15,8 +15,8 @@ public class ReferenceProxyTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] {
-			"org.springframework.osgi, org.springframework.osgi.iandt.simple.service," + getSpringDMVersion(),
-			"org.springframework.osgi, org.springframework.osgi.iandt.reference.proxy," + getSpringDMVersion() };
+			"org.springframework.osgi.iandt, simple.service," + getSpringDMVersion(),
+			"org.springframework.osgi.iandt, reference.proxy," + getSpringDMVersion() };
 	}
 
 	public void testReferenceProxyLifecycle() throws Exception {

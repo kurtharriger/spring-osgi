@@ -21,10 +21,10 @@ import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
- * Integration test that checks that a new classloader is created when the bundle is refreshed.
- * The test updates a bundle that internally creates JDK and CGLIB proxies which, will fail in case
- * the old CL is preserved.
- *
+ * Integration test that checks that a new classloader is created when the
+ * bundle is refreshed. The test updates a bundle that internally creates JDK
+ * and CGLIB proxies which, will fail in case the old CL is preserved.
+ * 
  * @author Costin Leau
  * 
  */
@@ -34,8 +34,7 @@ public class ProxyCreatorTest extends BaseIntegrationTest {
 
 
 	protected String[] getTestBundlesNames() {
-		return new String[] {
-			"org.springframework.osgi,org.springframework.osgi.iandt.proxy.creator," + getSpringDMVersion(),
+		return new String[] { "org.springframework.osgi.iandt,proxy.creator," + getSpringDMVersion(),
 			"org.springframework.osgi,cglib-nodep.osgi,2.1.3-SNAPSHOT" };
 	}
 

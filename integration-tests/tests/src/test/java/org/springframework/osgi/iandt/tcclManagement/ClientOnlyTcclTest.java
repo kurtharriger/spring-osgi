@@ -47,7 +47,7 @@ public class ClientOnlyTcclTest extends BaseIntegrationTest {
 	}
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { "org.springframework.osgi,org.springframework.osgi.iandt.tccl," + getSpringDMVersion() };
+		return new String[] { "org.springframework.osgi.iandt,tccl," + getSpringDMVersion() };
 	}
 
 	public void testTCCLUnmanaged() throws Exception {

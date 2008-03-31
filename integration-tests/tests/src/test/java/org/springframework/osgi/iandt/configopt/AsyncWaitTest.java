@@ -41,7 +41,7 @@ public class AsyncWaitTest extends BehaviorBaseTest {
 
 	public void testBehaviour() throws Exception {
 
-		String bundleId = "org.springframework.osgi, org.springframework.osgi.iandt.async-wait-bundle,"
+		String bundleId = "org.springframework.osgi.iandt, async-wait-bundle,"
 				+ getSpringDMVersion();
 
 		// start it

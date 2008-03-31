@@ -36,7 +36,7 @@ public class ExtenderVersionTest extends BaseIntegrationTest {
 	// certain version
 	public void testBundleIgnoredBasedOnSpringExtenderVersion() throws Exception {
 
-		String bundleId = "org.springframework.osgi, org.springframework.osgi.iandt.extender-version-bundle,"
+		String bundleId = "org.springframework.osgi.iandt, extender-version-bundle,"
 				+ getSpringDMVersion();
 		Resource location = locateBundle(bundleId);
 

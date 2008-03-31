@@ -4,12 +4,12 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>spring-osgi-integration-test-bundles</artifactId>
-        <groupId>org.springframework.osgi</groupId>
+        <groupId>org.springframework.osgi.iandt</groupId>
         <version>1.1.0-m1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.springframework.osgi</groupId>
-    <artifactId>org.springframework.osgi.iandt.dependendencies.factory</artifactId>
+    <groupId>org.springframework.osgi.iandt</groupId>
+    <artifactId>dependendencies.factory</artifactId>
     <packaging>jar</packaging>
     <name>Spring OSGi Test Bundle: Simple service created by a factory which has a non trivial delay in createObject()</name>
     <description>Simple service created by a factory which has a non trivial delay in createObject()</description>

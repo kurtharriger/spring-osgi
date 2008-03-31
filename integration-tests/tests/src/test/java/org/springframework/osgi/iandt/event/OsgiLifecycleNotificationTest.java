@@ -75,8 +75,8 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 		assertTrue("should start with an empty list", eventList.isEmpty());
 		// install a simple osgi bundle and check the list of events
 
-		Resource bundle = getLocator().locateArtifact("org.springframework.osgi",
-			"org.springframework.osgi.iandt.simple.service", getSpringDMVersion());
+		Resource bundle = getLocator().locateArtifact("org.springframework.osgi.iandt", "simple.service",
+			getSpringDMVersion());
 
 		Bundle bnd = bundleContext.installBundle(bundle.getURL().toExternalForm());
 		try {
@@ -97,8 +97,7 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 		assertTrue("should start with an empty list", eventList.isEmpty());
 		// install a simple osgi bundle and check the list of events
 
-		Resource bundle = getLocator().locateArtifact("org.springframework.osgi",
-			"org.springframework.osgi.iandt.error", getSpringDMVersion());
+		Resource bundle = getLocator().locateArtifact("org.springframework.osgi.iandt", "error", getSpringDMVersion());
 
 		Bundle bnd = bundleContext.installBundle(bundle.getURL().toExternalForm());
 

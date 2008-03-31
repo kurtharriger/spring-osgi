@@ -29,7 +29,7 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 public class NoPublishTest extends BehaviorBaseTest {
 
 	public void testBehaviour() throws Exception {
-		String bundleId = "org.springframework.osgi, org.springframework.osgi.iandt.nopublish-bundle,"
+		String bundleId = "org.springframework.osgi.iandt, nopublish-bundle,"
 				+ getSpringDMVersion();
 
 		// start it

@@ -1,3 +1,4 @@
+
 package org.springframework.osgi.iandt.dependencyWithDelay;
 
 import org.osgi.framework.Bundle;
@@ -11,9 +12,11 @@ import org.springframework.osgi.util.OsgiStringUtils;
  */
 
 public class FactoryDependencyTest extends BaseIntegrationTest {
+
 	private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.dependencies.Dependent";
 
 	private static final String DELAY_PROP = "org.springframework.osgi.iandt.dependencies.factory.delay";
+
 
 	protected String getManifestLocation() {
 		return null;
@@ -28,15 +31,14 @@ public class FactoryDependencyTest extends BaseIntegrationTest {
 		System.setProperty(DELAY_PROP, "10000");
 
 		Bundle dependencyTestBundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.dependencies", getSpringDMVersion()).getURL().toExternalForm());
+			"org.springframework.osgi.iandt", "dependencies", getSpringDMVersion()).getURL().toExternalForm());
 
 		Bundle simpleService2Bundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service2", getSpringDMVersion()).getURL().toExternalForm());
+			"org.springframework.osgi.iandt", "simple.service2", getSpringDMVersion()).getURL().toExternalForm());
 		Bundle simpleService3Bundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.simple.service3", getSpringDMVersion()).getURL().toExternalForm());
+			"org.springframework.osgi.iandt", "simple.service3", getSpringDMVersion()).getURL().toExternalForm());
 		Bundle factoryServiceBundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi", "org.springframework.osgi.iandt.dependendencies.factory",
-			getSpringDMVersion()).getURL().toExternalForm());
+			"org.springframework.osgi.iandt", "dependendencies.factory", getSpringDMVersion()).getURL().toExternalForm());
 
 		assertNotNull("Cannot find the factory service bundle", factoryServiceBundle);
 		assertNotNull("Cannot find the simple service 2 bundle", simpleService2Bundle);
@@ -44,13 +46,13 @@ public class FactoryDependencyTest extends BaseIntegrationTest {
 		assertNotNull("dependencyTest can't be resolved", dependencyTestBundle);
 
 		assertNotSame("factory service bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
-				factoryServiceBundle.getState()));
+			factoryServiceBundle.getState()));
 
 		assertNotSame("simple service 2 bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
-				simpleService2Bundle.getState()));
+			simpleService2Bundle.getState()));
 
 		assertNotSame("simple service 3 bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
-				simpleService3Bundle.getState()));
+			simpleService3Bundle.getState()));
 
 		startDependencyAsynch(dependencyTestBundle);
 		Thread.sleep(2000); // Yield to give bundle time to get into waiting
@@ -96,6 +98,7 @@ public class FactoryDependencyTest extends BaseIntegrationTest {
 	private void startDependencyAsynch(final Bundle bundle) {
 		System.out.println("starting dependency test bundle");
 		Runnable runnable = new Runnable() {
+
 			public void run() {
 				try {
 					bundle.start();
@@ -112,20 +115,11 @@ public class FactoryDependencyTest extends BaseIntegrationTest {
 		thread.start();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#shouldWaitForSpringBundlesContextCreation()
-	 */
 	protected boolean shouldWaitForSpringBundlesContextCreation() {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#getDefaultWaitTime()
-	 */
 	protected long getDefaultWaitTime() {
 		return 60L;
 	}
-
 }

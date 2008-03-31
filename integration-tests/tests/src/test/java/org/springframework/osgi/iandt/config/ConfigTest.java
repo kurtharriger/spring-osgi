@@ -29,7 +29,7 @@ public abstract class ConfigTest extends BaseIntegrationTest {
 		System.setProperty("com.gatespace.bundle.cm.store", CONFIG_DIR);
 		initializeDirectory(CONFIG_DIR);
 		return new String[] { "org.knopflerfish.bundles, log_all, 2.0.0", "org.knopflerfish.bundles, cm_all, 2.0.0",
-				"org.springframework.osgi, org.springframework.osgi.iandt.configuration," + getSpringDMVersion() };
+				"org.springframework.osgi.iandt, configuration," + getSpringDMVersion() };
 	}
 
 	protected String getManifestLocation() {

@@ -67,76 +67,76 @@
     	</dependency>
 
         <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.service.listener</artifactId>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>service.listener</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.lifecycle</artifactId>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>lifecycle</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.reference.proxy</artifactId>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>reference.proxy</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.simple.service</artifactId>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>simple.service</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.simple.service2</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.cardinality0to1</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.scoped.bundle.a</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.scoped.bundle.b</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.scoped.bundle.common</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.configuration</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.dependencies</artifactId>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>simple.service2</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         
         <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.iandt.tccl</artifactId>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>cardinality0to1</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>scoped.bundle.a</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>scoped.bundle.b</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>scoped.bundle.common</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>configuration</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>dependencies</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>tccl</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -181,8 +181,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>org.springframework.osgi</groupId>
-                    <artifactId>org.springframework.osgi.iandt.annotation.proxy</artifactId>
+                    <groupId>org.springframework.osgi.iandt</groupId>
+                    <artifactId>annotation.proxy</artifactId>
                     <version>${project.parent.version}</version>
                     <scope>provided</scope>
                 </dependency>

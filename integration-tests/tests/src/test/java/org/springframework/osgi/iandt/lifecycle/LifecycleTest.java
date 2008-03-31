@@ -33,7 +33,7 @@ public class LifecycleTest extends BaseIntegrationTest {
 	}
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { "org.springframework.osgi,org.springframework.osgi.iandt.lifecycle,"
+		return new String[] { "org.springframework.osgi.iandt,lifecycle,"
 				+ getSpringDMVersion() };
 	}
 

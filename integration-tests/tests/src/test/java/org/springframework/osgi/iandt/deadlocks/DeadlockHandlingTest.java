@@ -1,3 +1,4 @@
+
 package org.springframework.osgi.iandt.deadlocks;
 
 import org.osgi.framework.Bundle;
@@ -25,8 +26,8 @@ public class DeadlockHandlingTest extends BaseIntegrationTest {
 	 * gracefully end. If not, it will hang for quite a while.
 	 */
 	public void testErrorHandling() throws Exception {
-		Resource errorResource = getLocator().locateArtifact("org.springframework.osgi",
-			"org.springframework.osgi.iandt.deadlock", getSpringDMVersion());
+		Resource errorResource = getLocator().locateArtifact("org.springframework.osgi.iandt", "deadlock",
+			getSpringDMVersion());
 		assertNotNull("bundle resource exists", errorResource);
 		Bundle errorBundle = bundleContext.installBundle(errorResource.getURL().toExternalForm());
 		assertNotNull("bundle exists", errorBundle);
