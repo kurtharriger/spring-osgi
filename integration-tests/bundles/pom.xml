@@ -60,19 +60,17 @@
     <module>web.bundles</module>
   </modules>
 
-<profiles>
+  <profiles>
     <profile>
       <id>jdk-1.5+</id>
       <activation>
         <jdk>!1.4</jdk>
       </activation>
       <modules>
-       <module>annotation.test.bundle</module>
-       <module>annotation.dependency.test.bundle</module>
-       <module>jdk5/component.scan.bundle</module>
+       <module>jdk5</module>
 	  </modules>
    </profile>
-</profiles>
+  </profiles>
 
  <build>
     <plugins>

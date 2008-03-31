@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>spring-osgi-integration-test-bundles</artifactId>
+        <artifactId>spring-osgi-jdk5-integration-test-bundles</artifactId>
         <groupId>org.springframework.osgi.iandt</groupId>
         <version>1.1.0-m1-SNAPSHOT</version>
     </parent>
@@ -22,27 +22,8 @@
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>spring-osgi-annotation</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
-<build>
-  <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-	      <groupId>org.apache.maven.plugins</groupId>
-          <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
-            <debug>true</debug>
-          </configuration>
-      </plugin>
-  </plugins>
-</build>
 
 </project>
 
