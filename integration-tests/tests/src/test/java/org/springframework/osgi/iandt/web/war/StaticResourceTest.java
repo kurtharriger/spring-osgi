@@ -19,8 +19,8 @@ package org.springframework.osgi.iandt.web.war;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.osgi.iandt.web.BaseWebIntegrationTest;
-import org.springframework.osgi.iandt.web.HttpClient;
 import org.springframework.osgi.iandt.web.HttpResponse;
+import org.springframework.osgi.iandt.web.HttpClient;
 
 /**
  * Integration test for the simple servlet bundle.
@@ -28,18 +28,20 @@ import org.springframework.osgi.iandt.web.HttpResponse;
  * @author Costin Leau
  * 
  */
-public abstract class StaticResourceTest extends BaseWebIntegrationTest {
+public class StaticResourceTest extends BaseWebIntegrationTest {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(StaticResourceTest.class);
-
-	private String BASE;
 
 	private final String GROUP_ID = "resources.only";
 
 
 	protected void onSetUp() throws Exception {
-		BASE = GROUP_ID + "-" + getSpringDMVersion();
+
+	}
+
+	protected String base() {
+		return GROUP_ID + "-" + getSpringDMVersion();
 	}
 
 	protected String[] getTestBundlesNames() {
@@ -47,28 +49,32 @@ public abstract class StaticResourceTest extends BaseWebIntegrationTest {
 	}
 
 	public void testWarIndexPage() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "index.html");
+		HttpResponse response = HttpClient.getLocalResponse(base(), "index.html");
 		assertTrue(response.toString(), response.isOk());
 	}
 
 	public void testIndexRedirect() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "");
+		HttpResponse response = HttpClient.getLocalResponse(base(), "");
 		assertTrue(response.toString(), response.isOk());
 	}
 
 	public void testOtherPage() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "other.html");
+		HttpResponse response = HttpClient.getLocalResponse(base(), "other.html");
 		assertTrue(response.toString(), response.isOk());
 	}
 
 	public void testNestedPage() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "nested/page.html");
+		HttpResponse response = HttpClient.getLocalResponse(base(), "nested/page.html");
 		assertTrue(response.toString(), response.isOk());
 	}
 
 	public void testUnexistingNestedPage() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "nested/no-such-page.html");
+		HttpResponse response = HttpClient.getLocalResponse(base(), "nested/no-such-page.html");
 		assertTrue(response.toString(), response.isNotFound());
 	}
-
+	//
+	//	public void testInput() throws Exception {
+	//		System.in.read();
+	//
+	//	}
 }

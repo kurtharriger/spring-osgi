@@ -164,6 +164,12 @@
 			<version>2.5-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+		  <groupId>org.springframework.osgi</groupId>
+		  <artifactId>mx4j.osgi</artifactId>
+		  <version>3.0.2-SNAPSHOT</version>
+		  <scope>test</scope>
+		</dependency>		
 		
     </dependencies>
 
@@ -190,7 +196,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <forkMode>perTest</forkMode>
+                    <forkMode>pertest</forkMode>
                     <systemProperties>
                         <property>
                             <name>com.gatespace.bundle.cm.store</name>

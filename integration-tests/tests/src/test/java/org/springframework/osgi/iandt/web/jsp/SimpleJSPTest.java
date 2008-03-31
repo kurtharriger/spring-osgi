@@ -17,8 +17,8 @@
 package org.springframework.osgi.iandt.web.jsp;
 
 import org.springframework.osgi.iandt.web.BaseWebIntegrationTest;
-import org.springframework.osgi.iandt.web.HttpClient;
 import org.springframework.osgi.iandt.web.HttpResponse;
+import org.springframework.osgi.iandt.web.HttpClient;
 
 /**
  * Test JSP support. For this to work, Tomcat Jasper is required.
@@ -26,15 +26,13 @@ import org.springframework.osgi.iandt.web.HttpResponse;
  * @author Costin Leau
  * 
  */
-public abstract class SimpleJSPTest extends BaseWebIntegrationTest {
-
-	private String BASE;
+public class SimpleJSPTest extends BaseWebIntegrationTest {
 
 	private final String GROUP_ID = "simple.jsp";
 
 
-	protected void onSetUp() throws Exception {
-		BASE = GROUP_ID + "-" + getSpringDMVersion();
+	protected String base() {
+		return GROUP_ID + "-" + getSpringDMVersion();
 	}
 
 	protected String[] getTestBundlesNames() {
@@ -42,22 +40,22 @@ public abstract class SimpleJSPTest extends BaseWebIntegrationTest {
 	}
 
 	public void testWarIndexPage() throws Exception {
-		HttpResponse resp = HttpClient.getLocalResponse(BASE, "index.html");
+		HttpResponse resp = HttpClient.getLocalResponse(base(), "index.html");
 		assertTrue(resp.toString(), resp.isOk());
 	}
 
 	public void testSimpleJSP() throws Exception {
-		HttpResponse resp = HttpClient.getLocalResponse(BASE, "jsp/simple.jsp");
+		HttpResponse resp = HttpClient.getLocalResponse(base(), "jsp/simple.jsp");
 		assertTrue(resp.toString(), resp.isOk());
 	}
 
 	public void testComplexJSP() throws Exception {
-		HttpResponse resp = HttpClient.getLocalResponse(BASE, "jsp/complex.jsp");
+		HttpResponse resp = HttpClient.getLocalResponse(base(), "jsp/complex.jsp");
 		assertTrue(resp.toString(), resp.isOk());
 	}
 
-	public void testWait() throws Exception {
-		System.in.read();
-	}
+	//	public void testWait() throws Exception {
+	//		System.in.read();
+	//	}
 
 }

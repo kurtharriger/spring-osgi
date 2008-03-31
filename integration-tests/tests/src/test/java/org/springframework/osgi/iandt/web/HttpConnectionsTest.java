@@ -18,17 +18,9 @@ package org.springframework.osgi.iandt.web;
 
 import junit.framework.TestCase;
 
-public abstract class HttpConnectionsTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+public class HttpConnectionsTest extends TestCase {
 
 	public void testHttpConnection() throws Exception {
-		assertTrue(HttpClient.getResponse("google.com").isOk());
+		assertTrue(HttpClient.getResponse("http://www.springframework.org").isOk());
 	}
 }
