@@ -33,9 +33,14 @@ public class HttpResponse {
 
 
 	public HttpResponse(HttpURLConnection connection) throws Exception {
-		this.code = connection.getResponseCode();
-		this.message = connection.getResponseMessage();
-		this.toString = connection.getURL().toExternalForm() + " returned " + "[" + message + "|" + code + "]";
+		this(connection.getURL().toExternalForm(), connection.getResponseCode(), connection.getResponseMessage());
+
+	}
+
+	public HttpResponse(String address, int code, String message) {
+		this.code = code;
+		this.message = message;
+		this.toString = address + " returned " + "[" + message + "|" + code + "]";
 	}
 
 	// simple testing methods

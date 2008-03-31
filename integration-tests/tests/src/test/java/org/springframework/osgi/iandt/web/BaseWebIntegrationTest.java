@@ -16,15 +16,21 @@
 
 package org.springframework.osgi.iandt.web;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+import org.springframework.core.JdkVersion;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.util.CollectionUtils;
 
 public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
+
+	private static final long WEB_APP_START_TIMEOUT = 10 * 1000;
 
 	protected static final String WEB_TESTS_GROUP = "org.springframework.osgi.iandt.web";
 
@@ -33,37 +39,11 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		String[] def = super.getTestFrameworkBundlesNames();
 		List col = new ArrayList();
 		CollectionUtils.mergeArrayIntoCollection(def, col);
-		// add compendium API (from equinox since the OSGi one is not a bundle ...)
-		// col.add("org.eclipse.bundles, org.eclipse.osgi.services, 20070605");
 
-		// add Config Admin (from Felix)
-		// col.add("org.apache.felix, org.apache.felix.configadmin, 1.0.0");
+		System.setProperty("DEBUG", "false");
+		// set this property (to whatever value) to get logging in Jetty
+		//System.setProperty("VERBOSE", "false");
 
-		// cm support
-		// col.add("org.knopflerfish.bundles, cm_all, 2.0.0");
-		// add http service (from equinox)
-		//		col.add("org.eclipse.bundles, org.eclipse.equinox.supplement, 20070507");
-		//		col.add("org.eclipse.bundles, org.mortbay.jetty, 20070611");
-		//		col.add("org.eclipse.bundles, org.eclipse.equinox.http.jetty, 20070816");
-		//		col.add("org.eclipse.bundles, org.eclipse.equinox.http.servlet, 20070816");
-		//col.add("org.eclipse.bundles, org.eclipse.equinox.http, 20070423");
-		//
-
-		System.setProperty("DEBUG", "true");
-		//System.setProperty("VERBOSE", "true");
-
-		// FIXME: can the creation of the logging folder be optional ?
-		try {
-			File logs = new File(".", "logs");
-			if (!logs.exists())
-				logs.mkdir();
-			String path = logs.getCanonicalPath();
-			System.setProperty("jetty.logs", path);
-			logger.info("Jetty logging folder " + path);
-		}
-		catch (IOException ex) {
-			logger.error("Ccannot create logging folder", ex);
-		}
 		// Servlet/JSP artifacts
 		col.add("org.springframework.osgi, servlet-api.osgi, 2.5-SNAPSHOT");
 		col.add("org.springframework.osgi, jsp-api.osgi, 2.0-SNAPSHOT");
@@ -73,21 +53,33 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		col.add("org.springframework.osgi, jsp-api.osgi, 2.0-SNAPSHOT");
 		col.add("org.springframework.osgi, jasper.osgi, 5.5.23-SNAPSHOT");
 		col.add("org.springframework.osgi, commons-el.osgi, 1.0-SNAPSHOT");
-		
+
 		// standard tag library
 		col.add("org.springframework.osgi, jstl.osgi, 1.1.2-SNAPSHOT");
 
 		// Jetty server
-		col.add("org.mortbay.jetty, jetty-util, 6.2-SNAPSHOT");
-		col.add("org.mortbay.jetty, jetty, 6.2-SNAPSHOT");
+		//		col.add("org.mortbay.jetty, jetty-util, 6.2-SNAPSHOT");
+		//		col.add("org.mortbay.jetty, jetty, 6.2-SNAPSHOT");
+
+		// add MX4J for 1.4
+		// if < jdk 1.5, add an JMX implementation
+		if (!JdkVersion.isAtLeastJava15())
+			col.add("org.springframework.osgi, mx4j.osgi, 3.0.2-SNAPSHOT");
+
+		col.add("org.springframework.osgi, catalina.osgi, 5.5.23-SNAPSHOT");
+		col.add("org.springframework.osgi, catalina.start.osgi, 1.0-SNAPSHOT");
 
 		// jetty starter
-		col.add("org.springframework.osgi, jetty.start.osgi, 6.1.7-SNAPSHOT");
-		col.add("org.springframework.osgi, jetty.etc.osgi, 6.1.7-SNAPSHOT");
+		//		col.add("org.springframework.osgi, jetty.start.osgi, 6.1.7-SNAPSHOT");
+		//		col.add("org.springframework.osgi, jetty.etc.osgi, 6.1.7-SNAPSHOT");
 
 		// Spring DM web extender
 		col.add("org.springframework.osgi, spring-osgi-web," + getSpringDMVersion());
 		col.add("org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT");
+
+		// Commons HTTP Client
+		//		col.add("org.springframework.osgi, commons-codec.osgi, 1.3-SNAPSHOT");
+		//		col.add("org.springframework.osgi, http-client.osgi, 3.1-SNAPSHOT");
 
 		return (String[]) col.toArray(new String[col.size()]);
 	}
@@ -98,5 +90,56 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		String[] patterns = new String[] { BaseIntegrationTest.class.getName().replace('.', '/').concat(".class"),
 			basePackage + "/*", pkg + "/**/*" };
 		return patterns;
+	}
+
+	// wait for the Jetty or Tomcat to start fully
+	protected void postProcessBundleContext(BundleContext context) throws Exception {
+		super.postProcessBundleContext(context);
+
+		// create a filter for our server implementations
+		Filter filter = FrameworkUtil.createFilter("(&(org.springframework.osgi.bean.name=*-server)("
+				+ Constants.SERVICE_VENDOR + "=Spring Dynamic Modules))");
+
+		ServiceTracker tracker = new ServiceTracker(context, filter, null);
+		tracker.open();
+		try {
+
+			// wait for 7 seconds max
+			Object server = tracker.waitForService(7 * 1000);
+			if (server == null)
+				throw new IllegalStateException("no web container server found");
+		}
+		finally {
+			tracker.close();
+		}
+
+		// the server has been started, check if the app has been properly deployed
+		// before that however, wait 2 secs to war to be unpacked and installed
+		Thread.sleep(2 * 1000);
+		logger.debug("Checking webapp deployed at " + base());
+		long start = System.currentTimeMillis();
+		long waited;
+
+		HttpResponse resp;
+		// wait until the page is up
+		do {
+			resp = HttpClient.getLocalResponse(base());
+			waited = System.currentTimeMillis() - start;
+			// wait 1 second
+			if (!resp.isOk())
+				Thread.sleep(2 * 1000);
+		} while (waited < WEB_APP_START_TIMEOUT && !resp.isOk());
+	}
+
+	/**
+	 * Returns the web context base. Used for checking if the application has
+	 * been properly deployed in a given amount of time.
+	 * 
+	 * @return
+	 */
+	protected abstract String base();
+
+	protected boolean createManifestOnlyFromTestClass() {
+		return false;
 	}
 }

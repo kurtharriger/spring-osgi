@@ -62,6 +62,8 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private boolean isTaskExecutorManagedInternally = false;
 
+	private boolean isMulticasterManagedInternally = false;
+
 	private long shutdownWaitTime;
 
 	private ApplicationEventMulticaster eventMulticaster;
@@ -86,6 +88,7 @@ public class ExtenderConfiguration implements DisposableBean {
 
 			taskExecutor = createDefaultTaskExecutor();
 			eventMulticaster = new SimpleApplicationEventMulticaster();
+			isMulticasterManagedInternally = true;
 		}
 		else {
 			String[] configs = copyEnumerationToList(enm);
@@ -121,13 +124,15 @@ public class ExtenderConfiguration implements DisposableBean {
 	 */
 	public void destroy() {
 
+		if (isMulticasterManagedInternally) {
+			eventMulticaster.removeAllListeners();
+			eventMulticaster = null;
+		}
+
 		if (extenderConfiguration != null) {
 			extenderConfiguration.close();
 			extenderConfiguration = null;
 		}
-
-		eventMulticaster.removeAllListeners();
-		eventMulticaster = null;
 
 		// postpone the task executor shutdown
 		if (forceThreadShutdown && isTaskExecutorManagedInternally) {

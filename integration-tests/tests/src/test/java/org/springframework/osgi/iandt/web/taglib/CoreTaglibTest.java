@@ -24,15 +24,13 @@ import org.springframework.osgi.iandt.web.HttpResponse;
  * @author Costin Leau
  * 
  */
-public abstract class CoreTaglibTest extends BaseWebIntegrationTest {
-
-	private String BASE;
+public class CoreTaglibTest extends BaseWebIntegrationTest {
 
 	private final String GROUP_ID = "taglib.jsp";
 
 
-	protected void onSetUp() throws Exception {
-		BASE = GROUP_ID + "-" + getSpringDMVersion();
+	protected String base() {
+		return GROUP_ID + "-" + getSpringDMVersion();
 	}
 
 	protected String[] getTestBundlesNames() {
@@ -40,21 +38,17 @@ public abstract class CoreTaglibTest extends BaseWebIntegrationTest {
 	}
 
 	public void testIndexPage() throws Exception {
-		HttpResponse resp = HttpClient.getLocalResponse(BASE, "index.html");
+		HttpResponse resp = HttpClient.getLocalResponse(base(), "index.html");
 		assertTrue(resp.toString(), resp.isOk());
 	}
 
 	public void testCoreTaglibJSP() throws Exception {
-		HttpResponse resp = HttpClient.getLocalResponse(BASE, "jsp/standard-core-taglib.jsp");
+		HttpResponse resp = HttpClient.getLocalResponse(base(), "jsp/standard-core-taglib.jsp");
 		assertTrue(resp.toString(), resp.isOk());
 	}
 
 	public void testXmlTaglibJSP() throws Exception {
-		HttpResponse resp = HttpClient.getLocalResponse(BASE, "jsp/standard-xml-taglib.jsp");
+		HttpResponse resp = HttpClient.getLocalResponse(base(), "jsp/standard-xml-taglib.jsp");
 		assertTrue(resp.toString(), resp.isOk());
-	}
-
-	public void testWait() throws Exception {
-		System.in.read();
 	}
 }

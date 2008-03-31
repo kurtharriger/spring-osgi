@@ -24,15 +24,13 @@ import org.springframework.osgi.iandt.web.HttpResponse;
  * @author Costin Leau
  * 
  */
-public abstract class SimpleServletTest extends BaseWebIntegrationTest {
-
-	private String BASE;
+public class SimpleServletTest extends BaseWebIntegrationTest {
 
 	private final String GROUP_ID = "simple.servlet";
 
 
-	protected void onSetUp() throws Exception {
-		BASE = GROUP_ID + "-" + getSpringDMVersion();
+	protected String base() {
+		return GROUP_ID + "-" + getSpringDMVersion();
 	}
 
 	protected String[] getTestBundlesNames() {
@@ -40,17 +38,17 @@ public abstract class SimpleServletTest extends BaseWebIntegrationTest {
 	}
 
 	public void testWarIndexPage() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "index.html");
+		HttpResponse response = HttpClient.getLocalResponse(base(), "index.html");
 		assertTrue(response.toString(), response.isOk());
 	}
 
 	public void testWarServletMapping() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "servlet");
+		HttpResponse response = HttpClient.getLocalResponse(base(), "servlet");
 		assertTrue(response.toString(), response.isOk());
 	}
 
 	public void testWarUnexistingServletMapping() throws Exception {
-		HttpResponse response = HttpClient.getLocalResponse(BASE, "serv");
+		HttpResponse response = HttpClient.getLocalResponse(base(), "serv");
 		assertTrue(response.toString(), response.isNotFound());
 	}
 }

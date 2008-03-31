@@ -49,8 +49,8 @@ public abstract class HttpClient {
 
 	private static final String READ_TIMEOUT_SYS_PROP = "sun.net.client.defaultReadTimeout";
 
-	/** default 10 seconds */
-	private static final String DEFAULT_TIMEOUT = "" + (10 * 1000);
+	/** default 5 seconds */
+	private static final String DEFAULT_TIMEOUT = "" + (5 * 1000);
 
 	private static final String READ_TIMEOUT = "" + 5 * 1000;
 
@@ -92,6 +92,7 @@ public abstract class HttpClient {
 		log.info("creating connection to [" + address + "] ...");
 		// create the URL
 		URL url = new URL(address);
+
 		URLConnection urlCon = url.openConnection();
 		Assert.isInstanceOf(HttpURLConnection.class, urlCon, "only http(s) connections supported");
 
