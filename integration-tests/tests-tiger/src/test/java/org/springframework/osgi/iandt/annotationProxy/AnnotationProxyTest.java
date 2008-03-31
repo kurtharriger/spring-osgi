@@ -21,9 +21,9 @@ public class AnnotationProxyTest extends AbstractConfigurableBundleCreatorTests 
 
     protected String[] getTestBundlesNames() {
 	return new String[] {
-                    "org.springframework.osgi, org.springframework.osgi.iandt.simple.service, "+
+                    "org.springframework.osgi.iandt, simple.service, "+
                             getSpringDMVersion(),
-                    "org.springframework.osgi, org.springframework.osgi.iandt.annotation.proxy,"+
+                    "org.springframework.osgi.iandt, annotation.proxy,"+
                             getSpringDMVersion()};
     }
 
@@ -65,9 +65,6 @@ public class AnnotationProxyTest extends AbstractConfigurableBundleCreatorTests 
         assertNotNull(reference.stringValue());
     }
 
-    /* (non-Javadoc)
-      * @see org.springframework.osgi.test.AbstractSynchronizedOsgiTests#getDefaultWaitTime()
-      */
     protected long getDefaultWaitTime() {
         return 15L;
     }
