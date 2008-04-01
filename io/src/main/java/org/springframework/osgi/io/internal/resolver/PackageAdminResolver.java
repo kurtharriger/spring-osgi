@@ -63,7 +63,7 @@ public class PackageAdminResolver implements DependencyResolver {
 		// 1. consider required bundles first
 
 		// see if there are required bundle(s) defined
-		String[] entries = OsgiResourceUtils.getRequiredBundle(bundle);
+		String[] entries = OsgiResourceUtils.getRequireBundle(bundle);
 
 		// 1. if so, locate the bundles
 		for (int i = 0; i < entries.length; i++) {
@@ -82,7 +82,7 @@ public class PackageAdminResolver implements DependencyResolver {
 
 			// find exported packages
 			ExportedPackage[] exportedPackages = pa.getExportedPackages(requiredBundle);
-			addExportedPackages(importedBundles, bundle, exportedPackages);
+			addExportedPackages(importedBundles, requiredBundle, exportedPackages);
 		}
 
 		// 2. determine imported bundles 
@@ -138,6 +138,15 @@ public class PackageAdminResolver implements DependencyResolver {
 		packages.add(packageName);
 	}
 
+	/**
+	 * Adds the bundle exporting the given packages which are then imported by
+	 * the owning bundle. This applies to special imports (such as
+	 * Require-Bundle).
+	 * 
+	 * @param map
+	 * @param bundle
+	 * @param pkgs
+	 */
 	private void addExportedPackages(Map map, Bundle bundle, ExportedPackage[] pkgs) {
 		List packages = (List) map.get(bundle);
 		if (packages == null) {

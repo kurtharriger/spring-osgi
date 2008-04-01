@@ -146,7 +146,7 @@ public abstract class OsgiResourceUtils {
 		return getHeaderAsTrimmedStringArray(bundle, Constants.BUNDLE_CLASSPATH);
 	}
 
-	public static String[] getRequiredBundle(Bundle bundle) {
+	public static String[] getRequireBundle(Bundle bundle) {
 		return getHeaderAsTrimmedStringArray(bundle, Constants.REQUIRE_BUNDLE);
 	}
 

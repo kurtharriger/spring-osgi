@@ -45,6 +45,7 @@ import org.springframework.osgi.io.internal.resolver.PackageAdminResolver;
 import org.springframework.osgi.test.internal.util.jar.JarUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -61,6 +62,10 @@ public abstract class JasperUtils {
 
 	private static final String META_INF = "META-INF";
 
+	/** Jasper class */
+	// org.apache.jasper.JspC
+	static final String JASPER_CLASS = "org.apache.jasper.servlet.JspServlet";
+
 	/** logger */
 	private static final Log log = LogFactory.getLog(JasperUtils.class);
 
@@ -75,7 +80,7 @@ public abstract class JasperUtils {
 	 */
 	private static Resource[] getBundleTagLibs(Bundle bundle) throws IOException {
 		ResourcePatternResolver resolver = new OsgiBundleResourcePatternResolver(bundle);
-		return resolver.getResources(META_INF + "/**/" + TLD_PATTERN);
+		return resolver.getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + META_INF + "/**/" + TLD_PATTERN);
 	}
 
 	/**
@@ -155,7 +160,7 @@ public abstract class JasperUtils {
 			}
 			if (trace)
 				log.trace("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle)
-						+ " has the following tlds in its classpath" + ObjectUtils.nullSafeToString(res));
+						+ " has the following tlds in its classpath " + ObjectUtils.nullSafeToString(res));
 
 			// create taglib jar for tlds from imported bundles
 			BundleContext ctx = OsgiBundleUtils.getBundleContext(bundle);
@@ -183,6 +188,9 @@ public abstract class JasperUtils {
 	 * that Tomcat Jasper detects the taglibs available inside the given bundle
 	 * and its imports.
 	 * 
+	 * <p/> To avoid unneeded lookups, the method will check for the presence of
+	 * Jasper compiler. If it's not found, then no taglibs will be searched.
+	 * 
 	 * @param bundle OSGi backing bundle
 	 * @param unpackLocation location where the bundle is unpacked
 	 * @param parent parent class loader
@@ -191,20 +199,35 @@ public abstract class JasperUtils {
 	 * class loader.
 	 */
 	public static URLClassLoader createJasperClassLoader(Bundle bundle, ClassLoader parent) {
-		URL[] tldJars = createTaglibClasspathJars(bundle);
-		return URLClassLoader.newInstance(tldJars, parent);
+		// search for Jasper
 
-	}
-
-	private static void closeStream(OutputStream os) {
-		if (os != null) {
-			try {
-				os.close();
-			}
-			catch (IOException ex) {
-				// ignore: handle exception
-			}
+		boolean jasperPresent = false;
+		try
+		// first search the bundle 
+		{
+			bundle.loadClass(JASPER_CLASS);
+			jasperPresent = true;
 		}
-	}
+		catch (ClassNotFoundException cnfe) {
+			//followed by the parent classloader
+			jasperPresent = ClassUtils.isPresent(JASPER_CLASS, parent);
+		}
 
+		URL[] tldJars = null;
+		if (jasperPresent) {
+			if (log.isDebugEnabled())
+				log.debug("Jasper present in bundle " + OsgiStringUtils.nullSafeSymbolicName(bundle)
+						+ "; looking for taglibs...");
+			tldJars = createTaglibClasspathJars(bundle);
+		}
+		else {
+			if (log.isDebugEnabled())
+				log.debug("Jasper not present in bundle " + OsgiStringUtils.nullSafeSymbolicName(bundle)
+						+ "; ignoring taglibs...");
+
+			tldJars = new URL[0];
+		}
+
+		return URLClassLoader.newInstance(tldJars, parent);
+	}
 }

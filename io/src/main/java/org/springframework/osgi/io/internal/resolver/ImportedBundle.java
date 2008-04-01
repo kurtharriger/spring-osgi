@@ -55,4 +55,9 @@ public class ImportedBundle {
 	public String[] getImportedPackages() {
 		return importedPackages;
 	}
+
+	public String toString() {
+		return importingBundle.toString();
+	}
+
 }
