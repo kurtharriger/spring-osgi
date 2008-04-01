@@ -19,8 +19,9 @@ package org.springframework.osgi.iandt.web.war;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.osgi.iandt.web.BaseWebIntegrationTest;
-import org.springframework.osgi.iandt.web.HttpResponse;
 import org.springframework.osgi.iandt.web.HttpClient;
+import org.springframework.osgi.iandt.web.HttpResponse;
+import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * Integration test for the simple servlet bundle.
@@ -72,6 +73,7 @@ public class StaticResourceTest extends BaseWebIntegrationTest {
 		HttpResponse response = HttpClient.getLocalResponse(base(), "nested/no-such-page.html");
 		assertTrue(response.toString(), response.isNotFound());
 	}
+
 	//
 	//	public void testInput() throws Exception {
 	//		System.in.read();

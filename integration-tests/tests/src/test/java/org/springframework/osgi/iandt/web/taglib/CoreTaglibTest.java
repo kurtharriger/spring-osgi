@@ -19,6 +19,7 @@ package org.springframework.osgi.iandt.web.taglib;
 import org.springframework.osgi.iandt.web.BaseWebIntegrationTest;
 import org.springframework.osgi.iandt.web.HttpClient;
 import org.springframework.osgi.iandt.web.HttpResponse;
+import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * @author Costin Leau
@@ -50,5 +51,9 @@ public class CoreTaglibTest extends BaseWebIntegrationTest {
 	public void testXmlTaglibJSP() throws Exception {
 		HttpResponse resp = HttpClient.getLocalResponse(base(), "jsp/standard-xml-taglib.jsp");
 		assertTrue(resp.toString(), resp.isOk());
+	}
+
+	public void tstSystemIn() throws Exception {
+		System.in.read();
 	}
 }

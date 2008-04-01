@@ -17,7 +17,6 @@
 package org.springframework.osgi.web.extender.internal.jetty;
 
 import java.io.File;
-import java.net.URLClassLoader;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
@@ -27,10 +26,8 @@ import org.mortbay.resource.Resource;
 import org.mortbay.util.IO;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.internal.support.AbstractWarDeployer;
-import org.springframework.osgi.web.extender.internal.util.JasperUtils;
 import org.springframework.osgi.web.extender.internal.util.Utils;
 
 /**
@@ -128,13 +125,8 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 
 		// no java 2 loading compliance
 		wac.setParentLoaderPriority(false);
-
-		ClassLoader serverLoader = Utils.chainedWebClassLoaders(Server.class);
-
-		// use the bundle classloader as a parent
-		ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, serverLoader);
-		URLClassLoader urlClassLoader = JasperUtils.createJasperClassLoader(bundle, bundleClassLoader);
-		wac.setClassLoader(urlClassLoader);
+		// create special classloader
+		wac.setClassLoader(Utils.createWebAppClassLoader(bundle, Server.class));
 		return wac;
 	}
 
