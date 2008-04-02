@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+
+  <chapter id="web">
+    <title>Web Support</title>
+    <para>A major feature of the 1.1.0-m1 release is the web support which implies running web applications as seamlessly as possible inside OSGi. 
+    The major problem in running web applications in OSGi is resource and class loading; there is no notion of <emphasis>bundle space</emphasis> or 
+    <emphasis>imported packages</emphasis> in a web application. Each web container has its own class loading hierarchy and classpath assumption 
+    which can conflict with the OSGi space. 
+    Spring-DM addresses this problem by bridging the web container and the OSGi space so loading is no longer a concern. Unique in its functionality, 
+    the web support in Spring-DM integrates directly with the web container so the WAR processing is literally handled by the server, giving full 
+    access to its configuration (non-blocking vs blocking IO, thread pool and the like) and capabilities (Servlet 2.3, 2.4, 2.5).
+    The entire <literal>web.xml</literal> syntax is supported without any filtering as well as any custom files particular to the target container.  
+    In short, everything that the target container supports is available to the OSGi WAR through Spring-DM.
+    </para>
+    
+    <note>For more information on web applications on Java platform, please see the appendix (link)</note>
+    
+    <sidebar>
+      <title>OSGi bundles and WARs</title>
+      <para>
+      <ulink url="http://en.wikipedia.org/wiki/WAR_%28file_format%29">Web ARchives</ulink>, or in short WARs, are JAR archives dedicated to web applications.
+      Since the same archive format is used (Java ARchive), each war can be considered an OSGi bundle if the proper OSGI manifest entries are present.
+      Note that it is not required for a bundle to have a <literal>.jar</literal> file extension - which means <literal>.war</literal> files can be installed
+      just as well.
+      </para>
+    </sidebar>
+    
+    <section id="web:containers">
+    	<title>Supported Web Containers</title>
+    	<para>Currently, Spring-DM supports <ulink url="http://tomcat.apache.org">Apache Tomcat</ulink> 5.5.x/6.0.x and 
+    	<ulink url="http://www.mortbay.org/">Jetty</ulink> 6.1.8+/6.2.x out of the box (other containers can be easily plugged in). The web support is JDK 1.4 
+    	compatible. Please check the chosen container requirements for more information on the required JVM. In general, Servlet 2.4/JSP 2.0 require JDK 1.4 
+    	while Servlet 2.5/JSP 2.1 require JDK 1.5.
+    	</para>
+    </section>
+    
+    <section id="web:usage">
+    	<title>Web support usage</title>
+    	<para>To use Spring-DM with wars, install the <literal>spring-osgi-web.jar</literal> bundle which uses the <ulink url="http://www.osgi.org/blog/2007/02/osgi-extender-model.html">extender</ulink> 
+    	pattern to detect started OSGi war bundles and deploy them to one of the supported web containers. By default, Tomcat will be used but this can be changed to Jetty or to another custom 
+    	server. When the war bundle is stopped, Spring-DM will also stop and uninstall the web application associated with it. Just like with 
+    	<emphasis>traditional</emphasis> web development, WAR bundles will automatically see the Servlet and JSP classes available in the web container without 
+    	importing them explicitly.</para>
+    </section>
+    
+    <section id="web:classpath">
+    	<title>WAR classpath in OSGi</title>
+    	
+    	<para>The servlet specification defines a number of rules and locations which special meaning inside a WAR. This section will explain how these are
+    	handled in an OSGi environment.</para>
+    	
+    	<section id="web:classpath:static-resources">
+    		<title>Static Resources</title>
+    		<para>When installing a WAR bundle, for static resources, Spring-DM will consider only what is available in the bundle space - this means what 
+    		is available in the bundle jar and its attached fragments. Conforming to the Servlet spec, resources under <literal>WEB-INF</literal> folder
+    		will be available through the <interfacename>ServletContext</interfacename> but not by remote clients connecting to the web applications.
+    		In addition, any resource available in the classpath (imported packages, required bundles or dynamic imports) can be loaded and used by
+    		the application code but not be seen <emphasis>outside</emphasis>of it.</para>
+    	</section>
+    	
+    	<section id="web:classpath:servlets">
+    		<title>Servlets</title>
+    		<para>The <ulink url="http://java.sun.com/products/servlet/">servlet</ulink> <ulink url="http://java.sun.com/products/servlet/reference/api/index.html">specification</ulink> 
+    		defines the classpath of a WAR, based on some predefined locations. To quickly recap, these are: </para>
+			<itemizedlist>
+				<listitem><literal>WEB-INF/classes</literal> - all resources under <literal>WEB-INF/classes</literal></listitem>   		
+				<listitem><literal>WEB-INF/lib/*.jar</literal> - all jars under <literal>WEB-INF/lib</literal></listitem>
+			</itemizedlist>
+			<para>In addition, each container implementation can provide <emphasis>common</emphasis> libraries that are appended to the war classpath. Since OSGi, 
+			with its class wiring, versioning, reloading, superseeds the WAR classpath, Spring-DM will ignore the WAR predefined locations and will <emphasis>always</emphasis>
+			use	the OSGi classpath instead. This means that classes imported by a WAR bundle can be used even if they are not present under <literal>WEB-INF/classes</literal>
+			folder or inside a jar under <literal>WEB-INF/lib</literal>. This also means that any class under <literal>WEB-INF/classes</literal> will not be considered
+			if it's not available in the war OSGi classpath.
+			</para>
+			<para>One of the easiest ways to support the pre-defined WAR locations, is to add them to the bundle classpath, by adding them to the bundle manifest:</para>
+			<programlisting language="java"><![CDATA[Bundle-Classpath: .,WEB-INF/classes,WEB-INF/lib/some.jar,WEB-INF/lib/lib.jar]]></programlisting>
+			<para>Make sure the default <literal>Bundle-Classpath</literal> location <literal>.</literal> is present and there are no whitespaces between the commas.</para>
+			
+			<note>Since the OSGi API doesn't provide a hook for bundles to be pre-processed, Spring-DM cannot automate the process in a reliable way. However, we are 
+			working on finding a suitable solution. Note that there are tools (<ulink url="http://www.aqute.biz/Code/Bnd">bnd</ulink>) that can add these entries either 
+			during packaging or at runtime when the bundles are installed.</note>
+
+			<para>Before creating entries for embedded libraries, consider whether the library cannot be installed as an OSGi bundle - it can be shared with other WARs
+			if needed and since OSGi allows versioning, it is perfectly okay to have multiple versions of the library inside the same VM.</para>
+    		
+    	</section>
+
+    	<section id="web:classpath:jsps">
+    		<title>Java Server Pages</title>
+    		<para>For <ulink url="http://java.sun.com/products/jsp">JSPs</ulink>, Spring-DM integrates with Tomcat <ulink url="http://en.wikipedia.org/wiki/Tomcat_Jasper">Jasper 2</ulink> Engine 
+    		which means JSP 1.2, 2.0 and 2.1 are supported. OSGified versions for Jasper (from Tomcat 5.5.x and 6.0.x distribution respectively) are available in the Spring-DM OSGi 
+    		repository. No imports on Jasper classes are required for the OSGi bundle.
+    		</para>
+    		
+    		<section id="web:classpath:jsps:taglibs">
+    			<title>Tag libraries support</title>
+    			<para>The JSP spec allows the creation of tag libraries to <quote>define declarative, modular functionality that can be reused by any JSP page</quote>. 
+    			Also known as taglibs, these reusable components consist of Java classes (the tag implementation) and description files that indicate how the tag can be used.
+    			Spring-DM extends the JSP convention, of placing the taglibs either packed as a jar under <literal>WEB-INF/lib</literal> or unpacked under 
+    			<literal>WEB-INF/classes</literal>, by detecting any taglib defined in the bundle classpath (imported packages or required bundles).</para>
+    			  
+    			<para>Spring-DM will automatically look for any taglib file <literal>*.tld</literal> available in the bundle classpath and will make that available to the Jasper engine.
+    			However, while the tag definitions are automatically discovered, the tag classes are not - again, the OSGi classpath takes priority. This means that in order to use a tag,
+    			the war bundle would have to import the tag corresponding classes since otherwise, they are not seen by the bundle and the tag cannot be used.</para> 
+    			
+    			<para>When dealing with libraries that export a lot of tags, one can use the <literal>Require-Bundle</literal> header instead of <literal>Import-Package</literal> for 
+    			importing the tags:</para>
+    			<programlisting><![CDATA[Require-Bundle: org.springframework.osgi.jstl]]></programlisting>
+    			<para>Using the manifest entry above, all the classes (and thus tag implementations) exported by the JSP Standard Tag Library (or 
+    			<ulink url="http://java.sun.com/products/jsp/jstl/index.jsp">JSTL</ulink> in short), are seen by the war bundle and thus can be
+    			used inside the JSPs.</para>
+    			
+    			<warning>Before using <literal>Require-Bundle</literal> on a large scale, please read the OSGi specification (section 3.13) 
+    			for an in-depth review of its implications.</warning>
+    		</section>
+    	</section>
+    	
+    	<para>No matter what mechanism you decide to use for the war classpath, by using OSGi capabilities it is possible to create libraries that are <emphasis>shared</emphasis>
+    	between multiple WARs while having full control over the used packages. Each bundle can import only the packages (and the versions) needed not an entire library jar - in fact,
+    	packages from different bundles/jars can be selectively used to obtain the desired behaviour - a very powerful capability which should make web application deployment easier.</para> 
+    </section>
+    
+  </chapter>
+  
