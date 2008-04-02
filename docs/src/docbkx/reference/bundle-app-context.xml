@@ -32,6 +32,16 @@
     <section id="bnd-app-ctx:extender">
       <title>The Spring Dynamic Modules Extender bundle</title>
 
+      <sidebar>
+		<title>Extender Pattern</title>
+		<para>A common pattern in OSGi applications is the <emphasis>extender</emphasis>, that 
+		(quoting <ulink url="http://www.aqute.biz/Blog/HomePage">Peter Kriens</ulink>, 
+		OSGi Technical Director), <quote>allows other bundles to extend the functionality in a specific domain</quote>.
+		See <ulink url="http://www.osgi.org/blog/2007/02/osgi-extender-model.html">this</ulink> OSGi Alliance blog
+		entry for an in-depth explanation.
+		</para>
+      </sidebar>
+
       <para>Spring Dynamic Modules provides an OSGi bundle
       <literal>org.springframework.osgi.bundle.extender</literal>. This
       bundle is responsible for instantiating the Spring application contexts
@@ -44,6 +54,7 @@
       automatically creates an application context for any Spring-powered
       bundle that is subsequently started. <xref linkend="app-deploy:headers"/>
       describes what the extender recognizes as a "Spring-powered bundle".</para>
+      
     </section>
 
     <section id="bnd-app-ctx:app-creation">
