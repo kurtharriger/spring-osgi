@@ -5,6 +5,10 @@
 	<title>Useful links</title>
 
 	<itemizedlist>
+
+	<listitem><emphasis>Spring-DM Home Page</emphasis> - <ulink url="http://www.springframework.org/osgi/">here</ulink></listitem>
+	<listitem><emphasis>SpringSource OSGi blog</emphasis> - <ulink url="http://blog.springsource.com/main/osgi">here</ulink></listitem>
+	<listitem><emphasis>Spring-DM Demos</emphasis> - <ulink url="http://www.springframework.org/osgi/demos">here</ulink></listitem>
 	
 	<listitem><emphasis>Getting Started with OSGi</emphasis> - by Neil Bartlett 
 	<ulink url="http://neilbartlett.name/blog/osgi-articles/">here</ulink> and 
@@ -27,9 +31,5 @@
 	
 	<listitem><emphasis>OSGi Alliance Blog</emphasis> - <ulink url="http://www.osgi.org/blog/">here</ulink></listitem>
 	
-	<listitem><emphasis>SpringSource OSGi blog</emphasis> - <ulink url="http://blog.springsource.com/main/osgi">here</ulink></listitem>
-	
 	</itemizedlist>
-	
-	
 </chapter>

@@ -378,7 +378,7 @@
 
     <!-- Use nice graphics for admonitions -->
     <xsl:param name="admon.graphics">'1'</xsl:param>
-    <!--  <xsl:param name="admon.graphics.path">&admon_gfx_path;</xsl:param> -->
+    <xsl:param name="admon.graphics.path">src/docbkx/resources/images/admons/</xsl:param>
 
     <!--###################################################
                          Misc
