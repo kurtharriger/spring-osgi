@@ -112,7 +112,8 @@
       <para>The <literal>Spring-Context</literal> manifest header may be used
       to specify an alternate set of configuration files. The resource paths
       are treated as relative resource paths and resolve to entries defined in
-      the bundle and the set of attached fragments. When the
+      the bundle and the set of attached <link linkend="appendix-tips:fragments">fragments</link>. 
+      When the
       <literal>Spring-Context</literal> header defines at least one
       configuration file location, any files in
       <literal>META-INF/spring</literal> are ignored unless directly
@@ -224,8 +225,90 @@ context ::= path ( ';' path ) * (';' directive) *
         </listitem>
       </itemizedlist>
     </section>
+    
+    <section id="app-deploy:extender-configuration">
+    	<title>Extender Configuration Options</title>
+    	
+    	<para>Aside from bundle-specific configurations, Spring-DM allows the core extender generic behaviour be configured. This is useful when
+    	embedding Spring-DM inside a managed environment or when a bundles-wide functionality is desired. To allow for extensible configuration,
+    	the extender relies on OSGi <link linkend="appendix-tips:fragments">fragments</link> to override its defaults. The extender looks for all XML files 
+    	under <literal>META-INF/spring</literal> folder in its bundle space and assembled them into an application context that 
+    	is used internally as its configuration. To override a default setting of the extender, look up the appropriate bean
+    	name from the table below, define it in a suitable manner and then attach it as a <link linkend="appendix-tips:fragments">fragment</link> to the 
+    	<literal>spring-osgi-extender.jar</literal>, using:</para>
+		<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.extender]]></programlisting>    	  
+    	
+    	<para>The following beans are currently recognized by the extender:</para>
+    	
+    	<table id="extender-configuration-options" pgwide="1">
+          <title>Extender Configuration Options</title>
+          <tgroup cols="3">
+            <colspec align="left" />
+            <thead>
+              <row>
+                <entry>Bean Name</entry>
+                <entry>Type</entry>
+                <entry>Role</entry>
+                <entry>Default Behaviour</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry><literal>taskExecutor</literal></entry>
+                <entry><interfacename>org.springframework.core.task.TaskExecutor</interfacename></entry>
+                <entry>Creates, runs and destroys the Spring application contexts associated with each bundle. The task executor is responsible for managing its own pool
+                of threads used by the application contexts.</entry>
+                <entry><classname>SimpleAsyncTaskExecutor</classname> is used by default which means a new thread will be created for each application contexts. While this
+                is suitable for testing and development, we strongly recommend to use a <ulink url="http://en.wikipedia.org/wiki/Thread_pool_pattern">thread pool</ulink> 
+                in a production environment.</entry>
+              </row>
+              
+              <row>
+                <entry><literal>extenderProperties</literal></entry>
+                <entry><classname>java.util.Properties</classname></entry>
+                <entry>Defines simple properties such as the maximum time for contexts to gracefully close</entry>
+                <entry>See the <link linkend="extender-configuration-options-properties">defaults</link> below.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+    	</table>
 
-    <section>
+		<para>From the <literal>extenderProperties</literal> bean, the following properties are recognized:</para>
+   	
+    	<table id="extender-configuration-options-properties" pgwide="1">
+          <title>Available <literal>extenderProperties</literal></title>
+          <tgroup cols="3">
+            <colspec align="left" />
+            <thead>
+              <row>
+                <entry>Name</entry>
+                <entry>Type</entry>
+                <entry>Description</entry>
+                <entry>Default Value</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry><literal>shutdown.wait.time</literal></entry>
+                <entry><classname>java.lang.Number</classname></entry>
+                <entry>The amount of time the extender will wait for each application context to shutdown gracefully. Expressed in milliseconds.</entry>
+                <entry>10000 ms (10 s)</entry>
+              </row>
+              
+              <row>
+                <entry><literal>process.annotations</literal></entry>
+                <entry><classname>java.lang.Boolean</classname></entry>
+                <entry>Flag indicating whether or not, the extender will process Spring-DM annotations. Note that this can be enabled in each process bundle
+                by adding the appropriate bean post processor. See <xref linkend="appendix-extensions:annotations"/> for more information.</entry>
+                <entry>false</entry>
+              </row>
+            </tbody>
+          </tgroup>
+    	</table>		
+    </section>
+    
+
+    <section id="app-deploy:required-libraries">
       <title>Required Spring Framework and Spring Dynamic Modules
       Bundles</title>
 

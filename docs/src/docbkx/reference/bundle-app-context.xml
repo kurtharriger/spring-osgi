@@ -53,7 +53,8 @@
       behalf. In addition, it listens for bundle starting events and
       automatically creates an application context for any Spring-powered
       bundle that is subsequently started. <xref linkend="app-deploy:headers"/>
-      describes what the extender recognizes as a "Spring-powered bundle".</para>
+      describes what the extender recognizes as a "Spring-powered bundle" while 
+      <xref linkend="app-deploy:extender-configuration"/> how the extender can be configured.</para>
       
     </section>
 
@@ -193,10 +194,10 @@
       <interfacename>org.springframework.core.io.ResourceLoader</interfacename> associated with the application
       context. The <interfacename>org.springframework.core.io.ResourceLoader</interfacename> is also 
       available to beans wishing to load resources programmatically. Resource paths with
-      explicit prefixes - for example "classpath:" are treated uniformly
+      explicit prefixes - such as <literal>classpath:</literal> - are treated uniformly
       across all application context types (for example, web application
       contexts and classpath-based application contexts). Relative resource
-      paths are interpreted differently based on the kind of application
+      paths are interpreted differently based on the type of application
       context being created. This enables easy integration testing outside
       the ultimate deployment environment.</para>
 
@@ -210,8 +211,8 @@
             <colspec align="left" />
             <thead>
               <row>
-                <entry>OSGi search strategy</entry>
-                <entry>prefix</entry>
+                <entry>OSGi Search Strategy</entry>
+                <entry>Prefix</entry>
                 <entry>Explanation</entry>
               </row>
             </thead>
@@ -219,17 +220,29 @@
               <row>
                 <entry>Class Space</entry>
                 <entry><literal>classpath:</literal></entry>
-                <entry>Search the bundle classloader (the bundle and all imported packages). Forces the bundle to be resolved.</entry>
+                <entry>Searches the bundle classloader (the bundle, all imported packages and required bundles). Forces the bundle to be resolved.
+                This method has similar semantics to 
+                <ulink url="http://www2.osgi.org/javadoc/r4/org/osgi/framework/Bundle.html#getResource(java.lang.String)"><literal>Bundle#getResource(String)</literal></ulink></entry>
               </row>
+              
+              <row>
+                <entry>Class Space</entry>
+                <entry><literal>classpath*:</literal></entry>
+                <entry>Searches the bundle classloader (the bundle and all imported packages and required bundles). Forces the bundle to be resolved.
+                This method has similar semantics to 
+                <ulink url="http://www2.osgi.org/javadoc/r4/org/osgi/framework/Bundle.html#getResources(java.lang.String)"><literal>Bundle#getResources(String)</literal></ulink>
+                </entry>
+              </row>
+              
               <row>
                 <entry>JAR File (or JarSpace)</entry>
                 <entry><literal>osgibundlejar:</literal></entry>
-                <entry>Search only the bundle jar. Provides low-level access without requiring the bundle to be resolved.</entry>
+                <entry>Searches only the bundle jar. Provides low-level access without requiring the bundle to be resolved.</entry>
               </row>
               <row>
                 <entry>Bundle Space</entry>
                 <entry><literal>osgibundle:</literal></entry>
-                <entry>Search the bundle jar and its attached fragments (if there are any). Will never create a class loader or resolve the bundle.</entry>
+                <entry>Searches the bundle jar and its attached fragments (if there are any). Does not create a class loader or force the bundle to be resolved.</entry>
               </row>
             </tbody>
           </tgroup>
@@ -238,9 +251,11 @@
 	  <para>Please consult section 4.3.12 of the OSGi specification for an in depth explanation of the differences between them.
 	  </para>
 	  
-	  <para>
-	  Note that if no prefix is specified, the bundle space will be used. 
-	  </para>
+	  <note>If no prefix is specified, the bundle space (<literal>osgibundle:</literal>) will be used.</note>
+	  
+	  <note>Due to the OSGi dynamic nature, a bundle classpath can change during its life time (for example when dynamic imports are used). This might cause different
+	  classpath <interfacename>Resource</interfacename>s to be returned when doing pattern matching based on the running environment or target platform.</note>
+	  
       <para>All of the regular Spring resource prefixes such as <literal>file:</literal> and
       <literal>http:</literal> are also supported, as are the pattern matching wildcards.
       Resources loaded using such prefixes may come from any location, they
@@ -249,8 +264,8 @@
 
       <para>OSGi platforms may define their own unique prefixes for accessing
       bundle contents. For example, Equinox defines the <literal>bundleresource:</literal> and
-      <literal>bundlentry:</literal> prefixes). These platform specific prefixes may also be
-      used with Spring OSGi, at the cost of course of tying yourself to a
+      <literal>bundlentry:</literal> prefixes. These platform specific prefixes may also be
+      used with Spring OSGi, at the cost, of course, of tying yourself to a
       particular OSGi implementation.</para>
     </section>
 
