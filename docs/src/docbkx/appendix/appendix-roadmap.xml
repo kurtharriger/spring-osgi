@@ -21,38 +21,21 @@
 			<title>Managed Services</title>
 
 			<para>
-				It should be possible to easily instantiate a bean from
-				the configuration information stored for a
-				<literal>ManagedService</literal>
-				, and a set of beans from the configuration information
-				stored for a
-				<literal>ManagedServiceFactory</literal>
-				. In addition, updates to the configuration information
+				It should be possible to easily instantiate a bean from the configuration information stored for a
+				<literal>ManagedService</literal>, and a set of beans from the configuration information
+				stored for a <literal>ManagedServiceFactory</literal>. In addition, updates to the configuration information
 				should be propagated to beans created in this way.
 			</para>
 
 			<para>
 				The
-				<literal>managed-service</literal>
-				element is used to define a bean based on the
-				configuration information stored under a given
-				persistent id. It has two mandatory attributes,
-				<literal>class</literal>
-				and
-				<literal>persistent-id</literal>
-				. The
-				<literal>persistent-id</literal>
-				attribute is used to specify the persistent id to be
-				looked up in the configuration administration service,
-				<literal>class</literal>
-				indicates the Java class of the bean that will be
-				instantiated.
+				<literal>managed-service</literal>	element is used to define a bean based on the configuration information stored under a given
+				persistent id. It has two mandatory attributes, <literal>class</literal> and <literal>persistent-id</literal>. The
+				<literal>persistent-id</literal> attribute is used to specify the persistent id to be looked up in the configuration administration service,
+				<literal>class</literal> indicates the Java class of the bean that will be	instantiated.
 			</para>
 
-			<para>
-				A simple declaration of a managed service bean would
-				look as follows:
-			</para>
+			<para>A simple declaration of a managed service bean would look as follows:</para>
 
 			<programlisting><![CDATA[<osgix:managed-service id="myService" class="com.xyz.MessageService" 
    persistent-id="com.xyz.messageservice"/>]]></programlisting>
@@ -231,19 +214,10 @@ public void anyMethodName(Dictionary properties);]]></programlisting>
     </section>
 
     <section>
-      <title>Web application support</title>
+      <title>Web library integration</title>
 
-      <para>A key part of the roadmap for the next release of Spring Dynamic
-      Modules is built-in support for building web applications out of OSGi
-      bundles. This will be supported using both an <interfacename>HttpService</interfacename> 
-      provided by a bundle installed into the running OSGi framework, and also by embedding
-      an OSGi container inside an existing servlet container. Pioneering work
-      has been done by <ulink
-      url="http://martinlippert.blogspot.com/2007/06/slides-and-examples-from-springone-2007.html">Martin
-      Lippert</ulink>, <ulink
-      url="http://thegoodthebadtheugly.wordpress.com/2007/05/20/springosgi/">Bernd
-      Kolb</ulink>, and Gerd Wutherich amongst others. Please see our mailing list archive
-      for more information.</para>
+      <para>While generic support for web applications is available in 1.1.0, we'd like to provide close
+      integration with existing popular libraries (like JSF and Spring Web Flow) in the upcoming releases.</para>
     </section>
 
     <section>

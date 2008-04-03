@@ -61,6 +61,21 @@
 	  <xi:include href="reference/web.xml"/>
 	  <xi:include href="reference/testing.xml"/>
   </part>
+  <part id="resources">
+      <title>Other Resources</title>
+      <partintro>
+          <para>
+              In addition to this reference documentation, there are a number of
+              other resources that may help you learn how to use OSGi and Spring Dynamic
+              Modules. These additional, third-party resources are enumerated in this 
+              section.
+          </para>
+      </partintro>
+      <xi:include href="links.xml"/>
+      <!-- 
+      <xi:include href="bibliography.xml"/>
+       -->
+  </part>
   <part id="appendixes">
       <title>Appendixes</title>
       <xi:include href="appendix/introduction.xml"/>
@@ -68,24 +83,9 @@
       <xi:include href="appendix/appendix-extensions.xml"/>
       <xi:include href="appendix/appendix-pde.xml"/>
       <xi:include href="appendix/appendix-archetype.xml"/>
+      <xi:include href="appendix/appendix-tips.xml"/>
       <xi:include href="appendix/appendix-roadmap.xml"/>
       <xi:include href="appendix/appendix-schema.xml"/>
       <xi:include href="appendix/appendix-ack.xml"/>
-  </part>
-  <part id="resources">
-      <title>Other Resources</title>
-      <partintro>
-          <para>
-              In addition to this reference documentation, there exist a number of
-              other resources that may help you learn how to use OSGi and Spring Dynamic
-              Modules. These additional, third-party resources are enumerated in this 
-              section.
-          </para>
-      </partintro>
-      <xi:include href="links.xml"/> -->
-      <!-- 
-      <xi:include href="bibliography.xml"/>
-       -->
-
   </part>
 </book>

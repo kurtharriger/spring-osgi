@@ -9,7 +9,7 @@
     backwards compatibility across point releases. We anticipate these
     features migrating into the core specification in future releases.</para>
 
-    <section>
+    <section id="appendix-extensions:annotations">
       <title>Annotation-based injection</title>
 
       <para>The
@@ -25,7 +25,7 @@
       registry and inject the result. For example, given the
       configuration:</para>
 
-      <programlisting><![CDATA[<bean id="annotationDriven" class="MyAnnotationDrivenBeanClass">
+      <programlisting><![CDATA[<bean id="annotationDriven" class="MyAnnotationDrivenBeanClass"/>
       ]]></programlisting>
 
       <para>and the class declaration:</para>

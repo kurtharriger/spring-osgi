@@ -23,6 +23,15 @@
       <para><xref linkend="appendix-archetype"/> describes the Spring-DM Maven 2 archetype
       usage.</para>
 
+      <para><xref linkend="appendix-tips"/> provides some useful OSGi tips, especially
+      meaningful when used along with Spring-DM.</para>
+
+      <para><xref linkend="appendix-roadmap"/> describes some features that are included in
+      the 1.0 distribution but are still considered early-access. The
+      externals of these features may change in future releases. This appendix
+      also discusses other planned features for which no implementation yet
+      exists.</para>
+
       <para><xref linkend="appendix-roadmap"/> describes some features that are included in
       the 1.0 distribution but are still considered early-access. The
       externals of these features may change in future releases. This appendix
