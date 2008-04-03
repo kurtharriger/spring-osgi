@@ -158,7 +158,7 @@ public void testOsgiPlatformStarts() throws Exception {
 	System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VENDOR));
 	System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_VERSION));
 	System.out.println(bundleContext.getProperty(Constants.FRAMEWORK_EXECUTIONENVIRONMENT));
-}
+	}
 }]]></programlisting>
       
     <para>Simply execute the test as you normally do with any JUnit test. On Equinox 3.2.x,

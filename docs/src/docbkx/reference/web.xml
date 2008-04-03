@@ -40,8 +40,8 @@
     
     <section id="web:usage">
     	<title>Web support usage</title>
-    	<para>To use Spring-DM with wars, install the <literal>spring-osgi-web.jar</literal> bundle which uses the <ulink url="http://www.osgi.org/blog/2007/02/osgi-extender-model.html">extender</ulink> 
-    	pattern to detect started OSGi war bundles and deploy them to one of the supported web containers. By default, Tomcat will be used but this can be changed to Jetty or to another custom 
+    	<para>To use Spring-DM with wars, install the <literal>spring-osgi-web.jar</literal> bundle which uses the <link linkend="extender-pattern">extender pattern</link>
+    	to detect started OSGi war bundles and deploy them to one of the supported web containers. By default, Tomcat will be used but this can be changed to Jetty or to another custom 
     	server. When the war bundle is stopped, Spring-DM will also stop and uninstall the web application associated with it. Just like with 
     	<emphasis>traditional</emphasis> web development, WAR bundles will automatically see the Servlet and JSP classes available in the web container without 
     	importing them explicitly.</para>
@@ -178,7 +178,7 @@ port = [server port number]]]></programlisting>
 			
 			<para>The Servlet, Java Server Pages, Standard Taglib, Commons-EL and other web libraries are available as well in the Spring-DM repository. When browsing
 			use an <ulink url="http://aws.amazon.com/s3">S3</ulink> compatible application 
-			(such <ulink url="http://s3browse.com/explore/maven.springframework.org">this</ulink> one).</para>
+			(such <ulink url="http://s3browse.com/explore/maven.springframework.org/osgi/org/springframework/osgi/">this</ulink> one).</para>
 		</section>
     </section>
   </chapter>

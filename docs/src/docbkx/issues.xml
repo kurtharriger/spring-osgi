@@ -41,24 +41,6 @@
 
 	<para>As a side note, it worth pointing out that the issues below are not really bugs but rather improvements.</para>		
 
-	<section id="OSGI-110">
-      <title>CGLIB proxying fails with NPE from time to time</title>
-      	<para>During our tests, we have encountered a strange cglib behaviour; when trying to proxy <literal>java.*</literal> classes
-      	the process fails with a NullPointerException. Further more, the bug cannot be reproduce constantly, depending a lot on the
-      	number of runs and JVM platform used. We believe the cause is a <literal>Weak</literal> reference - see 
-      	<ulink url=" http://www.nabble.com/cglib-2.1_3-no-dep-and-NPE-in-AbstractClassGenerator-tf3645088.html#a10179844">this</ulink> discussion. 
-      	</para> 
-      	<para>See <ulink url="http://jira.springframework.org/browse/OSGI-110">OSGI-110</ulink></para> 
-	</section>	
-
-    <section id="OSGI-210">
-      <title>Using <literal>classpath</literal> prefix on the root classpath (<literal>/</literal>) fails </title>
-      	<para>Calling <methodname>getResource()/getResources()</methodname> from a Bundle, on the root folder (<literal>/</literal>) fails. Currently,
-      	only Equinox and Knopflerfish (2.0.3+) support this behaviour.  At the moment of writing this document, Felix provides support for this in the 
-      	upcoming 1.1.0.</para>
-      	<para>See <ulink url="http://jira.springframework.org/browse/OSGI-210">OSGI-210</ulink></para> 
-	</section>
-
 	<section id="OSGI-237">
       <title>Publishing prototypes as OSGi services</title>
       	<para>Due to the way OSGi platform deals with OSGi services (it caches the instance and returns it every time), prototypes are not fully supported.

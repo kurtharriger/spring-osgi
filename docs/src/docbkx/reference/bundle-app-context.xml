@@ -32,7 +32,7 @@
     <section id="bnd-app-ctx:extender">
       <title>The Spring Dynamic Modules Extender bundle</title>
 
-      <sidebar>
+      <sidebar id="extender-pattern">
 		<title>Extender Pattern</title>
 		<para>A common pattern in OSGi applications is the <emphasis>extender</emphasis>, that 
 		(quoting <ulink url="http://www.aqute.biz/Blog/HomePage">Peter Kriens</ulink>, 

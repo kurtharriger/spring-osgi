@@ -28,7 +28,7 @@
           <area id="service-registry.xml.ns.default.beans.beans.25" coords="6"/>
           <area id="service-registry.xml.ns.default.beans.osgi.service" coords="10"/>
        </areaspec>
-       <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>;
+       <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:osgi="http://www.springframework.org/schema/osgi"
