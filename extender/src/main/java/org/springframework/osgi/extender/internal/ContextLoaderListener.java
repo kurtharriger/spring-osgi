@@ -745,7 +745,8 @@ public class ContextLoaderListener implements BundleActivator {
 		Map config = getExternalConfiguration();
 
 		Object setting = config.get(AUTO_ANNOTATION_PROCESSING);
-		if (setting != null && setting instanceof String && Boolean.getBoolean((String) setting)) {
+		if (extenderConfiguration.shouldProcessAnnotation()
+				|| (setting != null && setting instanceof String && Boolean.getBoolean((String) setting))) {
 
 			log.info("Enabled automatic Spring-DM annotation processing; [" + AUTO_ANNOTATION_PROCESSING + "="
 					+ setting + "]");

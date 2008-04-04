@@ -1025,7 +1025,7 @@ public class BeanWithServiceReference {
 </set>]]></programlisting>
 
 		<remark>For a sorted set, a <interfacename>SortedSet</interfacename> implementation will be created.
-		However, since JDK API do not provide a dedicated <interfacename>SortedList</interfacename>interface, 
+		However, since the JDK API does not provide a dedicated <interfacename>SortedList</interfacename>interface, 
 		the sorted list will implement only the <interfacename>List</interfacename> interface.</remark>
 		
 		<section id="service-registry:refs:collection:attributes">
