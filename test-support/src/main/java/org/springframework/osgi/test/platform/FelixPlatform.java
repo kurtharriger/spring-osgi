@@ -61,7 +61,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		Properties props = new Properties();
 		createStorageDir(props);
 		// disable logging
-		props.put("felix.log.level", "0");
+		props.put("felix.log.level", "4");
 		// use embedded mode
 		props.put("felix.embedded.execution", "true");
 		return props;

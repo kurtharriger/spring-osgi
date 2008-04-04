@@ -56,6 +56,15 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private static final String SHUTDOWN_WAIT_KEY = "shutdown.wait.time";
 
+	private static final String PROCESS_ANNOTATIONS_KEY = "process.annotations";
+
+	//
+	// defaults
+	//
+
+	private static final long DEFAULT_SHUTDOWN_WAIT = 10 * 1000;
+	private static final boolean DEFAULT_PROCESS_ANNOTATION = false;
+
 	private ConfigurableOsgiBundleApplicationContext extenderConfiguration;
 
 	private TaskExecutor taskExecutor;
@@ -65,6 +74,8 @@ public class ExtenderConfiguration implements DisposableBean {
 	private boolean isMulticasterManagedInternally = false;
 
 	private long shutdownWaitTime;
+
+	private boolean processAnnotation;
 
 	private ApplicationEventMulticaster eventMulticaster;
 
@@ -115,6 +126,7 @@ public class ExtenderConfiguration implements DisposableBean {
 		}
 
 		shutdownWaitTime = getShutdownWaitTime(properties);
+		processAnnotation = getProcessAnnotations(properties);
 	}
 
 	/**
@@ -174,7 +186,8 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private Properties createDefaultProperties() {
 		Properties properties = new Properties();
-		properties.setProperty(SHUTDOWN_WAIT_KEY, "" + 10 * 1000);
+		properties.setProperty(SHUTDOWN_WAIT_KEY, "" + DEFAULT_SHUTDOWN_WAIT);
+		properties.setProperty(PROCESS_ANNOTATIONS_KEY, "" + DEFAULT_PROCESS_ANNOTATION);
 
 		return properties;
 	}
@@ -198,6 +211,10 @@ public class ExtenderConfiguration implements DisposableBean {
 		return Long.parseLong(properties.getProperty(SHUTDOWN_WAIT_KEY));
 	}
 
+	private boolean getProcessAnnotations(Properties properties) {
+		return Boolean.getBoolean(properties.getProperty(PROCESS_ANNOTATIONS_KEY));
+	}
+
 	/**
 	 * Returns the taskExecutor.
 	 * 
@@ -214,6 +231,16 @@ public class ExtenderConfiguration implements DisposableBean {
 	 */
 	public long getShutdownWaitTime() {
 		return shutdownWaitTime;
+	}
+
+	/**
+	 * Indicates if the process annotation is enabled or not.
+	 * 
+	 * @return Returns true if the annotation should be processed or not
+	 * otherwise.
+	 */
+	public boolean shouldProcessAnnotation() {
+		return processAnnotation;
 	}
 
 	/**

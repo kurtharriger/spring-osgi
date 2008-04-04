@@ -174,6 +174,46 @@
             </tbody>
           </tgroup>
     	</table>
+    	
+    	<section id="web:configuration:changing-deployer">
+    		<title>Changing the war deployer</title>
+    	
+    		<para>To change the Tomcat deployer to Jetty for example, one can create a configuration file <literal>META-INF/spring/jetty-deployer.xml</literal> with
+    		the following content:</para>
+    		
+    		<programlistingco>
+    			<areaspec>
+			   	  <area id="web:configuration:changing-deployer.bn" coords="7"/>
+		          <area id="web:configuration:changing-deployer.bt" coords="8"/>
+		        </areaspec>
+		        
+		       	<programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="warDeployer"    
+        class="org.springframework.osgi.web.extender.internal.jetty.JettyWarDeployer" />
+</beans>
+]]></programlisting>
+				<calloutlist>
+		         <callout arearefs="web:configuration:changing-deployer.bn">
+		            <para><link linkend="web-extender-configuration-options">Pre-defined</link> bean name used by the web extender</para>
+		         </callout>
+		         <callout arearefs="web:configuration:changing-deployer.bt">
+		            <para>Bean implementing <interfacename>org.springframework.osgi.web.extender.WarDeployer</interfacename> interface</para>
+		         </callout>
+		        </calloutlist>		        
+    		</programlistingco>
+    		
+    		<para>Once the file is created, it should be bundled in an OSGi fragment attached to the Spring-DM Web bundle by adding the 
+    		<literal>Fragment-Host</literal> header:</para>
+    		
+			<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.extender]]></programlisting>
+	
+			<para>Now the fragment can be deployed alongside <literal>spring-osgi-web.jar</literal> bundle to plug in Jetty.</para>
+    	</section>
     </section>
     
     <section id="web:osgi-artifacts">

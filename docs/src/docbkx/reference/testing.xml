@@ -401,8 +401,17 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       	<listitem>
       	<para>The test bundle contains only test classes.</para>
       	<para>The byte-code parser will look only at the test classes hierarchy. Any other class included in the bundle, will not be considered so no imports
-      	will be generated for it. Consider customizing the manifest yourself or attaching the extra code as inner classes to the test class. A future version
-      	of Spring-DM might alleviate this problem by inspecting all classes included in the test bundle.</para>
+      	will be generated for it. To change the default behaviour, override <methodname>createManifestOnlyFromTestClass</methodname> to return 
+      	<literal>false</literal>:</para>
+      	
+      	<programlisting><![CDATA[protected boolean createManifestOnlyFromTestClass() {
+	return true;
+}]]></programlisting> 
+      	
+      	<note>The time required to generate the manifest might increase depending on the number and size of classes in the bundle.</note>
+      	
+      	<para>
+      	Additionally consider customizing the manifest yourself or attaching the extra code as inner classes to the test class (so it gets parsed automatically).</para>
       	</listitem>
       </itemizedlist>
       
