@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal.tomcat;
+package org.springframework.osgi.web.extender.deployer.tomcat;
 
 import java.beans.PropertyChangeListener;
 
@@ -30,7 +30,7 @@ import org.apache.catalina.Loader;
  * 
  */
 //FIXME: should PropertyChangeListener be implemented as well?
-public class OsgiCatalinaLoader implements Loader {
+class OsgiCatalinaLoader implements Loader {
 
 	private Container container;
 

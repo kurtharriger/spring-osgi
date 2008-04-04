@@ -243,7 +243,6 @@ context ::= path ( ';' path ) * (';' directive) *
     	<table id="extender-configuration-options" pgwide="1">
           <title>Extender Configuration Options</title>
           <tgroup cols="3">
-            <colspec align="left" />
             <thead>
               <row>
                 <entry>Bean Name</entry>
@@ -278,7 +277,6 @@ context ::= path ( ';' path ) * (';' directive) *
     	<table id="extender-configuration-options-properties" pgwide="1">
           <title>Available <literal>extenderProperties</literal></title>
           <tgroup cols="3">
-            <colspec align="left" />
             <thead>
               <row>
                 <entry>Name</entry>

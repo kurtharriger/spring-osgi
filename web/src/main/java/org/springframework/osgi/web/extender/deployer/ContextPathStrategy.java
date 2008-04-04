@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender;
-
-import java.net.URL;
+package org.springframework.osgi.web.extender.deployer;
 
 import org.osgi.framework.Bundle;
 
 /**
- * War scanner. Detects the presence of <code>web.xml</code> files or other
- * war configurations.
+ * Strategy interface that encapsulates the creation of WARs context path.
  * 
  * @author Costin Leau
- * 
+ * @see Bundle
  */
-public interface WarScanner {
+public interface ContextPathStrategy {
 
 	/**
-	 * Returns the <code>web.xml</code> configuration (if it exists) for the
-	 * given bundle.
+	 * Obtains the context path for the given OSGi bundle. The returned String
+	 * should be not null and should not contain any spaces.
 	 * 
-	 * @param bundle OSGi bundle
-	 * @return URL to the standard web.xml configuration
+	 * @param bundle OSGi bundle deployed as war
+	 * @return the not-null context path (without any spaces) associated with
+	 * the given bundle
 	 */
-	URL getWebXmlConfiguration(Bundle bundle);
+	String getContextPath(Bundle bundle);
 }

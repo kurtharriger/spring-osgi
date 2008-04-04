@@ -138,40 +138,46 @@
     	
     	<table id="web-extender-configuration-options" pgwide="1">
           <title>Web Extender Configuration Options</title>
-          <tgroup cols="3">
-            <colspec align="left" />
+          <tgroup cols="5">
+            <colspec colname="c1" colwidth="1*"/>
+        	<colspec colname="c2" colwidth="1*"/>
+			<colspec colname="c3" colwidth="3*"/>
+			<colspec colname="c4" colwidth="1*"/>
+			<colspec colname="c5" colwidth="3*"/>        	
             <thead>
               <row>
                 <entry>Bean Name</entry>
                 <entry>Type</entry>
                 <entry>Role</entry>
+                <entry>Default Class</entry>
                 <entry>Default Behaviour</entry>
-              </row>
+   			  </row>
             </thead>
             <tbody>
               <row>
                 <entry><literal>warDeployer</literal></entry>
-                <entry><interfacename>org.springframework.osgi.web.extender.WarDeployer</interfacename></entry>
-                <entry>Installs OSGi bundles as web applications. The deployers takes care of locating the required web container and installing and uninstalling web applications.</entry>
+                <entry><interfacename>WarDeployer</interfacename>
+                <footnote id="interface-package"><para>Part of of the <literal>org.springframework.osgi.web.extender.deployer</literal> package</para></footnote>
+                </entry>
+                <entry>Installs OSGi bundles as web applications. The deployers takes care of locating the required web container and installing and 
+                uninstalling web applications.</entry>
+                <entry><classname>TomcatWarDeployer</classname>
+                <footnote><para>Part of the <literal>org.springframework.osgi.web.extender.deployer.tomcat</literal> package</para></footnote>
+                </entry>
                 <entry>Installs OSGi WARs to Tomcat 5.5.x/6.0.x. The servers needs to be installed, started and published as OSGi services as explained  
                 <link linkend="web:osgi-artifacts:containers:tomcat">here</link>.</entry>
-              </row>
-              
-              <row>
-                <entry><literal>warScanner</literal></entry>
-                <entry><interfacename>org.springframework.osgi.web.extender.WarScanner</interfacename></entry>
-                <entry>Determine if the bundles installed in the OSGi platforms are WARs or not.</entry>
-                <entry>Considers an OSGi bundle a WAR if the entry <literal>WEB-INF/web.xml</literal> can be located in the bundle space.</entry>
-              </row>
-              
+   			  </row>
               <row>
                 <entry><literal>contextPathStrategy</literal></entry>
-                <entry><interfacename>org.springframework.osgi.web.extender.ContextPathStrategy</interfacename></entry>
-                <entry>Determins the context path associated with an OSGi bundle/WAR. The returned path is used by the war deployer to install the war application.</entry>
+                <entry><interfacename>ContextPathStrategy</interfacename><footnoteref linkend='interface-package'/></entry>
+                <entry>Determines the context path associated with an OSGi bundle/WAR. The returned path is used by the war deployer to install the war application.</entry>
+                <entry><classname>DefaultContextPathStrategy</classname><footnote>
+                <para>Part of the <literal>org.springframework.osgi.web.extender.deployer.support</literal> package</para></footnote>
+                </entry>
                 <entry>Returns as context path the file name from the bundle location, falling back to the bundle name and bundle symbolic name respectively. 
                 If neither of these is present, the bundle object identity will be used.</entry>
-              </row>
-            </tbody>
+              </row>   			  
+             </tbody>
           </tgroup>
     	</table>
     	
@@ -194,7 +200,7 @@
        http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="warDeployer"    
-        class="org.springframework.osgi.web.extender.internal.jetty.JettyWarDeployer" />
+        class="org.springframework.osgi.web.extender.deployer.jetty.JettyWarDeployer" />
 </beans>
 ]]></programlisting>
 				<calloutlist>
@@ -202,7 +208,7 @@
 		            <para><link linkend="web-extender-configuration-options">Pre-defined</link> bean name used by the web extender</para>
 		         </callout>
 		         <callout arearefs="web:configuration:changing-deployer.bt">
-		            <para>Bean implementing <interfacename>org.springframework.osgi.web.extender.WarDeployer</interfacename> interface</para>
+		            <para>Bean implementing <interfacename>org.springframework.osgi.web.extender.deployer.WarDeployer</interfacename> interface</para>
 		         </callout>
 		        </calloutlist>		        
     		</programlistingco>

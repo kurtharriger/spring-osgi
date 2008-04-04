@@ -394,7 +394,6 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
        <table id="service-export-options" pgwide="1">
           <title>OSGi &lt;service&gt; attributes</title>
           <tgroup cols="3">
-            <colspec align="center" />
             <thead>
               <row>
                 <entry>Name</entry>
@@ -762,7 +761,6 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
        	<table id="reference-import-options" pgwide="1">
           <title><![CDATA[OSGi <reference> attributes]]></title>
           <tgroup cols="3">
-            <colspec align="center" />
             <thead>
               <row>
                 <entry>Name</entry>
@@ -1040,7 +1038,10 @@ public class BeanWithServiceReference {
        	<table id="collection-import-options" pgwide="1">
           <title><![CDATA[<list>/<set> attributes]]></title>
           <tgroup cols="3">
-            <colspec align="center" />
+			<colspec colname="c1" colwidth="1*"/>
+        	<colspec colname="c2" colwidth="2*"/>
+        	<colspec colname="c3" colwidth="4*"/>
+
             <thead>
               <row>
                 <entry>Name</entry>
@@ -1067,9 +1068,9 @@ public class BeanWithServiceReference {
                 that is automatically advertised for beans published using the &lt;service&gt; element.</entry>
               </row>
               <row>
-                <entry>context-class-loader</entry>
-                <entry>client |  service-provider | unmanaged</entry>
-                <entry>Defines how the context class loader is managed when invoking operations on a service
+                <entry colname="c1">context-class-loader</entry>
+                <entry colname="c2">client |  service-provider | unmanaged</entry>
+                <entry colname="c3">Defines how the context class loader is managed when invoking operations on a service
                 backing this service reference. The default value is <literal>client</literal> which means that the context
                 class loader has visibility of the resources on this bundle's classpath. Alternate
                 options are <literal>service-provider</literal> which means that the context class loader has visibility of 
@@ -1077,9 +1078,9 @@ public class BeanWithServiceReference {
                	which does not do any management of the context class loader.</entry>
               </row>
               <row>
-                <entry>cardinality</entry>
-                <entry>0..N | 1..N</entry>
-                <entry>Defines the required cardinality of the relationship to the backing service. If not specified, 
+                <entry colname="c1">cardinality</entry>
+                <entry colname="c2">0..N | 1..N</entry>
+                <entry colname="c3">Defines the required cardinality of the relationship to the backing service. If not specified, 
                 the <literal>default-cardinality</literal> attribute will apply. A value is '1..N' means that a backing service 
                 must exist (this is a mandatory service reference). A value of '0..N' indicates that it is 
                 acceptable to be no backing service (an optional service reference).</entry>
@@ -1099,7 +1100,9 @@ public class BeanWithServiceReference {
        	 <table id="collection-import-comparator-options" pgwide="1">
           <title><![CDATA[collection <comparator> attributes]]></title>
           <tgroup cols="3">
-            <colspec align="center" />
+            <colspec colname="c1" colwidth="1*"/>
+        	<colspec colname="c2" colwidth="2*"/>
+        	<colspec colname="c3" colwidth="5*"/>
             <thead>
               <row>
                 <entry>Name</entry>
@@ -1187,7 +1190,6 @@ public class BeanWithServiceReference {
 		  <table id="collection-iterator-contract" pgwide="1">
            <title>Dynamic service collection <interfacename>Iterator</interfacename> contract</title>
            <tgroup cols="2">
-            <colspec align="center" />
             <thead>
               <row>
                 <entry>hasNext() returned value</entry>
@@ -1346,7 +1348,6 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
        	 <table id="reference-import-listener-options" pgwide="1">
           <title><![CDATA[OSGi <listener> attributes]]></title>
           <tgroup cols="3">
-            <colspec align="center" />
             <thead>
               <row>
                 <entry>Name</entry>

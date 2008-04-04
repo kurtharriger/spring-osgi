@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal.support;
+package org.springframework.osgi.web.extender.deployer.support;
 
 import java.util.Map;
 
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.web.extender.WarDeployer;
+import org.springframework.osgi.web.extender.deployer.WarDeployer;
 
 /**
  * Template class offering common functionality for war deployers such as

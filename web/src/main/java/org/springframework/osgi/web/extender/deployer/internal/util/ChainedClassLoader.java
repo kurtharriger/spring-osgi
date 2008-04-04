@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal.util;
+package org.springframework.osgi.web.extender.deployer.internal.util;
 
 import java.net.URL;
 

@@ -32,10 +32,8 @@ import org.springframework.core.CollectionFactory;
 import org.springframework.core.ConcurrentMap;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.web.extender.ContextPathStrategy;
-import org.springframework.osgi.web.extender.WarDeployer;
-import org.springframework.osgi.web.extender.WarScanner;
-import org.springframework.osgi.web.extender.internal.config.WarListenerConfiguration;
+import org.springframework.osgi.web.extender.deployer.ContextPathStrategy;
+import org.springframework.osgi.web.extender.deployer.WarDeployer;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
 

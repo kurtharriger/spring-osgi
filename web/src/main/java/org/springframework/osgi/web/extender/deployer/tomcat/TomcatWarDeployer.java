@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal.tomcat;
+package org.springframework.osgi.web.extender.deployer.tomcat;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +27,8 @@ import org.apache.catalina.startup.ExpandWar;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.web.extender.internal.support.AbstractWarDeployer;
-import org.springframework.osgi.web.extender.internal.util.Utils;
+import org.springframework.osgi.web.extender.deployer.internal.util.Utils;
+import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeployer;
 
 /**
  * <a href="http://tomcat.apache.org">Tomcat</a> 6.0.x specific war deployer.
