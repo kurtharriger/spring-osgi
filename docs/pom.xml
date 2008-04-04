@@ -97,10 +97,16 @@
                 </dependencies>
                 <configuration>
                     <includes>index.xml,faq.xml,issues.xml</includes>
-                    <chunkedOutput>true</chunkedOutput>
                     <htmlStylesheet>css/html.css</htmlStylesheet>
                     <xincludeSupported>true</xincludeSupported>
                     <sourceDirectory>${basedir}/src/docbkx</sourceDirectory>
+					<!-- use extensions -->
+                    <useExtensions>1</useExtensions>
+                    <highlightSource>1</highlightSource>
+					<highlightDefaultLanguage></highlightDefaultLanguage>
+					<!-- callouts -->
+                    <calloutsExtension>1</calloutsExtension>
+                    
                     <entities>
                         <entity>
                             <name>version</name>

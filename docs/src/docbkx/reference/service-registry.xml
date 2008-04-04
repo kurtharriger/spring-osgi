@@ -28,7 +28,7 @@
           <area id="service-registry.xml.ns.default.beans.beans.25" coords="6"/>
           <area id="service-registry.xml.ns.default.beans.osgi.service" coords="10"/>
        </areaspec>
-       <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+       <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:osgi="http://www.springframework.org/schema/osgi"
@@ -74,7 +74,7 @@
           <area id="service-registry.xml.ns.default.osgi.beans.25" coords="9"/>
           <area id="service-registry.xml.ns.default.osgi.service" coords="11"/>
        </areaspec>
-    <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans:beans 
    xmlns="http://www.springframework.org/schema/osgi"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -130,7 +130,7 @@
 
       <para>For example, the declaration</para>
 
-      <programlisting><![CDATA[<service ref="beanToPublish" interface="com.xyz.MessageService"/>]]></programlisting>
+      <programlisting language="xml"><![CDATA[<service ref="beanToPublish" interface="com.xyz.MessageService"/>]]></programlisting>
 
       <para>exports the bean with name <literal>beanToPublish</literal> with
       interface <literal>com.xyz.MessageService</literal>. The published
@@ -148,7 +148,7 @@
       <interfacename>ServiceRegistration</interfacename> object into other beans if
       needed. For example:</para>
 
-      <programlisting><![CDATA[<service id="myServiceRegistration" ref="beanToPublish"
+      <programlisting language="xml"><![CDATA[<service id="myServiceRegistration" ref="beanToPublish"
     interface="com.xyz.MessageService"/>]]></programlisting>
 
       <para>As an alternative to exporting a named bean, the bean to be
@@ -156,7 +156,7 @@
       bean of the service element. Typically the top-level namespace would be
       the <literal>beans</literal> namespace when using this style:</para>
 
-      <programlisting><![CDATA[<osgi:service interface="com.xyz.MessageService">
+      <programlisting language="xml"><![CDATA[<osgi:service interface="com.xyz.MessageService">
   <bean class="SomeClass">
      ...
   </bean>
@@ -176,7 +176,7 @@
       simply use the <literal>scope</literal> attribute of the
       <literal>bean</literal> element:</para>
 
-      <programlisting><![CDATA[<osgi:service ref="beanToBeExported" interface="com.xyz.MessageService"/>
+      <programlisting language="xml"><![CDATA[<osgi:service ref="beanToBeExported" interface="com.xyz.MessageService"/>
 
 <bean id="beanToBeExported" scope="bundle" class="com.xyz.MessageServiceImpl"/>]]></programlisting>
 
@@ -200,7 +200,7 @@
         nested <literal>interfaces</literal> element can be used in place of
         the <literal>interface</literal> attribute.</para>
 
-        <programlisting><![CDATA[<osgi:service ref="beanToBeExported">
+        <programlisting language="xml"><![CDATA[<osgi:service ref="beanToBeExported">
   <osgi:interfaces>
      <value>com.xyz.MessageService</value>
      <value>com.xyz.MarkerInterface</value>
@@ -273,7 +273,7 @@
         <para>For example, to automatically register a bean under all of the
         interfaces that it supports you would declare:</para>
 
-        <programlisting><![CDATA[<service ref="beanToBeExported" auto-export="interfaces"/>]]></programlisting>
+        <programlisting language="xml"><![CDATA[<service ref="beanToBeExported" auto-export="interfaces"/>]]></programlisting>
 
         <para>Given the interface hierarchy:</para>
 
@@ -314,7 +314,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         at least one nested <literal>entry</literal> element from the Spring
         beans namespace. For example:</para>
 
-        <programlisting><![CDATA[<service ref="beanToBeExported" interface="com.xyz.MyServiceInterface">
+        <programlisting language="xml"><![CDATA[<service ref="beanToBeExported" interface="com.xyz.MyServiceInterface">
   <service-properties>
     <beans:entry key="myOtherKey" value="aStringValue"/>
     <beans:entry key="aThirdKey" value-ref="beanToExposeAsProperty"/>
@@ -339,7 +339,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         exported, then the optional <literal>depends-on</literal> attribute
         can be used to express these dependencies.</para>
 
-        <programlisting><![CDATA[<service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"
+        <programlisting language="xml"><![CDATA[<service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"
      depends-on="myOtherComponent"/>]]></programlisting>
       </section>
       
@@ -380,7 +380,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         is zero. To explicitly specify a ranking value for the registered
         service, use the optional <literal>ranking</literal> attribute.</para>
 
-        <programlisting><![CDATA[<service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"
+        <programlisting language="xml"><![CDATA[<service ref="beanToBeExported" interface="com.xyz.MyServiceInterface"
   ranking="9"/>]]></programlisting>
       </section>
 
@@ -473,7 +473,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
           <area id="service-registry.exporter.listener.nested.decl" coords="7"/>
        </areaspec>
        
-        <programlisting><![CDATA[<service ref="beanToBeExported" interface="SomeInterface">
+        <programlisting language="xml"><![CDATA[<service ref="beanToBeExported" interface="SomeInterface">
   <registration-listener ref="myListener"
     registration-method="serviceRegistered"
     unregistration-method="serviceUnregistered"/>
@@ -591,14 +591,14 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 	        returned from the service registry when querying it for a service
 	        offering the <interfacename>MessageService</interfacename> interface.</para>
 	
-	        <programlisting><![CDATA[<reference id="messageService" interface="com.xyz.MessageService"/>]]></programlisting>
+	        <programlisting language="xml"><![CDATA[<reference id="messageService" interface="com.xyz.MessageService"/>]]></programlisting>
 	        
 	        <para>Just like the <literal>service</literal> declaration, when specifying
 	        multiple interfaces, use the nested <literal>interfaces</literal> element instead
 	        of <literal>interface</literal> attribute:
 	        </para>
 	        
-	        <programlisting><![CDATA[<osgi:reference id="importedOsgiService">
+	        <programlisting language="xml"><![CDATA[<osgi:reference id="importedOsgiService">
   <osgi:interfaces>
      <value>com.xyz.MessageService</value>
      <value>com.xyz.MarkerInterface</value>
@@ -632,7 +632,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 
           <para>For example:</para>
 
-          <programlisting><![CDATA[<reference id="asyncMessageService" interface="com.xyz.MessageService"
+          <programlisting language="xml"><![CDATA[<reference id="asyncMessageService" interface="com.xyz.MessageService"
   filter="(asynchronous-delivery=true)"/>]]></programlisting>
   
   		  <para>will match only OSGi services that advertise <interfacename>MessageService</interfacename>
@@ -650,7 +650,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 
           <para>For example:</para>
 
-          <programlisting><![CDATA[<reference id="messageService" interface="com.xyz.MessageService"
+          <programlisting language="xml"><![CDATA[<reference id="messageService" interface="com.xyz.MessageService"
    bean-name="defaultMessageService"/>]]></programlisting>
    
    		  <para>will match only OSGi services that advertise <interfacename>MessageService</interfacename>
@@ -879,7 +879,7 @@ public class BeanWithServiceReference {
           <area id="service-registry.importer.single.ref.normal.injection" coords="5"/>
        </areaspec>
        	
-		<programlisting><![CDATA[<reference id="service" interface="com.xyz.SomeService"/>
+		<programlisting language="xml"><![CDATA[<reference id="service" interface="com.xyz.SomeService"/>
 		
 <bean id="someBean" class="BeanWithServiceReference">
   <property name="serviceReference" ref="service"/> 
@@ -975,7 +975,7 @@ public class BeanWithServiceReference {
         will contain all registered services supporting the
         <literal>EventListener</literal> interface:</para>
 
-        <programlisting><![CDATA[<list id="myEventListeners" 
+        <programlisting language="xml"><![CDATA[<list id="myEventListeners" 
   interface="com.xyz.EventListener"/>]]></programlisting>
 
         <para>The members of the collection defined by the bean are managed
@@ -994,7 +994,7 @@ public class BeanWithServiceReference {
         <literal>comparator</literal> element can be used to define an inline
         bean. For example:</para>
 
-        <programlisting><![CDATA[<set id="myServices" interface="com.xyz.MyService"
+        <programlisting language="xml"><![CDATA[<set id="myServices" interface="com.xyz.MyService"
   comparator-ref="someComparator"/>
 
 <list id="myOtherServices" 
@@ -1014,7 +1014,7 @@ public class BeanWithServiceReference {
         the services themselves (in which case the services must be
         <interfacename>Comparable</interfacename>).</para>
 
-        <programlisting><![CDATA[<list id="myServices" interface"com.xyz.MyService">
+        <programlisting language="xml"><![CDATA[<list id="myServices" interface"com.xyz.MyService">
   <comparator><natural-ordering basis="services"/></comparator>
 </list>
 
@@ -1259,14 +1259,14 @@ public class BeanWithServiceReference {
       <para>An example of declaring a listener that implements
       <interfacename>OsgiServiceLifecycleListener</interfacename>:</para>
 
-      <programlisting><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
+      <programlisting language="xml"><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
   <listener ref="aListenerBean"/>
 </reference>]]></programlisting>
 
       <para>An example of declaring an inline listener bean with custom
       bind and unbind methods:</para>
 
-      <programlisting><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
+      <programlisting language="xml"><![CDATA[<reference id="someService" interface="com.xyz.MessageService">
   <listener bind-method="onBind" unbind-method="onUnbind">
      <beans:bean class="MyCustomListener"/>
   </listener>
@@ -1451,7 +1451,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
           	<area id="service-registry.listener.cycles.bean" coords="5"/>
           	<area id="service-registry.listener.cycles.bean.cycle" coords="6"/>
        	  </areaspec>
-          <programlisting><![CDATA[<bean id="listener" class="cycle.Listener">
+          <programlisting language="xml"><![CDATA[<bean id="listener" class="cycle.Listener">
     <property name="target" ref="importer" />
 </bean>
 	
@@ -1491,7 +1491,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
           	<area id="service-registry.listener.bad.cycles.listener.cycle" coords="4"/>
        	  </areaspec>
        	  
-          <programlisting><![CDATA[<osgi:reference id="importer" interface="SomeService">
+          <programlisting language="xml"><![CDATA[<osgi:reference id="importer" interface="SomeService">
     <osgi:listener bind-method="bind">
         <bean class="cycle.Listener">
             <property name="target" ref="importer" />
@@ -1579,7 +1579,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
           <area id="service-registry.global.ns.default.serv.w.timeout" coords="9"/>
        </areaspec>
        
-      <programlisting><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+      <programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:osgi="http://www.springframework.org/schema/osgi"
           osgi:default-timeout="5000">
@@ -1643,7 +1643,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
          
           <area id="service-registry.global.ns.defaults.osgi.collection.w.cardinality" coords="13"/>
        </areaspec>      	
-      <programlisting><![CDATA[<beans:beans
+      <programlisting language="xml"><![CDATA[<beans:beans
       xmlns="http://www.springframework.org/schema/osgi"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:beans="http://www.springframework.org/schema/beans"
@@ -1747,7 +1747,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
         <literal>M</literal> becomes satisfied again, <literal>S</literal>
         will be re-registered.</para>
 
-        <programlisting><![CDATA[<osgi:service id="S" ref="A" interface="SomeInterface"/>
+        <programlisting language="xml"><![CDATA[<osgi:service id="S" ref="A" interface="SomeInterface"/>
 
 <bean id="A" class="SomeImplementation">
    <property name="helperService" ref="M"/>

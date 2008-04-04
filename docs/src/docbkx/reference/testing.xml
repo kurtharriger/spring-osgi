@@ -403,7 +403,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       	will be generated for it. To change the default behaviour, override <methodname>createManifestOnlyFromTestClass</methodname> to return 
       	<literal>false</literal>:</para>
       	
-      	<programlisting><![CDATA[protected boolean createManifestOnlyFromTestClass() {
+      	<programlisting language="java"><![CDATA[protected boolean createManifestOnlyFromTestClass() {
 	return true;
 }]]></programlisting> 
       	

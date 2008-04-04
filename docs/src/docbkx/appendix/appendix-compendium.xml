@@ -12,7 +12,7 @@
     By convention, the prefix <literal>osgix</literal> is used for this
     namespace.</para>
 
-    <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/osgi"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
@@ -66,7 +66,7 @@
 
         <para>Given the declarations:</para>
 
-        <programlisting><![CDATA[<osgix:property-placeholder persistent-id="com.xyz.myapp"/>
+        <programlisting language="xml"><![CDATA[<osgix:property-placeholder persistent-id="com.xyz.myapp"/>
 
 <bean id="someBean" class="AClass">
   <property name="timeout" value="${timeout}"/>
@@ -98,7 +98,7 @@
         <literal>default-properties</literal> nested element may be used to
         define an inline set of properties.</para>
 
-        <programlisting><![CDATA[<osgix:property-placeholder persistent-id="com.xyz.myapp">
+        <programlisting language="xml"><![CDATA[<osgix:property-placeholder persistent-id="com.xyz.myapp">
   <default-properties> 
      <property name="productCategory" value="E792"/>
      <property name="businessUnit" value="811"/> 

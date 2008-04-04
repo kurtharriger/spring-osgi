@@ -37,7 +37,7 @@
 
 			<para>A simple declaration of a managed service bean would look as follows:</para>
 
-			<programlisting><![CDATA[<osgix:managed-service id="myService" class="com.xyz.MessageService" 
+			<programlisting language="xml"><![CDATA[<osgix:managed-service id="myService" class="com.xyz.MessageService" 
    persistent-id="com.xyz.messageservice"/>]]></programlisting>
 
         <para>The properties of the <literal>managed-service</literal> bean
@@ -98,7 +98,7 @@ public void anyMethodName(Dictionary properties);]]></programlisting>
         <para>A simple <literal>managed-service-factory</literal> declaration
         would look as follows:</para>
 
-        <programlisting><![CDATA[<osgix:managed-service-factory id="someId" factory-pid="org.xzy.services" 
+        <programlisting language="xml"><![CDATA[<osgix:managed-service-factory id="someId" factory-pid="org.xzy.services" 
            class="MyServiceClass"/>]]></programlisting>
 
         <para>This declaration results in the creation of zero or more beans,
@@ -144,7 +144,7 @@ public void anyMethodName(Dictionary properties);]]></programlisting>
         <literal>ManagedServiceFactory</literal> interface and specify the pid
         that you are interested in as a service property. For example:</para>
 
-        <programlisting><![CDATA[<service interface="org.osgi.service.cm.ManagedService" ref="MyManagedService">
+        <programlisting language="xml"><![CDATA[<service interface="org.osgi.service.cm.ManagedService" ref="MyManagedService">
   <service-properties>
     <entry key="service.pid" value="my.managed.service.pid"/>
   </service-properties>
@@ -166,7 +166,7 @@ public void anyMethodName(Dictionary properties);]]></programlisting>
         a given persistent id. This support has yet to be designed but may
         look as follows:</para>
 
-        <programlisting><![CDATA[<service ref="toBeExported" interface="SomeInterface">
+        <programlisting language="xml"><![CDATA[<service ref="toBeExported" interface="SomeInterface">
    <osgix:config-properties persistent-id="pid"/>
 </service>]]></programlisting>
 

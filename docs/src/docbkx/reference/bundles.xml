@@ -19,7 +19,7 @@
     <literal>symbolic-name</literal> of the bundle you are interested
     in:</para>
 
-    <programlisting><![CDATA[<bundle id="aBundle" symbolic-name="org.xyz.abundle"/>]]></programlisting>
+    <programlisting language="xml"><![CDATA[<bundle id="aBundle" symbolic-name="org.xyz.abundle"/>]]></programlisting>
 
     <para>The bean <literal>aBundle</literal> can now be injected into any property of 
     type <interfacename>Bundle</interfacename>.</para>
@@ -87,7 +87,7 @@
 
     <para>For example:</para>
 
-    <programlisting><![CDATA[<!-- ensure this bundle is installed and started -->;
+    <programlisting language="xml"><![CDATA[<!-- ensure this bundle is installed and started -->;
 <bundle id="aBundle" symbolic-name="org.xyz.abundle"
    location="http://www.xyz.com/bundles/org.xyz.abundle.jar"
    action="start"/>]]></programlisting>
