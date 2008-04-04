@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender;
+package org.springframework.osgi.web.extender.deployer;
 
 import org.osgi.framework.Bundle;
 

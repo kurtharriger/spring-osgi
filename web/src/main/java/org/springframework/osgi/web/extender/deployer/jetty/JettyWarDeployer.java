@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal.jetty;
+package org.springframework.osgi.web.extender.deployer.jetty;
 
 import java.io.File;
 
@@ -27,8 +27,8 @@ import org.mortbay.util.IO;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.web.extender.internal.support.AbstractWarDeployer;
-import org.springframework.osgi.web.extender.internal.util.Utils;
+import org.springframework.osgi.web.extender.deployer.internal.util.Utils;
+import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeployer;
 
 /**
  * <a href="http://jetty.mortbay.org">Jetty</a> 6.1.x specific war deployer.

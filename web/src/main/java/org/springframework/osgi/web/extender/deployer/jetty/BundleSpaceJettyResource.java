@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal.jetty;
+package org.springframework.osgi.web.extender.deployer.jetty;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +38,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-public class BundleSpaceJettyResource extends URLResource {
+class BundleSpaceJettyResource extends URLResource {
 
 	private static final String FOLDER_SEPARATOR = "/";
 	private final Bundle bundle;

@@ -208,7 +208,6 @@
 	  <table id="osgi-search-strategies" pgwide="1">
           <title>OSGi resource search strategies</title>
           <tgroup cols="3">
-            <colspec align="left" />
             <thead>
               <row>
                 <entry>OSGi Search Strategy</entry>

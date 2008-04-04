@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal.support;
+package org.springframework.osgi.web.extender.deployer.support;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
-import org.springframework.osgi.web.extender.ContextPathStrategy;
+import org.springframework.osgi.web.extender.deployer.ContextPathStrategy;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;

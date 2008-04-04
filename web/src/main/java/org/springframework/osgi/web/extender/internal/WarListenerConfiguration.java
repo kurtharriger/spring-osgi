@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal.config;
+package org.springframework.osgi.web.extender.internal;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -30,12 +30,10 @@ import org.osgi.framework.BundleContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
-import org.springframework.osgi.web.extender.ContextPathStrategy;
-import org.springframework.osgi.web.extender.WarDeployer;
-import org.springframework.osgi.web.extender.WarScanner;
-import org.springframework.osgi.web.extender.internal.support.DefaultContextPathStrategy;
-import org.springframework.osgi.web.extender.internal.support.DefaultWarScanner;
-import org.springframework.osgi.web.extender.internal.tomcat.TomcatWarDeployer;
+import org.springframework.osgi.web.extender.deployer.ContextPathStrategy;
+import org.springframework.osgi.web.extender.deployer.WarDeployer;
+import org.springframework.osgi.web.extender.deployer.support.DefaultContextPathStrategy;
+import org.springframework.osgi.web.extender.deployer.tomcat.TomcatWarDeployer;
 import org.springframework.util.ObjectUtils;
 
 /**

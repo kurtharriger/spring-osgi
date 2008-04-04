@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal.jetty;
+package org.springframework.osgi.web.extender.deployer.jetty;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -31,7 +31,7 @@ import org.osgi.framework.Bundle;
  * @author Costin Leau
  * 
  */
-public class OsgiWebAppContext extends WebAppContext {
+class OsgiWebAppContext extends WebAppContext {
 
 	private static final String BUNDLE_PROTOCOL = "bundle";
 	/** OSGi bundle */

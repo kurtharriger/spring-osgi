@@ -45,7 +45,6 @@
     <table id ="bundle-factory-actions" border="1" cellspacing="5" pgwide="1">
       <title><![CDATA[<bundle>]]> <literal>action</literal> values</title>
      	<tgroup cols="3">
-         <colspec align="center" />
          <thead>
           <row>
            <entry>Action</entry>
@@ -105,7 +104,6 @@
    	<table id="bundle-options" pgwide="1">
       <title><![CDATA[<bundle> attributes]]></title>
        <tgroup cols="3">
-         <colspec align="center" />
          <thead>
            <row>
              <entry>Name</entry>

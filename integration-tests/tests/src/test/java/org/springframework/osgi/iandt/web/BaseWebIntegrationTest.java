@@ -51,7 +51,6 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 
 		// JSP compiler
 		col.add("org.springframework.osgi, ant.osgi, 1.7.0-SNAPSHOT");
-		col.add("org.springframework.osgi, jsp-api.osgi, 2.0-SNAPSHOT");
 		col.add("org.springframework.osgi, jasper.osgi, 5.5.23-SNAPSHOT");
 		col.add("org.springframework.osgi, commons-el.osgi, 1.0-SNAPSHOT");
 

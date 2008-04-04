@@ -335,7 +335,6 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
 	    <table id ="integration-test-jar-setting-file" border="1" pgwide="1">
 	      <title>Default test jar content settings</title>
 	     	<tgroup cols="3">
-	         <colspec align="center" />
 	         <thead>
 	          <row>
 	           <entry>Property Name</entry>
