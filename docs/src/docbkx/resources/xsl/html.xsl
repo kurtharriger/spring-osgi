@@ -5,20 +5,19 @@
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:fo="http://www.w3.org/1999/XSL/Format"
+                xmlns:xslthl="http://xslthl.sf.net"
+                exclude-result-prefixes="xslthl"                
                 version="1.0">
-
+                
     <xsl:import href="urn:docbkx:stylesheet"/>
-
+    <xsl:import href="highlight.xsl"/>
+	
     <!--###################################################
                     HTML Settings
    ################################################### -->
 	
-    <xsl:param name="html.stylesheet">html.css</xsl:param>
-
     <!-- These extensions are required for table printing and other stuff -->
-    <xsl:param name="use.extensions">1</xsl:param>
     <xsl:param name="tablecolumns.extension">0</xsl:param>
-    <xsl:param name="callout.extensions">1</xsl:param>
     <xsl:param name="graphicsize.extension">0</xsl:param>
 
     <!--###################################################
@@ -101,7 +100,7 @@
                 <img style="border:none;position:absolute;padding-top:5px;right:42px;" src="images/s2-banner-rhs.png"/>
             </a>
         </div>
-    </xsl:template>    
+    </xsl:template>
 
 </xsl:stylesheet>
 
