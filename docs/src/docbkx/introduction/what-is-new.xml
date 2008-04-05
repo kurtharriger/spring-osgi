@@ -29,14 +29,14 @@
 		</section>
 
 		<section id="dm-1.1.x:configuration">
-  		    <title>Plug-able Extender Configuration</title>
+  		    <title>Pluggable Extender Configuration</title>
 			<para>1.1.x makes it easy to change the default configuration for various <link linkend="extender-pattern">extender</link>s used by Spring-DM. By using
 			<link linkend="appendix-tips:fragments">fragments</link>, users can customize the way bundles are started, what web container should be 
-			used for deployment or what thread-pool	should be used for running Spring applications. <xref linkend="bnd-app-ctx:extender"/> explains the options 
-			in detail.  
+			used for deployment or what thread-pool	should be used for running Spring applications. Additionally, it is possible to receive events 
+			regarding the OSGi Spring application contexts lifecycle. <xref linkend="bnd-app-ctx:extender"/> explains the options in detail.  
 			</para>
 		</section>
-		
+
     </section>
 
 </chapter>

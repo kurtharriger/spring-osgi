@@ -44,39 +44,39 @@
 
     <table id ="bundle-factory-actions" border="1" cellspacing="5" pgwide="1">
       <title><![CDATA[<bundle>]]> <literal>action</literal> values</title>
-     	<tgroup cols="3">
+     	<tgroup cols="4">
          <thead>
           <row>
            <entry>Action</entry>
-           <entry>UNINSTALLED</entry>
-           <entry>INSTALLED/RESOLVED</entry>
-           <entry>ACTIVE</entry>
+           <entry><literal>UNINSTALLED</literal></entry>
+           <entry><literal>INSTALLED/RESOLVED</literal></entry>
+           <entry><literal>ACTIVE</literal></entry>
          </row>
         </thead>
         <tbody>
          <row>
-            <entry>START</entry>
+            <entry><literal>START</literal></entry>
             <entry>installs and starts the bundle</entry>
 	        <entry>starts the bundle</entry>
 	        <entry>no action taken, bundle already started</entry>
     	</row>
 
     	<row>
-	        <entry>UPDATE</entry>
+	        <entry><literal>UPDATE</literal></entry>
 	        <entry>installs the bundle and then updates it (`Bundle.update()`)</entry>
 	        <entry>updates the bundle</entry>
 	        <entry>updates the bundle</entry>
        </row>
 
        <row>
-          <entry>STOP</entry>
+          <entry><literal>STOP</literal></entry>
 	      <entry>no action taken</entry>
 	      <entry>no action taken</entry>
 	      <entry>bundle is stopped</entry>
       </row>
 
       <row>
-        <entry>UNINSTALL</entry>
+        <entry><literal>UNINSTALL</literal></entry>
         <entry>no action taken</entry>
         <entry>bundle is uninstalled</entry>
         <entry>bundle is stopped and then uninstalled</entry>
@@ -87,7 +87,7 @@
 
     <para>For example:</para>
 
-    <programlisting language="xml"><![CDATA[<!-- ensure this bundle is installed and started -->;
+    <programlisting language="xml"><![CDATA[<!-- ensure this bundle is installed and started -->
 <bundle id="aBundle" symbolic-name="org.xyz.abundle"
    location="http://www.xyz.com/bundles/org.xyz.abundle.jar"
    action="start"/>]]></programlisting>
@@ -98,39 +98,55 @@
     -->
     
     <para>The following table lists the <literal>bundle</literal> element attributes names, 
-    possible values and a short description for each of them.
+    possible values and a short description for each of them:
     </para>
    	
    	<table id="bundle-options" pgwide="1">
       <title><![CDATA[<bundle> attributes]]></title>
-       <tgroup cols="3">
+       <tgroup cols="7">
+       	 <colspec colname="c1"/>
+       	 <colspec colname="c2" align="center"/>
+       	 <colspec colname="c3" align="center"/>
+       	 <colspec colname="c4" align="center"/>
+       	 <colspec colname="c5" align="center"/>
+       	 <colspec colname="c6" align="center"/>
+       	 <colspec colname="c7" align="justify"/>
+       	 
+       	 <spanspec spanname="values" namest="c2" nameend="c6" align="justify"/>
+       	 
          <thead>
            <row>
              <entry>Name</entry>
-             <entry>Values</entry>
+             <entry spanname="values">Values</entry>
              <entry>Description</entry>
            </row>
          </thead>
          <tbody>
            <row>
              <entry>symbolic-name</entry>
-             <entry>any valid symbolic-name String</entry>
-             <entry>The bundle symbolic name of the bundle object. Normally used when interacting with an already 
+             <entry spanname="values">any valid symbolic-name String</entry>
+             <entry>The symbolic name of the bundle object. Normally used when interacting with an already 
              installed bundle.</entry>
            </row>
            <row>
              <entry>location</entry>
-             <entry>String that can be converted into an <literal>URL</literal></entry>
+             <entry spanname="values">String that can be converted into an <literal>URL</literal></entry>
              <entry>Location used to install, update or/and identify a bundle.</entry>
            </row>
            <row>
              <entry>action</entry>
-             <entry>start | stop | install | uninstall | update</entry>
+             
+             <entry>start</entry>
+             <entry>stop</entry> 
+             <entry>install</entry> 
+             <entry>uninstall</entry>
+             <entry>update</entry>
+             
              <entry>Lifecyle action to drive on the bundle. The action is executed at startup.</entry>
            </row>
            <row>
              <entry>destroy-action</entry>
-             <entry>(same as action)</entry>
+             <entry spanname="values">(same as action)</entry>
              <entry>Lifecyle action to drive on the bundle. The action is executed at shutdown.</entry>
            </row>
          </tbody>

@@ -391,30 +391,38 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
        As a summary, the following table lists the attributes names, possible values and
        a short description for each of them.
        </para>
-       <table id="service-export-options" pgwide="1">
-          <title>OSGi &lt;service&gt; attributes</title>
-          <tgroup cols="3">
+       <table id="service-export-options" pgwide="1" align="center">
+          <title>OSGi <![CDATA[<service>]]> attributes</title>
+          <tgroup cols="6">
+          	<colspec colname="c1"/>
+          	<colspec colname="c2"/>
+          	<colspec colname="c3"/>
+          	<colspec colname="c4"/>
+          	<colspec colname="c5"/>
+          	<colspec colname="c6" align="justify"/>
+            <spanspec spanname="values" namest="c2" nameend="c5" align="center"/>
             <thead>
               <row>
                 <entry>Name</entry>
-                <entry>Values</entry>
+                <entry spanname="values">Values</entry>
                 <entry>Description</entry>
               </row>
             </thead>
             <tbody>
               <row>
                 <entry>interface</entry>
-                <entry>fully qualified class name (such as <literal>java.lang.Thread</literal>)</entry>
+                <entry spanname="values">fully qualified class name (such as <classname>java.lang.Thread</classname>)</entry>
                 <entry>the fully qualified name of the class under which the object will be exported</entry>
               </row>
               <row>
                 <entry>ref</entry>
-                <entry>any bean name</entry>
+                <entry spanname="values">any bean name</entry>
                 <entry>Reference to the named bean to be exported as a service in the service registry.</entry>
               </row>
               <row>
                 <entry>context-class-loader</entry>
-                <entry>unmanaged | service-provider</entry>
+                <entry namest="c2" nameend="c3">unmanaged</entry>
+                <entry namest="c4" nameend="c5">service-provider</entry>
                 <entry>Defines how the context class loader will be managed when an operation is invoked on the 
                 exported service. The default value is <literal>unmanaged</literal> which means that no management of 
                 the context class loader is attempted. A value of <literal>service-provider</literal> guarantees that
@@ -423,7 +431,10 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
               </row>
               <row>
                 <entry>auto-export</entry>
-                <entry>disabled | interfaces | class-hierarchy | all-classes</entry>
+                <entry>disabled</entry>
+                <entry>interfaces</entry>
+                <entry>class-hierarchy</entry>
+                <entry>all-classes</entry>
                 <entry>Enables Spring to automatically manage the set of service interfaces advertised for the
 				service. By default this facility is <literal>disabled</literal>. A value of <literal>interfaces</literal> advertises all 
                 of the Java interfaces supported by the exported service. A value of <literal>class-hierarchy</literal> 
@@ -432,7 +443,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
               </row>
               <row>
                 <entry>ranking</entry>
-                <entry>any integer value</entry>
+                <entry spanname="values">any integer value</entry>
                 <entry>Specify the service ranking to be used when advertising the service. Default value is 0.</entry>
               </row>
               
@@ -760,35 +771,45 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </para>
        	<table id="reference-import-options" pgwide="1">
           <title><![CDATA[OSGi <reference> attributes]]></title>
-          <tgroup cols="3">
+          <tgroup cols="5">
+           	<colspec colname="c1"/>
+          	<colspec colname="c2" align="center"/>
+          	<colspec colname="c3" align="center"/>
+          	<colspec colname="c4" align="center"/>
+          	<colspec colname="c5" align="center"/>
+          	<colspec colname="c6" align="justify"/>
+          	<spanspec namest="c2" nameend="c5" spanname="values" align="center"/>
+          
             <thead>
               <row>
                 <entry>Name</entry>
-                <entry>Values</entry>
+                <entry spanname="values">Values</entry>
                 <entry>Description</entry>
               </row>
             </thead>
             <tbody>
               <row>
                 <entry>interface</entry>
-                <entry>fully qualified class name (such as <classname>java.lang.Thread</classname>)</entry>
+                <entry spanname="values">fully qualified class name (such as <classname>java.lang.Thread</classname>)</entry>
                 <entry>The fully qualified name of the class under which the object will be exported.</entry>
               </row>
               <row>
                 <entry>filter</entry>
-                <entry>OSGi filter expression (such as <literal>((asynchronous-delivery=true)</literal>)</entry>
+                <entry spanname="values">OSGi filter expression (such as <literal>((asynchronous-delivery=true)</literal>)</entry>
                 <entry>OSGi filter expression that is used to constrain the set of matching services
                 in the service registry.</entry>
               </row>
               <row>
                 <entry>bean-name</entry>
-                <entry>any string value</entry>
+                <entry spanname="values">any string value</entry>
                 <entry>Convenient shortcut for specifying a filter expression that matches on the bean-name property 
                 that is automatically advertised for beans published using the &lt;service&gt; element.</entry>
               </row>
               <row>
                 <entry>context-class-loader</entry>
-                <entry>client |  service-provider | unmanaged</entry>
+                <entry>client</entry>
+                <entry namest="c3" nameend="c4" align="center">service-provider</entry>
+                <entry>unmanaged</entry>
                 <entry>Defines how the context class loader is managed when invoking operations on a service
                 backing this service reference. The default value is <literal>client</literal> which means that the context
                 class loader has visibility of the resources on this bundle's classpath. Alternate
@@ -798,7 +819,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
               </row>
               <row>
                 <entry>cardinality</entry>
-                <entry>0..1 | 1..1</entry>
+                <entry namest="c2" nameend="c3" align="center">0..1</entry>
+                <entry namest="c4" nameend="c5" align="center">1..1</entry>
                 <entry>Defines the required cardinality of the relationship to the backing service. If not specified, 
                 the <literal>default-cardinality</literal> attribute will apply. A value is '1..1' means that a backing service 
                 must exist (this is a mandatory service reference). A value of '0..1' indicates that it is 
@@ -806,7 +828,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
               </row>
               <row>
                 <entry>timeout</entry>
-                <entry>any positive long</entry>
+                <entry spanname="values">any positive long</entry>
                 <entry>The amount of time (in milliseconds) to wait for a backing service to be 
 				available when an operation is invoked. If not specified, the <literal>default-timeout</literal> attribute will apply.
                 </entry>
@@ -1036,40 +1058,48 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </para>
        	<table id="collection-import-options" pgwide="1">
           <title><![CDATA[<list>/<set> attributes]]></title>
-          <tgroup cols="3">
-			<colspec colname="c1" colwidth="1*"/>
-        	<colspec colname="c2" colwidth="2*"/>
-        	<colspec colname="c3" colwidth="4*"/>
+          <tgroup cols="6">
+			<colspec colname="c1"/>
+        	<colspec colname="c2" align="center"/>
+        	<colspec colname="c3" align="center"/>
+        	<colspec colname="c4" align="center"/>
+        	<colspec colname="c5" align="center"/>
+        	<colspec colname="c6" align="justify"/>
+        	<spanspec spanname="values" namest="c2" nameend="c5" align="justify"/>
 
             <thead>
               <row>
                 <entry>Name</entry>
-                <entry>Values</entry>
+                <entry spanname="values">Values</entry>
                 <entry>Description</entry>
               </row>
             </thead>
             <tbody>
               <row>
                 <entry>interface</entry>
-                <entry>fully qualified class name (such as <classname>java.lang.Thread</classname>)</entry>
+                <entry spanname="values">fully qualified class name (such as <classname>java.lang.Thread</classname>)</entry>
                 <entry>The fully qualified name of the class under which the object will be exported.</entry>
               </row>
               <row>
                 <entry>filter</entry>
-                <entry>OSGi filter expression (such as <literal>((asynchronous-delivery=true)</literal>)</entry>
+                <entry spanname="values">OSGi filter expression (such as <literal>((asynchronous-delivery=true)</literal>)</entry>
                 <entry>OSGi filter expression that is used to constrain the set of matching services
                 in the service registry.</entry>
               </row>
               <row>
                 <entry>bean-name</entry>
-                <entry>any string value</entry>
+                <entry spanname="values">any string value</entry>
                 <entry>Convenient shortcut for specifying a filter expression that matches on the bean-name property 
                 that is automatically advertised for beans published using the &lt;service&gt; element.</entry>
               </row>
               <row>
-                <entry colname="c1">context-class-loader</entry>
-                <entry colname="c2">client |  service-provider | unmanaged</entry>
-                <entry colname="c3">Defines how the context class loader is managed when invoking operations on a service
+                <entry>context-class-loader</entry>
+                
+                <entry>client</entry>
+                <entry namest="c3" nameend="c4" align="center">service-provider</entry>
+                <entry>unmanaged</entry>
+                
+                <entry>Defines how the context class loader is managed when invoking operations on a service
                 backing this service reference. The default value is <literal>client</literal> which means that the context
                 class loader has visibility of the resources on this bundle's classpath. Alternate
                 options are <literal>service-provider</literal> which means that the context class loader has visibility of 
@@ -1077,16 +1107,17 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
                	which does not do any management of the context class loader.</entry>
               </row>
               <row>
-                <entry colname="c1">cardinality</entry>
-                <entry colname="c2">0..N | 1..N</entry>
-                <entry colname="c3">Defines the required cardinality of the relationship to the backing service. If not specified, 
+                <entry>cardinality</entry>
+                <entry namest="c2" nameend="c3" align="center">0..N</entry>
+                <entry namest="c4" nameend="c5" align="center">1..N</entry>
+                <entry>Defines the required cardinality of the relationship to the backing service. If not specified, 
                 the <literal>default-cardinality</literal> attribute will apply. A value is '1..N' means that a backing service 
                 must exist (this is a mandatory service reference). A value of '0..N' indicates that it is 
                 acceptable to be no backing service (an optional service reference).</entry>
               </row>
               <row>
                 <entry>comparator-ref</entry>
-                <entry>any string value</entry>
+                <entry spanname="values">any string value</entry>
                 <entry>Named reference to a bean acting as comparator for the declaring collection. Declaring a comparator automatically
                 makes the declaring collection sorted.</entry>
               </row>              
@@ -1099,20 +1130,24 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
        	 <table id="collection-import-comparator-options" pgwide="1">
           <title><![CDATA[collection <comparator> attributes]]></title>
           <tgroup cols="3">
-            <colspec colname="c1" colwidth="1*"/>
-        	<colspec colname="c2" colwidth="2*"/>
-        	<colspec colname="c3" colwidth="5*"/>
+            <colspec colname="c1"/>
+        	<colspec colname="c2"/>
+        	<colspec colname="c3"/>
+        	<colspec colname="c4"/>
+        	<spanspec spanname="values" namest="c2" nameend="c3"/>
+        	
             <thead>
               <row>
                 <entry>Name</entry>
-                <entry>Values</entry>
+                <entry spanname="values">Values</entry>
                 <entry>Description</entry>
               </row>
             </thead>
             <tbody>
               <row>
                 <entry>basis</entry>
-                <entry>service | service-reference</entry>
+                <entry>service</entry>
+                <entry>service-reference</entry>
                 <entry>Indicate the element on which <emphasis>natural ordering</emphasis> should apply - <literal>service</literal> for considering
                 the service instance and <literal>service-reference</literal> for considering the service reference instead of the service.</entry>
               </row>
