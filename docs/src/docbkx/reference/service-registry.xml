@@ -865,8 +865,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         in place of the service itself:</para>
 
 
-		<programlisting language="java"><![CDATA[
-public class BeanWithServiceReference {
+		<programlisting language="java"><![CDATA[public class BeanWithServiceReference {
 	private ServiceReference serviceReference;
 	private SomeService service;
 			
@@ -1584,10 +1583,10 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       xmlns:osgi="http://www.springframework.org/schema/osgi"
           osgi:default-timeout="5000">
 
-  <reference id="someService" interface="com.xyz.AService" .../>
+  <reference id="someService" interface="com.xyz.AService"/>
 
   <reference id="someOtherService" interface="com.xyz.BService"
-       timeout="1000" .../>
+       timeout="1000"/>
 
 </beans:beans>]]></programlisting>
 

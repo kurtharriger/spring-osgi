@@ -14,6 +14,7 @@
 
 
     <xsl:import href="urn:docbkx:stylesheet"/>
+    <xsl:import href="highlight-fo.xsl"/>
 
     <!--###################################################
                   Custom Title Page
@@ -151,12 +152,7 @@
    ################################################### -->
 
     <!-- These extensions are required for table printing and other stuff -->
-    <xsl:param name="use.extensions">1</xsl:param>
-	<xsl:param name="highlight.source">1</xsl:param>
-	<!-- xml css looks weird -->
-	<xsl:param name="highlight.default.language"></xsl:param>
     <xsl:param name="tablecolumns.extension">0</xsl:param>
-    <xsl:param name="callout.extensions">1</xsl:param>
     <!-- FOP provide only PDF Bookmarks at the moment -->
     <xsl:param name="fop.extensions">1</xsl:param>
 
