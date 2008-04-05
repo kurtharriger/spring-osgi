@@ -17,6 +17,7 @@
     <xsl:param name="use.id.as.filename">'1'</xsl:param>
 	<xsl:param name="tablecolumns.extension">0</xsl:param>
     <xsl:param name="graphicsize.extension">0</xsl:param>
+    <xsl:param name="ignore.image.scaling">1</xsl:param>
     <!--###################################################
                       Table Of Contents
     ################################################### -->

@@ -345,13 +345,13 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
 	        <tbody>
 	         <row>
 	            <entry>root.dir</entry>
-	            <entry>file:./target/test-classes</entry>
+	            <entry><literal>file:./target/test-classes</literal></entry>
 		        <entry>the root folder considered as the jar root</entry>
 	    	</row>
 	
 	    	<row>
 		        <entry>include.patterns</entry>
-		        <entry>/**/*.class, /**/*.xml, /**/*.properties</entry>
+		        <entry><literal>/**/*.class,/**/*.xml,/**/*.properties</literal></entry>
 		        <entry>Comma-separated string of Ant-style patterns</entry>
 	       </row>
 	

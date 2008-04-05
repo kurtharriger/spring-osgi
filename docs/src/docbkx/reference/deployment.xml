@@ -227,13 +227,14 @@ context ::= path ( ';' path ) * (';' directive) *
     </section>
     
     <section id="app-deploy:extender-configuration">
-    	<title>Extender Configuration Options</title>
+    	<title>Extender configuration options</title>
     	
     	<para>Aside from bundle-specific configurations, Spring-DM allows the core extender generic behaviour be configured. This is useful when
     	embedding Spring-DM inside a managed environment or when a bundles-wide functionality is desired. To allow for extensible configuration,
     	the extender relies on OSGi <link linkend="appendix-tips:fragments">fragments</link> to override its defaults. The extender looks for all XML files 
-    	under <literal>META-INF/spring</literal> folder in its bundle space and assembled them into an application context that 
-    	is used internally as its configuration. To override a default setting of the extender, look up the appropriate bean
+    	under <literal>META-INF/spring</literal> folder in its bundle space and assembled them into an application context 
+    	(of type <classname>OsgiBundleXmlApplicationContext</classname>) 
+    	that is used internally as its configuration. To override a default setting of the extender, look up the appropriate bean
     	name from the table below, define it in a suitable manner and then attach it as a <link linkend="appendix-tips:fragments">fragment</link> to the 
     	<literal>spring-osgi-extender.jar</literal>, using:</para>
 		<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.extender]]></programlisting>    	  
@@ -242,7 +243,7 @@ context ::= path ( ';' path ) * (';' directive) *
     	
     	<table id="extender-configuration-options" pgwide="1">
           <title>Extender Configuration Options</title>
-          <tgroup cols="3">
+          <tgroup cols="4">
             <thead>
               <row>
                 <entry>Bean Name</entry>
@@ -254,19 +255,36 @@ context ::= path ( ';' path ) * (';' directive) *
             <tbody>
               <row>
                 <entry><literal>taskExecutor</literal></entry>
-                <entry><interfacename>org.springframework.core.task.TaskExecutor</interfacename></entry>
+                <entry><interfacename>TaskExecutor</interfacename>
+                <footnote><literal>org.springframework.core.task</literal> package</footnote></entry>
                 <entry>Creates, runs and destroys the Spring application contexts associated with each bundle. The task executor is responsible for managing its own pool
-                of threads used by the application contexts.</entry>
+                of threads used by the application contexts</entry>
                 <entry><classname>SimpleAsyncTaskExecutor</classname> is used by default which means a new thread will be created for each application contexts. While this
                 is suitable for testing and development, we strongly recommend to use a <ulink url="http://en.wikipedia.org/wiki/Thread_pool_pattern">thread pool</ulink> 
-                in a production environment.</entry>
+                in a production environment</entry>
               </row>
               
               <row>
                 <entry><literal>extenderProperties</literal></entry>
                 <entry><classname>java.util.Properties</classname></entry>
                 <entry>Defines simple properties such as the maximum time for contexts to gracefully close</entry>
-                <entry>See the <link linkend="extender-configuration-options-properties">defaults</link> below.</entry>
+                <entry>See the <link linkend="extender-configuration-options-properties">defaults</link> below</entry>
+              </row>
+              
+              <row>
+                <entry><literal>applicationEventMulticaster</literal></entry>
+                <entry><interfacename>ApplicationEventMulticaster</interfacename>
+                <footnote><literal>org.springframework.context.event</literal> package</footnote>
+                </entry>
+                <entry><literal><ulink url="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/event/ApplicationEventMulticaster.html">
+                ApplicationEventMultiCaster</ulink></literal> used for propagating Spring-DM <link linkend="app-deploy:extender-configuration:events">events</link>
+                to third parties. 
+                </entry>
+                <entry>An instance of <classname><ulink url="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/event/SimpleApplicationEventMulticaster.html">
+                SimpleApplicationEventMulticaster</ulink></classname> is used.
+                See <classname>AbstractApplicationContext</classname> 
+                <ulink url="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/support/AbstractApplicationContext.html">javadoc</ulink> 
+                for more information regarding available beans in an application context.</entry>
               </row>
             </tbody>
           </tgroup>
@@ -276,7 +294,7 @@ context ::= path ( ';' path ) * (';' directive) *
    	
     	<table id="extender-configuration-options-properties" pgwide="1">
           <title>Available <literal>extenderProperties</literal></title>
-          <tgroup cols="3">
+          <tgroup cols="4">
             <thead>
               <row>
                 <entry>Name</entry>
@@ -302,7 +320,58 @@ context ::= path ( ';' path ) * (';' directive) *
               </row>
             </tbody>
           </tgroup>
-    	</table>		
+    	</table>
+    	
+    	<note>Since an application context is used, the full power of the Spring IoC container can be used for creating the extender configuration beans</note>
+    	
+    	<section id="app-deploy:extender-configuration:events">
+    		<title>Listening to Extender events</title>
+    		
+    		<para>There are cases when the failure or succesful startup of an application context needs to be acknowledged for logging purposes (for example).
+    		For these cases, Spring-DM offers a dedicated package <literal>org.springframework.osgi.context.event</literal> which defines the events that
+    		OSGi application contexts can send during their lifecycle. At the moment, the following events are available:</para>
+    		 
+	    	<table id="app-deploy:extender-configuration:events-table" pgwide="1">
+	          <title>Spring-DM build-in events</title>
+	          <tgroup cols="2">
+	            <thead>
+	              <row>
+	                <entry>Event</entry>
+	                <entry>Explanation</entry>
+	              </row>
+	            </thead>
+	            <tbody>
+	              <row>
+	                <entry><classname>OsgiBundleContextRefreshedEvent</classname></entry>
+	                <entry>Published when an OSGi application context has been succesfully initialized or refreshed (e.g. using the 
+	                <methodname>refresh()</methodname>  method on the <interfacename>ConfigurableApplicationContext</interfacename> interface).
+	                There are no guarantees on how many times this event might be received during the lifecycle of an application context - this is
+	                left up to the used implementation.</entry>
+	              </row>
+
+	              <row>
+	                <entry><classname>OsgiBundleContextFailedEvent</classname></entry>
+	                <entry>Published when an OSGi application context is closed due to a failure. This event can appear any time during the lifecycle
+	                of an application context - before, during or after refresh. Usually the cause indicates an error in the configuration - syntax typo,
+	                incorrect wiring, missing bean and so forth.</entry>
+	              </row>
+	            </tbody>
+	          </tgroup>
+	    	</table>
+    		
+    		<para>Parties interested in receiving these events should implement <interfacename>OsgiBundleApplicationContextListener</interfacename> and
+    		then publish it as an OSGi service. The Spring-DM extender will automatically detect the listener and will send the events to it. By taking advantage
+    		of the OSGi service registry, the extender decouples the received from the event publisher and moreover, makes the registration/unregistration process
+    		easier. For example, there is nothing special a client should do to unregister the listener - simply stopping the bundle will automatically 
+    		unregister all its published services (including the listener), an event which will detected by the extender which will remove the listener.
+    		Of course, it is also possible for the client to unregister the listener manually during a bundle lifecycle.
+			    		
+    		<note>The Spring-DM events semantics are slightly different then
+    		<ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#context-functionality-events">Spring's</ulink>. The OSGi events are
+    		not sent to beans inside the <emphasis>causing</emphasis> application context but to other parties (possible beans in other application contexts)
+    		interested in monitoring its behaviour.</note>
+    		</para>
+    	</section>		
     </section>
     
 
