@@ -16,8 +16,13 @@ All demos require Maven 2.0.7+ and JDK 1.4+.
 
 Each module should be run from its top folder using maven:
 
-# mvn clean install
+# mvn clean install -P <osgi.platform>
 
+where osgi.platform can be one of the following:
+
+equinox - Eclipse Equinox
+knopflerfish - Knopflerfish
+felix - Apache Felix
 
 Alternatively, one can run only the samples and compile the project by
 using the existing Maven profiles. See the Spring-DM root folder readme.txt.
