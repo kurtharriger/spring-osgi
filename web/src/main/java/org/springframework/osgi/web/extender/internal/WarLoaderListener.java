@@ -110,8 +110,7 @@ public class WarLoaderListener implements BundleActivator {
 			try {
 				warDeployer.deploy(bundle, contextPath);
 
-				if (debug)
-					log.debug("Bundle " + bundleName + "successfully deployed");
+				log.info("Bundle " + bundleName + " successfully deployed at [" + contextPath + "]");
 
 			}
 			catch (Exception ex) {
@@ -146,8 +145,7 @@ public class WarLoaderListener implements BundleActivator {
 			managedBundles.remove(bundle);
 			try {
 				warDeployer.undeploy(bundle, contextPath);
-				if (debug)
-					log.debug("Bundle " + bundleName + "successfully undeployed");
+				log.info("Successfully undeployed war from [" + contextPath + "]");
 			}
 			catch (Exception ex) {
 				// log exception
@@ -295,10 +293,9 @@ public class WarLoaderListener implements BundleActivator {
 			String contextPath = contextPathStrategy.getContextPath(bundle);
 			// make sure it doesn't contain spaces (causes subtle problems with Tomcat Jasper)
 			Assert.doesNotContain(contextPath, " ", "context path should not contain whitespaces");
-			if (debug)
-				log.debug(OsgiStringUtils.nullSafeNameAndSymName(bundle)
-						+ " is a WAR, scheduling war deployment on context path + [" + contextPath
-						+ "] (detected web.xml at " + webXml + ")");
+			log.info(OsgiStringUtils.nullSafeNameAndSymName(bundle)
+					+ " is a WAR, scheduling war deployment on context path + [" + contextPath
+					+ "] (detected web.xml at " + webXml + ")");
 
 			managedBundles.put(bundle, contextPath);
 			deploymentManager.deployBundle(bundle, contextPath);
@@ -312,9 +309,8 @@ public class WarLoaderListener implements BundleActivator {
 		// if it has, then undeploy it
 		String contextPath = (String) managedBundles.remove(bundle);
 		if (contextPath != null) {
-			if (debug)
-				log.debug(OsgiStringUtils.nullSafeNameAndSymName(bundle)
-						+ " is a WAR, scheduling war undeployment with context path [" + contextPath + "]");
+			log.info(OsgiStringUtils.nullSafeNameAndSymName(bundle)
+					+ " is a WAR, scheduling war undeployment with context path [" + contextPath + "]");
 
 			deploymentManager.undeployBundle(bundle, contextPath);
 		}

@@ -17,12 +17,12 @@
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.4.3/slf4j-log4j12-1.4.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.lifecycle/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.lifecycle-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.service.listener/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.service.listener-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.simple.service/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.simple.service-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/lifecycle/1.1.0-m1-SNAPSHOT/lifecycle-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/service.listener/1.1.0-m1-SNAPSHOT/service.listener-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/simple.service/1.1.0-m1-SNAPSHOT/simple.service-1.1.0-m1-SNAPSHOT.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.annotation.dependencies/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.annotation.dependencies-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.annotation.proxy/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.annotation.proxy-1.1.0-m1-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/org.springframework.osgi.iandt.component.scan.bundle/1.1.0-m1-SNAPSHOT/org.springframework.osgi.iandt.component.scan.bundle-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/annotation.dependencies/1.1.0-m1-SNAPSHOT/annotation.dependencies-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/annotation.proxy/1.1.0-m1-SNAPSHOT/annotation.proxy-1.1.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/component.scan.bundle/1.1.0-m1-SNAPSHOT/component.scan.bundle-1.1.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>
