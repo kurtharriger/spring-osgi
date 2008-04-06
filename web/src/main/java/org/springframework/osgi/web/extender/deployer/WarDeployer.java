@@ -19,15 +19,19 @@ package org.springframework.osgi.web.extender.deployer;
 import org.osgi.framework.Bundle;
 
 /**
- * OSGi WAR bundle deployer. Implementations are free to use specific
- * environments for the actual deployment process, such as Apache Tomcat, OSGi
- * HttpService, Jetty or other web containers.
+ * OSGi WAR bundle deployer. Handles the installing and uninstalling of the OSGi
+ * bundle as an web application and deals with any container specific
+ * integration.
  * 
- * <p/>As the war listener handles the detection, start up and shutdown of
- * bundles, the deployer should be concerned only with the deployment process.
- * It is recommend that no tracking is performed inside the deployer (unless
- * necessary) and that the thrown exceptions (if any) are not wrapped (the
- * extender will take care of logging and wrapping them).
+ * <p/> Implementations are free to use specific environments for the actual
+ * deployment process, such as Apache Tomcat, OSGi HttpService, Jetty or other
+ * web containers.
+ * 
+ * <p/>As the war listener handles the detection, start up and shutdown of the
+ * bundles, the deployer should be concerned only with the deployment process of
+ * the bundle.
+ * It is recommended to thrown exceptions (if any) in unwrapped as the extender
+ * will take care of logging and wrapping.
  * 
  * @author Costin Leau
  * @see ContextPathStrategy
@@ -35,9 +39,11 @@ import org.osgi.framework.Bundle;
 public interface WarDeployer {
 
 	/**
-	 * Deploys the given bundle as a WAR using the given context path. It is
-	 * assumed that the given bundle is a WAR, meaning that it contains a
-	 * <code>WEB-INF/web.xml</code> file in its bundle space.
+	 * Deploys the given bundle as a WAR using the given context path.
+	 * Traditionally, a WAR means the given bundle contains a
+	 * <code>WEB-INF/web.xml</code> file in its bundle space. However,
+	 * implementations can chose to create a <em>synthetic</em> WAR or use
+	 * other configuration files instead.
 	 * 
 	 * @param bundle war bundle
 	 * @param contextPath the war context path

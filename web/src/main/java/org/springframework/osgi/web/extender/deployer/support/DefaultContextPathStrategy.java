@@ -25,15 +25,29 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Default implementation of the {@link ContextPathStrategy} interface that
- * considers the OSGi bundle properties.
+ * {@link ContextPathStrategy} default implementation that takes into account
+ * the OSGi bundle properties for determining the war context path.
  * 
- * <p/> This implementation will use the bundle location filename, falling back
- * to the bundle name and, in case that's missing, to the bundle symbolic name.
- * If neither of these properties is available then the bundle object identity
- * will be used.
+ * <p/>This implementation iterates through following properties, considering
+ * the first one that is available in the following order:
+ * 
+ * <ol>
+ * <li>bundle location - if present, the location filename is returned as the
+ * context path.</li>
+ * <li>bundle name - if present, it is used as a fall back to the bundle
+ * location.</li>
+ * <li>bundle symbolic name - if present, it used as a fallback to the bundle
+ * name.</li>
+ * <li>bundle identity - if neither of the properties above is present, the
+ * bundle object identity will be used as context path.</li>
+ * </ol>
  * 
  * @author Costin Leau
+ * 
+ * @see Bundle#getLocation()
+ * @see Constants#BUNDLE_NAME
+ * @see Bundle#getSymbolicName()
+ * @see System#identityHashCode(Object)
  */
 public class DefaultContextPathStrategy implements ContextPathStrategy {
 

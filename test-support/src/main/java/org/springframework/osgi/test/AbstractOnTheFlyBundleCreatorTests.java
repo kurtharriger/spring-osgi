@@ -54,8 +54,20 @@ import org.springframework.util.StringUtils;
  * test, create the OSGi bundle manifest and pack the test and its resources in
  * a jar that can be installed inside an OSGi platform.
  * 
- * <p/> Note that in more complex scenarios, dedicated packaging tools (such as
+ * <p/>Additionally, a valid OSGi manifest is automatically created for the
+ * resulting test if the user does not provide one. The classes present in the
+ * archive are analyzed and based on their byte-code, the required
+ * <code>Import-Package</code> entries (for packages not found in the bundle)
+ * are created.
+ * 
+ * Please see the reference documentation for an in-depth explanation and usage
+ * examples.
+ * 
+ * <p/>Note that in more complex scenarios, dedicated packaging tools (such as
  * ant scripts or maven2) should be used.
+ * 
+ * <p/>It is recommend to extend {@link AbstractConfigurableBundleCreatorTests}
+ * rather then this class as the former offers sensible defaults.
  * 
  * @author Costin Leau
  * 

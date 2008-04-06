@@ -66,7 +66,7 @@ import org.springframework.util.StringUtils;
  * strings which identify the resources that should be included into the
  * archive.</li>
  * <li>manifest ({@value #MANIFEST})- the location of the manifest used for
- * testing.</li>
+ * testing (if automatic generation is undesired).</li>
  * </ul>
  * <p/> These settings can be configured by:
  * <ul>
@@ -79,10 +79,16 @@ import org.springframework.util.StringUtils;
  * implementation.</li>
  * </ul>
  * 
+ * <p/>Another useful functionality inherited from
+ * {@link AbstractOnTheFlyBundleCreatorTests} class is the ability to create a
+ * manifest for the test bundle on the fly, based on the classes present in the
+ * archive.
+ * 
  * <p/><b>Note:</b> This class is the main testing framework entry point
  * 
  * @author Costin Leau
  * 
+ * @see AbstractOnTheFlyBundleCreatorTests
  */
 public abstract class AbstractConfigurableBundleCreatorTests extends AbstractOnTheFlyBundleCreatorTests {
 

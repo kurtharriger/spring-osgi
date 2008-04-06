@@ -31,11 +31,18 @@ import org.springframework.osgi.web.extender.deployer.internal.util.Utils;
 import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeployer;
 
 /**
- * <a href="http://tomcat.apache.org">Tomcat</a> 6.0.x specific war deployer.
- * Since Tomcat Catalina classes do not use interfaces, CGLIB is required for
- * proxying the server OSGi service.
+ * Apache <a href="http://tomcat.apache.org">Tomcat</a> 5.5.x/6.0.x specific
+ * war deployer. Unpacks the given bundle into a temporary folder which is then
+ * used for deploying the war into the web container.
+ * 
+ * <p/>The deployer expects the {@link org.apache.catalina.startup.Catalina}
+ * instance to be published as an OSGi service under {@link Embedded} class.
  * 
  * @author Costin Leau
+ * 
+ * @see Context
+ * @see Container
+ * @see Loader
  */
 public class TomcatWarDeployer extends AbstractWarDeployer {
 
