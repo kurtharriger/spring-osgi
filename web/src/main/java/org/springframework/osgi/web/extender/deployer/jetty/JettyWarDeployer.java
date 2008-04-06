@@ -31,11 +31,18 @@ import org.springframework.osgi.web.extender.deployer.internal.util.Utils;
 import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeployer;
 
 /**
- * <a href="http://jetty.mortbay.org">Jetty</a> 6.1.x specific war deployer.
- * Since Jetty Server does not use interfaces, CGLIB is required for proxying.
+ * <a href="http://jetty.mortbay.org">Jetty</a> 6.1.x+ specific war deployer.
+ * Unpacks the given bundle into a temporary folder which is then used for
+ * deploying the war into the web container. While the bundle could be used in
+ * packed formed by Jetty, for performance reasons and JSP support (through
+ * Jasper) an unpack, file-system based format is required.
+ * 
+ * <p/>The deployer expects the Jetty instance to be published as an OSGi
+ * service under {@link Server} class.
  * 
  * @author Costin Leau
  * 
+ * @see WebAppContext
  */
 public class JettyWarDeployer extends AbstractWarDeployer {
 

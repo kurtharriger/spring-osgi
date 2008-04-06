@@ -26,8 +26,9 @@ import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.deployer.WarDeployer;
 
 /**
- * Template class offering common functionality for war deployers such as
- * tracking.
+ * Convenient base class offering common functionality for war deployers such as
+ * logging. Additionally, subclasses can associate a <em>context</em> with
+ * each bundle deployed which will used at undeployment time.
  * 
  * @author Costin Leau
  */
@@ -40,6 +41,13 @@ public abstract class AbstractWarDeployer implements WarDeployer {
 	private final Map deployments = CollectionFactory.createConcurrentMap(4);
 
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Logs bundle deployment and associates it with a <em>context</em>
+	 * object. It's up to the subclass to define this object as it usually
+	 * contains container specific information.
+	 */
 	public void deploy(Bundle bundle, String contextPath) throws Exception {
 		if (log.isDebugEnabled())
 			log.debug("Creating deployment for [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] at ["
@@ -54,6 +62,12 @@ public abstract class AbstractWarDeployer implements WarDeployer {
 		startDeployment(deployment);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Logs bundle undeployment and clears the <em>context</em> object
+	 * associated with the bundle.
+	 */
 	public void undeploy(Bundle bundle, String contextPath) throws Exception {
 		if (log.isDebugEnabled())
 			log.debug("About to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
@@ -65,11 +79,11 @@ public abstract class AbstractWarDeployer implements WarDeployer {
 	}
 
 	/**
-	 * Creates and configures the web deployment for the given bundle. The
-	 * returned object is used for tracking the bundle and implementations are
-	 * free to use whatever appeals to the target environment. The returned
-	 * object will be given as argument to {@link #deploy(Bundle)} and
-	 * {@link #undeploy(Bundle)}.
+	 * Creates and configures (but does not start) the web deployment for the
+	 * given bundle. The returned object is used during the deploy/undeploy
+	 * stages; implementations are free to use whatever appeals to the target
+	 * environment. The returned object will be given as argument to
+	 * {@link #deploy(Bundle)} and {@link #undeploy(Bundle)}.
 	 * 
 	 * @param bundle OSGi bundle deployed as war
 	 * @param contextPath WAR context path

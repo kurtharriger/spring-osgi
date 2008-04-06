@@ -533,6 +533,12 @@ limitations under the License.
                <title>Spring Dynamic Modules IO</title>
                <packages>org.springframework.osgi.io*</packages>
             </group>
+
+            <group>
+               <title>Spring Dynamic Modules Web Support</title>
+               <packages>org.springframework.osgi.web*</packages>
+            </group>
+            
             <group>
                <title>Spring Dynamic Modules Integration Testing Framework</title>
                <packages>org.springframework.osgi.test*</packages>
@@ -569,9 +575,11 @@ limitations under the License.
             <link>http://logging.apache.org/log4j/docs/api/</link>
             <link>http://jakarta.apache.org/commons/logging/apidocs/</link>
             <link>http://junit.sourceforge.net/javadoc/</link>
-            <link>http://aopalliance.sourceforge.net/doc</link>
-            <!--
+            <link>http://aopalliance.sourceforge.net/doc/</link>
             <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
+            <link>http://tomcat.apache.org/tomcat-5.5-doc/catalina/docs/api/</link>
+            <link>http://www.mortbay.org/apidocs/</link>
+            <!--
             <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
             -->
           </links>
