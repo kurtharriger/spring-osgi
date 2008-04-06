@@ -42,9 +42,8 @@
     	<title>Web support usage</title>
     	<para>To use Spring-DM with wars, install the <literal>spring-osgi-web.jar</literal> bundle which uses the <link linkend="extender-pattern">extender pattern</link>
     	to detect started OSGi war bundles and deploy them to one of the supported web containers. By default, Tomcat will be used but this can be changed to Jetty or to another custom 
-    	server. When the war bundle is stopped, Spring-DM will also stop and uninstall the web application associated with it. Just like with 
-    	<emphasis>traditional</emphasis> web development, WAR bundles will automatically see the Servlet and JSP classes available in the web container without 
-    	importing them explicitly.</para>
+    	server. When the war bundle is stopped, Spring-DM will also stop and uninstall the web application associated with it. Different from 
+    	<emphasis>traditional</emphasis> web development, the Servlet classes need to be explicitly imported as the OSGi class path always takes priority.</para>
     </section>
     
     <section id="web:classpath">
@@ -64,7 +63,14 @@
     	
     	<section id="web:classpath:servlets">
     		<title>Servlets</title>
-    		<para>The <ulink url="http://java.sun.com/products/servlet/">servlet</ulink> <ulink url="http://java.sun.com/products/servlet/reference/api/index.html">specification</ulink> 
+    		
+    		<para>The main difference from the <emphasis>traditional</emphasis> WAR deployment is that the Servlet packages need to be imported so they are
+    		available to the Servlets inside the bundle. To do that, add the following packages to the <literal>Import-Package</literal> entry:</para>
+    		
+			<programlisting><![CDATA[Import-Package: javax.servlet,javax.servlet.http,javax.servlet.resources]]></programlisting>
+			
+    		<para>Additionally, the <ulink url="http://java.sun.com/products/servlet/">servlet</ulink> 
+    		<ulink url="http://java.sun.com/products/servlet/reference/api/index.html">specification</ulink> 
     		defines the classpath of a WAR, based on some predefined locations. To quickly recap, these are: </para>
 			<itemizedlist>
 				<listitem><literal>WEB-INF/classes</literal> - all resources under <literal>WEB-INF/classes</literal></listitem>   		
@@ -77,7 +83,7 @@
 			if it's not available in the war OSGi classpath.
 			</para>
 			<para>One of the easiest ways to support the pre-defined WAR locations, is to add them to the bundle classpath, by adding them to the bundle manifest:</para>
-			<programlisting language="java"><![CDATA[Bundle-Classpath: .,WEB-INF/classes,WEB-INF/lib/some.jar,WEB-INF/lib/lib.jar]]></programlisting>
+			<programlisting><![CDATA[Bundle-Classpath: .,WEB-INF/classes,WEB-INF/lib/some.jar,WEB-INF/lib/lib.jar]]></programlisting>
 			<para>Make sure the default <literal>Bundle-Classpath</literal> location <literal>.</literal> is present and there are no whitespaces between the commas.</para>
 			
 			<note>Since the OSGi API doesn't provide a hook for bundles to be pre-processed, Spring-DM cannot automate the process in a reliable way. However, we are 
