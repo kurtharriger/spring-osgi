@@ -21,9 +21,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.CollectionFactory;
+import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.deployer.WarDeployer;
+import org.springframework.util.Assert;
 
 /**
  * Convenient base class offering common functionality for war deployers such as
@@ -32,7 +36,7 @@ import org.springframework.osgi.web.extender.deployer.WarDeployer;
  * 
  * @author Costin Leau
  */
-public abstract class AbstractWarDeployer implements WarDeployer {
+public abstract class AbstractWarDeployer implements WarDeployer, InitializingBean, BundleContextAware {
 
 	/** logger */
 	protected final Log log = LogFactory.getLog(getClass());
@@ -40,6 +44,25 @@ public abstract class AbstractWarDeployer implements WarDeployer {
 	/** map associating bundles with specific deployment artifacts */
 	private final Map deployments = CollectionFactory.createConcurrentMap(4);
 
+	private BundleContext bundleContext;
+
+
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(bundleContext, "bundleContext is not set");
+	}
+
+	public void setBundleContext(BundleContext bundleContext) {
+		this.bundleContext = bundleContext;
+	}
+
+	/**
+	 * Returns the bundle context used by this deployer.
+	 * 
+	 * @return the OSGi bundle context used by this deployer.
+	 */
+	protected BundleContext getBundleContext() {
+		return bundleContext;
+	}
 
 	/**
 	 * {@inheritDoc}

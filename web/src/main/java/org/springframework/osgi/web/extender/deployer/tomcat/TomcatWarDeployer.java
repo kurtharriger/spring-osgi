@@ -25,7 +25,6 @@ import org.apache.catalina.Loader;
 import org.apache.catalina.startup.Embedded;
 import org.apache.catalina.startup.ExpandWar;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.deployer.internal.util.Utils;
 import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeployer;
@@ -47,11 +46,12 @@ import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeploye
 public class TomcatWarDeployer extends AbstractWarDeployer {
 
 	/** Catalina OSGi service */
-	private final Embedded serverService;
+	private Embedded serverService;
 
 
-	public TomcatWarDeployer(BundleContext bundleContext) {
-		serverService = (Embedded) Utils.createServerServiceProxy(bundleContext, Embedded.class, "tomcat-server");
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+		serverService = (Embedded) Utils.createServerServiceProxy(getBundleContext(), Embedded.class, "tomcat-server");
 	}
 
 	protected Object createDeployment(Bundle bundle, String contextPath) throws Exception {
