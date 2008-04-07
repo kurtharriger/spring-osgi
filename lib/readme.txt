@@ -78,7 +78,7 @@ distribution/website before using any of them in your own applications.
 - used for running the samples on JDK 1.4
 
 * org.apache.felix.main.jar
-- Apache Felix 1.0.1 OSGi platform implementation (http://felix.apache.org)
+- Apache Felix 1.0.3 OSGi platform implementation (http://felix.apache.org)
 - required for building and running the framework's test suite
 
 * org.eclipse.osgi.jar
