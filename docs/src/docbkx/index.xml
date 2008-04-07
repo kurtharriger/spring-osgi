@@ -88,6 +88,7 @@
       <xi:include href="appendix/appendix-archetype.xml"/>
       <xi:include href="appendix/appendix-tips.xml"/>
       <xi:include href="appendix/appendix-roadmap.xml"/>
+      <xi:include href="appendix/appendix-osgi-repo.xml"/>
       <xi:include href="appendix/appendix-schema.xml"/>
       <xi:include href="appendix/appendix-ack.xml"/>
   </part>

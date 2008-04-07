@@ -4,16 +4,16 @@
 <chapter id="what-is-new">
     <title>What is new?</title>
 
-    <para>While a relatively young project, each version of Spring Dynamic Modules (even minor ones) offer new functionality. This chapter is a guide to the new
-    and improved feature and intended as a high-level, short summary. Please follow the approapriate links for more in-depth information.</para>
+    <para>While a relatively young project, each version of Spring Dynamic Modules (even minor ones) offers new functionality. This chapter is a guide to the new
+    and improved feature and intended as a high-level, short summary. Please follow the appropriate links for more in-depth information.</para>
     
     <section id="dm-1.1.x">
 		<title>1.1.x</title>
 		
 		<section id="dm-1.1.x:web">
   		    <title>Web Support</title>
-			<para>The biggest feature of Spring Dynamic Modules 1.1.x version is the transparent support for web applications on OSGi platforms. By integrating
-			directly with web containers (such as Apache Tomcat and Jetty), Spring-DM allows WARs depending on Servlet 2.5, JSP 2.1 and taglibs to 
+			<para>The biggest feature in Spring Dynamic Modules 1.1.x is the transparent support for web applications on OSGi platforms. By integrating
+			directly with web containers (such as Apache Tomcat and Jetty), Spring-DM allows WARs using Servlet, JSP and taglib technologies to 
 			be used with little or no effort at all. 
 			Please see <xref linkend="web"/> for details.
 			</para>
@@ -21,19 +21,19 @@
 	
 		<section id="dm-1.1.x:io">
   		    <title>Classpath Resource Abstraction</title>
-			<para>1.1.x adds support for <literal>classpath:</literal> and <literal>classpath*:</literal> prefixes in the OSGi <interfacename>Resource</interfacename>
+			<para>1.1.x adds support for <literal>classpath:</literal> and <literal>classpath*:</literal> prefixes to the OSGi <interfacename>Resource</interfacename>
 			abstraction. This allows the discovery of classpath resources (such as Spring's 
 			<ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/new-in-2.html#new-in-2-ioc-component-scanning">component scanning</ulink>) to
-			work out-of-the-box inside OSGi, across multiple bundles on multiple OSGi platforms. See <xref linkend="bnd-app-ctx:osgi-resource"/> for more information.
+			work out-of-the-box across multiple bundles on the supported OSGi platforms. See <xref linkend="bnd-app-ctx:osgi-resource"/> for more information.
 			</para>
 		</section>
 
 		<section id="dm-1.1.x:configuration">
   		    <title>Pluggable Extender Configuration</title>
-			<para>1.1.x makes it easy to change the default configuration for various <link linkend="extender-pattern">extender</link>s used by Spring-DM. By using
-			<link linkend="appendix-tips:fragments">fragments</link>, users can customize the way bundles are started, what web container should be 
-			used for deployment or what thread-pool	should be used for running Spring applications. Additionally, it is possible to receive events 
-			regarding the OSGi Spring application contexts lifecycle. <xref linkend="bnd-app-ctx:extender"/> explains the options in detail.  
+			<para>1.1.x makes it easy to change the default configuration for the various <link linkend="extender-pattern">extender</link>s used by Spring-DM. By using
+			<link linkend="appendix-tips:fragments">fragments</link>, users can customize the way application contexts are started, the web container used 
+			for web deployment or the thread-pool for running Spring applications. Additionally, it is possible to receive events 
+			regarding the OSGi Spring application contexts lifecycle. <xref linkend="bnd-app-ctx:extender"/> lists the available options and explains them in detail.  
 			</para>
 		</section>
 
