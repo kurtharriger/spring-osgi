@@ -17,8 +17,8 @@
 package org.springframework.osgi.iandt.web.jsp;
 
 import org.springframework.osgi.iandt.web.BaseWebIntegrationTest;
-import org.springframework.osgi.iandt.web.HttpResponse;
 import org.springframework.osgi.iandt.web.HttpClient;
+import org.springframework.osgi.iandt.web.HttpResponse;
 
 /**
  * Test JSP support. For this to work, Tomcat Jasper is required.
@@ -57,5 +57,4 @@ public class SimpleJSPTest extends BaseWebIntegrationTest {
 	//	public void testWait() throws Exception {
 	//		System.in.read();
 	//	}
-
 }
