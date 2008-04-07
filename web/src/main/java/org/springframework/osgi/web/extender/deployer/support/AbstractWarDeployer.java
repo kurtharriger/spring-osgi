@@ -106,7 +106,8 @@ public abstract class AbstractWarDeployer implements WarDeployer, InitializingBe
 	 * given bundle. The returned object is used during the deploy/undeploy
 	 * stages; implementations are free to use whatever appeals to the target
 	 * environment. The returned object will be given as argument to
-	 * {@link #deploy(Bundle)} and {@link #undeploy(Bundle)}.
+	 * {@link #startDeployment(Object)} and
+	 * {@link #stopDeployment(Bundle, Object)}.
 	 * 
 	 * @param bundle OSGi bundle deployed as war
 	 * @param contextPath WAR context path
