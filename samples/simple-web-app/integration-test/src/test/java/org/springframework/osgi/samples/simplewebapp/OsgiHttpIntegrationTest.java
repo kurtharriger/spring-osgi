@@ -51,7 +51,6 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 		col.add(SPRING_OSGI_GROUP + ", jsp-api.osgi, 2.0-SNAPSHOT");
 
 		// JSP compiler
-		col.add(SPRING_OSGI_GROUP + ", ant.osgi, 1.7.0-SNAPSHOT");
 		col.add(SPRING_OSGI_GROUP + ", jasper.osgi, 5.5.23-SNAPSHOT");
 		col.add(SPRING_OSGI_GROUP + ", commons-el.osgi, 1.0-SNAPSHOT");
 

@@ -158,18 +158,72 @@
 			<scope>provided</scope>
 		</dependency>
 
+
+		<!--
+		  web artifacts
+		  -->
 		<dependency>
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>servlet-api.osgi</artifactId>
 			<version>2.5-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>jsp-api.osgi</artifactId>
+			<version>2.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+				
 		<dependency>
 		  <groupId>org.springframework.osgi</groupId>
 		  <artifactId>mx4j.osgi</artifactId>
 		  <version>3.0.2-SNAPSHOT</version>
 		  <scope>test</scope>
 		</dependency>		
+
+		<dependency>
+		  <groupId>org.springframework.osgi</groupId>
+		  <artifactId>jasper.osgi</artifactId>
+		  <version>5.5.23-SNAPSHOT</version>
+		  <scope>test</scope>
+		</dependency>		
+
+		<dependency>
+		  <groupId>org.springframework.osgi</groupId>
+		  <artifactId>commons-el.osgi</artifactId>
+		  <version>1.0-SNAPSHOT</version>
+		  <scope>test</scope>
+		</dependency>		
+
+		<dependency>
+		  <groupId>org.springframework.osgi</groupId>
+		  <artifactId>jstl.osgi</artifactId>
+		  <version>1.1.2-SNAPSHOT</version>
+		  <scope>test</scope>
+		</dependency>		
+
+		<dependency>
+		  <groupId>org.springframework.osgi</groupId>
+		  <artifactId>catalina.osgi</artifactId>
+		  <version>5.5.23-SNAPSHOT</version>
+		  <scope>test</scope>
+		</dependency>		
+
+		<dependency>
+		  <groupId>org.springframework.osgi</groupId>
+		  <artifactId>catalina.start.osgi</artifactId>
+		  <version>1.0-SNAPSHOT</version>
+		  <scope>test</scope>
+		</dependency>		
+
+		<dependency>
+		  <groupId>org.springframework.osgi</groupId>
+		  <artifactId>spring-osgi-web</artifactId>
+		  <version>${project.parent.version}</version>
+		  <scope>test</scope>
+		</dependency>	
 		
     </dependencies>
 

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<appendix id="appendix-osgi-repo">
+    <title>Spring-DM OSGi Repository</title>
+
+    <para>At the moment, most libraries are not released as OSGi bundles which means they cannot be used inside the OSGi space unless they
+    are embedded in other bundles. Though there are <ulink url="http://www.aqute.biz/Code/Bnd">tools</ulink> that make the bundling 
+    process easy, it is desirable to have the artifacts prepacked so they can be used immediately for development.</para> 
+    
+    <para>To address this problem, the Spring-DM project has osgified most of the common libraries and made them available through a dedicated
+    Maven <ulink url="http://maven.apache.org/guides/introduction/introduction-to-repositories.html">repository</ulink> available
+    at <literal>http://maven.springframework.org/osgi</literal>.
+    
+    <warning>The repository is <emphasis>provided as-is</emphasis> without any kind of support. The repository structure/content
+    can (and will) change until it becomes stable.
+    These being said, we hope you find it useful and we'd like to <ulink url="http://jira.springframework.org/browse/OSGI">know</ulink> 
+    if there are improvement that can be made to it.</warning> 
+    </para>
+
+	<section id="appendix-osgi-repo:conventions">
+		<title>Repository conventions</title>
+		
+		<para>Currently, all the artifacts published in the repository are marked as <literal>SNAPSHOT</literal>s meaning that, in time, their
+		content can change. This allows clients to download possible manifest updates made to the libraries. We foresee that, as the library usage
+		increases, several popular items will have the <literal>SNAPSHOT</literal> marker remove.
+		Additionally, to differentiate the <emphasis>OSGi</emphasis>-enabled artifacts from the original ones, all libraries are placed under
+		<literal>org.springframework.osgi</literal> group and their names contains a <literal>.osgi</literal> suffix.</para>
+		
+		<para>So for example, an OSGi version of <literal>aopalliance-1.0</literal> jar is available in the Spring-DM OSGi repository under at:
+		<literal>org/springframework/osgi/aopalliance.osgi/1.0-SNAPSHOT/aopalliance.osgi-1.0-SNAPSHOT.jar</literal></para>
+	</section>
+	
+	<section id="appendix-osgi-repo:browsing">
+		<title>Browsing the repository content</title>
+		
+		<para>The repository is currently hosted at Amazon <ulink url="http://aws.amazon.com/s3">S3</ulink>. To browse the repository structure,
+		use a S3 compatible browser (such as <ulink url="http://s3browse.com/explore/maven.springframework.org/osgi/org/springframework/osgi/">this</ulink> one)
+		since a vanilla web browse will not be suitable. 
+		</para>
+	</section>
+	
+	<section id="appendix-osgi-repo:maven">
+		<title>Using the repository with Maven</title>
+		
+		<para>The use the repository, simply add it ot the <literal>repositories</literal> group; since the repository 
+		contains <literal>SNAPSHOT</literal> artifacts, make sure to mark it accordingly:</para>
+		
+		<programlisting language="xml"><![CDATA[<repositories>
+  <repository>
+    <id>spring-osgified-artifacts</id>
+    <snapshots>
+      <enabled>true</enabled>
+    </snapshots>
+    <name>Springframework Maven OSGified Artifacts Repository</name>
+    <url>http://maven.springframework.org/osgi</url>
+  </repository>
+</repositories>]]></programlisting>
+		
+	</section>
+
+	<section id="appendix-osgi-repo:ant">
+		<title>Using the repository with Ant/Ivy</title>
+		
+		<para>When using <ulink url="http://ant.apache.org/">Ant</ulink> consider using the excellent <ulink url="http://ant.apache.org/ivy/">Ivy</ulink>
+		subproject for retrieving the OSGi dependencies from the Spring-DM repository as Ivy can work with a Maven-style repository. Please see the 
+		Ivy <ulink url="http://ant.apache.org/ivy/history/latest-milestone/tutorial/start.html">tutorial</ulink> for more information.</para>
+	</section>
+	
+
+
+</appendix>
