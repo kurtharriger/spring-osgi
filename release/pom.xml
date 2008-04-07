@@ -23,6 +23,7 @@
 		<module>../core</module>
 		<module>../extender</module>
 		<module>../test-support</module>		
+		<module>../web</module>
 		<module>../annotation</module>
 	</modules>
 
