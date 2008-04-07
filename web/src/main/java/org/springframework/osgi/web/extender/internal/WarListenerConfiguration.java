@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.osgi.OsgiException;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.web.extender.deployer.ContextPathStrategy;
@@ -143,7 +144,15 @@ public class WarListenerConfiguration implements DisposableBean {
 	}
 
 	private WarDeployer createDefaultWarDeployer(BundleContext bundleContext) {
-		return new TomcatWarDeployer(bundleContext);
+		TomcatWarDeployer deployer = new TomcatWarDeployer();
+		deployer.setBundleContext(bundleContext);
+		try {
+			deployer.afterPropertiesSet();
+			return deployer;
+		}
+		catch (Exception ex) {
+			throw new OsgiException("Cannot create Tomcat deployer", ex);
+		}
 	}
 
 	private ContextPathStrategy createDefaultContextPathStrategy() {

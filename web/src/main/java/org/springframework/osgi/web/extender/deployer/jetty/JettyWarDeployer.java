@@ -25,7 +25,6 @@ import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.resource.Resource;
 import org.mortbay.util.IO;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.deployer.internal.util.Utils;
 import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeployer;
@@ -58,12 +57,9 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	private Server serverService;
 
 
-	/**
-	 * Constructs a new <code>JettyWarDeployer</code> instance.
-	 * 
-	 */
-	public JettyWarDeployer(BundleContext bundleContext) {
-		serverService = (Server) Utils.createServerServiceProxy(bundleContext, Server.class, "jetty-server");
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+		serverService = (Server) Utils.createServerServiceProxy(getBundleContext(), Server.class, "jetty-server");
 	}
 
 	/**
