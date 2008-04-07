@@ -9,6 +9,7 @@ General
 * Knopflerfish 2.0.4+ required
 * Felix 1.0.3+ required
 * introduced new module dedicated to web application running on OSGi platforms
+  (tested succesfully on Equinox 3.2.2 and the upcoming Felix 1.0.4)
 
 Package org.springframework.osgi.context
 * AbstractDelegatedExecutionApplicationContext calls "cancelRefresh" if exceptions appear during the delegeted refresh
