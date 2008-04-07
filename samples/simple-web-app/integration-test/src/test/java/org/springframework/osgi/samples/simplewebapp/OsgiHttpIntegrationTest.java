@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.springframework.core.JdkVersion;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * Web integration test that bootstraps the web containers and its dependencies
@@ -105,6 +106,11 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 		testConnection(url() + "/hello-osgi-world.jsp");
 	}
 
+
+	// disable tests on Felix for the time being until 1.0.4 comes out
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return getPlatformName().equalsIgnoreCase(Platforms.FELIX);
+	}
 	//  Uncomment this method to stop the test from ending and manually connect to the browser
 	//	public void testWarDeployed() throws Exception {
 	//		System.in.read();
