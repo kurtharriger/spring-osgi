@@ -20,6 +20,10 @@ distribution/website before using any of them in your own applications.
 - Dawid Kurzyniec's JSR-166 backport, version 3.1 (http://dcl.mathcs.emory.edu/util/backport-util-concurrent)
 - required at runtime when using Spring's backport-concurrent support
 
+* catalina.jar
+- Apache Tomcat 5.5.23 (http://tomcat.apache.org)
+- required for building and (optionally) running Spring-DM web support
+
 * cglib-nodep-2.1_3.jar
 - CGLIB 2.1_3 with ObjectWeb ASM 1.5.3 (http://cglib.sourceforge.net)
 - required at runtime when proxying full target classes via Spring AOP
@@ -37,16 +41,29 @@ distribution/website before using any of them in your own applications.
 - required for building and running the framework's test suite
 
 * framework.jar
-- Knopflerfish 2.0.3 OSGi platform implementation (http://www.knopflerfish.org) 
+- Knopflerfish 2.0.5 OSGi platform implementation (http://www.knopflerfish.org) 
 - required for building and running the framework's test suite
  
-* jcr104-over-slf4j.jar
+* jcl104-over-slf4j.jar
 - SLF4J 1.4.3 Jakarta Commons Logging wrapper (http://www.slf4j.org)
 - required for building and running the framework's test suite
 
+* jetty-6.1.9.jar
+- Jetty 6.1.9 (http://jetty.mortbay.org)
+- required for building and (optionally) running Spring-DM web support
+
+* jetty-util-6.1.9.jar
+- Jetty Util 6.1.9 (http://jetty.mortbay.org)
+- required for building and (optionally) running Spring-DM web support
+  
 * junit-3.8.2.jar
 - JUnit 3.8.2 (http://www.junit.org)
 - required for building and running the framework's test suite
+
+* servlet-api-2.5.jar
+- Servlet API version 2.5 (http://java.sun.com/products/servlet/)
+- required for building and running Spring-DM web support
+- compiled against JDK 1.4
 
 * log4j/log4j-1.2.15.jar
 - Log4J 1.2.15 (http://logging.apache.org/log4j)
@@ -85,29 +102,37 @@ distribution/website before using any of them in your own applications.
 - required for running the framework's test suite
 
 * spring-aop.jar
-- Spring Framework 2.5.1 AOP library (http://www.springframework.org)
+- Spring Framework 2.5.2 AOP library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-beans.jar
-- Spring Framework 2.5.1 beans library (http://www.springframework.org)
+- Spring Framework 2.5.2 beans library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-context.jar
-- Spring Framework 2.5.1 beans library (http://www.springframework.org)
+- Spring Framework 2.5.2 context library (http://www.springframework.org)
+- required for building and running the framework's test suite
+
+* spring-context-support.jar
+- Spring Framework 2.5.2 context support library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-core.jar
-- Spring Framework 2.5.1 beans library (http://www.springframework.org)
+- Spring Framework 2.5.2 core library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-jdbc.jar
-- Spring Framework 2.5.1 beans library (http://www.springframework.org)
+- Spring Framework 2.5.2 jdbc library (http://www.springframework.org)
 - required for running the samples
 
 * spring-test.jar
-- Spring Framework 2.5.1 test library (http://www.springframework.org)
+- Spring Framework 2.5.2 test library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
-* spring-tx.jar
-- Spring Framework 2.5.1 transaction library (http://www.springframework.org)
-- required for running the samples
+* spring-web.jar
+- Spring Framework 2.5.2 web library (http://www.springframework.org)
+- required for running the samples and the framework's test suite
+
+* spring-webmvc.jar
+- Spring Framework 2.5.2 mvc library (http://www.springframework.org)
+- required for running the samples and the framework's test suite
