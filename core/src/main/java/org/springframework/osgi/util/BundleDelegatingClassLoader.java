@@ -87,7 +87,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	 * @param bundle
 	 * @param bridgeLoader
 	 */
-	private BundleDelegatingClassLoader(Bundle bundle, ClassLoader bridgeLoader) {
+	protected BundleDelegatingClassLoader(Bundle bundle, ClassLoader bridgeLoader) {
 		super(null);
 		Assert.notNull(bundle, "bundle should be non-null");
 		this.backingBundle = bundle;

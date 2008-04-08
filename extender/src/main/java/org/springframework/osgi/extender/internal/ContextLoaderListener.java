@@ -20,10 +20,8 @@ package org.springframework.osgi.extender.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 
 import org.apache.commons.logging.Log;
@@ -35,32 +33,25 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.OsgiException;
-import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
-import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceDependencySorter;
 import org.springframework.osgi.extender.internal.dependencies.startup.DependencyWaiterApplicationContextExecutor;
 import org.springframework.osgi.extender.internal.support.ApplicationContextConfiguration;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 import org.springframework.osgi.extender.internal.support.NamespaceManager;
+import org.springframework.osgi.extender.internal.support.OsgiAnnotationPostProcessor;
+import org.springframework.osgi.extender.internal.support.OsgiBeanFactoryPostProcessorAdapter;
 import org.springframework.osgi.extender.internal.util.ConfigUtils;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.extender.internal.util.concurrent.RunnableTimedExecution;
@@ -255,11 +246,10 @@ public class ContextLoaderListener implements BundleActivator {
 	}
 
 
-	private static final String AUTO_ANNOTATION_PROCESSING = "org.springframework.osgi.extender.annotation.auto.processing";
-
-	private static final String ANNOTATION_BPP_CLASS = "org.springframework.osgi.extensions.annotation.ServiceReferenceInjectionBeanPostProcessor";
-
 	private static final Log log = LogFactory.getLog(ContextLoaderListener.class);
+
+	/** annotation processing system property */
+	private static final String AUTO_ANNOTATION_PROCESSING = "org.springframework.osgi.extender.annotation.auto.processing";
 
 	// "Spring Application Context Creation Timer"
 	private Timer timer = new Timer(true);
@@ -276,27 +266,20 @@ public class ContextLoaderListener implements BundleActivator {
 	 */
 	private final Map managedContexts;
 
-	/** List of listeners subscribed to spring bundle events */
-	private final Set springBundleListeners = new LinkedHashSet();
-
 	/** Task executor used for bootstraping the Spring contexts in async mode */
 	private TaskExecutor taskExecutor;
 
 	/** ApplicationContext Creator */
 	private OsgiApplicationContextCreator contextCreator;
 
-	/** list BF PP */
-	// TODO: make this a list
-	private OsgiBeanFactoryPostProcessor postProcessor;
+	/** BFPP list */
+	private List postProcessors;
 
 	/**
 	 * Task executor which uses the same thread for running tasks. Used when
 	 * doing a synchronous wait-for-dependencies.
 	 */
 	private TaskExecutor sameThreadTaskExecutor = new SyncTaskExecutor();
-
-	/** Is the extender internally managing the task executor */
-	private boolean isTaskExecutorManagedInternally = false;
 
 	/** listener counter - used to properly synchronize shutdown */
 	private Counter contextsStarted = new Counter("contextsStarted");
@@ -396,8 +379,9 @@ public class ContextLoaderListener implements BundleActivator {
 
 		// initialize the configuration once namespace handlers have been detected
 		this.taskExecutor = extenderConfiguration.getTaskExecutor();
-
 		this.contextCreator = extenderConfiguration.getContextCreator();
+		this.postProcessors = extenderConfiguration.getPostProcessors();
+		addDefaultPostProcessors(postProcessors);
 
 		// init the OSGi event dispatch/listening system
 		initListenerService();
@@ -409,7 +393,6 @@ public class ContextLoaderListener implements BundleActivator {
 		contextListener = new ContextBundleListener();
 		// listen to any changes in bundles
 		context.addBundleListener(contextListener);
-
 		// get the bundles again to get an updated view
 		previousBundles = context.getBundles();
 
@@ -647,46 +630,50 @@ public class ContextLoaderListener implements BundleActivator {
 			return;
 		}
 
-		BundleContext bndCtx = OsgiBundleUtils.getBundleContext(bundle);
+		BundleContext localBundleContext = OsgiBundleUtils.getBundleContext(bundle);
 
 		Long bundleId = new Long(bundle.getBundleId());
 
 		if (managedContexts.containsKey(bundleId)) {
 			if (debug) {
-				log.debug("Bundle is already managed: " + bundleString);
+				log.debug("Bundle " + bundleString + "is already managed; ignoring...");
 			}
 			return;
 		}
 
 		// initialize context
-		final DelegatedExecutionOsgiBundleApplicationContext context;
+		final DelegatedExecutionOsgiBundleApplicationContext localApplicationContext;
 
 		try {
-			context = contextCreator.createApplicationContext(bndCtx);
+			localApplicationContext = contextCreator.createApplicationContext(localBundleContext);
 		}
 		catch (Exception ex) {
 			log.error("Cannot create application context for bundle " + bundleString, ex);
 			return;
 		}
 
-		if (context == null) {
+		if (localApplicationContext == null) {
 			log.debug("No application context created for bundle " + bundleString);
 			return;
 		}
 
+		// create a dedicated hook for this application context
+		BeanFactoryPostProcessor processingHook = new OsgiBeanFactoryPostProcessorAdapter(localBundleContext,
+			postProcessors);
+
+		// add in the post processors
+		localApplicationContext.addBeanFactoryPostProcessor(processingHook);
+
 		// add the context to the tracker
-		managedContexts.put(bundleId, context);
+		managedContexts.put(bundleId, localApplicationContext);
 
-		context.setDelegatedEventMulticaster(multicaster);
-
-		// TODO: post processing should be externalized
-		postProcessContext(context);
+		localApplicationContext.setDelegatedEventMulticaster(multicaster);
 
 		// create refresh runnable
 		Runnable contextRefresh = new Runnable() {
 
 			public void run() {
-				context.refresh();
+				localApplicationContext.refresh();
 			}
 		};
 
@@ -717,7 +704,7 @@ public class ContextLoaderListener implements BundleActivator {
 		// wait/no wait for dependencies behaviour
 		if (config.isWaitForDependencies()) {
 			DependencyWaiterApplicationContextExecutor appCtxExecutor = new DependencyWaiterApplicationContextExecutor(
-				context, !config.isCreateAsynchronously());
+				localApplicationContext, !config.isCreateAsynchronously());
 
 			appCtxExecutor.setTimeout(config.getTimeout());
 			appCtxExecutor.setWatchdog(timer);
@@ -733,87 +720,6 @@ public class ContextLoaderListener implements BundleActivator {
 		}
 
 		executor.execute(contextRefresh);
-	}
-
-	/**
-	 * Create an application context from the given locations. By default, will
-	 * use an xml application context.
-	 * 
-	 * @param context bundle context for the application context
-	 * @param locations configuration locations
-	 * @return
-	 */
-	protected DelegatedExecutionOsgiBundleApplicationContext createApplicationContext(BundleContext context,
-			String[] locations) {
-		DelegatedExecutionOsgiBundleApplicationContext sdoac = new OsgiBundleXmlApplicationContext(locations);
-		sdoac.setBundleContext(context);
-
-		postProcessContext(sdoac);
-		return sdoac;
-	}
-
-	/**
-	 * Post process the context (for example by adding bean post processors).
-	 * 
-	 * @param applicationContext application context to process
-	 */
-	protected void postProcessContext(DelegatedExecutionOsgiBundleApplicationContext applicationContext) {
-		addAnnotationBPP(applicationContext);
-	}
-
-	/**
-	 * Add the annotation post processor if the system property setting is
-	 * properly in place.
-	 * 
-	 * @param applicationContext
-	 */
-	private void addAnnotationBPP(DelegatedExecutionOsgiBundleApplicationContext applicationContext) {
-
-		Map config = getExternalConfiguration();
-
-		Object setting = config.get(AUTO_ANNOTATION_PROCESSING);
-		if (extenderConfiguration.shouldProcessAnnotation()
-				|| (setting != null && setting instanceof String && Boolean.getBoolean((String) setting))) {
-
-			log.info("Enabled automatic Spring-DM annotation processing; [" + AUTO_ANNOTATION_PROCESSING + "="
-					+ setting + "]");
-
-			// Try and load the annotation code if it exists
-			try {
-				Class annotationBppClass = bundleContext.getBundle().loadClass(ANNOTATION_BPP_CLASS);
-
-				final BeanPostProcessor annotationBpp = (BeanPostProcessor) BeanUtils.instantiateClass(annotationBppClass);
-				((BundleContextAware) annotationBpp).setBundleContext(bundleContext);
-
-				applicationContext.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
-
-					public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
-							throws BeansException {
-						((BeanFactoryAware) annotationBpp).setBeanFactory(beanFactory);
-						((BeanClassLoaderAware) annotationBpp).setBeanClassLoader(beanFactory.getBeanClassLoader());
-						beanFactory.addBeanPostProcessor(annotationBpp);
-					}
-				});
-			}
-			catch (ClassNotFoundException exception) {
-				log.info("Spring-dm annotation package cannot be found; automatic annotation processing is disabled");
-				if (log.isDebugEnabled())
-					log.debug("Cannot load annotation bpp", exception);
-			}
-		}
-		else {
-			log.info("Disabled automatic Spring-DM annotation processing; [ " + AUTO_ANNOTATION_PROCESSING + "="
-					+ setting + "]");
-		}
-	}
-
-	/**
-	 * Return the configuration properties. In time this will be extended.
-	 * 
-	 * @return configuration properties for the extender
-	 */
-	protected Map getExternalConfiguration() {
-		return System.getProperties();
 	}
 
 	/**
@@ -847,6 +753,34 @@ public class ContextLoaderListener implements BundleActivator {
 
 		if (log.isDebugEnabled())
 			log.debug("Iitializing OSGi listeners service completed...");
+	}
+	
+
+	/**
+	 * Post process the context (for example by adding bean post processors).
+	 * 
+	 * @param applicationContext application context to process
+	 */
+	private void addDefaultPostProcessors(List postProcessorsList) {
+		Map config = System.getProperties();
+
+		Object setting = config.get(AUTO_ANNOTATION_PROCESSING);
+		if (extenderConfiguration.shouldProcessAnnotation()
+				|| (setting != null && setting instanceof String && Boolean.getBoolean((String) setting))) {
+
+			log.info("Enabled automatic Spring-DM annotation processing; [" + AUTO_ANNOTATION_PROCESSING + "="
+					+ setting + "]");
+
+			// add annotation BFPP (first in the list)
+			if (log.isTraceEnabled())
+				log.trace("Adding OSGi annotation post processor");
+			postProcessorsList.add(0, new OsgiAnnotationPostProcessor());
+		}
+
+		else {
+			log.info("Disabled automatic Spring-DM annotation processing; [ " + AUTO_ANNOTATION_PROCESSING + "="
+					+ setting + "]");
+		}
 	}
 
 	/**
