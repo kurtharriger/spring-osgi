@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.extender.internal;
+package org.springframework.osgi.extender.internal.activator;
 
 import java.util.Iterator;
 import java.util.List;

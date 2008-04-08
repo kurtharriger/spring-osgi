@@ -2,6 +2,21 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
+Changes in version 1.1.0 M2 (2008-04-dd)
+-----------------------------------------
+
+Package org.springframework.osgi.extender
+* added OsgiApplicationContextCreator interface for handling the extender contexts creation
+* added OsgiBeanFactoryPostProcessor interface for customizing the contexts created by the extender
+* change package of the internal, private bundle activator
+
+Package org.springframework.osgi.util
+* BundleDelegatingClassLoader constructor visibility changed from private to protected
+
+Package org.springframework.osgi.util
+* change package of the internal, private bundle activator
+
+
 Changes in version 1.1.0 M1 (2008-04-07)
 -----------------------------------------
 

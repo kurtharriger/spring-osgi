@@ -29,6 +29,7 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.osgi.extender.internal.activator.ContextLoaderListener;
 import org.springframework.osgi.extender.internal.support.TestTaskExecutor;
 import org.springframework.osgi.extender.internal.util.ConfigUtils;
 import org.springframework.osgi.mock.EntryLookupControllingMockBundle;

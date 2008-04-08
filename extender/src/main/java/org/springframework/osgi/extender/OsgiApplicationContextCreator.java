@@ -39,7 +39,7 @@ import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationC
  * 		Object value = owningBundle.getHeaders().get(HEADER);
  * 		if (value != null &amp;&amp; value instanceof String) {
  * 			String[] locations = StringUtils.commaDelimitedListToStringArray((String) value);
- * 			return new OsgiBundleXmlApplicationContext(locations);
+ * 			// create application context
  * 		}
  * 		else
  * 			return null;
