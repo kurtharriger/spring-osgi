@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.internal;
+package org.springframework.osgi.web.extender.internal.activator;
 
 import java.net.URL;
 import java.util.Date;
@@ -34,6 +34,7 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.deployer.ContextPathStrategy;
 import org.springframework.osgi.web.extender.deployer.WarDeployer;
+import org.springframework.osgi.web.extender.internal.scanner.WarScanner;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
 

@@ -15,7 +15,7 @@
  *
  */
 
-package org.springframework.osgi.extender.internal;
+package org.springframework.osgi.extender.internal.activator;
 
 import java.util.ArrayList;
 import java.util.Collections;
