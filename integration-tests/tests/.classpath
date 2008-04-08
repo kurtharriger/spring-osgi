@@ -3,7 +3,7 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.2/spring-context-2.5.2.jar" sourcepath="/SPRING_TIGER_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.2/spring-context-2.5.2.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/2.5.2/spring-aop-2.5.2.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/aopalliance.osgi/1.0-SNAPSHOT/aopalliance.osgi-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.2/spring-core-2.5.2.jar" sourcepath="/SPRING_SRC"/>

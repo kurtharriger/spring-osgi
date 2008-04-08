@@ -40,8 +40,9 @@ import org.springframework.util.Assert;
  * {@link ConfigurableApplicationContext#refresh()} in two pieces so that beans
  * are not actually created unless the OSGi service imported are present.
  * 
- * Supports both asynch and synch behaviour. <p/>
+ * <p/>
  * 
+ * Supports both asynch and synch behaviour.
  * 
  * @author Hal Hildebrand
  * @author Costin Leau
