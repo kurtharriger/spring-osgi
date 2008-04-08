@@ -33,7 +33,7 @@ import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationC
  * 	private static final String HEADER = &quot;Context-Locations&quot;;
  * 
  * 
- * 	public ConfigurableApplicationContext createApplicationContext(BundleContext bundleContext) {
+ * 	public DelegatedExecutionOsgiBundleApplicationContext createApplicationContext(BundleContext bundleContext) {
  * 		Bundle owningBundle = bundleContext.getBundle();
  * 
  * 		Object value = owningBundle.getHeaders().get(HEADER);
@@ -46,6 +46,9 @@ import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationC
  * 	}
  * }
  * </pre>
+ * 
+ * <p/><b>Note:</b> The application contexts should be only created and
+ * initialized but not started (i.e. <code>refresh()</code> method called).
  * 
  * <p/>The recommended way of configuring the extender is to attach any relevant
  * <code>OsgiApplicationContextCreator</code> implementation as fragments to
@@ -71,5 +74,6 @@ public interface OsgiApplicationContextCreator {
 	 * otherwise
 	 * @throws Exception if something goes wrong
 	 */
-	DelegatedExecutionOsgiBundleApplicationContext createApplicationContext(BundleContext bundleContext) throws Exception;
+	DelegatedExecutionOsgiBundleApplicationContext createApplicationContext(BundleContext bundleContext)
+			throws Exception;
 }

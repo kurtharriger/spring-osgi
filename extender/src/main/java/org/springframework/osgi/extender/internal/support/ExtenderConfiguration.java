@@ -37,11 +37,14 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
+import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
 import org.springframework.util.ObjectUtils;
 
 /**
  * Configuration class for the extender. Takes care of locating the extender
  * specific configurations and merging the results with the defaults.
+ * 
+ * <p/> Note that this configuration will consider mandatory options required by
  * 
  * @author Costin Leau
  * 
@@ -86,6 +89,9 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private OsgiApplicationContextCreator contextCreator;
 
+	/** List of context post processors */
+	private List postProcessors = new ArrayList(0);
+
 
 	/**
 	 * Constructs a new <code>ExtenderConfiguration</code> instance. Locates
@@ -125,6 +131,9 @@ public class ExtenderConfiguration implements DisposableBean {
 			contextCreator = context.containsBean(CONTEXT_CREATOR_NAME) ? (OsgiApplicationContextCreator) context.getBean(
 				CONTEXT_CREATOR_NAME, OsgiApplicationContextCreator.class)
 					: createDefaultApplicationContextCreator();
+
+			// get post processors
+			postProcessors.addAll(context.getBeansOfType(OsgiBeanFactoryPostProcessor.class).values());
 
 			// extender properties using the defaults as backup
 			if (context.containsBean(PROPERTIES_NAME)) {
@@ -288,5 +297,14 @@ public class ExtenderConfiguration implements DisposableBean {
 	 */
 	public OsgiApplicationContextCreator getContextCreator() {
 		return contextCreator;
+	}
+
+	/**
+	 * Returns the postProcessors.
+	 * 
+	 * @return Returns the postProcessors
+	 */
+	public List getPostProcessors() {
+		return postProcessors;
 	}
 }
