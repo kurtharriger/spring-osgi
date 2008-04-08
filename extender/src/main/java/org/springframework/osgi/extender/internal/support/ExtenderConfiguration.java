@@ -36,6 +36,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -51,6 +52,8 @@ public class ExtenderConfiguration implements DisposableBean {
 	private static final Log log = LogFactory.getLog(ExtenderConfiguration.class);
 
 	private static final String TASK_EXECUTOR_NAME = "taskExecutor";
+
+	private static final String CONTEXT_CREATOR_NAME = "applicationContextCreator";
 
 	private static final String PROPERTIES_NAME = "extenderProperties";
 
@@ -81,6 +84,8 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private boolean forceThreadShutdown;
 
+	private OsgiApplicationContextCreator contextCreator;
+
 
 	/**
 	 * Constructs a new <code>ExtenderConfiguration</code> instance. Locates
@@ -100,6 +105,7 @@ public class ExtenderConfiguration implements DisposableBean {
 			taskExecutor = createDefaultTaskExecutor();
 			eventMulticaster = new SimpleApplicationEventMulticaster();
 			isMulticasterManagedInternally = true;
+			contextCreator = createDefaultApplicationContextCreator();
 		}
 		else {
 			String[] configs = copyEnumerationToList(enm);
@@ -109,10 +115,16 @@ public class ExtenderConfiguration implements DisposableBean {
 			context.setBundleContext(bundleContext);
 			context.refresh();
 
+			// initialize beans
+
 			taskExecutor = context.containsBean(TASK_EXECUTOR_NAME) ? (TaskExecutor) context.getBean(
 				TASK_EXECUTOR_NAME, TaskExecutor.class) : createDefaultTaskExecutor();
 
 			eventMulticaster = (ApplicationEventMulticaster) context.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME);
+
+			contextCreator = context.containsBean(CONTEXT_CREATOR_NAME) ? (OsgiApplicationContextCreator) context.getBean(
+				CONTEXT_CREATOR_NAME, OsgiApplicationContextCreator.class)
+					: createDefaultApplicationContextCreator();
 
 			// extender properties using the defaults as backup
 			if (context.containsBean(PROPERTIES_NAME)) {
@@ -207,6 +219,10 @@ public class ExtenderConfiguration implements DisposableBean {
 		return taskExecutor;
 	}
 
+	private OsgiApplicationContextCreator createDefaultApplicationContextCreator() {
+		return new DefaultOsgiApplicationContextCreator();
+	}
+
 	private long getShutdownWaitTime(Properties properties) {
 		return Long.parseLong(properties.getProperty(SHUTDOWN_WAIT_KEY));
 	}
@@ -263,5 +279,14 @@ public class ExtenderConfiguration implements DisposableBean {
 	 */
 	public void setForceThreadShutdown(boolean forceThreadShutdown) {
 		this.forceThreadShutdown = forceThreadShutdown;
+	}
+
+	/**
+	 * Returns the contextCreator.
+	 * 
+	 * @return Returns the contextCreator
+	 */
+	public OsgiApplicationContextCreator getContextCreator() {
+		return contextCreator;
 	}
 }
