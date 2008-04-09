@@ -29,12 +29,12 @@ import org.osgi.framework.Bundle;
  * 
  * <p/>As the war listener handles the detection, start up and shutdown of the
  * bundles, the deployer should be concerned only with the deployment process of
- * the bundle.
- * It is recommended to thrown exceptions (if any) in unwrapped as the extender
- * will take care of logging and wrapping.
+ * the bundle. It is recommended to thrown exceptions (if any) unwrapped as the
+ * extender will take care of logging and wrapping.
+ * 
+ * @see ContextPathStrategy
  * 
  * @author Costin Leau
- * @see ContextPathStrategy
  */
 public interface WarDeployer {
 
@@ -47,17 +47,10 @@ public interface WarDeployer {
 	 * 
 	 * @param bundle war bundle
 	 * @param contextPath the war context path
-	 * @throws Exception if something went wrong during deployment
+	 * @return a war deployment for the given bundle
+	 * @throws OsgiWarDeploymentException if something went wrong during
+	 * deployment
 	 */
-	void deploy(Bundle bundle, String contextPath) throws Exception;
+	WarDeployment deploy(Bundle bundle, String contextPath) throws OsgiWarDeploymentException;
 
-	/**
-	 * Un-deploys the given bundle from the given context path. Undeploying a
-	 * WAR makes sense only if it has been previously deployed.
-	 * 
-	 * @param bundle war bundle
-	 * @param contextPath the war context path
-	 * @throws Exception if something went wrong during undeployment
-	 */
-	void undeploy(Bundle bundle, String contextPath) throws Exception;
 }

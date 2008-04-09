@@ -33,7 +33,9 @@ import org.springframework.core.ConcurrentMap;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.deployer.ContextPathStrategy;
+import org.springframework.osgi.web.extender.deployer.OsgiWarDeploymentException;
 import org.springframework.osgi.web.extender.deployer.WarDeployer;
+import org.springframework.osgi.web.extender.deployer.WarDeployment;
 import org.springframework.osgi.web.extender.internal.scanner.WarScanner;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
@@ -86,83 +88,16 @@ public class WarLoaderListener implements BundleActivator {
 		}
 	}
 
-	/** deploy war task */
-	private class DeployTask implements Runnable {
-
-		/** bundle to deploy */
-		private final Bundle bundle;
-
-		private final String contextPath;
-
-		private final String bundleName;
-
-
-		public DeployTask(Bundle bundle, String contextPath) {
-			this.bundle = bundle;
-			this.contextPath = contextPath;
-			this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
-		}
-
-		public void run() {
-			boolean debug = log.isDebugEnabled();
-			if (debug)
-				log.debug("Deploying bundle " + bundleName);
-			managedBundles.put(bundle, new Date());
-			try {
-				warDeployer.deploy(bundle, contextPath);
-
-				log.info("Bundle " + bundleName + " successfully deployed at [" + contextPath + "]");
-
-			}
-			catch (Exception ex) {
-				// log exception
-				log.error("War deployment of bundle " + bundleName + " failed", ex);
-			}
-		}
-	}
-
-	/** undeploy war task */
-	private class UndeployTask implements Runnable {
-
-		/** bundle to deploy */
-		private final Bundle bundle;
-
-		private final String contextPath;
-
-		private final String bundleName;
-
-
-		public UndeployTask(Bundle bundle, String contextPath) {
-			this.bundle = bundle;
-			this.contextPath = contextPath;
-			this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
-		}
-
-		public void run() {
-			boolean debug = log.isDebugEnabled();
-
-			if (debug)
-				log.debug("Undeploying bundle " + bundleName);
-			managedBundles.remove(bundle);
-			try {
-				warDeployer.undeploy(bundle, contextPath);
-				log.info("Successfully undeployed war from [" + contextPath + "]");
-			}
-			catch (Exception ex) {
-				// log exception
-				log.error("War undeployment of bundle " + bundleName + " failed", ex);
-			}
-		}
-	}
-
 	/**
 	 * Simple WAR deployment manager. Handles the IO process involved in
 	 * deploying and undeploying the war.
 	 */
-	// TODO: make this pluggable so that smarter managers can be used
+	// TODO: in the future, this could be externalized so smarter implementations can be plugged in 
 	private class DeploymentManager implements DisposableBean {
 
-		// the timer class is directly used since we need access to the TimerTask
+		/** association map between a bundle and its web deployment object */
+		private final ConcurrentMap bundlesToDeployments = CollectionFactory.createConcurrentMap(16);
+
 		/** thread for deploying/undeploying bundles */
 		private TimerTaskExecutor executor = new TimerTaskExecutor();
 
@@ -175,12 +110,70 @@ public class WarLoaderListener implements BundleActivator {
 			executor.execute(new DeployTask(bundle, contextPath));
 		}
 
-		public void undeployBundle(Bundle bundle, String contextPath) {
-			executor.execute(new UndeployTask(bundle, contextPath));
+		public void undeployBundle(Bundle bundle) {
+			executor.execute(new UndeployTask(bundle));
 		}
 
 		public void destroy() throws Exception {
 			executor.destroy();
+		}
+
+
+		/** deploy war task */
+		private class DeployTask implements Runnable {
+
+			/** bundle to deploy */
+			private final Bundle bundle;
+
+			private final String contextPath;
+
+			private final String bundleName;
+
+
+			public DeployTask(Bundle bundle, String contextPath) {
+				this.bundle = bundle;
+				this.contextPath = contextPath;
+				this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
+			}
+
+			public void run() {
+				try {
+					WarDeployment deployment = warDeployer.deploy(bundle, contextPath);
+					bundlesToDeployments.put(bundle, deployment);
+				}
+				catch (OsgiWarDeploymentException ex) {
+					// log exception
+					log.error("War deployment of bundle " + bundleName + " failed", ex);
+				}
+			}
+		}
+
+		/** undeploy war task */
+		private class UndeployTask implements Runnable {
+
+			/** bundle to deploy */
+			private final Bundle bundle;
+
+			private final String bundleName;
+
+
+			public UndeployTask(Bundle bundle) {
+				this.bundle = bundle;
+				this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
+			}
+
+			public void run() {
+				WarDeployment deployment = (WarDeployment) bundlesToDeployments.remove(bundle);
+				// double check that we do have a deployment
+				if (deployment != null)
+					try {
+						deployment.undeploy();
+					}
+					catch (OsgiWarDeploymentException ex) {
+						// log exception
+						log.error("War undeployment of bundle " + bundleName + " failed", ex);
+					}
+			}
 		}
 	}
 
@@ -197,11 +190,8 @@ public class WarLoaderListener implements BundleActivator {
 	/** extender bundle id */
 	private long bundleId;
 
-	/**
-	 * Concurrent map of managed OSGi bundles considered wars. The keys are the
-	 * bundle ID while the values actual bundle references.
-	 */
-	protected final ConcurrentMap managedBundles;
+	/** map used for tracking bundles deployed as wars */
+	private final ConcurrentMap managedBundles;
 
 	/**
 	 * Bundle listener for WARs.
@@ -246,7 +236,7 @@ public class WarLoaderListener implements BundleActivator {
 
 		boolean trace = log.isTraceEnabled();
 
-		log.info("Starting org.springframework.osgi.web.extender bundle v.[" + extenderVersion + "]");
+		log.info("Starting [" + bundleContext.getBundle().getSymbolicName() + "] bundle v.[" + extenderVersion + "]");
 
 		// read configuration
 		configuration = new WarListenerConfiguration(context);
@@ -298,6 +288,7 @@ public class WarLoaderListener implements BundleActivator {
 					+ " is a WAR, scheduling war deployment on context path + [" + contextPath
 					+ "] (detected web.xml at " + webXml + ")");
 
+			// mark the bundle as managed
 			managedBundles.put(bundle, contextPath);
 			deploymentManager.deployBundle(bundle, contextPath);
 		}
@@ -313,7 +304,7 @@ public class WarLoaderListener implements BundleActivator {
 			log.info(OsgiStringUtils.nullSafeNameAndSymName(bundle)
 					+ " is a WAR, scheduling war undeployment with context path [" + contextPath + "]");
 
-			deploymentManager.undeployBundle(bundle, contextPath);
+			deploymentManager.undeployBundle(bundle);
 		}
 	}
 

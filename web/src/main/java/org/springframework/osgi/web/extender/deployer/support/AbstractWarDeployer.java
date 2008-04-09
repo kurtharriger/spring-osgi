@@ -16,23 +16,21 @@
 
 package org.springframework.osgi.web.extender.deployer.support;
 
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.osgi.web.extender.deployer.OsgiWarDeploymentException;
 import org.springframework.osgi.web.extender.deployer.WarDeployer;
+import org.springframework.osgi.web.extender.deployer.WarDeployment;
 import org.springframework.util.Assert;
 
 /**
  * Convenient base class offering common functionality for war deployers such as
- * logging. Additionally, subclasses can associate a <em>context</em> with
- * each bundle deployed which will used at undeployment time.
+ * logging.
  * 
  * @author Costin Leau
  */
@@ -40,9 +38,6 @@ public abstract class AbstractWarDeployer implements WarDeployer, InitializingBe
 
 	/** logger */
 	protected final Log log = LogFactory.getLog(getClass());
-
-	/** map associating bundles with specific deployment artifacts */
-	private final Map deployments = CollectionFactory.createConcurrentMap(4);
 
 	private BundleContext bundleContext;
 
@@ -67,71 +62,64 @@ public abstract class AbstractWarDeployer implements WarDeployer, InitializingBe
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * Logs bundle deployment and associates it with a <em>context</em>
-	 * object. It's up to the subclass to define this object as it usually
-	 * contains container specific information.
-	 */
-	public void deploy(Bundle bundle, String contextPath) throws Exception {
-		if (log.isDebugEnabled())
-			log.debug("Creating deployment for [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] at ["
-					+ contextPath + "] on server " + getServerInfo());
-		Object deployment = createDeployment(bundle, contextPath);
-		deployments.put(bundle, deployment);
-
-		if (log.isDebugEnabled())
-			log.debug("About to deploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] to [" + contextPath
-					+ "] on server " + getServerInfo());
-
-		startDeployment(deployment);
-	}
-
-	/**
-	 * {@inheritDoc}
+	 * Breaks down (and logs appropriately) the deployment process into:
 	 * 
-	 * Logs bundle undeployment and clears the <em>context</em> object
-	 * associated with the bundle.
+	 * <ol>
+	 * <li>creation of the deployment</li>
+	 * <li>start-up of the deployment</li>
+	 * </ol>
+	 * 
+	 * Any exception thrown during each step, is wrapped into
+	 * OsgiWarDeploymentException.
 	 */
-	public void undeploy(Bundle bundle, String contextPath) throws Exception {
+	public WarDeployment deploy(Bundle bundle, String contextPath) throws OsgiWarDeploymentException {
+		String commonMessage = "bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] at [" + contextPath
+				+ "] on server " + getServerInfo();
 		if (log.isDebugEnabled())
-			log.debug("About to undeploy [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] on server "
-					+ getServerInfo());
+			log.debug("Creating deployment for " + commonMessage);
+		WarDeployment deployment;
 
-		Object deployment = deployments.remove(bundle);
-		if (deployment != null)
-			stopDeployment(bundle, deployment);
+		try {
+			deployment = createDeployment(bundle, contextPath);
+		}
+		catch (Exception ex) {
+			throw new OsgiWarDeploymentException("Cannot create war deployment for " + commonMessage, ex);
+		}
+
+		if (log.isDebugEnabled())
+			log.debug("About to deploy " + commonMessage);
+
+		try {
+			startDeployment(deployment);
+			log.info("Successfully deployed " + commonMessage);
+		}
+		catch (Exception ex) {
+			throw new OsgiWarDeploymentException("Cannot create war deployment for " + commonMessage, ex);
+		}
+
+		return deployment;
 	}
 
 	/**
 	 * Creates and configures (but does not start) the web deployment for the
-	 * given bundle. The returned object is used during the deploy/undeploy
-	 * stages; implementations are free to use whatever appeals to the target
-	 * environment. The returned object will be given as argument to
-	 * {@link #startDeployment(Object)} and
-	 * {@link #stopDeployment(Bundle, Object)}.
+	 * given bundle. The returned object will be passed to
+	 * {@link #startDeployment(WarDeployment)}.
 	 * 
 	 * @param bundle OSGi bundle deployed as war
 	 * @param contextPath WAR context path
 	 * @return web deployment artifact
-	 * @throws Exception if something goes wrong
+	 * @throws Exception if something goes wrong.
 	 */
-	protected abstract Object createDeployment(Bundle bundle, String contextPath) throws Exception;
+	protected abstract WarDeployment createDeployment(Bundle bundle, String contextPath) throws Exception;
 
 	/**
-	 * Starts the deployment artifact.
+	 * Starts the deployment artifact using the object returned by
+	 * {@link #createDeployment(Bundle, String)}.
 	 * 
 	 * @param deployment web deployment artifact
 	 * @throws Exception if something goes wrong
 	 */
-	protected abstract void startDeployment(Object deployment) throws Exception;
-
-	/**
-	 * Stops the deployment artifact.
-	 * 
-	 * @param bundle OSGi bundle backing the OSGi deployment
-	 * @param deployment web deployment artifact
-	 * @throws Exception if something goes wrong
-	 */
-	protected abstract void stopDeployment(Bundle bundle, Object deployment) throws Exception;
+	protected abstract void startDeployment(WarDeployment deployment) throws Exception;
 
 	/**
 	 * Returns a nice String representation of the underlying server for logging

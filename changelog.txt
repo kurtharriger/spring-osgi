@@ -5,6 +5,10 @@ http://www.springframework.org/osgi
 Changes in version 1.1.0 M2 (2008-04-dd)
 -----------------------------------------
 
+General
+* refined the web deployer API
+* added integration with Spring MVC
+
 Package org.springframework.osgi.extender
 * added OsgiApplicationContextCreator interface for handling the extender contexts creation
 * added OsgiBeanFactoryPostProcessor interface for customizing the contexts created by the extender
@@ -13,8 +17,12 @@ Package org.springframework.osgi.extender
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader constructor visibility changed from private to protected
 
-Package org.springframework.osgi.util
+Package org.springframework.osgi.web
 * change package of the internal, private bundle activator
+* added OsgiWarDeploymentException to the deployment interfaces
+* added WarDeployment for bundles deployed by the WarDeployer
+* added WarDeploymentContext for accessing the properties associated with a war deployment
+* improved cleanup in case of exceptions for both TomcatWarDeployer and JettyWarDeployer
 
 
 Changes in version 1.1.0 M1 (2008-04-07)
