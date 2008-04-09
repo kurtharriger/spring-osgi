@@ -25,7 +25,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/asm.osgi/2.2.3-SNAPSHOT/asm.osgi-2.2.3-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.0.5/framework-2.0.5.jar" sourcepath="/KF_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.0/org.osgi.core-4.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/scoped.bundle.a/1.1.0-m2-SNAPSHOT/scoped.bundle.a-1.1.0-m2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/scoped.bundle.b/1.1.0-m2-SNAPSHOT/scoped.bundle.b-1.1.0-m2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/scoped.bundle.common/1.1.0-m2-SNAPSHOT/scoped.bundle.common-1.1.0-m2-SNAPSHOT.jar"/>
@@ -35,7 +34,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/reference.proxy/1.1.0-m2-SNAPSHOT/reference.proxy-1.1.0-m2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/servlet-api.osgi/2.5-SNAPSHOT/servlet-api.osgi-2.5-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/bundles/org.eclipse.equinox.common/20060603/org.eclipse.equinox.common-20060603.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/jasper.osgi/5.5.23-SNAPSHOT/jasper.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/JASPER_SRC"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>

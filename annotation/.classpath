@@ -9,7 +9,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.4.3/slf4j-log4j12-1.4.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.13/log4j-1.2.13.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.2/spring-context-2.5.2.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.2/spring-core-2.5.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.2/spring-beans-2.5.2.jar"/>
