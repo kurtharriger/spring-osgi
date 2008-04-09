@@ -56,6 +56,7 @@ public abstract class HttpClient {
 
 
 	public static HttpResponse getLocalResponse(String base, String resource) throws Exception {
+
 		String res;
 		if (base.endsWith(SLASH) || resource.startsWith(SLASH))
 			res = base.concat(resource);

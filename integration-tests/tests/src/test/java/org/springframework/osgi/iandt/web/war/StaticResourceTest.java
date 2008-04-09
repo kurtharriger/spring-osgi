@@ -16,12 +16,9 @@
 
 package org.springframework.osgi.iandt.web.war;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.osgi.iandt.web.BaseWebIntegrationTest;
 import org.springframework.osgi.iandt.web.HttpClient;
 import org.springframework.osgi.iandt.web.HttpResponse;
-import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * Integration test for the simple servlet bundle.
@@ -30,9 +27,6 @@ import org.springframework.osgi.test.platform.Platforms;
  * 
  */
 public class StaticResourceTest extends BaseWebIntegrationTest {
-
-	/** logger */
-	private static final Log log = LogFactory.getLog(StaticResourceTest.class);
 
 	private final String GROUP_ID = "resources.only";
 

@@ -26,8 +26,11 @@ import org.apache.catalina.startup.Embedded;
 import org.apache.catalina.startup.ExpandWar;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.osgi.web.extender.deployer.OsgiWarDeploymentException;
+import org.springframework.osgi.web.extender.deployer.WarDeployment;
 import org.springframework.osgi.web.extender.deployer.internal.util.Utils;
 import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeployer;
+import org.springframework.util.Assert;
 
 /**
  * Apache <a href="http://tomcat.apache.org">Tomcat</a> 5.5.x/6.0.x specific
@@ -37,11 +40,11 @@ import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeploye
  * <p/>The deployer expects the {@link org.apache.catalina.startup.Catalina}
  * instance to be published as an OSGi service under {@link Embedded} class.
  * 
- * @author Costin Leau
- * 
  * @see Context
  * @see Container
  * @see Loader
+ * 
+ * @author Costin Leau
  */
 public class TomcatWarDeployer extends AbstractWarDeployer {
 
@@ -54,7 +57,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		serverService = (Embedded) Utils.createServerServiceProxy(getBundleContext(), Embedded.class, "tomcat-server");
 	}
 
-	protected Object createDeployment(Bundle bundle, String contextPath) throws Exception {
+	protected WarDeployment createDeployment(Bundle bundle, String contextPath) throws Exception {
 		String docBase = createDocBase(bundle, contextPath);
 
 		Context catalinaContext = serverService.createContext(contextPath, docBase);
@@ -62,24 +65,16 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		catalinaContext.setPrivileged(false);
 		catalinaContext.setReloadable(false);
 
-		return catalinaContext;
+		// create Tomcat specific deployment
+		TomcatWarDeployment deployment = new TomcatWarDeployment(this, bundle, catalinaContext);
+
+		return deployment;
 	}
 
-	protected void startDeployment(Object deployment) throws Exception {
+	protected void startDeployment(WarDeployment deployment) throws Exception {
+		Assert.isInstanceOf(TomcatWarDeployment.class, deployment, "Wrong type of deployment used");
 		// start web context
-		startCatalinaContext((Context) deployment);
-	}
-
-	protected void stopDeployment(Bundle bundle, Object deployment) throws Exception {
-		Context context = (Context) deployment;
-		String docBase = context.getDocBase();
-		// remove context
-		serverService.removeContext(context);
-
-		if (log.isDebugEnabled())
-			log.debug("Cleaning unpacked folder " + docBase);
-		// clean unpacked folder
-		ExpandWar.delete(new File(docBase));
+		startCatalinaContext(((TomcatWarDeployment) deployment).getCatalinaContext());
 	}
 
 	private void startCatalinaContext(Context context) {
@@ -94,6 +89,37 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		}
 		finally {
 			currentThread.setContextClassLoader(old);
+		}
+	}
+
+	/**
+	 * Stops the given context.
+	 * 
+	 * @param catalinaContext
+	 * @throws OsgiWarDeploymentException
+	 */
+	// package protected method accessible only to the TomcatWarDeployment
+	void stopCatalinaContext(Context catalinaContext) throws OsgiWarDeploymentException {
+		String docBase = catalinaContext.getDocBase();
+		String contextPath = catalinaContext.getPath();
+		String messageEnding = "context [" + contextPath + "] from server " + getServerInfo();
+
+		log.info("About to undeploy " + messageEnding);
+
+		// remove context
+		try {
+			serverService.removeContext(catalinaContext);
+			log.info("Context [" + contextPath + "] undeployed successfully from server " + getServerInfo());
+		}
+		catch (Exception ex) {
+			throw new OsgiWarDeploymentException("Cannot undeploy " + messageEnding, ex);
+		}
+		// try to clean up anyway
+		finally {
+			if (log.isDebugEnabled())
+				log.debug("Cleaning unpacked folder " + docBase);
+			// clean unpacked folder
+			ExpandWar.delete(new File(docBase));
 		}
 	}
 
