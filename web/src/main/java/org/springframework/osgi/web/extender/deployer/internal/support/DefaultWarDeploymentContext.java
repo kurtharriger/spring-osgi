@@ -19,6 +19,7 @@ package org.springframework.osgi.web.extender.deployer.internal.support;
 import javax.servlet.ServletContext;
 
 import org.osgi.framework.Bundle;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.web.extender.deployer.WarDeploymentContext;
 import org.springframework.util.Assert;
 
@@ -45,9 +46,15 @@ public class DefaultWarDeploymentContext implements WarDeploymentContext {
 	public DefaultWarDeploymentContext(Bundle bundle, String contextPath, ServletContext servletContext) {
 		Assert.notNull(bundle, "bundle is required");
 		Assert.hasText(contextPath, "a valid contextPath is required");
+		Assert.notNull(servletContext, "servletContext is required");
+
 		this.bundle = bundle;
 		this.contextPath = contextPath;
 		this.servletContext = servletContext;
+
+		// bind the BundleContext as an attribute
+		this.servletContext.setAttribute(WarDeploymentContext.OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE,
+			OsgiBundleUtils.getBundleContext(bundle));
 	}
 
 	public Bundle getBundle() {

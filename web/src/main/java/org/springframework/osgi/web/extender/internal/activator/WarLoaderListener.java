@@ -17,7 +17,6 @@
 package org.springframework.osgi.web.extender.internal.activator;
 
 import java.net.URL;
-import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +41,8 @@ import org.springframework.util.Assert;
 
 /**
  * OSGi specific listener that bootstraps web applications packed as WARs (Web
- * ARchives).
+ * ARchives). Additionally, it makes the BundleContext available in the
+ * ServletContext so that various components can look it up.
  * 
  * @author Costin Leau
  * 
@@ -139,6 +139,7 @@ public class WarLoaderListener implements BundleActivator {
 			public void run() {
 				try {
 					WarDeployment deployment = warDeployer.deploy(bundle, contextPath);
+					// deploy the bundle 
 					bundlesToDeployments.put(bundle, deployment);
 				}
 				catch (OsgiWarDeploymentException ex) {

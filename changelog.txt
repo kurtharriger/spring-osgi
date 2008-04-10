@@ -21,8 +21,10 @@ Package org.springframework.osgi.web
 * change package of the internal, private bundle activator
 * added OsgiWarDeploymentException to the deployment interfaces
 * added WarDeployment for bundles deployed by the WarDeployer
-* added WarDeploymentContext for accessing the properties associated with a war deployment
+* added WarDeploymentContext for accessing the properties associated with a war deployment and the associated
+  BundleContext as a ServletContext attribute
 * improved cleanup in case of exceptions for both TomcatWarDeployer and JettyWarDeployer
+* added OsgiBundleXmlWebApplicationContext as an OSGi aware XML application context
 
 
 Changes in version 1.1.0 M1 (2008-04-07)

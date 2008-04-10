@@ -41,6 +41,7 @@
 
 	<spring.osgi.import.pkg>
 		org.apache.commons.logging*,
+		javax.servlet,
 		org.springframework.osgi.service.importer,
 		org.springframework.aop.framework,
 		org.osgi.service.cm;version=1.2;resolution:=optional,
@@ -94,7 +95,6 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
       <version>${spring.maven.artifact.version}</version>
-      <scope>test</scope>
       <exclusions>
       	<exclusion>
           <groupId>aopalliance</groupId>

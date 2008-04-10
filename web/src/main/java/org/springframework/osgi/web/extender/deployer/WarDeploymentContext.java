@@ -19,6 +19,7 @@ package org.springframework.osgi.web.extender.deployer;
 import javax.servlet.ServletContext;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
 /**
  * Context associated with a war deployment. Provides access to various war
@@ -31,9 +32,15 @@ import org.osgi.framework.Bundle;
  * @author Costin Leau
  * 
  */
-
-//TODO: define its lifecycle
 public interface WarDeploymentContext {
+
+	/**
+	 * Convenience context attribute under which the OSGI BundleContext is
+	 * bound. Implementations are required to support this attribute.
+	 */
+	String OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE = "org.springframework.osgi.web.WarDeploymentContext.OSGI."
+			+ BundleContext.class.getName();
+
 
 	/**
 	 * Returns the bundle associated with this war deployment.

@@ -98,7 +98,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	/** OSGi bundle context */
 	private BundleContext bundleContext;
 
-	/** Path to configuration files * */
+	/** Path to configuration files */
 	private String[] configLocations;
 
 	/**
@@ -116,7 +116,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 */
 	private OsgiBundleResourcePatternResolver osgiPatternResolver;
 
-	/** Used for publishing the app context * */
+	/** Used for publishing the app context */
 	private ServiceRegistration serviceRegistration;
 
 	/** Should context be published as an OSGi service? */
@@ -280,10 +280,10 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		if (publishContextAsService) {
 			Dictionary serviceProperties = new MapBasedDictionary();
 			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getBundleSymbolicName());
-			
+
 			serviceProperties.put(Constants.BUNDLE_SYMBOLICNAME, getBundleSymbolicName());
 			serviceProperties.put(Constants.BUNDLE_VERSION, OsgiBundleUtils.getBundleVersion(bundle));
-			
+
 			if (logger.isInfoEnabled()) {
 				logger.info("Publishing application context as OSGi service with properties " + serviceProperties);
 			}
@@ -306,7 +306,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		}
 		else {
 			if (logger.isInfoEnabled()) {
-				logger.info("Not publishing application context OSGi service for bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
+				logger.info("Not publishing application context OSGi service for bundle "
+						+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			}
 		}
 	}

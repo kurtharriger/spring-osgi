@@ -19,6 +19,7 @@ package org.springframework.osgi.context.support;
 
 import java.io.IOException;
 
+import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.Assert;
 import org.xml.sax.EntityResolver;
 
 /**
@@ -118,8 +120,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
 
-		NamespaceHandlerResolver nsResolver = createNamespaceHandlerResolver();
-		EntityResolver enResolver = createEntityResolver();
+		NamespaceHandlerResolver nsResolver = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
+		EntityResolver enResolver = createEntityResolver(getBundleContext(), getClassLoader());
 
 		beanDefinitionReader.setEntityResolver(enResolver);
 		beanDefinitionReader.setNamespaceHandlerResolver(nsResolver);
@@ -128,63 +130,6 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		// then proceed with actually loading the bean definitions.
 		initBeanDefinitionReader(beanDefinitionReader);
 		loadBeanDefinitions(beanDefinitionReader);
-	}
-
-	/**
-	 * Creates a special OSGi namespace resolver that first uses the bundle
-	 * class path falling back to the namespace service. This way embedded
-	 * libraries that provide namespace handlers take priority over namespace
-	 * provided by other bundles.
-	 * 
-	 * @return
-	 */
-	private NamespaceHandlerResolver createNamespaceHandlerResolver() {
-		// create local namespace resolver
-		// we'll use the default resolver which uses the bundle local class-loader
-		NamespaceHandlerResolver localNamespaceResolver = new DefaultNamespaceHandlerResolver(getClassLoader());
-		// hook in OSGi namespace resolver
-		NamespaceHandlerResolver osgiServiceNamespaceResolver = lookupNamespaceHandlerResolver(localNamespaceResolver);
-
-		DelegatedNamespaceHandlerResolver delegate = new DelegatedNamespaceHandlerResolver();
-		delegate.addNamespaceHandler(localNamespaceResolver, "LocalNamespaceResolver for bundle "
-				+ OsgiStringUtils.nullSafeNameAndSymName(getBundle()));
-		delegate.addNamespaceHandler(osgiServiceNamespaceResolver, "OSGi Service resolver");
-
-		return delegate;
-	}
-
-	/**
-	 * Similar to {@link #createNamespaceHandlerResolver()}, this method
-	 * creates a special OSGi entity resolver that considers the bundle class
-	 * path first, falling back to the entity resolver service provided by the
-	 * Spring DM extender.
-	 * 
-	 * @return
-	 */
-	private EntityResolver createEntityResolver() {
-		// create local namespace resolver
-		EntityResolver localEntityResolver = new DelegatingEntityResolver(getClassLoader());
-		// hook in OSGi namespace resolver
-		EntityResolver osgiServiceEntityResolver = lookupEntityResolver(localEntityResolver);
-
-		DelegatedEntityResolver delegate = new DelegatedEntityResolver();
-		delegate.addEntityResolver(localEntityResolver, "LocalEntityResolver for bundle "
-				+ OsgiStringUtils.nullSafeNameAndSymName(getBundle()));
-
-		// hook in OSGi namespace resolver
-		delegate.addEntityResolver(osgiServiceEntityResolver, "OSGi Service resolver");
-
-		return delegate;
-	}
-
-	private NamespaceHandlerResolver lookupNamespaceHandlerResolver(Object fallbackObject) {
-		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class[] { NamespaceHandlerResolver.class }, null,
-			getClassLoader(), getBundleContext(), fallbackObject);
-	}
-
-	private EntityResolver lookupEntityResolver(Object fallbackObject) {
-		return (EntityResolver) TrackingUtil.getService(new Class[] { EntityResolver.class }, null, getClassLoader(),
-			getBundleContext(), fallbackObject);
 	}
 
 	/**
@@ -236,5 +181,76 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 */
 	protected String[] getDefaultConfigLocations() {
 		return new String[] { DEFAULT_CONFIG_LOCATION };
+	}
+
+	/**
+	 * Creates a special OSGi namespace handler resolver that first searches the
+	 * bundle class path falling back to the namespace service published by
+	 * Spring-DM. This allows embedded libraries that provide namespace handlers
+	 * take priority over namespace provided by other bundles.
+	 * 
+	 * @param bundleContext the OSGi context of which the resolver should be
+	 * aware of
+	 * @param classLoader classloader for creating the OSGi namespace resolver
+	 * proxy
+	 * @return a OSGi aware namespace handler resolver
+	 */
+	private NamespaceHandlerResolver createNamespaceHandlerResolver(BundleContext bundleContext, ClassLoader classLoader) {
+		Assert.notNull(bundleContext, "bundleContext is required");
+		// create local namespace resolver
+		// we'll use the default resolver which uses the bundle local class-loader
+		NamespaceHandlerResolver localNamespaceResolver = new DefaultNamespaceHandlerResolver(classLoader);
+		// hook in OSGi namespace resolver
+		NamespaceHandlerResolver osgiServiceNamespaceResolver = lookupNamespaceHandlerResolver(bundleContext,
+			classLoader, localNamespaceResolver);
+
+		DelegatedNamespaceHandlerResolver delegate = new DelegatedNamespaceHandlerResolver();
+		delegate.addNamespaceHandler(localNamespaceResolver, "LocalNamespaceResolver for bundle "
+				+ OsgiStringUtils.nullSafeNameAndSymName(bundleContext.getBundle()));
+		delegate.addNamespaceHandler(osgiServiceNamespaceResolver, "OSGi Service resolver");
+
+		return delegate;
+	}
+
+	/**
+	 * Similar to
+	 * {@link #createNamespaceHandlerResolver(BundleContext, ClassLoader)},
+	 * this method creates a special OSGi entity resolver that considers the
+	 * bundle class path first, falling back to the entity resolver service
+	 * provided by the Spring DM extender.
+	 * 
+	 * @param bundleContext the OSGi context of which the resolver should be
+	 * aware of
+	 * @param classLoader classloader for creating the OSGi namespace resolver
+	 * proxy
+	 * @return a OSGi aware entity resolver
+	 */
+	private EntityResolver createEntityResolver(BundleContext bundleContext, ClassLoader classLoader) {
+		Assert.notNull(bundleContext, "bundleContext is required");
+		// create local namespace resolver
+		EntityResolver localEntityResolver = new DelegatingEntityResolver(classLoader);
+		// hook in OSGi namespace resolver
+		EntityResolver osgiServiceEntityResolver = lookupEntityResolver(bundleContext, classLoader, localEntityResolver);
+
+		DelegatedEntityResolver delegate = new DelegatedEntityResolver();
+		delegate.addEntityResolver(localEntityResolver, "LocalEntityResolver for bundle "
+				+ OsgiStringUtils.nullSafeNameAndSymName(bundleContext.getBundle()));
+
+		// hook in OSGi namespace resolver
+		delegate.addEntityResolver(osgiServiceEntityResolver, "OSGi Service resolver");
+
+		return delegate;
+	}
+
+	private NamespaceHandlerResolver lookupNamespaceHandlerResolver(BundleContext bundleContext,
+			ClassLoader classLoader, Object fallbackObject) {
+		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class[] { NamespaceHandlerResolver.class }, null,
+			classLoader, bundleContext, fallbackObject);
+	}
+
+	private EntityResolver lookupEntityResolver(BundleContext bundleContext, ClassLoader classLoader,
+			Object fallbackObject) {
+		return (EntityResolver) TrackingUtil.getService(new Class[] { EntityResolver.class }, null, classLoader,
+			bundleContext, fallbackObject);
 	}
 }
