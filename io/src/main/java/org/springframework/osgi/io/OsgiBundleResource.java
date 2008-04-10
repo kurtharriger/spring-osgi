@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.io.internal.OsgiResourceUtils;
@@ -76,7 +77,7 @@ import org.springframework.util.StringUtils;
  * @author Adrian Colyer
  * 
  */
-public class OsgiBundleResource extends AbstractResource {
+public class OsgiBundleResource extends AbstractResource implements ContextResource {
 
 	/**
 	 * Prefix for searching inside the owning bundle space. This translates to
@@ -100,10 +101,9 @@ public class OsgiBundleResource extends AbstractResource {
 	private final String path;
 
 	// used to avoid removing the prefix every time the URL is required
-	private String pathWithoutPrefix;
+	private final String pathWithoutPrefix;
 
 	// Bundle resource possible searches
-
 	private int searchType = OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED;
 
 
@@ -124,6 +124,24 @@ public class OsgiBundleResource extends AbstractResource {
 		this.path = StringUtils.cleanPath(path);
 
 		this.searchType = OsgiResourceUtils.getSearchType(this.path);
+
+		switch (this.searchType) {
+			case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
+				pathWithoutPrefix = path;
+				break;
+			case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
+				pathWithoutPrefix = path.substring(BUNDLE_URL_PREFIX.length());
+				break;
+			case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_JAR:
+				pathWithoutPrefix = path.substring(BUNDLE_JAR_URL_PREFIX.length());
+				break;
+			case OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE:
+				pathWithoutPrefix = path.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length());
+				break;
+			// prefix unknown so the path will be resolved outside the context
+			default:
+				pathWithoutPrefix = null;
+		}
 	}
 
 	/**
@@ -183,25 +201,15 @@ public class OsgiBundleResource extends AbstractResource {
 		switch (searchType) {
 			// same as bundle space but with a different string
 			case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
-				if (pathWithoutPrefix == null)
-					pathWithoutPrefix = path;
 				url = getResourceFromBundleSpace(pathWithoutPrefix);
 				break;
 			case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
-				if (pathWithoutPrefix == null)
-					pathWithoutPrefix = path.substring(BUNDLE_URL_PREFIX.length());
 				url = getResourceFromBundleSpace(pathWithoutPrefix);
 				break;
 			case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_JAR:
-				if (pathWithoutPrefix == null)
-					pathWithoutPrefix = path.substring(BUNDLE_JAR_URL_PREFIX.length());
-
 				url = getResourceFromBundleJar(pathWithoutPrefix);
 				break;
 			case OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE:
-				if (pathWithoutPrefix == null)
-					pathWithoutPrefix = path.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length());
-
 				url = getResourceFromBundleClasspath(pathWithoutPrefix);
 				break;
 			// fallback
@@ -470,4 +478,8 @@ public class OsgiBundleResource extends AbstractResource {
 		return (URL[]) resources.toArray(new URL[resources.size()]);
 	}
 
+	// TODO: can this return null or throw an exception
+	public String getPathWithinContext() {
+		return pathWithoutPrefix;
+	}
 }
