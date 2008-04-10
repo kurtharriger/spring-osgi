@@ -25,7 +25,8 @@ import org.osgi.framework.Bundle;
  * 
  * <p/> Implementations are free to use specific environments for the actual
  * deployment process, such as Apache Tomcat, OSGi HttpService, Jetty or other
- * web containers.
+ * web containers. It is up to implementations to start the servers embedded or
+ * to require their presence (though the latter is preferred).
  * 
  * <p/>As the war listener handles the detection, start up and shutdown of the
  * bundles, the deployer should be concerned only with the deployment process of
