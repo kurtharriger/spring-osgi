@@ -23,7 +23,9 @@ import javax.servlet.ServletContext;
 
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.web.extender.deployer.WarDeploymentContext;
@@ -87,14 +89,27 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 		this.servletContext = servletContext;
 
 		// look for the attribute only if there is no BundleContext available
-		if (getBundleContext() == null && servletContext != null) {
-			Object context = servletContext.getAttribute(WarDeploymentContext.OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE);
+		if (getBundleContext() == null) {
 
-			Assert.notNull(context, "BundleContext expected as attribute under "
-					+ WarDeploymentContext.OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE);
-			Assert.isInstanceOf(BundleContext.class, context);
+			// try to locate the bundleContext in the ServletContext
+			if (servletContext != null) {
+				Object context = servletContext.getAttribute(WarDeploymentContext.OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE);
 
-			setBundleContext((BundleContext) context);
+				if (context != null) {
+					Assert.isInstanceOf(BundleContext.class, context);
+					logger.debug("Using the bundle context located in the servlet context at "
+							+ WarDeploymentContext.OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE);
+					setBundleContext((BundleContext) context);
+				}
+			}
+
+			// fall back to the parent
+			ApplicationContext parent = getParent();
+
+			if (parent instanceof ConfigurableOsgiBundleApplicationContext) {
+				logger.debug("Using the application context parent's bundle context");
+				setBundleContext(((ConfigurableOsgiBundleApplicationContext) parent).getBundleContext());
+			}
 		}
 	}
 

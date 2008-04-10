@@ -14,6 +14,9 @@ Package org.springframework.osgi.extender
 * added OsgiBeanFactoryPostProcessor interface for customizing the contexts created by the extender
 * change package of the internal, private bundle activator
 
+Package org.springframework.osgi.io
+* extended OsgiBundleResource to implement ContextResource
+
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader constructor visibility changed from private to protected
 
