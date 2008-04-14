@@ -25,8 +25,8 @@
 	<classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/jetty-util/6.1.9/jetty-util-6.1.9.jar" sourcepath="/JETTY_UTIL_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.1.0-m2-SNAPSHOT/spring-osgi-core-1.1.0-m2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-web/2.5.2/spring-web-2.5.2.jar" sourcepath="/SPRING_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-webmvc/2.5.2/spring-webmvc-2.5.2.jar" sourcepath="/SPRING_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/catalina.osgi/5.5.23-SNAPSHOT/catalina.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/CATALINA_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-webmvc/2.5.2/spring-webmvc-2.5.2.jar" sourcepath="/SPRING_TIGER_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/catalina.osgi/5.5.23-SNAPSHOT/catalina.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/CATALINA_5.5.X"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-test-support"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/servlet-api.osgi/2.5-SNAPSHOT/servlet-api.osgi-2.5-SNAPSHOT.jar"/>

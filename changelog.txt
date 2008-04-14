@@ -9,10 +9,15 @@ General
 * refined the web deployer API
 * added integration with Spring MVC
 
+Package org.springframework.osgi.context
+* added OSGi import for Spring property editors loaded reflectively
+
 Package org.springframework.osgi.extender
 * added OsgiApplicationContextCreator interface for handling the extender contexts creation
 * added OsgiBeanFactoryPostProcessor interface for customizing the contexts created by the extender
-* change package of the internal, private bundle activator
+* changed package of the internal, private bundle activator
+* added filtering by type for the discovered namespace handler resolvers to avoid usage of classes with incompatible
+  wiring
 
 Package org.springframework.osgi.io
 * extended OsgiBundleResource to implement ContextResource
