@@ -21,8 +21,13 @@ import java.io.IOException;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Host;
 import org.apache.catalina.Loader;
-import org.apache.catalina.startup.Embedded;
+import org.apache.catalina.Server;
+import org.apache.catalina.Service;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardService;
+import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.ExpandWar;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -31,14 +36,22 @@ import org.springframework.osgi.web.extender.deployer.WarDeployment;
 import org.springframework.osgi.web.extender.deployer.internal.util.Utils;
 import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeployer;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Apache <a href="http://tomcat.apache.org">Tomcat</a> 5.5.x/6.0.x specific
  * war deployer. Unpacks the given bundle into a temporary folder which is then
  * used for deploying the war into the web container.
  * 
- * <p/>The deployer expects the {@link org.apache.catalina.startup.Catalina}
- * instance to be published as an OSGi service under {@link Embedded} class.
+ * <p/>The deployer works with {@link Server} instance which should contain the
+ * {@link Host} and at least one {@link org.apache.catalina.connector.Connector}.
+ * It is up to the server starter to decide whether an
+ * {@link org.apache.catalina.startup.Embedded} instance is used or whether
+ * {@link org.apache.catalina.startup.Catalina} will be used instead.
+ * 
+ * <p/>Additionally, this deployer expects the <em>traditional</em>
+ * configuration with one {@link org.apache.catalina.Engine} and one
+ * {@link Host} configured for the Tomcat {@link Service}.
  * 
  * @see Context
  * @see Container
@@ -49,18 +62,18 @@ import org.springframework.util.Assert;
 public class TomcatWarDeployer extends AbstractWarDeployer {
 
 	/** Catalina OSGi service */
-	private Embedded serverService;
+	private Service serverService;
 
 
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		serverService = (Embedded) Utils.createServerServiceProxy(getBundleContext(), Embedded.class, "tomcat-server");
+		serverService = (Service) Utils.createServerServiceProxy(getBundleContext(), Service.class, "tomcat-server");
 	}
 
 	protected WarDeployment createDeployment(Bundle bundle, String contextPath) throws Exception {
 		String docBase = createDocBase(bundle, contextPath);
 
-		Context catalinaContext = serverService.createContext(contextPath, docBase);
+		Context catalinaContext = createDefaultContext(contextPath, docBase);
 		catalinaContext.setLoader(createCatalinaLoader(bundle));
 		catalinaContext.setPrivileged(false);
 		catalinaContext.setReloadable(false);
@@ -69,6 +82,17 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		TomcatWarDeployment deployment = new TomcatWarDeployment(this, bundle, catalinaContext);
 
 		return deployment;
+	}
+
+	private Context createDefaultContext(String contextPath, String docBase) {
+		StandardContext context = new StandardContext();
+
+		context.setDocBase(docBase);
+		context.setPath(contextPath);
+
+		ContextConfig config = new ContextConfig();
+		context.addLifecycleListener(config);
+		return context;
 	}
 
 	protected void startDeployment(WarDeployment deployment) throws Exception {
@@ -108,7 +132,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 
 		// remove context
 		try {
-			serverService.removeContext(catalinaContext);
+			removeContext(catalinaContext);
 			log.info("Context [" + contextPath + "] undeployed successfully from server " + getServerInfo());
 		}
 		catch (Exception ex) {
@@ -123,6 +147,10 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		}
 	}
 
+	private void removeContext(Context context) {
+		context.getParent().removeChild(context);
+	}
+
 	/**
 	 * Creates a dedicated Catalina Loader plus a special, chained, OSGi
 	 * classloader.
@@ -133,7 +161,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	private Loader createCatalinaLoader(Bundle bundle) {
 		OsgiCatalinaLoader loader = new OsgiCatalinaLoader();
 		// create special class loader
-		loader.setClassLoader(Utils.createWebAppClassLoader(bundle, Embedded.class));
+		loader.setClassLoader(Utils.createWebAppClassLoader(bundle, StandardService.class));
 		return loader;
 	}
 
@@ -155,8 +183,14 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	private Container getHost() {
 		// get engine
 		Container container = serverService.getContainer();
+
+		if (container == null)
+			throw new IllegalStateException("The Tomcat server doesn't have any Engines defined");
 		// now get host
 		Container[] children = container.findChildren();
+		if (ObjectUtils.isEmpty(children))
+			throw new IllegalStateException("The Tomcat server doesn't have any Hosts defined");
+
 		// pick the first one and associate the context with it
 		return children[0];
 	}

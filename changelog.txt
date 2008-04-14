@@ -33,6 +33,7 @@ Package org.springframework.osgi.web
   BundleContext as a ServletContext attribute
 * improved cleanup in case of exceptions for both TomcatWarDeployer and JettyWarDeployer
 * added OsgiBundleXmlWebApplicationContext as an OSGi aware XML application context
+* refined TomcatDeployer to rely only on Service interface rather the EmbeddedServer class
 
 
 Changes in version 1.1.0 M1 (2008-04-07)
