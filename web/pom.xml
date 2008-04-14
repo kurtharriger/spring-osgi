@@ -30,7 +30,7 @@
 
     <spring.osgi.export>
       !org.springframework.osgi.web.*internal*,
-      org.springframework.osgi.web.extender*;version=${spring.osgi.export.version}
+      org.springframework.osgi.web*;version=${spring.osgi.export.version}
     </spring.osgi.export>
     
   	<spring.osgi.private.pkg>

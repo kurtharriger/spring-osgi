@@ -41,6 +41,8 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 
 	private static final Log log = LogFactory.getLog(NamespaceManager.class);
 
+	private static final String NS_HANDLER_RESOLVER_CLASS_NAME = NamespaceHandlerResolver.class.getName();
+
 	/**
 	 * The set of all namespace plugins known to the extender
 	 */
@@ -57,6 +59,8 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	 */
 	private final BundleContext context;
 
+	private final String extenderInfo;
+
 	private static final String META_INF = "META-INF/";
 
 	private static final String SPRING_HANDLERS = "spring.handlers";
@@ -71,6 +75,10 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	 */
 	public NamespaceManager(BundleContext context) {
 		this.context = context;
+
+		extenderInfo = context.getBundle().getSymbolicName() + "|"
+				+ OsgiBundleUtils.getBundleVersion(context.getBundle());
+
 		this.namespacePlugins = new NamespacePlugins();
 	}
 
@@ -88,9 +96,42 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 			return;
 		}
 
-		if (bundle.findEntries(META_INF, SPRING_HANDLERS, false) != null
-				|| bundle.findEntries(META_INF, SPRING_SCHEMAS, false) != null) {
-			addHandler(bundle);
+		boolean hasHandlers = bundle.findEntries(META_INF, SPRING_HANDLERS, false) != null;
+		boolean hasSchemas = bundle.findEntries(META_INF, SPRING_SCHEMAS, false) != null;
+
+		// if the bundle defines handlers
+		if (hasHandlers) {
+			// check type compatibility
+			if (hasCompatibleNamespaceType(bundle)) {
+				addHandler(bundle);
+			}
+			else {
+				if (log.isDebugEnabled())
+					log.debug("Bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
+							+ "] declares namespace handlers but is not compatible with extender [" + extenderInfo
+							+ "]; ignoring...");
+			}
+
+		}
+		else {
+			// bundle declares only schemas, add it though the handlers might not be compatible...
+			if (hasSchemas)
+				addHandler(bundle);
+		}
+	}
+
+	private boolean hasCompatibleNamespaceType(Bundle bundle) {
+		try {
+			Class type = bundle.loadClass(NS_HANDLER_RESOLVER_CLASS_NAME);
+			return NamespaceHandlerResolver.class.equals(type);
+		}
+		catch (Throwable th) {
+			if (log.isDebugEnabled())
+				// if the interface is not wired, ignore the bundle
+				log.debug("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " cannot see "
+						+ NS_HANDLER_RESOLVER_CLASS_NAME + "; ignoring its namespace handlers");
+
+			return false;
 		}
 	}
 
