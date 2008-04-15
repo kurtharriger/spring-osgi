@@ -53,7 +53,7 @@ public class CoreTaglibTest extends BaseWebIntegrationTest {
 		assertTrue(resp.toString(), resp.isOk());
 	}
 
-	public void tstSystemIn() throws Exception {
-		System.in.read();
-	}
+//	public void tstSystemIn() throws Exception {
+//		System.in.read();
+//	}
 }

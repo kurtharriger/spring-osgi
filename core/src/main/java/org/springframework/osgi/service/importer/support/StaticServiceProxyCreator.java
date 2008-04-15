@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import java.lang.reflect.Modifier;
@@ -39,6 +40,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 
 	private static final Log log = LogFactory.getLog(StaticServiceProxyCreator.class);
 
+
 	/**
 	 * Constructs a new <code>StaticServiceProxyCreator</code> instance.
 	 * 
@@ -59,11 +61,12 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 	Advice createServiceProviderTCCLAdvice(ServiceReference reference) {
 		Bundle bundle = reference.getBundle();
 		// if reference is dead already, it's impossible to provide the service
-		// classloader
+		// class loader
 		if (bundle == null)
 			return null;
 
-		return new ServiceTCCLInterceptor(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, ProxyFactory.class.getClassLoader()));
+		return new ServiceTCCLInterceptor(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle,
+			ProxyFactory.class.getClassLoader()));
 	}
 
 	Class[] discoverProxyClasses(ServiceReference ref) {
@@ -87,5 +90,4 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 		return clazzes;
 
 	}
-
 }

@@ -20,6 +20,7 @@ package org.springframework.osgi.context.support;
 import java.io.IOException;
 
 import org.osgi.framework.BundleContext;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.osgi.util.internal.ChainedClassLoader;
 import org.springframework.util.Assert;
 import org.xml.sax.EntityResolver;
 
@@ -120,8 +122,13 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
 
-		NamespaceHandlerResolver nsResolver = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
-		EntityResolver enResolver = createEntityResolver(getBundleContext(), getClassLoader());
+		// create the AOP class loader
+		ClassLoader aopClassLoader = new ChainedClassLoader(new ClassLoader[] { getClassLoader(),
+			NamespaceHandlerResolver.class.getClassLoader(), ProxyFactory.class.getClassLoader() });
+
+		NamespaceHandlerResolver nsResolver = createNamespaceHandlerResolver(getBundleContext(), getClassLoader(),
+			aopClassLoader);
+		EntityResolver enResolver = createEntityResolver(getBundleContext(), getClassLoader(), aopClassLoader);
 
 		beanDefinitionReader.setEntityResolver(enResolver);
 		beanDefinitionReader.setNamespaceHandlerResolver(nsResolver);
@@ -191,18 +198,21 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * 
 	 * @param bundleContext the OSGi context of which the resolver should be
 	 * aware of
-	 * @param classLoader classloader for creating the OSGi namespace resolver
-	 * proxy
+	 * @param bundleClassLoader classloader for creating the OSGi namespace
+	 * resolver proxy
+	 * @param aopClassLoader class loader used for AOP weaving
 	 * @return a OSGi aware namespace handler resolver
 	 */
-	private NamespaceHandlerResolver createNamespaceHandlerResolver(BundleContext bundleContext, ClassLoader classLoader) {
+	private NamespaceHandlerResolver createNamespaceHandlerResolver(BundleContext bundleContext,
+			ClassLoader bundleClassLoader, ClassLoader aopClassLoader) {
 		Assert.notNull(bundleContext, "bundleContext is required");
 		// create local namespace resolver
 		// we'll use the default resolver which uses the bundle local class-loader
-		NamespaceHandlerResolver localNamespaceResolver = new DefaultNamespaceHandlerResolver(classLoader);
+		NamespaceHandlerResolver localNamespaceResolver = new DefaultNamespaceHandlerResolver(bundleClassLoader);
+
 		// hook in OSGi namespace resolver
 		NamespaceHandlerResolver osgiServiceNamespaceResolver = lookupNamespaceHandlerResolver(bundleContext,
-			classLoader, localNamespaceResolver);
+			aopClassLoader, localNamespaceResolver);
 
 		DelegatedNamespaceHandlerResolver delegate = new DelegatedNamespaceHandlerResolver();
 		delegate.addNamespaceHandler(localNamespaceResolver, "LocalNamespaceResolver for bundle "
@@ -214,23 +224,26 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 
 	/**
 	 * Similar to
-	 * {@link #createNamespaceHandlerResolver(BundleContext, ClassLoader)},
+	 * {@link #createNamespaceHandlerResolver(BundleContext, ClassLoader, ClassLoader)},
 	 * this method creates a special OSGi entity resolver that considers the
 	 * bundle class path first, falling back to the entity resolver service
 	 * provided by the Spring DM extender.
 	 * 
 	 * @param bundleContext the OSGi context of which the resolver should be
 	 * aware of
-	 * @param classLoader classloader for creating the OSGi namespace resolver
-	 * proxy
+	 * @param bundleClassLoader classloader for creating the OSGi namespace
+	 * resolver proxy
+	 * @param aopClassLoader class loader used for AOP weaving
 	 * @return a OSGi aware entity resolver
 	 */
-	private EntityResolver createEntityResolver(BundleContext bundleContext, ClassLoader classLoader) {
+	private EntityResolver createEntityResolver(BundleContext bundleContext, ClassLoader bundleClassLoader,
+			ClassLoader aopClassLoader) {
 		Assert.notNull(bundleContext, "bundleContext is required");
 		// create local namespace resolver
-		EntityResolver localEntityResolver = new DelegatingEntityResolver(classLoader);
+		EntityResolver localEntityResolver = new DelegatingEntityResolver(bundleClassLoader);
 		// hook in OSGi namespace resolver
-		EntityResolver osgiServiceEntityResolver = lookupEntityResolver(bundleContext, classLoader, localEntityResolver);
+		EntityResolver osgiServiceEntityResolver = lookupEntityResolver(bundleContext, aopClassLoader,
+			localEntityResolver);
 
 		DelegatedEntityResolver delegate = new DelegatedEntityResolver();
 		delegate.addEntityResolver(localEntityResolver, "LocalEntityResolver for bundle "

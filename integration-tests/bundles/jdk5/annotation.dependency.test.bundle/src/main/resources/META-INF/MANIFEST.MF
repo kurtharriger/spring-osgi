@@ -5,5 +5,5 @@ Bundle-ManifestVersion: 2
 Bundle-ClassPath: .
 Spring-Context: *; eagerly-init-importers:=true
 Import-Package: org.springframework.osgi.iandt.simpleservice,
-  org.springframework.osgi.iandt.simpleservice2
+  org.springframework.osgi.iandt.simpleservice2,org.springframework.osgi.extensions.annotation
 Export-Package: org.springframework.osgi.iandt.annotation.dependencies
