@@ -81,7 +81,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		final OsgiServiceLifecycleListener tcclListener = tcclAdvice.new ServiceProviderTCCLListener();
 
 		final ServiceDynamicInterceptor lookupAdvice = new ServiceDynamicInterceptor(getBundleContext(),
-			getUnifiedFilter(), getBeanClassLoader());
+			getUnifiedFilter(), getAopClassLoader());
 
 		lookupAdvice.setRequiredAtStartup(isMandatory());
 
@@ -96,7 +96,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		lookupAdvice.setServiceImporter(this);
 
 		// create a proxy creator using the existing context
-		ServiceProxyCreator creator = new AbstractServiceProxyCreator(getInterfaces(), getBeanClassLoader(),
+		ServiceProxyCreator creator = new AbstractServiceProxyCreator(getInterfaces(), getAopClassLoader(),
 			getBundleContext(), getContextClassLoader()) {
 
 			Advice createDispatcherInterceptor(ServiceReference reference) {

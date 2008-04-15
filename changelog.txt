@@ -11,6 +11,9 @@ General
 
 Package org.springframework.osgi.context
 * added OSGi import for Spring property editors loaded reflectively
+* property editors are using through Spring-DM core bundle instead of the target bundle
+* AbstractOsgiBundleApplicationContext uses the raw bundle as the bean class loader to avoid class leaks
+* improved start up NamespaceHandlerResolver look up to avoid class incompatibility problems
 
 Package org.springframework.osgi.extender
 * added OsgiApplicationContextCreator interface for handling the extender contexts creation
@@ -34,6 +37,7 @@ Package org.springframework.osgi.web
 * improved cleanup in case of exceptions for both TomcatWarDeployer and JettyWarDeployer
 * added OsgiBundleXmlWebApplicationContext as an OSGi aware XML application context
 * refined TomcatDeployer to rely only on Service interface rather the EmbeddedServer class
+* fixed casting problem occurring during war undeployment
 
 
 Changes in version 1.1.0 M1 (2008-04-07)

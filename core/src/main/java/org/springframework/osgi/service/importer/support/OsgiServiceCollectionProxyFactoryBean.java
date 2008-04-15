@@ -57,8 +57,7 @@ import org.springframework.util.Assert;
  * the <code>next()</code> method always obey the result of the previous
  * <code>hasNext()</code> invocation:
  * 
- * <p/>
- * <table border="1">
+ * <p/> <table border="1">
  * <tr>
  * <th><code>hasNext()</code> returned value</th>
  * <th><code>next()</code> behaviour</th>
@@ -77,10 +76,9 @@ import org.springframework.util.Assert;
  * </tr>
  * </table>
  * 
- * <p/>
- * Due to the dynamic nature of OSGi, <code>hasNext()</code> invocation made
- * on the same <code>Iterator</code> can return different values based on the
- * services availability. However, as explained above, <code>next()</code>
+ * <p/> Due to the dynamic nature of OSGi, <code>hasNext()</code> invocation
+ * made on the same <code>Iterator</code> can return different values based on
+ * the services availability. However, as explained above, <code>next()</code>
  * will always obey the result of the last <code>hasNext()</code> method.
  * 
  * <p/><strong>Note:</strong> Even though the collection and its iterators
@@ -125,7 +123,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 
 		// create shared proxy creator ( reused for each new service
 		// joining the collection)
-		proxyCreator = new StaticServiceProxyCreator(getInterfaces(), getBeanClassLoader(), getBundleContext(),
+		proxyCreator = new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBundleContext(),
 			getContextClassLoader());
 	}
 
@@ -152,7 +150,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 		Collection delegate;
 
 		BundleContext bundleContext = getBundleContext();
-		ClassLoader classLoader = getBeanClassLoader();
+		ClassLoader classLoader = getAopClassLoader();
 		Filter filter = getUnifiedFilter();
 
 		if (CollectionType.LIST.equals(collectionType)) {

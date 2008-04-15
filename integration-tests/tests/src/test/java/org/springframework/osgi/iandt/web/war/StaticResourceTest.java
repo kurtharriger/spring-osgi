@@ -67,10 +67,4 @@ public class StaticResourceTest extends BaseWebIntegrationTest {
 		HttpResponse response = HttpClient.getLocalResponse(base(), "nested/no-such-page.html");
 		assertTrue(response.toString(), response.isNotFound());
 	}
-
-	//
-	//	public void testInput() throws Exception {
-	//		System.in.read();
-	//
-	//	}
 }

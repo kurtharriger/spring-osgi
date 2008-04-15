@@ -46,6 +46,7 @@ import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
+import org.springframework.osgi.util.internal.ChainedClassLoader;
 import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 import org.springframework.util.Assert;
@@ -69,7 +70,7 @@ import org.springframework.util.StringUtils;
  * </ul>
  * 
  * <p/> <strong>Note:</strong>If thread context class loader management is used ({@link #setContextClassLoader(ExportContextClassLoader)},
- * since proxying is required, the target class has to meet certain criterias
+ * since proxying is required, the target class has to meet certain criterions
  * described in the Spring AOP documentation. In short, final classes are not
  * supported when class enhancement is used.
  * 
@@ -161,6 +162,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	private ClassLoader classLoader;
+	/** class loader used by the aop infrastructure */
+	private ClassLoader aopClassLoader;
 
 	/** exporter bean name */
 	private String beanName;
@@ -176,7 +179,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		// if we have a name, we need a bean factory
 		if (hasNamedBean)
 			Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
-		
+
 		// initialize bean only when dealing with singletons and named beans
 		if (hasNamedBean) {
 			if (beanFactory.isSingleton(targetBeanName)) {
@@ -220,7 +223,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		factory.setFrozen(true);
 		try {
-			return factory.getProxy(classLoader);
+			return factory.getProxy(aopClassLoader);
 		}
 		catch (Throwable th) {
 
@@ -337,6 +340,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
+		this.aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
+			ProxyFactory.class.getClassLoader() });
 	}
 
 	/**

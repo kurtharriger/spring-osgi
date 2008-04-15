@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.web.extender.deployer.internal.util;
+package org.springframework.osgi.util.internal;
 
 import java.net.URL;
 
 import org.springframework.util.Assert;
 
 /**
- * Chaining classloader implementation that delegates the resource and class
+ * Chaining class loader implementation that delegates the resource and class
  * loading to a number of class loaders passed in.
  * 
  * @author Costin Leau
- * 
  */
 public class ChainedClassLoader extends ClassLoader {
 
@@ -61,7 +60,7 @@ public class ChainedClassLoader extends ClassLoader {
 				return clazz;
 			}
 			catch (ClassNotFoundException e) {
-				// keep moving through the classloaders
+				// keep moving through the class loaders
 			}
 		}
 		throw new ClassNotFoundException(name);

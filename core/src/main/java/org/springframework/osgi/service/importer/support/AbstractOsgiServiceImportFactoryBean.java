@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
@@ -29,6 +30,7 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.OsgiFilterUtils;
+import org.springframework.osgi.util.internal.ChainedClassLoader;
 import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -48,7 +50,10 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
 
+	/** context classloader */
 	private ClassLoader classLoader;
+	/** aop classloader */
+	private ClassLoader aopClassLoader;
 
 	private BundleContext bundleContext;
 
@@ -234,12 +239,15 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * This method is called automatically by the container. For programmatic
-	 * usage, make sure that the class loader is able to see the AOP
-	 * infrastructure interfaces that are used during the proxy creation.
+	 * This method is called automatically by the container. The class will
+	 * automatically chain this classloader with the AOP infrastructure classes
+	 * (even if these are not visible to the user) so that the proxy creation
+	 * can be completed successfully.
 	 */
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
+		this.aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
+			ProxyFactory.class.getClassLoader() });
 	}
 
 	/**
@@ -249,6 +257,16 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	 */
 	public ClassLoader getBeanClassLoader() {
 		return classLoader;
+	}
+
+	/**
+	 * Returns the class loader used for AOP weaving
+	 * 
+	 * @return
+	 */
+	//NB: package protected
+	ClassLoader getAopClassLoader() {
+		return aopClassLoader;
 	}
 
 	/**

@@ -83,7 +83,7 @@ abstract class TrackingUtil {
 	private static final Log log = LogFactory.getLog(TrackingUtil.class);
 
 
-	public static Object getService(Class[] classes, String filter, ClassLoader classLoader, BundleContext context,
+	static Object getService(Class[] classes, String filter, ClassLoader classLoader, BundleContext context,
 			Object fallbackObject) {
 		ProxyFactory factory = new ProxyFactory();
 
@@ -103,5 +103,4 @@ abstract class TrackingUtil {
 			throw ncdfe;
 		}
 	}
-
 }

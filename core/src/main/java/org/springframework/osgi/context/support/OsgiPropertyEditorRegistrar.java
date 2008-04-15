@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.context.support;
 
 import java.beans.PropertyEditor;
@@ -48,6 +49,11 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 	private final Map editors;
 
+
+	OsgiPropertyEditorRegistrar() {
+		this(OsgiPropertyEditorRegistrar.class.getClassLoader());
+	}
+
 	OsgiPropertyEditorRegistrar(ClassLoader classLoader) {
 		// load properties
 		Properties editorsConfig = new Properties();
@@ -56,7 +62,7 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 		}
 		catch (IOException ex) {
 			throw (RuntimeException) new IllegalStateException(
-					"cannot load default propertiy editorsConfig configuration").initCause(ex);
+				"cannot load default propertiy editorsConfig configuration").initCause(ex);
 		}
 
 		if (log.isTraceEnabled())

@@ -24,7 +24,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
@@ -258,7 +257,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * @param beanFactory beanFactory used for registration.
 	 */
 	private void registerPropertyEditors(ConfigurableListableBeanFactory beanFactory) {
-		beanFactory.addPropertyEditorRegistrar(new OsgiPropertyEditorRegistrar(getClassLoader()));
+		beanFactory.addPropertyEditorRegistrar(new OsgiPropertyEditorRegistrar());
 	}
 
 	private void cleanOsgiBundleScope(ConfigurableListableBeanFactory beanFactory) {
@@ -359,6 +358,6 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * @return
 	 */
 	private ClassLoader createBundleClassLoader(Bundle bundle) {
-		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, ProxyFactory.class.getClassLoader());
+		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 	}
 }
