@@ -127,17 +127,11 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	// XML attributes/elements
 	private static final String LISTENER = "listener";
 
-	private static final String BIND_METHOD = "bind-method";
-
-	private static final String UNBIND_METHOD = "unbind-method";
-
 	private static final String REF = "ref";
 
 	private static final String INTERFACE = "interface";
 
 	private static final String INTERFACES = "interfaces";
-
-	private static final String INTERFACEs = "interface";
 
 	private static final String CARDINALITY = "cardinality";
 
@@ -174,7 +168,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 			builder.getRawBeanDefinition().setBeanClass(beanClass);
 		}
 
-		builder.setSource(parserContext.extractSource(element));
+		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
 		if (parserContext.isNested()) {
 			// Inner bean definition must receive same scope as containing bean.
 			builder.setScope(parserContext.getContainingBeanDefinition().getScope());
@@ -211,7 +205,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 		GenericBeanDefinition def = new GenericBeanDefinition();
 		def.setBeanClass(BeanReferenceFactoryBean.class);
 		MutablePropertyValues mpv = new MutablePropertyValues();
-		mpv.addPropertyValue("targetBeanName", beanName);
+		mpv.addPropertyValue(TARGET_BEAN_NAME_PROP, beanName);
 		def.setPropertyValues(mpv);
 		return def;
 	}

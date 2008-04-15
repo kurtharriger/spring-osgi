@@ -87,12 +87,14 @@ import org.springframework.util.Assert;
  * synchronized. Due to the light nature of the iterators, consider creating a
  * new one rather then reusing or sharing.
  * 
- * @author Costin Leau
+ * 
  * @see java.util.Iterator
  * @see java.util.Collection
  * @see java.util.List
  * @see java.util.Set
  * @see java.util.SortedSet
+ * 
+ * @author Costin Leau
  */
 public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
 
@@ -116,6 +118,8 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	private Comparator comparator;
 
 	private CollectionType collectionType = CollectionType.LIST;
+	/** greedy-proxying */
+	private boolean greedyProxying = false;
 
 
 	public void afterPropertiesSet() {
@@ -124,7 +128,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 		// create shared proxy creator ( reused for each new service
 		// joining the collection)
 		proxyCreator = new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBundleContext(),
-			getContextClassLoader());
+			getContextClassLoader(), greedyProxying);
 	}
 
 	public Class getObjectType() {
@@ -245,4 +249,29 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 		super.setCardinality(cardinality);
 	}
 
+	/**
+	 * Dictates whether <em>greedy</em> proxies are created or not (default).
+	 * 
+	 * <p>
+	 * Greedy proxies will proxy <b>all</b> the (visible) classes published by
+	 * the imported OSGi services. This means that the individual service proxy,
+	 * might implement/extend additional classes.
+	 * </p>
+	 * By default, greedy proxies are disabled (false) meaning that only the
+	 * specified classes are used for generating the the imported OSGi service
+	 * proxies.
+	 * 
+	 * <p/><b>Note:</b>Greedy proxying will use the proxy mechanism dictated
+	 * by this factory configuration. This means that if JDK proxies are used,
+	 * greedy proxing will consider only additional interfaces exposed by the
+	 * OSGi service and none of the extra classes. When CGLIB is used, all extra
+	 * published classes (whether interfaces or <em>non-final</em> concrete
+	 * classes) will be considered.
+	 * 
+	 * @param greedyProxying true if greedy proxying should be enabled, false
+	 * otherwise.
+	 */
+	public void setGreedyProxying(boolean greedyProxying) {
+		this.greedyProxying = greedyProxying;
+	}
 }

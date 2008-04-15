@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.config;
 
 import java.util.Comparator;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.osgi.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.config.ReferenceBeanDefinitionParser.TimeoutAttributeCallback;
 import org.springframework.osgi.service.importer.internal.collection.comparator.ServiceReferenceComparator;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.CollectionType;
@@ -38,6 +41,24 @@ import org.w3c.dom.NodeList;
  */
 abstract class CollectionBeanDefinitionParser extends AbstractReferenceDefinitionParser {
 
+	/**
+	 * Greedy proxy attribute callback.
+	 * 
+	 * @author Costin Leau
+	 */
+	static class GreedyProxyingAttributeCallback implements AttributeCallback {
+
+		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
+			String name = attribute.getLocalName();
+			if (GREEDY_PROXYING.equals(name)) {
+				builder.addPropertyValue(GREEDY_PROXYING_PROPERTY, attribute.getValue());
+				return false;
+			}
+			return true;
+		}
+	}
+
+
 	private static final String NESTED_COMPARATOR = "comparator";
 
 	private static final String INLINE_COMPARATOR_REF = "comparator-ref";
@@ -50,11 +71,16 @@ abstract class CollectionBeanDefinitionParser extends AbstractReferenceDefinitio
 
 	private static final String SERVICE_REFERENCE_ORDER = "service-reference";
 
+	private static final String GREEDY_PROXYING = "greedy-proxying";
+
+	private static final String GREEDY_PROXYING_PROPERTY = "greedyProxying";
+
 	private static final Comparator SERVICE_REFERENCE_COMPARATOR = new ServiceReferenceComparator();
 
 	private static final String NATURAL = "natural";
 
 	private static final String BASIS = "basis";
+
 
 	protected Class getBeanClass(Element element) {
 		return OsgiServiceCollectionProxyFactoryBean.class;
@@ -66,6 +92,18 @@ abstract class CollectionBeanDefinitionParser extends AbstractReferenceDefinitio
 
 	protected String optionalCardinality() {
 		return Cardinality.C_0__N.getLabel();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Add support for 'greedy-proxying' attribute.
+	 */
+	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks) {
+		// add timeout callback
+		GreedyProxyingAttributeCallback greedyProxyingCallback = new GreedyProxyingAttributeCallback();
+		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(callbacks,
+			new AttributeCallback[] { greedyProxyingCallback }));
 	}
 
 	protected void parseNestedElements(Element element, ParserContext context, BeanDefinitionBuilder builder) {
