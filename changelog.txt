@@ -8,6 +8,11 @@ Changes in version 1.1.0 M2 (2008-04-dd)
 General
 * refined the web deployer API
 * added integration with Spring MVC
+* added 'greedy-proxying' attribute to reference collections (spring-osgi.xsd)
+
+Package org.springframework.osgi.config
+* removed usage of deprecated setSource method in AbstractReferenceDefinitionParser
+* added support for 'greedy-proxying' attribute
 
 Package org.springframework.osgi.context
 * added OSGi import for Spring property editors loaded reflectively
@@ -25,11 +30,15 @@ Package org.springframework.osgi.extender
 Package org.springframework.osgi.io
 * extended OsgiBundleResource to implement ContextResource
 
+Package org.springframework.osgi.service
+* refined OsgiServiceCollectionProxyFactoryBean to allow for configurable 'greedy-proxying' behaviour
+* changed service collection behaviour to not perform greedy proxying by default
+
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader constructor visibility changed from private to protected
 
 Package org.springframework.osgi.web
-* change package of the internal, private bundle activator
+* changed package of the internal, private bundle activator
 * added OsgiWarDeploymentException to the deployment interfaces
 * added WarDeployment for bundles deployed by the WarDeployer
 * added WarDeploymentContext for accessing the properties associated with a war deployment and the associated

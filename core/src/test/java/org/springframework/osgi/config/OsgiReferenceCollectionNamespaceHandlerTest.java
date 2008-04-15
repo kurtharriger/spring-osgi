@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.config;
 
 import java.io.Externalizable;
@@ -50,6 +51,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 
 	private GenericApplicationContext appContext;
 
+
 	protected void setUp() throws Exception {
 		// reset counter just to be sure
 		DummyListener.BIND_CALLS = 0;
@@ -62,6 +64,7 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		DummyListenerServiceSignature2.UNBIND_CALLS = 0;
 
 		BundleContext bundleContext = new MockBundleContext() {
+
 			// service reference already registered
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 				return new ServiceReference[0];
@@ -98,6 +101,22 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		Object bean = appContext.getBean("simpleSet");
 		assertFalse(bean instanceof OsgiServiceSet);
 		assertTrue(bean instanceof Set);
+	}
+
+	public void testSimpleListWithGreedyProxyingOn() throws Exception {
+		Object factoryBean = appContext.getBean("&simpleListWithGreedyProxying");
+		assertTrue(factoryBean instanceof OsgiServiceCollectionProxyFactoryBean);
+		assertEquals(Boolean.TRUE, (Boolean) TestUtils.getFieldValue(factoryBean, "greedyProxying"));
+		// get the factory product
+		Object bean = appContext.getBean("simpleListWithGreedyProxying");
+		assertFalse(bean instanceof OsgiServiceList);
+		assertTrue(bean instanceof List);
+	}
+
+	public void testSimpleListWithDefaultProxying() throws Exception {
+		Object factoryBean = appContext.getBean("&simpleSet");
+		assertTrue(factoryBean instanceof OsgiServiceCollectionProxyFactoryBean);
+		assertEquals(Boolean.FALSE, (Boolean) TestUtils.getFieldValue(factoryBean, "greedyProxying"));
 	}
 
 	public void testImplicitSortedList() {

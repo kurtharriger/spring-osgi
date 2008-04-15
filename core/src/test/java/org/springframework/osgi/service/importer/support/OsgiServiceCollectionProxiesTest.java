@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import java.util.Date;
@@ -48,10 +49,12 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 
 	private ServiceProxyCreator proxyCreator;
 
+
 	protected void setUp() throws Exception {
 		services = new LinkedHashMap();
 
 		BundleContext ctx = new MockBundleContext() {
+
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 				return new ServiceReference[0];
 			}
@@ -64,7 +67,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 		};
 
 		proxyCreator = new StaticServiceProxyCreator(new Class[] { Cloneable.class }, getClass().getClassLoader(), ctx,
-				ImportContextClassLoader.UNMANAGED);
+			ImportContextClassLoader.UNMANAGED, false);
 	}
 
 	protected void tearDown() throws Exception {
