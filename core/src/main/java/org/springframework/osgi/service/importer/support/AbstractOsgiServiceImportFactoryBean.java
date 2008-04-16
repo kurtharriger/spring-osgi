@@ -247,7 +247,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 		this.aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
-			ProxyFactory.class.getClassLoader() });
+			ProxyFactory.class.getClassLoader(), AbstractOsgiServiceImportFactoryBean.class.getClassLoader() });
 	}
 
 	/**
