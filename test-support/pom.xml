@@ -75,6 +75,7 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-extender</artifactId>
       <version>${project.parent.version}</version>
+	  <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -83,6 +84,7 @@
       <version>${equinox.ver}</version>
       <type>jar</type>
       <scope>provided</scope>
+	  <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>knopflerfish</groupId>
@@ -90,6 +92,7 @@
       <version>${kf.ver}</version>
       <type>jar</type>
       <scope>provided</scope>
+	  <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
@@ -97,28 +100,26 @@
       <version>${felix.ver}</version>
       <type>jar</type>
       <scope>provided</scope>
-		  <exclusions>
-            <exclusion>
-              <groupId>org.apache.felix</groupId>
-              <artifactId>org.apache.felix.framework</artifactId>
-            </exclusion>          
-            <exclusion>
-              <groupId>org.apache.felix</groupId>
-              <artifactId>org.apache.felix.shell</artifactId>
-            </exclusion>          
-            <exclusion>
-              <groupId>org.apache.felix</groupId>
-              <artifactId>org.apache.felix.shell.tui</artifactId>
-            </exclusion>          
-            <exclusion>
-              <groupId>org.apache.felix</groupId>
-              <artifactId>org.apache.felix.bundlerepository</artifactId>
-            </exclusion>          
-          </exclusions>            
-      
+	  <optional>true</optional>
+	  <exclusions>
+        <exclusion>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>org.apache.felix.framework</artifactId>
+        </exclusion>          
+        <exclusion>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>org.apache.felix.shell</artifactId>
+        </exclusion>          
+        <exclusion>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>org.apache.felix.shell.tui</artifactId>
+        </exclusion>          
+        <exclusion>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>org.apache.felix.bundlerepository</artifactId>
+        </exclusion>          
+      </exclusions>            
     </dependency>
-    
-     
      
     <!-- for testing -->
     <dependency>

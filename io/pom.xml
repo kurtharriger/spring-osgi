@@ -41,7 +41,6 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
       <version>${spring.maven.artifact.version}</version>
-      <!-- assume it's there since io is usually ran as part of a suite -->
       <scope>provided</scope>
       <exclusions>      
       	<exclusion>
@@ -50,8 +49,6 @@
       	</exclusion>
       </exclusions>        
     </dependency> 
-
-    
   </dependencies>
 
 </project>

@@ -69,6 +69,7 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-test</artifactId>
       <version>${project.parent.version}</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -82,6 +83,7 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-io</artifactId>
       <version>${project.parent.version}</version>
+      <optional>true</optional>
     </dependency>
     
    <dependency>
@@ -95,6 +97,7 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
       <version>${spring.maven.artifact.version}</version>
+	  <optional>true</optional>
       <exclusions>
       	<exclusion>
           <groupId>aopalliance</groupId>
@@ -130,6 +133,7 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>
       <version>${spring.maven.artifact.version}</version>
+	  <optional>true</optional>
       <exclusions>
       	<exclusion>
           <groupId>aopalliance</groupId>
@@ -159,6 +163,7 @@
       <artifactId>osgi_R4_compendium</artifactId>
       <version>1.0</version>
       <scope>provided</scope>
+	  <optional>true</optional>
     </dependency>
     
     <!-- Jetty -->
@@ -167,6 +172,7 @@
       <artifactId>jetty</artifactId>
       <version>${jetty.version}</version>
       <scope>provided</scope>
+	  <optional>true</optional>
       <exclusions>      
       	<exclusion>
           <groupId>org.mortbay.jetty</groupId>
@@ -181,6 +187,7 @@
       <artifactId>jetty-util</artifactId>
       <version>${jetty.version}</version>
       <scope>provided</scope>
+	  <optional>true</optional>
     </dependency>
     
     <!-- Tomcat Catalina -->
@@ -190,23 +197,8 @@
       <artifactId>catalina.osgi</artifactId>
       <version>${catalina.version}</version>
       <scope>provided</scope>
+	  <optional>true</optional>
     </dependency>   
   </dependencies>
-
-  <!--
-  <repositories>
-    <repository>
-      <id>codehaus-repo</id>
-      <name>Jetty Repository at CodeHaus</name>
-      <snapshots>
-         <enabled>true</enabled>
-      </snapshots>
-      <url>http://snapshots.repository.codehaus.org/</url>
-    </repository>
-  </repositories>
-  
-  -->
-    
-   
 
 </project>

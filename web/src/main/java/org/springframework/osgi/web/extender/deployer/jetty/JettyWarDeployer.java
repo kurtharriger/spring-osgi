@@ -26,9 +26,11 @@ import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.resource.Resource;
 import org.mortbay.util.IO;
 import org.osgi.framework.Bundle;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.extender.deployer.OsgiWarDeploymentException;
 import org.springframework.osgi.web.extender.deployer.WarDeployment;
+import org.springframework.osgi.web.extender.deployer.WarDeploymentContext;
 import org.springframework.osgi.web.extender.deployer.internal.util.Utils;
 import org.springframework.osgi.web.extender.deployer.support.AbstractWarDeployer;
 import org.springframework.util.Assert;
@@ -74,6 +76,9 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	 */
 	protected WarDeployment createDeployment(Bundle bundle, String contextPath) throws Exception {
 		WebAppContext wac = createJettyWebContext(bundle, contextPath);
+		// FIXME: remove this once things are improved in Jetty (OSGI-438)
+		wac.setAttribute(WarDeploymentContext.OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE,
+			OsgiBundleUtils.getBundleContext(bundle));
 		JettyWarDeployment deployment = new JettyWarDeployment(this, bundle, wac);
 
 		return deployment;
