@@ -327,18 +327,20 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	// delegate methods to a proper OsgiResourceLoader
 
 	public ClassLoader getClassLoader() {
-		return osgiResourceLoader.getClassLoader();
+		return (osgiResourceLoader != null ? osgiResourceLoader.getClassLoader() : null);
 	}
 
 	public Resource getResource(String location) {
-		return osgiResourceLoader.getResource(location);
+		return (osgiResourceLoader != null ? osgiResourceLoader.getResource(location) : null);
 	}
 
 	public Resource[] getResources(String locationPattern) throws IOException {
-		return osgiPatternResolver.getResources(locationPattern);
+		return (osgiResourceLoader != null ? osgiPatternResolver.getResources(locationPattern) : null);
 	}
 
 	public void setClassLoader(ClassLoader classLoader) {
+		if (osgiResourceLoader == null)
+			throw new IllegalStateException("the resource loader is not initialized; call setBundleContext() first");
 		osgiResourceLoader.setClassLoader(classLoader);
 	}
 

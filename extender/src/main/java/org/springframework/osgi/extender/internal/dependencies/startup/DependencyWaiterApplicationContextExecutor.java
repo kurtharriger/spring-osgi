@@ -295,11 +295,6 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 		synchronized (monitor) {
 
-			//			if (state == ContextState.DEPENDENCIES_RESOLVED) {
-			//				if (debug)
-			//					log.debug("context [" + getDisplayName() + "]  already in state (" + state + "); bailing out");
-			//				return;
-			//			}
 			if (state != ContextState.RESOLVING_DEPENDENCIES) {
 				logWrongState(ContextState.RESOLVING_DEPENDENCIES);
 				return;
