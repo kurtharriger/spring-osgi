@@ -270,7 +270,7 @@ port = [server port number]]]></programlisting>
 		</section>
 
 		<section id="web:osgi-artifacts:containers:jetty">
-    		<title>Jettt 6.1.8+/6.2.0</title>
+    		<title>Jetty 6.1.8+/6.2.0</title>
 			
 			<para>Since Jetty is OSGi-ready by default, the official distribution can be installed without any transformation/processing on the OSGi platform. However,
 			since there is no activator, Spring-DM provides one, similar in functionality to the one available for Tomcat. The activator has 

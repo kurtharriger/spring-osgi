@@ -19,6 +19,9 @@ Package org.springframework.osgi.context
 * property editors are using through Spring-DM core bundle instead of the target bundle
 * AbstractOsgiBundleApplicationContext uses the raw bundle as the bean class loader to avoid class leaks
 * improved start up NamespaceHandlerResolver look up to avoid class incompatibility problems
+* added getContextClassLoader() method to AbstractDelegatedExecutionApplicationContext for pluggable thread context 
+  class loader strategy
+* improved AbstractOsgiBundleApplicationContext behaviour if the internal resource loader is not set
 
 Package org.springframework.osgi.extender
 * added OsgiApplicationContextCreator interface for handling the extender contexts creation

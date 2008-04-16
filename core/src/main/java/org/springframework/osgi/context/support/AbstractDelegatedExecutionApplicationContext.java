@@ -138,7 +138,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		ClassLoader oldTCCL = currentThread.getContextClassLoader();
 
 		try {
-			currentThread.setContextClassLoader(getClassLoader());
+			currentThread.setContextClassLoader(getContextClassLoader());
 			try {
 				super.refresh();
 				sendRefreshedEvent();
@@ -159,8 +159,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		ClassLoader oldTCCL = currentThread.getContextClassLoader();
 
 		try {
-			if (getBundleContext() != null)
-				currentThread.setContextClassLoader(getClassLoader());
+			currentThread.setContextClassLoader(getContextClassLoader());
 			super.doClose();
 		}
 		finally {
@@ -188,7 +187,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 		try {
 			synchronized (contextMonitor) {
-				thread.setContextClassLoader(getClassLoader());
+				thread.setContextClassLoader(getContextClassLoader());
 
 				if (ObjectUtils.isEmpty(getConfigLocations())) {
 					setConfigLocations(getDefaultConfigLocations());
@@ -247,7 +246,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		try {
 
 			synchronized (contextMonitor) {
-				thread.setContextClassLoader(getClassLoader());
+				thread.setContextClassLoader(getContextClassLoader());
 
 				try {
 					ConfigurableListableBeanFactory beanFactory = getBeanFactory();
@@ -332,4 +331,18 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 			delegatedMulticaster.multicastEvent(new OsgiBundleContextRefreshedEvent(this));
 	}
 
+	/**
+	 * Returns the context class loader to be used as the Thread Context Class
+	 * Loader for {@link #refresh()} and {@link #destroy()} calls.
+	 * 
+	 * The default implementation returns the bean class loader if it is set or
+	 * or the current context class loader otherwise.
+	 * 
+	 * @return the thread context class loader to be used during the execution
+	 * of critical section blocks
+	 */
+	protected ClassLoader getContextClassLoader() {
+		ClassLoader cl = getClassLoader();
+		return (cl == null ? Thread.currentThread().getContextClassLoader() : cl);
+	}
 }
