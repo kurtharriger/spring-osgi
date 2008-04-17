@@ -40,6 +40,7 @@ Package org.springframework.osgi.extender
 
 Package org.springframework.osgi.io
 * extended OsgiBundleResource to implement ContextResource
+* fixed internal PackageAdminResolver parsing of Require-Bundle entries which specify versions
 
 Package org.springframework.osgi.service
 * refined OsgiServiceCollectionProxyFactoryBean to allow for configurable 'greedy-proxying' behaviour

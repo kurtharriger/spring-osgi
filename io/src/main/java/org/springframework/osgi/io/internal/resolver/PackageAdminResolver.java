@@ -46,6 +46,9 @@ import org.springframework.util.Assert;
  */
 public class PackageAdminResolver implements DependencyResolver {
 
+	private static final String SEMI_COLON = ";";
+	private static final String DOUBLE_QUOTE = "\"";
+	private static final String DEFAULT_VERSION = "0.0.0";
 	private final BundleContext bundleContext;
 
 
@@ -67,18 +70,8 @@ public class PackageAdminResolver implements DependencyResolver {
 
 		// 1. if so, locate the bundles
 		for (int i = 0; i < entries.length; i++) {
-			String version = "0.0.0";
-			// determine the bundle version
-			String entry = entries[i];
-			int index = entry.indexOf(Constants.BUNDLE_VERSION_ATTRIBUTE);
-			if (index > 0) {
-				// find quotes
-				int firstQuoteIndex = entry.indexOf("\"", index);
-				int secondQuoteIndex = entry.indexOf("\"", firstQuoteIndex);
-				version = entry.substring(firstQuoteIndex, secondQuoteIndex + 1);
-			}
-
-			Bundle requiredBundle = pa.getBundles(entries[i], version)[0];
+			String[] parsed = parseRequiredBundleString(entries[i]);
+			Bundle requiredBundle = pa.getBundles(parsed[0], parsed[1])[0];
 
 			// find exported packages
 			ExportedPackage[] exportedPackages = pa.getExportedPackages(requiredBundle);
@@ -120,6 +113,58 @@ public class PackageAdminResolver implements DependencyResolver {
 		}
 
 		return (ImportedBundle[]) importedBundlesList.toArray(new ImportedBundle[importedBundlesList.size()]);
+	}
+
+	/**
+	 * Parses the required bundle entry to determine the bundle symbolic name
+	 * and version.
+	 * 
+	 * @param string required bundle entry
+	 * @return returns an array of strings with 2 entries, the first being the
+	 * bundle sym name, the second the version (or 0.0.0 if nothing is
+	 * specified).
+	 */
+	String[] parseRequiredBundleString(String entry) {
+		String[] value = new String[2];
+
+		// determine the bundle symbolic name
+		int index = entry.indexOf(SEMI_COLON);
+
+		// there is at least one flag so extract the sym name
+		if (index > 0) {
+			value[0] = entry.substring(0, index);
+		}
+		// no flag, short circuit
+		else {
+			value[0] = entry;
+			value[1] = DEFAULT_VERSION;
+			return value;
+		}
+
+		// look for bundle-version
+		index = entry.indexOf(Constants.BUNDLE_VERSION_ATTRIBUTE);
+		if (index > 0) {
+			// skip the =
+			int firstQuoteIndex = index + Constants.BUNDLE_VERSION_ATTRIBUTE.length() + 1;
+			// check if a range or a number is specified
+			char testChar = entry.charAt(firstQuoteIndex + 1);
+			boolean isRange = (testChar == '[' || testChar == '(');
+			int secondQuoteStartIndex = (isRange ? firstQuoteIndex + 3 : firstQuoteIndex + 1);
+
+			int numberStart = (isRange ? firstQuoteIndex + 3 : firstQuoteIndex + 1);
+			int numberEnd = entry.indexOf(DOUBLE_QUOTE, secondQuoteStartIndex);
+
+			value[1] = entry.substring(numberStart, numberEnd);
+			// if it's a range, append the interval notation
+			if (isRange) {
+				value[1] = entry.charAt(firstQuoteIndex + 1) + value[1] + entry.charAt(numberEnd + 1);
+			}
+		}
+		else {
+			value[1] = DEFAULT_VERSION;
+		}
+
+		return value;
 	}
 
 	/**
@@ -167,4 +212,4 @@ public class PackageAdminResolver implements DependencyResolver {
 		// we can assume for now that it will stay
 		return (PackageAdmin) bundleContext.getService(ref);
 	}
-}
+};
