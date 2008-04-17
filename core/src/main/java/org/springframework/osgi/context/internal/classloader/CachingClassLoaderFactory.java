@@ -31,9 +31,26 @@ import org.springframework.aop.framework.ProxyFactory;
  */
 class CachingClassLoaderFactory implements InternalAopClassLoaderFactory {
 
+	private static final String CGLIB_CLASS = "net.sf.cglib.proxy.Enhancer";
+	/** CGLIB class (if it's present) */
+	private final Class cglibClass;
+
 	/** class loader -> aop class loader cache */
 	private final Map cache = new WeakHashMap();
 
+
+	CachingClassLoaderFactory() {
+		// load CGLIB through Spring-AOP
+		ClassLoader springAopClassLoader = ProxyFactory.class.getClassLoader();
+		Class clazz = null;
+		try {
+			clazz = springAopClassLoader.loadClass(CGLIB_CLASS);
+		}
+		catch (ClassNotFoundException cnfe) {
+			// assume cglib is not present
+		}
+		cglibClass = clazz;
+	}
 
 	public ClassLoader createClassLoader(ClassLoader classLoader) {
 		// search key (should be fast as the default classloader (BundleDelegatingClassLoader) has identity equality/hashcode)
@@ -47,9 +64,16 @@ class CachingClassLoaderFactory implements InternalAopClassLoaderFactory {
 
 			// no associated class loader found, create one and put it in the cache
 			if (aopClassLoader == null) {
-				// use the given class loader, spring-aop and then spring-dm core class loader (for its infrastructure interfaces)
-				aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
-					ProxyFactory.class.getClassLoader(), CachingClassLoaderFactory.class.getClassLoader() });
+				// use the given class loader, spring-aop, cglib (if available) and then spring-dm core class loader (for its infrastructure interfaces)
+				if (cglibClass != null) {
+					aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
+						ProxyFactory.class.getClassLoader(), cglibClass.getClassLoader(),
+						CachingClassLoaderFactory.class.getClassLoader() });
+				}
+				else {
+					aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
+						ProxyFactory.class.getClassLoader(), CachingClassLoaderFactory.class.getClassLoader() });
+				}
 
 				// save the class loader as a weak reference (since it refers to the given class loader)
 				cache.put(classLoader, new WeakReference(aopClassLoader));

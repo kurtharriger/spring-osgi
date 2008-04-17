@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.serviceProxyFactoryBean;
 
 import java.util.ArrayList;
@@ -24,23 +25,20 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
 public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 	private OsgiServiceCollectionProxyFactoryBean fb;
 
+
 	protected void onSetUp() throws Exception {
 		fb = new OsgiServiceCollectionProxyFactoryBean();
 		fb.setBundleContext(bundleContext);
-		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
-			ProxyFactory.class.getClassLoader());
-		fb.setBeanClassLoader(classLoader);
+		fb.setBeanClassLoader(getClass().getClassLoader());
 	}
 
 	protected void onTearDown() throws Exception {
@@ -48,7 +46,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 	}
 
 	// causes CGLIB problems
-	public void tstFactoryBeanForMultipleServicesAsInterfaces() throws Exception {
+	public void testFactoryBeanForMultipleServicesAsInterfaces() throws Exception {
 
 		fb.setCardinality(Cardinality.C_0__N);
 		// look for collections
@@ -57,8 +55,6 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 		List registrations = new ArrayList(3);
 
-		// Eek. cglib dances the bizarre initialization hula of death here. Must
-		// use interfaces for now.
 		try {
 			Object result = fb.getObject();
 			assertTrue(result instanceof Collection);
@@ -74,6 +70,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 			registrations.add(publishService(a, ArrayList.class.getName()));
 
+			assertTrue(iter.hasNext());
 			Object service = iter.next();
 
 			assertTrue(service instanceof ArrayList);
@@ -83,6 +80,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 			a = new ArrayList();
 			a.add(new Long(100));
 			registrations.add(publishService(a, ArrayList.class.getName()));
+			assertTrue(iter.hasNext());
 			service = iter.next();
 			assertTrue(service instanceof ArrayList);
 			assertEquals(100, ((Number) ((Collection) service).toArray()[0]).intValue());

@@ -57,8 +57,8 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		col.add("org.springframework.osgi, jstl.osgi, 1.1.2-SNAPSHOT");
 
 		// Jetty server
-		//		col.add("org.mortbay.jetty, jetty-util, 6.2-SNAPSHOT");
-		//		col.add("org.mortbay.jetty, jetty, 6.2-SNAPSHOT");
+		col.add("org.mortbay.jetty, jetty-util, 6.1.9");
+		col.add("org.mortbay.jetty, jetty, 6.1.9");
 
 		// add MX4J for 1.4
 		// if < jdk 1.5, add an JMX implementation
@@ -69,16 +69,13 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		col.add("org.springframework.osgi, catalina.start.osgi, 1.0-SNAPSHOT");
 
 		// jetty starter
-		//		col.add("org.springframework.osgi, jetty.start.osgi, 6.1.7-SNAPSHOT");
-		//		col.add("org.springframework.osgi, jetty.etc.osgi, 6.1.7-SNAPSHOT");
+//		col.add("org.springframework.osgi, jetty.start.osgi, 6.1.9-SNAPSHOT");
+//		col.add("org.springframework.osgi, jetty.etc.osgi, 6.1.9-SNAPSHOT");
+//		col.add("org.springframework.osgi, jetty.web.fragment.osgi, 1.0-SNAPSHOT");
 
 		// Spring DM web extender
 		col.add("org.springframework.osgi, spring-osgi-web," + getSpringDMVersion());
 		col.add("org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT");
-
-		// Commons HTTP Client
-		//		col.add("org.springframework.osgi, commons-codec.osgi, 1.3-SNAPSHOT");
-		//		col.add("org.springframework.osgi, http-client.osgi, 3.1-SNAPSHOT");
 
 		return (String[]) col.toArray(new String[col.size()]);
 	}
@@ -145,7 +142,8 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 	// disable tests on KF for the time being
 	// disable Felix as well until 1.0.4 comes out
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return getPlatformName().equalsIgnoreCase(Platforms.KNOPFLERFISH) || getPlatformName().equalsIgnoreCase(Platforms.FELIX);
+		return getPlatformName().equalsIgnoreCase(Platforms.KNOPFLERFISH)
+				|| getPlatformName().equalsIgnoreCase(Platforms.FELIX);
 	}
 
 }
