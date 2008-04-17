@@ -77,11 +77,16 @@ public abstract class DebugUtils {
 		String className = null;
 		// NoClassDefFoundError
 		if (loadingThrowable instanceof NoClassDefFoundError) {
-			className = loadingThrowable.getMessage().replace('/', '.');
+			className = loadingThrowable.getMessage();
+			if (className != null)
+				className = className.replace('/', '.');
 		}
 		// ClassNotFound
 		else if (loadingThrowable instanceof ClassNotFoundException) {
-			className = loadingThrowable.getMessage().replace('/', '.');
+			className = loadingThrowable.getMessage();
+
+			if (className != null)
+				className = className.replace('/', '.');
 		}
 
 		if (className != null) {
