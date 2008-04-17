@@ -27,10 +27,11 @@ import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
+import org.springframework.osgi.context.internal.classloader.ChainedClassLoader;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.OsgiFilterUtils;
-import org.springframework.osgi.util.internal.ChainedClassLoader;
 import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -246,8 +247,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	 */
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
-		this.aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
-			ProxyFactory.class.getClassLoader(), AbstractOsgiServiceImportFactoryBean.class.getClassLoader() });
+		this.aopClassLoader = AopClassLoaderFactory.getAopClassLoaderFor(classLoader);
 	}
 
 	/**

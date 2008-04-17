@@ -754,7 +754,6 @@ public class ContextLoaderListener implements BundleActivator {
 		if (log.isDebugEnabled())
 			log.debug("Iitializing OSGi listeners service completed...");
 	}
-	
 
 	/**
 	 * Post process the context (for example by adding bean post processors).
@@ -793,20 +792,7 @@ public class ContextLoaderListener implements BundleActivator {
 		fb.setCardinality(Cardinality.C_0__N);
 		fb.setCollectionType(CollectionType.LIST);
 		fb.setInterfaces(new Class[] { OsgiBundleApplicationContextListener.class });
-
-		// load the aop class loader used by spring core
-		ClassLoader coreCL = OsgiServiceCollectionProxyFactoryBean.class.getClassLoader();
-		ClassLoader aopCL;
-		try {
-			Class clazz = coreCL.loadClass("org.springframework.aop.framework.ProxyFactory");
-			aopCL = clazz.getClassLoader();
-		}
-		catch (Exception ex) {
-			throw new OsgiException("cannot create dynamic listener list", ex);
-		}
-		ClassLoader loader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(), aopCL);
-
-		fb.setBeanClassLoader(loader);
+		fb.setBeanClassLoader(extenderConfiguration.getClassLoader());
 		fb.afterPropertiesSet();
 
 		applicationListenersCleaner = fb;

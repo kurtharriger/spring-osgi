@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.util.internal;
+package org.springframework.osgi.context.internal.classloader;
 
 import java.net.URL;
 

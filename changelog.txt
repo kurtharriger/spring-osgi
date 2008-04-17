@@ -9,6 +9,7 @@ General
 * refined the web deployer API
 * added integration with Spring MVC
 * added 'greedy-proxying' attribute to reference collections (spring-osgi.xsd)
+* reduced the number of class loader instances generated internally by Spring-DM
 
 Package org.springframework.osgi.config
 * removed usage of deprecated setSource method in AbstractReferenceDefinitionParser
@@ -16,15 +17,18 @@ Package org.springframework.osgi.config
 
 Package org.springframework.osgi.context
 * added OSGi import for Spring property editors loaded reflectively
-* property editors are using through Spring-DM core bundle instead of the target bundle
+* improved loading of property editors by using Spring-DM core bundle instead of the target bundle
 * AbstractOsgiBundleApplicationContext uses the raw bundle as the bean class loader to avoid class leaks
 * improved start up NamespaceHandlerResolver look up to avoid class incompatibility problems
 * added getContextClassLoader() method to AbstractDelegatedExecutionApplicationContext for pluggable thread context 
   class loader strategy
 * improved AbstractOsgiBundleApplicationContext behaviour if the internal resource loader is not set
+* improved bundle class loader creation by using an internal cache
 
 Package org.springframework.osgi.service
 * refined weaving process for service importers so that knowledge of org.springframework.osgi package is not required
+* fixed potential infrastructure class leak through the thread context class loader management of imported services
+* improved proxy class loader creation by using an internal cache
 
 Package org.springframework.osgi.extender
 * added OsgiApplicationContextCreator interface for handling the extender contexts creation
@@ -32,6 +36,7 @@ Package org.springframework.osgi.extender
 * changed package of the internal, private bundle activator
 * added filtering by type for the discovered namespace handler resolvers to avoid usage of classes with incompatible
   wiring
+* improved listener list creation by reusing the extender bundle class loader
 
 Package org.springframework.osgi.io
 * extended OsgiBundleResource to implement ContextResource

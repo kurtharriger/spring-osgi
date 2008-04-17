@@ -26,15 +26,13 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
 import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Costin Leau
@@ -90,8 +88,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 		if (bundle == null)
 			return null;
 
-		return new ServiceTCCLInterceptor(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle,
-			ProxyFactory.class.getClassLoader()));
+		return new ServiceTCCLInterceptor(AopClassLoaderFactory.getBundleClassLoaderFor(bundle));
 	}
 
 	/**

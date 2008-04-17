@@ -38,6 +38,7 @@ import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -89,6 +90,8 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private OsgiApplicationContextCreator contextCreator;
 
+	/** bundle wrapped class loader */
+	private ClassLoader classLoader;
 	/** List of context post processors */
 	private List postProcessors = new ArrayList(0);
 
@@ -112,6 +115,7 @@ public class ExtenderConfiguration implements DisposableBean {
 			eventMulticaster = new SimpleApplicationEventMulticaster();
 			isMulticasterManagedInternally = true;
 			contextCreator = createDefaultApplicationContextCreator();
+			classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 		}
 		else {
 			String[] configs = copyEnumerationToList(enm);
@@ -135,6 +139,7 @@ public class ExtenderConfiguration implements DisposableBean {
 			// get post processors
 			postProcessors.addAll(context.getBeansOfType(OsgiBeanFactoryPostProcessor.class).values());
 
+			classLoader = context.getClassLoader();
 			// extender properties using the defaults as backup
 			if (context.containsBean(PROPERTIES_NAME)) {
 				Properties customProperties = (Properties) context.getBean(PROPERTIES_NAME, Properties.class);
@@ -306,5 +311,14 @@ public class ExtenderConfiguration implements DisposableBean {
 	 */
 	public List getPostProcessors() {
 		return postProcessors;
+	}
+
+	/**
+	 * Returns the class loader wrapped around the extender bundle.
+	 * 
+	 * @return extender bundle class loader
+	 */
+	public ClassLoader getClassLoader() {
+		return classLoader;
 	}
 }
