@@ -23,6 +23,9 @@ Package org.springframework.osgi.context
   class loader strategy
 * improved AbstractOsgiBundleApplicationContext behaviour if the internal resource loader is not set
 
+Package org.springframework.osgi.service
+* refined weaving process for service importers so that knowledge of org.springframework.osgi package is not required
+
 Package org.springframework.osgi.extender
 * added OsgiApplicationContextCreator interface for handling the extender contexts creation
 * added OsgiBeanFactoryPostProcessor interface for customizing the contexts created by the extender
@@ -39,6 +42,7 @@ Package org.springframework.osgi.service
 
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader constructor visibility changed from private to protected
+* fixed sporadic exception occuring in DebugUtils when analyzing class loading errors
 
 Package org.springframework.osgi.web
 * changed package of the internal, private bundle activator
