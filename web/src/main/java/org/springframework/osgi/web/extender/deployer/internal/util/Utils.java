@@ -28,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.aop.framework.DefaultAopProxyFactory;
 import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
@@ -105,14 +104,7 @@ public abstract class Utils {
 
 		OsgiServiceProxyFactoryBean proxyFB = new OsgiServiceProxyFactoryBean();
 
-		// create a bridged classloader so that all the proxy dependencies are considered
-
-		// first between the extender bundle and spring-aop (so that the proxy infrastructure classes are seen)
-		// TODO: OSGI-350
-		BundleDelegatingClassLoader cl = BundleDelegatingClassLoader.createBundleClassLoaderFor(
-			bundleContext.getBundle(), DefaultAopProxyFactory.class.getClassLoader());
-
-		proxyFB.setBeanClassLoader(cl);
+		proxyFB.setBeanClassLoader(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle()));
 		proxyFB.setBundleContext(bundleContext);
 		proxyFB.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
 		proxyFB.setInterfaces(new Class[] { proxyType });

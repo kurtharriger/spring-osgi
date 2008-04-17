@@ -28,9 +28,9 @@ import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
+import org.springframework.osgi.context.internal.classloader.ChainedClassLoader;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.util.internal.ChainedClassLoader;
 import org.springframework.util.Assert;
 import org.xml.sax.EntityResolver;
 

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.aop;
 
 import java.util.Map;
@@ -20,9 +21,9 @@ import java.util.Map;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
+import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -55,6 +56,7 @@ public class ServiceProviderTCCLInterceptor implements MethodInterceptor {
 		}
 	}
 
+
 	private static final int hashCode = ServiceProviderTCCLInterceptor.class.hashCode() * 13;
 
 	/** internal lock used for synchronized access to the serviceBundle */
@@ -63,6 +65,7 @@ public class ServiceProviderTCCLInterceptor implements MethodInterceptor {
 	private Bundle serviceBundle;
 
 	private ClassLoader serviceClassLoader;
+
 
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		ClassLoader current = getServiceProvidedClassLoader();
@@ -87,7 +90,7 @@ public class ServiceProviderTCCLInterceptor implements MethodInterceptor {
 		synchronized (lock) {
 			this.serviceBundle = serviceBundle;
 			if (serviceBundle != null) {
-				serviceClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(serviceBundle, null);
+				serviceClassLoader = AopClassLoaderFactory.getBundleClassLoaderFor(serviceBundle);
 			}
 			else
 				serviceClassLoader = null;

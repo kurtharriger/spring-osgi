@@ -33,11 +33,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -354,12 +354,12 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	/**
-	 * Create the classloader that delegates to the underlying OSGi bundle.
+	 * Create the class loader that delegates to the underlying OSGi bundle.
 	 * 
 	 * @param bundle
 	 * @return
 	 */
 	private ClassLoader createBundleClassLoader(Bundle bundle) {
-		return BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
+		return AopClassLoaderFactory.getBundleClassLoaderFor(bundle);
 	}
 }

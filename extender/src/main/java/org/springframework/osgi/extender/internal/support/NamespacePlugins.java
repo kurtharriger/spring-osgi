@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extender.internal.support;
 
 import java.io.FileNotFoundException;
@@ -52,11 +53,13 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 	 * bundle.
 	 */
 	private static class Plugin implements NamespaceHandlerResolver, EntityResolver {
+
 		private final NamespaceHandlerResolver namespace;
 
 		private final EntityResolver entity;
 
 		private final Bundle bundle;
+
 
 		private Plugin(Bundle bundle) {
 			this.bundle = bundle;
@@ -80,9 +83,11 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 		}
 	}
 
+
 	private static final Log log = LogFactory.getLog(NamespacePlugins.class);
 
 	private final Map plugins = CollectionFactory.createConcurrentMap(5);
+
 
 	public void addHandler(Bundle bundle) {
 		if (log.isDebugEnabled())
