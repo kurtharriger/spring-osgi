@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.serviceProxyFactoryBean;
 
 import java.io.Serializable;
 import java.util.Date;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
 /**
@@ -33,15 +32,14 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 	private OsgiServiceProxyFactoryBean fb;
 
+
 	protected void onSetUp() throws Exception {
 		fb = new OsgiServiceProxyFactoryBean();
 		fb.setBundleContext(bundleContext);
 		// execute retries fast
 		fb.setRetryTimes(1);
 		fb.setTimeout(1);
-		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
-			ProxyFactory.class.getClassLoader());
-		fb.setBeanClassLoader(classLoader);
+		fb.setBeanClassLoader(getClass().getClassLoader());
 	}
 
 	protected void onTearDown() throws Exception {
@@ -75,7 +73,7 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 		Class[] intfs = new Class[] { Comparable.class, Serializable.class, Cloneable.class };
 
 		String[] classes = new String[] { Comparable.class.getName(), Serializable.class.getName(),
-				Cloneable.class.getName(), Date.class.getName() };
+			Cloneable.class.getName(), Date.class.getName() };
 
 		ServiceRegistration reg = publishService(date, classes);
 

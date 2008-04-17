@@ -103,11 +103,11 @@ public abstract class Utils {
 	public static Object createServerServiceProxy(BundleContext bundleContext, Class proxyType, String serviceName) {
 
 		OsgiServiceProxyFactoryBean proxyFB = new OsgiServiceProxyFactoryBean();
-
-		proxyFB.setBeanClassLoader(BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle()));
 		proxyFB.setBundleContext(bundleContext);
 		proxyFB.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
 		proxyFB.setInterfaces(new Class[] { proxyType });
+		// use the spring-dm class loader to generate the proxy (since it can see all the needed server classes)
+		proxyFB.setBeanClassLoader(proxyType.getClassLoader());
 		// wait 5 seconds
 		proxyFB.setTimeout(5 * 1000);
 		if (StringUtils.hasText(serviceName))

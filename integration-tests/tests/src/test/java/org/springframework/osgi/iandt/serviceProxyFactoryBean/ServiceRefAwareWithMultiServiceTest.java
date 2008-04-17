@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.serviceProxyFactoryBean;
 
 import java.util.ArrayList;
@@ -22,11 +23,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
 /**
  * @author Costin Leau
@@ -36,19 +35,17 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 
 	private OsgiServiceCollectionProxyFactoryBean fb;
 
+
 	protected void onSetUp() throws Exception {
 		fb = new OsgiServiceCollectionProxyFactoryBean();
 		fb.setBundleContext(bundleContext);
-		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
-			ProxyFactory.class.getClassLoader());
-		fb.setBeanClassLoader(classLoader);
+		fb.setBeanClassLoader(getClass().getClassLoader());
 	}
 
 	protected void onTearDown() throws Exception {
 		fb = null;
 	}
 
-	// this fails due to some CGLIB problems
 	public void testProxyForMultipleCardinality() throws Exception {
 		fb.setCardinality(Cardinality.C_0__N);
 		fb.setInterfaces(new Class[] { Date.class });

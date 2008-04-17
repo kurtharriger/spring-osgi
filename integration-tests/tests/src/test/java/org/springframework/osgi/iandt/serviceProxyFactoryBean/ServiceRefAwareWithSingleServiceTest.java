@@ -24,11 +24,9 @@ import java.util.Properties;
 
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.SpringProxy;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
 /**
  * @author Costin Leau
@@ -45,22 +43,18 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 		// execute retries fast
 		fb.setRetryTimes(1);
 		fb.setTimeout(1);
-		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle(),
-			ProxyFactory.class.getClassLoader());
-		fb.setBeanClassLoader(classLoader);
+		fb.setBeanClassLoader(getClass().getClassLoader());
 	}
 
 	protected void onTearDown() throws Exception {
 		fb = null;
 	}
 
-	public void tstProxyForUnaryCardinality() throws Exception {
+	public void testProxyForUnaryCardinality() throws Exception {
 		long time = 1234;
 		Date date = new Date(time);
-		Dictionary dict = new Properties();
 		ServiceRegistration reg = publishService(date);
 
-		fb = new OsgiServiceProxyFactoryBean();
 		fb.setCardinality(Cardinality.C_1__1);
 
 		fb.setInterfaces(new Class[] { Date.class });
@@ -89,22 +83,6 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 	}
 
 	public void testServiceReferenceProperties() throws Exception {
-		/**
-		 * this fails with following stack trace if tstProxyForUnaryCardinality
-		 * actually runs. Looks like an internal issue with cglib.
-		 * 
-		 * Caused by: java.lang.NullPointerException at
-		 * net.sf.cglib.core.AbstractClassGenerator.getClassNameCache(AbstractClassGenerator.java:80)
-		 * at
-		 * net.sf.cglib.core.AbstractClassGenerator.create(AbstractClassGenerator.java:218)
-		 * at net.sf.cglib.proxy.Enhancer.createHelper(Enhancer.java:377) at
-		 * net.sf.cglib.proxy.Enhancer.create(Enhancer.java:285) at
-		 * org.springframework.aop.framework.Cglib2AopProxy.getProxy(Cglib2AopProxy.java:196)
-		 * at
-		 * org.springframework.aop.framework.ProxyFactory.getProxy(ProxyFactory.java:110)
-		 * ...
-		 */
-
 		long time = 1234;
 		Date date = new Date(time);
 		Dictionary dict = new Properties();
