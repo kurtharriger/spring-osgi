@@ -374,7 +374,15 @@ limitations under the License.
               <generatePdf>false</generatePdf>
 			  <generateXml>true</generateXml>
               <generateHtml>true</generateHtml>
+              <!--
+              <flushPolicy>interval</flushPolicy>
+			  <flushInterval>10000</flushInterval>
+			  -->
               <generateHistorical>false</generateHistorical>
+              <!-- saving history is problematic since each module would override
+              the previous unless a different folder is used for the root
+              <historyDir>${basedir}/clover/history</historyDir>
+              -->
               <jdk>${source-jdk}</jdk>
           </configuration>
       </plugin>      

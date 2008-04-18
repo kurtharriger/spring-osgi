@@ -16,19 +16,35 @@
 
 package org.springframework.osgi.test.parsing;
 
+import java.io.File;
 import java.util.Properties;
 import java.util.jar.Manifest;
 
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * @author Costin Leau
  * 
  */
-public class BaseTestCaseWithVisibleMethods extends AbstractConfigurableBundleCreatorTests {
+public abstract class CaseWithVisibleMethodsBaseTest extends AbstractConfigurableBundleCreatorTests {
 
 	public String getRootPath() {
-		return super.getRootPath();
+		ResourceLoader fileLoader = new DefaultResourceLoader();
+		try {
+			String classFile = CaseWithVisibleMethodsBaseTest.class.getName().replace('.', '/').concat(".class");
+			Resource res = fileLoader.getResource(classFile);
+			String fileLocation = "file:/" + res.getFile().getAbsolutePath();
+			String classFileToPlatform = CaseWithVisibleMethodsBaseTest.class.getName().replace('.', File.separatorChar).concat(
+				".class");
+			return fileLocation.substring(0, fileLocation.indexOf(classFileToPlatform));
+		}
+		catch (Exception ex) {
+		}
+
+		return null;
 	}
 
 	public Manifest getManifest() {
@@ -42,6 +58,5 @@ public class BaseTestCaseWithVisibleMethods extends AbstractConfigurableBundleCr
 	public String[] getBundleContentPattern() {
 		return super.getBundleContentPattern();
 	}
-	
-	
+
 }

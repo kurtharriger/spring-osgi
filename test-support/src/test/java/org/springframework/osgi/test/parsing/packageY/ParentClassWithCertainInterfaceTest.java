@@ -18,7 +18,7 @@ package org.springframework.osgi.test.parsing.packageY;
 
 import javax.security.auth.callback.Callback;
 
-import org.springframework.osgi.test.parsing.packageX.BaseClassInACertainPackage;
+import org.springframework.osgi.test.parsing.packageX.BaseClassInACertainPackageTest;
 
 /**
  * Test class that implements an interface.
@@ -26,6 +26,6 @@ import org.springframework.osgi.test.parsing.packageX.BaseClassInACertainPackage
  * @author Costin Leau
  * 
  */
-public abstract class ParentClassWithCertainInterfaceTest extends BaseClassInACertainPackage implements Callback {
+public abstract class ParentClassWithCertainInterfaceTest extends BaseClassInACertainPackageTest implements Callback {
 
 }

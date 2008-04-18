@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.test.parsing.packageZ;
+package org.springframework.osgi.test.parsing.packageA;
 
-import javax.swing.text.Position;
+import java.io.File;
 
-import org.springframework.osgi.test.parsing.packageY.ParentClassWithCertainInterfaceTest;
+import javax.imageio.ImageIO;
+
+import org.springframework.osgi.test.parsing.CaseWithVisibleMethodsBaseTest;
 
 /**
+ * Simple base class from a different class that will be included in the
+ * archive.
+ * 
  * @author Costin Leau
  * 
  */
-public abstract class FinalTestClass extends ParentClassWithCertainInterfaceTest implements Position {
+public abstract class BaseClassFromAnotherPackageTest extends CaseWithVisibleMethodsBaseTest {
 
-	public int getOffset() {
-		throw new UnsupportedOperationException();
-	}
+	// strange import that doesn't do anything
+	private static File file = ImageIO.getCacheDirectory();
+
 }
