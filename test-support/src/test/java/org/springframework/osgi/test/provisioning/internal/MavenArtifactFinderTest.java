@@ -25,7 +25,7 @@ public class MavenArtifactFinderTest extends TestCase {
 	public void testFindMyArtifact()throws IOException {
 		MavenPackagedArtifactFinder finder = 
 			new MavenPackagedArtifactFinder("test-artifact","1.0-SNAPSHOT", "jar");
-		File found = finder.findPackagedArtifact(new File("target/test-classes/org/springframework/osgi/test"));
+		File found = finder.findPackagedArtifact(new File("src/test/resources/org/springframework/osgi/test"));
 		assertNotNull(found);
 		assertTrue(found.exists());
 	}
@@ -33,7 +33,7 @@ public class MavenArtifactFinderTest extends TestCase {
 	public void testFindChildArtifact()throws IOException {
 		MavenPackagedArtifactFinder finder = 
 			new MavenPackagedArtifactFinder("test-child-artifact","1.0-SNAPSHOT", "jar");
-		File found = finder.findPackagedArtifact(new File("target/test-classes/org/springframework/osgi/test"));
+		File found = finder.findPackagedArtifact(new File("src/test/resources/org/springframework/osgi/test"));
 		assertNotNull(found);
 		assertTrue(found.exists());
 	}
@@ -41,7 +41,7 @@ public class MavenArtifactFinderTest extends TestCase {
 	public void testFindParentArtifact()throws IOException {
 		MavenPackagedArtifactFinder finder = 
 			new MavenPackagedArtifactFinder("test-artifact","1.0-SNAPSHOT", "jar");
-		File found = finder.findPackagedArtifact(new File("target/test-classes/org/springframework/osgi/test/child"));
+		File found = finder.findPackagedArtifact(new File("src/test/resources/org/springframework/osgi/test/child"));
 		assertNotNull(found);
 		assertTrue(found.exists());
 	}

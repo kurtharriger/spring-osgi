@@ -22,13 +22,13 @@ import java.net.URI;
 import javax.imageio.ImageIO;
 import javax.print.URIException;
 
-import org.springframework.osgi.test.parsing.BaseTestCaseWithVisibleMethods;
+import org.springframework.osgi.test.parsing.CaseWithVisibleMethodsBaseTest;
 
 /**
  * @author Costin Leau
  * 
  */
-public abstract class BaseClassInACertainPackage extends BaseTestCaseWithVisibleMethods implements URIException {
+public abstract class BaseClassInACertainPackageTest extends CaseWithVisibleMethodsBaseTest implements URIException {
 
 	// strange import that doesn't do anything
 	private static File file = ImageIO.getCacheDirectory();

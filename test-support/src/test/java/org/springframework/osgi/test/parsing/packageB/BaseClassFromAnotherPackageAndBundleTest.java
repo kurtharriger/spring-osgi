@@ -19,14 +19,14 @@ package org.springframework.osgi.test.parsing.packageB;
 import javax.naming.CompositeName;
 import javax.naming.Name;
 
-import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackage;
+import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackageTest;
 
 /**
  * @author Costin Leau
  * 
  */
 // add an interface just to check the behaviour
-public class BaseClassFromAnotherPackageAndBundle extends BaseClassFromAnotherPackage {
+public abstract class BaseClassFromAnotherPackageAndBundleTest extends BaseClassFromAnotherPackageTest {
 
 	private Name context = new CompositeName();
 

@@ -18,8 +18,8 @@ package org.springframework.osgi.test.parsing.packageC;
 
 import java.util.jar.Manifest;
 
-import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackage;
-import org.springframework.osgi.test.parsing.packageB.BaseClassFromAnotherPackageAndBundle;
+import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackageTest;
+import org.springframework.osgi.test.parsing.packageB.BaseClassFromAnotherPackageAndBundleTest;
 
 /**
  * Abstract since we don't want to execute the test per se.
@@ -28,7 +28,7 @@ import org.springframework.osgi.test.parsing.packageB.BaseClassFromAnotherPackag
  * 
  */
 // callback interface (no exception or custom method signature pulled in)
-public abstract class TestInDifferentPackageThenItsParents extends BaseClassFromAnotherPackageAndBundle {
+public abstract class TestInDifferentPackageThenItsParentsTest extends BaseClassFromAnotherPackageAndBundleTest {
 
 	public void testCheckBaseClassesHierarchy() throws Exception {
 		Manifest mf = getManifest();
@@ -36,9 +36,9 @@ public abstract class TestInDifferentPackageThenItsParents extends BaseClassFrom
 	}
 
 	public String[] getBundleContentPattern() {
-		String pkg = TestInDifferentPackageThenItsParents.class.getPackage().getName().replace('.', '/').concat("/");
-		String[] patterns = new String[] { pkg + "**/*",
-			BaseClassFromAnotherPackage.class.getName().replace('.', '/').concat(".class") };
+		String pkg = TestInDifferentPackageThenItsParentsTest.class.getPackage().getName().replace('.', '/').concat("/");
+		String[] patterns = new String[] { pkg,
+			BaseClassFromAnotherPackageTest.class.getName().replace('.', '/').concat(".class") };
 		return patterns;
 	}
 }

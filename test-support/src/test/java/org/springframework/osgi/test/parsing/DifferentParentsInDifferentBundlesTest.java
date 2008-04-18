@@ -23,10 +23,10 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.Constants;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackage;
-import org.springframework.osgi.test.parsing.packageB.BaseClassFromAnotherPackageAndBundle;
-import org.springframework.osgi.test.parsing.packageC.TestInDifferentPackageThenItsParents;
-import org.springframework.osgi.test.parsing.packageZ.FinalTestClass;
+import org.springframework.osgi.test.parsing.packageA.BaseClassFromAnotherPackageTest;
+import org.springframework.osgi.test.parsing.packageB.BaseClassFromAnotherPackageAndBundleTest;
+import org.springframework.osgi.test.parsing.packageC.TestInDifferentPackageThenItsParentsTest;
+import org.springframework.osgi.test.parsing.packageZ.FinalTestClassTest;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -41,7 +41,7 @@ public class DifferentParentsInDifferentBundlesTest extends TestCase {
 	public void testCheckBaseClassesHierarchy() throws Exception {
 		// create class
 		// make sure the packaging puts some of the tests parent in a different class
-		TestInDifferentPackageThenItsParents test = new TestInDifferentPackageThenItsParents() {
+		TestInDifferentPackageThenItsParentsTest test = new TestInDifferentPackageThenItsParentsTest() {
 		};
 
 		String importPackage = getImportPackage(test);
@@ -49,16 +49,16 @@ public class DifferentParentsInDifferentBundlesTest extends TestCase {
 		// check parent package
 		// parent in a different bundle
 		assertTrue("missing parent package not considered", contains(importPackage,
-			BaseClassFromAnotherPackageAndBundle.class.getPackage().getName()));
+			BaseClassFromAnotherPackageAndBundleTest.class.getPackage().getName()));
 		// parent in a different package but the same bundle (i.e. no import)
 		assertFalse("contained parent not considered", contains(importPackage,
-			BaseClassFromAnotherPackage.class.getPackage().getName()));
+			BaseClassFromAnotherPackageTest.class.getPackage().getName()));
 		// check present parent dependencies
 		assertTrue("contained parent dependencies not considered", contains(importPackage, "javax.imageio"));
 	}
 
 	public void testSuperClassInterfacesConsidered() throws Exception {
-		FinalTestClass test = new FinalTestClass() {
+		FinalTestClassTest test = new FinalTestClassTest() {
 		};
 
 		String importPackage = getImportPackage(test);
@@ -71,7 +71,7 @@ public class DifferentParentsInDifferentBundlesTest extends TestCase {
 		assertTrue("interface present on superclass ignored", contains(importPackage, "javax.print"));
 	}
 
-	private Manifest getParsedManifestFor(BaseTestCaseWithVisibleMethods testCase) throws Exception {
+	private Manifest getParsedManifestFor(CaseWithVisibleMethodsBaseTest testCase) throws Exception {
 
 		System.out.println(ObjectUtils.nullSafeToString(testCase.getBundleContentPattern()));
 		Field jarSettings = AbstractConfigurableBundleCreatorTests.class.getDeclaredField("jarSettings");
@@ -84,7 +84,7 @@ public class DifferentParentsInDifferentBundlesTest extends TestCase {
 		return mf;
 	}
 
-	private String getImportPackage(BaseTestCaseWithVisibleMethods test) throws Exception {
+	private String getImportPackage(CaseWithVisibleMethodsBaseTest test) throws Exception {
 		Manifest mf = getParsedManifestFor(test);
 		String importPackage = mf.getMainAttributes().getValue(Constants.IMPORT_PACKAGE);
 		System.out.println("import package value is " + importPackage);
