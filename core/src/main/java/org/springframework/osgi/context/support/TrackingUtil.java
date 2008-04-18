@@ -22,7 +22,9 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiFilterUtils;
@@ -45,6 +47,13 @@ import org.springframework.osgi.util.internal.ClassUtils;
 abstract class TrackingUtil {
 
 	/**
+	 * special field used by the extender for getting a hold of the
+	 * handler/resolver invoking bundle
+	 */
+	public static final ThreadLocal invokingBundle = new ThreadLocal();
+
+
+	/**
 	 * Advice which fetches the target using the ServiceTracker service provided
 	 * by the OSGi space.
 	 * 
@@ -57,25 +66,46 @@ abstract class TrackingUtil {
 
 		private final BundleContext context;
 
+		private final Bundle bundle;
+
 		private final String filter;
 
 
 		public MethodInvocationServiceAdvice(Object fallbackObject, BundleContext bundleContext, String filter) {
 			this.fallbackObject = fallbackObject;
 			this.context = bundleContext;
+			this.bundle = context.getBundle();
 			this.filter = filter;
 		}
 
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			Method m = invocation.getMethod();
 
-			Object target = context.getService(OsgiServiceReferenceUtils.getServiceReference(context, filter));
+			ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(context, filter);
 
-			if (target == null)
+			Object target = (ref != null ? context.getService(ref) : null);
+
+			boolean bindBundle = true;
+
+			if (target == null) {
 				target = fallbackObject;
+				bindBundle = false;
+			}
 
+			// bind the bundle before doing the invocation
+			if (bindBundle) {
+				invokingBundle.set(bundle);
+			}
 			// re-route call to the target
-			return m.invoke(target, invocation.getArguments());
+			try {
+				return m.invoke(target, invocation.getArguments());
+			}
+			finally {
+				if (bindBundle) {
+					// clear the thread local
+					invokingBundle.set(null);
+				}
+			}
 		}
 	}
 
