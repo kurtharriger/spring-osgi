@@ -25,6 +25,7 @@
 	*
 	</spring.osgi.import.pkg>
 
+	<source-jdk>1.5</source-jdk>
   </properties>
   
   <dependencies>
@@ -48,40 +49,5 @@
     </dependency>    
      
   </dependencies>
-
-<build>
-  <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-	      <groupId>org.apache.maven.plugins</groupId>
-          <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
-            <debug>true</debug>
-          </configuration>
-      </plugin>
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-              <systemProperties>
-                  <property>
-                      <name>org.osgi.vendor.framework</name>
-                      <value>org.springframework.osgi</value>
-                  </property>
-              </systemProperties>
-          </configuration>
-      </plugin>
-  </plugins>
-</build>
-
-  <reporting>
-    <plugins>
-       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </reporting>
 
 </project>
