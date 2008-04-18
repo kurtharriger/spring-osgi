@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extender.internal.support;
 
 import java.io.IOException;
@@ -34,9 +35,10 @@ public class NamespacePluginsTest extends TestCase {
 
 	private NamespacePlugins namespacePlugins;
 
+
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.namespacePlugins = new NamespacePlugins();
+		this.namespacePlugins = new NamespacePlugins(null);
 	}
 
 	public void testCantResolveWithNoPlugins() throws IOException, SAXException {
