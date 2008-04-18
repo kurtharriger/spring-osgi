@@ -79,6 +79,7 @@
    
    <!-- JDK classifier property -->
    <jdk-classifier>jdk14</jdk-classifier>
+   <source-jdk>1.4</source-jdk>
   </properties>
 
   <!-- ============================================= -->
@@ -267,11 +268,11 @@ limitations under the License.
       <artifactId>log4j.osgi</artifactId>
       <version>1.2.15-SNAPSHOT</version>
       <scope>test</scope>
-    </dependency>    
+    </dependency>
+    
   </dependencies>
   
  <build>
-    
     <extensions>
       <extension>
          <groupId>org.springframework.aws</groupId>
@@ -279,7 +280,7 @@ limitations under the License.
          <version>1.2.2</version>
        </extension>
     </extensions>
-    
+
     <resources>
       <resource>
         <filtering>true</filtering>
@@ -298,7 +299,6 @@ limitations under the License.
     </pluginManagement>
     
     <plugins>
-    
        <!-- OSGi Felix bundle plugin -->
        <plugin>
         <groupId>org.apache.felix</groupId>
@@ -350,8 +350,8 @@ limitations under the License.
         <artifactId>maven-compiler-plugin</artifactId>
 	      <groupId>org.apache.maven.plugins</groupId>
           <configuration>
-            <source>1.4</source>
-            <target>1.4</target>
+            <source>${source-jdk}</source>
+            <target>${source-jdk}</target>
             <debug>true</debug>
           </configuration>
       </plugin>
@@ -363,6 +363,21 @@ limitations under the License.
           </descriptors>
         </configuration>
       </plugin>
+      
+      <!-- clover plug-in -->
+      <plugin>
+          <artifactId>maven-clover-plugin</artifactId>
+          <groupId>com.atlassian.maven.plugins</groupId>
+          <version>3.7</version>
+          <configuration>
+              <licenseLocation>${clover.licenseLocation}</licenseLocation>
+              <generatePdf>false</generatePdf>
+			  <generateXml>true</generateXml>
+              <generateHtml>true</generateHtml>
+              <generateHistorical>false</generateHistorical>
+              <jdk>${source-jdk}</jdk>
+          </configuration>
+      </plugin>      
 
     </plugins>
   </build>
@@ -594,22 +609,22 @@ limitations under the License.
       <!-- ============== -->
       <!--     FindBugs   -->
       <!-- ============== -->
-  <plugin>
-    <groupId>org.codehaus.mojo</groupId>
-    <artifactId>findbugs-maven-plugin</artifactId>
-    <configuration>
-    <!--
-      <xmlOutput>true</xmlOutput>
-      <xmlOutputDirectory>target</xmlOutputDirectory>
-      -->
-      <threshold>Low</threshold>
-      <effort>Max</effort>
-      <!--
-      <debug>true</debug>
-      <relaxed>true</relaxed>
-      -->
-    </configuration>
-  </plugin>
+	  <plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>findbugs-maven-plugin</artifactId>
+		<configuration>
+		<!--
+		  <xmlOutput>true</xmlOutput>
+		  <xmlOutputDirectory>target</xmlOutputDirectory>
+		  -->
+		  <threshold>Low</threshold>
+		  <effort>Max</effort>
+		  <!--
+		  <debug>true</debug>
+		  <relaxed>true</relaxed>
+		  -->
+		</configuration>
+	  </plugin>
   
       <!-- =========== -->
       <!--     PMD     -->
@@ -632,7 +647,6 @@ limitations under the License.
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jdepend-maven-plugin</artifactId>
       </plugin>
-      
     </plugins>
    </reporting>
 
@@ -692,6 +706,12 @@ limitations under the License.
       <url>http://cvs.apache.org/maven-snapshot-repository</url>
 	</pluginRepository>
     -->
+    <!-- clover repository -->
+    <pluginRepository>
+      <id>atlassian-m2-repository</id>
+      <name>Atlassian Maven 2.x Repository</name>
+      <url>http://repository.atlassian.com/maven2</url>
+    </pluginRepository>    
   </pluginRepositories>
 
 
