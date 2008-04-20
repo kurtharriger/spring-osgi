@@ -47,6 +47,9 @@ Package org.springframework.osgi.service
 * changed service collection behaviour to not perform greedy proxying by default
 * improved the proxy weaving process by providing the aop infrastructure dependencies internally
 
+Package org.springframework.osgi.test
+* improved installed bundles resolving when PackageAdmin service is available
+
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader constructor visibility changed from private to protected
 * fixed sporadic exception occuring in DebugUtils when analyzing class loading errors

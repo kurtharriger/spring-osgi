@@ -102,16 +102,16 @@ public class DefaultContextPathStrategyTest extends TestCase {
 	}
 
 	public void testBundleWithFolderLocationAndDots() throws Exception {
-		final String expectedContextPath = "/folder.extension";
-		final String location = "/root" + expectedContextPath + "/";
+		final String expectedContextPath = "/folder";
+		final String location = "/root" + expectedContextPath + ".extension/";
 
 		assertEquals("extension should not be removed when dealing with folders", expectedContextPath,
 			strategy.getContextPath(createBundleWithLocation(location)));
 	}
 
 	public void testBundleWithFolderButNoLeadingSlash() throws Exception {
-		final String expectedContextPath = "folder.extension";
-		final String location = expectedContextPath + "/";
+		final String expectedContextPath = "folder";
+		final String location = expectedContextPath + ".extension/";
 
 		assertEquals("/" + expectedContextPath, strategy.getContextPath(createBundleWithLocation(location)));
 	}
@@ -124,8 +124,8 @@ public class DefaultContextPathStrategyTest extends TestCase {
 	}
 
 	public void testBundleWithSpecialCharactersAndExtensionFolderLocation() throws Exception {
-		final String expectedContextPath = "some file.bla extension";
-		final String location = "/root/" + expectedContextPath + "/";
+		final String expectedContextPath = "some file";
+		final String location = "/root/" + expectedContextPath + ".bla extension/";
 
 		assertEquals("/" + encode(expectedContextPath), strategy.getContextPath(createBundleWithLocation(location)));
 	}

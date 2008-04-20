@@ -37,14 +37,13 @@ import org.springframework.util.StringUtils;
  * 
  * <ol>
  * <li>bundle location - if present, the implementation will try to determine
- * if the location points to a file or a folder. If it's the former, the file
- * name (without extension) will be returned for the latter, the full name will
- * be returned:
+ * if the location points to a file or a folder. In both cases, the name will be
+ * returned without the extension (if it's present):
  * 
  * <pre class="code">
- * /root/name.ext -&gt; /name
- * /root/folder/ -&gt; /folder
- * /root/folder.ext/ -&gt; /folder.ext
+ * /root/bundle.jar -&gt; /name
+ * /root/bundle/ -&gt; /bundle
+ * /root/bundle.jar/ -&gt; /bundle
  * </pre>
  * 
  * </li>
@@ -105,12 +104,9 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 				// if there is no other slash, consider the whole location, otherwise detect the folder
 				path = (separatorIndex > -1 ? path.substring(separatorIndex + 1) : path);
 			}
-			// not a folder, remove the extension
-			else {
-				path = StringUtils.getFilename(path);
-				// remove file extension
-				path = StringUtils.stripFilenameExtension(path);
-			}
+			path = StringUtils.getFilename(path);
+			// remove file extension
+			path = StringUtils.stripFilenameExtension(path);
 		}
 		// the location is not good, use a fall back
 		else {
