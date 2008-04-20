@@ -28,6 +28,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
@@ -253,6 +254,9 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 				bundles[i] = installBundle(bundleResources[i]);
 			}
 
+			// try to resolve packages through the package admin
+			resolveBundles();
+
 			// start bundles
 			for (int i = 0; i < bundles.length; i++) {
 				startBundle(bundles[i]);
@@ -321,6 +325,23 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 		}
 
 		return platformContext.installBundle(bundleLocation, location.getInputStream());
+	}
+
+	/**
+	 * Use the PackageAdmin to resolve packages.
+	 */
+	private void resolveBundles() {
+		ServiceReference pkgAdminReference = platformContext.getServiceReference(PackageAdmin.class.getName());
+		PackageAdmin pkgAdmin = (PackageAdmin) (pkgAdminReference == null ? null
+				: platformContext.getService(pkgAdminReference));
+
+		if (pkgAdmin != null) {
+			logger.info("Resolving bundles through the PackageAdmin " + pkgAdmin);
+			pkgAdmin.resolveBundles(null);
+		}
+		else {
+			logger.info("No package admin found; skipping bundle resolving");
+		}
 	}
 
 	/**
