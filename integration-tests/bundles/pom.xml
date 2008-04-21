@@ -58,6 +58,7 @@
     <module>config.file.with.dots.bundle</module>
     <module>proxy.creator.bundle</module>
     <module>web.bundles</module>
+    <module>extender.fragment.bundle</module>
   </modules>
 
   <profiles>
