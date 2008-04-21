@@ -56,11 +56,11 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		}
 
 		private Resource parse(String id, Resource resource) {
-			if (id.contains(SPRING_DM_PREFIX)) {
+			if (id.indexOf(SPRING_DM_PREFIX) > -1) {
 				try {
 					String relativePath = "";
 					// check if it's a relative file
-					if (StringUtils.cleanPath(resource.getURI().toString()).contains("/target/")) {
+					if (StringUtils.cleanPath(resource.getURI().toString()).indexOf("/target/") > -1) {
 						relativePath = "clover" + File.separator;
 					}
 					relativePath = relativePath + id + "-clover.jar";
@@ -70,9 +70,8 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 					return res;
 				}
 				catch (Exception ex) {
-					throw new IllegalStateException(
-						"Trying to find Clover instrumented class but none is available; disable clover or build the instrumented artifacts",
-						ex);
+					throw (RuntimeException) new IllegalStateException(
+						"Trying to find Clover instrumented class but none is available; disable clover or build the instrumented artifacts").initCause(ex);
 				}
 			}
 			return resource;
