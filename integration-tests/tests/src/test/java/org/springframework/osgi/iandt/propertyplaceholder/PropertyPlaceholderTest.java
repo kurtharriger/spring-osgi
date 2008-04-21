@@ -66,10 +66,6 @@ public class PropertyPlaceholderTest extends BaseIntegrationTest {
 		}
 	}
 
-	protected String getManifestLocation() {
-		return "classpath:org/springframework/osgi/iandt/propertyplaceholder/PropertyPlaceholder.MF";
-	}
-
 	protected String[] getTestBundlesNames() {
 		return new String[] {
 		// required by cm_all for logging
