@@ -59,7 +59,6 @@ class OsgiWebAppContext extends WebAppContext {
 			return null;
 
 		// hack to support jetty resources
-		System.out.println("requesting resource " + url);
 		String protocol = url.getProtocol();
 		// OSGi bundle
 		if (protocol.startsWith(BUNDLE_PROTOCOL)) {

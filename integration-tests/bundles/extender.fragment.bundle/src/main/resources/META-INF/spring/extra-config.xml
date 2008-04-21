@@ -12,7 +12,8 @@
 	<osgi:reference id="packageAdmin"
 		interface="org.osgi.service.packageadmin.PackageAdmin" />
 
-	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" p:threadGroupName="configured-extender" />
+	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" p:threadGroupName="configured-extender" 
+			p:threadNamePrefix="conf-extender-thread" />
 	
 	<util:properties id="extenderProperties">
 		<prop key="smth">bla</prop>

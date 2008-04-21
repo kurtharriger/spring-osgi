@@ -19,6 +19,7 @@ package org.springframework.osgi.context.support;
 import java.beans.PropertyEditor;
 import java.io.IOException;
 import java.util.Dictionary;
+import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -278,10 +279,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	void publishContextAsOsgiServiceIfNecessary() {
 		if (publishContextAsService) {
 			Dictionary serviceProperties = new MapBasedDictionary();
-			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getBundleSymbolicName());
 
-			serviceProperties.put(Constants.BUNDLE_SYMBOLICNAME, getBundleSymbolicName());
-			serviceProperties.put(Constants.BUNDLE_VERSION, OsgiBundleUtils.getBundleVersion(bundle));
+			customizeApplicationContextServiceProperties((Map) serviceProperties);
 
 			if (logger.isInfoEnabled()) {
 				logger.info("Publishing application context as OSGi service with properties " + serviceProperties);
@@ -309,6 +308,29 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 						+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			}
 		}
+	}
+
+	/**
+	 * Customizes the properties of the application context OSGi service. This
+	 * method is called only if the application context will be published as an
+	 * OSGi service.
+	 * 
+	 * <p/>The default implementation stores the bundle symbolic name under
+	 * {@link Constants#BUNDLE_SYMBOLICNAME} and
+	 * {@link ConfigurableOsgiBundleApplicationContex#APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME}
+	 * and the bundle version under {@link Constants#BUNDLE_VERSION} property.
+	 * 
+	 * Can be overridden by subclasses to add more properties if needed (for
+	 * example for web applications where multiple application contexts are
+	 * available inside the same bundle).
+	 * 
+	 * @param serviceProperties service properties map (can be casted to
+	 * {@link Dictionary})
+	 */
+	protected void customizeApplicationContextServiceProperties(Map serviceProperties) {
+		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getBundleSymbolicName());
+		serviceProperties.put(Constants.BUNDLE_SYMBOLICNAME, getBundleSymbolicName());
+		serviceProperties.put(Constants.BUNDLE_VERSION, OsgiBundleUtils.getBundleVersion(bundle));
 	}
 
 	private String getBundleSymbolicName() {

@@ -24,6 +24,7 @@ Package org.springframework.osgi.context
   class loader strategy
 * improved AbstractOsgiBundleApplicationContext behaviour if the internal resource loader is not set
 * improved bundle class loader creation by using an internal cache
+* refined AbstractOsgiBundleApplicationContext to allow customization of the OSGi service properties
 
 Package org.springframework.osgi.service
 * refined weaving process for service importers so that knowledge of org.springframework.osgi package is not required
@@ -66,7 +67,8 @@ Package org.springframework.osgi.web
 * fixed casting problem occurring during war undeployment
 * improved weaving process for imported web container services
 * refined DefaultContextPathStrategy to support folders and encode unsafe characters
-
+* OsgiBundleXmlWebApplicationContext provides the servlet namespace under 'org.springframework.context.web.namespace'
+  property of its OSGi service
 
 Changes in version 1.1.0 M1 (2008-04-07)
 -----------------------------------------
