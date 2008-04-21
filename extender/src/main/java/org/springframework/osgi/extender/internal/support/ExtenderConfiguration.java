@@ -121,28 +121,30 @@ public class ExtenderConfiguration implements DisposableBean {
 			String[] configs = copyEnumerationToList(enm);
 			log.info("Detected custom configurations " + ObjectUtils.nullSafeToString(configs));
 			// create OSGi specific XML context
-			ConfigurableOsgiBundleApplicationContext context = new OsgiBundleXmlApplicationContext(configs);
-			context.setBundleContext(bundleContext);
-			context.refresh();
+			extenderConfiguration = new OsgiBundleXmlApplicationContext(configs);
+			extenderConfiguration.setBundleContext(bundleContext);
+			extenderConfiguration.refresh();
 
 			// initialize beans
 
-			taskExecutor = context.containsBean(TASK_EXECUTOR_NAME) ? (TaskExecutor) context.getBean(
-				TASK_EXECUTOR_NAME, TaskExecutor.class) : createDefaultTaskExecutor();
+			taskExecutor = extenderConfiguration.containsBean(TASK_EXECUTOR_NAME) ? (TaskExecutor) extenderConfiguration.getBean(
+				TASK_EXECUTOR_NAME, TaskExecutor.class)
+					: createDefaultTaskExecutor();
 
-			eventMulticaster = (ApplicationEventMulticaster) context.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME);
+			eventMulticaster = (ApplicationEventMulticaster) extenderConfiguration.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME);
 
-			contextCreator = context.containsBean(CONTEXT_CREATOR_NAME) ? (OsgiApplicationContextCreator) context.getBean(
+			contextCreator = extenderConfiguration.containsBean(CONTEXT_CREATOR_NAME) ? (OsgiApplicationContextCreator) extenderConfiguration.getBean(
 				CONTEXT_CREATOR_NAME, OsgiApplicationContextCreator.class)
 					: createDefaultApplicationContextCreator();
 
 			// get post processors
-			postProcessors.addAll(context.getBeansOfType(OsgiBeanFactoryPostProcessor.class).values());
+			postProcessors.addAll(extenderConfiguration.getBeansOfType(OsgiBeanFactoryPostProcessor.class).values());
 
-			classLoader = context.getClassLoader();
+			classLoader = extenderConfiguration.getClassLoader();
 			// extender properties using the defaults as backup
-			if (context.containsBean(PROPERTIES_NAME)) {
-				Properties customProperties = (Properties) context.getBean(PROPERTIES_NAME, Properties.class);
+			if (extenderConfiguration.containsBean(PROPERTIES_NAME)) {
+				Properties customProperties = (Properties) extenderConfiguration.getBean(PROPERTIES_NAME,
+					Properties.class);
 				Enumeration propertyKey = customProperties.propertyNames();
 				while (propertyKey.hasMoreElements()) {
 					String property = (String) propertyKey.nextElement();

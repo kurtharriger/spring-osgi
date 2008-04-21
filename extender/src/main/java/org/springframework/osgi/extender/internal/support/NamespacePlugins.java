@@ -37,6 +37,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.ReflectionUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -283,6 +284,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 		try {
 			Class cacheClass = coreClassLoader.loadClass(CACHE_CLASS);
 			Field field = cacheClass.getField(FIELD_NAME);
+			ReflectionUtils.makeAccessible(field);
 			return (Bundle) ((ThreadLocal) field.get(null)).get();
 		}
 		catch (Exception ex) {
