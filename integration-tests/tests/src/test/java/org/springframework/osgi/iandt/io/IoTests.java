@@ -26,10 +26,6 @@ import org.springframework.core.io.Resource;
  */
 public class IoTests extends BaseIoTest {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests#getManifestLocation()
-	 */
 	protected String getManifestLocation() {
 		return null;
 	}

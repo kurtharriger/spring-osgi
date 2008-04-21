@@ -17,6 +17,7 @@
 package org.springframework.osgi.web.context.support;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -53,6 +54,11 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
  * resource loading with an OSGi specific loader which provides equivalent
  * functionality.
  * 
+ * <p/>The OSGi service published for this application context contains the
+ * namespace under <code>org.springframework.context.web.namespace</code>
+ * property.
+ * 
+ * 
  * @see XmlWebApplicationContext
  * @see OsgiBundleResourceLoader
  * @see OsgiBundleXmlApplicationContext
@@ -61,6 +67,9 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
  */
 public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplicationContext implements
 		ConfigurableWebApplicationContext, ThemeSource {
+
+	/** service entry used for storing the namespace associated with this context */
+	private static final String APPLICATION_CONTEXT_SERVICE_NAMESPACE_PROPERTY = "org.springframework.context.web.namespace";
 
 	/** Servlet context that this context runs in */
 	private ServletContext servletContext;
@@ -153,6 +162,17 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 		beanFactory.registerResolvableDependency(ServletConfig.class, this.servletConfig);
 
 		registerWebApplicationScopes(beanFactory);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Additionally, this implementation published the context namespace under
+	 * <code>org.springframework.context.web.namespace</code> property.
+	 */
+	protected void customizeApplicationContextServiceProperties(Map serviceProperties) {
+		super.customizeApplicationContextServiceProperties(serviceProperties);
+		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_NAMESPACE_PROPERTY, getNamespace());
 	}
 
 	// TODO: remove ugly hack
