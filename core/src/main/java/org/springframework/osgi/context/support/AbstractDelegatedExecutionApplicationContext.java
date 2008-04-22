@@ -211,7 +211,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// resources.
 					beanFactory.destroySingletons();
 					// rethrow exception to the caller
-					throws ex;
+					throw ex;
 				}
 			}
 		}
