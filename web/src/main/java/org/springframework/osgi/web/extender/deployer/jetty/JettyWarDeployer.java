@@ -79,7 +79,12 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 		// FIXME: remove this once things are improved in Jetty (OSGI-438)
 		wac.setAttribute(WarDeploymentContext.OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE,
 			OsgiBundleUtils.getBundleContext(bundle));
-		JettyWarDeployment deployment = new JettyWarDeployment(this, bundle, wac);
+		JettyWarDeployment deployment = new JettyWarDeployment(new JettyContextUndeployer() {
+
+			public void undeploy(WebAppContext webAppCtx) throws OsgiWarDeploymentException {
+				stopWebAppContext(webAppCtx);
+			}
+		}, bundle, wac);
 
 		return deployment;
 	}
@@ -186,8 +191,7 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	 * @param wac
 	 * @throws Exception
 	 */
-	// package protected method accessible only to the JettyWarDeployment
-	void stopWebAppContext(WebAppContext wac) throws OsgiWarDeploymentException {
+	private void stopWebAppContext(WebAppContext wac) throws OsgiWarDeploymentException {
 
 		Resource rootResource = wac.getBaseResource();
 		String contextPath = wac.getContextPath();

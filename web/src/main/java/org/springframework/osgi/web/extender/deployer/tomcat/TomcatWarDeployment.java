@@ -37,13 +37,13 @@ class TomcatWarDeployment implements WarDeployment {
 	/** catalina context associated with this object */
 	private final Context catalinaContext;
 	/** deployer entity */
-	private final TomcatWarDeployer deployer;
+	private final TomcatContextUndeployer undeployer;
 	/** context object */
 	private final WarDeploymentContext deploymentContext;
 
 
-	TomcatWarDeployment(TomcatWarDeployer deployer, Bundle bundle, Context catalinaContext) {
-		this.deployer = deployer;
+	TomcatWarDeployment(TomcatContextUndeployer undeployer, Bundle bundle, Context catalinaContext) {
+		this.undeployer = undeployer;
 		this.catalinaContext = catalinaContext;
 
 		// create context
@@ -64,7 +64,7 @@ class TomcatWarDeployment implements WarDeployment {
 			return;
 
 		active = false;
-		deployer.stopCatalinaContext(catalinaContext);
+		undeployer.undeploy(catalinaContext);
 	}
 
 	// package protected method
