@@ -47,6 +47,10 @@
 		*
 	</spring.osgi.import>
 
+	<!-- decoration osgi import - used internally when the jars are pre-processed and bnd doens't have to know about it -->
+    <spring.decorate.osgi.import>${spring.osgi.import}</spring.decorate.osgi.import>
+    
+
 
     <symName.prefix>org.springframework.bundle.osgi</symName.prefix>
     <spring.osgi.symbolic.name>${groupId}.${artifactId}</spring.osgi.symbolic.name>
@@ -506,6 +510,25 @@ limitations under the License.
       <modules>
       	<module>samples</module>
       </modules>
+    </profile>
+
+	<!-- clover profile -->
+    <profile>
+      <id>clover</id>
+      <properties>
+        <clover.enabled>true</clover.enabled>
+        <spring.decorate.osgi.import>!com_cenqua_clover*,${spring.osgi.import}</spring.decorate.osgi.import>
+      </properties>
+	
+	  <dependencies>
+	    <dependency>
+ 		  <groupId>com.cenqua.clover</groupId>
+		  <artifactId>clover</artifactId>
+		  <version>2.1.0</version>
+		  <type>jar</type>
+		  <scope>provided</scope>
+        </dependency>
+	  </dependencies>
     </profile>
     
   </profiles>

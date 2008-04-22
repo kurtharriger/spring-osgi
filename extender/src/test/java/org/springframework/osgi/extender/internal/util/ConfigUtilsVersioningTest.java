@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
+import org.springframework.osgi.extender.support.internal.ConfigUtils;
 import org.springframework.osgi.mock.MockBundle;
 
 public class ConfigUtilsVersioningTest extends TestCase {

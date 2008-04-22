@@ -49,4 +49,9 @@ public class ExtenderConfigurationTest extends BaseIntegrationTest {
 	public void testPackageAdminReferenceBean() throws Exception {
 		assertNotNull(context.getBean("packageAdmin"));
 	}
+
+	// felix doesn't support fragments, so disable this test
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return getPlatformName().indexOf("elix") > -1;
+	}
 }

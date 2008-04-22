@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.collection;
 
 import java.util.Collection;
@@ -45,14 +46,20 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 
 		public void add(Object o) {
 			removalAllowed = false;
-			synchronized (lock) {
-				DynamicList.this.add(cursor, o);
+			synchronized (storage) {
+				synchronized (lock) {
+					DynamicList.this.add(cursor, o);
+				}
 			}
+		}
+
+		private boolean unsafeHasPrevious() {
+			return (cursor - 1 >= 0);
 		}
 
 		public boolean hasPrevious() {
 			synchronized (lock) {
-				return (cursor - 1 >= 0);
+				return unsafeHasPrevious();
 			}
 		}
 
@@ -64,9 +71,11 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 
 		public Object previous() {
 			removalAllowed = true;
-			if (hasPrevious()) {
+			synchronized (storage) {
 				synchronized (lock) {
-					return storage.get(--cursor);
+					if (unsafeHasPrevious()) {
+						return storage.get(--cursor);
+					}
 				}
 			}
 
@@ -82,13 +91,14 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 		public void set(Object o) {
 			if (!removalAllowed)
 				throw new IllegalStateException();
-
-			synchronized (lock) {
-				storage.set(cursor - 1, o);
+			synchronized (storage) {
+				synchronized (lock) {
+					storage.set(cursor - 1, o);
+				}
 			}
 		}
-
 	}
+
 
 	public DynamicList() {
 		super();
@@ -107,19 +117,27 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 	}
 
 	public boolean addAll(int index, Collection c) {
-		return storage.addAll(index, c);
+		synchronized (storage) {
+			return storage.addAll(index, c);
+		}
 	}
 
 	public Object get(int index) {
-		return storage.get(index);
+		synchronized (storage) {
+			return storage.get(index);
+		}
 	}
 
 	public int indexOf(Object o) {
-		return storage.indexOf(o);
+		synchronized (storage) {
+			return storage.indexOf(o);
+		}
 	}
 
 	public int lastIndexOf(Object o) {
-		return storage.lastIndexOf(o);
+		synchronized (storage) {
+			return storage.lastIndexOf(o);
+		}
 	}
 
 	public ListIterator listIterator() {
@@ -141,13 +159,17 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 	}
 
 	public Object set(int index, Object o) {
-		return storage.set(index, o);
+		synchronized (storage) {
+			return storage.set(index, o);
+		}
 	}
 
 	// TODO: test behavior to see if the returned list properly behaves under
 	// dynamic circumstances
 	public List subList(int fromIndex, int toIndex) {
-		return storage.subList(fromIndex, toIndex);
+		synchronized (storage) {
+			return storage.subList(fromIndex, toIndex);
+		}
 	}
 
 }

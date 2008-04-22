@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.collection;
 
 import java.util.Collection;
@@ -31,6 +32,7 @@ import org.springframework.util.Assert;
 public class DynamicSortedList extends DynamicList {
 
 	private final Comparator comparator;
+
 
 	public DynamicSortedList() {
 		this((Comparator) null);
@@ -63,40 +65,35 @@ public class DynamicSortedList extends DynamicList {
 
 		int index = 0;
 
-		// TODO: Is this dangerous (we are holding two locks) ?
-		synchronized (iteratorsLock) {
-			synchronized (storage) {
-				index = Collections.binarySearch(storage, o, comparator);
-				// duplicate found; it's okay since it's a list
-				boolean duplicate = (index >= 0);
+		synchronized (storage) {
+			index = Collections.binarySearch(storage, o, comparator);
+			// duplicate found; it's okay since it's a list
+			boolean duplicate = (index >= 0);
 
-				// however, make sure we add the element at the end of the
-				// duplicates
-				if (duplicate) {
-					boolean stillEqual = true;
-					while (index + 1 < storage.size() && stillEqual) {
+			// however, make sure we add the element at the end of the
+			// duplicates
+			if (duplicate) {
+				boolean stillEqual = true;
+				while (index + 1 < storage.size() && stillEqual) {
 
-						stillEqual = false;
-						Object next = storage.get(index + 1);
+					stillEqual = false;
+					Object next = storage.get(index + 1);
 
-						if ((comparator != null ? comparator.compare(o, next) == 0
-								: ((Comparable) o).compareTo(next) == 0)) {
-							stillEqual = true;
-							index++;
-						}
+					if ((comparator != null ? comparator.compare(o, next) == 0 : ((Comparable) o).compareTo(next) == 0)) {
+						stillEqual = true;
+						index++;
 					}
 				}
-
-				// translate index
-				else
-					index = -index - 1;
-
-				if (duplicate)
-					super.add(index + 1, o);
-				else
-					super.add(index, o);
-
 			}
+
+			// translate index
+			else
+				index = -index - 1;
+
+			if (duplicate)
+				super.add(index + 1, o);
+			else
+				super.add(index, o);
 		}
 		return true;
 	}
@@ -106,15 +103,15 @@ public class DynamicSortedList extends DynamicList {
 	// 
 
 	public void add(int index, Object o) {
-		throw new UnsupportedOperationException("this is a sorted list; it is illegal to specify the element position");
+		throw new UnsupportedOperationException("This is a sorted list; it is illegal to specify the element position");
 	}
 
 	public boolean addAll(int index, Collection c) {
-		throw new UnsupportedOperationException("this is a sorted list; it is illegal to specify the element position");
+		throw new UnsupportedOperationException("This is a sorted list; it is illegal to specify the element position");
 	}
 
 	public Object set(int index, Object o) {
-		throw new UnsupportedOperationException("this is a sorted list; it is illegal to specify the element position");
+		throw new UnsupportedOperationException("This is a sorted list; it is illegal to specify the element position");
 	}
 
 }

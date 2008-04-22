@@ -21,12 +21,13 @@
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 
   
-  	<spring.osgi.private.pkg>org.springframework.osgi.extender.internal*</spring.osgi.private.pkg>
+  	<spring.osgi.private.pkg>org.springframework.osgi.extender.*internal*</spring.osgi.private.pkg>
   	<!-- don't export a thing -->
-	<spring.osgi.export.pkg>!${spring.osgi.private.pkg}, org.springframework.osgi.extender</spring.osgi.export.pkg>
+	<spring.osgi.export.pkg>!${spring.osgi.private.pkg}, org.springframework.osgi.extender*</spring.osgi.export.pkg>
 	<!-- add this until FELIX-390 gets fixed -->
 	<spring.osgi.import.pkg>
 	 org.apache.commons.logging*,
+	 org.osgi.service.packageadmin;version=1.2,
 	 org.xml.sax;resolution:=optional
 	</spring.osgi.import.pkg>
 	<spring.osgi.symbolic.name>${symName.prefix}.extender</spring.osgi.symbolic.name>

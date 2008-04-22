@@ -21,6 +21,7 @@ import java.util.Hashtable;
 
 import junit.framework.TestCase;
 
+import org.springframework.osgi.extender.support.internal.ConfigUtils;
 import org.springframework.osgi.io.OsgiBundleResource;
 
 /**

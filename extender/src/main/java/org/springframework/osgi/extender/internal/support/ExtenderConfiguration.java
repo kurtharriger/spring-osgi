@@ -38,6 +38,7 @@ import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
+import org.springframework.osgi.extender.support.DefaultOsgiApplicationContextCreator;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.util.ObjectUtils;
 

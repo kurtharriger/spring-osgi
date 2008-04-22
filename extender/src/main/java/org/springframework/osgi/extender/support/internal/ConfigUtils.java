@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.extender.internal.util;
+package org.springframework.osgi.extender.support.internal;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
