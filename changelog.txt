@@ -25,6 +25,7 @@ Package org.springframework.osgi.context
 * improved AbstractOsgiBundleApplicationContext behaviour if the internal resource loader is not set
 * improved bundle class loader creation by using an internal cache
 * refined AbstractOsgiBundleApplicationContext to allow customization of the OSGi service properties
+* AbstractDelegatedExecutionApplicationContext rethrows all exceptions occuring during refresh
 
 Package org.springframework.osgi.service
 * refined weaving process for service importers so that knowledge of org.springframework.osgi package is not required
