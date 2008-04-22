@@ -33,7 +33,7 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * OSGi-specific application context that delegates the execution of its
- * lifecycle methods to a different class. The main reason behind this is to
+ * life cycle methods to a different class. The main reason behind this is to
  * <em>break</em> the startup of the application context in steps that can be
  * executed asynchronously.
  * 
@@ -146,8 +146,9 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 			catch (RuntimeException ex) {
 				logger.error("Refresh error", ex);
 				sendFailedEvent(ex);
+				// propagate exception to the caller
+				throw ex;
 			}
-
 		}
 		finally {
 			currentThread.setContextClassLoader(oldTCCL);
@@ -225,6 +226,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// resources.
 					beanFactory.destroySingletons();
 					cancelRefresh(ex);
+					// propagate exception to the caller
+					throw ex;
 				}
 			}
 		}
@@ -278,6 +281,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// resources.
 					getBeanFactory().destroySingletons();
 					cancelRefresh(ex);
+					// propagate exception to the caller
+					throw ex;
 				}
 			}
 		}
@@ -300,13 +305,6 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		}
 		// publish the context only after all the beans have been published
 		publishContextAsOsgiServiceIfNecessary();
-	}
-
-	protected void cancelRefresh(BeansException ex) {
-		super.cancelRefresh(ex);
-		logger.error("Canceling refresh", ex);
-		// send notification event
-		sendFailedEvent(ex);
 	}
 
 	public Object getMonitor() {
