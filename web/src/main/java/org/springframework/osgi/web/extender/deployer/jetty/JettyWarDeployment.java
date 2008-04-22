@@ -36,14 +36,14 @@ class JettyWarDeployment implements WarDeployment {
 	private boolean active = true;
 	/** Jetty webapp context associated with this object */
 	private final WebAppContext webAppCtx;
-	/** deployer entity */
-	private final JettyWarDeployer deployer;
+	/** undeployer entity */
+	private final JettyContextUndeployer undeployer;
 	/** context object */
 	private final WarDeploymentContext deploymentContext;
 
 
-	public JettyWarDeployment(JettyWarDeployer jettyWarDeployer, Bundle bundle, WebAppContext wac) {
-		this.deployer = jettyWarDeployer;
+	public JettyWarDeployment(JettyContextUndeployer jettyWarUndeployer, Bundle bundle, WebAppContext wac) {
+		this.undeployer = jettyWarUndeployer;
 		this.webAppCtx = wac;
 
 		// create context
@@ -63,7 +63,7 @@ class JettyWarDeployment implements WarDeployment {
 			return;
 
 		active = false;
-		deployer.stopWebAppContext(webAppCtx);
+		undeployer.undeploy(webAppCtx);
 	}
 
 	// package protected method

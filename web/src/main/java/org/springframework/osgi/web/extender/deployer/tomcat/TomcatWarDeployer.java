@@ -79,7 +79,12 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 		catalinaContext.setReloadable(false);
 
 		// create Tomcat specific deployment
-		TomcatWarDeployment deployment = new TomcatWarDeployment(this, bundle, catalinaContext);
+		TomcatWarDeployment deployment = new TomcatWarDeployment(new TomcatContextUndeployer() {
+
+			public void undeploy(Context catalinaContext) throws OsgiWarDeploymentException {
+				stopCatalinaContext(catalinaContext);
+			}
+		}, bundle, catalinaContext);
 
 		return deployment;
 	}
@@ -122,8 +127,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	 * @param catalinaContext
 	 * @throws OsgiWarDeploymentException
 	 */
-	// package protected method accessible only to the TomcatWarDeployment
-	void stopCatalinaContext(Context catalinaContext) throws OsgiWarDeploymentException {
+	private void stopCatalinaContext(Context catalinaContext) throws OsgiWarDeploymentException {
 		String docBase = catalinaContext.getDocBase();
 		String contextPath = catalinaContext.getPath();
 		String messageEnding = "context [" + contextPath + "] from server " + getServerInfo();
@@ -198,5 +202,4 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	protected String getServerInfo() {
 		return serverService.getInfo();
 	}
-
 }
