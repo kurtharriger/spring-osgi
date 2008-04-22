@@ -1478,7 +1478,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
          The declaration above while valid, creates a dependecy between the <literal>listener</literal> and the importer it is defined upon. 
          In order to create the importer, the <literal>listener</literal> has to be resolved and created but in order to do that, 
          the importer called <literal>service</literal> needs to be retrieved (instantiated and configured). This cycle needs to be broken
-         down so that at least one bean can be fully created and configured. This scenario is supported is supported by Spring-DM
+         down so that at least one bean can be fully created and configured. This scenario is supported by Spring-DM
          for both exporter and importers however, if the listener is defined as a nested bean, the cycle cannot be resolved:</para> 
 
         <programlistingco>

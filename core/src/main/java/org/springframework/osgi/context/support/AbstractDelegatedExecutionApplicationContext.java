@@ -210,6 +210,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// Destroy already created singletons to avoid dangling
 					// resources.
 					beanFactory.destroySingletons();
+					// rethrow exception to the caller
+					throws ex;
 				}
 			}
 		}
@@ -258,6 +260,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 					// resources.
 					getBeanFactory().destroySingletons();
 					logger.error("Post refresh error", ex);
+					// rethrow exception to the caller
 					throw ex;
 				}
 			}
