@@ -5,6 +5,9 @@ http://www.springframework.org/osgi
 Changes in version 1.0.3 (2008-0x-xx)
 -------------------------------------
 
+Package org.springframework.osgi.context
+* AbstractDelegatedExecutionApplicationContext rethrows all exceptions occuring during refresh
+
 
 Changes in version 1.0.2 (2008-03-25)
 -------------------------------------
