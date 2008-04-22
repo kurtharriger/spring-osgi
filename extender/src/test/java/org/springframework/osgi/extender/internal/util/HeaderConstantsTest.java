@@ -18,6 +18,8 @@ package org.springframework.osgi.extender.internal.util;
 import java.util.Dictionary;
 import java.util.Properties;
 
+import org.springframework.osgi.extender.support.internal.ConfigUtils;
+
 import junit.framework.TestCase;
 
 /**

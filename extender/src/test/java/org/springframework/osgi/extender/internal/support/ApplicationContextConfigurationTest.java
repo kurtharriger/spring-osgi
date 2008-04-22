@@ -23,6 +23,7 @@ import java.util.Hashtable;
 import junit.framework.TestCase;
 
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.osgi.extender.support.ApplicationContextConfiguration;
 import org.springframework.osgi.mock.EntryLookupControllingMockBundle;
 
 /**

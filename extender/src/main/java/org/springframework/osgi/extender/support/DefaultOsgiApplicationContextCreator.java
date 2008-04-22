@@ -23,7 +23,6 @@ import org.osgi.framework.BundleContext;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
-import org.springframework.osgi.extender.internal.support.ApplicationContextConfiguration;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**

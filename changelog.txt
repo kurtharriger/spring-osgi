@@ -30,6 +30,7 @@ Package org.springframework.osgi.service
 * refined weaving process for service importers so that knowledge of org.springframework.osgi package is not required
 * fixed potential infrastructure class leak through the thread context class loader management of imported services
 * improved proxy class loader creation by using an internal cache
+* improved thread-safety of the dynamic service collections
 
 Package org.springframework.osgi.extender
 * added OsgiApplicationContextCreator interface for handling the extender contexts creation
@@ -69,6 +70,7 @@ Package org.springframework.osgi.web
 * refined DefaultContextPathStrategy to support folders and encode unsafe characters
 * OsgiBundleXmlWebApplicationContext provides the servlet namespace under 'org.springframework.context.web.namespace'
   property of its OSGi service
+* ApplicationContextConfiguration is now public
 
 Changes in version 1.1.0 M1 (2008-04-07)
 -----------------------------------------

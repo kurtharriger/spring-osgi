@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.collection;
 
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -42,41 +42,60 @@ import java.util.WeakHashMap;
 public class DynamicCollection extends AbstractCollection {
 
 	/**
-	 * Dynamic <strong>consistent</strong> iterator. This class has to be
-	 * thread-safe since a thread might be iterating while the collection is
-	 * being modified.
+	 * Dynamic <strong>consistent</strong> iterator. This iterator is
+	 * not-thread with respect to iteration (it should not be shared against
+	 * multiple threads) but it is thread safe with respect to the backing
+	 * storage which might be modified during the iterator life cycle.
 	 * 
 	 * @author Costin Leau
-	 * 
 	 */
 	protected class DynamicIterator implements Iterator {
+
 		/**
-		 * cursor pointing to the element that has to be returned by
-		 * {@link #next()} method.
+		 * Cursor pointing to the element that has to be returned by
+		 * {@link #next()} method. This element needs to be synchronized.
 		 */
 		protected volatile int cursor = 0;
 
 		/**
 		 * Lock protecting the cursor which might be affected by the backing
 		 * collection shrinking.
-		 * 
-		 * (not used at the moment)
 		 */
 		protected final Object lock = new Object();
 
+		/**
+		 * Iterator variable - not thread-safe since only one thread should use
+		 * the iterator.
+		 */
 		protected boolean removalAllowed = false;
 
 		// flag for enforcing the iterator consistency:
 		// null - do not enforce anything
 		// true - should not throw exception
 		// false - should throw exception
+		/**
+		 * Iterator variable - not thread-safe since only one thread should use
+		 * the iterator.
+		 */
 		protected Boolean hasNext = null;
 
-		public boolean hasNext() {
-			synchronized (iteratorsLock) {
-				hasNext = (cursor < storage.size() ? Boolean.TRUE : Boolean.FALSE);
-			}
 
+		public boolean hasNext() {
+			synchronized (storage) {
+				synchronized (iteratorsLock) {
+					return unsafeHasNext();
+				}
+			}
+		}
+
+		/**
+		 * Internal unprotected method to avoid nested synchronization blocks.
+		 * To execute this code, one needs both the storage and iteratorsLock.
+		 * 
+		 * @return
+		 */
+		protected boolean unsafeHasNext() {
+			hasNext = (cursor < storage.size() ? Boolean.TRUE : Boolean.FALSE);
 			return hasNext.booleanValue();
 		}
 
@@ -85,17 +104,21 @@ public class DynamicCollection extends AbstractCollection {
 				removalAllowed = true;
 				// no enforcement
 				if (hasNext == null) {
-					if (hasNext())
+					synchronized (storage) {
 						synchronized (iteratorsLock) {
-							return storage.get(cursor++);
+							if (unsafeHasNext())
+								return storage.get(cursor++);
+							else
+								throw new NoSuchElementException();
 						}
-					else
-						throw new NoSuchElementException();
+					}
 				}
 				else if (hasNext.booleanValue()) {
-					synchronized (iteratorsLock) {
-						if (hasNext())
-							return storage.get(cursor++);
+					synchronized (storage) {
+						synchronized (iteratorsLock) {
+							if (unsafeHasNext())
+								return storage.get(cursor++);
+						}
 					}
 					return null;
 				}
@@ -114,22 +137,24 @@ public class DynamicCollection extends AbstractCollection {
 		public void remove() {
 			// make sure the cursor is valid
 			if (removalAllowed) {
+				DynamicCollection.this.remove(cursor - 1);
 				removalAllowed = false;
-				// delete the cursor update to the main remove method
-				synchronized (iteratorsLock) {
-					DynamicCollection.this.remove(cursor - 1);
-				}
 			}
 			else
 				throw new IllegalStateException();
 		}
-
 	}
 
+
 	/** Lock used by operations that require iterator updates (such as removal) */
+	/**
+	 * If it interacts with the storage, the *storage* lock needs to be acquired
+	 * first
+	 */
 	protected final Object iteratorsLock = new Object();
 
-	/** actual collection storage * */
+	/** actual collection storage */
+	/** this list is not-synchronized by default */
 	protected final List storage;
 
 	/** map of weak references to the list iterators */
@@ -139,12 +164,13 @@ public class DynamicCollection extends AbstractCollection {
 	 */
 	protected final Map iterators;
 
+
 	public DynamicCollection() {
 		this(16);
 	}
 
 	public DynamicCollection(int size) {
-		storage = Collections.synchronizedList(new ArrayList(size));
+		storage = new ArrayList(size);
 		iterators = new WeakHashMap(4);
 	}
 
@@ -163,33 +189,46 @@ public class DynamicCollection extends AbstractCollection {
 		return iter;
 	}
 
-	
 	public void clear() {
-		storage.clear();
+		synchronized (storage) {
+			storage.clear();
+		}
 	}
 
 	public int size() {
-		return storage.size();
+		synchronized (storage) {
+			return storage.size();
+		}
 	}
 
 	public boolean add(Object o) {
-		return storage.add(o);
+		synchronized (storage) {
+			return storage.add(o);
+		}
 	}
 
 	public boolean addAll(Collection c) {
-		return storage.addAll(c);
+		synchronized (storage) {
+			return storage.addAll(c);
+		}
 	}
 
 	public boolean contains(Object o) {
-		return storage.contains(o);
+		synchronized (storage) {
+			return storage.contains(o);
+		}
 	}
 
 	public boolean containsAll(Collection c) {
-		return storage.containsAll(c);
+		synchronized (storage) {
+			return storage.containsAll(c);
+		}
 	}
 
 	public boolean isEmpty() {
-		return storage.isEmpty();
+		synchronized (storage) {
+			return storage.isEmpty();
+		}
 	}
 
 	public boolean remove(Object o) {
@@ -210,20 +249,23 @@ public class DynamicCollection extends AbstractCollection {
 	protected Object remove(int index) {
 		Object o = null;
 
-		// first aquire iterators lock
-		synchronized (iteratorsLock) {
+		// first acquire storage lock
+		synchronized (storage) {
+			// then the iterator
+			synchronized (iteratorsLock) {
 
-			// update storage
-			o = storage.remove(index);
+				// update storage
+				o = storage.remove(index);
 
-			// update iterators
+				// update iterators
 
-			for (Iterator iter = iterators.entrySet().iterator(); iter.hasNext();) {
-				Map.Entry entry = (Map.Entry) iter.next();
-				DynamicIterator dynamicIterator = (DynamicIterator) entry.getKey();
+				for (Iterator iter = iterators.entrySet().iterator(); iter.hasNext();) {
+					Map.Entry entry = (Map.Entry) iter.next();
+					DynamicIterator dynamicIterator = (DynamicIterator) entry.getKey();
 
-				if (index < dynamicIterator.cursor)
-					dynamicIterator.cursor--;
+					if (index < dynamicIterator.cursor)
+						dynamicIterator.cursor--;
+				}
 			}
 		}
 
@@ -237,33 +279,39 @@ public class DynamicCollection extends AbstractCollection {
 		// update iterators (since items are not added at the end
 		// anymore)
 
-		synchronized (iteratorsLock) {
+		// first acquire storage lock
+		synchronized (storage) {
+			synchronized (iteratorsLock) {
+				// update storage
+				storage.add(index, o);
 
-			// update storage
+				for (Iterator iter = iterators.entrySet().iterator(); iter.hasNext();) {
+					Map.Entry entry = (Map.Entry) iter.next();
+					DynamicIterator dynamicIterator = (DynamicIterator) entry.getKey();
 
-			storage.add(index, o);
-
-			for (Iterator iter = iterators.entrySet().iterator(); iter.hasNext();) {
-				Map.Entry entry = (Map.Entry) iter.next();
-				DynamicIterator dynamicIterator = (DynamicIterator) entry.getKey();
-
-				if (index < dynamicIterator.cursor)
-					dynamicIterator.cursor++;
+					if (index < dynamicIterator.cursor)
+						dynamicIterator.cursor++;
+				}
 			}
-
 		}
 	}
 
 	public Object[] toArray() {
-		return storage.toArray();
+		synchronized (storage) {
+			return storage.toArray();
+		}
 	}
 
 	public Object[] toArray(Object[] array) {
-		return storage.toArray(array);
+		synchronized (storage) {
+			return storage.toArray(array);
+		}
 	}
 
 	public String toString() {
-		return storage.toString();
+		synchronized (storage) {
+			return storage.toString();
+		}
 	}
 
 	/**
@@ -274,7 +322,9 @@ public class DynamicCollection extends AbstractCollection {
 	 * @return
 	 */
 	protected int indexOf(Object o) {
-		return storage.indexOf(o);
+		synchronized (storage) {
+			return storage.indexOf(o);
+		}
 	}
 
 }

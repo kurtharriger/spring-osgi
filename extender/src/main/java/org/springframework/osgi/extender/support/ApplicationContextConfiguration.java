@@ -16,27 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.springframework.osgi.extender.internal.support;
+
+package org.springframework.osgi.extender.support;
 
 import java.util.Dictionary;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.extender.internal.util.ConfigUtils;
+import org.springframework.osgi.extender.support.internal.ConfigUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Determine the configuration information needed to construct an application
- * context for a given bundle. Reads all the options present in the bundle
- * header.
+ * Configuration class for Spring-DM application contexts.
+ * 
+ * Determines the configuration information available in a bundle for
+ * constructing an application context. Reads all the Spring-DM options present
+ * in the bundle header.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
  */
 public class ApplicationContextConfiguration {
+
+	/** logger */
+	private static final Log log = LogFactory.getLog(ApplicationContextConfiguration.class);
 
 	private final Bundle bundle;
 
@@ -54,10 +60,16 @@ public class ApplicationContextConfiguration {
 
 	private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT * 1000;
 
-	private static final Log log = LogFactory.getLog(ApplicationContextConfiguration.class);
 
-	public ApplicationContextConfiguration(Bundle forBundle) {
-		this.bundle = forBundle;
+	/**
+	 * Constructs a new <code>ApplicationContextConfiguration</code> instance
+	 * from the given bundle.
+	 * 
+	 * @param bundle bundle for which the application context configuration is
+	 * created
+	 */
+	public ApplicationContextConfiguration(Bundle bundle) {
+		this.bundle = bundle;
 		initialise();
 		// create toString
 		StringBuffer buf = new StringBuffer();
@@ -75,30 +87,36 @@ public class ApplicationContextConfiguration {
 		buf.append(timeout / 1000);
 		buf.append("s");
 		toString = buf.toString();
-		if (log.isDebugEnabled()) {
-			log.debug("configuration: " + toString);
+		if (log.isTraceEnabled()) {
+			log.trace("Configuration: " + toString);
 		}
 	}
 
 	/**
+	 * Indicates if the given bundle is "Spring-Powered" or not.
+	 * 
 	 * True if this bundle has at least one defined application context
 	 * configuration file.
 	 * 
-	 * A bundle is "Spring-Powered" if it has at least one configuration file.
+	 * <p/> A bundle is "Spring-Powered" if it has at least one configuration
+	 * file.
 	 */
 	public boolean isSpringPoweredBundle() {
 		return this.isSpringPoweredBundle;
 	}
 
 	/**
-	 * How long (in miliseconds) should the application context wait for
-	 * dependent services to be satisfied on context creation?
+	 * Returns the timeout (in milliseconds) an application context needs to
+	 * wait for mandatory dependent services.
 	 */
 	public long getTimeout() {
 		return this.timeout;
 	}
 
 	/**
+	 * Indicates if an application context needs to be created asynchronously or
+	 * not.
+	 * 
 	 * Should the application context wait for all non-optional service
 	 * references to be satisfied before starting?
 	 */
@@ -107,6 +125,9 @@ public class ApplicationContextConfiguration {
 	}
 
 	/**
+	 * Indicates if the application context needs to be published as a service
+	 * or not.
+	 * 
 	 * @return Returns the publishContextAsService.
 	 */
 	public boolean isPublishContextAsService() {
@@ -114,7 +135,7 @@ public class ApplicationContextConfiguration {
 	}
 
 	/**
-	 * Will this configuration wait for dependencies.
+	 * Indicates if the configuration must wait for dependencies.
 	 * 
 	 * @return true if the configuration indicates that dependencies should be
 	 * waited for.
@@ -124,9 +145,10 @@ public class ApplicationContextConfiguration {
 	}
 
 	/**
-	 * The locations of the configuration files used to build the application
-	 * context (as Spring resource paths).
-	 * @return
+	 * Returns the locations of the configuration resources used to build the
+	 * application context (as Spring resource paths).
+	 * 
+	 * @return configuration paths
 	 */
 	public String[] getConfigurationLocations() {
 		return this.configurationLocations;

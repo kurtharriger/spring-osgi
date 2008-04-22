@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.collection;
 
 import java.util.Collection;
@@ -33,6 +34,7 @@ import org.springframework.util.Assert;
 public class DynamicSortedSet extends DynamicSet implements SortedSet {
 
 	private final Comparator comparator;
+
 
 	public DynamicSortedSet() {
 		this((Comparator) null);
@@ -71,19 +73,16 @@ public class DynamicSortedSet extends DynamicSet implements SortedSet {
 
 		int index = 0;
 
-		// TODO: Is this dangerous (we are holding two locks) ?
-		synchronized (iteratorsLock) {
-			synchronized (storage) {
-				index = Collections.binarySearch(storage, o, comparator);
-				// duplicate found; bail out
-				if (index >= 0)
-					return false;
+		synchronized (storage) {
+			index = Collections.binarySearch(storage, o, comparator);
+			// duplicate found; bail out
+			if (index >= 0)
+				return false;
 
-				// translate index
-				index = -index - 1;
+			// translate index
+			index = -index - 1;
 
-				super.add(index, o);
-			}
+			super.add(index, o);
 		}
 
 		return true;

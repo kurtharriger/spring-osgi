@@ -105,12 +105,13 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 	}
 
 	private boolean isCloverEnabled() {
-		return (System.getProperty(CLOVER_PROPERTY) != null);
+		return Boolean.getBoolean(CLOVER_PROPERTY);
 	}
 
 	protected String[] getTestFrameworkBundlesNames() {
 		String[] names = super.getTestFrameworkBundlesNames();
 		if (isCloverEnabled()) {
+			logger.warn("Clover instrumentation enabled");
 			return (String[]) ObjectUtils.addObjectToArray(names, "org.springframework.iandt,clover.bundle,"
 					+ getSpringDMVersion());
 		}
