@@ -42,15 +42,11 @@
 	<spring.osgi.import.pkg>
 		org.apache.commons.logging*,
 		javax.servlet,
-		org.springframework.osgi.service.importer,
-		org.springframework.aop.framework,
-		org.osgi.service.cm;version=1.2;resolution:=optional,
-		org.mortbay.jetty*;version=${jetty.osgi.version};resolution:=optional,
+		org.mortbay*;version=${jetty.osgi.version};resolution:=optional,
 		org.apache.catalina*;version=${catalina.osgi.version};resolution:=optional,
-		org.w3c.dom;resolution:=optional,
-		org.xml.sax;resolution:=optional,
 		org.apache.jasper;resolution:=optional,
 		org.apache.jasper.servlet;resolution:=optional,
+		org.osgi.service.packageadmin;version=1.2;resolution:=optional,
 		*;resolution:=optional
 	</spring.osgi.import.pkg>
 	

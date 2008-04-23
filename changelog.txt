@@ -72,6 +72,8 @@ Package org.springframework.osgi.web
 * refined DefaultContextPathStrategy to support folders and encode unsafe characters
 * OsgiBundleXmlWebApplicationContext provides the servlet namespace under 'org.springframework.context.web.namespace'
   property of its OSGi service
+* TomcatWarDeployer Service object can be set directly by the user
+* JettyWarDeployer Server object can be set directly by the user
 
 Package org.springframework.osgi.web.extender
 * changed package of the internal, private bundle activator
