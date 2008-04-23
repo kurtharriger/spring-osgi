@@ -52,7 +52,7 @@ public abstract class TestUtils {
 		return fld[0];
 	}
 
-	public static Object invokeMethod(final Object target, String methodName, Object[] args) {
+	private static Object invokeMethod(final Object target, final Class targetClass, String methodName, Object[] args) {
 		Class[] types = null;
 		if (ObjectUtils.isEmpty(args)) {
 			types = new Class[0];
@@ -64,25 +64,16 @@ public abstract class TestUtils {
 			}
 		}
 
-		Method method = ReflectionUtils.findMethod(target.getClass(), methodName, types);
+		Method method = ReflectionUtils.findMethod(targetClass, methodName, types);
 		ReflectionUtils.makeAccessible(method);
 		return ReflectionUtils.invokeMethod(method, target, args);
 	}
 
-	public static Object invokeStaticMethod(final Class target, String methodName, Object[] args) {
-		Class[] types = null;
-		if (ObjectUtils.isEmpty(args)) {
-			types = new Class[0];
-		}
-		else {
-			types = new Class[args.length];
-			for (int objectIndex = 0; objectIndex < args.length; objectIndex++) {
-				types[objectIndex] = args[objectIndex].getClass();
-			}
-		}
+	public static Object invokeMethod(final Object target, String methodName, Object[] args) {
+		return invokeMethod(target, target.getClass(), methodName, args);
+	}
 
-		Method method = ReflectionUtils.findMethod(target, methodName, types);
-		ReflectionUtils.makeAccessible(method);
-		return ReflectionUtils.invokeMethod(method, null, args);
+	public static Object invokeStaticMethod(final Class target, String methodName, Object[] args) {
+		return invokeMethod(null, target, methodName, args);
 	}
 }

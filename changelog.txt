@@ -58,7 +58,7 @@ Package org.springframework.osgi.test
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader constructor visibility changed from private to protected
 * fixed sporadic exception occuring in DebugUtils when analyzing class loading errors
-* fixed problem in DebugUtils regarding packages with version ranges
+* fixed parsing exception in DebugUtils when dealing with version ranges
 
 Package org.springframework.osgi.web
 * added OsgiWarDeploymentException to the deployment interfaces
