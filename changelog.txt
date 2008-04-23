@@ -7,6 +7,7 @@ Changes in version 1.1.0 M2 (2008-04-dd)
 
 General
 * refined the web deployer API
+* split web functionality into web and web-extender bundle
 * added integration with Spring MVC
 * added 'greedy-proxying' attribute to reference collections (spring-osgi.xsd)
 * reduced the number of class loader instances generated internally by Spring-DM
@@ -40,6 +41,7 @@ Package org.springframework.osgi.extender
 * added filtering by type for the discovered namespace handler resolvers to avoid usage of classes with incompatible
   wiring
 * improved listener list creation by reusing the extender bundle class loader
+* ApplicationContextConfiguration is now public
 
 Package org.springframework.osgi.io
 * extended OsgiBundleResource to implement ContextResource
@@ -58,7 +60,6 @@ Package org.springframework.osgi.util
 * fixed sporadic exception occuring in DebugUtils when analyzing class loading errors
 
 Package org.springframework.osgi.web
-* changed package of the internal, private bundle activator
 * added OsgiWarDeploymentException to the deployment interfaces
 * added WarDeployment for bundles deployed by the WarDeployer
 * added WarDeploymentContext for accessing the properties associated with a war deployment and the associated
@@ -71,7 +72,10 @@ Package org.springframework.osgi.web
 * refined DefaultContextPathStrategy to support folders and encode unsafe characters
 * OsgiBundleXmlWebApplicationContext provides the servlet namespace under 'org.springframework.context.web.namespace'
   property of its OSGi service
-* ApplicationContextConfiguration is now public
+
+Package org.springframework.osgi.web.extender
+* changed package of the internal, private bundle activator
+
 
 Changes in version 1.1.0 M1 (2008-04-07)
 -----------------------------------------

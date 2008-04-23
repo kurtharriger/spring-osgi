@@ -219,6 +219,7 @@ limitations under the License.
     <module>extender</module>
     <module>test-support</module>
     <module>web</module>
+    <module>web-extender</module>
     <module>bundle-archetype</module>
     <!-- unused at the moment
     <module>release</module>

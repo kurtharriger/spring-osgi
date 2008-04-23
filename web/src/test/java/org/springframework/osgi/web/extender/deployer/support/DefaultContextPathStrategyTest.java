@@ -25,7 +25,8 @@ import junit.framework.TestCase;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.springframework.osgi.mock.MockBundle;
-import org.springframework.osgi.web.extender.deployer.ContextPathStrategy;
+import org.springframework.osgi.web.deployer.ContextPathStrategy;
+import org.springframework.osgi.web.deployer.support.DefaultContextPathStrategy;
 
 /**
  * 

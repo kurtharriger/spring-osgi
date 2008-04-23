@@ -29,7 +29,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.io.OsgiBundleResourceLoader;
-import org.springframework.osgi.web.extender.deployer.WarDeploymentContext;
 import org.springframework.ui.context.Theme;
 import org.springframework.ui.context.ThemeSource;
 import org.springframework.ui.context.support.UiApplicationContextUtils;
@@ -47,17 +46,15 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
  * OSGi variant for {@link XmlWebApplicationContext}. The implementation
  * mandates that the OSGi bundle context is either set ({@link #setBundleContext(BundleContext)}
  * before setting the ServletContext or that the given ServletContext contains
- * the BundleContext as an attribute under
- * {@link WarDeploymentContext#OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE}.
+ * the BundleContext as an attribute under {@link #BUNDLE_CONTEXT_ATTRIBUTE} (<code>org.springframework.osgi.web.org.osgi.framework.BundleContext</code>).
  * 
  * <p/> Additionally, this implementation replaces the {@link ServletContext}
  * resource loading with an OSGi specific loader which provides equivalent
  * functionality.
  * 
  * <p/>The OSGi service published for this application context contains the
- * namespace under <code>org.springframework.context.web.namespace</code>
- * property.
- * 
+ * namespace property under
+ * <code>org.springframework.web.context.namespace</code> property.
  * 
  * @see XmlWebApplicationContext
  * @see OsgiBundleResourceLoader
@@ -69,7 +66,11 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 		ConfigurableWebApplicationContext, ThemeSource {
 
 	/** service entry used for storing the namespace associated with this context */
-	private static final String APPLICATION_CONTEXT_SERVICE_NAMESPACE_PROPERTY = "org.springframework.context.web.namespace";
+	private static final String APPLICATION_CONTEXT_SERVICE_NAMESPACE_PROPERTY = "org.springframework.web.context.namespace";
+
+	/** ServletContext attribute for retrieving the bundle context */
+	public static final String BUNDLE_CONTEXT_ATTRIBUTE = "org.springframework.osgi.web."
+			+ BundleContext.class.getName();
 
 	/** Servlet context that this context runs in */
 	private ServletContext servletContext;
@@ -92,7 +93,7 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 	 * {@inheritDoc}
 	 * 
 	 * Additionally, if the {@link BundleContext} is not set, it is looked up
-	 * under {@link WarDeploymentContext #OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE}.
+	 * under {@link #BUNDLE_CONTEXT_ATTRIBUTE}.
 	 */
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
@@ -102,12 +103,12 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 
 			// try to locate the bundleContext in the ServletContext
 			if (servletContext != null) {
-				Object context = servletContext.getAttribute(WarDeploymentContext.OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE);
+				Object context = servletContext.getAttribute(BUNDLE_CONTEXT_ATTRIBUTE);
 
 				if (context != null) {
 					Assert.isInstanceOf(BundleContext.class, context);
 					logger.debug("Using the bundle context located in the servlet context at "
-							+ WarDeploymentContext.OSGI_BUNDLE_CONTEXT_CONTEXT_ATTRIBUTE);
+							+ BUNDLE_CONTEXT_ATTRIBUTE);
 					setBundleContext((BundleContext) context);
 				}
 			}

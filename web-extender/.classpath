@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
+	<classpathentry exported="true" kind="lib" path="target/classes" sourcepath="src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/easymock/easymock/1.2_Java1.3/easymock-1.2_Java1.3.jar"/>
+	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/1.1.0-m2-SNAPSHOT/spring-osgi-mock-1.1.0-m2-SNAPSHOT.jar" sourcepath="/OSGI_MOCK"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.2/spring-core-2.5.2.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.2/spring-beans-2.5.2.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/2.5.2/spring-aop-2.5.2.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.2/spring-context-2.5.2.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/aopalliance.osgi/1.0-SNAPSHOT/aopalliance.osgi-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/sf/retrotranslator/retrotranslator-runtime/1.2.3/retrotranslator-runtime-1.2.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-test/2.5.2/spring-test-2.5.2.jar" sourcepath="/SPRING_MOCK_SRC"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/jetty/6.1.9/jetty-6.1.9.jar" sourcepath="/JETTY_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/jetty-util/6.1.9/jetty-util-6.1.9.jar" sourcepath="/JETTY_UTIL_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.1.0-m2-SNAPSHOT/spring-osgi-core-1.1.0-m2-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-web/2.5.2/spring-web-2.5.2.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-webmvc/2.5.2/spring-webmvc-2.5.2.jar" sourcepath="/SPRING_MVC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/catalina.osgi/5.5.23-SNAPSHOT/catalina.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/CATALINA_5.5.X"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/servlet-api.osgi/2.5-SNAPSHOT/servlet-api.osgi-2.5-SNAPSHOT.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-web"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
