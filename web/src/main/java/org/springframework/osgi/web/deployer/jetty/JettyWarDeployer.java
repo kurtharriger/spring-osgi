@@ -40,10 +40,11 @@ import org.springframework.util.Assert;
  * Unpacks the given bundle into a temporary folder which is then used for
  * deploying the war into the web container. While the bundle could be used in
  * packed formed by Jetty, for performance reasons and JSP support (through
- * Jasper) an unpack, file-system based format is required.
+ * Jasper) an unpack, file-system based format is required (thus the unpacking).
  * 
- * <p/>The deployer expects the Jetty instance to be published as an OSGi
- * service under {@link Server} class.
+ * <p/>The deployer works with a {@link Server} instance which can be either
+ * configured by the user ({@link #setServer(Object)} or detected automatically
+ * by the deployer.
  * 
  * @see WebAppContext
  * 
@@ -64,9 +65,37 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	private Server serverService;
 
 
+	/**
+	 * Sets the Jetty Server used by this deployer. If none is set (the
+	 * default), the deployer will look for an OSGi service, matching the
+	 * {@link Server} interface (using a timeout of 5 seconds).
+	 * 
+	 * <p/> To avoid the dependencies on Jetty classes in its signature, this
+	 * setter accepts a plain Object that is checked and casted internally.
+	 * 
+	 * @param server Jetty server (normally a Spring-DM OSGi service reference)
+	 */
+	public void setServer(Object server) {
+		if (server != null) {
+			Assert.isInstanceOf(Server.class, server, "Invalid Jetty Server given:");
+			this.serverService = (Server) server;
+		}
+	}
+
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		serverService = (Server) Utils.createServerServiceProxy(getBundleContext(), Server.class, "jetty-server");
+
+		if (serverService == null) {
+			log.info("No Jetty Server set; looking for one in the OSGi service registry...");
+			try {
+				serverService = (Server) Utils.createServerServiceProxy(getBundleContext(), Server.class, null);
+				log.info("Found service " + serverService);
+			}
+			catch (RuntimeException ex) {
+				log.error("No Jetty Server found, bailing out", ex);
+				throw ex;
+			}
+		}
 	}
 
 	/**

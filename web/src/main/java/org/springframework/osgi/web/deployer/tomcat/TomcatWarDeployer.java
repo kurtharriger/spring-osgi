@@ -23,7 +23,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Loader;
-import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardService;
@@ -43,15 +42,15 @@ import org.springframework.util.ObjectUtils;
  * war deployer. Unpacks the given bundle into a temporary folder which is then
  * used for deploying the war into the web container.
  * 
- * <p/>The deployer works with {@link Server} instance which should contain the
- * {@link Host} and at least one {@link org.apache.catalina.connector.Connector}.
- * It is up to the server starter to decide whether an
- * {@link org.apache.catalina.startup.Embedded} instance is used or whether
- * {@link org.apache.catalina.startup.Catalina} will be used instead.
+ * <p/>The deployer works with a {@link Service} instance which should contain
+ * the {@link Host} and at least one
+ * {@link org.apache.catalina.connector.Connector}. The service can be either
+ * configured by the user ({@link #setService(Object)} or detected
+ * automatically by the deployer.
  * 
- * <p/>Additionally, this deployer expects the <em>traditional</em>
- * configuration with one {@link org.apache.catalina.Engine} and one
- * {@link Host} configured for the Tomcat {@link Service}.
+ * <p/>Note: It is up to the Catalina Service provider to decide whether an
+ * {@link org.apache.catalina.startup.Embedded} instance is used or whether a
+ * {@link org.apache.catalina.startup.Catalina} object will be used instead.
  * 
  * @see Context
  * @see Container
@@ -62,12 +61,40 @@ import org.springframework.util.ObjectUtils;
 public class TomcatWarDeployer extends AbstractWarDeployer {
 
 	/** Catalina OSGi service */
-	private Service serverService;
+	private Service service;
 
+
+	/**
+	 * Sets the Tomcat Service used by this deployer. If none is set (the
+	 * default), the deployer will look for an OSGi service, matching the
+	 * {@link Service} interface (using a timeout of 5 seconds).
+	 * 
+	 * <p/> To avoid the dependencies on Tomcat classes in its signature, this
+	 * setter accepts a plain Object that is checked and casted internally.
+	 * 
+	 * @param service Tomcat service (normally a Spring-DM OSGi service
+	 * reference)
+	 */
+	public void setService(Object service) {
+		if (service != null) {
+			Assert.isInstanceOf(Service.class, service, "Invalid Catalina Service given:");
+			this.service = (Service) service;
+		}
+	}
 
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		serverService = (Service) Utils.createServerServiceProxy(getBundleContext(), Service.class, "tomcat-server");
+		if (service == null) {
+			log.info("No Catalina Service set; looking for one in the OSGi service registry...");
+			try {
+				service = (Service) Utils.createServerServiceProxy(getBundleContext(), Service.class, null);
+				log.info("Found service " + service.getName());
+			}
+			catch (RuntimeException ex) {
+				log.error("No Catalina Service found, bailing out", ex);
+				throw ex;
+			}
+		}
 	}
 
 	protected WarDeployment createDeployment(Bundle bundle, String contextPath) throws Exception {
@@ -186,7 +213,7 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 
 	private Container getHost() {
 		// get engine
-		Container container = serverService.getContainer();
+		Container container = service.getContainer();
 
 		if (container == null)
 			throw new IllegalStateException("The Tomcat server doesn't have any Engines defined");
@@ -200,6 +227,6 @@ public class TomcatWarDeployer extends AbstractWarDeployer {
 	}
 
 	protected String getServerInfo() {
-		return serverService.getInfo();
+		return service.getInfo();
 	}
 }
