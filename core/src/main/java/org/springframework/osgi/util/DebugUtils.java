@@ -48,6 +48,12 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class DebugUtils {
 
+	private static final String EQUALS = "=";
+	private static final String DOUBLE_QUOTE = "\"";
+	private static final String SEMI_COLON = ";";
+	private static final String COMMA = ",";
+
+	
 	/** use degradable logger */
 	private static final Log log = LogUtils.createLogger(DebugUtils.class);
 
