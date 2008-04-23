@@ -317,7 +317,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * 
 	 * <p/>The default implementation stores the bundle symbolic name under
 	 * {@link Constants#BUNDLE_SYMBOLICNAME} and
-	 * {@link ConfigurableOsgiBundleApplicationContex#APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME}
+	 * {@link ConfigurableOsgiBundleApplicationContext#APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME}
 	 * and the bundle version under {@link Constants#BUNDLE_VERSION} property.
 	 * 
 	 * Can be overridden by subclasses to add more properties if needed (for

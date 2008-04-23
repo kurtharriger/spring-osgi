@@ -36,7 +36,7 @@
   	<spring.osgi.private.pkg>
 		org.springframework.osgi.test.internal.util.jar*,
 		org.springframework.osgi.io.internal*,
-		org.springframework.osgi.web.extender.*internal*,
+		org.springframework.osgi.web.*internal*
 	</spring.osgi.private.pkg>
 
 	<spring.osgi.import.pkg>

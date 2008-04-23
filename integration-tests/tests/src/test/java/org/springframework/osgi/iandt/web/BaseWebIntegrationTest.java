@@ -69,12 +69,13 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		col.add("org.springframework.osgi, catalina.start.osgi, 1.0-SNAPSHOT");
 
 		// jetty starter
-//		col.add("org.springframework.osgi, jetty.start.osgi, 6.1.9-SNAPSHOT");
-//		col.add("org.springframework.osgi, jetty.etc.osgi, 6.1.9-SNAPSHOT");
-//		col.add("org.springframework.osgi, jetty.web.fragment.osgi, 1.0-SNAPSHOT");
+		//		col.add("org.springframework.osgi, jetty.start.osgi, 6.1.9-SNAPSHOT");
+		//		col.add("org.springframework.osgi, jetty.etc.osgi, 6.1.9-SNAPSHOT");
+		//		col.add("org.springframework.osgi, jetty.web.fragment.osgi, 1.0-SNAPSHOT");
 
 		// Spring DM web extender
 		col.add("org.springframework.osgi, spring-osgi-web," + getSpringDMVersion());
+		col.add("org.springframework.osgi, spring-osgi-web-extender," + getSpringDMVersion());
 		col.add("org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT");
 
 		return (String[]) col.toArray(new String[col.size()]);
