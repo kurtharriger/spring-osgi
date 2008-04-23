@@ -48,6 +48,10 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class DebugUtils {
 
+	private static final String EQUALS = "=";
+	private static final String DOUBLE_QUOTE = "\"";
+	private static final String SEMI_COLON = ";";
+	private static final String COMMA = ",";
 	/** use degradable logger */
 	private static final Log log = LogUtils.createLogger(DebugUtils.class);
 
@@ -303,15 +307,15 @@ public abstract class DebugUtils {
 		// Check for dynamic imports
 		String dynimports = (String) dict.get(Constants.DYNAMICIMPORT_PACKAGE);
 		if (dynimports != null) {
-			for (StringTokenizer strok = new StringTokenizer(dynimports, ","); strok.hasMoreTokens();) {
-				StringTokenizer parts = new StringTokenizer(strok.nextToken(), ";");
+			for (StringTokenizer strok = new StringTokenizer(dynimports, COMMA); strok.hasMoreTokens();) {
+				StringTokenizer parts = new StringTokenizer(strok.nextToken(), SEMI_COLON);
 				String pkg = parts.nextToken().trim();
 				if (pkg.endsWith(".*") && packageName.startsWith(pkg.substring(0, pkg.length() - 2)) || pkg.equals("*")) {
 					Version version = Version.emptyVersion;
 					for (; parts.hasMoreTokens();) {
 						String modifier = parts.nextToken().trim();
 						if (modifier.startsWith("version")) {
-							version = Version.parseVersion(modifier.substring(modifier.indexOf("=") + 1).trim());
+							version = Version.parseVersion(modifier.substring(modifier.indexOf(EQUALS) + 1).trim());
 						}
 					}
 					return version;
@@ -335,20 +339,39 @@ public abstract class DebugUtils {
 	 */
 	private static Version getVersion(String stmt, String packageName) {
 		if (stmt != null) {
-			for (StringTokenizer strok = new StringTokenizer(stmt, ","); strok.hasMoreTokens();) {
-				StringTokenizer parts = new StringTokenizer(strok.nextToken(), ";");
-				String pkg = parts.nextToken().trim();
+			String[] pkgTokens = stmt.split(COMMA);
+			for (int pkgTokenIndex = 0; pkgTokenIndex < pkgTokens.length; pkgTokenIndex++) {
+				String pkgToken = pkgTokens[pkgTokenIndex].trim();
+				String pkg = null;
+				Version version = null;
+				// extract package first (incorrect, this needs to be changed)
+				int firstDirectiveIndex = pkgToken.indexOf(SEMI_COLON);
+				if (firstDirectiveIndex > -1) {
+					pkg = pkgToken.substring(0, firstDirectiveIndex);
+				}
+				else {
+					pkg = pkgToken;
+					version = Version.emptyVersion;
+				}
+
+				// check for version only if we have a match
 				if (pkg.equals(packageName)) {
-					Version version = Version.emptyVersion;
-					for (; parts.hasMoreTokens();) {
-						String modifier = parts.nextToken().trim();
-						if (modifier.startsWith("version")) {
-							String vstr = modifier.substring(modifier.indexOf("=") + 1).trim();
-							if (vstr.startsWith("\""))
-								vstr = vstr.substring(1);
-							if (vstr.endsWith("\""))
-								vstr = vstr.substring(0, vstr.length() - 1);
-							version = Version.parseVersion(vstr);
+					// no version determined, find one
+					if (version == null) {
+						String[] directiveTokens = pkgToken.substring(firstDirectiveIndex + 1).split(SEMI_COLON);
+						for (int directiveTokenIndex = 0; directiveTokenIndex < directiveTokens.length; directiveTokenIndex++) {
+							String directive = directiveTokens[directiveTokenIndex].trim();
+							// found it
+							if (directive.startsWith(Constants.VERSION_ATTRIBUTE)) {
+								String value = directive.substring(directive.indexOf(EQUALS) + 1).trim();
+								if (value.startsWith("\"[") || value.startsWith("\"(")) {
+									value = value.substring(2);
+								}
+								version = Version.parseVersion(value);
+							}
+						}
+						if (version == null) {
+							version = Version.emptyVersion;
 						}
 					}
 					return version;
