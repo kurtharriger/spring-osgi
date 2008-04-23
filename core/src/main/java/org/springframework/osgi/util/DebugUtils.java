@@ -330,20 +330,39 @@ public abstract class DebugUtils {
 	 */
 	private static Version getVersion(String stmt, String packageName) {
 		if (stmt != null) {
-			for (StringTokenizer strok = new StringTokenizer(stmt, ","); strok.hasMoreTokens();) {
-				StringTokenizer parts = new StringTokenizer(strok.nextToken(), ";");
-				String pkg = parts.nextToken().trim();
+			String[] pkgTokens = stmt.split(COMMA);
+			for (int pkgTokenIndex = 0; pkgTokenIndex < pkgTokens.length; pkgTokenIndex++) {
+				String pkgToken = pkgTokens[pkgTokenIndex].trim();
+				String pkg = null;
+				Version version = null;
+				// extract package first (incorrect, this needs to be changed)
+				int firstDirectiveIndex = pkgToken.indexOf(SEMI_COLON);
+				if (firstDirectiveIndex > -1) {
+					pkg = pkgToken.substring(0, firstDirectiveIndex);
+				}
+				else {
+					pkg = pkgToken;
+					version = Version.emptyVersion;
+				}
+
+				// check for version only if we have a match
 				if (pkg.equals(packageName)) {
-					Version version = Version.emptyVersion;
-					for (; parts.hasMoreTokens();) {
-						String modifier = parts.nextToken().trim();
-						if (modifier.startsWith("version")) {
-							String vstr = modifier.substring(modifier.indexOf("=") + 1).trim();
-							if (vstr.startsWith("\""))
-								vstr = vstr.substring(1);
-							if (vstr.endsWith("\""))
-								vstr = vstr.substring(0, vstr.length() - 1);
-							version = Version.parseVersion(vstr);
+					// no version determined, find one
+					if (version == null) {
+						String[] directiveTokens = pkgToken.substring(firstDirectiveIndex + 1).split(SEMI_COLON);
+						for (int directiveTokenIndex = 0; directiveTokenIndex < directiveTokens.length; directiveTokenIndex++) {
+							String directive = directiveTokens[directiveTokenIndex].trim();
+							// found it
+							if (directive.startsWith(Constants.VERSION_ATTRIBUTE)) {
+								String value = directive.substring(directive.indexOf(EQUALS) + 1).trim();
+								if (value.startsWith("\"[") || value.startsWith("\"(")) {
+									value = value.substring(2);
+								}
+								version = Version.parseVersion(value);
+							}
+						}
+						if (version == null) {
+							version = Version.emptyVersion;
 						}
 					}
 					return version;
