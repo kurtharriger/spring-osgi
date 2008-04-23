@@ -58,6 +58,7 @@ Package org.springframework.osgi.test
 Package org.springframework.osgi.util
 * BundleDelegatingClassLoader constructor visibility changed from private to protected
 * fixed sporadic exception occuring in DebugUtils when analyzing class loading errors
+* fixed problem in DebugUtils regarding packages with version ranges
 
 Package org.springframework.osgi.web
 * added OsgiWarDeploymentException to the deployment interfaces
@@ -72,10 +73,10 @@ Package org.springframework.osgi.web
 * refined DefaultContextPathStrategy to support folders and encode unsafe characters
 * OsgiBundleXmlWebApplicationContext provides the servlet namespace under 'org.springframework.context.web.namespace'
   property of its OSGi service
+* moved war deployers outside the extender package
+* WarLoaderListener and its related classes were moved into sprig-osgi-web-extender bundle
 * TomcatWarDeployer Service object can be set directly by the user
 * JettyWarDeployer Server object can be set directly by the user
-
-Package org.springframework.osgi.web.extender
 * changed package of the internal, private bundle activator
 
 

@@ -68,4 +68,21 @@ public abstract class TestUtils {
 		ReflectionUtils.makeAccessible(method);
 		return ReflectionUtils.invokeMethod(method, target, args);
 	}
+
+	public static Object invokeStaticMethod(final Class target, String methodName, Object[] args) {
+		Class[] types = null;
+		if (ObjectUtils.isEmpty(args)) {
+			types = new Class[0];
+		}
+		else {
+			types = new Class[args.length];
+			for (int objectIndex = 0; objectIndex < args.length; objectIndex++) {
+				types[objectIndex] = args[objectIndex].getClass();
+			}
+		}
+
+		Method method = ReflectionUtils.findMethod(target, methodName, types);
+		ReflectionUtils.makeAccessible(method);
+		return ReflectionUtils.invokeMethod(method, null, args);
+	}
 }
