@@ -659,11 +659,34 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
           <literal>bean-name</literal> property automatically set when exporting a bean using the
           <literal>service</literal> element (see <xref linkend="service-registry:export"/>).</para>
 
-          <para>For example:</para>
-
-          <programlisting language="xml"><![CDATA[<reference id="messageService" interface="com.xyz.MessageService"
-   bean-name="defaultMessageService"/>]]></programlisting>
-   
+          <para>Consider the following exporter/importer declarations:</para>
+          
+         <programlistingco>
+		   <areaspec>
+		   	  <areaset id="service-registry:refs:bean-name" coords="">
+		   	  	<area id="service-registry:refs:bean-name.1" coords="1 11"/>
+		   	  	<area id="service-registry:refs:bean-name.2" coords="3 48"/>
+		   	  </areaset>
+		   </areaspec>
+           <programlisting language="xml"><![CDATA[<bean id="messageServiceBean" scope="bundle" class="com.xyz.MessageServiceImpl"/>
+<!-- service exporter -->
+<osgi:service id="messageServiceExporter" ref="beanToBeExported" interface="com.xyz.MessageService"/>]]>
+</programlisting>
+          </programlistingco>
+		  <programlistingco>
+		   <areaspec>
+		   	  <area id="service-registry:refs:bean-name" coords="2 15"/>
+		   </areaspec>
+           <programlisting language="xml"><![CDATA[<osgi:reference id="messageService" interface="com.xyz.MessageService"
+   bean-name="messageServiceBean"/>
+]]></programlisting>
+   		  </programlistingco>
+   		  <calloutlist>
+   		  	<callout arearefs="service-registry:refs:bean-name">
+   		  		<para>the name used with <literal>bean-name</literal> attribute</para>
+   		  	</callout>
+   		  </calloutlist>
+   		  
    		  <para>will match only OSGi services that advertise <interfacename>MessageService</interfacename>
    		  interface and have the property named <literal>org.springframework.osgi.bean.name</literal> set
    		  to value <literal>defaultMessageService</literal>. In short, this means finding all Spring-DM exported
@@ -1470,6 +1493,45 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       	class. The first is an interface while the latter is a deprecated, abstract class. To preserve compatibility, Spring-DM
       	will pass to the listeners a <interfacename>Map</interfacename> implementation that can be casted, if needed, to a 
       	<classname>Dictionary</classname>.</listitem>
+      	
+      	<listitem>Be careful when using overloaded methods: all methods matching a certain service type will be called which is not
+      	always expected. Consider the following listener:
+      	<programlistingco>
+      		<programlisting><![CDATA[public class MyListener {
+    void register(Object service, Map properties);
+    void register(Collection dataService, Map properties);
+    void register(SortedSet orderedDataService , Map properties);
+}]]></programlisting>
+		
+		<areaspec>
+			<area id="service-registry:refs:listener:type.1" coords="2 19" />
+			<area id="service-registry:refs:listener:type.2" coords="3 19" />
+			<area id="service-registry:refs:listener:type.3" coords="4 19" />
+		</areaspec>
+				
+		<calloutlist>
+			<callout arearefs="service-registry:refs:listener:type.1">
+				<anchor id="service-registry:refs:listener:type.1"/>
+				<para><classname>Object</classname> type - will match all services for which the listener is triggered. This method will be always called.</para>
+			</callout>
+			<callout arearefs="service-registry:refs:listener:type.2">
+				<anchor id="service-registry:refs:listener:type.2"/>
+				<para><classname>Collection</classname> type - if this method is called, the <link linkend="service-registry:refs:listener:type.1">
+				<classname>Object</classname> method</link> is also called.
+				</para>
+			</callout>
+			<callout arearefs="service-registry:refs:listener:type.3">
+				<anchor id="service-registry:refs:listener:type.3"/>
+				<para><classname>SortedSet</classname> type - if this method is called, then both the <link linkend="service-registry:refs:listener:type.1">
+				<classname>Object</classname></link> and <link linkend="service-registry:refs:listener:type.2"><classname>Collection</classname></link> 
+				methods are called.</para>
+			</callout>
+		</calloutlist>
+		
+      	</programlistingco>
+      	
+      	</listitem>
+      	
       </itemizedlist>
       
       <section id="service-registry:refs:listener-best-practices:cycles">
