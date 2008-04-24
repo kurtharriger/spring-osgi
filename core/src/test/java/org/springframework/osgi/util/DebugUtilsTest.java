@@ -16,6 +16,9 @@
 
 package org.springframework.osgi.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import junit.framework.TestCase;
 
 import org.osgi.framework.Version;
@@ -32,14 +35,6 @@ public class DebugUtilsTest extends TestCase {
 
 	private Version getVersion(String statement, String pkg) {
 		return (Version) TestUtils.invokeStaticMethod(DebugUtils.class, "getVersion", new String[] { statement, pkg });
-	}
-
-	public void tstStringSplit() throws Exception {
-		String str = "gigel;version=\"[12,3.4)\";resolution:=optional,costel;resolution:=optional;version=\"1.2\",florel;resolution:=optional;version=1.2";
-		String split = ",+?";
-		String[] tokens = str.split(split);
-		System.out.println("tokens found " + tokens.length);
-		System.out.println("split is " + ObjectUtils.nullSafeToString(tokens));
 	}
 
 	public void testNoVersion() throws Exception {
