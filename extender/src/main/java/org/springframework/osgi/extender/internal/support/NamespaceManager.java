@@ -94,7 +94,6 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 				log.debug("Found PackageAdmin " + pa + "; enabled namespace type wiring checks");
 			this.namespacePlugins = new NamespacePlugins(pa);
 		}
-
 	}
 
 	/**
@@ -141,10 +140,9 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 			return NamespaceHandlerResolver.class.equals(type);
 		}
 		catch (Throwable th) {
-			if (log.isDebugEnabled())
-				// if the interface is not wired, ignore the bundle
-				log.debug("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " cannot see "
-						+ NS_HANDLER_RESOLVER_CLASS_NAME + "; ignoring its namespace handlers");
+			// if the interface is not wired, ignore the bundle
+			log.warn("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " cannot see "
+					+ NS_HANDLER_RESOLVER_CLASS_NAME + "; ignoring its namespace handlers");
 
 			return false;
 		}

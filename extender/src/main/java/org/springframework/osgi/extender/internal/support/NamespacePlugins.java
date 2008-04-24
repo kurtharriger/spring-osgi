@@ -131,10 +131,10 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 	}
 
 	public NamespaceHandler resolve(String namespaceUri) {
-		boolean trace = log.isTraceEnabled();
+		boolean debug = log.isDebugEnabled();
 
-		if (trace)
-			log.trace("Trying to resolving namespace handler for " + namespaceUri);
+		if (debug)
+			log.debug("Trying to resolving namespace handler for " + namespaceUri);
 
 		// avoid creation if there is no package admin
 		Map possibleProviders = (pa == null ? null : new LinkedHashMap(4));
@@ -144,8 +144,8 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 			try {
 				NamespaceHandler handler = plugin.resolve(namespaceUri);
 				if (handler != null) {
-					if (trace)
-						log.trace("Namespace handler for " + namespaceUri + " found inside "
+					if (debug)
+						log.debug("Namespace handler for " + namespaceUri + " found inside "
 								+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
 
 					// no package admin, just bail out
@@ -157,8 +157,8 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 				}
 			}
 			catch (IllegalArgumentException ex) {
-				if (trace)
-					log.trace("Namespace handler for " + namespaceUri + " not found inside "
+				if (debug)
+					log.debug("Namespace handler for " + namespaceUri + " not found inside "
 							+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
 
 			}
@@ -174,10 +174,10 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 	}
 
 	public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-		boolean trace = log.isTraceEnabled();
+		boolean debug = log.isDebugEnabled();
 
-		if (trace)
-			log.trace("Trying to resolving entity for " + publicId + "|" + systemId);
+		if (debug)
+			log.debug("Trying to resolving entity for " + publicId + "|" + systemId);
 
 		// avoid creation if there is no package admin
 		Map possibleProviders = (pa == null ? null : new LinkedHashMap(4));
@@ -189,8 +189,8 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 				try {
 					inputSource = plugin.resolveEntity(publicId, systemId);
 					if (inputSource != null) {
-						if (trace)
-							log.trace("XML schema for " + publicId + "|" + systemId + " found inside "
+						if (debug)
+							log.debug("XML schema for " + publicId + "|" + systemId + " found inside "
 									+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
 
 						// no package admin, just bail out
@@ -203,8 +203,8 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 				}
 				catch (FileNotFoundException ex) {
-					if (trace)
-						log.trace("XML schema for " + publicId + "|" + systemId + " not found inside "
+					if (debug)
+						log.debug("XML schema for " + publicId + "|" + systemId + " not found inside "
 								+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()), ex);
 				}
 			}
