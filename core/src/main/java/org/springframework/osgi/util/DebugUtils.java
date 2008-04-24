@@ -18,12 +18,13 @@ package org.springframework.osgi.util;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
@@ -57,6 +58,7 @@ public abstract class DebugUtils {
 	/** use degradable logger */
 	private static final Log log = LogUtils.createLogger(DebugUtils.class);
 
+	// currently not used but might be in the future
 	private static final String PACKAGE_REGEX = "([^;,]+(?:;?\\w+:?=((\"[^\"]+\")|([^,]+)))*)+";
 	private static final Pattern PACKAGE_PATTERN = Pattern.compile(PACKAGE_REGEX);
 
@@ -344,9 +346,10 @@ public abstract class DebugUtils {
 	 */
 	private static Version getVersion(String stmt, String packageName) {
 		if (stmt != null) {
-			Matcher packageMatcher = PACKAGE_PATTERN.matcher(stmt);
-			while (packageMatcher.find()) {
-				String pkgToken = packageMatcher.group().trim();
+			String[] pkgs = splitIntoPackages(stmt);
+
+			for (int packageIndex = 0; packageIndex < pkgs.length; packageIndex++) {
+				String pkgToken = pkgs[packageIndex].trim();
 				String pkg = null;
 				Version version = null;
 				int firstDirectiveIndex = pkgToken.indexOf(SEMI_COLON);
@@ -397,5 +400,34 @@ public abstract class DebugUtils {
 			}
 		}
 		return null;
+	}
+
+	private static String[] splitIntoPackages(String stmt) {
+		// spit the statement into packages but consider "
+		List pkgs = new ArrayList(2);
+
+		StringBuffer pkg = new StringBuffer();
+		boolean ignoreComma = false;
+		for (int stringIndex = 0; stringIndex < stmt.length(); stringIndex++) {
+			char currentChar = stmt.charAt(stringIndex);
+			if (currentChar == ',') {
+				if (ignoreComma) {
+					pkg.append(currentChar);
+				}
+				else {
+					pkgs.add(pkg.toString());
+					pkg = new StringBuffer();
+					ignoreComma = false;
+				}
+			}
+			else {
+				if (currentChar == '\"') {
+					ignoreComma = !ignoreComma;
+				}
+				pkg.append(currentChar);
+			}
+		}
+		pkgs.add(pkg.toString());
+		return (String[]) pkgs.toArray(new String[pkgs.size()]);
 	}
 }

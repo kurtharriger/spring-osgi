@@ -16,14 +16,10 @@
 
 package org.springframework.osgi.util;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import junit.framework.TestCase;
 
 import org.osgi.framework.Version;
 import org.springframework.osgi.TestUtils;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Test for the critical logging path in debug utils.
