@@ -413,5 +413,15 @@
       	<code>[workspace_dir]\.metadata\.plugins\org.eclipse.pde.core\OSGi\org.eclipse.osgi\bundles</code>).
       	</para>
       </section>
+      
+     <section id="upgrade-to-1.1">
+      	<title>I'm upgrading to Spring-DM 1.1 but now I get some ClassNotFoundExceptions. What has changed?</title>
+      	
+      	<para>
+      	In Spring-DM 1.1 M2, the proxy infrastructure has been refined to avoid <emphasis>type leaks</emphasis>, the usage of dynamic imports
+      	or exposure of class loader chain delegation. If you encounter class visibility problems during the upgrade then it's likely you have
+      	missing imports which were previously resolved as a side effect of Spring-DM proxy weaving process. 
+      	</para>
+      </section>      
     </chapter>
 </book>
