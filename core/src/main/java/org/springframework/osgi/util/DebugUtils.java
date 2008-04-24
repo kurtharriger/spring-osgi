@@ -18,8 +18,10 @@ package org.springframework.osgi.util;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -53,7 +55,6 @@ public abstract class DebugUtils {
 	private static final String SEMI_COLON = ";";
 	private static final String COMMA = ",";
 
-	
 	/** use degradable logger */
 	private static final Log log = LogUtils.createLogger(DebugUtils.class);
 
@@ -336,12 +337,12 @@ public abstract class DebugUtils {
 	 */
 	private static Version getVersion(String stmt, String packageName) {
 		if (stmt != null) {
-			String[] pkgTokens = stmt.split(COMMA);
-			for (int pkgTokenIndex = 0; pkgTokenIndex < pkgTokens.length; pkgTokenIndex++) {
-				String pkgToken = pkgTokens[pkgTokenIndex].trim();
+			String[] pkgs = splitIntoPackages(stmt);
+
+			for (int packageIndex = 0; packageIndex < pkgs.length; packageIndex++) {
+				String pkgToken = pkgs[packageIndex].trim();
 				String pkg = null;
 				Version version = null;
-				// extract package first (incorrect, this needs to be changed)
 				int firstDirectiveIndex = pkgToken.indexOf(SEMI_COLON);
 				if (firstDirectiveIndex > -1) {
 					pkg = pkgToken.substring(0, firstDirectiveIndex);
@@ -361,8 +362,22 @@ public abstract class DebugUtils {
 							// found it
 							if (directive.startsWith(Constants.VERSION_ATTRIBUTE)) {
 								String value = directive.substring(directive.indexOf(EQUALS) + 1).trim();
-								if (value.startsWith("\"[") || value.startsWith("\"(")) {
-									value = value.substring(2);
+
+								boolean lowEqualTo = value.startsWith("\"[");
+								boolean lowGreaterThen = value.startsWith("\"(");
+								if (lowEqualTo || lowGreaterThen) {
+									boolean highEqualTo = value.endsWith("]\"");
+									boolean highLessThen = value.endsWith(")\"");
+
+									// remove brackets
+									value = value.substring(2, value.length() - 2);
+									int commaIndex = value.indexOf(COMMA);
+
+									// TODO: currently, only the left side is considered
+									Version left = Version.parseVersion(value.substring(0, commaIndex));
+									Version right = Version.parseVersion(value.substring(commaIndex + 1));
+
+									return left;
 								}
 								version = Version.parseVersion(value);
 							}
@@ -376,5 +391,34 @@ public abstract class DebugUtils {
 			}
 		}
 		return null;
+	}
+
+	private static String[] splitIntoPackages(String stmt) {
+		// spit the statement into packages but consider "
+		List pkgs = new ArrayList(2);
+
+		StringBuffer pkg = new StringBuffer();
+		boolean ignoreComma = false;
+		for (int stringIndex = 0; stringIndex < stmt.length(); stringIndex++) {
+			char currentChar = stmt.charAt(stringIndex);
+			if (currentChar == ',') {
+				if (ignoreComma) {
+					pkg.append(currentChar);
+				}
+				else {
+					pkgs.add(pkg.toString());
+					pkg = new StringBuffer();
+					ignoreComma = false;
+				}
+			}
+			else {
+				if (currentChar == '\"') {
+					ignoreComma = !ignoreComma;
+				}
+				pkg.append(currentChar);
+			}
+		}
+		pkgs.add(pkg.toString());
+		return (String[]) pkgs.toArray(new String[pkgs.size()]);
 	}
 }
