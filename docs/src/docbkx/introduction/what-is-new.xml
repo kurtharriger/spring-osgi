@@ -17,6 +17,12 @@
 			be used with little or no effort at all. 
 			Please see <xref linkend="web"/> for details.
 			</para>
+
+			<section id="dm-1.1.x:web:spring-mvc">
+				<title>Spring-MVC Integration</title>
+				<para>Additionally, with 1.1.x it is possible to run Spring-MVC applications inside OSGi environments. See <xref linkend="web:spring-mvc"/>
+				for more information.</para>
+			</section>
 		</section>
 	
 		<section id="dm-1.1.x:io">
