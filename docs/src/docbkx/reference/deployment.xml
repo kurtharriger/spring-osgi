@@ -249,14 +249,14 @@ context ::= path ( ';' path ) * (';' directive) *
                 <entry>Bean Name</entry>
                 <entry>Type</entry>
                 <entry>Role</entry>
-                <entry>Default Behaviour</entry>
+                <entry>Default Behaviour/Value</entry>
               </row>
             </thead>
             <tbody>
               <row>
                 <entry><literal>taskExecutor</literal></entry>
                 <entry><interfacename>TaskExecutor</interfacename>
-                <footnote><literal>org.springframework.core.task</literal> package</footnote></entry>
+                <footnote>Part of <literal>org.springframework.core.task</literal> package</footnote></entry>
                 <entry>Creates, runs and destroys the Spring application contexts associated with each bundle. The task executor is responsible for managing its own pool
                 of threads used by the application contexts</entry>
                 <entry><classname>SimpleAsyncTaskExecutor</classname> is used by default which means a new thread will be created for each application contexts. While this
@@ -274,7 +274,7 @@ context ::= path ( ';' path ) * (';' directive) *
               <row>
                 <entry><literal>applicationEventMulticaster</literal></entry>
                 <entry><interfacename>ApplicationEventMulticaster</interfacename>
-                <footnote><literal>org.springframework.context.event</literal> package</footnote>
+                <footnote>Part of <literal>org.springframework.context.event</literal> package</footnote>
                 </entry>
                 <entry><literal><ulink url="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/event/ApplicationEventMulticaster.html">
                 ApplicationEventMultiCaster</ulink></literal> used for propagating Spring-DM <link linkend="app-deploy:extender-configuration:events">events</link>
@@ -286,6 +286,29 @@ context ::= path ( ';' path ) * (';' directive) *
                 <ulink url="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/support/AbstractApplicationContext.html">javadoc</ulink> 
                 for more information regarding available beans in an application context.</entry>
               </row>
+              
+              <row id="extender-configuration-options:acc">
+                <entry><literal>applicationContextCreator</literal></entry>
+                <entry><interfacename>OsgiApplicationContextCreator</interfacename>
+                <footnote id="extender-configuration-options:extender.pkg"><literal>org.springframework.osgi.extender package</literal></footnote>
+                </entry>
+                <entry>Allows customization of the application context created by the extender. This includes changing the application context class type or additional
+                processing (see <link linkend="extender-configuration-options:obfpp">below</link>).</entry>
+                <entry>The Extender default behaviour applies.</entry>
+              </row>
+
+              <row id="extender-configuration-options:obfpp">
+                <entry><emphasis>(irrelevant)</emphasis></entry>
+                <entry><interfacename>OsgiBeanFactoryPostProcessor</interfacename>
+                <footnoteref linkend="extender-configuration-options:extender.pkg"/>
+                </entry>
+                <entry>Similar to Spring's <interfacename>BeanFactoryPostProcessor</interfacename> interface, beans of type
+                <interfacename>OsgiBeanFactoryPostProcessor</interfacename> are automatically detected and applied to all contexts created by the
+                extender (whether <link linkend="extender-configuration-options:acc">user-defined</link> or not). This type of post processor
+                is useful as it allows customization of the bean factory such as adding/removing/changing existing bean definitions or adding new bean
+                instances.</entry>
+                <entry>The Extender default behaviour applies.</entry>
+              </row>              
             </tbody>
           </tgroup>
     	</table>

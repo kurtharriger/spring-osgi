@@ -58,18 +58,28 @@
     	which the WAR is installed. That is, Spring-DM Web <emphasis>only</emphasis> dictates when a WAR is deployer to and undeployed from a web container; 
     	it is up to the web container to create and manage the equivalent web application.    
     	</para> 
-    	<para>To use Spring-DM, install the <literal>spring-osgi-web.jar</literal> and <literal>spring-osgi-web-extender.jar</literal> bundles 
-    	to detect started OSGi WAR bundles and to deploy them to one of the supported web containers. 
+    	<para>To use Spring-DM, install:
+    	<itemizedlist>
+    		<listitem>
+    			<literal>spring-osgi-web.jar</literal> - Spring-DM web support
+    		</listitem>
+    		<listitem>
+    			<literal>spring-osgi-web-extender.jar</literal> - Spring-DM web extender
+	   		</listitem>
+    	</itemizedlist>
+    	bundles to detect started OSGi WAR bundles and to deploy them to one of the supported web containers. 
     	By default, Tomcat will be used but this can be changed to Jetty or to another custom 
     	server. When the war bundle is stopped, Spring-DM will also stop and uninstall the web application associated with it. Different from 
     	<emphasis>traditional</emphasis> web development, the Servlet classes need to be explicitly imported as the OSGi class path always takes priority
-    	(see below).</para>
+    	(see <link linkend="web:classpath">below</link>).</para>
     	
-    	<para>Since when running a web application, it's the web container that does the bootstrapping and instantiation, there is no need to 
+    	<para>Since, when running a web application, it's the web container that does the bootstrapping and instantiation, there is no need to 
     	place the Spring .xml files under <literal>META-INF/spring</literal> or use the Spring-DM <link linkend="app-deploy:headers">manifest entries</link>.
     	Simply bundle your files in the WAR and use your web framework (or <interfacename>Servlet</interfacename>s/<interfacename>Listener</interfacename>s) 
     	to bootstrap the Spring container. See <xref linkend="web:spring-mvc"/> for Spring-MVC integration and/or Spring reference
-    	<ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#context-create">documentation</ulink> for more information.</para>
+    	<ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#context-create">documentation</ulink> for more information.
+    	These being said, the Spring Extender is still required as it performs namespace handlers discovery - without it, it would not be possible to use
+    	Spring namespace (like <literal>osgi:</literal>, <literal>aop:</literal> or even <literal>beans:</literal> for that matter).</para>
     </section>
     
     <section id="web:classpath">
@@ -189,12 +199,12 @@
               <row>
                 <entry><literal>warDeployer</literal></entry>
                 <entry><interfacename>WarDeployer</interfacename>
-                <footnote id="interface-package"><para>Part of of the <literal>org.springframework.osgi.web.extender.deployer</literal> package</para></footnote>
+                <footnote id="interface-package"><para>Part of <literal>org.springframework.osgi.web.deployer</literal> package</para></footnote>
                 </entry>
                 <entry>Installs OSGi bundles as web applications. The deployers takes care of locating the required web container and installing and 
                 uninstalling web applications.</entry>
                 <entry><classname>TomcatWarDeployer</classname>
-                <footnote><para>Part of the <literal>org.springframework.osgi.web.extender.deployer.tomcat</literal> package</para></footnote>
+                <footnote><para>Part of <literal>org.springframework.osgi.web.deployer.tomcat</literal> package</para></footnote>
                 </entry>
                 <entry>Installs OSGi WARs to Tomcat 5.5.x/6.0.x. The servers needs to be installed, started and published as OSGi services as explained  
                 <link linkend="web:osgi-artifacts:containers:tomcat">here</link>.</entry>
@@ -204,7 +214,7 @@
                 <entry><interfacename>ContextPathStrategy</interfacename><footnoteref linkend='interface-package'/></entry>
                 <entry>Determines the context path associated with an OSGi bundle/WAR. The returned path is used by the war deployer to install the war application.</entry>
                 <entry><classname>DefaultContextPathStrategy</classname><footnote>
-                <para>Part of the <literal>org.springframework.osgi.web.extender.deployer.support</literal> package</para></footnote>
+                <para>Part of <literal>org.springframework.osgi.web.deployer.support</literal> package</para></footnote>
                 </entry>
                 <entry>Returns as context path the file name from the bundle location, falling back to the bundle name and bundle symbolic name respectively. 
                 If neither of these is present, the bundle object identity will be used.</entry>
@@ -232,7 +242,7 @@
        http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="warDeployer"    
-        class="org.springframework.osgi.web.extender.deployer.jetty.JettyWarDeployer" />
+        class="org.springframework.osgi.web.deployer.jetty.JettyWarDeployer" />
 </beans>
 ]]></programlisting>
 				<calloutlist>
@@ -250,8 +260,67 @@
 			<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.web.extender]]></programlisting>
 	
 			<para>Now the fragment can be deployed alongside <literal>spring-osgi-web.jar</literal> bundle to plug in Jetty.</para>
+			<para>A pre-packed Jetty fragment is available in Spring-DM <link linkend="appendix-osgi-repo"> maven repository</link> under 
+			<literal>jetty.web.extender.fragment.osgi</literal> artifactId.</para>
     	</section>
     </section>
+    
+    <section id="web:configuration:changing-deployer">
+    	<title>Customizing the standard deployer</title>
+    	<para>By default, the default deployers look up the needed services, at startup. As the services are considered mandatory, the deployers will wait for
+    	them and, in case they are not found, will throw an exception. In cases where the default timeout or service lookup filter is not be appropriate, one
+    	can customize the service used through a Spring-DM <link linkend="service-registry:refs">reference</link>: 
+    	</para>
+    	
+    	<programlistingco>
+    		<areaspec>
+			  <area id="web:configuration:deployer-service.userdef" coords="11"/>
+		      <area id="web:configuration:deployer-service.wardeployer" coords="16"/>
+		      <area id="web:configuration:deployer-service.prop" coords="18"/>
+		      <area id="web:configuration:deployer-service.p.ns" coords="5"/>
+		    </areaspec>
+		        
+		    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:osgi="http://www.springframework.org/schema/osgi"
+   xmlns:p="http://www.springframework.org/schema/p"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans   
+     http://www.springframework.org/schema/beans/spring-beans.xsd
+     http://www.springframework.org/schema/osgi
+     http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+    <osgi:reference id="myTomcatServer"
+		interface="org.apache.catalina.Service" 
+		filter="(environment=testing)"
+		cardinality="0..1"/>
+		
+    <bean id="warDeployer"    
+        class="org.springframework.osgi.web.deployer.tomcat.TomcatWarDeployer"
+        p:service-ref="myTomcatServer"/>
+]]></programlisting>
+
+		<calloutlist>
+         <callout arearefs="web:configuration:deployer-service.userdef">
+            <para>User defined OSGi service lookup</para>
+         </callout>
+         <callout arearefs="web:configuration:deployer-service.wardeployer">
+            <para>Deployer definition (name is important)</para>
+         </callout>
+         <callout arearefs="web:configuration:deployer-service.prop">
+            <para>Service assignment (through the <literal>p</literal> namespace) </para>
+         </callout>
+         <callout arearefs="web:configuration:deployer-service.p.ns">
+            <para>Spring's <literal>p</literal> namespace declaration - 
+            see <ulink url="http://blog.springsource.com/main/2006/11/25/xml-syntax-sugar-in-spring-20/">this</ulink> blog entry
+            for more information</para>
+         </callout>
+         
+        </calloutlist>		        
+    	
+    	</programlistingco>
+    </section>
+    
     
     <section id="web:osgi-artifacts">
     	<title>OSGi-ready libraries and web development</title>
