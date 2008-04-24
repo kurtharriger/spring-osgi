@@ -61,7 +61,7 @@
       <xi:include href="reference/deployment.xml"/>
 	  <xi:include href="reference/service-registry.xml"/>
 	  <xi:include href="reference/bundles.xml"/>
-	  <xi:include href="reference/web.xml"/>
+	  <xi:include href="reference/web/web.xml"/>
 	  <xi:include href="reference/testing.xml"/>
   </part>
   <part id="resources">
