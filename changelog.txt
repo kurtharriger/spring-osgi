@@ -11,6 +11,7 @@ General
 * added integration with Spring MVC
 * added 'greedy-proxying' attribute to reference collections (spring-osgi.xsd)
 * reduced the number of class loader instances generated internally by Spring-DM
+* improved proxy infrastructure to avoid type leaks or the usage of spring-aop dynamic import
 
 Package org.springframework.osgi.config
 * removed usage of deprecated setSource method in AbstractReferenceDefinitionParser

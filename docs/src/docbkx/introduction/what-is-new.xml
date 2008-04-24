@@ -43,6 +43,12 @@
 			</para>
 		</section>
 
+		<section id="dm-1.1.x:improved-class-loading">
+  		    <title>Improved class loading</title>
+			<para>In 1.1.x, the proxy creation has been improved, leading to better package wiring for the managed bundles. See the FAQ for more information.  
+			</para>
+		</section>
+
     </section>
 
 </chapter>
