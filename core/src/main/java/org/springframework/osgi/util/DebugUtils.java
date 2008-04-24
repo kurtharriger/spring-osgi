@@ -23,6 +23,8 @@ import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.osgi.framework.Bundle;
@@ -54,6 +56,9 @@ public abstract class DebugUtils {
 	private static final String COMMA = ",";
 	/** use degradable logger */
 	private static final Log log = LogUtils.createLogger(DebugUtils.class);
+
+	private static final String PACKAGE_REGEX = "([^;,]+(?:;?\\w+:?=((\"[^\"]+\")|([^,]+)))*)+";
+	private static final Pattern PACKAGE_PATTERN = Pattern.compile(PACKAGE_REGEX);
 
 
 	/**
@@ -339,12 +344,11 @@ public abstract class DebugUtils {
 	 */
 	private static Version getVersion(String stmt, String packageName) {
 		if (stmt != null) {
-			String[] pkgTokens = stmt.split(COMMA);
-			for (int pkgTokenIndex = 0; pkgTokenIndex < pkgTokens.length; pkgTokenIndex++) {
-				String pkgToken = pkgTokens[pkgTokenIndex].trim();
+			Matcher packageMatcher = PACKAGE_PATTERN.matcher(stmt);
+			while (packageMatcher.find()) {
+				String pkgToken = packageMatcher.group().trim();
 				String pkg = null;
 				Version version = null;
-				// extract package first (incorrect, this needs to be changed)
 				int firstDirectiveIndex = pkgToken.indexOf(SEMI_COLON);
 				if (firstDirectiveIndex > -1) {
 					pkg = pkgToken.substring(0, firstDirectiveIndex);
@@ -364,8 +368,22 @@ public abstract class DebugUtils {
 							// found it
 							if (directive.startsWith(Constants.VERSION_ATTRIBUTE)) {
 								String value = directive.substring(directive.indexOf(EQUALS) + 1).trim();
-								if (value.startsWith("\"[") || value.startsWith("\"(")) {
-									value = value.substring(2);
+
+								boolean lowEqualTo = value.startsWith("\"[");
+								boolean lowGreaterThen = value.startsWith("\"(");
+								if (lowEqualTo || lowGreaterThen) {
+									boolean highEqualTo = value.endsWith("]\"");
+									boolean highLessThen = value.endsWith(")\"");
+
+									// remove brackets
+									value = value.substring(2, value.length() - 2);
+									int commaIndex = value.indexOf(COMMA);
+
+									// TODO: currently, only the left side is considered
+									Version left = Version.parseVersion(value.substring(0, commaIndex));
+									Version right = Version.parseVersion(value.substring(commaIndex + 1));
+
+									return left;
 								}
 								version = Version.parseVersion(value);
 							}
