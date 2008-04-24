@@ -50,14 +50,17 @@ public class HolderLoader {
 
 
 	public HolderLoader() {
-		// use the app ClassLoader
+		// try to load the holder using the app ClassLoader
 		ClassLoader appCL = Bundle.class.getClassLoader();
 		Class clazz;
 		try {
 			clazz = appCL.loadClass(HOLDER_CLASS_NAME);
 		}
 		catch (Exception ex) {
-			throw (RuntimeException) new IllegalStateException("cannot properly load class " + HOLDER_CLASS_NAME).initCause(ex);
+			// if it's not found, then the class path is incorrectly constructed
+			throw (RuntimeException) new IllegalStateException(
+				"spring-osgi-test.jar is not available on the boot class path; are you deploying the test framework"
+						+ "as a bundle by any chance? ").initCause(ex);
 		}
 		// get the static instance
 		Field field = ReflectionUtils.findField(clazz, INSTANCE_FIELD, clazz);
@@ -66,7 +69,7 @@ public class HolderLoader {
 			instance = field.get(null);
 		}
 		catch (Exception ex) {
-			throw (RuntimeException) new IllegalStateException("cannot read property " + INSTANCE_FIELD).initCause(ex);
+			throw (RuntimeException) new IllegalStateException("Cannot read property " + INSTANCE_FIELD).initCause(ex);
 		}
 		// once the class is loaded return it wrapped through it's OSGi instance
 		holder = new ReflectionOsgiHolder(instance);

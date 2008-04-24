@@ -7,7 +7,7 @@ Changes in version 1.1.0 M2 (2008-04-dd)
 
 General
 * refined the web deployer API
-* split web functionality into web and web-extender bundle
+* split web functionality into web and web-extender (symbolic name:org.springframework.bundle.osgi.web.extender) bundle
 * added integration with Spring MVC
 * added 'greedy-proxying' attribute to reference collections (spring-osgi.xsd)
 * reduced the number of class loader instances generated internally by Spring-DM

@@ -131,6 +131,8 @@ public void testComponent() throws Exception {
         instance that is running outside of OSGi</para>
       </listitem>
     </itemizedlist>
+	<warning>The testing framework is aimed at running OSGi integration tests from a non-OSGi environment (like Ant/Maven). The testing framework
+	is NOT meant to be used as an OSGi bundle (nor will it work for that matter).</warning>    
 
     <para>By following this sequence it is trivial to write JUnit-based
     integration tests for OSGi and have them integration into any environment
@@ -204,7 +206,7 @@ spring-osgi-extender, etc... TestBundle-testOsgiPlatformStarts-com.your.package.
      
      <sidebar>
        <title>OSGi-friendly libraries</title>
-       <para>To work on OSGi environments, jars need to declare in their
+       <para>To work in OSGi environments, jars need to declare in their
        <literal>MANIFEST.MF</literal>, Export or Import packages; that is
        declare what classes they need or offer to other bundles.
        Most libraries are OSGi unaware and do not provide the proper manifest
@@ -236,7 +238,8 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
 	]]></programlisting>
 
      <para>The test requires <literal>org.apache.commons.lang.time</literal> package but there is no bundle
-     that exports it. Let's fix this by installing a commons-lang bundle.</para>
+     that exports it. Let's fix this by installing a commons-lang bundle (make sure you use at least version 2.4
+     which adds the proper OSGi entries to the jar manifest).</para>
 
      <para>One can specify the bundles that she wants
      to be installed using <literal>getTestBundlesNames</literal> or <literal>getTestBundles
@@ -260,7 +263,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
      <programlisting language="java"><![CDATA[protected String[] getTestBundlesNames() {
 	 return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT",
 	 	"org.springframework.osgi, jta.osgi, 1.1-SNAPSHOT",
-	 	"org.springframework.osgi, commons-lang.osgi, 2.3-SNAPSHOT" };
+	 	"commons-lang, commons-lang, 2.4" };
 	 };
 }]]></programlisting>
  	 
@@ -494,13 +497,13 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       In fact, the current infrastructure started as way to do efficient, automatic testing without worrying 
       about deployment problems and redundancy.</para> 
       <para>As for the numbers, the current infrastructure has been used internally for the last half a year - our integration tests
-      (around 120) run in about 3:30 on a laptop. Most of this time is spent on starting and stopping the OSGi platform: the "testing 
+      (around 120) run in about 3:30 minutes on a laptop. Most of this time is spent on starting and stopping the OSGi platform: the "testing 
       framework" takes around 10% (as shown in our profiling so far).
       For example, the manifest generation has proved to take less then 0.5 seconds in general, while the jar creation around 1
       second.</para>
       <para>However, we are working on making it even faster and smarter so that less configuration options are needed and
       the contextual information available in your tests is used as much as possible. If you have any ideas or suggestion,
-      feel free to use our issue tracker or/and mailing list.     
+      feel free to use our issue tracker or/and forum.     
       </para>
     </section>
     

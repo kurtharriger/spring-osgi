@@ -42,11 +42,34 @@
     
     <section id="web:usage">
     	<title>Web support usage</title>
-    	<para>To use Spring-DM with wars, install the <literal>spring-osgi-web.jar</literal> bundle which uses the <link linkend="extender-pattern">extender pattern</link>
-    	to detect started OSGi war bundles and deploy them to one of the supported web containers. By default, Tomcat will be used but this can be changed to Jetty or to another custom 
+    	
+	    <sidebar>
+	      <title>WAR vs Web Application</title>
+	      <para>
+	   	  This document understand by web application an instance of a WAR: a WAR is a definition while a web application a runtime instance of a definition. 
+	   	  This is similar to the difference between a class and an object: the class represents a (bytecode) definition while the object, 
+	   	  the instance of a class.
+	      </para>
+	    </sidebar>
+    	
+    	<para>Just like with non-WAR bundles, Spring-DM Web uses the <link linkend="extender-pattern">extender pattern</link> to detect and install WARs. However,
+    	one crucial difference from the standard Spring-DM <link linkend="bnd-app-ctx:extender">Extender</link> is that Spring-DM will 
+    	only trigger the install and uninstall of the WAR - the actual web application creation and thread management is delegated to the web container in 
+    	which the WAR is installed. That is, Spring-DM Web <emphasis>only</emphasis> dictates when a WAR is deployer to and undeployed from a web container; 
+    	it is up to the web container to create and manage the equivalent web application.    
+    	</para> 
+    	<para>To use Spring-DM, install the <literal>spring-osgi-web.jar</literal> and <literal>spring-osgi-web-extender.jar</literal> bundles 
+    	to detect started OSGi WAR bundles and to deploy them to one of the supported web containers. 
+    	By default, Tomcat will be used but this can be changed to Jetty or to another custom 
     	server. When the war bundle is stopped, Spring-DM will also stop and uninstall the web application associated with it. Different from 
     	<emphasis>traditional</emphasis> web development, the Servlet classes need to be explicitly imported as the OSGi class path always takes priority
     	(see below).</para>
+    	
+    	<para>Since when running a web application, it's the web container that does the bootstrapping and instantiation, there is no need to 
+    	place the Spring .xml files under <literal>META-INF/spring</literal> or use the Spring-DM <link linkend="app-deploy:headers">manifest entries</link>.
+    	Simply bundle your files in the WAR and use your web framework (or <interfacename>Servlet</interfacename>s/<interfacename>Listener</interfacename>s) 
+    	to bootstrap the Spring container. See <xref linkend="web:spring-mvc"/> for Spring-MVC integration and/or Spring reference
+    	<ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#context-create">documentation</ulink> for more information.</para>
     </section>
     
     <section id="web:classpath">
@@ -141,7 +164,7 @@
     	an application context that is used internally as its configuration. To override a default setting of the web extender, look up the appropriate bean
     	name from the table below, define it in a suitable manner and then attach it as a <link linkend="appendix-tips:fragments">fragment</link> to the <literal>spring-osgi-web.jar</literal>,
     	using:</para>
-		<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.web]]></programlisting>    	  
+		<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.web.extender]]></programlisting>    	  
     	
     	<para>The following beans are currently recognized by the web extender:</para>
     	
@@ -222,9 +245,9 @@
 		        </calloutlist>		        
     		</programlistingco>
     		
-    		<para>Once the file is created, it should be bundled in an OSGi fragment attached to the Spring-DM Web bundle by adding the 
+    		<para>Once the file is created, it should be bundled in an OSGi fragment attached to the Spring-DM Web Extender bundle by adding the 
     		<literal>Fragment-Host</literal> header:</para>
-			<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.web]]></programlisting>
+			<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.web.extender]]></programlisting>
 	
 			<para>Now the fragment can be deployed alongside <literal>spring-osgi-web.jar</literal> bundle to plug in Jetty.</para>
     	</section>
@@ -291,6 +314,11 @@ port = [server port number]]]></programlisting>
 			<para>The Servlet, Java Server Pages, Standard Taglib, Commons-EL and other web libraries are available as well in the Spring-DM repository. When browsing
 			use an <ulink url="http://aws.amazon.com/s3">S3</ulink> compatible application .</para>
 		</section>
-    </section>
+	</section>
+	
+	<section id="web:spring-mvc">
+		<title>Spring-MVC Integration</title>
+		<para>TBD</para>
+	</section>
   </chapter>
   

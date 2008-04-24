@@ -10,6 +10,11 @@
 	
 	<section id="appendix-tips:fragments">
 		<title>OSGi Fragments</title>
+		<sidebar>
+			<title>Check the target OSGi platform fragment support</title>
+			<para>Before using fragments, make sure the target OSGi environment supports them (and to what degree). Out of the OSGi platforms on
+			which Spring-DM is tested upon, at the time of this writing, Apache Felix does not support fragments (it simply ignores them).</para>
+		</sidebar>
 		
 		<para>Part of the OSGi R4 release, <emphasis>fragments</emphasis> are a very useful and powerful feature. A fragment is 
 		<quote>a bundle that is <emphasis>attached</emphasis> to a <emphasis>host bundle</emphasis></quote>, adding content to the target bundle. 
