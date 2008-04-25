@@ -19,7 +19,7 @@
 
   <properties>
     <!-- Spring version -->   
-    <spring.maven.artifact.version>2.5.2</spring.maven.artifact.version>
+    <spring.maven.artifact.version>2.5.4-SNAPSHOT</spring.maven.artifact.version>
     <spring.base.version>2.5</spring.base.version>
     
     <!-- Felix BND plugin settings -->
@@ -772,17 +772,27 @@ limitations under the License.
 	<repository>
 		<id>spring-release</id>
 		<name>Spring Portfolio Release Repository</name>
-		<url>http://s3.amazonaws.com/maven.springframework.org/release</url>
+		<url>http://maven.springframework.org/release</url>
 	</repository>
 	<repository>
 		<id>spring-external</id>
 		<name>Spring Portfolio Release Repository</name>
-		<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
+		<url>http://maven.springframework.org/external</url>
 	</repository>
 	<repository>
 		<id>spring-milestone</id>
 		<name>Spring Portfolio Milestone Repository</name>
-		<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+		<url>http://maven.springframework.org/milestone</url>
+	</repository>
+
+	<!-- used when building against Spring snapshots -->
+	<repository>
+		<id>spring-snapshot</id>
+		<name>Spring Portfolio Milestone Repository</name>
+		<url>http://maven.springframework.org/snapshot</url>
+ 	    <snapshots>
+		 <enabled>true</enabled>
+		</snapshots>
 	</repository>
     
     <repository>
@@ -791,7 +801,7 @@ limitations under the License.
       <snapshots>
          <enabled>true</enabled>
       </snapshots>
-      <url>http://s3.amazonaws.com/maven.springframework.org/osgi</url>
+      <url>http://maven.springframework.org/osgi</url>
     </repository>
   </repositories>
 

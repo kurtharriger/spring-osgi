@@ -22,11 +22,14 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.SpringProxy;
+import org.springframework.core.InfrastructureProxy;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
  * @author Costin Leau
@@ -68,9 +71,12 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 			assertEquals(time, ((Date) result).getTime());
 			assertTrue(result instanceof SpringProxy);
 			assertTrue(result instanceof ImportedOsgiServiceProxy);
+			assertTrue(result instanceof InfrastructureProxy);
 
 			refAware = (ImportedOsgiServiceProxy) result;
 			assertNotNull(refAware.getServiceReference());
+
+			assertEquals("wrong target returned", date, ((InfrastructureProxy) result).getWrappedObject());
 		}
 		finally {
 			if (reg != null)
@@ -92,6 +98,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 		ServiceRegistration reg = publishService(date, dict);
 
 		fb.setCardinality(Cardinality.C_1__1);
+		fb.setFilter("(&(foo=bar)(george=michael))");
 		fb.setInterfaces(new Class[] { Date.class });
 		fb.afterPropertiesSet();
 
@@ -103,6 +110,11 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 
 			ImportedOsgiServiceProxy refAware = (ImportedOsgiServiceProxy) result;
 
+			assertTrue(doesMapContainsDictionary(dict,
+				OsgiServiceReferenceUtils.getServicePropertiesAsMap(refAware.getServiceReference())));
+
+			InfrastructureProxy targetAware = (InfrastructureProxy) result;
+			assertEquals(date, targetAware.getWrappedObject());
 		}
 		finally {
 			if (reg != null)

@@ -6,6 +6,7 @@ Changes in version 1.1.0 M2 (2008-04-dd)
 -----------------------------------------
 
 General
+* Spring 2.5.4+ required
 * refined the web deployer API
 * split web functionality into web and web-extender (symbolic name:org.springframework.bundle.osgi.web.extender) bundle
 * added integration with Spring MVC
@@ -34,6 +35,7 @@ Package org.springframework.osgi.service
 * fixed potential infrastructure class leak through the thread context class loader management of imported services
 * improved proxy class loader creation by using an internal cache
 * improved thread-safety of the dynamic service collections
+* introduced InfrastructureProxy interface to imported OSGi service proxies
 
 Package org.springframework.osgi.extender
 * added OsgiApplicationContextCreator interface for handling the extender contexts creation

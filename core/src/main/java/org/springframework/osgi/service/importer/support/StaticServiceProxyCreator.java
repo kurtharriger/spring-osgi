@@ -27,6 +27,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
+import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
@@ -77,7 +78,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 			log.debug("Greedy proxying will " + msg + " consider exposed classes");
 	}
 
-	Advice createDispatcherInterceptor(ServiceReference reference) {
+	ServiceInvoker createDispatcherInterceptor(ServiceReference reference) {
 		return new ServiceStaticInterceptor(bundleContext, reference);
 	}
 

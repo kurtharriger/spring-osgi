@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import java.util.ArrayList;
@@ -26,8 +27,10 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.importer.internal.aop.ImportedOsgiServiceProxyAdvice;
-import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.InfrastructureOsgiProxyAdvice;
+import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
+import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
@@ -63,6 +66,7 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 
 	private final ImportContextClassLoader iccl;
 
+
 	AbstractServiceProxyCreator(Class[] classes, ClassLoader classLoader, BundleContext bundleContext,
 			ImportContextClassLoader iccl) {
 		Assert.notNull(bundleContext);
@@ -94,7 +98,13 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 		if (tcclAdvice != null)
 			advices.add(tcclAdvice);
 
-		advices.add(createDispatcherInterceptor(reference));
+		// 4. add the infrastructure proxy
+		// but first create the dispatcher since we need
+		ServiceInvoker dispatcherInterceptor = createDispatcherInterceptor(reference);
+		Advice infrastructureMixin = new InfrastructureOsgiProxyAdvice(dispatcherInterceptor);
+
+		advices.add(infrastructureMixin);
+		advices.add(dispatcherInterceptor);
 
 		return createProxy(getInterfaces(reference), classLoader, bundleContext, advices);
 	}
@@ -164,6 +174,5 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 	 * @param reference service reference
 	 * @return AOP advice
 	 */
-	abstract Advice createDispatcherInterceptor(ServiceReference reference);
-
+	abstract ServiceInvoker createDispatcherInterceptor(ServiceReference reference);
 }

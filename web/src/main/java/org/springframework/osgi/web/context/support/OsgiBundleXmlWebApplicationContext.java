@@ -162,7 +162,7 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 		beanFactory.registerResolvableDependency(ServletContext.class, this.servletContext);
 		beanFactory.registerResolvableDependency(ServletConfig.class, this.servletConfig);
 
-		registerWebApplicationScopes(beanFactory);
+		WebApplicationContextUtils.registerWebApplicationScopes(beanFactory);
 	}
 
 	/**
@@ -174,15 +174,6 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 	protected void customizeApplicationContextServiceProperties(Map serviceProperties) {
 		super.customizeApplicationContextServiceProperties(serviceProperties);
 		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_NAMESPACE_PROPERTY, getNamespace());
-	}
-
-	// TODO: remove ugly hack
-	private void registerWebApplicationScopes(ConfigurableListableBeanFactory beanFactory) {
-		Method method = ReflectionUtils.findMethod(WebApplicationContextUtils.class, "registerWebApplicationScopes",
-			new Class[] { ConfigurableListableBeanFactory.class });
-
-		ReflectionUtils.makeAccessible(method);
-		ReflectionUtils.invokeMethod(method, null, new Object[] { beanFactory });
 	}
 
 	/**

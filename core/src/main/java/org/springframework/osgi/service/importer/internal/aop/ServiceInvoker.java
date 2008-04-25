@@ -84,5 +84,4 @@ public abstract class ServiceInvoker implements MethodInterceptor, ServiceRefere
 	public ServiceReference getServiceReference() {
 		return null;
 	}
-
 }
