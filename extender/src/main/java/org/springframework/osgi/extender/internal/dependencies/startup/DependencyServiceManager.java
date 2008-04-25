@@ -3,8 +3,8 @@ package org.springframework.osgi.extender.internal.dependencies.startup;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,9 +32,9 @@ public class DependencyServiceManager {
 
 	private static final Log log = LogFactory.getLog(DependencyServiceManager.class);
 
-	protected final Set dependencies = Collections.synchronizedSet(new LinkedHashSet());
+	protected final Map dependencies = Collections.synchronizedMap(new LinkedHashMap());
 
-	protected final Set unsatisfiedDependencies = Collections.synchronizedSet(new LinkedHashSet());
+	protected final Map unsatisfiedDependencies = Collections.synchronizedMap(new LinkedHashMap());
 
 	private final ContextExecutorStateAccessor contextStateAccessor;
 
@@ -66,13 +66,12 @@ public class DependencyServiceManager {
 		 */
 		public void serviceChanged(ServiceEvent serviceEvent) {
 			boolean trace = log.isTraceEnabled();
-			boolean debug = log.isDebugEnabled();
 
 			try {
 				if (unsatisfiedDependencies.isEmpty()) { // already
 					// completed.
 					if (trace) {
-						log.trace("handling service event, but no unsatisfied dependencies for "
+						log.trace("Handling service event, but no unsatisfied dependencies for "
 								+ context.getDisplayName());
 					}
 					return;
@@ -80,7 +79,7 @@ public class DependencyServiceManager {
 
 				ServiceReference ref = serviceEvent.getServiceReference();
 				if (trace) {
-					log.trace("handling service event [" + OsgiStringUtils.nullSafeToString(serviceEvent) + ":"
+					log.trace("Handling service event [" + OsgiStringUtils.nullSafeToString(serviceEvent) + ":"
 							+ OsgiStringUtils.nullSafeToString(ref) + "] for " + context.getDisplayName());
 				}
 
@@ -117,7 +116,7 @@ public class DependencyServiceManager {
 			boolean trace = log.isTraceEnabled();
 			boolean debug = log.isDebugEnabled();
 
-			for (Iterator i = dependencies.iterator(); i.hasNext();) {
+			for (Iterator i = dependencies.keySet().iterator(); i.hasNext();) {
 				ServiceDependency dependency = (ServiceDependency) i.next();
 
 				// check if there is a match on the service
@@ -128,14 +127,14 @@ public class DependencyServiceManager {
 						case ServiceEvent.MODIFIED:
 							unsatisfiedDependencies.remove(dependency);
 							if (debug) {
-								log.debug("found service; eliminating " + dependency);
+								log.debug("Found service; eliminating " + dependency);
 							}
 							break;
 
 						case ServiceEvent.UNREGISTERING:
-							unsatisfiedDependencies.add(dependency);
+							unsatisfiedDependencies.put(dependency, dependency.getBeanName());
 							if (debug) {
-								log.debug("service unregistered; adding " + dependency);
+								log.debug("Service unregistered; adding " + dependency);
 							}
 							break;
 						default: // do nothing
@@ -192,21 +191,12 @@ public class DependencyServiceManager {
 
 				AbstractOsgiServiceImportFactoryBean reference = (AbstractOsgiServiceImportFactoryBean) beanFactory.getBean(beanName);
 				ServiceDependency dependency = new ServiceDependency(bundleContext, reference.getUnifiedFilter(),
-					reference.isMandatory());
+					reference.isMandatory(), beanName);
 
-				String realBean = beanName.substring(1);
-
-				if (debug)
-					log.debug("destroying bean " + realBean + " from context " + beanFactory);
-
-				// clean up factory singleton
-				// ((DefaultListableBeanFactory)
-				// beanFactory).destroySingleton(realBean);
-
-				dependencies.add(dependency);
+				dependencies.put(dependency, dependency.getBeanName());
 				if (!dependency.isServicePresent()) {
-					log.info("adding OSGi service dependency for importer " + beanName);
-					unsatisfiedDependencies.add(dependency);
+					log.info("Adding OSGi service dependency for importer " + beanName);
+					unsatisfiedDependencies.put(dependency, dependency.getBeanName());
 				}
 			}
 		}
@@ -216,16 +206,20 @@ public class DependencyServiceManager {
 
 		if (debug) {
 			log.debug(dependencies.size() + " OSGi service dependencies, " + unsatisfiedDependencies.size()
-					+ " unsatisfied for " + context.getDisplayName());
+					+ " unsatisfied (for beans " + unsatisfiedDependencies.values() + ") in "
+					+ context.getDisplayName());
 		}
-
+		if (log.isTraceEnabled()) {
+			log.trace("Total OSGi service dependencies beans " + dependencies.values());
+			log.trace("Unsatified OSGi service dependencies beans " + unsatisfiedDependencies.values());
+		}
 	}
 
 	protected boolean isSatisfied() {
 		return unsatisfiedDependencies.isEmpty();
 	}
 
-	public Set getUnsatisfiedDependencies() {
+	public Map getUnsatisfiedDependencies() {
 		return unsatisfiedDependencies;
 	}
 
@@ -250,7 +244,7 @@ public class DependencyServiceManager {
 		if (multiple) {
 			sb.append("(|");
 		}
-		for (Iterator i = unsatisfiedDependencies.iterator(); i.hasNext();) {
+		for (Iterator i = unsatisfiedDependencies.keySet().iterator(); i.hasNext();) {
 			sb.append(((ServiceDependency) i.next()).filterAsString);
 		}
 		if (multiple) {
@@ -261,7 +255,7 @@ public class DependencyServiceManager {
 
 	protected void deregister() {
 		if (log.isDebugEnabled()) {
-			log.debug("deregistering service dependency dependencyDetector for " + context.getDisplayName());
+			log.debug("Deregistering service dependency dependencyDetector for " + context.getDisplayName());
 		}
 
 		OsgiListenerUtils.removeServiceListener(bundleContext, listener);

@@ -99,13 +99,13 @@ public abstract class OsgiListenerUtils {
 			context.addServiceListener(listener, filter);
 		}
 		catch (InvalidSyntaxException isex) {
-			throw (RuntimeException) new IllegalArgumentException("invalid filter").initCause(isex);
+			throw (RuntimeException) new IllegalArgumentException("Invalid filter").initCause(isex);
 		}
 	}
 
 	private static void dispatchServiceRegistrationEvents(ServiceReference[] alreadyRegistered, ServiceListener listener) {
 		if (log.isTraceEnabled())
-			log.trace("calling listener for already registered services: "
+			log.trace("Calling listener for already registered services: "
 					+ ObjectUtils.nullSafeToString(alreadyRegistered));
 
 		if (alreadyRegistered != null) {

@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
@@ -28,7 +27,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
-import org.springframework.osgi.context.internal.classloader.ChainedClassLoader;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.OsgiFilterUtils;
@@ -144,16 +142,17 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 
 		String filterWithClasses = OsgiFilterUtils.unifyFilter(interfaces, filter);
 
-		if (log.isTraceEnabled())
-			log.trace("unified classes=" + ObjectUtils.nullSafeToString(interfaces) + " and filter=[" + filter
+		boolean trace = log.isTraceEnabled();
+		if (trace)
+			log.trace("Unified classes=" + ObjectUtils.nullSafeToString(interfaces) + " and filter=[" + filter
 					+ "]  in=[" + filterWithClasses + "]");
 
 		// add the serviceBeanName constraint
 		String filterWithServiceBeanName = OsgiFilterUtils.unifyFilter(
 			OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY, new String[] { serviceBeanName }, filterWithClasses);
 
-		if (log.isTraceEnabled())
-			log.trace("unified serviceBeanName [" + ObjectUtils.nullSafeToString(serviceBeanName) + "] and filter=["
+		if (trace)
+			log.trace("Unified serviceBeanName [" + ObjectUtils.nullSafeToString(serviceBeanName) + "] and filter=["
 					+ filterWithClasses + "]  in=[" + filterWithServiceBeanName + "]");
 
 		// create (which implies validation) the actual filter
