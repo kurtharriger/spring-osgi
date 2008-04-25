@@ -897,6 +897,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 	      no matching service becomes available within the timeout period, an
 	      unchecked <classname>ServiceUnavailableException</classname> is
 	      thrown.</para>
+	      
         </section>        
 
 		<section id="service-registry:refs:singular:property-editor">
@@ -1019,8 +1020,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         will contain all registered services supporting the
         <literal>EventListener</literal> interface:</para>
 
-        <programlisting language="xml"><![CDATA[<list id="myEventListeners" 
-  interface="com.xyz.EventListener"/>]]></programlisting>
+        <programlisting language="xml"><![CDATA[<list id="myEventListeners" interface="com.xyz.EventListener"/>]]></programlisting>
 
         <para>The members of the collection defined by the bean are managed
         dynamically by Spring. As matching services are registered and
@@ -1066,9 +1066,45 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
   <comparator><natural-ordering basis="service-references"/></comparator>
 </set>]]></programlisting>
 
-		<remark>For a sorted set, a <interfacename>SortedSet</interfacename> implementation will be created.
+		<note>For a sorted set, a <interfacename>SortedSet</interfacename> implementation will be created.
 		However, since the JDK API does not provide a dedicated <interfacename>SortedList</interfacename>interface, 
-		the sorted list will implement only the <interfacename>List</interfacename> interface.</remark>
+		the sorted list will implement only the <interfacename>List</interfacename> interface.</note>
+
+
+		<section id="service-registry:refs:collection:greedy-proxying">
+			<title>Greedy Proxying</title>
+			
+			<para>All OSGi services imported by a Spring-DM service collection publish and are type-compatible with the classes
+			declared by the <literal>interfaces</literal> property. However, some services might expose additional (optional) 
+			classes that could be relevant to your application.</para>
+			
+			<para>For these cases, Spring-DM collections offer a dedicated attribute called <literal>greedy-proxying</literal> which
+			will cause the creates proxies to use <emphasis>all</emphasis> the classes advertised by the imported services, visible to the consuming
+			importing bundle. Thus, it is possible to cast the imported proxy to a class different then those specified in the
+			<literal>interfaces</literal>. For example, with the following list definition:
+			</para>
+
+        	<programlisting language="xml"><![CDATA[<list id="services" interface="com.xyz.SomeService" greedy-proxying="true"/>]]></programlisting>
+			
+			<para>one can do the following iteration:</para>	
+        <programlisting language="java"><![CDATA[for (Iterator iterator = services.iterator(); iterator.hasNext();) {
+	SomeService service = (SomeService) iterator.next();
+	service.executeOperation();
+	// if the service implements an additional type
+	// do something extra
+	if (service instanceof MessageDispatcher) {
+		((MessageDispatcher)service).sendAckMessage();
+	}
+}]]></programlisting>
+
+			
+			<note>Before using greedy proxies and <literal>instanceof</literal> statements, consider using a different
+			interface/class for your services which provides better 
+			<ulink url="http://en.wikipedia.org/wiki/Polymorphism_in_object-oriented_programming">polymorphism</ulink> 
+			and is more 
+			<ulink url="http://en.wikipedia.org/wiki/Object_oriented">object-oriented</ulink>.</note>
+			
+		</section>		
 		
 		<section id="service-registry:refs:collection:attributes">
 			<title>Collection (<literal>list</literal> and <literal>set</literal>) element attributes</title>
@@ -1143,6 +1179,14 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
                 <entry spanname="values">any string value</entry>
                 <entry>Named reference to a bean acting as comparator for the declaring collection. Declaring a comparator automatically
                 makes the declaring collection sorted.</entry>
+              </row>
+              <row>
+                <entry>greedy-proxying</entry>
+                <entry namest="c2" nameend="c3" align="center">true</entry>
+                <entry namest="c4" nameend="c5" align="center">false</entry>
+                <entry>Indicates whether the proxies created for the imported OSGi services will be generated using 
+                just the classes specified (<literal>false</literal>) or all the classes exported by the service and visible to
+                the importing bundle (<literal>true</literal>). The default value is <literal>false</literal>.</entry>
               </row>              
             </tbody>
           </tgroup>
