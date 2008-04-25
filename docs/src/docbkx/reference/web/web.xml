@@ -250,7 +250,7 @@
 		            <para><link linkend="web-extender-configuration-options">Pre-defined</link> bean name used by the web extender</para>
 		         </callout>
 		         <callout arearefs="web:configuration:changing-deployer.bt">
-		            <para>Bean implementing <interfacename>org.springframework.osgi.web.extender.WarDeployer</interfacename> interface</para>
+		            <para>Bean implementing <interfacename>org.springframework.osgi.web.deployer.WarDeployer</interfacename> interface</para>
 		         </callout>
 		        </calloutlist>		        
     		</programlistingco>
@@ -350,14 +350,13 @@
 			</para>
 			
 			<para>In addition to the Catalina artifacts, the repository contains also a Tomcat activator (that works with both 5.5.x and 6.0.x versions) named
-			<literal>catalina.osgi.start</literal>. The activator contains a default configuration that starts the server on <literal>localhost</literal>, 
-			port <literal>8080</literal>. This behaviour can be customized through a properties file located at <literal>conf/embedded-server.properties</literal> 
-			which can contain the following entries:</para>
-			<programlisting language="java"><![CDATA[home = [catalina home]
-host = [server host name]
-port = [server port number]]]></programlisting>
-
-			<para>To attach <link linkend="appendix-tips:fragments">fragments</link> to the Tomcat activator, specify the following host name in the fragment manifest:</para>
+			<literal>catalina.osgi.start</literal>. The activator understands Tomcat XML configuration and contains a default, minimal setup that starts the 
+			server on <literal>localhost</literal>,	port <literal>8080</literal>. This behaviour can be customized by placing the desired configuration 
+			(which will override the default one) under	<literal>conf/server.xml</literal> location (following the Tomcat folder layout) 
+			in a fragment attached to the Tomcat activator.</para>
+			
+			<para>To attach <link linkend="appendix-tips:fragments">fragments</link> to the Tomcat activator, specify the following host name in the fragment 
+			manifest:</para>
 			<programlisting><![CDATA[Fragment-Host: org.springframework.osgi.catalina.start.osgi]]></programlisting>
 		</section>
 
@@ -366,8 +365,9 @@ port = [server port number]]]></programlisting>
 			
 			<para>Since Jetty is OSGi-ready by default, the official distribution can be installed without any transformation/processing on the OSGi platform. However,
 			since there is no activator, Spring-DM provides one, similar in functionality to the one available for Tomcat. The activator has 
-			<literal>jetty.start.osgi</literal> as artifact id. Besides the activator, a separate bundle containing the configuration is provided, as a fragment,
-			under the name <literal>jetty.etc.osgi</literal>. The fragment contains the standard Jetty configuration under <literal>etc/</literal> folder.</para>
+			<literal>jetty.start.osgi</literal> as artifact id. Just like the Tomcat case, a default configuration is included which starts a Jetty
+			instance on <literal>localhost</literal>, port <literal>8080</literal>. To change the defaults, place your Jetty configuration under 
+			<literal>etc/jetty.xml</literal> location.</para>			 
 			
 			<para>To attach <link linkend="appendix-tips:fragments">fragments</link> to the Jetty activator, specify the following host name in the fragment manifest:</para>
 			<programlisting><![CDATA[Fragment-Host: org.springframework.osgi.jetty.start.osgi]]></programlisting>
