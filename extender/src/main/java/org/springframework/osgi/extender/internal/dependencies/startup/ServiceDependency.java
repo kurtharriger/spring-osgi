@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
 import org.osgi.framework.BundleContext;
@@ -21,10 +22,13 @@ import org.osgi.framework.ServiceEvent;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
- * @author Costin Leau
+ * Holder/helper class representing an OSGi service dependency
  * 
+ * @author Costin Leau
+ * @author Hal Hildebrand
  */
 public class ServiceDependency {
+
 	protected final Filter filter;
 
 	protected final String filterAsString;
@@ -33,12 +37,15 @@ public class ServiceDependency {
 
 	protected final BundleContext bundleContext;
 
-	public ServiceDependency(BundleContext bc, Filter serviceFilter, boolean isMandatory) {
+	private final String beanName;
+
+
+	public ServiceDependency(BundleContext bc, Filter serviceFilter, boolean isMandatory, String beanName) {
 		filter = serviceFilter;
 		this.filterAsString = filter.toString();
 		this.isMandatory = isMandatory;
 		bundleContext = bc;
-
+		this.beanName = beanName;
 	}
 
 	public boolean matches(ServiceEvent event) {
@@ -53,7 +60,7 @@ public class ServiceDependency {
 	}
 
 	public String toString() {
-		return "Dependency on [" + filterAsString + "]";
+		return "Dependency on [" + filterAsString + "] (from bean [" + beanName + "])";
 	}
 
 	/**
@@ -61,6 +68,15 @@ public class ServiceDependency {
 	 */
 	public Filter getFilter() {
 		return filter;
+	}
+
+	/**
+	 * Returns the beanName.
+	 * 
+	 * @return Returns the beanName
+	 */
+	public String getBeanName() {
+		return beanName;
 	}
 
 }

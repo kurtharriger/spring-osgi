@@ -43,6 +43,7 @@ Package org.springframework.osgi.extender
   wiring
 * improved listener list creation by reusing the extender bundle class loader
 * ApplicationContextConfiguration is now public
+* improved osgi service dependency logs by including the depedency declaring bean name
 
 Package org.springframework.osgi.io
 * extended OsgiBundleResource to implement ContextResource

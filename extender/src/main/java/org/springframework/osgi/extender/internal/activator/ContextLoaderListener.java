@@ -750,7 +750,7 @@ public class ContextLoaderListener implements BundleActivator {
 		multicaster.addApplicationListener(new OsgiListenerWrapper(applicationListeners));
 
 		if (log.isDebugEnabled())
-			log.debug("Iitializing OSGi listeners service completed...");
+			log.debug("Initialization of OSGi listeners service completed...");
 	}
 
 	/**

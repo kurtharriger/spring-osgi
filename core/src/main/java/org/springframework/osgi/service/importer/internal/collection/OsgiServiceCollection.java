@@ -220,7 +220,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		boolean trace = log.isTraceEnabled();
 
 		if (trace)
-			log.trace("adding osgi listener for services matching [" + filter + "]");
+			log.trace("Adding osgi listener for services matching [" + filter + "]");
 		OsgiListenerUtils.addServiceListener(context, listener, filter);
 
 		if (serviceRequiredAtStartup) {
@@ -365,7 +365,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	 * @param listeners The listeners to set.
 	 */
 	public void setListeners(OsgiServiceLifecycleListener[] listeners) {
-		Assert.notNull(listeners, "argument should not be null");
+		Assert.notNull(listeners);
 		this.listeners = listeners;
 	}
 

@@ -148,7 +148,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	 */
 	Object createProxy() {
 		if (log.isDebugEnabled())
-			log.debug("creating a multi-value/collection proxy");
+			log.debug("Creating a multi-value/collection proxy");
 
 		OsgiServiceCollection collection;
 		Collection delegate;
@@ -180,7 +180,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 		}
 
 		else {
-			throw new IllegalArgumentException("unknown collection type:" + collectionType);
+			throw new IllegalArgumentException("Unknown collection type:" + collectionType);
 		}
 
 		collection.setRequiredAtStartup(isMandatory());
@@ -245,7 +245,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	 */
 	public void setCardinality(Cardinality cardinality) {
 		Assert.notNull(cardinality);
-		Assert.isTrue(cardinality.isMultiple(), "only multiple cardinality ('X..N') accepted");
+		Assert.isTrue(cardinality.isMultiple(), "Only multiple cardinality ('X..N') accepted");
 		super.setCardinality(cardinality);
 	}
 

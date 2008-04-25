@@ -120,11 +120,11 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		boolean trace = log.isTraceEnabled();
 
 		if (trace)
-			log.trace("looking for resource " + name);
+			log.trace("Looking for resource " + name);
 		URL url = this.backingBundle.getResource(name);
 
 		if (trace && url != null)
-			log.trace("found resource " + name + " at " + url);
+			log.trace("Found resource " + name + " at " + url);
 		return url;
 	}
 
@@ -132,12 +132,12 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		boolean trace = log.isTraceEnabled();
 
 		if (trace)
-			log.trace("looking for resources " + name);
+			log.trace("Looking for resources " + name);
 
 		Enumeration enm = this.backingBundle.getResources(name);
 
 		if (trace && enm != null && enm.hasMoreElements())
-			log.trace("found resource " + name + " at " + this.backingBundle.getLocation());
+			log.trace("Found resource " + name + " at " + this.backingBundle.getLocation());
 
 		return enm;
 	}

@@ -378,7 +378,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			buf.append("none");
 		}
 		else {
-			for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().iterator(); dependencies.hasNext();) {
+			for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().keySet().iterator(); dependencies.hasNext();) {
 				ServiceDependency dependency = (ServiceDependency) dependencies.next();
 				buf.append(dependency.toString());
 				if (dependencies.hasNext()) {

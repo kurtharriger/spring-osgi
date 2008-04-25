@@ -71,7 +71,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 
 		interfacesOnlyProxying = onlyInterfaces;
 
-		String msg = (interfacesOnlyProxying ? " NOT " : "");
+		String msg = (interfacesOnlyProxying ? "NOT" : "");
 
 		if (log.isDebugEnabled())
 			log.debug("Greedy proxying will " + msg + " consider exposed classes");
