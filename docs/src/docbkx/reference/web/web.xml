@@ -18,13 +18,13 @@
     <para>A major feature introduced in the 1.1.0 release is <emphasis>support for web applications</emphasis> which enables easy deployment of web artifacts 
     to OSGi.</para>
     <para>
-    The major problems in running web applications in OSGi involve resource and class loading; there is no notion of <emphasis>bundle space</emphasis> or 
+    The biggest problems in running web applications in OSGi involve resource and class loading; there is no notion of <emphasis>bundle space</emphasis> or 
     <emphasis>imported packages</emphasis> in a web application. Each web container has its own class loading hierarchy and classpath assumption 
     which can conflict with the OSGi space. 
     Spring-DM addresses these problems by bridging the web container and the OSGi space so loading is no longer a concern. Unique in its functionality, 
     the web support in Spring-DM integrates directly with the web container so the WAR processing is literally handled by the server, giving full 
     access to its configuration and capabilities(non-blocking vs blocking IO, thread pool, specification support (Servlet 2.3, 2.4, 2.5) and so on).
-    The entire <literal>web.xml</literal> syntax is supported without any parsing on Spring-DM behalf, as well as any custom configuration files 
+    The entire <literal>web.xml</literal> syntax is supported (without any parsing on Spring-DM behalf), as well as any custom configuration file 
     particular to the target container. In short, everything that the target container supports is available to the OSGi WAR through Spring-DM.
     </para>
     
@@ -58,7 +58,7 @@
     	which the WAR is installed. That is, Spring-DM Web <emphasis>only</emphasis> dictates when a WAR is deployer to and undeployed from a web container; 
     	it is up to the web container to create and manage the equivalent web application.    
     	</para> 
-    	<para>To use Spring-DM, install:
+    	<para>To use Spring-DM Web, install:
     	<itemizedlist>
     		<listitem>
     			<literal>spring-osgi-web.jar</literal> - Spring-DM web support
@@ -79,7 +79,7 @@
     	to bootstrap the Spring container. See <xref linkend="web:spring-mvc"/> for Spring-MVC integration and/or Spring reference
     	<ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#context-create">documentation</ulink> for more information.
     	These being said, the Spring Extender is still required as it performs namespace handlers discovery - without it, it would not be possible to use
-    	Spring namespace (like <literal>osgi:</literal>, <literal>aop:</literal> or even <literal>beans:</literal> for that matter).</para>
+    	Spring namespaces (like <literal>osgi:</literal>, <literal>aop:</literal> or even <literal>beans:</literal> for that matter).</para>
     </section>
     
     <section id="web:classpath">
@@ -90,7 +90,7 @@
     	
     	<section id="web:classpath:static-resources">
     		<title>Static Resources</title>
-    		<para>When installing a WAR bundle, for static resources, Spring-DM will consider only what is available in the bundle space - this means what 
+    		<para>When installing a WAR bundle, for static resources, Spring-DM will only consider what is available in the bundle space - this means what 
     		is available in the bundle jar and its attached fragments. Conforming to the Servlet spec, resources under <literal>WEB-INF</literal> folder
     		will be available through the <interfacename>ServletContext</interfacename> API but not to remote clients connecting to the web application.
     		In addition, any resource available in the classpath (imported packages, required bundles or dynamic imports) can be loaded and used by
@@ -101,7 +101,7 @@
     		<title>Servlets</title>
     		
     		<para>The main difference from the <emphasis>traditional</emphasis> WAR deployment is that the Servlet packages need to be imported so they are
-    		available to WAR bundle. To do that, add the following packages to the <literal>Import-Package</literal> entry:</para>
+    		available to the WAR bundle. To do that, add the following packages to the <literal>Import-Package</literal> entry:</para>
     		
 			<programlisting><![CDATA[Import-Package: javax.servlet,javax.servlet.http,javax.servlet.resources]]></programlisting>
 			
@@ -113,21 +113,21 @@
 				<listitem><literal>WEB-INF/lib/*.jar</literal> - all jars under <literal>WEB-INF/lib</literal></listitem>
 			</itemizedlist>
 			<para>In addition, each container implementation can provide <emphasis>common</emphasis> libraries that are appended to the war classpath. Since OSGi, 
-			with its class wiring, versioning, reloading superseeds the WAR classpath, Spring-DM will ignore the WAR predefined locations and will <emphasis>always</emphasis>
+			with its class wiring, versioning, reloading, superseeds the WAR classpath, Spring-DM will ignore the WAR predefined locations and will <emphasis>always</emphasis>
 			use	the OSGi classpath instead. This means that classes imported by a WAR bundle can be used even if they are not present under <literal>WEB-INF/classes</literal>
 			folder or inside a jar under <literal>WEB-INF/lib</literal>. This also means that any class under <literal>WEB-INF/classes</literal> will not be considered
-			if it's not available in the war OSGi classpath.
+			if it's not available in the WAR OSGi classpath.
 			</para>
 			<para>One of the easiest ways to support the pre-defined WAR locations, is to add them to the bundle classpath, by adding them to the bundle manifest:</para>
 			<programlisting><![CDATA[Bundle-Classpath: .,WEB-INF/classes,WEB-INF/lib/some.jar,WEB-INF/lib/lib.jar]]></programlisting>
 			<para>Make sure the default <literal>Bundle-Classpath</literal> location (<literal>.</literal>) is present and there are no whitespaces between the commas.</para>
 			
 			<note>Since the OSGi API doesn't provide a hook for bundles to be pre-processed, Spring-DM cannot automate this process in a reliable way. However, we are 
-			working on finding a suitable solution. Note that there are tools (<ulink url="http://www.aqute.biz/Code/Bnd">bnd</ulink>) that can add these entries either 
-			during packaging or at runtime when the bundles are installed.</note>
+			working on finding a suitable solution. Note that there are tools (<ulink url="http://www.aqute.biz/Code/Bnd">bnd</ulink>) that can add these entries 
+			during packaging.</note>
 
-			<para>Before creating entries for embedded libraries, consider whether the library cannot be installed as an OSGi bundle - doing so will allow it to be 
-			shared with other WARs if needed and since OSGi allows versioning, it is perfectly okay to have multiple versions of the library inside the same VM.</para>
+			<para>Before creating entries for embedded libraries, consider whether they can be installed as OSGi bundles - doing so allows them to be 
+			shared with other WARs if needed and since OSGi allows versioning, it is perfectly okay to have multiple versions of the same library inside the same VM.</para>
     		
     	</section>
 
@@ -151,7 +151,7 @@
     			
     			<para>When dealing with libraries that export a lot of tags, one can use the <literal>Require-Bundle</literal> header instead of <literal>Import-Package</literal> for 
     			importing the tags:</para>
-    			<programlisting><![CDATA[Require-Bundle: org.springframework.osgi.jstl]]></programlisting>
+    			<programlisting><![CDATA[Require-Bundle: org.springframework.osgi.jstl.osgi]]></programlisting>
     			<para>Using the manifest entry above, all the classes (and thus tag implementations) exported by the JSP Standard Tag Library (or 
     			<ulink url="http://java.sun.com/products/jsp/jstl/index.jsp">JSTL</ulink> in short), are seen by the war bundle and thus can be
     			used inside the JSPs.</para>
@@ -161,7 +161,7 @@
     		</section>
     	</section>
 
-	<para>No matter what mechanism you decide to use for the war classpath, due to OSGi capabilities, it is possible to create libraries that are <emphasis>shared</emphasis>
+	<para>No matter what mechanism you decide to use for the war classpath, due to the OSGi capabilities, it is possible to create libraries that are <emphasis>shared</emphasis>
     between multiple WARs while having full control over the used packages. Each bundle can import only the packages (and the versions) needed not an entire library jar - in fact,
     packages from different bundles/jars can be selectively used to obtain the desired behaviour - a very powerful capability which should make web application deployment easier.</para> 
     </section>
@@ -170,7 +170,7 @@
     	<title>Configuring the web extender</title>
     	
     	<para>Just like the <link linkend="app-deploy:extender-configuration">core extender</link>, the web extender can be configured by using OSGi <link linkend="appendix-tips:fragments">fragments</link>.
-    	Following a similar pattern, the web extender looks for all XMLs under <literal>META-INF/spring</literal> folder in its bundle space and assembles them into
+    	Following a similar pattern, the web extender looks for all XMLs under <literal>META-INF/spring</literal> folder in <emphasis>its<emphasis> bundle space and assembles them into
     	an application context that is used internally as its configuration. To override a default setting of the web extender, look up the appropriate bean
     	name from the table below, define it in a suitable manner and then attach it as a <link linkend="appendix-tips:fragments">fragment</link> to the <literal>spring-osgi-web.jar</literal>,
     	using:</para>
@@ -250,7 +250,7 @@
 		            <para><link linkend="web-extender-configuration-options">Pre-defined</link> bean name used by the web extender</para>
 		         </callout>
 		         <callout arearefs="web:configuration:changing-deployer.bt">
-		            <para>Bean implementing <interfacename>org.springframework.osgi.web.extender.deployer.WarDeployer</interfacename> interface</para>
+		            <para>Bean implementing <interfacename>org.springframework.osgi.web.extender.WarDeployer</interfacename> interface</para>
 		         </callout>
 		        </calloutlist>		        
     		</programlistingco>
@@ -260,14 +260,14 @@
 			<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.web.extender]]></programlisting>
 	
 			<para>Now the fragment can be deployed alongside <literal>spring-osgi-web.jar</literal> bundle to plug in Jetty.</para>
-			<para>A pre-packed Jetty fragment is available in Spring-DM <link linkend="appendix-osgi-repo"> maven repository</link> under 
+			<para>A pre-packed Jetty fragment is available in the Spring-DM <link linkend="appendix-osgi-repo"> maven repository</link> under 
 			<literal>jetty.web.extender.fragment.osgi</literal> artifactId.</para>
     	</section>
     </section>
     
     <section id="web:configuration:changing-deployer">
     	<title>Customizing the standard deployer</title>
-    	<para>By default, the default deployers look up the needed services, at startup. As the services are considered mandatory, the deployers will wait for
+    	<para>By default, the out of the box deployers look up the needed services, at startup. As the services are considered mandatory, the deployers will wait for
     	them and, in case they are not found, will throw an exception. In cases where the default timeout or service lookup filter is not be appropriate, one
     	can customize the service used through a Spring-DM <link linkend="service-registry:refs">reference</link>: 
     	</para>
@@ -308,7 +308,7 @@
             <para>Deployer definition (name is important)</para>
          </callout>
          <callout arearefs="web:configuration:deployer-service.prop">
-            <para>Service assignment (through the <literal>p</literal> namespace) </para>
+            <para><emphasis>Service</emphasis> property assignment (through <literal>p</literal> namespace) </para>
          </callout>
          <callout arearefs="web:configuration:deployer-service.p.ns">
             <para>Spring's <literal>p</literal> namespace declaration - 
