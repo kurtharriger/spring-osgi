@@ -1080,13 +1080,13 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 			
 			<para>For these cases, Spring-DM collections offer a dedicated attribute called <literal>greedy-proxying</literal> which
 			will cause the creates proxies to use <emphasis>all</emphasis> the classes advertised by the imported services, visible to the consuming
-			importing bundle. Thus, it is possible to cast the imported proxy to a class different then those specified in the
+			importing bundle. Thus, it is possible to cast the imported proxies to classes different then those specified in the
 			<literal>interfaces</literal>. For example, with the following list definition:
 			</para>
 
         	<programlisting language="xml"><![CDATA[<list id="services" interface="com.xyz.SomeService" greedy-proxying="true"/>]]></programlisting>
 			
-			<para>one can do the following iteration:</para>	
+			<para>one can do the following iteration (assuming <classname>MessageDispatcher</classname> type is imported by the bundle):</para>	
         <programlisting language="java"><![CDATA[for (Iterator iterator = services.iterator(); iterator.hasNext();) {
 	SomeService service = (SomeService) iterator.next();
 	service.executeOperation();
