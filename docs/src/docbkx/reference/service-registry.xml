@@ -1497,7 +1497,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       	<listitem>Be careful when using overloaded methods: all methods matching a certain service type will be called which is not
       	always expected. Consider the following listener:
       	<programlistingco>
-      		<programlisting><![CDATA[public class MyListener {
+      		<programlisting language="java"><![CDATA[public class MyListener {
     void register(Object service, Map properties);
     void register(Collection dataService, Map properties);
     void register(SortedSet orderedDataService , Map properties);
