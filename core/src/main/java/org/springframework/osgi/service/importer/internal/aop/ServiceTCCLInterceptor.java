@@ -1,3 +1,4 @@
+
 package org.springframework.osgi.service.importer.internal.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -17,6 +18,7 @@ public class ServiceTCCLInterceptor implements MethodInterceptor {
 
 	/** classloader to set the TCCL during invocation */
 	private final ClassLoader loader;
+
 
 	/**
 	 * Constructs a new <code>OsgiServiceTCCLInterceptor</code> instance.
@@ -51,5 +53,4 @@ public class ServiceTCCLInterceptor implements MethodInterceptor {
 	public int hashCode() {
 		return hashCode;
 	}
-
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import java.awt.Polygon;
@@ -21,12 +22,17 @@ import java.awt.Shape;
 import junit.framework.TestCase;
 
 import org.aopalliance.aop.Advice;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.core.InfrastructureProxy;
+import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.importer.internal.aop.InfrastructureOsgiProxyAdvice;
 import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
@@ -43,6 +49,7 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 	private MockBundleContext bundleContext;
 
 	private ClassLoader classLoader;
+
 
 	/**
 	 * Simple interface which declares equals.
@@ -62,6 +69,7 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 	public static class Implementor implements InterfaceWithEquals {
 
 		private int count = 0;
+
 
 		public Implementor(int count) {
 			this.count = count;
@@ -91,7 +99,10 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 		}
 	}
 
-	ServiceReference ref; 
+
+	private ServiceReference ref;
+
+
 	protected void setUp() throws Exception {
 		ref = new MockServiceReference();
 		bundleContext = new MockBundleContext() {
@@ -200,6 +211,7 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 	public void testDifferentInterceptorsButTargetHasEquals() throws Exception {
 		target = new Implementor();
 		bundleContext = new MockBundleContext() {
+
 			public Object getService(ServiceReference reference) {
 				return target;
 			}
@@ -242,6 +254,72 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 		assertEquals(((InterfaceWithEquals) target).doSmth(), proxyB.doSmth());
 
 		assertEquals(proxyA, proxyB);
+	}
+
+	public void testSpringInfrastructureProxyOnImportersWithTheSameRef() throws Exception {
+		Object service = new Object();
+		ServiceInvoker invokerA = new ServiceStaticInterceptor(createObjectTrackingBundleContext(service), ref);
+		ServiceInvoker invokerB = new ServiceStaticInterceptor(createObjectTrackingBundleContext(service), ref);
+		InfrastructureProxy proxyA = new InfrastructureOsgiProxyAdvice(invokerA);
+		InfrastructureProxy proxyB = new InfrastructureOsgiProxyAdvice(invokerB);
+
+		// though this is not normal, we want the interceptors to be different to make sure the wrapped object
+		// gets properly delegated
+		assertFalse("invokers should not be equal (they have different bundle contexts)", invokerA.equals(invokerB));
+		assertFalse("proxies should not be equal", proxyA.equals(proxyB));
+		assertSame(proxyA.getWrappedObject(), proxyB.getWrappedObject());
+	}
+
+	public void testSpringInfrastructureProxyOnImportersWithDifferentRefs() throws Exception {
+		Object service = new Object();
+		BundleContext ctx = createObjectTrackingBundleContext(service);
+		ServiceInvoker invokerA = new ServiceStaticInterceptor(ctx, new MockServiceReference());
+		ServiceInvoker invokerB = new ServiceStaticInterceptor(ctx, new MockServiceReference());
+		InfrastructureProxy proxyA = new InfrastructureOsgiProxyAdvice(invokerA);
+		InfrastructureProxy proxyB = new InfrastructureOsgiProxyAdvice(invokerB);
+
+		assertFalse("invokers should not be equal (they have different service references)", invokerA.equals(invokerB));
+		assertFalse("proxies should not be equal", proxyA.equals(proxyB));
+		assertFalse("target objects should not be equal", proxyA.getWrappedObject().equals(proxyB.getWrappedObject()));
+	}
+
+	public void testNakedTargetPropertyReturnedByTheInfrastructureProxy() throws Exception {
+		Object service = new Object();
+		ServiceInvoker invoker = new ServiceStaticInterceptor(createObjectTrackingBundleContext(service), ref);
+		InfrastructureProxy proxy = new InfrastructureOsgiProxyAdvice(invoker);
+		assertSame(TestUtils.invokeMethod(invoker, "getTarget", null), proxy.getWrappedObject());
+		assertSame(service, proxy.getWrappedObject());
+	}
+
+	public void testEqualityBetweenInfrastructureProxies() throws Exception {
+		Advice interceptorA1 = new InfrastructureOsgiProxyAdvice(new ServiceStaticInterceptor(bundleContext, ref));
+		Advice interceptorB1 = new InfrastructureOsgiProxyAdvice(new ServiceStaticInterceptor(bundleContext, ref));
+
+		assertEquals("interceptors should be equal", interceptorA1, interceptorB1);
+	}
+
+	public void testNonEqualityBetweenInfrastructureProxies() throws Exception {
+		Advice interceptorA1 = new InfrastructureOsgiProxyAdvice(new ServiceStaticInterceptor(bundleContext, ref));
+		Advice interceptorB1 = new InfrastructureOsgiProxyAdvice(createInterceptorWOServiceRequired());
+
+		assertFalse("interceptors should not be equal", interceptorA1.equals(interceptorB1));
+	}
+
+	private BundleContext createObjectTrackingBundleContext(final Object trackedObject) {
+		return new MockBundleContext() {
+
+			public ServiceReference getServiceReference(String clazz) {
+				return ref;
+			}
+
+			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+				return new ServiceReference[] { ref };
+			}
+
+			public Object getService(ServiceReference reference) {
+				return (reference.equals(ref) ? trackedObject : super.getService(reference));
+			}
+		};
 	}
 
 }

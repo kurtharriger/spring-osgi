@@ -7,7 +7,7 @@
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/1.1.0-m2-SNAPSHOT/spring-osgi-mock-1.1.0-m2-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.2/spring-core-2.5.2.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.4-SNAPSHOT/spring-core-2.5.4-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.4.3/slf4j-log4j12-1.4.3.jar"/>

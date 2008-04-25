@@ -128,7 +128,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 						ServiceReference newReference = null;
 
 						boolean isDestroyed = false;
-						
+
 						synchronized (lock) {
 							isDestroyed = destroyed;
 						}
@@ -276,7 +276,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	/** flag indicating whether the destruction has started or not */
 	private boolean isDuringDestruction = false;
-	
+
 	private boolean destroyed = false;
 
 	/** private lock */
@@ -387,6 +387,13 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * This particular interceptor returns a delegated service reference so that
+	 * callers can keep the reference even if the underlying target service
+	 * reference changes in time.
+	 */
 	public ServiceReference getServiceReference() {
 		return referenceDelegate;
 	}

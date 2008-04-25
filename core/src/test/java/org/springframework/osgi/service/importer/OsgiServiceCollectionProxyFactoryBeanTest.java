@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer;
 
 import java.io.Serializable;
@@ -46,6 +47,7 @@ public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 
 	private ServiceReference ref;
 
+
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.serviceFactoryBean = new OsgiServiceCollectionProxyFactoryBean();
@@ -55,7 +57,9 @@ public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 		ref = new MockServiceReference(new String[] { Serializable.class.getName() });
 
 		bundleContext = new MockBundleContext() {
+
 			private final String filter_Serializable = OsgiFilterUtils.unifyFilter(Serializable.class, null);
+
 
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 				if (this.filter_Serializable.equalsIgnoreCase(filter))

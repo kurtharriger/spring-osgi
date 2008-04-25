@@ -29,8 +29,6 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Unit test for the static proxies returned by Osgi collection.
@@ -140,5 +138,4 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 		assertEquals("proxy should be equal to itself", proxy, proxy);
 
 	}
-
 }

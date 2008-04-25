@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Timer;
 
 import javax.print.attribute.SupportedValuesAttribute;
 
@@ -33,7 +32,6 @@ import org.springframework.core.enums.LabeledEnum;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Unit test regarding the importing of services inside a collection.

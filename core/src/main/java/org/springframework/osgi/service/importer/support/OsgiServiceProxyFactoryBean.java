@@ -24,6 +24,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProviderTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
@@ -99,7 +100,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		ServiceProxyCreator creator = new AbstractServiceProxyCreator(getInterfaces(), getAopClassLoader(),
 			getBundleContext(), getContextClassLoader()) {
 
-			Advice createDispatcherInterceptor(ServiceReference reference) {
+			ServiceInvoker createDispatcherInterceptor(ServiceReference reference) {
 				return lookupAdvice;
 			}
 

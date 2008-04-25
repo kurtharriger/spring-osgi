@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.core.InfrastructureProxy;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
@@ -54,7 +55,7 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 		List registrations = new ArrayList(3);
 
 		long time = 321;
-		Date date = new Date(time);
+		Date dateA = new Date(time);
 
 		try {
 			Object result = fb.getObject();
@@ -65,7 +66,7 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 			Iterator iter = col.iterator();
 
 			assertFalse(iter.hasNext());
-			registrations.add(publishService(date));
+			registrations.add(publishService(dateA));
 			assertTrue(iter.hasNext());
 			Object service = iter.next();
 			assertTrue(service instanceof Date);
@@ -73,11 +74,12 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 
 			assertTrue(service instanceof ImportedOsgiServiceProxy);
 			assertNotNull(((ImportedOsgiServiceProxy) service).getServiceReference());
+			assertSame(dateA, ((InfrastructureProxy) service).getWrappedObject());
 
 			assertFalse(iter.hasNext());
 			time = 111;
-			date = new Date(time);
-			registrations.add(publishService(date));
+			Date dateB = new Date(time);
+			registrations.add(publishService(dateB));
 			assertTrue(iter.hasNext());
 			service = iter.next();
 			assertTrue(service instanceof Date);
@@ -85,6 +87,8 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 			assertTrue(service instanceof ImportedOsgiServiceProxy);
 			assertNotNull(((ImportedOsgiServiceProxy) service).getServiceReference());
 
+			assertTrue(service instanceof InfrastructureProxy);
+			assertSame(dateB, ((InfrastructureProxy) service).getWrappedObject());
 		}
 		finally {
 			for (int i = 0; i < registrations.size(); i++) {

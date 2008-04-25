@@ -16,42 +16,45 @@
 
 package org.springframework.osgi.service.importer.internal.aop;
 
-import org.osgi.framework.ServiceReference;
 import org.springframework.aop.support.DelegatingIntroductionInterceptor;
-import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
+import org.springframework.core.InfrastructureProxy;
 import org.springframework.util.Assert;
 
 /**
- * Mix-in implementation for ImportedOsgiServiceProxy.
+ * Mixin implementation for {@link InfrastructureProxy} interface.
  * 
  * @author Costin Leau
  * 
  */
-public class ImportedOsgiServiceProxyAdvice extends DelegatingIntroductionInterceptor implements
-		ImportedOsgiServiceProxy {
+public class InfrastructureOsgiProxyAdvice extends DelegatingIntroductionInterceptor implements InfrastructureProxy {
 
-	private static final long serialVersionUID = 6455437774724678999L;
+	private static final long serialVersionUID = -496653472310304413L;
 
-	private static final int hashCode = ImportedOsgiServiceProxyAdvice.class.hashCode() * 13;
+	private static final int hashCode = InfrastructureOsgiProxyAdvice.class.hashCode() * 13;
 
-	private final transient ServiceReference reference;
+	private final transient ServiceInvoker invoker;
 
 
-	public ImportedOsgiServiceProxyAdvice(ServiceReference reference) {
-		Assert.notNull(reference);
-		this.reference = reference;
+	public InfrastructureOsgiProxyAdvice(ServiceInvoker serviceInvoker) {
+		Assert.notNull(serviceInvoker);
+		this.invoker = serviceInvoker;
 	}
 
-	public ServiceReference getServiceReference() {
-		return reference;
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Returns the OSGi target service.
+	 */
+	public Object getWrappedObject() {
+		return invoker.getTarget();
 	}
 
 	public boolean equals(Object other) {
 		if (this == other)
 			return true;
-		if (other instanceof ImportedOsgiServiceProxyAdvice) {
-			ImportedOsgiServiceProxyAdvice oth = (ImportedOsgiServiceProxyAdvice) other;
-			return (reference.equals(oth.reference));
+		if (other instanceof InfrastructureOsgiProxyAdvice) {
+			InfrastructureOsgiProxyAdvice oth = (InfrastructureOsgiProxyAdvice) other;
+			return (invoker.equals(oth.invoker));
 		}
 		else
 			return false;
