@@ -388,7 +388,12 @@ public abstract class DebugUtils {
 
 									return left;
 								}
-								version = Version.parseVersion(value);
+
+								// check quotes
+								if (value.startsWith("\"")) {
+									return Version.parseVersion(value.substring(1, value.length() - 1));
+								}
+								return Version.parseVersion(value);
 							}
 						}
 						if (version == null) {

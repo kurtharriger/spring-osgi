@@ -18,7 +18,7 @@ package org.springframework.osgi.iandt.web;
 
 import junit.framework.TestCase;
 
-public class HttpConnectionsTest extends TestCase {
+public abstract class HttpConnectionsTest extends TestCase {
 
 	public void testHttpConnection() throws Exception {
 		assertTrue(HttpClient.getResponse("http://www.springframework.org").isOk());

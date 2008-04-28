@@ -69,4 +69,10 @@ public class DebugUtilsTest extends TestCase {
 			pkg));
 	}
 
+	public void testSingleVersionWithQuotes() throws Exception {
+		String pkg = "foo";
+		String version = "3.4.5.pausesti";
+		assertEquals(Version.parseVersion(version), getVersion(pkg + ";version=\"" + version + "\"", pkg));
+	}
+
 }

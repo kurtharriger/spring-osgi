@@ -265,8 +265,8 @@
     	</section>
     </section>
     
-    <section id="web:configuration:changing-deployer">
-    	<title>Customizing the standard deployer</title>
+    <section id="web:configuration:customizing-deployer">
+    	<title>Customizing the standard deployers</title>
     	<para>By default, the out of the box deployers look up the needed services, at startup. As the services are considered mandatory, the deployers will wait for
     	them and, in case they are not found, will throw an exception. In cases where the default timeout or service lookup filter is not be appropriate, one
     	can customize the service used through a Spring-DM <link linkend="service-registry:refs">reference</link>: 
@@ -298,7 +298,8 @@
     <bean id="warDeployer"    
         class="org.springframework.osgi.web.deployer.tomcat.TomcatWarDeployer"
         p:service-ref="myTomcatServer"/>
-]]></programlisting>
+
+</beans>]]></programlisting>
 
 		<calloutlist>
          <callout arearefs="web:configuration:deployer-service.userdef">
@@ -319,6 +320,16 @@
         </calloutlist>		        
     	
     	</programlistingco>
+    	
+    	<para>Make sure to add the packages on which your configuration depends to the fragment manifest (since the web extender bundle imports only the packages
+    	it needs: Spring-DM web support's). For the example above, one must import Catalina <interfacename>Service</interfacename>'s package. Since the 
+    	<interfacename>Service</interfacename> interface signature depends on the <interfacename>Connector</interfacename> class from another package, its package
+    	needs to be imported as well - not doing so results in <classname>ClassNotFoundException/NoClassDefFoundError</classname>s:</para>
+
+		<programlisting><lineannotation># Catalina packages</lineannotation>
+Import-Package: org.apache.catalina,org.apache.catalina.connector
+<lineannotation># Spring-DM Web Extender</lineannotation>
+Fragment-Host: org.springframework.bundle.osgi.web.extender</programlisting>
     </section>
     
     

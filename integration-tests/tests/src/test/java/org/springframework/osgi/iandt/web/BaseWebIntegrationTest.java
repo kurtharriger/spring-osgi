@@ -143,8 +143,8 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 	// disable tests on KF for the time being
 	// disable Felix as well until 1.0.4 comes out
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return getPlatformName().equalsIgnoreCase(Platforms.KNOPFLERFISH)
-				|| getPlatformName().equalsIgnoreCase(Platforms.FELIX);
+		return getPlatformName().equalsIgnoreCase(Platforms.KNOPFLERFISH);
+				//|| getPlatformName().equalsIgnoreCase(Platforms.FELIX);
 	}
 
 }
