@@ -19,7 +19,7 @@
 
   <properties>
     <!-- Spring version -->   
-    <spring.maven.artifact.version>2.5.4-SNAPSHOT</spring.maven.artifact.version>
+    <spring.maven.artifact.version>2.5.4</spring.maven.artifact.version>
     <spring.base.version>2.5</spring.base.version>
     
     <!-- Felix BND plugin settings -->
@@ -76,7 +76,7 @@
    <!-- platform versions -->
    <equinox.ver>3.2.2</equinox.ver>
    <kf.ver>2.0.5</kf.ver>
-   <felix.ver>1.0.3</felix.ver>
+   <felix.ver>1.0.4</felix.ver>
    
    <!-- javadoc configuration -->
    <javadoc.loc>${basedir}/docs/src/javadoc</javadoc.loc>
@@ -720,16 +720,7 @@ limitations under the License.
     </pluginRepository>
 
 
-	<!-- alternative felix BND plugin snapshot -->
-	<pluginRepository>
-		<id>ops4j-snapshots</id>
-		<url>http://repository.ops4j.org/mvn-snapshots</url>
-		<releases>
-			<enabled>false</enabled>
-		</releases>
-	</pluginRepository>
-
-    <!--  Do NOT enable this repository
+   <!--  Do NOT enable this repository
     
     <pluginRepository>
 	 <snapshots><enabled>true</enabled></snapshots>
@@ -754,11 +745,6 @@ limitations under the License.
       <url>http://repo1.maven.org/eclipse/</url>
     </repository>
 
-    <repository>
-      <id>safehaus-repository</id>
-      <name>Safehaus Repository</name>
-      <url>http://m2.safehaus.org</url>
-    </repository>
 
     <repository>
       <id>spring-ext</id>
@@ -785,7 +771,7 @@ limitations under the License.
 		<url>http://maven.springframework.org/milestone</url>
 	</repository>
 
-	<!-- used when building against Spring snapshots -->
+	<!-- used when building against Spring snapshots
 	<repository>
 		<id>spring-snapshot</id>
 		<name>Spring Portfolio Milestone Repository</name>
@@ -794,6 +780,13 @@ limitations under the License.
 		 <enabled>true</enabled>
 		</snapshots>
 	</repository>
+	-->
+	
+    <repository>
+      <id>safehaus-repository</id>
+      <name>Safehaus Repository</name>
+      <url>http://m2.safehaus.org</url>
+    </repository>
     
     <repository>
       <id>i21-s3-osgi-repo</id>

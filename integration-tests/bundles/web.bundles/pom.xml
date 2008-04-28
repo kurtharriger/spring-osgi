@@ -50,7 +50,8 @@
     <module>static.resource.only.bundle</module>
     <module>simple.servlet.bundle</module>
     <module>simple.jsp.bundle</module>    
-	<module>taglib.jsp.bundle</module>        
+	<module>taglib.jsp.bundle</module>
+	<module>web.extender.deployer.fragment.bundle</module>
   </modules>
 
  <build>
