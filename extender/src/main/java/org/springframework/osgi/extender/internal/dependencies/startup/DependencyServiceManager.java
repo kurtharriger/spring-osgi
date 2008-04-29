@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
+import org.springframework.osgi.service.importer.OsgiServiceImportDependencyFactory;
+import org.springframework.osgi.service.importer.OsgiServiceImportDependencyDefinition;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
@@ -27,6 +30,7 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * 
  * @author Costin Leau
  * @author Hal Hildebrand
+ * @author Andy Piper
  */
 public class DependencyServiceManager {
 
@@ -199,7 +203,27 @@ public class DependencyServiceManager {
 					unsatisfiedDependencies.put(dependency, dependency.getBeanName());
 				}
 			}
-		}
+            // Add dependencies defined by any OsgiServiceImportDependencyFactorys.
+            beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
+                OsgiServiceImportDependencyFactory.class, true, false);
+            for (int i = 0; i < beans.length; i++) {
+                String beanName = beans[i];
+                OsgiServiceImportDependencyFactory reference = (OsgiServiceImportDependencyFactory) beanFactory.getBean(beanName);
+                Set depList = reference.getServiceDependencyDefinitions();
+                for (Iterator iter = depList.iterator(); iter.hasNext();) {
+                    OsgiServiceImportDependencyDefinition def = (OsgiServiceImportDependencyDefinition)iter.next();
+                    ServiceDependency dependency = new ServiceDependency(bundleContext, def.getFilter(),
+                        def.isMandatory(), def.getBeanName());
+
+                    dependencies.put(dependency, dependency.getBeanName());
+                    if (!dependency.isServicePresent()) {
+                        if (debug)
+                            log.debug("adding OSGi service dependency for filter " + def.getFilter());
+                        unsatisfiedDependencies.put(dependency, dependency.getBeanName());
+                    }
+                }
+            }
+        }
 		finally {
 			currentThread.setContextClassLoader(oldTCCL);
 		}
