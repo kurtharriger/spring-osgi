@@ -18,13 +18,13 @@ package org.springframework.osgi.extender.internal.dependencies.startup;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
+import org.springframework.osgi.service.importer.OsgiServiceImportDependencyDefinition;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
  * @author Costin Leau
- * 
  */
-public class ServiceDependency {
+public class ServiceDependency implements OsgiServiceImportDependencyDefinition {
 	protected final Filter filter;
 
 	protected final String filterAsString;
@@ -63,4 +63,7 @@ public class ServiceDependency {
 		return filter;
 	}
 
+	public boolean isMandatory() {
+		return isMandatory;
+	}
 }

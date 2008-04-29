@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.SortedSet;
 
 import junit.framework.TestCase;
-
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -64,18 +63,17 @@ public class OsgiServiceAnnotationTest extends TestCase {
 
 	/**
 	 * Disabled since it doesn't work as we can't proxy final classes.
-	 * @throws Exception
 	 */
 	public void tstGetServicePropertySetters() throws Exception {
 		OsgiServiceProxyFactoryBean pfb = new OsgiServiceProxyFactoryBean();
-		Method setter = AnnotatedBean.class.getMethod("setStringType", new Class[] { String.class });
+		Method setter = AnnotatedBean.class.getMethod("setStringType", new Class[]{String.class});
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 
 		processor.getServiceProperty(pfb, ref, setter, null);
 		Class[] intfs = (Class[]) getPrivateProperty(pfb, "serviceTypes");
 		assertEquals(intfs[0], String.class);
 
-		setter = AnnotatedBean.class.getMethod("setIntType", new Class[] { Integer.TYPE });
+		setter = AnnotatedBean.class.getMethod("setIntType", new Class[]{Integer.TYPE});
 		ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 
 		pfb = new OsgiServiceProxyFactoryBean();
@@ -88,48 +86,62 @@ public class OsgiServiceAnnotationTest extends TestCase {
 	public void testGetServicePropertyCardinality() throws Exception {
 		OsgiServiceProxyFactoryBean pfb = new OsgiServiceProxyFactoryBean();
 		Method setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithCardinality1_1",
-			new Class[] { AnnotatedBean.class });
+			new Class[]{AnnotatedBean.class});
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
 		assertTrue(pfb.isMandatory());
 
 		setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithCardinality0_1",
-			new Class[] { AnnotatedBean.class });
+			new Class[]{AnnotatedBean.class});
 		ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		pfb = new OsgiServiceProxyFactoryBean();
 		processor.getServiceProperty(pfb, ref, setter, null);
 		assertFalse(pfb.isMandatory());
 	}
 
-	// disabled since there are no annotations for multi-injection
 	public void testProperMultiCardinality() throws Exception {
 		OsgiServiceCollectionProxyFactoryBean pfb = new OsgiServiceCollectionProxyFactoryBean();
 
 		Method setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithCardinality0_N",
-			new Class[] { List.class });
+			new Class[]{List.class});
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
 		assertFalse(pfb.isMandatory());
 
 		setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithCardinality1_N",
-			new Class[] { SortedSet.class });
+			new Class[]{SortedSet.class});
 		ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		pfb = new OsgiServiceCollectionProxyFactoryBean();
 		processor.getServiceProperty(pfb, ref, setter, null);
 		assertTrue(pfb.isMandatory());
 	}
 
+	public void testErrorMultiCardinality() throws Exception {
+		OsgiServiceCollectionProxyFactoryBean pfb = new OsgiServiceCollectionProxyFactoryBean();
+
+		Method setter = AnnotatedBean.class.getMethod("setAnnotatedBeanErrorTypeWithCardinality1_N",
+			new Class[]{SortedSet.class});
+		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
+		pfb = new OsgiServiceCollectionProxyFactoryBean();
+		try {
+			processor.getServiceProperty(pfb, ref, setter, null);
+			fail("IllegalArgumentException should have been thrown");
+		}
+		catch (Exception e) {
+		}
+	}
+
 	public void testGetServicePropertyClassloader() throws Exception {
 		OsgiServiceProxyFactoryBean pfb = new OsgiServiceProxyFactoryBean();
 		Method setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithClassLoaderClient",
-			new Class[] { AnnotatedBean.class });
+			new Class[]{AnnotatedBean.class});
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
 		assertEquals(pfb.getContextClassLoader(), ImportContextClassLoader.CLIENT);
 
 		pfb = new OsgiServiceProxyFactoryBean();
 		setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithClassLoaderUmanaged",
-			new Class[] { AnnotatedBean.class });
+			new Class[]{AnnotatedBean.class});
 		ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
 
@@ -137,7 +149,7 @@ public class OsgiServiceAnnotationTest extends TestCase {
 
 		pfb = new OsgiServiceProxyFactoryBean();
 		setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithClassLoaderServiceProvider",
-			new Class[] { AnnotatedBean.class });
+			new Class[]{AnnotatedBean.class});
 		ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
 		assertEquals(pfb.getContextClassLoader(), ImportContextClassLoader.SERVICE_PROVIDER);
@@ -146,7 +158,7 @@ public class OsgiServiceAnnotationTest extends TestCase {
 	public void testGetServicePropertyBeanName() throws Exception {
 		OsgiServiceProxyFactoryBean pfb = new OsgiServiceProxyFactoryBean();
 		Method setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithBeanName",
-			new Class[] { AnnotatedBean.class });
+			new Class[]{AnnotatedBean.class});
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
 		String beanName = (String) getPrivateProperty(pfb, "serviceBeanName");
@@ -157,7 +169,7 @@ public class OsgiServiceAnnotationTest extends TestCase {
 	public void testGetServicePropertyFilter() throws Exception {
 		OsgiServiceProxyFactoryBean pfb = new OsgiServiceProxyFactoryBean();
 		Method setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithFilter",
-			new Class[] { AnnotatedBean.class });
+			new Class[]{AnnotatedBean.class});
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
 		String filter = (String) getPrivateProperty(pfb, "filter");
@@ -168,7 +180,7 @@ public class OsgiServiceAnnotationTest extends TestCase {
 	public void testGetServicePropertyServiceClass() throws Exception {
 		OsgiServiceProxyFactoryBean pfb = new OsgiServiceProxyFactoryBean();
 		Method setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeWithServiceType",
-			new Class[] { AnnotatedBean.class });
+			new Class[]{AnnotatedBean.class});
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
 		Class[] intfs = (Class[]) getPrivateProperty(pfb, "interfaces");
@@ -178,7 +190,7 @@ public class OsgiServiceAnnotationTest extends TestCase {
 	public void testGetServicePropertyComplex() throws Exception {
 		OsgiServiceProxyFactoryBean pfb = new OsgiServiceProxyFactoryBean();
 		Method setter = AnnotatedBean.class.getMethod("setAnnotatedBeanTypeComplex",
-			new Class[] { AnnotatedBean.class });
+			new Class[]{AnnotatedBean.class});
 		ServiceReference ref = AnnotationUtils.getAnnotation(setter, ServiceReference.class);
 		processor.getServiceProperty(pfb, ref, setter, null);
 		Class[] intfs = (Class[]) getPrivateProperty(pfb, "interfaces");
@@ -304,9 +316,9 @@ public class OsgiServiceAnnotationTest extends TestCase {
 		ServiceReferenceInjectionBeanPostProcessor p = new ServiceReferenceInjectionBeanPostProcessor();
 		p.setBundleContext(context);
 		p.setBeanClassLoader(getClass().getClassLoader());
-		PropertyValues pvs = p.postProcessPropertyValues(new MutablePropertyValues(), new PropertyDescriptor[] {
-				new PropertyDescriptor("serviceBean", ServiceFactoryBean.class),
-				new PropertyDescriptor("serializableBean", ServiceFactoryBean.class) }, bean, "myBean");
+		PropertyValues pvs = p.postProcessPropertyValues(new MutablePropertyValues(), new PropertyDescriptor[]{
+			new PropertyDescriptor("serviceBean", ServiceFactoryBean.class),
+			new PropertyDescriptor("serializableBean", ServiceFactoryBean.class)}, bean, "myBean");
 
 		MyService msb = (MyService) pvs.getPropertyValue("serviceBean").getValue();
 		Serializable ssb = (Serializable) pvs.getPropertyValue("serializableBean").getValue();
@@ -350,9 +362,9 @@ public class OsgiServiceAnnotationTest extends TestCase {
 		ServiceReferenceInjectionBeanPostProcessor p = new ServiceReferenceInjectionBeanPostProcessor();
 		p.setBundleContext(context);
 		p.setBeanClassLoader(getClass().getClassLoader());
-		PropertyValues pvs = p.postProcessPropertyValues(new MutablePropertyValues(), new PropertyDescriptor[] {
-				new PropertyDescriptor("serviceBean", ServiceBean.class),
-				new PropertyDescriptor("serializableBean", ServiceBean.class) }, bean, "myBean");
+		PropertyValues pvs = p.postProcessPropertyValues(new MutablePropertyValues(), new PropertyDescriptor[]{
+			new PropertyDescriptor("serviceBean", ServiceBean.class),
+			new PropertyDescriptor("serializableBean", ServiceBean.class)}, bean, "myBean");
 
 		MyService msb = (MyService) pvs.getPropertyValue("serviceBean").getValue();
 		Serializable ssb = (Serializable) pvs.getPropertyValue("serializableBean").getValue();
