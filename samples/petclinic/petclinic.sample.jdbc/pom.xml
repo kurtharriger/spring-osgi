@@ -3,7 +3,7 @@
   <parent>
     <artifactId>petclinic</artifactId>
     <groupId>org.springframework.osgi.samples</groupId>
-    <version>1.1.0-m2-SNAPSHOT</version>
+    <version>1.1.0-m2</version>
   </parent>
   
   <modelVersion>4.0.0</modelVersion>
@@ -11,7 +11,7 @@
   <artifactId>jdbc</artifactId>
   <packaging>jar</packaging>
   <name>Spring OSGi Samples: Simple Petclinic JDBC</name>
-  <version>1.1.0-m2-SNAPSHOT</version>
+  <version>1.1.0-m2</version>
   <url>http://www.springframework.org/osgi</url>
   
   <dependencies>
@@ -53,7 +53,7 @@
     <repository>
     <id>i21-s3-maven-repo</id>
       <name>i21 S3 milestone repo</name>
-      <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+      <url>http://maven.springframework.org/milestone</url>
     </repository>	
  </repositories>    
 </project>
