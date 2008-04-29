@@ -17,6 +17,8 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
+import org.springframework.osgi.service.importer.OsgiServiceImportDependencyFactory;
+import org.springframework.osgi.service.importer.OsgiServiceImportDependencyDefinition;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
@@ -210,7 +212,27 @@ public class DependencyServiceManager {
 					unsatisfiedDependencies.add(dependency);
 				}
 			}
-		}
+            // Add dependencies defined by any OsgiServiceImportDependencyFactorys.
+            beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
+                OsgiServiceImportDependencyFactory.class, true, false);
+            for (int i = 0; i < beans.length; i++) {
+                String beanName = beans[i];
+                OsgiServiceImportDependencyFactory reference = (OsgiServiceImportDependencyFactory) beanFactory.getBean(beanName);
+                Set depList = reference.getServiceDependencyDefinitions();
+                for (Iterator iter = depList.iterator(); iter.hasNext();) {
+                    OsgiServiceImportDependencyDefinition def = (OsgiServiceImportDependencyDefinition)iter.next();
+                    ServiceDependency dependency = new ServiceDependency(bundleContext, def.getFilter(),
+                        def.isMandatory());
+
+                    dependencies.add(dependency);
+                    if (!dependency.isServicePresent()) {
+                        if (debug)
+                            log.debug("adding OSGi service dependency for filter " + def.getFilter());
+                        unsatisfiedDependencies.add(dependency);
+                    }
+                }
+            }
+        }
 		finally {
 			currentThread.setContextClassLoader(oldTCCL);
 		}
