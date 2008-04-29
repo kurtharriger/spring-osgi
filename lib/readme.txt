@@ -78,7 +78,7 @@ distribution/website before using any of them in your own applications.
 - used for running the samples on JDK 1.4
 
 * org.apache.felix.main.jar
-- Apache Felix 1.0.3 OSGi platform implementation (http://felix.apache.org)
+- Apache Felix 1.0.4 OSGi platform implementation (http://felix.apache.org)
 - required for building and running the framework's test suite
 
 * org.eclipse.osgi.jar
@@ -102,37 +102,37 @@ distribution/website before using any of them in your own applications.
 - required for running the framework's test suite
 
 * spring-aop.jar
-- Spring Framework 2.5.2 AOP library (http://www.springframework.org)
+- Spring Framework 2.5.4 AOP library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-beans.jar
-- Spring Framework 2.5.2 beans library (http://www.springframework.org)
+- Spring Framework 2.5.4 beans library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-context.jar
-- Spring Framework 2.5.2 context library (http://www.springframework.org)
+- Spring Framework 2.5.4 context library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-context-support.jar
-- Spring Framework 2.5.2 context support library (http://www.springframework.org)
+- Spring Framework 2.5.4 context support library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-core.jar
-- Spring Framework 2.5.2 core library (http://www.springframework.org)
+- Spring Framework 2.5.4 core library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-jdbc.jar
-- Spring Framework 2.5.2 jdbc library (http://www.springframework.org)
+- Spring Framework 2.5.4 jdbc library (http://www.springframework.org)
 - required for running the samples
 
 * spring-test.jar
-- Spring Framework 2.5.2 test library (http://www.springframework.org)
+- Spring Framework 2.5.4 test library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-web.jar
-- Spring Framework 2.5.2 web library (http://www.springframework.org)
+- Spring Framework 2.5.4 web library (http://www.springframework.org)
 - required for running the samples and the framework's test suite
 
 * spring-webmvc.jar
-- Spring Framework 2.5.2 mvc library (http://www.springframework.org)
+- Spring Framework 2.5.4 mvc library (http://www.springframework.org)
 - required for running the samples and the framework's test suite
