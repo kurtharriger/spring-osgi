@@ -122,4 +122,4 @@ The Spring Dynamic Modules homepage is located at:
 
 The Spring Framework portal is located at:
 
-	http://www.springframework.org	
+	http://www.springframework.org
