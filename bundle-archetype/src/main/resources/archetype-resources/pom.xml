@@ -11,7 +11,7 @@
   
   <properties>
 	<slf4j.version>1.4.3</slf4j.version>
-	<spring.maven.artifact.version>2.5.2</spring.maven.artifact.version>
+	<spring.maven.artifact.version>2.5.4</spring.maven.artifact.version>
 	<spring.osgi.version>1.1.0-m2-SNAPSHOT</spring.osgi.version>
 	<equinox.ver>3.2.2</equinox.ver>
   </properties>
@@ -203,14 +203,14 @@
       <snapshots>
          <enabled>true</enabled>
       </snapshots>
-      <url>http://s3.amazonaws.com/maven.springframework.org/osgi</url>
+      <url>http://maven.springframework.org/osgi</url>
     </repository>    
     
     
     <repository>
       <id>i21-s3-maven-repo</id>
       <name>i21 S3 milestone repo</name>
-      <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+      <url>http://maven.springframework.org/milestone</url>
     </repository>
     
     <!--
