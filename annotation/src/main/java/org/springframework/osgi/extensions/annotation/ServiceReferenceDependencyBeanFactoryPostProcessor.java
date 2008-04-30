@@ -48,7 +48,7 @@ public class ServiceReferenceDependencyBeanFactoryPostProcessor
 			String className = definition.getBeanClassName();
 			try {
 				Class clazz = Class.forName(className, true, beanFactory.getBeanClassLoader());
-				dependencies.addAll(getClassServiceDependencies(clazz, definitionName));
+				dependencies.addAll(getClassServiceDependencies(clazz, definitionName, definition));
 			}
 			catch (ClassNotFoundException cnfe) {
 				if (logger.isWarnEnabled())
@@ -67,14 +67,17 @@ public class ServiceReferenceDependencyBeanFactoryPostProcessor
 		return AnnotationUtils.findAnnotation(clazz, ServiceReference.class) != null;
 	}
 
-	private Set getClassServiceDependencies(final Class beanClass, final String beanName) {
+	private Set getClassServiceDependencies(final Class beanClass, final String beanName,
+                                            final BeanDefinition definition) {
 		final HashSet dependencies = new HashSet();
 		ReflectionUtils.doWithMethods(beanClass, new ReflectionUtils.MethodCallback() {
 
 			public void doWith(final Method method) {
 				final ServiceReference s = AnnotationUtils.getAnnotation(method, ServiceReference.class);
 				if (s != null && method.getParameterTypes().length == 1
-					&& !Collection.class.isAssignableFrom(method.getParameterTypes()[0])) {
+					&& !Collection.class.isAssignableFrom(method.getParameterTypes()[0])
+                        // Ignore definitions overriden in the XML config
+                        && !definition.getPropertyValues().contains(getPropertyName(method))) {
 					try {
 						if (logger.isDebugEnabled())
 							logger.debug("Processing annotation [" + s + "] for [" + beanClass.getName() + "."
@@ -103,7 +106,15 @@ public class ServiceReferenceDependencyBeanFactoryPostProcessor
 		return dependencies;
 	}
 
-	private Filter getUnifiedFilter(ServiceReference s, Method writeMethod, String beanName) {
+    private String getPropertyName(Method method) {
+        String name = method.getName();
+        if (name.startsWith("set")) {
+            return Character.toLowerCase(name.charAt(3)) + name.substring(4);
+        }
+        return name;
+    }
+
+    private Filter getUnifiedFilter(ServiceReference s, Method writeMethod, String beanName) {
 		String filter;
 		if (s.serviceTypes() == null || s.serviceTypes().length == 0
 			|| (s.serviceTypes().length == 1 && s.serviceTypes()[0].equals(ServiceReference.class))) {

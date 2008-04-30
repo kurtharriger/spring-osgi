@@ -130,7 +130,9 @@ public class DependencyServiceManager {
 						case ServiceEvent.MODIFIED:
 							unsatisfiedDependencies.remove(dependency);
 							if (debug) {
-								log.debug("found service; eliminating " + dependency);
+								log.debug("found service for " + context.getDisplayName()
+                                        +  "; eliminating " + dependency + ", remaining ["
+                                + unsatisfiedDependencies + "]");
 							}
 							break;
 
@@ -198,8 +200,8 @@ public class DependencyServiceManager {
 
 				String realBean = beanName.substring(1);
 
-				if (debug)
-					log.debug("destroying bean " + realBean + " from context " + beanFactory);
+				//if (debug)
+				//	log.debug("destroying bean " + realBean + " from context " + beanFactory);
 
 				// clean up factory singleton
 				// ((DefaultListableBeanFactory)
@@ -238,8 +240,7 @@ public class DependencyServiceManager {
 		}
 
 		log.info(dependencies.size() + " OSGi service dependencies, " + unsatisfiedDependencies.size()
-				+ " unsatisfied for " + context.getDisplayName());
-
+				+ " unsatisfied ["+ unsatisfiedDependencies + "] for " + context.getDisplayName());
 	}
 
 	protected boolean isSatisfied() {
