@@ -33,13 +33,13 @@ public class ServiceDependency implements OsgiServiceImportDependencyDefinition 
 
 	protected final BundleContext bundleContext;
 
-	public ServiceDependency(BundleContext bc, Filter serviceFilter, boolean isMandatory) {
-		filter = serviceFilter;
-		this.filterAsString = filter.toString();
-		this.isMandatory = isMandatory;
-		bundleContext = bc;
+    public ServiceDependency(BundleContext bc, Filter serviceFilter, boolean isMandatory) {
+        filter = serviceFilter;
+        this.filterAsString = filter.toString();
+        this.isMandatory = isMandatory;
+        bundleContext = bc;
 
-	}
+    }
 
 	public boolean matches(ServiceEvent event) {
 		return filter.match(event.getServiceReference());
@@ -66,4 +66,24 @@ public class ServiceDependency implements OsgiServiceImportDependencyDefinition 
 	public boolean isMandatory() {
 		return isMandatory;
 	}
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final ServiceDependency that = (ServiceDependency) o;
+
+        if (isMandatory != that.isMandatory) return false;
+        if (filterAsString != null ? !filterAsString.equals(that.filterAsString) : that.filterAsString != null)
+            return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result;
+        result = (filterAsString != null ? filterAsString.hashCode() : 0);
+        result = 29 * result + (isMandatory ? 1 : 0);
+        return result;
+    }
 }
