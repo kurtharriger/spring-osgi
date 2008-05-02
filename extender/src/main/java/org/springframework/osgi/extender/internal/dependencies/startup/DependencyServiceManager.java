@@ -131,7 +131,9 @@ public class DependencyServiceManager {
 						case ServiceEvent.MODIFIED:
 							unsatisfiedDependencies.remove(dependency);
 							if (debug) {
-								log.debug("Found service; eliminating " + dependency);
+								log.debug("Found service for " + context.getDisplayName()
+                                        +  "; eliminating " + dependency + ", remaining ["
+                                + unsatisfiedDependencies + "]");
 							}
 							break;
 
