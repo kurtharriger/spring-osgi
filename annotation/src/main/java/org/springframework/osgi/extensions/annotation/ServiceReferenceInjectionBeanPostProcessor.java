@@ -35,12 +35,14 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -93,7 +95,7 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 						if (logger.isDebugEnabled())
 							logger.debug("Processing annotation [" + s + "] for [" + bean.getClass().getName() + "."
 								+ method.getName() + "()] on bean [" + beanName + "]");
-						method.invoke(bean, getServiceProperty(s, method, beanName));
+                        method.invoke(bean, getServiceImporter(s, method, beanName).getObject());
 					}
 					catch (Exception e) {
 						throw new IllegalArgumentException("Error processing service annotation", e);
@@ -113,7 +115,15 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 				try {
 					if (logger.isDebugEnabled())
 						logger.debug("Processing annotation [" + s + "] for [" + beanName + "." + pd.getName() + "]");
-					newprops.addPropertyValue(pd.getName(), getServiceProperty(s, pd.getWriteMethod(), beanName));
+                    AbstractOsgiServiceImportFactoryBean importer = getServiceImporter(s, pd.getWriteMethod(), beanName);
+                    // BPPs are created in stageOne(), even though they are run in stageTwo(). This check means that
+                    // the call to getObject() will not fail with ServiceUnavailable. This is safe to do because
+                    // ServiceReferenceDependencyBeanFactoryPostProcessor will ensure that mandatory services are
+                    // satisfied before stageTwo() is run.
+                    if (bean instanceof BeanPostProcessor) {
+                        importer.setCardinality(Cardinality.C_0__1);
+                    }
+                    newprops.addPropertyValue(pd.getName(), importer.getObject());
 				}
 				catch (Exception e) {
 					throw new FatalBeanException("Could not create service reference", e);
@@ -123,7 +133,7 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 		return newprops;
 	}
 
-	private Object getServiceProperty(ServiceReference s, Method writeMethod, String beanName) throws Exception {
+	private AbstractOsgiServiceImportFactoryBean getServiceImporter(ServiceReference s, Method writeMethod, String beanName) throws Exception {
 		// Invocations will block here, so although the ApplicationContext is
 		// created nothing will
 		// proceed until all the dependencies are satisfied.
@@ -132,10 +142,10 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 			throw new IllegalArgumentException("Setter for [" + beanName + "] must have only one argument");
 		}
 		if (Collection.class.isAssignableFrom(params[0])) {
-			return getServiceProperty(new OsgiServiceCollectionProxyFactoryBean(), s, writeMethod, beanName).getObject();
+			return getServiceProperty(new OsgiServiceCollectionProxyFactoryBean(), s, writeMethod, beanName);
 		}
 		else {
-			return getServiceProperty(new OsgiServiceProxyFactoryBean(), s, writeMethod, beanName).getObject();
+			return getServiceProperty(new OsgiServiceProxyFactoryBean(), s, writeMethod, beanName);
 		}
 	}
 
@@ -165,8 +175,8 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 		else {
 			pfb.setInterfaces(s.serviceTypes());
 		}
-		pfb.setCardinality(s.cardinality().toCardinality());
-		pfb.setContextClassLoader(s.contextClassLoader().toImportContextClassLoader());
+        pfb.setCardinality(s.cardinality().toCardinality());
+        pfb.setContextClassLoader(s.contextClassLoader().toImportContextClassLoader());
 		pfb.setBundleContext(bundleContext);
 		if (s.serviceBeanName().length() > 0) {
 			pfb.setServiceBeanName(s.serviceBeanName());
