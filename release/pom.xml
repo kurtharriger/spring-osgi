@@ -24,6 +24,7 @@
 		<module>../extender</module>
 		<module>../test-support</module>		
 		<module>../web</module>
+		<module>../web-extender</module>
 		<module>../annotation</module>
 	</modules>
 

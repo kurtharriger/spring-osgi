@@ -17,6 +17,7 @@
 				<include>org.springframework.osgi:spring-osgi-extender</include>											
 				<include>org.springframework.osgi:spring-osgi-test</include>
 				<include>org.springframework.osgi:spring-osgi-web</include>
+				<include>org.springframework.osgi:spring-osgi-web-extender</include>
 			</includes>
 			<!-- the .jar and -sources.jar will be included here -->
 			<sources>
