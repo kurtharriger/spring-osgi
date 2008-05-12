@@ -236,6 +236,6 @@ public class DefaultContextPathStrategyTest extends TestCase {
 
 		String path = strategy.getContextPath(bundle);
 		assertTrue(path.startsWith("/"));
-		assertEquals(encode("/" + value), path);
+		assertEquals("/" + encode(value), path);
 	}
 }

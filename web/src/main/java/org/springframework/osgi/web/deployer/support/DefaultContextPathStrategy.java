@@ -136,6 +136,9 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 
 	private String getBundleHeader(Bundle bundle) {
 		Dictionary headers = bundle.getHeaders();
+		if (headers == null)
+			return null;
+
 		String header = (String) headers.get(CONTEXT_PATH_HEADER);
 		if (header != null) {
 			header = header.trim();
