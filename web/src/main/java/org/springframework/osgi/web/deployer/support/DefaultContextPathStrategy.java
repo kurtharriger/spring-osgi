@@ -36,6 +36,10 @@ import org.springframework.util.StringUtils;
  * first one that is available in the following order:
  * 
  * <ol>
+ * <li>Web-ContextPath manifest header (identical to the one in SpringSource
+ * Application Platform). If present, the value of this header will be used as
+ * the context path.</li>
+ * 
  * <li>bundle location - if present, the implementation will try to determine
  * if the location points to a file or a folder. In both cases, the name will be
  * returned without the extension (if it's present):
@@ -71,6 +75,10 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 
 	private static String encodingScheme = "UTF-8";
 
+	private static String CONTEXT_PATH_HEADER = "Web-ContextPath";
+
+	private static final String SLASH = "/";
+
 	/** determine encoding */
 	static {
 		// do encoding
@@ -84,43 +92,33 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 		}
 	}
 
-	private static final String SLASH = "/";
-
 
 	public String getContextPath(Bundle bundle) {
 		Assert.notNull(bundle);
 
-		String location = bundle.getLocation();
-		String path = null;
-		if (StringUtils.hasText(location)) {
-			// clean up the path
-			path = StringUtils.cleanPath(location);
-			// it's a folder
-			if (path.endsWith(SLASH)) {
-				// remove trailing slash
-				path = path.substring(0, path.length() - 1);
-				int separatorIndex = path.lastIndexOf(SLASH);
+		// first get the header
+		String path = getBundleHeader(bundle);
 
-				// if there is no other slash, consider the whole location, otherwise detect the folder
-				path = (separatorIndex > -1 ? path.substring(separatorIndex + 1) : path);
+		if (path == null) {
+			String location = bundle.getLocation();
+			if (StringUtils.hasText(location)) {
+				path = getBundleLocation(location);
 			}
-			path = StringUtils.getFilename(path);
-			// remove file extension
-			path = StringUtils.stripFilenameExtension(path);
-		}
-		// the location is not good, use a fall back
-		else {
-			// fall-back to bundle name
-			Dictionary headers = bundle.getHeaders();
-			path = (headers != null ? (String) headers.get(Constants.BUNDLE_NAME) : null);
+			// the location is not good, use a fall back
+			else {
+				// fall-back to bundle name
+				Dictionary headers = bundle.getHeaders();
+				path = (headers != null ? (String) headers.get(Constants.BUNDLE_NAME) : null);
 
-			if (!StringUtils.hasText(path)) {
-				// fall back to bundle sym name
-				path = bundle.getSymbolicName();
-
-				// fall back to object identity
 				if (!StringUtils.hasText(path)) {
-					path = ClassUtils.getShortName(bundle.getClass()) + "-" + ObjectUtils.getIdentityHexString(bundle);
+					// fall back to bundle sym name
+					path = bundle.getSymbolicName();
+
+					// fall back to object identity
+					if (!StringUtils.hasText(path)) {
+						path = ClassUtils.getShortName(bundle.getClass()) + "-"
+								+ ObjectUtils.getIdentityHexString(bundle);
+					}
 				}
 			}
 		}
@@ -134,5 +132,35 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 			throw (RuntimeException) new IllegalStateException((encodingScheme == null ? "default " : encodingScheme)
 					+ " encoding scheme detected but unsable").initCause(ex);
 		}
+	}
+
+	private String getBundleHeader(Bundle bundle) {
+		Dictionary headers = bundle.getHeaders();
+		String header = (String) headers.get(CONTEXT_PATH_HEADER);
+		if (header != null) {
+			header = header.trim();
+			Assert.hasText(header, CONTEXT_PATH_HEADER
+					+ " manifest header contains no text; either specify a context path or remove the header");
+			return header;
+		}
+		return null;
+	}
+
+	private String getBundleLocation(String location) {
+		// clean up the path
+		String path = StringUtils.cleanPath(location);
+		// it's a folder
+		if (path.endsWith(SLASH)) {
+			// remove trailing slash
+			path = path.substring(0, path.length() - 1);
+			int separatorIndex = path.lastIndexOf(SLASH);
+
+			// if there is no other slash, consider the whole location, otherwise detect the folder
+			path = (separatorIndex > -1 ? path.substring(separatorIndex + 1) : path);
+		}
+		path = StringUtils.getFilename(path);
+		// remove file extension
+		path = StringUtils.stripFilenameExtension(path);
+		return path;
 	}
 }

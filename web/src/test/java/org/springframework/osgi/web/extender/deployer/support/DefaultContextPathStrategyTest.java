@@ -181,4 +181,61 @@ public class DefaultContextPathStrategyTest extends TestCase {
 		String path = strategy.getContextPath(bundle);
 		assertTrue(path.startsWith("/"));
 	}
+
+	public void testBundleHeader() throws Exception {
+		String value = "bla";
+		Dictionary headers = new Properties();
+		headers.put("Web-ContextPath", value);
+		Bundle bundle = new MockBundle(headers);
+
+		String path = strategy.getContextPath(bundle);
+		assertTrue(path.startsWith("/"));
+		assertEquals("/" + value, path);
+	}
+
+	public void testBundleHeaderWithoutText() throws Exception {
+		String value = "   ";
+		Dictionary headers = new Properties();
+		headers.put("Web-ContextPath", value);
+		Bundle bundle = new MockBundle(headers);
+
+		try {
+			strategy.getContextPath(bundle);
+			fail("expected exception as the header does not contains any text");
+		}
+		catch (IllegalArgumentException ex) {
+
+		}
+	}
+
+	public void testBundleHeaderMispelled() throws Exception {
+		final String expectedContextPath = "someLocation";
+
+		final Dictionary dict = new Properties();
+		dict.put("Web-ContextPth", "somethingElse");
+
+		Bundle bundle = new MockBundle() {
+
+			public Dictionary getHeaders() {
+				return dict;
+			}
+
+			public String getLocation() {
+				return expectedContextPath;
+			}
+		};
+
+		assertEquals("/" + expectedContextPath, strategy.getContextPath(bundle));
+	}
+
+	public void testBundleHeaderEncoding() throws Exception {
+		String value = "some file";
+		Dictionary headers = new Properties();
+		headers.put("Web-ContextPath", value);
+		Bundle bundle = new MockBundle(headers);
+
+		String path = strategy.getContextPath(bundle);
+		assertTrue(path.startsWith("/"));
+		assertEquals(encode("/" + value), path);
+	}
 }
