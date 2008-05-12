@@ -52,13 +52,6 @@
       <version>${slf4j.version}</version>
     </dependency>
 
-    
-    <dependency>
-     <groupId>org.osgi</groupId>
-     <artifactId>org.osgi.core</artifactId>
-     <version>4.0</version>
-    </dependency>
-
 	<!-- test scoped dependencies -->
     <dependency>
       <groupId>org.springframework.osgi</groupId>
