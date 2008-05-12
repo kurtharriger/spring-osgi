@@ -18,6 +18,7 @@ package org.springframework.osgi.config;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
@@ -99,7 +100,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 			else if (CONTEXT_CLASSLOADER.equals(name)) {
 				// convert constant to upper case to let Spring do the
 				// conversion
-				String val = value.toUpperCase().replace('-', '_');
+				String val = value.toUpperCase(Locale.ENGLISH).replace('-', '_');
 				builder.addPropertyValue(CCL_PROP, val);
 				return false;
 			}
@@ -296,7 +297,8 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	 * @return
 	 */
 	private Cardinality processCardinalityString(String value) {
-		return (Cardinality) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(Cardinality.class, value);
+		return (Cardinality) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(Cardinality.class,
+			value.toUpperCase(Locale.ENGLISH));
 	}
 
 	/**

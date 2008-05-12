@@ -16,6 +16,8 @@
  */
 package org.springframework.osgi.config;
 
+import java.util.Locale;
+
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -52,7 +54,7 @@ class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 		// do upper case to make sure the constants match
 		private Object parseAction(Element parent, Attr attribute) {
-			return attribute.getValue().toUpperCase();
+			return attribute.getValue().toUpperCase(Locale.ENGLISH);
 		}
 	};
 
