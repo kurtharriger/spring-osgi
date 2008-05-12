@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.aop;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -44,6 +46,7 @@ public abstract class ServiceInvoker implements MethodInterceptor, ServiceRefere
 
 	protected transient final Log log = LogFactory.getLog(getClass());
 
+
 	/**
 	 * Actual invocation - the class is being executed on a different object
 	 * then the one exposed in the invocation object.
@@ -55,8 +58,15 @@ public abstract class ServiceInvoker implements MethodInterceptor, ServiceRefere
 	 */
 	protected Object doInvoke(Object service, MethodInvocation invocation) throws Throwable {
 		Assert.notNull(service, "service should not be null!");
+		Method method = invocation.getMethod();
 		try {
-			return invocation.getMethod().invoke(service, invocation.getArguments());
+			return method.invoke(service, invocation.getArguments());
+		}
+		catch (IllegalAccessException ex) {
+			throw (RuntimeException) new IllegalAccessException(
+				"The invoked method ["
+						+ method.getName()
+						+ "] cannot be accessed. This usually occurs when proxying classes with final methods (which cannot be proxied). Consider using interfaces instead. If this is not an option, call only non-final methods.").initCause(ex);
 		}
 		catch (InvocationTargetException ex) {
 			throw ex.getTargetException();
