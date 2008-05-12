@@ -437,22 +437,16 @@
             </xsl:choose>
         </fo:basic-link>
     </xsl:template>
+    <!--
     
     <xsl:template match="xref">
         <fo:basic-link internal-destination="{@linkend}"
                 xsl:use-attribute-sets="xref.properties"
                 text-decoration="underline"
                 color="blue">
-            <xsl:choose>
-                <xsl:when test="count(child::node())=0">
-                    <xsl:value-of select="@linkend"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:apply-templates/>
-                </xsl:otherwise>
-            </xsl:choose>
+				<xsl:apply-templates/>
         </fo:basic-link>
     </xsl:template>    
-        
+    -->
 
 </xsl:stylesheet>
