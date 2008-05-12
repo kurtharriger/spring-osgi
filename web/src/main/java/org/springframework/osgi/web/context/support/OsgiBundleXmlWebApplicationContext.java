@@ -16,7 +16,6 @@
 
 package org.springframework.osgi.web.context.support;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -33,7 +32,6 @@ import org.springframework.ui.context.Theme;
 import org.springframework.ui.context.ThemeSource;
 import org.springframework.ui.context.support.UiApplicationContextUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.ServletConfigAware;
@@ -53,7 +51,7 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
  * functionality.
  * 
  * <p/>The OSGi service published for this application context contains the
- * namespace property under
+ * namespace property (if non-null) under
  * <code>org.springframework.web.context.namespace</code> property.
  * 
  * @see XmlWebApplicationContext
@@ -173,7 +171,10 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 	 */
 	protected void customizeApplicationContextServiceProperties(Map serviceProperties) {
 		super.customizeApplicationContextServiceProperties(serviceProperties);
-		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_NAMESPACE_PROPERTY, getNamespace());
+		String ns = getNamespace();
+		if (ns != null) {
+			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_NAMESPACE_PROPERTY, getNamespace());
+		}
 	}
 
 	/**
