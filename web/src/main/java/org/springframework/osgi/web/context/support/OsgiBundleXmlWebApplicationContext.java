@@ -70,6 +70,11 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 	public static final String BUNDLE_CONTEXT_ATTRIBUTE = "org.springframework.osgi.web."
 			+ BundleContext.class.getName();
 
+	/**
+	 * Suffix for WebApplicationContext namespaces.
+	 */
+	private static final String DEFAULT_NAMESPACE_SUFFIX = "-servlet";
+
 	/** Servlet context that this context runs in */
 	private ServletContext servletContext;
 
@@ -143,12 +148,29 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Returns the namespace for this application context, falling back to
+	 * default scheme if the servlet config is known and no custom namespace was
+	 * set: e.g. "test-servlet" for a servlet named "test".
+	 */
 	public String getNamespace() {
-		return this.namespace;
+		if (this.namespace != null) {
+			return this.namespace;
+		}
+
+		if (this.servletConfig != null) {
+			return this.servletConfig.getServletName() + DEFAULT_NAMESPACE_SUFFIX;
+		}
+
+		return null;
 	}
 
 	/**
-	 * Register request/session scopes, a {@link ServletContextAwareProcessor},
+	 * {@inheritDoc}
+	 * 
+	 * Registers request/session scopes, a {@link ServletContextAwareProcessor},
 	 * etc.
 	 */
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
@@ -173,12 +195,14 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 		super.customizeApplicationContextServiceProperties(serviceProperties);
 		String ns = getNamespace();
 		if (ns != null) {
-			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_NAMESPACE_PROPERTY, getNamespace());
+			serviceProperties.put(APPLICATION_CONTEXT_SERVICE_NAMESPACE_PROPERTY, ns);
 		}
 	}
 
 	/**
-	 * Initialize the theme capability.
+	 * {@inheritDoc}
+	 * 
+	 * Initializes the theme capability.
 	 */
 	protected void onRefresh() {
 		super.onRefresh();
@@ -190,7 +214,9 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 	}
 
 	/**
-	 * The default location for the root context is
+	 * {@inheritDoc}
+	 * 
+	 * Returns the default location for the root context. Default values are
 	 * "/WEB-INF/applicationContext.xml", and "/WEB-INF/test-servlet.xml" for a
 	 * context with the namespace "test-servlet" (like for a DispatcherServlet
 	 * instance with the servlet-name "test").
@@ -209,7 +235,9 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 	}
 
 	/**
-	 * Set the config locations for this application context in init-param
+	 * {@inheritDoc}
+	 * 
+	 * Sets the config locations for this application context in init-param
 	 * style, i.e. with distinct locations separated by commas, semicolons or
 	 * whitespace.
 	 * <p>
