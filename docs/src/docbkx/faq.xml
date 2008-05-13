@@ -201,11 +201,16 @@
         and Spring-DM delegate all logging (including initialisation) to the
         actual commons-logging API implementation.</para>
 
-        <para>Out of the box, <ulink type=""
-        url="http://www.slf4j.org/">SLF4J</ulink> library is provided, which
+        <para>Out of the box, <ulink url="http://www.slf4j.org/">SLF4J</ulink> library is provided, which
         shares the same purpose as commons-logging but without the
-        classloading discovery mechanism that causes loading issues, using
-        static wiring (see the SLF4J site for more info). Please see <link linkend="commons-logging">this
+        class loading discovery mechanism (that causes loading issues), using
+        static wiring (see the SLF4J site for more info). To use slf4j, make sure
+        you use: <literal>slf4j-api-XXX.jar</literal>, <literal>jcl104-overslf4j-XXX.jar</literal>
+        and <literal>slf4j-log4j-XXX.jar</literal> (where XXX stands for the slf4j version).
+        The last jar provides the static wiring between slf4j and log4j - if another implementation
+        is desired (such as jdk14), then a different jar is required (for the jdk14 that would be
+        slf4j-jdk14-XXX.jar) - see the official SLF4J site for more information.
+        Please see <link linkend="commons-logging">this
         question</link > for more details on why commons-logging jar is not
         used.</para>
 
