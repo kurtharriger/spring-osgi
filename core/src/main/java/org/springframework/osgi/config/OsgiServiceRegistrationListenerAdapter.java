@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.JdkVersion;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.internal.ReflectionUtils;
 import org.springframework.util.Assert;
@@ -132,8 +133,8 @@ class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegistrationL
 			new org.springframework.util.ReflectionUtils.MethodCallback() {
 
 				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-					// do matching on method name first
-					if (methodName.equals(method.getName())) {
+					// do matching on method name
+					if (!MethodUtils.isBridge(method) && methodName.equals(method.getName())) {
 						// take a look at the parameter types
 						Class[] args = method.getParameterTypes();
 						if (args != null && args.length == 1) {

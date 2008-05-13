@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.config;
 
 import java.lang.reflect.Method;
@@ -40,6 +41,7 @@ abstract class CustomListenerAdapterUtils {
 
 	private static final Log log = LogFactory.getLog(CustomListenerAdapterUtils.class);
 
+
 	/**
 	 * Specialized reflection utility that determines all methods that accept
 	 * two parameters such:
@@ -59,8 +61,7 @@ abstract class CustomListenerAdapterUtils {
 	 * @param possibleArgumentTypes
 	 * @return
 	 */
-	static Map determineCustomMethods(final Class target, final String methodName,
-			final Class[] possibleArgumentTypes) {
+	static Map determineCustomMethods(final Class target, final String methodName, final Class[] possibleArgumentTypes) {
 
 		if (!StringUtils.hasText(methodName)) {
 			return Collections.EMPTY_MAP;
@@ -76,7 +77,7 @@ abstract class CustomListenerAdapterUtils {
 			new org.springframework.util.ReflectionUtils.MethodCallback() {
 
 				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-					if (methodName.equals(method.getName())) {
+					if (!MethodUtils.isBridge(method) && methodName.equals(method.getName())) {
 						// take a look at the variables
 						Class[] args = method.getParameterTypes();
 
@@ -126,8 +127,8 @@ abstract class CustomListenerAdapterUtils {
 	/**
 	 * Invoke the custom listener method. Takes care of iterating through the
 	 * method map (normally aquired through
-	 * {@link #determineCustomMethods(Class, String, Class[])} and
-	 * invoking the method using the arguments.
+	 * {@link #determineCustomMethods(Class, String, Class[])} and invoking the
+	 * method using the arguments.
 	 * 
 	 * @param target
 	 * @param methods

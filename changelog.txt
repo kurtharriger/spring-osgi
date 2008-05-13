@@ -10,6 +10,7 @@ General
 
 Package org.springframework.osgi.config
 * fixed localization problem in xml enumeration conversion 
+* fixed listener double invocation caused by JDK 5 bridge methods
 
 Package org.springframework.osgi.service
 * added descriptive exception when invoking non-public methods on class proxies (caused by classes with final mehtods)
