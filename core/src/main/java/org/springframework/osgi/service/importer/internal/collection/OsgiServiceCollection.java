@@ -240,13 +240,12 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		synchronized (serviceProxies) {
 			for (Iterator iterator = serviceProxies.iterator(); iterator.hasNext();) {
 				ImportedOsgiServiceProxy serviceProxy = (ImportedOsgiServiceProxy) iterator.next();
-				listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, serviceProxy.getServiceReference()));
-			}
-			serviceProxies.clear();
+				ServiceReference ref = serviceProxy.getServiceReference();
 
-			// destroy the proxies now
-			for (Iterator iterator = servicesIdMap.values().iterator(); iterator.hasNext();) {
-				ProxyPlusCallback ppc = (ProxyPlusCallback) iterator.next();
+				// get first the destruction callback
+				ProxyPlusCallback ppc = (ProxyPlusCallback) servicesIdMap.get((Long) ref.getProperty(Constants.SERVICE_ID));
+				listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
+
 				try {
 					ppc.destructionCallback.destroy();
 				}
@@ -255,6 +254,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				}
 			}
 
+			serviceProxies.clear();
 			servicesIdMap.clear();
 		}
 	}

@@ -28,6 +28,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.core.InfrastructureProxy;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
+import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 
@@ -43,6 +44,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 	}
 
 	protected void onTearDown() throws Exception {
+		fb.destroy();
 		fb = null;
 	}
 
@@ -182,6 +184,41 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 		}
 		finally {
 			cleanRegistrations(registrations);
+		}
+	}
+
+	public void testProxyDestruction() throws Exception {
+		fb.setCardinality(Cardinality.C_0__N);
+		fb.setInterfaces(new Class[] { Date.class });
+		fb.afterPropertiesSet();
+
+		long time = 123;
+		Date date = new Date(time);
+		Properties props = new Properties();
+		props.put("Moroccan", "Sunset");
+
+		ServiceRegistration reg = publishService(date, props);
+		try {
+			Collection col = (Collection) fb.getObject();
+			Iterator iter = col.iterator();
+
+			assertTrue(iter.hasNext());
+			Date proxy = (Date) iter.next();
+
+			assertEquals(proxy.toString(), date.toString());
+
+			fb.destroy();
+
+			try {
+				proxy.getTime();
+				fail("should have thrown exception");
+			}
+			catch (ServiceProxyDestroyedException spde) {
+				// expected 
+			}
+		}
+		finally {
+			reg.unregister();
 		}
 	}
 
