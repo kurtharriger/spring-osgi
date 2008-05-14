@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.internal.service.collection;
 
 import java.util.Date;
 import java.util.Iterator;
 
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.support.CollectionType;
 
 /**
  * Mock test for OsgiServiceCollection.
@@ -30,6 +32,7 @@ public class OsgiServiceCollectionTest extends AbstractOsgiCollectionTest {
 
 	private Iterator iter;
 
+
 	protected void setUp() throws Exception {
 		super.setUp();
 		iter = col.iterator();
@@ -37,7 +40,7 @@ public class OsgiServiceCollectionTest extends AbstractOsgiCollectionTest {
 
 	OsgiServiceCollection createCollection() {
 		return new OsgiServiceCollection(null, context, getClass().getClassLoader(), createProxyCreator(new Class[] {
-				Wrapper.class, Comparable.class }));
+			Wrapper.class, Comparable.class }));
 	}
 
 	protected void tearDown() throws Exception {
@@ -106,5 +109,4 @@ public class OsgiServiceCollectionTest extends AbstractOsgiCollectionTest {
 		removeService(date2);
 		assertFalse(iter.hasNext());
 	}
-
 }
