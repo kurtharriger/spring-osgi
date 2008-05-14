@@ -12,6 +12,12 @@ Package org.springframework.osgi.config
 * fixed localization problem in xml enumeration conversion 
 * fixed listener double invocation caused by JDK 5 bridge methods
 
+Package org.springframework.osgi.context
+* refined AbstractOsgiBundleApplicationContext internal resource loader creation so that subclasses can override it
+
+Package org.springframework.osgi.io
+* improved getFile() method when dealing with resources in expanded bundles
+
 Package org.springframework.osgi.service
 * added descriptive exception when invoking non-public methods on class proxies (caused by classes with final mehtods)
 

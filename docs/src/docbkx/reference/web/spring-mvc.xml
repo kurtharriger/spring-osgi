@@ -20,7 +20,8 @@
      <interfacename>BundleContextAware</interfacename> and component scanning across the bundles included in the classpath.</para>
      
      <para>To use this application context instead of the default one, use the <literal>contextClass</literal> parameters supported by 
-     Spring's <classname>ContextLoaderListener</classname> and <classname>DispatcherServlet</classname>:</para>
+     Spring's <classname>ContextLoaderListener</classname> and <classname>DispatcherServlet</classname> inside your web application 
+     <literal>WEB-INF/web.xml</literal>:</para>
      
      <programlistingco>
  		<areaspec>
