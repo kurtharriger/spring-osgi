@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.TargetSource;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.util.Assert;
 
 /**
@@ -42,7 +43,7 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public abstract class ServiceInvoker implements MethodInterceptor, ServiceReferenceProvider {
+public abstract class ServiceInvoker implements MethodInterceptor, ServiceReferenceProvider, DisposableBean {
 
 	protected transient final Log log = LogFactory.getLog(getClass());
 
@@ -94,4 +95,7 @@ public abstract class ServiceInvoker implements MethodInterceptor, ServiceRefere
 	public ServiceReference getServiceReference() {
 		return null;
 	}
+
+	// override so no exception is thrown
+	public abstract void destroy();
 }

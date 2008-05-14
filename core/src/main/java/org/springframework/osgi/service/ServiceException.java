@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service;
 
 import org.springframework.osgi.OsgiException;
@@ -21,15 +22,16 @@ import org.springframework.osgi.OsgiException;
  * OSGi service specific exception.
  * 
  * @author Costin Leau
- *
+ * 
  */
 public class ServiceException extends OsgiException {
 
 	private static final long serialVersionUID = 8290043693193600721L;
 
+
 	/**
 	 * Constructs a new <code>ServiceException</code> instance.
-	 *
+	 * 
 	 */
 	public ServiceException() {
 		super();
@@ -37,7 +39,7 @@ public class ServiceException extends OsgiException {
 
 	/**
 	 * Constructs a new <code>ServiceException</code> instance.
-	 *
+	 * 
 	 * @param message exception detailed message
 	 * @param cause exception cause
 	 */
@@ -47,7 +49,7 @@ public class ServiceException extends OsgiException {
 
 	/**
 	 * Constructs a new <code>ServiceException</code> instance.
-	 *
+	 * 
 	 * @param message exception detailed message
 	 */
 	public ServiceException(String message) {
@@ -56,11 +58,10 @@ public class ServiceException extends OsgiException {
 
 	/**
 	 * Constructs a new <code>ServiceException</code> instance.
-	 *
+	 * 
 	 * @param cause exception cause
 	 */
 	public ServiceException(Throwable cause) {
 		super(cause);
 	}
-
 }

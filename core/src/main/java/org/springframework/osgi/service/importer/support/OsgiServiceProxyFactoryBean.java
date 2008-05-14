@@ -23,6 +23,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.internal.aop.ProxyPlusCallback;
 import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProviderTCCLInterceptor;
@@ -109,9 +110,10 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 			}
 		};
 
-		disposable = lookupAdvice;
+		ProxyPlusCallback proxyPlusCallback = creator.createServiceProxy(lookupAdvice.getServiceReference());
 
-		proxy = (ImportedOsgiServiceProxy) creator.createServiceProxy(lookupAdvice.getServiceReference());
+		proxy = proxyPlusCallback.proxy;
+		disposable = proxyPlusCallback.destructionCallback;
 
 		lookupAdvice.setProxy(proxy);
 		// start the lookup only after the proxy has been assembled

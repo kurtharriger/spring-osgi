@@ -70,7 +70,7 @@ import org.springframework.util.StringUtils;
  * </ul>
  * 
  * <p/> <strong>Note:</strong>If thread context class loader management is used ({@link #setContextClassLoader(ExportContextClassLoader)},
- * since proxying is required, the target class has to meet certain criterions
+ * since proxying is required, the target class has to meet certain criterion
  * described in the Spring AOP documentation. In short, final classes are not
  * supported when class enhancement is used.
  * 

@@ -18,7 +18,9 @@ package org.springframework.osgi.service.importer.internal.aop;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
 import org.springframework.util.Assert;
 
 /**
@@ -33,6 +35,11 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 
 	private static final int hashCode = ServiceStaticInterceptor.class.hashCode() * 13;
 
+	private boolean destroyed = false;
+
+	/** private lock */
+	private final Object lock = new Object();
+
 	private final ServiceReference reference;
 
 	private final BundleContext bundleContext;
@@ -46,6 +53,11 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 	}
 
 	protected Object getTarget() {
+		synchronized (lock) {
+			if (destroyed)
+				throw new ServiceProxyDestroyedException();
+		}
+
 		// check if the service is alive first
 		if (reference.getBundle() != null) {
 			// since requesting for a service requires additional work
@@ -60,6 +72,13 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 
 	public ServiceReference getServiceReference() {
 		return reference;
+	}
+
+	public void destroy() {
+		synchronized (lock) {
+			// set this flag first to make sure after destruction, the OSGi service is not used any more
+			destroyed = true;
+		}
 	}
 
 	public boolean equals(Object other) {

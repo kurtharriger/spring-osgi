@@ -28,6 +28,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.importer.internal.aop.ImportedOsgiServiceProxyAdvice;
 import org.springframework.osgi.service.importer.internal.aop.InfrastructureOsgiProxyAdvice;
+import org.springframework.osgi.service.importer.internal.aop.ProxyPlusCallback;
 import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
@@ -81,7 +82,7 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 		invokerBundleContextAdvice = new LocalBundleContextAdvice(bundleContext);
 	}
 
-	public Object createServiceProxy(ServiceReference reference) {
+	public ProxyPlusCallback createServiceProxy(ServiceReference reference) {
 		List advices = new ArrayList(4);
 
 		// 1. the ServiceReference-like mixin
@@ -106,7 +107,8 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 		advices.add(infrastructureMixin);
 		advices.add(dispatcherInterceptor);
 
-		return createProxy(getInterfaces(reference), classLoader, bundleContext, advices);
+		return new ProxyPlusCallback(createProxy(getInterfaces(reference), classLoader, bundleContext, advices),
+			dispatcherInterceptor);
 	}
 
 	private Advice determineTCCLAdvice(ServiceReference reference) {
@@ -145,6 +147,7 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 		// which is determined automatically anyway
 		// factory.setOptimize(true);
 		factory.setFrozen(true);
+		factory.setOpaque(true);
 		try {
 			return factory.getProxy(classLoader);
 		}

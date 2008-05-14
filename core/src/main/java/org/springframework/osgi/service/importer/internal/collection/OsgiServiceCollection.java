@@ -34,6 +34,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.internal.aop.ProxyPlusCallback;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.internal.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
@@ -69,6 +70,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				Long serviceId = (Long) ref.getProperty(Constants.SERVICE_ID);
 				boolean collectionModified = false;
 
+				ProxyPlusCallback ppc = null;
 				Object proxy = null;
 				switch (event.getType()) {
 
@@ -77,12 +79,13 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 						// same as ServiceEvent.REGISTERED
 						synchronized (serviceProxies) {
 							if (!servicesIdMap.containsKey(serviceId)) {
-								proxy = proxyCreator.createServiceProxy(ref);
+								ppc = proxyCreator.createServiceProxy(ref);
+								proxy = ppc.proxy;
 								// let the dynamic collection decide if the service
 								// is added or not (think set, sorted set)
 								if (serviceProxies.add(proxy)) {
 									collectionModified = true;
-									servicesIdMap.put(serviceId, proxy);
+									servicesIdMap.put(serviceId, ppc);
 								}
 							}
 						}
@@ -95,14 +98,15 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 					case (ServiceEvent.UNREGISTERING):
 						synchronized (serviceProxies) {
 							// remove service id / proxy association
-							proxy = servicesIdMap.remove(serviceId);
-							if (proxy != null) {
+							ppc = (ProxyPlusCallback) servicesIdMap.remove(serviceId);
+							if (ppc != null) {
+								proxy = ppc.proxy;
 								// before removal, allow analysis
 								checkDeadProxies(proxy);
 								// remove service proxy
 								collectionModified = serviceProxies.remove(proxy);
 								// invalidate it
-								invalidateProxy(proxy);
+								invalidateProxy(ppc);
 							}
 						}
 						// TODO: should this be part of the lock also?
@@ -239,8 +243,20 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, serviceProxy.getServiceReference()));
 			}
 			serviceProxies.clear();
+
+			// destroy the proxies now
+			for (Iterator iterator = servicesIdMap.values().iterator(); iterator.hasNext();) {
+				ProxyPlusCallback ppc = (ProxyPlusCallback) iterator.next();
+				try {
+					ppc.destructionCallback.destroy();
+				}
+				catch (Exception ex) {
+					log.error("Exception occurred while destroying proxy " + ppc.proxy, ex);
+				}
+			}
+
+			servicesIdMap.clear();
 		}
-		servicesIdMap.clear();
 	}
 
 	/**
@@ -266,8 +282,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		return new DynamicCollection();
 	}
 
-	private void invalidateProxy(Object proxy) {
-		// TODO: add proxy invalidation (if it makes sense)
+	private void invalidateProxy(ProxyPlusCallback ppc) {
+		// don't do anything (the proxy will simply thrown an exception if still in use)
 	}
 
 	/**
@@ -288,7 +304,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	 * @param proxy
 	 */
 	private void checkDeadProxies(Object proxy) {
-		// no need for a collection lock (alreayd have it)
+		// no need for a collection lock (already have it)
 		int index = serviceProxies.indexOf(proxy);
 		checkDeadProxies(proxy, index);
 	}

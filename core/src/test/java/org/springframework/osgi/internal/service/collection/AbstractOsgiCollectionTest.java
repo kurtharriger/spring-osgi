@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.internal.service.collection;
 
 import java.util.Date;
@@ -49,12 +50,16 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 
 	protected OsgiServiceCollection col;
 
+
 	public static interface Wrapper {
+
 		Object execute();
 	}
 
 	public static class DateWrapper implements Wrapper, Comparable {
+
 		private Date date;
+
 
 		public DateWrapper(long time) {
 			date = new Date(time);
@@ -86,14 +91,12 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 
 	};
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
+
 	protected void setUp() throws Exception {
 		services = new LinkedHashMap();
 
 		context = new MockBundleContext() {
+
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 				return new ServiceReference[0];
 			}
@@ -115,10 +118,6 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 		return new SimpleServiceJDKProxyCreator(context, classes, getClass().getClassLoader());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	protected void tearDown() throws Exception {
 		services = null;
 		context = null;

@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.springframework.aop.framework.Advised;
+import org.springframework.aop.SpringProxy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
@@ -127,7 +127,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 
 		Object proxy = serviceFactoryBean.getObject();
 		assertTrue(proxy instanceof Serializable);
-		assertTrue("should be proxied", proxy instanceof Advised);
+		assertTrue("should be proxied", proxy instanceof SpringProxy);
 	}
 
 	public void testClassLoadingOptionsConstant() throws Exception {
