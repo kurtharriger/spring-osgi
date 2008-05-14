@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
 public abstract class AopClassLoaderFactory {
 
 	/** plug-able, private, class loader factory */
-	private static InternalAopClassLoaderFactory classLoaderFactory = new CachingClassLoaderFactory();
+	private static InternalAopClassLoaderFactory classLoaderFactory = new CachingAopClassLoaderFactory();
 	/** plug-able, private, bundle loader factory */
 	private static BundleClassLoaderFactory bundleClassLoaderFactory = new CachingBundleClassLoaderFactory();
 

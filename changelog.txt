@@ -14,12 +14,18 @@ Package org.springframework.osgi.config
 
 Package org.springframework.osgi.context
 * refined AbstractOsgiBundleApplicationContext internal resource loader creation so that subclasses can override it
+* improved internal namespace service handling
+* improved AbstractOsgiBundleApplicationContext handling of ResourceLoader methods
+* AbstractOsgiBundleApplicationContext extends AbstractRefreshableConfigApplicationContext (new in Spring 2.5.2)
 
 Package org.springframework.osgi.io
 * improved getFile() method when dealing with resources in expanded bundles
 
 Package org.springframework.osgi.service
 * added descriptive exception when invoking non-public methods on class proxies (caused by classes with final mehtods)
+
+Package org.springframework.osgi.test
+* removed usage of PackageAdmin for resolving bundles
 
 Package org.springframework.osgi.web
 * improved namespace detection strategy for OsgiBundleXmlWebApplicationContext

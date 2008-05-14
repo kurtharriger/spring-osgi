@@ -101,18 +101,21 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	/** Path to configuration files */
 	private String[] configLocations;
 
+	/** Used for publishing the app context */
+	private ServiceRegistration serviceRegistration;
+
+	/** Should context be published as an OSGi service? */
+	private boolean publishContextAsService = true;
+
+	/** class loader used for loading the beans */
+	private ClassLoader classLoader;
+
 	/**
 	 * Internal pattern resolver. The parent one can't be used since it is being
 	 * instantiated inside the constructor when the bundle field is not
 	 * initialized yet.
 	 */
 	private ResourcePatternResolver osgiPatternResolver;
-
-	/** Used for publishing the app context */
-	private ServiceRegistration serviceRegistration;
-
-	/** Should context be published as an OSGi service? */
-	private boolean publishContextAsService = true;
 
 
 	/**
@@ -138,14 +141,18 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * {@inheritDoc}
 	 * 
 	 * <p/> Will automatically determine the bundle, create a new
-	 * <code>ResourceLoader</code> (and set its <code>ClassLoader</code> to
-	 * a custom implementation that will delegate the calls to the bundle).
+	 * <code>ResourceLoader</code> (and set its <code>ClassLoader</code> (if
+	 * none is set already) to a custom implementation that will delegate the
+	 * calls to the bundle).
 	 */
 	public void setBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 		this.bundle = bundleContext.getBundle();
 		this.osgiPatternResolver = createResourcePatternResolver();
-		this.setClassLoader(createBundleClassLoader(this.bundle));
+
+		if (getClassLoader() == null)
+			this.setClassLoader(createBundleClassLoader(this.bundle));
+
 		this.setDisplayName(ClassUtils.getShortName(getClass()) + "(bundle=" + getBundleSymbolicName() + ", config="
 				+ StringUtils.arrayToCommaDelimitedString(getConfigLocations()) + ")");
 	}
@@ -349,7 +356,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	// delegate methods to a proper osgi resource loader
 
 	public ClassLoader getClassLoader() {
-		return (osgiPatternResolver != null ? osgiPatternResolver.getClassLoader() : null);
+		return classLoader;
 	}
 
 	public Resource getResource(String location) {
@@ -361,10 +368,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	public void setClassLoader(ClassLoader classLoader) {
-		if (osgiPatternResolver == null)
-			throw new IllegalStateException("the resource loader is not initialized; call setBundleContext() first");
-		if (osgiPatternResolver instanceof DefaultResourceLoader)
-			((DefaultResourceLoader) osgiPatternResolver).setClassLoader(classLoader);
+		this.classLoader = classLoader;
 	}
 
 	protected Resource getResourceByPath(String path) {
