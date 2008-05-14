@@ -30,6 +30,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.BundleContextAware;
@@ -37,7 +38,6 @@ import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext
 import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.io.OsgiBundleResource;
-import org.springframework.osgi.io.OsgiBundleResourceLoader;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
@@ -102,19 +102,11 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	private String[] configLocations;
 
 	/**
-	 * Internal ResourceLoader implementation used for delegation.
-	 * 
-	 * Note that the PatternResolver is handled through
-	 * {@link #getResourcePatternResolver()}
-	 */
-	private OsgiBundleResourceLoader osgiResourceLoader;
-
-	/**
 	 * Internal pattern resolver. The parent one can't be used since it is being
 	 * instantiated inside the constructor when the bundle field is not
-	 * instantiated yet.
+	 * initialized yet.
 	 */
-	private OsgiBundleResourcePatternResolver osgiPatternResolver;
+	private ResourcePatternResolver osgiPatternResolver;
 
 	/** Used for publishing the app context */
 	private ServiceRegistration serviceRegistration;
@@ -152,8 +144,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	public void setBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 		this.bundle = bundleContext.getBundle();
-		this.osgiResourceLoader = new OsgiBundleResourceLoader(this.bundle);
-		this.osgiPatternResolver = new OsgiBundleResourcePatternResolver(this.bundle);
+		this.osgiPatternResolver = createResourcePatternResolver();
 		this.setClassLoader(createBundleClassLoader(this.bundle));
 		this.setDisplayName(ClassUtils.getShortName(getClass()) + "(bundle=" + getBundleSymbolicName() + ", config="
 				+ StringUtils.arrayToCommaDelimitedString(getConfigLocations()) + ")");
@@ -338,32 +329,42 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	/**
+	 * Creates an OSGi specific resource pattern resolver.
+	 * 
+	 * @return returns an OSGi specific pattern resolver.
+	 */
+	protected ResourcePatternResolver createResourcePatternResolver() {
+		return new OsgiBundleResourcePatternResolver(getBundle());
+	}
+
+	/**
 	 * This implementation supports pattern matching inside the OSGi bundle.
 	 * 
 	 * @see OsgiBundleResourcePatternResolver
 	 */
 	protected ResourcePatternResolver getResourcePatternResolver() {
-		return new OsgiBundleResourcePatternResolver(this.bundle);
+		return osgiPatternResolver;
 	}
 
-	// delegate methods to a proper OsgiResourceLoader
+	// delegate methods to a proper osgi resource loader
 
 	public ClassLoader getClassLoader() {
-		return (osgiResourceLoader != null ? osgiResourceLoader.getClassLoader() : null);
+		return (osgiPatternResolver != null ? osgiPatternResolver.getClassLoader() : null);
 	}
 
 	public Resource getResource(String location) {
-		return (osgiResourceLoader != null ? osgiResourceLoader.getResource(location) : null);
+		return (osgiPatternResolver != null ? osgiPatternResolver.getResource(location) : null);
 	}
 
 	public Resource[] getResources(String locationPattern) throws IOException {
-		return (osgiResourceLoader != null ? osgiPatternResolver.getResources(locationPattern) : null);
+		return (osgiPatternResolver != null ? osgiPatternResolver.getResources(locationPattern) : null);
 	}
 
 	public void setClassLoader(ClassLoader classLoader) {
-		if (osgiResourceLoader == null)
+		if (osgiPatternResolver == null)
 			throw new IllegalStateException("the resource loader is not initialized; call setBundleContext() first");
-		osgiResourceLoader.setClassLoader(classLoader);
+		if (osgiPatternResolver instanceof DefaultResourceLoader)
+			((DefaultResourceLoader) osgiPatternResolver).setClassLoader(classLoader);
 	}
 
 	protected Resource getResourceByPath(String path) {
