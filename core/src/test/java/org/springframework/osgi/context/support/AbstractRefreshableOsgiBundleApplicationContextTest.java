@@ -40,29 +40,14 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 	private AbstractOsgiBundleApplicationContext context;
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	protected void setUp() throws Exception {
 		context = new AbstractOsgiBundleApplicationContext() {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.springframework.context.support.AbstractRefreshableApplicationContext#loadBeanDefinitions(org.springframework.beans.factory.support.DefaultListableBeanFactory)
-			 */
 			protected void loadBeanDefinitions(DefaultListableBeanFactory arg0) throws IOException, BeansException {
 			}
 		};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	protected void tearDown() throws Exception {
 		context = null;
 	}
@@ -90,7 +75,7 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 		assertSame(bundleCtx, context.getBundleContext());
 
 		ClassLoader loader = context.getClassLoader();
-		assertTrue(loader instanceof BundleDelegatingClassLoader);
+		assertFalse(loader instanceof BundleDelegatingClassLoader);
 
 		// do some resource loading
 		assertEquals(bundleResource, context.getResource(location));
@@ -98,5 +83,4 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 		bundleCtrl.verify();
 		bundleCtxCtrl.verify();
 	}
-
 }
