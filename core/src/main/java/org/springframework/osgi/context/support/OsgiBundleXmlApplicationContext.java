@@ -20,7 +20,6 @@ package org.springframework.osgi.context.support;
 import java.io.IOException;
 
 import org.osgi.framework.BundleContext;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
@@ -28,7 +27,6 @@ import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.context.internal.classloader.ChainedClassLoader;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
@@ -122,9 +120,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
 
-		// create the AOP class loader
-		ClassLoader aopClassLoader = new ChainedClassLoader(new ClassLoader[] { getClassLoader(),
-			NamespaceHandlerResolver.class.getClassLoader(), ProxyFactory.class.getClassLoader() });
+		ClassLoader aopClassLoader = OsgiBundleXmlApplicationContext.class.getClassLoader();
 
 		NamespaceHandlerResolver nsResolver = createNamespaceHandlerResolver(getBundleContext(), getClassLoader(),
 			aopClassLoader);
@@ -265,5 +261,9 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 			Object fallbackObject) {
 		return (EntityResolver) TrackingUtil.getService(new Class[] { EntityResolver.class }, null, classLoader,
 			bundleContext, fallbackObject);
+	}
+
+	public String[] getConfigLocations() {
+		return super.getConfigLocations();
 	}
 }

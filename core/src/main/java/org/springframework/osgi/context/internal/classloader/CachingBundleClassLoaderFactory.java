@@ -86,7 +86,7 @@ class CachingBundleClassLoaderFactory implements BundleClassLoaderFactory {
 		StringBuffer buffer = new StringBuffer();
 		// add the bundle id first
 		buffer.append(bundle.getBundleId());
-		// followed by its update time (in hexa to reduce its length)
+		// followed by its update time (in hex to reduce its length)
 		buffer.append(DELIMITER);
 		buffer.append(Long.toHexString(bundle.getLastModified()));
 		// plus the bundle class name (just to be triple sure)

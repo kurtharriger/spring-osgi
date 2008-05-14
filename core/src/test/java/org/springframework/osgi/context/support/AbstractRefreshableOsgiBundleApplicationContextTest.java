@@ -75,7 +75,7 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 		assertSame(bundleCtx, context.getBundleContext());
 
 		ClassLoader loader = context.getClassLoader();
-		assertFalse(loader instanceof BundleDelegatingClassLoader);
+		assertTrue(loader instanceof BundleDelegatingClassLoader);
 
 		// do some resource loading
 		assertEquals(bundleResource, context.getResource(location));

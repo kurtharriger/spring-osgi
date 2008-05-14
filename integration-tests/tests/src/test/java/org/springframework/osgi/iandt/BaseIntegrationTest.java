@@ -86,17 +86,6 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 	private static final String SPRING_DM_PREFIX = "spring-osgi";
 
 
-	//	protected Manifest getManifest() {
-	//		Manifest mf = super.getManifest();
-	//		String imports = mf.getMainAttributes().getValue(Constants.IMPORT_PACKAGE);
-	//		if (!imports.contains("org.springframework.osgi.test.provisioning")) {
-	//			imports = imports + ",org.springframework.osgi.test.provisioning,org.springframework.osgi.test";
-	//			mf.getMainAttributes().putValue(Constants.IMPORT_PACKAGE, imports);
-	//		}
-	//		System.out.println("new manifest is " + mf.getMainAttributes().entrySet());
-	//		return mf;
-	//	}
-
 	protected String[] getBundleContentPattern() {
 		String pkg = getClass().getPackage().getName().replace('.', '/').concat("/");
 		String[] patterns = new String[] { BaseIntegrationTest.class.getName().replace('.', '/').concat("*.class"),

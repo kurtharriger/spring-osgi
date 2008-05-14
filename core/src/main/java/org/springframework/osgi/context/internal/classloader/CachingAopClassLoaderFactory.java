@@ -29,7 +29,7 @@ import org.springframework.aop.framework.ProxyFactory;
  * 
  * @author Costin Leau
  */
-class CachingClassLoaderFactory implements InternalAopClassLoaderFactory {
+class CachingAopClassLoaderFactory implements InternalAopClassLoaderFactory {
 
 	private static final String CGLIB_CLASS = "net.sf.cglib.proxy.Enhancer";
 	/** CGLIB class (if it's present) */
@@ -39,7 +39,7 @@ class CachingClassLoaderFactory implements InternalAopClassLoaderFactory {
 	private final Map cache = new WeakHashMap();
 
 
-	CachingClassLoaderFactory() {
+	CachingAopClassLoaderFactory() {
 		// load CGLIB through Spring-AOP
 		ClassLoader springAopClassLoader = ProxyFactory.class.getClassLoader();
 		Class clazz = null;
@@ -68,11 +68,11 @@ class CachingClassLoaderFactory implements InternalAopClassLoaderFactory {
 				if (cglibClass != null) {
 					aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
 						ProxyFactory.class.getClassLoader(), cglibClass.getClassLoader(),
-						CachingClassLoaderFactory.class.getClassLoader() });
+						CachingAopClassLoaderFactory.class.getClassLoader() });
 				}
 				else {
 					aopClassLoader = new ChainedClassLoader(new ClassLoader[] { classLoader,
-						ProxyFactory.class.getClassLoader(), CachingClassLoaderFactory.class.getClassLoader() });
+						ProxyFactory.class.getClassLoader(), CachingAopClassLoaderFactory.class.getClassLoader() });
 				}
 
 				// save the class loader as a weak reference (since it refers to the given class loader)
