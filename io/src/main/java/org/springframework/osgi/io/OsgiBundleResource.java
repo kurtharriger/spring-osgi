@@ -35,6 +35,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.osgi.io.internal.OsgiResourceUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -75,7 +76,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  * @author Adrian Colyer
- * 
+ * @author Sam Brannen
  */
 public class OsgiBundleResource extends AbstractResource implements ContextResource {
 
@@ -227,25 +228,6 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	}
 
 	/**
-	 * Resolves a resource from the file system.
-	 * 
-	 * @param fileName resource file name
-	 * @return a URL to the returned resource or null if none is found
-	 */
-	URL getResourceFromFilesystem(String fileName) {
-		File f = new File(fileName);
-		if (!f.exists()) {
-			return null;
-		}
-		try {
-			return f.toURL();
-		}
-		catch (MalformedURLException e) {
-			return null;
-		}
-	}
-
-	/**
 	 * Resolves a resource from *the bundle space* only. Only the bundle and its
 	 * attached fragments are searched for the given resource. Note that this
 	 * method returns only the first URL found, discarding the rest. To retrieve
@@ -327,7 +309,11 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	}
 
 	/**
-	 * Returns a <code>File</code> handle for this resource.
+	 * Returns a <code>File</code> handle for this resource. This method does
+	 * a best-effort attempt to locate the bundle resource on the file system.
+	 * It is strongly recommended to use {@link #getInputStream()} method
+	 * instead which works no matter if the bundles are saved (in exploded form
+	 * or not) on the file system.
 	 * 
 	 * @return File handle to this resource
 	 * @throws IOException if the resource cannot be resolved as absolute file
@@ -335,15 +321,28 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	 */
 	public File getFile() throws IOException {
 		if (searchType != OsgiResourceUtils.PREFIX_TYPE_UNKNOWN) {
-			return super.getFile();
+			String bundleLocation = bundle.getLocation();
+			if (bundleLocation.startsWith(ResourceUtils.FILE_URL_PREFIX)) {
+				bundleLocation = bundleLocation.substring(ResourceUtils.FILE_URL_PREFIX.length());
+			}
+			File file = new File(bundleLocation, path);
+			if (file.exists()) {
+				return file;
+			}
+			// fall back to the URL discovery (just in case)
 		}
+
 		try {
 			URL url = new URL(path);
-			return new File(url.getPath());
+			File file = new File(url.getPath());
+			if (file.exists())
+				return file;
 		}
 		catch (MalformedURLException mue) {
-			throw new FileNotFoundException(getDescription() + " cannot be resolved to absolute file path");
+			// falls back to the default implementation
 		}
+
+		return super.getFile();
 	}
 
 	/**
