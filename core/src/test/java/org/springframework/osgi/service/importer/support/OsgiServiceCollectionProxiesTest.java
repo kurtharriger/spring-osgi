@@ -78,7 +78,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
-		Object proxy = proxyCreator.createServiceProxy(ref);
+		Object proxy = proxyCreator.createServiceProxy(ref).proxy;
 
 		assertFalse("proxy and service should have different hashcodes", date.hashCode() == proxy.hashCode());
 
@@ -90,8 +90,8 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
-		Object proxy = proxyCreator.createServiceProxy(ref);
-		Object proxy2 = proxyCreator.createServiceProxy(ref);
+		Object proxy = proxyCreator.createServiceProxy(ref).proxy;
+		Object proxy2 = proxyCreator.createServiceProxy(ref).proxy;
 		assertEquals("proxies for the same service should have the same hashcode", proxy.hashCode(), proxy2.hashCode());
 	}
 
@@ -101,7 +101,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
-		Object proxy = proxyCreator.createServiceProxy(ref);
+		Object proxy = proxyCreator.createServiceProxy(ref).proxy;
 
 		assertFalse("proxy and service should not be equal", date.equals(proxy));
 	}
@@ -112,8 +112,8 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
-		Object proxy = proxyCreator.createServiceProxy(ref);
-		Object proxy2 = proxyCreator.createServiceProxy(ref);
+		Object proxy = proxyCreator.createServiceProxy(ref).proxy;
+		Object proxy2 = proxyCreator.createServiceProxy(ref).proxy;
 		assertEquals("proxies for the same target should be equal", proxy, proxy2);
 	}
 
@@ -123,7 +123,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
-		Object proxy = proxyCreator.createServiceProxy(ref);
+		Object proxy = proxyCreator.createServiceProxy(ref).proxy;
 
 		assertEquals("proxy should consistent hashcode", proxy.hashCode(), proxy.hashCode());
 	}
@@ -134,7 +134,7 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 		ServiceReference ref = new MockServiceReference(classInterfaces);
 		services.put(ref, date);
 
-		Object proxy = proxyCreator.createServiceProxy(ref);
+		Object proxy = proxyCreator.createServiceProxy(ref).proxy;
 		assertEquals("proxy should be equal to itself", proxy, proxy);
 
 	}

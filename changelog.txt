@@ -23,6 +23,9 @@ Package org.springframework.osgi.io
 
 Package org.springframework.osgi.service
 * added descriptive exception when invoking non-public methods on class proxies (caused by classes with final mehtods)
+* added ServiceProxyDestroyedException to indicate the illegal usage of a destroyed proxy
+* refined dynamic proxies (unary cardinality) to throw ServiceProxyDestroyedException instead of IllegalStateException
+* refined static proxies (multi cardinality) to throw ServiceProxyDestroyedException if used after being destroyed
 
 Package org.springframework.osgi.test
 * removed usage of PackageAdmin for resolving bundles

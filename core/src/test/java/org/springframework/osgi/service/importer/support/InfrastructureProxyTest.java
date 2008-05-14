@@ -59,7 +59,7 @@ public class InfrastructureProxyTest extends TestCase {
 	public void testCreatedProxy() throws Exception {
 		MockServiceReference ref = new MockServiceReference();
 
-		Object proxy = proxyCreator.createServiceProxy(ref);
+		Object proxy = proxyCreator.createServiceProxy(ref).proxy;
 		assertTrue(proxy instanceof ImportedOsgiServiceProxy);
 		assertTrue(proxy instanceof InfrastructureProxy);
 	}
@@ -84,9 +84,9 @@ public class InfrastructureProxyTest extends TestCase {
 		};
 
 		proxyCreator = createProxyCreator(ctx, classes);
-		InfrastructureProxy proxy = (InfrastructureProxy) proxyCreator.createServiceProxy(ref);
+		InfrastructureProxy proxy = (InfrastructureProxy) proxyCreator.createServiceProxy(ref).proxy;
 		assertEquals(service, proxy.getWrappedObject());
-		InfrastructureProxy anotherProxy = (InfrastructureProxy) proxyCreator.createServiceProxy(new MockServiceReference());
+		InfrastructureProxy anotherProxy = (InfrastructureProxy) proxyCreator.createServiceProxy(new MockServiceReference()).proxy;
 		assertFalse(proxy.equals(anotherProxy));
 		assertFalse(anotherProxy.getWrappedObject().equals(proxy.getWrappedObject()));
 	}

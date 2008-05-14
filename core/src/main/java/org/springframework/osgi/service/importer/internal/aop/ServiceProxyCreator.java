@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.aop;
 
 import org.osgi.framework.ServiceReference;
@@ -31,8 +32,15 @@ public interface ServiceProxyCreator {
 	 * is to transparently decouple the client from holding a strong reference
 	 * to the service (which might go away) and provide various decorations.
 	 * 
+	 * 
+	 * <p/> The method returns a container object with the proxy and a
+	 * destruction callback for it (normally an invocation interceptor). The
+	 * same functionality can be achieved by casting the proxy to Advised but
+	 * for security reasons (users could disable the proxies themselves) the
+	 * proxies are now created in an opaque manner.
+	 * 
 	 * @param reference service reference
-	 * @return proxy on top of the given service reference
+	 * @return the proxy plus a destruction callback to it
 	 */
-	Object createServiceProxy(ServiceReference reference);
+	ProxyPlusCallback createServiceProxy(ServiceReference reference);
 }

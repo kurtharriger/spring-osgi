@@ -32,6 +32,7 @@ import org.springframework.osgi.service.dependency.DependableServiceImporter;
 import org.springframework.osgi.service.dependency.MandatoryDependencyEvent;
 import org.springframework.osgi.service.dependency.MandatoryDependencyListener;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
 import org.springframework.osgi.service.importer.internal.support.DefaultRetryCallback;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
 import org.springframework.osgi.service.importer.internal.support.ServiceWrapper;
@@ -51,7 +52,7 @@ import org.springframework.util.ObjectUtils;
  * 
  * @author Costin Leau
  */
-public class ServiceDynamicInterceptor extends ServiceInvoker implements InitializingBean, DisposableBean {
+public class ServiceDynamicInterceptor extends ServiceInvoker implements InitializingBean {
 
 	/**
 	 * Listener tracking the OSGi services which form the dynamic reference.
@@ -339,15 +340,15 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private Object lookupService() {
 		synchronized (lock) {
 			if (destroyed && !isDuringDestruction)
-				throw new IllegalStateException("the service proxy has been destroyed!");
+				throw new ServiceProxyDestroyedException();
+
+			return (Object) retryTemplate.execute(new DefaultRetryCallback() {
+
+				public Object doWithRetry() {
+					return (wrapper != null) ? wrapper.getService() : null;
+				}
+			}, lock);
 		}
-
-		return (Object) retryTemplate.execute(new DefaultRetryCallback() {
-
-			public Object doWithRetry() {
-				return (wrapper != null) ? wrapper.getService() : null;
-			}
-		}, lock);
 	}
 
 	public void afterPropertiesSet() {
@@ -358,18 +359,18 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			retryTemplate = new RetryTemplate();
 
 		if (debug)
-			log.debug("adding osgi mandatoryListeners for services matching [" + filter + "]");
+			log.debug("Adding osgi mandatoryListeners for services matching [" + filter + "]");
 		OsgiListenerUtils.addSingleServiceListener(bundleContext, listener, filter);
 		if (serviceRequiredAtStartup) {
 			if (debug)
 				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
 			Object target = getTarget();
 			if (debug)
-				log.debug("service retrieved " + target);
+				log.debug("Service retrieved " + target);
 		}
 	}
 
-	public void destroy() throws Exception {
+	public void destroy() {
 		OsgiListenerUtils.removeServiceListener(bundleContext, listener);
 		synchronized (lock) {
 			// set this flag first to make sure no rebind is done
