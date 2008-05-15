@@ -25,7 +25,6 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.dependency.DependableServiceImporter;
@@ -269,7 +268,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 */
 	private final ClassLoader classLoader;
 
-	private final ServiceReferenceDelegate referenceDelegate;
+	private final SwappingServiceReferenceProxy referenceDelegate;
 
 	private final ServiceListener listener;
 
@@ -319,7 +318,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		this.filter = filter;
 		this.classLoader = classLoader;
 
-		referenceDelegate = new ServiceReferenceDelegate();
+		referenceDelegate = new SwappingServiceReferenceProxy();
 		listener = new Listener();
 	}
 

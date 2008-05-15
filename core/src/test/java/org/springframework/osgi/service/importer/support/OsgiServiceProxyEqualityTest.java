@@ -30,6 +30,7 @@ import org.springframework.core.InfrastructureProxy;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.internal.aop.InfrastructureOsgiProxyAdvice;
 import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;

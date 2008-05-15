@@ -13,24 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.aop;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.service.importer.ServiceReferenceProxy;
 import org.springframework.util.Assert;
 
 /**
- * Simple {@link ServiceReference} implementation that delegates to an
- * underlying implementation which can be swapped at runtime.
+ * Synchronized, swapping {@link ServiceReference} implementation that delegates
+ * to an underlying implementation which can be swapped at runtime.
  * 
  * <strong>Note:</strong> this class is thread-safe.
  * 
  * @author Costin Leau
  * 
  */
-class ServiceReferenceDelegate implements ServiceReference {
+class SwappingServiceReferenceProxy implements ServiceReferenceProxy {
+
+	private static final int HASH_CODE = SwappingServiceReferenceProxy.class.hashCode() * 13;
 
 	private ServiceReference delegate;
+
 
 	synchronized ServiceReference swapDelegates(ServiceReference newDelegate) {
 		Assert.notNull(newDelegate);
@@ -58,5 +63,21 @@ class ServiceReferenceDelegate implements ServiceReference {
 
 	public synchronized boolean isAssignableTo(Bundle bundle, String className) {
 		return delegate.isAssignableTo(bundle, className);
+	}
+
+	public synchronized ServiceReference getTargetServiceReference() {
+		return delegate;
+	}
+
+	public boolean equals(Object obj) {
+		if (obj instanceof SwappingServiceReferenceProxy) {
+			SwappingServiceReferenceProxy other = (SwappingServiceReferenceProxy) obj;
+			return (delegate.equals(other.delegate));
+		}
+		return false;
+	}
+
+	public int hashCode() {
+		return HASH_CODE + delegate.hashCode();
 	}
 }

@@ -18,7 +18,6 @@ package org.springframework.osgi.service.importer.internal.aop;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
 import org.springframework.util.Assert;
