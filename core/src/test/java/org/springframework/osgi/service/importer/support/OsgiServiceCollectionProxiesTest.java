@@ -27,6 +27,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
+import org.springframework.osgi.service.importer.ServiceReferenceProxy;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
 
@@ -136,6 +138,35 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 
 		Object proxy = proxyCreator.createServiceProxy(ref).proxy;
 		assertEquals("proxy should be equal to itself", proxy, proxy);
+	}
 
+	public void testServiceReferenceProxy() throws Exception {
+		Date date = new Date(123);
+		ServiceReference ref = new MockServiceReference(classInterfaces);
+		services.put(ref, date);
+
+		Object proxy = proxyCreator.createServiceProxy(ref).proxy;
+		assertTrue(proxy instanceof ImportedOsgiServiceProxy);
+		ServiceReferenceProxy referenceProxy = ((ImportedOsgiServiceProxy) proxy).getServiceReference();
+		assertNotNull(referenceProxy);
+		assertSame(ref, referenceProxy.getTargetServiceReference());
+	}
+
+	public void testServiceReferenceProxyEquality() throws Exception {
+
+		Date date = new Date(123);
+
+		ServiceReference ref = new MockServiceReference(classInterfaces);
+		services.put(ref, date);
+
+		Object proxy = proxyCreator.createServiceProxy(ref).proxy;
+		Object proxy2 = proxyCreator.createServiceProxy(ref).proxy;
+
+		ServiceReferenceProxy referenceProxy = ((ImportedOsgiServiceProxy) proxy).getServiceReference();
+		assertSame(ref, referenceProxy.getTargetServiceReference());
+		ServiceReferenceProxy referenceProxy2 = ((ImportedOsgiServiceProxy) proxy2).getServiceReference();
+		assertSame(ref, referenceProxy2.getTargetServiceReference());
+		assertEquals(referenceProxy, referenceProxy2);
+		assertFalse(referenceProxy == referenceProxy2);
 	}
 }

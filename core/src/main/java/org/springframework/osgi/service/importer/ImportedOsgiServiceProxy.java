@@ -13,24 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.importer;
 
-import org.osgi.framework.ServiceReference;
+package org.springframework.osgi.service.importer;
 
 /**
  * Infrastructure interface available on Spring-DM managed OSGi services. Gives
  * read-only access to the proxy backing object service reference.
  * 
+ * @see ServiceReferenceProxy
  * @author Costin Leau
  * 
  */
 public interface ImportedOsgiServiceProxy {
 
 	/**
-	 * Get access to the service reference used for accessing the backing
-	 * object.
+	 * Provides access to the service reference used for accessing the backing
+	 * object. The returned object is a proxy over the native ServiceReference
+	 * obtained from the OSGi platform, so that proper service tracking is
+	 * obtained. This means that if the imported service change, the updates are
+	 * reflected to the returned service reference automatically.
 	 * 
 	 * @return backing object service reference
 	 */
-	ServiceReference getServiceReference();
+	ServiceReferenceProxy getServiceReference();
 }

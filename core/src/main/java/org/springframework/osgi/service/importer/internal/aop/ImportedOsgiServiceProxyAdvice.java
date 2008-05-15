@@ -19,6 +19,7 @@ package org.springframework.osgi.service.importer.internal.aop;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.support.DelegatingIntroductionInterceptor;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
+import org.springframework.osgi.service.importer.ServiceReferenceProxy;
 import org.springframework.util.Assert;
 
 /**
@@ -34,15 +35,16 @@ public class ImportedOsgiServiceProxyAdvice extends DelegatingIntroductionInterc
 
 	private static final int hashCode = ImportedOsgiServiceProxyAdvice.class.hashCode() * 13;
 
-	private final transient ServiceReference reference;
+	private final transient ServiceReferenceProxy reference;
 
 
 	public ImportedOsgiServiceProxyAdvice(ServiceReference reference) {
 		Assert.notNull(reference);
-		this.reference = reference;
+		this.reference = (reference instanceof ServiceReferenceProxy ? (ServiceReferenceProxy) reference
+				: new StaticServiceReferenceProxy(reference));
 	}
 
-	public ServiceReference getServiceReference() {
+	public ServiceReferenceProxy getServiceReference() {
 		return reference;
 	}
 

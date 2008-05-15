@@ -26,6 +26,8 @@ Package org.springframework.osgi.service
 * added ServiceProxyDestroyedException to indicate the illegal usage of a destroyed proxy
 * refined dynamic proxies (unary cardinality) to throw ServiceProxyDestroyedException instead of IllegalStateException
 * refined static proxies (multi cardinality) to throw ServiceProxyDestroyedException if used after being destroyed
+* introduced ServiceReferenceProxy interface (available through ImportedOsgiServiceProxy) for accessing the native 
+  service reference
 
 Package org.springframework.osgi.test
 * removed usage of PackageAdmin for resolving bundles
