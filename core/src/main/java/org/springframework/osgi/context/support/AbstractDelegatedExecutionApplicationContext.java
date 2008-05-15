@@ -32,8 +32,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * OSGi-specific application context that delegates the execution of its
- * life cycle methods to a different class. The main reason behind this is to
+ * OSGi-specific application context that delegates the execution of its life
+ * cycle methods to a different class. The main reason behind this is to
  * <em>break</em> the startup of the application context in steps that can be
  * executed asynchronously.
  * 
@@ -44,8 +44,9 @@ import org.springframework.util.ObjectUtils;
  * <p/> One can still call the 'traditional' lifecycle methods through
  * {@link #normalRefresh()} and {@link #normalClose()}.
  * 
- * @author Costin Leau
  * @see DelegatedExecutionOsgiBundleApplicationContext
+ * 
+ * @author Costin Leau
  */
 public abstract class AbstractDelegatedExecutionApplicationContext extends AbstractOsgiBundleApplicationContext
 		implements DelegatedExecutionOsgiBundleApplicationContext {
@@ -89,6 +90,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 	/** delegated multicaster */
 	private ApplicationEventMulticaster delegatedMulticaster;
+
+	private ContextClassLoaderProvider cclProvider;
 
 
 	/**
@@ -138,7 +141,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		ClassLoader oldTCCL = currentThread.getContextClassLoader();
 
 		try {
-			currentThread.setContextClassLoader(getContextClassLoader());
+			currentThread.setContextClassLoader(contextClassLoaderProvider().getContextClassLoader());
 			try {
 				super.refresh();
 				sendRefreshedEvent();
@@ -160,7 +163,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		ClassLoader oldTCCL = currentThread.getContextClassLoader();
 
 		try {
-			currentThread.setContextClassLoader(getContextClassLoader());
+			currentThread.setContextClassLoader(contextClassLoaderProvider().getContextClassLoader());
 			super.doClose();
 		}
 		finally {
@@ -188,7 +191,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 		try {
 			synchronized (contextMonitor) {
-				thread.setContextClassLoader(getContextClassLoader());
+				thread.setContextClassLoader(contextClassLoaderProvider().getContextClassLoader());
 
 				if (ObjectUtils.isEmpty(getConfigLocations())) {
 					setConfigLocations(getDefaultConfigLocations());
@@ -249,7 +252,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		try {
 
 			synchronized (contextMonitor) {
-				thread.setContextClassLoader(getContextClassLoader());
+				thread.setContextClassLoader(contextClassLoaderProvider().getContextClassLoader());
 
 				try {
 					ConfigurableListableBeanFactory beanFactory = getBeanFactory();
@@ -338,9 +341,32 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * 
 	 * @return the thread context class loader to be used during the execution
 	 * of critical section blocks
+	 * @deprecated will be removed after RC1 is released
 	 */
 	protected ClassLoader getContextClassLoader() {
-		ClassLoader cl = getClassLoader();
-		return (cl == null ? Thread.currentThread().getContextClassLoader() : cl);
+		return contextClassLoaderProvider().getContextClassLoader();
+	}
+
+	/** private method used for doing lazy-init-if-not-set for cclProvider */
+	private ContextClassLoaderProvider contextClassLoaderProvider() {
+		if (cclProvider == null) {
+			DefaultContextClassLoaderProvider defaultProvider = new DefaultContextClassLoaderProvider();
+			defaultProvider.setBeanClassLoader(getClassLoader());
+			cclProvider = defaultProvider;
+		}
+		return cclProvider;
+	}
+
+	/**
+	 * Sets the {@link ContextClassLoaderProvider} used by this OSGi application
+	 * context instance. By default, {@link DefaultContextClassLoaderProvider}
+	 * is used.
+	 * 
+	 * @param contextClassLoaderProvider context class loader provider to use
+	 * @see ContextClassLoaderProvider
+	 * @see DefaultContextClassLoaderProvider
+	 */
+	public void setContextClassLoaderProvider(ContextClassLoaderProvider contextClassLoaderProvider) {
+		this.cclProvider = contextClassLoaderProvider;
 	}
 }

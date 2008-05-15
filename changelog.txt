@@ -16,7 +16,8 @@ Package org.springframework.osgi.context
 * refined AbstractOsgiBundleApplicationContext internal resource loader creation so that subclasses can override it
 * improved internal namespace service handling
 * improved AbstractOsgiBundleApplicationContext handling of ResourceLoader methods
-* AbstractOsgiBundleApplicationContext extends AbstractRefreshableConfigApplicationContext (new in Spring 2.5.2)
+* introduced ContextClassLoaderProvider interface as a strategy for customizing the application context thread context
+  class loader
 
 Package org.springframework.osgi.io
 * improved getFile() method when dealing with resources in expanded bundles
