@@ -22,6 +22,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,6 +58,10 @@ public class WarListenerConfiguration implements DisposableBean {
 
 	private static final String CONTEXT_PATH_STRATEGY_NAME = "contextPathStrategy";
 
+	private static final String PROPERTIES_NAME = "extenderProperties";
+
+	private static final String UNDEPLOY_WARS_AT_SHUTDOWN = "undeploy.wars.at.shutdown";
+
 	private ConfigurableOsgiBundleApplicationContext extenderConfiguration;
 
 	private WarScanner warScanner;
@@ -64,6 +69,13 @@ public class WarListenerConfiguration implements DisposableBean {
 	private WarDeployer warDeployer;
 
 	private ContextPathStrategy contextPathStrategy;
+
+	private boolean undeployWarsAtShutdown;
+
+	//
+	// defaults
+	//
+	private static final boolean UNDEPLOY_WARS_AT_SHUTDOWN_DEFAULT = false;
 
 
 	/**
@@ -75,6 +87,7 @@ public class WarListenerConfiguration implements DisposableBean {
 	 */
 	public WarListenerConfiguration(BundleContext bundleContext) {
 		Bundle bundle = bundleContext.getBundle();
+		Properties properties = new Properties(createDefaultProperties());
 
 		Enumeration enm = bundle.findEntries("META-INF/spring", "*.xml", false);
 		if (enm == null) {
@@ -92,6 +105,8 @@ public class WarListenerConfiguration implements DisposableBean {
 			context.setBundleContext(bundleContext);
 			context.refresh();
 
+			extenderConfiguration = context;
+
 			warScanner = context.containsBean(WAR_SCANNER_NAME) ? (WarScanner) context.getBean(WAR_SCANNER_NAME,
 				WarScanner.class) : createDefaultWarScanner();
 
@@ -101,6 +116,18 @@ public class WarListenerConfiguration implements DisposableBean {
 			contextPathStrategy = context.containsBean(CONTEXT_PATH_STRATEGY_NAME) ? (ContextPathStrategy) context.getBean(
 				CONTEXT_PATH_STRATEGY_NAME, ContextPathStrategy.class)
 					: createDefaultContextPathStrategy();
+
+			// extender properties using the defaults as backup
+			if (context.containsBean(PROPERTIES_NAME)) {
+				Properties customProperties = (Properties) context.getBean(PROPERTIES_NAME, Properties.class);
+				Enumeration propertyKey = customProperties.propertyNames();
+				while (propertyKey.hasMoreElements()) {
+					String property = (String) propertyKey.nextElement();
+					properties.setProperty(property, customProperties.getProperty(property));
+				}
+			}
+
+			undeployWarsAtShutdown = getUndeployWarsAtShutdown(properties);
 		}
 	}
 
@@ -141,6 +168,12 @@ public class WarListenerConfiguration implements DisposableBean {
 		}
 	}
 
+	private Properties createDefaultProperties() {
+		Properties properties = new Properties();
+		properties.setProperty(UNDEPLOY_WARS_AT_SHUTDOWN, "" + UNDEPLOY_WARS_AT_SHUTDOWN_DEFAULT);
+		return properties;
+	}
+
 	private WarScanner createDefaultWarScanner() {
 		return new DefaultWarScanner();
 	}
@@ -159,6 +192,10 @@ public class WarListenerConfiguration implements DisposableBean {
 
 	private ContextPathStrategy createDefaultContextPathStrategy() {
 		return new DefaultContextPathStrategy();
+	}
+
+	private boolean getUndeployWarsAtShutdown(Properties properties) {
+		return Boolean.valueOf(properties.getProperty(UNDEPLOY_WARS_AT_SHUTDOWN)).booleanValue();
 	}
 
 	/**
@@ -188,4 +225,12 @@ public class WarListenerConfiguration implements DisposableBean {
 		return contextPathStrategy;
 	}
 
+	/**
+	 * Returns the undeployWarsAtShutdown.
+	 * 
+	 * @return Returns the undeployWarsAtShutdown
+	 */
+	public boolean shouldUndeployWarsAtShutdown() {
+		return undeployWarsAtShutdown;
+	}
 }

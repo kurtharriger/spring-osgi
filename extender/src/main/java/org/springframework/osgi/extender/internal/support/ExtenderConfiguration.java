@@ -69,7 +69,6 @@ public class ExtenderConfiguration implements DisposableBean {
 	//
 	// defaults
 	//
-
 	private static final long DEFAULT_SHUTDOWN_WAIT = 10 * 1000;
 	private static final boolean DEFAULT_PROCESS_ANNOTATION = false;
 
@@ -245,7 +244,7 @@ public class ExtenderConfiguration implements DisposableBean {
 	}
 
 	private boolean getProcessAnnotations(Properties properties) {
-		return Boolean.getBoolean(properties.getProperty(PROCESS_ANNOTATIONS_KEY));
+		return Boolean.valueOf(properties.getProperty(PROCESS_ANNOTATIONS_KEY)).booleanValue();
 	}
 
 	/**
