@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extender.support.internal;
 
 import java.util.Dictionary;
-import java.util.Enumeration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,12 +52,6 @@ public abstract class ConfigUtils {
 	private static final String RIGHT_OPEN_INTERVAL = ")";
 
 	private static final String COMMA = ",";
-
-	protected static final String CONTEXT_DIR = "/META-INF/spring/";
-
-	protected static final String CONTEXT_FILES = "*.xml";
-
-	protected static final String META_INF_WILD_CARD = CONTEXT_DIR + CONTEXT_FILES;
 
 	public static final String CONFIG_WILDCARD = "*";
 
@@ -110,6 +104,7 @@ public abstract class ConfigUtils {
 	public static final long DIRECTIVE_TIMEOUT_DEFAULT = 5 * 60; // 5 minutes
 
 	public static final long DIRECTIVE_NO_TIMEOUT = -2L; // Indicates wait
+
 
 	// forever
 
@@ -200,7 +195,7 @@ public abstract class ConfigUtils {
 		Object header = null;
 		if (headers != null)
 			header = headers.get(SPRING_CONTEXT_HEADER);
-		return (header != null ? header.toString() : null);
+		return (header != null ? header.toString().trim() : null);
 	}
 
 	/**
@@ -309,25 +304,20 @@ public abstract class ConfigUtils {
 	}
 
 	/**
-	 * Return the config locations from the Spring-Context header. The returned
-	 * Strings can be sent to a
+	 * Returns the location headers (if any) specified by the Spring-Context
+	 * header (if available). The returned Strings can be sent to a
 	 * {@link org.springframework.core.io.ResourceLoader} for loading the
 	 * configurations.
 	 * 
-	 * <p/> This method does not perform any validation of the given resources.
-	 * 
-	 * @param headers
-	 * @return
+	 * @param headers bundle headers
+	 * @return array of locations specified (if any)
 	 */
-	public static String[] getConfigLocations(Dictionary headers) {
+	public static String[] getHeaderLocations(Dictionary headers) {
 		String header = getSpringContextHeader(headers);
-		if (header != null) {
-			header = header.trim();
-		}
 
 		String[] ctxEntries;
 		if (StringUtils.hasText(header) && !(';' == header.charAt(0))) {
-			// get the file location
+			// get the config locations
 			String locations = StringUtils.tokenizeToStringArray(header, DIRECTIVE_SEPARATOR)[0];
 			// parse it into individual token
 			ctxEntries = StringUtils.tokenizeToStringArray(locations, CONTEXT_LOCATION_SEPARATOR);
@@ -339,33 +329,9 @@ public abstract class ConfigUtils {
 			}
 		}
 		else {
-			ctxEntries = new String[] { OsgiBundleXmlApplicationContext.DEFAULT_CONFIG_LOCATION };
+			ctxEntries = new String[0];
 		}
 
-		// remove duplicates
-		return StringUtils.removeDuplicateStrings(ctxEntries);
+		return ctxEntries;
 	}
-
-	/**
-	 * Dictates if the given bundle is Spring/OSGi powered or not.
-	 * 
-	 * <p/> The method looks first for a Spring-Context bundle header and then
-	 * for *.xml files under META-INF/spring folder. If either is present, true
-	 * is returned.
-	 * 
-	 * @param bundle
-	 * @return
-	 */
-	public static boolean isSpringOsgiPoweredBundle(Bundle bundle) {
-		Assert.notNull(bundle, "non-null bundle required");
-
-		// look first for Spring-Context entry
-		if (getSpringContextHeader(bundle.getHeaders()) != null)
-			return true;
-
-		// check the default locations if the manifest doesn't give any info
-		Enumeration defaultConfig = bundle.findEntries(CONTEXT_DIR, CONTEXT_FILES, false);
-		return (defaultConfig != null && defaultConfig.hasMoreElements());
-	}
-
 }

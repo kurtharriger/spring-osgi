@@ -324,9 +324,7 @@ public class ContextLoaderListener implements BundleActivator {
 	private DisposableBean applicationListenersCleaner;
 
 
-	/**
-	 * Required by the BundleActivator contract
-	 */
+	/** Required by the BundleActivator contract */
 	public ContextLoaderListener() {
 		this.managedContexts = CollectionFactory.createConcurrentMap(16);
 	}
@@ -617,11 +615,20 @@ public class ContextLoaderListener implements BundleActivator {
 	protected void maybeCreateApplicationContextFor(Bundle bundle) {
 
 		boolean debug = log.isDebugEnabled();
-		String bundleString = OsgiStringUtils.nullSafeNameAndSymName(bundle);
+		String bundleString = "[" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "]";
+
+		Long bundleId = new Long(bundle.getBundleId());
+
+		if (managedContexts.containsKey(bundleId)) {
+			if (debug) {
+				log.debug("Bundle " + bundleString + " is already managed; ignoring...");
+			}
+			return;
+		}
 
 		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
 			if (debug)
-				log.debug("Bundle [" + bundleString + "] expects an extender w/ version["
+				log.debug("Bundle " + bundleString + " expects an extender w/ version["
 						+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
 						+ "] which does not match current extender w/ version[" + extenderVersion
 						+ "]; skipping bundle from context creation");
@@ -630,17 +637,14 @@ public class ContextLoaderListener implements BundleActivator {
 
 		BundleContext localBundleContext = OsgiBundleUtils.getBundleContext(bundle);
 
-		Long bundleId = new Long(bundle.getBundleId());
-
-		if (managedContexts.containsKey(bundleId)) {
-			if (debug) {
-				log.debug("Bundle " + bundleString + "is already managed; ignoring...");
-			}
-			return;
-		}
+		if (debug)
+			log.debug("Scanning bundle " + bundleString + " for configurations...");
 
 		// initialize context
 		final DelegatedExecutionOsgiBundleApplicationContext localApplicationContext;
+
+		if (debug)
+			log.debug("Creating an application context for bundle " + bundleString);
 
 		try {
 			localApplicationContext = contextCreator.createApplicationContext(localBundleContext);

@@ -19,6 +19,11 @@ Package org.springframework.osgi.context
 * introduced ContextClassLoaderProvider interface as a strategy for customizing the application context thread context
   class loader
 
+Package org.springframework.osgi.extender
+* added support.scanning package to allow custom locations to be used for 'Spring-powered' bundles
+* added setter for delegated application context creator in ConditionalApplicationContextCreator
+* improved ApplicationContextConfiguration internal structure
+
 Package org.springframework.osgi.io
 * improved getFile() method when dealing with resources in expanded bundles
 

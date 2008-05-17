@@ -118,4 +118,11 @@
    </plugins>            
 </build>
 
+  <pluginRepositories>
+	<pluginRepository>
+      <id>agilejava</id>
+      <url>http://agilejava.com/maven/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
 </project>

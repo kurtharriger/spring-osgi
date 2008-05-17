@@ -25,9 +25,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.extender.support.internal.ConfigUtils;
+import org.springframework.osgi.extender.support.scanning.ConfigurationScanner;
+import org.springframework.osgi.extender.support.scanning.DefaultConfigurationScanner;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * Configuration class for Spring-DM application contexts.
@@ -46,31 +48,54 @@ public class ApplicationContextConfiguration {
 
 	private final Bundle bundle;
 
-	private boolean asyncCreation = ConfigUtils.DIRECTIVE_CREATE_ASYNCHRONOUSLY_DEFAULT;
+	private final ConfigurationScanner configurationScanner;
 
-	private String[] configurationLocations = new String[0];
+	private final boolean asyncCreation;
 
-	private boolean isSpringPoweredBundle = true;
+	private final String[] configurationLocations;
 
-	private boolean publishContextAsService = ConfigUtils.DIRECTIVE_PUBLISH_CONTEXT_DEFAULT;
+	private final boolean isSpringPoweredBundle;
 
-	private boolean waitForDeps = ConfigUtils.DIRECTIVE_WAIT_FOR_DEPS_DEFAULT;
+	private final boolean publishContextAsService;
 
-	private String toString;
+	private final boolean waitForDeps;
 
-	private long timeout = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT * 1000;
+	private final String toString;
+
+	private final long timeout;
 
 
 	/**
 	 * Constructs a new <code>ApplicationContextConfiguration</code> instance
-	 * from the given bundle.
+	 * from the given bundle. Uses the {@link DefaultConfigurationScanner}
+	 * internally for discovering Spring-powered bundles.
 	 * 
 	 * @param bundle bundle for which the application context configuration is
 	 * created
 	 */
 	public ApplicationContextConfiguration(Bundle bundle) {
+		this(bundle, new DefaultConfigurationScanner());
+	}
+
+	public ApplicationContextConfiguration(Bundle bundle, ConfigurationScanner configurationScanner) {
+		Assert.notNull(bundle);
+		Assert.notNull(configurationScanner);
 		this.bundle = bundle;
-		initialise();
+		this.configurationScanner = configurationScanner;
+
+		Dictionary headers = this.bundle.getHeaders();
+
+		String[] configs = this.configurationScanner.getConfigurations(bundle);
+
+		this.isSpringPoweredBundle = !ObjectUtils.isEmpty(configs);
+		this.configurationLocations = configs;
+		long option = ConfigUtils.getTimeOut(headers);
+		// translate into ms
+		this.timeout = (option >= 0 ? option * 1000 : option);
+		this.publishContextAsService = ConfigUtils.getPublishContext(headers);
+		this.asyncCreation = ConfigUtils.getCreateAsync(headers);
+		this.waitForDeps = ConfigUtils.getWaitForDependencies(headers);
+
 		// create toString
 		StringBuffer buf = new StringBuffer();
 		buf.append("AppCtxCfg [Bundle=");
@@ -99,7 +124,7 @@ public class ApplicationContextConfiguration {
 	 * configuration file.
 	 * 
 	 * <p/> A bundle is "Spring-Powered" if it has at least one configuration
-	 * file.
+	 * resource.
 	 */
 	public boolean isSpringPoweredBundle() {
 		return this.isSpringPoweredBundle;
@@ -154,40 +179,7 @@ public class ApplicationContextConfiguration {
 		return this.configurationLocations;
 	}
 
-	/**
-	 * 
-	 * If the Spring-Context header is present the resource files defined there
-	 * will be used, otherwise all xml files in META-INF/spring will be treated
-	 * as application context configuration files.
-	 */
-	private void initialise() {
-		Dictionary headers = bundle.getHeaders();
-
-		this.isSpringPoweredBundle = ConfigUtils.isSpringOsgiPoweredBundle(bundle);
-
-		if (isSpringPoweredBundle) {
-			String springContextHeader = ConfigUtils.getSpringContextHeader(headers);
-			if (StringUtils.hasText(springContextHeader)) {
-				// translate into miliseconds
-				long option = ConfigUtils.getTimeOut(headers);
-				this.timeout = (option >= 0 ? option * 1000 : option);
-				this.publishContextAsService = ConfigUtils.getPublishContext(headers);
-				this.asyncCreation = ConfigUtils.getCreateAsync(headers);
-				this.waitForDeps = ConfigUtils.getWaitForDependencies(headers);
-			}
-
-			this.configurationLocations = ConfigUtils.getConfigLocations(headers);
-
-			if (ObjectUtils.isEmpty(this.configurationLocations)) {
-				log.error("Bundle claims to be Spring powered, but does not contain any configuration resources: "
-						+ OsgiStringUtils.nullSafeSymbolicName(bundle));
-				this.isSpringPoweredBundle = false;
-			}
-		}
-	}
-
 	public String toString() {
 		return toString;
 	}
-
 }

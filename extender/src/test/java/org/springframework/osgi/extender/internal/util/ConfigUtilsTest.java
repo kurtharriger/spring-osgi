@@ -32,40 +32,26 @@ public class ConfigUtilsTest extends TestCase {
 
 	private Dictionary headers;
 
-	private String DEFAULT_LOCATION = OsgiBundleResource.BUNDLE_URL_PREFIX + "/META-INF/spring/*.xml";
 
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	protected void setUp() throws Exception {
 		headers = new Hashtable();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	protected void tearDown() throws Exception {
 		headers = null;
 	}
 
 	public void testGetCompletelyEmptySpringContextHeader() throws Exception {
-		String[] locations = ConfigUtils.getConfigLocations(headers);
-		assertEquals(1, locations.length);
-		assertEquals(DEFAULT_LOCATION, locations[0]);
+		String[] locations = ConfigUtils.getHeaderLocations(headers);
+		assertEquals(0, locations.length);
 
 	}
 
 	public void testGetEmptyConfigLocations() throws Exception {
 		String entry = ";early-init-importers=true";
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, entry);
-		String[] locations = ConfigUtils.getConfigLocations(headers);
-		assertEquals(1, locations.length);
-		assertEquals(DEFAULT_LOCATION, locations[0]);
+		String[] locations = ConfigUtils.getHeaderLocations(headers);
+		assertEquals(0, locations.length);
 	}
 
 	public void testGetNotExistingConfigLocations() throws Exception {
@@ -73,7 +59,7 @@ public class ConfigUtilsTest extends TestCase {
 		String entry = location + "; early-init-importers=true";
 
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, entry);
-		String[] locations = ConfigUtils.getConfigLocations(headers);
+		String[] locations = ConfigUtils.getHeaderLocations(headers);
 		assertEquals(1, locations.length);
 		assertEquals(location, locations[0]);
 
@@ -83,7 +69,7 @@ public class ConfigUtilsTest extends TestCase {
 		String location = "classpath:/META-INF/spring/*.xml";
 		String entry = location + "; early-init-importers=true";
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, entry);
-		String[] locations = ConfigUtils.getConfigLocations(headers);
+		String[] locations = ConfigUtils.getHeaderLocations(headers);
 		assertEquals(1, locations.length);
 		assertEquals(location, locations[0]);
 	}
@@ -94,7 +80,7 @@ public class ConfigUtilsTest extends TestCase {
 
 		String entry = location1 + "," + location2 + "; early-init-importers=true";
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER, entry);
-		String[] locations = ConfigUtils.getConfigLocations(headers);
+		String[] locations = ConfigUtils.getHeaderLocations(headers);
 		assertEquals(2, locations.length);
 		assertEquals(location1, locations[0]);
 		assertEquals(location2, locations[1]);
@@ -103,7 +89,7 @@ public class ConfigUtilsTest extends TestCase {
 	public void testLocationWithMultipleDots() throws Exception {
 		headers.put(ConfigUtils.SPRING_CONTEXT_HEADER,
 			"META-INF/file.with.multiple.dots.xml, META-INF/another.file.xml");
-		String[] locations = ConfigUtils.getConfigLocations(headers);
+		String[] locations = ConfigUtils.getHeaderLocations(headers);
 		assertEquals(2, locations.length);
 	}
 }
