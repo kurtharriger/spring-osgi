@@ -17,6 +17,9 @@
 package org.springframework.osgi.web.extender.internal.activator;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -115,7 +118,48 @@ public class WarLoaderListener implements BundleActivator {
 		}
 
 		public void destroy() throws Exception {
+			// cancel any pendings tasks
 			executor.destroy();
+
+			// depending on the configuration, the bundles can be undeployed as well
+			if (configuration.shouldUndeployWarsAtShutdown()) {
+
+				final List bundles = new ArrayList(bundlesToDeployments.keySet());
+				StringBuffer bundlesToString = new StringBuffer("\n");
+				for (Iterator iterator = bundles.iterator(); iterator.hasNext();) {
+					Bundle bundle = (Bundle) iterator.next();
+					bundlesToString.append("[ ");
+					bundlesToString.append(OsgiStringUtils.nullSafeNameAndSymName(bundle));
+					bundlesToString.append(" ]\n");
+				}
+
+				// get a snapshot of the keys and maintain the order
+				log.info("Undeploying all deployed bundle wars: {" + bundlesToString.toString() + "}");
+
+				Runnable undeployBundlesRunnable = new Runnable() {
+
+					public void run() {
+						for (Iterator iterator = bundles.iterator(); iterator.hasNext();) {
+							Bundle bundle = (Bundle) iterator.next();
+							// undeploy the bundle
+							new UndeployTask(bundle).run();
+						}
+
+						// when finished, clear the map just in case
+						bundlesToDeployments.clear();
+
+						// only after everything is done, the configuratoin can be destroyed as well
+						// as it holds a reference to the tomcat service
+						configuration.destroy();
+					}
+				};
+
+				Thread thread = new Thread(undeployBundlesRunnable, "Spring-DM WebExtender[" + extenderVersion
+						+ "] war undeployment thread");
+				thread.start();
+			}
+			else
+				configuration.destroy();
 		}
 
 
@@ -310,16 +354,13 @@ public class WarLoaderListener implements BundleActivator {
 	}
 
 	public void stop(BundleContext context) throws Exception {
-
 		// unregister listener
 		if (warListener != null) {
 			bundleContext.removeBundleListener(warListener);
 			warListener = null;
 		}
 
-		// destroy any tasks that have to be processed
+		// cancel any tasks that have to be processed
 		deploymentManager.destroy();
-
-		configuration.destroy();
 	}
 }
