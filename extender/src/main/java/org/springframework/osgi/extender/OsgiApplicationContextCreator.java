@@ -24,12 +24,13 @@ import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationC
  * bundle started by the OSGi platform can create (or customize) an application
  * context that becomes managed by the Spring-DM extender.
  * 
- * For example, to create an application context based on the existence of a
+ * For example, to create an application context based on the presence of a
  * manifest header, one could use the following code:
  * 
  * <pre class="code">
  * class HeaderBasedAppCtxCreator implements OsgiApplicationContextCreator {
  * 
+ * 	/** location header &#42;/
  * 	private static final String HEADER = &quot;Context-Locations&quot;;
  * 
  * 
@@ -37,12 +38,17 @@ import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationC
  * 		Bundle owningBundle = bundleContext.getBundle();
  * 
  * 		Object value = owningBundle.getHeaders().get(HEADER);
+ * 		String[] locations = null;
  * 		if (value != null &amp;&amp; value instanceof String) {
- * 			String[] locations = StringUtils.commaDelimitedListToStringArray((String) value);
- * 			// create application context
+ * 			locations = StringUtils.commaDelimitedListToStringArray((String) value);
  * 		}
- * 		else
- * 			return null;
+ * 		else {
+ * 			locations = &lt;default values&gt;
+ * 		}
+ * 
+ * 		// create application context from 'locations'  
+ * 		
+ * 		return applicationContext;	
  * 	}
  * }
  * </pre>
@@ -55,7 +61,7 @@ import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationC
  * extender bundle. Please see the OSGi specification and Spring-DM reference
  * documentation for more information on how to do that.
  * 
- * <p/>Note the extender also supports <code>BeanFactoryPostProcessor</code>
+ * <p/>Note the extender also supports <code>OsgiBeanFactoryPostProcessor</code>
  * for application context customization.
  * 
  * @author Costin Leau

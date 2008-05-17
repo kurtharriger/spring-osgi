@@ -69,17 +69,19 @@ public class ConditionalApplicationContextCreator implements OsgiApplicationCont
 
 	private BundleContextFilter filter;
 
-	private final DefaultOsgiApplicationContextCreator defaultContextCreator = new DefaultOsgiApplicationContextCreator();
+	private OsgiApplicationContextCreator delegatedContextCreator;
 
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(filter, "filter property is required");
+		if (delegatedContextCreator == null)
+			delegatedContextCreator = new DefaultOsgiApplicationContextCreator();
 	}
 
 	public DelegatedExecutionOsgiBundleApplicationContext createApplicationContext(BundleContext bundleContext)
 			throws Exception {
 		if (filter.matches(bundleContext))
-			return defaultContextCreator.createApplicationContext(bundleContext);
+			return delegatedContextCreator.createApplicationContext(bundleContext);
 		else
 			return null;
 	}
@@ -91,6 +93,18 @@ public class ConditionalApplicationContextCreator implements OsgiApplicationCont
 	 */
 	public void setFilter(BundleContextFilter filter) {
 		this.filter = filter;
+	}
+
+	/**
+	 * Sets the {@link OsgiApplicationContextCreator} used by this context
+	 * creator for the actual creation. If none is specified,
+	 * {@link DefaultOsgiApplicationContextCreator} is used.
+	 * 
+	 * @param delegatedContextCreator the instance used for creating the
+	 * application context
+	 */
+	public void setDelegatedApplicationContextCreator(OsgiApplicationContextCreator delegatedContextCreator) {
+		this.delegatedContextCreator = delegatedContextCreator;
 	}
 
 }

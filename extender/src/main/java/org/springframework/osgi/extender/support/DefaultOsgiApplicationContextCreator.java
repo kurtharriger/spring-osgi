@@ -23,11 +23,23 @@ import org.osgi.framework.BundleContext;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
+import org.springframework.osgi.extender.support.scanning.ConfigurationScanner;
+import org.springframework.osgi.extender.support.scanning.DefaultConfigurationScanner;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Default {@link OsgiApplicationContextCreator} implementation.
  * 
+ * <p/> Creates an {@link OsgiBundleXmlApplicationContext} instance using the
+ * default locations (<tt>Spring-Context</tt> manifest header or
+ * <tt>META-INF/spring/*.xml</tt>) if available, null otherwise.
+ * 
+ * <p/> Additionally, this implementation allows custom locations to be
+ * specified through {@link ConfigurationScanner} interface.
+ * 
+ * @see ConfigurationScanner
  * @author Costin Leau
  * 
  */
@@ -36,11 +48,13 @@ public class DefaultOsgiApplicationContextCreator implements OsgiApplicationCont
 	/** logger */
 	private static final Log log = LogFactory.getLog(DefaultOsgiApplicationContextCreator.class);
 
+	private ConfigurationScanner configurationScanner = new DefaultConfigurationScanner();
+
 
 	public DelegatedExecutionOsgiBundleApplicationContext createApplicationContext(BundleContext bundleContext)
 			throws Exception {
 		Bundle bundle = bundleContext.getBundle();
-		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle, configurationScanner);
 		if (log.isTraceEnabled())
 			log.trace("Created configuration " + config + " for bundle "
 					+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
@@ -50,11 +64,24 @@ public class DefaultOsgiApplicationContextCreator implements OsgiApplicationCont
 			return null;
 		}
 
+		log.info("Discovered configurations " + ObjectUtils.nullSafeToString(config.getConfigurationLocations())
+				+ " in bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "]");
+
 		DelegatedExecutionOsgiBundleApplicationContext sdoac = new OsgiBundleXmlApplicationContext(
 			config.getConfigurationLocations());
 		sdoac.setBundleContext(bundleContext);
 		sdoac.setPublishContextAsService(config.isPublishContextAsService());
 
 		return sdoac;
+	}
+
+	/**
+	 * Sets the configurationScanner used by this creator.
+	 * 
+	 * @param configurationScanner The configurationScanner to set.
+	 */
+	public void setConfigurationScanner(ConfigurationScanner configurationScanner) {
+		Assert.notNull(configurationScanner);
+		this.configurationScanner = configurationScanner;
 	}
 }

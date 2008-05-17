@@ -20,7 +20,7 @@
   <properties>
     <!-- Spring version -->   
     <spring.maven.artifact.version>2.5.4</spring.maven.artifact.version>
-    <spring.base.version>2.5</spring.base.version>
+    <spring.base.version>2.5.4</spring.base.version>
     
     <!-- Felix BND plugin settings -->
     
@@ -714,12 +714,6 @@ limitations under the License.
       <url>http://repo1.maven.org/maven2/</url>
     </pluginRepository>
 
-    <pluginRepository>
-      <id>agilejava</id>
-      <url>http://agilejava.com/maven/</url>
-    </pluginRepository>
-
-
    <!--  Do NOT enable this repository
     
     <pluginRepository>
@@ -746,14 +740,11 @@ limitations under the License.
     </repository>
 
 
-    <repository>
-      <id>spring-ext</id>
-      <name>Spring External Dependencies Repository</name>
-      <url>
-        http://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
-      </url>
-    </repository>
-
+	<repository>
+	   <id>com.springsource.repository.bundles.external</id>
+	   <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+	   <url>http://repository.springsource.com/maven/bundles/external</url>
+	</repository>
 
 	<repository>
 		<id>spring-release</id>
@@ -771,6 +762,15 @@ limitations under the License.
 		<url>http://maven.springframework.org/milestone</url>
 	</repository>
 
+    <repository>
+      <id>spring-ext</id>
+      <name>Spring External Dependencies Repository</name>
+      <url>
+        http://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
+      </url>
+    </repository>
+
+
 	<!-- used when building against Spring snapshots
 	<repository>
 		<id>spring-snapshot</id>
@@ -782,12 +782,6 @@ limitations under the License.
 	</repository>
 	-->
 	
-    <repository>
-      <id>safehaus-repository</id>
-      <name>Safehaus Repository</name>
-      <url>http://m2.safehaus.org</url>
-    </repository>
-    
     <repository>
       <id>i21-s3-osgi-repo</id>
       <name>i21 osgi artifacts repo</name>

@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.test;
 
+import java.util.Enumeration;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
@@ -25,6 +27,7 @@ import org.springframework.osgi.extender.support.internal.ConfigUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * JUnit superclass which offers synchronization for application context
@@ -210,8 +213,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 				Bundle bundle = bundles[i];
 				String bundleName = OsgiStringUtils.nullSafeSymbolicName(bundle);
 				if (OsgiBundleUtils.isBundleActive(bundle)) {
-					if (ConfigUtils.isSpringOsgiPoweredBundle(bundle)
-							&& ConfigUtils.getPublishContext(bundle.getHeaders())) {
+					if (isSpringBundle(bundle) && ConfigUtils.getPublishContext(bundle.getHeaders())) {
 						if (debug)
 							logger.debug("Bundle [" + bundleName + "] triggers a context creation; waiting for it");
 						// use platformBundleContext
@@ -226,5 +228,12 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 				}
 			}
 		}
+	}
+
+	private boolean isSpringBundle(Bundle bundle) {
+		if (!ObjectUtils.isEmpty(ConfigUtils.getHeaderLocations(bundle.getHeaders())))
+			return true;
+		Enumeration enm = bundle.findEntries("META-INF/spring", "*.xml", false);
+		return (enm != null && enm.hasMoreElements());
 	}
 }
