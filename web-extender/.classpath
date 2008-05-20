@@ -19,5 +19,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.4/spring-context-2.5.4.jar" sourcepath="/SPRING_TIGER_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.4/spring-beans-2.5.4.jar" sourcepath="/SPRING_TIGER_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.4/spring-core-2.5.4.jar" sourcepath="/SPRING_TIGER_SRC"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-extender"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

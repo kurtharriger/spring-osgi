@@ -32,6 +32,7 @@ import org.osgi.framework.Version;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.ConcurrentMap;
+import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.web.deployer.ContextPathStrategy;
@@ -98,11 +99,17 @@ public class WarLoaderListener implements BundleActivator {
 	// TODO: in the future, this could be externalized so smarter implementations can be plugged in 
 	private class DeploymentManager implements DisposableBean {
 
+		/** timeout for any possible on going tasks */
+		/** default of 1 min */
+		private static final long SHUTDOWN_WAIT_TIME = 1000 * 60;
+
 		/** association map between a bundle and its web deployment object */
 		private final ConcurrentMap bundlesToDeployments = CollectionFactory.createConcurrentMap(16);
 
 		/** thread for deploying/undeploying bundles */
 		private TimerTaskExecutor executor = new TimerTaskExecutor();
+		/** on-going task monitor */
+		final Counter onGoingTask = new Counter("ongoing-task");
 
 
 		public DeploymentManager() {
@@ -110,15 +117,15 @@ public class WarLoaderListener implements BundleActivator {
 		}
 
 		public void deployBundle(Bundle bundle, String contextPath) {
-			executor.execute(new DeployTask(bundle, contextPath));
+			executor.execute(new DeployTask(bundle, contextPath, onGoingTask));
 		}
 
 		public void undeployBundle(Bundle bundle) {
-			executor.execute(new UndeployTask(bundle));
+			executor.execute(new UndeployTask(bundle, onGoingTask));
 		}
 
 		public void destroy() throws Exception {
-			// cancel any pendings tasks
+			// cancel any pending tasks
 			executor.destroy();
 
 			// depending on the configuration, the bundles can be undeployed as well
@@ -142,14 +149,14 @@ public class WarLoaderListener implements BundleActivator {
 						for (Iterator iterator = bundles.iterator(); iterator.hasNext();) {
 							Bundle bundle = (Bundle) iterator.next();
 							// undeploy the bundle
-							new UndeployTask(bundle).run();
+							new UndeployTask(bundle, onGoingTask).run();
 						}
 
 						// when finished, clear the map just in case
 						bundlesToDeployments.clear();
 
-						// only after everything is done, the configuratoin can be destroyed as well
-						// as it holds a reference to the tomcat service
+						// only after everything is done, the configuration can be destroyed as well
+						// as it holds a reference to the Tomcat service
 						configuration.destroy();
 					}
 				};
@@ -158,29 +165,80 @@ public class WarLoaderListener implements BundleActivator {
 						+ "] war undeployment thread");
 				thread.start();
 			}
-			else
+			else {
+				// if there's a task currently on going, wait for it
+				if (onGoingTask.waitForZero(SHUTDOWN_WAIT_TIME)) {
+					log.debug("An on-going deploy/undeploy task did not finish in time; continuing shutdown...");
+				}
 				configuration.destroy();
+			}
 		}
 
 
-		/** deploy war task */
-		private class DeployTask implements Runnable {
+		private abstract class BaseTask implements Runnable {
 
 			/** bundle to deploy */
-			private final Bundle bundle;
+			final Bundle bundle;
+			/** bundle name */
+			final String bundleName;
+			/** work monitor */
+			final Counter counter;
+
+
+			/**
+			 * Constructs a new <code>BaseTask</code> instance.
+			 * 
+			 * @param bundle
+			 * @param bundleName
+			 * @param counter
+			 */
+			public BaseTask(Bundle bundle, Counter counter) {
+				this.bundle = bundle;
+				this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
+				this.counter = counter;
+			}
+
+			/**
+			 * {@inheritDoc}
+			 * 
+			 * Add counter to prevent shutting down while tasks are still
+			 * running.
+			 */
+			public final void run() {
+				counter.increment();
+				boolean trace = log.isTraceEnabled();
+
+				if (trace)
+					log.trace("Incrementing work counter for " + toString());
+
+				try {
+					doRun();
+				}
+				finally {
+					counter.decrement();
+					if (trace)
+						log.trace("Decrementing work counter for " + toString());
+				}
+			}
+
+			/**
+			 * Abstract method meant for subclasses.
+			 */
+			protected abstract void doRun();
+		}
+
+		/** deploy war task */
+		private class DeployTask extends BaseTask {
 
 			private final String contextPath;
 
-			private final String bundleName;
 
-
-			public DeployTask(Bundle bundle, String contextPath) {
-				this.bundle = bundle;
+			public DeployTask(Bundle bundle, String contextPath, Counter counter) {
+				super(bundle, counter);
 				this.contextPath = contextPath;
-				this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
 			}
 
-			public void run() {
+			public void doRun() {
 				try {
 					WarDeployment deployment = warDeployer.deploy(bundle, contextPath);
 					// deploy the bundle 
@@ -194,20 +252,13 @@ public class WarLoaderListener implements BundleActivator {
 		}
 
 		/** undeploy war task */
-		private class UndeployTask implements Runnable {
+		private class UndeployTask extends BaseTask {
 
-			/** bundle to deploy */
-			private final Bundle bundle;
-
-			private final String bundleName;
-
-
-			public UndeployTask(Bundle bundle) {
-				this.bundle = bundle;
-				this.bundleName = OsgiStringUtils.nullSafeNameAndSymName(bundle);
+			public UndeployTask(Bundle bundle, Counter counter) {
+				super(bundle, counter);
 			}
 
-			public void run() {
+			public void doRun() {
 				WarDeployment deployment = (WarDeployment) bundlesToDeployments.remove(bundle);
 				// double check that we do have a deployment
 				if (deployment != null)
