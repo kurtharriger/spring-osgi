@@ -664,10 +664,13 @@ public class ContextLoaderListener implements BundleActivator {
 		}
 
 		if (compatibilityChecker.checkCompatibility(bundle)) {
-			log.info("Ignoring bundle " + bundleString + " as it's Spring incompatible");
+			log.debug("Bundle " + bundleString + " is Spring type compatible with Spring-DM");
+
 		}
-		else
-			log.debug("Bundle " + bundleString + " has the same Spring type as the extender ");
+		else {
+			log.debug("Ignoring bundle " + bundleString + " as it's Spring incompatible");
+			return;
+		}
 
 		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
 			if (debug)
