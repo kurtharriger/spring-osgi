@@ -23,6 +23,7 @@ Package org.springframework.osgi.extender
 * added support.scanning package to allow custom locations to be used for 'Spring-powered' bundles
 * added setter for delegated application context creator in ConditionalApplicationContextCreator
 * improved ApplicationContextConfiguration internal structure
+* added type filtering behaviour inside the extender so only Spring-compatible bundles are scanned and managed
 
 Package org.springframework.osgi.io
 * improved getFile() method when dealing with resources in expanded bundles

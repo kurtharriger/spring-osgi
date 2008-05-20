@@ -38,7 +38,7 @@ public class NamespacePluginsTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.namespacePlugins = new NamespacePlugins(null);
+		this.namespacePlugins = new NamespacePlugins();
 	}
 
 	public void testCantResolveWithNoPlugins() throws IOException, SAXException {
