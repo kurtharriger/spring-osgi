@@ -30,9 +30,11 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.context.event.ApplicationEventMulticaster;
@@ -59,6 +61,7 @@ import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.Assert;
 
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'.
@@ -322,6 +325,10 @@ public class ContextLoaderListener implements BundleActivator {
 
 	/** dynamicList clean up hook */
 	private DisposableBean applicationListenersCleaner;
+	/** Spring compatibility checker */
+	private SpringTypeCompatibilityChecker compatibilityChecker;
+	/** Spring version used */
+	private Bundle wiredSpringBundle;
 
 
 	/** Required by the BundleActivator contract */
@@ -349,6 +356,10 @@ public class ContextLoaderListener implements BundleActivator {
 
 		this.extenderVersion = OsgiBundleUtils.getBundleVersion(context.getBundle());
 		log.info("Starting [" + bundleContext.getBundle().getSymbolicName() + "] bundle v.[" + extenderVersion + "]");
+
+		detectSpringVersion(context);
+
+		compatibilityChecker = new SpringTypeCompatibilityChecker(bundleContext);
 
 		// Step 1 : discover existing namespaces (in case there are fragments with custom XML definitions)
 		nsManager = new NamespaceManager(context);
@@ -405,6 +416,32 @@ public class ContextLoaderListener implements BundleActivator {
 				}
 			}
 		}
+	}
+
+	private void detectSpringVersion(BundleContext context) {
+		boolean debug = log.isDebugEnabled();
+
+		// use PackageAdmin internally to determine the wired Spring version
+		ServiceReference ref = bundleContext.getServiceReference(PackageAdmin.class.getName());
+		if (ref != null) {
+			PackageAdmin pa = (PackageAdmin) bundleContext.getService(ref);
+			wiredSpringBundle = pa.getBundle(Assert.class);
+		}
+		else {
+			if (debug) {
+				log.debug("PackageAdmin not available; falling back to raw class loading for detecting the wired Spring bundle");
+			}
+			wiredSpringBundle = SpringTypeCompatibilityChecker.findOriginatingBundle(context, Assert.class);
+			if (wiredSpringBundle == null) {
+				throw new IllegalStateException("Impossible to find the originating Spring bundle for " + Assert.class
+						+ "; bailing out");
+			}
+		}
+
+		if (debug)
+			log.debug("Spring-DM v.[" + extenderVersion + "] is wired to Spring core bundle "
+					+ OsgiStringUtils.nullSafeSymbolicName(wiredSpringBundle) + "v."
+					+ OsgiBundleUtils.getBundleVersion(wiredSpringBundle));
 	}
 
 	/**
@@ -625,6 +662,12 @@ public class ContextLoaderListener implements BundleActivator {
 			}
 			return;
 		}
+
+		if (compatibilityChecker.checkCompatibility(bundle)) {
+			log.info("Ignoring bundle " + bundleString + " as it's Spring incompatible");
+		}
+		else
+			log.debug("Bundle " + bundleString + " has the same Spring type as the extender ");
 
 		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
 			if (debug)

@@ -19,16 +19,12 @@ package org.springframework.osgi.extender.internal.support;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
-import org.osgi.service.packageadmin.ExportedPackage;
-import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
@@ -102,13 +98,6 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 	private final Map plugins = CollectionFactory.createConcurrentMap(5);
 
-	/** hold a direct reference since it's a mandatory platform service */
-	private final PackageAdmin pa;
-
-
-	NamespacePlugins(PackageAdmin packageAdmin) {
-		this.pa = packageAdmin;
-	}
 
 	public void addHandler(Bundle bundle) {
 		if (log.isDebugEnabled())
@@ -136,9 +125,6 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 		if (debug)
 			log.debug("Trying to resolving namespace handler for " + namespaceUri);
 
-		// avoid creation if there is no package admin
-		Map possibleProviders = (pa == null ? null : new LinkedHashMap(4));
-
 		for (Iterator i = plugins.values().iterator(); i.hasNext();) {
 			Plugin plugin = (Plugin) i.next();
 			try {
@@ -148,12 +134,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 						log.debug("Namespace handler for " + namespaceUri + " found inside "
 								+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
 
-					// no package admin, just bail out
-					if (pa == null)
-						return handler;
-
-					// add bundle to the map
-					possibleProviders.put(plugin.getBundle(), handler);
+					return handler;
 				}
 			}
 			catch (IllegalArgumentException ex) {
@@ -163,14 +144,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 			}
 		}
-
-		// no provider found
-		if (pa == null || possibleProviders.isEmpty())
-			return null;
-
-		// filter provider
-		Bundle provider = filterProvider(possibleProviders.keySet());
-		return (provider == null ? null : (NamespaceHandler) possibleProviders.get(provider));
+		return null;
 	}
 
 	public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
@@ -178,9 +152,6 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 		if (debug)
 			log.debug("Trying to resolving entity for " + publicId + "|" + systemId);
-
-		// avoid creation if there is no package admin
-		Map possibleProviders = (pa == null ? null : new LinkedHashMap(4));
 
 		if (systemId != null) {
 			for (Iterator i = plugins.values().iterator(); i.hasNext();) {
@@ -192,13 +163,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 						if (debug)
 							log.debug("XML schema for " + publicId + "|" + systemId + " found inside "
 									+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
-
-						// no package admin, just bail out
-						if (pa == null)
-							return inputSource;
-
-						// add bundle to the map
-						possibleProviders.put(plugin.getBundle(), inputSource);
+						return inputSource;
 					}
 
 				}
@@ -209,67 +174,12 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 				}
 			}
 		}
-		// no provider found
-		if (pa == null || possibleProviders.isEmpty())
-			return null;
 
-		// filter provider
-		Bundle provider = filterProvider(possibleProviders.keySet());
-		return (provider == null ? null : (InputSource) possibleProviders.get(provider));
+		return null;
 	}
 
 	public void destroy() {
 		plugins.clear();
-	}
-
-	/**
-	 * Filter the possible provides based on the wiring to the requesting
-	 * bundle.
-	 * 
-	 * @param possibleProviders
-	 * @return
-	 */
-	private Bundle filterProvider(Collection possibleProviders) {
-		boolean trace = log.isTraceEnabled();
-		Bundle invokingBundle = getInvokingBundle();
-
-		// cannot find the invoking bundle, return the first provider found
-		if (invokingBundle == null) {
-			if (trace)
-				log.trace("No invoking bundle found; returning the first namespace/resolver found");
-		}
-
-		// use the package admin to find the exported packages of the given providers
-		for (Iterator iterator = possibleProviders.iterator(); iterator.hasNext();) {
-			Bundle possibleProvider = (Bundle) iterator.next();
-			// check the exported packages
-			ExportedPackage[] packages = pa.getExportedPackages(possibleProvider);
-			for (int packagesIndex = 0; packages != null && packagesIndex < packages.length; packagesIndex++) {
-				ExportedPackage exportedPackage = packages[packagesIndex];
-				// to discover the importing bundles
-				Bundle[] importingBundles = exportedPackage.getImportingBundles();
-
-				for (int importersIndex = 0; importingBundles != null && importersIndex < importingBundles.length; importersIndex++) {
-					Bundle importer = importingBundles[importersIndex];
-					// if the invoking bundle is wired to the provider, we have a match
-					if (importer.equals(invokingBundle)) {
-						if (trace)
-							log.trace("Found wiring between invoker "
-									+ OsgiStringUtils.nullSafeSymbolicName(invokingBundle) + " and namespace provider "
-									+ OsgiStringUtils.nullSafeSymbolicName(possibleProvider));
-						return possibleProvider;
-					}
-				}
-			}
-		}
-		// there is no wiring between the providers and the target so any handler will do
-		// return the first one found
-		Bundle match = (Bundle) possibleProviders.iterator().next();
-		if (trace)
-			log.trace("No wiring between the invoker bundle " + OsgiStringUtils.nullSafeSymbolicName(invokingBundle)
-					+ " and the handlers found; returning the first namespace provider "
-					+ OsgiStringUtils.nullSafeSymbolicName(match));
-		return match;
 	}
 
 	/**

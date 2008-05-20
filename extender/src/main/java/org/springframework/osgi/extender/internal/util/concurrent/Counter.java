@@ -137,7 +137,7 @@ public class Counter {
 	}
 
 	/**
-	 * Wait maximum the givem amount of time, for the counter to reach the given
+	 * Wait maximum the given amount of time, for the counter to reach the given
 	 * value.. This mechanism relies on {@link Object#wait(long)} and
 	 * {@link Object#notify()} mechanism to work appropriately. Please see the
 	 * class javadoc for more info.

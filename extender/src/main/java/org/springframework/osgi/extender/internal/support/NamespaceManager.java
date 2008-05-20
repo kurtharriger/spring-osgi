@@ -20,9 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
@@ -82,18 +80,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 				+ OsgiBundleUtils.getBundleVersion(context.getBundle());
 
 		// detect package admin
-		ServiceReference paReference = context.getServiceReference(PackageAdmin.class.getName());
-		PackageAdmin pa = (paReference == null ? null : (PackageAdmin) context.getService(paReference));
-
-		if (pa == null) {
-			log.warn("No PackageAdmin service present; namespace type wiring will be disabled");
-			this.namespacePlugins = new NamespacePlugins(null);
-		}
-		else {
-			if (log.isDebugEnabled())
-				log.debug("Found PackageAdmin " + pa + "; enabled namespace type wiring checks");
-			this.namespacePlugins = new NamespacePlugins(pa);
-		}
+		this.namespacePlugins = new NamespacePlugins();
 	}
 
 	/**
