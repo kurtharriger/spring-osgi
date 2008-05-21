@@ -29,7 +29,7 @@ import org.springframework.osgi.iandt.BaseIntegrationTest;
  * @author Costin Leau
  * 
  */
-public class JdkProxy extends BaseIntegrationTest {
+public class JdkProxyTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi.iandt,jdk.proxy," + getSpringDMVersion() };
