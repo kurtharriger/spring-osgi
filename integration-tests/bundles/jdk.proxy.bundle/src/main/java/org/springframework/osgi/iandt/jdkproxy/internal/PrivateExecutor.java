@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.jdkproxy.internal;;
+package org.springframework.osgi.iandt.jdkproxy.internal;
 
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -28,10 +28,10 @@ import org.apache.commons.logging.LogFactory;
  * @author Costin Leau
  * 
  */
-public class PrivateExecutor {
+class PrivateExecutor {
 
 	/** logger */
-	private static final Log log = LogFactory.getLog(PrivateInvocationHandler.class);
+	private static final Log log = LogFactory.getLog(PrivateExecutor.class);
 
 
 	Object dispatchMethod(Method method) {
