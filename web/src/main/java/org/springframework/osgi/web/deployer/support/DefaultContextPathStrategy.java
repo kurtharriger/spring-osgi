@@ -29,11 +29,10 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link ContextPathStrategy} default implementation that takes into account
- * the OSGi bundle properties for determining the war context path.
- * 
- * This implementation iterates through following properties, considering the
- * first one that is available in the following order:
+ * {@link ContextPathStrategy} default implementation. This class takes into
+ * account the OSGi bundle properties for determining the war context path. by
+ * iterating through the following properties, considering the first one that is
+ * available in the following order:
  * 
  * <ol>
  * <li>Web-ContextPath manifest header (identical to the one in SpringSource
@@ -48,6 +47,8 @@ import org.springframework.util.StringUtils;
  * /root/bundle.jar -&gt; /name
  * /root/bundle/ -&gt; /bundle
  * /root/bundle.jar/ -&gt; /bundle
+ * file:/path/bundle.jar -&gt; /bundle
+ * jar:url:/root/bundle.jar -&gt; /bundle
  * </pre>
  * 
  * </li>
@@ -79,6 +80,8 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 
 	private static final String SLASH = "/";
 
+	private static final String PREFIX_DELIMITER = ":";
+
 	/** determine encoding */
 	static {
 		// do encoding
@@ -96,6 +99,22 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 	public String getContextPath(Bundle bundle) {
 		Assert.notNull(bundle);
 
+		String path = determineContextPath(bundle);
+		path = encodePath(path);
+
+		// add leading slash
+		return (path.startsWith(SLASH) ? path : SLASH.concat(path));
+	}
+
+	/**
+	 * Determines the context path associated with this bundle. This method can
+	 * be overridden by possible subclasses that wish to decorate or modify the
+	 * existing behaviour.
+	 * 
+	 * @param bundle bundle for which the context path needs to be determined
+	 * @return non-null context path determined for the given bundle
+	 */
+	protected String determineContextPath(Bundle bundle) {
 		// first get the header
 		String path = getBundleHeader(bundle);
 
@@ -123,15 +142,7 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 			}
 		}
 
-		try {
-			path = URLEncoder.encode(path, encodingScheme);
-			// add leading slash
-			return (path.startsWith(SLASH) ? path : SLASH.concat(path));
-		}
-		catch (UnsupportedEncodingException ex) {
-			throw (RuntimeException) new IllegalStateException((encodingScheme == null ? "default " : encodingScheme)
-					+ " encoding scheme detected but unsable").initCause(ex);
-		}
+		return path;
 	}
 
 	private String getBundleHeader(Bundle bundle) {
@@ -150,9 +161,12 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 	}
 
 	private String getBundleLocation(String location) {
+		// remove prefix (if there's any)
+		int index = location.lastIndexOf(PREFIX_DELIMITER);
+		String path = ((index > 0) ? location.substring(index + 1) : location);
 		// clean up the path
-		String path = StringUtils.cleanPath(location);
-		// it's a folder
+		path = StringUtils.cleanPath(location);
+		// check if it's a folder
 		if (path.endsWith(SLASH)) {
 			// remove trailing slash
 			path = path.substring(0, path.length() - 1);
@@ -165,5 +179,15 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 		// remove file extension
 		path = StringUtils.stripFilenameExtension(path);
 		return path;
+	}
+
+	private String encodePath(String path) {
+		try {
+			return URLEncoder.encode(path, encodingScheme);
+		}
+		catch (UnsupportedEncodingException ex) {
+			throw (RuntimeException) new IllegalStateException((encodingScheme == null ? "default " : encodingScheme)
+					+ " encoding scheme detected but unsable").initCause(ex);
+		}
 	}
 }

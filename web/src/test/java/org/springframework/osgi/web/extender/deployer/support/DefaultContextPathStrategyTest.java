@@ -238,4 +238,19 @@ public class DefaultContextPathStrategyTest extends TestCase {
 		assertTrue(path.startsWith("/"));
 		assertEquals("/" + encode(value), path);
 	}
+
+	public void testPrefixRemoval() throws Exception {
+		final String expectedContextPath = "/folder";
+		final String location = "file:/somePath" + expectedContextPath + "/";
+
+		assertEquals(expectedContextPath, strategy.getContextPath(createBundleWithLocation(location)));
+
+	}
+
+	public void testMultiPrefixRemoval() throws Exception {
+		final String expectedContextPath = "/bundle";
+		final String location = "jar:http@file:url:/somePath" + expectedContextPath + ".jar";
+
+		assertEquals(expectedContextPath, strategy.getContextPath(createBundleWithLocation(location)));
+	}
 }
