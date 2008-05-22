@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+  <partintro>
+    <!-- <title>Spring DM Setup</title> -->
+
+    <section id="tutorial:prerequisite">
+	    <title>Prerequisite</title>
+	    <para>
+	    This tutorial was built on Mac 10.5,however the process should not be very different (if any) on other platforms.
+		Also, the following must be installed and available prior to using this tutorial:
+		<itemizedlist>
+			<listitem><para>Eclipse 3.2+</para></listitem>
+			<listitem><para>Spring 2.5.4</para></listitem>
+			<listitem><para>Latest Spring DM distribution</para></listitem>
+			<listitem><para>Eclipse Spring IDE installed (<ulink url="http://springide.org/project/wiki/SpringideInstall">Spring IDE installation page</ulink>)</para></listitem>
+		    <listitem><para>JDK 1.5+</para></listitem>
+		    
+		</itemizedlist>
+		Also, make sure your computer is connected to the internet (for Maven dependencies) 
+	    </para>
+    </section>
+    
+    <section id="tutorial:setup">
+      <title>Set up Eclipse Based Spring-DM environment</title>
+     
+      <para>
+        This tutorial is based on Eclipse (Europa) 3.3.1 with Maven Plug-in installed. 
+		You can download Eclipse from http://www.eclipse.org (if you don’t already have it) 
+      </para>
+      
+      <procedure>
+	   	 <step>
+	   	 	<title>Install Maven Plug-in</title>
+	   	 	<para> 
+	   	 	If you already have Maven plug-in installed you can skip to the next step, otherwise 
+		    let’s install it. 	
+	   	 	</para>
+	   	 	<para>
+	   	 	    <command>
+		   	 	 Open up Eclipse -> Click on Help (on the menu bar) -> Software Updates -> Find and Install -> Search for new features to install -> Next
+		   	 	</command>
+	   	 	</para>
+	   	 	<para><emphasis>Install Sites to Visit</emphasis> window will open up (see below)</para>
+	   	 	<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/update.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/update.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		          </mediaobject>        
+	        </para>
+	        
+	        <para>
+	        We are going to add a new Update site 
+	        </para>
+	        <para>
+		        <command>
+			   	 	 Click on <emphasis>New Remote Site </emphasis>
+			   	</command>
+	        </para>  
+	        <para>In the <emphasis>Name</emphasis> enter:  <literal>Maven Plug-in </literal></para>
+			<para>In the <emphasis>URL</emphasis> enter: <literal>http://m2eclipse.codehaus.org/update/</literal></para>		
+			<para><emphasis>New Update Site</emphasis> window will open up (see below)</para>
+	        <para>         
+                  <mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/updatesite.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/updatesite.jpg"
+		                         format="JPG"/>
+		            </imageobject>	
+		          </mediaobject>   	   	 	
+	     </para>  
+	 
+	   	 <para>
+	   	 	<command>Click OK -> Finish </command>
+	   	 </para>
+	   	<para>
+	   	Expend Maven Plug-in and select <emphasis>Maven integration for Eclipse</emphasis>
+	   	</para>
+	    <para>Accept the license agreement and the rest of the defaults.</para>	
+		<para>When wizard finishes downloading and installing plug-in it will prompt you to restart Eclipse. Do so.</para>
+		<para>Now you ready to continue. </para>
+
+	   	 </step>
+	  </procedure>
+    </section>
+    
+    <section id="tutorial:tg-platform">
+        <title>Prepare Spring-DM Target Platform</title>
+        <procedure>
+	    <step>  	
+	    	<title>Create Spring DM Target Platform</title> 	
+	   	 	<para>   	 	
+		   	 	<command>
+		   	 	Eclipse -> Preferences -> Plug-in Development -> Target Platform
+		   	 	</command>
+	   	 	</para>
+	   	 	
+	   	 	<para>The Preferences window will open up (see below)</para>
+	   	 	<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/new-tg-platform.jpg"
+		                         format="PNG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/new-tg-platform.jpg"
+		                         format="PNG"/>
+		            </imageobject>
+		
+		          </mediaobject>        
+	        </para>
+	        
+	        <para>At the bottom find a drop down list of <emphasis>Predefined Targets</emphasis> and select <emphasis>Spring Dynamic Modules for OSGi™ Service Platform 1.1.0.Snapshot</emphasis></para>
+
+			<para><command>Click on <emphasis>Load Target</emphasis></command></para>
+
+			<para>You should see an absolutely empty window (as above). Now we are going to set up our Target Platform by adding (deploying) Spring-DM Core bundles. 
+			The root directory for a Target Platform is shown in the <emphasis>Location</emphasis> drop-down at the top of the <emphasis>Preferences</emphasis> window
+			<literal>(e.g. /Users/olegzhurakousky/. . ./targets/snapshot/target).</literal>
+			We can obviously navigate to such directory via Finder/Explorer, but it would be easier to work with it if we set up a link from within the Eclipse workspace. 
+			This way we’ll be able to manage our Target Platform without leaving our IDE. To do this first create a General project:</para>
+			
+			<para><command>File -> New -> Project -> General -> Project</command> and name it <emphasis>OSGi-Target-Platform </emphasis>(or anything you want)</para>
+
+	        <para>
+	        <command>Right-click on the newly created project -> New -> Folder</command> 
+	        </para>
+	        <para>
+	        <emphasis>New Folder</emphasis> window will open up (see below)
+	        </para>
+	        
+	        <para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/folderLink.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/folderLink.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		          </mediaobject>        
+	        </para>
+	        <para>
+	 
+				Enter <emphasis>target</emphasis> as Folder name. Check <emphasis>Link to folder in the file system</emphasis> and enter (browse or cut/paste) the path 
+				to the Location of Target Platform discovered in the previous step:
+				<literal>(e.g. /Users/olegzhurakousky/. . ./targets/snapshot/target)</literal>
+	        </para>
+	        <para><command>Click on Finish</command></para>
+	        
+	        <para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/targetLink.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/targetLink.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		          </mediaobject>        
+	        </para>
+	        
+	        <para>
+	        Now we are ready to begin deploying bundles. All we need to do is start copying them into target directory of our newly created project. 
+	        </para>
+	       
+	   	 </step>
+	   	 <step>
+	   	 	<title>Install Spring DM Core Bundles</title>
+	   	 	<para>
+	   	 	To install bundles we need to know where to get them. Assuming you downloaded and unpacked the latest distribution of Spring-DM project, navigate to the directory where you unpacked the Spring-DM project. 
+	   	 	Once there go to <literal>lib</literal> directory and you will see a bunch of JAR files. These are ready to be used OSGi bundles (a.k.a OSGi-fied JARs).
+            The first bundle we are going to install is <literal>org.eclipse.osgi</literal>. This is the most essential bundle. Without it Equinox OSGi framework will not start. Copy it into target directory of OSGi-Target-Platform project we have created in the previous step.
+	   	 	</para>
+	   	 	<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/target-osgi.jpg"
+		                         format="JPG"/>
+		            </imageobject>	
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/target-osgi.jpg"
+		                         format="JPG"/>
+		            </imageobject>	
+		          </mediaobject>        
+	        </para>
+	        
+	        <para>
+	        Before we go any further let’s test and make sure that we are able to start our OSGi environment.
+	        </para>
+	        <para> 
+			<command>Right-click on the error beside Run icon on the menu bar and select Open Run Dialog</command>
+	        </para>
+	        
+	        <para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/run-osgi.jpg"
+		                         format="JPG"/>
+		            </imageobject>	
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/run-osgi.jpg"
+		                         format="JPG"/>
+		            </imageobject>	
+		          </mediaobject>        
+	        </para>
+	        
+	        <para>
+	        The Run window will open up. 
+	        <command>Navigate to OSGi Framework -> Right-click and select New</command>
+	        </para>
+	        
+	        <para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/new-osgi.jpg"
+		                         format="JPG"/>
+		            </imageobject>	
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/new-osgi.jpg"
+		                         format="JPG"/>
+		            </imageobject>	
+		          </mediaobject>        
+	        </para>
+	        
+	        <para>
+	        When new Configuration window opens up, name it <emphasis>OSGi-WEB</emphasis> and click on <command>Apply</command>.
+			You should also see the <literal>org.eclipse.osgi</literal> bundle that we’ve deployed earlier (see below). Make sure it is checked.
+	        </para>
+	        
+	        <para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/eclipse-osgi.jpg"
+		                         format="JPG"/>
+		            </imageobject>	
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/eclipse-osgi.jpg"
+		                         format="JPG"/>
+		            </imageobject>	
+		          </mediaobject>        
+	        </para>
+	        
+	        <para>
+	        Click Run. You should see the console prompt: <literal>osgi></literal> . Enter <literal>ss</literal> and you should see the message below. Make sure that the bundle state is <emphasis>ACTIVE</emphasis>.
+	        </para>
+	        
+	        <para>
+		    		        <programlisting language="xml"><![CDATA[
+Framework is launched.
+	       
+id	State       Bundle
+0	ACTIVE      org.eclipse.osgi_3.4.0.v20080205
+
+	]]></programlisting>        
+	        </para>
+	        
+	        <para>
+	        We’ve verified that our core OSGi environment is setup. You can shut down the OSGi platform now.
+			</para>
+			<para>
+			Now we are ready to deploy the rest of the bundles needed to “Spring-load” our OSGi platform. To do this we will simply repeat the step of installing bundles into our Target Platform (by copying them into target directory).
+			</para>
+			<para>	
+			Navigate back to the directory where you unpacked the Spring-DM distribution, go to <literal>dist</literal> directory and copy all JAR files into target directory of our new platform. Your <literal>target</literal> directory should now look something like this:
+	        </para>
+	        
+	        <para>
+	        Also, from <literal>lib</literal> directory copy the following JARs:
+	        </para>
+	        <literallayout>
+aopalliance.osgi-1.0-SNAPSHOT.jar
+asm.osgi-2.2.3-SNAPSHOT.jar
+jcl104-over-slf4j-1.4.3.jar
+log4j.osgi-1.2.15-SNAPSHOT.jar
+slf4j-api-1.4.3.jar
+slf4j-log4j12-1.4.3.jar
+spring-aop-2.5.4.jar
+spring-beans-2.5.4.jar
+spring-context-2.5.4.jar
+spring-context-support-2.5.4.jar
+spring-core-2.5.4.jar
+	        </literallayout>
+	        
+	        
+	        <para>
+	        Our Target Platform now contains all required Spring-DM bundles. 
+	        </para>
+	        <para>
+	        <command>Open Run Dialog</command> again, navigate to our OSGi configuration, make sure that all bundles are checked and click on <command>Run</command>
+	        </para>
+	        <para>
+	        Your console output should look similar to this
+	        <programlisting language="xml"><![CDATA[
+Framework is launched.
+	       
+id	State       Bundle
+0	ACTIVE      org.eclipse.osgi_3.4.0.v20080205
+15	INSTALLED   org.springframework.bundle.osgi.test_1.1.0.m2
+16	ACTIVE      org.springframework.osgi.log4j.osgi_1.2.15.SNAPSHOT
+17	ACTIVE      slf4j.api_1.4.3
+18	ACTIVE      slf4j.log4j12_1.4.3
+19	ACTIVE      org.springframework.osgi.asm.osgi_2.2.3.SNAPSHOT
+20	ACTIVE      org.springframework.bundle.osgi.extender_1.1.0.m2
+21	ACTIVE      org.springframework.bundle.osgi.mock_1.1.0.m2
+22	ACTIVE      org.springframework.bundle.osgi.io_1.1.0.m2
+23	INSTALLED   org.springframework.bundle.osgi.web_1.1.0.m2
+24	RESOLVED    org.springframework.bundle.osgi.web.extender_1.1.0.m2
+25	ACTIVE      jcl104.over.slf4j_1.4.3
+26	ACTIVE      org.springframework.osgi.aopalliance.osgi_1.0.0.SNAPSHOT
+27	ACTIVE      org.springframework.bundle.osgi.core_1.1.0.m2
+28	ACTIVE      org.springframework.bundle.spring.context_2.5.4
+29	ACTIVE      org.springframework.bundle.spring.beans_2.5.4
+30	ACTIVE      org.springframework.bundle.spring.context.support_2.5.4
+31	ACTIVE      org.springframework.bundle.spring.core_2.5.4
+32	ACTIVE      org.springframework.bundle.spring.aop_2.5.4
+	]]></programlisting>
+	        </para>
+	    
+	        
+	   	 </step>
+	   	 </procedure>
+    </section>
+  
+    
+  </partintro>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<book xmlns:xi="http://www.w3.org/2001/XInclude">
+  <bookinfo>
+    <title>Spring Dynamic Modules for <trademark>OSGi</trademark> Service
+    Platforms <superscript>*</superscript></title>
+	
+	<subtitle>Tutorial</subtitle>
+    <releaseinfo>&version;</releaseinfo>
+
+    <authorgroup>
+      <author>
+        <firstname>Oleg</firstname>
+        <surname>Zhurakousky</surname>
+        <affiliation>SpringSource</affiliation>
+      </author>
+    </authorgroup>
+
+    <legalnotice>
+      <para><superscript>*</superscript> - OSGi is a trademark of <ulink url="http://www.osgi.org">
+      the OSGi Alliance</ulink>,project name is pending OSGi Alliance approval.
+      </para>
+      
+      <para>Copies of this document may be made for your own use and for
+      distribution to others, provided that you do not charge any fee for such
+      copies and further provided that each copy contains this Copyright
+      Notice, whether distributed in print or electronically.</para>
+      
+    </legalnotice>
+    
+	  <abstract>
+	  
+		  <para>
+		  
+		  <literallayout>
+This tutorial will introduce the developers on how to setup development 
+environment for working with Spring Dynamic Modules (DM) for OSGi™ platform 
+project using currently available tools based on Eclipse IDE, Eclipse Equinox OSGi™ 
+container and Eclipse Maven plug-in. 
+For more information on the tools used please refer to the following websites: 
+			
+			<emphasis>Spring  DM</emphasis> - <ulink url="http://www.springframework.org/osgi ">http://www.springframework.org/osgi</ulink>
+			<emphasis>OSGi™</emphasis> - <ulink url="http://www.osgi.org/Main/HomePage ">http://www.osgi.org/Main/HomePage </ulink>
+			<emphasis>Eclipse IDE</emphasis> – <ulink url="http://eclipse.org">http://eclipse.org</ulink> 
+			<emphasis>Maven</emphasis> - <ulink url="http://maven.apache.org/">http://maven.apache.org/</ulink> 
+			<emphasis>Eclipse Equinox</emphasis> - <ulink url="http://www.eclipse.org/equinox/">http://www.eclipse.org/equinox/</ulink> 
+		  </literallayout>
+		  </para>
+	  
+	  </abstract>
+  </bookinfo>
+  <toc />
+  
+  <part id="springdm-env">
+      <title>Spring DM Setup</title>
+
+	  <xi:include href="tutorial/springdm-env.xml"/>
+  </part>
+ 
+ 
+</book>
