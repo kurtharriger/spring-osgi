@@ -178,11 +178,9 @@ public class ExtenderConfiguration implements DisposableBean {
 		if (forceThreadShutdown && isTaskExecutorManagedInternally) {
 			log.warn("Forcing the (internally created) taskExecutor to stop");
 			ThreadGroup th = ((SimpleAsyncTaskExecutor) taskExecutor).getThreadGroup();
-			if (th.isDestroyed()) {
-				// first ask the threads nicely to stop
+			if (!th.isDestroyed()) {
+				// ask the threads nicely to stop
 				th.interrupt();
-				th.stop();
-				th.destroy();
 			}
 		}
 		taskExecutor = null;
@@ -292,6 +290,7 @@ public class ExtenderConfiguration implements DisposableBean {
 	 * <p/> The flag will cause a best attempt to shutdown the threads.
 	 * 
 	 * @param forceThreadShutdown The forceThreadShutdown to set.
+	 * @deprecated
 	 */
 	public void setForceThreadShutdown(boolean forceThreadShutdown) {
 		this.forceThreadShutdown = forceThreadShutdown;
