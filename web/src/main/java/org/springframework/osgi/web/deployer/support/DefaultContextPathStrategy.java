@@ -20,6 +20,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Dictionary;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.springframework.osgi.web.deployer.ContextPathStrategy;
@@ -74,6 +76,9 @@ import org.springframework.util.StringUtils;
  */
 public class DefaultContextPathStrategy implements ContextPathStrategy {
 
+	/** logger */
+	private static final Log log = LogFactory.getLog(DefaultContextPathStrategy.class);
+
 	private static String encodingScheme = "UTF-8";
 
 	private static String CONTEXT_PATH_HEADER = "Web-ContextPath";
@@ -100,10 +105,15 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 		Assert.notNull(bundle);
 
 		String path = determineContextPath(bundle);
-		path = encodePath(path);
+		if (log.isTraceEnabled())
+			log.trace("Detected context path [" + path + "]");
+
+		String encodedPath = encodePath(path);
+		if (log.isTraceEnabled())
+			log.trace("Encoding context path [" + path + "] to [" + encodedPath + "]");
 
 		// add leading slash
-		return (path.startsWith(SLASH) ? path : SLASH.concat(path));
+		return (encodedPath.startsWith(SLASH) ? encodedPath : SLASH.concat(encodedPath));
 	}
 
 	/**
@@ -115,21 +125,31 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 	 * @return non-null context path determined for the given bundle
 	 */
 	protected String determineContextPath(Bundle bundle) {
+		boolean trace = log.isTraceEnabled();
+
 		// first get the header
 		String path = getBundleHeader(bundle);
 
 		if (path == null) {
+			if (trace)
+				log.trace("No " + CONTEXT_PATH_HEADER + " found; falling back to bundle location...");
 			String location = bundle.getLocation();
 			if (StringUtils.hasText(location)) {
 				path = getBundleLocation(location);
 			}
 			// the location is not good, use a fall back
 			else {
+				if (trace)
+					log.trace("No bundle location found; falling back to bundle name...");
+
 				// fall-back to bundle name
 				Dictionary headers = bundle.getHeaders();
 				path = (headers != null ? (String) headers.get(Constants.BUNDLE_NAME) : null);
 
 				if (!StringUtils.hasText(path)) {
+					if (trace)
+						log.trace("No bundle name found; falling back to bundle symbolic name...");
+
 					// fall back to bundle sym name
 					path = bundle.getSymbolicName();
 
@@ -137,9 +157,24 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 					if (!StringUtils.hasText(path)) {
 						path = ClassUtils.getShortName(bundle.getClass()) + "-"
 								+ ObjectUtils.getIdentityHexString(bundle);
+						if (trace)
+							log.trace("No bundle symbolic found; returning bundle identity [" + path
+									+ "] as context path");
+					}
+					else {
+						if (trace)
+							log.trace("Returning bundle symbolic name [" + path + "] as context path");
 					}
 				}
+				else {
+					if (trace)
+						log.trace("Returning bundle name [" + path + "] as context path");
+				}
 			}
+		}
+		else {
+			if (trace)
+				log.trace("Using the bundle " + CONTEXT_PATH_HEADER + " header as context path [" + path + "]");
 		}
 
 		return path;
@@ -165,7 +200,7 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 		int index = location.lastIndexOf(PREFIX_DELIMITER);
 		String path = ((index > 0) ? location.substring(index + 1) : location);
 		// clean up the path
-		path = StringUtils.cleanPath(location);
+		path = StringUtils.cleanPath(path);
 		// check if it's a folder
 		if (path.endsWith(SLASH)) {
 			// remove trailing slash
@@ -178,6 +213,10 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 		path = StringUtils.getFilename(path);
 		// remove file extension
 		path = StringUtils.stripFilenameExtension(path);
+
+		if (log.isTraceEnabled())
+			log.trace("Bundle location [" + location + "] resulted in context path [" + path + "]");
+
 		return path;
 	}
 

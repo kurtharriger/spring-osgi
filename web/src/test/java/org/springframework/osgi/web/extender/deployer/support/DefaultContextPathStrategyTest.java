@@ -253,4 +253,12 @@ public class DefaultContextPathStrategyTest extends TestCase {
 
 		assertEquals(expectedContextPath, strategy.getContextPath(createBundleWithLocation(location)));
 	}
+
+	public void testAnotherMultiPrefixRemoval() throws Exception {
+		final String expectedContextPath = "com.foo.some.bundle.web_1.0.0";
+		final String location = "initial@reference:file:" + expectedContextPath + ".SNAPSHOT";
+
+		assertEquals("/" + expectedContextPath, strategy.getContextPath(createBundleWithLocation(location)));
+
+	}
 }
