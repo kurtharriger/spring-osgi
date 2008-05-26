@@ -35,6 +35,7 @@ Package org.springframework.osgi.service
 * refined static proxies (multi cardinality) to throw ServiceProxyDestroyedException if used after being destroyed
 * introduced ServiceReferenceProxy interface (available through ImportedOsgiServiceProxy) for accessing the native 
   service reference
+* OsgiServiceFactoryBean performs type check validation on given interfaces at startup
 
 Package org.springframework.osgi.test
 * removed usage of PackageAdmin for resolving bundles
