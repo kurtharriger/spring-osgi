@@ -16,5 +16,14 @@
     <description>An OSGi bundle for JDK proxy testing</description>
     <url>http://www.springframework.org/osgi</url>
 
+	<dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl104-over-slf4j</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>provided</scope>
+    </dependency>
+	</dependencies>
+	
 </project>
 
