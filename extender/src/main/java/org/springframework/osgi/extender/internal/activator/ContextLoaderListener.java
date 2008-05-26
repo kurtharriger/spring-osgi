@@ -61,6 +61,7 @@ import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
 
 /**
@@ -329,6 +330,8 @@ public class ContextLoaderListener implements BundleActivator {
 	private SpringTypeCompatibilityChecker compatibilityChecker;
 	/** Spring version used */
 	private Bundle wiredSpringBundle;
+	/** shutdown task executor */
+	private TaskExecutor shutdownTaskExecutor;
 
 
 	/** Required by the BundleActivator contract */
@@ -386,6 +389,8 @@ public class ContextLoaderListener implements BundleActivator {
 
 		// initialize the configuration once namespace handlers have been detected
 		this.taskExecutor = extenderConfiguration.getTaskExecutor();
+		shutdownTaskExecutor = new TimerTaskExecutor();
+
 		this.contextCreator = extenderConfiguration.getContextCreator();
 		this.postProcessors = extenderConfiguration.getPostProcessors();
 		addDefaultPostProcessors(postProcessors);
@@ -416,6 +421,7 @@ public class ContextLoaderListener implements BundleActivator {
 				}
 			}
 		}
+
 	}
 
 	private void detectSpringVersion(BundleContext context) {
@@ -521,6 +527,9 @@ public class ContextLoaderListener implements BundleActivator {
 				// add a new runnable
 				taskList.add(new Runnable() {
 
+					private final String toString = "Closing runnable for context " + context.getDisplayName();
+
+
 					public void run() {
 						contextClosingDown[0] = context;
 						// eliminate context
@@ -528,6 +537,10 @@ public class ContextLoaderListener implements BundleActivator {
 						if (log.isDebugEnabled())
 							log.debug("Closing appCtx " + context.getDisplayName());
 						context.close();
+					}
+
+					public String toString() {
+						return toString;
 					}
 				});
 			}
@@ -538,10 +551,20 @@ public class ContextLoaderListener implements BundleActivator {
 
 		// start the ripper >:)
 		for (int j = 0; j < tasks.length; j++) {
-			if (RunnableTimedExecution.execute(tasks[j], extenderConfiguration.getShutdownWaitTime())) {
+			if (RunnableTimedExecution.execute(tasks[j], extenderConfiguration.getShutdownWaitTime(),
+				shutdownTaskExecutor)) {
 				if (debug) {
-					log.debug(contextClosingDown[0] + " context did not closed succesfully; forcing shutdown");
+					log.debug(contextClosingDown[0] + " context did not closed succesfully; forcing shutdown...");
 				}
+			}
+		}
+
+		if (shutdownTaskExecutor instanceof DisposableBean) {
+			try {
+				((DisposableBean) shutdownTaskExecutor).destroy();
+			}
+			catch (Exception ex) {
+				// ignore
 			}
 		}
 
@@ -786,10 +809,18 @@ public class ContextLoaderListener implements BundleActivator {
 
 		RunnableTimedExecution.execute(new Runnable() {
 
+			private final String toString = "Closing runnable for context " + context.getDisplayName();
+
+
 			public void run() {
 				context.close();
 			}
-		}, extenderConfiguration.getShutdownWaitTime());
+
+			public String toString() {
+				return toString;
+			}
+
+		}, extenderConfiguration.getShutdownWaitTime(), shutdownTaskExecutor);
 	}
 
 	private void initListenerService() {
