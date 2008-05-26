@@ -199,8 +199,19 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		}
 
 		// sanity check
-		if (interfaces == null)
+		if (interfaces == null) {
+			if (AutoExport.DISABLED.equals(autoExport))
+				throw new IllegalArgumentException(
+					"no service interface(s) specified and auto-export discovery disabled; change at least one of these properties");
 			interfaces = new Class[0];
+		}
+		// check visibility type
+		else {
+			for (int interfaceIndex = 0; interfaceIndex < interfaces.length; interfaceIndex++) {
+				Class intf = interfaces[interfaceIndex];
+				Assert.isInstanceOf(intf, target, "Exported service object does not implement the given interface: ");
+			}
+		}
 
 		super.afterPropertiesSet();
 	}
@@ -268,10 +279,14 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		Dictionary serviceProperties = mergeServiceProperties(beanName);
 
 		Class[] intfs = interfaces;
-		Class[] autoDetectedClasses = autoExport.getExportedClasses(targetClass);
+
+		// filter classes based on visibility
+		ClassLoader beanClassLoader = ClassUtils.getClassLoader(targetClass);
+		Class[] autoDetectedClasses = ClassUtils.getVisibleClasses(autoExport.getExportedClasses(targetClass),
+			beanClassLoader);
 
 		if (log.isTraceEnabled())
-			log.trace("autoexport mode [" + autoExport + "] discovered on class [" + targetClass + "] classes "
+			log.trace("Autoexport mode [" + autoExport + "] discovered on class [" + targetClass + "] classes "
 					+ ObjectUtils.nullSafeToString(autoDetectedClasses));
 
 		// filter duplicates
@@ -299,20 +314,15 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			classes,
 			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
 
-		// filter classes based on visibility
-		ClassLoader beanClassLoader = ClassUtils.getClassLoader(targetClass);
-
-		Class[] visibleClasses = ClassUtils.getVisibleClasses(classes, beanClassLoader);
-
 		// create an array of classnames (used for registering the service)
-		String[] names = ClassUtils.toStringArray(visibleClasses);
+		String[] names = ClassUtils.toStringArray(classes);
 
 		// sort the names in alphabetical order (eases debugging)
 		Arrays.sort(names);
 
 		log.info("Publishing service under classes [" + ObjectUtils.nullSafeToString(names) + "]");
 
-		ServiceFactory serviceFactory = new PublishingServiceFactory(visibleClasses);
+		ServiceFactory serviceFactory = new PublishingServiceFactory(classes);
 
 		if (isBeanBundleScoped())
 			serviceFactory = new OsgiBundleScope.BundleScopeServiceFactory(serviceFactory);

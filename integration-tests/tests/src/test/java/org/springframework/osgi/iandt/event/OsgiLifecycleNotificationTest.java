@@ -49,6 +49,10 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 	private final long TIME_OUT = 30 * 1000;
 
 
+	protected String[] getTestBundlesNames() {
+		return new String[] { "org.springframework.osgi.iandt, extender.listener.bundle," + getSpringDMVersion() };
+	}
+
 	protected void onSetUp() throws Exception {
 		eventList = new ArrayList();
 
