@@ -389,7 +389,9 @@ public class ContextLoaderListener implements BundleActivator {
 
 		// initialize the configuration once namespace handlers have been detected
 		this.taskExecutor = extenderConfiguration.getTaskExecutor();
-		shutdownTaskExecutor = new TimerTaskExecutor();
+		TimerTaskExecutor tte = new TimerTaskExecutor();
+		tte.afterPropertiesSet();
+		shutdownTaskExecutor = tte;
 
 		this.contextCreator = extenderConfiguration.getContextCreator();
 		this.postProcessors = extenderConfiguration.getPostProcessors();
