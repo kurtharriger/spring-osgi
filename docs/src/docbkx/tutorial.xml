@@ -53,10 +53,22 @@ For more information on the tools used please refer to the following websites:
   <toc />
   
   <part id="springdm-env">
-      <title>Spring DM Setup</title>
+      <title>Getting Started</title>
 
+	  <xi:include href="tutorial/introduction.xml"/>
 	  <xi:include href="tutorial/springdm-env.xml"/>
+	  <xi:include href="tutorial/project-config.xml"/>
+	  <xi:include href="tutorial/implement-project.xml"/>
+ <!--  -->	 
   </part>
- 
- 
+ <!-- 
+  <part id="springdm-web">
+      <title>Spring DM Web</title>
+
+	  <xi:include href="tutorial/springdmweb/introduction.xml"/>
+	  <xi:include href="tutorial/springdmweb/springdm-env.xml"/>
+	  <xi:include href="tutorial/springdmweb/project-config.xml"/>
+	  
+  </part>
+  --> 
 </book>
