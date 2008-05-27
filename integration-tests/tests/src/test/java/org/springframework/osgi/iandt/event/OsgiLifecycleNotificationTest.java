@@ -66,9 +66,6 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 			}
 		};
 
-		// publish listener
-		registration = bundleContext.registerService(
-			new String[] { OsgiBundleApplicationContextListener.class.getName() }, listener, null);
 	}
 
 	protected void onTearDown() throws Exception {
@@ -76,6 +73,10 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 	}
 
 	public void testEventsForCtxThatWork() throws Exception {
+		// publish listener
+		registration = bundleContext.registerService(
+			new String[] { OsgiBundleApplicationContextListener.class.getName() }, listener, null);
+
 		assertTrue("should start with an empty list", eventList.isEmpty());
 		// install a simple osgi bundle and check the list of events
 
@@ -98,6 +99,10 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 	}
 
 	public void testEventsForCtxThatFail() throws Exception {
+		// publish listener
+		registration = bundleContext.registerService(
+			new String[] { OsgiBundleApplicationContextListener.class.getName() }, listener, null);
+
 		assertTrue("should start with an empty list", eventList.isEmpty());
 		// install a simple osgi bundle and check the list of events
 
