@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-  <partintro>
-    <!-- <title>Spring DM Setup</title> -->
+  <chapter>
+    <title>Prepare the environment</title>
 
     <section id="tutorial:prerequisite">
 	    <title>Prerequisite</title>
 	    <para>
-	    This tutorial was built on Mac 10.5,however the process should not be very different (if any) on other platforms.
+	    This tutorial was built on Mac 10.5, however the process should not be very different (if any) on other platforms.
 		Also, the following must be installed and available prior to using this tutorial:
 		<itemizedlist>
 			<listitem><para>Eclipse 3.2+</para></listitem>
@@ -15,89 +15,56 @@
 			<listitem><para>Latest Spring DM distribution</para></listitem>
 			<listitem><para>Eclipse Spring IDE installed (<ulink url="http://springide.org/project/wiki/SpringideInstall">Spring IDE installation page</ulink>)</para></listitem>
 		    <listitem><para>JDK 1.5+</para></listitem>
+		    <listitem><para>Maven 2.0.7+</para></listitem>
 		    
 		</itemizedlist>
 		Also, make sure your computer is connected to the internet (for Maven dependencies) 
 	    </para>
     </section>
     
-    <section id="tutorial:setup">
-      <title>Set up Eclipse Based Spring-DM environment</title>
-     
-      <para>
-        This tutorial is based on Eclipse (Europa) 3.3.1 with Maven Plug-in installed. 
-		You can download Eclipse from http://www.eclipse.org (if you don’t already have it) 
-      </para>
-      
-      <procedure>
-	   	 <step>
-	   	 	<title>Install Maven Plug-in</title>
-	   	 	<para> 
-	   	 	If you already have Maven plug-in installed you can skip to the next step, otherwise 
-		    let’s install it. 	
-	   	 	</para>
-	   	 	<para>
-	   	 	    <command>
-		   	 	 Open up Eclipse -> Click on Help (on the menu bar) -> Software Updates -> Find and Install -> Search for new features to install -> Next
-		   	 	</command>
-	   	 	</para>
-	   	 	<para><emphasis>Install Sites to Visit</emphasis> window will open up (see below)</para>
-	   	 	<para>
+    <section id="tutorial:maven">
+	    <title>Setup Maven Environment</title>    
+	    <procedure>
+	    <step>  	
+	    	<title>In this section we are going to setup <literal>M2_REPO</literal> environment for our future class path</title>
+	    	<para>If you don't have Maven installed please refer to Maven documentation on how to install and configure Maven</para>
+	    	<para>Go to <command>Preferences -> Java -> Build Path -> Classpath Variables </command></para>
+	    	<para>Click on <command>New</command> </para>
+	    	<para>Select folder and point to the location of your <literal>.m2/repository</literal> </para>
+	    	<para>
 		    	<mediaobject>
 		            <imageobject role="fo">
 		              <imagedata align="center"
-		                         fileref="../src/docbkx/resources/images/tutorial/update.jpg"
-		                         format="JPG"/>
+		                         fileref="../src/docbkx/resources/images/tutorial/m2repo.jpg"
+		                         format="PNG"/>
 		            </imageobject>
 		
 		            <imageobject role="html">
-		              <imagedata align="center" fileref="images/tutorial/update.jpg"
-		                         format="JPG"/>
+		              <imagedata align="center" fileref="images/tutorial/m2repo.jpg"
+		                         format="PNG"/>
 		            </imageobject>
-		
 		          </mediaobject>        
 	        </para>
-	        
+	        <para>Click <command>OK</command> and your <literal>M2_REPO</literal> should be set </para>
 	        <para>
-	        We are going to add a new Update site 
-	        </para>
-	        <para>
-		        <command>
-			   	 	 Click on <emphasis>New Remote Site </emphasis>
-			   	</command>
-	        </para>  
-	        <para>In the <emphasis>Name</emphasis> enter:  <literal>Maven Plug-in </literal></para>
-			<para>In the <emphasis>URL</emphasis> enter: <literal>http://m2eclipse.codehaus.org/update/</literal></para>		
-			<para><emphasis>New Update Site</emphasis> window will open up (see below)</para>
-	        <para>         
-                  <mediaobject>
+		    	<mediaobject>
 		            <imageobject role="fo">
 		              <imagedata align="center"
-		                         fileref="../src/docbkx/resources/images/tutorial/updatesite.jpg"
-		                         format="JPG"/>
+		                         fileref="../src/docbkx/resources/images/tutorial/m2repo2.jpg"
+		                         format="PNG"/>
 		            </imageobject>
 		
 		            <imageobject role="html">
-		              <imagedata align="center" fileref="images/tutorial/updatesite.jpg"
-		                         format="JPG"/>
-		            </imageobject>	
-		          </mediaobject>   	   	 	
-	     </para>  
-	 
-	   	 <para>
-	   	 	<command>Click OK -> Finish </command>
-	   	 </para>
-	   	<para>
-	   	Expend Maven Plug-in and select <emphasis>Maven integration for Eclipse</emphasis>
-	   	</para>
-	    <para>Accept the license agreement and the rest of the defaults.</para>	
-		<para>When wizard finishes downloading and installing plug-in it will prompt you to restart Eclipse. Do so.</para>
-		<para>Now you ready to continue. </para>
-
-	   	 </step>
-	  </procedure>
+		              <imagedata align="center" fileref="images/tutorial/m2repo2.jpg"
+		                         format="PNG"/>
+		            </imageobject>
+		          </mediaobject>        
+	        </para>
+	        <para>Click <command>OK</command></para>
+	    </step>
+	    </procedure>
     </section>
-    
+        
     <section id="tutorial:tg-platform">
         <title>Prepare Spring-DM Target Platform</title>
         <procedure>
@@ -214,7 +181,7 @@
 	        Before we go any further let’s test and make sure that we are able to start our OSGi environment.
 	        </para>
 	        <para> 
-			<command>Right-click on the error beside Run icon on the menu bar and select Open Run Dialog</command>
+			<command>Right-click on the arrow beside Run icon on the menu bar and select Open Run Dialog</command>
 	        </para>
 	        
 	        <para>
@@ -251,7 +218,7 @@
 	        </para>
 	        
 	        <para>
-	        When new Configuration window opens up, name it <emphasis>OSGi-WEB</emphasis> and click on <command>Apply</command>.
+	        When new Configuration window opens up, name it <emphasis>OSGi-WEB</emphasis> (or anything you want, since our first bundle is not going to be web enabled) and click on <command>Apply</command>.
 			You should also see the <literal>org.eclipse.osgi</literal> bundle that we’ve deployed earlier (see below). Make sure it is checked.
 	        </para>
 	        
@@ -270,7 +237,7 @@
 	        </para>
 	        
 	        <para>
-	        Click Run. You should see the console prompt: <literal>osgi></literal> . Enter <literal>ss</literal> and you should see the message below. Make sure that the bundle state is <emphasis>ACTIVE</emphasis>.
+	        <command>Click Run.</command> You should see the console prompt: <literal>osgi></literal> . Enter <literal>ss</literal> and you should see the message below. Make sure that the bundle state is <emphasis>ACTIVE</emphasis>.
 	        </para>
 	        
 	        <para>
@@ -287,16 +254,16 @@ id	State       Bundle
 	        We’ve verified that our core OSGi environment is setup. You can shut down the OSGi platform now.
 			</para>
 			<para>
-			Now we are ready to deploy the rest of the bundles needed to “Spring-load” our OSGi platform. To do this we will simply repeat the step of installing bundles into our Target Platform (by copying them into target directory).
+			Now we are ready to deploy the rest of the bundles needed to “Spring-load” our OSGi platform. To do this we will simply repeat the step of installing bundles into our Target Platform (by copying them into target directory we've created (linked to) earlier).
 			</para>
 			<para>	
-			Navigate back to the directory where you unpacked the Spring-DM distribution, go to <literal>dist</literal> directory and copy all JAR files into target directory of our new platform. Your <literal>target</literal> directory should now look something like this:
+			Navigate back to the directory where you unpacked the Spring-DM distribution, go to <literal>dist</literal> directory and copy all JAR files into target directory of our new platform. 
 	        </para>
 	        
 	        <para>
 	        Also, from <literal>lib</literal> directory copy the following JARs:
 	        </para>
-	        <literallayout>
+	        <literallayout><emphasis>
 aopalliance.osgi-1.0-SNAPSHOT.jar
 asm.osgi-2.2.3-SNAPSHOT.jar
 jcl104-over-slf4j-1.4.3.jar
@@ -308,14 +275,47 @@ spring-beans-2.5.4.jar
 spring-context-2.5.4.jar
 spring-context-support-2.5.4.jar
 spring-core-2.5.4.jar
-	        </literallayout>
+	        </emphasis></literallayout>
 	        
 	        
 	        <para>
-	        Our Target Platform now contains all required Spring-DM bundles. 
+	        Our Target Platform now contains all required Spring-DM bundles (see below to verify). 
 	        </para>
 	        <para>
-	        <command>Open Run Dialog</command> again, navigate to our OSGi configuration, make sure that all bundles are checked and click on <command>Run</command>
+<literallayout><emphasis>	        
+aopalliance.osgi-1.0-SNAPSHOT.jar
+asm.osgi-2.2.3-SNAPSHOT.jar
+jcl104-over-slf4j-1.4.3.jar
+log4j.osgi-1.2.15-SNAPSHOT.jar
+org.eclipse.osgi_3.4.0.v20080205.jar
+slf4j-api-1.4.3.jar
+slf4j-log4j12-1.4.3.jar
+spring-aop-2.5.4.jar
+spring-beans-2.5.4.jar
+spring-context-2.5.4.jar
+spring-context-support-2.5.4.jar
+spring-core-2.5.4.jar
+spring-osgi-core-1.1.0-m2.jar
+spring-osgi-core-1.1.0-m2-sources.jar
+spring-osgi-extender-1.1.0-m2.jar
+spring-osgi-extender-1.1.0-m2-sources.jar
+spring-osgi-io-1.1.0-m2.jar
+spring-osgi-io-1.1.0-m2-sources.jar
+spring-osgi-mock-1.1.0-m2.jar
+spring-osgi-mock-1.1.0-m2-sources.jar
+spring-osgi-test-1.1.0-m2.jar
+spring-osgi-test-1.1.0-m2-sources.jar
+spring-osgi-web-1.1.0-m2.jar
+spring-osgi-web-1.1.0-m2-sources.jar
+spring-osgi-web-extender-1.1.0-m2.jar
+spring-osgi-web-extender-1.1.0-m2-sources.jar	
+</emphasis></literallayout>        
+	        </para>
+	        <para>
+	         Open <command>Eclipse -> Preferences -> Plug-in Development -> Target Platform</command> and click on <command>Reload -> OK</command>
+	        </para>
+	        <para>
+	        Next <command>Open Run Dialog</command> again, navigate to our OSGi configuration, make sure that all bundles are checked and click on <command>Run</command>
 	        </para>
 	        <para>
 	        Your console output should look similar to this
@@ -351,4 +351,4 @@ id	State       Bundle
     </section>
   
     
-  </partintro>
+  </chapter>

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+  <chapter>
+    <title>Create and Test Project Configuration</title>
+    
+    
+    <section>
+    	<title>Create Spring-DM Project</title>
+    	
+    	<para>In this section we are going to create a project for our Spring DM bundle. </para>
+    	<procedure>
+    		<step>
+    			<title>Create and configure Spring DM project using <emphasis>org.springframework.osgi</emphasis> Maven archetype</title>
+    			<para>We are going to create external configuration which will allow us to use Maven inside of the Eclipse. We could obviously do it jjst as easy from the command line, but integrating and saving it within the Eclipse will allow for future reuse of this command for other similar projects</para>
+    			<para>On the menu bar select <command>External Tools -> Open External Tools Dialog</command></para>
+				<para>
+			    	 <mediaobject>
+			            <imageobject role="fo">
+			              <imagedata align="center"
+			                         fileref="../src/docbkx/resources/images/tutorial/exttools1.jpg"
+			                         format="JPG"/>
+			            </imageobject>
+			
+			            <imageobject role="html">
+			              <imagedata align="center" fileref="images/tutorial/exttools1.jpg"
+			                         format="JPG"/>
+			            </imageobject>		
+			          </mediaobject>        
+	            </para>
+	            <para>Right click on<command> Program -> New</command> </para>
+	            <para>In the <emphasis>Name</emphasis> enter <emphasis>Spring DM Doc Build</emphasis> </para>
+	            <para>In the <emphasis>Location</emphasis> enter the path to your <literal>mvn</literal> file (located in the <literal>bin</literal> directory of your Maven installation) </para>
+	            <para>For <emphasis>Working Directory</emphasis> select the root of yor workspace. The easy way to do that is Click on <command>Variables</command> and select <emphasis>workspace_loc</emphasis> </para>
+	            <para>For the <emphasis>Arguments</emphasis> copy and paste the following</para>
+	            <para> <programlisting language="xml"><![CDATA[
+archetype:create     
+-DarchetypeGroupId=org.springframework.osgi  
+-DarchetypeArtifactId=spring-osgi-bundle-archetype   
+-DarchetypeVersion=1.0   
+-DgroupId=org.springframework.osgi.tutorial
+-DartifactId=SpringDMBundle
+-Dversion=0.1
+                ]]></programlisting></para>
+                <para><note>You can obviously change the <blockquote> groupId, artifactId</blockquote> and call it anything you want </note>  </para>
+				<para>Your external configuration should look similar to this:</para>
+	            <para>
+			    	 <mediaobject>
+			            <imageobject role="fo">
+			              <imagedata align="center"
+			                         fileref="../src/docbkx/resources/images/tutorial/springosgiProject.jpg"
+			                         format="JPG"/>
+			            </imageobject>
+			
+			            <imageobject role="html">
+			              <imagedata align="center" fileref="images/tutorial/springosgiProject.jpg"
+			                         format="JPG"/>
+			            </imageobject>		
+			          </mediaobject>        
+	            </para>
+	            <para>Click <command>Apply -> Run</command> </para>
+	            <para>Check your console and make sure Maven says: BUILD SUCCESSFULL</para>
+	   			<para>We've finished creating our first Spring DM Project</para>
+    		</step> 
+    		<step>
+    			<title>Convert project to Eclipse Project</title>
+    			<para>In this step we are going to make this project Eclipse ready and import it into Eclipse</para>
+    			<para>First let's make it Eclipse ready by executing a nifty Maven command. Open command window and navigate to the location of our newly created project (should be in our workspace, see example below) and make sure you are inside of project directory</para>
+    		    <para> <programlisting language="xml"><![CDATA[
+oleg:SpringDMBundle olegzhurakousky$ pwd
+/Users/olegzhurakousky/.../.../myworkspace/SpringDMBundle
+oleg:SpringDMBundle olegzhurakousky$ ls
+build.properties	readme.txt
+pom.xml			src
+oleg:SpringDMBundle olegzhurakousky$ 
+                ]]></programlisting></para>
+                
+                <para>type: <command>mvn eclipse:eclipse</command> </para>
+                <para>This will add all the required artifacts (e.g., <literal>.project, .classpath</literal>) for Eclipse to recognize it as valid Eclipse project</para>
+                <para>One Maven executed successfully follow Eclipse procedure of <emphasis>Import Existing Project</emphasis> into the workspece. (see below)</para>
+    		
+    			 <para>
+			    	 <mediaobject>
+			            <imageobject role="fo">
+			              <imagedata align="center"
+			                         fileref="../src/docbkx/resources/images/tutorial/importedProject.jpg"
+			                         format="JPG"/>
+			            </imageobject>
+			
+			            <imageobject role="html">
+			              <imagedata align="center" fileref="images/tutorial/importedProject.jpg"
+			                         format="JPG"/>
+			            </imageobject>		
+			          </mediaobject>        
+	            </para>
+    		</step>
+ 	<!-- 	
+    		<step>
+    			<title>Add Eclipse Plug-in Nature to the project</title>
+    			<para>In order for us to use Eclipse provided facilities and utilize Eclipse support to work with and execute 
+    			OSGi based projects we need to add Eclipse Plug-in nature to the project </para>
+    			<important>Unfortunately while executing command <blockquote> mvn eclipse:eclipse </blockquote>Eclipse assumed that this project is already a plug-in project, thus it will not allow us to add Plug-in nature to it. 
+    			Without getting into details as to why this is happening, let's just fix it (little hack), by removing org.eclipse.pde.PluginNature from the .project file </important>
+    			<para>Open <emphasis>Navigator </emphasis>view (which will allow you to see <literal>.project</literal>file) </para>
+    			<para>Open <literal>.project</literal> file and delete the following element </para>
+    			   			
+    			<para> <programlisting language="xml"><![CDATA[
+<nature>org.eclipse.pde.PluginNature</nature>
+                ]]></programlisting></para>
+    		    
+    		    <para>Now we can add Plug-in nature to our project</para>
+    		    <para>Right-click on our project <command>PDE Tools -> Convert Projects to Plug-in Projects</command> and make sure only our project is selected</para>
+    		
+    			 <para>
+			    	 <mediaobject>
+			            <imageobject role="fo">
+			              <imagedata align="center"
+			                         fileref="../src/docbkx/resources/images/tutorial/convertPde.jpg"
+			                         format="JPG"/>
+			            </imageobject>
+			
+			            <imageobject role="html">
+			              <imagedata align="center" fileref="images/tutorial/convertPde.jpg"
+			                         format="JPG"/>
+			            </imageobject>		
+			          </mediaobject>        
+	            </para>
+    		</step>
+   		-->
+    	</procedure>   	
+    </section>
+    <!-- 
+    <section>
+    	<title>Test Spring-DM Project Configuration</title>
+    	
+    	<para>In this section we will test our new project's configuration</para>
+    	<procedure>
+    		<step>
+    			<title>Deploy and execute project</title>
+    			<para>On the Menu bar click on <command>Run -> Open Run Dialog </command></para>
+    			<para> <command>Right Click on OSGi Framework -> New</command> In the name enter <emphasis>SpringDMConfiguration</emphasis></para>
+    			<para>Make sure SpringDMBundle is checked </para> 
+ 				<para>
+			    	 <mediaobject>
+			            <imageobject role="fo">
+			              <imagedata align="center"
+			                         fileref="../src/docbkx/resources/images/tutorial/target-osgi1.jpg"
+			                         format="JPG"/>
+			            </imageobject>
+			
+			            <imageobject role="html">
+			              <imagedata align="center" fileref="images/tutorial/target-osgi1.jpg"
+			                         format="JPG"/>
+			            </imageobject>		
+			          </mediaobject>        
+	            </para>
+	            <para> <command>Click on Apply -> Run </command> </para>
+	            <para>
+	            Eclipse Equinox OSGi™ container will start and the Console will show prompt simmilar to this:
+		        <programlisting language="xml"><![CDATA[	
+osgi> log4j:WARN No appenders could be found for logger (org.springframework.util.ClassUtils).
+log4j:WARN Please initialize the log4j system properly.
+				]]></programlisting>
+	            
+	            </para>
+	            
+	            <para>
+	            Enter <literal>ss</literal> inside the console 
+				And you should see that your project is deployed and in the ACTIVE state. Your console output should look simmilar to this:
+	            <programlisting language="xml"><![CDATA[	
+. . . . . . . . . .
+32	ACTIVE      org.springframework.bundle.spring.aop_2.5.4
+33	ACTIVE      SpringDMBundle_1.0.0
+				]]></programlisting>	            
+	            </para>
+	            
+	            <para>Obviously this bundle is useless since we didn’t write any code, but it is a valid OSGi™ bundle even though it has no relation to Spring or Spring DM.</para>
+	            <para>So let’s add some meat to it, but before let's make sure that our project build configuration is setup. You can kill the OSGi™ platform for now. </para>        
+    		</step>
+    	</procedure>
+    </section>
+     -->
+    <section>
+    	<title>Build Spring-DM Project </title>
+    	
+    	<para>In this section we will set up and test Maven build configuration for our project</para>
+    	<procedure>
+    		<step>
+    			<title>Create Maven build configuration</title>
+    			<para>We are going to use Eclipse External tools (similar to the way we did when we created <link linkend="ch02.html#d0e388">new project</link>) to configure Maven build configuration.</para>
+    			<para>Open <command>External Tools Dialog</command>, right-click on <command>Program -> New</command> </para>      
+    		    <para>In the <emphasis>Name</emphasis> enter <emphasis>SprinDmBundleInstall</emphasis> </para>
+    		    <para>In the <emphasis>Location</emphasis> point to the path of your <literal>mvn</literal> batch file located in bin directory of your Maven installation </para>
+    		    <para>In the <emphasis>Working Directory</emphasis> point to root of our project (remember: click on Variables and select workspace_loc)</para> 
+    		    <para>In the <emphasis>Arguments</emphasis> enter <literal>install</literal> </para>
+    		    
+    		    <para>
+			    	 <mediaobject>
+			            <imageobject role="fo">
+			              <imagedata align="center"
+			                         fileref="../src/docbkx/resources/images/tutorial/springDmBundleInstall.jpg"
+			                         format="JPG"/>
+			            </imageobject>
+			
+			            <imageobject role="html">
+			              <imagedata align="center" fileref="images/tutorial/springDmBundleInstall.jpg"
+			                         format="JPG"/>
+			            </imageobject>		
+			          </mediaobject>        
+	            </para>
+    		    <para>Click on <command>Apply -> Run</command> </para> and make sure Maven completes successfully
+    			<para>Now we are ready to implement our project</para>
+    		</step>
+    	</procedure>
+    </section>
+
+  </chapter>
