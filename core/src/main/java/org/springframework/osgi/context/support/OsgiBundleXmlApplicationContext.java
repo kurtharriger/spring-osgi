@@ -120,11 +120,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
 
-		ClassLoader aopClassLoader = OsgiBundleXmlApplicationContext.class.getClassLoader();
-
-		NamespaceHandlerResolver nsResolver = createNamespaceHandlerResolver(getBundleContext(), getClassLoader(),
-			aopClassLoader);
-		EntityResolver enResolver = createEntityResolver(getBundleContext(), getClassLoader(), aopClassLoader);
+		NamespaceHandlerResolver nsResolver = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
+		EntityResolver enResolver = createEntityResolver(getBundleContext(), getClassLoader());
 
 		beanDefinitionReader.setEntityResolver(enResolver);
 		beanDefinitionReader.setNamespaceHandlerResolver(nsResolver);
@@ -196,11 +193,10 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * aware of
 	 * @param bundleClassLoader classloader for creating the OSGi namespace
 	 * resolver proxy
-	 * @param aopClassLoader class loader used for AOP weaving
 	 * @return a OSGi aware namespace handler resolver
 	 */
 	private NamespaceHandlerResolver createNamespaceHandlerResolver(BundleContext bundleContext,
-			ClassLoader bundleClassLoader, ClassLoader aopClassLoader) {
+			ClassLoader bundleClassLoader) {
 		Assert.notNull(bundleContext, "bundleContext is required");
 		// create local namespace resolver
 		// we'll use the default resolver which uses the bundle local class-loader
@@ -208,7 +204,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 
 		// hook in OSGi namespace resolver
 		NamespaceHandlerResolver osgiServiceNamespaceResolver = lookupNamespaceHandlerResolver(bundleContext,
-			aopClassLoader, localNamespaceResolver);
+			localNamespaceResolver);
 
 		DelegatedNamespaceHandlerResolver delegate = new DelegatedNamespaceHandlerResolver();
 		delegate.addNamespaceHandler(localNamespaceResolver, "LocalNamespaceResolver for bundle "
@@ -229,17 +225,14 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * aware of
 	 * @param bundleClassLoader classloader for creating the OSGi namespace
 	 * resolver proxy
-	 * @param aopClassLoader class loader used for AOP weaving
 	 * @return a OSGi aware entity resolver
 	 */
-	private EntityResolver createEntityResolver(BundleContext bundleContext, ClassLoader bundleClassLoader,
-			ClassLoader aopClassLoader) {
+	private EntityResolver createEntityResolver(BundleContext bundleContext, ClassLoader bundleClassLoader) {
 		Assert.notNull(bundleContext, "bundleContext is required");
 		// create local namespace resolver
 		EntityResolver localEntityResolver = new DelegatingEntityResolver(bundleClassLoader);
 		// hook in OSGi namespace resolver
-		EntityResolver osgiServiceEntityResolver = lookupEntityResolver(bundleContext, aopClassLoader,
-			localEntityResolver);
+		EntityResolver osgiServiceEntityResolver = lookupEntityResolver(bundleContext, localEntityResolver);
 
 		DelegatedEntityResolver delegate = new DelegatedEntityResolver();
 		delegate.addEntityResolver(localEntityResolver, "LocalEntityResolver for bundle "
@@ -251,16 +244,14 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		return delegate;
 	}
 
-	private NamespaceHandlerResolver lookupNamespaceHandlerResolver(BundleContext bundleContext,
-			ClassLoader classLoader, Object fallbackObject) {
+	private NamespaceHandlerResolver lookupNamespaceHandlerResolver(BundleContext bundleContext, Object fallbackObject) {
 		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class[] { NamespaceHandlerResolver.class }, null,
-			classLoader, bundleContext, fallbackObject);
+			NamespaceHandlerResolver.class.getClassLoader(), bundleContext, fallbackObject);
 	}
 
-	private EntityResolver lookupEntityResolver(BundleContext bundleContext, ClassLoader classLoader,
-			Object fallbackObject) {
-		return (EntityResolver) TrackingUtil.getService(new Class[] { EntityResolver.class }, null, classLoader,
-			bundleContext, fallbackObject);
+	private EntityResolver lookupEntityResolver(BundleContext bundleContext, Object fallbackObject) {
+		return (EntityResolver) TrackingUtil.getService(new Class[] { EntityResolver.class }, null,
+			EntityResolver.class.getClassLoader(), bundleContext, fallbackObject);
 	}
 
 	public String[] getConfigLocations() {
