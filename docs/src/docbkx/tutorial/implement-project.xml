@@ -2,11 +2,11 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
   <chapter>
-    <title>Implement Project</title>
+    <title>Implement Spring-DM Project</title>
     <para>In this chapter we will implement our service, add all the required configurations and test our service.</para>
    
     <section>
-    	<title>Implement service</title>   
+    	<title>Implement and test Spring-DM service</title>   
     	 <para>Your project already has template infrastructure (e.g., interface and implementation) provided in <literal>org.springframework.osgi.tutorial</literal> and <literal>org.springframework.osgi.tutorial.impl</literal>. 
     There you'll find <literal>Bean</literal> and <literal>BeanImpl</literal> But let's rename them to something more descriptive, such as <literal>SampleService</literal> and <literal>SampleServiceImpl</literal> <tip>Use Refactor option provided by Eclipse</tip> </para>
     <para>Once done, also change the implementation to reflect the following:</para>
@@ -199,6 +199,53 @@ Export-Package: org.springframework.osgi.tutorial,org.springframework.osgi.tutor
         </procedure>	
     </section>
 
+	<section>
+		<title>Inside Bundle Deployment and Service Export (Eclipse PDE Tracing)</title>
+		<procedure>
+			<step>
+				<title>Enable Eclipse PDE Tracing</title>
+				<para>Our bundle is deployed in Eclipse Equinox which is an OSGi™ platform which Eclipse is based on and which is provided by Eclipse PDE environment. </para>
+				<para>One of the features that you can use to debug and diagnose potential problems is Tracing facility provided by Eclipse PDE</para>
+				<para>Open up <emphasis>SpringDMConfiguration</emphasis> and click on the <emphasis>Tracing</emphasis> tab</para>
+				 <para>
+			    	 <mediaobject>
+			            <imageobject role="fo">
+			              <imagedata align="center"
+			                         fileref="../src/docbkx/resources/images/tutorial/pdeTracing.jpg"
+			                         format="JPG"/>
+			            </imageobject>
+			
+			            <imageobject role="html">
+			              <imagedata align="center" fileref="images/tutorial/pdeTracing.jpg"
+			                         format="JPG"/>
+			            </imageobject>		
+			          </mediaobject>        
+	            </para>
+	            <para>Make sure <emphasis>Tracing</emphasis> is enabled and <literal>debug/service</literal> is checked</para>
+				<para>Click on <command>Apply -> Run</command>. You should see lots of trace messages and since our service has already been deployed you should find the following present in yoru loggs:</para>
+			
+			   	<para> <programlisting language="xml"><![CDATA[
+. . . . .
+getService[file:/Users/olegzhurakousky/Dev/eclipse/workspaces/SpringIntegration/SpringDMBundle/target/SpringDMBundle-0.1.jar 
+[26]]({org.springframework.beans.factory.xml.NamespaceHandlerResolver}={service.id=23})
+getServiceReferences(null, "(objectClass=org.xml.sax.EntityResolver)")
+getService[file:/Users/olegzhurakousky/Dev/eclipse/workspaces/SpringIntegration/SpringDMBundle/target/SpringDMBundle-0.1.jar 
+[26]]({org.xml.sax.EntityResolver}={service.id=24})
+Constructing SampleServiceImpl
+registerService[file:/Users/olegzhurakousky/Dev/eclipse/workspaces/SpringIntegration/SpringDMBundle/target/SpringDMBundle-0.1.jar 
+[26]]({org.springframework.osgi.tutorial.SampleService}={org.springframework.osgi.bean.name=sampleService,
+Bundle-SymbolicName=org.springframework.osgi.tutorial.SpringDMBundle, Bundle-Version=0.1, service.id=27})
+registerService[file:/Users/olegzhurakousky/Dev/eclipse/workspaces/SpringIntegration/SpringDMBundle/target/SpringDMBundle-0.1.jar 
+. . . . . 
+                ]]></programlisting></para>
+
+				<para>The one to pay attention to is <emphasis>{ org.springframework.osgi.bean.name=sampleService, Bundle-SymbolicName=org.springframework.osgi.tutorial.SpringDMBundle, Bundle-Version=0.1, service.id=27})</emphasis> where you can clearly see that your service was exported and accessible under the name <emphasis>sampleService</emphasis> </para>
+				<para>Here it would be advisable to play with other OSGi™ commands (install, uninstall etc... type <literal>-help</literal> to get more info) and see what is going on inside of Equinox platform</para>
+				<para> Now we're ready to continue. . .</para>
+			</step>
+		
+		</procedure>
+	</section>
  
     
     
