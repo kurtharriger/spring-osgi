@@ -237,4 +237,8 @@ public class OsgiBundleResourceTest extends TestCase {
 		resource = new OsgiBundleResource(bundle, "file:" + contextPath);
 		assertNull(resource.getPathWithinContext());
 	}
+
+	public void testLastModified() throws Exception {
+		assertTrue("last modified should be non zero", resource.lastModified() > 0);
+	}
 }

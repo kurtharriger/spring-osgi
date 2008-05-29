@@ -385,6 +385,12 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 		return this.path.hashCode();
 	}
 
+	public long lastModified() throws IOException {
+		URLConnection con = getURL().openConnection();
+		con.setUseCaches(false);
+		return con.getLastModified();
+	}
+
 	/**
 	 * @return Returns the searchType.
 	 */
