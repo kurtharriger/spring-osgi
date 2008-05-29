@@ -26,13 +26,22 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.ApplicationListener;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.dependency.DependableServiceImporter;
 import org.springframework.osgi.service.dependency.MandatoryDependencyEvent;
 import org.springframework.osgi.service.dependency.MandatoryDependencyListener;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependency;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencySatisfiedEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyTimedOutEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitingEvent;
 import org.springframework.osgi.service.importer.internal.support.DefaultRetryCallback;
+import org.springframework.osgi.service.importer.internal.support.RetryCallback;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
 import org.springframework.osgi.service.importer.internal.support.ServiceWrapper;
 import org.springframework.osgi.service.importer.internal.util.OsgiServiceBindingUtils;
@@ -51,7 +60,64 @@ import org.springframework.util.ObjectUtils;
  * 
  * @author Costin Leau
  */
-public class ServiceDynamicInterceptor extends ServiceInvoker implements InitializingBean {
+public class ServiceDynamicInterceptor extends ServiceInvoker implements InitializingBean,
+		ApplicationEventPublisherAware {
+
+	/**
+	 * Override the default implementation to plug in event notification.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	private class EventSenderRetryTemplate extends RetryTemplate {
+
+		private final OsgiServiceDependency dependency = new DefaultServiceDependency(
+			"[TODO - add dependency name here]", filter, serviceRequiredAtStartup);
+
+		private static final String IMPORTER_NAME = "[TODO - add importer name here]";
+		private static final String DEPENDENCY_NAME = "[TODO - add dependecy name here]";
+
+
+		private void sendDependencyEvent(OsgiServiceDependencyEvent event) {
+			if (applicationEventPublisher != null) {
+				applicationEventPublisher.publishEvent(event);
+			}
+		}
+
+		public Object execute(RetryCallback callback, Object notificationLock) {
+			//send event
+			sendDependencyEvent(new OsgiServiceDependencyWaitingEvent(serviceImporter, IMPORTER_NAME, dependency,
+				this.getWaitTime() * this.getRetryNumbers()));
+
+			Object result = null;
+
+			long start = System.currentTimeMillis();
+			long stop;
+
+			try {
+				result = super.execute(callback, notificationLock);
+				stop = System.currentTimeMillis() - start;
+			}
+			catch (RuntimeException exception) {
+				stop = System.currentTimeMillis() - start;
+				sendDependencyEvent(new OsgiServiceDependencyTimedOutEvent(serviceImporter, DEPENDENCY_NAME,
+					dependency, stop));
+				throw exception;
+			}
+
+			// send finalization event
+			if (callback.isComplete(result)) {
+				sendDependencyEvent(new OsgiServiceDependencySatisfiedEvent(serviceImporter, DEPENDENCY_NAME,
+					dependency, stop));
+			}
+			else {
+				sendDependencyEvent(new OsgiServiceDependencyTimedOutEvent(serviceImporter, DEPENDENCY_NAME,
+					dependency, stop));
+			}
+
+			return result;
+		}
+	}
 
 	/**
 	 * Listener tracking the OSGi services which form the dynamic reference.
@@ -263,9 +329,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	private final Filter filter;
 
-	/**
-	 * TCCL to set when calling listeners
-	 */
+	/** TCCL to set when calling listeners */
 	private final ClassLoader classLoader;
 
 	private final SwappingServiceReferenceProxy referenceDelegate;
@@ -282,35 +346,26 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	/** private lock */
 	private final Object lock = new Object();
 
-	/**
-	 * utility service wrapper
-	 */
+	/** utility service wrapper */
 	private ServiceWrapper wrapper;
 
-	/**
-	 * Retry template
-	 */
+	/** Retry template */
 	private RetryTemplate retryTemplate;
 
-	/**
-	 * mandatory listeners
-	 */
+	/** mandatory listeners */
 	private List mandatoryListeners;
 
-	/**
-	 * depending service importer
-	 */
+	/** depending service importer */
 	private DependableServiceImporter serviceImporter;
 
-	/**
-	 * listener that need to be informed of bind/rebind/unbind
-	 */
+	/** listener that need to be informed of bind/rebind/unbind */
 	private OsgiServiceLifecycleListener[] listeners = new OsgiServiceLifecycleListener[0];
 
-	/**
-	 * reference to the created proxy passed to the listeners
-	 */
+	/** reference to the created proxy passed to the listeners */
 	private Object proxy;
+
+	/** event publisher */
+	private ApplicationEventPublisher applicationEventPublisher;
 
 
 	public ServiceDynamicInterceptor(BundleContext context, Filter filter, ClassLoader classLoader) {
@@ -430,6 +485,10 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		this.proxy = proxy;
 	}
 
+	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+		this.applicationEventPublisher = applicationEventPublisher;
+	}
+
 	public boolean equals(Object other) {
 		if (this == other)
 			return true;
@@ -449,5 +508,4 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	public int hashCode() {
 		return hashCode;
 	}
-
 }

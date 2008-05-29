@@ -18,6 +18,8 @@ Package org.springframework.osgi.context
 * improved AbstractOsgiBundleApplicationContext handling of ResourceLoader methods
 * introduced ContextClassLoaderProvider interface as a strategy for customizing the application context thread context
   class loader
+* removed ConfigurableOsgiBundleApplicationContext signature from OsgiBundleApplicationContextEvent
+* introduced new importer waiting event hierarchy (org.springframework.osgi.service.importer.event package)
 
 Package org.springframework.osgi.extender
 * added support.scanning package to allow custom locations to be used for 'Spring-powered' bundles
