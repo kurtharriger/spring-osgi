@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.context.ApplicationListener;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.internal.aop.ProxyPlusCallback;
@@ -39,7 +40,7 @@ import org.springframework.util.ObjectUtils;
  * the select service goes away (at any point in time), the proxy will
  * automatically search for a replacement without the user intervention.
  * 
- * Note that the proxy instance remains the same and only the backing OSGi
+ * <p/> Note that the proxy instance remains the same and only the backing OSGi
  * service changes. Due to the dynamic nature of OSGi, the backing object can
  * change during method invocations.
  * 

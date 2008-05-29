@@ -348,9 +348,10 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			}
 		}
 		try {
-			synchronized (delegateContext.getMonitor()) {
-				if (normalShutdown)
+			if (normalShutdown) {
+				synchronized (delegateContext.getMonitor()) {
 					delegateContext.normalClose();
+				}
 			}
 		}
 		catch (Exception ex) {
