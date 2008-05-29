@@ -43,6 +43,7 @@ import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ComparatorServiceDependencySorter;
@@ -319,7 +320,7 @@ public class ContextLoaderListener implements BundleActivator {
 	/** This extender version */
 	private Version extenderVersion;
 
-	private ApplicationEventMulticaster multicaster;
+	private OsgiBundleApplicationContextEventMulticaster multicaster;
 
 	/** listeners interested in monitoring managed OSGi appCtxs */
 	private List applicationListeners;
@@ -830,7 +831,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 		createListenersList();
 		// register the listener that does the dispatching
-		multicaster.addApplicationListener(new OsgiListenerWrapper(applicationListeners));
+		multicaster.addApplicationListener(new ListListenerAdapter(applicationListeners));
 
 		if (log.isDebugEnabled())
 			log.debug("Initialization of OSGi listeners service completed...");

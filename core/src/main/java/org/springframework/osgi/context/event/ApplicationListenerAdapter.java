@@ -14,39 +14,47 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.extender.internal.activator;
-
-import java.util.Iterator;
-import java.util.List;
+package org.springframework.osgi.context.event;
 
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
-import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 
 /**
- * Listener dispatching OSGi events to interested listeners.
+ * Listener dispatching OSGi events to interested listeners. This class acts
+ * mainly as an adapter bridging the {@link ApplicationListener} interface with
+ * {@link OsgiBundleApplicationContextListener}.
  * 
  * @author Costin Leau
  * 
  */
-public class OsgiListenerWrapper implements ApplicationListener {
+class ApplicationListenerAdapter implements ApplicationListener {
 
-	private final List osgiListeners;
+	private final OsgiBundleApplicationContextListener osgiListener;
+	private final String toString;
 
 
-	public OsgiListenerWrapper(List listeners) {
-		this.osgiListeners = listeners;
+	public ApplicationListenerAdapter(OsgiBundleApplicationContextListener listener) {
+		this.osgiListener = listener;
+		toString = "ApplicationListenerAdapter for listener " + osgiListener;
 	}
 
 	// filter non-osgi events
 	public void onApplicationEvent(ApplicationEvent event) {
 		if (event instanceof OsgiBundleApplicationContextEvent) {
 			OsgiBundleApplicationContextEvent osgiEvent = (OsgiBundleApplicationContextEvent) event;
-			for (Iterator iterator = osgiListeners.iterator(); iterator.hasNext();) {
-				OsgiBundleApplicationContextListener listener = (OsgiBundleApplicationContextListener) iterator.next();
-				listener.onOsgiApplicationEvent(osgiEvent);
-			}
+			osgiListener.onOsgiApplicationEvent(osgiEvent);
 		}
+	}
+
+	public boolean equals(Object obj) {
+		return osgiListener.equals(obj);
+	}
+
+	public int hashCode() {
+		return osgiListener.hashCode();
+	}
+
+	public String toString() {
+		return toString;
 	}
 }

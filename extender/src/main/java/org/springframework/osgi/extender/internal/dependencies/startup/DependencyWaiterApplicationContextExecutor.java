@@ -30,7 +30,9 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
+import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
@@ -97,7 +99,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	private final Counter waitBarrier = new Counter("syncCounterWait");
 
 	/** delegated multicaster */
-	private ApplicationEventMulticaster delegatedMulticaster;
+	private OsgiBundleApplicationContextEventMulticaster delegatedMulticaster;
 
 
 	/**
@@ -519,7 +521,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 * 
 	 * @param multicaster
 	 */
-	public void setDelegatedMulticaster(ApplicationEventMulticaster multicaster) {
+	public void setDelegatedMulticaster(OsgiBundleApplicationContextEventMulticaster multicaster) {
 		this.delegatedMulticaster = multicaster;
 	}
 
