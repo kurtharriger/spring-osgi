@@ -33,9 +33,8 @@ public class OsgiServiceDependencySatisfiedEvent extends OsgiServiceDependencyEv
 	 * @param sourceBeanName
 	 * @param dependency
 	 */
-	public OsgiServiceDependencySatisfiedEvent(Object source, String sourceBeanName, OsgiServiceDependency dependency,
-			long waitedTime) {
-		super(source, sourceBeanName, dependency);
+	public OsgiServiceDependencySatisfiedEvent(Object source, OsgiServiceDependency dependency, long waitedTime) {
+		super(source, dependency);
 		this.waitedTime = waitedTime;
 	}
 

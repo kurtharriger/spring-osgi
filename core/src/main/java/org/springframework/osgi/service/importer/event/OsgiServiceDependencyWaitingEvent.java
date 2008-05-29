@@ -18,6 +18,14 @@ package org.springframework.osgi.service.importer.event;
 
 /**
  * Dedicated event for OSGi dependencies that are imported in a timed manner.
+ * The event indicates that a dependency is missing and the application context
+ * will start waiting for it, for a specified amount of time (given as a
+ * maximum).
+ * 
+ * <p/> Note that the actual waiting starts shortly after the event is
+ * dispatched however there are no guarantees on when this will happen as it
+ * depends on the number of listeners interested in this event (and the amount
+ * of work done once the event is received).
  * 
  * @author Costin Leau
  * 
@@ -35,9 +43,8 @@ public class OsgiServiceDependencyWaitingEvent extends OsgiServiceDependencyEven
 	 * @param sourceBeanName
 	 * @param dependencyServiceFilter
 	 */
-	public OsgiServiceDependencyWaitingEvent(Object source, String sourceBeanName, OsgiServiceDependency dependency,
-			long timeToWait) {
-		super(source, sourceBeanName, dependency);
+	public OsgiServiceDependencyWaitingEvent(Object source, OsgiServiceDependency dependency, long timeToWait) {
+		super(source, dependency);
 		this.timeToWait = timeToWait;
 	}
 

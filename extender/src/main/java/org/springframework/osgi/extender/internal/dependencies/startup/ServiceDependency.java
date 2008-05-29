@@ -20,6 +20,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.springframework.osgi.service.importer.OsgiServiceImportDependencyDefinition;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependency;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
@@ -41,6 +42,8 @@ public class ServiceDependency implements OsgiServiceImportDependencyDefinition 
 
 	private final String beanName;
 
+	private OsgiServiceDependency serviceDependency;
+
 
 	public ServiceDependency(BundleContext bc, Filter serviceFilter, boolean isMandatory, String beanName) {
 		filter = serviceFilter;
@@ -48,7 +51,22 @@ public class ServiceDependency implements OsgiServiceImportDependencyDefinition 
 		this.isMandatory = isMandatory;
 		bundleContext = bc;
 		this.beanName = beanName;
-    }
+		serviceDependency = new OsgiServiceDependency() {
+
+			public String getBeanName() {
+				return ServiceDependency.this.beanName;
+			}
+
+			public Filter getServiceFilter() {
+				return ServiceDependency.this.filter;
+			}
+
+			public boolean isMandatoryService() {
+				return ServiceDependency.this.isMandatory;
+			}
+
+		};
+	}
 
 	public boolean matches(ServiceEvent event) {
 		return filter.match(event.getServiceReference());
@@ -85,23 +103,30 @@ public class ServiceDependency implements OsgiServiceImportDependencyDefinition 
 		return isMandatory;
 	}
 
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 
-        final ServiceDependency that = (ServiceDependency) o;
+		final ServiceDependency that = (ServiceDependency) o;
 
-        if (isMandatory != that.isMandatory) return false;
-        if (filterAsString != null ? !filterAsString.equals(that.filterAsString) : that.filterAsString != null)
-            return false;
+		if (isMandatory != that.isMandatory)
+			return false;
+		if (filterAsString != null ? !filterAsString.equals(that.filterAsString) : that.filterAsString != null)
+			return false;
 
-        return true;
-    }
+		return true;
+	}
 
-    public int hashCode() {
-        int result;
-        result = (filterAsString != null ? filterAsString.hashCode() : 0);
-        result = 29 * result + (isMandatory ? 1 : 0);
-        return result;
-    }
+	public int hashCode() {
+		int result;
+		result = (filterAsString != null ? filterAsString.hashCode() : 0);
+		result = 29 * result + (isMandatory ? 1 : 0);
+		return result;
+	}
+
+	public OsgiServiceDependency getServiceDependency() {
+		return serviceDependency;
+	}
 }

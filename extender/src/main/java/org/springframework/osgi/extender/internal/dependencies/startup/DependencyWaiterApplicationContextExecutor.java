@@ -26,13 +26,11 @@ import org.osgi.framework.Bundle;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
-import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
@@ -429,7 +427,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	protected DependencyServiceManager createDependencyServiceListener(Runnable task) {
-		return new DependencyServiceManager(this, delegateContext, task);
+		return new DependencyServiceManager(this, delegateContext, task, timeout);
 	}
 
 	/**
@@ -438,7 +436,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	protected void startWatchDog() {
 		synchronized (monitor) {
 			watchdogTask = new WatchDogTask();
-			watchdog.schedule(watchdogTask, timeout * 1000);
+			watchdog.schedule(watchdogTask, timeout);
 		}
 	}
 
@@ -452,7 +450,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	/**
-	 * The timeout for waiting for service dependencies.
+	 * Sets the timeout (in ms) for waiting for service dependencies.
 	 * 
 	 * @param timeout
 	 */
@@ -465,12 +463,6 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	public void setTaskExecutor(TaskExecutor taskExec) {
 		synchronized (monitor) {
 			this.taskExecutor = taskExec;
-		}
-	}
-
-	public ContextState getContextState() {
-		synchronized (monitor) {
-			return state;
 		}
 	}
 
@@ -526,4 +518,17 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		this.delegatedMulticaster = multicaster;
 	}
 
+	//
+	// accessor interface implementations
+	//
+
+	public ContextState getContextState() {
+		synchronized (monitor) {
+			return state;
+		}
+	}
+
+	public OsgiBundleApplicationContextEventMulticaster getEventMulticaster() {
+		return this.delegatedMulticaster;
+	}
 }

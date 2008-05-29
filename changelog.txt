@@ -29,6 +29,7 @@ Package org.springframework.osgi.extender
 * removed internal usage of Thread.stop as it breaks the VM state
 * improved bundle shutdown by using a simple thread executor (rather then one thread per bundle model) to increase
   scalability
+* added BootstrappingDependencyEvent for notifying the pre-refresh dependency activities
 
 Package org.springframework.osgi.io
 * improved getFile() method when dealing with resources in expanded bundles

@@ -16,18 +16,10 @@
 
 package org.springframework.osgi.iandt.event;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceRegistration;
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
-import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
-import org.springframework.osgi.iandt.BaseIntegrationTest;
-import org.springframework.osgi.util.OsgiServiceUtils;
 
 /**
  * Integration test for the appCtx notification mechanism.
@@ -35,47 +27,14 @@ import org.springframework.osgi.util.OsgiServiceUtils;
  * @author Costin Leau
  * 
  */
-public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
-
-	private OsgiBundleApplicationContextListener listener;
-
-	private ServiceRegistration registration;
-
-	private List eventList;
-
-	private final Object lock = new Object();
-
-	/** wait 30 seconds max */
-	private final long TIME_OUT = 30 * 1000;
-
+public class OsgiLifecycleNotificationTest extends AbstractEventTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi.iandt, extender.listener.bundle," + getSpringDMVersion() };
 	}
 
-	protected void onSetUp() throws Exception {
-		eventList = new ArrayList();
-
-		listener = new OsgiBundleApplicationContextListener() {
-
-			public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
-				eventList.add(event);
-				synchronized (lock) {
-					lock.notify();
-				}
-			}
-		};
-
-	}
-
-	protected void onTearDown() throws Exception {
-		OsgiServiceUtils.unregisterService(registration);
-	}
-
 	public void testEventsForCtxThatWork() throws Exception {
-		// publish listener
-		registration = bundleContext.registerService(
-			new String[] { OsgiBundleApplicationContextListener.class.getName() }, listener, null);
+		registerEventListener();
 
 		assertTrue("should start with an empty list", eventList.isEmpty());
 		// install a simple osgi bundle and check the list of events
@@ -99,9 +58,7 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 	}
 
 	public void testEventsForCtxThatFail() throws Exception {
-		// publish listener
-		registration = bundleContext.registerService(
-			new String[] { OsgiBundleApplicationContextListener.class.getName() }, listener, null);
+		registerEventListener();
 
 		assertTrue("should start with an empty list", eventList.isEmpty());
 		// install a simple osgi bundle and check the list of events
@@ -120,28 +77,6 @@ public class OsgiLifecycleNotificationTest extends BaseIntegrationTest {
 		}
 		finally {
 			bnd.uninstall();
-		}
-	}
-
-	/**
-	 * Returns true if the wait ended through a notification, false otherwise.
-	 * 
-	 * @param maxWait
-	 * @return
-	 * @throws Exception
-	 */
-	private boolean waitForEvent(long maxWait) {
-		long current = System.currentTimeMillis();
-		synchronized (lock) {
-			try {
-				lock.wait(maxWait);
-			}
-			catch (Exception ex) {
-				return false;
-			}
-			long awakenTime = System.currentTimeMillis();
-			boolean waitSuccessed = (awakenTime - current < maxWait);
-			return waitSuccessed;
 		}
 	}
 }
