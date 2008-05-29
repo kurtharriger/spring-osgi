@@ -535,7 +535,7 @@ limitations under the License.
         </dependency>
 	  </dependencies>
     </profile>
-    
+  </profiles>
        
        
   <!-- ======================================= -->
