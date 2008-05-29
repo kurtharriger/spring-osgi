@@ -329,6 +329,10 @@ limitations under the License.
 		   <!-- Spring specific entries -->
 		   <Spring-DM-Version>${pom.version}</Spring-DM-Version>
 		   <Spring-Version>${spring.maven.artifact.version}</Spring-Version>
+		   <!-- build version properties -->
+   		   <Build-Plan>${env.buildPlan}</Build-Plan>
+		   <Build-Number>${env.buildNumber}</Build-Number>
+		   <SVN-Revision>${env.svnRevision}</SVN-Revision>
 		  </instructions>
         </configuration>
       </plugin> 
@@ -532,7 +536,6 @@ limitations under the License.
 	  </dependencies>
     </profile>
     
-  </profiles>
        
        
   <!-- ======================================= -->
