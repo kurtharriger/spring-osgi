@@ -19,8 +19,8 @@
 
   <properties>
     <!-- Spring version -->   
-    <spring.maven.artifact.version>2.5.4</spring.maven.artifact.version>
-    <spring.base.version>2.5.4</spring.base.version>
+    <spring.maven.artifact.version>2.5.5-SNAPSHOT</spring.maven.artifact.version>
+    <spring.base.version>2.5.5</spring.base.version>
     
     <!-- Felix BND plugin settings -->
     
@@ -771,7 +771,7 @@ limitations under the License.
     </repository>
 
 
-	<!-- used when building against Spring snapshots
+	<!-- used when building against Spring snapshots -->
 	<repository>
 		<id>spring-snapshot</id>
 		<name>Spring Portfolio Milestone Repository</name>
@@ -780,7 +780,6 @@ limitations under the License.
 		 <enabled>true</enabled>
 		</snapshots>
 	</repository>
-	-->
 	
     <repository>
       <id>i21-s3-osgi-repo</id>

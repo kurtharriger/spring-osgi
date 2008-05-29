@@ -27,9 +27,24 @@ import org.osgi.framework.Filter;
 // FIXME: this seems to be similar with OsgiServiceImportDependencyDefinition
 public interface OsgiServiceDependency {
 
+	/**
+	 * Returns the OSGi filter for the service dependency.
+	 * 
+	 * @return
+	 */
 	Filter getServiceFilter();
 
+	/**
+	 * Indicates if the dependency is mandatory or not.
+	 * 
+	 * @return
+	 */
 	boolean isMandatoryService();
 
+	/**
+	 * Returns the bean name (if any) associated with this importer.
+	 * 
+	 * @return
+	 */
 	String getBeanName();
 }

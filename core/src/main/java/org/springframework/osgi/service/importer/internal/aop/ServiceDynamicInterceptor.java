@@ -28,7 +28,6 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.ApplicationListener;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.dependency.DependableServiceImporter;
 import org.springframework.osgi.service.dependency.MandatoryDependencyEvent;
@@ -86,8 +85,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 		public Object execute(RetryCallback callback, Object notificationLock) {
 			//send event
-			sendDependencyEvent(new OsgiServiceDependencyWaitingEvent(serviceImporter, IMPORTER_NAME, dependency,
-				this.getWaitTime() * this.getRetryNumbers()));
+			sendDependencyEvent(new OsgiServiceDependencyWaitingEvent(serviceImporter, dependency, this.getWaitTime()
+					* this.getRetryNumbers()));
 
 			Object result = null;
 
@@ -100,19 +99,16 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			}
 			catch (RuntimeException exception) {
 				stop = System.currentTimeMillis() - start;
-				sendDependencyEvent(new OsgiServiceDependencyTimedOutEvent(serviceImporter, DEPENDENCY_NAME,
-					dependency, stop));
+				sendDependencyEvent(new OsgiServiceDependencyTimedOutEvent(serviceImporter, dependency, stop));
 				throw exception;
 			}
 
 			// send finalization event
 			if (callback.isComplete(result)) {
-				sendDependencyEvent(new OsgiServiceDependencySatisfiedEvent(serviceImporter, DEPENDENCY_NAME,
-					dependency, stop));
+				sendDependencyEvent(new OsgiServiceDependencySatisfiedEvent(serviceImporter, dependency, stop));
 			}
 			else {
-				sendDependencyEvent(new OsgiServiceDependencyTimedOutEvent(serviceImporter, DEPENDENCY_NAME,
-					dependency, stop));
+				sendDependencyEvent(new OsgiServiceDependencyTimedOutEvent(serviceImporter, dependency, stop));
 			}
 
 			return result;

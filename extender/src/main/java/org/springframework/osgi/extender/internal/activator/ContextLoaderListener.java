@@ -37,7 +37,6 @@ import org.osgi.framework.Version;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;

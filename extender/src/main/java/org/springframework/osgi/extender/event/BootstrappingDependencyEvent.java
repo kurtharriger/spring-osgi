@@ -14,40 +14,34 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.service.importer.event;
+package org.springframework.osgi.extender.event;
 
-import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationContext;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
 import org.springframework.util.Assert;
 
 /**
- * Base event type used for sending dependencies notifications.
- * 
  * @author Costin Leau
  * 
  */
-public abstract class OsgiServiceDependencyEvent extends ApplicationEvent {
+public class BootstrappingDependencyEvent extends OsgiBundleApplicationContextEvent {
 
-	private final OsgiServiceDependency dependency;
+	private OsgiServiceDependencyEvent dependencyEvent;
 
 
 	/**
-	 * Constructs a new <code>OsgiServiceDependencyEvent</code> instance.
+	 * Constructs a new <code>BootstrappingDependencyEvent</code> instance.
 	 * 
 	 * @param source
 	 */
-	public OsgiServiceDependencyEvent(Object source, OsgiServiceDependency dependency) {
+	public BootstrappingDependencyEvent(ApplicationContext source, OsgiServiceDependencyEvent nestedEvent) {
 		super(source);
-		Assert.notNull(dependency);
-		this.dependency = dependency;
+		Assert.notNull(nestedEvent);
+		this.dependencyEvent = nestedEvent;
 	}
 
-	/**
-	 * Returns the OSGi service dependency filter for which this event is
-	 * triggered.
-	 * 
-	 * @return Returns the dependencyServiceFilter
-	 */
-	public OsgiServiceDependency getServiceDependency() {
-		return dependency;
+	public OsgiServiceDependencyEvent getDependencyEvent() {
+		return dependencyEvent;
 	}
 }

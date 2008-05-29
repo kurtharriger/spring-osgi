@@ -17,6 +17,7 @@
 package org.springframework.osgi.service.importer.internal.aop;
 
 import org.osgi.framework.Filter;
+import org.springframework.core.style.ToStringCreator;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependency;
 import org.springframework.util.Assert;
 
@@ -31,6 +32,7 @@ public class DefaultServiceDependency implements OsgiServiceDependency {
 	private final String beanName;
 	private final Filter filter;
 	private final boolean mandatoryService;
+	private final String toString;
 
 
 	/**
@@ -46,6 +48,8 @@ public class DefaultServiceDependency implements OsgiServiceDependency {
 		Assert.notNull(filter, "the service filter is required");
 		this.filter = filter;
 		this.mandatoryService = mandatoryService;
+		toString = "DependencyService[Name=" + (beanName != null ? beanName : "null") + "][Filter=" + filter
+				+ "][Mandatory=" + mandatoryService + "]";
 	}
 
 	public String getBeanName() {
@@ -58,5 +62,9 @@ public class DefaultServiceDependency implements OsgiServiceDependency {
 
 	public boolean isMandatoryService() {
 		return mandatoryService;
+	}
+
+	public String toString() {
+		return toString;
 	}
 }

@@ -33,9 +33,8 @@ public class OsgiServiceDependencyTimedOutEvent extends OsgiServiceDependencyEve
 	 * @param sourceBeanName
 	 * @param dependency
 	 */
-	public OsgiServiceDependencyTimedOutEvent(Object source, String sourceBeanName, OsgiServiceDependency dependency,
-			long waitingTime) {
-		super(source, sourceBeanName, dependency);
+	public OsgiServiceDependencyTimedOutEvent(Object source, OsgiServiceDependency dependency, long waitingTime) {
+		super(source, dependency);
 		this.waitingTime = waitingTime;
 	}
 
