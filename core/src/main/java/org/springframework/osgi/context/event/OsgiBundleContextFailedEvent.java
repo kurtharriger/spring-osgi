@@ -16,11 +16,10 @@
 
 package org.springframework.osgi.context.event;
 
-import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.context.ApplicationContext;
 
 /**
- * Event raised when an <code>ConfigurableOsgiBundleApplicationContext</code>
- * failed.
+ * Event raised when an <code>ApplicationContext</code> failed.
  * 
  * @author Costin Leau
  * 
@@ -38,7 +37,7 @@ public class OsgiBundleContextFailedEvent extends OsgiBundleApplicationContextEv
 	 * @param cause optional <code>Throwable</code> indicating the cause of
 	 * the failure
 	 */
-	public OsgiBundleContextFailedEvent(ConfigurableOsgiBundleApplicationContext source, Throwable cause) {
+	public OsgiBundleContextFailedEvent(ApplicationContext source, Throwable cause) {
 		super(source);
 		this.cause = cause;
 	}
@@ -52,5 +51,4 @@ public class OsgiBundleContextFailedEvent extends OsgiBundleApplicationContextEv
 	public final Throwable getFailureCause() {
 		return cause;
 	}
-
 }

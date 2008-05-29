@@ -16,20 +16,20 @@
 
 package org.springframework.osgi.context.event;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 
 /**
- * Base class for events raised for an OSGi <code>ApplicationContext</code>.
- * Events of this type are raised by the OSGi extender to notify 3rd parties
- * about changes in the lifecycle of an OSGi application context.
+ * Base class for events raised for an <code>ApplicationContext</code> created
+ * inside an OSGi environment. Normally, events of this type are raised by the
+ * OSGi extender to notify 3rd parties, external to the context, about changes
+ * in the life cycle of the application context.
  * 
- * <p/><b>Note:</b>One big difference from
- * <em>traditional</em> <code>ApplicationContextEvent</code> is that it is
- * the extender that sends the notification and not the OSGi application
- * context. This allows third parties to be informed of the life-cycle of an
- * application context without forcing bean initialization inside the source
- * context.
+ * <p/><b>Note:</b>While the context source is likely to be an implementation
+ * of {@link ConfigurableOsgiBundleApplicationContext}, this is not mandatory
+ * (it's entirely possible to have a non-OSGi aware {@link ApplicationContext}
+ * implementation).
  * 
  * @author Costin Leau
  */
@@ -41,19 +41,7 @@ public abstract class OsgiBundleApplicationContextEvent extends ApplicationConte
 	 * @param source the <code>ConfigurableOsgiBundleApplicationContext</code>
 	 * that the event is raised for (must not be <code>null</code>)
 	 */
-	public OsgiBundleApplicationContextEvent(ConfigurableOsgiBundleApplicationContext source) {
+	public OsgiBundleApplicationContextEvent(ApplicationContext source) {
 		super(source);
 	}
-
-	/**
-	 * Returns the <code>ConfigurableOsgiBundleApplicationContext</code> that
-	 * the event was raised for.
-	 * 
-	 * @return the source of the event as a
-	 * <code>ConfigurableOsgiBundleApplicationContext</code> instance.
-	 */
-	public final ConfigurableOsgiBundleApplicationContext getOsgiBundleApplicationContext() {
-		return (ConfigurableOsgiBundleApplicationContext) getSource();
-	}
-
 }

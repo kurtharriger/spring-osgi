@@ -35,6 +35,8 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticasterAdapter;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
@@ -60,6 +62,8 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private static final String CONTEXT_CREATOR_NAME = "applicationContextCreator";
 
+	private static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "osgiApplicationEventMulticaster";
+
 	private static final String PROPERTIES_NAME = "extenderProperties";
 
 	private static final String SHUTDOWN_WAIT_KEY = "shutdown.wait.time";
@@ -84,7 +88,7 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private boolean processAnnotation;
 
-	private ApplicationEventMulticaster eventMulticaster;
+	private OsgiBundleApplicationContextEventMulticaster eventMulticaster;
 
 	private boolean forceThreadShutdown;
 
@@ -112,7 +116,8 @@ public class ExtenderConfiguration implements DisposableBean {
 			log.info("No custom configuration detected; using defaults");
 
 			taskExecutor = createDefaultTaskExecutor();
-			eventMulticaster = new SimpleApplicationEventMulticaster();
+			eventMulticaster = createDefaultEventMulticaster();
+
 			isMulticasterManagedInternally = true;
 			contextCreator = createDefaultApplicationContextCreator();
 			classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
@@ -131,7 +136,9 @@ public class ExtenderConfiguration implements DisposableBean {
 				TASK_EXECUTOR_NAME, TaskExecutor.class)
 					: createDefaultTaskExecutor();
 
-			eventMulticaster = (ApplicationEventMulticaster) extenderConfiguration.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME);
+			eventMulticaster = extenderConfiguration.containsBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME) ? (OsgiBundleApplicationContextEventMulticaster) extenderConfiguration.getBean(
+				APPLICATION_EVENT_MULTICASTER_BEAN_NAME, OsgiBundleApplicationContextEventMulticaster.class)
+					: createDefaultEventMulticaster();
 
 			contextCreator = extenderConfiguration.containsBean(CONTEXT_CREATOR_NAME) ? (OsgiApplicationContextCreator) extenderConfiguration.getBean(
 				CONTEXT_CREATOR_NAME, OsgiApplicationContextCreator.class)
@@ -233,6 +240,10 @@ public class ExtenderConfiguration implements DisposableBean {
 		return taskExecutor;
 	}
 
+	private OsgiBundleApplicationContextEventMulticaster createDefaultEventMulticaster() {
+		return new OsgiBundleApplicationContextEventMulticasterAdapter(new SimpleApplicationEventMulticaster());
+	}
+
 	private OsgiApplicationContextCreator createDefaultApplicationContextCreator() {
 		return new DefaultOsgiApplicationContextCreator();
 	}
@@ -278,7 +289,7 @@ public class ExtenderConfiguration implements DisposableBean {
 	 * 
 	 * @return Returns the eventMulticaster
 	 */
-	public ApplicationEventMulticaster getEventMulticaster() {
+	public OsgiBundleApplicationContextEventMulticaster getEventMulticaster() {
 		return eventMulticaster;
 	}
 

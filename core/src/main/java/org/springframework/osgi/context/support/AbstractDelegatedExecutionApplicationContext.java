@@ -23,6 +23,8 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticasterAdapter;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.util.OsgiBundleUtils;
@@ -89,7 +91,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	private boolean available = false;
 
 	/** delegated multicaster */
-	private ApplicationEventMulticaster delegatedMulticaster;
+	private OsgiBundleApplicationContextEventMulticaster delegatedMulticaster;
 
 	private ContextClassLoaderProvider cclProvider;
 
@@ -318,8 +320,26 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 		this.executor = executor;
 	}
 
-	public void setDelegatedEventMulticaster(ApplicationEventMulticaster multicaster) {
+	public void setDelegatedEventMulticaster(OsgiBundleApplicationContextEventMulticaster multicaster) {
 		this.delegatedMulticaster = multicaster;
+	}
+
+	/**
+	 * Sets the OSGi multicaster by using a Spring
+	 * {@link ApplicationEventMulticaster}. This method is added as a
+	 * covenience.
+	 * 
+	 * @param multicaster Spring multi-caster used for propagating OSGi specific
+	 * events
+	 * 
+	 * @see OsgiBundleApplicationContextEventMulticasterAdapter
+	 */
+	public void setDelegatedEventMulticaster(ApplicationEventMulticaster multicaster) {
+		this.delegatedMulticaster = new OsgiBundleApplicationContextEventMulticasterAdapter(multicaster);
+	}
+
+	public OsgiBundleApplicationContextEventMulticaster getDelegatedEventMulticaster() {
+		return this.delegatedMulticaster;
 	}
 
 	private void sendFailedEvent(Throwable cause) {
