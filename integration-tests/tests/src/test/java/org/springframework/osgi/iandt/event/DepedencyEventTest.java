@@ -16,6 +16,10 @@
 
 package org.springframework.osgi.iandt.event;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
@@ -37,15 +41,25 @@ public class DepedencyEventTest extends AbstractEventTest {
 		return new String[] {};
 	}
 
+
+	private List refreshEvents;
+
+
 	protected void onSetUp() throws Exception {
 		super.onSetUp();
+		refreshEvents = Collections.synchronizedList(new ArrayList(10));
 
 		// override the listener with another implementation that waits until the appCtx are fully started
 		listener = new OsgiBundleApplicationContextListener() {
 
 			public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
 				System.out.println("receiving event " + event.getClass());
-				eventList.add(event);
+				if (event instanceof BootstrappingDependencyEvent) {
+					eventList.add(event);
+				}
+				else {
+					refreshEvents.add(event);
+				}
 				synchronized (lock) {
 					lock.notify();
 				}
@@ -116,25 +130,21 @@ public class DepedencyEventTest extends AbstractEventTest {
 			bnd3.start();
 			// make sure it's fully started
 			waitOnContextCreation("org.springframework.osgi.iandt.simpleservice3");
-			assertEquals("&simpleService3", getDependencyAt(5).getBeanName());
-			assertEquals(OsgiServiceDependencySatisfiedEvent.class, getNestedEventAt(5).getClass());
+			assertEquals("&simpleService3", getDependencyAt(4).getBeanName());
+			assertEquals(OsgiServiceDependencySatisfiedEvent.class, getNestedEventAt(4).getClass());
 			// bnd3 context started event
 
 			bnd2.start();
 			waitOnContextCreation("org.springframework.osgi.iandt.simpleservice2");
-			assertEquals("&simpleService2", getDependencyAt(7).getBeanName());
-			assertEquals(OsgiServiceDependencySatisfiedEvent.class, getNestedEventAt(7).getClass());
+			assertEquals("&simpleService2", getDependencyAt(5).getBeanName());
+			assertEquals(OsgiServiceDependencySatisfiedEvent.class, getNestedEventAt(5).getClass());
 			// bnd2 context started event
 			// wait until the bundle fully starts
 			waitOnContextCreation("org.springframework.osgi.iandt.dependencies");
 			// double check context started event
 
 			// bnd1 context started event
-
-			//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(4).getClass());
-			//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(6).getClass());
-			//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(8).getClass());
-			//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(9).getClass());
+			assertEquals(4, refreshEvents.size());
 
 		}
 		finally {
