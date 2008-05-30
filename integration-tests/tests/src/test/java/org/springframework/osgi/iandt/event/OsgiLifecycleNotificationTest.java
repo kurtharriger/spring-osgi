@@ -18,6 +18,8 @@ package org.springframework.osgi.iandt.event;
 
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 
@@ -31,6 +33,21 @@ public class OsgiLifecycleNotificationTest extends AbstractEventTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi.iandt, extender.listener.bundle," + getSpringDMVersion() };
+	}
+
+	protected void onSetUp() throws Exception {
+		super.onSetUp();
+		listener = new OsgiBundleApplicationContextListener() {
+
+			public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
+				if (event instanceof OsgiBundleApplicationContextEvent) {
+					eventList.add(event);
+					synchronized (lock) {
+						lock.notify();
+					}
+				}
+			}
+		};
 	}
 
 	public void testEventsForCtxThatWork() throws Exception {
