@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.dependency.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+package org.springframework.osgi.service.dependency;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.osgi.service.dependency.DependentServiceExporter;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.osgi.service.dependency.internal.DefaultMandatoryDependencyManager;
+import org.springframework.osgi.service.dependency.internal.MandatoryServiceDependencyManager;
+import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
+import org.springframework.util.Assert;
 
 /**
  * BeanPostProcessor registered for detecting the dependency between service
@@ -32,9 +35,8 @@ import org.springframework.osgi.service.dependency.DependentServiceExporter;
  */
 public class MandatoryDependencyBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware {
 
-	private static final Log log = LogFactory.getLog(MandatoryDependencyBeanPostProcessor.class);
-
 	private MandatoryServiceDependencyManager manager;
+
 
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
@@ -52,5 +54,4 @@ public class MandatoryDependencyBeanPostProcessor implements BeanPostProcessor, 
 		manager.setBeanFactory(beanFactory);
 		this.manager = manager;
 	}
-
 }

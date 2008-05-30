@@ -17,11 +17,9 @@
 package org.springframework.osgi.iandt.context;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Integration test on the functionality offered by OSGi app context.

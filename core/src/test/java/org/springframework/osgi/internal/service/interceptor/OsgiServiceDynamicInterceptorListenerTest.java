@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.internal.service.interceptor;
 
 import java.util.Dictionary;
@@ -20,6 +21,7 @@ import java.util.Hashtable;
 
 import junit.framework.TestCase;
 
+import org.easymock.MockControl;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
@@ -27,6 +29,7 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.dependency.DependableServiceImporter;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
@@ -48,10 +51,7 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 
 	private ServiceReference[] refs;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
+
 	protected void setUp() throws Exception {
 		listener = new SimpleTargetSourceLifecycleListener();
 
@@ -68,7 +68,9 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 		interceptor.setListeners(new OsgiServiceLifecycleListener[] { listener });
 		interceptor.setRequiredAtStartup(false);
 		interceptor.setProxy(new Object());
-		
+		interceptor.setServiceImporter((DependableServiceImporter) MockControl.createNiceControl(
+			DependableServiceImporter.class).getMock());
+
 		RetryTemplate tmpl = new RetryTemplate();
 		tmpl.setRetryNumbers(1);
 		tmpl.setWaitTime(1);
@@ -78,10 +80,6 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 		SimpleTargetSourceLifecycleListener.UNBIND = 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	protected void tearDown() throws Exception {
 		interceptor = null;
 		listener = null;

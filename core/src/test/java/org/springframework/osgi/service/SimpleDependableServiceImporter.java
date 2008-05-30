@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.context.event;
+package org.springframework.osgi.service;
 
-import org.springframework.context.ApplicationContext;
+import org.springframework.osgi.service.dependency.DependableServiceImporter;
+import org.springframework.osgi.service.dependency.MandatoryDependencyListener;
 
 /**
- * Event raised when an <code>ConfigurableOsgiBundleApplicationContext</code>
- * <code>refresh</code>
- * method executes successfully.
- * 
  * @author Costin Leau
+ * 
  */
-public class OsgiBundleContextRefreshedEvent extends OsgiBundleApplicationContextEvent {
+public class SimpleDependableServiceImporter implements DependableServiceImporter {
 
-	/**
-	 * Constructs a new <code>OsgiBundleContextRefreshedEvent</code> instance.
-	 * 
-	 * @param source event source
-	 */
-	public OsgiBundleContextRefreshedEvent(ApplicationContext source) {
-		super(source);
+	public void registerListener(MandatoryDependencyListener listener) {
 	}
+
+	public boolean isMandatory() {
+		return false;
+	}
+
+	public boolean isSatisfied() {
+		return true;
+	}
+
 }

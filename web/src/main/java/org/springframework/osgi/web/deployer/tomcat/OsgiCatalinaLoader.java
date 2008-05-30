@@ -16,6 +16,7 @@
 
 package org.springframework.osgi.web.deployer.tomcat;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.apache.catalina.Container;
@@ -29,8 +30,7 @@ import org.apache.catalina.Loader;
  * @author Costin Leau
  * 
  */
-//FIXME: should PropertyChangeListener be implemented as well?
-class OsgiCatalinaLoader implements Loader {
+class OsgiCatalinaLoader implements Loader, PropertyChangeListener {
 
 	private Container container;
 
@@ -99,4 +99,7 @@ class OsgiCatalinaLoader implements Loader {
 			throw new UnsupportedOperationException("reloading unsupported");
 	}
 
+	public void propertyChange(PropertyChangeEvent evt) {
+		// this is a static class, don't do anything
+	}
 }

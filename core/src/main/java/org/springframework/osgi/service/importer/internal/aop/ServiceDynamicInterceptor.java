@@ -54,8 +54,10 @@ import org.springframework.util.ObjectUtils;
  * will look for a service using the given filter, retrying if the service is
  * down or unavailable. Will dynamically rebound a new service, if one is
  * available with a higher service ranking. <p/> <p/> In case no service is
- * available, it will throw an exception. <p/> <strong>Note</strong>: this is a
- * stateful interceptor and should not be shared.
+ * available, it will throw an exception.
+ * 
+ * <p/> <strong>Note</strong>: this is a stateful interceptor and should not be
+ * shared.
  * 
  * @author Costin Leau
  */
@@ -70,12 +72,17 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 */
 	private class EventSenderRetryTemplate extends RetryTemplate {
 
-		private final OsgiServiceDependency dependency = new DefaultServiceDependency(
-			"[TODO - add dependency name here]", filter, serviceRequiredAtStartup);
+		private final OsgiServiceDependency dependency;
 
-		private static final String IMPORTER_NAME = "[TODO - add importer name here]";
-		private static final String DEPENDENCY_NAME = "[TODO - add dependecy name here]";
 
+		public EventSenderRetryTemplate(String dependencyName) {
+			this(dependencyName, null);
+		}
+
+		public EventSenderRetryTemplate(String dependencyName, RetryTemplate retryTemplate) {
+			super(retryTemplate);
+			dependency = new DefaultServiceDependency(dependencyName, filter, serviceRequiredAtStartup);
+		}
 
 		private void sendDependencyEvent(OsgiServiceDependencyEvent event) {
 			if (applicationEventPublisher != null) {
@@ -330,13 +337,16 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	private final SwappingServiceReferenceProxy referenceDelegate;
 
+	/** event listener */
 	private final ServiceListener listener;
 
+	/** mandatory flag */
 	private boolean serviceRequiredAtStartup = true;
 
 	/** flag indicating whether the destruction has started or not */
 	private boolean isDuringDestruction = false;
 
+	/** flag indicating whether the proxy is already destroyed or not */
 	private boolean destroyed = false;
 
 	/** private lock */
@@ -345,13 +355,13 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	/** utility service wrapper */
 	private ServiceWrapper wrapper;
 
-	/** Retry template */
+	/** retry template */
 	private RetryTemplate retryTemplate;
 
 	/** mandatory listeners */
 	private List mandatoryListeners;
 
-	/** depending service importer */
+	/** dependable service importer */
 	private DependableServiceImporter serviceImporter;
 
 	/** listener that need to be informed of bind/rebind/unbind */
@@ -403,14 +413,20 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	public void afterPropertiesSet() {
 		Assert.notNull(proxy);
+		Assert.notNull(serviceImporter);
 
 		boolean debug = log.isDebugEnabled();
-		if (retryTemplate == null)
-			retryTemplate = new RetryTemplate();
 
 		if (debug)
 			log.debug("Adding osgi mandatoryListeners for services matching [" + filter + "]");
 		OsgiListenerUtils.addSingleServiceListener(bundleContext, listener, filter);
+
+		//serviceImporter.getBeanName()
+		//FIXME: add service name
+		String importerName = (serviceImporter != null ? "[TODO add importer name in here]" : "");
+
+		retryTemplate = new EventSenderRetryTemplate(importerName, retryTemplate);
+
 		if (serviceRequiredAtStartup) {
 			if (debug)
 				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
@@ -492,10 +508,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			ServiceDynamicInterceptor oth = (ServiceDynamicInterceptor) other;
 			return (serviceRequiredAtStartup == oth.serviceRequiredAtStartup
 					&& ObjectUtils.nullSafeEquals(wrapper, oth.wrapper)
-					&& ObjectUtils.nullSafeEquals(filter, oth.filter)
-					&& ObjectUtils.nullSafeEquals(retryTemplate, oth.retryTemplate)
-					&& ObjectUtils.nullSafeEquals(serviceImporter, oth.serviceImporter) && Arrays.equals(listeners,
-				oth.listeners));
+					&& ObjectUtils.nullSafeEquals(filter, oth.filter) && ObjectUtils.nullSafeEquals(retryTemplate,
+				oth.retryTemplate));
 		}
 		else
 			return false;
