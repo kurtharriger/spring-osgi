@@ -40,7 +40,7 @@ public class OsgiLifecycleNotificationTest extends AbstractEventTest {
 		listener = new OsgiBundleApplicationContextListener() {
 
 			public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
-				if (event instanceof OsgiBundleApplicationContextEvent) {
+				if (event instanceof OsgiBundleContextRefreshedEvent || event instanceof OsgiBundleContextFailedEvent) {
 					eventList.add(event);
 					synchronized (lock) {
 						lock.notify();
@@ -65,6 +65,7 @@ public class OsgiLifecycleNotificationTest extends AbstractEventTest {
 			bnd.start();
 
 			assertTrue("event not received", waitForEvent(TIME_OUT));
+			System.out.println("event received " + eventList);
 			assertEquals("wrong number of events received", 1, eventList.size());
 			Object event = eventList.get(0);
 			assertTrue("wrong event received", event instanceof OsgiBundleContextRefreshedEvent);
@@ -88,6 +89,7 @@ public class OsgiLifecycleNotificationTest extends AbstractEventTest {
 			bnd.start();
 
 			assertTrue("event not received", waitForEvent(TIME_OUT));
+			System.out.println("event received " + eventList);
 			assertEquals("wrong number of events received", 1, eventList.size());
 			Object event = eventList.get(0);
 			assertTrue("wrong event received", event instanceof OsgiBundleContextFailedEvent);
