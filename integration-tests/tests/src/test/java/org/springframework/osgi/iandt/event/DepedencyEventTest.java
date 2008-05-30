@@ -20,7 +20,6 @@ import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
-import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
@@ -132,10 +131,10 @@ public class DepedencyEventTest extends AbstractEventTest {
 
 			// bnd1 context started event
 
-//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(4).getClass());
-//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(6).getClass());
-//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(8).getClass());
-//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(9).getClass());
+			//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(4).getClass());
+			//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(6).getClass());
+			//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(8).getClass());
+			//			assertEquals(OsgiBundleContextRefreshedEvent.class, eventList.get(9).getClass());
 
 		}
 		finally {
@@ -152,7 +151,9 @@ public class DepedencyEventTest extends AbstractEventTest {
 	}
 
 	private OsgiServiceDependencyEvent getNestedEventAt(int index) {
-		BootstrappingDependencyEvent event = (BootstrappingDependencyEvent) eventList.get(index);
+		Object obj = eventList.get(index);
+		System.out.println("received object " + obj.getClass() + "|" + obj);
+		BootstrappingDependencyEvent event = (BootstrappingDependencyEvent) obj;
 		return event.getDependencyEvent();
 	}
 }
