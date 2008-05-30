@@ -17,7 +17,6 @@
 package org.springframework.osgi.service.importer.internal.aop;
 
 import org.osgi.framework.Filter;
-import org.springframework.core.style.ToStringCreator;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependency;
 import org.springframework.util.Assert;
 
@@ -45,7 +44,6 @@ public class DefaultServiceDependency implements OsgiServiceDependency {
 	public DefaultServiceDependency(String beanName, Filter filter, boolean mandatoryService) {
 		super();
 		this.beanName = beanName;
-		Assert.notNull(filter, "the service filter is required");
 		this.filter = filter;
 		this.mandatoryService = mandatoryService;
 		toString = "DependencyService[Name=" + (beanName != null ? beanName : "null") + "][Filter=" + filter

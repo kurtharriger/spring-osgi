@@ -153,7 +153,7 @@ class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 			}
 		}
 
-		// if we have a named bean use target_bean_name
+		// if we have a named bean use target_bean_name (so we postpone the service creation)
 		if (target instanceof RuntimeBeanReference) {
 			builder.addPropertyValue(TARGET_BEAN_NAME_PROP, ((RuntimeBeanReference) target).getBeanName());
 		}

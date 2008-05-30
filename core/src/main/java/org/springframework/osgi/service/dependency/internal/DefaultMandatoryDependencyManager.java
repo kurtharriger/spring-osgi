@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.dependency.internal;
 
 import java.util.ArrayList;
@@ -36,9 +37,11 @@ import org.springframework.osgi.service.dependency.DependentServiceExporter;
 import org.springframework.osgi.service.dependency.MandatoryDependencyEvent;
 import org.springframework.osgi.service.dependency.MandatoryDependencyListener;
 import org.springframework.osgi.service.dependency.ServiceDependency;
+import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.osgi.util.internal.BeanFactoryUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Default implementation of {@link MandatoryServiceDependencyManager} which
@@ -99,6 +102,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 	};
 
+
 	private static final Log log = LogFactory.getLog(DefaultMandatoryDependencyManager.class);
 
 	/** association of importers instances: name -> ServiceImporter instance */
@@ -137,6 +141,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 	private final MandatoryDependencyListener importerListener = new ImportersListeners();
 
+
 	public void addServiceExporter(String exporterBeanName) {
 		Assert.hasText(exporterBeanName);
 
@@ -149,13 +154,27 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 			// check if it's factory bean (no need to check for abstract
 			// definition since we're called by a BPP)
-			if (!beanFactory.isSingleton(beanName))
-				log.trace("exporter [" + beanName + "] is not singleton and will not be tracked");
+			if (!beanFactory.isSingleton(beanName)) {
+				log.info("Exporter [" + beanName + "] is not singleton and will not be tracked");
+			}
+
 			else {
 				DependentServiceExporter exporter = (DependentServiceExporter) beanFactory.getBean(beanName);
 
 				// disable publication at startup
 				exporter.setPublishAtStartup(false);
+
+				// add though the dependency between the exporter and another bean (might be lazy)
+				// discover if there's a lazy reference (by name) to another bean
+				if (exporter instanceof OsgiServiceFactoryBean) {
+					String targetBeanName = ((OsgiServiceFactoryBean) exporter).getTargetBeanName();
+					if (StringUtils.hasText(targetBeanName) && beanFactory.containsBean(targetBeanName)) {
+						beanFactory.registerDependentBean(targetBeanName, exporterBeanName);
+						beanFactory.registerDependentBean(targetBeanName, beanName);
+
+						beanFactory.getBean(targetBeanName);
+					}
+				}
 
 				// populate the dependency maps
 				discoverDependentImporterFor(exporterBeanName, exporter);

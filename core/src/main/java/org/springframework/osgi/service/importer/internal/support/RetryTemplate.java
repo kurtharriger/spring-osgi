@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.internal.support;
 
 import org.springframework.util.Assert;
@@ -34,7 +35,9 @@ public class RetryTemplate {
 
 	private int retryNumbers = DEFAULT_RETRY_NUMBER;
 
+
 	public RetryTemplate() {
+		this(null);
 	}
 
 	public RetryTemplate(int retryNumbers, long waitTime) {
@@ -46,7 +49,8 @@ public class RetryTemplate {
 	}
 
 	public RetryTemplate(RetryTemplate template) {
-		this(template.getRetryNumbers(), template.getWaitTime());
+		this((template != null ? template.getRetryNumbers() : DEFAULT_RETRY_NUMBER),
+			(template != null ? template.getWaitTime() : DEFAULT_WAIT_TIME));
 	}
 
 	public Object execute(RetryCallback callback, Object notificationLock) {

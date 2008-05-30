@@ -17,10 +17,10 @@
 package org.springframework.osgi.service.dependency;
 
 /**
- * Generic dependency service import contract. Offers various access on its
- * status such as being mandatory or satisfied.
+ * Generic dependency service import contract. Offers access to its status such
+ * as being mandatory or satisfied.
  * 
- * This interface is used internally for accessing the importer status.
+ * <p/> This interface is used internally for accessing the importer status.
  * 
  * @author Costin Leau
  */
@@ -34,7 +34,7 @@ public interface ServiceDependency {
 	boolean isMandatory();
 
 	/**
-	 * Indicates if the dependency is satisified or not. For optional service
+	 * Indicates if the dependency is satisfied or not. For optional service
 	 * imports, this should always return true while for mandatory service
 	 * imports, should return true if at least one service is available or false
 	 * otherwise.

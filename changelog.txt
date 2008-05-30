@@ -20,6 +20,7 @@ Package org.springframework.osgi.context
   class loader
 * removed ConfigurableOsgiBundleApplicationContext signature from OsgiBundleApplicationContextEvent
 * introduced new importer waiting event hierarchy (org.springframework.osgi.service.importer.event package)
+* improved handling of OSGi namespaces during shutdown
 
 Package org.springframework.osgi.extender
 * added support.scanning package to allow custom locations to be used for 'Spring-powered' bundles
@@ -43,6 +44,10 @@ Package org.springframework.osgi.service
 * introduced ServiceReferenceProxy interface (available through ImportedOsgiServiceProxy) for accessing the native 
   service reference
 * OsgiServiceFactoryBean performs type check validation on given interfaces at startup
+
+Package org.springframework.osgi.util
+* fixed internal handling of nested beans when discovering transitive dependencies of a bean
+* fixed internal handling of 'depends-on' beans when discovering transitive dependencies of a bean
 
 Package org.springframework.osgi.test
 * removed usage of PackageAdmin for resolving bundles

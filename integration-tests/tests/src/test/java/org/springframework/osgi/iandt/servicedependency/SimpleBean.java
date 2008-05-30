@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.context.event;
+package org.springframework.osgi.iandt.servicedependency;
 
-import org.springframework.context.ApplicationContext;
+public class SimpleBean {
 
-/**
- * Event raised when an <code>ConfigurableOsgiBundleApplicationContext</code>
- * <code>refresh</code>
- * method executes successfully.
- * 
- * @author Costin Leau
- */
-public class OsgiBundleContextRefreshedEvent extends OsgiBundleApplicationContextEvent {
+	private Object property;
 
-	/**
-	 * Constructs a new <code>OsgiBundleContextRefreshedEvent</code> instance.
-	 * 
-	 * @param source event source
-	 */
-	public OsgiBundleContextRefreshedEvent(ApplicationContext source) {
-		super(source);
+
+	public Object getProperty() {
+		return property;
+	}
+
+	public void setProperty(Object property) {
+		this.property = property;
 	}
 }

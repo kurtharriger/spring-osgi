@@ -22,6 +22,7 @@ import java.awt.Shape;
 import junit.framework.TestCase;
 
 import org.aopalliance.aop.Advice;
+import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -30,6 +31,8 @@ import org.springframework.core.InfrastructureProxy;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.SimpleDependableServiceImporter;
+import org.springframework.osgi.service.dependency.DependableServiceImporter;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.internal.aop.InfrastructureOsgiProxyAdvice;
 import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
@@ -141,6 +144,8 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext, null, classLoader);
 		interceptor.setRequiredAtStartup(true);
 		interceptor.setProxy(new Object());
+		interceptor.setServiceImporter(new SimpleDependableServiceImporter());
+
 		interceptor.afterPropertiesSet();
 		return interceptor;
 	}
@@ -149,6 +154,7 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext, null, classLoader);
 		interceptor.setRequiredAtStartup(false);
 		interceptor.setProxy(new Object());
+		interceptor.setServiceImporter(new SimpleDependableServiceImporter());
 		interceptor.afterPropertiesSet();
 		return interceptor;
 

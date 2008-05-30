@@ -177,8 +177,9 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		Assert.isTrue(hasNamedBean || target != null, "either 'targetBeanName' or 'target' properties have to be set");
 
 		// if we have a name, we need a bean factory
-		if (hasNamedBean)
+		if (hasNamedBean) {
 			Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
+		}
 
 		// initialize bean only when dealing with singletons and named beans
 		if (hasNamedBean) {

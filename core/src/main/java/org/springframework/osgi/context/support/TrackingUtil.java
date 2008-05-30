@@ -56,6 +56,8 @@ abstract class TrackingUtil {
 		private final BundleContext context;
 
 		private final String filter;
+		/** flag used to bypass the OSGi space if the context becomes unavailable */
+		private boolean bundleContextInvalidated = false;
 
 
 		public OsgiServiceHandler(Object fallbackObject, BundleContext bundleContext, String filter) {
@@ -75,9 +77,17 @@ abstract class TrackingUtil {
 				return new Integer(System.identityHashCode(proxy));
 			}
 
-			ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(context, filter);
-
-			Object target = (ref != null ? context.getService(ref) : null);
+			Object target = null;
+			if (!bundleContextInvalidated) {
+				try {
+					ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(context, filter);
+					target = (ref != null ? context.getService(ref) : null);
+				}
+				catch (IllegalStateException ise) {
+					// context has been invalidated
+					bundleContextInvalidated = true;
+				}
+			}
 
 			if (target == null) {
 				target = fallbackObject;

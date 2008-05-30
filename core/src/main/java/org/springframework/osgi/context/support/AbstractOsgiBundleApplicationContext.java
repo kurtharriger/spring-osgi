@@ -38,6 +38,7 @@ import org.springframework.osgi.context.internal.classloader.AopClassLoaderFacto
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
+import org.springframework.osgi.service.dependency.MandatoryDependencyBeanPostProcessor;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -231,6 +232,11 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 
 		beanFactory.addBeanPostProcessor(new BundleContextAwareProcessor(this.bundleContext));
 		beanFactory.ignoreDependencyInterface(BundleContextAware.class);
+
+		// FIXME: add dependency processor
+		MandatoryDependencyBeanPostProcessor mdbpp = new MandatoryDependencyBeanPostProcessor();
+		mdbpp.setBeanFactory(beanFactory);
+		beanFactory.addBeanPostProcessor(mdbpp);
 
 		// add bundleContext bean
 		if (!beanFactory.containsLocalBean(BUNDLE_CONTEXT_BEAN_NAME)) {

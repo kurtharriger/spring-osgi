@@ -16,13 +16,15 @@
 
 package org.springframework.osgi.service.dependency;
 
+import java.util.EventListener;
+
 /**
  * Internal framework listener notified when a mandatory service importer comes
  * up or down (that is, becomes satisfied or not).
  * 
  * @author Costin Leau
  */
-public interface MandatoryDependencyListener {
+public interface MandatoryDependencyListener extends EventListener {
 
 	/**
 	 * Called when a mandatory dependency for an importer has been satisfied.

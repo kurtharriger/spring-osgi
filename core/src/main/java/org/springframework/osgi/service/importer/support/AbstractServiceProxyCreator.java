@@ -90,7 +90,7 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 		advices.add(mixin);
 
 		// 2. publication of bundleContext (if there is any)
-		// FIXME: make this configurable (so it can be disabled)
+		// TODO: make this configurable (so it can be disabled)
 		advices.add(invokerBundleContextAdvice);
 
 		// 3. TCCL handling (if there is any)
