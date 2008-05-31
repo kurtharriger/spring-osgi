@@ -15,6 +15,7 @@
  *
  * Created on 26-Jan-2006 by Adrian Colyer
  */
+
 package org.springframework.osgi.service.exporter.support;
 
 import java.io.Serializable;
@@ -33,6 +34,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceRegistration;
 
@@ -43,7 +45,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 	private OsgiServiceFactoryBean exporter;
 
-	private BeanFactory beanFactory;
+	private ConfigurableBeanFactory beanFactory;
 
 	private MockControl beanFactoryControl;
 
@@ -53,10 +55,11 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 	private BundleContext ctx;
 
+
 	protected void setUp() throws Exception {
 		exporter = new OsgiServiceFactoryBean();
-		beanFactoryControl = MockControl.createControl(BeanFactory.class);
-		beanFactory = (BeanFactory) this.beanFactoryControl.getMock();
+		beanFactoryControl = MockControl.createControl(ConfigurableBeanFactory.class);
+		beanFactory = (ConfigurableBeanFactory) this.beanFactoryControl.getMock();
 		bundleContext = new MockBundleContext();
 		ctxCtrl = MockControl.createControl(BundleContext.class);
 		ctx = (BundleContext) ctxCtrl.getMock();
@@ -112,6 +115,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		exporter.setTarget(new Object());
 		exporter.setTargetBeanName("costin");
 		beanFactoryControl.expectAndReturn(beanFactory.isSingleton("costin"), false);
+		beanFactoryControl.expectAndReturn(beanFactory.containsBean("costin"), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getType("costin"), Object.class);
 		beanFactoryControl.replay();
 		try {
@@ -155,7 +159,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		exporter.setAutoExport(AutoExport.ALL_CLASSES);
 		Class[] clazz = AutoExport.ALL_CLASSES.getExportedClasses(HashMap.class);
 		Class[] expected = new Class[] { Map.class, Cloneable.class, Serializable.class, HashMap.class,
-				AbstractMap.class };
+			AbstractMap.class };
 		assertTrue(compareArrays(expected, clazz));
 	}
 
@@ -181,7 +185,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 	public void testRegisterService() throws Exception {
 		Class[] clazz = new Class[] { Serializable.class, HashMap.class, Cloneable.class, Map.class,
-				LinkedHashMap.class };
+			LinkedHashMap.class };
 
 		String[] names = new String[clazz.length];
 
@@ -206,6 +210,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		exporter.setTargetBeanName(beanName);
 
 		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), false);
+		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), Object.class);
 		beanFactoryControl.replay();
 
@@ -245,6 +250,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		Object service = new Object();
 
 		BundleContext ctx = new MockBundleContext() {
+
 			public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
 				assertTrue(service instanceof ServiceFactory);
 				factory[0] = (ServiceFactory) service;
@@ -258,6 +264,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		exporter.setTargetBeanName(beanName);
 		exporter.setInterfaces(new Class[] { service.getClass() });
 		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), true);
+		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
 		beanFactoryControl.replay();
 		exporter.afterPropertiesSet();
@@ -284,6 +291,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		};
 
 		BundleContext ctx = new MockBundleContext() {
+
 			public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
 				assertTrue(service instanceof ServiceFactory);
 				factory[0] = (ServiceFactory) service;
@@ -294,6 +302,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		String beanName = "fooBar";
 
 		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), true);
+		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
 		beanFactoryControl.replay();
 
@@ -315,6 +324,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		Object service = new Object();
 
 		BundleContext ctx = new MockBundleContext() {
+
 			public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
 				assertTrue(service instanceof ServiceFactory);
 				factory[0] = (ServiceFactory) service;

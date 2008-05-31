@@ -164,18 +164,6 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 				// disable publication at startup
 				exporter.setPublishAtStartup(false);
 
-				// add though the dependency between the exporter and another bean (might be lazy)
-				// discover if there's a lazy reference (by name) to another bean
-				if (exporter instanceof OsgiServiceFactoryBean) {
-					String targetBeanName = ((OsgiServiceFactoryBean) exporter).getTargetBeanName();
-					if (StringUtils.hasText(targetBeanName) && beanFactory.containsBean(targetBeanName)) {
-						beanFactory.registerDependentBean(targetBeanName, exporterBeanName);
-						beanFactory.registerDependentBean(targetBeanName, beanName);
-
-						beanFactory.getBean(targetBeanName);
-					}
-				}
-
 				// populate the dependency maps
 				discoverDependentImporterFor(exporterBeanName, exporter);
 			}
@@ -202,7 +190,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 		Map importers = new LinkedHashMap(importerNames.length);
 
 		if (trace)
-			log.trace("exporter [" + exporterBeanName + "] depends (transitively) on the following importers:"
+			log.trace("Exporter [" + exporterBeanName + "] depends (transitively) on the following importers:"
 					+ ObjectUtils.nullSafeToString(importerNames));
 
 		// exclude non-singletons and non-mandatory importers
@@ -222,14 +210,14 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 				}
 
 				else if (trace)
-					log.trace("importer [" + importerNames[i] + "] is optional; skipping it");
+					log.trace("Importer [" + importerNames[i] + "] is optional; skipping it");
 			}
 			else if (trace)
-				log.trace("importer [" + importerNames[i] + "] is a non-singleton; ignoring it");
+				log.trace("Importer [" + importerNames[i] + "] is a non-singleton; ignoring it");
 		}
 
 		if (trace)
-			log.trace("after filtering, exporter [" + exporterBeanName + "] depends on importers:" + importers.values());
+			log.trace("After filtering, exporter [" + exporterBeanName + "] depends on importers:" + importers.values());
 
 		Collection imps = importers.keySet();
 

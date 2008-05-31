@@ -17,7 +17,6 @@
 package org.springframework.osgi.service.importer.support;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.aopalliance.aop.Advice;
@@ -25,16 +24,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.importer.internal.aop.ImportedOsgiServiceProxyAdvice;
 import org.springframework.osgi.service.importer.internal.aop.InfrastructureOsgiProxyAdvice;
 import org.springframework.osgi.service.importer.internal.aop.ProxyPlusCallback;
 import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
-import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
-import org.springframework.osgi.util.DebugUtils;
+import org.springframework.osgi.service.internal.aop.ProxyUtils;
+import org.springframework.osgi.service.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -107,8 +104,8 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 		advices.add(infrastructureMixin);
 		advices.add(dispatcherInterceptor);
 
-		return new ProxyPlusCallback(createProxy(getInterfaces(reference), classLoader, bundleContext, advices),
-			dispatcherInterceptor);
+		return new ProxyPlusCallback(ProxyUtils.createProxy(getInterfaces(reference), null, classLoader, bundleContext,
+			advices), dispatcherInterceptor);
 	}
 
 	private Advice determineTCCLAdvice(ServiceReference reference) {
@@ -130,30 +127,6 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 			if (log.isTraceEnabled()) {
 				log.trace(iccl + " TCCL used for invoking " + OsgiStringUtils.nullSafeToString(reference));
 			}
-		}
-	}
-
-	private Object createProxy(Class[] classes, ClassLoader classLoader, BundleContext bundleContext, List advices) {
-		ProxyFactory factory = new ProxyFactory();
-
-		ClassUtils.configureFactoryForClass(factory, classes);
-
-		for (Iterator iterator = advices.iterator(); iterator.hasNext();) {
-			Advice advice = (Advice) iterator.next();
-			factory.addAdvice(advice);
-		}
-
-		// no need to add optimize since it means implicit usage of CGLib always
-		// which is determined automatically anyway
-		// factory.setOptimize(true);
-		factory.setFrozen(true);
-		factory.setOpaque(true);
-		try {
-			return factory.getProxy(classLoader);
-		}
-		catch (NoClassDefFoundError ncdfe) {
-			DebugUtils.debugClassLoadingThrowable(ncdfe, bundleContext.getBundle(), classes);
-			throw ncdfe;
 		}
 	}
 

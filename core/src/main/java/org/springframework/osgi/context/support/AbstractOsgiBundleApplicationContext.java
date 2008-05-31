@@ -25,10 +25,14 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -38,7 +42,6 @@ import org.springframework.osgi.context.internal.classloader.AopClassLoaderFacto
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
-import org.springframework.osgi.service.dependency.MandatoryDependencyBeanPostProcessor;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -91,6 +94,8 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefreshableApplicationContext implements
 		ConfigurableOsgiBundleApplicationContext {
+
+	private static final String EXPORTER_IMPORTER_DEPENDENCY_MANAGER = "org.springframework.osgi.service.dependency.internal.MandatoryDependencyBeanPostProcessor";
 
 	/** OSGi bundle - determined from the BundleContext */
 	private Bundle bundle;
@@ -233,10 +238,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		beanFactory.addBeanPostProcessor(new BundleContextAwareProcessor(this.bundleContext));
 		beanFactory.ignoreDependencyInterface(BundleContextAware.class);
 
-		// FIXME: add dependency processor
-		MandatoryDependencyBeanPostProcessor mdbpp = new MandatoryDependencyBeanPostProcessor();
-		mdbpp.setBeanFactory(beanFactory);
-		beanFactory.addBeanPostProcessor(mdbpp);
+		enforceExporterImporterDependency(beanFactory);
 
 		// add bundleContext bean
 		if (!beanFactory.containsLocalBean(BUNDLE_CONTEXT_BEAN_NAME)) {
@@ -253,6 +255,30 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 
 		// register a 'bundle' scope
 		beanFactory.registerScope(OsgiBundleScope.SCOPE_NAME, new OsgiBundleScope());
+	}
+
+	/**
+	 * Takes care of enforcing the relationship between exporter and importers.
+	 * 
+	 * @param beanFactory
+	 */
+	private void enforceExporterImporterDependency(ConfigurableListableBeanFactory beanFactory) {
+		// create the service manager
+		ClassLoader loader = AbstractOsgiBundleApplicationContext.class.getClassLoader();
+		Object instance = null;
+		try {
+			Class managerClass = loader.loadClass(EXPORTER_IMPORTER_DEPENDENCY_MANAGER);
+			instance = BeanUtils.instantiateClass(managerClass);
+		}
+		catch (ClassNotFoundException cnfe) {
+			throw new ApplicationContextException("Cannot load class " + EXPORTER_IMPORTER_DEPENDENCY_MANAGER, cnfe);
+		}
+
+		// sanity check
+		Assert.isInstanceOf(BeanFactoryAware.class, instance);
+		Assert.isInstanceOf(BeanPostProcessor.class, instance);
+		((BeanFactoryAware) instance).setBeanFactory(beanFactory);
+		beanFactory.addBeanPostProcessor((BeanPostProcessor) instance);
 	}
 
 	/**

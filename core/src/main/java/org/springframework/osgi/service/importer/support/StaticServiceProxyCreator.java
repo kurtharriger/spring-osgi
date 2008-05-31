@@ -29,7 +29,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
 import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
-import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
+import org.springframework.osgi.service.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
