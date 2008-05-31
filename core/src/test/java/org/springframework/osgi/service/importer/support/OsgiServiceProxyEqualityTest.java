@@ -38,8 +38,8 @@ import org.springframework.osgi.service.importer.internal.aop.InfrastructureOsgi
 import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
 import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
-import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
+import org.springframework.osgi.service.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.util.ObjectUtils;
 
 /**

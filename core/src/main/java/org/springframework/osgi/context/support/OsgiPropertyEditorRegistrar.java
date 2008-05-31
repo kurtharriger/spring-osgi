@@ -87,7 +87,7 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 				editorClass = classLoader.loadClass((String) entry.getValue());
 			}
 			catch (ClassNotFoundException ex) {
-				throw (RuntimeException) new IllegalArgumentException("cannot load class").initCause(ex);
+				throw (RuntimeException) new IllegalArgumentException("Cannot load class").initCause(ex);
 			}
 
 			Assert.isAssignable(PropertyEditor.class, editorClass);

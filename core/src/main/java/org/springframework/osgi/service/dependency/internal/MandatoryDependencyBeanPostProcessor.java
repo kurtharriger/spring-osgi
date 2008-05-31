@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.service.dependency;
+package org.springframework.osgi.service.dependency.internal;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.osgi.service.dependency.internal.DefaultMandatoryDependencyManager;
-import org.springframework.osgi.service.dependency.internal.MandatoryServiceDependencyManager;
-import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
-import org.springframework.util.Assert;
+import org.springframework.osgi.service.dependency.DependentServiceExporter;
 
 /**
  * BeanPostProcessor registered for detecting the dependency between service
@@ -36,15 +33,27 @@ import org.springframework.util.Assert;
 public class MandatoryDependencyBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware {
 
 	private MandatoryServiceDependencyManager manager;
+	private ConfigurableBeanFactory beanFactory;
 
 
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		if (bean instanceof DependentServiceExporter) {
+			manager.addServiceExporter(beanName);
+		}
 		return bean;
 	}
 
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		// initialize exporter but disable publication until all the dependencies have been fulfilled
 		if (bean instanceof DependentServiceExporter) {
-			manager.addServiceExporter(beanName);
+			String exporterName = beanName;
+			if (beanFactory.isFactoryBean(beanName)) {
+				exporterName = BeanFactory.FACTORY_BEAN_PREFIX + beanName;
+			}
+			// if it's a singleton, then disable publication, otherwise ignore it
+			if (beanFactory.isSingleton(exporterName)) {
+				((DependentServiceExporter) bean).setPublishAtStartup(false);
+			}
 		}
 		return bean;
 	}
@@ -53,5 +62,6 @@ public class MandatoryDependencyBeanPostProcessor implements BeanPostProcessor, 
 		DefaultMandatoryDependencyManager manager = new DefaultMandatoryDependencyManager();
 		manager.setBeanFactory(beanFactory);
 		this.manager = manager;
+		this.beanFactory = (ConfigurableBeanFactory) beanFactory;
 	}
 }

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.dependency;
 
 /**
  * Interface describing the contract of OSGi service importers. Used for
- * decoupling other packages from using the OSGi service exporters directly.
+ * decoupling other packages from using the OSGi service importers directly.
  * 
  * @author Costin Leau
  * 
@@ -25,7 +26,7 @@ package org.springframework.osgi.service.dependency;
 public interface DependableServiceImporter extends ServiceDependency {
 
 	/**
-	 * Register a {@link MandatoryDependencyListener} on this importer.
+	 * Registers a {@link MandatoryDependencyListener} on this importer.
 	 * 
 	 * @param listener dependency listener to register.
 	 */

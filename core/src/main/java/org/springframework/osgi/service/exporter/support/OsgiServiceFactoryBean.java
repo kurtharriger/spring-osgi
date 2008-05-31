@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
@@ -38,13 +39,15 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.internal.classloader.ChainedClassLoader;
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
-import org.springframework.osgi.service.importer.internal.aop.ServiceTCCLInterceptor;
+import org.springframework.osgi.service.internal.aop.ProxyUtils;
+import org.springframework.osgi.service.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
@@ -174,15 +177,18 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		hasNamedBean = StringUtils.hasText(targetBeanName);
 
-		Assert.isTrue(hasNamedBean || target != null, "either 'targetBeanName' or 'target' properties have to be set");
+		Assert.isTrue(hasNamedBean || target != null, "Either 'targetBeanName' or 'target' properties have to be set.");
 
 		// if we have a name, we need a bean factory
 		if (hasNamedBean) {
-			Assert.notNull(beanFactory, "required property 'beanFactory' has not been set");
+			Assert.notNull(beanFactory, "Required property 'beanFactory' has not been set.");
 		}
 
 		// initialize bean only when dealing with singletons and named beans
 		if (hasNamedBean) {
+			Assert.isTrue(beanFactory.containsBean(targetBeanName), "Cannot locate bean named '" + targetBeanName
+					+ "' inside the running bean factory.");
+
 			if (beanFactory.isSingleton(targetBeanName)) {
 				target = beanFactory.getBean(targetBeanName);
 				targetClass = target.getClass();
@@ -190,6 +196,9 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			else {
 				targetClass = beanFactory.getType(targetBeanName);
 			}
+
+			// when running inside a container, add the dependency between this bean and the target one
+			addBeanFactoryDependency();
 		}
 		else
 			targetClass = target.getClass();
@@ -203,7 +212,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		if (interfaces == null) {
 			if (AutoExport.DISABLED.equals(autoExport))
 				throw new IllegalArgumentException(
-					"no service interface(s) specified and auto-export discovery disabled; change at least one of these properties");
+					"No service interface(s) specified and auto-export discovery disabled; change at least one of these properties.");
 			interfaces = new Class[0];
 		}
 		// check visibility type
@@ -217,6 +226,20 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		super.afterPropertiesSet();
 	}
 
+	private void addBeanFactoryDependency() {
+		if (beanFactory instanceof ConfigurableBeanFactory) {
+			ConfigurableBeanFactory cbf = (ConfigurableBeanFactory) beanFactory;
+			if (StringUtils.hasText(beanName) && cbf.containsBean(beanName)) {
+				// no need to validate targetBeanName (already did)
+				cbf.registerDependentBean(targetBeanName, BeanFactory.FACTORY_BEAN_PREFIX + beanName);
+				cbf.registerDependentBean(targetBeanName, beanName);
+			}
+		}
+		else {
+			log.warn("The running bean factory cannot support dependencies between beans - importer/exporter dependency cannot be enforced");
+		}
+	}
+
 	/**
 	 * Proxy the target object with an interceptor that manages the context
 	 * classloader. This should be applied only if such management is needed.
@@ -225,22 +248,13 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * @return
 	 */
 	private Object wrapWithClassLoaderManagingProxy(final Object target, Class[] interfaces) {
-		ProxyFactory factory = new ProxyFactory();
-
-		// mold the proxy
-		ClassUtils.configureFactoryForClass(factory, interfaces);
-
-		factory.addAdvice(new ServiceTCCLInterceptor(classLoader));
-		factory.setTarget(target);
-
-		factory.setFrozen(true);
 		try {
-			return factory.getProxy(aopClassLoader);
+
+			return ProxyUtils.createProxy(interfaces, target, aopClassLoader, bundleContext,
+				new Advice[] { new ServiceTCCLInterceptor(classLoader) });
 		}
 		catch (Throwable th) {
-
-			log.error("cannot create TCCL managed proxy; falling back to the naked object", th);
-
+			log.error("Cannot create TCCL managed proxy; falling back to the naked object", th);
 			if (th instanceof NoClassDefFoundError) {
 				NoClassDefFoundError ncdfe = (NoClassDefFoundError) th;
 				if (log.isWarnEnabled()) {

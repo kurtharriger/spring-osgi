@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.dependency;
 
 /**
- * Interface describing the OSGi service exporters dependency contract.
+ * Internal interface providing the OSGi service exporters dependency contract.
  * 
  * @author Costin Leau
  */
 public interface DependentServiceExporter {
 
 	/**
-	 * Instructs the exporter whether to publish the service at startup or not. This method
-	 * is used internally inside the framework to prevent the exporter for
-	 * publishing a service if it depends on importers with mandatory service
-	 * import.
+	 * Instructs the exporter whether to publish the service at startup or not.
+	 * This method is used internally inside the framework to prevent the
+	 * exporter for publishing a service if it depends on importers with
+	 * mandatory service import.
 	 * 
 	 * @param publish true if the exporter will publish things at startup, false
 	 * otherwise
@@ -34,21 +35,23 @@ public interface DependentServiceExporter {
 	void setPublishAtStartup(boolean publish);
 
 	/**
-	 * Starts the OSGi lifecycle.
+	 * Starts the OSGi life cycle. For the exporter, this translates to
+	 * registering the target service as an OSGi service.
 	 * 
-	 * Should not throw an exception if the component is already running.
+	 * <p/> Should not throw an exception if the component is already running.
 	 */
 	void start();
 
 	/**
-	 * Stops the OSGi lifecycle.
+	 * Stops the OSGi life cycle. For the exporter, this translates to
+	 * unregistering the target service as an OSGi service.
 	 * 
-	 * Should not throw an exception if the component is already stopped.
+	 * <p/> Should not throw an exception if the component is already stopped.
 	 */
 	void stop();
 
 	/**
-	 * Indicates whether this OSGi component is currently running.
+	 * Indicates whether the exporter is started or not.
 	 * 
 	 * @return true if the component is running, false otherwise
 	 */
