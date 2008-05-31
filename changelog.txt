@@ -35,6 +35,7 @@ Package org.springframework.osgi.extender
 Package org.springframework.osgi.io
 * improved OsgiBundleResource#getFile() method when dealing with resources in expanded bundles
 * OsgiBundleResource#lastModified() works even when the underlying bundle cannot be resolved to a File
+* added fallback logic to OsgiBundleResource#lastModified() if the underlying platform doesn't return a valid value
 
 Package org.springframework.osgi.service
 * added descriptive exception when invoking non-public methods on class proxies (caused by classes with final mehtods)
