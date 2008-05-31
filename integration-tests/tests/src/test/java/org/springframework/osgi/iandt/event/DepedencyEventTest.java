@@ -36,12 +36,6 @@ import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWait
  */
 public class DepedencyEventTest extends AbstractEventTest {
 
-	protected String[] getTestBundlesNames() {
-		// no bundle for starters
-		return new String[] {};
-	}
-
-
 	private List refreshEvents;
 
 
@@ -98,15 +92,12 @@ public class DepedencyEventTest extends AbstractEventTest {
 
 			bnd.start();
 
-			// wait 2 seconds to make sure the events properly propagate
-			Thread.sleep(2 * 1000);
-
-			// then check the event queue
-			System.out.println(eventList.size());
-			System.out.println(eventList);
-
-			// expect 3 events at least (3 importers unsatisfied)
-			assertTrue(eventList.size() >= 3);
+			// expect at least 3 events
+			for (int i = 0; i < 3; i++) {
+				if (!waitForEvent(TIME_OUT)) {
+					fail("not enough events received after " + TIME_OUT + " ms");
+				}
+			}
 
 			// check the event type and their name (plus the order)
 

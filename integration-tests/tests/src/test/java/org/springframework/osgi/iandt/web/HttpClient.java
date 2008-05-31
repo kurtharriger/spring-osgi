@@ -49,10 +49,10 @@ public abstract class HttpClient {
 
 	private static final String READ_TIMEOUT_SYS_PROP = "sun.net.client.defaultReadTimeout";
 
-	/** default 5 seconds */
-	private static final String DEFAULT_TIMEOUT = "" + (5 * 1000);
+	/** default 15 seconds (nightly build seems to be quite slow) */
+	private static final String DEFAULT_TIMEOUT = "" + (15 * 1000);
 
-	private static final String READ_TIMEOUT = "" + 5 * 1000;
+	private static final String READ_TIMEOUT = "" + 15 * 1000;
 
 
 	public static HttpResponse getLocalResponse(String base, String resource) throws Exception {

@@ -53,8 +53,4 @@ public class SimpleJSPTest extends BaseWebIntegrationTest {
 		HttpResponse resp = HttpClient.getLocalResponse(base(), "jsp/complex.jsp");
 		assertTrue(resp.toString(), resp.isOk());
 	}
-
-	//	public void testWait() throws Exception {
-	//		System.in.read();
-	//	}
 }
