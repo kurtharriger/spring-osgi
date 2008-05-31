@@ -388,7 +388,14 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	public long lastModified() throws IOException {
 		URLConnection con = getURL().openConnection();
 		con.setUseCaches(false);
-		return con.getLastModified();
+		long time = con.getLastModified();
+		// the implementation doesn't return the proper time stamp
+		if (time == 0) {
+			if (OsgiResourceUtils.PREFIX_TYPE_BUNDLE_JAR == searchType)
+				return bundle.getLastModified();
+		}
+		// there is nothing else we can do
+		return time;
 	}
 
 	/**

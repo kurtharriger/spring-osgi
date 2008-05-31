@@ -92,6 +92,4 @@ public class DynamicCollectionThreadingTest extends BaseThreadingTest {
 		waitForTick(70);
 		assertFalse(iter.hasNext());
 	}
-	
-
 }

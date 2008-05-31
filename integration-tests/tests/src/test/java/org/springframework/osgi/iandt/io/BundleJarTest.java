@@ -17,6 +17,7 @@
 package org.springframework.osgi.iandt.io;
 
 import org.springframework.core.io.Resource;
+import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * Bundle jar tests.
@@ -58,5 +59,4 @@ public class BundleJarTest extends BaseIoTest {
 		Resource resource = patternLoader.getResource("osgibundlejar:/org/springframework/osgi/iandt/io/duplicate.file");
 		assertTrue(resource.lastModified() > 0);
 	}
-
 }
