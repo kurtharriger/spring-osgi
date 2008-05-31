@@ -76,7 +76,7 @@ public abstract class AbstractEventTest extends BaseIntegrationTest {
 	 * @throws Exception
 	 */
 	protected boolean waitForEvent(long maxWait) {
-		long current = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 		synchronized (lock) {
 			try {
 				lock.wait(maxWait);
@@ -84,9 +84,9 @@ public abstract class AbstractEventTest extends BaseIntegrationTest {
 			catch (Exception ex) {
 				return false;
 			}
-			long awakenTime = System.currentTimeMillis();
-			boolean waitSuccessed = (awakenTime - current < maxWait);
-			return waitSuccessed;
 		}
+		long stop = System.currentTimeMillis();
+		boolean waitSuccessed = (stop - start <= maxWait);
+		return waitSuccessed;
 	}
 }
