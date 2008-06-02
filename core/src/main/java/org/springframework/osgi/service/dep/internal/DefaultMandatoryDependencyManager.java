@@ -79,7 +79,8 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 				importers.put(importer, Boolean.TRUE);
 				if (log.isTraceEnabled())
 					log.trace("Importer [" + importerToName.get(importer)
-							+ "] is satisfied; checking the rest of the dependencies for exporter " + exporter);
+							+ "] is satisfied; checking the rest of the dependencies for exporter "
+							+ exporterToName.get(exporter));
 
 				checkIfExporterShouldStart(exporter, importers);
 			}
@@ -88,7 +89,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 		public void importerUnsatisfied(Object importer, OsgiServiceDependency dependency) {
 
 			if (log.isDebugEnabled())
-				log.debug("Exporter [" + importerToName.get(importer) + "] stopped; transitive OSGi dependency ["
+				log.debug("Exporter [" + exporterToName.get(exporter) + "] stopped; transitive OSGi dependency ["
 						+ dependency.getBeanName() + "] is unsatifised");
 
 			// if the importer goes down, simply shut down the exporter
@@ -174,7 +175,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 			AbstractOsgiServiceImportFactoryBean.class);
 
 		// create map of associated importers
-		Map importers = new LinkedHashMap(importerNames.length);
+		Map dependingImporters = new LinkedHashMap(importerNames.length);
 
 		if (trace)
 			log.trace("Exporter [" + exporterBeanName + "] depends (transitively) on the following importers:"
@@ -191,9 +192,8 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 				// create an importer -> exporter association
 				if (importer.isMandatory()) {
-					importers.put(importer, importerNames[i]);
+					dependingImporters.put(importer, importerNames[i]);
 					importerToName.putIfAbsent(importer, importerNames[i]);
-					addListener(importer, listener);
 				}
 
 				else if (trace)
@@ -204,22 +204,23 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 		}
 
 		if (trace)
-			log.trace("After filtering, exporter [" + exporterBeanName + "] depends on importers:" + importers.values());
+			log.trace("After filtering, exporter [" + exporterBeanName + "] depends on importers:"
+					+ dependingImporters.values());
 
-		Collection imps = importers.keySet();
+		Collection filteredImporters = dependingImporters.keySet();
 
 		// add the importers and their status to the collection
 		synchronized (exporter) {
-			Map importerStatuses = new LinkedHashMap(imps.size());
+			Map importerStatuses = new LinkedHashMap(filteredImporters.size());
 
-			for (Iterator iter = imps.iterator(); iter.hasNext();) {
-				AbstractOsgiServiceImportFactoryBean imp = (AbstractOsgiServiceImportFactoryBean) iter.next();
-				importerStatuses.put(imp, Boolean.valueOf(imp.isSatisfied()));
+			for (Iterator iter = filteredImporters.iterator(); iter.hasNext();) {
+				AbstractOsgiServiceImportFactoryBean importer = (AbstractOsgiServiceImportFactoryBean) iter.next();
+				importerStatuses.put(importer, Boolean.valueOf(importer.isSatisfied()));
+				// add the listener after the importer status has been recorded
+				addListener(importer, listener);
 			}
-
 			exporterToImporterDeps.put(exporter, importerStatuses);
-
-			checkIfExporterShouldStart(exporter, importers);
+			checkIfExporterShouldStart(exporter, importerStatuses);
 		}
 	}
 
@@ -237,7 +238,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 			for (Iterator iterator = importers.entrySet().iterator(); iterator.hasNext();) {
 				Map.Entry entry = (Map.Entry) iterator.next();
 				if (Boolean.FALSE.equals(entry.getValue()))
-					unsatisfiedDependencies.add(entry.getKey());
+					unsatisfiedDependencies.add(importerToName.get(entry.getKey()));
 			}
 
 			if (log.isTraceEnabled()) {

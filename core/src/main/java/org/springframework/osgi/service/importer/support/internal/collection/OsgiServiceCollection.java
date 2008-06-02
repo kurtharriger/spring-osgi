@@ -94,8 +94,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 								// is added or not (think set, sorted set)
 								if (serviceProxies.add(proxy)) {
 									collectionModified = true;
-									// check if the list was empty
-									shouldInformStateListeners = (servicesIdMap.isEmpty());
+									// check if the list was empty before adding something to it
+									shouldInformStateListeners = (serviceProxies.size() == 1);
 									servicesIdMap.put(serviceId, ppc);
 								}
 							}
@@ -105,7 +105,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 						if (collectionModified) {
 							OsgiServiceBindingUtils.callListenersBind(context, proxy, ref, listeners);
 
-							if (shouldInformStateListeners)
+							if (serviceRequiredAtStartup && shouldInformStateListeners)
 								notifySatisfiedStateListeners();
 						}
 
@@ -122,13 +122,16 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 								collectionModified = serviceProxies.remove(proxy);
 								// invalidate it
 								invalidateProxy(ppc);
+
+								// check if the list is empty
+								shouldInformStateListeners = (serviceProxies.isEmpty());
 							}
 						}
 						// TODO: should this be part of the lock also?
 						if (collectionModified) {
 							OsgiServiceBindingUtils.callListenersUnbind(context, proxy, ref, listeners);
 
-							if (shouldInformStateListeners)
+							if (serviceRequiredAtStartup && shouldInformStateListeners)
 								notifyUnsatisfiedStateListeners();
 						}
 
@@ -245,7 +248,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	private List stateListeners = Collections.EMPTY_LIST;
 
 	private final Object lock = new Object();
-	
+
 	/** dependency object */
 	private OsgiServiceDependency dependency;
 
@@ -254,7 +257,6 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	/** event source (importer) name */
 	private String sourceName;
-
 
 
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader,
@@ -277,7 +279,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		boolean trace = log.isTraceEnabled();
 
 		dependency = new DefaultServiceDependency(sourceName, filter, serviceRequiredAtStartup);
-		
+
 		if (trace)
 			log.trace("Adding osgi listener for services matching [" + filter + "]");
 		OsgiListenerUtils.addServiceListener(context, listener, filter);
@@ -324,7 +326,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	public boolean isSatisfied() {
 		if (serviceRequiredAtStartup)
-			return serviceProxies.isEmpty();
+			return (!serviceProxies.isEmpty());
 		else
 			return true;
 	}
@@ -363,7 +365,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		int index = serviceProxies.indexOf(proxy);
 		checkDeadProxies(proxy, index);
 	}
-	
+
 	public void setServiceImporter(Object importer) {
 		this.eventSource = importer;
 	}
