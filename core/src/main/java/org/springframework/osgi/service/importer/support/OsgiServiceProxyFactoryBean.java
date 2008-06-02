@@ -24,7 +24,6 @@ import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
-import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -60,7 +59,7 @@ import org.springframework.util.ObjectUtils;
  * 
  */
 public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean implements
-		ApplicationEventPublisherAware, BeanNameAware {
+		ApplicationEventPublisherAware {
 
 	/**
 	 * Wrapper around internal commands.
@@ -92,9 +91,6 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 
 	/** application publisher */
 	private ApplicationEventPublisher applicationEventPublisher;
-
-	/** bean name */
-	private String beanName = "";
 
 	/** internal listeners */
 	private final List stateListeners = Collections.synchronizedList(new ArrayList(4));
@@ -248,19 +244,5 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 
 	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
 		this.applicationEventPublisher = applicationEventPublisher;
-	}
-
-	/**
-	 * Returns the bean name associated with the instance of this class (when
-	 * running inside the Spring container).
-	 * 
-	 * @return component bean name
-	 */
-	public String getBeanName() {
-		return beanName;
-	}
-
-	public void setBeanName(String name) {
-		beanName = name;
 	}
 }

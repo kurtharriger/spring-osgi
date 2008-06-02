@@ -16,7 +16,6 @@
 
 package org.springframework.osgi.service.importer.support.internal.aop;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -511,7 +510,9 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	/** Internal state listeners */
 	public void setStateListeners(List stateListeners) {
-		this.stateListeners = stateListeners;
+		synchronized (lock) {
+			this.stateListeners = stateListeners;	
+		}
 	}
 
 	public boolean equals(Object other) {
