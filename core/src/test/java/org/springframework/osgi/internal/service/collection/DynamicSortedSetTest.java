@@ -22,7 +22,7 @@ import java.util.SortedSet;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.service.importer.internal.collection.DynamicSortedSet;
+import org.springframework.osgi.service.importer.support.internal.collection.DynamicSortedSet;
 
 /**
  * @author Costin Leau

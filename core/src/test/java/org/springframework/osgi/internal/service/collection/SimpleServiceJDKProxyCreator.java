@@ -25,8 +25,8 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.aop.SpringProxy;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
-import org.springframework.osgi.service.importer.internal.aop.ProxyPlusCallback;
-import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
+import org.springframework.osgi.service.importer.support.internal.aop.ProxyPlusCallback;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 

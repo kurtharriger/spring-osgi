@@ -21,7 +21,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.service.importer.internal.collection.DynamicSet;
+import org.springframework.osgi.service.importer.support.internal.collection.DynamicSet;
 
 /**
  * @author Costin Leau

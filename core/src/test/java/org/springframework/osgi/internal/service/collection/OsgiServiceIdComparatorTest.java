@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.importer.internal.collection.comparator.ServiceReferenceComparator;
+import org.springframework.osgi.service.importer.support.internal.collection.comparator.ServiceReferenceComparator;
 
 /**
  * @author Costin Leau

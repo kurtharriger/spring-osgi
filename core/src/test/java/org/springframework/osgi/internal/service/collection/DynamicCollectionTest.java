@@ -19,7 +19,7 @@ import java.util.Collection;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.service.importer.internal.collection.DynamicCollection;
+import org.springframework.osgi.service.importer.support.internal.collection.DynamicCollection;
 
 /**
  * Tests regarding the collection behaviour.

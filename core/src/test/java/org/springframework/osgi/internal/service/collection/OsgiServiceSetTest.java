@@ -20,8 +20,8 @@ import java.util.Iterator;
 import java.util.Properties;
 
 import org.osgi.framework.Constants;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSet;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSet;
 
 /**
  * @author Costin Leau

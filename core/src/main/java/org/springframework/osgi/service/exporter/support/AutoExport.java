@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.exporter.support;
 
 import org.springframework.core.enums.StaticLabeledEnum;
 import org.springframework.osgi.util.internal.ClassUtils;
 
 /**
- * Enum-like class indicatin class exporters available to {@link OsgiServiceFactoryBean} for registering
- * object as OSGi services.
+ * Enum-like class indicatin class exporters available to
+ * {@link OsgiServiceFactoryBean} for registering object as OSGi services.
  * 
  * @author Costin Leau
  */
@@ -28,7 +29,11 @@ public abstract class AutoExport extends StaticLabeledEnum {
 
 	/** Do not export anything */
 	public static final AutoExport DISABLED = new AutoExport(0, "DISABLED") {
+
+		private static final long serialVersionUID = -8297270116184239840L;
+
 		private final Class[] clazz = new Class[0];
+
 
 		Class[] getExportedClasses(Class targetClass) {
 			return clazz;
@@ -40,9 +45,12 @@ public abstract class AutoExport extends StaticLabeledEnum {
 	 * class
 	 */
 	public static final AutoExport INTERFACES = new AutoExport(1, "INTERFACES") {
+
+		private static final long serialVersionUID = -8336152449611885031L;
+
+
 		public Class[] getExportedClasses(Class targetClass) {
-			return ClassUtils.getClassHierarchy(targetClass,
-				ClassUtils.INCLUDE_INTERFACES);
+			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.INCLUDE_INTERFACES);
 		}
 	};
 
@@ -51,9 +59,12 @@ public abstract class AutoExport extends StaticLabeledEnum {
 	 * excluding Object.class)
 	 */
 	public static final AutoExport CLASS_HIERARCHY = new AutoExport(2, "CLASS_HIERARCHY") {
+
+		private static final long serialVersionUID = 6464782616822538297L;
+
+
 		public Class[] getExportedClasses(Class targetClass) {
-			return ClassUtils.getClassHierarchy(targetClass,
-				ClassUtils.INCLUDE_CLASS_HIERARCHY);
+			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.INCLUDE_CLASS_HIERARCHY);
 
 		}
 	};
@@ -63,10 +74,15 @@ public abstract class AutoExport extends StaticLabeledEnum {
 	 * to {@link #CLASS_HIERARCHY} + {@link #INTERFACES}
 	 */
 	public static final AutoExport ALL_CLASSES = new AutoExport(3, "ALL_CLASSES") {
+
+		private static final long serialVersionUID = -6628398711158262852L;
+
+
 		public Class[] getExportedClasses(Class targetClass) {
 			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.INCLUDE_ALL_CLASSES);
 		}
 	};
+
 
 	/**
 	 * Determines the exported classes given a certain target class.

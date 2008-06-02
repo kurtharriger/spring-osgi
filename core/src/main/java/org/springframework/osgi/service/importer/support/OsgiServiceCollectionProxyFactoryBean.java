@@ -28,13 +28,13 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
-import org.springframework.osgi.service.importer.internal.collection.CollectionProxy;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceList;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSet;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedList;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedSet;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
+import org.springframework.osgi.service.importer.support.internal.collection.CollectionProxy;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceList;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSet;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedList;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedSet;
 import org.springframework.util.Assert;
 
 /**

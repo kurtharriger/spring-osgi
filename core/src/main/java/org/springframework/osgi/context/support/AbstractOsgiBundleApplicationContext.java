@@ -95,7 +95,7 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefreshableApplicationContext implements
 		ConfigurableOsgiBundleApplicationContext {
 
-	private static final String EXPORTER_IMPORTER_DEPENDENCY_MANAGER = "org.springframework.osgi.service.dependency.internal.MandatoryDependencyBeanPostProcessor";
+	private static final String EXPORTER_IMPORTER_DEPENDENCY_MANAGER = "org.springframework.osgi.service.dep.internal.MandatoryDependencyBeanPostProcessor";
 
 	/** OSGi bundle - determined from the BundleContext */
 	private Bundle bundle;

@@ -24,7 +24,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.util.OsgiPlatformDetector;
 
 /**
  * @author Adrian Colyer

@@ -37,8 +37,8 @@ import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Ordered;
@@ -46,8 +46,11 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.internal.classloader.ChainedClassLoader;
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
-import org.springframework.osgi.service.internal.aop.ProxyUtils;
-import org.springframework.osgi.service.internal.aop.ServiceTCCLInterceptor;
+import org.springframework.osgi.service.exporter.support.internal.controller.ExporterController;
+import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
+import org.springframework.osgi.service.exporter.support.internal.controller.ExporterRegistry;
+import org.springframework.osgi.service.util.internal.aop.ProxyUtils;
+import org.springframework.osgi.service.util.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.DebugUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
@@ -83,14 +86,15 @@ import org.springframework.util.StringUtils;
  * @author Andy Piper
  * 
  */
-public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implements BeanFactoryAware, DisposableBean,
-		BundleContextAware, FactoryBean, Ordered, BeanClassLoaderAware, BeanNameAware {
+public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implements BeanClassLoaderAware,
+		BeanFactoryAware, BeanNameAware, BundleContextAware, FactoryBean, InitializingBean, Ordered {
 
 	/**
 	 * ServiceFactory used for publishing the service beans. Acts as a a wrapper
 	 * around special beans (such as ServiceFactory) and delegates to the
 	 * container each time a bundle requests the service for the first time.
 	 * 
+	 * @author Costin Leau
 	 */
 	private class PublishingServiceFactory implements ServiceFactory {
 
@@ -132,6 +136,29 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		}
 	}
 
+	/**
+	 * Wrapper around internal commands.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	private class Executor implements ExporterInternalActions {
+
+		public void registerService() {
+			OsgiServiceFactoryBean.this.registerService();
+		}
+
+		public void registerServiceAtStartup(boolean register) {
+			synchronized (lock) {
+				registerAtStartup = register;
+			}
+		}
+
+		public void unregisterService() {
+			OsgiServiceFactoryBean.this.unregisterService();
+		}
+	};
+
 
 	private static final Log log = LogFactory.getLog(OsgiServiceFactoryBean.class);
 
@@ -165,12 +192,30 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	private ClassLoader classLoader;
+
 	/** class loader used by the aop infrastructure */
 	private ClassLoader aopClassLoader;
 
 	/** exporter bean name */
 	private String beanName;
 
+	/** registration sanity flag */
+	private boolean serviceRegistered = false;
+
+	/** register at startup by default */
+	private boolean registerAtStartup = true;
+
+	/** synchronization lock */
+	private final Object lock = new Object();
+
+	/** internal behaviour controller */
+	private final ExporterController controller;
+
+
+	public OsgiServiceFactoryBean() {
+		controller = new ExporterController(new Executor());
+		ExporterRegistry.putController(this, controller);
+	}
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(bundleContext, "required property 'bundleContext' has not been set");
@@ -223,7 +268,18 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			}
 		}
 
-		super.afterPropertiesSet();
+		boolean shouldRegisterAtStartup;
+		synchronized (lock) {
+			shouldRegisterAtStartup = registerAtStartup;
+		}
+
+		if (shouldRegisterAtStartup)
+			registerService();
+	}
+
+	public void destroy() {
+		ExporterRegistry.removeController(this);
+		super.destroy();
 	}
 
 	private void addBeanFactoryDependency() {
@@ -286,7 +342,14 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * classes required for publishing and then delegates the actual
 	 * registration to a dedicated method.
 	 */
-	public void registerService() {
+	void registerService() {
+
+		synchronized (lock) {
+			if (serviceRegistered)
+				return;
+			else
+				serviceRegistered = true;
+		}
 
 		// if we have a nested bean / non-Spring managed object
 		String beanName = (!hasNamedBean ? ObjectUtils.getIdentityHexString(target) : targetBeanName);
@@ -345,7 +408,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		return bundleContext.registerService(names, serviceFactory, serviceProperties);
 	}
 
-	boolean isBeanBundleScoped() {
+	private boolean isBeanBundleScoped() {
 		boolean bundleScoped = false;
 		// if we do have a bundle scope, use ServiceFactory decoration
 		if (targetBeanName != null) {
@@ -387,12 +450,14 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		return false;
 	}
 
-	public void destroy() {
-		// stop published service
-		stop();
-	}
+	void unregisterService() {
+		synchronized (lock) {
+			if (!serviceRegistered)
+				return;
+			else
+				serviceRegistered = false;
+		}
 
-	public void unregisterService() {
 		unregisterService(serviceRegistration);
 		serviceRegistration = null;
 	}

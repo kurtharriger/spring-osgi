@@ -36,12 +36,12 @@ import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceList;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSet;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedList;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedSet;
-import org.springframework.osgi.service.importer.internal.collection.comparator.ServiceReferenceComparator;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceList;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSet;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedList;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedSet;
+import org.springframework.osgi.service.importer.support.internal.collection.comparator.ServiceReferenceComparator;
 
 /**
  * @author Costin Leau

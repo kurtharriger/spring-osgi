@@ -44,8 +44,8 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDependableServiceImporter implements
-		SmartFactoryBean, InitializingBean, DisposableBean, BundleContextAware, BeanClassLoaderAware {
+public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFactoryBean, InitializingBean,
+		DisposableBean, BundleContextAware, BeanClassLoaderAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
 
@@ -78,11 +78,16 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 
 	private Object proxy;
 
+	/** is at least one service required? */
+	private boolean mandatory = true;
+
+	private Cardinality cardinality;
+
 
 	/**
 	 * Returns a managed hook to access OSGi service(s). Subclasses can decide
 	 * to create either a proxy managing only one OSGi service type or a
-	 * collection of services matching a certain criteri
+	 * collection of services matching a certain criteria.
 	 * 
 	 * @return managed OSGi service(s)
 	 */
@@ -112,18 +117,18 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	}
 
 	public void afterPropertiesSet() {
-		Assert.notNull(this.bundleContext, "Required 'bundleContext' property was not set");
-		Assert.notNull(classLoader, "Required 'classLoader' property was not set");
-		Assert.notNull(interfaces, "Required 'interfaces' property was not set");
+		Assert.notNull(this.bundleContext, "Required 'bundleContext' property was not set.");
+		Assert.notNull(classLoader, "Required 'classLoader' property was not set.");
+		Assert.notNull(interfaces, "Required 'interfaces' property was not set.");
 		// validate specified classes
 		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(interfaces),
-			"more then one concrete class specified; cannot create proxy");
+			"more then one concrete class specified; cannot create proxy.");
 
 		this.listeners = (listeners == null ? new OsgiServiceLifecycleListener[0] : listeners);
 
 		getUnifiedFilter(); // eager initialization of the cache to catch filter
 		// errors
-		Assert.notNull(interfaces, "Required serviceTypes property not specified");
+		Assert.notNull(interfaces, "Required serviceTypes property not specified.");
 
 		initialized = true;
 	}
@@ -177,6 +182,11 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 	 */
 	abstract DisposableBean getDisposable();
 
+	public abstract boolean isSatisfied();
+	
+	public boolean isMandatory() {
+		return mandatory;
+	}
 	/**
 	 * Sets the classes that the imported service advertises.
 	 * 
@@ -313,4 +323,24 @@ public abstract class AbstractOsgiServiceImportFactoryBean extends AbstractDepen
 		return contextClassLoader;
 	}
 
+	/**
+	 * Returns the cardinality used by this importer.
+	 * 
+	 * @return importer cardinality
+	 */
+	public Cardinality getCardinality() {
+		return cardinality;
+	}
+
+	/**
+	 * Sets the importer cardinality (0..1, 1..1, 0..N, or 1..N). Default is
+	 * 1..X.
+	 * 
+	 * @param cardinality importer cardinality.
+	 */
+	public void setCardinality(Cardinality cardinality) {
+		Assert.notNull(cardinality);
+		this.cardinality = cardinality;
+		this.mandatory = cardinality.isMandatory();
+	}
 }

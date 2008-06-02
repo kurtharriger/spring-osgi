@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.service.importer.internal.collection.DynamicCollection;
+import org.springframework.osgi.service.importer.support.internal.collection.DynamicCollection;
 
 /**
  * Tests related to the dynamic collection iterator (consistency and dynamic

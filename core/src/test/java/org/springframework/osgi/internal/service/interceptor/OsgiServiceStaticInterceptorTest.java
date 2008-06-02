@@ -26,7 +26,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.importer.internal.aop.ServiceStaticInterceptor;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceStaticInterceptor;
 
 /**
  * @author Costin Leau

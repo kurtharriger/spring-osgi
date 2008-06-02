@@ -21,7 +21,6 @@ import java.lang.reflect.Method;
 import junit.framework.TestCase;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -32,9 +31,8 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.dependency.DependableServiceImporter;
-import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
-import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 
 /**
  * @author Costin Leau
@@ -125,8 +123,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		template.setWaitTime(1);
 		interceptor.setRetryTemplate(template);
 		interceptor.setProxy(new Object());
-		interceptor.setServiceImporter((DependableServiceImporter) MockControl.createNiceControl(
-			DependableServiceImporter.class).getMock());
+		interceptor.setServiceImporter(new Object());
 
 		interceptor.afterPropertiesSet();
 	}

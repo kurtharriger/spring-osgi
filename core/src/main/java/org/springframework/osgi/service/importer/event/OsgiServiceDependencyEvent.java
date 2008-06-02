@@ -17,6 +17,7 @@
 package org.springframework.osgi.service.importer.event;
 
 import org.springframework.context.ApplicationEvent;
+import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.util.Assert;
 
 /**
