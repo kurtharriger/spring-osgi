@@ -45,10 +45,6 @@ public class SingleExportDependingOnMultipleImportTest extends BaseIntegrationTe
 		return new String[] { "org/springframework/osgi/iandt/servicedependency/single-export-multi-import.xml" };
 	}
 
-	protected String dependencyBundleSymbolicName() {
-		return null;
-	}
-
 	protected String[] getTestBundlesNames() {
 		// load the tccl bundle, plus simple.service + simple.service.2
 		return new String[] { "org.springframework.osgi.iandt, tccl," + getSpringDMVersion(),
