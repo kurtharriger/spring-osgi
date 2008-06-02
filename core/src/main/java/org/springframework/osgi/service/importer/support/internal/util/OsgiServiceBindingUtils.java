@@ -45,15 +45,15 @@ public abstract class OsgiServiceBindingUtils {
 			Dictionary properties = OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
 			for (int i = 0; i < listeners.length; i++) {
 				if (debug)
-					log.debug("calling bind on " + listeners[i] + " w/ reference " + reference);
+					log.debug("Calling bind on " + listeners[i] + " w/ reference " + reference);
 				try {
 					listeners[i].bind(serviceProxy, (Map) properties);
 				}
 				catch (Exception ex) {
-					log.warn("bind method on listener " + listeners[i] + " threw exception ", ex);
+					log.warn("Bind method on listener " + listeners[i] + " threw exception ", ex);
 				}
 				if (debug)
-					log.debug("called bind on " + listeners[i] + " w/ reference " + reference);
+					log.debug("Called bind on " + listeners[i] + " w/ reference " + reference);
 			}
 		}
 	}
@@ -66,15 +66,15 @@ public abstract class OsgiServiceBindingUtils {
 			Dictionary properties = OsgiServiceReferenceUtils.getServicePropertiesSnapshot(reference);
 			for (int i = 0; i < listeners.length; i++) {
 				if (debug)
-					log.debug("calling unbind on " + listeners[i] + " w/ reference " + reference);
+					log.debug("Calling unbind on " + listeners[i] + " w/ reference " + reference);
 				try {
 					listeners[i].unbind(serviceProxy, (Map) properties);
 				}
 				catch (Exception ex) {
-					log.warn("unbind method on listener " + listeners[i] + " threw exception ", ex);
+					log.warn("Unbind method on listener " + listeners[i] + " threw exception ", ex);
 				}
 				if (debug)
-					log.debug("called unbind on " + listeners[i] + " w/ reference " + reference);
+					log.debug("Called unbind on " + listeners[i] + " w/ reference " + reference);
 			}
 		}
 	}

@@ -78,7 +78,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 				Map importers = (Map) exporterToImporterDeps.get(exporter);
 				importers.put(importer, Boolean.TRUE);
 				if (log.isTraceEnabled())
-					log.trace("Importer [" + importer
+					log.trace("Importer [" + importerToName.get(importer)
 							+ "] is satisfied; checking the rest of the dependencies for exporter " + exporter);
 
 				checkIfExporterShouldStart(exporter, importers);
@@ -88,7 +88,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 		public void importerUnsatisfied(Object importer, OsgiServiceDependency dependency) {
 
 			if (log.isDebugEnabled())
-				log.debug("Exporter [" + exporter + "] stopped; transitive OSGi dependency ["
+				log.debug("Exporter [" + importerToName.get(importer) + "] stopped; transitive OSGi dependency ["
 						+ dependency.getBeanName() + "] is unsatifised");
 
 			// if the importer goes down, simply shut down the exporter
@@ -120,6 +120,12 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 	/** exporter -> importer listener map */
 	private final Map exporterListener = CollectionFactory.createConcurrentMap(8);
 
+	/** importer -> name map */
+	private final ConcurrentMap importerToName = CollectionFactory.createConcurrentMap(8);
+
+	/** exporter name map */
+	private final Map exporterToName = CollectionFactory.createConcurrentMap(8);
+
 	/** owning bean factory */
 	private ConfigurableListableBeanFactory beanFactory;
 
@@ -141,19 +147,18 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 			}
 
 			else {
-				Object exporterFactory = beanFactory.getBean(beanName);
+				exporterToName.put(exporter, exporterBeanName);
 				// retrieve associated controller
-				ExporterInternalActions controller = ExporterRegistry.getControllerFor(exporterFactory);
+				ExporterInternalActions controller = ExporterRegistry.getControllerFor(exporter);
 
 				// disable publication at startup
 				controller.registerServiceAtStartup(false);
 
 				// populate the dependency maps
-				discoverDependentImporterFor(exporterBeanName, exporterFactory);
+				discoverDependentImporterFor(exporterBeanName, exporter);
 			}
 		}
 	}
-
 
 	/**
 	 * Discover all the importers for the given exporter. Since the importers
@@ -187,6 +192,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 				// create an importer -> exporter association
 				if (importer.isMandatory()) {
 					importers.put(importer, importerNames[i]);
+					importerToName.putIfAbsent(importer, importerNames[i]);
 					addListener(importer, listener);
 				}
 
@@ -223,7 +229,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 			startExporter(exporter);
 
 			if (log.isDebugEnabled())
-				log.trace("Exporter " + exporter + " started; all its dependencies are satisfied");
+				log.trace("Exporter [" + exporterToName.get(exporter) + "] started; all its dependencies are satisfied");
 		}
 		else {
 			List unsatisfiedDependencies = new ArrayList(importers.size());
@@ -235,15 +241,15 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 			}
 
 			if (log.isTraceEnabled()) {
-				log.trace("Exporter " + exporter + " not started; there are still has unsatisfied dependencies "
-						+ unsatisfiedDependencies);
+				log.trace("Exporter [" + exporterToName.get(exporter)
+						+ "] not started; there are still has unsatisfied dependencies " + unsatisfiedDependencies);
 			}
 		}
 	}
-	
 
 	public void removeServiceExporter(Object bean, String beanName) {
 		// remove the exporter and its listeners from the map
+		exporterToName.remove(bean);
 		Map importers = (Map) exporterToImporterDeps.remove(bean);
 		ImporterStateListener stateListener = (ImporterStateListener) exporterListener.remove(bean);
 
@@ -265,6 +271,8 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 		exportersSeen.clear();
 		exporterListener.clear();
 		exporterToImporterDeps.clear();
+		exporterToName.clear();
+		importerToName.clear();
 	}
 
 	private void startExporter(Object exporter) {
@@ -274,7 +282,6 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 	private void stopExporter(Object exporter) {
 		ExporterRegistry.getControllerFor(exporter).unregisterService();
 	}
-	
 
 	private void addListener(Object importer, ImporterStateListener stateListener) {
 		ImporterInternalActions controller = ImporterRegistry.getControllerFor(importer);

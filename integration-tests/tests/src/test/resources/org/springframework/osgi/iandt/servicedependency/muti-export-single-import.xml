@@ -16,7 +16,7 @@
 	<osgi:service id="map-exporter" ref="map" auto-export="interfaces" />
 	<bean id="map" class="java.util.HashMap" depends-on="mandatory,optional"/>
 	
-	<!-- string exporter -->
+	<!-- simple exporter -->
 	<osgi:service id="bean-exporter" ref="simple-bean" auto-export="all-classes" />
 	
 	<bean id="simple-bean" class="org.springframework.osgi.iandt.servicedependency.SimpleBean">

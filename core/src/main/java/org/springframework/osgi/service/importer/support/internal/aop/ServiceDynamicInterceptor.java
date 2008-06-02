@@ -221,9 +221,9 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 							}
 
 							if (debug) {
-								String message = "service reference [" + ref + "] was unregistered";
+								String message = "Service reference [" + ref + "] was unregistered";
 								if (serviceRemoved) {
-									message += " and was unbound from the service proxy";
+									message += " and unbound from the service proxy";
 								}
 								else {
 									message += " but did not affect the service proxy";
@@ -300,7 +300,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			}
 			finally {
 				if (log.isDebugEnabled()) {
-					String message = "service reference [" + ref + "]";
+					String message = "Service reference [" + ref + "]";
 					if (updated)
 						message += " bound to proxy";
 					else
@@ -431,7 +431,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		dependency = new DefaultServiceDependency(sourceName, filter, serviceRequiredAtStartup);
 
 		if (debug)
-			log.debug("Adding osgi mandatoryListeners for services matching [" + filter + "]");
+			log.debug("Adding OSGi mandatoryListeners for services matching [" + filter + "]");
 		OsgiListenerUtils.addSingleServiceListener(bundleContext, listener, filter);
 
 		if (serviceRequiredAtStartup) {
