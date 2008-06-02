@@ -16,11 +16,15 @@
 
 package org.springframework.osgi.service.importer.event;
 
+import org.springframework.osgi.service.importer.OsgiServiceDependency;
+
 /**
  * @author Costin Leau
  * 
  */
 public class OsgiServiceDependencyTimedOutEvent extends OsgiServiceDependencyEvent {
+
+	private static final long serialVersionUID = -4519177698018683647L;
 
 	private final long waitingTime;
 

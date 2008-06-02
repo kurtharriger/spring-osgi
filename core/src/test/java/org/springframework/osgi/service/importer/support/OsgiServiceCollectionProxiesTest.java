@@ -29,8 +29,8 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.ServiceReferenceProxy;
-import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
 
 /**
  * Unit test for the static proxies returned by Osgi collection.

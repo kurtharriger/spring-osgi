@@ -19,8 +19,8 @@ package org.springframework.osgi.extender.internal.dependencies.startup;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
+import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceImportDependencyDefinition;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependency;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**

@@ -19,8 +19,7 @@ package org.springframework.osgi.internal.service.collection;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
-import org.springframework.osgi.service.importer.support.CollectionType;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
 
 /**
  * Mock test for OsgiServiceCollection.

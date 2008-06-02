@@ -21,7 +21,7 @@ import java.util.NoSuchElementException;
 
 import junit.framework.TestCase;
 
-import org.springframework.osgi.service.importer.internal.collection.DynamicList;
+import org.springframework.osgi.service.importer.support.internal.collection.DynamicList;
 
 /**
  * @author Costin Leau

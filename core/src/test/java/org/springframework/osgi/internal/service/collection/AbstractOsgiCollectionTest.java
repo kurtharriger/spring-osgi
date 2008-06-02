@@ -32,8 +32,8 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
 import org.springframework.util.ClassUtils;
 
 /**

@@ -25,7 +25,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependency;
+import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencySatisfiedEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitingEvent;

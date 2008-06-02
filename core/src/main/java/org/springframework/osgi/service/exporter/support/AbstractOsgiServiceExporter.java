@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.exporter.support;
 
 import java.util.Map;
 
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.osgi.service.dependency.DependentServiceExporter;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 
 /**
- * {@link DependentServiceExporter} extension that takes care of listeners
- * registration and notification.
+ * Base exporter class providing common functionality for registering (also
+ * known as exporting) Spring beans as OSGi services.
  * 
  * @author Costin Leau
  */
-public abstract class AbstractOsgiServiceExporter extends AbstractDependentServiceExporter {
+public abstract class AbstractOsgiServiceExporter implements DisposableBean {
 
+	/** listeners */
 	private OsgiServiceRegistrationListener[] listeners = new OsgiServiceRegistrationListener[0];
+
 
 	/**
 	 * Takes care of notifying the listeners on both startup and shutdown (by
@@ -76,4 +79,17 @@ public abstract class AbstractOsgiServiceExporter extends AbstractDependentServi
 			this.listeners = listeners;
 	}
 
+	public void destroy() {
+		unregisterService();
+	}
+
+	/**
+	 * Registers/Exports the OSGi service.
+	 */
+	abstract void registerService();
+
+	/**
+	 * Unregisters/de-exports the OSGi service.
+	 */
+	abstract void unregisterService();
 }

@@ -33,7 +33,7 @@ import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.ServiceReferenceProxy;
-import org.springframework.osgi.service.importer.internal.aop.StaticServiceReferenceProxy;
+import org.springframework.osgi.service.importer.support.internal.aop.StaticServiceReferenceProxy;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 
 /**

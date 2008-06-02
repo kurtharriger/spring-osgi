@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.util.internal;
 
 import java.lang.reflect.InvocationTargetException;
@@ -39,6 +40,10 @@ public abstract class ReflectionUtils {
 	 * 
 	 */
 	public static class InvocationCheckedExceptionWrapper extends RuntimeException {
+
+		private static final long serialVersionUID = 5496580030934775697L;
+
+
 		public InvocationCheckedExceptionWrapper(Exception cause) {
 			super(cause);
 		}
@@ -54,6 +59,7 @@ public abstract class ReflectionUtils {
 		}
 	}
 
+
 	/**
 	 * Invoke the specified {@link Method} against the supplied target object
 	 * with no arguments. The target object can be <code>null</code> when
@@ -67,6 +73,7 @@ public abstract class ReflectionUtils {
 	 * <p>
 	 * Thrown exceptions are handled via a call to
 	 * {@link #handleReflectionException}.
+	 * 
 	 * @param method the method to invoke
 	 * @param target the target object to invoke the method on
 	 * @return the invocation result, if any
@@ -89,6 +96,7 @@ public abstract class ReflectionUtils {
 	 * <p>
 	 * Thrown exceptions are handled via a call to
 	 * {@link #handleReflectionException}.
+	 * 
 	 * @param method the method to invoke
 	 * @param target the target object to invoke the method on
 	 * @param args the invocation arguments (may be <code>null</code>)

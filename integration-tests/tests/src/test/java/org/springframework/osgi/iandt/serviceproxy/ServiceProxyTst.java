@@ -23,7 +23,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceDynamicInterceptor;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiFilterUtils;

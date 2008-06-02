@@ -29,10 +29,10 @@ import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 
 /**
  * @author Costin Leau

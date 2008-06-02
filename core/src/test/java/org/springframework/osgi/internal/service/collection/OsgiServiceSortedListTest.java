@@ -18,8 +18,8 @@ package org.springframework.osgi.internal.service.collection;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceCollection;
-import org.springframework.osgi.service.importer.internal.collection.OsgiServiceSortedList;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
+import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedList;
 
 /**
  * @author Costin Leau

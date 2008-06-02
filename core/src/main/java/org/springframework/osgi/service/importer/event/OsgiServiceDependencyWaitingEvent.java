@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.service.importer.event;
 
+import org.springframework.osgi.service.importer.OsgiServiceDependency;
+
 /**
  * Dedicated event for OSGi dependencies that are imported in a timed manner.
  * The event indicates that a dependency is missing and the application context
@@ -31,6 +33,8 @@ package org.springframework.osgi.service.importer.event;
  * 
  */
 public class OsgiServiceDependencyWaitingEvent extends OsgiServiceDependencyEvent {
+
+	private static final long serialVersionUID = 5862243308294326959L;
 
 	private final long timeToWait;
 

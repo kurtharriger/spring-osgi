@@ -16,11 +16,16 @@
 
 package org.springframework.osgi.service.importer.event;
 
+import org.springframework.osgi.service.importer.OsgiServiceDependency;
+
 /**
  * @author Costin Leau
  * 
  */
+// FIXME: change name - this is a waiting successeded event rather then a generic satisfied event
 public class OsgiServiceDependencySatisfiedEvent extends OsgiServiceDependencyEvent {
+
+	private static final long serialVersionUID = 4798850518871798024L;
 
 	private long waitedTime;
 

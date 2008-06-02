@@ -19,7 +19,7 @@ package org.springframework.osgi.internal.service.interceptor;
 import junit.framework.TestCase;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceInvoker;
 
 /**
  * @author Costin Leau

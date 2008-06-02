@@ -16,20 +16,30 @@
 
 package org.springframework.osgi.service.importer.support;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
-import org.springframework.osgi.service.importer.internal.aop.ProxyPlusCallback;
-import org.springframework.osgi.service.importer.internal.aop.ServiceDynamicInterceptor;
-import org.springframework.osgi.service.importer.internal.aop.ServiceInvoker;
-import org.springframework.osgi.service.importer.internal.aop.ServiceProviderTCCLInterceptor;
-import org.springframework.osgi.service.importer.internal.aop.ServiceProxyCreator;
-import org.springframework.osgi.service.importer.internal.support.RetryTemplate;
+import org.springframework.osgi.service.importer.support.internal.aop.ProxyPlusCallback;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceDynamicInterceptor;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceInvoker;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceProviderTCCLInterceptor;
+import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
+import org.springframework.osgi.service.importer.support.internal.controller.ImporterController;
+import org.springframework.osgi.service.importer.support.internal.controller.ImporterInternalActions;
+import org.springframework.osgi.service.importer.support.internal.controller.ImporterRegistry;
+import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
+import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -49,7 +59,26 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
+public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean implements
+		ApplicationEventPublisherAware, BeanNameAware {
+
+	/**
+	 * Wrapper around internal commands.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	private class Executor implements ImporterInternalActions {
+
+		public void addStateListener(ImporterStateListener stateListener) {
+			stateListeners.add(stateListener);
+		}
+
+		public void removeStateListener(ImporterStateListener stateListener) {
+			stateListeners.remove(stateListener);
+		}
+	};
+
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
@@ -61,6 +90,22 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	/** proxy infrastructure hook exposed to allow clean up */
 	private DisposableBean disposable;
 
+	/** application publisher */
+	private ApplicationEventPublisher applicationEventPublisher;
+
+	/** bean name */
+	private String beanName = "";
+
+	/** internal listeners */
+	private final List stateListeners = Collections.synchronizedList(new ArrayList(4));
+
+	private final ImporterInternalActions controller;
+
+
+	public OsgiServiceProxyFactoryBean() {
+		controller = new ImporterController(new Executor());
+		ImporterRegistry.putController(this, controller);
+	}
 
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(getInterfaces()) ? Object.class
@@ -92,10 +137,11 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 
 		lookupAdvice.setListeners(listeners);
 		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
+		lookupAdvice.setApplicationEventPublisher(applicationEventPublisher);
 
 		// add the listeners as a list since it might be updated after the proxy
 		// has been created
-		lookupAdvice.setDependencyListeners(getDepedencyListeners());
+		lookupAdvice.setStateListeners(stateListeners);
 		lookupAdvice.setServiceImporter(this);
 
 		// create a proxy creator using the existing context
@@ -198,5 +244,23 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		Assert.notNull(cardinality);
 		Assert.isTrue(cardinality.isSingle(), "only singular cardinality ('X..1') accepted");
 		super.setCardinality(cardinality);
+	}
+
+	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+		this.applicationEventPublisher = applicationEventPublisher;
+	}
+
+	/**
+	 * Returns the bean name associated with the instance of this class (when
+	 * running inside the Spring container).
+	 * 
+	 * @return component bean name
+	 */
+	public String getBeanName() {
+		return beanName;
+	}
+
+	public void setBeanName(String name) {
+		beanName = name;
 	}
 }
