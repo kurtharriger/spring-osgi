@@ -16,11 +16,16 @@
 
 package org.springframework.osgi.service.importer.support;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
@@ -45,7 +50,7 @@ import org.springframework.util.ObjectUtils;
  * 
  */
 public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFactoryBean, InitializingBean,
-		DisposableBean, BundleContextAware, BeanClassLoaderAware {
+		DisposableBean, BundleContextAware, BeanClassLoaderAware, BeanNameAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
 
@@ -82,6 +87,9 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 	private boolean mandatory = true;
 
 	private Cardinality cardinality;
+
+	/** bean name */
+	private String beanName = "";
 
 
 	/**
@@ -183,10 +191,11 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 	abstract DisposableBean getDisposable();
 
 	public abstract boolean isSatisfied();
-	
+
 	public boolean isMandatory() {
 		return mandatory;
 	}
+
 	/**
 	 * Sets the classes that the imported service advertises.
 	 * 
@@ -342,5 +351,19 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 		Assert.notNull(cardinality);
 		this.cardinality = cardinality;
 		this.mandatory = cardinality.isMandatory();
+	}
+
+	/**
+	 * Returns the bean name associated with the instance of this class (when
+	 * running inside the Spring container).
+	 * 
+	 * @return component bean name
+	 */
+	public String getBeanName() {
+		return beanName;
+	}
+
+	public void setBeanName(String name) {
+		beanName = name;
 	}
 }

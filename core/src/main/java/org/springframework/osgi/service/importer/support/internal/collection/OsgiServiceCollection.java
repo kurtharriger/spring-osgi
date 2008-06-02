@@ -17,8 +17,10 @@
 package org.springframework.osgi.service.importer.support.internal.collection;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -33,9 +35,12 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
+import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.support.internal.aop.DefaultServiceDependency;
 import org.springframework.osgi.service.importer.support.internal.aop.ProxyPlusCallback;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
+import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.service.importer.support.internal.util.OsgiServiceBindingUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.util.Assert;
@@ -72,6 +77,10 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 				ProxyPlusCallback ppc = null;
 				Object proxy = null;
+
+				// flag used for sending state events 
+				boolean shouldInformStateListeners = false;
+
 				switch (event.getType()) {
 
 					case (ServiceEvent.REGISTERED):
@@ -85,14 +94,20 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 								// is added or not (think set, sorted set)
 								if (serviceProxies.add(proxy)) {
 									collectionModified = true;
+									// check if the list was empty
+									shouldInformStateListeners = (servicesIdMap.isEmpty());
 									servicesIdMap.put(serviceId, ppc);
 								}
 							}
 						}
 						// inform listeners
 						// TODO: should this be part of the lock also?
-						if (collectionModified)
+						if (collectionModified) {
 							OsgiServiceBindingUtils.callListenersBind(context, proxy, ref, listeners);
+
+							if (shouldInformStateListeners)
+								notifySatisfiedStateListeners();
+						}
 
 						break;
 					case (ServiceEvent.UNREGISTERING):
@@ -110,8 +125,13 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 							}
 						}
 						// TODO: should this be part of the lock also?
-						if (collectionModified)
+						if (collectionModified) {
 							OsgiServiceBindingUtils.callListenersUnbind(context, proxy, ref, listeners);
+
+							if (shouldInformStateListeners)
+								notifyUnsatisfiedStateListeners();
+						}
+
 						break;
 
 					default:
@@ -127,6 +147,24 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 			}
 			finally {
 				Thread.currentThread().setContextClassLoader(tccl);
+			}
+		}
+
+		private void notifySatisfiedStateListeners() {
+			synchronized (stateListeners) {
+				for (Iterator iterator = stateListeners.iterator(); iterator.hasNext();) {
+					ImporterStateListener stateListener = (ImporterStateListener) iterator.next();
+					stateListener.importerSatisfied(eventSource, dependency);
+				}
+			}
+		}
+
+		private void notifyUnsatisfiedStateListeners() {
+			synchronized (stateListeners) {
+				for (Iterator iterator = stateListeners.iterator(); iterator.hasNext();) {
+					ImporterStateListener stateListener = (ImporterStateListener) iterator.next();
+					stateListener.importerUnsatisfied(eventSource, dependency);
+				}
 			}
 		}
 	}
@@ -203,6 +241,21 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	private final ServiceListener listener;
 
+	/** state listener */
+	private List stateListeners = Collections.EMPTY_LIST;
+
+	private final Object lock = new Object();
+	
+	/** dependency object */
+	private OsgiServiceDependency dependency;
+
+	/** dependable service importer */
+	private Object eventSource;
+
+	/** event source (importer) name */
+	private String sourceName;
+
+
 
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader,
 			ServiceProxyCreator proxyCreator) {
@@ -223,6 +276,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 		boolean trace = log.isTraceEnabled();
 
+		dependency = new DefaultServiceDependency(sourceName, filter, serviceRequiredAtStartup);
+		
 		if (trace)
 			log.trace("Adding osgi listener for services matching [" + filter + "]");
 		OsgiListenerUtils.addServiceListener(context, listener, filter);
@@ -308,6 +363,14 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		int index = serviceProxies.indexOf(proxy);
 		checkDeadProxies(proxy, index);
 	}
+	
+	public void setServiceImporter(Object importer) {
+		this.eventSource = importer;
+	}
+
+	public void setServiceImporterName(String name) {
+		this.sourceName = name;
+	}
 
 	public Iterator iterator() {
 		return new OsgiServiceIterator();
@@ -387,5 +450,11 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	public void setRequiredAtStartup(boolean serviceRequiredAtStartup) {
 		this.serviceRequiredAtStartup = serviceRequiredAtStartup;
+	}
+
+	public void setStateListeners(List stateListeners) {
+		synchronized (lock) {
+			this.stateListeners = stateListeners;
+		}
 	}
 }

@@ -16,6 +16,7 @@
 
 package org.springframework.osgi.service.importer.support;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,6 +36,10 @@ import org.springframework.osgi.service.importer.support.internal.collection.Osg
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSet;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedList;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedSet;
+import org.springframework.osgi.service.importer.support.internal.controller.ImporterController;
+import org.springframework.osgi.service.importer.support.internal.controller.ImporterInternalActions;
+import org.springframework.osgi.service.importer.support.internal.controller.ImporterRegistry;
+import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.util.Assert;
 
 /**
@@ -98,6 +103,24 @@ import org.springframework.util.Assert;
  */
 public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
 
+	/**
+	 * Wrapper around internal commands.
+	 * 
+	 * @author Costin Leau
+	 * 
+	 */
+	private class Executor implements ImporterInternalActions {
+
+		public void addStateListener(ImporterStateListener stateListener) {
+			stateListeners.add(stateListener);
+		}
+
+		public void removeStateListener(ImporterStateListener stateListener) {
+			stateListeners.remove(stateListener);
+		}
+	};
+
+
 	private static final Log log = LogFactory.getLog(OsgiServiceCollectionProxyFactoryBean.class);
 
 	/**
@@ -121,6 +144,16 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	/** greedy-proxying */
 	private boolean greedyProxying = false;
 
+	/** internal listeners */
+	private final List stateListeners = Collections.synchronizedList(new ArrayList(4));
+
+	private final ImporterInternalActions controller;
+
+
+	public OsgiServiceCollectionProxyFactoryBean() {
+		controller = new ImporterController(new Executor());
+		ImporterRegistry.putController(this, controller);
+	}
 
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
@@ -185,6 +218,9 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 
 		collection.setRequiredAtStartup(isMandatory());
 		collection.setListeners(getListeners());
+		collection.setStateListeners(stateListeners);
+		collection.setServiceImporter(this);
+		collection.setServiceImporterName(getBeanName());
 		collection.afterPropertiesSet();
 
 		proxy = delegate;
