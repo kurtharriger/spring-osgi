@@ -252,7 +252,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			for (int i = 0; i < bundles.length; i++) {
 				bundles[i] = installBundle(bundleResources[i]);
 			}
-
+			
 			// start bundles
 			for (int i = 0; i < bundles.length; i++) {
 				startBundle(bundles[i]);

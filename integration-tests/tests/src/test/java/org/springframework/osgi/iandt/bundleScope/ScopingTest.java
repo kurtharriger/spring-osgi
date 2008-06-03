@@ -36,7 +36,7 @@ import org.springframework.util.ObjectUtils;
 public class ScopingTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT",
+		return new String[] { "net.sourceforge.cglib, com.springsource.net.sf.cglib, 2.1.3",
 			"org.springframework.osgi.iandt, scoped.bundle.common," + getSpringDMVersion(),
 			"org.springframework.osgi.iandt, scoped.bundle.a," + getSpringDMVersion(),
 			"org.springframework.osgi.iandt, scoped.bundle.b," + getSpringDMVersion() };

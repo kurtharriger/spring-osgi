@@ -71,7 +71,7 @@
 
     <cobertura.file>${basedir}/target/cobertura/cobertura.ser</cobertura.file>
    <!-- other properties -->
-   <slf4j.version>1.4.3</slf4j.version>
+   <slf4j.version>1.5.0</slf4j.version>
    
    <!-- platform versions -->
    <equinox.ver>3.2.2</equinox.ver>
@@ -123,9 +123,7 @@
     <developerConnection>
       scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-osgi/trunk
     </developerConnection>
-    <url>
-      http://fisheye3.cenqua.com/browse/springframework/spring-osgi
-    </url>
+    <url>https://fisheye.springframework.org/browse/spring-osgi</url>
   </scm>
 
   <inceptionYear>2006</inceptionYear>
@@ -230,9 +228,9 @@ limitations under the License.
   <dependencies>
     <!-- junit -->
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>junit.osgi</artifactId>
-      <version>3.8.2-SNAPSHOT</version>
+      <groupId>org.junit</groupId>
+      <artifactId>com.springsource.junit</artifactId>
+      <version>3.8.2</version>
       <scope>test</scope>
     </dependency>
 	<dependency>
@@ -245,19 +243,19 @@ limitations under the License.
     <!-- commons-logging in slf4j wrapper -->
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>jcl104-over-slf4j</artifactId>
+      <artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
       <version>${slf4j.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <artifactId>com.springsource.slf4j.api</artifactId>
       <version>${slf4j.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
+      <artifactId>com.springsource.slf4j.log4j</artifactId>
       <version>${slf4j.version}</version>
       <scope>provided</scope>
 	  <exclusions>

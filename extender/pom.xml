@@ -46,13 +46,14 @@
 			<artifactId>spring-osgi-core</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
+	   <dependency>
+		  <groupId>edu.emory.mathcs.backport</groupId>
+		  <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
+		  <version>3.1.0</version>
+		  <scope>test</scope>
+	   </dependency> 
 		
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>backport-util-concurrent.osgi</artifactId>
-			<version>3.1-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency> 
 	</dependencies>
 
 </project>

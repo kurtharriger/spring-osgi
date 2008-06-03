@@ -36,7 +36,7 @@ import org.springframework.util.ClassUtils;
 public abstract class ServiceProxyTst extends AbstractConfigurableBundleCreatorTests {
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT" };
+		return new String[] { "net.sourceforge.cglib, com.springsource.net.sf.cglib, 2.1.3" };
 	}
 
 	protected String getManifestLocation() {

@@ -29,7 +29,7 @@ import org.springframework.util.ClassUtils;
 abstract class ServiceCollectionTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { "org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT" };
+		return new String[] { "net.sourceforge.cglib, com.springsource.net.sf.cglib, 2.1.3" };
 	}
 	protected ServiceRegistration publishService(Object obj) throws Exception {
 		return bundleContext.registerService(obj.getClass().getName(), obj, null);

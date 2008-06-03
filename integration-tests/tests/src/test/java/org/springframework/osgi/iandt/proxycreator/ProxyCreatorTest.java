@@ -35,7 +35,7 @@ public class ProxyCreatorTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi.iandt,proxy.creator," + getSpringDMVersion(),
-			"org.springframework.osgi,cglib-nodep.osgi,2.1.3-SNAPSHOT" };
+			"net.sourceforge.cglib, com.springsource.net.sf.cglib, 2.1.3" };
 	}
 
 	public void testNewProxiesCreatedOnBundleRefresh() throws Exception {
