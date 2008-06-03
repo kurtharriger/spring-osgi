@@ -12,7 +12,7 @@
     	<procedure>
     		<step>
     			<title>Create and configure Spring DM project using <emphasis>org.springframework.osgi</emphasis> Maven archetype</title>
-    			<para>We are going to create external configuration which will allow us to use Maven inside of the Eclipse. We could obviously do it jjst as easy from the command line, but integrating and saving it within the Eclipse will allow for future reuse of this command for other similar projects</para>
+    			<para>We are going to create external configuration which will allow us to use Maven inside of the Eclipse. We could obviously do it just as easy from the command line (see the end of this step), but integrating and saving it within the Eclipse will allow for future reuse of this command for other similar projects</para>
     			<para>On the menu bar select <command>External Tools -> Open External Tools Dialog</command></para>
 				<para>
 			    	 <mediaobject>
@@ -31,7 +31,7 @@
 	            <para>Right click on<command> Program -> New</command> </para>
 	            <para>In the <emphasis>Name</emphasis> enter <emphasis>Spring DM Doc Build</emphasis> </para>
 	            <para>In the <emphasis>Location</emphasis> enter the path to your <literal>mvn</literal> file (located in the <literal>bin</literal> directory of your Maven installation) </para>
-	            <para>For <emphasis>Working Directory</emphasis> select the root of yor workspace. The easy way to do that is Click on <command>Variables</command> and select <emphasis>workspace_loc</emphasis> </para>
+	            <para>For <emphasis>Working Directory</emphasis> select the root of your workspace. The easy way to do that is Click on <emphasis>Variables</emphasis> and select <literal>workspace_loc</literal> </para>
 	            <para>For the <emphasis>Arguments</emphasis> copy and paste the following</para>
 	            <para> <programlisting language="xml"><![CDATA[
 archetype:create     
@@ -42,7 +42,7 @@ archetype:create
 -DartifactId=SpringDMBundle
 -Dversion=0.1
                 ]]></programlisting></para>
-                <para><note>You can obviously change the <blockquote> groupId, artifactId</blockquote> and call it anything you want </note>  </para>
+                <para><note>You can obviously change the values of <blockquote> groupId, artifactId</blockquote> to anything you like </note>  </para>
 				<para>Your external configuration should look similar to this:</para>
 	            <para>
 			    	 <mediaobject>
@@ -61,9 +61,23 @@ archetype:create
 	            <para>Click <command>Apply -> Run</command> </para>
 	            <para>Check your console and make sure Maven says: BUILD SUCCESSFULL</para>
 	   			<para>We've finished creating our first Spring DM Project</para>
+	   			<note>
+	   				<para>If you prefer to use command shell then here is your command.</para>
+	   		<para> <programlisting language="xml"><![CDATA[
+mvn archetype:create     
+-DarchetypeGroupId=org.springframework.osgi  
+-DarchetypeArtifactId=spring-osgi-bundle-archetype   
+-DarchetypeVersion=1.0   
+-DgroupId=org.springframework.osgi.tutorial
+-DartifactId=SpringDMBundle
+-Dversion=0.1
+                ]]></programlisting></para>
+	   			</note>
     		</step> 
+    	<!-- 
     		<step>
     			<title>Convert project to Eclipse Project</title>
+    			<important>This is Eclipse specific step and doesn't have to be completed if using another IDE. Refer to Maven documentation to see if support for your IDE is provided.</important>
     			<para>In this step we are going to make this project Eclipse ready and import it into Eclipse</para>
     			<para>First let's make it Eclipse ready by executing a nifty Maven command. Open command window and navigate to the location of our newly created project (should be in our workspace, see example below) and make sure you are inside of project directory</para>
     		    <para> <programlisting language="xml"><![CDATA[
@@ -77,7 +91,8 @@ oleg:SpringDMBundle olegzhurakousky$
                 
                 <para>type: <command>mvn eclipse:eclipse</command> </para>
                 <para>This will add all the required artifacts (e.g., <literal>.project, .classpath</literal>) for Eclipse to recognize it as valid Eclipse project</para>
-                <para>One Maven executed successfully follow Eclipse procedure of <emphasis>Import Existing Project</emphasis> into the workspece. (see below)</para>
+                <para>Once Maven executed successfully follow Eclipse procedure to <emphasis>Import Existing Project</emphasis> into the workspece.</para>
+                <para>Once imported your project should look similar to this:</para>
     		
     			 <para>
 			    	 <mediaobject>
@@ -94,6 +109,7 @@ oleg:SpringDMBundle olegzhurakousky$
 			          </mediaobject>        
 	            </para>
     		</step>
+    -->
  	<!-- 	
     		<step>
     			<title>Add Eclipse Plug-in Nature to the project</title>
@@ -190,10 +206,11 @@ log4j:WARN Please initialize the log4j system properly.
     			<para>We are going to use Eclipse External tools (similar to the way we did when we created <link linkend="ch02.html#d0e388">new project</link>) to configure Maven build configuration.</para>
     			<para>Open <command>External Tools Dialog</command>, right-click on <command>Program -> New</command> </para>      
     		    <para>In the <emphasis>Name</emphasis> enter <emphasis>SprinDmBundleInstall</emphasis> </para>
-    		    <para>In the <emphasis>Location</emphasis> point to the path of your <literal>mvn</literal> batch file located in bin directory of your Maven installation </para>
-    		    <para>In the <emphasis>Working Directory</emphasis> point to root of our project (remember: click on Variables and select workspace_loc)</para> 
+    		    <para>In the <emphasis>Location</emphasis> point to the path of your <literal>mvn</literal> batch file located in <literal>bin</literal> directory of your Maven installation </para>
+    		    <para>In the <emphasis>Working Directory</emphasis> point to root of our project (remember: click on <emphasis>Variables</emphasis> and select <literal>workspace_loc</literal>)</para> 
     		    <para>In the <emphasis>Arguments</emphasis> enter <literal>install</literal> </para>
     		    
+    		    <note>You can also open command shell, navigate to the project's root directory and execute <literal>mvn install</literal> </note>
     		    <para>
 			    	 <mediaobject>
 			            <imageobject role="fo">
@@ -209,7 +226,7 @@ log4j:WARN Please initialize the log4j system properly.
 			          </mediaobject>        
 	            </para>
     		    <para>Click on <command>Apply -> Run</command> </para> and make sure Maven completes successfully
-    			<para>Now we are ready to implement our project</para>
+    			<para>Now we are ready to implement our project. . .</para>
     		</step>
     	</procedure>
     </section>
