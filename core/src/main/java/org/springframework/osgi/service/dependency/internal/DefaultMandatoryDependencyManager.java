@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.service.dep.internal;
+package org.springframework.osgi.service.dependency.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;

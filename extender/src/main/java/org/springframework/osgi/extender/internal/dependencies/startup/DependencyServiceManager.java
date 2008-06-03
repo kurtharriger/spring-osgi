@@ -22,7 +22,6 @@ import org.springframework.osgi.service.importer.OsgiServiceImportDependencyDefi
 import org.springframework.osgi.service.importer.OsgiServiceImportDependencyFactory;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencySatisfiedEvent;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependencyTimedOutEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitingEvent;
 import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
 import org.springframework.osgi.util.OsgiListenerUtils;

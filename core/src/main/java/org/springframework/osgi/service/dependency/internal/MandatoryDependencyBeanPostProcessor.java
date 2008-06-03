@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.service.dep.internal;
+package org.springframework.osgi.service.dependency.internal;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;

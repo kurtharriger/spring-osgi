@@ -29,9 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
@@ -43,6 +41,7 @@ import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
 import org.springframework.osgi.extender.support.DefaultOsgiApplicationContextCreator;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Configuration class for the extender. Takes care of locating the extender
@@ -69,6 +68,17 @@ public class ExtenderConfiguration implements DisposableBean {
 	private static final String SHUTDOWN_WAIT_KEY = "shutdown.wait.time";
 
 	private static final String PROCESS_ANNOTATIONS_KEY = "process.annotations";
+
+	private static final String EXTENDER_CFG_LOCATION = "META-INF/spring/extender";
+
+	/**
+	 * old configuration location
+	 * 
+	 * @deprecated
+	 */
+	private static final String OLD_EXTENDER_CFG_LOCATION = "META-INF/spring";
+
+	private static final String XML_PATTERN = "*.xml";
 
 	//
 	// defaults
@@ -111,8 +121,11 @@ public class ExtenderConfiguration implements DisposableBean {
 		Bundle bundle = bundleContext.getBundle();
 		Properties properties = new Properties(createDefaultProperties());
 
-		Enumeration enm = bundle.findEntries("META-INF/spring", "*.xml", false);
-		if (enm == null) {
+		Enumeration enm = bundle.findEntries(EXTENDER_CFG_LOCATION, XML_PATTERN, false);
+
+		Enumeration oldConfiguration = bundle.findEntries(OLD_EXTENDER_CFG_LOCATION, XML_PATTERN, false);
+
+		if (enm == null && oldConfiguration == null) {
 			log.info("No custom configuration detected; using defaults");
 
 			taskExecutor = createDefaultTaskExecutor();
@@ -123,7 +136,18 @@ public class ExtenderConfiguration implements DisposableBean {
 			classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 		}
 		else {
-			String[] configs = copyEnumerationToList(enm);
+			String[] newConfigs = copyEnumerationToList(enm);
+			String[] oldConfigs = copyEnumerationToList(oldConfiguration);
+
+			if (!ObjectUtils.isEmpty(oldConfigs)) {
+				log.warn("Extender configuration location [" + OLD_EXTENDER_CFG_LOCATION
+						+ "] has been deprecated and will be removed after RC1; use [" + EXTENDER_CFG_LOCATION
+						+ "] instead");
+			}
+
+			// merge old configs first so the new file can override bean definitions (if needed)
+			String[] configs = StringUtils.mergeStringArrays(oldConfigs, newConfigs);
+
 			log.info("Detected custom configurations " + ObjectUtils.nullSafeToString(configs));
 			// create OSGi specific XML context
 			extenderConfiguration = new OsgiBundleXmlApplicationContext(configs);
@@ -202,7 +226,7 @@ public class ExtenderConfiguration implements DisposableBean {
 	 */
 	private String[] copyEnumerationToList(Enumeration enm) {
 		List urls = new ArrayList(4);
-		while (enm.hasMoreElements()) {
+		while (enm != null && enm.hasMoreElements()) {
 			URL configURL = (URL) enm.nextElement();
 			String configURLAsString = configURL.toExternalForm();
 			try {

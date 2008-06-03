@@ -39,6 +39,7 @@ import org.springframework.osgi.web.deployer.tomcat.TomcatWarDeployer;
 import org.springframework.osgi.web.extender.internal.scanner.DefaultWarScanner;
 import org.springframework.osgi.web.extender.internal.scanner.WarScanner;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Configuration class for the web extender. Takes care of locating the custom
@@ -61,6 +62,17 @@ public class WarListenerConfiguration implements DisposableBean {
 	private static final String PROPERTIES_NAME = "extenderProperties";
 
 	private static final String UNDEPLOY_WARS_AT_SHUTDOWN = "undeploy.wars.at.shutdown";
+
+	private static final String EXTENDER_CFG_LOCATION = "META-INF/spring/extender";
+
+	/**
+	 * old configuration location
+	 * 
+	 * @deprecated
+	 */
+	private static final String OLD_EXTENDER_CFG_LOCATION = "META-INF/spring";
+
+	private static final String XML_PATTERN = "*.xml";
 
 	private ConfigurableOsgiBundleApplicationContext extenderConfiguration;
 
@@ -89,8 +101,11 @@ public class WarListenerConfiguration implements DisposableBean {
 		Bundle bundle = bundleContext.getBundle();
 		Properties properties = new Properties(createDefaultProperties());
 
-		Enumeration enm = bundle.findEntries("META-INF/spring", "*.xml", false);
-		if (enm == null) {
+		Enumeration enm = bundle.findEntries(EXTENDER_CFG_LOCATION, XML_PATTERN, false);
+
+		Enumeration oldConfiguration = bundle.findEntries(OLD_EXTENDER_CFG_LOCATION, XML_PATTERN, false);
+		
+		if (enm == null && oldConfiguration == null) {
 			log.info("No custom configuration detected; using defaults");
 
 			warScanner = createDefaultWarScanner();
@@ -98,7 +113,19 @@ public class WarListenerConfiguration implements DisposableBean {
 			contextPathStrategy = createDefaultContextPathStrategy();
 		}
 		else {
-			String[] configs = copyEnumerationToList(enm);
+			String[] newConfigs = copyEnumerationToList(enm);
+			String[] oldConfigs = copyEnumerationToList(oldConfiguration);
+
+			if (!ObjectUtils.isEmpty(oldConfigs)) {
+				log.warn("Extender configuration location [" + OLD_EXTENDER_CFG_LOCATION
+						+ "] has been deprecated and will be removed after RC1; use [" + EXTENDER_CFG_LOCATION
+						+ "] instead");
+			}
+
+			// merge old configs first so the new file can override bean definitions (if needed)
+			String[] configs = StringUtils.mergeStringArrays(oldConfigs, newConfigs);
+
+			
 			log.info("Detected custom configurations " + ObjectUtils.nullSafeToString(configs));
 			// create OSGi specific XML context
 			ConfigurableOsgiBundleApplicationContext context = new OsgiBundleXmlApplicationContext(configs);

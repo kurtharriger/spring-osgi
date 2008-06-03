@@ -232,7 +232,7 @@ context ::= path ( ';' path ) * (';' directive) *
     	<para>Aside from bundle-specific configurations, Spring-DM allows the core extender generic behaviour be configured. This is useful when
     	embedding Spring-DM inside a managed environment or when a bundles-wide functionality is desired. To allow for extensible configuration,
     	the extender relies on OSGi <link linkend="appendix-tips:fragments">fragments</link> to override its defaults. The extender looks for all XML files 
-    	under <literal>META-INF/spring</literal> folder in its bundle space and assembled them into an application context 
+    	under <literal>META-INF/spring/extender</literal> folder in its bundle space and assembled them into an application context 
     	(of type <classname>OsgiBundleXmlApplicationContext</classname>) 
     	that is used internally as its configuration. To override a default setting of the extender, look up the appropriate bean
     	name from the table below, define it in a suitable manner and then attach it as a <link linkend="appendix-tips:fragments">fragment</link> to the 

@@ -10,6 +10,7 @@ General
 * migrated some of the project dependencies to SpringSource Bundle Repository
 * removed internal package org.springframework.osgi.service.dependency (and associated dependencies) from the public 
   API
+* extenders configuration file changed from META-INF/spring to META-INF/spring/extender to avoid confusion
 
 Package org.springframework.osgi.config
 * fixed localization problem in xml enumeration conversion 
@@ -35,6 +36,7 @@ Package org.springframework.osgi.extender
 * improved bundle shutdown by using a simple thread executor (rather then one thread per bundle model) to increase
   scalability
 * added BootstrappingDependencyEvent for notifying the pre-refresh dependency activities
+* changed extender configuration to META-INF/spring/extender to avoid confusion
 
 Package org.springframework.osgi.io
 * improved OsgiBundleResource#getFile() method when dealing with resources in expanded bundles
@@ -66,7 +68,8 @@ Package org.springframework.osgi.web
 * introduced configuration property to web extender that allows deployed wars to be undeployed during shutdown
 * improved war undeployment by adding a timeout and better shutdown synchronization
 * improved handling of bundle locations given as URLs in DefaultContextPathStrategy
-+ improved DefaultContextPathStrategy structure to allow better subclassing
+* improved DefaultContextPathStrategy structure to allow better subclassing
+* changed extender configuration to META-INF/spring/extender to avoid confusion
 
 
 Changes in version 1.1.0 M2 (2008-04-29)
