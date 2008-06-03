@@ -76,7 +76,7 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		// Spring DM web extender
 		col.add("org.springframework.osgi, spring-osgi-web," + getSpringDMVersion());
 		col.add("org.springframework.osgi, spring-osgi-web-extender," + getSpringDMVersion());
-		col.add("org.springframework.osgi, cglib-nodep.osgi, 2.1.3-SNAPSHOT");
+		col.add("net.sourceforge.cglib, com.springsource.net.sf.cglib, 2.1.3");
 
 		return (String[]) col.toArray(new String[col.size()]);
 	}

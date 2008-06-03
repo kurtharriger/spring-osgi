@@ -132,9 +132,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>aopalliance.osgi</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <groupId>org.aopalliance</groupId>
+      <artifactId>com.springsource.org.aopalliance</artifactId>
+      <version>1.0.0</version>
       <scope>provided</scope>
     </dependency>
 
@@ -146,9 +146,9 @@
     </dependency>
     
    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>backport-util-concurrent.osgi</artifactId>
-      <version>3.1-SNAPSHOT</version>
+      <groupId>edu.emory.mathcs.backport</groupId>
+      <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
+      <version>3.1.0</version>
       <scope>provided</scope>
    </dependency> 
 

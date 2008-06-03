@@ -26,6 +26,7 @@ import org.springframework.osgi.test.internal.util.PropertiesUtil;
 import org.springframework.osgi.test.provisioning.ArtifactLocator;
 import org.springframework.osgi.test.provisioning.internal.LocalFileSystemMavenRepository;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -190,6 +191,9 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 			logger.trace("JDK " + JdkVersion.getJavaVersion() + " excluded bundles " + excluded);
 
 		String[] bundles = (String[]) props.keySet().toArray(new String[props.size()]);
+		// sort the array (as the Properties file doesn't respect the order)
+		bundles = StringUtils.sortStringArray(bundles);
+		
 		if (logger.isDebugEnabled())
 			logger.debug("Default framework bundles :" + ObjectUtils.nullSafeToString(bundles));
 

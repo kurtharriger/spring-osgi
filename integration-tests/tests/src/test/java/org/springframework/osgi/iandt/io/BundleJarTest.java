@@ -17,7 +17,6 @@
 package org.springframework.osgi.iandt.io;
 
 import org.springframework.core.io.Resource;
-import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * Bundle jar tests.
