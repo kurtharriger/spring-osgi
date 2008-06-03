@@ -104,7 +104,7 @@ public class WarListenerConfiguration implements DisposableBean {
 		Enumeration enm = bundle.findEntries(EXTENDER_CFG_LOCATION, XML_PATTERN, false);
 
 		Enumeration oldConfiguration = bundle.findEntries(OLD_EXTENDER_CFG_LOCATION, XML_PATTERN, false);
-		
+
 		if (enm == null && oldConfiguration == null) {
 			log.info("No custom configuration detected; using defaults");
 
@@ -125,7 +125,6 @@ public class WarListenerConfiguration implements DisposableBean {
 			// merge old configs first so the new file can override bean definitions (if needed)
 			String[] configs = StringUtils.mergeStringArrays(oldConfigs, newConfigs);
 
-			
 			log.info("Detected custom configurations " + ObjectUtils.nullSafeToString(configs));
 			// create OSGi specific XML context
 			ConfigurableOsgiBundleApplicationContext context = new OsgiBundleXmlApplicationContext(configs);
@@ -167,7 +166,7 @@ public class WarListenerConfiguration implements DisposableBean {
 	 */
 	private String[] copyEnumerationToList(Enumeration enm) {
 		List urls = new ArrayList(4);
-		while (enm.hasMoreElements()) {
+		while (enm != null && enm.hasMoreElements()) {
 			URL configURL = (URL) enm.nextElement();
 			String configURLAsString = configURL.toExternalForm();
 			try {
