@@ -4,10 +4,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <!-- regular spring configuration file defining the beans for this
-       bundle. We've kept the osgi definitions in a separate 
+       bundle. The configuration of OSGi definitions is kept in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-
-  <bean name="myBean" class="${package}.impl.BeanImpl" />
-
 </beans>
