@@ -170,7 +170,7 @@
     	<title>Configuring the web extender</title>
     	
     	<para>Just like the <link linkend="app-deploy:extender-configuration">core extender</link>, the web extender can be configured by using OSGi <link linkend="appendix-tips:fragments">fragments</link>.
-    	Following a similar pattern, the web extender looks for all XMLs under <literal>META-INF/spring</literal> folder in <emphasis>its</emphasis> bundle space and assembles them into
+    	Following a similar pattern, the web extender looks for all XMLs under <literal>META-INF/spring/extender</literal> folder in <emphasis>its</emphasis> bundle space and assembles them into
     	an application context that is used internally as its configuration. To override a default setting of the web extender, look up the appropriate bean
     	name from the table below, define it in a suitable manner and then attach it as a <link linkend="appendix-tips:fragments">fragment</link> to the <literal>spring-osgi-web.jar</literal>,
     	using:</para>
@@ -226,7 +226,7 @@
     	<section id="web:configuration:changing-deployer">
     		<title>Changing the war deployer</title>
     	
-    		<para>To change the Tomcat deployer to Jetty for example, one can create a configuration file <literal>META-INF/spring/jetty-deployer.xml</literal> with
+    		<para>To change the Tomcat deployer to Jetty for example, one can create a configuration file <literal>META-INF/spring/extender/jetty-deployer.xml</literal> with
     		the following content:</para>
     		
     		<programlistingco>

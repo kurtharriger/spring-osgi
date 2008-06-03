@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.service.dep.internal;
+package org.springframework.osgi.service.dependency.internal;
 
 /**
  * Manager dealing with the dependencies of mandatory OSGi importers. It's up to
