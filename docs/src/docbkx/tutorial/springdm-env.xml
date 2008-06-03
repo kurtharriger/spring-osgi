@@ -24,9 +24,35 @@
     
     <section id="tutorial:maven">
 	    <title>Setup Maven Environment</title>    
+	    <para>
+	    In this section we are going to configure Maven to assist us with bundle packaging as well as class path. There are few Maven Eclipse plug-ins available which you can use at your will, 
+	    however in order to keep this tutorial as much independent from any particular IDE as we can (even though it is based on Eclipse), we are not going to use any of the Maven Eclipse plug-ins. Instead we will use 
+	    <emphasis>External Tools Configuration</emphasis> feature provided by Eclipse to simply point to your Maven installation (as if it was any other batch program). This way if someone prefers to execute Maven commands 
+	    from the command shell, such switch would not be difficult to make.    
+	   </para>
+	    <para>
+	    However we will be using Maven Bundle (BND) plug-in developed by Apache Felix project to help us with packaging of our bundles.
+	    Fpr more information as well as details of this plug-in refer to Apache Felix documentation (<ulink url="http://felix.apache.org/site/maven-bundle-plugin-bnd.html">http://felix.apache.org/site/maven-bundle-plugin-bnd.html</ulink>)
+	    </para>
+	    <para>
+	    <important>
+	    It is also important to understand that by doing so we are not going to use and type of Maven integration with Ecipse's Java Development Toolkit (JDT). 
+	    This means that we will use Maven to simply define dependencies so they can be downloaded automatically to your local M2 repository and then identify these dependencies 
+	    separately in your project's class path (JDT managed class path) so you can use all the features (code helper, javadoc etc.) of JDT. We will also use Maven to package our bundles (create JARs).
+	    It might look like double work, but this will allow us to spend more time concentrating on details of developing Spring-DM applications rather then deal with specifics of
+	    various Eclipse plug-ins that might not always work as expected or might not be available on other platforms.  
+	    While utilizing limited set of features of a particular IDE (Eclipse in this case) just to get by in this tutorial, we want to make sure that if you feel more comfortable using another IDE, 
+	    there is a clear separation of concerns between IDE and Spring-DM related tasks. 
+	    
+	    
+	    
+	    The main goal is to make sure that all Maven functions would work the same way from the command shell as they do within <emphasis>External Tools Configuration</emphasis> feature of the Eclipse.
+	    </important>
+	    
+	    </para>
 	    <procedure>
 	    <step>  	
-	    	<title>In this section we are going to setup <literal>M2_REPO</literal> environment for our future class path</title>
+	    	<title>Setup <literal>M2_REPO</literal> environment variable for our future class path</title>
 	    	<para>If you don't have Maven installed please refer to Maven documentation on how to install and configure Maven</para>
 	    	<para>Go to <command>Preferences -> Java -> Build Path -> Classpath Variables </command></para>
 	    	<para>Click on <command>New</command> </para>
