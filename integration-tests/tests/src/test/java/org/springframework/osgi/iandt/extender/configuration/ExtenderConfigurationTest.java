@@ -46,7 +46,7 @@ public class ExtenderConfigurationTest extends BaseIntegrationTest {
 		assertNotNull(context);
 	}
 
-	public void testPackageAdminReferenceBean() throws Exception {
+	public void tstPackageAdminReferenceBean() throws Exception {
 		logger.info("Calling package admin bean");
 		assertNotNull(context.getBean("packageAdmin"));
 	}
