@@ -126,7 +126,7 @@ public class ExtenderConfiguration implements DisposableBean {
 		Enumeration oldConfiguration = bundle.findEntries(OLD_EXTENDER_CFG_LOCATION, XML_PATTERN, false);
 
 		if (enm == null && oldConfiguration == null) {
-			log.info("No custom configuration detected; using defaults");
+			log.info("No custom extender configuration detected; using defaults...");
 
 			taskExecutor = createDefaultTaskExecutor();
 			eventMulticaster = createDefaultEventMulticaster();
@@ -148,7 +148,7 @@ public class ExtenderConfiguration implements DisposableBean {
 			// merge old configs first so the new file can override bean definitions (if needed)
 			String[] configs = StringUtils.mergeStringArrays(oldConfigs, newConfigs);
 
-			log.info("Detected custom configurations " + ObjectUtils.nullSafeToString(configs));
+			log.info("Detected extender custom configurations at " + ObjectUtils.nullSafeToString(configs));
 			// create OSGi specific XML context
 			extenderConfiguration = new OsgiBundleXmlApplicationContext(configs);
 			extenderConfiguration.setBundleContext(bundleContext);

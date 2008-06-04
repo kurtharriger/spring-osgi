@@ -448,8 +448,8 @@ public class ContextLoaderListener implements BundleActivator {
 
 		if (debug)
 			log.debug("Spring-DM v.[" + extenderVersion + "] is wired to Spring core bundle "
-					+ OsgiStringUtils.nullSafeSymbolicName(wiredSpringBundle) + "v."
-					+ OsgiBundleUtils.getBundleVersion(wiredSpringBundle));
+					+ OsgiStringUtils.nullSafeSymbolicName(wiredSpringBundle) + " version ["
+					+ OsgiBundleUtils.getBundleVersion(wiredSpringBundle) + "]");
 	}
 
 	/**
