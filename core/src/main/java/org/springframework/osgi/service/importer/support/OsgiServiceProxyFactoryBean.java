@@ -24,7 +24,6 @@ import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
@@ -76,6 +75,14 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		public void removeStateListener(ImporterStateListener stateListener) {
 			stateListeners.remove(stateListener);
 		}
+
+		public boolean isSatisfied() {
+			if (!mandatory)
+				return true;
+			else
+				return (proxy == null ? true : proxy.getServiceReference().getBundle() != null);
+
+		}
 	};
 
 
@@ -87,7 +94,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	private ImportedOsgiServiceProxy proxy;
 
 	/** proxy infrastructure hook exposed to allow clean up */
-	private DisposableBean disposable;
+	private Runnable destructionCallback;
 
 	/** application publisher */
 	private ApplicationEventPublisher applicationEventPublisher;
@@ -96,6 +103,8 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 	private final List stateListeners = Collections.synchronizedList(new ArrayList(4));
 
 	private final ImporterInternalActions controller;
+	/** covenience field * */
+	private boolean mandatory;
 
 
 	public OsgiServiceProxyFactoryBean() {
@@ -103,19 +112,20 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		ImporterRegistry.putController(this, controller);
 	}
 
+	public void afterPropertiesSet() {
+		super.afterPropertiesSet();
+
+		// add default cardinality
+		if (getCardinality() == null)
+			setCardinality(Cardinality.C_1__1);
+	}
+
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(getInterfaces()) ? Object.class
 				: getInterfaces()[0]));
 	}
 
-	public boolean isSatisfied() {
-		if (!isMandatory())
-			return true;
-		else
-			return (proxy == null ? true : proxy.getServiceReference().getBundle() != null);
-	}
-
-	Object createProxy() {
+	protected Object createProxy() {
 		if (log.isDebugEnabled())
 			log.debug("creating a single service proxy ...");
 
@@ -127,7 +137,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		final ServiceDynamicInterceptor lookupAdvice = new ServiceDynamicInterceptor(getBundleContext(),
 			getUnifiedFilter(), getAopClassLoader());
 
-		lookupAdvice.setRequiredAtStartup(isMandatory());
+		lookupAdvice.setRequiredAtStartup(getCardinality().isMandatory());
 
 		OsgiServiceLifecycleListener[] listeners = addListener(getListeners(), tcclListener);
 
@@ -156,13 +166,17 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		ProxyPlusCallback proxyPlusCallback = creator.createServiceProxy(lookupAdvice.getServiceReference());
 
 		proxy = proxyPlusCallback.proxy;
-		disposable = proxyPlusCallback.destructionCallback;
+		destructionCallback = new DisposableBeanRunnableAdapter(proxyPlusCallback.destructionCallback);
 
 		lookupAdvice.setProxy(proxy);
 		// start the lookup only after the proxy has been assembled
 		lookupAdvice.afterPropertiesSet();
 
 		return proxy;
+	}
+
+	protected Runnable getProxyDestructionCallback() {
+		return destructionCallback;
 	}
 
 	/**
@@ -181,10 +195,6 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		if (listeners != null)
 			System.arraycopy(listeners, 0, list, 1, listeners.length);
 		return list;
-	}
-
-	DisposableBean getDisposable() {
-		return disposable;
 	}
 
 	/**
@@ -240,6 +250,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		Assert.notNull(cardinality);
 		Assert.isTrue(cardinality.isSingle(), "only singular cardinality ('X..1') accepted");
 		super.setCardinality(cardinality);
+		this.mandatory = cardinality.isMandatory();
 	}
 
 	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {

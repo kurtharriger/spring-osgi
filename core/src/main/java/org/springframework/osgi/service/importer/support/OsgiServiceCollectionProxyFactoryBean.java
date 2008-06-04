@@ -28,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.support.internal.collection.CollectionProxy;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
@@ -118,6 +117,10 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 		public void removeStateListener(ImporterStateListener stateListener) {
 			stateListeners.remove(stateListener);
 		}
+
+		public boolean isSatisfied() {
+			return (exposedProxy == null ? true : exposedProxy.isSatisfied());
+		}
 	};
 
 
@@ -133,7 +136,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	private CollectionProxy exposedProxy;
 
 	/** proxy infrastructure hook exposed to allow clean up */
-	private DisposableBean disposable;
+	private Runnable proxyDestructionCallback;
 
 	/** proxy creator */
 	private ServiceProxyCreator proxyCreator;
@@ -158,6 +161,10 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 
+		// add default cardinality
+		if (getCardinality() == null)
+			setCardinality(Cardinality.C_1__N);
+
 		// create shared proxy creator ( reused for each new service
 		// joining the collection)
 		proxyCreator = new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBundleContext(),
@@ -168,10 +175,6 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 		return (proxy != null ? proxy.getClass() : collectionType.getCollectionClass());
 	}
 
-	public boolean isSatisfied() {
-		return (exposedProxy == null ? true : exposedProxy.isSatisfied());
-	}
-
 	/**
 	 * Create the managed-collection given the existing settings. This method
 	 * creates the osgi managed collection and wraps it with an unmodifiable map
@@ -179,7 +182,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	 * 
 	 * @return importer proxy
 	 */
-	Object createProxy() {
+	protected Object createProxy() {
 		if (log.isDebugEnabled())
 			log.debug("Creating a multi-value/collection proxy");
 
@@ -216,7 +219,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 			throw new IllegalArgumentException("Unknown collection type:" + collectionType);
 		}
 
-		collection.setRequiredAtStartup(isMandatory());
+		collection.setRequiredAtStartup(getCardinality().isMandatory());
 		collection.setListeners(getListeners());
 		collection.setStateListeners(stateListeners);
 		collection.setServiceImporter(this);
@@ -225,13 +228,13 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 
 		proxy = delegate;
 		exposedProxy = collection;
-		disposable = collection;
+		proxyDestructionCallback = new DisposableBeanRunnableAdapter(collection);
 
 		return delegate;
 	}
 
-	DisposableBean getDisposable() {
-		return disposable;
+	protected Runnable getProxyDestructionCallback() {
+		return proxyDestructionCallback;
 	}
 
 	/**

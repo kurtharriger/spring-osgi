@@ -14,21 +14,39 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.service.importer.support.internal.controller;
+package org.springframework.osgi.service.importer.support;
 
-import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
+import org.springframework.beans.factory.DisposableBean;
 
 /**
- * Contract describing the exporter internal actions that interfere with its
- * behaviour but should not be controller in the public API.
+ * Simple adapter around a Spring disposable bean.
  * 
  * @author Costin Leau
+ * 
  */
-public interface ImporterInternalActions {
+class DisposableBeanRunnableAdapter implements Runnable {
 
-	void addStateListener(ImporterStateListener stateListener);
-	
-	void removeStateListener(ImporterStateListener stateListener);
-	
-	boolean isSatisfied();
+	private final DisposableBean bean;
+
+
+	/**
+	 * Constructs a new <code>DisposableBeanRunnableAdapter</code> instance.
+	 * 
+	 * @param bean
+	 */
+	public DisposableBeanRunnableAdapter(DisposableBean bean) {
+		this.bean = bean;
+	}
+
+	public void run() {
+		try {
+			bean.destroy();
+		}
+		catch (Exception ex) {
+			if (ex instanceof RuntimeException)
+				throw (RuntimeException) ex;
+			else
+				throw new RuntimeException(ex);
+		}
+	}
 }

@@ -188,10 +188,10 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 		// exclude non-singletons and non-mandatory importers
 		for (int i = 0; i < importerNames.length; i++) {
 			if (beanFactory.isSingleton(importerNames[i])) {
-				AbstractOsgiServiceImportFactoryBean importer = (AbstractOsgiServiceImportFactoryBean) beanFactory.getBean(importerNames[i]);
+				Object importer = beanFactory.getBean(importerNames[i]);
 
 				// create an importer -> exporter association
-				if (importer.isMandatory()) {
+				if (isSatisfied(importer)) {
 					dependingImporters.put(importer, importerNames[i]);
 					importerToName.putIfAbsent(importer, importerNames[i]);
 				}
@@ -215,7 +215,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 
 			for (Iterator iter = filteredImporters.iterator(); iter.hasNext();) {
 				AbstractOsgiServiceImportFactoryBean importer = (AbstractOsgiServiceImportFactoryBean) iter.next();
-				importerStatuses.put(importer, Boolean.valueOf(importer.isSatisfied()));
+				importerStatuses.put(importer, Boolean.valueOf(isSatisfied(importer)));
 				// add the listener after the importer status has been recorded
 				addListener(importer, listener);
 			}
@@ -292,5 +292,9 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 	private void removeListener(Object importer, ImporterStateListener stateListener) {
 		ImporterInternalActions controller = ImporterRegistry.getControllerFor(importer);
 		controller.removeStateListener(stateListener);
+	}
+
+	private boolean isSatisfied(Object importer) {
+		return ImporterRegistry.getControllerFor(importer).isSatisfied();
 	}
 }
