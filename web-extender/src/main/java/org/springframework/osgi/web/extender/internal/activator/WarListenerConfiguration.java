@@ -106,7 +106,7 @@ public class WarListenerConfiguration implements DisposableBean {
 		Enumeration oldConfiguration = bundle.findEntries(OLD_EXTENDER_CFG_LOCATION, XML_PATTERN, false);
 
 		if (enm == null && oldConfiguration == null) {
-			log.info("No custom configuration detected; using defaults");
+			log.info("No custom extender configuration detected; using defaults...");
 
 			warScanner = createDefaultWarScanner();
 			warDeployer = createDefaultWarDeployer(bundleContext);
@@ -125,7 +125,7 @@ public class WarListenerConfiguration implements DisposableBean {
 			// merge old configs first so the new file can override bean definitions (if needed)
 			String[] configs = StringUtils.mergeStringArrays(oldConfigs, newConfigs);
 
-			log.info("Detected custom configurations " + ObjectUtils.nullSafeToString(configs));
+			log.info("Detected extender custom configurations at " + ObjectUtils.nullSafeToString(configs));
 			// create OSGi specific XML context
 			ConfigurableOsgiBundleApplicationContext context = new OsgiBundleXmlApplicationContext(configs);
 			context.setBundleContext(bundleContext);
