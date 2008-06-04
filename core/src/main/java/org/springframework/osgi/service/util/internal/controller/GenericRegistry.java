@@ -16,9 +16,9 @@
 
 package org.springframework.osgi.service.util.internal.controller;
 
-import java.lang.ref.WeakReference;
 import java.util.Map;
-import java.util.WeakHashMap;
+
+import org.springframework.core.CollectionFactory;
 
 /**
  * Internal registry that associates a public object with its internal
@@ -37,18 +37,18 @@ import java.util.WeakHashMap;
 public class GenericRegistry implements ControllerRegistry {
 
 	/** controller registry */
-	private final Map registry = new WeakHashMap();
+	private final Map registry = CollectionFactory.createConcurrentMapIfPossible(8);
 
 
 	public void putController(Object slave, Object master) {
-		registry.put(slave, new WeakReference(master));
+		registry.put(slave, master);
 	}
 
 	public Object getControllerFor(Object slave) {
-		WeakReference ref = (WeakReference) registry.get(slave);
-		if (ref != null)
-			return (Object) ref.get();
-		return null;
+		Object master = registry.get(slave);
+		if (master == null)
+			throw new IllegalStateException("No master object associated with object " + slave);
+		return master;
 	}
 
 	public void removeController(Object slave) {
