@@ -24,6 +24,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.SynchronousBundleListener;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
+import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
@@ -39,7 +40,7 @@ import org.springframework.osgi.util.OsgiStringUtils;
  */
 public class CallingResourceOnDifferentBundlesTest extends BaseIntegrationTest {
 
-	private static final String LOCATION = "META-INF";
+	private static final String LOCATION = "META-INF/";
 
 
 	public void testCallGetResourceOnADifferentBundle() throws Exception {
