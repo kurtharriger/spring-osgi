@@ -16,10 +16,6 @@
 
 package org.springframework.osgi.service.importer.support;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
@@ -27,6 +23,7 @@ import org.osgi.framework.Filter;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.SmartFactoryBean;
@@ -42,7 +39,7 @@ import org.springframework.util.ObjectUtils;
 /**
  * Base class for importing OSGi services. Provides most of the constructs
  * required for assembling the service proxies, leaving subclasses to decide on
- * the service cardinality (one service or multiple).
+ * the service cardinality (one service or multiple) and proxy weaving.
  * 
  * @author Costin Leau
  * @author Adrian Colyer
@@ -83,9 +80,6 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 
 	private Object proxy;
 
-	/** is at least one service required? */
-	private boolean mandatory = true;
-
 	private Cardinality cardinality;
 
 	/** bean name */
@@ -110,7 +104,24 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 		return proxy;
 	}
 
-	abstract Object createProxy();
+	/**
+	 * Creates the proxy tracking the matching OSGi services. This method is
+	 * guaranteed to be called only once, normally during initialization.
+	 * 
+	 * @return OSGi service tracking proxy.
+	 * @see #getProxyDestructionCallback()
+	 */
+	protected abstract Object createProxy();
+
+	/**
+	 * Returns the destruction callback associated with the proxy created by
+	 * this object. The callback is called once, during the destruction process
+	 * of the {@link FactoryBean}.
+	 * 
+	 * @return destruction callback for the service proxy.
+	 * @see #createProxy()
+	 */
+	protected abstract Runnable getProxyDestructionCallback();
 
 	public boolean isSingleton() {
 		return true;
@@ -175,25 +186,16 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 	}
 
 	public void destroy() throws Exception {
-		DisposableBean bean = getDisposable();
-		if (bean != null) {
-			bean.destroy();
+		Runnable callback = getProxyDestructionCallback();
+		try {
+			if (callback != null) {
+				callback.run();
+			}
 		}
-		proxy = null;
-	}
+		finally {
+			proxy = null;
 
-	/**
-	 * Hook for getting a disposable instance backing the proxy returned to the
-	 * user.
-	 * 
-	 * @return disposable bean for cleaning the proxy
-	 */
-	abstract DisposableBean getDisposable();
-
-	public abstract boolean isSatisfied();
-
-	public boolean isMandatory() {
-		return mandatory;
+		}
 	}
 
 	/**
@@ -350,7 +352,6 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 	public void setCardinality(Cardinality cardinality) {
 		Assert.notNull(cardinality);
 		this.cardinality = cardinality;
-		this.mandatory = cardinality.isMandatory();
 	}
 
 	/**

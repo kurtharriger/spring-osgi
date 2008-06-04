@@ -40,4 +40,8 @@ public class ImporterController implements ImporterInternalActions {
 	public void removeStateListener(ImporterStateListener stateListener) {
 		executor.removeStateListener(stateListener);
 	}
+
+	public boolean isSatisfied() {
+		return executor.isSatisfied();
+	}
 }

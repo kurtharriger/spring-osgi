@@ -51,8 +51,9 @@ Package org.springframework.osgi.service
 * introduced ServiceReferenceProxy interface (available through ImportedOsgiServiceProxy) for accessing the native 
   service reference
 * OsgiServiceFactoryBean performs type check validation on given interfaces at startup
-* removed internal 'dependency' subpackage from the public API
-* significantly improved exporter/importer transitive dependency tracking for both single and multi service proxies
+* removed internal 'dependency' subpackage (and associated implementations) from the public API
+* improved significantly exporter/importer transitive dependency tracking for both single and multi service proxies
+* added default cardinality (1..X) when none is specified for both single and multiple service importers
 
 Package org.springframework.osgi.util
 * fixed internal handling of nested beans when discovering transitive dependencies of a bean

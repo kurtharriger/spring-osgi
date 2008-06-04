@@ -211,7 +211,7 @@ public class DependencyServiceManager {
 
 				AbstractOsgiServiceImportFactoryBean reference = (AbstractOsgiServiceImportFactoryBean) beanFactory.getBean(beanName);
 				ServiceDependency dependency = new ServiceDependency(bundleContext, reference.getUnifiedFilter(),
-					reference.isMandatory(), beanName);
+					reference.getCardinality().isMandatory(), beanName);
 
 				dependencies.put(dependency, dependency.getBeanName());
 				if (!dependency.isServicePresent()) {
