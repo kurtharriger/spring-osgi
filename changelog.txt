@@ -37,6 +37,9 @@ Package org.springframework.osgi.extender
   scalability
 * added BootstrappingDependencyEvent for notifying the pre-refresh dependency activities
 * changed extender configuration to META-INF/spring/extender to avoid confusion
+* introduced OsgiServiceDependencyFactory interface to allow third parties to add service dependencies required 
+  before an application context is refreshed
+
 
 Package org.springframework.osgi.io
 * improved OsgiBundleResource#getFile() method when dealing with resources in expanded bundles
@@ -75,7 +78,7 @@ Package org.springframework.osgi.web
 
 
 Changes in version 1.1.0 M2 (2008-04-29)
------------------------------------------
+----------------------------------------
 
 General
 * Spring 2.5.4+ required

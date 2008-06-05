@@ -20,6 +20,7 @@
 	<spring.osgi.export.pkg>org.springframework.osgi.extensions.annotation</spring.osgi.export.pkg>
 	<spring.osgi.symbolic.name>${symName.prefix}.extensions.annotations</spring.osgi.symbolic.name>
 	<spring.osgi.import.pkg>
+	org.springframework.osgi.extender;version=${spring.osgi.import.version};resolution:=optional,
 	org.springframework.osgi*;version=${spring.osgi.import.version},
 	org.springframework*;version=${spring.base.version},
 	*
@@ -41,6 +42,12 @@
       <version>${project.parent.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>spring-osgi-extender</artifactId>
+      <version>${project.parent.version}</version>
+	  <optional>true</optional>
+    </dependency>    
     <dependency>
       <groupId>org.aopalliance</groupId>
       <artifactId>com.springsource.org.aopalliance</artifactId>

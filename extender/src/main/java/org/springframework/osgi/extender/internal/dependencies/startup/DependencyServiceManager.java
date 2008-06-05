@@ -1,11 +1,12 @@
 
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,17 +14,14 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
+import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
-import org.springframework.osgi.service.importer.OsgiServiceImportDependencyDefinition;
-import org.springframework.osgi.service.importer.OsgiServiceImportDependencyFactory;
+import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencySatisfiedEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitingEvent;
-import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
@@ -59,6 +57,9 @@ public class DependencyServiceManager {
 
 	/** Maximum waiting time used in events when waiting for dependencies */
 	private final long waitTime;
+
+	/** dependency factories */
+	private List dependencyFactories;
 
 
 	/**
@@ -131,7 +132,7 @@ public class DependencyServiceManager {
 			boolean debug = log.isDebugEnabled();
 
 			for (Iterator i = dependencies.keySet().iterator(); i.hasNext();) {
-				ServiceDependency dependency = (ServiceDependency) i.next();
+				MandatoryServiceDependency dependency = (MandatoryServiceDependency) i.next();
 
 				// check if there is a match on the service
 				if (dependency.matches(serviceEvent)) {
@@ -170,7 +171,6 @@ public class DependencyServiceManager {
 				}
 			}
 		}
-
 	}
 
 
@@ -184,9 +184,11 @@ public class DependencyServiceManager {
 	 * @param executeIfDone
 	 */
 	public DependencyServiceManager(ContextExecutorStateAccessor executor,
-			DelegatedExecutionOsgiBundleApplicationContext context, Runnable executeIfDone, long maxWaitTime) {
+			DelegatedExecutionOsgiBundleApplicationContext context, List dependencyFactories, Runnable executeIfDone,
+			long maxWaitTime) {
 		this.contextStateAccessor = executor;
 		this.context = context;
+		this.dependencyFactories = dependencyFactories;
 		this.waitTime = maxWaitTime;
 		this.bundleContext = context.getBundleContext();
 		this.listener = new DependencyServiceListener();
@@ -203,41 +205,30 @@ public class DependencyServiceManager {
 			currentThread.setContextClassLoader(context.getClassLoader());
 
 			ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-			String[] beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
-				AbstractOsgiServiceImportFactoryBean.class, true, false);
-			for (int i = 0; i < beans.length; i++) {
-				String beanName = (beans[i].startsWith(BeanFactory.FACTORY_BEAN_PREFIX) ? beans[i]
-						: BeanFactory.FACTORY_BEAN_PREFIX + beans[i]);
 
-				AbstractOsgiServiceImportFactoryBean reference = (AbstractOsgiServiceImportFactoryBean) beanFactory.getBean(beanName);
-				ServiceDependency dependency = new ServiceDependency(bundleContext, reference.getUnifiedFilter(),
-					reference.getCardinality().isMandatory(), beanName);
+			for (Iterator iterator = dependencyFactories.iterator(); iterator.hasNext();) {
+				OsgiServiceDependencyFactory dependencyFactory = (OsgiServiceDependencyFactory) iterator.next();
+				Collection discoveredDependencies = null;
 
-				dependencies.put(dependency, dependency.getBeanName());
-				if (!dependency.isServicePresent()) {
-					log.info("Adding OSGi service dependency for importer " + beanName);
-					unsatisfiedDependencies.put(dependency, dependency.getBeanName());
+				try {
+					discoveredDependencies = dependencyFactory.getServiceDependencies(bundleContext, beanFactory);
 				}
-			}
-			// Add dependencies defined by any OsgiServiceImportDependencyFactorys.
-			beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
-				OsgiServiceImportDependencyFactory.class, true, false);
-			for (int i = 0; i < beans.length; i++) {
-				String beanName = beans[i];
-				OsgiServiceImportDependencyFactory reference = (OsgiServiceImportDependencyFactory) beanFactory.getBean(beanName);
-				Set depList = reference.getServiceDependencyDefinitions();
-				for (Iterator iter = depList.iterator(); iter.hasNext();) {
-					OsgiServiceImportDependencyDefinition def = (OsgiServiceImportDependencyDefinition) iter.next();
-					ServiceDependency dependency = new ServiceDependency(bundleContext, def.getFilter(),
-						def.isMandatory(), def.getBeanName());
+				catch (Exception ex) {
+					log.warn("Dependency factory " + dependencyFactory
+							+ " threw exception while detecting dependencies for beanFactory " + beanFactory, ex);
+				}
+				// add the dependencies one by one
+				if (dependencies != null)
+					for (Iterator iterator2 = discoveredDependencies.iterator(); iterator2.hasNext();) {
+						OsgiServiceDependency dependency = (OsgiServiceDependency) iterator2.next();
+						MandatoryServiceDependency msd = new MandatoryServiceDependency(bundleContext, dependency);
+						dependencies.put(msd, dependency.getBeanName());
 
-					dependencies.put(dependency, dependency.getBeanName());
-					if (!dependency.isServicePresent()) {
-						if (debug)
-							log.debug("adding OSGi service dependency for filter " + def.getFilter());
-						unsatisfiedDependencies.put(dependency, dependency.getBeanName());
+						if (!msd.isServicePresent()) {
+							log.info("Adding OSGi service dependency for importer " + msd.getBeanName());
+							unsatisfiedDependencies.put(msd, dependency.getBeanName());
+						}
 					}
-				}
 			}
 		}
 		finally {
@@ -288,7 +279,7 @@ public class DependencyServiceManager {
 			sb.append("(|");
 		}
 		for (Iterator i = unsatisfiedDependencies.keySet().iterator(); i.hasNext();) {
-			sb.append(((ServiceDependency) i.next()).filterAsString);
+			sb.append(((MandatoryServiceDependency) i.next()).filterAsString);
 		}
 		if (multiple) {
 			sb.append(')');
@@ -307,7 +298,7 @@ public class DependencyServiceManager {
 	// event notification
 	private void sendInitialDependencyEvents() {
 		for (Iterator iterator = unsatisfiedDependencies.keySet().iterator(); iterator.hasNext();) {
-			ServiceDependency entry = (ServiceDependency) iterator.next();
+			MandatoryServiceDependency entry = (MandatoryServiceDependency) iterator.next();
 			OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitingEvent(context,
 				entry.getServiceDependency(), waitTime);
 			BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, nestedEvent);
@@ -315,14 +306,14 @@ public class DependencyServiceManager {
 		}
 	}
 
-	private void sendDependencyUnsatisfiedEvent(ServiceDependency dependency) {
+	private void sendDependencyUnsatisfiedEvent(MandatoryServiceDependency dependency) {
 		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitingEvent(context,
 			dependency.getServiceDependency(), waitTime);
 		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, nestedEvent);
 		publishEvent(dependencyEvent);
 	}
 
-	private void sendDependencySatisfiedEvent(ServiceDependency dependency) {
+	private void sendDependencySatisfiedEvent(MandatoryServiceDependency dependency) {
 		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencySatisfiedEvent(context,
 			dependency.getServiceDependency(), waitTime);
 		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, nestedEvent);

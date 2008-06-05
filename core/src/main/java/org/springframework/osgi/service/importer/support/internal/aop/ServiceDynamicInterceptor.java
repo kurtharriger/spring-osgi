@@ -31,6 +31,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.service.importer.DefaultOsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
@@ -416,8 +417,12 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	private void publishEvent(ApplicationEvent event) {
 		if (applicationEventPublisher != null) {
+			if (log.isTraceEnabled())
+				log.trace("Publishing event through publisher " + applicationEventPublisher);
 			applicationEventPublisher.publishEvent(event);
 		}
+		else if (log.isTraceEnabled())
+			log.trace("No application event publisher set; no events will be published");
 	}
 
 	public void afterPropertiesSet() {
@@ -428,7 +433,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 		retryTemplate = new EventSenderRetryTemplate(retryTemplate);
 
-		dependency = new DefaultServiceDependency(sourceName, filter, serviceRequiredAtStartup);
+		dependency = new DefaultOsgiServiceDependency(sourceName, filter, serviceRequiredAtStartup);
 
 		if (debug)
 			log.debug("Adding OSGi mandatoryListeners for services matching [" + filter + "]");
@@ -511,7 +516,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	/** Internal state listeners */
 	public void setStateListeners(List stateListeners) {
 		synchronized (lock) {
-			this.stateListeners = stateListeners;	
+			this.stateListeners = stateListeners;
 		}
 	}
 

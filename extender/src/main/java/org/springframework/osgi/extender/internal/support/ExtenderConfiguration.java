@@ -28,8 +28,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
+import org.springframework.core.JdkVersion;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
@@ -38,8 +40,11 @@ import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventM
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
+import org.springframework.osgi.extender.internal.dependencies.startup.MandatoryImporterDependencyFactory;
 import org.springframework.osgi.extender.support.DefaultOsgiApplicationContextCreator;
+import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
+import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -80,6 +85,8 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private static final String XML_PATTERN = "*.xml";
 
+	private static final String ANNOTATION_DEPENDENCY_FACTORY = "ANNOTATION FACTORY";
+
 	//
 	// defaults
 	//
@@ -105,9 +112,11 @@ public class ExtenderConfiguration implements DisposableBean {
 	private OsgiApplicationContextCreator contextCreator;
 
 	/** bundle wrapped class loader */
-	private ClassLoader classLoader;
+	private final ClassLoader classLoader;
 	/** List of context post processors */
-	private List postProcessors = new ArrayList(0);
+	private final List postProcessors = new ArrayList(0);
+	/** List of service dependency factories */
+	private final List dependencyFactories = new ArrayList(0);
 
 
 	/**
@@ -122,7 +131,6 @@ public class ExtenderConfiguration implements DisposableBean {
 		Properties properties = new Properties(createDefaultProperties());
 
 		Enumeration enm = bundle.findEntries(EXTENDER_CFG_LOCATION, XML_PATTERN, false);
-
 		Enumeration oldConfiguration = bundle.findEntries(OLD_EXTENDER_CFG_LOCATION, XML_PATTERN, false);
 
 		if (enm == null && oldConfiguration == null) {
@@ -171,6 +179,9 @@ public class ExtenderConfiguration implements DisposableBean {
 			// get post processors
 			postProcessors.addAll(extenderConfiguration.getBeansOfType(OsgiBeanFactoryPostProcessor.class).values());
 
+			// get dependency factories
+			dependencyFactories.addAll(extenderConfiguration.getBeansOfType(OsgiBeanFactoryPostProcessor.class).values());
+
 			classLoader = extenderConfiguration.getClassLoader();
 			// extender properties using the defaults as backup
 			if (extenderConfiguration.containsBean(PROPERTIES_NAME)) {
@@ -186,6 +197,9 @@ public class ExtenderConfiguration implements DisposableBean {
 
 		shutdownWaitTime = getShutdownWaitTime(properties);
 		processAnnotation = getProcessAnnotations(properties);
+
+		// load default dependency factories
+		addDefaultDependencyFactories();
 	}
 
 	/**
@@ -247,6 +261,43 @@ public class ExtenderConfiguration implements DisposableBean {
 		properties.setProperty(PROCESS_ANNOTATIONS_KEY, "" + DEFAULT_PROCESS_ANNOTATION);
 
 		return properties;
+	}
+
+	private void addDefaultDependencyFactories() {
+		boolean debug = log.isDebugEnabled();
+
+		// default JDK 1.4 processor
+		dependencyFactories.add(0, new MandatoryImporterDependencyFactory());
+		
+		// load through reflection the processor if running on JDK 1.5 and annotation processing is enabled
+		if (processAnnotation) {
+			if (JdkVersion.isAtLeastJava15()) {
+
+				Class annotationProcessor = null;
+				try {
+					annotationProcessor = Class.forName(ANNOTATION_DEPENDENCY_FACTORY, false,
+						ExtenderConfiguration.class.getClassLoader());
+				}
+				catch (ClassNotFoundException cnfe) {
+					log.warn("Spring-DM annotation package not found, annotation processing disabled.", cnfe);
+					return;
+				}
+				Object processor = BeanUtils.instantiateClass(annotationProcessor);
+				Assert.isInstanceOf(OsgiServiceDependency.class, processor);
+				dependencyFactories.add(1, (OsgiServiceDependency) processor);
+				if (debug)
+					log.debug("Succesfully loaded annotation dependency processor [" + ANNOTATION_DEPENDENCY_FACTORY
+							+ "]");
+			}
+			else if (debug)
+				log.debug("JDK 5 not available [" + ANNOTATION_DEPENDENCY_FACTORY + "] not loaded");
+		}
+		else {
+			if (debug) {
+				log.debug("Annotation processing disabled; [" + ANNOTATION_DEPENDENCY_FACTORY + "] not loaded");
+			}
+		}
+		
 	}
 
 	private TaskExecutor createDefaultTaskExecutor() {
@@ -356,5 +407,16 @@ public class ExtenderConfiguration implements DisposableBean {
 	 */
 	public ClassLoader getClassLoader() {
 		return classLoader;
+	}
+
+	/**
+	 * Returns the dependencies factories declared by the extender
+	 * configuration. The list automatically contains the default listeners
+	 * (such as the annotation one).
+	 * 
+	 * @return list of dependency factories
+	 */
+	public List getDependencyFactories() {
+		return dependencyFactories;
 	}
 }

@@ -286,7 +286,7 @@ public class ContextLoaderListener implements BundleActivator {
 	/** listener counter - used to properly synchronize shutdown */
 	private Counter contextsStarted = new Counter("contextsStarted");
 
-	/** ServiceDependency for dependencyDetector management */
+	/** MandatoryServiceDependency for dependencyDetector management */
 	private ServiceRegistration listenerServiceRegistration;
 
 	/** Spring namespace/resolver manager */
@@ -777,7 +777,8 @@ public class ContextLoaderListener implements BundleActivator {
 		// wait/no wait for dependencies behaviour
 		if (config.isWaitForDependencies()) {
 			DependencyWaiterApplicationContextExecutor appCtxExecutor = new DependencyWaiterApplicationContextExecutor(
-				localApplicationContext, !config.isCreateAsynchronously());
+				localApplicationContext, !config.isCreateAsynchronously(),
+				extenderConfiguration.getDependencyFactories());
 
 			appCtxExecutor.setTimeout(config.getTimeout());
 			appCtxExecutor.setWatchdog(timer);
