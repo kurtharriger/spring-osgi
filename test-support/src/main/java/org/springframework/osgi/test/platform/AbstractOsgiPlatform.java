@@ -43,10 +43,10 @@ abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
 
 	public Properties getConfigurationProperties() {
-		// local properties
-		configurationProperties.putAll(getPlatformProperties());
 		// system properties
 		configurationProperties.putAll(System.getProperties());
+		// local properties
+		configurationProperties.putAll(getPlatformProperties());
 		return configurationProperties;
 	}
 
