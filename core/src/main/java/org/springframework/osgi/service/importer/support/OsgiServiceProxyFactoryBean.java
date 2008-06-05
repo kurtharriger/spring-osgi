@@ -127,7 +127,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 
 	protected Object createProxy() {
 		if (log.isDebugEnabled())
-			log.debug("creating a single service proxy ...");
+			log.debug("Creating a single service proxy ...");
 
 		// first create the TCCL interceptor to register its listener with the
 		// dynamic interceptor

@@ -20,7 +20,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
-import org.springframework.osgi.service.importer.OsgiServiceImportDependencyDefinition;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
@@ -30,7 +29,7 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
  * @author Hal Hildebrand
  * @author Andy Piper
  */
-public class ServiceDependency implements OsgiServiceImportDependencyDefinition {
+public class MandatoryServiceDependency implements OsgiServiceDependency {
 
 	protected final Filter filter;
 
@@ -45,7 +44,7 @@ public class ServiceDependency implements OsgiServiceImportDependencyDefinition 
 	private OsgiServiceDependency serviceDependency;
 
 
-	public ServiceDependency(BundleContext bc, Filter serviceFilter, boolean isMandatory, String beanName) {
+	public MandatoryServiceDependency(BundleContext bc, Filter serviceFilter, boolean isMandatory, String beanName) {
 		filter = serviceFilter;
 		this.filterAsString = filter.toString();
 		this.isMandatory = isMandatory;
@@ -54,18 +53,22 @@ public class ServiceDependency implements OsgiServiceImportDependencyDefinition 
 		serviceDependency = new OsgiServiceDependency() {
 
 			public String getBeanName() {
-				return ServiceDependency.this.beanName;
+				return MandatoryServiceDependency.this.beanName;
 			}
 
 			public Filter getServiceFilter() {
-				return ServiceDependency.this.filter;
+				return MandatoryServiceDependency.this.filter;
 			}
 
-			public boolean isMandatoryService() {
-				return ServiceDependency.this.isMandatory;
+			public boolean isMandatory() {
+				return MandatoryServiceDependency.this.isMandatory;
 			}
 
 		};
+	}
+
+	public MandatoryServiceDependency(BundleContext bc, OsgiServiceDependency dependency) {
+		this(bc, dependency.getServiceFilter(), dependency.isMandatory(), dependency.getBeanName());
 	}
 
 	public boolean matches(ServiceEvent event) {
@@ -86,7 +89,7 @@ public class ServiceDependency implements OsgiServiceImportDependencyDefinition 
 	/**
 	 * @return Returns the filter.
 	 */
-	public Filter getFilter() {
+	public Filter getServiceFilter() {
 		return filter;
 	}
 
@@ -109,7 +112,7 @@ public class ServiceDependency implements OsgiServiceImportDependencyDefinition 
 		if (o == null || getClass() != o.getClass())
 			return false;
 
-		final ServiceDependency that = (ServiceDependency) o;
+		final MandatoryServiceDependency that = (MandatoryServiceDependency) o;
 
 		if (isMandatory != that.isMandatory)
 			return false;

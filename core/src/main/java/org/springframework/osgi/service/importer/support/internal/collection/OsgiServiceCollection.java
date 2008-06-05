@@ -34,10 +34,10 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.service.importer.DefaultOsgiServiceDependency;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
-import org.springframework.osgi.service.importer.support.internal.aop.DefaultServiceDependency;
 import org.springframework.osgi.service.importer.support.internal.aop.ProxyPlusCallback;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
@@ -278,7 +278,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 		boolean trace = log.isTraceEnabled();
 
-		dependency = new DefaultServiceDependency(sourceName, filter, serviceRequiredAtStartup);
+		dependency = new DefaultOsgiServiceDependency(sourceName, filter, serviceRequiredAtStartup);
 
 		if (trace)
 			log.trace("Adding osgi listener for services matching [" + filter + "]");

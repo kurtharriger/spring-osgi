@@ -17,5 +17,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-mock"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-extender"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -45,5 +45,5 @@ public interface OsgiServiceDependency {
 	 * 
 	 * @return true if the dependency is mandatory, false otherwise.
 	 */
-	boolean isMandatoryService();
+	boolean isMandatory();
 }

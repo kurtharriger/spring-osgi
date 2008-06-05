@@ -17,6 +17,7 @@
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -99,6 +100,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	/** delegated multicaster */
 	private OsgiBundleApplicationContextEventMulticaster delegatedMulticaster;
 
+	private List dependencyFactories;
+
 
 	/**
 	 * The task for the watch dog.
@@ -147,10 +150,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 
 	public DependencyWaiterApplicationContextExecutor(DelegatedExecutionOsgiBundleApplicationContext delegateContext,
-			boolean syncWait) {
+			boolean syncWait, List dependencyFactories) {
 		this.delegateContext = delegateContext;
 		this.delegateContext.setExecutor(this);
 		this.synchronousWait = syncWait;
+		this.dependencyFactories = dependencyFactories;
 	}
 
 	/**
@@ -380,7 +384,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		}
 		else {
 			for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().keySet().iterator(); dependencies.hasNext();) {
-				ServiceDependency dependency = (ServiceDependency) dependencies.next();
+				MandatoryServiceDependency dependency = (MandatoryServiceDependency) dependencies.next();
 				buf.append(dependency.toString());
 				if (dependencies.hasNext()) {
 					buf.append(", ");
@@ -427,7 +431,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	protected DependencyServiceManager createDependencyServiceListener(Runnable task) {
-		return new DependencyServiceManager(this, delegateContext, task, timeout);
+		return new DependencyServiceManager(this, delegateContext, dependencyFactories, task, timeout);
 	}
 
 	/**
