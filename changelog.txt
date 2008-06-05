@@ -61,6 +61,7 @@ Package org.springframework.osgi.util
 
 Package org.springframework.osgi.test
 * removed usage of PackageAdmin for resolving bundles
+* improved testing behaviour so that user-defined properties override the system declared ones
 
 Package org.springframework.osgi.web
 * improved namespace detection strategy for OsgiBundleXmlWebApplicationContext
