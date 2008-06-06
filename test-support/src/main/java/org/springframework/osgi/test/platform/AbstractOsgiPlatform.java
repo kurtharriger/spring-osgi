@@ -32,31 +32,52 @@ import org.apache.commons.logging.LogFactory;
  */
 abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
-	Log log = LogFactory.getLog(getClass());
+	final Log log = LogFactory.getLog(getClass());
 
 	/**
 	 * Subclasses should override this field.
 	 */
 	String toString = getClass().getName();
 
-	Properties configurationProperties = new Properties();
+	private Properties configurationProperties = null;
 
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * This implementation considers existing system properties as well as
+	 * platform specific ones, defined in this class. The system properties are
+	 * convenient for changing the configuration directly from the command line
+	 * (useful for CI builds) leaving the programmer to ultimately decide the
+	 * actual configuration used.
+	 */
 	public Properties getConfigurationProperties() {
-		// system properties
-		configurationProperties.putAll(System.getProperties());
-		// local properties
-		configurationProperties.putAll(getPlatformProperties());
+		// check if defaults should apply
+		if (configurationProperties == null) {
+			configurationProperties = new Properties();
+			// system properties
+			configurationProperties.putAll(System.getProperties());
+			// local properties
+			configurationProperties.putAll(getPlatformProperties());
+			return configurationProperties;
+		}
 		return configurationProperties;
 	}
 
 	/**
 	 * Subclasses can override this to provide special platform properties.
+	 * DEPRECATED
 	 * 
+	 * @deprecated
 	 * @return platform implementation specific properties.
 	 */
 	abstract Properties getPlatformProperties();
 
+	/**
+	 * Returns the underlying OSGi platform name.
+	 * 
+	 * @return the platform name
+	 */
 	public String toString() {
 		return toString;
 	}

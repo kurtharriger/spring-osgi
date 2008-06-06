@@ -17,14 +17,10 @@
 package org.springframework.osgi.test.platform;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.knopflerfish.framework.Framework;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.springframework.core.JdkVersion;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.test.internal.util.IOUtils;
 
 /**
