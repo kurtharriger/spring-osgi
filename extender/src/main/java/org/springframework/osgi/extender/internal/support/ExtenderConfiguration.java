@@ -40,6 +40,7 @@ import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventM
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
+import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.internal.dependencies.startup.MandatoryImporterDependencyFactory;
 import org.springframework.osgi.extender.support.DefaultOsgiApplicationContextCreator;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
@@ -180,7 +181,7 @@ public class ExtenderConfiguration implements DisposableBean {
 			postProcessors.addAll(extenderConfiguration.getBeansOfType(OsgiBeanFactoryPostProcessor.class).values());
 
 			// get dependency factories
-			dependencyFactories.addAll(extenderConfiguration.getBeansOfType(OsgiBeanFactoryPostProcessor.class).values());
+			dependencyFactories.addAll(extenderConfiguration.getBeansOfType(OsgiServiceDependencyFactory.class).values());
 
 			classLoader = extenderConfiguration.getClassLoader();
 			// extender properties using the defaults as backup
@@ -268,7 +269,7 @@ public class ExtenderConfiguration implements DisposableBean {
 
 		// default JDK 1.4 processor
 		dependencyFactories.add(0, new MandatoryImporterDependencyFactory());
-		
+
 		// load through reflection the processor if running on JDK 1.5 and annotation processing is enabled
 		if (processAnnotation) {
 			if (JdkVersion.isAtLeastJava15()) {
@@ -297,7 +298,7 @@ public class ExtenderConfiguration implements DisposableBean {
 				log.debug("Annotation processing disabled; [" + ANNOTATION_DEPENDENCY_FACTORY + "] not loaded");
 			}
 		}
-		
+
 	}
 
 	private TaskExecutor createDefaultTaskExecutor() {

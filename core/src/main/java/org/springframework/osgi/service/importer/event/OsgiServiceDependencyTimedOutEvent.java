@@ -19,12 +19,15 @@ package org.springframework.osgi.service.importer.event;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 
 /**
+ * Event raised when an OSGi service dependency could not be found in a certain
+ * amount of time. Normally thrown by OSGi importers, this event allows
+ * notifications of potential failures inside the application context due to
+ * missing (but required) OSGi dependencies.
+ * 
  * @author Costin Leau
  * 
  */
 public class OsgiServiceDependencyTimedOutEvent extends OsgiServiceDependencyEvent {
-
-	private static final long serialVersionUID = -4519177698018683647L;
 
 	private final long waitingTime;
 

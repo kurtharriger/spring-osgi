@@ -419,7 +419,17 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		if (applicationEventPublisher != null) {
 			if (log.isTraceEnabled())
 				log.trace("Publishing event through publisher " + applicationEventPublisher);
-			applicationEventPublisher.publishEvent(event);
+			try {
+				applicationEventPublisher.publishEvent(event);
+			}
+			catch (IllegalStateException ise) {
+				log.error(
+					"Event "
+							+ event
+							+ " not published as the publisher is not initialized - usually this is caused by eager initialization of the importers by post processing",
+					ise);
+			}
+
 		}
 		else if (log.isTraceEnabled())
 			log.trace("No application event publisher set; no events will be published");

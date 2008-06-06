@@ -22,10 +22,7 @@ import org.springframework.osgi.service.importer.OsgiServiceDependency;
  * @author Costin Leau
  * 
  */
-// FIXME: change name - this is a waiting successeded event rather then a generic satisfied event
 public class OsgiServiceDependencySatisfiedEvent extends OsgiServiceDependencyEvent {
-
-	private static final long serialVersionUID = 4798850518871798024L;
 
 	private long waitedTime;
 
@@ -44,10 +41,11 @@ public class OsgiServiceDependencySatisfiedEvent extends OsgiServiceDependencyEv
 	}
 
 	/**
-	 * Returns the time spent waiting before the service was found (and the
-	 * dependency considered satisfied)
+	 * Returns the time spent (in milliseconds) waiting, until service was found
+	 * (and the dependency considered satisfied).
 	 * 
-	 * @return Returns the waitedTime
+	 * @return Returns the time (in milliseconds) spent waiting for the OSGi
+	 * service to appear
 	 */
 	public long getWaitedTime() {
 		return waitedTime;
