@@ -36,9 +36,9 @@ public class OsgiServiceDependencyTimedOutEvent extends OsgiServiceDependencyEve
 	 * Constructs a new <code>OsgiServiceDependencyTimedOutEvent</code>
 	 * instance.
 	 * 
-	 * @param source
-	 * @param sourceBeanName
-	 * @param dependency
+	 * @param source event source (usually a service importer)
+	 * @param dependency service dependency description
+	 * @param waitingTime time spent waiting
 	 */
 	public OsgiServiceDependencyTimedOutEvent(Object source, OsgiServiceDependency dependency, long waitingTime) {
 		super(source, dependency);

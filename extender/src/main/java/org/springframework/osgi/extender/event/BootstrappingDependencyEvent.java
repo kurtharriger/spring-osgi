@@ -22,6 +22,13 @@ import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEven
 import org.springframework.util.Assert;
 
 /**
+ * Spring-DM Extender boostrapping event. This event is used during the
+ * application context discovery phase, before an application context is fully
+ * initialized.
+ * 
+ * <p/> It can be used to receive status updates for contexts started by the
+ * extender.
+ * 
  * @author Costin Leau
  * 
  */

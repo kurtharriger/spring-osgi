@@ -41,9 +41,9 @@ public class OsgiServiceDependencyWaitingEvent extends OsgiServiceDependencyEven
 	 * Constructs a new <code>OsgiServiceDependencyWaitingEvent</code>
 	 * instance.
 	 * 
-	 * @param source
-	 * @param sourceBeanName
-	 * @param dependencyServiceFilter
+	 * @param source event source (usually the service importer)
+	 * @param dependency dependency description
+	 * @param timeToWait wait duration
 	 */
 	public OsgiServiceDependencyWaitingEvent(Object source, OsgiServiceDependency dependency, long timeToWait) {
 		super(source, dependency);

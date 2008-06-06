@@ -31,9 +31,9 @@ public class OsgiServiceDependencySatisfiedEvent extends OsgiServiceDependencyEv
 	 * Constructs a new <code>OsgiServiceDependencySatisfiedEvent</code>
 	 * instance.
 	 * 
-	 * @param source
-	 * @param sourceBeanName
-	 * @param dependency
+	 * @param source event source (usually the service importer)
+	 * @param dependency dependency description
+	 * @param waitedTime time to wait
 	 */
 	public OsgiServiceDependencySatisfiedEvent(Object source, OsgiServiceDependency dependency, long waitedTime) {
 		super(source, dependency);

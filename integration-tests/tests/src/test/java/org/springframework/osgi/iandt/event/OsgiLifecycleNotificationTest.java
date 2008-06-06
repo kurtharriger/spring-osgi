@@ -90,7 +90,7 @@ public class OsgiLifecycleNotificationTest extends AbstractEventTest {
 			assertTrue("event not received", waitForEvent(TIME_OUT));
 			System.out.println("events received " + eventList);
 			Object event = eventList.get(0);
-			assertTrue("wrong event received", event instanceof OsgiBundleContextFailedEvent);
+			assertTrue("wrong event received " + event, event instanceof OsgiBundleContextFailedEvent);
 		}
 		finally {
 			bnd.uninstall();

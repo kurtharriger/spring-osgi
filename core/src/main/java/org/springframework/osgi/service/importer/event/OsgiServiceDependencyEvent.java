@@ -35,7 +35,8 @@ public abstract class OsgiServiceDependencyEvent extends ApplicationEvent {
 	/**
 	 * Constructs a new <code>OsgiServiceDependencyEvent</code> instance.
 	 * 
-	 * @param source
+	 * @param source event source (usually the service importer)
+	 * @param dependency dependency description
 	 */
 	public OsgiServiceDependencyEvent(Object source, OsgiServiceDependency dependency) {
 		super(source);
