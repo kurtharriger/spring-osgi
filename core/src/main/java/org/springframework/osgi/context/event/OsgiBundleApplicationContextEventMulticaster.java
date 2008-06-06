@@ -38,14 +38,14 @@ public interface OsgiBundleApplicationContextEventMulticaster {
 	/**
 	 * Add an OSGi listener to be notified of all events.
 	 * 
-	 * @param listener the listener to add
+	 * @param osgiListener the listener to add
 	 */
 	void addApplicationListener(OsgiBundleApplicationContextListener osgiListener);
 
 	/**
 	 * Remove an OSGi listener from the notification list.
 	 * 
-	 * @param listener the listener to remove
+	 * @param osgiListener the listener to remove
 	 */
 	void removeApplicationListener(OsgiBundleApplicationContextListener osgiListener);
 
@@ -58,7 +58,7 @@ public interface OsgiBundleApplicationContextEventMulticaster {
 	/**
 	 * Multicast the given application event to appropriate listeners.
 	 * 
-	 * @param event the event to multicast
+	 * @param osgiListener the event to multicast
 	 */
-	void multicastEvent(OsgiBundleApplicationContextEvent osgiEvent);
+	void multicastEvent(OsgiBundleApplicationContextEvent osgiListener);
 }
