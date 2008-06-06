@@ -21,7 +21,8 @@ import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.util.Assert;
 
 /**
- * Base event type used for sending dependencies notifications.
+ * Base event type used for sending dependencies notifications. Usually these
+ * are sent by Spring-DM OSGi importers.
  * 
  * @author Costin Leau
  * 
