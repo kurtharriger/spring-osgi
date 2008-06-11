@@ -28,6 +28,7 @@ import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitEndedEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitStartingEvent;
 
 /**
  * @author Costin Leau
@@ -92,7 +93,7 @@ public class DepedencyEventTest extends AbstractEventTest {
 			bnd.start();
 
 			// expect at least 3 events
-			for (int i = 0; i < 3; i++) {
+			while (eventList.size() < 3) {
 				if (!waitForEvent(TIME_OUT)) {
 					fail("not enough events received after " + TIME_OUT + " ms");
 				}
@@ -102,13 +103,13 @@ public class DepedencyEventTest extends AbstractEventTest {
 
 			// simple service 3
 			assertEquals("&simpleService3", getDependencyAt(0).getBeanName());
-			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(0).getClass());
+			assertEquals(OsgiServiceDependencyWaitStartingEvent.class, getNestedEventAt(0).getClass());
 			// simple service 2
 			assertEquals("&simpleService2", getDependencyAt(1).getBeanName());
-			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(0).getClass());
+			assertEquals(OsgiServiceDependencyWaitStartingEvent.class, getNestedEventAt(0).getClass());
 			// simple service 1
 			assertEquals("&nested", getDependencyAt(2).getBeanName());
-			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(0).getClass());
+			assertEquals(OsgiServiceDependencyWaitStartingEvent.class, getNestedEventAt(0).getClass());
 
 			// start the dependencies first dependency
 			bnd1.start();
