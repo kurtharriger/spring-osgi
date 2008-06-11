@@ -100,7 +100,7 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
+public final class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
 
 	/**
 	 * Wrapper around internal commands.
@@ -182,7 +182,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 	 * 
 	 * @return importer proxy
 	 */
-	protected Object createProxy() {
+	Object createProxy() {
 		if (log.isDebugEnabled())
 			log.debug("Creating a multi-value/collection proxy");
 
@@ -233,7 +233,7 @@ public class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceIm
 		return delegate;
 	}
 
-	protected Runnable getProxyDestructionCallback() {
+	Runnable getProxyDestructionCallback() {
 		return proxyDestructionCallback;
 	}
 

@@ -27,8 +27,7 @@ import org.springframework.osgi.context.event.OsgiBundleApplicationContextListen
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependencySatisfiedEvent;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitingEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitEndedEvent;
 
 /**
  * @author Costin Leau
@@ -103,32 +102,32 @@ public class DepedencyEventTest extends AbstractEventTest {
 
 			// simple service 3
 			assertEquals("&simpleService3", getDependencyAt(0).getBeanName());
-			assertEquals(OsgiServiceDependencyWaitingEvent.class, getNestedEventAt(0).getClass());
+			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(0).getClass());
 			// simple service 2
 			assertEquals("&simpleService2", getDependencyAt(1).getBeanName());
-			assertEquals(OsgiServiceDependencyWaitingEvent.class, getNestedEventAt(0).getClass());
+			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(0).getClass());
 			// simple service 1
 			assertEquals("&nested", getDependencyAt(2).getBeanName());
-			assertEquals(OsgiServiceDependencyWaitingEvent.class, getNestedEventAt(0).getClass());
+			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(0).getClass());
 
 			// start the dependencies first dependency
 			bnd1.start();
 			// make sure it's fully started
 			waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
 			assertEquals("&nested", getDependencyAt(3).getBeanName());
-			assertEquals(OsgiServiceDependencySatisfiedEvent.class, getNestedEventAt(3).getClass());
+			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(3).getClass());
 
 			bnd3.start();
 			// make sure it's fully started
 			waitOnContextCreation("org.springframework.osgi.iandt.simpleservice3");
 			assertEquals("&simpleService3", getDependencyAt(4).getBeanName());
-			assertEquals(OsgiServiceDependencySatisfiedEvent.class, getNestedEventAt(4).getClass());
+			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(4).getClass());
 			// bnd3 context started event
 
 			bnd2.start();
 			waitOnContextCreation("org.springframework.osgi.iandt.simpleservice2");
 			assertEquals("&simpleService2", getDependencyAt(5).getBeanName());
-			assertEquals(OsgiServiceDependencySatisfiedEvent.class, getNestedEventAt(5).getClass());
+			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(5).getClass());
 			// bnd2 context started event
 			// wait until the bundle fully starts
 			waitOnContextCreation("org.springframework.osgi.iandt.dependencies");

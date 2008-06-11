@@ -34,7 +34,7 @@ import org.springframework.util.Assert;
  */
 public class BootstrappingDependencyEvent extends OsgiBundleApplicationContextEvent {
 
-	private OsgiServiceDependencyEvent dependencyEvent;
+	private final OsgiServiceDependencyEvent dependencyEvent;
 
 
 	/**

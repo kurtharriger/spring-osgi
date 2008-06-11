@@ -32,20 +32,20 @@ import org.springframework.osgi.service.importer.OsgiServiceDependency;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceDependencyWaitingEvent extends OsgiServiceDependencyEvent {
+public class OsgiServiceDependencyWaitStartingEvent extends OsgiServiceDependencyEvent {
 
 	private final long timeToWait;
 
 
 	/**
-	 * Constructs a new <code>OsgiServiceDependencyWaitingEvent</code>
+	 * Constructs a new <code>OsgiServiceDependencyWaitStartingEvent</code>
 	 * instance.
 	 * 
 	 * @param source event source (usually the service importer)
 	 * @param dependency dependency description
 	 * @param timeToWait wait duration
 	 */
-	public OsgiServiceDependencyWaitingEvent(Object source, OsgiServiceDependency dependency, long timeToWait) {
+	public OsgiServiceDependencyWaitStartingEvent(Object source, OsgiServiceDependency dependency, long timeToWait) {
 		super(source, dependency);
 		this.timeToWait = timeToWait;
 	}

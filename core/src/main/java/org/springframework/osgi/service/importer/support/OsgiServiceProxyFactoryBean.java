@@ -57,7 +57,7 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean implements
+public final class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean implements
 		ApplicationEventPublisherAware {
 
 	/**
@@ -125,7 +125,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 				: getInterfaces()[0]));
 	}
 
-	protected Object createProxy() {
+	Object createProxy() {
 		if (log.isDebugEnabled())
 			log.debug("Creating a single service proxy ...");
 
@@ -175,7 +175,7 @@ public class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactor
 		return proxy;
 	}
 
-	protected Runnable getProxyDestructionCallback() {
+	Runnable getProxyDestructionCallback() {
 		return destructionCallback;
 	}
 

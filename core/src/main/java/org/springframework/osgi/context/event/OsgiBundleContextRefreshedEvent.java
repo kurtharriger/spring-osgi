@@ -27,9 +27,6 @@ import org.springframework.context.ApplicationContext;
  */
 public class OsgiBundleContextRefreshedEvent extends OsgiBundleApplicationContextEvent {
 
-	private static final long serialVersionUID = 1940652656961641769L;
-
-
 	/**
 	 * Constructs a new <code>OsgiBundleContextRefreshedEvent</code> instance.
 	 * 

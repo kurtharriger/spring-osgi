@@ -19,25 +19,29 @@ package org.springframework.osgi.service.importer.event;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 
 /**
+ * Importer event indicating that the wait for a given dependency has ended
+ * (successfully), namely the dependency was found before the time allocated for
+ * it elapsed.
+ * 
  * @author Costin Leau
  * 
  */
-public class OsgiServiceDependencySatisfiedEvent extends OsgiServiceDependencyEvent {
+public class OsgiServiceDependencyWaitEndedEvent extends OsgiServiceDependencyEvent {
 
-	private long waitedTime;
+	private final long waitedTime;
 
 
 	/**
-	 * Constructs a new <code>OsgiServiceDependencySatisfiedEvent</code>
+	 * Constructs a new <code>OsgiServiceDependencyWaitEndedEvent</code>
 	 * instance.
 	 * 
 	 * @param source event source (usually the service importer)
 	 * @param dependency dependency description
-	 * @param waitedTime time to wait
+	 * @param elapsedTime time to wait
 	 */
-	public OsgiServiceDependencySatisfiedEvent(Object source, OsgiServiceDependency dependency, long waitedTime) {
+	public OsgiServiceDependencyWaitEndedEvent(Object source, OsgiServiceDependency dependency, long elapsedTime) {
 		super(source, dependency);
-		this.waitedTime = waitedTime;
+		this.waitedTime = elapsedTime;
 	}
 
 	/**
@@ -47,7 +51,7 @@ public class OsgiServiceDependencySatisfiedEvent extends OsgiServiceDependencyEv
 	 * @return Returns the time (in milliseconds) spent waiting for the OSGi
 	 * service to appear
 	 */
-	public long getWaitedTime() {
+	public long getElapsedTime() {
 		return waitedTime;
 	}
 }

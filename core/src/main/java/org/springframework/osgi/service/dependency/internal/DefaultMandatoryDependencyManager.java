@@ -35,13 +35,15 @@ import org.springframework.core.ConcurrentMap;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterRegistry;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
-import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.internal.controller.ImporterInternalActions;
 import org.springframework.osgi.service.importer.support.internal.controller.ImporterRegistry;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.util.internal.BeanFactoryUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Default implementation of {@link MandatoryServiceDependencyManager} which
@@ -171,8 +173,13 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 		boolean trace = log.isTraceEnabled();
 
 		// determine exporters
-		String[] importerNames = BeanFactoryUtils.getTransitiveDependenciesForBean(beanFactory, exporterBeanName, true,
-			AbstractOsgiServiceImportFactoryBean.class);
+		String[] importerA = BeanFactoryUtils.getTransitiveDependenciesForBean(beanFactory, exporterBeanName, true,
+			OsgiServiceProxyFactoryBean.class);
+
+		String[] importerB = BeanFactoryUtils.getTransitiveDependenciesForBean(beanFactory, exporterBeanName, true,
+			OsgiServiceCollectionProxyFactoryBean.class);
+
+		String[] importerNames = StringUtils.concatenateStringArrays(importerA, importerB);
 
 		// create map of associated importers
 		Map dependingImporters = new LinkedHashMap(importerNames.length);
@@ -214,7 +221,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 			Map importerStatuses = new LinkedHashMap(filteredImporters.size());
 
 			for (Iterator iter = filteredImporters.iterator(); iter.hasNext();) {
-				AbstractOsgiServiceImportFactoryBean importer = (AbstractOsgiServiceImportFactoryBean) iter.next();
+				Object importer = iter.next();
 				importerStatuses.put(importer, Boolean.valueOf(isSatisfied(importer)));
 				// add the listener after the importer status has been recorded
 				addListener(importer, listener);

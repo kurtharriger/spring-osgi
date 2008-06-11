@@ -21,7 +21,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/1.1.0-rc1-SNAPSHOT/spring-osgi-test-1.1.0-rc1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/test-support/src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/1.1.0-rc1-SNAPSHOT/spring-osgi-io-1.1.0-rc1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/io/src/main/java"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/asm.osgi/2.2.3-SNAPSHOT/asm.osgi-2.2.3-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.0.5/framework-2.0.5.jar" sourcepath="/KF_SRC"/>

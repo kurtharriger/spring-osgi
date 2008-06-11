@@ -40,7 +40,6 @@ Package org.springframework.osgi.extender
 * introduced OsgiServiceDependencyFactory interface to allow third parties to add service dependencies required 
   before an application context is refreshed
 
-
 Package org.springframework.osgi.io
 * improved OsgiBundleResource#getFile() method when dealing with resources in expanded bundles
 * OsgiBundleResource#lastModified() works even when the underlying bundle cannot be resolved to a File
@@ -57,6 +56,8 @@ Package org.springframework.osgi.service
 * removed internal 'dependency' subpackage (and associated implementations) from the public API
 * improved significantly exporter/importer transitive dependency tracking for both single and multi service proxies
 * added default cardinality (1..X) when none is specified for both single and multiple service importers
+* deprecated importer base class AbstractOsgiServiceImportFactoryBean
+* deprecated exporter base class AbstractOsgiServiceExporter
 
 Package org.springframework.osgi.util
 * fixed internal handling of nested beans when discovering transitive dependencies of a bean
@@ -66,7 +67,6 @@ Package org.springframework.osgi.test
 * removed usage of PackageAdmin for resolving bundles
 * improved testing behaviour so that user-defined properties override the platform default ones
 * deprecated #getPlatformProperties() from existing platforms classes as it was confusing
-
 
 Package org.springframework.osgi.web
 * improved namespace detection strategy for OsgiBundleXmlWebApplicationContext
