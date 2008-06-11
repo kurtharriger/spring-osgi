@@ -27,22 +27,22 @@ import org.springframework.osgi.service.importer.OsgiServiceDependency;
  * @author Costin Leau
  * 
  */
-public class OsgiServiceDependencyTimedOutEvent extends OsgiServiceDependencyEvent {
+public class OsgiServiceDependencyWaitTimedOutEvent extends OsgiServiceDependencyEvent {
 
-	private final long waitingTime;
+	private final long elapsedTime;
 
 
 	/**
-	 * Constructs a new <code>OsgiServiceDependencyTimedOutEvent</code>
+	 * Constructs a new <code>OsgiServiceDependencyWaitTimedOutEvent</code>
 	 * instance.
 	 * 
 	 * @param source event source (usually a service importer)
 	 * @param dependency service dependency description
-	 * @param waitingTime time spent waiting
+	 * @param elapsedTime time spent waiting
 	 */
-	public OsgiServiceDependencyTimedOutEvent(Object source, OsgiServiceDependency dependency, long waitingTime) {
+	public OsgiServiceDependencyWaitTimedOutEvent(Object source, OsgiServiceDependency dependency, long elapsedTime) {
 		super(source, dependency);
-		this.waitingTime = waitingTime;
+		this.elapsedTime = elapsedTime;
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class OsgiServiceDependencyTimedOutEvent extends OsgiServiceDependencyEve
 	 * 
 	 * @return Returns the timeToWait
 	 */
-	public long getWaitingTime() {
-		return waitingTime;
+	public long getElapsedTime() {
+		return elapsedTime;
 	}
 }

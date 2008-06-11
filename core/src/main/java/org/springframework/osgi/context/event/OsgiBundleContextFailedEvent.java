@@ -26,8 +26,6 @@ import org.springframework.context.ApplicationContext;
  */
 public class OsgiBundleContextFailedEvent extends OsgiBundleApplicationContextEvent {
 
-	private static final long serialVersionUID = 3801822535665049023L;
-
 	private final Throwable cause;
 
 

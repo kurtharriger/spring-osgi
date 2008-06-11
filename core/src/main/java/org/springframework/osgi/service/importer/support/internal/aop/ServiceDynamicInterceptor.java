@@ -35,9 +35,9 @@ import org.springframework.osgi.service.importer.DefaultOsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependencySatisfiedEvent;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependencyTimedOutEvent;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitingEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitEndedEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitTimedOutEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitStartingEvent;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.service.importer.support.internal.support.DefaultRetryCallback;
 import org.springframework.osgi.service.importer.support.internal.support.RetryCallback;
@@ -78,7 +78,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 		public Object execute(RetryCallback callback, Object notificationLock) {
 			//send event
-			publishEvent(new OsgiServiceDependencyWaitingEvent(eventSource, dependency, this.getWaitTime()
+			publishEvent(new OsgiServiceDependencyWaitStartingEvent(eventSource, dependency, this.getWaitTime()
 					* this.getRetryNumbers()));
 
 			Object result = null;
@@ -92,16 +92,16 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			}
 			catch (RuntimeException exception) {
 				stop = System.currentTimeMillis() - start;
-				publishEvent(new OsgiServiceDependencyTimedOutEvent(eventSource, dependency, stop));
+				publishEvent(new OsgiServiceDependencyWaitTimedOutEvent(eventSource, dependency, stop));
 				throw exception;
 			}
 
 			// send finalization event
 			if (callback.isComplete(result)) {
-				publishEvent(new OsgiServiceDependencySatisfiedEvent(eventSource, dependency, stop));
+				publishEvent(new OsgiServiceDependencyWaitEndedEvent(eventSource, dependency, stop));
 			}
 			else {
-				publishEvent(new OsgiServiceDependencyTimedOutEvent(eventSource, dependency, stop));
+				publishEvent(new OsgiServiceDependencyWaitTimedOutEvent(eventSource, dependency, stop));
 			}
 
 			return result;
@@ -423,7 +423,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 				applicationEventPublisher.publishEvent(event);
 			}
 			catch (IllegalStateException ise) {
-				log.error(
+				log.debug(
 					"Event "
 							+ event
 							+ " not published as the publisher is not initialized - usually this is caused by eager initialization of the importers by post processing",

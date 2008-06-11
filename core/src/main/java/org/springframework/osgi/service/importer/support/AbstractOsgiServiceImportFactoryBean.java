@@ -44,7 +44,8 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * @author Adrian Colyer
  * @author Hal Hildebrand
- * 
+ * @deprecated after 1.1 RC1, this call will be removed. Use concrete importer implementations such as
+ * OsgiServiceCollectionProxyFactoryBean or OsgiServiceProxyFactoryBean
  */
 public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFactoryBean, InitializingBean,
 		DisposableBean, BundleContextAware, BeanClassLoaderAware, BeanNameAware {
@@ -111,7 +112,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 	 * @return OSGi service tracking proxy.
 	 * @see #getProxyDestructionCallback()
 	 */
-	protected abstract Object createProxy();
+	abstract Object createProxy();
 
 	/**
 	 * Returns the destruction callback associated with the proxy created by
@@ -121,7 +122,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 	 * @return destruction callback for the service proxy.
 	 * @see #createProxy()
 	 */
-	protected abstract Runnable getProxyDestructionCallback();
+	abstract Runnable getProxyDestructionCallback();
 
 	public boolean isSingleton() {
 		return true;

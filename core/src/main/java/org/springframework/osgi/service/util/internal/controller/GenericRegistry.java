@@ -35,7 +35,8 @@ import org.springframework.core.CollectionFactory;
  * 
  */
 public class GenericRegistry implements ControllerRegistry {
-
+// TODO: consider using identity instead of equals() to guarantee no object clash occur
+	
 	/** controller registry */
 	private final Map registry = CollectionFactory.createConcurrentMapIfPossible(8);
 

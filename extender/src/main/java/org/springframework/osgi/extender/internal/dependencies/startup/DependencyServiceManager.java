@@ -20,8 +20,8 @@ import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependencySatisfiedEvent;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitingEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitEndedEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitStartingEvent;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
@@ -111,7 +111,7 @@ public class DependencyServiceManager {
 				if (unsatisfiedDependencies.isEmpty()) {
 					deregister();
 					// context.listener = null;
-					log.info("No outstanding OSGi service dependencies, completing initialization for "
+					log.info("No unsatisfied OSGi service dependencies; completing initialization for "
 							+ context.getDisplayName());
 
 					// execute task to complete initialization
@@ -225,7 +225,8 @@ public class DependencyServiceManager {
 						dependencies.put(msd, dependency.getBeanName());
 
 						if (!msd.isServicePresent()) {
-							log.info("Adding OSGi service dependency for importer " + msd.getBeanName());
+							log.info("Adding OSGi service dependency for importer [" + msd.getBeanName()
+									+ "] matching OSGi filter [" + msd.filterAsString + "]");
 							unsatisfiedDependencies.put(msd, dependency.getBeanName());
 						}
 					}
@@ -239,6 +240,11 @@ public class DependencyServiceManager {
 			log.debug(dependencies.size() + " OSGi service dependencies, " + unsatisfiedDependencies.size()
 					+ " unsatisfied (for beans " + unsatisfiedDependencies.values() + ") in "
 					+ context.getDisplayName());
+		}
+
+		if (!unsatisfiedDependencies.isEmpty()) {
+			log.info(context.getDisplayName() + " is waiting for unsatisfied dependencies [" + unsatisfiedDependencies.values()
+					+ "]");
 		}
 		if (log.isTraceEnabled()) {
 			log.trace("Total OSGi service dependencies beans " + dependencies.values());
@@ -299,7 +305,7 @@ public class DependencyServiceManager {
 	private void sendInitialDependencyEvents() {
 		for (Iterator iterator = unsatisfiedDependencies.keySet().iterator(); iterator.hasNext();) {
 			MandatoryServiceDependency entry = (MandatoryServiceDependency) iterator.next();
-			OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitingEvent(context,
+			OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context,
 				entry.getServiceDependency(), waitTime);
 			BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, nestedEvent);
 			publishEvent(dependencyEvent);
@@ -307,14 +313,14 @@ public class DependencyServiceManager {
 	}
 
 	private void sendDependencyUnsatisfiedEvent(MandatoryServiceDependency dependency) {
-		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitingEvent(context,
+		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context,
 			dependency.getServiceDependency(), waitTime);
 		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, nestedEvent);
 		publishEvent(dependencyEvent);
 	}
 
 	private void sendDependencySatisfiedEvent(MandatoryServiceDependency dependency) {
-		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencySatisfiedEvent(context,
+		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitEndedEvent(context,
 			dependency.getServiceDependency(), waitTime);
 		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, nestedEvent);
 		publishEvent(dependencyEvent);

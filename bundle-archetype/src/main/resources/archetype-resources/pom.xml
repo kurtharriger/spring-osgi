@@ -12,9 +12,7 @@
 
 	<properties>
 		<slf4j.version>1.4.3</slf4j.version>
-		<spring.maven.artifact.version>
-			2.5.4
-		</spring.maven.artifact.version>
+		<spring.maven.artifact.version>2.5.4</spring.maven.artifact.version>
 		<spring.osgi.version>1.1.0-rc1-SNAPSHOT</spring.osgi.version>
 		<equinox.ver>3.2.2</equinox.ver>
 	</properties>
@@ -38,29 +36,36 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl104-over-slf4j</artifactId>
-			<version>${slf4j.version}</version>
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+		  <version>${slf4j.version}</version>
+		  <scope>provided</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>com.springsource.slf4j.api</artifactId>
+		  <version>${slf4j.version}</version>
+		  <scope>provided</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j.version}</version>
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>com.springsource.slf4j.log4j</artifactId>
+		  <version>${slf4j.version}</version>
+		  <scope>provided</scope>
+		  <exclusions>
+			<exclusion>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+			</exclusion>
+		  </exclusions>      
 		</dependency>
 
 		<!-- test scoped dependencies -->
 		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>junit.osgi</artifactId>
-			<version>3.8.2-SNAPSHOT</version>
-			<scope>test</scope>
+		  <groupId>org.junit</groupId>
+		  <artifactId>com.springsource.junit</artifactId>
+		  <version>3.8.2</version>
+		  <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -84,10 +89,10 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>aopalliance.osgi</artifactId>
-			<version>1.0-SNAPSHOT</version>
-			<scope>test</scope>
+			<groupId>org.aopalliance</groupId>
+			<artifactId>com.springsource.org.aopalliance</artifactId>
+			<version>1.0.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Equinox OSGi platform -->

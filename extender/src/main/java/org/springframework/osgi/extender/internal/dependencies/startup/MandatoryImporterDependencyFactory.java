@@ -26,10 +26,14 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.service.importer.DefaultOsgiServiceDependency;
-import org.springframework.osgi.service.importer.support.AbstractOsgiServiceImportFactoryBean;
+import org.springframework.osgi.service.importer.OsgiServiceDependency;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
+import org.springframework.util.StringUtils;
 
 /**
  * Default mandatory importer dependency factory.
@@ -42,8 +46,13 @@ public class MandatoryImporterDependencyFactory implements OsgiServiceDependency
 	public Collection getServiceDependencies(BundleContext bundleContext, ConfigurableListableBeanFactory beanFactory)
 			throws BeansException, InvalidSyntaxException, BundleException {
 
-		String[] beans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
-			AbstractOsgiServiceImportFactoryBean.class, true, false);
+		String[] singleBeans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
+			OsgiServiceProxyFactoryBean.class, true, false);
+
+		String[] collectionBeans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
+			OsgiServiceCollectionProxyFactoryBean.class, true, false);
+
+		String[] beans = StringUtils.concatenateStringArrays(singleBeans, collectionBeans);
 
 		List beansCollections = new ArrayList(beans.length);
 
@@ -51,9 +60,23 @@ public class MandatoryImporterDependencyFactory implements OsgiServiceDependency
 			String beanName = (beans[i].startsWith(BeanFactory.FACTORY_BEAN_PREFIX) ? beans[i]
 					: BeanFactory.FACTORY_BEAN_PREFIX + beans[i]);
 
-			AbstractOsgiServiceImportFactoryBean reference = (AbstractOsgiServiceImportFactoryBean) beanFactory.getBean(beanName);
-			beansCollections.add(new DefaultOsgiServiceDependency(beanName, reference.getUnifiedFilter(),
-				reference.getCardinality().isMandatory()));
+			SmartFactoryBean reference = (SmartFactoryBean) beanFactory.getBean(beanName);
+
+			OsgiServiceDependency dependency;
+			if (reference instanceof OsgiServiceProxyFactoryBean) {
+				OsgiServiceProxyFactoryBean importer = (OsgiServiceProxyFactoryBean) reference;
+
+				dependency = new DefaultOsgiServiceDependency(beanName, importer.getUnifiedFilter(),
+					importer.getCardinality().isMandatory());
+			}
+			else {
+				OsgiServiceCollectionProxyFactoryBean importer = (OsgiServiceCollectionProxyFactoryBean) reference;
+
+				dependency = new DefaultOsgiServiceDependency(beanName, importer.getUnifiedFilter(),
+					importer.getCardinality().isMandatory());
+			}
+
+			beansCollections.add(dependency);
 		}
 
 		return beansCollections;
