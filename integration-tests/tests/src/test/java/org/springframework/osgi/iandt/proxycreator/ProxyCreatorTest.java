@@ -48,7 +48,7 @@ public class ProxyCreatorTest extends BaseIntegrationTest {
 
 		// make sure it starts-up
 		try {
-			waitOnContextCreation(PROXY_CREATOR_SYM_NAME, 3);
+			waitOnContextCreation(PROXY_CREATOR_SYM_NAME, 60);
 		}
 		catch (Exception ex) {
 			fail("updating the bundle failed");
