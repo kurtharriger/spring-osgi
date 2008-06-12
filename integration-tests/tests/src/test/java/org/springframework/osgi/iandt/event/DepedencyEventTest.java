@@ -16,6 +16,7 @@
 
 package org.springframework.osgi.iandt.event;
 
+import java.beans.EventSetDescriptor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -111,22 +112,16 @@ public class DepedencyEventTest extends AbstractEventTest {
 			assertEquals("&nested", getDependencyAt(2).getBeanName());
 			assertEquals(OsgiServiceDependencyWaitStartingEvent.class, getNestedEventAt(0).getClass());
 
-			// start the dependencies first dependency
-			bnd1.start();
-			// make sure it's fully started
-			waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
+			waitForContextStartEvent(bnd1);
 			assertEquals("&nested", getDependencyAt(3).getBeanName());
 			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(3).getClass());
 
-			bnd3.start();
-			// make sure it's fully started
-			waitOnContextCreation("org.springframework.osgi.iandt.simpleservice3");
+			waitForContextStartEvent(bnd3);
 			assertEquals("&simpleService3", getDependencyAt(4).getBeanName());
 			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(4).getClass());
 			// bnd3 context started event
 
-			bnd2.start();
-			waitOnContextCreation("org.springframework.osgi.iandt.simpleservice2");
+			waitForContextStartEvent(bnd2);
 			assertEquals("&simpleService2", getDependencyAt(5).getBeanName());
 			assertEquals(OsgiServiceDependencyWaitEndedEvent.class, getNestedEventAt(5).getClass());
 			// bnd2 context started event
@@ -158,5 +153,13 @@ public class DepedencyEventTest extends AbstractEventTest {
 		System.out.println("received object " + obj.getClass() + "|" + obj);
 		BootstrappingDependencyEvent event = (BootstrappingDependencyEvent) obj;
 		return event.getDependencyEvent();
+	}
+
+	private void waitForContextStartEvent(Bundle bundle) throws Exception {
+		int eventNumber = eventList.size();
+		bundle.start();
+		waitOnContextCreation(bundle.getSymbolicName());
+		while (eventList.size() < eventNumber + 1)
+			waitForEvent(TIME_OUT);
 	}
 }
