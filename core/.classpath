@@ -12,13 +12,13 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.4/spring-beans-2.5.4.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/2.5.4/spring-aop-2.5.4.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.4/spring-context-2.5.4.jar" sourcepath="/SPRING_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/aopalliance.osgi/1.0-SNAPSHOT/aopalliance.osgi-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/aopalliance/com.springsource.org.aopalliance/1.0.0/com.springsource.org.aopalliance-1.0.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.4.3/jcl104-over-slf4j-1.4.3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
 	<classpathentry kind="var" path="M2_REPO/multithreadedtc/multithreadedtc/1.01/multithreadedtc-1.01-jdk14.jar" sourcepath="/MTC_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.0/com.springsource.slf4j.org.apache.commons.logging-1.5.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/net/sf/retrotranslator/retrotranslator-runtime/1.2.3/retrotranslator-runtime-1.2.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/backport-util-concurrent.osgi/3.1-SNAPSHOT/backport-util-concurrent.osgi-3.1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/edu/emory/mathcs/backport/com.springsource.edu.emory.mathcs.backport/3.1.0/com.springsource.edu.emory.mathcs.backport-3.1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-test/2.5.4/spring-test-2.5.4.jar" sourcepath="/SPRING_MOCK_SRC"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
