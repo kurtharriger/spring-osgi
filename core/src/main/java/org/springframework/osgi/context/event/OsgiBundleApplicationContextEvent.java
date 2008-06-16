@@ -16,9 +16,11 @@
 
 package org.springframework.osgi.context.event;
 
+import org.osgi.framework.Bundle;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.util.Assert;
 
 /**
  * Base class for events raised for an <code>ApplicationContext</code> created
@@ -35,13 +37,28 @@ import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext
  */
 public abstract class OsgiBundleApplicationContextEvent extends ApplicationContextEvent {
 
+	private final Bundle bundle;
+
+
 	/**
 	 * Constructs a new <code>OsgiApplicationContextEvent</code> instance.
 	 * 
 	 * @param source the <code>ConfigurableOsgiBundleApplicationContext</code>
 	 * that the event is raised for (must not be <code>null</code>)
 	 */
-	public OsgiBundleApplicationContextEvent(ApplicationContext source) {
+	public OsgiBundleApplicationContextEvent(ApplicationContext source, Bundle bundle) {
 		super(source);
+		Assert.notNull(bundle);
+		this.bundle = bundle;
+	}
+
+	/**
+	 * Returns the OSGi {@link Bundle} associated with the application context
+	 * that triggers the event.
+	 * 
+	 * @return associated OSGi bundle
+	 */
+	public Bundle getBundle() {
+		return bundle;
 	}
 }

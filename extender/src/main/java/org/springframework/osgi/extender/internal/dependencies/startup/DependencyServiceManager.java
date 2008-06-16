@@ -218,9 +218,9 @@ public class DependencyServiceManager {
 							+ " threw exception while detecting dependencies for beanFactory " + beanFactory, ex);
 				}
 				// add the dependencies one by one
-				if (dependencies != null)
-					for (Iterator iterator2 = discoveredDependencies.iterator(); iterator2.hasNext();) {
-						OsgiServiceDependency dependency = (OsgiServiceDependency) iterator2.next();
+				if (discoveredDependencies != null)
+					for (Iterator dependencyIterator = discoveredDependencies.iterator(); dependencyIterator.hasNext();) {
+						OsgiServiceDependency dependency = (OsgiServiceDependency) dependencyIterator.next();
 						MandatoryServiceDependency msd = new MandatoryServiceDependency(bundleContext, dependency);
 						dependencies.put(msd, dependency.getBeanName());
 
@@ -243,8 +243,8 @@ public class DependencyServiceManager {
 		}
 
 		if (!unsatisfiedDependencies.isEmpty()) {
-			log.info(context.getDisplayName() + " is waiting for unsatisfied dependencies [" + unsatisfiedDependencies.values()
-					+ "]");
+			log.info(context.getDisplayName() + " is waiting for unsatisfied dependencies ["
+					+ unsatisfiedDependencies.values() + "]");
 		}
 		if (log.isTraceEnabled()) {
 			log.trace("Total OSGi service dependencies beans " + dependencies.values());
@@ -307,7 +307,8 @@ public class DependencyServiceManager {
 			MandatoryServiceDependency entry = (MandatoryServiceDependency) iterator.next();
 			OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context,
 				entry.getServiceDependency(), waitTime);
-			BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, nestedEvent);
+			BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context,
+				context.getBundle(), nestedEvent);
 			publishEvent(dependencyEvent);
 		}
 	}
@@ -315,14 +316,16 @@ public class DependencyServiceManager {
 	private void sendDependencyUnsatisfiedEvent(MandatoryServiceDependency dependency) {
 		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context,
 			dependency.getServiceDependency(), waitTime);
-		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, nestedEvent);
+		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, context.getBundle(),
+			nestedEvent);
 		publishEvent(dependencyEvent);
 	}
 
 	private void sendDependencySatisfiedEvent(MandatoryServiceDependency dependency) {
 		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitEndedEvent(context,
 			dependency.getServiceDependency(), waitTime);
-		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, nestedEvent);
+		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, context.getBundle(),
+			nestedEvent);
 		publishEvent(dependencyEvent);
 	}
 

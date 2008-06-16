@@ -37,7 +37,6 @@ import org.springframework.osgi.service.importer.support.internal.collection.Osg
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedSet;
 import org.springframework.osgi.service.importer.support.internal.controller.ImporterController;
 import org.springframework.osgi.service.importer.support.internal.controller.ImporterInternalActions;
-import org.springframework.osgi.service.importer.support.internal.controller.ImporterRegistry;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.util.Assert;
 
@@ -155,7 +154,6 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiSer
 
 	public OsgiServiceCollectionProxyFactoryBean() {
 		controller = new ImporterController(new Executor());
-		ImporterRegistry.putController(this, controller);
 	}
 
 	public void afterPropertiesSet() {

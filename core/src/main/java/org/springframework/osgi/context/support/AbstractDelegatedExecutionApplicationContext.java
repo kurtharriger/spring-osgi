@@ -344,12 +344,12 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 	private void sendFailedEvent(Throwable cause) {
 		if (delegatedMulticaster != null)
-			delegatedMulticaster.multicastEvent(new OsgiBundleContextFailedEvent(this, cause));
+			delegatedMulticaster.multicastEvent(new OsgiBundleContextFailedEvent(this, this.getBundle(), cause));
 	}
 
 	private void sendRefreshedEvent() {
 		if (delegatedMulticaster != null)
-			delegatedMulticaster.multicastEvent(new OsgiBundleContextRefreshedEvent(this));
+			delegatedMulticaster.multicastEvent(new OsgiBundleContextRefreshedEvent(this, this.getBundle()));
 	}
 
 	/**

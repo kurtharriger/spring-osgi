@@ -24,7 +24,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
-import org.springframework.osgi.service.exporter.support.internal.controller.ExporterRegistry;
+import org.springframework.osgi.service.exporter.support.internal.controller.ExporterControllerUtils;
 
 /**
  * BeanPostProcessor registered for detecting the dependency between service
@@ -58,7 +58,7 @@ public class MandatoryDependencyBeanPostProcessor implements BeanFactoryAware, B
 			// if it's a singleton, then disable publication, otherwise ignore it
 			if (beanFactory.isSingleton(exporterName)) {
 				// get controller
-				ExporterInternalActions controller = ExporterRegistry.getControllerFor(bean);
+				ExporterInternalActions controller = ExporterControllerUtils.getControllerFor(bean);
 				controller.registerServiceAtStartup(false);
 			}
 		}

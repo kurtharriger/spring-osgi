@@ -128,8 +128,8 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 		}
 		catch (Throwable th) {
 			// if the interface is not wired, ignore the bundle
-			log.warn("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " cannot see "
-					+ NS_HANDLER_RESOLVER_CLASS_NAME + "; ignoring its namespace handlers");
+			log.warn("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " cannot see class ["
+					+ NS_HANDLER_RESOLVER_CLASS_NAME + "]; ignoring its namespace handlers");
 
 			return false;
 		}
