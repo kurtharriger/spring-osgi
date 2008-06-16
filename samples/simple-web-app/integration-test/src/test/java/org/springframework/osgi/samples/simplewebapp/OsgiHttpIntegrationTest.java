@@ -94,8 +94,8 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 	}
 
 	public void testHtmlPage() throws Exception {
-		// wait 3 seconds to make sure things are properly deployed
-		Thread.sleep(3 * 1000);
+		// wait 10 seconds to make sure things are properly deployed
+		Thread.sleep(10 * 1000);
 		testConnection(url() + "/index.html");
 	}
 
