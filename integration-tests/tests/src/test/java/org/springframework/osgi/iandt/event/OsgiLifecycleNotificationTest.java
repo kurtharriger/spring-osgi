@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.iandt.event;
 
+import java.util.Iterator;
+
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
@@ -66,8 +68,12 @@ public class OsgiLifecycleNotificationTest extends AbstractEventTest {
 
 			assertTrue("no event received", waitForEvent(TIME_OUT));
 			System.out.println("events received " + eventList);
-			Object event = eventList.get(0);
-			assertTrue("wrong event received", event instanceof OsgiBundleContextRefreshedEvent);
+			boolean eventFound = false;
+			for (Iterator iterator = eventList.iterator(); iterator.hasNext();) {
+				if (iterator.next() instanceof OsgiBundleContextRefreshedEvent)
+					eventFound = true;
+			}
+			assertTrue("wrong event received", eventFound);
 		}
 		finally {
 			bnd.uninstall();
