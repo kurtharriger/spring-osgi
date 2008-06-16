@@ -400,7 +400,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		log.error(message.toString(), t);
 
 		// send notification
-		delegatedMulticaster.multicastEvent(new OsgiBundleContextFailedEvent(delegateContext, t));
+		delegatedMulticaster.multicastEvent(new OsgiBundleContextFailedEvent(delegateContext,
+			delegateContext.getBundle(), t));
 
 		// rethrow the exception wrapped to the caller (and prevent bundles
 		// started in sync mode to complete).

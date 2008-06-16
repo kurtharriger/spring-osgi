@@ -16,12 +16,12 @@
 
 package org.springframework.osgi.context.event;
 
+import org.osgi.framework.Bundle;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Event raised when an <code>ConfigurableOsgiBundleApplicationContext</code>
- * <code>refresh</code>
- * method executes successfully.
+ * Event raised when an <tt>ApplicationContext#refresh()</tt> method executes
+ * successfully inside an OSGi.
  * 
  * @author Costin Leau
  */
@@ -31,8 +31,9 @@ public class OsgiBundleContextRefreshedEvent extends OsgiBundleApplicationContex
 	 * Constructs a new <code>OsgiBundleContextRefreshedEvent</code> instance.
 	 * 
 	 * @param source event source
+	 * @param bundle associated OSGi bundle
 	 */
-	public OsgiBundleContextRefreshedEvent(ApplicationContext source) {
-		super(source);
+	public OsgiBundleContextRefreshedEvent(ApplicationContext source, Bundle bundle) {
+		super(source, bundle);
 	}
 }

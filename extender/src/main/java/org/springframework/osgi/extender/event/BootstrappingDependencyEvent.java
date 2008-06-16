@@ -16,13 +16,14 @@
 
 package org.springframework.osgi.extender.event;
 
+import org.osgi.framework.Bundle;
 import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
 import org.springframework.util.Assert;
 
 /**
- * Spring-DM Extender boostrapping event. This event is used during the
+ * Spring-DM Extender bootstrapping event. This event is used during the
  * application context discovery phase, before an application context is fully
  * initialized.
  * 
@@ -42,12 +43,18 @@ public class BootstrappingDependencyEvent extends OsgiBundleApplicationContextEv
 	 * 
 	 * @param source
 	 */
-	public BootstrappingDependencyEvent(ApplicationContext source, OsgiServiceDependencyEvent nestedEvent) {
-		super(source);
+	public BootstrappingDependencyEvent(ApplicationContext source, Bundle bundle, OsgiServiceDependencyEvent nestedEvent) {
+		super(source, bundle);
 		Assert.notNull(nestedEvent);
 		this.dependencyEvent = nestedEvent;
 	}
 
+	/**
+	 * Returns the nested, dependency event that caused the bootstrapping event
+	 * to be raised.
+	 * 
+	 * @return associated dependency event
+	 */
 	public OsgiServiceDependencyEvent getDependencyEvent() {
 		return dependencyEvent;
 	}

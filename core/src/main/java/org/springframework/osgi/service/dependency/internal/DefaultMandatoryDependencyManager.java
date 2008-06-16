@@ -33,12 +33,12 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.ConcurrentMap;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
-import org.springframework.osgi.service.exporter.support.internal.controller.ExporterRegistry;
+import org.springframework.osgi.service.exporter.support.internal.controller.ExporterControllerUtils;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.internal.controller.ImporterInternalActions;
-import org.springframework.osgi.service.importer.support.internal.controller.ImporterRegistry;
+import org.springframework.osgi.service.importer.support.internal.controller.ImporterControllerUtils;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.util.internal.BeanFactoryUtils;
 import org.springframework.util.Assert;
@@ -152,7 +152,7 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 			else {
 				exporterToName.put(exporter, exporterBeanName);
 				// retrieve associated controller
-				ExporterInternalActions controller = ExporterRegistry.getControllerFor(exporter);
+				ExporterInternalActions controller = ExporterControllerUtils.getControllerFor(exporter);
 
 				// disable publication at startup
 				controller.registerServiceAtStartup(false);
@@ -284,24 +284,24 @@ public class DefaultMandatoryDependencyManager implements MandatoryServiceDepend
 	}
 
 	private void startExporter(Object exporter) {
-		ExporterRegistry.getControllerFor(exporter).registerService();
+		ExporterControllerUtils.getControllerFor(exporter).registerService();
 	}
 
 	private void stopExporter(Object exporter) {
-		ExporterRegistry.getControllerFor(exporter).unregisterService();
+		ExporterControllerUtils.getControllerFor(exporter).unregisterService();
 	}
 
 	private void addListener(Object importer, ImporterStateListener stateListener) {
-		ImporterInternalActions controller = ImporterRegistry.getControllerFor(importer);
+		ImporterInternalActions controller = ImporterControllerUtils.getControllerFor(importer);
 		controller.addStateListener(stateListener);
 	}
 
 	private void removeListener(Object importer, ImporterStateListener stateListener) {
-		ImporterInternalActions controller = ImporterRegistry.getControllerFor(importer);
+		ImporterInternalActions controller = ImporterControllerUtils.getControllerFor(importer);
 		controller.removeStateListener(stateListener);
 	}
 
 	private boolean isSatisfied(Object importer) {
-		return ImporterRegistry.getControllerFor(importer).isSatisfied();
+		return ImporterControllerUtils.getControllerFor(importer).isSatisfied();
 	}
 }

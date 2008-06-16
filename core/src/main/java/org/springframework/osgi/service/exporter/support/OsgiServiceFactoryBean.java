@@ -48,7 +48,6 @@ import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterController;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
-import org.springframework.osgi.service.exporter.support.internal.controller.ExporterRegistry;
 import org.springframework.osgi.service.util.internal.aop.ProxyUtils;
 import org.springframework.osgi.service.util.internal.aop.ServiceTCCLInterceptor;
 import org.springframework.osgi.util.DebugUtils;
@@ -214,7 +213,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	public OsgiServiceFactoryBean() {
 		controller = new ExporterController(new Executor());
-		ExporterRegistry.putController(this, controller);
 	}
 
 	public void afterPropertiesSet() throws Exception {
@@ -275,11 +273,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		if (shouldRegisterAtStartup)
 			registerService();
-	}
-
-	public void destroy() {
-		ExporterRegistry.removeController(this);
-		super.destroy();
 	}
 
 	private void addBeanFactoryDependency() {
