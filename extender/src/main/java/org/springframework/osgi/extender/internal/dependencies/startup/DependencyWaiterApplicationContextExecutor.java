@@ -144,7 +144,6 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			synchronized (delegateContext.getMonitor()) {
 				delegateContext.completeRefresh();
 			}
-
 		}
 	}
 

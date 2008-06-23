@@ -25,6 +25,9 @@
 	<jetty.version>6.1.9</jetty.version>
 	<catalina.version>5.5.23-SNAPSHOT</catalina.version>
 
+
+	<!-- minimal servlet version -->
+	<servlet.version>2.4</servlet.version>
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 	
 
@@ -40,14 +43,12 @@
 	</spring.osgi.private.pkg>
 
 	<spring.osgi.import.pkg>
-		org.apache.commons.logging*,
-		javax.servlet,
+		javax.servlet;version=${servlet.version},
 		org.mortbay*;version=${jetty.osgi.version};resolution:=optional,
 		org.apache.catalina*;version=${catalina.osgi.version};resolution:=optional,
 		org.apache.jasper;resolution:=optional,
 		org.apache.jasper.servlet;resolution:=optional,
-		org.osgi.service.packageadmin;version=1.2;resolution:=optional,
-		*;resolution:=optional
+		org.osgi.service.packageadmin;version=1.2;resolution:=optional
 	</spring.osgi.import.pkg>
 	
 	<spring.osgi.symbolic.name>${symName.prefix}.web</spring.osgi.symbolic.name>

@@ -20,10 +20,7 @@
 	<spring.osgi.export.pkg>org.springframework.osgi.extensions.annotation</spring.osgi.export.pkg>
 	<spring.osgi.symbolic.name>${symName.prefix}.extensions.annotations</spring.osgi.symbolic.name>
 	<spring.osgi.import.pkg>
-	org.springframework.osgi.extender;version=${spring.osgi.import.version};resolution:=optional,
-	org.springframework.osgi*;version=${spring.osgi.import.version},
-	org.springframework*;version=${spring.base.version},
-	*
+		org.apache.commons.logging
 	</spring.osgi.import.pkg>
 
 	<source-jdk>1.5</source-jdk>

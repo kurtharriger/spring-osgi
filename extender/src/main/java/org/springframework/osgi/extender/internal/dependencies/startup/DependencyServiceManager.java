@@ -15,6 +15,7 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.osgi.OsgiException;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
@@ -196,7 +197,7 @@ public class DependencyServiceManager {
 		this.executeIfDone = executeIfDone;
 	}
 
-	protected void findServiceDependencies() {
+	protected void findServiceDependencies() throws Exception {
 		Thread currentThread = Thread.currentThread();
 		ClassLoader oldTCCL = currentThread.getContextClassLoader();
 
@@ -216,6 +217,7 @@ public class DependencyServiceManager {
 				catch (Exception ex) {
 					log.warn("Dependency factory " + dependencyFactory
 							+ " threw exception while detecting dependencies for beanFactory " + beanFactory, ex);
+					throw ex;
 				}
 				// add the dependencies one by one
 				if (discoveredDependencies != null)

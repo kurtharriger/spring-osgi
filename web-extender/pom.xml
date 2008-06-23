@@ -27,12 +27,9 @@
 		org.springframework.osgi.extender.internal.util*
 	</spring.osgi.private.pkg>
 
-	<spring.osgi.import.pkg>
-		org.apache.commons.logging*,
-		*;resolution:=optional
-	</spring.osgi.import.pkg>
-	
 	<spring.osgi.symbolic.name>${symName.prefix}.web.extender</spring.osgi.symbolic.name>
+	
+	<spring.osgi.import.pkg>org.apache.commons.logging</spring.osgi.import.pkg>
   </properties>
   
   <dependencies>
