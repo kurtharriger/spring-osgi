@@ -96,6 +96,11 @@ import org.springframework.util.Assert;
  * <td>Task executor used for creating the discovered application contexts.</td>
  * </tr>
  * <tr>
+ * <td><code>shutdownTaskExecutor</code></td>
+ * <td><code>org.springframework.core.task.TaskExecutor</code></td>
+ * <td>Task executor used for shutting down various application contexts.</td>
+ * </tr>
+ * <tr>
  * <td><code>extenderProperties</code></td>
  * <td><code>java.util.Properties</code></td>
  * <td>Various properties for configuring the extender behaviour (see below)</td>
@@ -389,9 +394,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 		// initialize the configuration once namespace handlers have been detected
 		this.taskExecutor = extenderConfiguration.getTaskExecutor();
-		TimerTaskExecutor tte = new TimerTaskExecutor();
-		tte.afterPropertiesSet();
-		shutdownTaskExecutor = tte;
+		this.shutdownTaskExecutor = extenderConfiguration.getShutdownTaskExecutor();
 
 		this.contextCreator = extenderConfiguration.getContextCreator();
 		this.postProcessors = extenderConfiguration.getPostProcessors();
@@ -558,15 +561,6 @@ public class ContextLoaderListener implements BundleActivator {
 				if (debug) {
 					log.debug(contextClosingDown[0] + " context did not closed succesfully; forcing shutdown...");
 				}
-			}
-		}
-
-		if (shutdownTaskExecutor instanceof DisposableBean) {
-			try {
-				((DisposableBean) shutdownTaskExecutor).destroy();
-			}
-			catch (Exception ex) {
-				// ignore
 			}
 		}
 
