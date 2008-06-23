@@ -17,7 +17,9 @@
 package org.springframework.osgi.iandt.extender.configuration;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
+import org.springframework.scheduling.timer.TimerTaskExecutor;
 
 /**
  * Extender configuration fragment.
@@ -49,6 +51,18 @@ public class ExtenderConfigurationTest extends BaseIntegrationTest {
 	public void tstPackageAdminReferenceBean() throws Exception {
 		logger.info("Calling package admin bean");
 		assertNotNull(context.getBean("packageAdmin"));
+	}
+
+	public void testShutdownTaskExecutor() throws Exception {
+		assertTrue(context.containsBean("shutdownTaskExecutor"));
+		Object bean = context.getBean("shutdownTaskExecutor");
+		assertTrue("unexpected type", bean instanceof TimerTaskExecutor);
+	}
+
+	public void testTaskExecutor() throws Exception {
+		assertTrue(context.containsBean("taskExecutor"));
+		Object bean = context.getBean("shutdownTaskExecutor");
+		assertTrue("unexpected type", bean instanceof TaskExecutor);
 	}
 
 	// felix doesn't support fragments, so disable this test
