@@ -29,13 +29,14 @@ public class ExtenderTest extends BaseIntegrationTest {
 
 		// remove extender
 		CollectionUtils.mergeArrayIntoCollection(bundles, list);
+		// additionally remove the annotation bundle as well (if included)
 
-		boolean found = false;
-		for (Iterator iter = list.iterator(); iter.hasNext() && !found;) {
+		int bundlesFound = 0;
+		for (Iterator iter = list.iterator(); (iter.hasNext() && (bundlesFound < 2));) {
 			String element = (String) iter.next();
-			if (element.indexOf("extender") >= 0) {
+			if (element.indexOf("extender") >= 0 || element.indexOf("osgi-annotation") >= 0) {
 				iter.remove();
-				found = true;
+				bundlesFound++;
 			}
 		}
 
@@ -49,8 +50,7 @@ public class ExtenderTest extends BaseIntegrationTest {
 	}
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { "org.springframework.osgi.iandt, lifecycle,"
-				+ getSpringDMVersion() };
+		return new String[] { "org.springframework.osgi.iandt, lifecycle," + getSpringDMVersion() };
 	}
 
 	public void testLifecycle() throws Exception {
