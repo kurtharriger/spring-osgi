@@ -285,5 +285,4 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	protected String getServerInfo() {
 		return "Jetty-" + Server.getVersion();
 	}
-
 }

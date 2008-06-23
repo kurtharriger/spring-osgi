@@ -28,14 +28,11 @@
 
 	<!-- import property editors which are loaded reflectively -->
 	<spring.osgi.import.pkg>
-		org.apache.commons.logging*,
 		org.aopalliance*;version="0.0.0",
 		org.springframework.aop;version=${spring.base.version},
 		org.springframework.beans.propertyeditors;version=${spring.base.version},
 		org.osgi.service.cm;version=1.2;resolution:=optional,
 		org.osgi.service.startlevel;version=1.0;resolution:=optional,
-		org.w3c.dom;resolution:=optional,
-		org.xml.sax;resolution:=optional,
 	</spring.osgi.import.pkg>
 	
 	<spring.osgi.private.pkg>

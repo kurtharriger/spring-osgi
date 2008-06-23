@@ -44,7 +44,8 @@
 		org.springframework.osgi*;version=${spring.osgi.import.version},
 		org.springframework*;version=${spring.base.version},
 		org.osgi.framework;version=1.3,
-		*
+		org.apache.commons.logging*,
+		*;resolution:=optional
 	</spring.osgi.import>
 
 	<!-- decoration osgi import - used internally when the jars are pre-processed and bnd doens't have to know about it -->
