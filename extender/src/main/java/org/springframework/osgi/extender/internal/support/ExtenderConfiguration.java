@@ -45,6 +45,7 @@ import org.springframework.osgi.extender.internal.dependencies.startup.Mandatory
 import org.springframework.osgi.extender.support.DefaultOsgiApplicationContextCreator;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
+import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -64,6 +65,8 @@ public class ExtenderConfiguration implements DisposableBean {
 	private static final Log log = LogFactory.getLog(ExtenderConfiguration.class);
 
 	private static final String TASK_EXECUTOR_NAME = "taskExecutor";
+
+	private static final String SHUTDOWN_TASK_EXECUTOR_NAME = "shutdownTaskExecutor";
 
 	private static final String CONTEXT_CREATOR_NAME = "applicationContextCreator";
 
@@ -96,9 +99,11 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private ConfigurableOsgiBundleApplicationContext extenderConfiguration;
 
-	private TaskExecutor taskExecutor;
+	private TaskExecutor taskExecutor, shutdownTaskExecutor;
 
 	private boolean isTaskExecutorManagedInternally = false;
+
+	private boolean isShutdownTaskExecutorManagedInternally = false;
 
 	private boolean isMulticasterManagedInternally = false;
 
@@ -138,6 +143,7 @@ public class ExtenderConfiguration implements DisposableBean {
 			log.info("No custom extender configuration detected; using defaults...");
 
 			taskExecutor = createDefaultTaskExecutor();
+			shutdownTaskExecutor = createDefaultShutdownTaskExecutor();
 			eventMulticaster = createDefaultEventMulticaster();
 
 			isMulticasterManagedInternally = true;
@@ -168,6 +174,10 @@ public class ExtenderConfiguration implements DisposableBean {
 			taskExecutor = extenderConfiguration.containsBean(TASK_EXECUTOR_NAME) ? (TaskExecutor) extenderConfiguration.getBean(
 				TASK_EXECUTOR_NAME, TaskExecutor.class)
 					: createDefaultTaskExecutor();
+
+			shutdownTaskExecutor = extenderConfiguration.containsBean(SHUTDOWN_TASK_EXECUTOR_NAME) ? (TaskExecutor) extenderConfiguration.getBean(
+				SHUTDOWN_TASK_EXECUTOR_NAME, TaskExecutor.class)
+					: createDefaultShutdownTaskExecutor();
 
 			eventMulticaster = extenderConfiguration.containsBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME) ? (OsgiBundleApplicationContextEventMulticaster) extenderConfiguration.getBean(
 				APPLICATION_EVENT_MULTICASTER_BEAN_NAME, OsgiBundleApplicationContextEventMulticaster.class)
@@ -221,15 +231,28 @@ public class ExtenderConfiguration implements DisposableBean {
 		}
 
 		// postpone the task executor shutdown
-		if (forceThreadShutdown && isTaskExecutorManagedInternally) {
-			log.warn("Forcing the (internally created) taskExecutor to stop");
-			ThreadGroup th = ((SimpleAsyncTaskExecutor) taskExecutor).getThreadGroup();
-			if (!th.isDestroyed()) {
-				// ask the threads nicely to stop
-				th.interrupt();
+		if (forceThreadShutdown) {
+
+			if (isTaskExecutorManagedInternally) {
+				log.warn("Forcing the (internally created) taskExecutor to stop...");
+				ThreadGroup th = ((SimpleAsyncTaskExecutor) taskExecutor).getThreadGroup();
+				if (!th.isDestroyed()) {
+					// ask the threads nicely to stop
+					th.interrupt();
+				}
 			}
+			taskExecutor = null;
 		}
-		taskExecutor = null;
+
+		if (isShutdownTaskExecutorManagedInternally) {
+			try {
+				((DisposableBean) shutdownTaskExecutor).destroy();
+			}
+			catch (Exception ex) {
+				log.debug("Received exception while shutting down shutdown task executor", ex);
+			}
+			shutdownTaskExecutor = null;
+		}
 	}
 
 	/**
@@ -316,6 +339,13 @@ public class ExtenderConfiguration implements DisposableBean {
 		return taskExecutor;
 	}
 
+	private TaskExecutor createDefaultShutdownTaskExecutor() {
+		TimerTaskExecutor taskExecutor = new TimerTaskExecutor();
+		taskExecutor.afterPropertiesSet();
+		isShutdownTaskExecutorManagedInternally = true;
+		return taskExecutor;
+	}
+
 	private OsgiBundleApplicationContextEventMulticaster createDefaultEventMulticaster() {
 		return new OsgiBundleApplicationContextEventMulticasterAdapter(new SimpleApplicationEventMulticaster());
 	}
@@ -339,6 +369,15 @@ public class ExtenderConfiguration implements DisposableBean {
 	 */
 	public TaskExecutor getTaskExecutor() {
 		return taskExecutor;
+	}
+
+	/**
+	 * Returns the shutdown task executor.
+	 * 
+	 * @return Returns the shutdown task executor
+	 */
+	public TaskExecutor getShutdownTaskExecutor() {
+		return null;
 	}
 
 	/**
