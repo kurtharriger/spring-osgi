@@ -39,6 +39,7 @@ Package org.springframework.osgi.extender
 * changed extender configuration to META-INF/spring/extender to avoid confusion
 * introduced OsgiServiceDependencyFactory interface to allow third parties to add service dependencies required 
   before an application context is refreshed
+* added support for local OsgiServiceDependencyFactory declared inside the analyzed application context
 
 Package org.springframework.osgi.io
 * improved OsgiBundleResource#getFile() method when dealing with resources in expanded bundles
