@@ -7,6 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.0/org.osgi.core-4.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-core"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.4/spring-beans-2.5.4.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.5/spring-beans-2.5.5.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
