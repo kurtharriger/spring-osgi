@@ -106,5 +106,4 @@ public class ConditionalApplicationContextCreator implements OsgiApplicationCont
 	public void setDelegatedApplicationContextCreator(OsgiApplicationContextCreator delegatedContextCreator) {
 		this.delegatedContextCreator = delegatedContextCreator;
 	}
-
 }
