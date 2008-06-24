@@ -96,7 +96,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <includes>index.xml,faq.xml,issues.xml,tutorial.xml</includes>
+                    <includes>index.xml,faq.xml,issues.xml</includes>
                     <htmlStylesheet>css/html.css</htmlStylesheet>
                     <xincludeSupported>true</xincludeSupported>
                     <sourceDirectory>${basedir}/src/docbkx</sourceDirectory>

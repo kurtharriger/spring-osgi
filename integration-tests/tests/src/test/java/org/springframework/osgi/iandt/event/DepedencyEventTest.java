@@ -16,7 +16,6 @@
 
 package org.springframework.osgi.iandt.event;
 
-import java.beans.EventSetDescriptor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

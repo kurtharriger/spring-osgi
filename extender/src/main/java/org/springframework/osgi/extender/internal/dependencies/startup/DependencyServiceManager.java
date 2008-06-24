@@ -1,13 +1,13 @@
 
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,8 +15,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
@@ -31,7 +31,7 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * ServiceListener used for tracking dependent services. Even if the
  * ServiceListener receives event synchronously, mutable properties should be
  * synchronized to guarantee safe publishing between threads.
- *
+ * 
  * @author Costin Leau
  * @author Hal Hildebrand
  * @author Andy Piper
@@ -61,12 +61,12 @@ public class DependencyServiceManager {
 	private final long waitTime;
 
 	/** dependency factories */
-	private List dependencyFactories = new ArrayList();
+	private List dependencyFactories;
 
 
 	/**
 	 * Actual ServiceListener.
-	 *
+	 * 
 	 * @author Costin Leau
 	 * @author Hal Hildebrand
 	 */
@@ -75,7 +75,7 @@ public class DependencyServiceManager {
 		/**
 		 * Process serviceChanged events, completing context initialization if
 		 * all the required dependencies are satisfied.
-		 *
+		 * 
 		 * @param serviceEvent
 		 */
 		public void serviceChanged(ServiceEvent serviceEvent) {
@@ -180,7 +180,7 @@ public class DependencyServiceManager {
 	 * Create a dependency manager, indicating the executor bound to, the
 	 * context that contains the dependencies and the task to execute if all
 	 * dependencies are met.
-	 *
+	 * 
 	 * @param executor
 	 * @param context
 	 * @param executeIfDone
@@ -190,7 +190,11 @@ public class DependencyServiceManager {
 			long maxWaitTime) {
 		this.contextStateAccessor = executor;
 		this.context = context;
-		this.dependencyFactories.addAll(dependencyFactories);
+		this.dependencyFactories = new ArrayList(8);
+
+		if (dependencyFactories != null)
+			this.dependencyFactories.addAll(dependencyFactories);
+
 		this.waitTime = maxWaitTime;
 		this.bundleContext = context.getBundleContext();
 		this.listener = new DependencyServiceListener();
@@ -203,15 +207,25 @@ public class DependencyServiceManager {
 		ClassLoader oldTCCL = currentThread.getContextClassLoader();
 
 		boolean debug = log.isDebugEnabled();
+		boolean trace = log.isTraceEnabled();
+
 		try {
 			currentThread.setContextClassLoader(context.getClassLoader());
 
 			ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 
-            Map localFactories = BeanFactoryUtils.beansOfTypeIncludingAncestors(beanFactory, OsgiServiceDependencyFactory.class, true, false);
-            dependencyFactories.addAll(localFactories.values());
+			if (trace)
+				log.trace("Looking for dependency factories inside bean factory [" + beanFactory.toString() + "]");
 
-            for (Iterator iterator = dependencyFactories.iterator(); iterator.hasNext();) {
+			Map localFactories = BeanFactoryUtils.beansOfTypeIncludingAncestors(beanFactory,
+				OsgiServiceDependencyFactory.class, true, false);
+
+			if (debug)
+				log.debug("Discovered local dependency factories: " + localFactories.keySet());
+
+			dependencyFactories.addAll(localFactories.values());
+
+			for (Iterator iterator = dependencyFactories.iterator(); iterator.hasNext();) {
 				OsgiServiceDependencyFactory dependencyFactory = (OsgiServiceDependencyFactory) iterator.next();
 				Collection discoveredDependencies = null;
 
@@ -220,8 +234,8 @@ public class DependencyServiceManager {
 				}
 				catch (Exception ex) {
 					log.warn("Dependency factory " + dependencyFactory
-							+ " threw exception while detecting dependencies for beanFactory " + beanFactory +
-                            " in " + context.getDisplayName(), ex);
+							+ " threw exception while detecting dependencies for beanFactory " + beanFactory + " in "
+							+ context.getDisplayName(), ex);
 					throw ex;
 				}
 				// add the dependencies one by one
@@ -267,7 +281,7 @@ public class DependencyServiceManager {
 		return unsatisfiedDependencies;
 	}
 
-    protected void register() {
+	protected void register() {
 		String filter = createDependencyFilter();
 		if (log.isDebugEnabled()) {
 			log.debug(context.getDisplayName() + " has registered service dependency dependencyDetector with filter: "
@@ -282,7 +296,7 @@ public class DependencyServiceManager {
 	/**
 	 * Look at the existing dependencies and create an appropriate filter. This
 	 * method concatenates the filters into one.
-	 *
+	 * 
 	 * @return
 	 */
 	protected String createDependencyFilter() {

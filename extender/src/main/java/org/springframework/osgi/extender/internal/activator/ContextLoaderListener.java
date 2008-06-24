@@ -727,7 +727,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 		}
 		else {
-			log.debug("Ignoring bundle " + bundleString + " as it's Spring incompatible");
+			log.debug("Ignoring bundle " + bundleString + " as it's Spring incompatible with Spring-DM...");
 			return;
 		}
 

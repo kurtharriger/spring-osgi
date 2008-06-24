@@ -19,7 +19,7 @@
 
   <properties>
     <!-- Spring version -->   
-    <spring.maven.artifact.version>2.5.5-SNAPSHOT</spring.maven.artifact.version>
+    <spring.maven.artifact.version>2.5.5</spring.maven.artifact.version>
     <spring.base.version>2.5.4</spring.base.version>
     
     <!-- Felix BND plugin settings -->
