@@ -54,7 +54,8 @@ import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationC
  * </pre>
  * 
  * <p/><b>Note:</b> The application contexts should be only created and
- * initialized but not started (i.e. <code>refresh()</code> method called).
+ * initialized but not started (i.e. <code>refresh()</code> method should not
+ * be called).
  * 
  * <p/>The recommended way of configuring the extender is to attach any relevant
  * <code>OsgiApplicationContextCreator</code> implementation as fragments to
@@ -64,6 +65,10 @@ import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationC
  * <p/>Note the extender also supports <code>OsgiBeanFactoryPostProcessor</code>
  * for application context customization.
  * 
+ * <p/>The creation of an application context doesn't guarantee that a bundle
+ * becomes Spring-DM managed. The Spring-DM extender can do additional post
+ * filtering that can discard the bundle (and associated context).
+ * 
  * @author Costin Leau
  * 
  */
@@ -72,7 +77,7 @@ public interface OsgiApplicationContextCreator {
 	/**
 	 * Creates an application context for the given bundle context. If no
 	 * application context needs to be created, then <code>null</code> should
-	 * be returned. Exceptions will be catch and logged but will not prevent the
+	 * be returned. Exceptions will be caught and logged but will not prevent the
 	 * creation of other application contexts.
 	 * 
 	 * @param bundleContext OSGi bundle context determining the context creation

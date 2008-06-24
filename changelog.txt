@@ -31,7 +31,7 @@ Package org.springframework.osgi.extender
 * added support.scanning package to allow custom locations to be used for 'Spring-powered' bundles
 * added setter for delegated application context creator in ConditionalApplicationContextCreator
 * improved ApplicationContextConfiguration internal structure
-* added type filtering behaviour inside the extender so only Spring-compatible bundles are scanned and managed
+* added type filtering behaviour inside the extender so that scanned bundles are Spring-compatible with the extender
 * removed internal usage of Thread.stop as it breaks the VM state
 * improved bundle shutdown by using a simple thread executor (rather then one thread per bundle model) to increase
   scalability
