@@ -4,7 +4,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi</artifactId>
   <packaging>pom</packaging>
-  <version>1.1.0-rc1</version>
+  <version>1.1.0-SNAPSHOT</version>
   <name>Spring Dynamic Modules</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
@@ -25,11 +25,11 @@
     <!-- Felix BND plugin settings -->
     
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
-    <spring.osgi.import.version>1.1.0.rc1</spring.osgi.import.version>
+    <spring.osgi.import.version>1.1.0</spring.osgi.import.version>
     
     <!--- Spring OSGi packages exported version -->
-    <spring.osgi.export.version>1.1.0.rc1</spring.osgi.export.version>
-    <spring.osgi.bundle.version>1.1.0.rc1</spring.osgi.bundle.version>
+    <spring.osgi.export.version>1.1.0</spring.osgi.export.version>
+    <spring.osgi.bundle.version>1.1.0</spring.osgi.bundle.version>
 
    
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
@@ -70,7 +70,6 @@
     
     <!-- End Felix BND plugin settings -->
 
-    <cobertura.file>${basedir}/target/cobertura/cobertura.ser</cobertura.file>
    <!-- other properties -->
    <slf4j.version>1.5.0</slf4j.version>
    
