@@ -69,7 +69,7 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 		// Spring DM web extender
 		col.add(SPRING_OSGI_GROUP + ", spring-osgi-web," + getSpringDMVersion());
 		col.add(SPRING_OSGI_GROUP + ", spring-osgi-web-extender," + getSpringDMVersion());
-		col.add(SPRING_OSGI_GROUP + ", cglib-nodep.osgi, 2.1.3-SNAPSHOT");
+		col.add("net.sourceforge.cglib, com.springsource.net.sf.cglib, 2.1.3");
 
 		// the war
 		col.add(SPRING_OSGI_GROUP + ".samples.simple-web-app, war, " + getSpringDMVersion() + ",war");

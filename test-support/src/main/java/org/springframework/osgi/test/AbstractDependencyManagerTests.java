@@ -26,7 +26,6 @@ import org.springframework.osgi.test.internal.util.PropertiesUtil;
 import org.springframework.osgi.test.provisioning.ArtifactLocator;
 import org.springframework.osgi.test.provisioning.internal.LocalFileSystemMavenRepository;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
