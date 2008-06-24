@@ -559,7 +559,7 @@ public class ContextLoaderListener implements BundleActivator {
 			if (RunnableTimedExecution.execute(tasks[j], extenderConfiguration.getShutdownWaitTime(),
 				shutdownTaskExecutor)) {
 				if (debug) {
-					log.debug(contextClosingDown[0] + " context did not closed succesfully; forcing shutdown...");
+					log.debug(contextClosingDown[0] + " context did not close successfully; forcing shutdown...");
 				}
 			}
 		}

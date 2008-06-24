@@ -307,8 +307,8 @@ public class ExtenderConfiguration implements DisposableBean {
 					return;
 				}
 				Object processor = BeanUtils.instantiateClass(annotationProcessor);
-				Assert.isInstanceOf(OsgiServiceDependency.class, processor);
-				dependencyFactories.add(1, (OsgiServiceDependency) processor);
+				Assert.isInstanceOf(OsgiServiceDependencyFactory.class, processor);
+				dependencyFactories.add(1, (OsgiServiceDependencyFactory) processor);
 				if (debug)
 					log.debug("Succesfully loaded annotation dependency processor [" + ANNOTATION_DEPENDENCY_FACTORY
 							+ "]");
