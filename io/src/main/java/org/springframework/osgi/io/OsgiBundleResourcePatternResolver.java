@@ -491,7 +491,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p/> Overrides the default check up since computing the URL can be fairly
+	 * Overrides the default check up since computing the URL can be fairly
 	 * expensive operation as there is no caching (due to the framework dynamic
 	 * nature).
 	 */

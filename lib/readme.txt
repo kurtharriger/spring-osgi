@@ -1,7 +1,8 @@
 The following libraries are included in the Spring Dynamic Modules Framework distribution 
 because they are required either for building or running the framework and its samples. 
-All libraries are 'rewrapped' as OSGi bundles using Apache Felix Bnd plugin:
-(http://felix.apache.org/site/maven-bundle-plugin-bnd.html).
+
+Most (if not all) libraries are available from SpringSource Enterprise Bundle Repository:
+http://www.springsource.com/repository/app/
 
 Note that each
 of these libraries is subject to the respective license; check the respective project
@@ -27,14 +28,6 @@ distribution/website before using any of them in your own applications.
 * cglib-nodep-2.1_3.jar
 - CGLIB 2.1_3 with ObjectWeb ASM 1.5.3 (http://cglib.sourceforge.net)
 - required at runtime when proxying full target classes via Spring AOP
-
-* cm_all.jar
-- Knopflerfish Configuration Admin implementation 2.0.0 (http://www.knopflerfish.org) 
-- required for running the framework's test suite
-
-* commons-lang.jar
-- Commons Lang 2.3 (http://jakarta.apache.org/commons/lang)
-- required by the framework samples
 
 * easymock.jar
 - EasyMock 1.2 (JDK 1.3 version) (http://www.easymock.org)
@@ -65,7 +58,7 @@ distribution/website before using any of them in your own applications.
 - required for building and running Spring-DM web support
 - compiled against JDK 1.4
 
-* log4j/log4j-1.2.15.jar
+* log4j-1.2.15.jar
 - Log4J 1.2.15 (http://logging.apache.org/log4j)
 - required for building running the framework's test suite
 
@@ -120,10 +113,6 @@ distribution/website before using any of them in your own applications.
 * spring-core.jar
 - Spring Framework 2.5.4 core library (http://www.springframework.org)
 - required for building and running the framework's test suite
-
-* spring-jdbc.jar
-- Spring Framework 2.5.4 jdbc library (http://www.springframework.org)
-- required for running the samples
 
 * spring-test.jar
 - Spring Framework 2.5.4 test library (http://www.springframework.org)
