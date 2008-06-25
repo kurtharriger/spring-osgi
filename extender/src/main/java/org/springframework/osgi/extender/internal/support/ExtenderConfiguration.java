@@ -43,7 +43,6 @@ import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.internal.dependencies.startup.MandatoryImporterDependencyFactory;
 import org.springframework.osgi.extender.support.DefaultOsgiApplicationContextCreator;
-import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
@@ -377,7 +376,7 @@ public class ExtenderConfiguration implements DisposableBean {
 	 * @return Returns the shutdown task executor
 	 */
 	public TaskExecutor getShutdownTaskExecutor() {
-		return null;
+		return shutdownTaskExecutor;
 	}
 
 	/**

@@ -61,7 +61,6 @@ import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
 
 /**

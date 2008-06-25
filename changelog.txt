@@ -5,8 +5,10 @@ http://www.springframework.org/osgi
 Changes in version 1.1.0 final (2008-0m-dd)
 -------------------------------------------
 
-Package org.springframework.osgi.extender.internal.dependencies.shutdown
+Package org.springframework.osgi.extender
 * Treat presence of ApplicationContext service as indicating reference is spring-powered.
+* fixed bug that prevented the shutdownTaskExecutor from being used
+
 
 Changes in version 1.1.0 RC1 (2008-06-24)
 -----------------------------------------
