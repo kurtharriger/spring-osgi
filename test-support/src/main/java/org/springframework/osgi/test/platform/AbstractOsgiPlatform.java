@@ -66,9 +66,7 @@ abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
 	/**
 	 * Subclasses can override this to provide special platform properties.
-	 * DEPRECATED
 	 * 
-	 * @deprecated
 	 * @return platform implementation specific properties.
 	 */
 	abstract Properties getPlatformProperties();

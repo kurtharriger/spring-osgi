@@ -56,7 +56,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		toString = "Felix OSGi Platform";
 	}
 
-	protected Properties getPlatformProperties() {
+	Properties getPlatformProperties() {
 		// load Felix configuration
 		Properties props = new Properties();
 		createStorageDir(props);
@@ -119,5 +119,4 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 			IOUtils.delete(felixStorageDir);
 		}
 	}
-
 }

@@ -41,7 +41,7 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 		toString = "Knopflerfish OSGi Platform";
 	}
 
-	protected Properties getPlatformProperties() {
+	Properties getPlatformProperties() {
 		if (kfStorageDir == null) {
 			kfStorageDir = createTempDir("kf");
 			kfStorageDir.deleteOnExit();
