@@ -11,6 +11,7 @@ General
 Package org.springframework.osgi.extender
 * improved shutdown ordering algorithm to consider published ApplicationContext
 * fixed bug that prevented the shutdownTaskExecutor option from being used
+* removed support for extender configuration at META-INF/spring
 
 Package org.springframework.osgi.test
 * removed deprecated #getPlatformProperties() method from platforms classes
