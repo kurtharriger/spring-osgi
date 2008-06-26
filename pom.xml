@@ -395,6 +395,13 @@ limitations under the License.
               <historyDir>${basedir}/clover/history</historyDir>
               -->
               <jdk>${source-jdk}</jdk>
+              
+              <!-- exclusions -->
+              <excludes>
+                <!-- integration tests -->
+				<exclude>org/springframework/osgi/iandt/**</exclude>
+				<exclude>org/springframework/osgi/test/parsing/**</exclude>
+              </excludes>
           </configuration>
       </plugin>      
 

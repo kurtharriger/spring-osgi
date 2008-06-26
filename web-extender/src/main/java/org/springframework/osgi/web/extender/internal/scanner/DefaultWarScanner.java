@@ -19,8 +19,6 @@ package org.springframework.osgi.web.extender.internal.scanner;
 import java.net.URL;
 import java.util.Enumeration;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 
 /**
@@ -32,8 +30,10 @@ import org.osgi.framework.Bundle;
  */
 public class DefaultWarScanner implements WarScanner {
 
-	/** logger */
-	private static final Log log = LogFactory.getLog(DefaultWarScanner.class);
+	/** default folder */
+	private static final String WEB_INF = "WEB-INF/";
+	/** default configuration file */
+	private static final String WEB_XML = "web.xml";
 
 
 	public URL getWebXmlConfiguration(Bundle bundle) {
@@ -41,7 +41,7 @@ public class DefaultWarScanner implements WarScanner {
 			return null;
 
 		// look into the bundle space for web.xml
-		Enumeration enm = bundle.findEntries("WEB-INF/", "web.xml", false);
+		Enumeration enm = bundle.findEntries(WEB_INF, WEB_XML, false);
 		if (enm != null && enm.hasMoreElements())
 			return (URL) enm.nextElement();
 		return null;
