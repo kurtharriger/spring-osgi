@@ -13,6 +13,10 @@ Package org.springframework.osgi.extender
 * fixed bug that prevented the shutdownTaskExecutor option from being used
 * removed support for extender configuration at META-INF/spring
 
+Package org.springframework.osgi.service
+* removed deprecated importer base class AbstractOsgiServiceImportFactoryBean
+* removed deprecated exporter base class AbstractOsgiServiceExporter
+
 Package org.springframework.osgi.test
 * removed deprecated #getPlatformProperties() method from platforms classes
 
