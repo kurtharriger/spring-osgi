@@ -284,7 +284,7 @@ limitations under the License.
       <extension>
          <groupId>org.springframework.aws</groupId>
          <artifactId>spring-aws-maven</artifactId>
-         <version>1.2.2</version>
+         <version>1.2.3</version>
        </extension>
     </extensions>
 
@@ -377,9 +377,9 @@ limitations under the License.
       
       <!-- clover plug-in -->
       <plugin>
-          <artifactId>maven-clover-plugin</artifactId>
           <groupId>com.atlassian.maven.plugins</groupId>
-          <version>3.7</version>
+          <artifactId>maven-clover2-plugin</artifactId>
+          <version>2.3.1</version>
           <configuration>
               <licenseLocation>${clover.licenseLocation}</licenseLocation>
               <generatePdf>false</generatePdf>
