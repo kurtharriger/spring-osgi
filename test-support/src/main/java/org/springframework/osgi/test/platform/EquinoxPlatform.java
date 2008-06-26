@@ -39,7 +39,7 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 		toString = "Equinox OSGi Platform";
 	}
 
-	protected Properties getPlatformProperties() {
+	Properties getPlatformProperties() {
 		// default properties
 		Properties props = new Properties();
 		props.setProperty("eclipse.ignoreApp", "true");
@@ -88,5 +88,4 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 	public void stop() throws Exception {
 		EclipseStarter.shutdown();
 	}
-
 }
