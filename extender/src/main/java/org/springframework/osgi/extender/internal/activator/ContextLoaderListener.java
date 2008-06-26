@@ -290,9 +290,6 @@ public class ContextLoaderListener implements BundleActivator {
 	/** listener counter - used to properly synchronize shutdown */
 	private Counter contextsStarted = new Counter("contextsStarted");
 
-	/** MandatoryServiceDependency for dependencyDetector management */
-	private ServiceRegistration listenerServiceRegistration;
-
 	/** Spring namespace/resolver manager */
 	private NamespaceManager nsManager;
 
@@ -665,8 +662,9 @@ public class ContextLoaderListener implements BundleActivator {
 	 * <p/> Kick off a background activity to create an application context for
 	 * the given bundle if needed.
 	 * 
-	 * <b>Note:</b> Make sure to do the fastest filtering first to avoid slowdowns
-	 * on platforms with a big number of plugins and wiring (i.e. Eclipse platform).
+	 * <b>Note:</b> Make sure to do the fastest filtering first to avoid
+	 * slowdowns on platforms with a big number of plugins and wiring (i.e.
+	 * Eclipse platform).
 	 * 
 	 * @param bundle
 	 */
@@ -716,11 +714,11 @@ public class ContextLoaderListener implements BundleActivator {
 			log.debug("No application context created for bundle " + bundleString);
 			return;
 		}
-		
+
 		// an application context has been created - do type filtering
 		// filtering could be applied before creating the application context but then user might disable this by accident
 		// so its best to do this inside the extender itself (this could change in the future)
-		
+
 		if (compatibilityChecker.checkCompatibility(bundle)) {
 			log.debug("Bundle " + bundleString + " is Spring type compatible with Spring-DM");
 

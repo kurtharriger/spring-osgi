@@ -47,7 +47,6 @@ import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * Configuration class for the extender. Takes care of locating the extender
@@ -78,13 +77,6 @@ public class ExtenderConfiguration implements DisposableBean {
 	private static final String PROCESS_ANNOTATIONS_KEY = "process.annotations";
 
 	private static final String EXTENDER_CFG_LOCATION = "META-INF/spring/extender";
-
-	/**
-	 * old configuration location
-	 * 
-	 * @deprecated
-	 */
-	private static final String OLD_EXTENDER_CFG_LOCATION = "META-INF/spring";
 
 	private static final String XML_PATTERN = "*.xml";
 
@@ -136,9 +128,8 @@ public class ExtenderConfiguration implements DisposableBean {
 		Properties properties = new Properties(createDefaultProperties());
 
 		Enumeration enm = bundle.findEntries(EXTENDER_CFG_LOCATION, XML_PATTERN, false);
-		Enumeration oldConfiguration = bundle.findEntries(OLD_EXTENDER_CFG_LOCATION, XML_PATTERN, false);
 
-		if (enm == null && oldConfiguration == null) {
+		if (enm == null) {
 			log.info("No custom extender configuration detected; using defaults...");
 
 			taskExecutor = createDefaultTaskExecutor();
@@ -150,17 +141,7 @@ public class ExtenderConfiguration implements DisposableBean {
 			classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 		}
 		else {
-			String[] newConfigs = copyEnumerationToList(enm);
-			String[] oldConfigs = copyEnumerationToList(oldConfiguration);
-
-			if (!ObjectUtils.isEmpty(oldConfigs)) {
-				log.warn("Extender configuration location [" + OLD_EXTENDER_CFG_LOCATION
-						+ "] has been deprecated and will be removed after RC1; use [" + EXTENDER_CFG_LOCATION
-						+ "] instead");
-			}
-
-			// merge old configs first so the new file can override bean definitions (if needed)
-			String[] configs = StringUtils.mergeStringArrays(oldConfigs, newConfigs);
+			String[] configs = copyEnumerationToList(enm);
 
 			log.info("Detected extender custom configurations at " + ObjectUtils.nullSafeToString(configs));
 			// create OSGi specific XML context
@@ -415,7 +396,6 @@ public class ExtenderConfiguration implements DisposableBean {
 	 * <p/> The flag will cause a best attempt to shutdown the threads.
 	 * 
 	 * @param forceThreadShutdown The forceThreadShutdown to set.
-	 * @deprecated
 	 */
 	public void setForceThreadShutdown(boolean forceThreadShutdown) {
 		this.forceThreadShutdown = forceThreadShutdown;
