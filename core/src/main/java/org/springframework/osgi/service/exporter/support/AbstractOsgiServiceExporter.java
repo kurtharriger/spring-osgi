@@ -27,10 +27,8 @@ import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener
  * known as exporting) Spring beans as OSGi services.
  * 
  * @author Costin Leau
- * @deprecated will be removed after 1.1 RC1 - use a concrete implementation
- * (such as OsgiServiceFactoryBean) instead.
  */
-public abstract class AbstractOsgiServiceExporter implements DisposableBean {
+abstract class AbstractOsgiServiceExporter implements DisposableBean {
 
 	/** listeners */
 	private OsgiServiceRegistrationListener[] listeners = new OsgiServiceRegistrationListener[0];
