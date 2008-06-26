@@ -44,10 +44,8 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * @author Adrian Colyer
  * @author Hal Hildebrand
- * @deprecated after 1.1 RC1, this class will be removed. Use concrete importer implementations such as
- * OsgiServiceCollectionProxyFactoryBean or OsgiServiceProxyFactoryBean
  */
-public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFactoryBean, InitializingBean,
+abstract class AbstractOsgiServiceImportFactoryBean implements SmartFactoryBean, InitializingBean,
 		DisposableBean, BundleContextAware, BeanClassLoaderAware, BeanNameAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
