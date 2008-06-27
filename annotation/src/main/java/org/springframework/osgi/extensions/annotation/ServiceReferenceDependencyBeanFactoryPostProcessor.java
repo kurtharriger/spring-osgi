@@ -46,11 +46,13 @@ class ServiceReferenceDependencyBeanFactoryPostProcessor implements OsgiServiceD
 			}
 			catch (ClassNotFoundException cnfe) {
 				if (logger.isWarnEnabled())
-					logger.warn("Could not load class [" + className + "]");
+					logger.warn("Could not load class [" + className + "] for ["
+                            + bundleContext.getBundle().getSymbolicName() + "]");
 			}
 		}
 		if (logger.isDebugEnabled())
-			logger.debug("Processing annotations for [" + beanFactory + "] found " + dependencies);
+			logger.debug("Processing annotations for [" + bundleContext.getBundle().getSymbolicName()
+                    + "] found " + dependencies);
 
 		return dependencies;
 	}
