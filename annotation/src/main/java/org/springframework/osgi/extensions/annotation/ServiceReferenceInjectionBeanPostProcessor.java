@@ -88,6 +88,12 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 				((OsgiServiceCollectionProxyFactoryBean) importer).setCardinality(cardinality);
 		}
 
+        static void setGreedyProxying(Object importer, boolean greedy) {
+            if (importer instanceof OsgiServiceCollectionProxyFactoryBean) {
+                ((OsgiServiceCollectionProxyFactoryBean) importer).setGreedyProxying(greedy);
+            }
+        }
+
 		static void afterPropertiesSet(Object importer) throws Exception {
 			((InitializingBean) importer).afterPropertiesSet();
 		}

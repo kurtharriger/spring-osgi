@@ -57,7 +57,12 @@ public @interface ServiceReference {
 	 */
 	Class<?>[] serviceTypes() default ServiceReference.class;
 
-	/**
+    /**
+     * Whether or not to proxy greedily in collection references.
+     */
+    boolean greedyProxying() default false;
+
+    /**
 	 * filter used to narrow service matches, may be null
 	 */
 	String filter() default "";
