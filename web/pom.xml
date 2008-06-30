@@ -59,14 +59,12 @@
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-core</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
 
 	<!-- required for JarUtils & co. -->
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-test</artifactId>
-      <version>${project.parent.version}</version>
       <optional>true</optional>
     </dependency>
 
@@ -80,49 +78,25 @@
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-io</artifactId>
-      <version>${project.parent.version}</version>
       <optional>true</optional>
     </dependency>
     
    <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-mock</artifactId>
-      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
 
 	<dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>${spring.maven.artifact.version}</version>
 	  <optional>true</optional>
-      <exclusions>
-      	<exclusion>
-          <groupId>aopalliance</groupId>
-	      <artifactId>aopalliance</artifactId>
-      	</exclusion>
-      	<exclusion>
-          <groupId>commons-logging</groupId>
-	      <artifactId>commons-logging</artifactId>
-      	</exclusion>
-      </exclusions>      
     </dependency>
 
 	<dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
-      <version>${spring.maven.artifact.version}</version>
       <scope>test</scope>
-      <exclusions>
-      	<exclusion>
-          <groupId>aopalliance</groupId>
-	      <artifactId>aopalliance</artifactId>
-      	</exclusion>
-      	<exclusion>
-          <groupId>commons-logging</groupId>
-	      <artifactId>commons-logging</artifactId>
-      	</exclusion>
-      </exclusions>      
     </dependency>
 
    <!-- we add this dependencies so that the BND plugin can determine their versions -->
@@ -130,36 +104,15 @@
    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>
-      <version>${spring.maven.artifact.version}</version>
 	  <optional>true</optional>
-      <exclusions>
-      	<exclusion>
-          <groupId>aopalliance</groupId>
-	      <artifactId>aopalliance</artifactId>
-      	</exclusion>
-      	<exclusion>
-          <groupId>commons-logging</groupId>
-	      <artifactId>commons-logging</artifactId>
-      	</exclusion>
-      </exclusions>
     </dependency>
-    
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>${spring.maven.artifact.version}</version>
-      <exclusions>      
-      	<exclusion>
-          <groupId>commons-logging</groupId>
-	      <artifactId>commons-logging</artifactId>
-      	</exclusion>
-      </exclusions>      
     </dependency>    
-
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>osgi_R4_compendium</artifactId>
-      <version>1.0</version>
       <scope>provided</scope>
 	  <optional>true</optional>
     </dependency>
@@ -177,7 +130,6 @@
 	      <artifactId>servlet-api-2.5</artifactId>
       	</exclusion>
       </exclusions>      
-      
     </dependency>
 
     <dependency>

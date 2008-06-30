@@ -30,28 +30,23 @@
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-mock</artifactId>
-      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-core</artifactId>
-      <version>${project.parent.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-extender</artifactId>
-      <version>${project.parent.version}</version>
 	  <optional>true</optional>
     </dependency>    
     <dependency>
       <groupId>org.aopalliance</groupId>
       <artifactId>com.springsource.org.aopalliance</artifactId>
-      <version>1.0.0</version>
       <scope>test</scope>
     </dependency>    
-     
   </dependencies>
 
 </project>

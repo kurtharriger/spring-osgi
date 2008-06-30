@@ -36,27 +36,21 @@
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-core</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-web</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
     <!-- used for getting Counter util in -->
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-extender</artifactId>
-      <version>${project.parent.version}</version>
 	  <optional>true</optional>
     </dependency>
-    
-
-   <dependency>
+    <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-mock</artifactId>
-      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
    </dependencies>

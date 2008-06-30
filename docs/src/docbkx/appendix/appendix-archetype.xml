@@ -13,13 +13,12 @@
    <programlisting><![CDATA[mvn archetype:generate]]></programlisting>
    <para>
    The maven plugin will display a selection of possible archetype, from which you should pick 
-   <literal>spring-osgi-bundle-archetype (Spring-OSGi archetype)</literal> (currently number 32), and after that the project <literal>groupId</literal>,
-   <literal>artifactId</literal>, <literal>version</literal> and <literal>package</literal>. A list of all available archetypes included with the plugin
-   and their versions is available <ulink url="http://docs.codehaus.org/display/MAVENUSER/Archetypes+List">here</ulink>.
+   <literal>spring-osgi-bundle-archetype (Spring-OSGi archetype)</literal> (currently number 32), and will request input regarding the project about to be created. 
+   A list of all available archetypes included with the plugin and their versions is available <ulink url="http://docs.codehaus.org/display/MAVENUSER/Archetypes+List">here</ulink>.
    </para>
    
    <para>
-   Note that one can still select the osgi archetype directly from the command line (i.e. the old way of using the archetype): 
+   Note that it is still possible to select the osgi archetype directly from the command line (i.e. the old way of using the archetype): 
    </para>
    
    <programlisting>mvn archetype:create \
@@ -54,8 +53,8 @@
    	<itemizedlist>
    		<listitem>Packaged as an OSGi bundle</listitem>
    		<listitem><literal>META-INF/MANIFEST.MF</literal> automatically generated</listitem>
-   		<listitem><literal><![CDATA[<package>]]></literal> public package exported by the bundle</listitem>
-   		<listitem><literal><![CDATA[<package>.internal]]></literal> private package, not exported by the bundle</listitem>
+   		<listitem><literal>src/main/java/<![CDATA[<package>]]></literal> public package exported by the bundle</listitem>
+   		<listitem><literal>src/main/java/<![CDATA[<package>/internal]]></literal> private package, not exported by the bundle</listitem>
    		<listitem><literal>src/main/resources/META-INF/spring/bundle-context.xml</literal> is a Spring configuration file that defines the simple bean.</listitem>
    		<listitem><literal>src/main/resources/META-INF/spring/bundle-context-osgi.xml</literal> is a Spring configuration file ready for you to add bean 
    		definitions from the osgi namespace (services, references etc.)</listitem>
