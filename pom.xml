@@ -224,6 +224,165 @@ limitations under the License.
     -->
   </modules>
 
+
+  <dependencyManagement>
+  	<dependencies>
+  		<!-- Spring-DM -->
+  		<dependency>
+  		  <groupId>org.springframework.osgi</groupId>
+          <artifactId>spring-osgi-mock</artifactId>
+          <version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  		  <groupId>org.springframework.osgi</groupId>
+          <artifactId>spring-osgi-io</artifactId>
+          <version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  		  <groupId>org.springframework.osgi</groupId>
+          <artifactId>spring-osgi-core</artifactId>
+          <version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  		  <groupId>org.springframework.osgi</groupId>
+          <artifactId>spring-osgi-extender</artifactId>
+          <version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  		  <groupId>org.springframework.osgi</groupId>
+          <artifactId>spring-osgi-test</artifactId>
+          <version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  		  <groupId>org.springframework.osgi</groupId>
+          <artifactId>spring-osgi-web</artifactId>
+          <version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  		  <groupId>org.springframework.osgi</groupId>
+          <artifactId>spring-osgi-web-extender</artifactId>
+          <version>${project.version}</version>
+  		</dependency>
+  		<!-- Spring -->
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+          <version>${spring.maven.artifact.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+          <version>${spring.maven.artifact.version}</version>
+        </dependency>
+        <dependency>
+	      <groupId>org.springframework</groupId>
+	      <artifactId>spring-aop</artifactId>
+	      <version>${spring.maven.artifact.version}</version>
+	      <exclusions>
+	      	<exclusion>
+	          <groupId>aopalliance</groupId>
+		      <artifactId>aopalliance</artifactId>
+	      	</exclusion>
+	      	<exclusion>
+	          <groupId>commons-logging</groupId>
+		      <artifactId>commons-logging</artifactId>
+	      	</exclusion>
+	      </exclusions>
+		</dependency>
+	    <dependency>
+	      <groupId>org.springframework</groupId>
+	      <artifactId>spring-beans</artifactId>
+	      <version>${spring.maven.artifact.version}</version>
+	      <exclusions>
+	      	<exclusion>
+	          <groupId>commons-logging</groupId>
+		      <artifactId>commons-logging</artifactId>
+	      	</exclusion>
+	      </exclusions>
+	    </dependency>
+ 		<dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+          <version>${spring.maven.artifact.version}</version>
+	      <exclusions>      
+	      	<exclusion>
+	          <groupId>commons-logging</groupId>
+		      <artifactId>commons-logging</artifactId>
+	      	</exclusion>
+	      </exclusions>        
+        </dependency>
+	    <dependency>
+	      <groupId>org.springframework</groupId>
+	      <artifactId>spring-context</artifactId>
+	      <version>${spring.maven.artifact.version}</version>
+	      <exclusions>
+	      	<exclusion>
+	          <groupId>aopalliance</groupId>
+		      <artifactId>aopalliance</artifactId>
+	      	</exclusion>
+	      	<exclusion>
+	          <groupId>commons-logging</groupId>
+		      <artifactId>commons-logging</artifactId>
+	      	</exclusion>
+	      </exclusions>      
+	    </dependency>
+	    <dependency>
+	      <groupId>org.springframework</groupId>
+	      <artifactId>spring-test</artifactId>
+	      <version>${spring.maven.artifact.version}</version>
+	      <exclusions>
+	      	<exclusion>
+	          <groupId>commons-logging</groupId>
+		      <artifactId>commons-logging</artifactId>
+	      	</exclusion>
+	      	<exclusion>
+	          <groupId>junit</groupId>
+		      <artifactId>junit</artifactId>
+	      	</exclusion>      	
+	      </exclusions>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.aopalliance</groupId>
+	      <artifactId>com.springsource.org.aopalliance</artifactId>
+	      <version>1.0.0</version>
+	    </dependency>
+		<dependency>
+	      <groupId>org.springframework</groupId>
+	      <artifactId>spring-web</artifactId>
+	      <version>${spring.maven.artifact.version}</version>
+	      <exclusions>
+	      	<exclusion>
+	          <groupId>aopalliance</groupId>
+		      <artifactId>aopalliance</artifactId>
+	      	</exclusion>
+	      	<exclusion>
+	          <groupId>commons-logging</groupId>
+		      <artifactId>commons-logging</artifactId>
+	      	</exclusion>
+	      </exclusions>      
+	    </dependency>
+		<dependency>
+	      <groupId>org.springframework</groupId>
+	      <artifactId>spring-webmvc</artifactId>
+	      <version>${spring.maven.artifact.version}</version>
+	      <exclusions>
+	      	<exclusion>
+	          <groupId>aopalliance</groupId>
+		      <artifactId>aopalliance</artifactId>
+	      	</exclusion>
+	      	<exclusion>
+	          <groupId>commons-logging</groupId>
+		      <artifactId>commons-logging</artifactId>
+	      	</exclusion>
+	      </exclusions>      
+	    </dependency>
+	    <dependency>
+	      <groupId>org.osgi</groupId>
+	      <artifactId>osgi_R4_compendium</artifactId>
+	      <version>1.0</version>
+	    </dependency>
+  	</dependencies>
+  </dependencyManagement>
   <!-- shared dependencies across modules -->
   <dependencies>
     <!-- junit -->
@@ -349,11 +508,6 @@ limitations under the License.
               <name>org.springframework.osgi.test.framework</name>
               <value>${osgi.test.platform}</value>
             </property>
-            <property>
-				<name>net.sourceforge.cobertura.datafile</name>
-				<value>${cobertura.file}</value>
-			</property>
-
           </systemProperties>
         </configuration>
       </plugin>
