@@ -31,7 +31,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
 import org.osgi.service.packageadmin.PackageAdmin;
@@ -673,7 +672,7 @@ public class ContextLoaderListener implements BundleActivator {
 		boolean debug = log.isDebugEnabled();
 		String bundleString = "[" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "]";
 
-		Long bundleId = new Long(bundle.getBundleId());
+		final Long bundleId = new Long(bundle.getBundleId());
 
 		if (managedContexts.containsKey(bundleId)) {
 			if (debug) {

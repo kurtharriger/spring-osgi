@@ -246,6 +246,7 @@
                 <dependency>
                     <groupId>org.springframework.osgi.iandt</groupId>
                     <artifactId>annotation.proxy</artifactId>
+					<version>${project.parent.version}</version>                    
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
