@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+  <chapter>
+    <title>Integration Testing with Spring-DM</title>
+    <para>
+    In this chapter we are going to create another project which will use Testing framework provided by Spring DM 
+    on top of JUnit Test framework to test bundles without deploying them into OSGi environment. 
+    For more details on Spring DM Testing framework please refer to <ulink url="http://static.springframework.org/osgi/docs/current/reference/html/testing.html">Chapter 9. Testing OSGi based Applications</ulink> or Spring-DM reference manual.
+    </para>
+    <section id="tutorial:integration-testing">
+    	<title>Develop the Integration Test</title>
+    	
+<para>Create Test Project</para>  	
+    	
+<para>
+Our test project is typical Eclipse Java project and contains only one class StringReverserTest.java. 
+To save time we are going to skip the details of how to create Java project in Eclipse 
+(you can follow similar steps we went through when created our first project). 
+Instead use <emphasis>Import Existing Project into the workspace</emphasis> feature provided by Eclipse and 
+import <emphasis>org.springframework.osgi.service.test</emphasis> project form the <literal>samples/eclipse-samples</literal> directory of Spring-DM distribution.
+</para>
+
+<para>Once done your project should look like this:</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/test1.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/test1.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+
+<para>Read the comments to get details on each test method. </para>
+
+<para>
+The only thing worth pointing out in this tutorial is the two methods provided by Spring DM testing framework 
+that help us bootstrap our test:
+
+</para>
+
+<para>
+	<programlisting language="java"><![CDATA[
+public Resource[] getTestBundles() {
+	return new Resource[] 
+		{ new FileSystemResource("../org.sprigframework.osgi.simple/reverser.jar")};
+}
+	]]></programlisting>        
+</para>
+
+<para>
+This method will deploy the bundle we’ve created and packaged in the previous section inside of Spring DM test environment. 
+</para>
+
+<note>
+The relative path assumes that both projects are in the same Eclipse workspace.
+</note>
+<para>
+	<programlisting language="java"><![CDATA[
+public String getRootPath() {
+	return "file:./bin";
+}
+	]]></programlisting>        
+</para>
+
+<para>
+Our code is compiled (by default) into <literal>bin</literal> directory at the root of our project, however Spring-DM Test framework
+will be looking in the default directory for our classes and resources.
+This method will override default location (<literal>./target/test-classes</literal>) of the root path for the 
+on-the-fly bundle created by Spring-DM Testing framework.
+
+</para>
+
+<para>
+Run the test as JUnit test and study the output. 
+</para>
+<para>
+Open up <emphasis> StringReverserTest.java</emphasis>, click on <command> Run -> Run As -> JUnit Test</command>
+
+</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/test2.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/test2.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+<para>
+You should see that our bundle was deployed, service exported and tested
+</para>
+<para>
+	<programlisting language="xml"><![CDATA[
+. . . . . . .
+906  [main] INFO  
+org.springframework.osgi.test.AbstractOptionalDependencyInjectionTests$EmptyOsgiApplicationContext  - 
+Publishing application context as OSGi service with properties 
+{org.springframework.context.service.name=
+TestBundle-testOsgiPlatformStarts-org.springframework.osgi.service.test.StringReverserTest, 
+Bundle-SymbolicName=
+TestBundle-testOsgiPlatformStarts-org.springframework.osgi.service.test.StringReverserTest, 
+Bundle-Version=0.0.0}
+Eclipse
+1.3.0
+OSGi/Minimum-1.0,OSGi/Minimum-1.1,JRE-1.1,J2SE-1.2,J2SE-1.3,J2SE-1.4,J2SE-1.5,JavaSE-1.6
+OSGi System Bundle, 
+AOP Appliance API, 
+JUnit, 
+ObjectWeb ASM, 
+SLF4J API, 
+SLF4J Log4J Binding, 
+SLF4J Jakarta Commons Logging Over SLF4J Binding, 
+spring-aop, 
+spring-beans, 
+spring-context, 
+spring-core, 
+spring-test, 
+log4j.osgi, 
+spring-osgi-annotation, 
+spring-osgi-core, 
+spring-osgi-extender, 
+spring-osgi-io, 
+spring-osgi-test, 
+Simple String Reverser Bundle, 
+TestBundle-testOsgiPlatformStarts-org.springframework.osgi.service.test.StringReverserTest, 
+938  [main] INFO  org.springframework.osgi.sample.service.impl.StringReverserImpl  - 
+	Receiveing string: Hello Spring DM
+938  [main] INFO  org.springframework.osgi.sample.service.impl.StringReverserImpl  - 
+	Returning string: MD gnirpS olleH
+938  [main] INFO  org.springframework.osgi.service.test.StringReverserTest  - 
+	Reversed String: MD gnirpS olleH
+2454 [Thread-0] INFO  org.springframework.osgi.service.test.StringReverserTest  - 
+	Shutting down OSGi platform
+. . . . . . .
+	]]></programlisting>        
+</para>    	
+
+	</section>
+
+  </chapter>

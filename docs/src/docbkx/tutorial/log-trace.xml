@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+  <chapter>
+    <title>Logging and Tracing with Eclipse PDE and Log4J</title>
+    
+    
+    <section id="tutorial-log4j">
+    	<title>Logging and Tracing with Log4J</title>
+    	
+<para>
+ <ulink url="http://static.springframework.org/osgi/docs/current/reference/html/app-deploy.html#app-deploy:troubleshooting">5.7. Diagnosing problems</ulink> section of Spring-DM reference manual
+ gives you a good overview of logging and tracing strategies used by Spring-DM.
+</para>
+<para>
+This section will show you how to configure Log4J to be used with Spring-DM.
+</para>
+<para>
+We want to do this step before we start developing the Spring-DM  projects as it will help us to diagnose potential problems.
+</para>
+
+<para>
+In the previous step when we started Target Platform we’ve seen a warning message telling us that our Log4J configuration is missing. 
+And indeed it is. Although Log4J bundle is deployed successfully it is missing configuration. In order to provide Log4J configuration 
+we are going to create and OSGi Fragment bundle, a technique widely used to attach extra configuration to already deployed bundles. 
+In other words we will create an OSGi™ Fragment Bundle which will contain <literal>log4j.properties</literal> file and will attach it to Log4j bundle.
+To do that we will utilize Eclipse PDE which allows us to not only create OSGi bundles, but also deploy them without packaging them into JARs, 
+which is very useful and convenient  for configuration bundles such as Log4J, which often changes during the development. 
+</para>
+<para>Let's create a new Project that will represent such Fragment Bundle</para>
+<para>
+Click on: <command>File -> New -> Project</command> 
+</para>
+
+<para>Expend: <command>Plug-in Development</command>  and select <command>Fragment Project</command></para>
+
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/log4j/log4j1.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/log4j/log4j1.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+
+<para>Click <command>Next</command></para>
+
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/log4j/log4j2.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/log4j/log4j2.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+<para>Enter the following in the corresponding fields:</para>
+<para><emphasis>Project name:</emphasis> <literal>org.springframework.osgi.log4j.config</literal></para>
+<para>Uncheck: <emphasis>Create a Java Project</emphasis></para>
+<para>Check: <emphasis>OSGi framework (Equinox)</emphasis></para>
+
+<para>Click <command>Next</command></para>
+
+<para>Enter <literal>Log4J Configuration</literal> as <emphasis>Fragment Name:</emphasis></para>
+
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/log4j/log4j4.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/log4j/log4j4.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+ 
+<para>
+Click on <command>Browse</command> and select <emphasis>org.springframework.osgi.log4j.osgi</emphasis> bundle. This is the bundle 
+to which we will attach this fragment.
+</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/log4j/log4j3.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/log4j/log4j3.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+<para>Click <command>OK -> Finish</command></para>
+
+<para>At the root of the newly created project create <literal>log4j.properties</literal> file with the following contents:</para>
+<para>
+	<programlisting language="xml"><![CDATA[
+log4j.rootLogger=info, A
+log4j.appender.A=org.apache.log4j.ConsoleAppender
+log4j.appender.A.layout=org.apache.log4j.PatternLayout
+log4j.appender.A.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
+	]]></programlisting>        
+</para>
+
+<para>Later on you can modify it as you whish</para>
+<para>Your newly created Fragment Bundle project should look like this:</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/log4j/log4j5.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/log4j/log4j5.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+ 
+<para>
+Note, how Eclipse already pre-created an OSGi structure for us with <literal>META-INF</literal> directory and <literal>MANIFEST.MF</literal> file.
+It also made it available to our Target Platform without any special deployment procedure. Open Target Platform and you should see our Log4J fragment bundle there:
+</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/log4j/log4j6.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/log4j/log4j6.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+<para>
+Now we can start the Target Platform again. Note, we no longer see the warning log4j message, but rather INFO messages coming out of 
+Tomcat bundle which shows us that the server was started and is available on Port 8080.
+</para>
+<para>
+	<programlisting language="xml"><![CDATA[
+. . . . . . . . . . . . . . .
+891  [Tomcat Catalina Start Thread] INFO  
+	org.apache.catalina.core.StandardService  - Starting service Catalina
+891  [Tomcat Catalina Start Thread] INFO  
+	org.apache.catalina.core.StandardEngine  - Starting Servlet Engine: Apache Tomcat/5.5.23
+906  [Tomcat Catalina Start Thread] INFO  
+	org.apache.catalina.core.StandardHost  - XML validation disabled
+1110 [Tomcat Catalina Start Thread] INFO  org.apache.coyote.http11.Http11BaseProtocol  - 
+	Starting Coyote HTTP/1.1 on http-8080
+. . . . . . . . . . . . . . .
+	]]></programlisting>        
+</para>
+    </section>
+    
+    
+    
+<section id="tutorial:pde-tracing">
+		<title>Eclipse PDE Tracing</title>
+		<procedure>
+			<step>
+				<title>Enable Eclipse PDE Tracing</title>
+				<para>Our bundles will be deployed in Eclipse Equinox which is an OSGi™ platform which Eclipse is based on and which is provided by Eclipse PDE environment. </para>
+				<para>One of the features that you can use to debug and diagnose potential problems is Tracing facility provided by Eclipse PDE</para>
+				<para>Open up <emphasis>Spring-DM-TP</emphasis> launch configuration.</para>
+				 <para>
+			    	 <mediaobject>
+			            <imageobject role="fo">
+			              <imagedata align="center"
+			                         fileref="../src/docbkx/resources/images/tutorial/log4j/trace1.jpg"
+			                         format="JPG"/>
+			            </imageobject>
+			
+			            <imageobject role="html">
+			              <imagedata align="center" fileref="images/tutorial/log4j/trace1.jpg"
+			                         format="JPG"/>
+			            </imageobject>		
+			          </mediaobject>        
+	            </para>
+	            
+	            <para>Click on: <command>Tracing</command> tab</para>
+	            <para>
+			    	 <mediaobject>
+			            <imageobject role="fo">
+			              <imagedata align="center"
+			                         fileref="../src/docbkx/resources/images/tutorial/log4j/trace2.jpg"
+			                         format="JPG"/>
+			            </imageobject>
+			
+			            <imageobject role="html">
+			              <imagedata align="center" fileref="images/tutorial/log4j/trace2.jpg"
+			                         format="JPG"/>
+			            </imageobject>		
+			          </mediaobject>        
+	            </para>
+	            <para>Make sure <emphasis>Tracing</emphasis> is enabled and <literal>debug/service</literal> is checked</para>
+				<para>Click on: <command>Apply -> Run</command></para>
+				<para>You should see lots of trace messages. We will see how they can help us when we develop and deploy our first project</para>
+			
+				<para> Now we're ready to continue. . .</para>
+			</step>
+		
+		</procedure>
+	</section>
+
+  </chapter>

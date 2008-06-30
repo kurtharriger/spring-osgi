@@ -2,455 +2,376 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
   <chapter>
-    <title>Implement Spring-DM Project</title>
-    <para>In this chapter we will implement our service, add all the required configurations and test our service.</para>
+    <title>Implement Simple Spring-DM Service</title>
+    <para>In this chapter we will implement our first Spring-DM service.</para>
    
-    <section>
-    	<title>Implement and test Spring-DM service</title>   
-    	<para>To implement a simple service we are going to define a service strategy (interface) and then implement it.</para>
-    	<para>First we are going to create two packages:</para>
-    	<para><literal>org.springframework.org.tutorial</literal></para>
-    	<para><literal>org.springframework.org.tutorial.impl</literal></para>
-    	<para>Now we are ready for implementation</para>
-        <procedure>
-        	<step>
-        		<title>Define SampleServie Interface</title>
-        		
-        	    <para> <programlisting language="java"><![CDATA[
-public interface SampleService {
-
-	String stringValue(String str);
-	
-}
-                ]]></programlisting></para>
-        	</step>
-        	<step>
-        		<title>Create SampleService implementation</title>
-        		
-        		<para> <programlisting language="java"><![CDATA[
-public class SampleServiceImpl implements SampleService {
-    
-	public SampleServiceImpl(){
-		System.out.println("Constructing SampleServiceImpl");
-	}
-	
-	public String stringValue(String str) {
-	    System.out.println("Hello Spring-DM");
-		return str;
-	}
-
-}
-                ]]></programlisting></para>
-               <para>As you see we're also overriding default Constructor just to output a message on the console when our Service is created</para>
-                <para>
-                
-Note that in the best traditions of Spring there is nothing Spring specific in these artifacts, 
-just a POJO and POJI. And as far as OSGi™ concern that is actually enough with the 
-exception of OSGi™ Activator class that would bootstrap such service. Activator is 
-responsible for lifecycle and registration of the bundle which means Activator usually 
-contains nothing more then a boilerplate code that wires your bundle to OSGi™ 
-platform and as we know Spring is very good in handling boilerplate code and Spring-DM is no exception, which means Activation and Registration of Application Context, beans and export of services will be handled by Spring-DM</para>
+    <section id="tutorial:cr-java-project">
+    	<title>Create Spring-DM service</title>   
+ 
+<para>Before we create our first Spring-DM project let's define a use case for it</para>
 <para>
-Writing Activator is outside of scope of this section, however when we get 
-to the Test Client later on, we will write a sample Activator for testing purposes as well as to demonstrate integration between raw OSGi™ bundle and Spring-DM enabled bundles. And for 
-those who are interested in more details about Activator, there are plenty examples on 
-how to do it available on the web. 
+Our project will consist of a simple service which will define a method that accepts a String and returns it back in reverse order. 
+We will also export this service as an OSGi™ service, so later on when we develop Spring-DM web-based project we will be able to reference this service
+as plain OSGi™ service using features of Spring-DM.
 </para>
 
-<para>However, what we want to do in this section is a little more then just deploy an OSGi™ bundle. We want to do two things:</para>
-<para><emphasis> - Configure our service as Spring bean within Spring Application Context and have OSGi environment bootstrap Spring Application Context</emphasis> </para> 
-<para><emphasis> - Export our Sample Service and register it as plain vanilla OSGi™ service inside of OSGi™ platform (something we would do using Bundle Activator)</emphasis> </para> 
-<para>Spring-DM will allow us to do all that. 
-</para>
+<para>Create Java Project</para>
+<para>Click on: <command> File -> New -> Java Project</command></para>
 <para>
-Obviously (you probably already guessed) we would need to provide some configuration details for our service to be recognized by Spring as well as exported (registered) to OSGi™ platform
-Thankfully we already have two template files provided for use when we created a project.
-                </para>
-                <para>Navigate to your <literal>src/main/resources/</literal> directory</para>
-                <para>There you'll see two XML files <literal>bundle-context.xml</literal> and <literal>bundle-context-osgi</literal> </para>
-                <para>First file is plain vanilla Spring Application Context configuration file where we'll define SampleService as regular Spring Bean</para>
-                <para> <programlisting language="xml"><![CDATA[
-<bean name="sampleService" class="org.springframework.osgi.tutorial.impl.SampleServiceImpl" />
-                ]]></programlisting></para>
-                <para>The next file meant to provide configuration directives for Spring-DM as to which services defined in Spring Application Context would need to be exported as plain vanilla OSGi™ services, under which name and what interface they would need to expose. </para>
-                <para>So, let's add such configuration</para>
-                <para> <programlisting language="xml"><![CDATA[
-<osgi:service id="sampleServiceOsgi" ref="sampleService" 
-    interface="org.springframework.osgi.tutorial.SampleService" /> 
-                ]]></programlisting></para>
-                
-                <para>
-Note that we are using a <literal>osgi</literal> name space which will allow Spring-DM 
-(<emphasis>OSGIServiceFactoryBean</emphasis> in particular) to use Spring exporter infrastructure to export 
-and register our service as OSGi™ service inside of OSGi™ platform, so it could be used 
-by other bundles that might not be Spring enabled. 
-</para>
+<emphasis>New Java Project</emphasis> window will open up:
+</para> 
 <para>
-We could obviously have placed both definitions into a single file, but separating them makes testing 
-(we’ll get to testing later) of  POJO service functionality simpler since it doesn’t require 
-OSGi™ specific dependencies and or Spring-DM testing infrastructure. </para>
-<para>
-More details on the deployment infrastructure of Spring DM bundles are provided in 
-Spring-DM reference documentation (<ulink url="http://static.springframework.org/osgi/docs/current/reference/html/bnd-app-ctx.html">Chapter 4</ulink>), 
-but in the nut-shell here is what is going to happen when we package our bundle: 
-Once our Spring-powered OSGi™ bundle is deployed into OSGi™ platform and 
-brought up to the ACTIVE state, Spring-DM Extender Bundle will recognize it and  similarly to the way
-ContextLoaderListener bootstraps root Web Application Context inside of the Servlet Container, it will load 
-Application Context defined by configurations located in <literal>/META-INF/spring</literal> directory of our bundle.             
-                </para>
-                <para>
-Then OSGi™ service defined in our <emphasis>bundle-context-osgi.xml</emphasis> file will be registered within 
-OSGi™ container by <emphasis>OSGIServiceFactoryBean</emphasis> as an OSGi™ service identified by <literal>sampleService</literal> name and exposing
-SampleService.java interface which is how it is going to be known to the rest of the OSGi™ 
-bundle. The actual implementation becomes internal to the Application Context. You can 
-read more on Exporting Spring Bean as OSGi™ service in <ulink url="http://static.springframework.org/osgi/docs/current/reference/html/bnd-app-ctx.html">Chapter 5</ulink> of reference 
-documentation.
-                </para>
-                
-    			<para>We're almost ready to test our new project, by running it inside of Spring-DM target platform we created earlier.</para>
-    			<para>One last thing we have to do is configure our project as OSGi™ bundle</para>
-    			<para>
-One of the best parts of OSGi™ is the fact that it takes us back to the basics, where Java 
-programs are packaged into JAR files and <emphasis>MANIFEST.MF</emphasis> actually means something. 
-<emphasis>MANIFEST.MF</emphasis> is the main descriptor for OSGi™ platform. It describes a particular OSGi bundle to an OSGi platform via provided configurations.
-
-let’s create our <emphasis>MANIFEST.MF</emphasis> file at the rot of the META-INF directory and test our Spring-powered bundle. 		
-    			</para>
-    			
-    			<para>Normally we would create <emphasis>MANIFEST.MF</emphasis> file manually, but since we are using Maven plug-in provided by <ulink url="http://felix.apache.org/site/maven-bundle-plugin-bnd.html">Apache Felix</ulink> 
-    			we can now provide manifest configurations as well as describe our bundle inside of POM file, and MANIFEST.MF will be generated for us once we build the project. </para>
-    			
-    			<para>Your <literal>pom.xml</literal> file at the root of your project already contains definition of Apache Felix plug-in with template configuration. 
-    			In it's current state it contains enough information to build our project, but lets quickly review it.</para>
-    			<para>As I mentioned before one of our goals is to export our service into the OSGi™ container (handled by Spring configuration using <literal>osgi</literal> namespace). But for other bundles to successfully use it we would also need to export the package which contain interface definition for exported service as well as it's implementation.</para>  
-    			
-    			<para>Our <emphasis>MANIFEST.MF</emphasis> should look like this:</para>
-    			<para> <programlisting language="xml"><![CDATA[
-<plugin>
-	<groupId>org.apache.felix</groupId>
-	<artifactId>maven-bundle-plugin</artifactId>
-	<extensions>true</extensions>
-	<version>1.4.0</version>
-	<configuration>
-1		<manifestLocation>META-INF</manifestLocation>
-		<instructions>
-2			<Export-Package>org.springframework.osgi.tutorial.impl,org.springframework.osgi.tutorial*</Export-Package>
-3			<Import-Package>*</Import-Package>
-			. . . . .
-4			<Include-Resource>src/main/resources</Include-Resource>
-		</instructions>
-	</configuration>
-</plugin>
-                ]]></programlisting></para>
-                
-<para>In the segment 1 we define the location where we want the generated <emphasis>MANIFEST.MF</emphasis> file to be placed, which in our 
-case is <literal>META-INF</literal> directory at the root of our project</para>
-<para>Segment 2 defines which packages we would like to <emphasis>export</emphasis> to OSGi™ platform</para>
-<para>Segment 3 defines which packages we would need to <emphasis>import</emphasis> into our bundle</para>
-<para>Segment 4 defines which resources would need to be included with our packaged bundle. 
-In our case we need to include Spring specific descriptors located in <literal>META-INF/spring</literal> directory with our bundle distribution</para>
-    			
-<para><command>Build</command> the project the same way it is described in <ulink url="ch02.html#d0e512">Chapter 2.2</ulink> </para>
-<note>
-After project build (especially in the Eclipse environemnt), refresh the project to pick up changes that are made on the file system outside of Eclipse control (e.g., generated MANIFEST.MF file)
-</note>
-<para>Explode the <literal>MEAT-INF</literal> directory at the root of the project. There you'll see generated MANIFEST.MF file. Inspect it and it should look similar to this</para>
-    		
-    			<para> <programlisting language="java"><![CDATA[
-Manifest-Version: 1.0
-Bundle-Name: Spring OSGi Bundle
-Built-By: olegzhurakousky
-Build-Jdk: 1.5.0_13
-Created-By: Apache Maven Bundle Plugin
-Import-Package: org.springframework.osgi.tutorial,
-                org.springframework.osgi.tutorial.impl
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.springframework.osgi.tutorial.SpringDMBundle
-Tool: Bnd-0.0.238
-Bnd-LastModified: 1212457729990
-Export-Package: org.springframework.osgi.tutorial,
-                org.springframework.osgi.tutorial.impl;uses:="org.springframework.osgi.tutorial"
-Bundle-Version: 0.1
-                ]]></programlisting></para>
-    			<para>Here you clearly see <literal>Export-Package</literal> directive describing the packages we would like to export</para>
-                <para>Now we are ready to test our bundle</para>
-        	</step>
-        	<step>
-        		<title>Test Bundle</title>
-        		<para>Build your project by running External Tools Maven Configuration (<emphasis>SpringDmBundleInstall)</emphasis> we created earlier and make sure it completes successfully</para>
-        		<para>
-			    	 <mediaobject>
-			            <imageobject role="fo">
-			              <imagedata align="center"
-			                         fileref="../src/docbkx/resources/images/tutorial/projectBuild.jpg"
-			                         format="JPG"/>
-			            </imageobject>
-			
-			            <imageobject role="html">
-			              <imagedata align="center" fileref="images/tutorial/projectBuild.jpg"
-			                         format="JPG"/>
-			            </imageobject>		
-			          </mediaobject>        
-	            </para>
-        		
-        		<para>Start your target platform </para>
-        		<para>
-			    	 <mediaobject>
-			            <imageobject role="fo">
-			              <imagedata align="center"
-			                         fileref="../src/docbkx/resources/images/tutorial/startPlatform.jpg"
-			                         format="JPG"/>
-			            </imageobject>
-			
-			            <imageobject role="html">
-			              <imagedata align="center" fileref="images/tutorial/startPlatform.jpg"
-			                         format="JPG"/>
-			            </imageobject>		
-			          </mediaobject>        
-	            </para>
-        		<para>Deploy project</para>
-        		<para>First figure out physical location of your bundle JAR file. To do that explode <literal>target</literal> directory of your project, right-click on the <command>JAR -> Properties - Resources</command> and copy contents of the <emphasis>Location</emphasis> (on the right of the window)</para>
-        		<para>Now go into your Eclipse Console and type: <literal>install file:/[absolute path to bundle location]</literal> (see example below) </para>
-        	    <para>
-			    	 <mediaobject>
-			            <imageobject role="fo">
-			              <imagedata align="center"
-			                         fileref="../src/docbkx/resources/images/tutorial/installBundle.jpg"
-			                         format="JPG"/>
-			            </imageobject>
-			
-			            <imageobject role="html">
-			              <imagedata align="center" fileref="images/tutorial/installBundle.jpg"
-			                         format="JPG"/>
-			            </imageobject>		
-			          </mediaobject>        
-	            </para>
-	            <para>Once you see that Bundle ID was assigned you can type <literal>ss</literal>  and you will see that your bundle is in the INSTALLED state</para>
-	            <para>Type <literal>start [bundle_id]</literal> (see example below)  </para>
-	            <para>
-			    	 <mediaobject>
-			            <imageobject role="fo">
-			              <imagedata align="center"
-			                         fileref="../src/docbkx/resources/images/tutorial/startBundle.jpg"
-			                         format="JPG"/>
-			            </imageobject>
-			
-			            <imageobject role="html">
-			              <imagedata align="center" fileref="images/tutorial/startBundle.jpg"
-			                         format="JPG"/>
-			            </imageobject>		
-			          </mediaobject>        
-	            </para>
-	            <para>You'll see the message from default constructor (implemented earlier) of our <emphasis>SampleServiceImpl</emphasis> appearing on the console. This means that our bundle was successfully started and our Spring-DM configurations successfully picked up and our service was exported into OSGi container as a regular OSGi service. </para>
-	            <para>In the next step we will attempt to interact with our service in non-spring way, but before. . .</para>
-        	</step>
-        </procedure>	
-    </section>
-
-	<section>
-		<title>Inside Bundle Deployment and Service Export (Eclipse PDE Tracing)</title>
-		<procedure>
-			<step>
-				<title>Enable Eclipse PDE Tracing</title>
-				<para>Our bundle is deployed in Eclipse Equinox which is an OSGi™ platform which Eclipse is based on and which is provided by Eclipse PDE environment. </para>
-				<para>One of the features that you can use to debug and diagnose potential problems is Tracing facility provided by Eclipse PDE</para>
-				<para>Open up <emphasis>SpringDMConfiguration</emphasis> and click on the <emphasis>Tracing</emphasis> tab</para>
-				 <para>
-			    	 <mediaobject>
-			            <imageobject role="fo">
-			              <imagedata align="center"
-			                         fileref="../src/docbkx/resources/images/tutorial/pdeTracing.jpg"
-			                         format="JPG"/>
-			            </imageobject>
-			
-			            <imageobject role="html">
-			              <imagedata align="center" fileref="images/tutorial/pdeTracing.jpg"
-			                         format="JPG"/>
-			            </imageobject>		
-			          </mediaobject>        
-	            </para>
-	            <para>Make sure <emphasis>Tracing</emphasis> is enabled and <literal>debug/service</literal> is checked</para>
-				<para>Click on <command>Apply -> Run</command>. You should see lots of trace messages and since our service has already been deployed you should find the following present in your logs:</para>
-			
-			   	<para> <programlisting language="xml"><![CDATA[
-. . . . .
-getService[file:/Users/olegzhurakousky/Dev/eclipse/workspaces/SpringIntegration/SpringDMBundle/target/SpringDMBundle-0.1.jar 
-[26]]({org.springframework.beans.factory.xml.NamespaceHandlerResolver}={service.id=23})
-getServiceReferences(null, "(objectClass=org.xml.sax.EntityResolver)")
-getService[file:/Users/olegzhurakousky/Dev/eclipse/workspaces/SpringIntegration/SpringDMBundle/target/SpringDMBundle-0.1.jar 
-[26]]({org.xml.sax.EntityResolver}={service.id=24})
-Constructing SampleServiceImpl
-registerService[file:/Users/olegzhurakousky/Dev/eclipse/workspaces/SpringIntegration/SpringDMBundle/target/SpringDMBundle-0.1.jar 
-[26]]({org.springframework.osgi.tutorial.SampleService}={org.springframework.osgi.bean.name=sampleService,
-Bundle-SymbolicName=org.springframework.osgi.tutorial.SpringDMBundle, Bundle-Version=0.1, service.id=27})
-registerService[file:/Users/olegzhurakousky/Dev/eclipse/workspaces/SpringIntegration/SpringDMBundle/target/SpringDMBundle-0.1.jar 
-. . . . . 
-                ]]></programlisting></para>
-
-				<para>The one to pay attention to is <emphasis>{ org.springframework.osgi.bean.name=sampleService, Bundle-SymbolicName=org.springframework.osgi.tutorial.SpringDMBundle, Bundle-Version=0.1, service.id=27})</emphasis> where you can clearly see that your service was exported and accessible under the name <emphasis>sampleService</emphasis> </para>
-				<para>Here it would be advisable to play with other OSGi™ commands (install, uninstall etc... type <literal>-help</literal> to get more info) and see what is going on inside of Equinox platform</para>
-				<para> Now we're ready to continue. . .</para>
-			</step>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/simple1.jpg"
+		                         format="JPG"/>
+		            </imageobject>
 		
-		</procedure>
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/simple1.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+<para>
+Enter <literal>org.springframework.osgi.simple</literal> as <emphasis>Project Name</emphasis> and click on <command>Next</command>. 
+</para>
+<para>
+Now, we are going to add the Spring-DM Library we created earlier to the project class path.
+</para>
+<para>Click on: <command>Add Library</command> and select <command> User Library</command></para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/simple2.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/simple2.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+<para>Select <emphasis>SPRING_DM_1.1</emphasis></para>
+
+<para>Click <command>Finish -> Finish</command></para>
+<para>Your project should look like this:</para>
+
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/simple4.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/simple4.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+<para>Remember this procedure since you might want to reuse it while creating other projects.</para>
+    	
+	</section> 
+	
+	<section id="tutorial:impl-project">
+		<title>Implement Spring-DM service</title>
+<para>Create the following Java Artifacts:</para>		
+<para><emphasis>StringReverser.java</emphasis> – service interface:</para>
+
+<para>
+	<programlisting language="java"><![CDATA[
+package org.springframework.osgi.sample.service;
+
+public interface StringReverser {
+
+	public String reverse(String str);
+}
+	]]></programlisting>        
+</para>
+
+<para><emphasis>StringReverserImpl.java</emphasis> – service implementation:</para>
+<para>
+	<programlisting language="java"><![CDATA[
+package org.springframework.osgi.sample.service.impl;
+
+import org.apache.log4j.Logger;
+import org.springframework.osgi.service.StringReverser;
+
+public class StringReverserImpl implements StringReverser {
+	private static Logger logger = Logger.getLogger(StringReverserImpl.class);
+
+	@Override
+	public String reverse(String str) {
+		logger.info("Receiveing string: " + str);
+		char[] chars = str.toCharArray();
+		StringBuffer buf = new StringBuffer();
+		
+		for (int i = chars.length - 1, x = 0; i >= 0; i--, x++) {
+			buf.append(chars[i]);			
+		}
+		String reveresed = buf.toString();
+		logger.info("Reterning string: " + reveresed);
+		return reveresed;	
+	}
+}
+	]]></programlisting>        
+</para>
+<para>This is it. As you can see, it is a very simple POJO based service.</para>		
+
+<para>Your project should look like this:</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/simple4a.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/simple4a.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
 	</section>
 	
-	<section>
-		<title>Testing</title>
-		<para>
-So far we have created SpringDM OSGi™ bundle, deployed it, exported the service and 
-were able to verify its creation and registration. 
-We missed few things: 
-<literallayout>
-<emphasis>We did not test service functionality (however trivial it is) </emphasis>
-<emphasis>We did not attempt to access our service from another bundle </emphasis>
-</literallayout>	
-		</para>
-		<para>
-Spring DM provides a testing framework that will allow you to test your services without 
-ever deploying them. The details on how to do that are very well covered in the screen 
-casts available on <ulink url="http://www.springframework.org/osgi/demos">Spring DM website</ulink>. You can also look at the <emphasis>simple-service</emphasis> available 
-with Spring DM distribution which has a very trivial example demonstrating Spring DM 
-testing platform. 
-We'll also skip the details on how to write a Unit Test to test functionality of our service, but don't underestimate it's importance!
-What we’ll do in this section instead, is develop <emphasis>SpringDMBundleClient</emphasis> (raw OSGi bundle) that will interact with our service.	
-		</para>
-		<procedure>
-			<step>
-				<title>Implementing raw OSGi™ client bundle</title>
-				<para>To make it more interesting we'll implement our test client as raw OSGi™ bundle, which means there will be nothing related to Spring or Spring-DM in its implementation.</para>
-				<para>You should remember that one of the features provided by Spring-DM is to export beans defined in Spring Application Context as raw OSGi™ services. 
-				Our SpringDMBundle exported <literal>sampleService</literal> service as raw OSGi™ service. This will allow our SpringDMBundleClient to invoke the exported service via standard OSGi™ API.</para>
-				<para>Create new Project following the same procedure we followed in <ulink url="ch02.html">Section 2</ulink>. We already have External Tools Configuration shortcut configured and the only thing we have to do is copy it and change the Archetype arguments where we are going to provide new project (<literal>artifactId</literal>) name (see below) </para>
-	
-<para> <programlisting language="java"><![CDATA[
-archetype:create   
-   -DarchetypeGroupId=org.springframework.osgi  
-   -DarchetypeArtifactId=spring-osgi-bundle-archetype   
-   -DarchetypeVersion=1.0 
-   -DgroupId=org.springframework.osgi.activator
-   -DartifactId=RawOSGiClientActivator
-   -Dversion=0.1	
-                ]]></programlisting></para>	
-                <para>Once done creating and importing project, modify <literal>pom.xml</literal> file to reflect the following:</para>
-                <para>Since this is raw OSGi™ bundle we would need to specify <emphasis>Bundle Activator</emphasis>, so we are going to add <literal>Bundle-Activator</literal> element to our Apache Felix plug-in configuration of our <literal>pom.xml</literal>file </para>
-                <para>It should look similar to this:</para>
-			<para> <programlisting language="xml"><![CDATA[
-<plugin>
-	<groupId>org.apache.felix</groupId>
-	<artifactId>maven-bundle-plugin</artifactId>
-	<extensions>true</extensions>
-	<version>1.4.0</version>
-	<configuration>
-		<manifestLocation>META-INF</manifestLocation>
-		<instructions>
-			<Export-Package>
-				!org.springframework.osgi.activator.impl,org.springframework.osgi.activator*
-			</Export-Package>
-			<Import-Package>*</Import-Package>
-1			<Bundle-Activator>org.springframework.osgi.activator.RawOSGiBundleActivator</Bundle-Activator>
-			. . . . .
-			<Include-Resource>src/main/resources</Include-Resource>
-		</instructions>
-	</configuration>
-</plugin>
-                ]]></programlisting></para>	   
-                
-<note><emphasis>RawOSGiBundleActivator</emphasis>, doesn't yet exist. We'll define and implement it in the next step. </note>             
-<para>We could also (if desired) safely remove <emphasis>Include-Resource</emphasis> element since we are not really interested in any of the resources defined there. </para>              
-                
-                
-<para>Build project by creating and executing new Maven build configuration <literal>RawOSGiClientActivatorInstall</literal> following the steps described in <ulink url="ch02.html#d0e520">Section 2.2</ulink> </para>
-<note>
-Being raw OSGi bundle eliminates the need to depend on Spring, however for consistency we are following the same process while creating this bundle as we did with the previous one
-</note>
-				
-				
-				<para>Generated MANIFEST.MF should look similar to this</para>
-				<para> <programlisting language="java"><![CDATA[
+	<section id="tutorial:config-project">
+		<title>Configure Spring-DM servie</title>
+<para>
+In order for this project to be recognized as an OSGi™ project it should have <literal>MANIFEST</literal> file. 
+We could have created this project originally as Eclipse PDE project (similar to the way we did Log4J project) and <literal>MANIFEST</literal> 
+would be created for us automatically; however for the purposes of learning experience we are going to define it manually. 
+It will also allow us not to be coupled completely to the environment provided by the 
+Eclipse PDE (just use it enough to help us out)
+</para>
+
+<para>Create <literal>META-INF</literal> directory at the root of the project </para>
+
+<para>Create <literal>MANIFEST.MF</literal> file inside of <literal>META-INF</literal> directory (i.e., <literal>META-INF/MANIFEST.MF</literal>) </para>
+
+<para>
+Copy the following contents into <literal>MANIFEST</literal> file:
+</para>
+<para>
+
+	<programlisting language="xml"><![CDATA[
 Manifest-Version: 1.0
-Built-By: olegzhurakousky
-Created-By: Apache Maven Bundle Plugin
-Bundle-Activator: org.springframework.osgi.activator.RawOSGiBundleActivator
-Import-Package: org.osgi.framework;version="1.3",org.springframework.osgi.activator
-Bnd-LastModified: 1212461238352
-Export-Package: org.springframework.osgi.activator;uses:="org.osgi.framework"
-Bundle-Version: 0.1
-Bundle-Name: Spring OSGi Bundle
-Build-Jdk: 1.5.0_13
+Bundle-Version: 1.0
+Bundle-SymbolicName: org.springframework.osgi.simple.reverser
+Bundle-Name: Simple String Reverser Bundle
+Bundle-Vendor: Spring Framework
 Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.springframework.osgi.activator.RawOSGiClientActivator
-Tool: Bnd-0.0.238
-                ]]></programlisting></para>	
-			</step>
-			<step>
-				<title>Implement Bundle Activator</title>
-				<para>Since this bundle going to be raw OSGi™ bundle and won't have any dependency on Spring, we have to implement Bundle Activator which defines life-cycle methods to be triggered by our OSGi™ platform </para>
-				<para>
-				BundleActivator interface defines two methods START and STOP. We are going to implement START method where we will attempt to access our 
-SpringDMBundle's <emphasis>SampleService</emphasis> and execute <literal>stringValue()</literal> method. </para>
-<para>Why are we doing this? Simply because we can, and it is the quickest way to demonstrate how one bundle can access services exported by another bundle. It will 
-also give you a quick introduction to OSGi™ API. </para>
-<para>The use case for our START method will be simple. 
-<literallayout>
- - Locate <literal>SampleService </literal>
- - Execute <literal>stringValue()</literal> method. 
-</literallayout>				
-				</para>
-				
-				<para>Now we are going to create an actual implementation of Bundle Activator. </para>
-				<para>Inside of package <literal>org.springframework.osgi.activator</literal> create a class <literal>RawOSGiBundleActivator</literal> which should implement <literal>org.osgi.framework.BundleActivator</literal>  </para>
-				<para>Define a dependency on <emphasis>SpringDMBundle</emphasis> project by Right-clicking on <emphasis>SpringDMBundleClient</emphasis> <command>Properties -> Java Build Path -> Projects -> Add</command> and select <emphasis>SpringDMBundle</emphasis> </para>
-				<note>
-				We would also need to define dependency in Maven since we are using it to package our bundle (also see notes in <ulink url="ch01.html#tutorial:maven">1.2. Setup Maven Environment</ulink>
-				To do that simply define another <literal>dependency</literal> element inside of our <literal>pom.xml</literal> file which should point to the already installed <emphasis>SpringDMBundle</emphasis> (see below)
-				</note>
-				<para> <programlisting language="xml"><![CDATA[
-<dependency>
-	<groupId>org.springframework.osgi.tutorial</groupId>
-	<artifactId>SpringDMBundle</artifactId>
-	<version>1.0</version>
-</dependency>
-                ]]></programlisting></para>	
-							
-				<para>Below is the code for our Activator client</para>
-<para> <programlisting language="java"><![CDATA[
-package org.springframework.osgi.activator;
+Export-Package: org.springframework.osgi.sample.service
+Import-Package: org.apache.log4j;version="1.2.15"
+	]]></programlisting>        
+</para>
+<para>
+As you see, we are exporting the package which contains our service definition (interface). 
+We are also importing log4j package, as we depend on it within our code.
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.tutorial.SampleService;
+</para>
+<para>Now we have enough for Equinox (our OSGi platform) to recognize our project as valid OSGi bundle. </para>
 
-public class RawOSGiBundleActivator implements BundleActivator {
+<para>However few things are still missing. . .</para>
 
-	public void start(BundleContext bCtx) throws Exception {
-		ServiceReference ref = bCtx.getServiceReference(SampleService.class.getName());
-		if (ref != null){
-			System.out.println("Service found");
-			SampleService service = (SampleService) bCtx.getService(ref);
-			System.out.println("Retrieved service: " + service.getClass().getName());
-			service.stringValue("Welcome to Spring-DM");
-		}
-	}
+<para>
+For our project being Spring based project, we have yet to define our Application Context and its configuration. 
+We can obviously define it anywhere, but then we would have to let Spring DM Extender know where the configuration files 
+located. <ulink url="http://static.springframework.org/osgi/docs/1.0.2/reference/html/app-deploy.html#app-deploy:headers">Chapter 4.1. Bundle format and Manifest headers</ulink>  
+explains in details how to do that (extra MANIFEST headers). But for the purposes of this tutorial we are going 
+rely on default location specified and expected by Spring DM. This way Spring DM Extender bundle will be able to find 
+our Application Context configuration , bootstrap it (similar to the way ContextLoaderListener does in web environment) 
+and export our service as OSGi™ service into our Target Platform without any extra MANIFEST headers.
+</para>
+<para>
 
-	public void stop(BundleContext bCtx) throws Exception {
-		System.out.println("Stopping service");
-	}
-}
-                ]]></programlisting></para>				
-			<para>Install and Start bundle following the same steps (end of chapter 3.1) we defined earlier while installing and starting <emphasis>SpringDMBundle</emphasis></para>
-			<para>You should see the following messages in your console:</para>
+Create <literal>spring</literal> directory inside of <literal>META-INF</literal> directory. 
+This is the default directory where Spring DM Extender bundle will look for Spring configurations.
 
-			<para> <programlisting language="xml"><![CDATA[
-. . . . .
-Service found
-Retrieved service: org.springframework.osgi.tutorial.impl.SampleServiceImpl
-Hello Spring-DM	
-. . . . . 
-                ]]></programlisting></para>
-                <para>Here we were able to demonstrate how we were able to access a service that was exported by Spring-DM and use it as raw OSGi™ service.</para>
-			</step>
-		</procedure>
-	</section> 
+</para>
+<para>Create <literal>simpleservice.xml</literal> file and copy the following contents into the file:</para>
+
+<para>
+
+	<programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean name="stringReverser"
+		class="org.springframework.osgi.sample.service.impl.StringReverserImpl"/>
+</beans>
+	]]></programlisting>        
+</para>
+<para>This file configures our service as a regular Spring bean</para>
+
+<para>Create <literal>simpleservice-osgi.xml</literal> file and copy the following contents into the file:</para>
+
+<para>
+
+	<programlisting language="xml"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/osgi 
+                      http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+	<osgi:service id="stringReverserOsgi" ref="stringReverser"
+		interface="org.springframework.osgi.sample.service.StringReverser" />
+</beans>
+	]]></programlisting>        
+</para>
+<para>
+This file uses <literal>osgi</literal> name space to provide a directive for Spring DM’s Extender bundle to export 
+our service and publish it under the interface it implements.
+
+</para>
+
+<para>This is it. Your <literal>META-INF</literal> directory should look like this:</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/simple6.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/simple6.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+ 
+ <para>
+ The only thing that is left to do is to package our bundle. However, one nice thing about Eclipse PDE environment 
+ is the fact that it recognizes this project as valid OSGi™ bundle project simply because it has valid OSGi™ 
+ <literal>META-INF/MANIFEST.MF</literal> file at the root of the project (see below)
+ 
+ </para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/simple5.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/simple5.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+
+<para>
+And even though we will need to package it later on to do the integration testing, we don’t have to do it just yet.
+
+</para>	
+		
+	</section>
+	
+	<section id="tutorial:deploy-service">
+	<title>Deploy Spring-DM Service</title>
+	
+<para>To deploy our Spring DM powered bundle simply start the OSGi environment and you’ll see that the bundle is deployed.</para>	
+	
+<para>If you enable Eclipse PDE tracing (debug/services)you can easily find the following message in the console:</para>	
+	
+<para>
+
+	<programlisting language="xml"><![CDATA[
+. . . . . . .
+registerService[initial@reference:file:../../org.sprigframework.osgi.simple/ [18]]
+	({org.springframework.osgi.sample.service.StringReverser}=
+	{org.springframework.osgi.bean.name=stringReverser, 
+	Bundle-SymbolicName=org.springframework.osgi.simple.reverser, 
+	Bundle-Version=1.0, service.id=27})
+. . . . . . .
+	]]></programlisting>        
+</para>	
+	 
+<para>There you can clearly see that our service was exported successfully into OSGi environment. </para>
+
+</section>
+
+<section id="tutorial:package-service">
+<title>Package Spring-DM Service</title>
+<para>
+To package our project you simply need to <literal>jar</literal> it. Eclipse can help us with that as well.
+</para>
+<para>Right click on the project <command> -> Export</command></para>
+<para>When <emphasis>Export</emphasis> window opens up expend <command>Java</command> and select <command>JAR file</command></para>
+
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/simple7.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/simple7.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+ <para>Click <command>Next</command></para>
+<important>
+On the next window make sure you select all the option you see on the screen shot below. 
+And select the location to where you want the JAR file to be exported (e.g., I choose the root of the project itself). 
+Name it: <literal>reverser.jar</literal> 
+</important>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/simple8.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/simple8.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+
+<para>Click <command>Next -> Next</command></para>
+
+<para>On the next window select <command>Use existing manifest from workspace</command>. We don’t want the generated one.</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/simple9.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/simple9.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+
+<para>Click on <command>Finish</command> (ignore the warning message if present)</para>
+
+<para>Verify that the JAR file was generated. You can also peek inside and study its structure.</para>
+
+<para>Our project is complete and packaged as valid Spring DM/OSGi bundle. </para>
+	
+	</section>
+	
   </chapter>
