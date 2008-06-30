@@ -53,12 +53,14 @@ For more information on the tools used please refer to the following websites:
   <toc />
   
   <part id="springdm-env">
-      <title>Getting Started</title>
+      <title>Spring-DM Getting Started</title>
 
 	  <xi:include href="tutorial/introduction.xml"/>
 	  <xi:include href="tutorial/springdm-env.xml"/>
-	  <xi:include href="tutorial/project-config.xml"/>
+	  <xi:include href="tutorial/log-trace.xml"/>
 	  <xi:include href="tutorial/implement-project.xml"/>
+	  <xi:include href="tutorial/integration-testing.xml"/>
+	  <xi:include href="tutorial/springdm-webmvc.xml"/>
  <!--  -->	 
   </part>
  <!-- 
