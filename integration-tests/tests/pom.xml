@@ -57,29 +57,23 @@
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-core</artifactId>
-            <version>${project.parent.version}</version>
-            <type>jar</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-extender</artifactId>
-            <version>${project.parent.version}</version>
-            <type>jar</type>
             <scope>provided</scope>
         </dependency>
         
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-test</artifactId>
-            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency> 
     	
     	<dependency>
       		<groupId>org.aopalliance</groupId>
       		<artifactId>com.springsource.org.aopalliance</artifactId>
-      		<version>1.0.0</version>
       		<scope>provided</scope>
     	</dependency>
 
@@ -161,7 +155,6 @@
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>osgi_R4_compendium</artifactId>
-			<version>1.0</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -238,7 +231,6 @@
 		<dependency>
 		  <groupId>org.springframework.osgi</groupId>
 		  <artifactId>spring-osgi-web</artifactId>
-		  <version>${project.parent.version}</version>
 		  <scope>test</scope>
 		</dependency>	
 		
@@ -254,7 +246,6 @@
                 <dependency>
                     <groupId>org.springframework.osgi.iandt</groupId>
                     <artifactId>annotation.proxy</artifactId>
-                    <version>${project.parent.version}</version>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
@@ -278,17 +269,9 @@
 							<value>${osgi.test.platform}</value>
 						</property>
 						<property>
-							<name>net.sourceforge.cobertura.datafile</name>
-							<value>${basedir}/target/cobertura/cobertura.ser</value>
-						</property> 
-
-						<property>
 							<name>org.springframework.osgi.integration.testing.clover</name>
 							<value>${clover.enabled}</value>
 						</property> 
-						
-						
-
                     </systemProperties>
                     <!--argLine>-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=2111,server=y,suspend=y</argLine-->
                 </configuration>
