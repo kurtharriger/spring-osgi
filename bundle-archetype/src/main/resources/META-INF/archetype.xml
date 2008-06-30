@@ -3,6 +3,7 @@
 
   <sources>
     <source>src/main/java/readme.txt</source>
+    <source>src/main/java/internal/readme.txt</source>
   </sources>
    
   <resources>

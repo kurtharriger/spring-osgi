@@ -145,7 +145,7 @@
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
 						<Export-Package>
-							!${package}.impl,${package}*
+							!${package}.internal,${package}*
 						</Export-Package>
 						<Import-Package>*</Import-Package>
 						<!-- 

@@ -1,1 +1,2 @@
-Since Archetype "create" can not create empty directories this file was created. It is safe to delete
+Public package normally containing interfaces or other classes that can be exposed/shared with other bundles.
+By default this package is exported by the bundle.

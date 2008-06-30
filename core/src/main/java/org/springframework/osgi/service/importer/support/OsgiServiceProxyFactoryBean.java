@@ -103,7 +103,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImport
 	private final List stateListeners = Collections.synchronizedList(new ArrayList(4));
 
 	private final ImporterInternalActions controller;
-	/** covenience field * */
+	/** convenience field * */
 	private boolean mandatory;
 
 
