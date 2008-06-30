@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+  <chapter>
+    <title>Develop and deploy Spring-MVC project</title>
+    
+ <para>
+ Our Spring-DM Target Platform contains enough bundles to define itself as Spring-MVC/web-enabled platform. 
+ So, in this chapter we will go through the steps on how to develop Spring-MVC based project and deploy it inside of 
+ our Target Platform.
+ 
+ </para>  
+   
+<para>
+   We are going through the following steps:
+<itemizedlist>
+			<listitem><para>Utilize EclipseWTP features to develop Dynamic web project</para></listitem>
+			<listitem><para>Define configurations required to deploy it inside of Spring-DM</para></listitem>	
+		    <listitem><para>Deploy Spring-MVC project into Spring-DM Target Platform</para></listitem>	    
+</itemizedlist>
+</para> 
+
+<para>
+We are only going to go through essential steps. The full source for this project is available from 
+<literal>samples/eclipse-samples</literal> directory of Spring-DM distribution.
+</para>
+<para>
+The Use Case foe this project is to provide the UI to interact with the Reverser service we’ve created earlier. 
+So we’ll define a simple Form where we will be able to enter the String value and submit it. 
+In return we should get our String back in reversed order.  
+</para>
+    
+    <section id="tutorial:create-web-project">
+    	<title>Utilize EclipseWTP features to develop Dynamic web project</title>
+ 
+ <para>
+ Click on: <command>File -> New -> Project</command>
+ </para>
+ <para><emphasis>New Project</emphasis> window will open up:</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/web/web1.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/web/web1.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+<para>Expend: <command>Web -> Dynamic Web Project</command> and click on <command>Next</command></para>
+<para>Enter: <literal> org.springframework.osgi.web.simple</literal> in the <emphasis>Project Name</emphasis> and click on <command>Next -> Next</command></para>
+<para><emphasis>New Dynamic Web Project</emphasis> window will open up.</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/web/web2.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/web/web2.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+<para>Override <emphasis>Content Directory</emphasis> and name it <literal>webmvc-osgi</literal>.</para>
+
+<note>
+We need to do that to be able to differentiate from other web-bundles we might create later on. 
+Since we are going to be deploying this bundle exploded, the name of this directory will become a Context Root of our web 
+project. If you are not planning to deploy this bundle in exploded way, this step is not necessary, 
+as by default the name of the WAR file will become the Context Root.
+</note>
+<para>
+Click on <command> Finish</command>
+</para>
+
+<para>
+Since we are going to be deploying our project as directory (exploded) we need to make sure that all our 
+resources (classes etc.) will be under the Content Directory. To do this we would need to override the default 
+Build Path created by eclipse WTP which is <literal>./build/classes</literal>. We need to change it to 
+<literal>org.springframework.osgi.web.simple/webmvc-osgi/WEB-INF/classes</literal>. 
+
+</para>
+
+ <para>Right click on the project <command>-> Properties -> Java Build Path</command> and select <command>Source tab</command>:</para>
+
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/web/web3.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/web/web3.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+<para>
+Override Default output folder to have the following value:
+</para> 
+<para>
+<literal>org.springframework.osgi.web.simple/webmvc-osgi/WEB-INF/classes</literal>
+</para>
+
+<para>
+You can also Import the entire project using <emphasis>Import Existing project into the workspace</emphasis> feature 
+provided by Eclipse. The steps above is just a tip that might be useful when developing from scratch.
+
+</para>
+
+<para>
+Our project is now ready to be developed. From this point on, this project is no different as any other Spring-MVC project, 
+and since developing basic Spring-MVC project is outside of scope of this tutorial, we are not going to be covering details on how to do it.
+ You may however refer to Spring Reference manual for more information.
+ 
+</para>
+ 
+	</section>
+	
+	<section id="tutorial:cnfigure-web">
+		<title>Define OSGi specific deployment configurations</title>
+	
+<para>
+Some extra details of Spring-MVC specifics overall web integration with Spring-DM environment are 
+provided in section <ulink url="http://static.springframework.org/osgi/docs/current/reference/html/web.html">8. Web-support</ulink> 
+of Spring-DM reference manual. 
+</para>
+<para>Even though our project is a very basic Spring-MVC implementation, there are few things that are worth mentioning:</para>
+
+<para>
+In order to be properly used inside of OSGified web platform we need to define special Web Application Context 
+implementation that is <quote>. . .dedicated, OSGi-aware. . .</quote> to bootstrap our Application Context in OSGi environment. 
+This class called <literal>OsgiBundleXmlWebApplicationContext</literal>
+</para>
+<para>
+Below is a fragment of <literal>web.xml</literal>. There you’ll see how we define this Application Context using 
+<literal>init-param</literal> <emphasis>contextClass</emphasis>. We do it for both Web Application Context (Dispatcher Servlet), 
+as well as Root Application Context (Context Loader)
+
+</para>
+<para>
+	<programlisting language="xml"><![CDATA[
+. . . . . . . . . .
+<context-param>
+	<param-name>contextClass</param-name>
+	<param-value>
+		org.springframework.osgi.web.context.support.OsgiBundleXmlWebApplicationContext
+	</param-value>
+</context-param>
+<listener>
+	<listener-class>
+		org.springframework.web.context.ContextLoaderListener
+	</listener-class>
+</listener>
+ 
+<servlet>
+	<servlet-name>osgiwebmvc</servlet-name>
+	<servlet-class>
+		org.springframework.web.servlet.DispatcherServlet
+	</servlet-class>
+	<init-param>
+		<param-name>contextClass</param-name>
+		<param-value>
+		org.springframework.osgi.web.context.support.OsgiBundleXmlWebApplicationContext
+		</param-value>
+	</init-param>
+	<load-on-startup>2</load-on-startup>
+</servlet>
+
+<servlet-mapping>
+	<servlet-name>osgiwebmvc</servlet-name>
+	<url-pattern>/osgi/*</url-pattern>
+</servlet-mapping>
+. . . . . . . . . .
+	]]></programlisting>        
+</para>
+
+<para>
+There are no more deviations from standard Spring-MVC patterns.
+</para>
+
+
+<para>
+The biggest difference from Standard Web project vs. OSGified Web project is its ability to integrate with class loading 
+mechanism defined by OSGi™. This means that although this is a basic web project it is still an OSGi™ bundle, 
+thus requiring proper import entries in <literal>MANIFEST</literal> file.
+
+</para>
+
+<para>
+The current MANIFEST for this project looks like this:
+</para>
+
+<para>
+	<programlisting language="xml"><![CDATA[
+Manifest-Version: 1.0
+Bundle-Version: 1.0
+Bundle-SymbolicName: org.springframework.osgi.web.simple
+Bundle-Name: Simple Web MVC Bundle
+Bundle-Vendor: Spring Framework
+Bundle-ManifestVersion: 2
+Bundle-ClassPath: WEB-INF/classes/
+Import-Package: javax.servlet.http;version="2.5.0",
+ javax.servlet.jsp;version="2.0.0",
+ javax.servlet.jsp.jstl.core;version="1.1.2",
+ javax.servlet.jsp.jstl.fmt;version="1.1.2",
+ javax.servlet.jsp.jstl.tlv;version="1.1.2",
+ org.apache.taglibs.standard.resources;version="1.1.2",
+ org.apache.taglibs.standard.tag.rt.core;version="1.1.2",
+ org.apache.taglibs.standard.tei;version="1.1.2",
+ org.apache.taglibs.standard.tlv;version="1.1.2",
+ org.springframework.osgi.sample.service,
+ org.springframework.osgi.web.context.support;version="1.1.0",
+ org.springframework.stereotype;version="2.5.5",
+ org.springframework.web.bind.annotation;version="2.5.5",
+ org.springframework.web.context;version="2.5.5",
+ org.springframework.web.servlet;version="2.5.5",
+ org.springframework.web.servlet.view;version="2.5.5"
+	]]></programlisting>        
+</para>
+
+<para>
+The two important entries here are:
+</para>
+<para><emphasis>Bundle-Classpath:</emphasis> - which points to the location of all our class files</para>
+<para><emphasis>Import-Package:</emphasis> - Which imports all the packages required by this bundle to work.</para>
+
+<para>
+The only thing left is to package our project and deploy it. As far as packaging, WAR file is a valid OSGi™ bundle, 
+so <literal>jarring</literal> it into WAR and dropping it into your Target Platform will work.
+
+</para>
+<para>
+However, in the next step we will look how to deploy it without packaging (exploded), which could be very useful 
+when developing a new project and changes are frequent.
+
+</para>
+
+	</section>
+	
+	<section id="tutorial:depeloy-web">
+	<title>Deploy Spring-MVC project into Spring-DM Target Platform</title>
+<para>Deploying Spring-MVC project into Spring-DM Target platform is quite simple.</para>
+<para>We are going to use some of the commands provided by Equinox OSGi platform.</para>	
+
+<para>Start you Target Platform (<emphasis>Spring-DM-TP</emphasis>)</para>
+
+<para>Type <literal>ss</literal> on the console to make sure that everything is in tact (bundles are ACTIVE).</para>
+<para>
+Now, type: 
+<literal>install file:[absolute location of webmvc-osgi directory (Content Directory we created earlier)]</literal>
+</para>
+
+<para>Example:</para>
+<para>
+<literal>osgi> install file:C:\osgitutorial\org.springframework.osgi.web.simple\webmvc-osgi</literal>
+</para>
+
+<para>The output should be similar to this.</para>
+
+<para>
+	<programlisting language="xml"><![CDATA[
+. . . . . .
+getService[System Bundle [0]]({org.eclipse.osgi.framework.console.CommandProvider}=
+	{service.ranking=2147483647, 
+	service.pid=0.org.eclipse.core.runtime.internal.adaptor.EclipseCommandProvider, 
+	service.vendor=Eclipse.org, service.id=16})
+getService[System Bundle [0]]({org.eclipse.osgi.framework.console.CommandProvider}=
+	{service.ranking=2147483647, service.id=19})
+Bundle id is 37
+	]]></programlisting>        
+</para>
+<para>Make sure you remember <emphasis>Bundle ID</emphasis>.</para>
+
+<para>Type <literal>ss</literal> again to make sure your bundle is in the INSTALLED state</para>
+
+<para>Now you are ready to start it</para>
+
+<para>Type: <literal>start [bundle ID]</literal></para>
+
+<para>Example:</para>
+<para>
+<literal>osgi>start 37</literal>
+</para> 
+
+<para>
+Your output should look similar to this:
+</para>
+<para>
+	<programlisting language="xml"><![CDATA[
+. . . . . . . 
+registerService[file:C:\osgitutorial\org.springframework.osgi.web.simple\webmvc-osgi [37]]
+	({org.springframework.web.context.ConfigurableWebApplicationContext, 
+	org.springframework.ui.context.ThemeSource, 
+	org.springframework.web.context.WebApplicationContext, 
+	org.springframework.context.ConfigurableApplicationContext, 
+	org.springframework.context.ApplicationContext, 
+	org.springframework.beans.factory.ListableBeanFactory, 
+	org.springframework.beans.factory.HierarchicalBeanFactory, 
+	org.springframework.context.MessageSource, 
+	org.springframework.context.ApplicationEventPublisher, 
+	org.springframework.core.io.support.ResourcePatternResolver, 
+	org.springframework.beans.factory.BeanFactory, org.springframework.core.io.ResourceLoader, 
+	org.springframework.context.Lifecycle, 
+	org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext, 
+	org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext, 
+	org.springframework.beans.factory.DisposableBean}=
+	{org.springframework.context.service.name=org.springframework.osgi.web.simple, 
+	Bundle-SymbolicName=org.springframework.osgi.web.simple, Bundle-Version=1.0.0, 
+	org.springframework.web.context.namespace=osgiwebmvc-servlet, service.id=30})
+320344 [Timer-2] INFO  org.springframework.web.servlet.DispatcherServlet  - 
+	FrameworkServlet 'osgiwebmvc': initialization completed in 359 ms
+320516 [Timer-2] INFO  org.springframework.osgi.web.deployer.tomcat.TomcatWarDeployer  - 
+	Successfully deployed bundle [Simple Web MVC Bundle (org.springframework.osgi.web.simple)] at 
+	[/webmvc-osgi] on server org.apache.catalina.core.StandardService/1.0
+
+	]]></programlisting>        
+</para>
+<para>Your bundle was successfully started and deployed to Tomcat.</para>
+
+<para>Hit this link <ulink url="http://localhost:8080/webmvc-osgi/">http://localhost:8080/webmvc-osgi/</ulink> and you should see the 
+front page of our Spring-MVC application.
+</para>
+<para>
+		    	<mediaobject>
+		            <imageobject role="fo">
+		              <imagedata align="center"
+		                         fileref="../src/docbkx/resources/images/tutorial/project/web/web4.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		
+		            <imageobject role="html">
+		              <imagedata align="center" fileref="images/tutorial/project/web/web4.jpg"
+		                         format="JPG"/>
+		            </imageobject>
+		          </mediaobject>        
+</para>
+
+ <para>That's all there is to it.</para>
+
+	</section>
+
+  </chapter>
