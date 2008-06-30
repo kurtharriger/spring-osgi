@@ -85,7 +85,7 @@ public interface DelegatedExecutionOsgiBundleApplicationContext extends Configur
 	 * Allows a delegated {@link OsgiBundleApplicationContextEventMulticaster},
 	 * external to the application context, to be used for sending OSGi
 	 * application context events regarding the application context life cycle.
-	 * This method is mainly intended for monitoring the context lifec ycle by
+	 * This method is mainly intended for monitoring the context lifecycle by
 	 * third parties (such as the OSGi extender). It's up to the implementation
 	 * to decide whether this setter method is required or not.
 	 * 

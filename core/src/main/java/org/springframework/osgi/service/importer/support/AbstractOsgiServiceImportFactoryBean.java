@@ -45,7 +45,7 @@ import org.springframework.util.ObjectUtils;
  * @author Adrian Colyer
  * @author Hal Hildebrand
  */
-abstract class AbstractOsgiServiceImportFactoryBean implements SmartFactoryBean, InitializingBean,
+public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFactoryBean, InitializingBean,
 		DisposableBean, BundleContextAware, BeanClassLoaderAware, BeanNameAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
