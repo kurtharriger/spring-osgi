@@ -18,6 +18,7 @@ package org.springframework.osgi.web.extender.internal.activator;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
@@ -371,23 +372,36 @@ public class WarLoaderListener implements BundleActivator {
 			return;
 
 		// check if the bundle is a war
-		URL webXml = warScanner.getWebXmlConfiguration(bundle);
-
-		boolean debug = log.isDebugEnabled();
-
-		if (webXml != null) {
+		if (warScanner.isWar(bundle)) {
 			// get bundle name
 			String contextPath = contextPathStrategy.getContextPath(bundle);
 			// make sure it doesn't contain spaces (causes subtle problems with Tomcat Jasper)
 			Assert.doesNotContain(contextPath, " ", "context path should not contain whitespaces");
-			log.info(OsgiStringUtils.nullSafeNameAndSymName(bundle)
-					+ " is a WAR, scheduling war deployment on context path + [" + contextPath
-					+ "] (detected web.xml at " + webXml + ")");
+			String msg = OsgiStringUtils.nullSafeNameAndSymName(bundle)
+					+ " is a WAR, scheduling war deployment on context path + [" + contextPath + "];(";
+
+			URL webXML = getWebXml(bundle);
+
+			if (webXML != null) {
+				msg = msg + "web.xml present at " + webXML + ")";
+			}
+			else
+				msg = msg + "no web.xml detected)";
+
+			log.info(msg);
 
 			// mark the bundle as managed
 			managedBundles.put(bundle, contextPath);
 			deploymentManager.deployBundle(bundle, contextPath);
 		}
+	}
+
+	private URL getWebXml(Bundle bundle) {
+		Enumeration enm = bundle.findEntries("META-INF/", "web.xml", false);
+		if (enm != null && enm.hasMoreElements())
+			return (URL) enm.nextElement();
+
+		return null;
 	}
 
 	private void maybeUndeployWar(Bundle bundle) {

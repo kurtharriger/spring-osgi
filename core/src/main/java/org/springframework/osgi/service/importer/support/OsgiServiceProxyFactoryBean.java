@@ -35,7 +35,6 @@ import org.springframework.osgi.service.importer.support.internal.aop.ServicePro
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.support.internal.controller.ImporterController;
 import org.springframework.osgi.service.importer.support.internal.controller.ImporterInternalActions;
-import org.springframework.osgi.service.importer.support.internal.controller.ImporterControllerUtils;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 import org.springframework.util.Assert;
@@ -57,7 +56,7 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public final class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean implements
+public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterProxyFactoryBean implements
 		ApplicationEventPublisherAware {
 
 	/**
@@ -119,9 +118,24 @@ public final class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImport
 			setCardinality(Cardinality.C_1__1);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Returns the managed proxy type. If the proxy is not created when this
+	 * method is invoked, only the first interface/class will be returned.
+	 */
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(getInterfaces()) ? Object.class
 				: getInterfaces()[0]));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Returns a managed proxy to the best matching OSGi service.
+	 */
+	public Object getObject() {
+		return super.getObject();
 	}
 
 	Object createProxy() {

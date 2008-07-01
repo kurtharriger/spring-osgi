@@ -45,7 +45,7 @@ public class DefaultWarScannerTest extends TestCase {
 		scanner = null;
 	}
 
-	public void testBundleWithExistingWebXml() throws Exception {
+	public void testBundleWithExistingWebXmlButNoSuitableLocation() throws Exception {
 		final URL url = new URL("file:///");
 		bundle = new MockBundle() {
 
@@ -55,22 +55,42 @@ public class DefaultWarScannerTest extends TestCase {
 				assertEquals(false, recurse);
 				return new ArrayEnumerator(new URL[] { url });
 			}
+
+			public String getLocation() {
+				return "foo.bar";
+			}
 		};
 
-		assertSame(url, scanner.getWebXmlConfiguration(bundle));
+		assertFalse(scanner.isWar(bundle));
 	}
 
-	public void testBundleWithNoWebXML() throws Exception {
+	public void testBundleWithNoLocation() throws Exception {
 		bundle = new MockBundle() {
 
-			public Enumeration findEntries(String path, String filePattern, boolean recurse) {
+			public String getLocation() {
 				return null;
 			}
 		};
-		assertNull(scanner.getWebXmlConfiguration(bundle));
+		assertFalse(scanner.isWar(bundle));
 	}
 
-	public void testBundleThatReturnsAnEmptyEnumeration() throws Exception {
-		assertNull(scanner.getWebXmlConfiguration(new MockBundle()));
+	public void testBundleWithProperExtension() throws Exception {
+		bundle = new MockBundle() {
+
+			public String getLocation() {
+				return "petclinic.war";
+			}
+		};
+		assertTrue(scanner.isWar(bundle));
+	}
+
+	public void testBundleWithLongLocation() throws Exception {
+		bundle = new MockBundle() {
+
+			public String getLocation() {
+				return "initial@reference:file:petclinic.war";
+			}
+		};
+		assertTrue(scanner.isWar(bundle));
 	}
 }

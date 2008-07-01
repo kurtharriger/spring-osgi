@@ -16,34 +16,42 @@
 
 package org.springframework.osgi.web.extender.internal.scanner;
 
-import java.net.URL;
-import java.util.Enumeration;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
+import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
- * Scanner for WAR applications. Looks for the presence of
- * <code>WEB-INF/web.xml</code>.
+ * Scanner for Web application ARchives (WARs). This implementation simply
+ * checks the <tt>.war</tt> extension of a bundle to identify a WAR.
  * 
  * @author Costin Leau
- * 
  */
 public class DefaultWarScanner implements WarScanner {
 
-	/** default folder */
-	private static final String WEB_INF = "WEB-INF/";
-	/** default configuration file */
-	private static final String WEB_XML = "web.xml";
+	/** war extension */
+	private static final String WAR_EXT = ".war";
+
+	/** logger */
+	private static final Log log = LogFactory.getLog(DefaultWarScanner.class);
 
 
-	public URL getWebXmlConfiguration(Bundle bundle) {
+	public boolean isWar(Bundle bundle) {
+		boolean trace = log.isTraceEnabled();
+
+		if (trace)
+			log.trace("Scanning bundle " + OsgiStringUtils.nullSafeSymbolicName(bundle));
+
 		if (bundle == null)
-			return null;
+			return false;
 
-		// look into the bundle space for web.xml
-		Enumeration enm = bundle.findEntries(WEB_INF, WEB_XML, false);
-		if (enm != null && enm.hasMoreElements())
-			return (URL) enm.nextElement();
-		return null;
+		// check bundle extension
+		String location = bundle.getLocation();
+		if (location != null) {
+			if (trace)
+				log.trace("Scanning for war bundle location " + location);
+			return location.endsWith(WAR_EXT);
+		}
+		return false;
 	}
 }

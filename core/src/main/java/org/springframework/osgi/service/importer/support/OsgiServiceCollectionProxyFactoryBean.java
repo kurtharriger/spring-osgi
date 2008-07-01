@@ -99,7 +99,7 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public final class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean {
+public final class OsgiServiceCollectionProxyFactoryBean extends AbstractServiceImporterProxyFactoryBean {
 
 	/**
 	 * Wrapper around internal commands.
@@ -169,8 +169,23 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiSer
 			getContextClassLoader(), greedyProxying);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Returns the managed collection type.
+	 */
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : collectionType.getCollectionClass());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Returns a managed collection that automatically handles the dynamics of
+	 * matching OSGi services.
+	 */
+	public Object getObject() {
+		return super.getObject();
 	}
 
 	/**
