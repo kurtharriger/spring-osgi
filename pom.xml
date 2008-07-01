@@ -263,6 +263,11 @@ limitations under the License.
           <artifactId>spring-osgi-web-extender</artifactId>
           <version>${project.version}</version>
   		</dependency>
+  		<dependency>
+  		  <groupId>org.springframework.osgi</groupId>
+          <artifactId>spring-osgi-annotation</artifactId>
+          <version>${project.version}</version>
+  		</dependency>  		
   		<!-- Spring -->
         <dependency>
           <groupId>org.springframework</groupId>
