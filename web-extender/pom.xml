@@ -29,7 +29,11 @@
 
 	<spring.osgi.symbolic.name>${symName.prefix}.web.extender</spring.osgi.symbolic.name>
 	
-	<spring.osgi.import.pkg>org.apache.commons.logging</spring.osgi.import.pkg>
+	<spring.osgi.import.pkg>
+		org.apache.commons.logging,
+		org.springframework.osgi.web.deployer.tomcat;version=${spring.osgi.import.version};resolution:=optional,
+		org.springframework.osgi.web.deployer.jetty;version=${spring.osgi.import.version};resolution:=optional
+	</spring.osgi.import.pkg>
   </properties>
   
   <dependencies>

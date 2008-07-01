@@ -26,7 +26,6 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.core.JdkVersion;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
-import org.springframework.osgi.test.platform.Platforms;
 import org.springframework.util.CollectionUtils;
 
 public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
@@ -56,10 +55,6 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		// standard tag library
 		col.add("org.springframework.osgi, jstl.osgi, 1.1.2-SNAPSHOT");
 
-		// Jetty server
-		col.add("org.mortbay.jetty, jetty-util, 6.1.9");
-		col.add("org.mortbay.jetty, jetty, 6.1.9");
-
 		// add MX4J for 1.4
 		// if < jdk 1.5, add an JMX implementation
 		if (!JdkVersion.isAtLeastJava15())
@@ -69,9 +64,10 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		col.add("org.springframework.osgi, catalina.start.osgi, 1.0-SNAPSHOT");
 
 		// jetty starter
-		//		col.add("org.springframework.osgi, jetty.start.osgi, 6.1.9-SNAPSHOT");
-		//		col.add("org.springframework.osgi, jetty.etc.osgi, 6.1.9-SNAPSHOT");
-		//		col.add("org.springframework.osgi, jetty.web.fragment.osgi, 1.0-SNAPSHOT");
+//		col.add("org.springframework.osgi, jetty.start.osgi, 1.0.0-SNAPSHOT");
+//		col.add("org.springframework.osgi, jetty.web.extender.fragment.osgi, 1.0.0-SNAPSHOT");
+//		col.add("org.mortbay.jetty, jetty-util, 6.1.9");
+//		col.add("org.mortbay.jetty, jetty, 6.1.9");
 
 		// Spring DM web extender
 		col.add("org.springframework.osgi, spring-osgi-web," + getSpringDMVersion());
@@ -138,11 +134,5 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 
 	protected boolean createManifestOnlyFromTestClass() {
 		return false;
-	}
-
-	// disable tests on KF for the time being
-	// disable Felix as well until 1.0.4 comes out
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return getPlatformName().equalsIgnoreCase(Platforms.FELIX);
 	}
 }
