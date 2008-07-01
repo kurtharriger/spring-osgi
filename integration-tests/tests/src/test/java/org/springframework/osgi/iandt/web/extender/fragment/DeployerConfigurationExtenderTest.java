@@ -45,7 +45,7 @@ public class DeployerConfigurationExtenderTest extends BaseWebIntegrationTest {
 	}
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { WEB_TESTS_GROUP + "," + GROUP_ID + "," + getSpringDMVersion() };
+		return new String[] { WEB_TESTS_GROUP + "," + GROUP_ID + "," + getSpringDMVersion() + ",war" };
 	}
 
 	protected String[] getTestFrameworkBundlesNames() {

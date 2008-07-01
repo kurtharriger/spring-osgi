@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi.iandt.web</groupId>
   <artifactId>resources.only</artifactId>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
   <name>Spring OSGi Web Test: Static Resource Only Bundle</name>
   <url>http://www.springframework.org/osgi</url>
   
