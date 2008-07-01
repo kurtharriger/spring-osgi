@@ -2,23 +2,32 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.1.0 final (2008-0m-dd)
+Changes in version 1.1.0 final (2008-07-dd)
 -------------------------------------------
 
 General
 * removed deprecated items
+* improved project Maven dependencies
+
+Package org.springframework.osgi.extensions.annotation
+* added attribute for collection greedy-proxying
 
 Package org.springframework.osgi.extender
 * improved shutdown ordering algorithm to consider published ApplicationContext
 * fixed bug that prevented the shutdownTaskExecutor option from being used
 * removed support for extender configuration at META-INF/spring
+* fixed deadlock with failed contexts during shutdown
 
 Package org.springframework.osgi.service
-* removed deprecated importer base class AbstractOsgiServiceImportFactoryBean
+* removed deprecation from AbstractOsgiServiceImportFactoryBean to maintain backwards compatibility
+* removed package visible methods from AbstractOsgiServiceImportFactoryBean
 * removed deprecated exporter base class AbstractOsgiServiceExporter
 
 Package org.springframework.osgi.test
 * removed deprecated #getPlatformProperties() method from platforms classes
+
+Package org.springframework.osgi.web
+* improved war scanner Servlet 2.5 compliance (by considering as WARs only bundles with ".war" extension)
 
 
 Changes in version 1.1.0 RC1 (2008-06-24)

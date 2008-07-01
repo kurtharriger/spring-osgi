@@ -16,25 +16,21 @@
 
 package org.springframework.osgi.web.extender.internal.scanner;
 
-import java.net.URL;
-
 import org.osgi.framework.Bundle;
 
 /**
- * War scanner. Detects the presence of <code>web.xml</code> files or other
- * war configurations.
+ * War scanner. Indicates if the given bundle is a war or not.
  * 
  * @author Costin Leau
- * 
  */
 public interface WarScanner {
 
 	/**
-	 * Returns the <code>web.xml</code> configuration (if it exists) for the
-	 * given bundle.
+	 * Indicates if the given bundle is a war or not. Implementations are free
+	 * to choose the appropriate strategy.
 	 * 
 	 * @param bundle OSGi bundle
-	 * @return URL to the standard web.xml configuration
+	 * @return true if the given bundle is a war, false otherwise
 	 */
-	URL getWebXmlConfiguration(Bundle bundle);
+	boolean isWar(Bundle bundle);
 }

@@ -24,11 +24,8 @@ import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.util.OsgiFilterUtils;
@@ -37,23 +34,20 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Base class for importing OSGi services. Provides most of the constructs
- * required for assembling the service proxies, leaving subclasses to decide on
- * the service cardinality (one service or multiple) and proxy weaving.
+ * Base class for importing OSGi services. Provides the common properties and
+ * contracts between importers.
  * 
  * @author Costin Leau
  * @author Adrian Colyer
  * @author Hal Hildebrand
  */
-public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFactoryBean, InitializingBean,
-		DisposableBean, BundleContextAware, BeanClassLoaderAware, BeanNameAware {
+public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBean, InitializingBean, DisposableBean,
+		BundleContextAware, BeanClassLoaderAware, BeanNameAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
 
 	/** context classloader */
 	private ClassLoader classLoader;
-	/** aop classloader */
-	private ClassLoader aopClassLoader;
 
 	private BundleContext bundleContext;
 
@@ -75,64 +69,11 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 	/** Service Bean property of the OSGi service * */
 	private String serviceBeanName;
 
-	private boolean initialized = false;
-
-	private Object proxy;
-
 	private Cardinality cardinality;
 
 	/** bean name */
 	private String beanName = "";
 
-
-	/**
-	 * Returns a managed hook to access OSGi service(s). Subclasses can decide
-	 * to create either a proxy managing only one OSGi service type or a
-	 * collection of services matching a certain criteria.
-	 * 
-	 * @return managed OSGi service(s)
-	 */
-	public Object getObject() {
-		if (!initialized)
-			throw new FactoryBeanNotInitializedException();
-
-		if (proxy == null) {
-			proxy = createProxy();
-		}
-
-		return proxy;
-	}
-
-	/**
-	 * Creates the proxy tracking the matching OSGi services. This method is
-	 * guaranteed to be called only once, normally during initialization.
-	 * 
-	 * @return OSGi service tracking proxy.
-	 * @see #getProxyDestructionCallback()
-	 */
-	abstract Object createProxy();
-
-	/**
-	 * Returns the destruction callback associated with the proxy created by
-	 * this object. The callback is called once, during the destruction process
-	 * of the {@link FactoryBean}.
-	 * 
-	 * @return destruction callback for the service proxy.
-	 * @see #createProxy()
-	 */
-	abstract Runnable getProxyDestructionCallback();
-
-	public boolean isSingleton() {
-		return true;
-	}
-
-	public boolean isEagerInit() {
-		return true;
-	}
-
-	public boolean isPrototype() {
-		return false;
-	}
 
 	public void afterPropertiesSet() {
 		Assert.notNull(this.bundleContext, "Required 'bundleContext' property was not set.");
@@ -147,8 +88,6 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 		getUnifiedFilter(); // eager initialization of the cache to catch filter
 		// errors
 		Assert.notNull(interfaces, "Required serviceTypes property not specified.");
-
-		initialized = true;
 	}
 
 	/**
@@ -182,19 +121,6 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 		unifiedFilter = OsgiFilterUtils.createFilter(filterWithServiceBeanName);
 
 		return unifiedFilter;
-	}
-
-	public void destroy() throws Exception {
-		Runnable callback = getProxyDestructionCallback();
-		try {
-			if (callback != null) {
-				callback.run();
-			}
-		}
-		finally {
-			proxy = null;
-
-		}
 	}
 
 	/**
@@ -259,14 +185,10 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * This method is called automatically by the container. The class will
-	 * automatically chain this classloader with the AOP infrastructure classes
-	 * (even if these are not visible to the user) so that the proxy creation
-	 * can be completed successfully.
+	 * This method is called automatically by the container.
 	 */
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
-		this.aopClassLoader = AopClassLoaderFactory.getAopClassLoaderFor(classLoader);
 	}
 
 	/**
@@ -276,16 +198,6 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements SmartFacto
 	 */
 	public ClassLoader getBeanClassLoader() {
 		return classLoader;
-	}
-
-	/**
-	 * Returns the class loader used for AOP weaving
-	 * 
-	 * @return
-	 */
-	//NB: package protected
-	ClassLoader getAopClassLoader() {
-		return aopClassLoader;
 	}
 
 	/**
