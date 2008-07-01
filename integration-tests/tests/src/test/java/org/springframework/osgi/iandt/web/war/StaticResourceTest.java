@@ -40,7 +40,7 @@ public class StaticResourceTest extends BaseWebIntegrationTest {
 	}
 
 	protected String[] getTestBundlesNames() {
-		return new String[] { WEB_TESTS_GROUP + "," + GROUP_ID + "," + getSpringDMVersion() };
+		return new String[] { WEB_TESTS_GROUP + "," + GROUP_ID + "," + getSpringDMVersion() + ",war" };
 	}
 
 	public void testWarIndexPage() throws Exception {
