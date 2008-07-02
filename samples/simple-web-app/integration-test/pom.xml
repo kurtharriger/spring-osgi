@@ -82,7 +82,7 @@
 	<dependency>
 	  <groupId>org.springframework.osgi</groupId>
 	  <artifactId>catalina.start.osgi</artifactId>
-	  <version>1.0.0-SNAPSHOT</version>
+	  <version>1.0.0</version>
 	  <scope>test</scope>
 	</dependency>		
 
