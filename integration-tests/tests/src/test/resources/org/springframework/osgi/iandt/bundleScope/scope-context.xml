@@ -8,4 +8,8 @@
 
 	<bean id="props" class="java.util.Properties" destroy-method="clear" scope="bundle"/>
 	
+	<osgi:service interface="java.util.Map" ref="props"/>
+	
+	<bean id="object" class="java.lang.Object" scope="prototype"/>
+	<osgi:service auto-export="all-classes" ref="object"/>
 </beans>

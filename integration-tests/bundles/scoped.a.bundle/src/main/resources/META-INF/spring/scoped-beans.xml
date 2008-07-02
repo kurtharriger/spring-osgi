@@ -8,7 +8,7 @@
 
     <bean id="a.service" class="org.springframework.osgi.iandt.scope.common.HashCodeScopeTestService" scope="bundle"/>
 
-    <osgi:service ref="a.service" auto-export="all-classes"/>
+    <osgi:service ref="a.service" interface="org.springframework.osgi.iandt.scope.common.ScopeTestService"/>
     
     <bean id="staticReference" class="org.springframework.osgi.iandt.scope.a.BeanReference">
     	<property name="bean" ref="a.service"/>

@@ -262,7 +262,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		else {
 			for (int interfaceIndex = 0; interfaceIndex < interfaces.length; interfaceIndex++) {
 				Class intf = interfaces[interfaceIndex];
-				Assert.isInstanceOf(intf, target, "Exported service object does not implement the given interface: ");
+				Assert.isAssignable(intf, targetClass, "Exported service object does not implement the given interface: ");
 			}
 		}
 

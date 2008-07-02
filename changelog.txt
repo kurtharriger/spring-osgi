@@ -24,6 +24,7 @@ Package org.springframework.osgi.service
 * removed deprecation from AbstractOsgiServiceImportFactoryBean to maintain backwards compatibility
 * removed package visible methods from AbstractOsgiServiceImportFactoryBean
 * removed deprecated exporter base class AbstractOsgiServiceExporter
+* fixed validation during export of non-singleton beans
 
 Package org.springframework.osgi.test
 * removed deprecated #getPlatformProperties() method from platforms classes

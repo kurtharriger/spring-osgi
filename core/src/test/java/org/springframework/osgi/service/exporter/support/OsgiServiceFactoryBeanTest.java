@@ -203,14 +203,15 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 			}
 		});
 
-		exporter.setTarget(MockControl.createControl(ServiceFactory.class).getMock());
+		Object proxy = MockControl.createControl(ServiceFactory.class).getMock();
+		exporter.setTarget(proxy);
 		exporter.setInterfaces(new Class[] { ServiceFactory.class });
 		String beanName = "boo";
 		exporter.setTargetBeanName(beanName);
 
 		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
-		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), Object.class);
+		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), proxy.getClass());
 		beanFactoryControl.replay();
 
 		exporter.afterPropertiesSet();
