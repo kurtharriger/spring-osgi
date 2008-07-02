@@ -93,4 +93,15 @@ public class DefaultWarScannerTest extends TestCase {
 		};
 		assertTrue(scanner.isWar(bundle));
 	}
+
+	public void testExpandedBundleLocation() throws Exception {
+
+		bundle = new MockBundle() {
+
+			public String getLocation() {
+				return "initial@reference:file:petclinic.war/";
+			}
+		};
+		assertTrue(scanner.isWar(bundle));
+	}
 }

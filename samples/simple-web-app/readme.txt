@@ -24,9 +24,22 @@ of the html page, the servlet and JSP.
 This directory contains the source files.
 For building, Maven 2 and JDK 1.4 are required.
 
-To manually connect to the server, modify the integration test commented method
-to wait for user input from the console, run the test and connect your browser
-at http://localhost:8080/simple-web-app/
+To start the sample, run the following commands:
 
-Additionally, you can install the project bundles into the target OSGi platform
-and start it.
+a) Download the needed libraries. This step will download Equinox OSGi platform
+as well as the sample dependencies. This step is required only once
+
+# mvn -P dependencies,equinox package
+
+The equinox platform and the project dependencies should be available under the libs/ folder.
+
+b) start Equinox platform using the downloaded libraries.
+The sample already contains a proper Equinox config under configuration/ folder.
+To start the sample and interact with the Equinox platform run:
+
+# java -jar libs/org.eclipse.osgi.jar
+
+Note that you can interact with the osgi platform. Type h or help for more information
+
+c) Connect to the web app by pointing your browser at
+http://localhost:8080/simple-web-app/

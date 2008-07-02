@@ -31,6 +31,7 @@ public class DefaultWarScanner implements WarScanner {
 
 	/** war extension */
 	private static final String WAR_EXT = ".war";
+	private static final String SLASH = "/";
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(DefaultWarScanner.class);
@@ -47,7 +48,13 @@ public class DefaultWarScanner implements WarScanner {
 
 		// check bundle extension
 		String location = bundle.getLocation();
+
 		if (location != null) {
+			// handle unpacked bundles
+			if (location.endsWith(SLASH)) {
+				// remove trailing slash
+				location = location.substring(0, location.length() - 1);
+			}
 			if (trace)
 				log.trace("Scanning for war bundle location " + location);
 			return location.endsWith(WAR_EXT);
