@@ -24,9 +24,8 @@
   
     <!-- JUnit is required at build time not just test time -->
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>junit.osgi</artifactId>
-      <version>3.8.2-SNAPSHOT</version>
+	  <groupId>org.junit</groupId>
+	  <artifactId>com.springsource.junit</artifactId>
       <scope>provided</scope>
     </dependency>
   </dependencies>
