@@ -61,11 +61,11 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 			col.add("org.springframework.osgi, mx4j.osgi, 3.0.2-SNAPSHOT");
 
 		col.add("org.springframework.osgi, catalina.osgi, 5.5.23-SNAPSHOT");
-		col.add("org.springframework.osgi, catalina.start.osgi, 1.0.0-SNAPSHOT");
+		col.add("org.springframework.osgi, catalina.start.osgi, 1.0.0");
 
 		// jetty starter
-//		col.add("org.springframework.osgi, jetty.start.osgi, 1.0.0-SNAPSHOT");
-//		col.add("org.springframework.osgi, jetty.web.extender.fragment.osgi, 1.0.0-SNAPSHOT");
+//		col.add("org.springframework.osgi, jetty.start.osgi, 1.0.0");
+//		col.add("org.springframework.osgi, jetty.web.extender.fragment.osgi, 1.0.0");
 //		col.add("org.mortbay.jetty, jetty-util, 6.1.9");
 //		col.add("org.mortbay.jetty, jetty, 6.1.9");
 

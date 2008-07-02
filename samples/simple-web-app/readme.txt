@@ -26,7 +26,7 @@ For building, Maven 2 and JDK 1.4 are required.
 
 To manually connect to the server, modify the integration test commented method
 to wait for user input from the console, run the test and connect your browser
-at http://localhost:8080/war-<version>/
+at http://localhost:8080/simple-web-app/
 
 Additionally, you can install the project bundles into the target OSGi platform
 and start it.

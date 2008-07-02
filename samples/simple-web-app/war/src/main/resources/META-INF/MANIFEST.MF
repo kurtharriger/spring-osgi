@@ -1,4 +1,4 @@
-Web-ContextPath: simple-war
+Web-ContextPath: simple-web-app
 Bundle-ManifestVersion: 2
 Bundle-Name: Simple OSGi War
 Bundle-SymbolicName: org.springframework.osgi.samples.simplewebapp
