@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Costin Leau
  * 
  */
-public class HelloOsgiWorld extends HttpServlet {
+public class HelloOsgiWorldServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		addHelloWorld(resp, req.getMethod());
