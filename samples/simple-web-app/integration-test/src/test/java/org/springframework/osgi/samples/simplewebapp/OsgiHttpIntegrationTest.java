@@ -112,7 +112,7 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 
 
 	//  Uncomment this method to stop the test from ending and manually connect to the browser
-		public void testWarDeployed() throws Exception {
-		System.in.read();
-	}
+//		public void testWarDeployed() throws Exception {
+//		System.in.read();
+//	}
 }

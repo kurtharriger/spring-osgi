@@ -29,14 +29,12 @@
 		<dependency>
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>spring-osgi-core</artifactId>
-			<version>${project.parent.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
-		   <groupId>org.springframework.osgi</groupId>
-		   <artifactId>junit.osgi</artifactId>
-		   <version>3.8.2-SNAPSHOT</version>
+		   <groupId>org.junit</groupId>
+		   <artifactId>com.springsource.junit</artifactId>
 		   <scope>provided</scope>
         </dependency>
 	</dependencies>

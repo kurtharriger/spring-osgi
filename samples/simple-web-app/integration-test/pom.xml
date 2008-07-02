@@ -16,25 +16,21 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>${spring.maven.artifact.version}</version>
       <scope>provided</scope>      
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>${spring.maven.artifact.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-test</artifactId>
-      <version>${version}</version>
       <scope>provided</scope>      
     </dependency>
 	<dependency>
-	   <groupId>org.springframework.osgi</groupId>
-	   <artifactId>junit.osgi</artifactId>
-	   <version>3.8.2-SNAPSHOT</version>
+	   <groupId>org.junit</groupId>
+	   <artifactId>com.springsource.junit</artifactId>
 	   <scope>provided</scope>
     </dependency>
     <dependency>
@@ -86,16 +82,30 @@
 	<dependency>
 	  <groupId>org.springframework.osgi</groupId>
 	  <artifactId>catalina.start.osgi</artifactId>
-	  <version>1.0-SNAPSHOT</version>
+	  <version>1.0.0-SNAPSHOT</version>
 	  <scope>test</scope>
 	</dependency>		
 
 	<dependency>
 	  <groupId>org.springframework.osgi</groupId>
 	  <artifactId>spring-osgi-web</artifactId>
-	  <version>${project.parent.version}</version>
+	  <scope>test</scope>
+	</dependency>
+	
+	<dependency>
+	  <groupId>org.springframework.osgi</groupId>
+	  <artifactId>spring-osgi-web-extender</artifactId>
 	  <scope>test</scope>
 	</dependency>	    
+
+	<dependency>
+	  <groupId>org.springframework.osgi.samples.simple-web-app</groupId>
+	  <artifactId>war</artifactId>
+	  <version>${project.version}</version>
+	  <type>war</type>
+	  <scope>test</scope>
+	</dependency>	    
+
   </dependencies>
 
 </project>
