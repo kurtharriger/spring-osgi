@@ -52,6 +52,10 @@ public class CoreTaglibTest extends BaseWebIntegrationTest {
 		assertTrue(resp.toString(), resp.isOk());
 	}
 
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return getPlatformName().indexOf("Felix") > -1;
+	}
+
 	//	public void tstSystemIn() throws Exception {
 	//		System.in.read();
 	//	}

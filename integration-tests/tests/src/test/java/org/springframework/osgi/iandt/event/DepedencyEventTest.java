@@ -130,6 +130,12 @@ public class DepedencyEventTest extends AbstractEventTest {
 
 			// bnd1 context started event
 			System.out.println("Refresh events received are " + refreshEvents);
+			
+			while (eventList.size() < 3) {
+				if (!waitForEvent(TIME_OUT)) {
+					fail("not enough events received after " + TIME_OUT + " ms");
+				}
+			}
 			// at least 3 events have to be received
 			assertTrue(refreshEvents.size() >= 3);
 
