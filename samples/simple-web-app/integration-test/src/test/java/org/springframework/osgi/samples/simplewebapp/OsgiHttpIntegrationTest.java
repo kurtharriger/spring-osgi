@@ -114,4 +114,8 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 	//		public void testWarDeployed() throws Exception {
 	//		System.in.read();
 	//	}
+
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return getPlatformName().indexOf("Felix") > -1;
+	}
 }

@@ -53,4 +53,8 @@ public class SimpleJSPTest extends BaseWebIntegrationTest {
 		HttpResponse resp = HttpClient.getLocalResponse(base(), "jsp/complex.jsp");
 		assertTrue(resp.toString(), resp.isOk());
 	}
+
+	protected boolean isDisabledInThisEnvironment(String testMethodName) {
+		return getPlatformName().indexOf("Felix") > -1;
+	}
 }
