@@ -52,7 +52,8 @@ public abstract class ImporterControllerUtils {
 
 
 	public static ImporterInternalActions getControllerFor(Object importer) {
-		Field field = (importer instanceof OsgiServiceProxyFactoryBean ? singleProxyField : collectionProxyField);
+		Field field = (OsgiServiceProxyFactoryBean.class == importer.getClass() ? singleProxyField
+				: collectionProxyField);
 		try {
 			return (ImporterInternalActions) field.get(importer);
 		}
