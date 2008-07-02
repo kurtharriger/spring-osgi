@@ -83,7 +83,6 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 				return true;
 			else
 				return (proxy == null ? true : proxy.getServiceReference().getBundle() != null);
-
 		}
 	};
 

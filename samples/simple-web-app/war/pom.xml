@@ -25,4 +25,37 @@
 		 </resource>
     </resources>
   </build>
+  
+ 
+  <profiles>
+   <profile>
+    <id>dependencies</id>
+    <build>
+     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>libs</outputDirectory>
+              <excludeTransitive>false</excludeTransitive>
+              <stripVersion>true</stripVersion>
+              <!--
+              <excludeArtifactIds>org.eclipse.osgi</excludeArtifactIds>
+              -->
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+     </plugins>
+    </build>
+   </profile>    
+  </profiles>
+  
 </project>
