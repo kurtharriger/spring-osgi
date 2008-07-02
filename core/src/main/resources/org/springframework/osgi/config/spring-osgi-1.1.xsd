@@ -6,7 +6,7 @@
             targetNamespace="http://www.springframework.org/schema/osgi"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified"
-            version="1.1-rc1">
+            version="1.1">
 
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
     <xsd:import namespace="http://www.springframework.org/schema/tool"/>

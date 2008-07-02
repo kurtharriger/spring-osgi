@@ -23,7 +23,7 @@ http://maven.apache.org/guides/introduction/introduction-to-profiles.html
 The following Maven profiles are available for selecting an OSGi platform:
 
 equinox - Equinox 3.2.x
-knopflerfish - Knopflerfish 2.0.x
+knopflerfish - Knopflerfish 2.0.x/2.1.x
 felix - Apache Felix 1.0.x
 
 The OSGi platform should be always specified otherwise the project will not compile.
@@ -55,7 +55,7 @@ To check the Java version used by maven, use the followig command:
 
 # mvn -v
 
-Unfortunately, at the moment (Maven 2.0.8), combining several profiles automatically
+Unfortunately, at the moment (Maven 2.0.9), combining several profiles automatically
 activates doesn't seem to be supported (hence the need to always specify an OSGi platform
 even when using the default). We hope that in the future, the building process will
 be improved in this regards so the proper profiles will be applied automatically based
