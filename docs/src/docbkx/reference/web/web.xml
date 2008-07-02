@@ -28,6 +28,9 @@
     particular to the target container. In short, everything that the target container supports is available to the OSGi WAR through Spring-DM.
     </para>
     
+    <tip>As a complement to this chapter, the Spring-DM distribution contains a number of web samples involving static resources, Servlets and JSPs running inside
+    OSGi.</tip>
+    
     <note>For more information on web applications on Java platform, please see the Servlet home <ulink url="http://java.sun.com/products/servlet/">page</ulink>.</note>
     
     <section id="web:supported-containers">
@@ -67,7 +70,7 @@
     			<literal>spring-osgi-web-extender.jar</literal> - Spring-DM web extender
 	   		</listitem>
     	</itemizedlist>
-    	bundles to detect started OSGi WAR bundles and to deploy them to one of the supported web containers. 
+    	bundles to detect started OSGi WAR bundles (bundles with <literal>.war</literal> extension) and to deploy them to one of the supported web containers. 
     	By default, Tomcat will be used but this can be changed to Jetty or to another custom 
     	server. When the war bundle is stopped, Spring-DM will also stop and uninstall the web application associated with it. Different from 
     	<emphasis>traditional</emphasis> web development, the Servlet classes need to be explicitly imported as the OSGi class path always takes priority
@@ -163,7 +166,7 @@
 
 	<para>No matter what mechanism you decide to use for the war classpath, due to the OSGi capabilities, it is possible to create libraries that are <emphasis>shared</emphasis>
     between multiple WARs while having full control over the used packages. Each bundle can import only the packages (and the versions) needed not an entire library jar - in fact,
-    packages from different bundles/jars can be selectively used to obtain the desired behaviour - a very powerful capability which should make web application deployment easier.</para> 
+    packages from different bundles/jars can be selectively used to obtain the desired behaviour - a very powerful capability which should make web application deployment easier.</para>
     </section>
     
     <section id="web:configuration">
@@ -216,12 +219,16 @@
                 <entry><classname>DefaultContextPathStrategy</classname><footnote>
                 <para>Part of <literal>org.springframework.osgi.web.deployer.support</literal> package</para></footnote>
                 </entry>
-                <entry>Returns as context path the file name from the bundle location, falling back to the bundle name and bundle symbolic name respectively. 
+                <entry>Returns as context path of the war based on the <literal>Web-ContextPath</literal> manifest header or (if missing),
+                the file name from the bundle location, falling back to the bundle name and bundle symbolic name respectively. 
                 If neither of these is present, the bundle object identity will be used.</entry>
               </row>   			  
              </tbody>
           </tgroup>
     	</table>
+    	
+    	<para>Note that to properly support wars, whether they are using Servlet 2.5 or not, the Spring-DM web extender considers as WARs bundles that
+    	contains a <literal>.war</literal> extension.</para>
     	
     	<section id="web:configuration:changing-deployer">
     		<title>Changing the war deployer</title>
@@ -350,8 +357,11 @@ Fragment-Host: org.springframework.bundle.osgi.web.extender</programlisting>
 		and publish it as an OSGi service. While the activators are generic, they can be easily customized for advance usages or even replaced - it's up to each 
 		deployer to decide how the server instances are looked up.</para>
 		
+		<note>The activator binaries and sources can be found either in the Spring-DM repository (see below) or under the <literal>lib/</literal> folder 
+		inside the Spring-DM (<literal>with-dependencies</literal>) distribution</note>
+		
 		<para>All entries in the repository belong to the <literal>org.springframework.osgi</literal> group and have an <literal>.osgi</literal> termination to differentiate
-		them from the original jars</para>
+		them from the original jars.</para>
 
 		<section id="web:osgi-artifacts:containers:tomcat">
     		<title>Tomcat 5.5.x/6.0.x</title>

@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Log4J Configuration
-Bundle-SymbolicName: org.springframework.osgi.log4j.config
-Bundle-Version: 1.0.0
-Fragment-Host: org.springframework.osgi.log4j.osgi;bundle-version="1.2.15"
