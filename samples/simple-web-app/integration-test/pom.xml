@@ -13,6 +13,7 @@
   <packaging>jar</packaging>
 
 
+  <dependencies>
 	<dependency>
 	  <groupId>org.springframework.osgi.samples.simple-web-app</groupId>
 	  <artifactId>war</artifactId>
