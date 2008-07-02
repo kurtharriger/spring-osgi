@@ -59,8 +59,8 @@ import org.springframework.util.ObjectUtils;
  * @author Hal Hildebrand
  * 
  */
-public final class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean implements
-		ApplicationEventPublisherAware, SmartFactoryBean {
+public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterProxyFactoryBean implements
+		ApplicationEventPublisherAware {
 
 	/**
 	 * Wrapper around internal commands.
@@ -108,11 +108,6 @@ public final class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImport
 	/** convenience field * */
 	private boolean mandatory;
 
-	private boolean initialized = false;
-
-	/** aop classloader */
-	private ClassLoader aopClassLoader;
-
 
 	public OsgiServiceProxyFactoryBean() {
 		controller = new ImporterController(new Executor());
@@ -124,8 +119,6 @@ public final class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImport
 		// add default cardinality
 		if (getCardinality() == null)
 			setCardinality(Cardinality.C_1__1);
-
-		initialized = true;
 	}
 
 	/**
@@ -137,6 +130,15 @@ public final class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImport
 	public Class getObjectType() {
 		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(getInterfaces()) ? Object.class
 				: getInterfaces()[0]));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Returns a managed proxy to the best matching OSGi service.
+	 */
+	public Object getObject() {
+		return super.getObject();
 	}
 
 	Object createProxy() {
@@ -270,87 +272,4 @@ public final class OsgiServiceProxyFactoryBean extends AbstractOsgiServiceImport
 	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
 		this.applicationEventPublisher = applicationEventPublisher;
 	}
-
-	public void destroy() throws Exception {
-		Runnable callback = getProxyDestructionCallback();
-		try {
-			if (callback != null) {
-				callback.run();
-			}
-		}
-		finally {
-			proxy = null;
-
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * Returns a managed proxy to the best matching OSGi service.
-	 */
-	public Object getObject() {
-		if (!initialized)
-			throw new FactoryBeanNotInitializedException();
-
-		if (proxy == null) {
-			proxy = (ImportedOsgiServiceProxy) createProxy();
-		}
-
-		return proxy;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * The object managed by this factory is a singleton.
-	 * 
-	 * @return true (i.e. the FactoryBean returns singletons)
-	 */
-	public boolean isSingleton() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * The object created by this factory bean is eagerly initialized.
-	 * 
-	 * @return true (this factory bean should be eagerly initialized)
-	 */
-	public boolean isEagerInit() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc} The object returned by this FactoryBean is a not a
-	 * prototype.
-	 * 
-	 * @return false (the managed object is not a prototype)
-	 */
-	public boolean isPrototype() {
-		return false;
-	}
-
-	/**
-	 * Returns the class loader used for AOP weaving
-	 * 
-	 * @return the classloader used for weaving
-	 */
-	ClassLoader getAopClassLoader() {
-		return aopClassLoader;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * The class will automatically chain this classloader with the AOP
-	 * infrastructure classes (even if these are not visible to the user) so
-	 * that the proxy creation can be completed successfully.
-	 */
-	public void setBeanClassLoader(ClassLoader classLoader) {
-		super.setBeanClassLoader(classLoader);
-		this.aopClassLoader = AopClassLoaderFactory.getAopClassLoaderFor(classLoader);
-	}
-
 }

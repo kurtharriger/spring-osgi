@@ -102,8 +102,7 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public final class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean implements
-		SmartFactoryBean {
+public final class OsgiServiceCollectionProxyFactoryBean extends AbstractServiceImporterProxyFactoryBean {
 
 	/**
 	 * Wrapper around internal commands.
@@ -155,11 +154,6 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiSer
 
 	private final ImporterInternalActions controller;
 
-	private boolean initialized = false;
-
-	/** aop classloader */
-	private ClassLoader aopClassLoader;
-
 
 	public OsgiServiceCollectionProxyFactoryBean() {
 		controller = new ImporterController(new Executor());
@@ -176,21 +170,6 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiSer
 		// joining the collection)
 		proxyCreator = new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBundleContext(),
 			getContextClassLoader(), greedyProxying);
-
-		initialized = true;
-	}
-
-	public void destroy() throws Exception {
-		Runnable callback = getProxyDestructionCallback();
-		try {
-			if (callback != null) {
-				callback.run();
-			}
-		}
-		finally {
-			proxy = null;
-
-		}
 	}
 
 	/**
@@ -209,14 +188,7 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiSer
 	 * matching OSGi services.
 	 */
 	public Object getObject() {
-		if (!initialized)
-			throw new FactoryBeanNotInitializedException();
-
-		if (proxy == null) {
-			proxy = (Collection) createProxy();
-		}
-
-		return proxy;
+		return super.getObject();
 	}
 
 	/**
@@ -225,7 +197,6 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiSer
 	 * to prevent exposing infrastructure methods and write access.
 	 * 
 	 * @return importer proxy
-	 * @see #getProxyDestructionCallback()
 	 */
 	Object createProxy() {
 		if (log.isDebugEnabled())
@@ -357,58 +328,5 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractOsgiSer
 	 */
 	public void setGreedyProxying(boolean greedyProxying) {
 		this.greedyProxying = greedyProxying;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * The class will automatically chain this classloader with the AOP
-	 * infrastructure classes (even if these are not visible to the user) so
-	 * that the proxy creation can be completed successfully.
-	 */
-	public void setBeanClassLoader(ClassLoader classLoader) {
-		super.setBeanClassLoader(classLoader);
-		this.aopClassLoader = AopClassLoaderFactory.getAopClassLoaderFor(classLoader);
-	}
-
-	/**
-	 * Returns the class loader used for AOP weaving
-	 * 
-	 * @return the classloader used for weaving
-	 */
-	ClassLoader getAopClassLoader() {
-		return aopClassLoader;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * The object managed by this factory is a singleton.
-	 * 
-	 * @return true (i.e. the FactoryBean returns singletons)
-	 */
-	public boolean isSingleton() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * The object created by this factory bean is eagerly initialized.
-	 * 
-	 * @return true (this factory bean should be eagerly initialized)
-	 */
-	public boolean isEagerInit() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc} The object returned by this FactoryBean is a not a
-	 * prototype.
-	 * 
-	 * @return false (the managed object is not a prototype)
-	 */
-	public boolean isPrototype() {
-		return false;
 	}
 }

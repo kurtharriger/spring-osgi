@@ -34,11 +34,11 @@ distribution/website before using any of them in your own applications.
 - required for building and running the framework's test suite
 
 * framework.jar
-- Knopflerfish 2.0.5 OSGi platform implementation (http://www.knopflerfish.org) 
+- Knopflerfish 2.1.0 OSGi platform implementation (http://www.knopflerfish.org) 
 - required for building and running the framework's test suite
  
 * jcl104-over-slf4j.jar
-- SLF4J 1.4.3 Jakarta Commons Logging wrapper (http://www.slf4j.org)
+- SLF4J 1.5.0 Jakarta Commons Logging wrapper (http://www.slf4j.org)
 - required for building and running the framework's test suite
 
 * jetty-6.1.9.jar
@@ -87,41 +87,41 @@ distribution/website before using any of them in your own applications.
 - required for running the framework's test suite on JDK 1.4
 
 * slf4j-api.jar
-- SLF4J API 1.4.3 (http://www.slf4j.org)
+- SLF4J API 1.5.0 (http://www.slf4j.org)
 - required for building and running the framework's test suite
 
 * slf4j-log4j.jar
-- SLF4J 1.4.3 adapter for log4j (http://www.slf4j.org) 
+- SLF4J 1.5.0 adapter for log4j (http://www.slf4j.org) 
 - required for running the framework's test suite
 
 * spring-aop.jar
-- Spring Framework 2.5.4 AOP library (http://www.springframework.org)
+- Spring Framework 2.5.x AOP library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-beans.jar
-- Spring Framework 2.5.4 beans library (http://www.springframework.org)
+- Spring Framework 2.5.x beans library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-context.jar
-- Spring Framework 2.5.4 context library (http://www.springframework.org)
+- Spring Framework 2.5.x context library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-context-support.jar
-- Spring Framework 2.5.4 context support library (http://www.springframework.org)
+- Spring Framework 2.5.x context support library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-core.jar
-- Spring Framework 2.5.4 core library (http://www.springframework.org)
+- Spring Framework 2.5.x core library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-test.jar
-- Spring Framework 2.5.4 test library (http://www.springframework.org)
+- Spring Framework 2.5.x test library (http://www.springframework.org)
 - required for building and running the framework's test suite
 
 * spring-web.jar
-- Spring Framework 2.5.4 web library (http://www.springframework.org)
+- Spring Framework 2.5.x web library (http://www.springframework.org)
 - required for running the samples and the framework's test suite
 
 * spring-webmvc.jar
-- Spring Framework 2.5.4 mvc library (http://www.springframework.org)
+- Spring Framework 2.5.x mvc library (http://www.springframework.org)
 - required for running the samples and the framework's test suite

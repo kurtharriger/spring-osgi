@@ -386,6 +386,11 @@ limitations under the License.
 	      <artifactId>osgi_R4_compendium</artifactId>
 	      <version>1.0</version>
 	    </dependency>
+		<dependency>
+		  <groupId>org.junit</groupId>
+		  <artifactId>com.springsource.junit</artifactId>
+		  <version>3.8.2</version>
+		</dependency>
   	</dependencies>
   </dependencyManagement>
   <!-- shared dependencies across modules -->
