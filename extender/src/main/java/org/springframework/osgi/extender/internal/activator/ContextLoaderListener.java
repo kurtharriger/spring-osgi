@@ -64,24 +64,24 @@ import org.springframework.util.Assert;
 
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'.
- *
+ * 
  * <p/> The class listens to bundle events and manages the creation and
  * destruction of application contexts for bundles that have one or both of:
  * <ul>
  * <li> A manifest header entry Spring-Context
  * <li> XML files in META-INF/spring folder
  * </ul>
- *
+ * 
  * <p/> The extender also discovers any Spring namespace/schema handlers in
  * resolved bundles and makes them available through a dedicated OSGi service.
- *
+ * 
  * <p/> The extender behaviour can be customized by attaching fragments to the
  * extender bundle. On startup, the extender will look for
  * <code>META-INF/spring/*.xml</code> files and merge them into an application
  * context. From the resulting context, the context will look for beans with
  * predefined names to determine its configuration. The current version
  * recognises the following bean names:
- *
+ * 
  * <table border="1">
  * <tr>
  * <th>Bean Name</th>
@@ -104,9 +104,9 @@ import org.springframework.util.Assert;
  * <td>Various properties for configuring the extender behaviour (see below)</td>
  * </tr>
  * </table>
- *
+ * 
  * <p/> <code>extenderProperties</code> recognises the following properties:
- *
+ * 
  * <table border="1">
  * <tr>
  * <th>Name</th>
@@ -125,12 +125,12 @@ import org.springframework.util.Assert;
  * <td>Whether or not, the extender will process SpringOSGi annotations.</td>
  * </tr>
  * </table>
- *
+ * 
  * <p/> Note: The extender configuration context is created during the bundle
  * activation (a synchronous OSGi lifecycle callback) and should contain only
  * simple bean definitions that will not delay context initialisation.
  * </p>
- *
+ * 
  * @author Bill Gallagher
  * @author Andy Piper
  * @author Hal Hildebrand
@@ -141,7 +141,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 	/**
 	 * Common base class for {@link ContextLoaderListener} listeners.
-	 *
+	 * 
 	 * @author Costin Leau
 	 */
 	private abstract class BaseListener implements SynchronousBundleListener {
@@ -150,7 +150,7 @@ public class ContextLoaderListener implements BundleActivator {
 		 * A bundle has been started, stopped, resolved, or unresolved. This
 		 * method is a synchronous callback, do not do any long-running work in
 		 * this thread.
-		 *
+		 * 
 		 * @see org.osgi.framework.SynchronousBundleListener#bundleChanged
 		 */
 		public void bundleChanged(BundleEvent event) {
@@ -187,7 +187,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * conditions with bundles in INSTALLING state but still to avoid premature
 	 * context creation before the Spring {@link ContextLoaderListener} is not
 	 * fully initialized.
-	 *
+	 * 
 	 * @author Costin Leau
 	 */
 	private class NamespaceBundleLister extends BaseListener {
@@ -349,7 +349,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * <p/> Registers a namespace/entity resolving service for use by web app
 	 * contexts.
 	 * </p>
-	 *
+	 * 
 	 * @see org.osgi.framework.BundleActivator#start
 	 */
 	public void start(BundleContext context) throws Exception {
@@ -456,7 +456,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * management of application contexts created by this extender prior to
 	 * stopping the bundle occurs after this point (even if the extender bundle
 	 * is subsequently restarted).
-	 *
+	 * 
 	 * @see org.osgi.framework.BundleActivator#stop
 	 */
 	public void stop(BundleContext context) throws Exception {
@@ -625,7 +625,7 @@ public class ContextLoaderListener implements BundleActivator {
 	/**
 	 * Utility method that does extender range versioning and approapriate
 	 * logging.
-	 *
+	 * 
 	 * @param bundle
 	 */
 	private boolean handlerBundleMatchesExtenderVersion(Bundle bundle) {
@@ -654,17 +654,17 @@ public class ContextLoaderListener implements BundleActivator {
 	/**
 	 * Context creation is a potentially long-running activity (certainly more
 	 * than we want to do on the synchronous event callback).
-	 *
+	 * 
 	 * <p/>Based on our configuration, the context can be started on the same
 	 * thread or on a different one.
-	 *
+	 * 
 	 * <p/> Kick off a background activity to create an application context for
 	 * the given bundle if needed.
-	 *
+	 * 
 	 * <b>Note:</b> Make sure to do the fastest filtering first to avoid
 	 * slowdowns on platforms with a big number of plugins and wiring (i.e.
 	 * Eclipse platform).
-	 *
+	 * 
 	 * @param bundle
 	 */
 	protected void maybeCreateApplicationContextFor(Bundle bundle) {
@@ -840,14 +840,9 @@ public class ContextLoaderListener implements BundleActivator {
 	 * Post process the context (for example by adding bean post processors).
 	 */
 	private void addDefaultPostProcessors(List postProcessorsList) {
-		Map config = System.getProperties();
+		if (extenderConfiguration.shouldProcessAnnotation() || Boolean.getBoolean(AUTO_ANNOTATION_PROCESSING)) {
 
-		Object setting = config.get(AUTO_ANNOTATION_PROCESSING);
-		if (extenderConfiguration.shouldProcessAnnotation()
-				|| (setting != null && setting instanceof String && Boolean.getBoolean((String) setting))) {
-
-			log.info("Enabled automatic Spring-DM annotation processing; [" + AUTO_ANNOTATION_PROCESSING + "="
-					+ setting + "]");
+			log.info("Enabled automatic Spring-DM annotation processing");
 
 			// add annotation BFPP (first in the list)
 			if (log.isTraceEnabled())
@@ -856,8 +851,7 @@ public class ContextLoaderListener implements BundleActivator {
 		}
 
 		else {
-			log.info("Disabled automatic Spring-DM annotation processing; [ " + AUTO_ANNOTATION_PROCESSING + "="
-					+ setting + "]");
+			log.info("Disabled automatic Spring-DM annotation processing");
 		}
 	}
 
