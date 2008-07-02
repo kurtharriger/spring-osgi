@@ -27,7 +27,7 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 /**
  * Web integration test that bootstraps the web containers and its dependencies
  * and tests the Http connection to the local server at
- * <code>http://localhost:8080/war-<version>/</code>.
+ * <code>http://localhost:8080/simple-web-app/</code>.
  * 
  * @author Costin Leau
  * 
@@ -63,7 +63,7 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 			col.add(SPRING_OSGI_GROUP + ", mx4j.osgi, 3.0.2-SNAPSHOT");
 
 		col.add(SPRING_OSGI_GROUP + ", catalina.osgi, 5.5.23-SNAPSHOT");
-		col.add(SPRING_OSGI_GROUP + ", catalina.start.osgi, 1.0.0-SNAPSHOT");
+		col.add(SPRING_OSGI_GROUP + ", catalina.start.osgi, 1.0.0");
 
 		// Spring DM web extender
 		col.add(SPRING_OSGI_GROUP + ", spring-osgi-web," + getSpringDMVersion());
@@ -76,7 +76,7 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 	}
 
 	private String url() {
-		return "http://localhost:8080/war-" + getSpringDMVersion();
+		return "http://localhost:8080/simple-web-app";
 	}
 
 	private void testConnection(String address) throws Exception {
@@ -110,9 +110,8 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 		testConnection(url() + "/hello-osgi-world.jsp");
 	}
 
-
 	//  Uncomment this method to stop the test from ending and manually connect to the browser
-//		public void testWarDeployed() throws Exception {
-//		System.in.read();
-//	}
+	//		public void testWarDeployed() throws Exception {
+	//		System.in.read();
+	//	}
 }
