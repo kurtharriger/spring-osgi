@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.springframework.core.JdkVersion;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
-import org.springframework.osgi.test.platform.Platforms;
 
 /**
  * Web integration test that bootstraps the web containers and its dependencies
@@ -64,7 +63,7 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 			col.add(SPRING_OSGI_GROUP + ", mx4j.osgi, 3.0.2-SNAPSHOT");
 
 		col.add(SPRING_OSGI_GROUP + ", catalina.osgi, 5.5.23-SNAPSHOT");
-		col.add(SPRING_OSGI_GROUP + ", catalina.start.osgi, 1.0-SNAPSHOT");
+		col.add(SPRING_OSGI_GROUP + ", catalina.start.osgi, 1.0.0-SNAPSHOT");
 
 		// Spring DM web extender
 		col.add(SPRING_OSGI_GROUP + ", spring-osgi-web," + getSpringDMVersion());
@@ -99,8 +98,12 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 		testConnection(url() + "/index.html");
 	}
 
-	public void testServlet() throws Exception {
-		testConnection(url() + "/servlet");
+	public void testHelloServlet() throws Exception {
+		testConnection(url() + "/helloWorldServlet");
+	}
+
+	public void testResourceServlet() throws Exception {
+		testConnection(url() + "/resourceServlet?resource=/META-INF/MANIFEST.MF");
 	}
 
 	public void testJSP() throws Exception {
@@ -108,12 +111,8 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 	}
 
 
-	// disable tests on Felix for the time being until 1.0.4 comes out
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return getPlatformName().equalsIgnoreCase(Platforms.FELIX);
-	}
 	//  Uncomment this method to stop the test from ending and manually connect to the browser
-	//	public void testWarDeployed() throws Exception {
-	//		System.in.read();
-	//	}
+		public void testWarDeployed() throws Exception {
+		System.in.read();
+	}
 }

@@ -11,7 +11,7 @@ The demo contains 2 maven projects:
 
 * war
 which contains the actual demo war. The bundle is just an archive that
-contains one static resource (index.html), a servlet and a JSP. 
+contains one static resource (index.html), some servlets and some JSP. 
 Additionally, the project contains a manifest suitable for web development.
 
 * integration-test
@@ -27,3 +27,6 @@ For building, Maven 2 and JDK 1.4 are required.
 To manually connect to the server, modify the integration test commented method
 to wait for user input from the console, run the test and connect your browser
 at http://localhost:8080/war-<version>/
+
+Additionally, you can install the project bundles into the target OSGi platform
+and start it.

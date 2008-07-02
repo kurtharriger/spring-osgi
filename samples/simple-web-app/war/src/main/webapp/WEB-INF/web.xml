@@ -12,15 +12,27 @@
 	</welcome-file-list>
 
 	<servlet>
-		<servlet-name>HelloOsgiWorld</servlet-name>
+		<servlet-name>HelloOsgiWorldServlet</servlet-name>
 		<servlet-class>
-			org.springframework.osgi.samples.simplewebapp.servlet.HelloOsgiWorld
+			org.springframework.osgi.samples.simplewebapp.servlet.HelloOsgiWorldServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ResourceServlet</servlet-name>
+		<servlet-class>
+			org.springframework.osgi.samples.simplewebapp.servlet.ResourceServingServlet
 		</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>HelloOsgiWorld</servlet-name>
-		<url-pattern>/servlet</url-pattern>
+		<servlet-name>HelloOsgiWorldServlet</servlet-name>
+		<url-pattern>/helloWorldServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ResourceServlet</servlet-name>
+		<url-pattern>/resourceServlet</url-pattern>
 	</servlet-mapping>
 	
 </web-app>
