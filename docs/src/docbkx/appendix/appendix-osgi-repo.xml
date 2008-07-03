@@ -38,8 +38,8 @@
 		Additionally, to differentiate the <emphasis>OSGi</emphasis>-enabled artifacts from the original ones, all libraries are placed under
 		<literal>org.springframework.osgi</literal> group and their names contains a <literal>.osgi</literal> suffix.</para>
 		
-		<para>So for example, an OSGi version of <literal>aopalliance-1.0</literal> jar is available in the Spring-DM OSGi repository under at:
-		<literal>org/springframework/osgi/aopalliance.osgi/1.0-SNAPSHOT/aopalliance.osgi-1.0-SNAPSHOT.jar</literal></para>
+		<para>So for example, an OSGi version of <literal>mx4j-3.0.2</literal> jar is available in the Spring-DM OSGi repository under at:
+		<literal>org/springframework/osgi/mx4j.osgi/3.0.2-SNAPSHOT/mx4j.osgi-3.0.2-SNAPSHOT.jar</literal></para>
 	</section>
 	
 	<section id="appendix-osgi-repo:browsing">
