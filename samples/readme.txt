@@ -3,7 +3,7 @@ Spring Dynamic Modules Samples
 
 This folder contains various samples and demos for Spring-DM.
 
-Please see each demo folder for instructions (readme.txt) on what the demo contains.
+Please see each demo folder for detailed instructions (readme.txt).
 
 As a general rule, each demo provides an integration tests that bootstraps
 the OSGi platform, installs the demo and its dependencies and interacts with 
@@ -25,7 +25,7 @@ knopflerfish - Knopflerfish
 felix - Apache Felix
 
 Alternatively, one can run only the samples and compile the project by
-using the existing Maven profiles. See the Spring-DM root folder readme.txt.
+using the existing Maven profiles. See the Spring-DM root folder readme-building.txt.
 
 Notice that all modules part of the demo must be installed locally as
 the integration tests rely on the local maven repository (at the moment)
