@@ -26,6 +26,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.OsgiException;
+import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
 
 /**
@@ -55,6 +56,7 @@ public class OsgiAnnotationPostProcessor implements OsgiBeanFactoryPostProcessor
 			// everything went okay so configure the BPP and add it to the BF
 			((BeanFactoryAware) annotationBeanPostProcessor).setBeanFactory(beanFactory);
 			((BeanClassLoaderAware) annotationBeanPostProcessor).setBeanClassLoader(beanFactory.getBeanClassLoader());
+			((BundleContextAware) annotationBeanPostProcessor).setBundleContext(bundleContext);
 			beanFactory.addBeanPostProcessor(annotationBeanPostProcessor);
 		}
 		catch (ClassNotFoundException exception) {
