@@ -19,6 +19,7 @@ Package org.springframework.osgi.extender
 * fixed bug that prevented the shutdownTaskExecutor option from being used
 * removed support for extender configuration at META-INF/spring
 * fixed deadlock with failed contexts during shutdown
+* set BundleContext before adding the annotation BeanPostProcessor
 
 Package org.springframework.osgi.service
 * removed deprecation from AbstractOsgiServiceImportFactoryBean to maintain backwards compatibility
