@@ -430,6 +430,18 @@
       	or exposure of class loader chain delegation. If you encounter class visibility problems during the upgrade then it's likely you have
       	missing imports which were previously resolved as a side effect of Spring-DM proxy weaving process. 
       	</para>
-      </section>      
+     </section>
+      
+     <section id="proxy-equality">
+     	<title>I've noticed that objects imported by Spring-DM are not always equal to the raw target service. Why is that?</title>
+     	
+     	<para>
+     	To deal with dynamics, Spring-DM creates proxies around the imported services. The proxies are classes (generated at runtime), different
+     	from the target but able to intercept the calls made to it. Since a proxy is different then its target, comparing objects against it can 
+     	yield different results then when the comparison is done against the target. In most scenarios this is not a problem but there might be 
+     	corner cases where this contract matters. Since 1.1, Spring-DM importer proxies implement <interfacename>InfrastructureProxy</interfacename> 
+     	interface (from Spring framework) which allow access to the raw target.
+     	</para>
+     </section>       
     </chapter>
 </book>

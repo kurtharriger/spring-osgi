@@ -49,15 +49,6 @@
       	to fully support prototypes even though, as pointed out, this involves a knowledge between Client/Server regarding the publication contract.</para>
       	<para>See <ulink url="http://jira.springframework.org/browse/OSGI-237">OSGI-237</ulink></para> 
 	</section>	
-	
-	<section id="OSGI-245">
-      <title>Service proxy/object equality</title>
-      	<para>Since Spring-DM uses run-time proxies, equality between objects that rely on private field comparison tends to fail. The problem becomes
-      	more apparent when dealing with sets that use service rather then service reference equality. Since the proxy does only method interception it
-      	does not seem to exist any practical solution at the moment. As a workaround, consider modifying your equality method or relying on the reference
-      	equality.</para>
-      	<para>See <ulink url="http://jira.springframework.org/browse/OSGI-245">OSGI-245</ulink></para> 
-	</section>
-	
+
   </chapter>
 </book>
