@@ -11,6 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Weather Sample Service Bundle"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-test-support"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.1/spring-core-2.5.1.jar" sourcepath="/SPRING_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_core/1.0.3-SNAPSHOT/osgi_R4_core-1.0.3-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_core/1.0.3/osgi_R4_core-1.0.3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
