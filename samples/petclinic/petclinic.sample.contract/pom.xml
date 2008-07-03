@@ -3,7 +3,7 @@
   <parent>
     <artifactId>petclinic</artifactId>
     <groupId>org.springframework.osgi.samples</groupId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
   </parent>
   
   <modelVersion>4.0.0</modelVersion>
@@ -11,7 +11,7 @@
   <artifactId>contract</artifactId>
   <packaging>jar</packaging>
   <name>Spring OSGi Samples: Simple Petclinic Contract</name>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.3</version>
   <url>http://www.springframework.org/osgi</url>
   
   <dependencies>
