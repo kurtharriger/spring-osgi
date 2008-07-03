@@ -212,8 +212,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 	private static final String ANNOTATION_BPP_CLASS = "org.springframework.osgi.extensions.annotation.ServiceReferenceInjectionBeanPostProcessor";
 
-    private static final String ANNOTATION_BFPP_CLASS = "org.springframework.osgi.extensions.annotation.ServiceReferenceDependencyBeanFactoryPostProcessor";
-
 	private static final Log log = LogFactory.getLog(ContextLoaderListener.class);
 
 	// "Spring Application Context Creation Timer"
@@ -729,11 +727,6 @@ public class ContextLoaderListener implements BundleActivator {
 						beanFactory.addBeanPostProcessor(annotationBpp);
 					}
 				});
-
-                Class annotationBfppClass = context.getBundle().loadClass(ANNOTATION_BFPP_CLASS);
-
-                final BeanFactoryPostProcessor annotationBfpp = (BeanFactoryPostProcessor) BeanUtils.instantiateClass(annotationBfppClass);
-                applicationContext.addBeanFactoryPostProcessor(annotationBfpp);
 			}
 			catch (ClassNotFoundException exception) {
 				log.info("Spring-dm annotation package cannot be found; automatic annotation processing is disabled");

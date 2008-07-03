@@ -8,7 +8,6 @@
     <bean id="referer" class="org.springframework.osgi.iandt.annotation.proxy.ServiceReferer" lazy-init="false"/>
 
    <!-- annotation injection post processor -->
-   <bean class="org.springframework.osgi.extensions.annotation.ServiceReferenceDependencyBeanFactoryPostProcessor"/>    
-   <bean class="org.springframework.osgi.extensions.annotation.ServiceReferenceInjectionBeanPostProcessor"/>
+   <bean class="org.springframework.osgi.extensions.annotation.ServiceReferenceInjectionBeanPostProcessor"/>    
 
 </beans>
