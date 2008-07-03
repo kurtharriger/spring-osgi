@@ -151,7 +151,7 @@ context ::= path ( ';' path ) * (';' directive) *
 
       <para>For example:</para>
 
-      <programlisting><![CDATA[Spring-Context: *;create-asynchronously=false 
+      <programlisting><![CDATA[Spring-Context: *;create-asynchronously:=false 
 ]]></programlisting>
 
       <para>Creates an application context synchronously, using all of the
