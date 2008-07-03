@@ -23,4 +23,4 @@ several operations on it.
 2. BUILD AND DEPLOYMENT
 
 This directory contains the source files.
-For building, Maven 2 and JDK 1.4 are required.
+For building, Maven 2 and JDK 1.4+ are required.
