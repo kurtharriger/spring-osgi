@@ -53,11 +53,6 @@ distribution/website before using any of them in your own applications.
 - JUnit 3.8.2 (http://www.junit.org)
 - required for building and running the framework's test suite
 
-* servlet-api-2.5.jar
-- Servlet API version 2.5 (http://java.sun.com/products/servlet/)
-- required for building and running Spring-DM web support
-- compiled against JDK 1.4
-
 * log4j-1.2.15.jar
 - Log4J 1.2.15 (http://logging.apache.org/log4j)
 - required for building running the framework's test suite
@@ -85,6 +80,11 @@ distribution/website before using any of them in your own applications.
 * retrotranslator-runtime.jar
 - Retrotranslator backporting library 1.2.3 (http://retrotranslator.sourceforge.net)
 - required for running the framework's test suite on JDK 1.4
+
+* servlet-api-2.5.jar
+- Servlet API version 2.5 (http://java.sun.com/products/servlet/)
+- required for building and running Spring-DM web support
+- compiled against JDK 1.4
 
 * slf4j-api.jar
 - SLF4J API 1.5.0 (http://www.slf4j.org)
