@@ -216,8 +216,9 @@ public void anyMethodName(Dictionary properties);]]></programlisting>
     <section>
       <title>Web library integration</title>
 
-      <para>While generic support for web applications is available in 1.1.0, we'd like to provide close
-      integration with existing popular libraries (like JSF and Spring Web Flow) in the upcoming releases.</para>
+      <para>While support for generic and Spring-MVC web applications is available in 1.1.0,
+      in the future we'd like to provide integration (if needed) with other popular web libraries 
+      (such as JSF and Spring Web Flow) in the upcoming releases.</para>
     </section>
 
     <section>
