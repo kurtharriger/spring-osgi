@@ -378,12 +378,12 @@ public class WarLoaderListener implements BundleActivator {
 			// make sure it doesn't contain spaces (causes subtle problems with Tomcat Jasper)
 			Assert.doesNotContain(contextPath, " ", "context path should not contain whitespaces");
 			String msg = OsgiStringUtils.nullSafeNameAndSymName(bundle)
-					+ " is a WAR, scheduling war deployment on context path + [" + contextPath + "];(";
+					+ " is a WAR, scheduling war deployment on context path [" + contextPath + "] (";
 
 			URL webXML = getWebXml(bundle);
 
 			if (webXML != null) {
-				msg = msg + "web.xml present at " + webXML + ")";
+				msg = msg + "web.xml found at [" + webXML + "])";
 			}
 			else
 				msg = msg + "no web.xml detected)";
@@ -397,7 +397,7 @@ public class WarLoaderListener implements BundleActivator {
 	}
 
 	private URL getWebXml(Bundle bundle) {
-		Enumeration enm = bundle.findEntries("META-INF/", "web.xml", false);
+		Enumeration enm = bundle.findEntries("WEB-INF/", "web.xml", false);
 		if (enm != null && enm.hasMoreElements())
 			return (URL) enm.nextElement();
 
