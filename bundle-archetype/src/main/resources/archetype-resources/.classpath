@@ -16,11 +16,11 @@
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.log4j/1.5.0/com.springsource.slf4j.log4j-1.5.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/1.1.0/spring-osgi-test-1.1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/1.1.0/spring-osgi-mock-1.1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.1.0/spring-osgi-core-1.1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/1.1.0/spring-osgi-extender-1.1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/1.1.0/spring-osgi-io-1.1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/1.1.1-SNAPSHOT/spring-osgi-test-1.1.1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/1.1.1-SNAPSHOT/spring-osgi-mock-1.1.1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/1.1.1-SNAPSHOT/spring-osgi-core-1.1.1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/1.1.1-SNAPSHOT/spring-osgi-extender-1.1.1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/1.1.1-SNAPSHOT/spring-osgi-io-1.1.1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/objectweb/asm/com.springsource.org.objectweb.asm/2.2.3/com.springsource.org.objectweb.asm-2.2.3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
