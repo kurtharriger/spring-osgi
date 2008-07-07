@@ -242,6 +242,12 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 			sendFailedEvent(ex);
 			throw ex;
 		}
+        catch (Error err) {
+            logger.error("Pre refresh error", err);
+            // send failure event
+            sendFailedEvent(err);
+            throw err;
+        }
 		finally {
 			thread.setContextClassLoader(oldTCCL);
 		}
@@ -297,6 +303,12 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 			sendFailedEvent(ex);
 			throw ex;
 		}
+        catch (Error err) {
+            logger.error("Post refresh error", err);
+            // post notification
+            sendFailedEvent(err);
+            throw err;
+        }
 		finally {
 			thread.setContextClassLoader(oldTCCL);
 		}
