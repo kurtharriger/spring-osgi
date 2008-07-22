@@ -670,7 +670,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 		   </areaspec>
            <programlisting language="xml"><![CDATA[<bean id="messageServiceBean" scope="bundle" class="com.xyz.MessageServiceImpl"/>
 <!-- service exporter -->
-<osgi:service id="messageServiceExporter" ref="beanToBeExported" interface="com.xyz.MessageService"/>]]>
+<osgi:service id="messageServiceExporter" ref="messageServiceBean" interface="com.xyz.MessageService"/>]]>
 </programlisting>
           </programlistingco>
 		  <programlistingco>
@@ -689,9 +689,9 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
    		  
    		  <para>will match only OSGi services that advertise <interfacename>MessageService</interfacename>
    		  interface and have the property named <literal>org.springframework.osgi.bean.name</literal> set
-   		  to value <literal>defaultMessageService</literal>. In short, this means finding all Spring-DM exported
+   		  to value <literal>messageServiceBean</literal>. In short, this means finding all Spring-DM exported
    		  beans that implement interface <interfacename>MessageService</interfacename> and are named
-   		  <literal>defaultMessageService</literal>.</para>
+   		  <literal>messageServiceBean</literal>.</para>
    		  
         </section>
 
@@ -1054,8 +1054,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         element inside of <literal>comparator</literal>. You need to specify
         the basis for the natural ordering: based on the service references,
         following the <interfacename>ServiceReference</interfacename> natural ordering
-        defined in the OSGi Core Specification section 6.1.2.3; or based on
-        the services themselves (in which case the services must be
+        defined in the OSGi Core Specification release 4, version 4.1, section 6.1.23; 
+        or based on the services themselves (in which case the services must be
         <interfacename>Comparable</interfacename>).</para>
 
         <programlisting language="xml"><![CDATA[<list id="myServices" interface"com.xyz.MyService">
