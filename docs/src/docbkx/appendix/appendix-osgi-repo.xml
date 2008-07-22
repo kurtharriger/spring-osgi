@@ -12,8 +12,8 @@
     providing 
     <quote>a collection of open source libraries commonly used for developing enterprise Java applications with the Spring Framework</quote> (taken
     from the Repository <ulink url="http://www.springsource.com/repository/app/faq">FAQ</ulink>). With the availability of the Bundle Repository,
-    the Spring-DM old repository (see below) has been deprecated and it is being used until migrating completely to S2 Repository. It is highly recommended
-    that users migrate as well to S2 Repository as it provides significantly more libraries and it is intended to be a user-facing infrastructure component. 
+    the Spring-DM old repository (see below) has been deprecated and it is being used until migrating completely to SpringSource Repository. It is highly recommended
+    that users migrate as well to SpringSource Repository as it provides significantly more libraries and it is intended to be a user-facing infrastructure component. 
     </para>
     
     <section id="appendix-osgi-repo:old-repo">

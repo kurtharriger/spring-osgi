@@ -50,8 +50,6 @@
 
 	<!-- decoration osgi import - used internally when the jars are pre-processed and bnd doens't have to know about it -->
     <spring.decorate.osgi.import>${spring.osgi.import}</spring.decorate.osgi.import>
-    
-
 
     <symName.prefix>org.springframework.bundle.osgi</symName.prefix>
     <spring.osgi.symbolic.name>${groupId}.${artifactId}</spring.osgi.symbolic.name>
@@ -84,6 +82,8 @@
    <!-- JDK classifier property -->
    <jdk-classifier>jdk14</jdk-classifier>
    <source-jdk>1.4</source-jdk>
+   <clover.ver>2.3.1</clover.ver>
+   <clover.argLine></clover.argLine>
   </properties>
 
   <!-- ============================================= -->
@@ -543,7 +543,7 @@ limitations under the License.
       <plugin>
           <groupId>com.atlassian.maven.plugins</groupId>
           <artifactId>maven-clover2-plugin</artifactId>
-          <version>2.3.1</version>
+          <version>${clover.ver}</version>
           <configuration>
               <licenseLocation>${clover.licenseLocation}</licenseLocation>
               <generatePdf>false</generatePdf>
@@ -697,6 +697,8 @@ limitations under the License.
       <properties>
         <clover.enabled>true</clover.enabled>
         <spring.decorate.osgi.import>!com_cenqua_clover*,${spring.osgi.import}</spring.decorate.osgi.import>
+        <clover.argLine>-Xbootclasspath/a:"${settings.localRepository}${file.separator}com${file.separator}cenqua${file.separator}clover${file.separator}clover${file.separator}${clover.ver}${file.separator}clover-${clover.ver}.jar"
+        </clover.argLine>
       </properties>
 	
 	  <dependencies>
