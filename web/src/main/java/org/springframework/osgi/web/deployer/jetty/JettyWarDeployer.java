@@ -123,7 +123,7 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	}
 
 	/**
-	 * Creates the Jetty specifc web context for the given OSGi bundle.
+	 * Creates the Jetty specific web context for the given OSGi bundle.
 	 * 
 	 * @param bundle
 	 * @return
