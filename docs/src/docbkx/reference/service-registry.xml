@@ -1050,7 +1050,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 
 	
         <para>To sort using a natural ordering instead of an explicit
-        comparator, you can use the <literal>natural-ordering</literal>
+        comparator, you can use the <literal>natural</literal>
         element inside of <literal>comparator</literal>. You need to specify
         the basis for the natural ordering: based on the service references,
         following the <interfacename>ServiceReference</interfacename> natural ordering
@@ -1059,11 +1059,11 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <interfacename>Comparable</interfacename>).</para>
 
         <programlisting language="xml"><![CDATA[<list id="myServices" interface"com.xyz.MyService">
-  <comparator><natural-ordering basis="services"/></comparator>
+  <comparator><natural basis="services"/></comparator>
 </list>
 
 <set id="myOtherServices"interface="com.xyz.OtherService">
-  <comparator><natural-ordering basis="service-references"/></comparator>
+  <comparator><natural basis="service-references"/></comparator>
 </set>]]></programlisting>
 
 		<note>For a sorted set, a <interfacename>SortedSet</interfacename> implementation will be created.
