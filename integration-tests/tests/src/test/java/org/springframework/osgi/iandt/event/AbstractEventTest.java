@@ -36,7 +36,7 @@ public abstract class AbstractEventTest extends BaseIntegrationTest {
 
 	private ServiceRegistration registration;
 	/** list of events */
-	protected List eventList;
+	protected List eventList = Collections.synchronizedList(new ArrayList());;
 	/** lock */
 	protected final Object lock = new Object();
 
@@ -45,7 +45,7 @@ public abstract class AbstractEventTest extends BaseIntegrationTest {
 
 
 	protected void onSetUp() throws Exception {
-		eventList = Collections.synchronizedList(new ArrayList());
+		eventList.clear();
 
 		listener = new OsgiBundleApplicationContextListener() {
 
@@ -60,6 +60,7 @@ public abstract class AbstractEventTest extends BaseIntegrationTest {
 
 	protected void onTearDown() throws Exception {
 		OsgiServiceUtils.unregisterService(registration);
+		eventList.clear();
 	}
 
 	protected void registerEventListener() {
