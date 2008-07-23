@@ -713,7 +713,9 @@ limitations under the License.
 	  
       <modules>
       	<module>integration-tests/tests</module>
+      	<!--
       	<module>integration-tests/tests-tiger</module>
+      	-->
       </modules>
       
     </profile>
@@ -872,7 +874,7 @@ limitations under the License.
 		<site>
 			<id>static.springframework.org</id>
 			<name>SpringFramework.org</name>
-			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-osgi/snapshot-site</url>
+			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-osgi/snapshot-site/1.1.x/</url>
 		</site>
 		<repository>
 			<id>spring-milestone</id>
