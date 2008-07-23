@@ -17,16 +17,12 @@
 package org.springframework.osgi.io.internal;
 
 import java.net.URL;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.osgi.mock.ArrayEnumerator;
-import org.springframework.osgi.mock.MockBundle;
 import org.springframework.util.ResourceUtils;
 
 /**

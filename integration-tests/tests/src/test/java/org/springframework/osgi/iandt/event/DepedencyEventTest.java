@@ -34,14 +34,13 @@ import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWait
  * @author Costin Leau
  * 
  */
-public class DepedencyEventTest extends AbstractEventTest {
+public abstract class DepedencyEventTest extends AbstractEventTest {
 
-	private List refreshEvents;
+	private List refreshEvents = Collections.synchronizedList(new ArrayList(10));
 
 
 	protected void onSetUp() throws Exception {
-		super.onSetUp();
-		refreshEvents = Collections.synchronizedList(new ArrayList(10));
+		refreshEvents.clear();
 
 		// override the listener with another implementation that waits until the appCtx are fully started
 		listener = new OsgiBundleApplicationContextListener() {
@@ -59,7 +58,6 @@ public class DepedencyEventTest extends AbstractEventTest {
 				}
 			}
 		};
-
 	}
 
 	public void testEventsForCtxThatWork() throws Exception {
@@ -130,7 +128,7 @@ public class DepedencyEventTest extends AbstractEventTest {
 
 			// bnd1 context started event
 			System.out.println("Refresh events received are " + refreshEvents);
-			
+
 			while (eventList.size() < 3) {
 				if (!waitForEvent(TIME_OUT)) {
 					fail("not enough events received after " + TIME_OUT + " ms");
