@@ -21,8 +21,6 @@ import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
@@ -142,27 +140,6 @@ public abstract class OsgiResourceUtils {
 		return (Resource[]) resources.toArray(new Resource[resources.size()]);
 	}
 
-	public static String[] getBundleClassPath(Bundle bundle) {
-		return getHeaderAsTrimmedStringArray(bundle, Constants.BUNDLE_CLASSPATH);
-	}
-
-	public static String[] getRequireBundle(Bundle bundle) {
-		return getHeaderAsTrimmedStringArray(bundle, Constants.REQUIRE_BUNDLE);
-	}
-
-	private static String[] getHeaderAsTrimmedStringArray(Bundle bundle, String header) {
-		if (bundle == null || !StringUtils.hasText(header))
-			return new String[0];
-
-		String headerContent = (String) bundle.getHeaders().get(header);
-		String[] entries = StringUtils.commaDelimitedListToStringArray(headerContent);
-		for (int i = 0; i < entries.length; i++) {
-			entries[i] = entries[i].trim();
-		}
-
-		return entries;
-	}
-
 	/**
 	 * Similar to /path/path1/ -> /path/, /path/file -> /path/
 	 * 
@@ -186,5 +163,4 @@ public abstract class OsgiResourceUtils {
 			// fallback to defaults
 			return path;
 	}
-
 }
