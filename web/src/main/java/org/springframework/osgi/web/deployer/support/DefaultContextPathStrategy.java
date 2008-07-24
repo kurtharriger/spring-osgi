@@ -37,16 +37,17 @@ import org.springframework.util.StringUtils;
  * available in the following order:
  * 
  * <ol>
- * <li>Web-ContextPath manifest header (identical to the one in SpringSource
+ * <li><tt>Web-ContextPath</tt> manifest header (identical to the one in SpringSource
  * Application Platform). If present, the value of this header will be used as
- * the context path.</li>
+ * the context path.
+ * </li>
  * 
  * <li>bundle location - if present, the implementation will try to determine
  * if the location points to a file or a folder. In both cases, the name will be
  * returned without the extension (if it's present):
  * 
  * <pre class="code">
- * /root/bundle.jar -&gt; /name
+ * /root/bundle.jar -&gt; /bundle
  * /root/bundle/ -&gt; /bundle
  * /root/bundle.jar/ -&gt; /bundle
  * file:/path/bundle.jar -&gt; /bundle
@@ -55,12 +56,12 @@ import org.springframework.util.StringUtils;
  * 
  * </li>
  * <li>bundle name - if present, it is used as a fall back to the bundle
- * location (ex: <code>/myBundle</code>)</li>
+ * location (ex: <tt>/myBundle</tt>)</li>
  * <li>bundle symbolic name - if present, it used as a fall back to the bundle
- * name (ex: <code>/org.comp.osgi.some.bundle</code>)</li>
+ * name (ex: <tt>/org.comp.osgi.some.bundle</tt>)</li>
  * <li>bundle identity - if neither of the properties above is present, the
  * bundle object identity will be used as context path (ex:
- * <code>/BundleImpl-15a0305</code>)</li>
+ * <tt>/BundleImpl-15a0305</tt>)</li>
  * </ol>
  * 
  * Additionally, the returned context path will be HTML encoded (using 'UTF-8')
@@ -188,9 +189,8 @@ public class DefaultContextPathStrategy implements ContextPathStrategy {
 		String header = (String) headers.get(CONTEXT_PATH_HEADER);
 		if (header != null) {
 			header = header.trim();
-			Assert.hasText(header, CONTEXT_PATH_HEADER
-					+ " manifest header contains no text; either specify a context path or remove the header");
-			return header;
+			// check whether it starts with a "/"
+			return (header.startsWith(SLASH) ? header.substring(1) : header);
 		}
 		return null;
 	}
