@@ -54,7 +54,7 @@ Package org.springframework.osgi.test
 Package org.springframework.osgi.web
 * removed support for extender configuration at META-INF/spring
 * improved war scanner Servlet 2.5 compliance (by considering as WARs only bundles with ".war" extension)
-
+* extended DefaultWarScanner scanning mechanism by considering as WARs bundles with WEB-INF/ entries
 
 Changes in version 1.1.0 RC1 (2008-06-24)
 -----------------------------------------
