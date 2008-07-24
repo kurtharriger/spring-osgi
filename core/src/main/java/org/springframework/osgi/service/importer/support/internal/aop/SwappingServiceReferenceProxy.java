@@ -62,22 +62,22 @@ class SwappingServiceReferenceProxy implements ServiceReferenceProxy {
 	}
 
 	public synchronized boolean isAssignableTo(Bundle bundle, String className) {
-		return delegate.isAssignableTo(bundle, className);
+		return (delegate == null ? false : delegate.isAssignableTo(bundle, className));
 	}
 
 	public synchronized ServiceReference getTargetServiceReference() {
 		return delegate;
 	}
 
-	public boolean equals(Object obj) {
+	public synchronized boolean equals(Object obj) {
 		if (obj instanceof SwappingServiceReferenceProxy) {
 			SwappingServiceReferenceProxy other = (SwappingServiceReferenceProxy) obj;
-			return (delegate.equals(other.delegate));
+			return (delegate == null ? other.delegate == null : delegate.equals(other.delegate));
 		}
 		return false;
 	}
 
-	public int hashCode() {
-		return HASH_CODE + delegate.hashCode();
+	public synchronized int hashCode() {
+		return HASH_CODE + (delegate == null ? 0 : delegate.hashCode());
 	}
 }
