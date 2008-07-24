@@ -708,12 +708,12 @@ limitations under the License.
 		  <scope>provided</scope>
         </dependency>
 	  </dependencies>
-	  
+<!--	  
       <modules>
       	<module>integration-tests/tests</module>
       	<module>integration-tests/tests-tiger</module>
       </modules>
-      
+    -->  
     </profile>
   </profiles>
        
