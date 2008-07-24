@@ -12,10 +12,25 @@
   <name>Spring OSGi Integration Tests Module</name>
   <url>http://www.springframework.org/osgi</url>
   
+  <properties>
+	<clover.skip>true</clover.skip>
+  </properties>
+  
   <modules>
     <module>bundles</module>
     <module>tests</module>
   </modules>
+  
+  <build>
+	  <plugins>
+		  <plugin>
+			<artifactId>maven-deploy-plugin</artifactId>
+			<configuration>
+			  <skip>true</skip>
+			</configuration>
+		  </plugin>
+	  </plugins>
+  </build>
   
   <profiles>
     <profile>

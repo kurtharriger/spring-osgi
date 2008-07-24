@@ -42,7 +42,7 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		Manifest mf = super.getManifest();
 		// add bundle classpath
 		mf.getMainAttributes().putValue(Constants.BUNDLE_CLASSPATH,
-			".,bundleclasspath/folder,bundleclasspath/simple.jar");
+			".,bundleclasspath/folder,bundleclasspath/simple.jar,foo");
 		return mf;
 	}
 
