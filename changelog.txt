@@ -10,6 +10,10 @@ Package org.springframework.osgi.io
 * improved handling of Require-Bundle header (with regards to quotes and ranges)
 * fixed handling of required bundles that do not export packages
 
+Package org.springframework.osgi.service
+* fixed potential NPE when comparing managed service references
+* improved thread safety for the managed service reference returned to the user
+
 Package org.springframework.osgi.mock
 * improved dependency between MockBundleContext and the bundle it returns
 
