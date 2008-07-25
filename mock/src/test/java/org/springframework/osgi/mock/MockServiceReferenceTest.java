@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -31,6 +33,7 @@ import org.osgi.framework.Constants;
 public class MockServiceReferenceTest extends TestCase {
 
 	MockServiceReference mock;
+
 
 	/*
 	 * (non-Javadoc)
@@ -154,4 +157,49 @@ public class MockServiceReferenceTest extends TestCase {
 		assertSame(objectClass, mock.getProperty(Constants.OBJECTCLASS));
 	}
 
+	public void testCompareReferencesWithTheSameId() throws Exception {
+		MockServiceReference refA = createReference(new Long(1), null);
+		MockServiceReference refB = createReference(new Long(1), null);
+
+		// refA is higher then refB
+		assertEquals(0, refA.compareTo(refB));
+		assertEquals(0, refB.compareTo(refA));
+	}
+
+	public void testServiceRefsWithDifferentIdAndNoRanking() throws Exception {
+		MockServiceReference refA = createReference(new Long(1), null);
+		MockServiceReference refB = createReference(new Long(2), null);
+
+		// refA is higher then refB
+		// default ranking is equal
+		assertTrue(refA.compareTo(refB) > 0);
+		assertTrue(refB.compareTo(refA) < 0);
+	}
+
+	public void testServiceRefsWithDifferentIdAndDifferentRanking() throws Exception {
+		MockServiceReference refA = createReference(new Long(1), new Integer(0));
+		MockServiceReference refB = createReference(new Long(2), new Integer(1));
+
+		// refB is higher then refA (due to ranking)
+		assertTrue(refA.compareTo(refB) < 0);
+		assertTrue(refB.compareTo(refA) > 0);
+	}
+
+	public void testServiceRefsWithSameRankAndDifId() throws Exception {
+		MockServiceReference refA = createReference(new Long(1), new Integer(5));
+		MockServiceReference refB = createReference(new Long(2), new Integer(5));
+
+		// same ranking, means id equality applies
+		assertTrue(refA.compareTo(refB) > 0);
+		assertTrue(refB.compareTo(refA) < 0);
+	}
+
+	private MockServiceReference createReference(Long id, Integer ranking) {
+		Dictionary dict = new Properties();
+		dict.put(Constants.SERVICE_ID, id);
+		if (ranking != null)
+			dict.put(Constants.SERVICE_RANKING, ranking);
+
+		return new MockServiceReference(null, dict, null);
+	}
 }

@@ -30,7 +30,7 @@ import org.springframework.osgi.service.importer.support.internal.collection.com
  * @author Costin Leau
  * 
  */
-public class OsgiServiceIdComparatorTest extends TestCase {
+public class ServiceReferenceComparatorTest extends TestCase {
 
 	private Comparator comparator;
 

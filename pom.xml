@@ -617,6 +617,8 @@ limitations under the License.
                 <!-- integration tests -->
 				<exclude>org/springframework/osgi/iandt/**</exclude>
 				<exclude>org/springframework/osgi/test/parsing/**</exclude>
+				<!-- addressed in 1.2 -->
+				<exclude>org/springframework/osgi/compendium/internal/**</exclude>
               </excludes>
           </configuration>
       </plugin>      
