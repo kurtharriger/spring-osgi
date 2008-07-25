@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.util.Dictionary;
@@ -24,6 +25,7 @@ import junit.framework.TestCase;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 
 /**
@@ -32,13 +34,9 @@ import org.osgi.framework.Constants;
  */
 public class MockBundleTest extends TestCase {
 
-	Bundle mock;
+	MockBundle mock;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
+
 	protected void setUp() throws Exception {
 		mock = new MockBundle();
 	}
@@ -274,4 +272,54 @@ public class MockBundleTest extends TestCase {
 		}
 	}
 
+	public void testDefaultStart() throws Exception {
+		mock = new MockBundle() {
+
+			public void start(int options) throws BundleException {
+				assertEquals(0, options);
+			}
+		};
+		mock.start();
+	}
+
+	public void testStartWithOptions() throws Exception {
+		mock = new MockBundle() {
+
+			public void start(int options) throws BundleException {
+				assertEquals(3, options);
+			}
+		};
+
+		mock.start(3);
+	}
+
+	public void testDefaultStop() throws Exception {
+		mock = new MockBundle() {
+
+			public void stop(int options) throws BundleException {
+				assertEquals(0, options);
+			}
+		};
+		mock.stop();
+	}
+
+	public void testStopWithOptions() throws Exception {
+		mock = new MockBundle() {
+
+			public void stop(int options) throws BundleException {
+				assertEquals(3, options);
+			}
+		};
+		mock.stop(3);
+	}
+
+	public void testDefaultGetBundleContext() throws Exception {
+		assertNotNull(mock.getBundleContext());
+	}
+
+	public void testBundleContextSpecified() throws Exception {
+		BundleContext ctx = new MockBundleContext();
+		mock = new MockBundle(ctx);
+		assertSame(ctx, mock.getBundleContext());
+	}
 }
