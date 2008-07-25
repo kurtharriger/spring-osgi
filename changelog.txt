@@ -9,11 +9,11 @@ Package org.springframework.osgi.io
 * fixed incorrect parsing of headers specifying version ranges
 * improved handling of Require-Bundle header (with regards to quotes and ranges)
 * fixed handling of required bundles that do not export packages
+* fixed premature failure when searching missing resources in multiple paths
 
 Package org.springframework.osgi.service
 * fixed potential NPE when comparing managed service references
 * improved thread safety for the managed service reference returned to the user
-* added OSGi R4.1 compareTo contract to the Spring-DM managed service references
 
 Package org.springframework.osgi.mock
 * improved dependency between MockBundleContext and the bundle it returns
