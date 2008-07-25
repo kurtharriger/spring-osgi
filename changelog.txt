@@ -13,6 +13,7 @@ Package org.springframework.osgi.io
 Package org.springframework.osgi.service
 * fixed potential NPE when comparing managed service references
 * improved thread safety for the managed service reference returned to the user
+* added OSGi R4.1 compareTo contract to the Spring-DM managed service references
 
 Package org.springframework.osgi.mock
 * improved dependency between MockBundleContext and the bundle it returns

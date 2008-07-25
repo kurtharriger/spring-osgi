@@ -35,11 +35,6 @@ public class MockServiceReferenceTest extends TestCase {
 	MockServiceReference mock;
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	protected void setUp() throws Exception {
 		mock = new MockServiceReference();
 	}
