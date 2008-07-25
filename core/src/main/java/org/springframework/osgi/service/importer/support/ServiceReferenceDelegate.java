@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support;
+
+import java.util.Comparator;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
+import org.springframework.osgi.service.importer.support.internal.collection.comparator.ServiceReferenceComparator;
 import org.springframework.util.Assert;
 
 /**
@@ -28,7 +32,11 @@ import org.springframework.util.Assert;
  * 
  */
 class ServiceReferenceDelegate implements ServiceReference {
+
+	private static final Comparator COMPARATOR = new ServiceReferenceComparator();
+
 	private final ImportedOsgiServiceProxy delegate;
+
 
 	public ServiceReferenceDelegate(ImportedOsgiServiceProxy delegate) {
 		Assert.notNull(delegate, "delegate object should not be null");
@@ -57,5 +65,9 @@ class ServiceReferenceDelegate implements ServiceReference {
 
 	public String toString() {
 		return "ServiceReference wrapper for " + delegate.getServiceReference();
+	}
+
+	public int compareTo(Object other) {
+		return COMPARATOR.compare(delegate.getServiceReference(), other);
 	}
 }

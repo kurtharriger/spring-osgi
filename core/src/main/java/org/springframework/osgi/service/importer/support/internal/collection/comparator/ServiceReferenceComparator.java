@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support.internal.collection.comparator;
 
 import java.io.Serializable;
@@ -49,21 +50,32 @@ public class ServiceReferenceComparator implements Comparator, Serializable {
 
 	private static final int hashCode = ServiceReferenceComparator.class.hashCode() * 13;
 
+
 	public int compare(Object o1, Object o2) {
 
 		ServiceReference ref1, ref2;
 
-		// look first for service references
-		if (o1 instanceof ServiceReference && o2 instanceof ServiceReference) {
-			ref1 = (ServiceReference) o1;
-			ref2 = (ServiceReference) o2;
+		if (o1 == null || o2 == null) {
+			if (o1 == o2)
+				return 0;
+			else
+				throw new ClassCastException("Cannot compare null with a non-null object");
 		}
-		// then for ServiceReferenceAccessor objects
+
+		// look first for service references
+		if (o1 instanceof ServiceReference) {
+			ref1 = (ServiceReference) o1;
+		}
 		else {
 			ImportedOsgiServiceProxy obj1 = (ImportedOsgiServiceProxy) o1;
-			ImportedOsgiServiceProxy obj2 = (ImportedOsgiServiceProxy) o2;
-
 			ref1 = obj1.getServiceReference();
+		}
+
+		if (o2 instanceof ServiceReference) {
+			ref2 = (ServiceReference) o2;
+		}
+		else {
+			ImportedOsgiServiceProxy obj2 = (ImportedOsgiServiceProxy) o2;
 			ref2 = obj2.getServiceReference();
 		}
 
@@ -71,19 +83,22 @@ public class ServiceReferenceComparator implements Comparator, Serializable {
 	}
 
 	private int compare(ServiceReference ref1, ServiceReference ref2) {
-		long id1 = OsgiServiceReferenceUtils.getServiceId(ref1);
-		long id2 = OsgiServiceReferenceUtils.getServiceId(ref2);
-
-		if (id1 == id2)
-			return 0;
-
 		// compare based on service ranking
 		int rank1 = OsgiServiceReferenceUtils.getServiceRanking(ref1);
 		int rank2 = OsgiServiceReferenceUtils.getServiceRanking(ref2);
 
-		// when comparing IDs, make sure to return inverse results (i.e. lower
-		// id, means higher service)
-		return (rank1 < rank2 ? -1 : (rank1 == rank2) ? (id1 < id2 ? 1 : -1) : 1);
+		int result = rank1 - rank2;
+
+		if (result == 0) {
+			long id1 = OsgiServiceReferenceUtils.getServiceId(ref1);
+			long id2 = OsgiServiceReferenceUtils.getServiceId(ref2);
+
+			// when comparing IDs, make sure to return inverse results (i.e. lower
+			// id, means higher service)
+			return (int) (id2 - id1);
+		}
+
+		return result;
 	}
 
 	public boolean equals(Object obj) {
@@ -93,5 +108,4 @@ public class ServiceReferenceComparator implements Comparator, Serializable {
 	public int hashCode() {
 		return hashCode;
 	}
-
 }

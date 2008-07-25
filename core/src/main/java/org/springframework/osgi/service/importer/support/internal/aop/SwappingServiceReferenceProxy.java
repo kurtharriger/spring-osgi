@@ -16,9 +16,12 @@
 
 package org.springframework.osgi.service.importer.support.internal.aop;
 
+import java.util.Comparator;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.service.importer.ServiceReferenceProxy;
+import org.springframework.osgi.service.importer.support.internal.collection.comparator.ServiceReferenceComparator;
 import org.springframework.util.Assert;
 
 /**
@@ -33,6 +36,8 @@ import org.springframework.util.Assert;
 class SwappingServiceReferenceProxy implements ServiceReferenceProxy {
 
 	private static final int HASH_CODE = SwappingServiceReferenceProxy.class.hashCode() * 13;
+
+	private static final Comparator COMPARATOR = new ServiceReferenceComparator();
 
 	private ServiceReference delegate;
 
@@ -79,5 +84,11 @@ class SwappingServiceReferenceProxy implements ServiceReferenceProxy {
 
 	public synchronized int hashCode() {
 		return HASH_CODE + (delegate == null ? 0 : delegate.hashCode());
+	}
+
+	public synchronized int compareTo(Object other) {
+		if (other instanceof SwappingServiceReferenceProxy)
+			return COMPARATOR.compare(delegate, ((SwappingServiceReferenceProxy) other).delegate);
+		return COMPARATOR.compare(delegate, other);
 	}
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.internal.service.collection;
 
 import java.util.Comparator;
@@ -33,6 +34,7 @@ import org.springframework.osgi.service.importer.support.internal.collection.com
 public class ServiceReferenceComparatorTest extends TestCase {
 
 	private Comparator comparator;
+
 
 	protected void setUp() throws Exception {
 		comparator = new ServiceReferenceComparator();
@@ -73,6 +75,19 @@ public class ServiceReferenceComparatorTest extends TestCase {
 
 		// same ranking, means id equality applies
 		assertTrue(comparator.compare(refA, refB) > 0);
+	}
+
+	public void testNullObjects() throws Exception {
+		assertEquals(0, comparator.compare(null, null));
+	}
+
+	public void testNonNullWithNull() throws Exception {
+		try {
+			comparator.compare(new MockServiceReference(), null);
+			fail("should have thrown exception");
+		}
+		catch (ClassCastException cce) {
+		}
 	}
 
 	private ServiceReference createReference(Long id, Integer ranking) {

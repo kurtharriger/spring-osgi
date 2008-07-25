@@ -169,12 +169,6 @@ public class MockServiceReference implements ServiceReference {
 	public int compareTo(Object reference) {
 		ServiceReference other = (ServiceReference) reference;
 
-		long id1 = serviceId;
-		long id2 = ((Long) other.getProperty(Constants.SERVICE_ID)).longValue();
-
-		if (id1 == id2)
-			return 0;
-
 		// compare based on service ranking
 
 		Object ranking = this.getProperty(Constants.SERVICE_RANKING);
@@ -183,8 +177,17 @@ public class MockServiceReference implements ServiceReference {
 		ranking = other.getProperty(Constants.SERVICE_RANKING);
 		int rank2 = ((ranking != null && ranking instanceof Integer) ? ((Integer) ranking).intValue() : 0);
 
-		// when comparing IDs, make sure to return inverse results (i.e. lower
-		// id, means higher service)
-		return (rank1 < rank2 ? -1 : (rank1 == rank2) ? (id1 < id2 ? 1 : -1) : 1);
+		int result = rank1 - rank2;
+
+		if (result == 0) {
+			long id1 = serviceId;
+			long id2 = ((Long) other.getProperty(Constants.SERVICE_ID)).longValue();
+
+			// when comparing IDs, make sure to return inverse results (i.e. lower
+			// id, means higher service)
+			return (int) (id2 - id1);
+		}
+
+		return result;
 	}
 }

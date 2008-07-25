@@ -147,4 +147,24 @@ public class SwappingServiceReferenceProxyTest extends TestCase {
 		assertEquals(reference, anotherRef);
 		assertEquals(reference, reference);
 	}
+
+	public void testCompareToItself() throws Exception {
+		assertEquals(0, reference.compareTo(reference));
+	}
+
+	public void testDefaultCompareTo() throws Exception {
+		assertEquals(0, reference.compareTo(new SwappingServiceReferenceProxy()));
+	}
+
+	public void testCompareToDifferentService() throws Exception {
+		SwappingServiceReferenceProxy proxy = new SwappingServiceReferenceProxy();
+		proxy.swapDelegates(new MockServiceReference());
+		try {
+			reference.compareTo(proxy);
+			fail("expected CCE");
+		}
+		catch (Exception ex) {
+
+		}
+	}
 }
