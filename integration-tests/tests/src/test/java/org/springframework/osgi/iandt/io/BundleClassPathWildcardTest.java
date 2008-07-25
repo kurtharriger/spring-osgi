@@ -116,4 +116,19 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		while (enm.hasMoreElements())
 			System.out.println(enm.nextElement());
 	}
+
+	public void testResourceAvailableOnlyInsideJarClasspath() throws Exception {
+		Resource[] resources = patternLoader.getResources("classpath*:jar.file");
+		assertNotNull(resources);
+		assertEquals(1, resources.length);
+		assertTrue(resources[0].exists());
+	}
+
+	public void testResourceAvailableOnlyInsideFolderClasspath() throws Exception {
+		Resource[] resources = patternLoader.getResources("classpath*:/org/springframework/osgi/iandt/compliance/io/folder-test.file");
+		assertNotNull(resources);
+		assertEquals(1, resources.length);
+		assertTrue(resources[0].exists());
+	}
+
 }

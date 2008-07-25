@@ -458,8 +458,15 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 
 		OsgiBundleResourcePatternResolver localResolver = new OsgiBundleResourcePatternResolver(bundle);
 		Resource[] resources = localResolver.getResources(bundlePathPattern);
-		for (int i = 0; i < resources.length; i++) {
-			list.add(resources[i].getURL().getPath());
+
+		// skip when dealing with non-existing resources
+		if (resources.length == 1 && !resources[0].exists()) {
+			return;
+		}
+		else {
+			for (int i = 0; i < resources.length; i++) {
+				list.add(resources[i].getURL().getPath());
+			}
 		}
 	}
 
