@@ -20,6 +20,9 @@ Package org.springframework.osgi.mock
 * added OSGi R4.1 start/stop signatures to MockBundle
 * added OSGi R4.1 compareTo contract to MockServiceReference
 
+Package org.springframework.osgi.mock
+* improved local maven artifact search by adding groupId filtering
+
 Package org.springframework.osgi.web
 * DefaultContextPathStrategy allows "/" contexts to be specified through Web-ContextPath header
 * improved encoding of user defined context paths
