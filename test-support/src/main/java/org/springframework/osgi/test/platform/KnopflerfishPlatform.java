@@ -73,20 +73,26 @@ public class KnopflerfishPlatform extends AbstractOsgiPlatform {
 	}
 
 	public void start() throws Exception {
-		// copy configuration properties to sys properties
-		System.getProperties().putAll(getConfigurationProperties());
+		if (framework == null) {
+			// copy configuration properties to sys properties
+			System.getProperties().putAll(getConfigurationProperties());
 
-		framework = new Framework(this);
-		framework.launch(0);
-		context = framework.getSystemBundleContext();
+			framework = new Framework(this);
+			framework.launch(0);
+			context = framework.getSystemBundleContext();
+		}
 	}
 
 	public void stop() throws Exception {
-		try {
-			framework.shutdown();
-		}
-		finally {
-			IOUtils.delete(kfStorageDir);
+		if (framework != null) {
+			context = null;
+			try {
+				framework.shutdown();
+			}
+			finally {
+				framework = null;
+				IOUtils.delete(kfStorageDir);
+			}
 		}
 	}
 }
