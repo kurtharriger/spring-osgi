@@ -142,7 +142,6 @@ public class JettyWarDeployerTest extends TestCase {
 				assertEquals(HandlerCollection.class, byclass);
 				return handlerCollection;
 			}
-
 		};
 		deployer.setServer(tempServer);
 		deployer.afterPropertiesSet();
@@ -152,5 +151,26 @@ public class JettyWarDeployerTest extends TestCase {
 
 	public void testGetServerInfo() {
 		assertTrue(deployer.getServerInfo().indexOf(Server.getVersion()) > -1);
+	}
+
+	public void testStopWebAppCtx() throws Exception {
+		final boolean[] stopped = new boolean[1];
+
+		Server tempServer = new Server() {
+
+			public Handler getChildHandlerByClass(Class byclass) {
+				if (ContextHandlerCollection.class.equals(byclass))
+					return null;
+				assertEquals(HandlerCollection.class, byclass);
+				return new HandlerCollection();
+			}
+		};
+
+		BundleContext bundleCtx = new MockBundleContext();
+		String contextPath = "/path";
+		deployer.setServer(tempServer);
+		deployer.afterPropertiesSet();
+		WarDeployment deployment = deployer.createDeployment(bundleCtx.getBundle(), contextPath);
+		deployment.undeploy();
 	}
 }

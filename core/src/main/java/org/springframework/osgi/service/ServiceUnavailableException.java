@@ -57,7 +57,9 @@ public class ServiceUnavailableException extends ServiceException {
 	 * @param reference service reference
 	 */
 	public ServiceUnavailableException(ServiceReference reference) {
-		super("service with id=[" + OsgiServiceReferenceUtils.getServiceId(reference) + "] unavailable");
+		super("service with id=["
+				+ (reference == null ? "null" : "" + OsgiServiceReferenceUtils.getServiceId(reference))
+				+ "] unavailable");
 	}
 
 }
