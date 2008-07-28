@@ -944,8 +944,21 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 		
 		<note>
 		The injected <interfacename>ServiceReference</interfacename> is managed by Spring-DM and will change
-		at the same time as the referenced backing OSGi service instance.  
+		at the same time as the referenced backing OSGi service instance.
 		</note>
+		
+		<para>There are cases when the managed <interfacename>ServiceReference</interfacename> is needed to get a hold of the OSGi service. Unfortunately,
+		most of the OSGi frameworks expect their own <interfacename>ServiceReference</interfacename> classes and will fail when the
+		Spring-DM managed reference is used. For such cases, one can get a hold of the native <interfacename>ServiceReference</interfacename> bound
+		at that moment, by casting the reference object to <interfacename>ServiceReferenceProxy</interfacename> and then calling 
+		<methodname>getTargetServiceReference</methodname>. Using the example context above, one might use the following code:</para>
+		
+		<programlisting language="java"><![CDATA[ServiceReference nativeReference = ((ServiceReferenceProxy)serviceReference).getTargetServiceReference()]]></programlisting>
+		
+		<para>The returned <literal>nativeReference</literal> can be safely passed to the OSGi framework however, since it is not managed by Spring-DM,
+		in time, it might refer to a service different then the one backing the imported OSGi service.</para>
+		<para>To avoid this desynchronization, consider using managed <interfacename>ServiceReference</interfacename> objects mainly for reading the
+		bound OSGi service properties rather then getting a hold of OSGi services (which can be simply injected by Spring-DM).</para>
 		</section>
    	</section>
 
