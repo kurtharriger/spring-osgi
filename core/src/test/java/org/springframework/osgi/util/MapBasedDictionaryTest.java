@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.util;
 
 import java.util.Dictionary;
@@ -33,6 +34,7 @@ import org.springframework.osgi.util.internal.MapBasedDictionary;
 public class MapBasedDictionaryTest extends TestCase {
 
 	private Dictionary dict;
+
 
 	protected void setUp() throws Exception {
 		dict = new MapBasedDictionary();
@@ -179,6 +181,57 @@ public class MapBasedDictionaryTest extends TestCase {
 		MapBasedDictionary wrapper = new MapBasedDictionary();
 		wrapper.putAll(dict);
 		assertEquals(wrapper, dict);
+	}
+
+	public void testValues() throws Exception {
+		Dictionary dict = new Properties();
+		dict.put("joe", "satriani");
+
+		MapBasedDictionary wrapper = new MapBasedDictionary();
+		wrapper.putAll(dict);
+
+		Enumeration enm1 = dict.elements();
+		Enumeration enm2 = wrapper.elements();
+
+		while (enm1.hasMoreElements()) {
+			assertTrue(enm2.hasMoreElements());
+			assertEquals(enm1.nextElement(), enm2.nextElement());
+		}
+	}
+
+	public void testClear() throws Exception {
+		Dictionary dict = new Properties();
+		dict.put("joe", "satriani");
+
+		MapBasedDictionary wrapper = new MapBasedDictionary();
+		wrapper.putAll(dict);
+		assertEquals(1, wrapper.size());
+		wrapper.clear();
+		assertEquals(0, wrapper.size());
+	}
+
+	public void testContainsKey() throws Exception {
+		Dictionary dict = new Properties();
+		dict.put("joe", "satriani");
+
+		MapBasedDictionary wrapper = new MapBasedDictionary();
+		wrapper.putAll(dict);
+		assertTrue(wrapper.containsKey("joe"));
+	}
+
+	public void testValue() throws Exception {
+		Dictionary dict = new Properties();
+		dict.put("joe", "satriani");
+
+		MapBasedDictionary wrapper = new MapBasedDictionary();
+		wrapper.putAll(dict);
+		assertTrue(wrapper.containsValue("satriani"));
+	}
+
+	public void testHashCode() throws Exception {
+		MapBasedDictionary wrapper1 = new MapBasedDictionary();
+		MapBasedDictionary wrapper2 = new MapBasedDictionary();
+		assertFalse(wrapper1.hashCode() == wrapper2.hashCode());
 	}
 
 }
