@@ -34,6 +34,7 @@
 
 	
 		<!-- readme -->
+		<!--
 		<fileSet>
 			 <directory>../</directory>
 			 <outputDirectory/>
@@ -42,6 +43,7 @@
 			 </includes>
 			 <lineEnding>dos</lineEnding>
 		</fileSet>
+		-->
 		<fileSet>
 			 <directory>../lib</directory>
 			 <outputDirectory>lib</outputDirectory>

@@ -44,13 +44,13 @@ above, and JDK level 1.4 and above.
 
 Release contents:
 * "src" contains the Java source files for the framework
-* "samples" contains various demo applications and showcases
+* "src/samples" contains various demo applications and showcases
 * "dist" contains various Spring DM distribution jar files
 * "lib" contains all third-party libraries needed for running the samples and/or building the framework
 * "docs" contains general documentation and API javadocs
 
-The "lib" directory is just included in the "-with-dependencies" download. Make sure to download this full
-distribution ZIP file if you want to run the sample applications and/or build the framework yourself.
+The "lib" and "src" directories are just included in the "-with-dependencies" download. Make sure to download 
+this full distribution ZIP file if you want to run the sample applications and/or build the framework yourself.
 Maven 2 pom.xml are provided for building the sources.
  
 Latest info is available at the public website: http://www.springframework.org/osgi
