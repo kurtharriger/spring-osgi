@@ -231,6 +231,8 @@ public class MapBasedDictionaryTest extends TestCase {
 	public void testHashCode() throws Exception {
 		MapBasedDictionary wrapper1 = new MapBasedDictionary();
 		MapBasedDictionary wrapper2 = new MapBasedDictionary();
+		assertEquals(wrapper1.hashCode(), wrapper2.hashCode());
+		wrapper1.put(new Object(), new Object());
 		assertFalse(wrapper1.hashCode() == wrapper2.hashCode());
 	}
 
