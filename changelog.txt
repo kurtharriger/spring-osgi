@@ -2,7 +2,7 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.1.1 (2008-mm-dd)
+Changes in version 1.1.1 (2008-07-29)
 -------------------------------------
 
 Package org.springframework.osgi.io
@@ -11,17 +11,15 @@ Package org.springframework.osgi.io
 * fixed handling of required bundles that do not export packages
 * fixed premature failure when searching missing resources in multiple paths
 
-Package org.springframework.osgi.service
-* fixed potential NPE when comparing managed service references
-* improved thread safety for the managed service reference returned to the user
-
 Package org.springframework.osgi.mock
 * improved dependency between MockBundleContext and the bundle it returns
 * added OSGi R4.1 start/stop signatures to MockBundle
 * added OSGi R4.1 compareTo contract to MockServiceReference
-
-Package org.springframework.osgi.mock
 * improved local maven artifact search by adding groupId filtering
+
+Package org.springframework.osgi.service
+* fixed potential NPE when comparing managed service references
+* improved thread safety for the managed service reference returned to the user
 
 Package org.springframework.osgi.web
 * DefaultContextPathStrategy allows "/" contexts to be specified through Web-ContextPath header
@@ -170,13 +168,6 @@ Package org.springframework.osgi.context
 * refined AbstractOsgiBundleApplicationContext to allow customization of the OSGi service properties
 * AbstractDelegatedExecutionApplicationContext rethrows all exceptions occuring during refresh
 
-Package org.springframework.osgi.service
-* refined weaving process for service importers so that knowledge of org.springframework.osgi package is not required
-* fixed potential infrastructure class leak through the thread context class loader management of imported services
-* improved proxy class loader creation by using an internal cache
-* improved thread-safety of the dynamic service collections
-* introduced InfrastructureProxy interface to imported OSGi service proxies
-
 Package org.springframework.osgi.extender
 * added OsgiApplicationContextCreator interface for handling the extender contexts creation
 * added OsgiBeanFactoryPostProcessor interface for customizing the contexts created by the extender
@@ -192,6 +183,11 @@ Package org.springframework.osgi.io
 * fixed internal PackageAdminResolver parsing of Require-Bundle entries which specify versions
 
 Package org.springframework.osgi.service
+* refined weaving process for service importers so that knowledge of org.springframework.osgi package is not required
+* fixed potential infrastructure class leak through the thread context class loader management of imported services
+* improved proxy class loader creation by using an internal cache
+* improved thread-safety of the dynamic service collections
+* introduced InfrastructureProxy interface to imported OSGi service proxies
 * refined OsgiServiceCollectionProxyFactoryBean to allow for configurable 'greedy-proxying' behaviour
 * changed service collection behaviour to not perform greedy proxying by default
 * improved the proxy weaving process by providing the aop infrastructure dependencies internally
@@ -286,10 +282,8 @@ General
 * added log4j.properties to spring-osgi bundle archetype
 * added OSGi integration test to the spring-osgi bundle archetype
 
-Package org.springframework.context.support
-* the namespace resolver mechanism first checks the local bundle classpath before using the extender namespace service
-
 Package org.springframework.osgi.context
+* the namespace resolver mechanism first checks the local bundle classpath before using the extender namespace service
 * fixed AbstractDelegatedExecutionApplicationContext to log errors that occur during the bean factory startup
 
 Package org.springframework.osgi.io
