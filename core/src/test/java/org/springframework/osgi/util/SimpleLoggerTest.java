@@ -180,7 +180,7 @@ public class SimpleLoggerTest extends TestCase {
 	public void testTraceObjectThrowable() {
 		shouldBeCalled = outStream;
 		shouldNotBeCalled = errStream;
-		simpleLogger.info(object, throwable);
+		simpleLogger.trace(object, throwable);
 	}
 
 	public void testWarnObject() {
