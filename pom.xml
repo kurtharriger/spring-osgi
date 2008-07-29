@@ -4,7 +4,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi</artifactId>
   <packaging>pom</packaging>
-  <version>1.1.1</version>
+  <version>1.1.2-SNAPSHOT</version>
   <name>Spring Dynamic Modules</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
@@ -25,11 +25,11 @@
     <!-- Felix BND plugin settings -->
     
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
-    <spring.osgi.import.version>1.1.1</spring.osgi.import.version>
+    <spring.osgi.import.version>1.1.2</spring.osgi.import.version>
     
     <!--- Spring OSGi packages exported version -->
-    <spring.osgi.export.version>1.1.1</spring.osgi.export.version>
-    <spring.osgi.bundle.version>1.1.1</spring.osgi.bundle.version>
+    <spring.osgi.export.version>1.1.2</spring.osgi.export.version>
+    <spring.osgi.bundle.version>1.1.2</spring.osgi.bundle.version>
 
    
     <spring.osgi.import.pkg>*</spring.osgi.import.pkg>
