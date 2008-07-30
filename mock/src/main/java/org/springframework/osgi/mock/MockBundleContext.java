@@ -65,7 +65,7 @@ public class MockBundleContext implements BundleContext {
 	}
 
 	public MockBundleContext(Bundle bundle, Properties props) {
-		this.bundle = (bundle == null ? new MockBundle() : bundle);
+		this.bundle = (bundle == null ? new MockBundle(this) : bundle);
 		properties = new Properties(DEFAULT_PROPERTIES);
 		if (props != null)
 			properties.putAll(props);

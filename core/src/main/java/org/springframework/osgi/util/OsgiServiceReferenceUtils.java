@@ -48,7 +48,7 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class OsgiServiceReferenceUtils {
 
-	private static Log log = LogFactory.getLog(OsgiServiceReferenceUtils.class);
+	private static final Log log = LogFactory.getLog(OsgiServiceReferenceUtils.class);
 
 
 	/**

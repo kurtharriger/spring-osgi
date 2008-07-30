@@ -199,13 +199,7 @@ public class DefaultContextPathStrategyTest extends TestCase {
 		headers.put("Web-ContextPath", value);
 		Bundle bundle = new MockBundle(headers);
 
-		try {
-			strategy.getContextPath(bundle);
-			fail("expected exception as the header does not contains any text");
-		}
-		catch (IllegalArgumentException ex) {
-
-		}
+		assertEquals("/", strategy.getContextPath(bundle));
 	}
 
 	public void testBundleHeaderMispelled() throws Exception {
@@ -244,7 +238,6 @@ public class DefaultContextPathStrategyTest extends TestCase {
 		final String location = "file:/somePath" + expectedContextPath + "/";
 
 		assertEquals(expectedContextPath, strategy.getContextPath(createBundleWithLocation(location)));
-
 	}
 
 	public void testMultiPrefixRemoval() throws Exception {
@@ -259,6 +252,41 @@ public class DefaultContextPathStrategyTest extends TestCase {
 		final String location = "initial@reference:file:" + expectedContextPath + ".SNAPSHOT";
 
 		assertEquals("/" + expectedContextPath, strategy.getContextPath(createBundleWithLocation(location)));
+	}
 
+	public void testEmptyWebContextPath() throws Exception {
+		String value = "";
+		Dictionary headers = new Properties();
+		headers.put("Web-ContextPath", value);
+		Bundle bundle = new MockBundle(headers);
+		String path = strategy.getContextPath(bundle);
+		assertEquals("/", path);
+	}
+
+	public void testRootWebContextPath() throws Exception {
+		String value = "/";
+		Dictionary headers = new Properties();
+		headers.put("Web-ContextPath", value);
+		Bundle bundle = new MockBundle(headers);
+		String path = strategy.getContextPath(bundle);
+		assertEquals(value, path);
+	}
+
+	public void testWebContextPathStartsWithSlash() throws Exception {
+		String value = "/web";
+		Dictionary headers = new Properties();
+		headers.put("Web-ContextPath", value);
+		Bundle bundle = new MockBundle(headers);
+		String path = strategy.getContextPath(bundle);
+		assertEquals(value, path);
+	}
+
+	public void testWebContextPathContainsExtraWhiteSpaces() throws Exception {
+		String value = " /web  ";
+		Dictionary headers = new Properties();
+		headers.put("Web-ContextPath", value);
+		Bundle bundle = new MockBundle(headers);
+		String path = strategy.getContextPath(bundle);
+		assertEquals(value.trim(), path);
 	}
 }

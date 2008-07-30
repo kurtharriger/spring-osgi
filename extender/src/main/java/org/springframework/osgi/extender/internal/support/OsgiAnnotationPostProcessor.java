@@ -18,6 +18,7 @@ package org.springframework.osgi.extender.internal.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.OsgiException;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
+import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * Post processor used for processing Spring-DM annotations.
@@ -47,9 +49,10 @@ public class OsgiAnnotationPostProcessor implements OsgiBeanFactoryPostProcessor
 	public void postProcessBeanFactory(BundleContext bundleContext, ConfigurableListableBeanFactory beanFactory)
 			throws BeansException, OsgiException {
 
+		Bundle bundle = bundleContext.getBundle();
 		try {
 			// Try and load the annotation code using the bundle classloader
-			Class annotationBppClass = bundleContext.getBundle().loadClass(ANNOTATION_BPP_CLASS);
+			Class annotationBppClass = bundle.loadClass(ANNOTATION_BPP_CLASS);
 			// instantiate the class
 			final BeanPostProcessor annotationBeanPostProcessor = (BeanPostProcessor) BeanUtils.instantiateClass(annotationBppClass);
 
@@ -60,7 +63,9 @@ public class OsgiAnnotationPostProcessor implements OsgiBeanFactoryPostProcessor
 			beanFactory.addBeanPostProcessor(annotationBeanPostProcessor);
 		}
 		catch (ClassNotFoundException exception) {
-			log.info("Spring-DM annotation package could not be found; automatic annotation processing disabled");
+			log.info("Spring-DM annotation package could not be loaded from bundle ["
+					+ OsgiStringUtils.nullSafeNameAndSymName(bundle)
+					+ "]bundleContext.getBundle(); annotation processing disabled...");
 			if (log.isDebugEnabled())
 				log.debug("Cannot load annotation bpp", exception);
 		}

@@ -32,7 +32,7 @@ import org.springframework.util.CollectionUtils;
  * @author Costin Leau
  * 
  */
-public class CommonsLogging104Test extends BaseIntegrationTest {
+public abstract class CommonsLogging104Test extends BaseIntegrationTest {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(CommonsLogging104Test.class);

@@ -16,7 +16,6 @@
 
 package org.springframework.osgi.web.extender.internal.scanner;
 
-import java.net.URL;
 import java.util.Enumeration;
 
 import junit.framework.TestCase;
@@ -45,15 +44,11 @@ public class DefaultWarScannerTest extends TestCase {
 		scanner = null;
 	}
 
-	public void testBundleWithExistingWebXmlButNoSuitableLocation() throws Exception {
-		final URL url = new URL("file:///");
+	public void testBundleWithNoWebXmlAndNoSuitableLocation() throws Exception {
 		bundle = new MockBundle() {
 
 			public Enumeration findEntries(String path, String filePattern, boolean recurse) {
-				assertEquals("WEB-INF/", path);
-				assertEquals("web.xml", filePattern);
-				assertEquals(false, recurse);
-				return new ArrayEnumerator(new URL[] { url });
+				return null;
 			}
 
 			public String getLocation() {
@@ -102,6 +97,38 @@ public class DefaultWarScannerTest extends TestCase {
 				return "initial@reference:file:petclinic.war/";
 			}
 		};
+		assertTrue(scanner.isWar(bundle));
+	}
+
+	public void testWebInfEntryFromRoot() throws Exception {
+		bundle = new MockBundle() {
+
+			public Enumeration findEntries(String path, String filePattern, boolean recurse) {
+				assertEquals("/", path);
+				assertEquals("WEB-INF", filePattern);
+				assertEquals(false, recurse);
+				return new ArrayEnumerator(new Object[] { new Object() });
+			}
+		};
+
+		assertTrue(scanner.isWar(bundle));
+	}
+
+	public void testWebInfEntry() throws Exception {
+		bundle = new MockBundle() {
+
+			public Enumeration findEntries(String path, String filePattern, boolean recurse) {
+				// return null the first time around
+				if ("/".equals(path))
+					return null;
+
+				assertEquals("WEB-INF", path);
+				assertNull(filePattern);
+				assertEquals(false, recurse);
+				return new ArrayEnumerator(new Object[] { new Object() });
+			}
+		};
+
 		assertTrue(scanner.isWar(bundle));
 	}
 }

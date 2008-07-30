@@ -17,6 +17,7 @@
 package org.springframework.osgi.iandt;
 
 import java.io.File;
+import java.util.List;
 
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
@@ -101,8 +102,8 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		String[] names = super.getTestFrameworkBundlesNames();
 		if (isCloverEnabled()) {
 			logger.warn("Clover instrumentation enabled");
-			return (String[]) ObjectUtils.addObjectToArray(names, "org.springframework.iandt,clover.bundle,"
-					+ getSpringDMVersion());
+//			return (String[]) ObjectUtils.addObjectToArray(names, "org.springframework.osgi.iandt,clover.bundle,"
+//					+ getSpringDMVersion());
 		}
 		return names;
 	}
@@ -114,5 +115,13 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 			return new CloverClassifiedArtifactLocator(defaultLocator);
 		}
 		return defaultLocator;
+	}
+
+	protected List getBootDelegationPackages() {
+		List bootPkgs = super.getBootDelegationPackages();
+		if (isCloverEnabled()) {
+			bootPkgs.add("com_cenqua_clover");
+		}
+		return bootPkgs;
 	}
 }
