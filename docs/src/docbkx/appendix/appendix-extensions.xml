@@ -47,5 +47,28 @@
       example, to specify a filter string) that mirror the options provided by
       the <literal>reference</literal> element. See the javadoc for more
       information.</para>
+      
+      <section id="appendix-extensions:annotations:enable">
+		<title>Enabling/Disabling annotation processing</title>
+		
+		<para>By default, as Spring-OSGi is JDK 1.4 compatible, annotation injection is disabled. There are
+		currently two ways for enabling it:</para>
+		
+		<itemizedlist>
+			<listitem><para>through Spring-DM extender (see <xref linkend="app-deploy:extender-configuration"/>).</para>
+			  <para>This is an extender wide configuration which means all bundles started by the extender will have annotation injection applied to them.
+			  </para>
+			</listitem>
+			<listitem><para>by specifying a dedicated bean post processor</para>
+			<para>By specifying the Spring-DM annotation extension processor, one
+			can enable <emphasis>per-bundle</emphasis> annotation injection. To do that, add the following to your bundle configuration:</para>
+			<programlisting><![CDATA[<!-- annotation processor -->
+<bean class="org.springframework.osgi.extensions.annotation.ServiceReferenceInjectionBeanPostProcessor"/>]]></programlisting>
+			</listitem>
+		</itemizedlist>
+		
+		<para>As a reminder, for the annotations to work, the containing bundle needs to import <literal>org.springframework.osgi.extensions.annotation</literal>
+		package, which is available in the <literal>spring-osgi-annotation</literal> bundle.</para>
+      </section>
     </section>
 </appendix>

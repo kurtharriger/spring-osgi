@@ -130,10 +130,23 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 		return this.servletContext;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Additionally, it also sets the context namespace if it's not initialized
+	 * (null).
+	 */
 	public void setServletConfig(ServletConfig servletConfig) {
 		this.servletConfig = servletConfig;
-		if (servletConfig != null && this.servletContext == null) {
-			this.servletContext = servletConfig.getServletContext();
+		if (servletConfig != null) {
+
+			if (this.servletContext == null) {
+				setServletContext(servletConfig.getServletContext());
+			}
+
+			if (getNamespace() == null) {
+				setNamespace(this.servletConfig.getServletName() + DEFAULT_NAMESPACE_SUFFIX);
+			}
 		}
 	}
 
@@ -148,23 +161,8 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * Returns the namespace for this application context, falling back to
-	 * default scheme if the servlet config is known and no custom namespace was
-	 * set: e.g. "test-servlet" for a servlet named "test".
-	 */
 	public String getNamespace() {
-		if (this.namespace != null) {
-			return this.namespace;
-		}
-
-		if (this.servletConfig != null) {
-			return this.servletConfig.getServletName() + DEFAULT_NAMESPACE_SUFFIX;
-		}
-
-		return null;
+		return this.namespace;
 	}
 
 	/**
@@ -225,8 +223,9 @@ public class OsgiBundleXmlWebApplicationContext extends OsgiBundleXmlApplication
 	 * @see XmlWebApplicationContext#DEFAULT_CONFIG_LOCATION
 	 */
 	protected String[] getDefaultConfigLocations() {
-		if (getNamespace() != null) {
-			return new String[] { XmlWebApplicationContext.DEFAULT_CONFIG_LOCATION_PREFIX + getNamespace()
+		String ns = getNamespace();
+		if (ns != null) {
+			return new String[] { XmlWebApplicationContext.DEFAULT_CONFIG_LOCATION_PREFIX + ns
 					+ XmlWebApplicationContext.DEFAULT_CONFIG_LOCATION_SUFFIX };
 		}
 		else {

@@ -13,34 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.test.internal.util;
 
-import java.io.ByteArrayOutputStream;
+package org.springframework.osgi.extender.internal.util.concurrent;
+
+import junit.framework.TestCase;
 
 /**
- * Simple class which allows a specific buffer to be used as the underlying
- * implementation. This makes it easy to manipulate directly the storage support
- * (such as resizing the byte array or reading from it).
  * 
  * @author Costin Leau
  * 
  */
-public class ConfigurableByteArrayOutputStream extends ByteArrayOutputStream {
+public class RunnableTimedExecutionTest extends TestCase {
 
-	public ConfigurableByteArrayOutputStream() {
-		super();
+	private long wait = 5 * 1000;
+
+
+	public void testExecute() {
+		RunnableTimedExecution.execute(new Runnable() {
+
+			public void run() {
+				assertTrue(true);
+			}
+
+		}, wait);
 	}
 
-	public ConfigurableByteArrayOutputStream(int size) {
-		super(size);
-	}
+	public void testDestroy() {
+		RunnableTimedExecution.execute(new Runnable() {
 
-	/**
-	 * Extension added to the original class.
-	 * 
-	 * @param bufferToUse
-	 */
-	public ConfigurableByteArrayOutputStream(byte[] bufferToUse) {
-		this.buf = bufferToUse;
+			public void run() {
+				try {
+					Thread.sleep(wait * 5);
+					fail("should have been interrupted");
+				}
+				catch (InterruptedException ie) {
+					// expected
+				}
+
+			}
+
+		}, 10);
 	}
 }

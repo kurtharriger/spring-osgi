@@ -44,10 +44,14 @@ import org.xml.sax.InputSource;
  */
 public class LocalFileSystemMavenRepository implements ArtifactLocator {
 
+	private static final char SLASH_CHAR = '/';
+
+	private static final String LOCAL_REPOSITORY_ELEM = "localRepository";
+
 	private static final Log log = LogFactory.getLog(LocalFileSystemMavenRepository.class);
 
 	/** local repo system property */
-	private static final String SYS_PROPERTY = "localRepository";
+	private static final String SYS_PROPERTY = LOCAL_REPOSITORY_ELEM;
 	/** user home system property */
 	private static final String USER_HOME_PROPERTY = "user.home";
 	/** m2 local user settings */
@@ -119,11 +123,11 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 			Document document = docLoader.loadDocument(new InputSource(m2Settings.getInputStream()), null, null,
 				XmlValidationModeDetector.VALIDATION_NONE, false);
 
-			return (DomUtils.getChildElementValueByTagName(document.getDocumentElement(), "localRepository"));
+			return (DomUtils.getChildElementValueByTagName(document.getDocumentElement(), LOCAL_REPOSITORY_ELEM));
 		}
 		catch (Exception ex) {
 			throw (RuntimeException) new RuntimeException(new ParserConfigurationException("error parsing resource="
-					+ m2Settings)).initCause(ex);
+					+ m2Settings).initCause(ex));
 		}
 	}
 
@@ -156,7 +160,7 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 		init();
 
 		try {
-			return localMavenBuildArtifact(artifactId, version, type);
+			return localMavenBuildArtifact(groupId, artifactId, version, type);
 		}
 		catch (IllegalStateException illStateEx) {
 			Resource localMavenBundle = localMavenBundle(groupId, artifactId, version, type);
@@ -185,12 +189,12 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 	 * @return
 	 */
 	protected Resource localMavenBundle(String groupId, String artifact, String version, String type) {
-		StringBuffer location = new StringBuffer(groupId.replace('.', '/'));
-		location.append('/');
+		StringBuffer location = new StringBuffer(groupId.replace('.', SLASH_CHAR));
+		location.append(SLASH_CHAR);
 		location.append(artifact);
-		location.append('/');
+		location.append(SLASH_CHAR);
 		location.append(version);
-		location.append('/');
+		location.append(SLASH_CHAR);
 		location.append(artifact);
 		location.append('-');
 		location.append(version);
@@ -209,9 +213,10 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 	 * @param type
 	 * @return
 	 */
-	protected Resource localMavenBuildArtifact(String artifactId, String version, String type) {
+	protected Resource localMavenBuildArtifact(String groupId, String artifactId, String version, String type) {
 		try {
-			File found = new MavenPackagedArtifactFinder(artifactId, version, type).findPackagedArtifact(new File("."));
+			File found = new MavenPackagedArtifactFinder(groupId, artifactId, version, type).findPackagedArtifact(new File(
+				"."));
 			Resource res = new FileSystemResource(found);
 			if (log.isDebugEnabled()) {
 				log.debug("[" + artifactId + "|" + version + "] resolved to " + res.getDescription()

@@ -32,34 +32,34 @@ class SimpleLogger implements Log {
 	}
 
 	public void debug(Object message, Throwable th) {
-		System.out.print(message);
+		System.out.println(message);
 		th.printStackTrace(System.out);
 	}
 
 	public void error(Object message) {
-		System.err.print(message);
+		System.err.println(message);
 	}
 
 	public void error(Object message, Throwable th) {
-		System.err.print(message);
+		System.err.println(message);
 		th.printStackTrace(System.err);
 	}
 
 	public void fatal(Object message) {
-		System.err.print(message);
+		System.err.println(message);
 	}
 
 	public void fatal(Object message, Throwable th) {
-		System.err.print(message);
+		System.err.println(message);
 		th.printStackTrace(System.err);
 	}
 
 	public void info(Object message) {
-		System.out.print(message);
+		System.out.println(message);
 	}
 
 	public void info(Object message, Throwable th) {
-		System.out.print(message);
+		System.out.println(message);
 		th.printStackTrace(System.out);
 	}
 
@@ -88,21 +88,20 @@ class SimpleLogger implements Log {
 	}
 
 	public void trace(Object message) {
-		System.out.print(message);
+		System.out.println(message);
 	}
 
 	public void trace(Object message, Throwable th) {
-		System.out.print(message);
+		System.out.println(message);
 		th.printStackTrace(System.out);
 	}
 
 	public void warn(Object message) {
-		System.out.print(message);
+		System.out.println(message);
 	}
 
 	public void warn(Object message, Throwable th) {
-		System.out.print(message);
+		System.out.println(message);
 		th.printStackTrace(System.out);
 	}
-
 }

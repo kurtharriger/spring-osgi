@@ -17,6 +17,7 @@
     <!-- plugin not yet enabled to avoid further problems -->
 	<spring.osgi.import.pkg>!org.springframework.osgi.iandt, *</spring.osgi.import.pkg>
 	<spring.osgi.export.pkg>${pom.artifactId}*</spring.osgi.export.pkg>
+  	<clover.skip>true</clover.skip>
   </properties>
   
   <!-- shared dependencies -->
@@ -75,6 +76,12 @@
 
  <build>
     <plugins>
+	   <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>    
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>

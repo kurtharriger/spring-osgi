@@ -16,9 +16,12 @@
 
 package org.springframework.osgi.service.importer.support.internal.aop;
 
+import java.util.Comparator;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.service.importer.ServiceReferenceProxy;
+import org.springframework.osgi.service.importer.support.internal.collection.comparator.ServiceReferenceComparator;
 import org.springframework.util.Assert;
 
 /**
@@ -33,6 +36,8 @@ import org.springframework.util.Assert;
 class SwappingServiceReferenceProxy implements ServiceReferenceProxy {
 
 	private static final int HASH_CODE = SwappingServiceReferenceProxy.class.hashCode() * 13;
+
+	private static final Comparator COMPARATOR = new ServiceReferenceComparator();
 
 	private ServiceReference delegate;
 
@@ -62,22 +67,28 @@ class SwappingServiceReferenceProxy implements ServiceReferenceProxy {
 	}
 
 	public synchronized boolean isAssignableTo(Bundle bundle, String className) {
-		return delegate.isAssignableTo(bundle, className);
+		return (delegate == null ? false : delegate.isAssignableTo(bundle, className));
 	}
 
 	public synchronized ServiceReference getTargetServiceReference() {
 		return delegate;
 	}
 
-	public boolean equals(Object obj) {
+	public synchronized boolean equals(Object obj) {
 		if (obj instanceof SwappingServiceReferenceProxy) {
 			SwappingServiceReferenceProxy other = (SwappingServiceReferenceProxy) obj;
-			return (delegate.equals(other.delegate));
+			return (delegate == null ? other.delegate == null : delegate.equals(other.delegate));
 		}
 		return false;
 	}
 
-	public int hashCode() {
-		return HASH_CODE + delegate.hashCode();
+	public synchronized int hashCode() {
+		return HASH_CODE + (delegate == null ? 0 : delegate.hashCode());
+	}
+
+	public synchronized int compareTo(Object other) {
+		if (other instanceof SwappingServiceReferenceProxy)
+			return COMPARATOR.compare(delegate, ((SwappingServiceReferenceProxy) other).delegate);
+		return COMPARATOR.compare(delegate, other);
 	}
 }

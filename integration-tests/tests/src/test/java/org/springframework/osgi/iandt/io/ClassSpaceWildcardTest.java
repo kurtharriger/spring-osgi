@@ -16,6 +16,7 @@
 
 package org.springframework.osgi.iandt.io;
 
+import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
 
 /**
@@ -27,6 +28,12 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 	//
 	// Wild-card tests
 	//
+
+	public void testBundleClassPath() throws Exception {
+		System.out.println("*** Bundle-ClassPath is " + bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH));
+		Resource res[] = patternLoader.getResources("classpath*:/org/springframework/osgi/iandt/io/ClassSpaceWildcardTest.class");
+		assertEquals("invalid bundle-classpath entries should be skipped", 1, res.length);
+	}
 
 	// finds all files at root level
 	public void testWildcardAtRootFileLevel() throws Exception {

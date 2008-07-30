@@ -38,6 +38,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.osgi.io.internal.OsgiHeaderUtils;
 import org.springframework.osgi.io.internal.OsgiResourceUtils;
 import org.springframework.osgi.io.internal.OsgiUtils;
 import org.springframework.osgi.io.internal.resolver.DependencyResolver;
@@ -347,7 +348,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			logger.trace("Analyzing " + Constants.BUNDLE_CLASSPATH + " entries for bundle [" + bundle.getBundleId()
 					+ "|" + bundle.getSymbolicName() + "]");
 		// see if there is a bundle class-path defined
-		String[] entries = OsgiResourceUtils.getBundleClassPath(bundle);
+		String[] entries = OsgiHeaderUtils.getBundleClassPath(bundle);
 
 		if (trace)
 			logger.trace("Found " + Constants.BUNDLE_CLASSPATH + " entries " + ObjectUtils.nullSafeToString(entries));
@@ -457,8 +458,15 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 
 		OsgiBundleResourcePatternResolver localResolver = new OsgiBundleResourcePatternResolver(bundle);
 		Resource[] resources = localResolver.getResources(bundlePathPattern);
-		for (int i = 0; i < resources.length; i++) {
-			list.add(resources[i].getURL().getPath());
+
+		// skip when dealing with non-existing resources
+		if (resources.length == 1 && !resources[0].exists()) {
+			return;
+		}
+		else {
+			for (int i = 0; i < resources.length; i++) {
+				list.add(resources[i].getURL().getPath());
+			}
 		}
 	}
 

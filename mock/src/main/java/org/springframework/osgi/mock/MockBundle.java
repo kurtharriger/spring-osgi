@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.io.IOException;
@@ -45,7 +46,7 @@ public class MockBundle implements Bundle {
 	private Dictionary headers;
 
 	private static int GENERAL_BUNDLE_ID = 0;
-	
+
 	private long bundleId = (GENERAL_BUNDLE_ID++);
 
 	// required for introspection by util classes (should be removed)
@@ -59,7 +60,9 @@ public class MockBundle implements Bundle {
 
 	private final String symName;
 
+
 	private static class EmptyEnumeration implements Enumeration {
+
 		public boolean hasMoreElements() {
 			return false;
 		}
@@ -68,6 +71,7 @@ public class MockBundle implements Bundle {
 			throw new NoSuchElementException();
 		}
 	}
+
 
 	public MockBundle() {
 		this(null, null, null);
@@ -114,11 +118,6 @@ public class MockBundle implements Bundle {
 		return (enm == null ? new EmptyEnumeration() : enm);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getBundleId()
-	 */
 	public long getBundleId() {
 		return this.bundleId;
 	}
@@ -127,170 +126,83 @@ public class MockBundle implements Bundle {
 		this.bundleId = bundleId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getEntry(java.lang.String)
-	 */
 	public URL getEntry(String name) {
 		return loader.getResource(name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getEntryPaths(java.lang.String)
-	 */
 	public Enumeration getEntryPaths(String path) {
 		return new EmptyEnumeration();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getHeaders()
-	 */
 	public Dictionary getHeaders() {
 		return headers;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getHeaders(java.lang.String)
-	 */
 	public Dictionary getHeaders(String locale) {
 		return getHeaders();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getLastModified()
-	 */
 	public long getLastModified() {
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getLocation()
-	 */
 	public String getLocation() {
 		return location;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getRegisteredServices()
-	 */
 	public ServiceReference[] getRegisteredServices() {
 		return new ServiceReference[] {};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getResource(java.lang.String)
-	 */
 	public URL getResource(String name) {
 		return loader.getResource(name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getResources(java.lang.String)
-	 */
 	public Enumeration getResources(String name) throws IOException {
 		return loader.getResources(name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getServicesInUse()
-	 */
 	public ServiceReference[] getServicesInUse() {
 		return new ServiceReference[] {};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getState()
-	 */
 	public int getState() {
 		return Bundle.ACTIVE;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#getSymbolicName()
-	 */
 	public String getSymbolicName() {
 		String name = (String) headers.get(Constants.BUNDLE_SYMBOLICNAME);
 		return (name == null ? SYMBOLIC_NAME : name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#hasPermission(java.lang.Object)
-	 */
 	public boolean hasPermission(Object permission) {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#loadClass(java.lang.String)
-	 */
 	public Class loadClass(String name) throws ClassNotFoundException {
 		return loader.loadClass(name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#start()
-	 */
 	public void start() throws BundleException {
+		start(0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#stop()
-	 */
+	public void start(int options) throws BundleException {
+	}
+
 	public void stop() throws BundleException {
+		stop(0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#uninstall()
-	 */
+	public void stop(int options) throws BundleException {
+	}
+
 	public void uninstall() throws BundleException {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#update()
-	 */
 	public void update() throws BundleException {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Bundle#update(java.io.InputStream)
-	 */
 	public void update(InputStream in) throws BundleException {
 	}
 

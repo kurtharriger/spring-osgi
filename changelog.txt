@@ -2,8 +2,34 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.x.y (2008-mm-dd)
+Changes in version 1.2.0 M1 (2008-mm-dd)
+----------------------------------------
+
+
+Changes in version 1.1.1 (2008-07-29)
 -------------------------------------
+
+Package org.springframework.osgi.io
+* fixed incorrect parsing of headers specifying version ranges
+* improved handling of Require-Bundle header (with regards to quotes and ranges)
+* fixed handling of required bundles that do not export packages
+* fixed premature failure when searching missing resources in multiple paths
+
+Package org.springframework.osgi.service
+* fixed potential NPE when comparing managed service references
+* improved thread safety for the managed service reference returned to the user
+
+Package org.springframework.osgi.mock
+* improved dependency between MockBundleContext and the bundle it returns
+* added OSGi R4.1 start/stop signatures to MockBundle
+* added OSGi R4.1 compareTo contract to MockServiceReference
+
+Package org.springframework.osgi.mock
+* improved local maven artifact search by adding groupId filtering
+
+Package org.springframework.osgi.web
+* DefaultContextPathStrategy allows "/" contexts to be specified through Web-ContextPath header
+* improved encoding of user defined context paths
 
 
 Changes in version 1.1.0 final (2008-07-04)
@@ -39,7 +65,7 @@ Package org.springframework.osgi.test
 Package org.springframework.osgi.web
 * removed support for extender configuration at META-INF/spring
 * improved war scanner Servlet 2.5 compliance (by considering as WARs only bundles with ".war" extension)
-
+* extended DefaultWarScanner scanning mechanism by considering as WARs bundles with WEB-INF/ entries
 
 Changes in version 1.1.0 RC1 (2008-06-24)
 -----------------------------------------

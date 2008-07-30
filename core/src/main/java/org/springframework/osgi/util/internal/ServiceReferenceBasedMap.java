@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.util.internal;
 
 import java.util.AbstractMap;
@@ -40,19 +41,17 @@ public class ServiceReferenceBasedMap extends AbstractMap {
 
 	private static final String READ_ONLY_MSG = "this is a readonly map";
 
-	public static class SimpleEntry implements Map.Entry {
+
+	private static class SimpleEntry implements Map.Entry {
+
 		Object key;
 
 		Object value;
 
+
 		public SimpleEntry(Object key, Object value) {
 			this.key = key;
 			this.value = value;
-		}
-
-		public SimpleEntry(Map.Entry e) {
-			this.key = e.getKey();
-			this.value = e.getValue();
 		}
 
 		public Object getKey() {
@@ -87,8 +86,8 @@ public class ServiceReferenceBasedMap extends AbstractMap {
 		private boolean eq(Object o1, Object o2) {
 			return (o1 == null ? o2 == null : o1.equals(o2));
 		}
-
 	}
+
 
 	public ServiceReferenceBasedMap(ServiceReference ref) {
 		Assert.notNull(ref);

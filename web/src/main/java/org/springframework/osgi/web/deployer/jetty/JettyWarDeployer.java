@@ -123,7 +123,7 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 	}
 
 	/**
-	 * Creates the Jetty specifc web context for the given OSGi bundle.
+	 * Creates the Jetty specific web context for the given OSGi bundle.
 	 * 
 	 * @param bundle
 	 * @return
@@ -204,9 +204,13 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 		ClassLoader old = current.getContextClassLoader();
 		try {
 			current.setContextClassLoader(wac.getClassLoader());
-			contexts.addHandler(wac);
+			if (contexts != null) {
+				contexts.addHandler(wac);
+			}
 			wac.start();
-			contexts.start();
+			if (contexts != null) {
+				contexts.start();
+			}
 		}
 		finally {
 			current.setContextClassLoader(old);
@@ -235,7 +239,9 @@ public class JettyWarDeployer extends AbstractWarDeployer {
 		try {
 			current.setContextClassLoader(wac.getClassLoader());
 			wac.stop();
-			contexts.removeHandler(wac);
+			if (contexts != null) {
+				contexts.removeHandler(wac);
+			}
 			log.info("Context [" + contextPath + "] undeployed successfully from server " + getServerInfo());
 		}
 		catch (Exception ex) {

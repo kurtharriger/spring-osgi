@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.util.Dictionary;
@@ -47,6 +48,7 @@ public class MockServiceReference implements ServiceReference {
 	private Dictionary properties;
 
 	private String[] objectClass = new String[] { Object.class.getName() };
+
 
 	public MockServiceReference() {
 		this(null, null, null);
@@ -100,29 +102,14 @@ public class MockServiceReference implements ServiceReference {
 		serviceId = ((Long) dict.get(Constants.SERVICE_ID)).longValue();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.ServiceReference#getBundle()
-	 */
 	public Bundle getBundle() {
 		return bundle;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.ServiceReference#getProperty(java.lang.String)
-	 */
 	public Object getProperty(String key) {
 		return properties.get(key);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.ServiceReference#getPropertyKeys()
-	 */
 	public String[] getPropertyKeys() {
 		String[] keys = new String[this.properties.size()];
 		Enumeration ks = this.properties.keys();
@@ -134,35 +121,15 @@ public class MockServiceReference implements ServiceReference {
 		return keys;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.ServiceReference#getUsingBundles()
-	 */
 	public Bundle[] getUsingBundles() {
 		return new Bundle[] {};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.ServiceReference#isAssignableTo(org.osgi.framework.Bundle,
-	 * java.lang.String)
-	 */
 	public boolean isAssignableTo(Bundle bundle, String className) {
 		return false;
 	}
 
 	public void setProperties(Dictionary properties) {
-		/*
-		 * Enumeration keys = props.keys(); while (keys.hasMoreElements())
-		 * this.properties.remove(keys.nextElement());
-		 * 
-		 * Enumeration enm = props.keys(); while (enm.hasMoreElements()) {
-		 * Object key = enm.nextElement(); this.properties.put(key,
-		 * props.get(key)); }
-		 */
-
 		if (properties != null) {
 			// copy mandatory properties
 			properties.put(Constants.SERVICE_ID, this.properties.get(Constants.SERVICE_ID));
@@ -195,12 +162,32 @@ public class MockServiceReference implements ServiceReference {
 		return MockServiceReference.class.hashCode() * 13 + (int) serviceId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	public String toString() {
 		return "mock service reference [owning bundle id=" + bundle.hashCode() + "|props : " + properties + "]";
 	}
 
+	public int compareTo(Object reference) {
+		ServiceReference other = (ServiceReference) reference;
+
+		// compare based on service ranking
+
+		Object ranking = this.getProperty(Constants.SERVICE_RANKING);
+		// if the property is not supplied or of incorrect type, use the default
+		int rank1 = ((ranking != null && ranking instanceof Integer) ? ((Integer) ranking).intValue() : 0);
+		ranking = other.getProperty(Constants.SERVICE_RANKING);
+		int rank2 = ((ranking != null && ranking instanceof Integer) ? ((Integer) ranking).intValue() : 0);
+
+		int result = rank1 - rank2;
+
+		if (result == 0) {
+			long id1 = serviceId;
+			long id2 = ((Long) other.getProperty(Constants.SERVICE_ID)).longValue();
+
+			// when comparing IDs, make sure to return inverse results (i.e. lower
+			// id, means higher service)
+			return (int) (id2 - id1);
+		}
+
+		return result;
+	}
 }

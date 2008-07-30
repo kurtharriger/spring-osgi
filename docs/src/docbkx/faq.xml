@@ -315,8 +315,8 @@
           	  <para>Use a repository of pre-wrapped libraries such as <ulink url="http://www.eclipse.org/orbit/">Orbit</ulink>,
           	  <ulink url="http://felix.apache.org/site/apache-felix-commons.html">Felix Commons</ulink> or Knopflerfish <ulink 
           	  url="http://www.knopflerfish.org/repo/index.html">repository</ulink>.
-          	  Spring-DM uses the SpringSource Enterprise <ulink url="http://www.springsource.com/repository/app/">Bundle Repository</ulink> (BRITS)
-          	  for its dependencies, which you might find useful. Additionally, for artifacts that have not yet made it into BRITS,
+          	  Spring-DM uses the SpringSource Enterprise <ulink url="http://www.springsource.com/repository/app/">Bundle Repository</ulink> 
+          	  for its dependencies, which you might find useful. Additionally, for artifacts that have not yet made it into SpringSource Repository,
           	  Spring-DM provides a small, temporary (Amazon S3) 
           	  Maven repository (<ulink url="http://s3.amazonaws.com/maven.springframework.org/osgi">link</ulink> | 
           	  <ulink url="http://s3browse.com/explore/maven.springframework.org/osgi/">browser-friendly link</ulink>) for its internal usage.</para> 

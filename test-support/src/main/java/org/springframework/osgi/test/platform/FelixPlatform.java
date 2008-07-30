@@ -90,33 +90,39 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	}
 
 	public void start() throws Exception {
-		// use Felix main and then read the felix instance
+		if (platform == null) {
+			// use Felix main and then read the felix instance
 
-		// initialize properties and set them as system wide so Felix can pick them up
-		System.getProperties().putAll(getPlatformProperties());
+			// initialize properties and set them as system wide so Felix can pick them up
+			System.getProperties().putAll(getPlatformProperties());
 
-		Main.main(new String[0]);
+			Main.main(new String[0]);
 
-		// read the Felix private field
-		Field field = Main.class.getDeclaredField(FELIX_PRIVATE_FIELD);
-		ReflectionUtils.makeAccessible(field);
-		platform = (Felix) field.get(Main.class);
+			// read the Felix private field
+			Field field = Main.class.getDeclaredField(FELIX_PRIVATE_FIELD);
+			ReflectionUtils.makeAccessible(field);
+			platform = (Felix) field.get(Main.class);
 
-		// call getBundleContext
-		final Method getContext = platform.getClass().getDeclaredMethod(BUNDLE_CONTEXT_METHOD, null);
+			// call getBundleContext
+			final Method getContext = platform.getClass().getDeclaredMethod(BUNDLE_CONTEXT_METHOD, null);
 
-		ReflectionUtils.makeAccessible(getContext);
+			ReflectionUtils.makeAccessible(getContext);
 
-		context = (BundleContext) getContext.invoke(platform, null);
+			context = (BundleContext) getContext.invoke(platform, null);
+		}
 	}
 
 	public void stop() throws Exception {
-		try {
-			platform.stop();
-		}
-		finally {
-			// remove cache folder
-			IOUtils.delete(felixStorageDir);
+		if (platform != null) {
+			try {
+				platform.stop();
+			}
+			finally {
+				context = null;
+				platform = null;
+				// remove cache folder
+				IOUtils.delete(felixStorageDir);
+			}
 		}
 	}
 }

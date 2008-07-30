@@ -32,6 +32,12 @@ import org.apache.commons.logging.LogFactory;
  */
 abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
+	private static final String TMP_DIR_FALLBACK = "./tmp-test";
+
+	private static final String DEFAULT_SUFFIX = "osgi";
+
+	private static final String TMP_PREFIX = "org.sfw.osgi";
+
 	final Log log = LogFactory.getLog(getClass());
 
 	/**
@@ -82,17 +88,17 @@ abstract class AbstractOsgiPlatform implements OsgiPlatform {
 
 	File createTempDir(String suffix) {
 		if (suffix == null)
-			suffix = "osgi";
+			suffix = DEFAULT_SUFFIX;
 		File tempFileName;
 
 		try {
-			tempFileName = File.createTempFile("org.sfw.osgi", suffix);
+			tempFileName = File.createTempFile(TMP_PREFIX, suffix);
 		}
 		catch (IOException ex) {
 			if (log.isWarnEnabled()) {
 				log.warn("Could not create temporary directory, returning a temp folder inside the current folder", ex);
 			}
-			return new File("./tmp-test");
+			return new File(TMP_DIR_FALLBACK);
 		}
 
 		tempFileName.delete(); // we want it to be a directory...

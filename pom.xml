@@ -51,8 +51,6 @@
 	<!-- decoration osgi import - used internally when the jars are pre-processed and bnd doens't have to know about it -->
     <spring.decorate.osgi.import>${spring.osgi.import}</spring.decorate.osgi.import>
     
-
-
     <symName.prefix>org.springframework.bundle.osgi</symName.prefix>
     <spring.osgi.symbolic.name>${groupId}.${artifactId}</spring.osgi.symbolic.name>
 
@@ -84,6 +82,9 @@
    <!-- JDK classifier property -->
    <jdk-classifier>jdk14</jdk-classifier>
    <source-jdk>1.4</source-jdk>
+   <clover.ver>2.3.1</clover.ver>
+   <clover.argLine></clover.argLine>
+   <clover.skip>false</clover.skip>
   </properties>
 
   <!-- ============================================= -->
@@ -99,7 +100,7 @@
 
   <ciManagement>
     <system>bamboo</system>
-    <url>http://build.springframework.org/bamboo/browse/OSGI-TRUNK</url>
+    <url>http://build.springframework.org/browse/OSGI-TRUNK</url>
     <notifiers>
       <notifier>
         <type>mail</type>
@@ -392,7 +393,9 @@ limitations under the License.
 		  <version>3.8.2</version>
 		</dependency>
   	</dependencies>
+  	
   </dependencyManagement>
+  
   <!-- shared dependencies across modules -->
   <dependencies>
     <!-- junit -->
@@ -471,6 +474,59 @@ limitations under the License.
           <artifactId>maven-plugin-plugin</artifactId>
           <version>2.3</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-deploy-plugin</artifactId>
+	      <version>2.3</version>
+	      <!-- we cannot depend on a snapshot
+	      <version>2.4-SNAPSHOT</version>
+	       -->
+	    </plugin>
+        <plugin>
+	      <groupId>org.apache.felix</groupId>
+    	  <artifactId>maven-bundle-plugin</artifactId>
+          <version>1.4.0</version>
+	    </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.4.3</version>
+	    </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.2</version>
+	    </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>2.0</version>
+    	</plugin>	    
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.4</version>
+	    </plugin>
+        <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jxr-plugin</artifactId>
+		  <version>2.1</version>
+	    </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>jdepend-maven-plugin</artifactId>
+          <version>2.0-beta1</version>
+        </plugin>
+  	    <plugin>
+		  <groupId>org.codehaus.mojo</groupId>
+		  <artifactId>findbugs-maven-plugin</artifactId>
+		  <version>1.2</version>
+        </plugin>
+	    <plugin>
+	      <groupId>com.atlassian.maven.plugins</groupId>
+          <artifactId>maven-clover2-plugin</artifactId>
+          <version>${clover.ver}</version>
+		</plugin>
       </plugins>
     </pluginManagement>
     
@@ -479,7 +535,6 @@ limitations under the License.
        <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>1.4.0</version>
         <extensions>true</extensions>
 
         <configuration>
@@ -522,8 +577,8 @@ limitations under the License.
         </configuration>
       </plugin>
       <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-	      <groupId>org.apache.maven.plugins</groupId>
           <configuration>
             <source>${source-jdk}</source>
             <target>${source-jdk}</target>
@@ -543,16 +598,11 @@ limitations under the License.
       <plugin>
           <groupId>com.atlassian.maven.plugins</groupId>
           <artifactId>maven-clover2-plugin</artifactId>
-          <version>2.3.1</version>
           <configuration>
               <licenseLocation>${env.clover.licenseLocation}</licenseLocation>
               <generatePdf>false</generatePdf>
 			  <generateXml>true</generateXml>
               <generateHtml>true</generateHtml>
-              <!--
-              <flushPolicy>interval</flushPolicy>
-			  <flushInterval>10000</flushInterval>
-			  -->
               <generateHistorical>false</generateHistorical>
               <!-- saving history is problematic since each module would override
               the previous unless a different folder is used for the root
@@ -560,12 +610,15 @@ limitations under the License.
               -->
               <jdk>${source-jdk}</jdk>
               <includesTestSourceRoots>false</includesTestSourceRoots>
+              <skip>${clover.skip}</skip>
 
               <!-- exclusions -->
               <excludes>
                 <!-- integration tests -->
 				<exclude>org/springframework/osgi/iandt/**</exclude>
 				<exclude>org/springframework/osgi/test/parsing/**</exclude>
+				<!-- addressed in 1.2 -->
+				<exclude>org/springframework/osgi/compendium/internal/**</exclude>
               </excludes>
           </configuration>
       </plugin>      
@@ -697,23 +750,33 @@ limitations under the License.
       <properties>
         <clover.enabled>true</clover.enabled>
         <spring.decorate.osgi.import>!com_cenqua_clover*,${spring.osgi.import}</spring.decorate.osgi.import>
+        <clover.argLine>-Xbootclasspath/a:"${settings.localRepository}${file.separator}com${file.separator}cenqua${file.separator}clover${file.separator}clover${file.separator}${clover.ver}${file.separator}clover-${clover.ver}.jar"
+        </clover.argLine>
       </properties>
 	
 	  <dependencies>
 	    <dependency>
  		  <groupId>com.cenqua.clover</groupId>
 		  <artifactId>clover</artifactId>
-		  <version>2.3.1</version>
+		  <version>${clover.ver}</version>
 		  <type>jar</type>
 		  <scope>provided</scope>
         </dependency>
 	  </dependencies>
-<!--	  
+	  <!-- 
+	    disabled for now since we don't want them to be deployed
+	    by the nightly build. Version 2.4 of the deploy plugin
+	    has a skip flag but it hasn't been released yet.
+	    
+	    To have both coverage and run the tests, the CI
+	    needs to run two different maven process (as a script).
+
       <modules>
       	<module>integration-tests/tests</module>
       	<module>integration-tests/tests-tiger</module>
       </modules>
-    -->  
+	  -->      
+	  
     </profile>
   </profiles>
        
@@ -727,9 +790,8 @@ limitations under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
-		<version>2.0</version>
         <configuration>
-          <aggregate>false</aggregate>
+          <aggregate>true</aggregate>
         </configuration>
       </plugin>
       <plugin>
@@ -809,9 +871,6 @@ limitations under the License.
             <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
             <link>http://tomcat.apache.org/tomcat-5.5-doc/catalina/docs/api/</link>
             <link>http://www.mortbay.org/apidocs/</link>
-            <!--
-            <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
-            -->
           </links>
         </configuration>
       </plugin>
@@ -832,8 +891,8 @@ limitations under the License.
 		  <xmlOutput>true</xmlOutput>
 		  <xmlOutputDirectory>target</xmlOutputDirectory>
 		  -->
-		  <threshold>Low</threshold>
-		  <effort>Max</effort>
+		  <threshold>Normal</threshold>
+		  <effort>Default</effort>
 		  <!--
 		  <debug>true</debug>
 		  <relaxed>true</relaxed>
@@ -850,14 +909,9 @@ limitations under the License.
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
       
-      <!-- cobertura  (disabled for now)
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.1</version>
-      </plugin>
-	  -->
-	  <!-- jdepend -->
+      <!-- ============== -->
+      <!--     jDepend    -->
+      <!-- ============== -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jdepend-maven-plugin</artifactId>
@@ -870,7 +924,7 @@ limitations under the License.
 		<site>
 			<id>static.springframework.org</id>
 			<name>SpringFramework.org</name>
-			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-osgi/snapshot-site</url>
+			<url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-osgi/snapshot-site/</url>
 		</site>
 		<repository>
 			<id>spring-milestone</id>
@@ -913,7 +967,6 @@ limitations under the License.
       <url>http://repository.atlassian.com/maven2</url>
     </pluginRepository>    
   </pluginRepositories>
-
 
   <repositories>
     <repository>
