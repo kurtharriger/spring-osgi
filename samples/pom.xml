@@ -16,7 +16,9 @@
     <module>weather</module>
     <module>petclinic</module>
     <module>simple-web-app</module>
+    <!--
     <module>web-console</module>
+    -->
   </modules>
   
   <reporting>

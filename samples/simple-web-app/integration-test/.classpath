@@ -7,7 +7,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/servlet-api.osgi/2.5-SNAPSHOT/servlet-api.osgi-2.5-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.5/spring-core-2.5.5.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.5/spring-context-2.5.5.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.5/spring-context-2.5.5.jar" sourcepath="/M2_REPO/org/springframework/spring-context/2.5.5/spring-context-2.5.5-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-test/2.5.5/spring-test-2.5.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.5/spring-beans-2.5.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/1.2.0-m1-SNAPSHOT/spring-osgi-test-1.2.0-m1-SNAPSHOT.jar"/>
