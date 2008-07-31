@@ -17,6 +17,7 @@
 package org.springframework.osgi.iandt.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -24,8 +25,13 @@ import java.util.Enumeration;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -38,12 +44,26 @@ import org.springframework.util.ObjectUtils;
  */
 public class BundleClassPathWildcardTest extends BaseIoTest {
 
+	private static boolean noRootCPTestBundleInstalled = false;
+
+
 	protected Manifest getManifest() {
 		Manifest mf = super.getManifest();
 		// add bundle classpath
 		mf.getMainAttributes().putValue(Constants.BUNDLE_CLASSPATH,
-			".,bundleclasspath/folder,bundleclasspath/simple.jar,foo");
+			".,bundleclasspath/folder/,bundleclasspath/simple.jar,foo");
 		return mf;
+	}
+
+	protected void preProcessBundleContext(BundleContext platformBundleContext) throws Exception {
+		super.preProcessBundleContext(platformBundleContext);
+		if (!noRootCPTestBundleInstalled) {
+			logger.info("Installing no root cp bundle...");
+			InputStream stream = getClass().getResourceAsStream("/norootcpbundle.jar");
+			Bundle bundle = platformBundleContext.installBundle("norootcpbundle", stream);
+			bundle.start();
+			noRootCPTestBundleInstalled = true;
+		}
 	}
 
 	protected String[] getBundleContentPattern() {
@@ -125,10 +145,91 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 	}
 
 	public void testResourceAvailableOnlyInsideFolderClasspath() throws Exception {
-		Resource[] resources = patternLoader.getResources("classpath*:/org/springframework/osgi/iandt/compliance/io/folder-test.file");
+		Resource[] resources = patternLoader.getResources("classpath*:org/springframework/osgi/iandt/compliance/io/folder-test.file");
 		assertNotNull(resources);
 		assertEquals(1, resources.length);
 		assertTrue(resources[0].exists());
+		System.out.println(ObjectUtils.nullSafeToString((resources)));
 	}
 
+	public void testResourceAvailableWithPatternOnPathsOnlyInsideFolderClasspath() throws Exception {
+		Resource[] resources = patternLoader.getResources("classpath*:org/springframework/osgi/iandt/**/folder-test.file");
+		assertNotNull(resources);
+		assertEquals(1, resources.length);
+		assertTrue(resources[0].exists());
+		System.out.println(ObjectUtils.nullSafeToString((resources)));
+	}
+
+	public void testResourceAvailableWithPatternOnlyInsideFolderClasspath() throws Exception {
+		Resource[] resources = patternLoader.getResources("classpath:org/springframework/osgi/iandt/**/folder-test.file");
+		assertNotNull(resources);
+		assertEquals(1, resources.length);
+		assertTrue(resources[0].exists());
+		System.out.println(ObjectUtils.nullSafeToString((resources)));
+	}
+
+	private ResourcePatternResolver getNoRootCpBundleResourceResolver() {
+		Bundle bnd = OsgiBundleUtils.findBundleBySymbolicName(bundleContext,
+			"org.springframework.bundle.osgi.io.test.no.root.classpath");
+		assertNotNull("noRootClassPath bundle was not found", bnd);
+		return new OsgiBundleResourcePatternResolver(bnd);
+	}
+
+	public void testNoRootCpBundleResourceInRootNotFound() throws Exception {
+		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
+		Resource[] res = resolver.getResources("classpath:root.file");
+		// since there is no pattern matching, the loader will return a non-existing resource
+		assertFalse("resource should not be found since / is not in the classpath", res[0].exists());
+	}
+
+	public void testNoRootCpBundleResourceInRootNotFoundOnAllClasspaths() throws Exception {
+		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
+		Resource[] res = resolver.getResources("classpath*:root.file");
+		assertTrue("resource should not be found since / is not in the classpath", ObjectUtils.isEmpty(res));
+	}
+
+	public void testNoRootCpBundleResourceInClassPathFound() throws Exception {
+		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
+		Resource[] res = resolver.getResources("classpath*:cp.file");
+		assertFalse("resource should be found since it's on the classpath", ObjectUtils.isEmpty(res));
+		assertTrue("resource should be found since it's on the classpath", res[0].exists());
+	}
+
+	public void testNoRootCpBundleResourceNestedInClassPathFound() throws Exception {
+		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
+		Resource[] res = resolver.getResources("classpath*:/some/nested/nested.file");
+		assertFalse("resource should be found since it's on the classpath", ObjectUtils.isEmpty(res));
+		assertTrue("resource should be found since it's on the classpath", res[0].exists());
+	}
+
+	public void testNoRootCpBundleResourceNestedInPkgInClassPathFound() throws Exception {
+		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
+		Resource[] res = resolver.getResources("classpath*:/some/nested/pkg/pkg.file");
+		assertFalse("resource should be found since it's on the classpath", ObjectUtils.isEmpty(res));
+		assertTrue("resource should be found since it's on the classpath", res[0].exists());
+	}
+
+	public void testNoRootCpBundleResourcePatternMatching() throws Exception {
+		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
+		Resource[] res = resolver.getResources("classpath:/**/*.file");
+		assertEquals("incorrect number of resources found", 3, res.length);
+	}
+
+	public void testNoRootCpBundleResourceMultipleRoots() throws Exception {
+		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
+		Resource[] res = resolver.getResources("classpath*:/**/*.file");
+		assertEquals("incorrect number of resources found", 3, res.length);
+	}
+
+	public void testNoRootCpBundleResourcePatternMatchingWithSpecifiedFolder() throws Exception {
+		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
+		Resource[] res = resolver.getResources("classpath:/some/**/*.file");
+		assertEquals("incorrect number of resources found", 2, res.length);
+	}
+
+	public void testNoRootCpBundleResourceMultipleRootsSpecifiedFolder() throws Exception {
+		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
+		Resource[] res = resolver.getResources("classpath*:/some/**/*.file");
+		assertEquals("incorrect number of resources found", 2, res.length);
+	}
 }

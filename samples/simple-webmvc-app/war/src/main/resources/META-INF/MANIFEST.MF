@@ -2,7 +2,7 @@ Web-ContextPath: simple-webmvc-app
 Bundle-ManifestVersion: 2
 Bundle-Name: Simple OSGi War
 Bundle-SymbolicName: org.springframework.osgi.samples.simplewebmvcapp
-Bundle-Classpath: WEB-INF/classes
+Bundle-ClassPath: WEB-INF/classes
 Import-Package: javax.servlet.http;version="2.5.0",
  javax.servlet.jsp;version="2.0.0",
  javax.servlet.jsp.jstl.core;version="1.1.2",
