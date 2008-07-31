@@ -19,7 +19,7 @@
 
   <properties>
     <!-- Spring version -->   
-    <spring.maven.artifact.version>2.5.5</spring.maven.artifact.version>
+    <spring.maven.artifact.version>2.5.6-SNAPSHOT</spring.maven.artifact.version>
     <spring.base.version>2.5.4</spring.base.version>
     
     <!-- Felix BND plugin settings -->
@@ -500,7 +500,7 @@ limitations under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
-          <version>2.0</version>
+          <version>2.0.2</version>
     	</plugin>	    
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

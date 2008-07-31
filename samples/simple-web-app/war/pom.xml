@@ -24,6 +24,19 @@
 		   <directory>src/main/java</directory>
 		 </resource>
     </resources>
+    
+	<plugins>
+	  <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-war-plugin</artifactId>
+		 <configuration>
+		   <warSourceExcludes>WEB-INF/lib/*</warSourceExcludes>
+		   <archive>
+			 <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+		   </archive>
+		 </configuration>
+	  </plugin>
+	</plugins>
   </build>
   
  
