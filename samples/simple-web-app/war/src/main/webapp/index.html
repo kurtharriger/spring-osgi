@@ -43,21 +43,6 @@
       the raw content of resources found inside the bundle. This main usage of this servlet
       is to see, direclty from the web application, the servlet and JSP <a href="#sources">sources</a>.
 
-	  <!--
-      <h4>Tip</h4>
-            
-      The Content Servlet can serve <i>any</i> resource from the OSGi space through Spring-DM
-	  Spring-DM <tt>ResourceLoader</tt>. If no prefix is specified, resources are resolved from
-	  the servlet own bundle. However, by using <tt>classpath:</tt>, <tt>osgibundlejar:</tt> you can get access to the other <i>spaces</i>
-	  defined by OSGi (for more information, see OsgiBundleResourceLoader <a href="http://static.springframework.org/osgi/docs/current/api/org/springframework/osgi/io/OsgiBundleResourceLoader.html">javadoc</a>).
-	  <br/>
-	  
-	  <form action="contentServlet" method="GET">
-	    <input type="
-		<input type="submit" value="Get resource">
-	  </form>
-	  -->
-	  
     </li>
   </ul>
   
@@ -73,8 +58,8 @@
   While the servlets/pages are simplistic, they show the main functionality working inside an OSGi platform.
   
   <h2>Sources</h2><a name="sources"> </a>
-  To view the Servlet and JSP sources directly from the browser, use one of the links above. The content itself
-  is served through a Servlet (the Content Servlet below) that sends to the browser the content of the files 
+  To view the Servlet and JSP sources directly from the browser, use one of the links below. The content itself
+  is served through a Servlet (the Resource Serving below) that sends to the browser the content of the files 
   found in its bundle classpath.
   
   <ul>
