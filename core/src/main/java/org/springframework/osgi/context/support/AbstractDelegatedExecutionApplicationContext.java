@@ -148,11 +148,17 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 				super.refresh();
 				sendRefreshedEvent();
 			}
-			catch (RuntimeException ex) {
-				logger.error("Refresh error", ex);
-				sendFailedEvent(ex);
+			catch (Throwable th) {
+				logger.error("Refresh error", th);
+				sendFailedEvent(th);
 				// propagate exception to the caller
-				throw ex;
+				// rethrow the problem w/o rewrapping
+				if (th instanceof RuntimeException) {
+					throw (RuntimeException) th;
+				}
+				else {
+					throw (Error) th;
+				}
 			}
 		}
 		finally {
@@ -236,11 +242,17 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 				}
 			}
 		}
-		catch (RuntimeException ex) {
-			logger.error("Pre refresh error", ex);
+		catch (Throwable th) {
+			logger.error("Pre refresh error", th);
 			// send failure event
-			sendFailedEvent(ex);
-			throw ex;
+			sendFailedEvent(th);
+			// rethrow the problem w/o rewrapping
+			if (th instanceof RuntimeException) {
+				throw (RuntimeException) th;
+			}
+			else {
+				throw (Error) th;
+			}
 		}
 		finally {
 			thread.setContextClassLoader(oldTCCL);
@@ -291,11 +303,17 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 				}
 			}
 		}
-		catch (RuntimeException ex) {
-			logger.error("Post refresh error", ex);
+		catch (Throwable th) {
+			logger.error("Post refresh error", th);
 			// post notification
-			sendFailedEvent(ex);
-			throw ex;
+			sendFailedEvent(th);
+			// rethrow the problem w/o rewrapping
+			if (th instanceof RuntimeException) {
+				throw (RuntimeException) th;
+			}
+			else {
+				throw (Error) th;
+			}
 		}
 		finally {
 			thread.setContextClassLoader(oldTCCL);

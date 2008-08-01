@@ -500,7 +500,7 @@ limitations under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
-          <version>2.0</version>
+          <version>2.0.2</version>
     	</plugin>	    
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -599,7 +599,7 @@ limitations under the License.
           <groupId>com.atlassian.maven.plugins</groupId>
           <artifactId>maven-clover2-plugin</artifactId>
           <configuration>
-              <licenseLocation>${clover.licenseLocation}</licenseLocation>
+              <licenseLocation>${env.clover.licenseLocation}</licenseLocation>
               <generatePdf>false</generatePdf>
 			  <generateXml>true</generateXml>
               <generateHtml>true</generateHtml>
@@ -892,8 +892,8 @@ limitations under the License.
 		  <xmlOutput>true</xmlOutput>
 		  <xmlOutputDirectory>target</xmlOutputDirectory>
 		  -->
-		  <threshold>Low</threshold>
-		  <effort>Max</effort>
+		  <threshold>Normal</threshold>
+		  <effort>Default</effort>
 		  <!--
 		  <debug>true</debug>
 		  <relaxed>true</relaxed>
