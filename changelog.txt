@@ -5,6 +5,15 @@ http://www.springframework.org/osgi
 Changes in version 1.1.2 (2008-mm-dd)
 -------------------------------------
 
+General
+* improved sample wars packaging
+
+Package org.springframework.osgi.context
+* added reporting of Errors raised during delegated refresh in AbstractDelegatedExecutionApplicationContext
+
+Package org.springframework.osgi.io
+* fixed classpath pattern matching on certain resources when the default Bundle-ClassPath entry (.) is not specified
+
 
 Changes in version 1.1.1 (2008-07-29)
 -------------------------------------

@@ -207,7 +207,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * them individually.
 	 * 
 	 * <p/> Since the bundle space is considered, runtime classpath entries such
-	 * as bundle-classpath entries are not supported (yet).
+	 * as dynamic imports are not supported (yet).
 	 * 
 	 * @param locationPattern
 	 * @param type
@@ -216,7 +216,8 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	private Resource[] findClassPathMatchingResources(String locationPattern, int type) throws IOException {
 
 		if (resolver == null)
-			throw new IllegalArgumentException("an OSGi bundle is required for classpath matching");
+			throw new IllegalArgumentException(
+				"PackageAdmin service/a started bundle is required for classpath matching");
 
 		ImportedBundle[] importedBundles = resolver.getImportedBundles(bundle);
 
@@ -257,6 +258,10 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				if (url != null)
 					resources.add(new UrlResource(url));
 			}
+		}
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("Fitered " + foundPaths + " to " + resources);
 		}
 
 		return (Resource[]) resources.toArray(new Resource[resources.size()]);
@@ -369,12 +374,13 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 					logger.trace("Classpath entry [" + entry + "] resolves to [" + url + "]");
 				// we've got a valid entry so let's parse it
 				if (url != null) {
+					String cpEntryPath = url.getPath();
 					// is it a jar ?
 					if (entry.endsWith(JAR_EXTENSION))
 						findBundleClassPathMatchingJarEntries(list, url, pattern);
-					// then it must be a folder
+					// no, so it must be a folder
 					else
-						findBundleClassPathMatchingFolders(list, bundle, entry, pattern);
+						findBundleClassPathMatchingFolders(list, bundle, cpEntryPath, pattern);
 				}
 			}
 		}
@@ -420,6 +426,9 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			}
 		}
 
+		if (logger.isTraceEnabled())
+			logger.trace("Found in nested jar [" + url + "] matching entries " + result);
+
 		list.addAll(result);
 	}
 
@@ -429,44 +438,60 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * 
 	 * @param list
 	 * @param bundle
-	 * @param entry
+	 * @param cpEntryPath
 	 * @param pattern
 	 * @throws IOException
 	 */
-	private void findBundleClassPathMatchingFolders(List list, Bundle bundle, String entry, String pattern)
+	private void findBundleClassPathMatchingFolders(List list, Bundle bundle, String cpEntryPath, String pattern)
 			throws IOException {
 		// append path to the pattern and do a normal search
 		// folder/<pattern> starts being applied
 
 		String bundlePathPattern;
 
-		boolean entryWithFolderSlash = entry.endsWith(FOLDER_SEPARATOR);
+		boolean entryWithFolderSlash = cpEntryPath.endsWith(FOLDER_SEPARATOR);
 		boolean patternWithFolderSlash = pattern.startsWith(FOLDER_SEPARATOR);
-		// avoid double slashes
+		// concatenate entry + pattern w/o double slashes
 		if (entryWithFolderSlash) {
 			if (patternWithFolderSlash)
-				bundlePathPattern = entry + pattern.substring(1, pattern.length());
+				bundlePathPattern = cpEntryPath + pattern.substring(1, pattern.length());
 			else
-				bundlePathPattern = entry + pattern;
+				bundlePathPattern = cpEntryPath + pattern;
 		}
 		else {
 			if (patternWithFolderSlash)
-				bundlePathPattern = entry + pattern;
+				bundlePathPattern = cpEntryPath + pattern;
 			else
-				bundlePathPattern = entry + FOLDER_SEPARATOR + pattern;
+				bundlePathPattern = cpEntryPath + FOLDER_SEPARATOR + pattern;
 		}
 
+		// search the bundle space for the detected resource
 		OsgiBundleResourcePatternResolver localResolver = new OsgiBundleResourcePatternResolver(bundle);
 		Resource[] resources = localResolver.getResources(bundlePathPattern);
 
-		// skip when dealing with non-existing resources
-		if (resources.length == 1 && !resources[0].exists()) {
-			return;
-		}
-		else {
-			for (int i = 0; i < resources.length; i++) {
-				list.add(resources[i].getURL().getPath());
+		boolean trace = logger.isTraceEnabled();
+		List foundResources = (trace ? new ArrayList(resources.length) : null);
+
+		try {
+			// skip when dealing with non-existing resources
+			if (resources.length == 1 && !resources[0].exists()) {
+				return;
 			}
+			else {
+				int cutStartingIndex = cpEntryPath.length();
+				// add the resource stripping the cp
+				for (int i = 0; i < resources.length; i++) {
+					String path = resources[i].getURL().getPath().substring(cutStartingIndex);
+					list.add(path);
+					if (trace)
+						foundResources.add(path);
+				}
+			}
+		}
+		finally {
+			if (trace)
+				logger.trace("Searching for [" + bundlePathPattern + "] revealed resources (relative to the cp entry ["
+						+ cpEntryPath + "]): " + foundResources);
 		}
 	}
 
