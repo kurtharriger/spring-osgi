@@ -19,14 +19,17 @@ package org.springframework.osgi.samples.console.web;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.osgi.samples.console.service.BundleListingOptions;
+
 /**
  * @author Costin Leau
  * 
  */
-public class CommandObject {
+public class SelectionCommand {
 
 	private Map bag = new LinkedHashMap();
-	private Long selectedBundleId;
+	private Long bundleId;
+	private BundleListingOptions displayChoice = BundleListingOptions.NAME;
 
 
 	public Map getBag() {
@@ -37,12 +40,25 @@ public class CommandObject {
 		this.bag = bag;
 	}
 
-	public Long getSelectedBundleId() {
-		return selectedBundleId;
+	public Long getBundleId() {
+		return bundleId;
 	}
 
-	public void setSelectedBundleId(Long bundleId) {
-		this.selectedBundleId = bundleId;
+	public void setBundleId(Long bundleId) {
+		this.bundleId = bundleId;
 	}
 
+	public BundleListingOptions getDisplayChoice() {
+		return displayChoice;
+	}
+
+	public void setDisplayChoice(BundleListingOptions selectedDisplayOption) {
+		this.displayChoice = selectedDisplayOption;
+	}
+
+	@Override
+	public String toString() {
+		return "[bundleId=" + bundleId + "|displayChoice=" + displayChoice.toString()
+				+ "]";
+	}
 }

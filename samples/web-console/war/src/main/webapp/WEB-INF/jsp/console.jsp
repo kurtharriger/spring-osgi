@@ -25,16 +25,15 @@
 	      <tr>
 		      <td>Available bundles:</td>
 		      <td>
-		      <form:select path="selectedBundleId" items="${bundles}"/>
+		      <form:select path="bundleId" items="${bundles}"/>
 		      </td>
 		      </tr>
 			  <tr>
 		      <td>Display bundles as:</td>
-		      <td><form:select path="bag[displayOption]" items="${displayOptions}"/></td>
+		      <td><form:select path="displayChoice" items="${displayOptions}"/></td>
 		  	  </tr>
 		  	  <tr>
 	          <td colspan="2">
-	          	  <input type="hidden" name="bundleId" value="${bundleId}"/>
     			  <p class="submit"><input align="center" type="submit" value="Select Bundle"/></p>
               </td>
           </tr>
