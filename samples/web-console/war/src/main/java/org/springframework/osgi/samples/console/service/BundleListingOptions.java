@@ -16,17 +16,61 @@
 
 package org.springframework.osgi.samples.console.service;
 
+import java.util.EnumMap;
+import java.util.Map;
+
+import org.osgi.framework.Bundle;
+import org.springframework.osgi.util.OsgiStringUtils;
+
 /**
  * Enumeration describing the bundle listing options.
  * 
  * @author Costin Leau
  */
 public enum BundleListingOptions {
-	ID, NAME, SYMBOLIC_NAME;
+	ID {
 
-	@Override
-	public String toString() {
-		return super.toString().toLowerCase().replace('_', ' ');
+		@Override
+		public String display(Bundle bundle) {
+			return (bundle == null ? "null" : String.valueOf(bundle.getBundleId()));
+		}
+	},
+	NAME {
+
+		@Override
+		public String display(Bundle bundle) {
+			return OsgiStringUtils.nullSafeName(bundle);
+		}
+
+	},
+	SYMBOLIC_NAME {
+
+		@Override
+		public String display(Bundle bundle) {
+			return OsgiStringUtils.nullSafeSymbolicName(bundle);
+		}
+
+	};
+
+	// Initialize the phase transition map
+	private static final Map<BundleListingOptions, String> toStringMap = new EnumMap<BundleListingOptions, String>(
+		BundleListingOptions.class);
+
+	static {
+		// create to String map
+		for (BundleListingOptions option : BundleListingOptions.values())
+			toStringMap.put(option, option.toString().toLowerCase().replace('_', ' '));
 	}
 
+
+	/**
+	 * Returns a map of enum<->toString association.
+	 * 
+	 * @return
+	 */
+	public static Map<BundleListingOptions, String> toStringMap() {
+		return toStringMap;
+	}
+
+	public abstract String display(Bundle bundle);
 }

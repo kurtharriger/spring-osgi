@@ -32,8 +32,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 /**
  * OSGi console controller. The application main entry point, this class handles
@@ -42,11 +40,11 @@ import org.springframework.web.bind.annotation.SessionAttributes;
  * @author Costin Leau
  */
 @Controller
-@SessionAttributes("console")
 public class ConsoleController {
 
 	private final OsgiConsole console;
 	private Bundle bundle;
+	private BundleListingOptions displayChoice = BundleListingOptions.NAME;
 
 
 	@Autowired
@@ -56,18 +54,20 @@ public class ConsoleController {
 
 	/**
 	 * Custom handler for the welcome view.
-	 * <p>
-	 * Note that this handler relies on the RequestToViewNameTranslator to
-	 * determine the logical view name based on the request URL: "/console.do"
-	 * -&gt; "console".
 	 */
 	@RequestMapping("/console.do")
-	public void consoleHandler(@RequestParam(required = false, value = "bundleId")
-	Long bundleId, Model model) {
-		System.out.println("received model " + model.asMap());
-		bundleId = (bundleId == null ? console.getDefaultBundleId() : bundleId);
-		bundle = console.getBundle(bundleId);
-		model.addAttribute("bundleId", bundleId);
+	public void consoleHandler(@ModelAttribute("selection")
+	SelectionCommand selectionCommand, Model model) {
+		System.out.println("model selected diplay choice " + selectionCommand.getDisplayChoice());
+		// apply default for selected bundle (if needed)
+		if (selectionCommand.getBundleId() == null) {
+			selectionCommand.setBundleId(console.getDefaultBundleId());
+		}
+		displayChoice = selectionCommand.getDisplayChoice();
+		bundle = console.getBundle(selectionCommand.getBundleId());
+		
+		model.addAttribute("bundles", listBundles());
+		model.addAttribute("bundleInfo", createBundleInfo());
 	}
 
 	/**
@@ -77,40 +77,22 @@ public class ConsoleController {
 	 * @param model model associated with the view
 	 * @return "bundles" attribute
 	 */
-	@ModelAttribute("bundles")
-	public Map<Long, String> listBundles(Model model) {
+	public Map<Long, String> listBundles() {
 		Bundle[] bundles = console.listBundles();
 		Map<Long, String> map = new LinkedHashMap<Long, String>(bundles.length);
-		for (int i = 0; i < bundles.length; i++) {
-			Bundle bundle = bundles[i];
-			map.put(new Long(bundle.getBundleId()), OsgiStringUtils.nullSafeName(bundle));
+		for (Bundle bundle : bundles) {
+			map.put(bundle.getBundleId(), displayChoice.display(bundle));
 		}
-
 		return map;
 	}
 
 	@ModelAttribute("displayOptions")
-	public BundleListingOptions[] listingOptions() {
-		return BundleListingOptions.values();
+	public Map<BundleListingOptions, String> listingOptions() {
+		return BundleListingOptions.toStringMap();
 	}
 
-	@ModelAttribute("selection")
-	public CommandObject commandObject(Model model) {
-		Map<String, Object> map = model.asMap();
-		CommandObject obj = (CommandObject) map.get("selection");
-		if (obj != null) {
-			System.out.println("selection bag is " + obj.getBag());
-		}
-		if (obj == null) {
-			obj = new CommandObject();
-			obj.getBag().put("bundle", "39");
-		}
-		return obj;
-	}
-
-	@ModelAttribute("bundleInfo")
 	public BundleInfo createBundleInfo() {
-		bundle = console.getBundle(39);
+		bundle = console.getBundle(bundle.getBundleId());
 		BundleInfo info = new BundleInfo();
 		addHeaders(info);
 		addWiring(info);
@@ -135,12 +117,10 @@ public class ConsoleController {
 	}
 
 	private void addWiring(BundleInfo info) {
-		bundle = console.getBundle(39);
 		info.addExportedPackages(console.getExportedPackages(bundle));
 		info.addImportedPackages(console.getImportedPackages(bundle));
 	}
 
 	private void addServices(BundleInfo info) {
 	}
-
 }

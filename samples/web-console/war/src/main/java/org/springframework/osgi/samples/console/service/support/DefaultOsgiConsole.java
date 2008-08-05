@@ -54,7 +54,7 @@ public class DefaultOsgiConsole implements OsgiConsole {
 	}
 
 	public Bundle getBundle(long bundleId) {
-		return bundleContext.getBundle(39);
+		return bundleContext.getBundle(bundleId);
 	}
 
 	public String[] getExportedPackages(Bundle bundle) {
