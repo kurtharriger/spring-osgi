@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
+import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceInvoker;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceStaticInterceptor;
 import org.springframework.osgi.service.util.internal.aop.ServiceTCCLInterceptor;
@@ -52,14 +52,14 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 	 * Constructs a new <code>StaticServiceProxyCreator</code> instance.
 	 * 
 	 * @param classes
-	 * @param classLoader
+	 * @param aopClassLoader
 	 * @param bundleContext
 	 * @param iccl
 	 * @param greedyProxying
 	 */
-	StaticServiceProxyCreator(Class[] classes, ClassLoader classLoader, BundleContext bundleContext,
-			ImportContextClassLoader iccl, boolean greedyProxying) {
-		super(classes, classLoader, bundleContext, iccl);
+	StaticServiceProxyCreator(Class[] classes, ClassLoader aopClassLoader, ClassLoader bundleClassLoader,
+			BundleContext bundleContext, ImportContextClassLoader iccl, boolean greedyProxying) {
+		super(classes, aopClassLoader, bundleClassLoader, bundleContext, iccl);
 		this.greedyProxying = greedyProxying;
 
 		boolean onlyInterfaces = true;
@@ -89,7 +89,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 		if (bundle == null)
 			return null;
 
-		return new ServiceTCCLInterceptor(AopClassLoaderFactory.getBundleClassLoaderFor(bundle));
+		return new ServiceTCCLInterceptor(ClassLoaderFactory.getBundleClassLoaderFor(bundle));
 	}
 
 	/**

@@ -17,18 +17,26 @@
 package org.springframework.osgi.context.internal.classloader;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.util.Assert;
 
 /**
  * Chaining class loader implementation that delegates the resource and class
  * loading to a number of class loaders passed in.
  * 
+ * <p/> Additionally, the class space of this class loader can be extended at
+ * runtime (by allowing more classloaders to be added).
+ * 
  * @author Costin Leau
  */
 public class ChainedClassLoader extends ClassLoader {
 
-	private final ClassLoader[] loaders;
+	private final List loaders = new ArrayList();
+	/** index at which new classloader are added to */
+	private int index = 0;
 
 
 	public ChainedClassLoader(ClassLoader[] loaders) {
@@ -36,33 +44,67 @@ public class ChainedClassLoader extends ClassLoader {
 		for (int i = 0; i < loaders.length; i++) {
 			ClassLoader classLoader = loaders[i];
 			Assert.notNull(classLoader, "null classloaders not allowed");
+			this.loaders.add(classLoader);
 		}
-		this.loaders = (ClassLoader[]) loaders.clone();
 	}
 
 	public URL getResource(String name) {
 		URL url = null;
-		for (int i = 0; i < loaders.length; i++) {
-			ClassLoader loader = loaders[i];
-			url = loader.getResource(name);
-			if (url != null)
-				return url;
+		synchronized (loaders) {
+			for (int i = 0; i < loaders.size(); i++) {
+				ClassLoader loader = (ClassLoader) loaders.get(i);
+				url = loader.getResource(name);
+				if (url != null)
+					return url;
+			}
 		}
 		return url;
 	}
 
 	public Class loadClass(String name) throws ClassNotFoundException {
 		Class clazz = null;
-		for (int i = 0; i < loaders.length; i++) {
-			ClassLoader loader = loaders[i];
-			try {
-				clazz = loader.loadClass(name);
-				return clazz;
+		synchronized (loaders) {
+			for (int i = 0; i < loaders.size(); i++) {
+				ClassLoader loader = (ClassLoader) loaders.get(i);
+				try {
+					clazz = loader.loadClass(name);
+					return clazz;
+				}
+				catch (ClassNotFoundException e) {
+					// keep moving through the class loaders
+				}
 			}
-			catch (ClassNotFoundException e) {
-				// keep moving through the class loaders
+			throw new ClassNotFoundException(name);
+		}
+	}
+
+	/**
+	 * Adds the classloader defining the given class.
+	 * 
+	 * @param clazz
+	 */
+	public void addClassLoader(Class clazz) {
+		addClassLoader(ClassUtils.getClassLoader(clazz));
+	}
+
+	/**
+	 * Adds the given classloader to the existing list. Note that since this
+	 * classloader is used internally for AOP purposes, the classloader will
+	 * always be added to
+	 * 
+	 * @param classLoader
+	 */
+	public void addClassLoader(ClassLoader classLoader) {
+		synchronized (loaders) {
+			if (!loaders.contains(classLoader)) {
+				// special case - add the system classloader last since otherwise you can run into CCE problems 
+				if (ClassLoader.getSystemClassLoader().equals(classLoader)) {
+					loaders.add(classLoader);
+				}
+				else {
+					loaders.add(++index, classLoader);
+				}
 			}
 		}
-		throw new ClassNotFoundException(name);
 	}
 }

@@ -21,10 +21,10 @@ import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.util.Assert;
 
 /**
- * Simple factory for generating AOP-suitable class loaders used internally by
- * Spring-DM for generating proxies. The factory acts as a generic facade for
- * framework components hiding the implementation details (or the changes in
- * strategy).
+ * Simple factory for generating Bundle/AOP-suitable class loaders used
+ * internally by Spring-DM for generating proxies. The factory acts as a generic
+ * facade for framework components hiding the implementation details (or the
+ * changes in strategy).
  * 
  * <p/> Internally the factory will try to use a cache to avoid creating
  * unneeded class loader (even if lightweight) to avoid polluting the JDK/CGLIB
@@ -32,10 +32,10 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public abstract class AopClassLoaderFactory {
+public abstract class ClassLoaderFactory {
 
 	/** plug-able, private, class loader factory */
-	private static InternalAopClassLoaderFactory classLoaderFactory = new CachingAopClassLoaderFactory();
+	private static InternalAopClassLoaderFactory aopClassLoaderFactory = new CachingAopClassLoaderFactory();
 	/** plug-able, private, bundle loader factory */
 	private static BundleClassLoaderFactory bundleClassLoaderFactory = new CachingBundleClassLoaderFactory();
 
@@ -47,24 +47,24 @@ public abstract class AopClassLoaderFactory {
 	 * @param classLoader base class loader
 	 * @return AOP class loader created using the given argument
 	 */
-	public static ClassLoader getAopClassLoaderFor(ClassLoader classLoader) {
+	public static ChainedClassLoader getAopClassLoaderFor(ClassLoader classLoader) {
 		Assert.notNull(classLoader);
-		return classLoaderFactory.createClassLoader(classLoader);
+		return aopClassLoaderFactory.createClassLoader(classLoader);
 	}
 
 	/**
-	 * Returns the standard, extended AOP class loader for the given class
-	 * loader.
+	 * Returns the wrapped class loader for the given bundle.
 	 * 
 	 * <p/> This method is similar to {@link #getAopClassLoaderFor(ClassLoader)}
-	 * but considers the {@link BundleDelegatingClassLoader} identity semantics.
-	 * Namely, the implementation will check if there is a wrapping class loader
-	 * associated with the given bundle and return its associated class loader.
+	 * but considers the {@link BundleDelegatingClassLoader} associated with a
+	 * bundle. Namely, the implementation will check if there is a wrapping
+	 * class loader associated with the given bundle, creating one if none if
+	 * found.
 	 * 
-	 * <p/> Useful when creating importers/exporters programmatically
+	 * <p/> Useful when creating importers/exporters programmatically.
 	 * 
 	 * @param bundle OSGi bundle
-	 * @return AOP class loader created using the given argument
+	 * @return associated wrapping class loader
 	 */
 	public static ClassLoader getBundleClassLoaderFor(Bundle bundle) {
 		Assert.notNull(bundle);

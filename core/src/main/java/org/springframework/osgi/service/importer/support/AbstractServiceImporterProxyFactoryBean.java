@@ -19,7 +19,8 @@ package org.springframework.osgi.service.importer.support;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.SmartFactoryBean;
-import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
+import org.springframework.osgi.context.internal.classloader.ChainedClassLoader;
+import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
 
 /**
  * Package protected class that provides the common aop infrastructure
@@ -41,11 +42,18 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	private Object proxy;
 
 	/** aop classloader */
-	private ClassLoader aopClassLoader;
+	private ChainedClassLoader aopClassLoader;
 
 
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
+
+		Class[] intfs = getInterfaces();
+
+		for (int i = 0; i < intfs.length; i++) {
+			Class intf = intfs[i];
+			aopClassLoader.addClassLoader(intf);
+		}
 		initialized = true;
 	}
 
@@ -147,6 +155,6 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	 */
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		super.setBeanClassLoader(classLoader);
-		this.aopClassLoader = AopClassLoaderFactory.getAopClassLoaderFor(classLoader);
+		this.aopClassLoader = ClassLoaderFactory.getAopClassLoaderFor(classLoader);
 	}
 }
