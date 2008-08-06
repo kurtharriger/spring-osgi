@@ -65,17 +65,17 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 	private final ImportContextClassLoader iccl;
 
 
-	AbstractServiceProxyCreator(Class[] classes, ClassLoader classLoader, BundleContext bundleContext,
-			ImportContextClassLoader iccl) {
+	AbstractServiceProxyCreator(Class[] classes, ClassLoader aopClassLoader, ClassLoader bundleClassLoader,
+			BundleContext bundleContext, ImportContextClassLoader iccl) {
 		Assert.notNull(bundleContext);
-		Assert.notNull(classLoader);
+		Assert.notNull(aopClassLoader);
 
 		this.classes = classes;
 		this.bundleContext = bundleContext;
-		this.classLoader = classLoader;
+		this.classLoader = aopClassLoader;
 		this.iccl = iccl;
 
-		clientTCCLAdvice = new ServiceTCCLInterceptor(classLoader);
+		clientTCCLAdvice = new ServiceTCCLInterceptor(bundleClassLoader);
 		invokerBundleContextAdvice = new LocalBundleContextAdvice(bundleContext);
 	}
 
