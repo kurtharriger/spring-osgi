@@ -16,7 +16,9 @@
 
 package org.springframework.osgi.samples.console.service.support;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,10 +26,14 @@ import java.util.TreeSet;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.ExportedPackage;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 import org.springframework.osgi.samples.console.service.OsgiConsole;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -88,7 +94,7 @@ public class DefaultOsgiConsole implements OsgiConsole {
 						if (importingBundles != null)
 							for (int k = 0; k < importingBundles.length; k++) {
 								if (bundle.equals(importingBundles[k])) {
-									importedPackages.add(exportedPackage.getName() + " version="
+									importedPackages.add(exportedPackage.getName() + ";version="
 											+ exportedPackage.getVersion());
 								}
 							}
@@ -99,4 +105,29 @@ public class DefaultOsgiConsole implements OsgiConsole {
 		return (String[]) importedPackages.toArray(new String[importedPackages.size()]);
 	}
 
+	public ServiceReference[] getRegisteredServices(Bundle bundle) {
+		ServiceReference[] services = bundle.getRegisteredServices();
+		return (services == null ? new ServiceReference[0] : services);
+	}
+
+	public ServiceReference[] getServicesInUse(Bundle bundle) {
+		ServiceReference[] services = bundle.getServicesInUse();
+		return (services == null ? new ServiceReference[0] : services);
+	}
+
+	public Collection<String> search(Bundle bundle, String pattern) {
+		OsgiBundleResourcePatternResolver patternResolver = new OsgiBundleResourcePatternResolver(bundle);
+		Collection<String> result = new ArrayList<String>();
+		try {
+			for (Resource resource : patternResolver.getResources(pattern)) {
+				result.add(resource.getURI().toString());
+			}
+		}
+		catch (IOException ex) {
+			throw new IllegalArgumentException("Cannot perform search using pattern [" + pattern + "] on bundle "
+					+ OsgiStringUtils.nullSafeNameAndSymName(bundle), ex);
+		}
+
+		return result;
+	}
 }

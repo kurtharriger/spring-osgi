@@ -18,11 +18,23 @@ package org.springframework.osgi.samples.console.web;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.samples.console.service.BundleDisplayOption;
+import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Simple POJO used for passing information to the view.
@@ -31,48 +43,72 @@ import org.springframework.util.CollectionUtils;
  */
 public class BundleInfo {
 
-	static class OsgiService {
+	public static class OsgiService {
 
-		private Collection<String> usingBundles = new ArrayList<String>();
-		private Map<String, Object> properties = new LinkedHashMap<String, Object>();
-		private String bundle;
+		private final Collection<String> usingBundles;
+		private final Map<String, Object> properties;
+		private final String bundle;
 
+
+		public OsgiService(ServiceReference reference, BundleDisplayOption displayOption) {
+			Hashtable<String, Object> props = new Hashtable<String, Object>();
+			for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) OsgiServiceReferenceUtils.getServicePropertiesSnapshotAsMap(
+				reference).entrySet()) {
+				props.put(entry.getKey(), ObjectUtils.nullSafeToString(entry.getValue()));
+			}
+			properties = Collections.unmodifiableMap(props);
+
+			bundle = displayOption.display(reference.getBundle());
+			Collection<String> usingBundlesString = new ArrayList<String>();
+			Bundle[] usingBndls = reference.getUsingBundles();
+			if (usingBndls != null)
+				for (Bundle usingBundle : usingBndls) {
+					usingBundlesString.add(displayOption.display(usingBundle));
+				}
+			usingBundles = Collections.unmodifiableCollection(usingBundlesString);
+		}
 
 		public Collection<String> getUsingBundles() {
 			return usingBundles;
-		}
-
-		public void addUsingBundles(String usingBundle) {
-			this.usingBundles.add(usingBundle);
 		}
 
 		public Map<String, Object> getProperties() {
 			return properties;
 		}
 
-		public void addProperty(String key, Object value) {
-			this.properties.put(key, value);
-		}
-
 		public String getBundle() {
 			return bundle;
-		}
-
-		public void setBundle(String bundle) {
-			this.bundle = bundle;
 		}
 	}
 
 
-	private Map<String, Object> properties = new LinkedHashMap<String, Object>();
-	private String location;
-	private String state;
-	private Date lastModified;
-	private Collection<String> exportedPackages = new ArrayList<String>();
-	private Collection<String> importedPackages = new ArrayList<String>();
-	private Collection<OsgiService> registeredServices = new ArrayList<OsgiService>();
-	private Collection<OsgiService> servicesInUse = new ArrayList<OsgiService>();
+	private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+	private final String state;
+	private final Date lastModified;
+	private final Collection<String> exportedPackages = new ArrayList<String>();
+	private final Collection<String> importedPackages = new ArrayList<String>();
+	private final Collection<OsgiService> registeredServices = new ArrayList<OsgiService>();
+	private final Collection<OsgiService> servicesInUse = new ArrayList<OsgiService>();
+	private final Bundle bundle;
 
+
+	public BundleInfo(Bundle bundle) {
+		this.bundle = bundle;
+		// initialize properties
+		Dictionary headers = bundle.getHeaders();
+		addKeyValueForHeader(Constants.BUNDLE_ACTIVATOR, headers);
+		addKeyValueForHeader(Constants.BUNDLE_CLASSPATH, headers);
+		addKeyValueForHeader(Constants.BUNDLE_NAME, headers);
+		addKeyValueForHeader(Constants.BUNDLE_SYMBOLICNAME, headers);
+		properties.put(Constants.BUNDLE_VERSION, OsgiBundleUtils.getBundleVersion(bundle));
+		this.state = OsgiStringUtils.bundleStateAsString(bundle);
+		this.lastModified = new Date(bundle.getLastModified());
+
+	}
+
+	private void addKeyValueForHeader(String headerName, Dictionary headers) {
+		properties.put(headerName, headers.get(headerName));
+	}
 
 	public Map<String, Object> getProperties() {
 		return properties;
@@ -82,28 +118,20 @@ public class BundleInfo {
 		properties.put(name, (value == null ? "" : value));
 	}
 
-	public String getLocation() {
-		return location;
+	public Bundle getBundle() {
+		return bundle;
 	}
 
-	public void setLocation(String location) {
-		this.location = location;
+	public String getLocation() {
+		return bundle.getLocation();
 	}
 
 	public String getState() {
 		return state;
 	}
 
-	public void setState(String state) {
-		this.state = state;
-	}
-
 	public Date getLastModified() {
 		return lastModified;
-	}
-
-	public void setLastModified(Date lastModified) {
-		this.lastModified = lastModified;
 	}
 
 	public Collection<String> getExportedPackages() {
@@ -137,4 +165,5 @@ public class BundleInfo {
 	public void addServiceInUse(OsgiService serviceInUse) {
 		this.servicesInUse.add(serviceInUse);
 	}
+
 }

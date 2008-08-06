@@ -27,7 +27,7 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * 
  * @author Costin Leau
  */
-public enum BundleListingOptions {
+public enum BundleDisplayOption {
 	ID {
 
 		@Override
@@ -41,7 +41,6 @@ public enum BundleListingOptions {
 		public String display(Bundle bundle) {
 			return OsgiStringUtils.nullSafeName(bundle);
 		}
-
 	},
 	SYMBOLIC_NAME {
 
@@ -49,17 +48,16 @@ public enum BundleListingOptions {
 		public String display(Bundle bundle) {
 			return OsgiStringUtils.nullSafeSymbolicName(bundle);
 		}
-
 	};
 
-	// Initialize the phase transition map
-	private static final Map<BundleListingOptions, String> toStringMap = new EnumMap<BundleListingOptions, String>(
-		BundleListingOptions.class);
+	// Initialize the options map
+	private static final Map<BundleDisplayOption, String> optionsMap = new EnumMap<BundleDisplayOption, String>(
+		BundleDisplayOption.class);
 
 	static {
-		// create to String map
-		for (BundleListingOptions option : BundleListingOptions.values())
-			toStringMap.put(option, option.toString().toLowerCase().replace('_', ' '));
+		// create toString map
+		for (BundleDisplayOption option : BundleDisplayOption.values())
+			optionsMap.put(option, option.toString().toLowerCase().replace('_', ' '));
 	}
 
 
@@ -68,8 +66,8 @@ public enum BundleListingOptions {
 	 * 
 	 * @return
 	 */
-	public static Map<BundleListingOptions, String> toStringMap() {
-		return toStringMap;
+	public static Map<BundleDisplayOption, String> optionsMap() {
+		return optionsMap;
 	}
 
 	public abstract String display(Bundle bundle);

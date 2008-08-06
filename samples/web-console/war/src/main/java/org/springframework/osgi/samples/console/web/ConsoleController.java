@@ -16,20 +16,19 @@
 
 package org.springframework.osgi.samples.console.web;
 
-import java.util.Date;
-import java.util.Dictionary;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.osgi.samples.console.service.BundleListingOptions;
+import org.springframework.osgi.samples.console.service.BundleDisplayOption;
 import org.springframework.osgi.samples.console.service.OsgiConsole;
-import org.springframework.osgi.util.OsgiBundleUtils;
-import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -43,8 +42,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ConsoleController {
 
 	private final OsgiConsole console;
-	private Bundle bundle;
-	private BundleListingOptions displayChoice = BundleListingOptions.NAME;
 
 
 	@Autowired
@@ -58,16 +55,18 @@ public class ConsoleController {
 	@RequestMapping("/console.do")
 	public void consoleHandler(@ModelAttribute("selection")
 	SelectionCommand selectionCommand, Model model) {
-		System.out.println("model selected diplay choice " + selectionCommand.getDisplayChoice());
 		// apply default for selected bundle (if needed)
 		if (selectionCommand.getBundleId() == null) {
 			selectionCommand.setBundleId(console.getDefaultBundleId());
 		}
-		displayChoice = selectionCommand.getDisplayChoice();
-		bundle = console.getBundle(selectionCommand.getBundleId());
-		
-		model.addAttribute("bundles", listBundles());
-		model.addAttribute("bundleInfo", createBundleInfo());
+
+		BundleDisplayOption displayChoice = selectionCommand.getDisplayChoice();
+		Bundle bundle = console.getBundle(selectionCommand.getBundleId());
+		SearchSpace searchChoice = SearchSpace.BUNDLE;
+
+		model.addAttribute("bundles", listBundles(displayChoice));
+		model.addAttribute("bundleInfo", createBundleInfo(bundle, displayChoice));
+		model.addAttribute("searchResult", search(bundle, searchChoice, "**/*"));
 	}
 
 	/**
@@ -77,7 +76,7 @@ public class ConsoleController {
 	 * @param model model associated with the view
 	 * @return "bundles" attribute
 	 */
-	public Map<Long, String> listBundles() {
+	public Map<Long, String> listBundles(BundleDisplayOption displayChoice) {
 		Bundle[] bundles = console.listBundles();
 		Map<Long, String> map = new LinkedHashMap<Long, String>(bundles.length);
 		for (Bundle bundle : bundles) {
@@ -87,40 +86,38 @@ public class ConsoleController {
 	}
 
 	@ModelAttribute("displayOptions")
-	public Map<BundleListingOptions, String> listingOptions() {
-		return BundleListingOptions.toStringMap();
+	public Map<BundleDisplayOption, String> listingOptions() {
+		return BundleDisplayOption.optionsMap();
 	}
 
-	public BundleInfo createBundleInfo() {
-		bundle = console.getBundle(bundle.getBundleId());
-		BundleInfo info = new BundleInfo();
-		addHeaders(info);
+	public BundleInfo createBundleInfo(Bundle bundle, BundleDisplayOption displayChoice) {
+		BundleInfo info = new BundleInfo(bundle);
 		addWiring(info);
-		addServices(info);
+		addServices(info, displayChoice);
 		return info;
 	}
 
-	private void addHeaders(BundleInfo info) {
-		Dictionary headers = bundle.getHeaders();
-		addKeyValueForHeader(Constants.BUNDLE_ACTIVATOR, info, headers);
-		addKeyValueForHeader(Constants.BUNDLE_CLASSPATH, info, headers);
-		addKeyValueForHeader(Constants.BUNDLE_NAME, info, headers);
-		addKeyValueForHeader(Constants.BUNDLE_SYMBOLICNAME, info, headers);
-		info.addProperty(Constants.BUNDLE_VERSION, OsgiBundleUtils.getBundleVersion(bundle));
-		info.setLocation(bundle.getLocation());
-		info.setState(OsgiStringUtils.bundleStateAsString(bundle));
-		info.setLastModified(new Date(bundle.getLastModified()));
-	}
-
-	private void addKeyValueForHeader(String headerName, BundleInfo info, Dictionary headers) {
-		info.addProperty(headerName, headers.get(headerName));
-	}
-
 	private void addWiring(BundleInfo info) {
-		info.addExportedPackages(console.getExportedPackages(bundle));
-		info.addImportedPackages(console.getImportedPackages(bundle));
+		info.addExportedPackages(console.getExportedPackages(info.getBundle()));
+		info.addImportedPackages(console.getImportedPackages(info.getBundle()));
 	}
 
-	private void addServices(BundleInfo info) {
+	private void addServices(BundleInfo info, BundleDisplayOption displayChoice) {
+		for (ServiceReference registeredReference : console.getRegisteredServices(info.getBundle())) {
+			info.addRegisteredServices(new BundleInfo.OsgiService(registeredReference, displayChoice));
+		}
+
+		for (ServiceReference importedRef : console.getServicesInUse(info.getBundle())) {
+			info.addServiceInUse(new BundleInfo.OsgiService(importedRef, displayChoice));
+		}
+	}
+
+	private Collection<String> search(Bundle bundle, SearchSpace searchChoice, String userPattern) {
+		if (!StringUtils.hasText(userPattern)) {
+			return Collections.emptyList();
+		}
+
+		// strip any prefix specified by the user
+		return console.search(bundle, searchChoice.resourcePrefix() + userPattern);
 	}
 }

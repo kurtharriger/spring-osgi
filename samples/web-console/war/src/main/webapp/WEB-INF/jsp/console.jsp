@@ -60,9 +60,12 @@
 	    <td><c:out value="${prop.value}"/></td>
 	  </tr>
 	</c:forEach>
-	<tr><td>State</td><td>${bundleInfo.state}</td></tr>
-	<tr><td>LastModified</td><td><fmt:formatDate value="${bundleInfo.lastModified}" pattern="HH:mm:ss z 'on' yyyy.MM.dd"/></td></tr>
-	<tr><td>Location</td><td>${bundleInfo.location}</td></tr>
+  </table>
+  <h4>Status</h4>
+  <table>
+	<tr><th>State</th><td>${bundleInfo.state}</td></tr>
+	<tr><th>LastModified</th><td><fmt:formatDate value="${bundleInfo.lastModified}" pattern="HH:mm:ss z 'on' yyyy.MM.dd"/></td></tr>
+	<tr><th>Location</th><td>${bundleInfo.location}</td></tr>
   </table>
   
   <p/>
@@ -99,10 +102,10 @@
   	<tr>
   	  <td>
  	  <c:forEach var="prop" items="${service.properties}">
-	    <c:out value="${prop.key}"/><br/>
+ 	    <i><c:out value="${prop.key}"/></i> : 
 	    <c:out value="${prop.value}"/><br/>
   	  </c:forEach>
-      </td>
+  	  </td>
       <td>
   	  <c:forEach var="bundle" items="${service.usingBundles}">
   	  	<c:out value="${bundle}"/><br/>
@@ -121,7 +124,7 @@
   	<tr>
   	  <td>
  	  <c:forEach var="prop" items="${service.properties}">
-	    <c:out value="${prop.key}"/><br/>
+	    <i><c:out value="${prop.key}"/></i> : 
 	    <c:out value="${prop.value}"/><br/>
   	  </c:forEach>
       </td>
@@ -134,22 +137,25 @@
   
   <h3>Bundle Search</h3>
  
-  <p/>
-  While the servlets/pages are simplistic, they show the main functionality working inside an OSGi platform.
+
+  <c:set var="searchEntries" value="${fn:length(searchResult)}" />
   
-  <h2>Sources</h2><a name="sources"> </a>
-  To view the Servlet and JSP sources directly from the browser, use one of the links below. The content itself
-  is served through a Servlet (the Resource Servlet below) that sends to the browser the content of the files 
-  found in its bundle classpath.
-  
-  <ul>
-	<li><a href="./resourceServlet?resource=/WEB-INF/classes/org/springframework/osgi/samples/simplewebapp/servlet/HelloOsgiWorldServlet.java">Hello World Servlet</a></li>
-	<li><a href="./resourceServlet?resource=/WEB-INF/classes/org/springframework/osgi/samples/simplewebapp/servlet/ResourceServingServlet.java">Resource Serving Servlet</a></li>
-	<li><a href="./resourceServlet?resource=/hello-osgi-world.jsp">bare-bone JSP</a></li>
-	<li><a href="./resourceServlet?resource=/jsp-tag-osgi-world.jsp">tag-based JSP</a></li>
-	<li><a href="./resourceServlet?resource=/WEB-INF/web.xml">Web application <tt>web.xml</tt></a></li>
-	<li><a href="./resourceServlet?resource=">WAR OSGi bundle content</a></li>
-  </ul>
+  <h4>Search Results ( <c:out value="${searchEntries}"/>  
+      <c:choose>
+        <c:when test='${searchEntries == 1}'>
+            entry
+        </c:when>
+        <c:otherwise>
+            entries
+       </c:otherwise>
+    </c:choose>)</h4>
+  <table>
+    <tr><td>
+    <c:forEach var="result" items="${searchResult}">
+  	    <c:out value="${result}"/><br/>
+  	</c:forEach>
+	</td></tr>  	
+  </table>
   
   <h2>Requirements</h2> 
   

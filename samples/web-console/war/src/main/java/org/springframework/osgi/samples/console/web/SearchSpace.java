@@ -14,33 +14,24 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.samples.console.service;
-
-import java.util.Collection;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.samples.console.web.SearchSpace;
+package org.springframework.osgi.samples.console.web;
 
 /**
  * @author Costin Leau
  * 
  */
-public interface OsgiConsole {
+public enum SearchSpace {
 
-	long getDefaultBundleId();
+	BUNDLE("osgibundle:"), JAR("osgibundlejar:"), CLASSPATH("classpath:"), CLASSPATHS("classpath*:");
 
-	Bundle[] listBundles();
+	private final String resourcePrefix;
 
-	Bundle getBundle(long bundleId);
 
-	String[] getExportedPackages(Bundle bundle);
+	private SearchSpace(String resourcePrefix) {
+		this.resourcePrefix = resourcePrefix;
+	}
 
-	String[] getImportedPackages(Bundle bundle);
-
-	ServiceReference[] getRegisteredServices(Bundle bundle);
-
-	ServiceReference[] getServicesInUse(Bundle bundle);
-
-	Collection<String> search(Bundle bundle, String pattern);
+	public String resourcePrefix() {
+		return resourcePrefix;
+	}
 }
