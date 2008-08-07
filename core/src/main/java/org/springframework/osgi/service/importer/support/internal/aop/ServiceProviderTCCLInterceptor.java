@@ -21,7 +21,7 @@ import java.util.Map;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
+import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.util.ObjectUtils;
@@ -90,7 +90,7 @@ public class ServiceProviderTCCLInterceptor implements MethodInterceptor {
 		synchronized (lock) {
 			this.serviceBundle = serviceBundle;
 			if (serviceBundle != null) {
-				serviceClassLoader = AopClassLoaderFactory.getBundleClassLoaderFor(serviceBundle);
+				serviceClassLoader = ClassLoaderFactory.getBundleClassLoaderFor(serviceBundle);
 			}
 			else
 				serviceClassLoader = null;

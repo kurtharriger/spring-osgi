@@ -52,14 +52,14 @@ class CachingAopClassLoaderFactory implements InternalAopClassLoaderFactory {
 		cglibClass = clazz;
 	}
 
-	public ClassLoader createClassLoader(ClassLoader classLoader) {
+	public ChainedClassLoader createClassLoader(ClassLoader classLoader) {
 		// search key (should be fast as the default classloader (BundleDelegatingClassLoader) has identity equality/hashcode)
 		synchronized (cache) {
-			ClassLoader aopClassLoader = null;
+			ChainedClassLoader aopClassLoader = null;
 			WeakReference loaderReference = (WeakReference) cache.get(classLoader);
 
 			if (loaderReference != null) {
-				aopClassLoader = (ClassLoader) loaderReference.get();
+				aopClassLoader = (ChainedClassLoader) loaderReference.get();
 			}
 
 			// no associated class loader found, create one and put it in the cache

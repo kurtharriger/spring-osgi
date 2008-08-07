@@ -66,7 +66,8 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 
 		};
 
-		proxyCreator = new StaticServiceProxyCreator(new Class[] { Cloneable.class }, getClass().getClassLoader(), ctx,
+		ClassLoader cl = getClass().getClassLoader();
+		proxyCreator = new StaticServiceProxyCreator(new Class[] { Cloneable.class }, cl, cl, ctx,
 			ImportContextClassLoader.UNMANAGED, false);
 	}
 

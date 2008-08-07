@@ -33,5 +33,5 @@ interface InternalAopClassLoaderFactory {
 	 * @param classLoader OSGi bundle
 	 * @return AOP class loader for it
 	 */
-	ClassLoader createClassLoader(ClassLoader classLoader);
+	ChainedClassLoader createClassLoader(ClassLoader classLoader);
 }
