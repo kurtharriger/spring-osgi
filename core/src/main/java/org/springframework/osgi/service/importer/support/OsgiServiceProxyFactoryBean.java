@@ -24,11 +24,8 @@ import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
-import org.springframework.beans.factory.FactoryBeanNotInitializedException;
-import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.support.internal.aop.ProxyPlusCallback;
@@ -167,7 +164,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 
 		// create a proxy creator using the existing context
 		ServiceProxyCreator creator = new AbstractServiceProxyCreator(getInterfaces(), getAopClassLoader(),
-			getBundleContext(), getContextClassLoader()) {
+			getBeanClassLoader(), getBundleContext(), getContextClassLoader()) {
 
 			ServiceInvoker createDispatcherInterceptor(ServiceReference reference) {
 				return lookupAdvice;

@@ -28,9 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
-import org.springframework.beans.factory.FactoryBeanNotInitializedException;
-import org.springframework.beans.factory.SmartFactoryBean;
-import org.springframework.osgi.context.internal.classloader.AopClassLoaderFactory;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.support.internal.collection.CollectionProxy;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
@@ -168,8 +165,8 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 
 		// create shared proxy creator ( reused for each new service
 		// joining the collection)
-		proxyCreator = new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBundleContext(),
-			getContextClassLoader(), greedyProxying);
+		proxyCreator = new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBeanClassLoader(),
+			getBundleContext(), getContextClassLoader(), greedyProxying);
 	}
 
 	/**

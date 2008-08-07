@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.tcclManagement;
 
 import java.net.URL;
@@ -41,6 +42,7 @@ public class ClientOnlyTcclTest extends BaseIntegrationTest {
 	private static final String SERVICE_CLASS = "org.springframework.osgi.iandt.tccl.internal.PrivateTCCLServiceImplementation";
 
 	private static final String SERVICE_PUBLIC_CLASS = "org.springframework.osgi.iandt.tccl.TCCLService";
+
 
 	protected String[] getConfigLocations() {
 		return new String[] { "/org/springframework/osgi/iandt/tcclManagement/client-context.xml" };
@@ -95,7 +97,10 @@ public class ClientOnlyTcclTest extends BaseIntegrationTest {
 	}
 
 	public void testClientTCCLWithServiceClasses() throws Exception {
+		ClassLoader current = Thread.currentThread().getContextClassLoader();
 		ClassLoader cl = getClientTCCL().getTCCL();
+		System.out.println("current :" + current);
+		System.out.println("cl : " + cl);
 		cl.loadClass(SERVICE_PUBLIC_CLASS);
 		failToLoadClass(cl, SERVICE_CLASS);
 	}

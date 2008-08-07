@@ -45,7 +45,7 @@ public class InfrastructureProxyTest extends TestCase {
 		if (ctx == null) {
 			ctx = new MockBundleContext();
 		}
-		return new StaticServiceProxyCreator(classes, cl, ctx, ImportContextClassLoader.UNMANAGED, true);
+		return new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoader.UNMANAGED, true);
 	}
 
 	protected void setUp() throws Exception {
