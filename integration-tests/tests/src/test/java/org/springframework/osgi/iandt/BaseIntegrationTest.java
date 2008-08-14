@@ -178,6 +178,10 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 	protected void preProcessBundleContext(BundleContext context) throws Exception {
 		super.preProcessBundleContext(context);
 		PermissionManager pm = new PermissionManager(context);
+		
+		if (isCloverEnabled()) {
+			logger.warn("Test coverage instrumentation (Clover) enabled");			
+		}
 
 	}
 
@@ -189,7 +193,6 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		ArtifactLocator defaultLocator = super.getLocator();
 		// redirect to the clover artifacts
 		if (isCloverEnabled()) {
-			logger.warn("Test coverage instrumentation (Clover) enabled");
 			return new CloverClassifiedArtifactLocator(defaultLocator);
 		}
 		return defaultLocator;

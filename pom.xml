@@ -698,6 +698,13 @@ limitations under the License.
             </exclusion>          
           </exclusions>            
         </dependency>
+        <!-- include the OSGi jar to allow PermissionAdmin API to be used -->
+        <dependency>
+		  <groupId>org.apache.felix</groupId>
+		  <artifactId>org.osgi.core</artifactId>
+		  <version>1.0.1</version>
+		  <scope>test</scope>
+        </dependency>
       </dependencies>
       <properties>
         <osgi.test.platform>org.springframework.osgi.test.platform.FelixPlatform</osgi.test.platform>
