@@ -16,6 +16,12 @@
 
 package org.springframework.osgi.iandt.event;
 
+import java.io.FilePermission;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PropertyPermission;
+
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
@@ -106,5 +112,15 @@ public class OsgiLifecycleNotificationTest extends AbstractEventTest {
 		finally {
 			bnd.uninstall();
 		}
+	}
+
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		// export package
+		perms.add(new AdminPermission("*", AdminPermission.EXECUTE));
+		perms.add(new AdminPermission("*", AdminPermission.LIFECYCLE));
+		perms.add(new AdminPermission("*", AdminPermission.RESOLVE));
+		perms.add(new FilePermission("<<ALL FILES>>", "read"));
+		return perms;
 	}
 }

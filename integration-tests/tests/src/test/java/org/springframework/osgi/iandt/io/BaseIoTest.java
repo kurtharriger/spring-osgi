@@ -16,10 +16,12 @@
 
 package org.springframework.osgi.iandt.io;
 
+import java.io.FilePermission;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -39,6 +41,8 @@ import org.springframework.util.ObjectUtils;
 public abstract class BaseIoTest extends BaseIntegrationTest {
 
 	protected final static String PACKAGE = "org/springframework/osgi/iandt/io/";
+	private static final String FRAGMENT_1 = "org.springframework.osgi.iandt.io.fragment.1";
+	private static final String FRAGMENT_2 = "org.springframework.osgi.iandt.io.fragment.2";
 
 	protected Resource thisClass;
 
@@ -103,5 +107,17 @@ public abstract class BaseIoTest extends BaseIntegrationTest {
 
 	protected boolean isFelix() {
 		return (createPlatform().toString().startsWith("Felix"));
+	}
+
+	protected List getTestPermissions() {
+		List list = super.getTestPermissions();
+		list.add(new FilePermission("<<ALL FILES>>", "read"));
+		// log files
+		list.add(new FilePermission("<<ALL FILES>>", "delete"));
+		list.add(new FilePermission("<<ALL FILES>>", "write"));
+		list.add(new AdminPermission("*", AdminPermission.LISTENER));
+		list.add(new AdminPermission("(name=" + FRAGMENT_1 + ")", AdminPermission.RESOURCE));
+		list.add(new AdminPermission("(name=" + FRAGMENT_2 + ")", AdminPermission.RESOURCE));
+		return list;
 	}
 }

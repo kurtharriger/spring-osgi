@@ -18,7 +18,9 @@ package org.springframework.osgi.iandt.tcclManagement;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
 
+import org.osgi.framework.AdminPermission;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.tccl.TCCLService;
 
@@ -151,4 +153,10 @@ public class ClientOnlyTcclTest extends BaseIntegrationTest {
 		return (TCCLService) applicationContext.getBean("client");
 	}
 
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		perms.add(new AdminPermission("(name=org.springframework.osgi.iandt.tccl)", AdminPermission.RESOURCE));
+		perms.add(new AdminPermission("(name=org.springframework.osgi.iandt.tccl)", AdminPermission.CLASS));
+		return perms;
+	}
 }

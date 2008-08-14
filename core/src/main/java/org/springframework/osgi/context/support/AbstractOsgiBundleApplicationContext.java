@@ -18,6 +18,8 @@ package org.springframework.osgi.context.support;
 
 import java.beans.PropertyEditor;
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Dictionary;
 import java.util.Map;
 
@@ -263,16 +265,23 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * @param beanFactory
 	 */
 	private void enforceExporterImporterDependency(ConfigurableListableBeanFactory beanFactory) {
-		// create the service manager
-		ClassLoader loader = AbstractOsgiBundleApplicationContext.class.getClassLoader();
 		Object instance = null;
-		try {
-			Class managerClass = loader.loadClass(EXPORTER_IMPORTER_DEPENDENCY_MANAGER);
-			instance = BeanUtils.instantiateClass(managerClass);
-		}
-		catch (ClassNotFoundException cnfe) {
-			throw new ApplicationContextException("Cannot load class " + EXPORTER_IMPORTER_DEPENDENCY_MANAGER, cnfe);
-		}
+
+		instance = AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				// create the service manager
+				ClassLoader loader = AbstractOsgiBundleApplicationContext.class.getClassLoader();
+				try {
+					Class managerClass = loader.loadClass(EXPORTER_IMPORTER_DEPENDENCY_MANAGER);
+					return BeanUtils.instantiateClass(managerClass);
+				}
+				catch (ClassNotFoundException cnfe) {
+					throw new ApplicationContextException("Cannot load class " + EXPORTER_IMPORTER_DEPENDENCY_MANAGER,
+						cnfe);
+				}
+			}
+		});
 
 		// sanity check
 		Assert.isInstanceOf(BeanFactoryAware.class, instance);

@@ -3,6 +3,8 @@ package org.springframework.osgi.service.util.internal.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.osgi.util.internal.PrivilegedUtils;
+import org.springframework.osgi.util.internal.PrivilegedUtils.UnprivilegedThrowableExecution;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -30,6 +32,25 @@ public class ServiceTCCLInterceptor implements MethodInterceptor {
 	}
 
 	public Object invoke(MethodInvocation invocation) throws Throwable {
+
+		if (System.getSecurityManager() != null) {
+			return invokePrivileged(invocation);
+		}
+		else {
+			return invokeUnprivileged(invocation);
+		}
+	}
+
+	private Object invokePrivileged(final MethodInvocation invocation) throws Throwable {
+		return PrivilegedUtils.executeWithCustomTCCL(loader, new PrivilegedUtils.UnprivilegedThrowableExecution() {
+
+			public Object run() throws Throwable {
+				return invocation.proceed();
+			}
+		});
+	}
+
+	private Object invokeUnprivileged(MethodInvocation invocation) throws Throwable {
 		ClassLoader previous = Thread.currentThread().getContextClassLoader();
 		try {
 			Thread.currentThread().setContextClassLoader(loader);

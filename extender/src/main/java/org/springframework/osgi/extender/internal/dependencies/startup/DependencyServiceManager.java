@@ -20,6 +20,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
+import org.springframework.osgi.extender.internal.util.PrivilegedUtils;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitEndedEvent;
@@ -203,61 +204,25 @@ public class DependencyServiceManager {
 	}
 
 	protected void findServiceDependencies() throws Exception {
-		Thread currentThread = Thread.currentThread();
-		ClassLoader oldTCCL = currentThread.getContextClassLoader();
-
-		boolean debug = log.isDebugEnabled();
-		boolean trace = log.isTraceEnabled();
-
 		try {
-			currentThread.setContextClassLoader(context.getClassLoader());
 
-			ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+			PrivilegedUtils.executeWithCustomTCCL(context.getClassLoader(),
+				new PrivilegedUtils.UnprivilegedThrowableExecution() {
 
-			if (trace)
-				log.trace("Looking for dependency factories inside bean factory [" + beanFactory.toString() + "]");
-
-			Map localFactories = BeanFactoryUtils.beansOfTypeIncludingAncestors(beanFactory,
-				OsgiServiceDependencyFactory.class, true, false);
-
-			if (debug)
-				log.debug("Discovered local dependency factories: " + localFactories.keySet());
-
-			dependencyFactories.addAll(localFactories.values());
-
-			for (Iterator iterator = dependencyFactories.iterator(); iterator.hasNext();) {
-				OsgiServiceDependencyFactory dependencyFactory = (OsgiServiceDependencyFactory) iterator.next();
-				Collection discoveredDependencies = null;
-
-				try {
-					discoveredDependencies = dependencyFactory.getServiceDependencies(bundleContext, beanFactory);
-				}
-				catch (Exception ex) {
-					log.warn("Dependency factory " + dependencyFactory
-							+ " threw exception while detecting dependencies for beanFactory " + beanFactory + " in "
-							+ context.getDisplayName(), ex);
-					throw ex;
-				}
-				// add the dependencies one by one
-				if (discoveredDependencies != null)
-					for (Iterator dependencyIterator = discoveredDependencies.iterator(); dependencyIterator.hasNext();) {
-						OsgiServiceDependency dependency = (OsgiServiceDependency) dependencyIterator.next();
-						MandatoryServiceDependency msd = new MandatoryServiceDependency(bundleContext, dependency);
-						dependencies.put(msd, dependency.getBeanName());
-
-						if (!msd.isServicePresent()) {
-							log.info("Adding OSGi service dependency for importer [" + msd.getBeanName()
-									+ "] matching OSGi filter [" + msd.filterAsString + "]");
-							unsatisfiedDependencies.put(msd, dependency.getBeanName());
-						}
+					public Object run() throws Throwable {
+						doFindDependencies();
+						return null;
 					}
-			}
+
+				});
 		}
-		finally {
-			currentThread.setContextClassLoader(oldTCCL);
+		catch (Throwable th) {
+			if (th instanceof Exception)
+				throw ((Exception) th);
+			throw (Error) th;
 		}
 
-		if (debug) {
+		if (log.isDebugEnabled()) {
 			log.debug(dependencies.size() + " OSGi service dependencies, " + unsatisfiedDependencies.size()
 					+ " unsatisfied (for beans " + unsatisfiedDependencies.values() + ") in "
 					+ context.getDisplayName());
@@ -270,6 +235,51 @@ public class DependencyServiceManager {
 		if (log.isTraceEnabled()) {
 			log.trace("Total OSGi service dependencies beans " + dependencies.values());
 			log.trace("Unsatified OSGi service dependencies beans " + unsatisfiedDependencies.values());
+		}
+	}
+
+	private void doFindDependencies() throws Exception {
+		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+		boolean debug = log.isDebugEnabled();
+		boolean trace = log.isTraceEnabled();
+
+		if (trace)
+			log.trace("Looking for dependency factories inside bean factory [" + beanFactory.toString() + "]");
+
+		Map localFactories = BeanFactoryUtils.beansOfTypeIncludingAncestors(beanFactory,
+			OsgiServiceDependencyFactory.class, true, false);
+
+		if (debug)
+			log.debug("Discovered local dependency factories: " + localFactories.keySet());
+
+		dependencyFactories.addAll(localFactories.values());
+
+		for (Iterator iterator = dependencyFactories.iterator(); iterator.hasNext();) {
+			OsgiServiceDependencyFactory dependencyFactory = (OsgiServiceDependencyFactory) iterator.next();
+			Collection discoveredDependencies = null;
+
+			try {
+				discoveredDependencies = dependencyFactory.getServiceDependencies(bundleContext, beanFactory);
+			}
+			catch (Exception ex) {
+				log.warn("Dependency factory " + dependencyFactory
+						+ " threw exception while detecting dependencies for beanFactory " + beanFactory + " in "
+						+ context.getDisplayName(), ex);
+				throw ex;
+			}
+			// add the dependencies one by one
+			if (discoveredDependencies != null)
+				for (Iterator dependencyIterator = discoveredDependencies.iterator(); dependencyIterator.hasNext();) {
+					OsgiServiceDependency dependency = (OsgiServiceDependency) dependencyIterator.next();
+					MandatoryServiceDependency msd = new MandatoryServiceDependency(bundleContext, dependency);
+					dependencies.put(msd, dependency.getBeanName());
+
+					if (!msd.isServicePresent()) {
+						log.info("Adding OSGi service dependency for importer [" + msd.getBeanName()
+								+ "] matching OSGi filter [" + msd.filterAsString + "]");
+						unsatisfiedDependencies.put(msd, dependency.getBeanName());
+					}
+				}
 		}
 	}
 

@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.configopt;
 
+import java.io.FilePermission;
+import java.util.List;
+
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
@@ -55,5 +60,14 @@ public abstract class BehaviorBaseTest extends BaseIntegrationTest {
 		assertTrue("bundle " + bundleId + " could not be found", bundleLocation.exists());
 
 		return bundleContext.installBundle(bundleLocation.getURL().toString());
+	}
+
+	protected List getTestPermissions() {
+		List list = super.getTestPermissions();
+		list.add(new FilePermission("<<ALL FILES>>", "read"));
+		list.add(new AdminPermission("*", AdminPermission.LIFECYCLE));
+		list.add(new AdminPermission("*", AdminPermission.EXECUTE));
+		list.add(new AdminPermission("*", AdminPermission.RESOLVE));
+		return list;
 	}
 }

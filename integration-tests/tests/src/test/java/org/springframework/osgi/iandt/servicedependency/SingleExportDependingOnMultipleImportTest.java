@@ -16,6 +16,10 @@
 
 package org.springframework.osgi.iandt.servicedependency;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
@@ -163,5 +167,12 @@ public class SingleExportDependingOnMultipleImportTest extends BaseIntegrationTe
 
 	private boolean isExporterStarted() throws Exception {
 		return (bundleContext.getServiceReference(SimpleBean.class.getName()) != null);
+	}
+
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		// export package
+		perms.add(new AdminPermission("*", AdminPermission.EXECUTE));
+		return perms;
 	}
 }

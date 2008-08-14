@@ -16,9 +16,12 @@
 
 package org.springframework.osgi.iandt.web;
 
+import java.net.SocketPermission;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PropertyPermission;
 
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -64,10 +67,10 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		col.add("org.springframework.osgi, catalina.start.osgi, 1.0.0");
 
 		// jetty starter
-//		col.add("org.springframework.osgi, jetty.start.osgi, 1.0.0");
-//		col.add("org.springframework.osgi, jetty.web.extender.fragment.osgi, 1.0.0");
-//		col.add("org.mortbay.jetty, jetty-util, 6.1.9");
-//		col.add("org.mortbay.jetty, jetty, 6.1.9");
+		//		col.add("org.springframework.osgi, jetty.start.osgi, 1.0.0");
+		//		col.add("org.springframework.osgi, jetty.web.extender.fragment.osgi, 1.0.0");
+		//		col.add("org.mortbay.jetty, jetty-util, 6.1.9");
+		//		col.add("org.mortbay.jetty, jetty, 6.1.9");
 
 		// Spring DM web extender
 		col.add("org.springframework.osgi, spring-osgi-web," + getSpringDMVersion());
@@ -134,5 +137,15 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 
 	protected boolean createManifestOnlyFromTestClass() {
 		return false;
+	}
+
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		// export package
+		perms.add(new PropertyPermission("*", "read"));
+		perms.add(new PropertyPermission("*", "write"));
+		// accept only local host
+		perms.add(new SocketPermission("localhost:8080", "connect"));
+		return perms;
 	}
 }

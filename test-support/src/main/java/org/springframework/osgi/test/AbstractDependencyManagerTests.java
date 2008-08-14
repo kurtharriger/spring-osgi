@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.test;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
@@ -97,7 +99,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 */
 	protected String getSpringDMVersion() {
 		if (springOsgiVersion == null) {
-			springOsgiVersion = System.getProperty(SPRING_OSGI_VERSION_PROP_KEY);
+			springOsgiVersion = readProperty(SPRING_OSGI_VERSION_PROP_KEY);
 		}
 
 		return springOsgiVersion;
@@ -111,9 +113,22 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 */
 	protected String getSpringVersion() {
 		if (springBundledVersion == null) {
-			springBundledVersion = System.getProperty(SPRING_VERSION_PROP_KEY);
+			springBundledVersion = readProperty(SPRING_VERSION_PROP_KEY);
 		}
 		return springBundledVersion;
+	}
+
+	private String readProperty(final String name) {
+		if (System.getSecurityManager() != null) {
+			return (String) AccessController.doPrivileged(new PrivilegedAction() {
+
+				public Object run() {
+					return System.getProperty(name);
+				}
+			});
+		}
+		else
+			return System.getProperty(name);
 	}
 
 	/**
@@ -192,7 +207,7 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 		String[] bundles = (String[]) props.keySet().toArray(new String[props.size()]);
 		// sort the array (as the Properties file doesn't respect the order)
 		bundles = StringUtils.sortStringArray(bundles);
-		
+
 		if (logger.isDebugEnabled())
 			logger.debug("Default framework bundles :" + ObjectUtils.nullSafeToString(bundles));
 
@@ -263,7 +278,14 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 	 * start up related to the thread context class loader.
 	 */
 	protected void preProcessBundleContext(BundleContext platformBundleContext) throws Exception {
-		System.setProperty("log4j.ignoreTCL", "true");
+		AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				System.setProperty("log4j.ignoreTCL", "true");
+				return null;
+			}
+		});
+
 		super.preProcessBundleContext(platformBundleContext);
 	}
 

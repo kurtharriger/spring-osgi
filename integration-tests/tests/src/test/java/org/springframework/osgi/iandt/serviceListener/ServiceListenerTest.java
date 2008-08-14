@@ -1,6 +1,11 @@
 
 package org.springframework.osgi.iandt.serviceListener;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PropertyPermission;
+
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.service.listener.MyListener;
@@ -12,8 +17,7 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 public class ServiceListenerTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
-		return new String[] {
-			"org.springframework.osgi.iandt,simple.service," + getSpringDMVersion(),
+		return new String[] { "org.springframework.osgi.iandt,simple.service," + getSpringDMVersion(),
 			"org.springframework.osgi.iandt, service.listener," + getSpringDMVersion() };
 	}
 
@@ -51,7 +55,10 @@ public class ServiceListenerTest extends BaseIntegrationTest {
 		return 10L;
 	}
 
-	protected boolean isDisabledInThisEnvironment(String testMethodName) {
-		return false;
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		// export package
+		perms.add(new AdminPermission("*", AdminPermission.EXECUTE));
+		return perms;
 	}
 }

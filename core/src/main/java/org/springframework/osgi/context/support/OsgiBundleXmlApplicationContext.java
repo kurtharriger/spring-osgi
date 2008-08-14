@@ -18,6 +18,8 @@
 package org.springframework.osgi.context.support;
 
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
@@ -120,11 +122,19 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
 
-		NamespaceHandlerResolver nsResolver = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
-		EntityResolver enResolver = createEntityResolver(getBundleContext(), getClassLoader());
+		final Object[] resolvers = new Object[2];
 
-		beanDefinitionReader.setEntityResolver(enResolver);
-		beanDefinitionReader.setNamespaceHandlerResolver(nsResolver);
+		AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				resolvers[0] = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
+				resolvers[1] = createEntityResolver(getBundleContext(), getClassLoader());
+				return null;
+			}
+		});
+
+		beanDefinitionReader.setNamespaceHandlerResolver((NamespaceHandlerResolver) resolvers[0]);
+		beanDefinitionReader.setEntityResolver((EntityResolver) resolvers[1]);
 
 		// Allow a subclass to provide custom initialisation of the reader,
 		// then proceed with actually loading the bean definitions.
@@ -244,12 +254,13 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		return delegate;
 	}
 
-	private NamespaceHandlerResolver lookupNamespaceHandlerResolver(BundleContext bundleContext, Object fallbackObject) {
+	private NamespaceHandlerResolver lookupNamespaceHandlerResolver(final BundleContext bundleContext,
+			final Object fallbackObject) {
 		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class[] { NamespaceHandlerResolver.class }, null,
 			NamespaceHandlerResolver.class.getClassLoader(), bundleContext, fallbackObject);
 	}
 
-	private EntityResolver lookupEntityResolver(BundleContext bundleContext, Object fallbackObject) {
+	private EntityResolver lookupEntityResolver(final BundleContext bundleContext, final Object fallbackObject) {
 		return (EntityResolver) TrackingUtil.getService(new Class[] { EntityResolver.class }, null,
 			EntityResolver.class.getClassLoader(), bundleContext, fallbackObject);
 	}

@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.io.internal.resolver;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -150,11 +152,17 @@ public class PackageAdminResolver implements DependencyResolver {
 	}
 
 	private PackageAdmin getPackageAdmin() {
-		ServiceReference ref = bundleContext.getServiceReference(PackageAdmin.class.getName());
-		if (ref == null)
-			throw new IllegalStateException(PackageAdmin.class.getName() + " service is required");
-		// don't do any proxying since PackageAdmin is normally a framework service
-		// we can assume for now that it will stay
-		return (PackageAdmin) bundleContext.getService(ref);
+
+		return (PackageAdmin) AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				ServiceReference ref = bundleContext.getServiceReference(PackageAdmin.class.getName());
+				if (ref == null)
+					throw new IllegalStateException(PackageAdmin.class.getName() + " service is required");
+				// don't do any proxying since PackageAdmin is normally a framework service
+				// we can assume for now that it will stay
+				return (PackageAdmin) bundleContext.getService(ref);
+			}
+		});
 	}
-};
+}

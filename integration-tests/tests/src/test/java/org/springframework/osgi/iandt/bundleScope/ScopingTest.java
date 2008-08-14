@@ -16,8 +16,10 @@
 
 package org.springframework.osgi.iandt.bundleScope;
 
+import java.util.List;
 import java.util.Properties;
 
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.ServiceReference;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
@@ -173,5 +175,17 @@ public class ScopingTest extends BaseIntegrationTest {
 		if (ref == null)
 			throw new IllegalArgumentException("cannot find appCtx for bundle " + symBundle);
 		return (ConfigurableApplicationContext) bundleContext.getService(ref);
+	}
+
+	/**
+	 * Since the test is creating some application contexts, give it some
+	 * privileges.
+	 */
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		perms.add(new AdminPermission("(name=org.springframework.osgi.iandt.scope.a)", AdminPermission.RESOURCE));
+		perms.add(new AdminPermission("(name=org.springframework.osgi.iandt.scope.a)", AdminPermission.METADATA));
+		perms.add(new AdminPermission("(name=org.springframework.osgi.iandt.scope.a)", AdminPermission.CLASS));
+		return perms;
 	}
 }

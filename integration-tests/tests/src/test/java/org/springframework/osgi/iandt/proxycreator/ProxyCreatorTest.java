@@ -16,6 +16,10 @@
 
 package org.springframework.osgi.iandt.proxycreator;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiBundleUtils;
@@ -53,6 +57,13 @@ public class ProxyCreatorTest extends BaseIntegrationTest {
 		catch (Exception ex) {
 			fail("updating the bundle failed");
 		}
+	}
 
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		// export package
+		perms.add(new AdminPermission("*", AdminPermission.LIFECYCLE));
+		perms.add(new AdminPermission("*", AdminPermission.RESOLVE));
+		return perms;
 	}
 }

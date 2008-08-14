@@ -1,6 +1,11 @@
 
 package org.springframework.osgi.iandt.duplicateClass;
 
+import java.io.FilePermission;
+import java.util.List;
+import java.util.PropertyPermission;
+
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
@@ -104,5 +109,22 @@ public class DuplicateClassTest extends BaseIntegrationTest {
 
 	protected long getDefaultWaitTime() {
 		return 60L;
+	}
+
+	protected List getTestPermissions() {
+		List list = super.getTestPermissions();
+		list.add(new FilePermission("<<ALL FILES>>", "read"));
+		list.add(new AdminPermission("*", AdminPermission.EXECUTE));
+		list.add(new AdminPermission("*", AdminPermission.LIFECYCLE));
+		list.add(new AdminPermission("*", AdminPermission.RESOLVE));
+		list.add(new AdminPermission("*", AdminPermission.METADATA));
+		return list;
+	}
+
+	protected List getIAndTPermissions() {
+		List perms = super.getIAndTPermissions();
+		perms.add(new PropertyPermission("*", "read"));
+		perms.add(new PropertyPermission("*", "write"));
+		return perms;
 	}
 }

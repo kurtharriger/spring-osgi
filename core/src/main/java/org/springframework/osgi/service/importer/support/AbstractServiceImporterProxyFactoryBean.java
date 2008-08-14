@@ -16,6 +16,9 @@
 
 package org.springframework.osgi.service.importer.support;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.SmartFactoryBean;
@@ -153,8 +156,14 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	 * infrastructure classes (even if these are not visible to the user) so
 	 * that the proxy creation can be completed successfully.
 	 */
-	public void setBeanClassLoader(ClassLoader classLoader) {
+	public void setBeanClassLoader(final ClassLoader classLoader) {
 		super.setBeanClassLoader(classLoader);
-		this.aopClassLoader = ClassLoaderFactory.getAopClassLoaderFor(classLoader);
+		AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				aopClassLoader = ClassLoaderFactory.getAopClassLoaderFor(classLoader);
+				return null;
+			}
+		});
 	}
 }
