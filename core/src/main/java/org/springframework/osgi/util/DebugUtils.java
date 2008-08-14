@@ -147,13 +147,16 @@ public abstract class DebugUtils {
 			log.trace("Could not find class [" + className + "] required by [" + bname + "] scanning available bundles");
 
 		BundleContext context = OsgiBundleUtils.getBundleContext(bundle);
-		String packageName = className.substring(0, className.lastIndexOf('.'));
+		int pkgIndex = className.lastIndexOf('.');
 		// Reject global packages
-		if (className.indexOf('.') < 0) {
+		if (pkgIndex < 0) {
 			if (trace)
 				log.trace("Class is not in a package, its unlikely that this will work");
 			return;
 		}
+		
+		String packageName = className.substring(0, pkgIndex);
+
 		Version iversion = hasImport(bundle, packageName);
 		if (iversion != null && context != null) {
 			if (trace)
