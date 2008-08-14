@@ -1,10 +1,12 @@
 
 package org.springframework.osgi.iandt.extender;
 
+import java.io.FilePermission;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.util.tracker.ServiceTracker;
@@ -91,5 +93,15 @@ public class ExtenderTest extends BaseIntegrationTest {
 		assertEquals("Guinea pig started up", "true",
 			System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.startUp"));
 
+	}
+
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		// export package
+		perms.add(new AdminPermission("*", AdminPermission.EXECUTE));
+		perms.add(new AdminPermission("*", AdminPermission.LIFECYCLE));
+		perms.add(new AdminPermission("*", AdminPermission.RESOLVE));
+		perms.add(new FilePermission("<<ALL FILES>>", "read"));
+		return perms;
 	}
 }

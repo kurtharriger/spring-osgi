@@ -16,8 +16,11 @@
 
 package org.springframework.osgi.iandt.servicedependency;
 
+import java.io.FilePermission;
+import java.util.List;
 import java.util.Map;
 
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
@@ -124,5 +127,12 @@ public class CollectionImporterTest extends BaseIntegrationTest {
 
 	private boolean isExporterAStarted() throws Exception {
 		return (bundleContext.getServiceReference(Map.class.getName()) != null);
+	}
+
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		// export package
+		perms.add(new AdminPermission("*", AdminPermission.EXECUTE));
+		return perms;
 	}
 }

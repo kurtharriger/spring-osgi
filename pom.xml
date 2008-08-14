@@ -85,6 +85,10 @@
    <clover.ver>2.3.1</clover.ver>
    <clover.argLine></clover.argLine>
    <clover.skip>false</clover.skip>
+   
+   <!-- security options for integration testing -->
+   <security.argLine></security.argLine>
+   <policy.url>..${file.separator}policy.all</policy.url>
   </properties>
 
   <!-- ============================================= -->
@@ -661,7 +665,7 @@ limitations under the License.
       <properties>
         <osgi.test.platform>org.springframework.osgi.test.platform.KnopflerfishPlatform</osgi.test.platform>
 		<log4j.ignoreTCL>true</log4j.ignoreTCL>
-		<org.knopflerfish.osgi.setcontextclassloader>true</org.knopflerfish.osgi.setcontextclassloader>        
+		<org.knopflerfish.osgi.setcontextclassloader>true</org.knopflerfish.osgi.setcontextclassloader>
       </properties>
     </profile>
     
@@ -744,6 +748,14 @@ limitations under the License.
       </modules>
     </profile>
 
+	<!-- Java 2 security enabled profile -->
+    <profile>
+      <id>security</id>
+      <properties>
+   		<security.argLine>-Djava.security.manager -Djava.security.policy=${policy.url}</security.argLine>
+      </properties>
+    </profile>
+    
 	<!-- clover profile -->
     <profile>
       <id>clover</id>

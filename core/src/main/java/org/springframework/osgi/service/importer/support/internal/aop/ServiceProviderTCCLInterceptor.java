@@ -24,6 +24,7 @@ import org.osgi.framework.Bundle;
 import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.util.internal.PrivilegedUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -68,6 +69,26 @@ public class ServiceProviderTCCLInterceptor implements MethodInterceptor {
 
 
 	public Object invoke(MethodInvocation invocation) throws Throwable {
+
+		if (System.getSecurityManager() != null) {
+			return invokePrivileged(invocation);
+		}
+		else {
+			return invokeUnprivileged(invocation);
+		}
+	}
+
+	private Object invokePrivileged(final MethodInvocation invocation) throws Throwable {
+		return PrivilegedUtils.executeWithCustomTCCL(getServiceProvidedClassLoader(),
+			new PrivilegedUtils.UnprivilegedThrowableExecution() {
+
+				public Object run() throws Throwable {
+					return invocation.proceed();
+				}
+			});
+	}
+
+	private Object invokeUnprivileged(MethodInvocation invocation) throws Throwable {
 		ClassLoader current = getServiceProvidedClassLoader();
 
 		ClassLoader previous = Thread.currentThread().getContextClassLoader();

@@ -1,6 +1,10 @@
 
 package org.springframework.osgi.iandt.referenceProxy;
 
+import java.util.List;
+import java.util.PropertyPermission;
+
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.reference.proxy.ServiceReferer;
@@ -14,8 +18,7 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 public class ReferenceProxyTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
-		return new String[] {
-			"org.springframework.osgi.iandt, simple.service," + getSpringDMVersion(),
+		return new String[] { "org.springframework.osgi.iandt, simple.service," + getSpringDMVersion(),
 			"org.springframework.osgi.iandt, reference.proxy," + getSpringDMVersion() };
 	}
 
@@ -61,4 +64,20 @@ public class ReferenceProxyTest extends BaseIntegrationTest {
 	protected long getDefaultWaitTime() {
 		return 15L;
 	}
+
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		// export package
+		perms.add(new AdminPermission("*", AdminPermission.EXECUTE));
+		perms.add(new AdminPermission("*", AdminPermission.LIFECYCLE));
+		return perms;
+	}
+
+	protected List getIAndTPermissions() {
+		List perms = super.getIAndTPermissions();
+		perms.add(new PropertyPermission("*", "read"));
+		perms.add(new PropertyPermission("*", "write"));
+		return perms;
+	}
+
 }

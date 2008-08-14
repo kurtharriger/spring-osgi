@@ -19,10 +19,12 @@ package org.springframework.osgi.iandt.proxycreator;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.event.DocumentEvent;
 
+import org.osgi.framework.AdminPermission;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
@@ -101,5 +103,12 @@ public class ClassDependenciesVisibilityTest extends BaseIntegrationTest {
 		packages.remove("javax.*");
 		packages.remove("javax.swing.*");
 		return packages;
+	}
+
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		// export package
+		perms.add(new RuntimePermission("*", "getClassLoader"));
+		return perms;
 	}
 }

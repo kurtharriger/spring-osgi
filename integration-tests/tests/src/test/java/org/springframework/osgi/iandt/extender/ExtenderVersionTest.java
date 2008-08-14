@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.extender;
 
 import java.awt.Point;
+import java.io.FilePermission;
+import java.util.List;
 
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
@@ -36,8 +40,7 @@ public class ExtenderVersionTest extends BaseIntegrationTest {
 	// certain version
 	public void testBundleIgnoredBasedOnSpringExtenderVersion() throws Exception {
 
-		String bundleId = "org.springframework.osgi.iandt, extender-version-bundle,"
-				+ getSpringDMVersion();
+		String bundleId = "org.springframework.osgi.iandt, extender-version-bundle," + getSpringDMVersion();
 		Resource location = locateBundle(bundleId);
 
 		Bundle bundle = bundleContext.installBundle(location.getURL().toString());
@@ -46,6 +49,15 @@ public class ExtenderVersionTest extends BaseIntegrationTest {
 
 		assertTrue(OsgiBundleUtils.isBundleActive(bundle));
 		assertNull("no point should be published ", bundleContext.getServiceReference(Point.class.getName()));
+	}
 
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		// export package
+		perms.add(new AdminPermission("*", AdminPermission.EXECUTE));
+		perms.add(new AdminPermission("*", AdminPermission.LIFECYCLE));
+		perms.add(new AdminPermission("*", AdminPermission.RESOLVE));
+		perms.add(new FilePermission("<<ALL FILES>>", "read"));
+		return perms;
 	}
 }

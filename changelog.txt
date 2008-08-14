@@ -8,6 +8,7 @@ Changes in version 1.2.0 M1 (2008-mm-dd)
 General
 * added new annotation-based, Spring-MVC sample
 * improved sample wars packaging
+* improved behaviour when running under a Java 2 SecurityManager
 
 Package org.springframework.osgi.context
 * added reporting of Errors raised during delegated refresh in AbstractDelegatedExecutionApplicationContext

@@ -17,11 +17,27 @@
 package org.springframework.osgi.iandt;
 
 import java.io.File;
+import java.lang.reflect.ReflectPermission;
+import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.PropertyPermission;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundlePermission;
+import org.osgi.framework.PackagePermission;
+import org.osgi.framework.ServicePermission;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.SynchronousBundleListener;
+import org.osgi.service.permissionadmin.PermissionAdmin;
+import org.osgi.service.permissionadmin.PermissionInfo;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.provisioning.ArtifactLocator;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -79,6 +95,71 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		}
 	}
 
+	private class PermissionManager implements SynchronousBundleListener {
+
+		private final PermissionAdmin pa;
+		private final boolean securityTurnedOn;
+
+
+		/**
+		 * Constructs a new <code>PermissionManager</code> instance.
+		 * 
+		 * @param bc
+		 */
+		private PermissionManager(BundleContext bc) {
+			ServiceReference ref = bc.getServiceReference(PermissionAdmin.class.getName());
+			securityTurnedOn = (ref != null);
+			if (ref != null) {
+				logger.trace("Found permission admin " + ref);
+				pa = (PermissionAdmin) bc.getService(ref);
+				bc.addBundleListener(this);
+				logger.trace("Default permissions are " + ObjectUtils.nullSafeToString(pa.getDefaultPermissions()));
+				logger.warn("Security turned ON");
+
+			}
+			else {
+				logger.warn("Security turned OFF");
+				pa = null;
+			}
+		}
+
+		public void bundleChanged(BundleEvent event) {
+			if (event.getType() == BundleEvent.INSTALLED) {
+				Bundle bnd = event.getBundle();
+				String location = bnd.getLocation();
+				if (location.indexOf("iandt") > -1 || location.indexOf("integration-tests") > -1) {
+					logger.trace("Discovered I&T test...");
+					List perms = getIAndTPermissions();
+					// define permission info
+					PermissionInfo[] pi = getPIFromPermissions(perms);
+					logger.info("About to set permissions " + perms + " for I&T bundle "
+							+ OsgiStringUtils.nullSafeNameAndSymName(bnd) + "@" + location);
+					pa.setPermissions(location, pi);
+				}
+				else if (location.indexOf("onTheFly") > -1) {
+					logger.trace("Discovered on the fly test...");
+					List perms = getTestPermissions();
+
+					// define permission info
+					PermissionInfo[] pi = getPIFromPermissions(perms);
+					logger.info("About to set permissions " + perms + " for OnTheFly bundle "
+							+ OsgiStringUtils.nullSafeNameAndSymName(bnd) + "@" + location);
+					pa.setPermissions(location, pi);
+				}
+			}
+		}
+
+		private PermissionInfo[] getPIFromPermissions(List perms) {
+			PermissionInfo[] pi = new PermissionInfo[perms.size()];
+			int index = 0;
+			for (Iterator iterator = perms.iterator(); iterator.hasNext();) {
+				Permission perm = (Permission) iterator.next();
+				pi[index++] = new PermissionInfo(perm.getClass().getName(), perm.getName(), perm.getActions());
+			}
+			return pi;
+		}
+	}
+
 
 	private static final String CLOVER_PROPERTY = "org.springframework.osgi.integration.testing.clover";
 
@@ -94,24 +175,21 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		return patterns;
 	}
 
-	private boolean isCloverEnabled() {
-		return Boolean.getBoolean(CLOVER_PROPERTY);
+	protected void preProcessBundleContext(BundleContext context) throws Exception {
+		super.preProcessBundleContext(context);
+		PermissionManager pm = new PermissionManager(context);
+
 	}
 
-	protected String[] getTestFrameworkBundlesNames() {
-		String[] names = super.getTestFrameworkBundlesNames();
-		if (isCloverEnabled()) {
-			logger.warn("Clover instrumentation enabled");
-//			return (String[]) ObjectUtils.addObjectToArray(names, "org.springframework.osgi.iandt,clover.bundle,"
-//					+ getSpringDMVersion());
-		}
-		return names;
+	private boolean isCloverEnabled() {
+		return Boolean.getBoolean(CLOVER_PROPERTY);
 	}
 
 	protected ArtifactLocator getLocator() {
 		ArtifactLocator defaultLocator = super.getLocator();
 		// redirect to the clover artifacts
 		if (isCloverEnabled()) {
+			logger.warn("Test coverage instrumentation (Clover) enabled");
 			return new CloverClassifiedArtifactLocator(defaultLocator);
 		}
 		return defaultLocator;
@@ -120,8 +198,49 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 	protected List getBootDelegationPackages() {
 		List bootPkgs = super.getBootDelegationPackages();
 		if (isCloverEnabled()) {
-			bootPkgs.add("com_cenqua_clover");
+			bootPkgs.add(CLOVER_PKG);
 		}
 		return bootPkgs;
+	}
+
+	/**
+	 * Returns the list of permissions for the running test.
+	 * 
+	 * @return
+	 */
+	protected List getTestPermissions() {
+		List perms = new ArrayList();
+		perms.add(new PackagePermission("*", PackagePermission.EXPORT));
+		perms.add(new PackagePermission("*", PackagePermission.IMPORT));
+		perms.add(new BundlePermission("*", BundlePermission.HOST));
+		perms.add(new BundlePermission("*", BundlePermission.PROVIDE));
+		perms.add(new BundlePermission("*", BundlePermission.REQUIRE));
+		perms.add(new ServicePermission("*", ServicePermission.REGISTER));
+		perms.add(new ServicePermission("*", ServicePermission.GET));
+		perms.add(new PropertyPermission("org.springframework.osgi.*", "read"));
+		perms.add(new PropertyPermission("org.springframework.osgi.iandt.*", "write"));
+		// required by Spring
+		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
+		perms.add(new ReflectPermission("*", "suppressAccessChecks"));
+		return perms;
+	}
+
+	protected List getIAndTPermissions() {
+		List perms = new ArrayList();
+		// export package
+		perms.add(new PackagePermission("*", PackagePermission.EXPORT));
+		perms.add(new PackagePermission("*", PackagePermission.IMPORT));
+		perms.add(new BundlePermission("*", BundlePermission.FRAGMENT));
+		perms.add(new BundlePermission("*", BundlePermission.PROVIDE));
+		perms.add(new ServicePermission("*", ServicePermission.REGISTER));
+		perms.add(new ServicePermission("*", ServicePermission.GET));
+		perms.add(new PropertyPermission("*", "read"));
+		perms.add(new PropertyPermission("*", "write"));
+
+		// required by Spring
+		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
+		perms.add(new ReflectPermission("*", "suppressAccessChecks"));
+
+		return perms;
 	}
 }

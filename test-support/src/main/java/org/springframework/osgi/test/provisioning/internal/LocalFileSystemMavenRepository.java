@@ -18,6 +18,8 @@ package org.springframework.osgi.test.provisioning.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -82,9 +84,19 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 
 		boolean trace = log.isDebugEnabled();
 
+		final String[] sysProperties = new String[2];
 		// check system property
-		String localRepository = System.getProperty(SYS_PROPERTY);
-		String userHome = System.getProperty(USER_HOME_PROPERTY);
+		AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				sysProperties[0] = System.getProperty(SYS_PROPERTY);
+				sysProperties[1] = System.getProperty(USER_HOME_PROPERTY);
+				return null;
+			}
+		});
+		String localRepository = sysProperties[0];
+		String userHome = sysProperties[1];
+
 		if (trace)
 			log.trace("M2 system property [" + SYS_PROPERTY + "] has value=" + localRepository);
 
@@ -156,28 +168,36 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 	 * @param type - the extension type of the artifact
 	 * @return
 	 */
-	public Resource locateArtifact(String groupId, String artifactId, String version, String type) {
+	public Resource locateArtifact(final String groupId, final String artifactId, final String version,
+			final String type) {
 		init();
 
-		try {
-			return localMavenBuildArtifact(groupId, artifactId, version, type);
-		}
-		catch (IllegalStateException illStateEx) {
-			Resource localMavenBundle = localMavenBundle(groupId, artifactId, version, type);
-			if (log.isDebugEnabled()) {
-				StringBuffer buf = new StringBuffer();
-				buf.append("[");
-				buf.append(groupId);
-				buf.append("|");
-				buf.append(artifactId);
-				buf.append("|");
-				buf.append(version);
-				buf.append("]");
-				log.debug(buf + " local maven build artifact detection failed, falling back to local maven bundle "
-						+ localMavenBundle.getDescription());
+		return (Resource) AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				try {
+
+					return localMavenBuildArtifact(groupId, artifactId, version, type);
+				}
+				catch (IllegalStateException illStateEx) {
+					Resource localMavenBundle = localMavenBundle(groupId, artifactId, version, type);
+					if (log.isDebugEnabled()) {
+						StringBuffer buf = new StringBuffer();
+						buf.append("[");
+						buf.append(groupId);
+						buf.append("|");
+						buf.append(artifactId);
+						buf.append("|");
+						buf.append(version);
+						buf.append("]");
+						log.debug(buf
+								+ " local maven build artifact detection failed, falling back to local maven bundle "
+								+ localMavenBundle.getDescription());
+					}
+					return localMavenBundle;
+				}
 			}
-			return localMavenBundle;
-		}
+		});
 	}
 
 	/**

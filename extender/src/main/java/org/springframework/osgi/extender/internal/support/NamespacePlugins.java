@@ -18,7 +18,10 @@ package org.springframework.osgi.extender.internal.support;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -33,7 +36,6 @@ import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.util.ReflectionUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -92,10 +94,6 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 	private static final Log log = LogFactory.getLog(NamespacePlugins.class);
 
-	private static final String CACHE_CLASS = "org.springframework.osgi.context.support.TrackingUtil";
-
-	private static final String FIELD_NAME = "invokingBundle";
-
 	private final Map plugins = CollectionFactory.createConcurrentMap(5);
 
 
@@ -119,7 +117,46 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 		return (plugins.remove(bundle) != null);
 	}
 
-	public NamespaceHandler resolve(String namespaceUri) {
+	public NamespaceHandler resolve(final String namespaceUri) {
+		if (System.getSecurityManager() != null) {
+			return (NamespaceHandler) AccessController.doPrivileged(new PrivilegedAction() {
+
+				public Object run() {
+					return doResolve(namespaceUri);
+				}
+			});
+
+		}
+		else {
+			return doResolve(namespaceUri);
+		}
+	}
+
+	public InputSource resolveEntity(final String publicId, final String systemId) throws SAXException, IOException {
+		if (System.getSecurityManager() != null) {
+			try {
+				return (InputSource) AccessController.doPrivileged(new PrivilegedExceptionAction() {
+
+					public Object run() throws Exception {
+						return doResolveEntity(publicId, systemId);
+					}
+				});
+			}
+			catch (PrivilegedActionException pae) {
+				Exception cause = pae.getException();
+				if (cause instanceof IOException) {
+					throw (IOException) cause;
+				}
+				else
+					throw (SAXException) cause;
+			}
+		}
+		else {
+			return doResolveEntity(publicId, systemId);
+		}
+	}
+
+	private NamespaceHandler doResolve(String namespaceUri) {
 		boolean debug = log.isDebugEnabled();
 
 		if (debug)
@@ -147,7 +184,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 		return null;
 	}
 
-	public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+	private InputSource doResolveEntity(String publicId, String systemId) throws SAXException, IOException {
 		boolean debug = log.isDebugEnabled();
 
 		if (debug)
@@ -180,26 +217,5 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 	public void destroy() {
 		plugins.clear();
-	}
-
-	/**
-	 * Returns the namespace/resolver invoker plugin. To do that, the Spring-DM
-	 * core classes will be used assuming that its infrastructure is being used.
-	 * 
-	 * @return the invoking bundle
-	 */
-	private Bundle getInvokingBundle() {
-		// get the spring-dm core class loader
-		ClassLoader coreClassLoader = OsgiStringUtils.class.getClassLoader();
-		try {
-			Class cacheClass = coreClassLoader.loadClass(CACHE_CLASS);
-			Field field = cacheClass.getField(FIELD_NAME);
-			ReflectionUtils.makeAccessible(field);
-			return (Bundle) ((ThreadLocal) field.get(null)).get();
-		}
-		catch (Exception ex) {
-			log.trace("Could not determine invoking bundle", ex);
-			return null;
-		}
 	}
 }

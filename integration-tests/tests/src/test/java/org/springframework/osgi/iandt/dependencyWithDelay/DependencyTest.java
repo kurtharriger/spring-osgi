@@ -1,8 +1,17 @@
 
 package org.springframework.osgi.iandt.dependencyWithDelay;
 
+import java.io.FilePermission;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PropertyPermission;
+
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.BundlePermission;
+import org.osgi.framework.PackagePermission;
+import org.osgi.framework.ServicePermission;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -127,5 +136,22 @@ public class DependencyTest extends BaseIntegrationTest {
 
 	protected long getDefaultWaitTime() {
 		return 60L;
+	}
+
+	protected List getTestPermissions() {
+		List perms = super.getTestPermissions();
+		perms.add(new FilePermission("<<ALL FILES>>", "read"));
+		perms.add(new AdminPermission("*", AdminPermission.EXECUTE));
+		perms.add(new AdminPermission("*", AdminPermission.LIFECYCLE));
+		perms.add(new AdminPermission("*", AdminPermission.RESOLVE));
+		perms.add(new AdminPermission("*", AdminPermission.METADATA));
+		return perms;
+	}
+
+	protected List getIAndTPermissions() {
+		List perms = super.getIAndTPermissions();
+		perms.add(new PropertyPermission("*", "read"));
+		perms.add(new PropertyPermission("*", "write"));
+		return perms;
 	}
 }

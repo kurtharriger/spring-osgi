@@ -22,9 +22,11 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -45,6 +47,7 @@ import org.springframework.util.ObjectUtils;
 public class BundleClassPathWildcardTest extends BaseIoTest {
 
 	private static boolean noRootCPTestBundleInstalled = false;
+	private static final String NO_ROOT_BND_SYM = "org.springframework.bundle.osgi.io.test.no.root.classpath";
 
 
 	protected Manifest getManifest() {
@@ -169,8 +172,7 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 	}
 
 	private ResourcePatternResolver getNoRootCpBundleResourceResolver() {
-		Bundle bnd = OsgiBundleUtils.findBundleBySymbolicName(bundleContext,
-			"org.springframework.bundle.osgi.io.test.no.root.classpath");
+		Bundle bnd = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, NO_ROOT_BND_SYM);
 		assertNotNull("noRootClassPath bundle was not found", bnd);
 		return new OsgiBundleResourcePatternResolver(bnd);
 	}
@@ -231,5 +233,12 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
 		Resource[] res = resolver.getResources("classpath*:/some/**/*.file");
 		assertEquals("incorrect number of resources found", 2, res.length);
+	}
+
+	protected List getTestPermissions() {
+		List list = super.getTestPermissions();
+		list.add(new AdminPermission("(name=" + NO_ROOT_BND_SYM + ")", AdminPermission.METADATA));
+		list.add(new AdminPermission("(name=" + NO_ROOT_BND_SYM + ")", AdminPermission.RESOURCE));
+		return list;
 	}
 }

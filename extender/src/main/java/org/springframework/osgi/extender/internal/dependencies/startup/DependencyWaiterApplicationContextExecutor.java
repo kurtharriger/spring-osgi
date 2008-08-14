@@ -16,6 +16,9 @@
 
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
@@ -126,10 +129,14 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 */
 	private class CompleteRefreshTask implements Runnable {
 
+		private AccessControlContext acc;
+
+
 		public void run() {
 			boolean debug = log.isDebugEnabled();
-			if (debug)
+			if (debug) {
 				log.debug("Completing refresh for " + getDisplayName());
+			}
 
 			synchronized (monitor) {
 				if (state != ContextState.DEPENDENCIES_RESOLVED) {
@@ -390,9 +397,15 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				}
 			}
 		}
-		StringBuffer message = new StringBuffer();
+		final StringBuffer message = new StringBuffer();
 		message.append("Unable to create application context for [");
-		message.append(getBundleSymbolicName());
+		AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				message.append(OsgiStringUtils.nullSafeSymbolicName(getBundle()));
+				return null;
+			}
+		});
 		message.append("], unsatisfied dependencies: ");
 		message.append(buf.toString());
 
@@ -423,7 +436,12 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 					+ "]");
 
 			ApplicationContextException e = new ApplicationContextException("Application context initializition for '"
-					+ OsgiStringUtils.nullSafeSymbolicName(getBundle()) + "' has timed out");
+					+ (String) AccessController.doPrivileged(new PrivilegedAction() {
+
+						public Object run() {
+							return OsgiStringUtils.nullSafeSymbolicName(getBundle());
+						}
+					}) + "' has timed out");
 			e.fillInStackTrace();
 			fail(e);
 
@@ -481,10 +499,6 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			return delegateContext.getDisplayName();
 		}
 
-	}
-
-	private String getBundleSymbolicName() {
-		return OsgiStringUtils.nullSafeSymbolicName(getBundle());
 	}
 
 	public void setWatchdog(Timer watchdog) {
