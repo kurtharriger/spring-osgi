@@ -23,11 +23,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PropertyPermission;
+import java.util.jar.Manifest;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundlePermission;
+import org.osgi.framework.Constants;
 import org.osgi.framework.PackagePermission;
 import org.osgi.framework.ServicePermission;
 import org.osgi.framework.ServiceReference;
@@ -98,7 +100,6 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 	private class PermissionManager implements SynchronousBundleListener {
 
 		private final PermissionAdmin pa;
-		private final boolean securityTurnedOn;
 
 
 		/**
@@ -108,7 +109,6 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		 */
 		private PermissionManager(BundleContext bc) {
 			ServiceReference ref = bc.getServiceReference(PermissionAdmin.class.getName());
-			securityTurnedOn = (ref != null);
 			if (ref != null) {
 				logger.trace("Found permission admin " + ref);
 				pa = (PermissionAdmin) bc.getService(ref);
@@ -178,11 +178,10 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 	protected void preProcessBundleContext(BundleContext context) throws Exception {
 		super.preProcessBundleContext(context);
 		PermissionManager pm = new PermissionManager(context);
-		
-		if (isCloverEnabled()) {
-			logger.warn("Test coverage instrumentation (Clover) enabled");			
-		}
 
+		if (isCloverEnabled()) {
+			logger.warn("Test coverage instrumentation (Clover) enabled");
+		}
 	}
 
 	private boolean isCloverEnabled() {
@@ -204,6 +203,19 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 			bootPkgs.add(CLOVER_PKG);
 		}
 		return bootPkgs;
+	}
+
+	protected Manifest getManifest() {
+		String permissionPackage = "org.osgi.service.permissionadmin";
+		Manifest mf = super.getManifest();
+		// make permission admin packages optional
+		String impPackage = mf.getMainAttributes().getValue(Constants.IMPORT_PACKAGE);
+		//		int startIndex = impPackage.indexOf(permissionPackage);
+		//		int endIndex = impPackage.indexOf(',', startIndex);
+		//		String newImpPackage = impPackage.substring(0, startIndex) + permissionPackage + ";resolution:=optional,"+impPackage.substring(endIndex+1);
+		impPackage = impPackage.replace(permissionPackage, permissionPackage + ";resolution:=optional");
+		mf.getMainAttributes().putValue(Constants.IMPORT_PACKAGE, impPackage);
+		return mf;
 	}
 
 	/**
