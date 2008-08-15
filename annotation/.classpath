@@ -5,7 +5,7 @@
 	<classpathentry exported="true" kind="lib" path="target/classes" sourcepath="target/classes"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="var" path="M2_REPO/easymock/easymock/1.2_Java1.3/easymock-1.2_Java1.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/junit/com.springsource.junit-3.8.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.0/com.springsource.slf4j.org.apache.commons.logging-1.5.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.5/spring-context-2.5.5.jar" sourcepath="/M2_REPO/org/springframework/spring-context/2.5.5/spring-context-2.5.5-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.5/spring-core-2.5.5.jar"/>

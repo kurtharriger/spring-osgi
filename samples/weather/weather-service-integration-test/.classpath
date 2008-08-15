@@ -5,7 +5,7 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/junit/com.springsource.junit-3.8.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.5/spring-context-2.5.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-test/2.5.5/spring-test-2.5.5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Weather Sample Service Bundle"/>
