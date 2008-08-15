@@ -210,11 +210,13 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		Manifest mf = super.getManifest();
 		// make permission admin packages optional
 		String impPackage = mf.getMainAttributes().getValue(Constants.IMPORT_PACKAGE);
-		//		int startIndex = impPackage.indexOf(permissionPackage);
-		//		int endIndex = impPackage.indexOf(',', startIndex);
-		//		String newImpPackage = impPackage.substring(0, startIndex) + permissionPackage + ";resolution:=optional,"+impPackage.substring(endIndex+1);
-		impPackage = impPackage.replace(permissionPackage, permissionPackage + ";resolution:=optional");
-		mf.getMainAttributes().putValue(Constants.IMPORT_PACKAGE, impPackage);
+		int startIndex = impPackage.indexOf(permissionPackage);
+		String newImpPackage = impPackage;
+		if (startIndex >= 0) {
+			newImpPackage = impPackage.substring(0, startIndex) + permissionPackage + ";resolution:=optional"
+					+ impPackage.substring(startIndex + permissionPackage.length());
+		}
+		mf.getMainAttributes().putValue(Constants.IMPORT_PACKAGE, newImpPackage);
 		return mf;
 	}
 
