@@ -270,6 +270,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <forkMode>pertest</forkMode>
+                    <forkedProcessTimeoutInSeconds>180</forkedProcessTimeoutInSeconds>
                     <systemProperties>
                         <property>
                             <name>com.gatespace.bundle.cm.store</name>
