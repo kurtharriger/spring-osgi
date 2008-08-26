@@ -80,7 +80,10 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private static final String XML_PATTERN = "*.xml";
 
-	private static final String ANNOTATION_DEPENDENCY_FACTORY = "ANNOTATION FACTORY";
+	private static final String ANNOTATION_DEPENDENCY_FACTORY = "org.springframework.osgi.extensions.annotation.ServiceReferenceDependencyBeanFactoryPostProcessor";
+
+	/** annotation processing system property (kept for backwards compatibility) */
+	private static final String AUTO_ANNOTATION_PROCESSING = "org.springframework.osgi.extender.annotation.auto.processing";
 
 	//
 	// defaults
@@ -273,10 +276,10 @@ public class ExtenderConfiguration implements DisposableBean {
 		// default JDK 1.4 processor
 		dependencyFactories.add(0, new MandatoryImporterDependencyFactory());
 
-		// load through reflection the processor if running on JDK 1.5 and annotation processing is enabled
+		// load through reflection the dependency and injection processors if running on JDK 1.5 and annotation processing is enabled
 		if (processAnnotation) {
 			if (JdkVersion.isAtLeastJava15()) {
-
+				// dependency processor
 				Class annotationProcessor = null;
 				try {
 					annotationProcessor = Class.forName(ANNOTATION_DEPENDENCY_FACTORY, false,
@@ -289,16 +292,25 @@ public class ExtenderConfiguration implements DisposableBean {
 				Object processor = BeanUtils.instantiateClass(annotationProcessor);
 				Assert.isInstanceOf(OsgiServiceDependencyFactory.class, processor);
 				dependencyFactories.add(1, (OsgiServiceDependencyFactory) processor);
+
 				if (debug)
 					log.debug("Succesfully loaded annotation dependency processor [" + ANNOTATION_DEPENDENCY_FACTORY
 							+ "]");
+
+				// add injection processor (first in line)
+				postProcessors.add(0, new OsgiAnnotationPostProcessor());
+				log.info("Spring-DM annotation processing enabled");
 			}
-			else if (debug)
-				log.debug("JDK 5 not available [" + ANNOTATION_DEPENDENCY_FACTORY + "] not loaded");
+			else {
+				if (debug)
+					log.debug("JDK 5 not available [" + ANNOTATION_DEPENDENCY_FACTORY + "] not loaded");
+				log.warn("Spring-DM annotation processing enabled but JDK 5 is n/a; disabling annotation processing...");
+			}
 		}
 		else {
 			if (debug) {
-				log.debug("Annotation processing disabled; [" + ANNOTATION_DEPENDENCY_FACTORY + "] not loaded");
+				log.debug("Spring-DM annotation processing disabled; [" + ANNOTATION_DEPENDENCY_FACTORY
+						+ "] not loaded");
 			}
 		}
 
@@ -339,7 +351,8 @@ public class ExtenderConfiguration implements DisposableBean {
 	}
 
 	private boolean getProcessAnnotations(Properties properties) {
-		return Boolean.valueOf(properties.getProperty(PROCESS_ANNOTATIONS_KEY)).booleanValue();
+		return Boolean.valueOf(properties.getProperty(PROCESS_ANNOTATIONS_KEY)).booleanValue()
+				|| Boolean.getBoolean(AUTO_ANNOTATION_PROCESSING);
 	}
 
 	/**

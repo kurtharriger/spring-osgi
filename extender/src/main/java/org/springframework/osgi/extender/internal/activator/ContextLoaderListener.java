@@ -49,7 +49,6 @@ import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceD
 import org.springframework.osgi.extender.internal.dependencies.startup.DependencyWaiterApplicationContextExecutor;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 import org.springframework.osgi.extender.internal.support.NamespaceManager;
-import org.springframework.osgi.extender.internal.support.OsgiAnnotationPostProcessor;
 import org.springframework.osgi.extender.internal.support.OsgiBeanFactoryPostProcessorAdapter;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.extender.internal.util.concurrent.RunnableTimedExecution;
@@ -253,9 +252,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 	private static final Log log = LogFactory.getLog(ContextLoaderListener.class);
 
-	/** annotation processing system property */
-	private static final String AUTO_ANNOTATION_PROCESSING = "org.springframework.osgi.extender.annotation.auto.processing";
-
 	// "Spring Application Context Creation Timer"
 	private Timer timer = new Timer(true);
 
@@ -393,7 +389,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 		this.contextCreator = extenderConfiguration.getContextCreator();
 		this.postProcessors = extenderConfiguration.getPostProcessors();
-		addDefaultPostProcessors(postProcessors);
 
 		// init the OSGi event dispatch/listening system
 		initListenerService();
@@ -834,25 +829,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 		if (log.isDebugEnabled())
 			log.debug("Initialization of OSGi listeners service completed...");
-	}
-
-	/*
-	 * Post process the context (for example by adding bean post processors).
-	 */
-	private void addDefaultPostProcessors(List postProcessorsList) {
-		if (extenderConfiguration.shouldProcessAnnotation() || Boolean.getBoolean(AUTO_ANNOTATION_PROCESSING)) {
-
-			log.info("Enabled automatic Spring-DM annotation processing");
-
-			// add annotation BFPP (first in the list)
-			if (log.isTraceEnabled())
-				log.trace("Adding OSGi annotation post processor");
-			postProcessorsList.add(0, new OsgiAnnotationPostProcessor());
-		}
-
-		else {
-			log.info("Disabled automatic Spring-DM annotation processing");
-		}
 	}
 
 	/**
