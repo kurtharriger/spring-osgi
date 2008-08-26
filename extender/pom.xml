@@ -25,7 +25,8 @@
   	<!-- don't export a thing -->
 	<spring.osgi.export.pkg>!${spring.osgi.private.pkg}, org.springframework.osgi.extender*</spring.osgi.export.pkg>
 	<spring.osgi.import.pkg>
-	 org.osgi.service.packageadmin;version=1.2
+	 org.osgi.service.packageadmin;version=1.2,
+	 org.springframework.osgi.extensions.annotation;resolution:=optional;version=${spring.osgi.import.version}
 	</spring.osgi.import.pkg>
 	<spring.osgi.symbolic.name>${symName.prefix}.extender</spring.osgi.symbolic.name>
   </properties>

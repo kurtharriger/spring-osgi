@@ -1,73 +1,80 @@
+
 package org.springframework.osgi.iandt.annotationProxy;
 
-import java.lang.reflect.Field;
-
 import org.osgi.framework.Bundle;
-import org.springframework.core.JdkVersion;
-import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.iandt.annotation.proxy.ServiceReferer;
 import org.springframework.osgi.iandt.simpleservice.MyService;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
  * @author Andy Piper
  */
 public class AnnotationProxyTest extends AbstractConfigurableBundleCreatorTests {
 
-    protected String getManifestLocation() {
-        return "classpath:org/springframework/osgi/iandt/annotationProxy/AnnotationProxyTest.MF";
-    }
+	private static final String ANNOTATION_CONST = "org.springframework.osgi.extender.annotation.auto.processing";
 
-    protected String[] getTestBundlesNames() {
-	return new String[] {
-                    "org.springframework.osgi.iandt, simple.service, "+
-                            getSpringDMVersion(),
-                    "org.springframework.osgi.iandt, annotation.proxy,"+
-                            getSpringDMVersion()};
-    }
 
-    public void testReferenceProxyLifecycle() throws Exception {
+	protected String getManifestLocation() {
+		return "classpath:org/springframework/osgi/iandt/annotationProxy/AnnotationProxyTest.MF";
+	}
 
-        MyService reference = ServiceReferer.serviceReference;
+	protected String[] getTestBundlesNames() {
+		return new String[] { "org.springframework.osgi.iandt, simple.service, " + getSpringDMVersion(),
+			"org.springframework.osgi.iandt, annotation.proxy," + getSpringDMVersion() };
+	}
 
-        assertNotNull("reference not initialized", reference);
-        assertNotNull("no value specified in the reference", reference.stringValue());
+	public AnnotationProxyTest() {
+		System.setProperty(ANNOTATION_CONST, "true");
+	}
 
-        Bundle simpleServiceBundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, "org.springframework.osgi.iandt.simpleservice");
+	@Override
+	protected void finalize() throws Throwable {
+		System.getProperties().remove(ANNOTATION_CONST);
+	}
 
-        assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
-        System.out.println("stopping bundle");
-        simpleServiceBundle.stop();
+	public void testReferenceProxyLifecycle() throws Exception {
 
-        while (simpleServiceBundle.getState() == Bundle.STOPPING) {
-            System.out.println("waiting for bundle to stop");
-            Thread.sleep(10);
-        }
-        System.out.println("bundle stopped");
+		MyService reference = ServiceReferer.serviceReference;
 
-        // Service should be unavailable
-        try {
-            reference.stringValue();
-            fail("ServiceUnavailableException should have been thrown!");
-        }
-        catch (ServiceUnavailableException e) {
-            // Expected
-        }
+		assertNotNull("reference not initialized", reference);
+		assertNotNull("no value specified in the reference", reference.stringValue());
 
-        System.out.println("starting bundle");
-        simpleServiceBundle.start();
+		Bundle simpleServiceBundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext,
+			"org.springframework.osgi.iandt.simpleservice");
 
-        waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
+		assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
+		System.out.println("stopping bundle");
+		simpleServiceBundle.stop();
 
-        System.out.println("bundle started");
-        // Service should be running
-        assertNotNull(reference.stringValue());
-    }
+		while (simpleServiceBundle.getState() == Bundle.STOPPING) {
+			System.out.println("waiting for bundle to stop");
+			Thread.sleep(10);
+		}
+		System.out.println("bundle stopped");
 
-    protected long getDefaultWaitTime() {
-        return 15L;
-    }
+		// Service should be unavailable
+		try {
+			reference.stringValue();
+			fail("ServiceUnavailableException should have been thrown!");
+		}
+		catch (ServiceUnavailableException e) {
+			// Expected
+		}
 
+		System.out.println("starting bundle");
+		simpleServiceBundle.start();
+
+		waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
+
+		System.out.println("bundle started");
+		// Service should be running
+		assertNotNull(reference.stringValue());
+	}
+
+	protected long getDefaultWaitTime() {
+		return 15L;
+	}
 
 }
