@@ -22,7 +22,6 @@ import java.util.List;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.provisioning.ArtifactLocator;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**

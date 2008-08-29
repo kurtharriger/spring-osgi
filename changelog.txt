@@ -7,6 +7,7 @@ Changes in version 1.1.2 (2008-mm-dd)
 
 General
 * improved sample wars packaging
+* various minor documentation improvements
 
 Package org.springframework.osgi.context
 * added reporting of Errors raised during delegated refresh in AbstractDelegatedExecutionApplicationContext
@@ -18,6 +19,7 @@ Package org.springframework.osgi.extender
 Package org.springframework.osgi.service
 * changed the proxying classloader strategy to address package dependency visibility
 * fixed usage of incorrect class loader for imported services with client thread context class loader management
+* fixed intermittent deadlock that appeared in some cases betweem importers and exporters during shutdown
 
 Package org.springframework.osgi.io
 * fixed classpath pattern matching on certain resources when the default Bundle-ClassPath entry (.) is not specified
