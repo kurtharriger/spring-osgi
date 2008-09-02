@@ -17,14 +17,22 @@
 package org.springframework.osgi.iandt.compliance.io;
 
 import java.io.InputStream;
+import java.lang.reflect.ReflectPermission;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.PropertyPermission;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundlePermission;
 import org.osgi.framework.Constants;
+import org.osgi.framework.PackagePermission;
+import org.osgi.framework.ServicePermission;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 
 /**
@@ -161,6 +169,5 @@ public class BundleClassPathTest extends BaseIntegrationTest {
 		System.out.println(jis.getNextJarEntry());
 		System.out.println(jis.available());
 		jis.close();
-
 	}
 }
