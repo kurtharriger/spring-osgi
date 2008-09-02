@@ -66,20 +66,23 @@ public class WarListenerConfiguration implements DisposableBean {
 
 	private static final String XML_PATTERN = "*.xml";
 
-	private ConfigurableOsgiBundleApplicationContext extenderConfiguration;
-
-	private WarScanner warScanner;
-
-	private WarDeployer warDeployer;
-
-	private ContextPathStrategy contextPathStrategy;
-
-	private boolean undeployWarsAtShutdown;
-
 	//
 	// defaults
 	//
 	private static final boolean UNDEPLOY_WARS_AT_SHUTDOWN_DEFAULT = false;
+
+	private ConfigurableOsgiBundleApplicationContext extenderConfiguration;
+
+	private final WarScanner warScanner;
+
+	private final WarDeployer warDeployer;
+
+	private final ContextPathStrategy contextPathStrategy;
+
+	private final boolean undeployWarsAtShutdown;
+
+	// field read/write lock
+	private final Object lock = new Object();
 
 
 	/**
@@ -111,7 +114,9 @@ public class WarListenerConfiguration implements DisposableBean {
 			context.setBundleContext(bundleContext);
 			context.refresh();
 
-			extenderConfiguration = context;
+			synchronized (lock) {
+				extenderConfiguration = context;
+			}
 
 			warScanner = context.containsBean(WAR_SCANNER_NAME) ? (WarScanner) context.getBean(WAR_SCANNER_NAME,
 				WarScanner.class) : createDefaultWarScanner();
@@ -132,9 +137,8 @@ public class WarListenerConfiguration implements DisposableBean {
 					properties.setProperty(property, customProperties.getProperty(property));
 				}
 			}
-
-			undeployWarsAtShutdown = getUndeployWarsAtShutdown(properties);
 		}
+		undeployWarsAtShutdown = getUndeployWarsAtShutdown(properties);
 	}
 
 	/**
@@ -168,9 +172,11 @@ public class WarListenerConfiguration implements DisposableBean {
 	 */
 	public void destroy() {
 
-		if (extenderConfiguration != null) {
-			extenderConfiguration.close();
-			extenderConfiguration = null;
+		synchronized (lock) {
+			if (extenderConfiguration != null) {
+				extenderConfiguration.close();
+				extenderConfiguration = null;
+			}
 		}
 	}
 

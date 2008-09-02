@@ -131,8 +131,9 @@ public void testComponent() throws Exception {
         instance that is running outside of OSGi</para>
       </listitem>
     </itemizedlist>
-	<warning>The testing framework is aimed at running OSGi integration tests from a non-OSGi environment (like Ant/Maven). The testing framework
-	is NOT meant to be used as an OSGi bundle (nor will it work for that matter).</warning>    
+	<warning>The testing framework is aimed at running OSGi integration tests from a non-OSGi environment (like Ant/Maven/IDE). The testing framework
+	is NOT meant to be used as an OSGi bundle (nor will it work for that matter). In practice this means that the testing bundle should be separate from the bundle(s) it
+	tests (similar to unit testing, where tests are separate from the classes they test).</warning>    
 
     <para>By following this sequence it is trivial to write JUnit-based
     integration tests for OSGi and have them integration into any environment

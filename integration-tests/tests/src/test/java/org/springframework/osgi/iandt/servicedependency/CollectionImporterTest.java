@@ -52,9 +52,10 @@ public class CollectionImporterTest extends BaseIntegrationTest {
 
 	public void testExporterAWhenImporterAGoesDownAndUp() throws Exception {
 		assertTrue("exporterA should be running", isExporterAStarted());
-
+		logger.info("Taking down serviceA...");
 		takeDownServiceA();
 		assertFalse("serviceA should take exporterA down", isExporterAStarted());
+		logger.info("Putting up serviceA...");
 		putUpServiceA();
 		// check exporter
 		assertTrue("serviceA is up again, so should exporterA", isExporterAStarted());
@@ -62,9 +63,10 @@ public class CollectionImporterTest extends BaseIntegrationTest {
 
 	public void testExporterBWhenImporterAGoesDownAndUp() throws Exception {
 		assertTrue("exporterB should be running", isExporterBStarted());
-
+		logger.info("Taking down serviceA...");
 		takeDownServiceA();
 		assertFalse("serviceA should take exporterB down", isExporterBStarted());
+		logger.info("Putting up serviceA...");
 		putUpServiceA();
 		// check exporter
 		assertTrue("service A is up again, so should exporterB", isExporterBStarted());

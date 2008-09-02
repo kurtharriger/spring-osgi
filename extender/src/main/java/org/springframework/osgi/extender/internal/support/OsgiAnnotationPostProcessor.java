@@ -64,10 +64,9 @@ public class OsgiAnnotationPostProcessor implements OsgiBeanFactoryPostProcessor
 		}
 		catch (ClassNotFoundException exception) {
 			log.info("Spring-DM annotation package could not be loaded from bundle ["
-					+ OsgiStringUtils.nullSafeNameAndSymName(bundle)
-					+ "]bundleContext.getBundle(); annotation processing disabled...");
+					+ OsgiStringUtils.nullSafeNameAndSymName(bundle) + "]; annotation processing disabled...");
 			if (log.isDebugEnabled())
-				log.debug("Cannot load annotation bpp", exception);
+				log.debug("Cannot load annotation injection processor", exception);
 		}
 	}
 }

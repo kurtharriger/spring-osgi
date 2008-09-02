@@ -66,7 +66,7 @@ public class ServiceReferenceInjectionBeanPostProcessor extends InstantiationAwa
 
 	private abstract static class ImporterCallAdapter {
 
-		static void setInterfaces(Object importer, Class[] classes) {
+		static void setInterfaces(Object importer, Class<?>[] classes) {
 			if (importer instanceof OsgiServiceProxyFactoryBean)
 				((OsgiServiceProxyFactoryBean) importer).setInterfaces(classes);
 			else
