@@ -15,6 +15,7 @@ Package org.springframework.osgi.context
 Package org.springframework.osgi.extender
 * fixed bug related to enabling Spring-DM annotation depedency processing
 * improved annotation injection processing
+* improved extender configuration thread-safety
 
 Package org.springframework.osgi.service
 * changed the proxying classloader strategy to address package dependency visibility
@@ -23,6 +24,10 @@ Package org.springframework.osgi.service
 
 Package org.springframework.osgi.io
 * fixed classpath pattern matching on certain resources when the default Bundle-ClassPath entry (.) is not specified
+
+Package org.springframework.osgi.web
+* improved web extender configuration thread-safety
+* improved web extender initialization by using an asynch model for cases with out-of-order dependencies
 
 
 Changes in version 1.1.1 (2008-07-29)

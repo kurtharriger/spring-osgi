@@ -66,10 +66,6 @@ public class WarLoaderListener implements BundleActivator {
 			Bundle bundle = event.getBundle();
 			boolean trace = log.isTraceEnabled();
 
-			// ignore current bundle for war deployment
-			if (bundle.getBundleId() == bundleId) {
-				return;
-			}
 			switch (event.getType()) {
 				case BundleEvent.STARTED: {
 					if (trace)
@@ -77,6 +73,7 @@ public class WarLoaderListener implements BundleActivator {
 								+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
 					maybeDeployWar(bundle);
+
 					break;
 				}
 				case BundleEvent.STOPPING: {
@@ -85,6 +82,7 @@ public class WarLoaderListener implements BundleActivator {
 								+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
 					maybeUndeployWar(bundle);
+
 					break;
 				}
 				default:
@@ -97,7 +95,6 @@ public class WarLoaderListener implements BundleActivator {
 	 * Simple WAR deployment manager. Handles the IO process involved in
 	 * deploying and undeploying the war.
 	 */
-	// TODO: in the future, this could be externalized so smarter implementations can be plugged in 
 	private class DeploymentManager implements DisposableBean {
 
 		/** timeout for any possible on going tasks */
@@ -108,7 +105,7 @@ public class WarLoaderListener implements BundleActivator {
 		private final ConcurrentMap bundlesToDeployments = CollectionFactory.createConcurrentMap(16);
 
 		/** thread for deploying/undeploying bundles */
-		private TimerTaskExecutor executor = new TimerTaskExecutor();
+		private final TimerTaskExecutor executor = new TimerTaskExecutor();
 		/** on-going task monitor */
 		final Counter onGoingTask = new Counter("ongoing-task");
 
@@ -129,8 +126,14 @@ public class WarLoaderListener implements BundleActivator {
 			// cancel any pending tasks
 			executor.destroy();
 
+			final WarListenerConfiguration localConfig;
+
+			synchronized (lock) {
+				localConfig = configuration;
+			}
+
 			// depending on the configuration, the bundles can be undeployed as well
-			if (configuration.shouldUndeployWarsAtShutdown()) {
+			if (localConfig.shouldUndeployWarsAtShutdown()) {
 
 				final List bundles = new ArrayList(bundlesToDeployments.keySet());
 				StringBuffer bundlesToString = new StringBuffer("\n");
@@ -158,7 +161,7 @@ public class WarLoaderListener implements BundleActivator {
 
 						// only after everything is done, the configuration can be destroyed as well
 						// as it holds a reference to the Tomcat service
-						configuration.destroy();
+						localConfig.destroy();
 					}
 				};
 
@@ -171,7 +174,7 @@ public class WarLoaderListener implements BundleActivator {
 				if (onGoingTask.waitForZero(SHUTDOWN_WAIT_TIME)) {
 					log.debug("An on-going deploy/undeploy task did not finish in time; continuing shutdown...");
 				}
-				configuration.destroy();
+				localConfig.destroy();
 			}
 		}
 
@@ -304,9 +307,13 @@ public class WarLoaderListener implements BundleActivator {
 	/** contextPath strategy */
 	private ContextPathStrategy contextPathStrategy;
 
-	private DeploymentManager deploymentManager;
+	private final DeploymentManager deploymentManager;
 
 	private WarListenerConfiguration configuration;
+
+	/** lock used for reading non-final fields between multiple threads */
+	/** transient would be nice to have ... */
+	private final Object lock = new Object();
 
 
 	/**
@@ -324,41 +331,64 @@ public class WarLoaderListener implements BundleActivator {
 	 * Bootstrapping procedure. Monitors deployed bundles and will scan for WARs
 	 * known locations. Once such a war is detected, the web application will be
 	 * deployed through a specific web deployer.
-	 * 
 	 */
-	public void start(BundleContext context) throws Exception {
-		this.bundleContext = context;
-		this.bundleId = bundleContext.getBundle().getBundleId();
-		this.extenderVersion = OsgiBundleUtils.getBundleVersion(context.getBundle());
+	public void start(final BundleContext context) throws Exception {
+		synchronized (lock) {
+			this.bundleContext = context;
+			this.bundleId = bundleContext.getBundle().getBundleId();
+			this.extenderVersion = OsgiBundleUtils.getBundleVersion(context.getBundle());
+		}
 
-		boolean trace = log.isTraceEnabled();
+		final boolean trace = log.isTraceEnabled();
 
 		log.info("Starting [" + bundleContext.getBundle().getSymbolicName() + "] bundle v.[" + extenderVersion + "]");
 
-		// read configuration
-		configuration = new WarListenerConfiguration(context);
+		// start the initialization on a different thread
+		// this helps if the web server is deployed after the extender
+		Thread th = new Thread(new Runnable() {
 
-		// instantiate fields
-		warScanner = configuration.getWarScanner();
-		warDeployer = configuration.getWarDeployer();
-		contextPathStrategy = configuration.getContextPathStrategy();
+			public void run() {
+				try {
+					// read configuration
+					WarListenerConfiguration config = new WarListenerConfiguration(bundleContext);
+					synchronized (lock) {
+						configuration = config;
+						// instantiate fields
+						warScanner = configuration.getWarScanner();
+						warDeployer = configuration.getWarDeployer();
+						contextPathStrategy = configuration.getContextPathStrategy();
 
-		// register war listener
-		warListener = new WarBundleListener();
+						// register war listener
+						warListener = new WarBundleListener();
+					}
+					context.addBundleListener(warListener);
 
-		bundleContext.addBundleListener(warListener);
+					// check existing bundles
+					Bundle[] bnds = context.getBundles();
 
-		// check existing bundles
-		Bundle[] bnds = bundleContext.getBundles();
-
-		for (int i = 0; i < bnds.length; i++) {
-			Bundle bundle = bnds[i];
-			if (OsgiBundleUtils.isBundleActive(bundle)) {
-				if (trace)
-					log.trace("Checking if bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " is a war..");
-				maybeDeployWar(bundle);
+					for (int i = 0; i < bnds.length; i++) {
+						Bundle bundle = bnds[i];
+						if (OsgiBundleUtils.isBundleActive(bundle)) {
+							if (trace)
+								log.trace("Checking if bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle)
+										+ " is a war..");
+							maybeDeployWar(bundle);
+						}
+					}
+				}
+				catch (Exception ex) {
+					log.error("Cannot property start Spring-DM WebExtender; stopping bundle...", ex);
+					try {
+						context.getBundle().stop();
+					}
+					catch (Exception excep) {
+						log.debug("Stopping of the extender bundle failed", excep);
+					}
+				}
 			}
-		}
+		}, "WebExtender-Init");
+
+		th.start();
 	}
 
 	/**
@@ -368,13 +398,23 @@ public class WarLoaderListener implements BundleActivator {
 	 */
 	private void maybeDeployWar(Bundle bundle) {
 		// exclude special bundles (such as the framework or this bundle)
-		if (OsgiBundleUtils.isSystemBundle(bundle) || bundle.getBundleId() == bundleId)
-			return;
+		synchronized (lock) {
+			if (OsgiBundleUtils.isSystemBundle(bundle) || bundle.getBundleId() == bundleId)
+				return;
+		}
+
+		WarScanner localWarScanner;
+		ContextPathStrategy localCPS;
+
+		synchronized (lock) {
+			localWarScanner = warScanner;
+			localCPS = contextPathStrategy;
+		}
 
 		// check if the bundle is a war
-		if (warScanner.isWar(bundle)) {
+		if (localWarScanner.isWar(bundle)) {
 			// get bundle name
-			String contextPath = contextPathStrategy.getContextPath(bundle);
+			String contextPath = localCPS.getContextPath(bundle);
 			// make sure it doesn't contain spaces (causes subtle problems with Tomcat Jasper)
 			Assert.doesNotContain(contextPath, " ", "context path should not contain whitespaces");
 			String msg = OsgiStringUtils.nullSafeNameAndSymName(bundle)
@@ -420,11 +460,12 @@ public class WarLoaderListener implements BundleActivator {
 
 	public void stop(BundleContext context) throws Exception {
 		// unregister listener
-		if (warListener != null) {
-			bundleContext.removeBundleListener(warListener);
-			warListener = null;
+		synchronized (lock) {
+			if (warListener != null) {
+				context.removeBundleListener(warListener);
+				warListener = null;
+			}
 		}
-
 		// cancel any tasks that have to be processed
 		deploymentManager.destroy();
 	}
