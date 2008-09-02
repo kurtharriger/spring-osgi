@@ -525,9 +525,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	/** Internal state listeners */
 	public void setStateListeners(List stateListeners) {
-		synchronized (lock) {
-			this.stateListeners = stateListeners;
-		}
+		this.stateListeners = stateListeners;
 	}
 
 	public boolean equals(Object other) {

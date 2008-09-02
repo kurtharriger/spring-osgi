@@ -15,7 +15,4 @@
         <property name="service2" ref="simpleService2"/>
     </bean>
 
-   <!-- annotation injection post processor (no need to define it if property 
-		"org.springframework.osgi.extender.annotation.auto.processing" is set-->
-   <bean class="org.springframework.osgi.extensions.annotation.ServiceReferenceInjectionBeanPostProcessor"/>    
 </beans>

@@ -39,11 +39,6 @@ public class OsgiStringUtilsTest extends TestCase {
 	private Bundle bundle;
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	protected void setUp() throws Exception {
 		OsgiStringUtilsTest.state = Bundle.UNINSTALLED;
 		bundle = new MockBundle() {
@@ -55,10 +50,10 @@ public class OsgiStringUtilsTest extends TestCase {
 	}
 
 	public void testGetBundleEventAsString() {
-		assertSame("INSTALLED", OsgiStringUtils.nullSafeBundleEventToString(BundleEvent.INSTALLED));
-		assertSame("STARTING", OsgiStringUtils.nullSafeBundleEventToString(BundleEvent.STARTING));
-		assertSame("UNINSTALLED", OsgiStringUtils.nullSafeBundleEventToString(BundleEvent.UNINSTALLED));
-		assertSame("UPDATED", OsgiStringUtils.nullSafeBundleEventToString(BundleEvent.UPDATED));
+		assertEquals("INSTALLED", OsgiStringUtils.nullSafeBundleEventToString(BundleEvent.INSTALLED));
+		assertEquals("STARTING", OsgiStringUtils.nullSafeBundleEventToString(BundleEvent.STARTING));
+		assertEquals("UNINSTALLED", OsgiStringUtils.nullSafeBundleEventToString(BundleEvent.UNINSTALLED));
+		assertEquals("UPDATED", OsgiStringUtils.nullSafeBundleEventToString(BundleEvent.UPDATED));
 		assertTrue(OsgiStringUtils.nullSafeBundleEventToString(-1324).startsWith("UNKNOWN"));
 	}
 

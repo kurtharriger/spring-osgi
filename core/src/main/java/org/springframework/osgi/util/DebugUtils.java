@@ -154,6 +154,7 @@ public abstract class DebugUtils {
 				log.trace("Class is not in a package, its unlikely that this will work");
 			return;
 		}
+		
 		String packageName = className.substring(0, pkgIndex);
 
 		Version iversion = hasImport(bundle, packageName);

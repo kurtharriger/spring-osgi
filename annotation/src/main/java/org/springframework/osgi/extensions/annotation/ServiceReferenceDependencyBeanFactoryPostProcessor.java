@@ -3,7 +3,7 @@ package org.springframework.osgi.extensions.annotation;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -31,39 +31,39 @@ class ServiceReferenceDependencyBeanFactoryPostProcessor implements OsgiServiceD
 	private static Log logger = LogFactory.getLog(ServiceReferenceDependencyBeanFactoryPostProcessor.class);
 
 
-	public Collection getServiceDependencies(BundleContext bundleContext, ConfigurableListableBeanFactory beanFactory)
-			throws BeansException, InvalidSyntaxException, BundleException {
+	public Collection<OsgiServiceDependency> getServiceDependencies(BundleContext bundleContext,
+			ConfigurableListableBeanFactory beanFactory) throws BeansException, InvalidSyntaxException, BundleException {
 
-		Set dependencies = new HashSet();
+		Set<OsgiServiceDependency> dependencies = new LinkedHashSet<OsgiServiceDependency>();
 
 		String[] beanDefinitionNames = beanFactory.getBeanDefinitionNames();
 		for (String definitionName : beanDefinitionNames) {
 			BeanDefinition definition = beanFactory.getBeanDefinition(definitionName);
 			String className = definition.getBeanClassName();
 			try {
-				Class clazz = Class.forName(className, true, beanFactory.getBeanClassLoader());
+				Class<?> clazz = Class.forName(className, true, beanFactory.getBeanClassLoader());
 				dependencies.addAll(getClassServiceDependencies(clazz, definitionName, definition));
 			}
 			catch (ClassNotFoundException cnfe) {
 				if (logger.isWarnEnabled())
 					logger.warn("Could not load class [" + className + "] for ["
-                            + bundleContext.getBundle().getSymbolicName() + "]");
+							+ bundleContext.getBundle().getSymbolicName() + "]");
 			}
 		}
 		if (logger.isDebugEnabled())
-			logger.debug("Processing annotations for [" + bundleContext.getBundle().getSymbolicName()
-                    + "] found " + dependencies);
+			logger.debug("Processing annotations for [" + bundleContext.getBundle().getSymbolicName() + "] found "
+					+ dependencies);
 
 		return dependencies;
 	}
 
-	protected boolean hasServiceProperty(Class clazz) {
+	protected boolean hasServiceProperty(Class<?> clazz) {
 		return AnnotationUtils.findAnnotation(clazz, ServiceReference.class) != null;
 	}
 
-	private Set getClassServiceDependencies(final Class beanClass, final String beanName,
+	private Set<OsgiServiceDependency> getClassServiceDependencies(final Class<?> beanClass, final String beanName,
 			final BeanDefinition definition) {
-		final HashSet dependencies = new HashSet();
+		final Set<OsgiServiceDependency> dependencies = new LinkedHashSet<OsgiServiceDependency>();
 		ReflectionUtils.doWithMethods(beanClass, new ReflectionUtils.MethodCallback() {
 
 			public void doWith(final Method method) {
