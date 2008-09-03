@@ -16,13 +16,27 @@
 
 package org.springframework.osgi.samples.console.web;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 /**
+ * OSGi bundle search space enumeration.
+ * 
  * @author Costin Leau
  * 
  */
 public enum SearchSpace {
 
 	BUNDLE("osgibundle:"), JAR("osgibundlejar:"), CLASSPATH("classpath:"), CLASSPATHS("classpath*:");
+
+	// Initialize the toString map
+	private static final Map<SearchSpace, String> toStringMap = new EnumMap<SearchSpace, String>(SearchSpace.class);
+
+	static {
+		// create toString map
+		for (SearchSpace space : SearchSpace.values())
+			toStringMap.put(space, space.toString().toLowerCase());
+	}
 
 	private final String resourcePrefix;
 
@@ -33,5 +47,14 @@ public enum SearchSpace {
 
 	public String resourcePrefix() {
 		return resourcePrefix;
+	}
+
+	/**
+	 * Returns a map of enum<->toString association.
+	 * 
+	 * @return enum<->toString association map
+	 */
+	public static Map<SearchSpace, String> toStringMap() {
+		return toStringMap;
 	}
 }

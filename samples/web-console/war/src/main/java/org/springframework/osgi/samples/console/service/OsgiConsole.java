@@ -20,27 +20,80 @@ import java.util.Collection;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.samples.console.web.SearchSpace;
 
 /**
- * @author Costin Leau
+ * Contract for a simple, OSGi "console". Provides a more convenient and simpler
+ * API for interacting with the OSGi framework.
  * 
+ * @author Costin Leau
  */
 public interface OsgiConsole {
 
+	/**
+	 * Returns the id of the console bundle. Used as starting point for the
+	 * console analysis.
+	 * 
+	 * @return default bundle id
+	 */
 	long getDefaultBundleId();
 
+	/**
+	 * Returns an array containing the bundles currently installed in the OSGi
+	 * platform.
+	 * 
+	 * @return array of bundles
+	 */
 	Bundle[] listBundles();
 
+	/**
+	 * Returns the {@link Bundle} object associated with the given id.
+	 * 
+	 * @param bundleId bundle id
+	 * @return bundle with the given id
+	 */
 	Bundle getBundle(long bundleId);
 
+	/**
+	 * Returns the packages exported by the given bundle, as an array of
+	 * strings.
+	 * 
+	 * @param bundle OSGi bundle
+	 * @return array of exported packages
+	 */
 	String[] getExportedPackages(Bundle bundle);
 
+	/**
+	 * Returns the packages imported by the given bundle, as an array of
+	 * Strings.
+	 * 
+	 * @param bundle OSGi bundle
+	 * @return array of imported packages
+	 */
 	String[] getImportedPackages(Bundle bundle);
 
+	/**
+	 * Returns references to the OSGi services registered by the given bundle.
+	 * 
+	 * @param bundle OSGi bundle
+	 * @return references to the services registered by the given bundle
+	 */
 	ServiceReference[] getRegisteredServices(Bundle bundle);
 
+	/**
+	 * Returns references to the OSGi services used by the given bundle.
+	 * 
+	 * @param bundle OSGi bundle
+	 * @return references to the services registered by the given bundle
+	 */
 	ServiceReference[] getServicesInUse(Bundle bundle);
 
+	/**
+	 * Returns a collection of paths, contained by the given bundle, that match
+	 * the given pattern.
+	 * 
+	 * @param bundle OSGi bundle
+	 * @param pattern path search pattern
+	 * @return collection of matching paths
+	 */
 	Collection<String> search(Bundle bundle, String pattern);
 }

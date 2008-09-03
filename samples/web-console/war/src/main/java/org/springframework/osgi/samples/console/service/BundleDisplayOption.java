@@ -50,25 +50,31 @@ public enum BundleDisplayOption {
 		}
 	};
 
-	// Initialize the options map
-	private static final Map<BundleDisplayOption, String> optionsMap = new EnumMap<BundleDisplayOption, String>(
+	// Initialize the toString map
+	private static final Map<BundleDisplayOption, String> toStringMap = new EnumMap<BundleDisplayOption, String>(
 		BundleDisplayOption.class);
 
 	static {
 		// create toString map
 		for (BundleDisplayOption option : BundleDisplayOption.values())
-			optionsMap.put(option, option.toString().toLowerCase().replace('_', ' '));
+			toStringMap.put(option, option.toString().toLowerCase().replace('_', ' '));
 	}
 
 
 	/**
 	 * Returns a map of enum<->toString association.
 	 * 
-	 * @return
+	 * @return enum<->toString association map
 	 */
-	public static Map<BundleDisplayOption, String> optionsMap() {
-		return optionsMap;
+	public static Map<BundleDisplayOption, String> toStringMap() {
+		return toStringMap;
 	}
 
+	/**
+	 * Returns a String representation for the given bundle.
+	 * 
+	 * @param bundle OSGi bundle
+	 * @return bundle String representation
+	 */
 	public abstract String display(Bundle bundle);
 }
