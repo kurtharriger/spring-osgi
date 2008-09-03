@@ -13,6 +13,7 @@
   <packaging>pom</packaging>
   
   <modules>
+	<module>logging</module>
     <module>war</module>
   </modules>
   

@@ -23,40 +23,40 @@ import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
- * Enumeration describing the bundle listing options.
+ * OSGi bundle identifier enumeration.
  * 
  * @author Costin Leau
  */
-public enum BundleDisplayOption {
+public enum BundleIdentifier {
 	ID {
 
 		@Override
-		public String display(Bundle bundle) {
+		public String toString(Bundle bundle) {
 			return (bundle == null ? "null" : String.valueOf(bundle.getBundleId()));
 		}
 	},
 	NAME {
 
 		@Override
-		public String display(Bundle bundle) {
+		public String toString(Bundle bundle) {
 			return OsgiStringUtils.nullSafeName(bundle);
 		}
 	},
 	SYMBOLIC_NAME {
 
 		@Override
-		public String display(Bundle bundle) {
+		public String toString(Bundle bundle) {
 			return OsgiStringUtils.nullSafeSymbolicName(bundle);
 		}
 	};
 
 	// Initialize the toString map
-	private static final Map<BundleDisplayOption, String> toStringMap = new EnumMap<BundleDisplayOption, String>(
-		BundleDisplayOption.class);
+	private static final Map<BundleIdentifier, String> toStringMap = new EnumMap<BundleIdentifier, String>(
+		BundleIdentifier.class);
 
 	static {
 		// create toString map
-		for (BundleDisplayOption option : BundleDisplayOption.values())
+		for (BundleIdentifier option : BundleIdentifier.values())
 			toStringMap.put(option, option.toString().toLowerCase().replace('_', ' '));
 	}
 
@@ -66,7 +66,7 @@ public enum BundleDisplayOption {
 	 * 
 	 * @return enum<->toString association map
 	 */
-	public static Map<BundleDisplayOption, String> toStringMap() {
+	public static Map<BundleIdentifier, String> toStringMap() {
 		return toStringMap;
 	}
 
@@ -76,5 +76,5 @@ public enum BundleDisplayOption {
 	 * @param bundle OSGi bundle
 	 * @return bundle String representation
 	 */
-	public abstract String display(Bundle bundle);
+	public abstract String toString(Bundle bundle);
 }

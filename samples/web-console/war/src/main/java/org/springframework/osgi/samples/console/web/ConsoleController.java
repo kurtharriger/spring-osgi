@@ -24,7 +24,7 @@ import java.util.Map;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.osgi.samples.console.service.BundleDisplayOption;
+import org.springframework.osgi.samples.console.service.BundleIdentifier;
 import org.springframework.osgi.samples.console.service.OsgiConsole;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -66,17 +66,23 @@ public class ConsoleController {
 	 */
 	@RequestMapping("/console.do")
 	public void consoleHandler(@ModelAttribute("selection")
-	SelectionCommand selectionCommand, Model model) {
+	SelectionCommand selectionCommand, BindingResult bindingResult, Model model) {
 		// apply default for selected bundle (if needed)
 		if (selectionCommand.getBundleId() == null) {
 			selectionCommand.setBundleId(console.getDefaultBundleId());
 		}
-
-		BundleDisplayOption displayChoice = selectionCommand.getDisplayChoice();
+		BundleIdentifier displayChoice = selectionCommand.getDisplayChoice();
 		Bundle bundle = console.getBundle(selectionCommand.getBundleId());
 
 		model.addAttribute("bundles", listBundles(displayChoice));
 		model.addAttribute("bundleInfo", createBundleInfo(bundle, displayChoice));
+
+		searchPatternValidator.validate(selectionCommand.getSearchPattern(), bindingResult);
+
+		if (bindingResult.hasErrors()) {
+			return;
+		}
+
 		model.addAttribute("searchResult", search(bundle, selectionCommand.getSearchChoice(),
 			selectionCommand.getSearchPattern()));
 	}
@@ -88,11 +94,11 @@ public class ConsoleController {
 	 * @param model model associated with the view
 	 * @return "bundles" attribute
 	 */
-	public Map<Long, String> listBundles(BundleDisplayOption displayChoice) {
+	public Map<Long, String> listBundles(BundleIdentifier displayChoice) {
 		Bundle[] bundles = console.listBundles();
 		Map<Long, String> map = new LinkedHashMap<Long, String>(bundles.length);
 		for (Bundle bundle : bundles) {
-			map.put(bundle.getBundleId(), displayChoice.display(bundle));
+			map.put(bundle.getBundleId(), displayChoice.toString(bundle));
 		}
 		return map;
 	}
@@ -103,8 +109,8 @@ public class ConsoleController {
 	 * @return installed bundles map
 	 */
 	@ModelAttribute("displayOptions")
-	public Map<BundleDisplayOption, String> listingOptions() {
-		return BundleDisplayOption.toStringMap();
+	public Map<BundleIdentifier, String> listingOptions() {
+		return BundleIdentifier.toStringMap();
 	}
 
 	@ModelAttribute("searchChoices")
@@ -112,7 +118,7 @@ public class ConsoleController {
 		return SearchSpace.toStringMap();
 	}
 
-	private BundleInfo createBundleInfo(Bundle bundle, BundleDisplayOption displayChoice) {
+	private BundleInfo createBundleInfo(Bundle bundle, BundleIdentifier displayChoice) {
 		BundleInfo info = new BundleInfo(bundle);
 		addWiring(info);
 		addServices(info, displayChoice);
@@ -124,7 +130,7 @@ public class ConsoleController {
 		info.addImportedPackages(console.getImportedPackages(info.getBundle()));
 	}
 
-	private void addServices(BundleInfo info, BundleDisplayOption displayChoice) {
+	private void addServices(BundleInfo info, BundleIdentifier displayChoice) {
 		for (ServiceReference registeredReference : console.getRegisteredServices(info.getBundle())) {
 			info.addRegisteredServices(new BundleInfo.OsgiService(registeredReference, displayChoice));
 		}

@@ -124,8 +124,8 @@ public class DefaultOsgiConsole implements OsgiConsole {
 			}
 		}
 		catch (IOException ex) {
-			throw new IllegalArgumentException("Cannot perform search using pattern [" + pattern + "] on bundle "
-					+ OsgiStringUtils.nullSafeNameAndSymName(bundle), ex);
+			// invalid pattern
+			return null;
 		}
 
 		return result;
