@@ -2,7 +2,7 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.2.0 M1 (2008-mm-dd)
+Changes in version 1.2.0 M1 (2008-09-dd)
 ----------------------------------------
 
 General
@@ -17,6 +17,10 @@ Package org.springframework.osgi.extender
 * fixed bug related to enabling Spring-DM annotation depedency processing
 * improved annotation injection processing
 * improved extender configuration thread-safety
+
+Package org.springframework.osgi.io
+* improved existence check for bundle resources
+* improved jar space pattern matching when the root is not specified
 
 Package org.springframework.osgi.service
 * changed the proxying classloader strategy to address package dependency visibility
