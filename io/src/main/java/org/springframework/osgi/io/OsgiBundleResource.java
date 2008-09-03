@@ -320,6 +320,7 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	 * path, i.e. if the resource is not available in a file system
 	 */
 	public File getFile() throws IOException {
+		// locate the file inside the bundle only known prefixes
 		if (searchType != OsgiResourceUtils.PREFIX_TYPE_UNKNOWN) {
 			String bundleLocation = bundle.getLocation();
 			if (bundleLocation.startsWith(ResourceUtils.FILE_URL_PREFIX)) {
@@ -493,5 +494,27 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	// TODO: can this return null or throw an exception
 	public String getPathWithinContext() {
 		return pathWithoutPrefix;
+	}
+
+	/**
+	 * Return whether this resource actually exists in physical form.
+	 * <p>
+	 * This method performs a definitive existence check, whereas the existence
+	 * of a <code>Resource</code> handle only guarantees a valid descriptor
+	 * handle.
+	 * 
+	 * <p/>The existence check is done by opening an InputStream to the
+	 * underlying resource (overriding the default implementation which checks
+	 * first for the presence of a File).
+	 */
+	public boolean exists() {
+		try {
+			InputStream is = getInputStream();
+			is.close();
+			return true;
+		}
+		catch (Throwable isEx) {
+			return false;
+		}
 	}
 }
