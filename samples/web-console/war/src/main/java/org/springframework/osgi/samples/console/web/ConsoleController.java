@@ -29,6 +29,8 @@ import org.springframework.osgi.samples.console.service.OsgiConsole;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -42,15 +44,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ConsoleController {
 
 	private final OsgiConsole console;
+	private final Validator searchPatternValidator;
 
 
+	/**
+	 * Constructs a new <code>ConsoleController</code> instance.
+	 * 
+	 * @param console console service
+	 */
 	@Autowired
 	public ConsoleController(OsgiConsole console) {
 		this.console = console;
+		this.searchPatternValidator = new SearchPatternValidator();
 	}
 
 	/**
 	 * Custom handler for the welcome view.
+	 * 
+	 * @param selectionCommand
+	 * @param model
 	 */
 	@RequestMapping("/console.do")
 	public void consoleHandler(@ModelAttribute("selection")
@@ -62,11 +74,11 @@ public class ConsoleController {
 
 		BundleDisplayOption displayChoice = selectionCommand.getDisplayChoice();
 		Bundle bundle = console.getBundle(selectionCommand.getBundleId());
-		SearchSpace searchChoice = SearchSpace.BUNDLE;
 
 		model.addAttribute("bundles", listBundles(displayChoice));
 		model.addAttribute("bundleInfo", createBundleInfo(bundle, displayChoice));
-		model.addAttribute("searchResult", search(bundle, searchChoice, "**/*"));
+		model.addAttribute("searchResult", search(bundle, selectionCommand.getSearchChoice(),
+			selectionCommand.getSearchPattern()));
 	}
 
 	/**
@@ -85,12 +97,22 @@ public class ConsoleController {
 		return map;
 	}
 
+	/**
+	 * Returns an map of installed bundles.
+	 * 
+	 * @return installed bundles map
+	 */
 	@ModelAttribute("displayOptions")
 	public Map<BundleDisplayOption, String> listingOptions() {
-		return BundleDisplayOption.optionsMap();
+		return BundleDisplayOption.toStringMap();
 	}
 
-	public BundleInfo createBundleInfo(Bundle bundle, BundleDisplayOption displayChoice) {
+	@ModelAttribute("searchChoices")
+	public Map<SearchSpace, String> searchOptions() {
+		return SearchSpace.toStringMap();
+	}
+
+	private BundleInfo createBundleInfo(Bundle bundle, BundleDisplayOption displayChoice) {
 		BundleInfo info = new BundleInfo(bundle);
 		addWiring(info);
 		addServices(info, displayChoice);
@@ -112,6 +134,16 @@ public class ConsoleController {
 		}
 	}
 
+	/**
+	 * Searches the bundle for the given user pattern. Additionally, this method
+	 * handles the search space.
+	 * 
+	 * @param bundle OSGi bundle
+	 * @param searchChoice bundle search space
+	 * @param userPattern search pattern
+	 * 
+	 * @return collection of matching paths
+	 */
 	private Collection<String> search(Bundle bundle, SearchSpace searchChoice, String userPattern) {
 		if (!StringUtils.hasText(userPattern)) {
 			return Collections.emptyList();

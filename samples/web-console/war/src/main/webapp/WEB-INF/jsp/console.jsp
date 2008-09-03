@@ -19,7 +19,7 @@
 	 Additionally, resources can be searched in one of the bundle <i>spaces</i>. 
   </p>
   
-  <h3>Select Bundle</h3> 
+  <h3>Select Bundle</h3>
 	  <form:form modelAttribute="selection">
        <table>
 	      <tr>
@@ -137,6 +137,23 @@
   
   <h3>Bundle Search</h3>
  
+  <form:form modelAttribute="selection">
+    <table>
+     <tr>
+      <td>Search Space:</td>
+      <td><form:select path="searchChoice" items="${searchChoices}"/></td>
+      </tr>
+	  <tr>
+      <td>Pattern:</td>
+      <td><form:input path="searchPattern"/></td>
+  	  </tr>
+  	  <tr>
+         <td colspan="2">
+  			  <p class="submit"><input align="center" type="submit" value="Search Bundle"/></p>
+         </td>
+      </tr>
+	</table>
+  </form:form>
 
   <c:set var="searchEntries" value="${fn:length(searchResult)}" />
   
@@ -148,7 +165,8 @@
         <c:otherwise>
             entries
        </c:otherwise>
-    </c:choose>)</h4>
+      </c:choose>)
+  </h4>
   <table>
     <tr><td>
     <c:forEach var="result" items="${searchResult}">

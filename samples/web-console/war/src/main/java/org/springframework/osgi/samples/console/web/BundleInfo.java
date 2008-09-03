@@ -43,6 +43,12 @@ import org.springframework.util.ObjectUtils;
  */
 public class BundleInfo {
 
+	/**
+	 * Description POJO for an OSGi service reference. Extracts the relevant
+	 * information in a suitable manner for expression languages (EL).
+	 * 
+	 * @author Costin Leau
+	 */
 	public static class OsgiService {
 
 		private final Collection<String> usingBundles;
@@ -50,6 +56,12 @@ public class BundleInfo {
 		private final String bundle;
 
 
+		/**
+		 * Constructs a new <code>OsgiService</code> instance.
+		 * 
+		 * @param reference OSGi service reference
+		 * @param displayOption bundle to String convertor
+		 */
 		public OsgiService(ServiceReference reference, BundleDisplayOption displayOption) {
 			Hashtable<String, Object> props = new Hashtable<String, Object>();
 			for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) OsgiServiceReferenceUtils.getServicePropertiesSnapshotAsMap(
@@ -68,14 +80,29 @@ public class BundleInfo {
 			usingBundles = Collections.unmodifiableCollection(usingBundlesString);
 		}
 
+		/**
+		 * Returns the list of bundles using the OSGi service.
+		 * 
+		 * @return list of bundles (given as strings)
+		 */
 		public Collection<String> getUsingBundles() {
 			return usingBundles;
 		}
 
+		/**
+		 * Returns a map containing the OSGi service properties.
+		 * 
+		 * @return service properties map
+		 */
 		public Map<String, Object> getProperties() {
 			return properties;
 		}
 
+		/**
+		 * Returns the owning bundle (as String).
+		 * 
+		 * @return service owning bundle
+		 */
 		public String getBundle() {
 			return bundle;
 		}
@@ -92,6 +119,11 @@ public class BundleInfo {
 	private final Bundle bundle;
 
 
+	/**
+	 * Constructs a new <code>BundleInfo</code> instance.
+	 * 
+	 * @param bundle OSGi bundle
+	 */
 	public BundleInfo(Bundle bundle) {
 		this.bundle = bundle;
 		// initialize properties
@@ -110,60 +142,104 @@ public class BundleInfo {
 		properties.put(headerName, headers.get(headerName));
 	}
 
+	/**
+	 * Returns bundle properties.
+	 * 
+	 * @return bundle properties
+	 */
 	public Map<String, Object> getProperties() {
 		return properties;
 	}
 
-	public void addProperty(String name, Object value) {
+	void addProperty(String name, Object value) {
 		properties.put(name, (value == null ? "" : value));
 	}
 
+	/**
+	 * Returns the backing bundle.
+	 * 
+	 * @return backing bundle
+	 */
 	public Bundle getBundle() {
 		return bundle;
 	}
 
+	/**
+	 * Returns the backing bundle location.
+	 * 
+	 * @return backing bundle location
+	 */
 	public String getLocation() {
 		return bundle.getLocation();
 	}
 
+	/**
+	 * Returns the bundle state (as a String).
+	 * 
+	 * @return backing bundle state
+	 */
 	public String getState() {
 		return state;
 	}
 
+	/**
+	 * Returns the backing bundle last modified date.
+	 * 
+	 * @return backing bundle last modified date
+	 */
 	public Date getLastModified() {
 		return lastModified;
 	}
 
+	/**
+	 * Returns a collection of packages exported by the backing bundle.
+	 * 
+	 * @return collection of exported packages
+	 */
 	public Collection<String> getExportedPackages() {
 		return exportedPackages;
 	}
 
-	public void addExportedPackages(String... exportedPackage) {
+	void addExportedPackages(String... exportedPackage) {
 		CollectionUtils.mergeArrayIntoCollection(exportedPackage, exportedPackages);
 	}
 
+	/**
+	 * Returns a collection of packages imported by the backing bundle.
+	 * 
+	 * @return collectio of imported packages
+	 */
 	public Collection<String> getImportedPackages() {
 		return importedPackages;
 	}
 
-	public void addImportedPackages(String... importedPackage) {
+	void addImportedPackages(String... importedPackage) {
 		CollectionUtils.mergeArrayIntoCollection(importedPackage, importedPackages);
 	}
 
+	/**
+	 * Returns a collection of services registered by the backing bundle.
+	 * 
+	 * @return collection of registered services
+	 */
 	public Collection<OsgiService> getRegisteredServices() {
 		return registeredServices;
 	}
 
-	public void addRegisteredServices(OsgiService registeredService) {
+	void addRegisteredServices(OsgiService registeredService) {
 		this.registeredServices.add(registeredService);
 	}
 
+	/**
+	 * Returns a collection of services used by the backing bundle.
+	 * 
+	 * @return collection of services in use
+	 */
 	public Collection<OsgiService> getServicesInUse() {
 		return servicesInUse;
 	}
 
-	public void addServiceInUse(OsgiService serviceInUse) {
+	void addServiceInUse(OsgiService serviceInUse) {
 		this.servicesInUse.add(serviceInUse);
 	}
-
 }

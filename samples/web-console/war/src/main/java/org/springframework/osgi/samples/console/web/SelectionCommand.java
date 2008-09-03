@@ -19,13 +19,19 @@ package org.springframework.osgi.samples.console.web;
 import org.springframework.osgi.samples.console.service.BundleDisplayOption;
 
 /**
+ * Command object for selecting the bundle under analysis, the bundle display
+ * option and the bundle search pattern and choice.
+ * 
  * @author Costin Leau
  * 
  */
 public class SelectionCommand {
 
+	private static final String DEFAULT_SEARCH_PATTERN = "**/*";
 	private Long bundleId;
 	private BundleDisplayOption displayChoice = BundleDisplayOption.NAME;
+	private SearchSpace searchChoice = SearchSpace.BUNDLE;
+	private String searchPattern = DEFAULT_SEARCH_PATTERN;
 
 
 	public Long getBundleId() {
@@ -44,8 +50,25 @@ public class SelectionCommand {
 		this.displayChoice = selectedDisplayOption;
 	}
 
+	public SearchSpace getSearchChoice() {
+		return searchChoice;
+	}
+
+	public void setSearchChoice(SearchSpace searchChoice) {
+		this.searchChoice = searchChoice;
+	}
+
+	public String getSearchPattern() {
+		return searchPattern;
+	}
+
+	public void setSearchPattern(String searchPattern) {
+		this.searchPattern = searchPattern;
+	}
+
 	@Override
 	public String toString() {
-		return "[bundleId=" + bundleId + "|displayChoice=" + displayChoice.toString() + "]";
+		return "[bundleId=" + bundleId + "|displayChoice=" + displayChoice.toString() + "|searchSpace="
+				+ searchChoice.toString() + "]";
 	}
 }
