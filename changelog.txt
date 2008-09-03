@@ -17,6 +17,10 @@ Package org.springframework.osgi.extender
 * improved annotation injection processing
 * improved extender configuration thread-safety
 
+Package org.springframework.osgi.io
+* improved existence check for bundle resources
+* improved jar space pattern matching when the root is not specified
+
 Package org.springframework.osgi.service
 * changed the proxying classloader strategy to address package dependency visibility
 * fixed usage of incorrect class loader for imported services with client thread context class loader management

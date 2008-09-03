@@ -155,7 +155,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		Assert.notNull(locationPattern, "Location pattern must not be null");
 		int type = OsgiResourceUtils.getSearchType(locationPattern);
 
-		// look for patterns
+		// look for patterns (includes classpath*:)
 		if (getPathMatcher().isPattern(locationPattern)) {
 			// treat classpath as a special case
 			if (OsgiResourceUtils.isClassPathType(type))
@@ -168,20 +168,23 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		// - treat this case below
 		else {
 			Resource[] result = null;
-			// consider bundle-space which can return multiple URLs
-			if (type == OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED
-					|| type == OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE) {
-				OsgiBundleResource resource = new OsgiBundleResource(bundle, locationPattern);
-				URL[] urls = resource.getAllUrlsFromBundleSpace(locationPattern);
-				result = OsgiResourceUtils.convertURLArraytoResourceArray(urls);
-			}
 
-			else if (type == OsgiResourceUtils.PREFIX_TYPE_CLASS_SPACE) {
-				// remove prefix
-				String location = OsgiResourceUtils.stripPrefix(locationPattern);
-				result = OsgiResourceUtils.convertURLEnumerationToResourceArray(bundle.getResources(location));
-			}
+			OsgiBundleResource resource = new OsgiBundleResource(bundle, locationPattern);
 
+			switch (type) {
+				// same as bundle space
+				case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
+					// consider bundle-space which can return multiple URLs
+				case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
+					URL[] urls = resource.getAllUrlsFromBundleSpace(locationPattern);
+					result = OsgiResourceUtils.convertURLArraytoResourceArray(urls);
+					break;
+				// for the rest go with the normal resolving
+				default:
+					if (!resource.exists())
+						result = new Resource[] { resource };
+					break;
+			}
 			return result;
 		}
 	}
@@ -496,7 +499,8 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	}
 
 	/**
-	 * Override it to pass in the searchType parameter.
+	 * Replace the super class implementation to pass in the searchType
+	 * parameter.
 	 * 
 	 * @see PathMatchingResourcePatternResolver#findPathMatchingResources(String)
 	 */
@@ -563,6 +567,10 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 
 		if (rootPath != null) {
 			String cleanPath = OsgiResourceUtils.stripPrefix(rootPath);
+			// sanitize the root folder (since it's possible to not specify the root which fails any further matches)
+			if (!cleanPath.endsWith(FOLDER_SEPARATOR)) {
+				cleanPath = cleanPath + FOLDER_SEPARATOR;
+			}
 			String fullPattern = cleanPath + subPattern;
 			Set result = new LinkedHashSet(16);
 			doRetrieveMatchingBundleEntries(bundle, fullPattern, cleanPath, result, searchType);

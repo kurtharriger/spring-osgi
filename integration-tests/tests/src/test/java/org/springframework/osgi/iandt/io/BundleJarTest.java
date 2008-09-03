@@ -58,4 +58,11 @@ public class BundleJarTest extends BaseIoTest {
 		Resource resource = patternLoader.getResource("osgibundlejar:/org/springframework/osgi/iandt/io/duplicate.file");
 		assertTrue(resource.lastModified() > 0);
 	}
+
+	// wild pattern matching
+	public void testResourcesFromWildCardWithAndWithoutLeadingSlash() throws Exception {
+		Resource[] res = patternLoader.getResources("osgibundlejar:**/*");
+		Resource[] res2 = patternLoader.getResources("osgibundlejar:/**/*");
+		assertEquals(res2.length, res.length);
+	}
 }
