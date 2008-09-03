@@ -16,7 +16,7 @@
 
 package org.springframework.osgi.samples.console.web;
 
-import org.springframework.osgi.samples.console.service.BundleDisplayOption;
+import org.springframework.osgi.samples.console.service.BundleIdentifier;
 
 /**
  * Command object for selecting the bundle under analysis, the bundle display
@@ -29,7 +29,7 @@ public class SelectionCommand {
 
 	private static final String DEFAULT_SEARCH_PATTERN = "**/*";
 	private Long bundleId;
-	private BundleDisplayOption displayChoice = BundleDisplayOption.NAME;
+	private BundleIdentifier displayChoice = BundleIdentifier.NAME;
 	private SearchSpace searchChoice = SearchSpace.BUNDLE;
 	private String searchPattern = DEFAULT_SEARCH_PATTERN;
 
@@ -42,11 +42,11 @@ public class SelectionCommand {
 		this.bundleId = bundleId;
 	}
 
-	public BundleDisplayOption getDisplayChoice() {
+	public BundleIdentifier getDisplayChoice() {
 		return displayChoice;
 	}
 
-	public void setDisplayChoice(BundleDisplayOption selectedDisplayOption) {
+	public void setDisplayChoice(BundleIdentifier selectedDisplayOption) {
 		this.displayChoice = selectedDisplayOption;
 	}
 

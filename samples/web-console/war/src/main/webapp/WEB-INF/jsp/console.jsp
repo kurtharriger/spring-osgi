@@ -39,13 +39,6 @@
           </tr>
   	  </table>
   	  </form:form>
-  	  
-      <h4>Tip</h4>
-            
-      The Content Servlet can serve <i>any</i> resource from the OSGi space through Spring-DM
-	  Spring-DM <tt>ResourceLoader</tt>. If no prefix is specified, resources are resolved from
-	  the servlet own bundle. However, by using <tt>classpath:</tt>, <tt>osgibundlejar:</tt> you can get access to the other <i>spaces</i>
-	  defined by OSGi (for more information, see OsgiBundleResourceLoader <a href="http://static.springframework.org/osgi/docs/current/api/org/springframework/osgi/io/OsgiBundleResourceLoader.html">javadoc</a>).
   <br/>
  
   <h3>Bundle Synopsis</h3>
@@ -134,24 +127,27 @@
   	</tr>
   	</c:forEach>
   </table>
-  
+
+  <a name="search"></a>
   <h3>Bundle Search</h3>
- 
-  <form:form modelAttribute="selection">
+
+  <form:form modelAttribute="selection" action="#search">
     <table>
      <tr>
-      <td>Search Space:</td>
-      <td><form:select path="searchChoice" items="${searchChoices}"/></td>
-      </tr>
-	  <tr>
-      <td>Pattern:</td>
+      <td width="80%">Search Space: </td>
+      <td width="20%"><form:select path="searchChoice" items="${searchChoices}"/></td>
+     </tr>
+     <tr>
+      <td>Pattern:<br/>
+        <form:errors path="*" cssClass="errors"/>
+      </td>
       <td><form:input path="searchPattern"/></td>
-  	  </tr>
-  	  <tr>
-         <td colspan="2">
-  			  <p class="submit"><input align="center" type="submit" value="Search Bundle"/></p>
-         </td>
-      </tr>
+  	 </tr>
+  	 <tr>
+      <td colspan="2">
+  		<p class="submit"><input align="center" type="submit" value="Search Bundle"/></p>
+      </td>
+     </tr>
 	</table>
   </form:form>
 

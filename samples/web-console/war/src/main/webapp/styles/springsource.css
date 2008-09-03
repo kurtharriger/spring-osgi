@@ -36,6 +36,11 @@ h3{
   line-height:32px;
 }
 
+.errors {
+	color: red;
+	font-weight: bold;
+}
+
 a:link{color:#7db223; text-decoration:underline; font-size:13px;}
 a:hover{color:#456314; text-decoration:underline; font-size:13px;}
 a:active{color:#7db223; text-decoration:underline; font-size:13px;}

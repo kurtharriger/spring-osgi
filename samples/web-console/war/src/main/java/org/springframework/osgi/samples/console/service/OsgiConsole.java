@@ -89,11 +89,13 @@ public interface OsgiConsole {
 
 	/**
 	 * Returns a collection of paths, contained by the given bundle, that match
-	 * the given pattern.
+	 * the given pattern. If the pattern cannot be resolved, a <tt>null</tt>
+	 * collection is returned.
 	 * 
 	 * @param bundle OSGi bundle
 	 * @param pattern path search pattern
-	 * @return collection of matching paths
+	 * @return collection of matching paths or null if the given pattern is
+	 * invalid
 	 */
 	Collection<String> search(Bundle bundle, String pattern);
 }

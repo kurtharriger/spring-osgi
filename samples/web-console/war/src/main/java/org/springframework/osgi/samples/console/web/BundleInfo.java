@@ -29,7 +29,7 @@ import java.util.Set;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
-import org.springframework.osgi.samples.console.service.BundleDisplayOption;
+import org.springframework.osgi.samples.console.service.BundleIdentifier;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -62,7 +62,7 @@ public class BundleInfo {
 		 * @param reference OSGi service reference
 		 * @param displayOption bundle to String convertor
 		 */
-		public OsgiService(ServiceReference reference, BundleDisplayOption displayOption) {
+		public OsgiService(ServiceReference reference, BundleIdentifier displayOption) {
 			Hashtable<String, Object> props = new Hashtable<String, Object>();
 			for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) OsgiServiceReferenceUtils.getServicePropertiesSnapshotAsMap(
 				reference).entrySet()) {
@@ -70,12 +70,12 @@ public class BundleInfo {
 			}
 			properties = Collections.unmodifiableMap(props);
 
-			bundle = displayOption.display(reference.getBundle());
+			bundle = displayOption.toString(reference.getBundle());
 			Collection<String> usingBundlesString = new ArrayList<String>();
 			Bundle[] usingBndls = reference.getUsingBundles();
 			if (usingBndls != null)
 				for (Bundle usingBundle : usingBndls) {
-					usingBundlesString.add(displayOption.display(usingBundle));
+					usingBundlesString.add(displayOption.toString(usingBundle));
 				}
 			usingBundles = Collections.unmodifiableCollection(usingBundlesString);
 		}
