@@ -36,10 +36,10 @@ import org.apache.commons.logging.LogFactory;
  *    thread2.start();
  *    counter.increment();
  *    thread3.start();
- *  
- *    // wait 1 second for other threads to complete
- *    counter.waitForZero(1000);
- * }
+ *  } 
+ *  // wait 1 second for other threads to complete
+ *  counter.waitForZero(1000);
+ * 
  * 
  * Thread 2:
  *  // do some work
