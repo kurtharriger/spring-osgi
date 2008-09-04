@@ -15,7 +15,6 @@
     <module>simple-service</module>
     <module>weather</module>
     <module>simple-web-app</module>
-    <module>web-console</module>
   </modules>
   
   <reporting>
@@ -47,5 +46,17 @@
 
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>jdk-1.5+</id>
+        <activation>
+          <jdk>!1.4</jdk>
+        </activation>
+        <modules>
+          <module>web-console</module>
+        </modules>
+    </profile>
+  </profiles>
 	
 </project>
