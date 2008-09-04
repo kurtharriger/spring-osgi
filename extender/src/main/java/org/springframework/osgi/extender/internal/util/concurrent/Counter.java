@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extender.internal.util.concurrent;
 
 import org.apache.commons.logging.Log;
@@ -31,15 +32,13 @@ import org.apache.commons.logging.LogFactory;
  * 
  * <pre style="code">
  * Thread 1:
- *  synchronized(counter) {
- *    counter.increment();
- *    thread2.start();
- *    counter.increment();
- *    thread3.start();
- *  
- *    // wait 1 second for other threads to complete
- *    counter.waitForZero(1000);
- * }
+ *  counter.increment();
+ *  thread2.start();
+ *  counter.increment();
+ *  thread3.start();
+ *   
+ *  // wait 1 second for other threads to complete
+ *  counter.waitForZero(1000);
  * 
  * Thread 2:
  *  // do some work
@@ -66,8 +65,10 @@ public class Counter {
 
 	private final String name;
 
+
 	/**
 	 * Create counter with a given name.
+	 * 
 	 * @param name counter name
 	 */
 	public Counter(String name) {
@@ -102,6 +103,7 @@ public class Counter {
 
 	/**
 	 * Check if the counter value is zero.
+	 * 
 	 * @return true if value is equal or below zero, false otherwise.
 	 */
 	public synchronized boolean isZero() {
@@ -138,12 +140,12 @@ public class Counter {
 
 	/**
 	 * Wait maximum the given amount of time, for the counter to reach the given
-	 * value.. This mechanism relies on {@link Object#wait(long)} and
+	 * value. This mechanism relies on {@link Object#wait(long)} and
 	 * {@link Object#notify()} mechanism to work appropriately. Please see the
 	 * class javadoc for more info.
 	 * 
-	 * <p/> This method will stop waiting and return true if the thread
-	 * is interrupted.
+	 * <p/> This method will stop waiting and return true if the thread is
+	 * interrupted.
 	 * 
 	 * @param value the value to wait for
 	 * @param waitTime the time (in miliseconds) to wait for zero value
