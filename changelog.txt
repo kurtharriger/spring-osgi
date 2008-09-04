@@ -16,6 +16,7 @@ Package org.springframework.osgi.extender
 * fixed bug related to enabling Spring-DM annotation depedency processing
 * improved annotation injection processing
 * improved extender configuration thread-safety
+* fixed potential race condition in asynchronous waiting for service dependencies
 
 Package org.springframework.osgi.io
 * improved existence check for bundle resources

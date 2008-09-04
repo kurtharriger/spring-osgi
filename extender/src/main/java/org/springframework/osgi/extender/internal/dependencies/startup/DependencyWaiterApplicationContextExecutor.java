@@ -154,6 +154,10 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		this.delegateContext.setExecutor(this);
 		this.synchronousWait = syncWait;
 		this.dependencyFactories = dependencyFactories;
+
+		synchronized (monitor) {
+			watchdogTask = new WatchDogTask();
+		}
 	}
 
 	/**
@@ -256,7 +260,10 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			else {
 				// there are dependencies not met
 				// register a listener to look for them
-				dependencyDetector = dl;
+				synchronized (monitor) {
+					dependencyDetector = dl;
+				}
+
 				if (debug)
 					log.debug("Registering service dependency dependencyDetector for " + getDisplayName());
 				dependencyDetector.register();
@@ -277,11 +284,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				else {
 					// start the watchdog (we're asynch)
 					startWatchDog();
-
-					if (debug)
-						log.debug("Asynch wait-for-dependencies; ending method");
 				}
-
 			}
 		}
 		catch (Throwable e) {
@@ -378,18 +381,21 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		close();
 
 		StringBuffer buf = new StringBuffer();
-		if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
-			buf.append("none");
-		}
-		else {
-			for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().keySet().iterator(); dependencies.hasNext();) {
-				MandatoryServiceDependency dependency = (MandatoryServiceDependency) dependencies.next();
-				buf.append(dependency.toString());
-				if (dependencies.hasNext()) {
-					buf.append(", ");
+		synchronized (monitor) {
+			if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
+				buf.append("none");
+			}
+			else {
+				for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().keySet().iterator(); dependencies.hasNext();) {
+					MandatoryServiceDependency dependency = (MandatoryServiceDependency) dependencies.next();
+					buf.append(dependency.toString());
+					if (dependencies.hasNext()) {
+						buf.append(", ");
+					}
 				}
 			}
 		}
+
 		StringBuffer message = new StringBuffer();
 		message.append("Unable to create application context for [");
 		message.append(getBundleSymbolicName());
@@ -438,18 +444,34 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 * Schedule the watchdog task.
 	 */
 	protected void startWatchDog() {
+		boolean started = false;
 		synchronized (monitor) {
-			watchdogTask = new WatchDogTask();
-			watchdog.schedule(watchdogTask, timeout);
+			if (watchdogTask != null) {
+				started = true;
+				watchdog.schedule(watchdogTask, timeout);
+			}
+		}
+
+		boolean debug = log.isDebugEnabled();
+		if (debug) {
+			if (started)
+				log.debug("Asynch wait-for-dependencies started...");
+			else
+				log.debug("Dependencies satified; no need to start a watchdog...");
 		}
 	}
 
 	protected void stopWatchDog() {
+		boolean stopped = false;
 		synchronized (monitor) {
 			if (watchdogTask != null) {
 				watchdogTask.cancel();
 				watchdogTask = null;
+				stopped = true;
 			}
+		}
+		if (stopped && log.isDebugEnabled()) {
+			log.debug("Cancelled dependency watchdog...");
 		}
 	}
 
