@@ -26,14 +26,14 @@ equinox - Equinox 3.2.x
 knopflerfish - Knopflerfish 2.0.x/2.1.x
 felix - Apache Felix 1.0.x
 
-The OSGi platform should be always specified otherwise the project will not compile.
-We recommend that new users try building using Eclipse Equinox platform which is
-considered the default platform.
+The OSGi platform should be always specified otherwise the project will not
+compile.  We recommend that new users try building using Eclipse Equinox
+platform which is considered the default platform.
 
 1b. Running the integration tests
 
-By default the project builds only the distributable modules without running any
-integration tests. To run them, one should select the 'it' profile.
+By default the project builds only the distributable modules without running
+any integration tests.  To run them, one should select the 'it' profile.
 Note that 1a) applies, so an OSGi platform still has to be specified:
 
 # mvn -P equinox,it clean install
@@ -46,17 +46,18 @@ To compile and install the samples, use the 'samples' profile:
 
 1d. Using JDK 1.5 +
 
-Spring DM requires JDK 1.4+ for its core infrastructure but provides 1.5 specific
-source code such as the annotation support. For this cases, the jdk-1.5+ profile
-have been created which should be activated by default (and thus include the 
-1.5-specific modules into the build).
+Spring DM requires JDK 1.4+ for its core infrastructure but provides 1.5
+specific source code such as the annotation support. For this cases, the
+jdk-1.5+ profile have been created which should be activated by default
+(and thus include the 1.5-specific modules into the build).
 
-To check the Java version used by maven, use the followig command:
+To check the Java version used by maven, use the following command:
 
 # mvn -v
 
-Unfortunately, at the moment (Maven 2.0.9), combining several profiles automatically
-activates doesn't seem to be supported (hence the need to always specify an OSGi platform
-even when using the default). We hope that in the future, the building process will
-be improved in this regards so the proper profiles will be applied automatically based
-on the existing environment.
+Unfortunately, at the moment (Maven 2.0.9), combining several profiles
+automatically activates doesn't seem to be supported (hence the need to
+always specify an OSGi platform even when using the default). We hope that
+in the future, the building process will be improved in this regards so the
+proper profiles will be applied automatically based on the existing
+environment.
