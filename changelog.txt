@@ -7,8 +7,9 @@ Changes in version 1.2.0 M1 (2008-09-dd)
 
 General
 * added new annotation-based, Spring-MVC sample
+* removed petclinic sample (superseeded by simple-web-app and web-console samples)
 * improved sample wars packaging
-* improved behaviour when running under a Java 2 SecurityManager
+* improved framework behaviour when running in environments with Java 2 security enabled
 
 Package org.springframework.osgi.context
 * added reporting of Errors raised during delegated refresh in AbstractDelegatedExecutionApplicationContext
