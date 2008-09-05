@@ -4,7 +4,6 @@
 <appendix id="appendix-extensions">
     <title>Extensions</title>
 
-<<<<<<< .working
 	<sidebar>
 	  <title>Spring-DM and Spring annotations</title>
 	  <para>This chapter describes the annotations present in Spring-DM and how
@@ -12,15 +11,6 @@
 	  framework; enabling or disabling one does not interfere with the other.</para>
 	</sidebar>
 		
-=======
-	<sidebar>
-	  <title>Spring-DM and Spring annotations</title>
-	  <para>This chapter describes the annotations present in Spring-DM and how
-	  to enable/disable them. Spring-DM annotatations are separate from the <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/new-in-2.html#new-in-2-ioc-annotations">annotation</ulink> <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/new-in-2.html#new-in-2-ioc-component-scanning">support</ulink> in Spring
-	  framework; enabling or disabling one does not interfere with the other.</para>
-	</sidebar>
-
->>>>>>> .merge-right.r13778
     <para>This appendix describes extensions to the core functionality that
     are shipped with the 1.0 distribution, but are not guaranteed to have
     backwards compatibility across point releases. We anticipate these
