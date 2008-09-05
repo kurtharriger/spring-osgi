@@ -2,7 +2,7 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.2.0 M1 (2008-09-dd)
+Changes in version 1.2.0 M1 (2008-09-05)
 ----------------------------------------
 
 General
