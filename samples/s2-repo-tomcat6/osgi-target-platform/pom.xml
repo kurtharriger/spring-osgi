@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.springframework.osgi</groupId>
+    		<artifactId>s2-repo-tomcat6</artifactId>
+   	 	<version>1.2.0</version>
+  	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.osgi</groupId>
+	<artifactId>osgi-target-platform</artifactId>
+	<packaging>pom</packaging>
+	<name>Spring Dynamic Modules Target Platform 6</name>
+	<url>http://www.springframework.org/osgi</url>
+	<description>
+		The Spring Dynamic Modules Web-enabled Target Platform
+	</description>
+	<profiles>
+	   <profile>
+	     <id>dependencies</id>
+              <build>	
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>.</outputDirectory>
+							<excludeTransitive>false</excludeTransitive>
+							<stripVersion>false</stripVersion>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	       </build>
+           </profile>
+        </profiles>
+</project>
