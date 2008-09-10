@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tomcat Config Fragment
+Bundle-SymbolicName: server.config
+Bundle-Version: 1.0.0
+Fragment-Host: org.springframework.osgi.catalina.start.osgi;bundle-version="1.0.0.SNAPSHOT"
