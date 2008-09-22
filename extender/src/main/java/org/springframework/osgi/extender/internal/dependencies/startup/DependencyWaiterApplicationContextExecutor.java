@@ -155,9 +155,6 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		this.synchronousWait = syncWait;
 		this.dependencyFactories = dependencyFactories;
 
-		synchronized (monitor) {
-			watchdogTask = new WatchDogTask();
-		}
 	}
 
 	/**
@@ -181,8 +178,12 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		synchronized (monitor) {
 			Assert.notNull(watchdog, "watchdog timer required");
 			Assert.notNull(monitorCounter, " monitorCounter required");
-			if (state != ContextState.INTERRUPTED && state != ContextState.STOPPED)
+			watchdogTask = new WatchDogTask();
+
+			if (state != ContextState.INTERRUPTED && state != ContextState.STOPPED) {
 				state = ContextState.INITIALIZED;
+			}
+
 			else {
 				RuntimeException ex = new IllegalStateException("cannot refresh an interrupted/closed context");
 				log.fatal(ex);
