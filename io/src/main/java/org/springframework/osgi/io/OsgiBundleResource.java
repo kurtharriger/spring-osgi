@@ -323,8 +323,9 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 		// locate the file inside the bundle only known prefixes
 		if (searchType != OsgiResourceUtils.PREFIX_TYPE_UNKNOWN) {
 			String bundleLocation = bundle.getLocation();
-			if (bundleLocation.startsWith(ResourceUtils.FILE_URL_PREFIX)) {
-				bundleLocation = bundleLocation.substring(ResourceUtils.FILE_URL_PREFIX.length());
+			int prefixIndex = bundleLocation.indexOf(ResourceUtils.FILE_URL_PREFIX);
+			if (prefixIndex > -1) {
+				bundleLocation = bundleLocation.substring(prefixIndex + ResourceUtils.FILE_URL_PREFIX.length());
 			}
 			File file = new File(bundleLocation, path);
 			if (file.exists()) {
