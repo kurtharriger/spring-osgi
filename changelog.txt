@@ -21,14 +21,13 @@ Package org.springframework.osgi.extender
 Package org.springframework.osgi.io
 * improved existence check for bundle resources
 * improved jar space pattern matching when the root is not specified
+* fixed classpath pattern matching on certain resources when the default Bundle-ClassPath entry (.) is not specified
+* improved file resolving under Equinox
 
 Package org.springframework.osgi.service
 * changed the proxying classloader strategy to address package dependency visibility
 * fixed usage of incorrect class loader for imported services with client thread context class loader management
 * fixed intermittent deadlock that appeared in some cases betweem importers and exporters during shutdown
-
-Package org.springframework.osgi.io
-* fixed classpath pattern matching on certain resources when the default Bundle-ClassPath entry (.) is not specified
 
 Package org.springframework.osgi.web
 * improved web extender configuration thread-safety
