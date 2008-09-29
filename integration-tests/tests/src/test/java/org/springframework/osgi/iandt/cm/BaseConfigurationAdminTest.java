@@ -16,15 +16,18 @@
 
 package org.springframework.osgi.iandt.cm;
 
+import java.io.File;
 import java.io.FilePermission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PropertyPermission;
 
 import org.osgi.framework.AdminPermission;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationPermission;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 import org.springframework.util.Assert;
@@ -39,7 +42,52 @@ import org.springframework.util.CollectionUtils;
 public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 
 	protected ConfigurationAdmin cm;
+	private final static String CONFIG_DIR = "test-config";
 
+
+	protected static void initializeDirectory(String dir) {
+		File directory = new File(dir);
+		remove(directory);
+		assertTrue(dir + " directory successfully created", directory.mkdirs());
+	}
+
+	private static void remove(File directory) {
+		if (directory.exists()) {
+			File[] files = directory.listFiles();
+			for (int i = 0; i < files.length; i++) {
+				File file = files[i];
+				if (file.isDirectory()) {
+					remove(file);
+				}
+				else {
+					assertTrue(file + " deleted", file.delete());
+				}
+			}
+			assertTrue(directory + " directory successfully cleared", directory.delete());
+		}
+	}
+
+	protected void preProcessBundleContext(BundleContext context) throws Exception {
+		super.preProcessBundleContext(context);
+		System.setProperty("felix.cm.dir", CONFIG_DIR);
+		initializeDirectory(CONFIG_DIR);
+	}
+
+	protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
+		ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
+			ConfigurationAdmin.class.getName(), null);
+		Assert.notNull(ref, "Configuration Admin not present");
+		ConfigurationAdmin ca = (ConfigurationAdmin) bundleContext.getService(ref);
+
+		try {
+			prepareConfiguration(ca);
+		}
+		catch (Exception ex) {
+			throw new RuntimeException("Cannot prepare Configuration Admin service");
+		}
+
+		return super.createApplicationContext(locations);
+	}
 
 	protected String[] getTestBundlesNames() {
 		// felix configuration admin implementation
@@ -58,14 +106,15 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 			ConfigurationAdmin.class.getName(), null);
 		Assert.notNull(ref, "Configuration Admin not present");
 		cm = (ConfigurationAdmin) bundleContext.getService(ref);
-
-		prepareConfiguration();
 	}
 
 	/**
-	 * Template method for creating a default configuration
+	 * Template method for initializing the Configuration Admin service
+	 * <b>before</b> the test application context gets created.
+	 * 
+	 * @throws Exception
 	 */
-	private void prepareConfiguration() {
+	protected void prepareConfiguration(ConfigurationAdmin configAdmin) throws Exception {
 	}
 
 	protected List getTestPermissions() {

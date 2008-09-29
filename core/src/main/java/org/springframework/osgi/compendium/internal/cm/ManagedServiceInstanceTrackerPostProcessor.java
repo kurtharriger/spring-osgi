@@ -35,7 +35,7 @@ public class ManagedServiceInstanceTrackerPostProcessor implements BundleContext
 
 	private final String trackedBean;
 	private ManagedServiceBeanManager managedServiceManager;
-	private Object pid;
+	private String pid;
 	private String updateMethod;
 	private UpdateStrategy updateStrategy;
 
@@ -72,7 +72,7 @@ public class ManagedServiceInstanceTrackerPostProcessor implements BundleContext
 	 * 
 	 * @param pid The pid to set.
 	 */
-	public void setPersistentId(Object pid) {
+	public void setPersistentId(String pid) {
 		this.pid = pid;
 	}
 

@@ -16,13 +16,17 @@
 
 package org.springframework.osgi.compendium.config;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -43,11 +47,22 @@ public class ManagedServiceTest extends TestCase {
 
 
 	protected void setUp() throws Exception {
+
+		MockControl mc = MockControl.createNiceControl(Configuration.class);
+		final Configuration cfg = (Configuration) mc.getMock();
+		mc.expectAndReturn(cfg.getProperties(), new Properties());
+		mc.replay();
+
 		BundleContext bundleContext = new MockBundleContext() {
 
-			// service reference already registered
-			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
-				return new ServiceReference[] { new MockServiceReference(new String[] { Serializable.class.getName() }) };
+			// always return a ConfigurationAdmin
+			public Object getService(ServiceReference reference) {
+				return new MockConfigurationAdmin() {
+
+					public Configuration getConfiguration(String pid) throws IOException {
+						return cfg;
+					}
+				};
 			}
 		};
 

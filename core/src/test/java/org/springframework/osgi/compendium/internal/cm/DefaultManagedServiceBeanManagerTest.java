@@ -39,7 +39,7 @@ public class DefaultManagedServiceBeanManagerTest extends TestCase {
 
 
 	protected void setUp() throws Exception {
-		cam = new ConfigurationAdminManager(new Object(), new MockBundleContext()) {
+		cam = new ConfigurationAdminManager("bla", new MockBundleContext()) {
 
 			public Map getConfiguration() {
 				return configuration;
