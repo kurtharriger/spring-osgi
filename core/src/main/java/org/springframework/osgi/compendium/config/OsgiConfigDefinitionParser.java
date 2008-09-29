@@ -1,4 +1,5 @@
-package org.springframework.osgi.config;
+
+package org.springframework.osgi.compendium.config;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.compendium.internal.OsgiConfig;
+import org.springframework.osgi.config.internal.ParserUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -37,6 +39,7 @@ class OsgiConfigDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	public static final String FACTORY_FIELD = "factory";
 
+
 	protected Class getBeanClass(Element element) {
 		return OsgiConfig.class;
 	}
@@ -47,6 +50,7 @@ class OsgiConfigDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		ParserUtils.parseCustomAttributes(element, builder, new ParserUtils.AttributeCallback() {
+
 			public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 				String name = attribute.getLocalName();
 				String value = attribute.getValue();

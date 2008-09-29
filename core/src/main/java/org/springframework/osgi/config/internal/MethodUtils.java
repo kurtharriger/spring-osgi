@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.config;
+package org.springframework.osgi.config.internal;
 
 import java.lang.reflect.Method;
 
 import org.springframework.core.JdkVersion;
 
 /**
- * Package protected class that deals with Method handling. The main intent for
- * this class is to support bridge methods without requiring a JDK 5 to compile
+ * Internal class that deals with Method handling. The main intent for this
+ * class is to support bridge methods without requiring a JDK 5 to compile
  * (since maven will use the same VM for tests which is not what we want as we
  * do integration testing).
  * 
  * @author Costin Leau
  * 
  */
-abstract class MethodUtils {
+public abstract class MethodUtils {
 
 	private static final int BRIDGE = 0x00000040;
 
@@ -37,7 +37,7 @@ abstract class MethodUtils {
 	private static final boolean isJDK5 = JdkVersion.isAtLeastJava15();
 
 
-	static boolean isBridge(Method method) {
+	public static boolean isBridge(Method method) {
 		if (isJDK5) {
 			return (method.getModifiers() & BRIDGE) != 0;
 		}

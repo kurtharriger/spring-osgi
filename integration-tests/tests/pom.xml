@@ -14,26 +14,29 @@
   
     <dependencies>
 
-        <!-- Configuration Admin (might be removed with the Felix bundle) -->
-        <dependency>
-            <groupId>org.knopflerfish.bundles</groupId>
-            <artifactId>cm_all</artifactId>
-            <version>2.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.knopflerfish.bundles</groupId>
-            <artifactId>log_all</artifactId>
-            <version>2.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        
         <!-- config admin (from Felix) -->
         <dependency>
 		   <groupId>org.apache.felix</groupId>
 		   <artifactId>org.apache.felix.configadmin</artifactId>
-		   <version>1.0.0</version>
+		   <version>1.0.4</version>
+		   <scope>provided</scope>
+		   <exclusions>
+            <exclusion>
+  			  <groupId>org.apache.felix</groupId>
+			  <artifactId>org.osgi.core</artifactId>
+            </exclusion>          
+            <exclusion>
+  			  <groupId>org.apache.felix</groupId>
+			  <artifactId>org.osgi.compendium</artifactId>
+            </exclusion>          
+		   </exclusions>
+		</dependency>
+
+		<!-- metatype service -->
+        <dependency>
+		   <groupId>org.apache.felix</groupId>
+		   <artifactId>org.apache.felix.metatype</artifactId>
+		   <version>1.0.2</version>
 		   <scope>provided</scope>
 		   <exclusions>
             <exclusion>

@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.config;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+package org.springframework.osgi.iandt.cm.managedservice;
+
+import java.util.Dictionary;
+import java.util.Properties;
+
+import org.osgi.service.cm.Configuration;
+import org.springframework.osgi.iandt.cm.BaseConfigurationAdminTest;
 
 /**
- * Namespace handler for Osgi Compendium definitions.
- * 
  * @author Costin Leau
  * 
  */
-class CompendiumNamespaceHandler extends NamespaceHandlerSupport {
+public class ManagedServiceTest extends BaseConfigurationAdminTest {
 
-	public void init() {
-		registerBeanDefinitionParser("property-placeholder", new OsgiPropertyPlaceholderDefinitionParser());
+	private final String ID = getClass().getName();
+	private final Dictionary props = new Properties();
 
-		//registerBeanDefinitionParser("config-properties", new OsgiConfigDefinitionParser());
+
+	public void testCM() throws Exception {
+		Configuration cfg = cm.getConfiguration(ID);
+		cfg.update(props);
 	}
-
 }
