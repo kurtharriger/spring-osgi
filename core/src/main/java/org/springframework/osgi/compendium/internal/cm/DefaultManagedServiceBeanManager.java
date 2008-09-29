@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.core.CollectionFactory;
@@ -68,10 +70,13 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 		 */
 		private UpdateMethodAdapter getUpdateMethod(Object instance) {
 			WeakReference adapterReference = (WeakReference) classCache.get(instance.getClass());
+			UpdateMethodAdapter adapter;
 			if (adapterReference != null) {
-				return (UpdateMethodAdapter) adapterReference.get();
+				adapter = (UpdateMethodAdapter) adapterReference.get();
+				if (adapter != null)
+					return adapter;
 			}
-			UpdateMethodAdapter adapter = new UpdateMethodAdapter(methodName);
+			adapter = new UpdateMethodAdapter(methodName);
 			classCache.put(instance.getClass(), new WeakReference(adapter));
 			return adapter;
 		}
@@ -89,6 +94,9 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 		}
 	}
 
+
+	/** logger */
+	private static final Log log = LogFactory.getLog(DefaultManagedServiceBeanManager.class);
 
 	private final Map instanceRegistry = CollectionFactory.createConcurrentMap(8);
 	private final UpdateCallback updateCallback;
@@ -109,16 +117,24 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 			updateCallback = null;
 
 		this.cam = cam;
+		this.cam.setBeanManager(this);
 	}
 
 	public Object register(Object bean) {
-		instanceRegistry.put(new Integer(System.identityHashCode(bean)), bean);
+		int hashCode = System.identityHashCode(bean);
+		if (log.isTraceEnabled())
+			log.trace("Start tracking instance " + bean.getClass().getName() + "@" + hashCode);
+		instanceRegistry.put(new Integer(hashCode), bean);
 		injectConfigurationAdminInfo(bean, cam.getConfiguration());
 		return bean;
 	}
 
 	public void unregister(Object bean) {
-		instanceRegistry.remove(new Integer(System.identityHashCode(bean)));
+		int hashCode = System.identityHashCode(bean);
+		if (log.isTraceEnabled())
+			log.trace("Stopped tracking instance " + bean.getClass().getName() + "@" + hashCode);
+
+		instanceRegistry.remove(new Integer(hashCode));
 	}
 
 	public void updated(Map properties) {
@@ -135,6 +151,9 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 	 */
 	static void injectConfigurationAdminInfo(Object instance, Map properties) {
 		if (properties != null && !properties.isEmpty()) {
+			if (log.isTraceEnabled())
+				log.trace("Applying injection to instance " + instance.getClass() + "@"
+						+ System.identityHashCode(instance) + " using map " + properties);
 			BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(instance);
 			for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext();) {
 				Map.Entry entry = (Map.Entry) iterator.next();
