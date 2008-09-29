@@ -18,7 +18,8 @@ package org.springframework.osgi.config;
 
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.osgi.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.config.internal.ParserUtils;
+import org.springframework.osgi.config.internal.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.w3c.dom.Attr;

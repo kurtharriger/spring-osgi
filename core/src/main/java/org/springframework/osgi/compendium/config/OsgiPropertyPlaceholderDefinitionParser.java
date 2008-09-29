@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.config;
+
+package org.springframework.osgi.compendium.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.compendium.internal.OsgiPropertyPlaceholder;
-import org.springframework.osgi.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.config.internal.ParserUtils;
+import org.springframework.osgi.config.internal.ParserUtils.AttributeCallback;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -37,6 +39,7 @@ class OsgiPropertyPlaceholderDefinitionParser extends AbstractSingleBeanDefiniti
 	public static final String PROPERTIES_FIELD = "properties";
 
 	public static final String NESTED_PROPERTIES = "default-properties";
+
 
 	protected Class getBeanClass(Element element) {
 		return OsgiPropertyPlaceholder.class;

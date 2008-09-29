@@ -18,7 +18,6 @@ package org.springframework.osgi.iandt.propertyplaceholder;
 
 import java.io.File;
 import java.io.FilePermission;
-import java.net.SocketPermission;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -77,7 +76,7 @@ public class PropertyPlaceholderTest extends BaseIntegrationTest {
 	protected String[] getTestBundlesNames() {
 		return new String[] {
 		// required by cm_all for logging
-			"org.knopflerfish.bundles, log_all, 2.0.0", "org.knopflerfish.bundles, cm_all, 2.0.0" };
+		"org.apache.felix, org.apache.felix.configadmin, 1.0.4" };
 	}
 
 	protected void onSetUp() throws Exception {
@@ -85,6 +84,7 @@ public class PropertyPlaceholderTest extends BaseIntegrationTest {
 		DICT.put("white", "horse");
 		// Set up the bundle storage dirctory
 		System.setProperty("com.gatespace.bundle.cm.store", CONFIG_DIR);
+		System.setProperty("felix.cm.dir", CONFIG_DIR);
 		initializeDirectory(CONFIG_DIR);
 		prepareConfiguration();
 

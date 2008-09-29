@@ -20,7 +20,8 @@ import java.util.Comparator;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.osgi.config.ParserUtils.AttributeCallback;
+import org.springframework.osgi.config.internal.ParserUtils;
+import org.springframework.osgi.config.internal.ParserUtils.AttributeCallback;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;

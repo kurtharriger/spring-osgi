@@ -14,7 +14,8 @@
  * limitations under the License.
  *
  */
-package org.springframework.osgi.config;
+
+package org.springframework.osgi.config.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +23,10 @@ import java.util.List;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.core.Conventions;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
@@ -37,7 +36,7 @@ import org.w3c.dom.NamedNodeMap;
  * @author Andy Piper
  * @author Costin Leau
  */
-abstract class ParserUtils {
+public abstract class ParserUtils {
 
 	/**
 	 * Standard attribute callback. Deals with ID, DEPENDS-ON and LAZY-INIT
@@ -46,7 +45,8 @@ abstract class ParserUtils {
 	 * @author Costin Leau
 	 * 
 	 */
-	static class StandardAttributeCallback implements AttributeCallback {
+	public static class StandardAttributeCallback implements AttributeCallback {
+
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
 
@@ -82,8 +82,10 @@ abstract class ParserUtils {
 	 * @author Costin Leau
 	 * 
 	 */
-	static class PropertyRefAttributeCallback implements AttributeCallback {
+	public static class PropertyRefAttributeCallback implements AttributeCallback {
+
 		private static final String PROPERTY_REF = "-ref";
+
 
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
@@ -106,7 +108,8 @@ abstract class ParserUtils {
 	 * 
 	 * @author Costin Leau
 	 */
-	static class ConventionCallback implements AttributeCallback {
+	public static class ConventionCallback implements AttributeCallback {
+
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
 			String propertyName = Conventions.attributeNameToPropertyName(name);
@@ -115,17 +118,13 @@ abstract class ParserUtils {
 		}
 	}
 
+
 	private static final AttributeCallback STANDARD_ATTRS_CALLBACK = new StandardAttributeCallback();
 
 	private static final AttributeCallback PROPERTY_REF_ATTRS_CALLBACK = new PropertyRefAttributeCallback();
 
 	private static final AttributeCallback PROPERTY_CONV_ATTRS_CALLBACK = new ConventionCallback();
 
-	private static final String OSGI_NS = "http://www.springframework.org/schema/osgi";
-
-	private static final String DEFAULT_TIMEOUT = "default-timeout";
-
-	private static final String DEFAULT_CARDINALITY = "default-cardinality";
 
 	/**
 	 * Wrapper callback used for parsing attributes (one at a time) that have
@@ -134,7 +133,7 @@ abstract class ParserUtils {
 	 * @author Costin Leau
 	 * 
 	 */
-	static interface AttributeCallback {
+	public static interface AttributeCallback {
 
 		/**
 		 * Process the given attribute using the contextual element and bean
@@ -151,6 +150,7 @@ abstract class ParserUtils {
 		 */
 		boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder);
 	}
+
 
 	/**
 	 * Generic attribute callback. Will parse the given callback array, w/o any
@@ -221,40 +221,6 @@ abstract class ParserUtils {
 		parseCustomAttributes(element, builder, callbacks);
 	}
 
-	/**
-	 * Initialize OSGi defaults.
-	 * 
-	 * @param document XML document
-	 * @return initialized {@link OsgiDefaultsDefinition} instance
-	 */
-	public static OsgiDefaultsDefinition initOsgiDefaults(Document document) {
-		Assert.notNull(document);
-		return initOsgiDefaults(document.getDocumentElement());
-	}
-
-	/**
-	 * Initialize OSGi defaults.
-	 * 
-	 * @param root root document element
-	 * @return initialized {@link OsgiDefaultsDefinition} instance
-	 */
-	public static OsgiDefaultsDefinition initOsgiDefaults(Element root) {
-		Assert.notNull(root);
-
-		OsgiDefaultsDefinition defaults = new OsgiDefaultsDefinition();
-		String timeout = root.getAttributeNS(OSGI_NS, DEFAULT_TIMEOUT);
-
-		if (StringUtils.hasText(timeout))
-			defaults.setTimeout(timeout);
-
-		String cardinality = root.getAttributeNS(OSGI_NS, DEFAULT_CARDINALITY);
-
-		if (StringUtils.hasText(cardinality))
-			defaults.setCardinality(cardinality);
-
-		return defaults;
-	}
-
 	public static AttributeCallback[] mergeCallbacks(AttributeCallback[] callbacksA, AttributeCallback[] callbacksB) {
 		if (ObjectUtils.isEmpty(callbacksA))
 			if (ObjectUtils.isEmpty(callbacksB))
@@ -269,5 +235,4 @@ abstract class ParserUtils {
 		System.arraycopy(callbacksB, 0, newCallbacks, callbacksA.length, callbacksB.length);
 		return newCallbacks;
 	}
-
 }
