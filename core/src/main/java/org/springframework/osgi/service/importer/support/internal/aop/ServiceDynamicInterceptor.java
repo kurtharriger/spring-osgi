@@ -403,12 +403,13 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 */
 	private Object lookupService() {
 		synchronized (lock) {
-			if (destroyed && !isDuringDestruction)
-				throw new ServiceProxyDestroyedException();
-
 			return (Object) retryTemplate.execute(new DefaultRetryCallback() {
 
 				public Object doWithRetry() {
+					// before checking for a service, check whether the proxy is still valid
+					if (destroyed && !isDuringDestruction)
+						throw new ServiceProxyDestroyedException();
+
 					return (wrapper != null) ? wrapper.getService() : null;
 				}
 			}, lock);
@@ -473,6 +474,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			}
 			/** destruction process has ended */
 			isDuringDestruction = false;
+			// notify also any proxies that still wait on the service
+			lock.notifyAll();
 		}
 	}
 

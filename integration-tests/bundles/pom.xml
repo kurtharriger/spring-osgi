@@ -41,6 +41,7 @@
     <module>lifecycle.test.bundle</module>
     <module>service.listener.bundle</module>
     <module>reference.test.bundle</module>
+    <module>proxy.destruction.test.bundle</module>
     <module>dependency.test.bundle</module>
     <module>cardinality.0to1.bundle</module>
     <module>scoped.a.bundle</module>    
