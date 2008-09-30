@@ -5,8 +5,13 @@ http://www.springframework.org/osgi
 Changes in version 1.2.0 M2 (2008-xx-yy)
 ----------------------------------------
 
+General
+* added support for compendium namespace (managed-service)
+* incremented version of spring-osgi.xsd and spring-osgi-compendium.xsd
+
 Package org.springframework.osgi.io
 * improved existence check for bundle resources
+
 
 Changes in version 1.2.0 M1 (2008-09-05)
 ----------------------------------------
