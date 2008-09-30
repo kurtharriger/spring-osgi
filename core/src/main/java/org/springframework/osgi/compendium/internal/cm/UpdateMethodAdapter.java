@@ -125,24 +125,20 @@ class UpdateMethodAdapter {
 	}
 
 
-	private final String methodName;
-	private Map methods;
+	private final Map methods;
 
 
 	/**
 	 * Constructs a new <code>UpdateMethodAdapter</code> instance.
 	 * 
 	 * @param methodName
+	 * @param type
 	 */
-	UpdateMethodAdapter(String methodName) {
-		this.methodName = methodName;
+	UpdateMethodAdapter(String methodName, Class type) {
+		this.methods = determineUpdateMethod(type, methodName);
 	}
 
 	void invoke(Object instance, Map properties) {
-		if (methods == null) {
-			methods = determineUpdateMethod(instance.getClass(), methodName);
-		}
-
 		invokeCustomMethods(instance, methods, properties);
 	}
 }

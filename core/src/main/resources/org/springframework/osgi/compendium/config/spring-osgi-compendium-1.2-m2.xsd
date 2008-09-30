@@ -14,7 +14,7 @@
 
     <xsd:annotation>
         <xsd:documentation><![CDATA[
-            Namespace support for the compendium services provided by Spring Dynamic Modules.
+    Namespace support for the compendium services provided by Spring Dynamic Modules.
         ]]></xsd:documentation>
     </xsd:annotation>
 
@@ -23,9 +23,9 @@
     <xsd:element name="property-placeholder" type="TpropertyPlaceholder">
     	<xsd:annotation>
     		<xsd:documentation><![CDATA[
-    			Defines a property placeholder that replaces property values using
-    			delimited values ( ${...} by default) with properties sourced from
-    			the Configuration Admin service under the given persistent id.
+    Defines a property placeholder that replaces property values using
+    delimited values ( ${...} by default) with properties sourced from
+    the Configuration Admin service under the given persistent id.
     		]]></xsd:documentation>
     		<xsd:appinfo>
 				<tool:annotation>
@@ -43,9 +43,9 @@
                     <xsd:element name="default-properties" type="beans:propsType" minOccurs="0" maxOccurs="1">
                     	<xsd:annotation>
                     		<xsd:documentation><![CDATA[
-                    			Default property value to use for placeholder replacement
-                    			when the associated keys cannot be found under the given
-                    			persistent id.
+    Default property value to use for placeholder replacement
+    when the associated keys cannot be found under the given
+    persistent id.
                     		]]></xsd:documentation>
                     	</xsd:annotation>
                     </xsd:element>
@@ -53,31 +53,31 @@
                 <xsd:attribute name="persistent-id" type="xsd:string" use="required">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
-                			The persistent-id to lookup in Configuration Admin. Must refer to the pid of 
-                			a managed service, and not a managed service factory.
+    The persistent-id to lookup in Configuration Admin. Must refer to the pid of 
+    a managed service, and not a managed service factory.
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="placeholder-prefix" type="xsd:string" use="optional" default="${">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
-                			The prefix to use for placeholder values. The default is '${'.
+    The prefix to use for placeholder values. The default is '${'.
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="placeholder-suffix" type="xsd:string" use="optional" default="}">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
-                			The suffix to use for placeholder values. The default is '}'.
+    The suffix to use for placeholder values. The default is '}'.
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="defaults-ref" type="xsd:string" use="optional">
                 	<xsd:annotation>
                 		<xsd:documentation><![CDATA[
-                			Refers to a bean of type Properties or Map that supplies default placeholder 
-                			replacement values to be used when the associated keys cannot be found under the given
-                			persistent id. 
+    Refers to a bean of type Properties or Map that supplies default placeholder 
+    replacement values to be used when the associated keys cannot be found under the given
+    persistent id. 
                 		]]></xsd:documentation>
                 	</xsd:annotation>
                 </xsd:attribute>
@@ -93,26 +93,26 @@
 		<xsd:attribute name="persistent-id" type="xsd:string" use="required">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-					The persistent-id under which the configuration for this bean is stored in 
-					the Configuration Admin service.
+	The persistent-id under which the configuration for this bean is stored in 
+	the Configuration Admin service.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="update-strategy" type="TupdateStrategyType" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-					The strategy to use when the configuration data backing the beans defined by this element is 
-					updated. The default value is 'none', meaning that any update after the initial configuration
-					of the beans is ignored. A value of 'bean-managed' means that the method specified in the
-					'update-method' attribute will be invoked. A value of 'container-managed' means that the container
-					will autowire the bean instance by name with the new property set.
+	The strategy to use when the configuration data backing the beans defined by this element is 
+	updated. The default value is 'none', meaning that any update after the initial configuration
+	of the beans is ignored. A value of 'bean-managed' means that the method specified in the
+	'update-method' attribute will be invoked. A value of 'container-managed' means that the container
+	will autowire the bean instance by name with the new property set.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="update-method" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-					The update-method to invoke when using a 'bean-managed' update strategy.
+	The update-method to invoke when using a 'bean-managed' update strategy.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>			
@@ -137,8 +137,8 @@
     <xsd:element name="managed-service" type="TmanagedService">
     	<xsd:annotation>
     		<xsd:documentation><![CDATA[
-    			Defines a bean based on the given class name, and with properties autowired-by-name based
-    			on the configuration stored under the given persistent id.
+    Defines a bean based on the given class name, and with properties autowired-by-name based
+    on the configuration stored under the given persistent id.
     		]]></xsd:documentation>
     	</xsd:annotation>
     </xsd:element>	
@@ -155,8 +155,8 @@
     <xsd:element name="managed-service-factory" type="TmanagedServiceFactory">
     	<xsd:annotation>
     		<xsd:documentation><![CDATA[
-    			Defines a collection of beans based on the given class name, and with properties autowired-by-name based
-    			on the configuration sets stored under the given factory persistent id.
+    Defines a collection of beans based on the given class name, and with properties autowired-by-name based
+    on the configuration sets stored under the given factory persistent id.
     		]]></xsd:documentation>
     	</xsd:annotation>
     </xsd:element>
@@ -166,8 +166,8 @@
     <xsd:element name="config-properties" type="TconfigProperties">
     	<xsd:annotation>
     		<xsd:documentation><![CDATA[
-    			Declares that the properties found in the Configuration Admin service under the given
-    			persistent id should be exported as properties of the registered service.
+    Declares that the properties found in the Configuration Admin service under the given
+    persistent id should be exported as properties of the registered service.
     		]]></xsd:documentation>
     	</xsd:annotation>
     </xsd:element>
@@ -176,7 +176,7 @@
         <xsd:attribute name="persistent-id" type="xsd:string" use="required">
         	<xsd:annotation>
         		<xsd:documentation><![CDATA[
-        			The persistent id under which the properties to be exported are registered.
+    The persistent id under which the properties to be exported are registered.
         		]]></xsd:documentation>
         	</xsd:annotation>
         </xsd:attribute>

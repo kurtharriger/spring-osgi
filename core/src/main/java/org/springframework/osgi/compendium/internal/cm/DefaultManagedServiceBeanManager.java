@@ -69,15 +69,16 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 		 * @return method update method adapter
 		 */
 		private UpdateMethodAdapter getUpdateMethod(Object instance) {
-			WeakReference adapterReference = (WeakReference) classCache.get(instance.getClass());
+			Class type = instance.getClass();
+			WeakReference adapterReference = (WeakReference) classCache.get(type);
 			UpdateMethodAdapter adapter;
 			if (adapterReference != null) {
 				adapter = (UpdateMethodAdapter) adapterReference.get();
 				if (adapter != null)
 					return adapter;
 			}
-			adapter = new UpdateMethodAdapter(methodName);
-			classCache.put(instance.getClass(), new WeakReference(adapter));
+			adapter = new UpdateMethodAdapter(methodName, type);
+			classCache.put(type, new WeakReference(adapter));
 			return adapter;
 		}
 	}
