@@ -12,6 +12,9 @@ General
 Package org.springframework.osgi.io
 * improved existence check for bundle resources
 
+Package org.springframework.osgi.service
+* refined single service proxies so that any waiting activity is interrupted on destruction
+
 
 Changes in version 1.2.0 M1 (2008-09-05)
 ----------------------------------------
