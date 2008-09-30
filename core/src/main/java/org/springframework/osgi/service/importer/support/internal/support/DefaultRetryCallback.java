@@ -17,7 +17,7 @@ package org.springframework.osgi.service.importer.support.internal.support;
 
 
 /**
- * Implementation for cases where the work completition is given by the
+ * Implementation for cases where the work completion is given by the
  * non-nullity of the returned object.
  * 
  * @author Costin Leau

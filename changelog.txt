@@ -28,6 +28,7 @@ Package org.springframework.osgi.service
 * changed the proxying classloader strategy to address package dependency visibility
 * fixed usage of incorrect class loader for imported services with client thread context class loader management
 * fixed intermittent deadlock that appeared in some cases betweem importers and exporters during shutdown
+* refined single service proxies so that any waiting activity is interrupted on destruction
 
 Package org.springframework.osgi.web
 * improved web extender configuration thread-safety
