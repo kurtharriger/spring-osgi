@@ -12,7 +12,7 @@
   <url>http://www.springframework.org/osgi</url>
   <name>Spring OSGi Web Extender</name>
   <description>
-  Spring/OSGi web extender. Detects war bundles and deployes them into the configured web container.
+  Spring/OSGi web extender. Detects war bundles and deploys them into the configured web container.
   </description>
   
   
