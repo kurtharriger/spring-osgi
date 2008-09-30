@@ -53,6 +53,19 @@ public class RetryTemplate {
 			(template != null ? template.getWaitTime() : DEFAULT_WAIT_TIME));
 	}
 
+	/**
+	 * Main retry method. Executes the callback until it gets completed. The
+	 * callback will get executed the number of {@link #retryNumbers} while
+	 * waiting in-between for the {@link #DEFAULT_WAIT_TIME} amount.
+	 * 
+	 * Before bailing out, the callback will be called one more time. Thus, in
+	 * case of being unsuccesful, the default value of the callback is returned.
+	 * 
+	 * 
+	 * @param callback
+	 * @param notificationLock
+	 * @return
+	 */
 	public Object execute(RetryCallback callback, Object notificationLock) {
 		Assert.notNull(callback, "callback is required");
 		Assert.notNull(notificationLock, "notificationLock is required");
@@ -73,12 +86,12 @@ public class RetryTemplate {
 						notificationLock.wait(waitTime);
 					}
 					catch (InterruptedException ex) {
-						throw new RuntimeException("retry failed; interrupted while sleeping", ex);
+						throw new RuntimeException("Retry failed; interrupted while waiting", ex);
 					}
 				}
 			} while (count < retryNumbers);
 		}
-		return null;
+		return callback.doWithRetry();
 	}
 
 	public Object execute(RetryCallback callback) {
