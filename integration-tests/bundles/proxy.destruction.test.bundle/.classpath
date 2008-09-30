@@ -11,10 +11,4 @@
   <classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
   <classpathentry kind="src" path="/simple.service"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/2.5.6-SNAPSHOT/spring-aop-2.5.6-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/spring-aop/2.5.6-SNAPSHOT/spring-aop-2.5.6-SNAPSHOT-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.6-SNAPSHOT/spring-beans-2.5.6-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/spring-beans/2.5.6-SNAPSHOT/spring-beans-2.5.6-SNAPSHOT-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.6-SNAPSHOT/spring-context-2.5.6-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/spring-context/2.5.6-SNAPSHOT/spring-context-2.5.6-SNAPSHOT-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.6-SNAPSHOT/spring-core-2.5.6-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/spring-core/2.5.6-SNAPSHOT/spring-core-2.5.6-SNAPSHOT-sources.jar"/>
-  <classpathentry kind="src" path="/spring-osgi-core"/>
-  <classpathentry kind="src" path="/spring-osgi-io"/>
 </classpath>
