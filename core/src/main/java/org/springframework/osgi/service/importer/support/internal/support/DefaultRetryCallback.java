@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.importer.support.internal.support;
 
+package org.springframework.osgi.service.importer.support.internal.support;
 
 /**
  * Implementation for cases where the work completion is given by the
@@ -24,8 +24,8 @@ package org.springframework.osgi.service.importer.support.internal.support;
  * 
  */
 public abstract class DefaultRetryCallback implements RetryCallback {
+
 	public boolean isComplete(Object result) {
 		return (result != null);
 	}
-
 }
