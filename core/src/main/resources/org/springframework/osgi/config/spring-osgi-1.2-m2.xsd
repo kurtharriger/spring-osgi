@@ -79,8 +79,9 @@
                 	<xsd:element name="interfaces" type="beans:listOrSetType" minOccurs="0" maxOccurs="1">
                     	<xsd:annotation>
                     		<xsd:documentation><![CDATA[
-	The service interface that the services obtained via the registry are required to support.
-    By convention this is a Java interface type, but may also be a (non-final) class type.
+	The set of service interfaces that the services obtained via the registry are required to support.
+    By convention, the interface attribute is a Java interface type, but may also be a (non-final)
+    class type.
                     		]]></xsd:documentation>
                     	</xsd:annotation>
                     </xsd:element>                
