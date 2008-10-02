@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>weather</artifactId>
 		<groupId>org.springframework.osgi.samples</groupId>
-		<version>1.1.2-SNAPSHOT</version>
+		<version>1.1.2</version>
 	</parent>
 	<groupId>org.springframework.osgi.samples</groupId>
 	<artifactId>weather-service-test</artifactId>
