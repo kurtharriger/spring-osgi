@@ -72,11 +72,15 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 */
 	private class EventSenderRetryTemplate extends RetryTemplate {
 
-		public EventSenderRetryTemplate(RetryTemplate retryTemplate) {
-			super(retryTemplate);
+		public EventSenderRetryTemplate(int retryNumbers, long waitTime) {
+			super(retryNumbers, waitTime, lock);
 		}
 
-		public Object execute(RetryCallback callback, Object notificationLock) {
+		public EventSenderRetryTemplate() {
+			super(lock);
+		}
+
+		public Object execute(RetryCallback callback) {
 			//send event
 			publishEvent(new OsgiServiceDependencyWaitStartingEvent(eventSource, dependency, this.getWaitTime()
 					* this.getRetryNumbers()));
@@ -87,7 +91,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			long stop;
 
 			try {
-				result = super.execute(callback, notificationLock);
+				result = super.execute(callback);
 				stop = System.currentTimeMillis() - start;
 			}
 			catch (RuntimeException exception) {
@@ -358,7 +362,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private ServiceWrapper wrapper;
 
 	/** retry template */
-	private RetryTemplate retryTemplate;
+	private final RetryTemplate retryTemplate = new EventSenderRetryTemplate();
 
 	/** dependable service importer */
 	private Object eventSource;
@@ -416,7 +420,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 					return (wrapper != null) ? wrapper.getService() : null;
 				}
-			}, lock);
+			});
 		}
 	}
 
@@ -445,8 +449,6 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		Assert.notNull(eventSource);
 
 		boolean debug = log.isDebugEnabled();
-
-		retryTemplate = new EventSenderRetryTemplate(retryTemplate);
 
 		dependency = new DefaultOsgiServiceDependency(sourceName, filter, serviceRequiredAtStartup);
 
@@ -494,8 +496,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		return referenceDelegate;
 	}
 
-	public void setRetryTemplate(RetryTemplate retryTemplate) {
-		this.retryTemplate = retryTemplate;
+	public void setRetryParams(int numberRetries, long timeout) {
+		retryTemplate.reset(numberRetries, timeout);
 	}
 
 	public RetryTemplate getRetryTemplate() {

@@ -29,7 +29,6 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceDynamicInterceptor;
-import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 public class OsgiServiceDynamicInterceptorSyntheticEventsTest extends TestCase {
@@ -103,10 +102,7 @@ public class OsgiServiceDynamicInterceptorSyntheticEventsTest extends TestCase {
 		interceptor.setListeners(new OsgiServiceLifecycleListener[] { listener });
 		interceptor.setServiceImporter(new Object());
 
-		RetryTemplate tmpl = new RetryTemplate();
-		tmpl.setRetryNumbers(1);
-		tmpl.setWaitTime(1);
-		interceptor.setRetryTemplate(tmpl);
+		interceptor.setRetryParams(1, 1);
 	}
 
 	protected void tearDown() throws Exception {

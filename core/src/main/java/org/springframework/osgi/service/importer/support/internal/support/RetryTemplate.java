@@ -19,7 +19,8 @@ package org.springframework.osgi.service.importer.support.internal.support;
 import org.springframework.util.Assert;
 
 /**
- * Wrapper retry template.
+ * Wrapper retry template. This class does specialized retries using a given
+ * callback and lock.
  * 
  * @author Costin Leau
  */
@@ -31,26 +32,28 @@ public class RetryTemplate {
 
 	public static final int DEFAULT_RETRY_NUMBER = 3;
 
+	private final Object monitor = new Object();
+	private final Object notificationLock;
+
 	private long waitTime = DEFAULT_WAIT_TIME;
 
 	private int retryNumbers = DEFAULT_RETRY_NUMBER;
 
 
-	public RetryTemplate() {
-		this(null);
-	}
-
-	public RetryTemplate(int retryNumbers, long waitTime) {
+	public RetryTemplate(int retryNumbers, long waitTime, Object notificationLock) {
 		Assert.isTrue(retryNumbers >= 0, "retryNumbers must be positive");
 		Assert.isTrue(waitTime >= 0, "waitTime must be positive");
+		Assert.notNull(notificationLock, "notificationLock must be non null");
 
-		this.retryNumbers = retryNumbers;
-		this.waitTime = waitTime;
+		synchronized (monitor) {
+			this.retryNumbers = retryNumbers;
+			this.waitTime = waitTime;
+			this.notificationLock = notificationLock;
+		}
 	}
 
-	public RetryTemplate(RetryTemplate template) {
-		this((template != null ? template.getRetryNumbers() : DEFAULT_RETRY_NUMBER),
-			(template != null ? template.getWaitTime() : DEFAULT_WAIT_TIME));
+	public RetryTemplate(Object notificationLock) {
+		this(DEFAULT_RETRY_NUMBER, DEFAULT_WAIT_TIME, notificationLock);
 	}
 
 	/**
@@ -59,27 +62,32 @@ public class RetryTemplate {
 	 * waiting in-between for the {@link #DEFAULT_WAIT_TIME} amount.
 	 * 
 	 * Before bailing out, the callback will be called one more time. Thus, in
-	 * case of being unsuccessful, the default value of the callback is returned.
-	 * 
+	 * case of being unsuccessful, the default value of the callback is
+	 * returned.
 	 * 
 	 * @param callback
-	 * @param notificationLock
 	 * @return
 	 */
-	public Object execute(RetryCallback callback, Object notificationLock) {
+	public Object execute(RetryCallback callback) {
 		Assert.notNull(callback, "callback is required");
 		Assert.notNull(notificationLock, "notificationLock is required");
 
-		int count = 0;
+		long waitTime;
+		int retryNumbers;
+
+		synchronized (monitor) {
+			waitTime = this.waitTime;
+			retryNumbers = this.retryNumbers;
+		}
+
+		int count = -1;
 		synchronized (notificationLock) {
 			do {
 				Object result = callback.doWithRetry();
 				if (callback.isComplete(result))
 					return result;
 
-				// task is not complete - retry
-				count++;
-				if (waitTime != 0) {
+				if (waitTime > 0) {
 					// Do NOT use Thread.sleep() here - it does not release
 					// locks.
 					try {
@@ -89,29 +97,51 @@ public class RetryTemplate {
 						throw new RuntimeException("Retry failed; interrupted while waiting", ex);
 					}
 				}
+				count++;
+
+				// handle reset cases
+				synchronized (monitor) {
+					// has there been a reset in place ?
+					if (waitTime != this.waitTime || retryNumbers != this.retryNumbers) {
+						// start counting again
+						count = -1;
+						waitTime = this.waitTime;
+						retryNumbers = this.retryNumbers;
+					}
+				}
 			} while (count < retryNumbers);
 		}
 		return callback.doWithRetry();
 	}
 
-	public Object execute(RetryCallback callback) {
-		return execute(callback, this);
+	/**
+	 * Reset the retry template, by applying the new values. Any in-flight
+	 * waiting is interrupted and restarted using the new values.
+	 * 
+	 * @param retriesNumber
+	 * @param waitTime
+	 */
+	public void reset(int retriesNumber, long waitTime) {
+		synchronized (monitor) {
+			this.retryNumbers = retriesNumber;
+			this.waitTime = waitTime;
+		}
+
+		synchronized (notificationLock) {
+			notificationLock.notifyAll();
+		}
 	}
 
 	public int getRetryNumbers() {
-		return retryNumbers;
-	}
-
-	public void setRetryNumbers(int retryNumbers) {
-		this.retryNumbers = retryNumbers;
+		synchronized (monitor) {
+			return retryNumbers;
+		}
 	}
 
 	public long getWaitTime() {
-		return waitTime;
-	}
-
-	public void setWaitTime(long waitTime) {
-		this.waitTime = waitTime;
+		synchronized (monitor) {
+			return waitTime;
+		}
 	}
 
 	public boolean equals(Object other) {
@@ -120,7 +150,7 @@ public class RetryTemplate {
 		if (other instanceof RetryTemplate) {
 			RetryTemplate oth = (RetryTemplate) other;
 
-			return (waitTime == oth.waitTime && retryNumbers == oth.retryNumbers);
+			return (getWaitTime() == oth.getWaitTime() && getRetryNumbers() == oth.getRetryNumbers());
 		}
 		return false;
 	}
