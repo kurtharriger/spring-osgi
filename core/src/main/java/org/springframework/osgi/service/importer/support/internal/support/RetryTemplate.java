@@ -59,7 +59,7 @@ public class RetryTemplate {
 	 * waiting in-between for the {@link #DEFAULT_WAIT_TIME} amount.
 	 * 
 	 * Before bailing out, the callback will be called one more time. Thus, in
-	 * case of being unsuccesful, the default value of the callback is returned.
+	 * case of being unsuccessful, the default value of the callback is returned.
 	 * 
 	 * 
 	 * @param callback

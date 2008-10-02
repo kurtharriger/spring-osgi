@@ -348,6 +348,10 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private boolean destroyed = false;
 
 	/** private lock */
+	/**
+	 * used for reading/setting property and sending notifications between the
+	 * event listener and any threads waiting for an OSGi service to appear
+	 */
 	private final Object lock = new Object();
 
 	/** utility service wrapper */
