@@ -2,7 +2,7 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.1.2 (2008-10-02)
+Changes in version 1.1.2 (2008-10-03)
 -------------------------------------
 
 General
@@ -29,6 +29,7 @@ Package org.springframework.osgi.service
 * fixed usage of incorrect class loader for imported services with client thread context class loader management
 * fixed intermittent deadlock that appeared in some cases betweem importers and exporters during shutdown
 * refined single service proxies so that any waiting activity is interrupted on destruction
+* improved single service proxies to allow settings update at runtime
 
 Package org.springframework.osgi.web
 * improved web extender configuration thread-safety

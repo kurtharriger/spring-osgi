@@ -86,7 +86,9 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
-	private RetryTemplate retryTemplate = new RetryTemplate();
+	private int retriesNumber;
+	private long retryTimeout;
+	private RetryTemplate retryTemplate;
 
 	/** proxy casted to a specific interface to allow specific method calls */
 	private ImportedOsgiServiceProxy proxy;
@@ -103,6 +105,8 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	private final ImporterInternalActions controller;
 	/** convenience field * */
 	private boolean mandatory;
+
+	private final Object monitor = new Object();
 
 
 	public OsgiServiceProxyFactoryBean() {
@@ -154,7 +158,10 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		OsgiServiceLifecycleListener[] listeners = addListener(getListeners(), tcclListener);
 
 		lookupAdvice.setListeners(listeners);
-		lookupAdvice.setRetryTemplate(new RetryTemplate(retryTemplate));
+		synchronized (monitor) {
+			lookupAdvice.setRetryParams(retriesNumber, retryTimeout);
+			retryTemplate = lookupAdvice.getRetryTemplate();
+		}
 		lookupAdvice.setApplicationEventPublisher(applicationEventPublisher);
 
 		// add the listeners as a list since it might be updated after the proxy
@@ -177,8 +184,10 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 
 		ProxyPlusCallback proxyPlusCallback = creator.createServiceProxy(lookupAdvice.getServiceReference());
 
-		proxy = proxyPlusCallback.proxy;
-		destructionCallback = new DisposableBeanRunnableAdapter(proxyPlusCallback.destructionCallback);
+		synchronized (monitor) {
+			proxy = proxyPlusCallback.proxy;
+			destructionCallback = new DisposableBeanRunnableAdapter(proxyPlusCallback.destructionCallback);
+		}
 
 		lookupAdvice.setProxy(proxy);
 		// start the lookup only after the proxy has been assembled
@@ -188,7 +197,9 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	}
 
 	Runnable getProxyDestructionCallback() {
-		return destructionCallback;
+		synchronized (monitor) {
+			return destructionCallback;
+		}
 	}
 
 	/**
@@ -212,13 +223,22 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	/**
 	 * Sets how many times should this importer attempt to rebind to a target
 	 * service if the backing service currently used is unregistered. Default is
-	 * 3 times. <p/> Changing this property after initialization is complete has
-	 * no effect.
+	 * 3 times.
+	 * 
+	 * <p/> It is possible to change this property after initialization however,
+	 * the changes will <b>not</b> be applied on the running proxy until
+	 * {@link #setTimeout(long)} is called. Thus, to change both the number of
+	 * retries and timeout, after initialization, one should call first {{@link #setRetryTimes(int)}
+	 * followed by {@link #setTimeout(long)}. If the timeout value is
+	 * unchanged, retrieve the current value through {@link #getTimeout()} and
+	 * pass it again to {@link #setTimeout(long)}.
 	 * 
 	 * @param maxRetries The maxRetries to set.
 	 */
 	public void setRetryTimes(int maxRetries) {
-		this.retryTemplate.setRetryNumbers(maxRetries);
+		synchronized (monitor) {
+			this.retriesNumber = maxRetries;
+		}
 	}
 
 	/**
@@ -228,17 +248,35 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	 * @return number of retries to find a matching service before failing
 	 */
 	public int getRetryTimes() {
-		return this.retryTemplate.getRetryNumbers();
+		synchronized (monitor) {
+			return this.retriesNumber;
+		}
 	}
 
 	/**
 	 * Sets how long (in milliseconds) should this importer wait between failed
-	 * attempts at rebinding to a service that has been unregistered. <p/>
+	 * attempts at rebinding to a service that has been unregistered.
+	 * 
+	 * <p/> It is possible to change this value after initialization (while the
+	 * proxy is in place). The new values will be used immediately by the proxy.
+	 * Any in-flight waiting will be restarted using the new values. Note that
+	 * if both values are the same, no restart will be applied.
 	 * 
 	 * @param millisBetweenRetries The millisBetweenRetries to set.
 	 */
 	public void setTimeout(long millisBetweenRetries) {
-		this.retryTemplate.setWaitTime(millisBetweenRetries);
+		RetryTemplate rt;
+		int retries;
+
+		synchronized (monitor) {
+			this.retryTimeout = millisBetweenRetries;
+			rt = retryTemplate;
+			retries = this.retriesNumber;
+		}
+
+		if (rt != null) {
+			rt.reset(retries, millisBetweenRetries);
+		}
 	}
 
 	/**
@@ -248,7 +286,9 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	 * @return timeout in milliseconds
 	 */
 	public long getTimeout() {
-		return this.retryTemplate.getWaitTime();
+		synchronized (monitor) {
+			return retryTimeout;
+		}
 	}
 
 	/* override to check proper cardinality - x..1 */

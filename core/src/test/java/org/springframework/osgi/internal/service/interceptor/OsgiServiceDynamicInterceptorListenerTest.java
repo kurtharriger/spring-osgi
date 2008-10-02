@@ -68,10 +68,7 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 		interceptor.setProxy(new Object());
 		interceptor.setServiceImporter(new Object());
 
-		RetryTemplate tmpl = new RetryTemplate();
-		tmpl.setRetryNumbers(1);
-		tmpl.setWaitTime(1);
-		interceptor.setRetryTemplate(tmpl);
+		interceptor.setRetryParams(1, 1);
 
 		SimpleTargetSourceLifecycleListener.BIND = 0;
 		SimpleTargetSourceLifecycleListener.UNBIND = 0;

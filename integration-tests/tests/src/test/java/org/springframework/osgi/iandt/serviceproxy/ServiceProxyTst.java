@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.serviceproxy;
 
 import java.util.Date;
@@ -62,11 +63,11 @@ public abstract class ServiceProxyTst extends AbstractConfigurableBundleCreatorT
 	private Advice createCardinalityAdvice(Class clazz) {
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext,
-				OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null)), classLoader);
+			OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null)), classLoader);
 		// fast retry
 		interceptor.setRequiredAtStartup(true);
 		interceptor.afterPropertiesSet();
-		interceptor.getRetryTemplate().setWaitTime(1);
+		interceptor.getRetryTemplate().reset(1, 1);
 		return interceptor;
 
 	}
