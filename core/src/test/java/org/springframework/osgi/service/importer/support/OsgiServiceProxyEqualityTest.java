@@ -221,7 +221,7 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 		};
 
 		ServiceDynamicInterceptor interceptorA1 = createInterceptorWServiceRequired();
-		interceptorA1.setRetryTemplate(new RetryTemplate(1, 10));
+		interceptorA1.setRetryParams(1, 10);
 
 		Advice interceptorB1 = new ServiceStaticInterceptor(bundleContext, new MockServiceReference());
 
