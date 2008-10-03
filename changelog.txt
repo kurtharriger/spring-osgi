@@ -14,7 +14,7 @@ Package org.springframework.osgi.io
 
 Package org.springframework.osgi.service
 * refined single service proxies so that any waiting activity is interrupted on destruction
-
+* improved single service proxies to allow settings update at runtime
 
 Changes in version 1.2.0 M1 (2008-09-05)
 ----------------------------------------

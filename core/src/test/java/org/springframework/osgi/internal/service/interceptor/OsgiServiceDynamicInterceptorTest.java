@@ -118,10 +118,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 		interceptor.setRequiredAtStartup(false);
 
-		RetryTemplate template = new RetryTemplate();
-		template.setRetryNumbers(3);
-		template.setWaitTime(1);
-		interceptor.setRetryTemplate(template);
+		interceptor.setRetryParams(3, 1);
 		interceptor.setProxy(new Object());
 		interceptor.setServiceImporter(new Object());
 
@@ -195,8 +192,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		createInterceptor(new MockFilter(nullFilter));
 		ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING, reference);
 		listener.serviceChanged(event);
-		interceptor.getRetryTemplate().setRetryNumbers(3);
-		interceptor.getRetryTemplate().setWaitTime(1000);
+		interceptor.getRetryTemplate().reset(3, 1000);
 		long now = System.currentTimeMillis();
 		try {
 			interceptor.invoke(invocation);
@@ -207,8 +203,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		}
 
 		// service is up
-		interceptor.getRetryTemplate().setRetryNumbers(3);
-		interceptor.getRetryTemplate().setWaitTime(1);
+		interceptor.getRetryTemplate().reset(3, 1);
 
 		assertTrue("Call did not block for 3000ms, actually blocked for " + (System.currentTimeMillis() - now) + "ms",
 			(System.currentTimeMillis() - now) >= 3000);
