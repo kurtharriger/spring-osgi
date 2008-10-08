@@ -69,7 +69,8 @@ public class PackageAdminResolver implements DependencyResolver {
 		// 1. if so, locate the bundles
 		for (int i = 0; i < entries.length; i++) {
 			String[] parsed = OsgiHeaderUtils.parseRequiredBundleString(entries[i]);
-			Bundle requiredBundle = pa.getBundles(parsed[0], parsed[1])[0];
+			// trim the strings just to be on the safe side (some implementations allows whitespaces, some don't)
+			Bundle requiredBundle = pa.getBundles(parsed[0].trim(), parsed[1].trim())[0];
 
 			// find exported packages
 			ExportedPackage[] exportedPackages = pa.getExportedPackages(requiredBundle);
