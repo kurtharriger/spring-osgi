@@ -87,7 +87,7 @@ public abstract class OsgiHeaderUtils {
 					token.append(currentChar);
 				}
 				else {
-					tokens.add(token.toString());
+					tokens.add(token.toString().trim());
 					token.delete(0, token.length());
 					ignoreComma = false;
 				}
@@ -99,7 +99,7 @@ public abstract class OsgiHeaderUtils {
 				token.append(currentChar);
 			}
 		}
-		tokens.add(token.toString());
+		tokens.add(token.toString().trim());
 		return (String[]) tokens.toArray(new String[tokens.size()]);
 	}
 
