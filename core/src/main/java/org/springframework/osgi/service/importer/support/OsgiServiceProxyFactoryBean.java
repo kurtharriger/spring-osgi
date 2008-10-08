@@ -234,6 +234,8 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	 * pass it again to {@link #setTimeout(long)}.
 	 * 
 	 * @param maxRetries The maxRetries to set.
+	 * @deprecated will be removed after 1.2.0 M2 with no replacement. Consider
+	 * using {@link #setTimeout(long)} instead.
 	 */
 	public void setRetryTimes(int maxRetries) {
 		synchronized (monitor) {
@@ -245,7 +247,9 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	 * Returns the number of attempts to rebind a target service before giving
 	 * up.
 	 * 
-	 * @return number of retries to find a matching service before failing
+	 * @return number of retries to find a matching service before failing *
+	 * @deprecated will be removed after 1.2.0 M2 with no replacement. Consider
+	 * using {@link #getTimeout(long)} instead.
 	 */
 	public int getRetryTimes() {
 		synchronized (monitor) {

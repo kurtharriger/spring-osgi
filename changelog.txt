@@ -11,10 +11,13 @@ General
 
 Package org.springframework.osgi.io
 * improved existence check for bundle resources
+* 
 
 Package org.springframework.osgi.service
 * refined single service proxies so that any waiting activity is interrupted on destruction
 * improved single service proxies to allow settings update at runtime
+* deprecated retryTimes parameter in OsgiServiceProxyFactoryBean
+
 
 Changes in version 1.2.0 M1 (2008-09-05)
 ----------------------------------------
