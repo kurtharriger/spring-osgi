@@ -83,7 +83,7 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 			prepareConfiguration(ca);
 		}
 		catch (Exception ex) {
-			throw new RuntimeException("Cannot prepare Configuration Admin service");
+			throw new RuntimeException("Cannot prepare Configuration Admin service", ex);
 		}
 
 		return super.createApplicationContext(locations);
