@@ -107,8 +107,9 @@ exact list of Spring-DM project dependencies see the respective Maven2 pom.xml f
           
 4. WHERE TO START
 
-This distribution contains API documentation and two sample applications illustrating the current features of Spring DM.
-The Spring Dynamic Modules reference documentation can be found at http://static.springframework.org/osgi/current/docs/reference/
+This distribution contains API documentation and several sample applications illustrating the current features of Spring
+DM. The Spring Dynamic Modules reference documentation can be found at 
+http://static.springframework.org/osgi/current/docs/reference/
 
 A great way to get started is to review and run the sample applications, supplementing with reference manual
 material as needed. You will require Maven 2, which can be downloaded from http://maven.apache.org/, for building
