@@ -1,9 +1,9 @@
 Spring Dynamic Modules Samples
 ------------------------------
 
-This folder contains various samples and demos for Spring-DM.
+This folder contains various various demo applications and samples for Spring-DM.
 
-Please see each demo folder for detailed instructions (readme.txt).
+Please see each folder for detailed instructions (readme.txt).
 
 As a general rule, each demo provides an integration tests that bootstraps
 the OSGi platform, installs the demo and its dependencies and interacts with 
