@@ -28,10 +28,8 @@ class CompendiumNamespaceHandler extends NamespaceHandlerSupport {
 
 	public void init() {
 		registerBeanDefinitionParser("property-placeholder", new OsgiPropertyPlaceholderDefinitionParser());
+		registerBeanDefinitionParser("config-properties", new ConfigPropertiesDefinitionParser());
 
 		registerBeanDefinitionDecorator("managed-service", new ManagedServiceDefinitionParser());
-		//registerBeanDefinitionParser("config-properties", new OsgiConfigDefinitionParser());
-
 	}
-
 }

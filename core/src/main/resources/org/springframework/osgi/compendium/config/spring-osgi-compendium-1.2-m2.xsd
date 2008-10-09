@@ -165,21 +165,42 @@
 
     <xsd:element name="config-properties" type="TconfigProperties">
     	<xsd:annotation>
-    		<xsd:documentation><![CDATA[
-    Declares that the properties found in the Configuration Admin service under the given
-    persistent id should be exported as properties of the registered service.
+    		<xsd:documentation source="java:org.springframework.osgi.compendium.cm.ConfigAdminPropertiesFactoryBean"><![CDATA[
+    Exposes the properties found in the Configuration Admin service under the given persistent id.
     		]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="java.util.Properties"/>
+				</tool:annotation>
+			</xsd:appinfo>
     	</xsd:annotation>
     </xsd:element>
 
     <xsd:complexType name="TconfigProperties">
-        <xsd:attribute name="persistent-id" type="xsd:string" use="required">
-        	<xsd:annotation>
-        		<xsd:documentation><![CDATA[
+    	<xsd:complexContent>
+    		<xsd:extension base="beans:propsType">
+    			<xsd:attribute name="id" type="xsd:ID"/>
+    		    <xsd:attribute name="persistent-id" type="xsd:string" use="required">
+		        	<xsd:annotation>
+        				<xsd:documentation><![CDATA[
     The persistent id under which the properties to be exported are registered.
-        		]]></xsd:documentation>
-        	</xsd:annotation>
-        </xsd:attribute>
+        				]]></xsd:documentation>
+        			</xsd:annotation>
+        		</xsd:attribute>
+				<xsd:attribute name="local-override" type="xsd:boolean">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+	Specifies whether local properties override properties from the Configuration Admin service.
+	Default is "false": properties from Configuration Admin service override local defaults.
+	If set to "true", local properties will override properties from Configuration Admin service.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<!-- disabled for now
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+				-->				
+    		</xsd:extension>
+    	</xsd:complexContent>
 	</xsd:complexType>
 
 </xsd:schema>
