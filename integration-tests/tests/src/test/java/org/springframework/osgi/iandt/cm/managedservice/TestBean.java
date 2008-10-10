@@ -29,7 +29,24 @@ public class TestBean {
 	private Integer integer;
 	private Class clazz;
 	private Map props;
+	private ExoticType exoticType;
 
+
+	/**
+	 * Returns the exoticType.
+	 * 
+	 * @return Returns the exoticType
+	 */
+	public ExoticType getExoticType() {
+		return exoticType;
+	}
+
+	/**
+	 * @param exoticType The exoticType to set.
+	 */
+	public void setExoticType(ExoticType exoticType) {
+		this.exoticType = exoticType;
+	}
 
 	/**
 	 * Returns the string.

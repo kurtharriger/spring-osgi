@@ -14,38 +14,18 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.compendium;
+package org.springframework.osgi.iandt.cm.managedservice;
 
 /**
- * @author Costin Leau
+ * Taken from Spring reference documentation.
  * 
  */
-public class OneSetter {
+public class ExoticType {
 
-	private Long prop;
-	private Class clz;
+	private String name;
 
-	public Long getProp() {
-		return prop;
-	}
 
-	public void setProp(Long prop) {
-		this.prop = prop;
-	}
-
-	/**
-	 * Returns the clz.
-	 *
-	 * @return Returns the clz
-	 */
-	public Class getClz() {
-		return clz;
-	}
-
-	/**
-	 * @param clz The clz to set.
-	 */
-	public void setClz(Class clz) {
-		this.clz = clz;
+	public ExoticType(String name) {
+		this.name = name;
 	}
 }

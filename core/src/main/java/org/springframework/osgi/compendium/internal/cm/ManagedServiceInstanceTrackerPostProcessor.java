@@ -18,6 +18,9 @@ package org.springframework.osgi.compendium.internal.cm;
 
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 import org.springframework.osgi.context.BundleContextAware;
@@ -30,18 +33,25 @@ import org.springframework.osgi.context.BundleContextAware;
  * @author Costin Leau
  * 
  */
-public class ManagedServiceInstanceTrackerPostProcessor implements BundleContextAware, BeanPostProcessor,
-		DestructionAwareBeanPostProcessor {
+public class ManagedServiceInstanceTrackerPostProcessor implements BeanFactoryAware, BundleContextAware,
+		InitializingBean, BeanPostProcessor, DestructionAwareBeanPostProcessor {
 
 	private final String trackedBean;
 	private ManagedServiceBeanManager managedServiceManager;
 	private String pid;
 	private String updateMethod;
 	private UpdateStrategy updateStrategy;
+	private BundleContext bundleContext;
+	private BeanFactory beanFactory;
 
 
 	public ManagedServiceInstanceTrackerPostProcessor(String beanNameToTrack) {
 		this.trackedBean = beanNameToTrack;
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		ConfigurationAdminManager cam = new ConfigurationAdminManager(pid, bundleContext);
+		managedServiceManager = new DefaultManagedServiceBeanManager(updateStrategy, updateMethod, cam, beanFactory);
 	}
 
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -63,8 +73,11 @@ public class ManagedServiceInstanceTrackerPostProcessor implements BundleContext
 	}
 
 	public void setBundleContext(BundleContext bundleContext) {
-		ConfigurationAdminManager cam = new ConfigurationAdminManager(pid, bundleContext);
-		managedServiceManager = new DefaultManagedServiceBeanManager(updateStrategy, updateMethod, cam);
+		this.bundleContext = bundleContext;
+	}
+
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
 	}
 
 	/**

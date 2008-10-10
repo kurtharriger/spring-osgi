@@ -11,6 +11,7 @@
 	<!-- osgix:managed-service -->
 	<bean id="simple" class="org.springframework.osgi.compendium.OneSetter">
 		<osgix:managed-service persistent-id="simple"/>
+		<property name="clz" value="java.lang.Object"/>
 	</bean>
 	
 	<bean class="org.springframework.osgi.compendium.OneSetter">
