@@ -26,7 +26,6 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationPlugin;
 import org.springframework.osgi.iandt.cm.BaseConfigurationAdminTest;
-import org.springframework.osgi.util.internal.MapBasedDictionary;
 
 /**
  * @author Costin Leau
@@ -45,6 +44,7 @@ public class ManagedServiceTest extends BaseConfigurationAdminTest {
 	}
 
 	private void initProperties() {
+		System.out.println("Import " + org.springframework.beans.factory.config.CustomEditorConfigurer.class);
 		props = new Properties();
 		props.setProperty("class", System.class.getName());
 		props.setProperty("integer", "54321");
@@ -88,8 +88,8 @@ public class ManagedServiceTest extends BaseConfigurationAdminTest {
 		TestBean simple = (TestBean) applicationContext.getBean(SIMPLE);
 		assertEquals(new Integer(54321), simple.getInteger());
 		assertEquals(SIMPLE, simple.getString());
-
-		//assertEquals(System.class, simple.getClazz());
+		assertEquals(System.class, simple.getClazz());
+		assertNotNull(simple.getExoticType());
 	}
 
 	public void testPrototype() throws Exception {

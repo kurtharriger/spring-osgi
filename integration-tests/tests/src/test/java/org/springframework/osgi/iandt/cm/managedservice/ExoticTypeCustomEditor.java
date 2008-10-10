@@ -14,38 +14,30 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.compendium;
+package org.springframework.osgi.iandt.cm.managedservice;
+
+import java.beans.PropertyEditorSupport;
 
 /**
- * @author Costin Leau
+ * Taken from the Spring reference documentation.
  * 
+ * The name has been changed so the javabeans doesn't automatically pick the
+ * editor (and thus the registration from the bean factory is checked).
  */
-public class OneSetter {
+public class ExoticTypeCustomEditor extends PropertyEditorSupport {
 
-	private Long prop;
-	private Class clz;
+	private String format;
 
-	public Long getProp() {
-		return prop;
+
+	public void setFormat(String format) {
+		this.format = format;
 	}
 
-	public void setProp(Long prop) {
-		this.prop = prop;
-	}
-
-	/**
-	 * Returns the clz.
-	 *
-	 * @return Returns the clz
-	 */
-	public Class getClz() {
-		return clz;
-	}
-
-	/**
-	 * @param clz The clz to set.
-	 */
-	public void setClz(Class clz) {
-		this.clz = clz;
+	public void setAsText(String text) {
+		if (format != null && format.equals("upperCase")) {
+			text = text.toUpperCase();
+		}
+		ExoticType type = new ExoticType(text);
+		setValue(type);
 	}
 }

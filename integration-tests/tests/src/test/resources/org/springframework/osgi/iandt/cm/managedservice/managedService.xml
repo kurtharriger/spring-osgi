@@ -8,11 +8,27 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd		
 		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd">
 
+
+	<!--  custom editors -->
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+	  <property name="customEditors">
+	    <map>
+	      <entry key="org.springframework.osgi.iandt.cm.managedservice.ExoticType">
+	        <bean class="org.springframework.osgi.iandt.cm.managedservice.ExoticTypeCustomEditor">
+	          <property name="format" value="upperCase"/>
+	        </bean>
+	      </entry>
+	    </map>
+	  </property>
+	</bean>
+
 	<!-- osgix:managed-service -->
 	<bean id="simple" class="org.springframework.osgi.iandt.cm.managedservice.TestBean">
 		<osgix:managed-service persistent-id="simple"/>
+		<property name="clazz" value="java.lang.System"/>
+		<property name="exoticType" value="aNameForExoticType"/>
 	</bean>
-
+	
 	<bean id="simplePrototype" class="org.springframework.osgi.iandt.cm.managedservice.TestBean" scope="prototype">
 		<osgix:managed-service persistent-id="simplePrototype" update-strategy="none"/>
 	</bean>
