@@ -5,5 +5,7 @@
 	<classpathentry exported="true" kind="lib" path="target/classes" sourcepath="target/classes"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/simple.service2/rfc-124-1.0-SNAPSHOT/simple.service2-rfc-124-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/simple.service/rfc-124-1.0-SNAPSHOT/simple.service-rfc-124-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
