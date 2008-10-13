@@ -12,5 +12,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.5/spring-core-2.5.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.5/spring-context-2.5.5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Weather Sample Service Bundle"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/rfc-124-1.0-SNAPSHOT/spring-osgi-core-rfc-124-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
