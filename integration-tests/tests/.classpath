@@ -36,7 +36,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/servlet-api.osgi/2.5-SNAPSHOT/servlet-api.osgi-2.5-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/jasper.osgi/5.5.23-SNAPSHOT/jasper.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/JASPER_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/catalina.osgi/5.5.23-SNAPSHOT/catalina.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/CATALINA_5.5.X"/>
-	<classpathentry kind="var" path="M2_REPO/com/cenqua/clover/clover/2.3.1/clover-2.3.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/rfc-124-1.0-SNAPSHOT/spring-osgi-extender-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/extender/src/main/java"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>
