@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>weather</artifactId>
 		<groupId>org.springframework.osgi.samples</groupId>
-		<version>1.2.0-m2-SNAPSHOT</version>
+		<version>rfc-124-1.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.springframework.osgi.samples</groupId>
 	<artifactId>weather-service-test</artifactId>
