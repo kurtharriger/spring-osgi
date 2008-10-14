@@ -66,11 +66,7 @@
         </xsd:attribute>
         <xsd:attribute name="class" type="xsd:string">
         </xsd:attribute>
-        <xsd:attribute name="parent" type="xsd:string">
-        </xsd:attribute>
         <xsd:attribute name="scope" type="xsd:string">
-        </xsd:attribute>
-        <xsd:attribute name="abstract" type="xsd:boolean">
         </xsd:attribute>
         <xsd:attribute name="lazy-init" default="default" type="defaultable-boolean">
         </xsd:attribute>
