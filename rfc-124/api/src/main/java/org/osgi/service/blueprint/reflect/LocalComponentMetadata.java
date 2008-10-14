@@ -73,28 +73,12 @@ public interface LocalComponentMetadata extends ComponentMetadata {
 	MethodInjectionMetadata[] getMethodInjectionMetadata();
 	
 	/**
-	 * Is this an abstract component declaration.
-	 * 
-	 * @return true, iff this component definition is marked as abstract and hence
-	 * has no associated component instance.
-	 */
-	boolean isAbstract();
-	
-	/**
 	 * Is this component to be lazily instantiated?
 	 * 
 	 * @return true, iff this component definition specifies lazy
 	 * instantiation.
 	 */
 	boolean isLazy();
-	
-	/**
-	 * The metadata for the parent definition of this component declaration, if any.
-	 * 
-	 * @return the component metadata for the parent component definition if this component
-	 * was declared using component metadata inheritance.
-	 */
-	LocalComponentMetadata getParent();
 	
 	/**
 	 * The metadata describing how to create the component instance by invoking a 
