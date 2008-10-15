@@ -331,7 +331,7 @@
     
     <xsd:attributeGroup name="defaults">
       <xsd:attribute name="default-timeout" type="xsd:long" default="30000"/>
-      <xsd:attribute name="default-availability" type="Tavailability" default="mandatory"/>
+      <xsd:attribute name="default-availability" type="Tavailability" default="required"/>
     </xsd:attributeGroup>
     
     <xsd:simpleType name="TdefaultCardinalityOptions">
@@ -354,9 +354,8 @@
           </xsd:sequence>
           <xsd:attribute name="interface" use="optional" type="xsd:token"/>
           <xsd:attribute name="filter" use="optional" type="xsd:string"/>
-          <xsd:attribute name="depends-on" type="xsd:string" use="optional"/>
           <xsd:attribute name="component-name" type="xsd:string" use="optional"/>
-          <xsd:attribute name="availability" use="optional" type="Tavailability" default="mandatory"/>
+          <xsd:attribute name="availability" use="optional" type="Tavailability" default="required"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
