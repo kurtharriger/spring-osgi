@@ -204,6 +204,9 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	/** register at startup by default */
 	private boolean registerAtStartup = true;
 
+	/** register the service by default */
+	private boolean registerService = true;
+
 	/** synchronization lock */
 	private final Object lock = new Object();
 
@@ -292,7 +295,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	/**
 	 * Proxy the target object with an interceptor that manages the context
 	 * classloader. This should be applied only if such management is needed.
-	 * 
+	 *
 	 * @param target
 	 * @return
 	 */
@@ -338,7 +341,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	void registerService() {
 
 		synchronized (lock) {
-			if (serviceRegistered)
+			if (serviceRegistered || !registerService)
 				return;
 			else
 				serviceRegistered = true;
@@ -375,7 +378,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	/**
 	 * Registration method.
-	 * 
+	 *
 	 * @param classes
 	 * @param serviceProperties
 	 * @return the ServiceRegistration
@@ -427,7 +430,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * <p/> Returns a {@link ServiceRegistration} to the OSGi service for the
 	 * target object.
 	 */
@@ -457,7 +460,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	/**
 	 * Unregisters (literally stops) a service.
-	 * 
+	 *
 	 * @param registration
 	 */
 	void unregisterService(ServiceRegistration registration) {
@@ -470,12 +473,12 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * Sets the context class loader management strategy to use when invoking
 	 * operations on the exposed target bean. By default,
 	 * {@link ExportContextClassLoader#UNMANAGED} is used.
-	 * 
+	 *
 	 * <p/> <strong>Note:</strong> Since proxying is required for context class
 	 * loader manager, the target class has to meet certain criterias described
 	 * in the Spring AOP documentation. In short, final classes are not
 	 * supported when class enhancement is used.
-	 * 
+	 *
 	 * @param ccl context class loader strategy to use
 	 * @see ExportContextClassLoader
 	 */
@@ -486,7 +489,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	/**
 	 * Returns the object exported as an OSGi service.
-	 * 
+	 *
 	 * @return the object exported as an OSGi service
 	 */
 	public Object getTarget() {
@@ -498,7 +501,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * the exported service is a nested bean or an object not managed by the
 	 * Spring container. Note that the passed target instance is ignored if
 	 * {@link #setTargetBeanName(String)} is used.
-	 * 
+	 *
 	 * @param target the object to be exported as an OSGi service
 	 */
 	public void setTarget(Object target) {
@@ -507,7 +510,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	/**
 	 * Returns the target bean name.
-	 * 
+	 *
 	 * @return the target object bean name
 	 */
 	public String getTargetBeanName() {
@@ -518,7 +521,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * Sets the name of the bean managed by the Spring container, which will be
 	 * exported as an OSGi service. This method is normally what most use-cases
 	 * need, rather then {@link #setTarget(Object)}.
-	 * 
+	 *
 	 * @param name target bean name
 	 */
 	public void setTargetBeanName(String name) {
@@ -530,12 +533,12 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * the exporter to use the target class hierarchy and/or interfaces for
 	 * registering the OSGi service. By default, autoExport is disabled
 	 * {@link AutoExport#DISABLED}.
-	 * 
+	 *
 	 * @param classExporter class exporter used for automatically publishing
 	 * service classes.
-	 * 
+	 *
 	 * @see AutoExport
-	 * 
+	 *
 	 */
 	public void setAutoExport(AutoExport classExporter) {
 		Assert.notNull(classExporter);
@@ -544,7 +547,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	/**
 	 * Returns the properties used when exporting the target as an OSGi service.
-	 * 
+	 *
 	 * @return properties used for exporting the target
 	 */
 	public Map getServiceProperties() {
@@ -553,7 +556,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	/**
 	 * Sets the properties used when exposing the target as an OSGi service.
-	 * 
+	 *
 	 * @param serviceProperties properties used for exporting the target as an
 	 * OSGi service
 	 */
@@ -563,7 +566,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	/**
 	 * Returns the OSGi ranking used when publishing the service.
-	 * 
+	 *
 	 * @return service ranking used when publishing the service
 	 */
 	public int getRanking() {
@@ -572,13 +575,39 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	/**
 	 * Shortcut for setting the ranking property of the published service.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param ranking service ranking
 	 * @see Constants#SERVICE_RANKING
 	 */
 	public void setRanking(int ranking) {
 		this.ranking = ranking;
+	}
+
+	/**
+	 * Controls whether the service actually gets published or not. This can be used by
+	 * application context creators to control service creation without blocking the creation of
+	 * the context
+	 *
+	 * @param register whether to register the service or not. The default is true.
+	 */
+	public void setRegisterAtStartup(boolean register) {
+		registerAtStartup = register;
+	}
+
+	/**
+	 * Controls whether the service actually gets published or not. This can be used by
+	 * application context creators to control service creation without blocking the creation of
+	 * the context
+	 *
+	 * @param register whether to register the service or not. The default is true.
+	 */
+	public void setRegisterService(boolean register) {
+		registerService = register;
+		// Use targetClass as a proxy for afterPropertiesSet() being called.
+		if (registerService && targetClass != null) {
+			registerService();
+		}
 	}
 
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {

@@ -73,15 +73,6 @@ public interface DelegatedExecutionOsgiBundleApplicationContext extends Configur
 	void setExecutor(OsgiBundleApplicationContextExecutor executor);
 
 	/**
-	 * Synchronization monitor for this
-	 * {@link org.springframework.context.ApplicationContext} in case multiple
-	 * threads can work with the application context lifecycle.
-	 * 
-	 * @return monitor for this application context.
-	 */
-	Object getMonitor();
-
-	/**
 	 * Allows a delegated {@link OsgiBundleApplicationContextEventMulticaster},
 	 * external to the application context, to be used for sending OSGi
 	 * application context events regarding the application context life cycle.

@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.HashSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,12 +19,17 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
+import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * Calculate service dependencies for annotation-style injected proxies.
+ *
  * @author Andy Piper
  */
 class ServiceReferenceDependencyBeanFactoryPostProcessor implements OsgiServiceDependencyFactory {
@@ -40,6 +46,13 @@ class ServiceReferenceDependencyBeanFactoryPostProcessor implements OsgiServiceD
 		for (String definitionName : beanDefinitionNames) {
 			BeanDefinition definition = beanFactory.getBeanDefinition(definitionName);
 			String className = definition.getBeanClassName();
+			// Ignore internal stuff
+			if (className == null
+				|| className.equals(OsgiServiceProxyFactoryBean.class.getName())
+				|| className.equals(OsgiServiceFactoryBean.class.getName())
+				|| className.equals(OsgiServiceCollectionProxyFactoryBean.class.getName())) {
+				continue;
+			}
 			try {
 				Class<?> clazz = Class.forName(className, true, beanFactory.getBeanClassLoader());
 				dependencies.addAll(getClassServiceDependencies(clazz, definitionName, definition));
