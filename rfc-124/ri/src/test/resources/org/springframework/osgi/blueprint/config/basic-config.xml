@@ -22,4 +22,3 @@
 	<component id="factory-component" factory-component="thread" factory-method="getName"/>
 	
 </components>
-
