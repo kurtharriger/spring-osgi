@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <artifactId>spring-osgi</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>rfc-124-1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi.rfc124</groupId>
+  <artifactId>ri</artifactId>
+  <packaging>jar</packaging>
+  <name>Spring OSGi RFC 124 Reference Implementation</name>
+  <url>http://www.springframework.org/osgi</url>
+  
+  <properties>
+	<spring.osgi.import.pkg>*</spring.osgi.import.pkg>
+	<spring.osgi.export.pkg>*</spring.osgi.export.pkg>
+  	<clover.skip>true</clover.skip>
+  </properties>
+  
+  <!-- shared dependencies -->
+  <dependencies>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+  </dependencies>
+
+  <!--
+  <build>
+    <plugins>
+	   <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>    
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  -->
+  
+</project>
