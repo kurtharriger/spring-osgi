@@ -11,26 +11,26 @@
   
   <!-- variations on construction -->
   
-  <bean id="simpleBean1" class=org.springframework.osgi.blueprint.reflect.adapters.TestBean"/>
+  <bean id="simpleBean1" class="org.springframework.osgi.blueprint.reflect.adapters.TestBean"/>
   
-  <bean id="simpleBean2" class=org.springframework.osgi.blueprint.reflect.adapters.TestBean">
+  <bean id="simpleBean2" class="org.springframework.osgi.blueprint.reflect.adapters.TestBean">
     <constructor-arg value="Hello"/>
   </bean>
   
-  <bean id="simpleBean3" class=org.springframework.osgi.blueprint.reflect.adapters.TestBean">
+  <bean id="simpleBean3" class="org.springframework.osgi.blueprint.reflect.adapters.TestBean">
     <constructor-arg value="Hello"/>
     <constructor-arg ref="simpleBean2"/>
   </bean>
   
-  <bean id="simpleBean4" class=org.springframework.osgi.blueprint.reflect.adapters.TestBean" factory-method="makeBean"/>
+  <bean id="simpleBean4" class="org.springframework.osgi.blueprint.reflect.adapters.TestBean" factory-method="makeBean"/>
     
-  <bean id="simpleBean5" class=org.springframework.osgi.blueprint.reflect.adapters.TestBean" factory-method="makeBean">
+  <bean id="simpleBean5" class="org.springframework.osgi.blueprint.reflect.adapters.TestBean" factory-method="makeBean">
     <constructor-arg value="Hello"/>
   </bean>
 
-  <bean id="simpleBean6" class=org.springframework.osgi.blueprint.reflect.adapters.TestBean" factory-method="clone" factory-bean="simpleBean5"/>
+  <bean id="simpleBean6" class="org.springframework.osgi.blueprint.reflect.adapters.TestBean" factory-method="clone" factory-bean="simpleBean5"/>
 
-  <bean id="simpleBean7" class=org.springframework.osgi.blueprint.reflect.adapters.TestBean" factory-method="clone" factory-bean="simpleBean5">
+  <bean id="simpleBean7" class="org.springframework.osgi.blueprint.reflect.adapters.TestBean" factory-method="clone" factory-bean="simpleBean5">
     <constructor-arg value="Hello"/>
   </bean>
   
