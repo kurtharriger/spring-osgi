@@ -19,6 +19,7 @@ package org.springframework.osgi.extender.internal.activator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -505,6 +506,16 @@ public class ContextLoaderListener implements BundleActivator {
 			buffer.append("Shutdown order is: {");
 			for (i = 0; i < bundles.length; i++) {
 				buffer.append("\nBundle [" + bundles[i].getSymbolicName() + "]");
+				ServiceReference[] services = bundles[i].getServicesInUse();
+				HashSet usedBundles = new HashSet();
+				for (int j = 0; j < services.length; j++) {
+					Bundle used = services[j].getBundle();
+					if (!used.equals(bundleContext.getBundle())
+						&& !usedBundles.contains(used)) {
+						usedBundles.add(used);
+						buffer.append("\n  Using [" + used.getSymbolicName() + "]");
+					}
+				}
 			}
 			buffer.append("\n}");
 			log.debug(buffer);
