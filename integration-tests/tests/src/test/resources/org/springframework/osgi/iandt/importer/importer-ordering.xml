@@ -10,10 +10,20 @@
 	<set id="setWithServiceOrder">
 		<interfaces>
 			<beans:value>org.springframework.osgi.iandt.importer.ServiceComparatorTest$MyInterface</beans:value>
+			<beans:value>java.io.Serializable</beans:value>
+			<beans:value>java.lang.Cloneable</beans:value>
 		</interfaces>
 		<comparator><natural basis="service"/></comparator>
 	</set>
  
+ 	<reference id="multiInterfaceProxy" cardinality="0..1">
+		<interfaces>
+			<beans:value>org.springframework.osgi.iandt.importer.ServiceComparatorTest$MyInterface</beans:value>
+			<beans:value>java.io.Serializable</beans:value>
+			<beans:value>java.lang.Cloneable</beans:value>
+		</interfaces>
+ 	</reference>
+ 	
 	<set id="setWithServiceReference">
 		<interfaces>
 			<beans:value>org.springframework.osgi.iandt.importer.ServiceComparatorTest$MyInterface</beans:value>
@@ -21,4 +31,9 @@
 		<comparator><natural basis="service-reference"/></comparator>
 	</set>
 	
+	<beans:bean id="testBean" class="org.springframework.osgi.iandt.importer.ServiceComparatorTest$TestBean">
+		<beans:property name="prop1" ref="multiInterfaceProxy"/>
+		<beans:property name="prop2" ref="multiInterfaceProxy"/>
+		<beans:property name="prop3" ref="multiInterfaceProxy"/>
+	</beans:bean>
 </beans:beans>

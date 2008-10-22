@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.importer;
 
 import java.io.Serializable;
@@ -38,13 +39,16 @@ public class ServiceComparatorTest extends BaseIntegrationTest {
 	/** load context on each test run */
 	private ConfigurableOsgiBundleApplicationContext context;
 
+
 	public static interface MyInterface extends Comparable, Serializable, Cloneable {
+
 		String value();
 	}
 
-	static class MyClass implements MyInterface {
+	static class MyClass implements MyInterface, Serializable, Cloneable {
 
 		private String value;
+
 
 		protected Object clone() throws CloneNotSupportedException {
 			return null;
@@ -75,9 +79,43 @@ public class ServiceComparatorTest extends BaseIntegrationTest {
 
 	}
 
+	static class TestBean {
+
+		private Serializable prop1;
+		private Cloneable prop2;
+		private MyInterface prop3;
+
+
+		public void setProp1(Serializable prop1) {
+			this.prop1 = prop1;
+		}
+
+		public void setProp2(Cloneable prop2) {
+			this.prop2 = prop2;
+		}
+
+		public void setProp3(MyInterface prop3) {
+			this.prop3 = prop3;
+		}
+
+		public Serializable getProp1() {
+			return prop1;
+		}
+
+		public Cloneable getProp2() {
+			return prop2;
+		}
+
+		public MyInterface getProp3() {
+			return prop3;
+		}
+	}
+
+
 	protected void onSetUp() throws Exception {
 		// publish service
-		String[] intfs = new String[] { MyInterface.class.getName() };
+		String[] intfs = new String[] { MyInterface.class.getName(), Serializable.class.getName(),
+			Cloneable.class.getName() };
 
 		service1 = new MyClass("abc");
 		service2 = new MyClass("xyz");
@@ -87,7 +125,6 @@ public class ServiceComparatorTest extends BaseIntegrationTest {
 		registration1 = bundleContext.registerService(intfs, service1, null);
 		registration2 = bundleContext.registerService(intfs, service2, null);
 		reg3 = bundleContext.registerService(intfs, service3, null);
-
 
 		context = loadAppContext();
 	}
@@ -101,7 +138,7 @@ public class ServiceComparatorTest extends BaseIntegrationTest {
 
 	private ConfigurableOsgiBundleApplicationContext loadAppContext() {
 		OsgiBundleXmlApplicationContext appContext = new OsgiBundleXmlApplicationContext(
-				new String[] { "/org/springframework/osgi/iandt/importer/importer-ordering.xml" });
+			new String[] { "/org/springframework/osgi/iandt/importer/importer-ordering.xml" });
 		appContext.setBundleContext(bundleContext);
 		appContext.refresh();
 		return appContext;
@@ -119,6 +156,7 @@ public class ServiceComparatorTest extends BaseIntegrationTest {
 		assertEquals(service1, iter.next());
 		assertEquals(service3, iter.next());
 		assertEquals(service2, iter.next());
+		assertTrue(service1 instanceof Serializable);
 	}
 
 	public void testServiceReferenceOrderingOnImportedObjects() throws Exception {
@@ -130,5 +168,14 @@ public class ServiceComparatorTest extends BaseIntegrationTest {
 		assertEquals(service3, iter.next());
 		assertEquals(service2, iter.next());
 		assertEquals(service1, iter.next());
+	}
+
+	public void testReferenceInjection() throws Exception {
+		TestBean bean = (TestBean) context.getBean("testBean");
+		assertNotNull(bean.getProp1());
+		assertNotNull(bean.getProp2());
+		assertNotNull(bean.getProp3());
+		assertSame(bean.getProp1(), bean.getProp2());
+		assertSame(bean.getProp2(), bean.getProp3());
 	}
 }

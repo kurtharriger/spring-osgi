@@ -4,7 +4,7 @@
 	xsi:schemaLocation="
 		http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"
 	default-init-method="init">
-	<!-- 
+
 	<description>Some different description</description>
 
 	<component id="constructor-arg" class="java.lang.Integer">
@@ -25,18 +25,17 @@
 		<property name="sendBufferSize" ref="constructor-arg" />
 	</component>
 
+	<component id="idref" class="java.lang.String">
+		<constructor-arg>
+			<idref component="constructor-arg" />
+		</constructor-arg>
+	</component>
+
 	<component id="propertyValueNested" class="java.net.Socket">
 		<property name="sendBufferSize">
 			<component class="java.lang.Integer">
 				<constructor-arg value="3" />
 			</component>
 		</property>
-	</component>
-
- 	-->
-	<component id="idref" class="java.lang.String">
-		<constructor-arg>
-			<idref component="constructor-arg" />
-		</constructor-arg>
 	</component>
 </components>
