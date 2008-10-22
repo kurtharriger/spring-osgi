@@ -131,7 +131,11 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 				Bundle[] referingBundles = services[i].getUsingBundles();
 				if (referingBundles != null) {
 					for (int j = 0; j < referingBundles.length; j++) {
-						if (a.equals(referingBundles[j])) {
+						// Don't count self-referentiality.
+						if (b.equals(referingBundles[j])) {
+							;
+						}
+						else if (a.equals(referingBundles[j])) {
 							return true;
 						}
 						else if (references(a, referingBundles[j], seen)) {
@@ -151,7 +155,7 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 	 * @param reference reference to the OSGi service
 	 * @return true if the service is spring managed, false otherwise
 	 */
-	private boolean isSpringManagedService(ServiceReference reference) {
+	private static boolean isSpringManagedService(ServiceReference reference) {
 		if (reference == null)
 			return false;
 		return (reference.getProperty(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY) != null
