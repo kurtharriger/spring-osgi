@@ -16,22 +16,19 @@
 
 package org.springframework.osgi.blueprint.config;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.xml.BeanDefinitionDecorator;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Node;
 
 /**
- * Spring-based namespace handler for the blueprint/RFC-124 core namespace.
- * 
  * @author Costin Leau
  * 
  */
-class BlueprintNamespaceHandler extends NamespaceHandlerSupport {
+public class TestDecorator implements BeanDefinitionDecorator {
 
-	public void init() {
-		registerBeanDefinitionParser(ComponentsNamespaceParser.COMPONENTS, new ComponentsNamespaceParser());
-
-		//		registerBeanDefinitionParser(DescriptionParser.DESCRIPTION, new DescriptionParser());
-		//		registerBeanDefinitionParser(ComponentNamespaceParser.COMPONENT, new ComponentNamespaceParser());
-		// register id ref parsing (since the namespace is checked and it's not parsed directly)
-		//registerBeanDefinitionDecorator(ComponentsNamespaceParser.COMPONENTS, new TestDecorator());
+	public BeanDefinitionHolder decorate(Node node, BeanDefinitionHolder definition, ParserContext parserContext) {
+		System.out.println("Trying to decorate definition " + definition + " for node " + node);
+		return definition;
 	}
 }
