@@ -5,7 +5,7 @@
 		http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"
 		default-init-method="init">
 
-	<description>Some description</description>
+	<description>Components just with attributes</description>
 
 	<component id="simple" class="java.lang.Object"/>
 	

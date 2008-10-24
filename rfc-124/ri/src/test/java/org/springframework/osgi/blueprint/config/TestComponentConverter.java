@@ -16,19 +16,24 @@
 
 package org.springframework.osgi.blueprint.config;
 
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.xml.BeanDefinitionDecorator;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Node;
+import org.osgi.service.blueprint.convert.Converter;
+import org.springframework.osgi.blueprint.TestComponent;
 
 /**
+ * Dummy converter used for testing.
+ * 
  * @author Costin Leau
  * 
  */
-public class TestDecorator implements BeanDefinitionDecorator {
+public class TestComponentConverter implements Converter {
 
-	public BeanDefinitionHolder decorate(Node node, BeanDefinitionHolder definition, ParserContext parserContext) {
-		System.out.println("Trying to decorate definition " + definition + " for node " + node);
-		return definition;
+	public Object convert(Object value) throws RuntimeException {
+		TestComponent comp = new TestComponent();
+		comp.setPropA(value);
+		return comp;
+	}
+
+	public Class<?> getTargetClass() {
+		return TestComponent.class;
 	}
 }

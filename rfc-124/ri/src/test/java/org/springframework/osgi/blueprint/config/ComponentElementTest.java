@@ -27,6 +27,11 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ObjectUtils;
 
+/**
+ * 
+ * @author Costin Leau
+ * 
+ */
 public class ComponentElementTest extends TestCase {
 
 	private static final String CONFIG = "basic-config.xml";
