@@ -80,20 +80,44 @@ class ComponentParser {
 	private ParserContext parserContext;
 
 
+	public ComponentParser() {
+		this(null, null);
+	}
+
+	/**
+	 * Constructs a new <code>ComponentParser</code> instance. Used by certain
+	 * reusable static methods.
+	 * 
+	 * @param parserContext
+	 */
+	private ComponentParser(ParserContext parserContext) {
+		this(null, null);
+		this.parserContext = parserContext;
+	}
+
 	public ComponentParser(ParseState parseState, Collection<String> usedNames) {
 		this.parseState = (parseState != null ? parseState : new ParseState());
 		this.usedNames = (usedNames != null ? usedNames : new LinkedHashSet<String>());
 	}
 
-	public void parse(Element componentElement, ParserContext parserContext) {
+	public BeanDefinition parse(Element componentElement, ParserContext parserContext) {
 		// save parser context
 		this.parserContext = parserContext;
 
 		// let Spring do its standard parsing
 		BeanDefinitionHolder bdHolder = parseComponentDefinitionElement(componentElement, null);
 
-		// decorate the holder and register it
-		ParsingUtils.register(componentElement, bdHolder, parserContext);
+		return bdHolder.getBeanDefinition();
+	}
+
+	public BeanDefinitionHolder parseAsHolder(Element componentElement, ParserContext parserContext) {
+		// save parser context
+		this.parserContext = parserContext;
+
+		// let Spring do its standard parsing
+		BeanDefinitionHolder bdHolder = parseComponentDefinitionElement(componentElement, null);
+
+		return bdHolder;
 	}
 
 	/**
@@ -387,6 +411,10 @@ class ComponentParser {
 		}
 	}
 
+	static Object parsePropertySubElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
+		return new ComponentParser(parserContext).parsePropertySubElement(ele, bd, null);
+	}
+
 	/**
 	 * Parse a value, ref or collection sub-element of a property or
 	 * constructor-arg element. This method is called from several places to
@@ -406,16 +434,15 @@ class ComponentParser {
 
 		// check Spring own namespace
 		if (parserContext.getDelegate().isDefaultNamespace(namespaceUri)) {
-			return parserContext.getDelegate().parseBeanDefinitionElement(ele, bd);
+			return parserContext.getDelegate().parsePropertySubElement(ele, bd);
 		}
 		// let the delegate handle other ns
-		else if (!ComponentsNamespaceParser.NAMESPACE_URI.equals(namespaceUri)) {
+		else if (!ComponentsBeanDefinitionParser.NAMESPACE_URI.equals(namespaceUri)) {
 			return parserContext.getDelegate().parseCustomElement(ele);
 		}
 
 		// 
 		else {
-
 			if (DomUtils.nodeNameEquals(ele, COMPONENT)) {
 				BeanDefinitionHolder bdHolder = parseComponentDefinitionElement(ele, bd);
 				if (bdHolder != null) {
@@ -561,7 +588,7 @@ class ComponentParser {
 	/**
 	 * Parse a set element.
 	 */
-	public Set<?> parseSetElement(Element collectionEle, BeanDefinition bd) {
+	private Set<?> parseSetElement(Element collectionEle, BeanDefinition bd) {
 		String defaultTypeClassName = collectionEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
 		NodeList nl = collectionEle.getChildNodes();
 		ManagedSet set = new ManagedSet(nl.getLength());
@@ -580,7 +607,7 @@ class ComponentParser {
 	/**
 	 * Parse a map element.
 	 */
-	public Map<?, ?> parseMapElement(Element mapEle, BeanDefinition bd) {
+	private Map<?, ?> parseMapElement(Element mapEle, BeanDefinition bd) {
 		String defaultKeyTypeClassName = mapEle.getAttribute(BeanDefinitionParserDelegate.KEY_TYPE_ATTRIBUTE);
 		String defaultValueTypeClassName = mapEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
 

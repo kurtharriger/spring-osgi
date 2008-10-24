@@ -17,7 +17,6 @@
 package org.springframework.osgi.blueprint.config;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
@@ -38,7 +37,7 @@ class ParsingUtils {
 	static BeanDefinitionHolder decorateAndRegister(Element ele, BeanDefinitionHolder bdHolder,
 			ParserContext parserContext) {
 		if (bdHolder != null) {
-			bdHolder = parserContext.getDelegate().decorateBeanDefinitionIfRequired(ele, bdHolder, null);
+			bdHolder = decorateBeanDefinitionIfRequired(ele, bdHolder, parserContext);
 		}
 
 		return register(ele, bdHolder, parserContext);
@@ -107,10 +106,10 @@ class ParsingUtils {
 	}
 
 	static boolean isRFC124Namespace(Node node) {
-		return (ComponentsNamespaceParser.NAMESPACE_URI.equals(node.getNamespaceURI()));
+		return (ComponentsBeanDefinitionParser.NAMESPACE_URI.equals(node.getNamespaceURI()));
 	}
 
 	static boolean isRFC124Namespace(String namespaceURI) {
-		return (ComponentsNamespaceParser.NAMESPACE_URI.equals(namespaceURI));
+		return (ComponentsBeanDefinitionParser.NAMESPACE_URI.equals(namespaceURI));
 	}
 }

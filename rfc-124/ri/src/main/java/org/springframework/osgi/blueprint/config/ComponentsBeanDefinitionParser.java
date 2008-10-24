@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.parsing.ParseState;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
@@ -35,7 +36,7 @@ import org.w3c.dom.NodeList;
  * 
  * @author Costin Leau
  */
-class ComponentsNamespaceParser implements BeanDefinitionParser {
+class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 
 	static final String COMPONENTS = "components";
 	// RFC 124 namespace
@@ -43,9 +44,7 @@ class ComponentsNamespaceParser implements BeanDefinitionParser {
 
 	private static final String DESCRIPTION = "description";
 
-	private static final String TYPE_CONVERTERS = "type-converters";
-
-	private Collection usedNames = new LinkedHashSet();
+	private Collection<String> usedNames = new LinkedHashSet<String>();
 
 	private ParseState parseState = new ParseState();
 
@@ -63,7 +62,8 @@ class ComponentsNamespaceParser implements BeanDefinitionParser {
 				String namespaceUri = ele.getNamespaceURI();
 				// check beans namespace
 				if (delegate.isDefaultNamespace(namespaceUri)) {
-					delegate.parseBeanDefinitionElement(ele);
+					BeanDefinitionHolder holder = delegate.parseBeanDefinitionElement(ele);
+					ParsingUtils.decorateAndRegister(ele, holder, parserContext);
 				}
 				// handle own components
 				else if (NAMESPACE_URI.equals(namespaceUri)) {
@@ -94,7 +94,7 @@ class ComponentsNamespaceParser implements BeanDefinitionParser {
 		else if (DomUtils.nodeNameEquals(ele, ComponentParser.COMPONENT)) {
 			parseComponentElement(ele, parserContext);
 		}
-		else if (DomUtils.nodeNameEquals(ele, TYPE_CONVERTERS)) {
+		else if (DomUtils.nodeNameEquals(ele, TypeConverterBeanDefinitionParser.TYPE_CONVERTERS)) {
 			parseConvertersElement(ele, parserContext);
 		}
 		else {
@@ -109,7 +109,8 @@ class ComponentsNamespaceParser implements BeanDefinitionParser {
 	 * @param parserContext
 	 */
 	protected void parseComponentElement(Element ele, ParserContext parserContext) {
-		new ComponentParser(parseState, usedNames).parse(ele, parserContext);
+		BeanDefinitionHolder holder = new ComponentParser(parseState, usedNames).parseAsHolder(ele, parserContext);
+		ParsingUtils.decorateAndRegister(ele, holder, parserContext);
 	}
 
 	/**
@@ -119,6 +120,9 @@ class ComponentsNamespaceParser implements BeanDefinitionParser {
 	 * @param parserContext
 	 */
 	protected void parseConvertersElement(Element ele, ParserContext parserContext) {
-		throw new UnsupportedOperationException(TYPE_CONVERTERS + " element not supported yet");
+		BeanDefinitionParser parser = new TypeConverterBeanDefinitionParser();
+		BeanDefinition bd = parser.parse(ele, parserContext);
+		// register bd
+		parserContext.getRegistry().registerBeanDefinition(parserContext.getReaderContext().generateBeanName(bd), bd);
 	}
 }

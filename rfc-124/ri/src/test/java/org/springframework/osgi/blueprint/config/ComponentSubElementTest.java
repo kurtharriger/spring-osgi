@@ -17,6 +17,10 @@
 package org.springframework.osgi.blueprint.config;
 
 import java.net.Socket;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -29,8 +33,14 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.osgi.blueprint.TestComponent;
 import org.springframework.util.ObjectUtils;
 
+/**
+ * 
+ * @author Costin Leau
+ * 
+ */
 public class ComponentSubElementTest extends TestCase {
 
 	private static final String CONFIG = "component-subelements.xml";
@@ -53,7 +63,6 @@ public class ComponentSubElementTest extends TestCase {
 	}
 
 	public void testNumberOfBeans() throws Exception {
-		System.out.println("The beans declared are: " + ObjectUtils.nullSafeToString(context.getBeanDefinitionNames()));
 		assertTrue("not enough beans found", context.getBeanDefinitionCount() > 4);
 	}
 
@@ -94,4 +103,44 @@ public class ComponentSubElementTest extends TestCase {
 		assertTrue(nested.getValue() instanceof BeanDefinitionHolder);
 	}
 
+	public void testList() throws Exception {
+		TestComponent cmpn = (TestComponent) context.getBean("list");
+		Object prop = cmpn.getPropA();
+		assertTrue(prop instanceof List);
+		List<?> list = (List<?>) prop;
+		assertEquals("value", list.get(0));
+		assertEquals("idref", list.get(1));
+		assertNull(list.get(2));
+		assertSame(context.getBean("idref"), list.get(3));
+	}
+
+	public void testSet() throws Exception {
+		TestComponent cmpn = (TestComponent) context.getBean("set");
+		Object prop = cmpn.getPropA();
+		assertTrue(prop instanceof Set);
+		Set<?> set = (Set<?>) prop;
+		assertTrue(set.contains("value"));
+		assertTrue(set.contains("idref"));
+		assertTrue(set.contains(null));
+		assertTrue(set.contains(context.getBean("idref")));
+	}
+
+	public void testMap() throws Exception {
+		TestComponent cmpn = (TestComponent) context.getBean("map");
+		Object prop = cmpn.getPropA();
+		assertTrue(prop instanceof Map);
+		Map<?, ?> map = (Map) prop;
+		assertEquals("bar", map.get("foo"));
+		assertEquals(context.getBean("set"), map.get(context.getBean("list")));
+		assertEquals(context.getBean("list"), map.get(context.getBean("set")));
+	}
+
+	public void testProps() throws Exception {
+		TestComponent cmpn = (TestComponent) context.getBean("props");
+		Object prop = cmpn.getPropA();
+		assertTrue(prop instanceof Properties);
+		Properties props = (Properties) prop;
+		assertEquals("two", props.get("one"));
+		assertEquals("smith", props.get("aero"));
+	}
 }

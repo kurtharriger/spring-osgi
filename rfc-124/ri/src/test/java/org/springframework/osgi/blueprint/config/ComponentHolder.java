@@ -16,20 +16,20 @@
 
 package org.springframework.osgi.blueprint.config;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
-
 /**
- * Spring-based namespace handler for the blueprint/RFC-124 core namespace.
- * 
  * @author Costin Leau
  * 
  */
-class BlueprintNamespaceHandler extends NamespaceHandlerSupport {
+public class ComponentHolder {
 
-	public void init() {
-		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.COMPONENTS, new ComponentsBeanDefinitionParser());
-		registerBeanDefinitionParser(ComponentParser.COMPONENT, new ComponentBeanDefinitionParser());
-		registerBeanDefinitionParser(TypeConverterBeanDefinitionParser.TYPE_CONVERTERS,
-			new TypeConverterBeanDefinitionParser());
+	private Object property;
+
+
+	public Object getProperty() {
+		return property;
+	}
+
+	public void setProperty(Object property) {
+		this.property = property;
 	}
 }

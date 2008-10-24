@@ -16,20 +16,23 @@
 
 package org.springframework.osgi.blueprint.config;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.osgi.service.blueprint.convert.Converter;
 
 /**
- * Spring-based namespace handler for the blueprint/RFC-124 core namespace.
+ * Dummy converter used for testing.
  * 
  * @author Costin Leau
  * 
  */
-class BlueprintNamespaceHandler extends NamespaceHandlerSupport {
+public class ComponentHolderConverter implements Converter {
 
-	public void init() {
-		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.COMPONENTS, new ComponentsBeanDefinitionParser());
-		registerBeanDefinitionParser(ComponentParser.COMPONENT, new ComponentBeanDefinitionParser());
-		registerBeanDefinitionParser(TypeConverterBeanDefinitionParser.TYPE_CONVERTERS,
-			new TypeConverterBeanDefinitionParser());
+	public Object convert(Object value) throws RuntimeException {
+		ComponentHolder comp = new ComponentHolder();
+		comp.setProperty(value);
+		return comp;
+	}
+
+	public Class<?> getTargetClass() {
+		return ComponentHolder.class;
 	}
 }
