@@ -76,11 +76,10 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIntegrationTest {
 
 		Bundle[] bundles = bundleContext.getBundles();
 		Bundle bundle = null;
-		System.out.println(ObjectUtils.nullSafeToString(bundles));
 		// find cglib library as we don't use it
 		for (int i = 1; bundle == null && i < bundles.length; i++) {
 			String location = bundles[i].getLocation();
-			if (location != null && location.contains(EXTRA_BUNDLE))
+			if (location != null && location.indexOf(EXTRA_BUNDLE) > -1)
 				bundle = bundles[i];
 		}
 
