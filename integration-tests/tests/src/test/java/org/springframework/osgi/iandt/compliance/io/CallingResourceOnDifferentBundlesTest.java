@@ -28,6 +28,7 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * 
@@ -71,13 +72,15 @@ public class CallingResourceOnDifferentBundlesTest extends BaseIntegrationTest {
 	}
 
 	public void testCallGetResourceOnADifferentBundleRetrievedThroughBundleEvent() throws Exception {
-		String CGLIB_BUNDLE_NAME = "spring-core";
+		String EXTRA_BUNDLE = "spring-core";
 
 		Bundle[] bundles = bundleContext.getBundles();
 		Bundle bundle = null;
+		System.out.println(ObjectUtils.nullSafeToString(bundles));
 		// find cglib library as we don't use it
 		for (int i = 1; bundle == null && i < bundles.length; i++) {
-			if (CGLIB_BUNDLE_NAME.equals(OsgiStringUtils.nullSafeName(bundles[i])))
+			String location = bundles[i].getLocation();
+			if (location != null && location.contains(EXTRA_BUNDLE))
 				bundle = bundles[i];
 		}
 
