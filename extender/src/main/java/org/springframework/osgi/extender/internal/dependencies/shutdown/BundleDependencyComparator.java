@@ -2,8 +2,6 @@ package org.springframework.osgi.extender.internal.dependencies.shutdown;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,7 +10,6 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
-import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -38,116 +35,6 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 
 	private static final Log log = LogFactory.getLog(BundleDependencyComparator.class);
 
-	public int compare(Object a, Object b) {
-		boolean trace = log.isTraceEnabled();
-
-		Bundle bundle1 = (Bundle) a;
-		Bundle bundle2 = (Bundle) b;
-
-		if (trace)
-			log.trace("comparing bundle1 [" + OsgiStringUtils.nullSafeNameAndSymName(bundle1) + "] w/ bundle2 ["
-				+ OsgiStringUtils.nullSafeNameAndSymName(bundle2) + "]..");
-
-		if (bundle1 == null) {
-			if (bundle2 == null) {
-				return 0;
-			}
-			else {
-				// Sort nulls first
-				return 1;
-			}
-		}
-		else if (bundle2 == null) {
-			// Sort nulls first
-			return -1;
-		}
-
-		// At this point, we know that bundle1 and bundle2 are not null
-		if (bundle1.equals(bundle2)) {
-			return 0;
-		}
-
-		// At this point, bundle1 and bundle2 are not null and not equal, here
-		// we
-		// compare them to see which is "higher" in the dependency graph
-		boolean b1Lower = references(bundle2, bundle1);
-		boolean b2Lower = references(bundle1, bundle2);
-
-		if (b1Lower && !b2Lower) {
-			// b2->b1
-			return 1;
-		}
-		else if (b2Lower && !b1Lower) {
-			// b1->b2
-			return -1;
-		}
-		// Do a decent job of informing the user about a circularity
-		else if (b1Lower && b2Lower && log.isInfoEnabled()) {
-			log.info("circular service dependency detected between ["
-				+ OsgiStringUtils.nullSafeNameAndSymName(bundle1) + ", "
-				+ OsgiStringUtils.nullSafeNameAndSymName(bundle2) + "]");
-		}
-		// Deal with circular references and unrelated bundles.
-		// both bundles refer to themselves
-		// b2 -> b1
-		// b1 -> b2
-		int compare = compareUsingServiceRankingAndId(bundle1, bundle2);
-
-		if (trace)
-			log.trace("comparison of [" + OsgiStringUtils.nullSafeNameAndSymName(bundle1)
-				+ ", " + OsgiStringUtils.nullSafeNameAndSymName(bundle2) + "] based on service ranking/id was won by bundle "
-				+ (compare > 0 ? "1" : "2"));
-		return compare;
-	}
-
-	/**
-	 * Answer whether Bundle b is referenced by Bundle a or bundle A references
-	 * Bundle B. This is the same as b -> a (i.e. a service owned by B is used
-	 * by A).
-	 */
-	protected boolean references(Bundle a, Bundle b) {
-		boolean ref = references(a, b, new HashSet());
-		if (log.isTraceEnabled())
-			log.trace("[" + OsgiStringUtils.nullSafeNameAndSymName(a) + "] " + (ref ? "->" : "!->")
-				+ "[" + OsgiStringUtils.nullSafeNameAndSymName(b) + "]");
-		return ref;
-	}
-
-	/**
-	 * Answer whether Bundle b is transitively referenced by Bundle a
-	 */
-	protected boolean references(Bundle a, Bundle b, Set seen) {
-		if (seen.contains(b)) {
-			return false;
-		}
-		seen.add(b);
-		ServiceReference[] services = b.getRegisteredServices();
-		if (services == null) {
-			return false;
-		}
-		for (int i = 0; i < services.length; i++) {
-			// filter on spring managed services
-			if (isSpringManagedService(services[i])) {
-				Bundle[] referingBundles = services[i].getUsingBundles();
-				if (referingBundles != null) {
-					for (int j = 0; j < referingBundles.length; j++) {
-						// Don't count self-referentiality.
-						if (b.equals(referingBundles[j])) {
-							;
-						}
-						else if (a.equals(referingBundles[j])) {
-							return true;
-						}
-						else if (references(a, referingBundles[j], seen)) {
-							return true;
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
-
 	/**
 	 * Simple method checking whether the given service reference points to a
 	 * spring managed service or not. Checks for
@@ -155,14 +42,14 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 	 * @param reference reference to the OSGi service
 	 * @return true if the service is spring managed, false otherwise
 	 */
-	private static boolean isSpringManagedService(ServiceReference reference) {
+	public static boolean isSpringManagedService(ServiceReference reference) {
 		if (reference == null)
 			return false;
 		return (reference.getProperty(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY) != null
 			|| reference.getProperty(ConfigurableOsgiBundleApplicationContext.APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME) != null);
 	}
 
-	private ServiceReference[] excludeNonSpringManagedServices(ServiceReference[] references) {
+	private static ServiceReference[] excludeNonSpringManagedServices(ServiceReference[] references) {
 		if (ObjectUtils.isEmpty(references))
 			return references;
 
@@ -194,7 +81,7 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 	 * id of its exported services. This is used as a tie-breaker for circular
 	 * references.
 	 */
-	protected int compareUsingServiceRankingAndId(Bundle a, Bundle b) {
+	protected static int compareUsingServiceRankingAndId(Bundle a, Bundle b) {
 		ServiceReference[] aservices = excludeNonSpringManagedServices(a.getRegisteredServices());
 		ServiceReference[] bservices = excludeNonSpringManagedServices(b.getRegisteredServices());
 
@@ -204,7 +91,7 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 		if (ObjectUtils.isEmpty(aservices) && ObjectUtils.isEmpty(bservices)) {
 			if (trace)
 				log.trace("both services have 0 services; sorting based on id");
-			return (int) (a.getBundleId() - b.getBundleId());
+			return signum((int) (a.getBundleId() - b.getBundleId()));
 		}
 		else if (aservices == null) {
 			return -1;
@@ -232,7 +119,7 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 					+ " w/ service id " + min);
 			}
 
-			return -(bRank - aRank);
+			return signum(-(bRank - aRank));
 		}
 
 		// Look for the highest id in each bundle (i.e. started last).
@@ -247,10 +134,10 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 					+ " w/ service id " + max);
 			}
 
-			return compare;
+			return signum(compare);
 		}
 
-		return (int) (a.getBundleId() - b.getBundleId());
+		return signum((int) (a.getBundleId() - b.getBundleId()));
 	}
 
 	/**
@@ -261,7 +148,7 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 	 *
 	 * @param refs
 	 */
-	private int findHighestServiceRanking(ServiceReference[] refs) {
+	private static int findHighestServiceRanking(ServiceReference[] refs) {
 		int maxRank = Integer.MIN_VALUE;
 		for (int i = 0; i < refs.length; i++) {
 			int currentRank = OsgiServiceReferenceUtils.getServiceRanking(refs[i]);
@@ -272,7 +159,7 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 		return maxRank;
 	}
 
-	private long findHighestServiceId(ServiceReference[] refs) {
+	private static long findHighestServiceId(ServiceReference[] refs) {
 		long maxId = Long.MIN_VALUE;
 		for (int i = 0; i < refs.length; i++) {
 			long currentId = OsgiServiceReferenceUtils.getServiceId(refs[i]);
@@ -281,5 +168,14 @@ public class BundleDependencyComparator implements Comparator, Serializable {
 		}
 
 		return maxId;
+	}
+
+	private static int signum(int a) {
+		return a < 0 ? -1 : a == 0 ? 0 : 1;
+	}
+
+
+	public int compare(Object a, Object b) {
+		return compareUsingServiceRankingAndId((Bundle) a, (Bundle) b);
 	}
 }
