@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
+import java.util.Collection;
+import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,6 +49,7 @@ import org.springframework.osgi.context.event.OsgiBundleApplicationContextListen
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceDependencySorter;
+import org.springframework.osgi.extender.internal.dependencies.shutdown.BundleDependencyComparator;
 import org.springframework.osgi.extender.internal.dependencies.startup.DependencyWaiterApplicationContextExecutor;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 import org.springframework.osgi.extender.internal.support.NamespaceManager;
@@ -502,6 +505,7 @@ public class ContextLoaderListener implements BundleActivator {
 		boolean debug = log.isDebugEnabled();
 
 		StringBuffer buffer = new StringBuffer();
+
 		if (debug) {
 			buffer.append("Shutdown order is: {");
 			for (i = 0; i < bundles.length; i++) {
@@ -509,12 +513,15 @@ public class ContextLoaderListener implements BundleActivator {
 				ServiceReference[] services = bundles[i].getServicesInUse();
 				HashSet usedBundles = new HashSet();
 				for (int j = 0; j < services.length; j++) {
-					Bundle used = services[j].getBundle();
-					if (!used.equals(bundleContext.getBundle())
-						&& !usedBundles.contains(used)) {
-						usedBundles.add(used);
-						buffer.append("\n  Using [" + used.getSymbolicName() + "]");
+					if (BundleDependencyComparator.isSpringManagedService(services[j])) {
+						Bundle used = services[j].getBundle();
+						if (!used.equals(bundleContext.getBundle())
+							&& !usedBundles.contains(used)) {
+							usedBundles.add(used);
+							buffer.append("\n  Using [" + used.getSymbolicName() + "]");
+						}
 					}
+
 				}
 			}
 			buffer.append("\n}");
