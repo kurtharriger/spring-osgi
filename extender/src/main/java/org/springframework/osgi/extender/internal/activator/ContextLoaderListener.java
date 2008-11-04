@@ -250,7 +250,7 @@ public class ContextLoaderListener implements BundleActivator {
 	}
 
 
-	private static final Log log = LogFactory.getLog(ContextLoaderListener.class);
+	protected final Log log = LogFactory.getLog(getClass());
 
 	// "Spring Application Context Creation Timer"
 	private Timer timer = new Timer(true);
@@ -361,27 +361,10 @@ public class ContextLoaderListener implements BundleActivator {
 		compatibilityChecker = new SpringTypeCompatibilityChecker(bundleContext);
 
 		// Step 1 : discover existing namespaces (in case there are fragments with custom XML definitions)
-		nsManager = new NamespaceManager(context);
-
-		// register listener first to make sure any bundles in INSTALLED state
-		// are not lost
-		nsListener = new NamespaceBundleLister();
-		context.addBundleListener(nsListener);
-
-		Bundle[] previousBundles = context.getBundles();
-
-		for (int i = 0; i < previousBundles.length; i++) {
-			Bundle bundle = previousBundles[i];
-			if (OsgiBundleUtils.isBundleResolved(bundle)) {
-				maybeAddNamespaceHandlerFor(bundle);
-			}
-		}
-
-		// discovery finished, publish the resolvers/parsers in the OSGi space
-		nsManager.afterPropertiesSet();
+		initNamespaceHandlers(bundleContext);
 
 		// Step 2: initialize the extender configuration
-		extenderConfiguration = new ExtenderConfiguration(context);
+		extenderConfiguration = initExtenderConfiguration(bundleContext);
 
 		// initialize the configuration once namespace handlers have been detected
 		this.taskExecutor = extenderConfiguration.getTaskExecutor();
@@ -395,28 +378,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 		// Step 3: discover the bundles that are started
 		// and require context creation
-
-		// register the context creation listener
-		contextListener = new ContextBundleListener();
-		// listen to any changes in bundles
-		context.addBundleListener(contextListener);
-		// get the bundles again to get an updated view
-		previousBundles = context.getBundles();
-
-		// Instantiate all previously resolved bundles which are Spring
-		// powered
-		for (int i = 0; i < previousBundles.length; i++) {
-			if (OsgiBundleUtils.isBundleActive(previousBundles[i])) {
-				try {
-					maybeCreateApplicationContextFor(previousBundles[i]);
-				}
-				catch (Throwable e) {
-					log.warn("Cannot start bundle " + OsgiStringUtils.nullSafeSymbolicName(previousBundles[i])
-							+ " due to", e);
-				}
-			}
-		}
-
+		initStartedBundles(bundleContext);
 	}
 
 	private void detectSpringVersion(BundleContext context) {
@@ -443,6 +405,54 @@ public class ContextLoaderListener implements BundleActivator {
 			log.debug("Spring-DM v.[" + extenderVersion + "] is wired to Spring core bundle "
 					+ OsgiStringUtils.nullSafeSymbolicName(wiredSpringBundle) + " version ["
 					+ OsgiBundleUtils.getBundleVersion(wiredSpringBundle) + "]");
+	}
+
+	protected ExtenderConfiguration initExtenderConfiguration(BundleContext bundleContext) {
+		return new ExtenderConfiguration(bundleContext);
+	}
+
+	protected void initNamespaceHandlers(BundleContext context) {
+		nsManager = new NamespaceManager(context);
+
+		// register listener first to make sure any bundles in INSTALLED state
+		// are not lost
+		nsListener = new NamespaceBundleLister();
+		context.addBundleListener(nsListener);
+
+		Bundle[] previousBundles = context.getBundles();
+
+		for (int i = 0; i < previousBundles.length; i++) {
+			Bundle bundle = previousBundles[i];
+			if (OsgiBundleUtils.isBundleResolved(bundle)) {
+				maybeAddNamespaceHandlerFor(bundle);
+			}
+		}
+
+		// discovery finished, publish the resolvers/parsers in the OSGi space
+		nsManager.afterPropertiesSet();
+	}
+
+	protected void initStartedBundles(BundleContext bundleContext) {
+		// register the context creation listener
+		contextListener = new ContextBundleListener();
+		// listen to any changes in bundles
+		bundleContext.addBundleListener(contextListener);
+		// get the bundles again to get an updated view
+		Bundle[] previousBundles = bundleContext.getBundles();
+
+		// Instantiate all previously resolved bundles which are Spring
+		// powered
+		for (int i = 0; i < previousBundles.length; i++) {
+			if (OsgiBundleUtils.isBundleActive(previousBundles[i])) {
+				try {
+					maybeCreateApplicationContextFor(previousBundles[i]);
+				}
+				catch (Throwable e) {
+					log.warn("Cannot start bundle " + OsgiStringUtils.nullSafeSymbolicName(previousBundles[i])
+							+ " due to", e);
+				}
+			}
+		}
 	}
 
 	/**
@@ -618,7 +628,7 @@ public class ContextLoaderListener implements BundleActivator {
 	}
 
 	/**
-	 * Utility method that does extender range versioning and approapriate
+	 * Utility method that does extender range versioning and appropriate
 	 * logging.
 	 * 
 	 * @param bundle
@@ -636,12 +646,12 @@ public class ContextLoaderListener implements BundleActivator {
 		return true;
 	}
 
-	private void maybeAddNamespaceHandlerFor(Bundle bundle) {
+	protected void maybeAddNamespaceHandlerFor(Bundle bundle) {
 		if (handlerBundleMatchesExtenderVersion(bundle))
 			nsManager.maybeAddNamespaceHandlerFor(bundle);
 	}
 
-	private void maybeRemoveNameSpaceHandlerFor(Bundle bundle) {
+	protected void maybeRemoveNameSpaceHandlerFor(Bundle bundle) {
 		if (handlerBundleMatchesExtenderVersion(bundle))
 			nsManager.maybeRemoveNameSpaceHandlerFor(bundle);
 	}
@@ -657,7 +667,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * the given bundle if needed.
 	 * 
 	 * <b>Note:</b> Make sure to do the fastest filtering first to avoid
-	 * slowdowns on platforms with a big number of plugins and wiring (i.e.
+	 * slow-downs on platforms with a big number of plugins and wiring (i.e.
 	 * Eclipse platform).
 	 * 
 	 * @param bundle
@@ -676,12 +686,7 @@ public class ContextLoaderListener implements BundleActivator {
 			return;
 		}
 
-		if (!ConfigUtils.matchExtenderVersionRange(bundle, extenderVersion)) {
-			if (debug)
-				log.debug("Bundle " + bundleString + " expects an extender w/ version["
-						+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
-						+ "] which does not match current extender w/ version[" + extenderVersion
-						+ "]; skipping bundle from context creation");
+		if (!matchExtenderVersion(bundle, extenderVersion)) {
 			return;
 		}
 
@@ -738,7 +743,14 @@ public class ContextLoaderListener implements BundleActivator {
 		Runnable contextRefresh = new Runnable() {
 
 			public void run() {
-				localApplicationContext.refresh();
+				preProcessRefresh(localApplicationContext);
+				try {
+					localApplicationContext.refresh();
+					postProcessRefresh(localApplicationContext);
+				}
+				catch (Throwable th) {
+					postProcessRefreshFailure(localApplicationContext, th);
+				}
 			}
 		};
 
@@ -788,6 +800,37 @@ public class ContextLoaderListener implements BundleActivator {
 		executor.execute(contextRefresh);
 	}
 
+	protected void preProcessRefresh(ConfigurableOsgiBundleApplicationContext context) {
+	}
+
+	protected void postProcessRefresh(ConfigurableOsgiBundleApplicationContext context) {
+	}
+
+	protected void postProcessRefreshFailure(DelegatedExecutionOsgiBundleApplicationContext localApplicationContext,
+			Throwable th) {
+	}
+
+	protected void postProcessClose(ConfigurableOsgiBundleApplicationContext context) {
+	}
+
+	protected void preProcessClose(ConfigurableOsgiBundleApplicationContext context) {
+	}
+
+	protected boolean matchExtenderVersion(Bundle bundle, Version expectedExtenderVersion) {
+		String bundleString = "[" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "]";
+
+		if (!ConfigUtils.matchExtenderVersionRange(bundle, expectedExtenderVersion)) {
+			if (log.isDebugEnabled())
+				log.debug("Bundle " + bundleString + " expects an extender w/ version["
+						+ OsgiBundleUtils.getHeaderAsVersion(bundle, ConfigUtils.EXTENDER_VERSION)
+						+ "] which does not match current extender w/ version[" + expectedExtenderVersion
+						+ "]; skipping bundle from context creation");
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * Closing an application context is a potentially long-running activity,
 	 * however, we *have* to do it synchronously during the event process as the
@@ -809,7 +852,13 @@ public class ContextLoaderListener implements BundleActivator {
 
 			public void run() {
 				if (context.isActive()) {
-					context.close();
+					preProcessClose(context);
+					try {
+						context.close();
+					}
+					finally {
+						postProcessClose(context);
+					}
 				}
 			}
 
@@ -820,15 +869,19 @@ public class ContextLoaderListener implements BundleActivator {
 		}, extenderConfiguration.getShutdownWaitTime(), shutdownTaskExecutor);
 	}
 
-	private void initListenerService() {
+	protected void initListenerService() {
 		multicaster = extenderConfiguration.getEventMulticaster();
 
-		createListenersList();
-		// register the listener that does the dispatching
-		multicaster.addApplicationListener(new ListListenerAdapter(applicationListeners));
+		addApplicationListener(multicaster);
 
 		if (log.isDebugEnabled())
 			log.debug("Initialization of OSGi listeners service completed...");
+	}
+
+	protected void addApplicationListener(OsgiBundleApplicationContextEventMulticaster multicaster) {
+		createListenersList();
+		// register the listener that does the dispatching
+		multicaster.addApplicationListener(new ListListenerAdapter(applicationListeners));
 	}
 
 	/**

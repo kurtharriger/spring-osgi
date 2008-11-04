@@ -16,7 +16,14 @@
 
 package org.springframework.osgi.rfc124.iandt.extender;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.osgi.framework.Bundle;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
+import org.springframework.core.io.Resource;
 import org.springframework.osgi.rfc124.iandt.BaseRFC124IntegrationTest;
 
 /**
@@ -27,15 +34,27 @@ import org.springframework.osgi.rfc124.iandt.BaseRFC124IntegrationTest;
  */
 public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 
-	protected String[] getTestBundlesNames() {
-		return new String[] { "org.springframework.osgi.rfc124.iandt,simple.bundle," + getSpringDMVersion() };
-	}
-
 	public void testSanity() throws Exception {
-		Bundle[] bundles = bundleContext.getBundles();
-		for (Bundle bundle : bundles) {
-			System.out.println(bundle.getSymbolicName());
-		}
-		System.out.println("Platform started");
+		Resource res = getLocator().locateArtifact("org.springframework.osgi.rfc124.iandt", "simple.bundle",
+			getSpringDMVersion());
+
+		final Bundle simpleBundle = bundleContext.installBundle(res.getDescription(), res.getInputStream());
+
+		EventHandler handler = new EventHandler() {
+
+			public void handleEvent(Event event) {
+				System.out.println("Received event " + event);
+			}
+		};
+
+		String[] topics = new String[] { "org/osgi/service/*" };
+		Dictionary<String, Object> prop = new Hashtable<String, Object>();
+		prop.put(EventConstants.EVENT_TOPIC, topics);
+		bundleContext.registerService(EventHandler.class.getName(), handler, prop);
+
+		simpleBundle.start();
+		Thread.sleep(1000 * 3);
+		simpleBundle.stop();
+		Thread.sleep(1000 * 3);
 	}
 }

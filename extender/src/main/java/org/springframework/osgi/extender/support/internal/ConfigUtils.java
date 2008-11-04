@@ -103,10 +103,8 @@ public abstract class ConfigUtils {
 
 	public static final long DIRECTIVE_TIMEOUT_DEFAULT = 5 * 60; // 5 minutes
 
-	public static final long DIRECTIVE_NO_TIMEOUT = -2L; // Indicates wait
+	public static final long DIRECTIVE_NO_TIMEOUT = -2L; // Indicates wait forever
 
-
-	// forever
 
 	public static boolean matchExtenderVersionRange(Bundle bundle, Version versionToMatch) {
 		Assert.notNull(bundle);
@@ -221,7 +219,7 @@ public abstract class ConfigUtils {
 	}
 
 	/**
-	 * Shortuct method to retrieve directive values. Used internally by the
+	 * Shortcut method to retrieve directive values. Used internally by the
 	 * dedicated getXXX.
 	 * 
 	 * @param directiveName
@@ -313,7 +311,20 @@ public abstract class ConfigUtils {
 	 * @return array of locations specified (if any)
 	 */
 	public static String[] getHeaderLocations(Dictionary headers) {
-		String header = getSpringContextHeader(headers);
+		return getLocationsFromHeader(getSpringContextHeader(headers),
+			OsgiBundleXmlApplicationContext.DEFAULT_CONFIG_LOCATION);
+
+	}
+
+	/**
+	 * Similar to {@link #getHeaderLocations(Dictionary)} but looks at a
+	 * specified header directly.
+	 * 
+	 * @param header header to look at
+	 * @param defaultValue default locations if none is specified
+	 * @return
+	 */
+	public static String[] getLocationsFromHeader(String header, String defaultValue) {
 
 		String[] ctxEntries;
 		if (StringUtils.hasText(header) && !(';' == header.charAt(0))) {
@@ -325,7 +336,7 @@ public abstract class ConfigUtils {
 			// replace * with a 'digestable' location
 			for (int i = 0; i < ctxEntries.length; i++) {
 				if (CONFIG_WILDCARD.equals(ctxEntries[i]))
-					ctxEntries[i] = OsgiBundleXmlApplicationContext.DEFAULT_CONFIG_LOCATION;
+					ctxEntries[i] = defaultValue;
 			}
 		}
 		else {
