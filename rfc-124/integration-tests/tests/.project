@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>rfc-124-ri.core</name>
+	<name>Spring OSGi RFC124 Integration Tests</name>
 	<comment></comment>
 	<projects>
 	</projects>
