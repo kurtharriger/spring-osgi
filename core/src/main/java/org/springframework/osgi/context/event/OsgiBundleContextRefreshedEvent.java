@@ -21,7 +21,7 @@ import org.springframework.context.ApplicationContext;
 
 /**
  * Event raised when an <tt>ApplicationContext#refresh()</tt> method executes
- * successfully inside an OSGi.
+ * successfully.
  * 
  * @author Costin Leau
  */
