@@ -6,19 +6,30 @@
     <version>rfc-124-1.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.springframework.osgi.rfc124</groupId>
-  <artifactId>rfc124</artifactId>
+  <groupId>org.springframework.osgi.rfc124.iandt</groupId>
+  <artifactId>rfc124-tests</artifactId>
   <packaging>pom</packaging>
-  <name>Spring OSGi RFC 124</name>
+  <name>Spring OSGi RFC 124 Integration Tests Module</name>
   <url>http://www.springframework.org/osgi</url>
   
   <properties>
 	<clover.skip>true</clover.skip>
   </properties>
-
+  
   <modules>
-    <module>api</module>
-    <module>ri</module>
+    <module>bundles</module>
+    <module>tests</module>
   </modules>
+  
+  <build>
+	  <plugins>
+		  <plugin>
+			<artifactId>maven-deploy-plugin</artifactId>
+			<configuration>
+			  <skip>true</skip>
+			</configuration>
+		  </plugin>
+	  </plugins>
+  </build>
   
 </project>

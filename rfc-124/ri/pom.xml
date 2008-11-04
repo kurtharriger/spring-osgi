@@ -7,9 +7,9 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi.rfc124</groupId>
-  <artifactId>rfc124</artifactId>
+  <artifactId>ri</artifactId>
   <packaging>pom</packaging>
-  <name>Spring OSGi RFC 124</name>
+  <name>Spring OSGi RFC 124 RI</name>
   <url>http://www.springframework.org/osgi</url>
   
   <properties>
@@ -17,8 +17,8 @@
   </properties>
 
   <modules>
-    <module>api</module>
-    <module>ri</module>
+    <module>core</module>
+    <module>extender</module>
   </modules>
   
 </project>
