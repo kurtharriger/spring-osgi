@@ -442,6 +442,17 @@
      	corner cases where this contract matters. Since 1.1, Spring-DM importer proxies implement <interfacename>InfrastructureProxy</interfacename> 
      	interface (from Spring framework) which allow access to the raw target.
      	</para>
+     </section>
+     <section id="static-collections">
+     	<title>My Spring DM collection doesn't change even though the number of OSGi service changes. What's wrong?</title>
+     	
+     	<para>
+     	Make sure the Spring DM collections are injected into object of compatible types (for example <literal>list</literal> into 
+     	<interfacename>java.util.List</interfacename> or <interfacename>java.util.Collection</interfacename>). If the types are not compatible,
+     	the container will have to perform 
+     	<ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/validation.html#beans-beans-conversion">type conversion</ulink>,
+     	transforming the Spring DM managed collection into a 'normal' one, unaware of the OSGi dynamics.
+     	</para>
      </section>       
     </chapter>
 </book>

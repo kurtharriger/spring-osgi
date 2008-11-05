@@ -1028,6 +1028,13 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <interfacename>java.util.List</interfacename>. The bean defined by a
         <literal>set</literal> element is of type
         <interfacename>java.util.Set</interfacename>.</para>
+        
+        <note>Make sure the Spring DM collections are injected into properties of compatible types (
+        for example <literal>set</literal> into <interfacename>Set</interfacename> or <interfacename>
+        Collection</interfacename>) since otherwise the container will automatically perform 
+        <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/validation.html#beans-beans-conversion">type conversion</ulink>,
+        transforming the Spring DM managed collection into a 'normal' one, unaware of the OSGi dynamics.
+        </note>
 
         <para>The following example defines a bean of type <interfacename>List</interfacename> that 
         will contain all registered services supporting the
