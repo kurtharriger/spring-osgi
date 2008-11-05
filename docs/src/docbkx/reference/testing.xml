@@ -19,7 +19,7 @@
     <sidebar>
      <title>Mocks vs Stubs</title>
      <para>There are various strategies to unit test code
-     that requires colaborators. The two most popular strategies
+     that requires collaborators. The two most popular strategies
      are <emphasis>stubs</emphasis> and <emphasis>mocks</emphasis>.
      </para><para>
      See <ulink url="http://martinfowler.com/articles/mocksArentStubs.html">
@@ -252,9 +252,10 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
      locate the bundles yourself.
      </para>
      
-     <para>By default, the test suite uses the local <ulink url="http://maven.apache.org">maven2</ulink> 
-     repository to locate the artifacts. The locator expects the bundle String to be a comma separated
-     values containing the artifact group, name, version and (optionally) type.
+     <para>By default, the test suite performs a lookup for artifacts, similar to the one used by 
+     <ulink url="http://maven.apache.org">Maven2</ulink>, searching first the items as being relative to the 
+     current project and then falling back to the local repository. 
+     The locator expects the bundle String to be a comma separated values containing the artifact group, name, version and (optionally) type.
      
      It's likely that in the future, various other locators will be available. One can plug in their own 
      locator through the <interfacename>org.springframework.osgi.test.provisioning.ArtifactLocator</interfacename> interface.

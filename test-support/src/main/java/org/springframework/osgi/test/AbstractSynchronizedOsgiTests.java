@@ -213,7 +213,7 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 				Bundle bundle = bundles[i];
 				String bundleName = OsgiStringUtils.nullSafeSymbolicName(bundle);
 				if (OsgiBundleUtils.isBundleActive(bundle)) {
-					if (isSpringBundle(bundle) && ConfigUtils.getPublishContext(bundle.getHeaders())) {
+					if (isSpringDMManaged(bundle) && ConfigUtils.getPublishContext(bundle.getHeaders())) {
 						if (debug)
 							logger.debug("Bundle [" + bundleName + "] triggers a context creation; waiting for it");
 						// use platformBundleContext
@@ -230,7 +230,15 @@ public abstract class AbstractSynchronizedOsgiTests extends AbstractConfigurable
 		}
 	}
 
-	private boolean isSpringBundle(Bundle bundle) {
+	/**
+	 * Determines if the given bundle, is Spring DM managed or not. This method
+	 * is used at startup, for waiting on all Spring DM contexts to be properly
+	 * started and published.
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	protected boolean isSpringDMManaged(Bundle bundle) {
 		if (!ObjectUtils.isEmpty(ConfigUtils.getHeaderLocations(bundle.getHeaders())))
 			return true;
 		Enumeration enm = bundle.findEntries("META-INF/spring", "*.xml", false);
