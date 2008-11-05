@@ -13,6 +13,7 @@ General
 Package org.springframework.osgi.io
 * improved existence check for bundle resources
 * fixed manifest headers parsing problem when dealing with nested whitespaces
+* fixed handling of optional required bundles
 
 Package org.springframework.osgi.service
 * refined single service proxies so that any waiting activity is interrupted on destruction

@@ -24,6 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -31,6 +33,7 @@ import org.osgi.service.packageadmin.ExportedPackage;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.osgi.io.internal.OsgiHeaderUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * {@link PackageAdmin} based dependency resolver.
@@ -47,6 +50,9 @@ import org.springframework.util.Assert;
  */
 public class PackageAdminResolver implements DependencyResolver {
 
+	/** logger */
+	private static final Log log = LogFactory.getLog(PackageAdminResolver.class);
+
 	private final BundleContext bundleContext;
 
 
@@ -56,6 +62,8 @@ public class PackageAdminResolver implements DependencyResolver {
 	}
 
 	public ImportedBundle[] getImportedBundles(Bundle bundle) {
+		boolean trace = log.isTraceEnabled();
+
 		PackageAdmin pa = getPackageAdmin();
 
 		// create map with bundles as keys and a list of packages as value
@@ -70,12 +78,23 @@ public class PackageAdminResolver implements DependencyResolver {
 		for (int i = 0; i < entries.length; i++) {
 			String[] parsed = OsgiHeaderUtils.parseRequiredBundleString(entries[i]);
 			// trim the strings just to be on the safe side (some implementations allows whitespaces, some don't)
-			Bundle requiredBundle = pa.getBundles(parsed[0].trim(), parsed[1].trim())[0];
+			String symName = parsed[0].trim();
+			String versionRange = parsed[1].trim();
+			Bundle[] foundBundles = pa.getBundles(symName, versionRange);
 
-			// find exported packages
-			ExportedPackage[] exportedPackages = pa.getExportedPackages(requiredBundle);
-			if (exportedPackages != null)
-				addExportedPackages(importedBundles, requiredBundle, exportedPackages);
+			if (!ObjectUtils.isEmpty(foundBundles)) {
+				Bundle requiredBundle = foundBundles[0];
+
+				// find exported packages
+				ExportedPackage[] exportedPackages = pa.getExportedPackages(requiredBundle);
+				if (exportedPackages != null)
+					addExportedPackages(importedBundles, requiredBundle, exportedPackages);
+			}
+			else {
+				if (trace) {
+					log.trace("Cannot find required bundle " + symName + "|" + versionRange);
+				}
+			}
 		}
 
 		// 2. determine imported bundles 
