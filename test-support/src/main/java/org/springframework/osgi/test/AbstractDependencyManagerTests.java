@@ -320,8 +320,8 @@ public abstract class AbstractDependencyManagerTests extends AbstractSynchronize
 
 	/**
 	 * Returns the ArtifactLocator used by this test suite. Subclasses should
-	 * override this method if the default locator (searching the local Maven2
-	 * repository) is not enough.
+	 * override this method if the default locator (searching the local
+	 * projects, falling back to the Maven2 repository) is not enough.
 	 * 
 	 * <p>
 	 * <b>Note</b>: This method will be used each time a bundle has to be

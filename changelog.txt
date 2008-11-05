@@ -6,6 +6,7 @@ Changes in version 1.2.0 M2 (2008-xx-yy)
 ----------------------------------------
 
 General
+* upgraded to Spring Framework 2.5.6
 * added support for compendium namespace (managed-service, config-properties)
 * incremented version of spring-osgi.xsd and spring-osgi-compendium.xsd
 
@@ -18,8 +19,8 @@ Package org.springframework.osgi.service
 * improved single service proxies to allow settings update at runtime
 * deprecated retryTimes parameter in OsgiServiceProxyFactoryBean
 
-Package org.springframework.osgi.extender.internal.dependencies.shutdown
-* fixed shutdown algorithm to correctly deal with transitive references
+Package org.springframework.osgi.extender
+* improved shutdown algorithm to deal with self-referenced and transitive service references
 
 Changes in version 1.2.0 M1 (2008-09-05)
 ----------------------------------------

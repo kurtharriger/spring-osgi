@@ -20,8 +20,8 @@
   
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
   
-    <spring.osgi.private.pkg>org.springframework.osgi.io.internal</spring.osgi.private.pkg>
-	<spring.osgi.export.pkg>!${spring.osgi.private.pkg}, org.springframework.osgi.io</spring.osgi.export.pkg>
+    <spring.osgi.private.pkg>org.springframework.osgi.io.*internal*</spring.osgi.private.pkg>
+	<spring.osgi.export.pkg>!${spring.osgi.private.pkg}, org.springframework.osgi.io*</spring.osgi.export.pkg>
 	<spring.osgi.import.pkg>
 		org.osgi.service.packageadmin;version=1.2;resolution:=optional
 	</spring.osgi.import.pkg>
