@@ -349,7 +349,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 			if (state == ContextState.STARTED) {
 				if (debug)
-					log.debug("Shutting down normaly appCtx " + getDisplayName());
+					log.debug("Shutting down normally appCtx " + getDisplayName());
 				// close the context only if it was actually started
 				state = ContextState.STOPPED;
 				normalShutdown = true;
@@ -440,10 +440,10 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				dependencyDetector.deregister();
 			}
 
-			log.warn("Timeout occured before finding service dependencies for [" + delegateContext.getDisplayName()
+			log.warn("Timeout occurred before finding service dependencies for [" + delegateContext.getDisplayName()
 				+ "]");
 
-			ApplicationContextException e = new ApplicationContextException("Application context initializition for '"
+			ApplicationContextException e = new ApplicationContextException("Application context initialization for '"
 				+ (String) AccessController.doPrivileged(new PrivilegedAction() {
 
 				public Object run() {
@@ -477,7 +477,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			if (started)
 				log.debug("Asynch wait-for-dependencies started...");
 			else
-				log.debug("Dependencies satified; no need to start a watchdog...");
+				log.debug("Dependencies satisfied; no need to start a watchdog...");
 		}
 	}
 
