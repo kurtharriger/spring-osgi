@@ -547,6 +547,7 @@ limitations under the License.
            <!-- bundle specific conf -->
            <Bundle-Name>${artifactId}</Bundle-Name>
            <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
+           <Bundle-Vendor>SpringSource</Bundle-Vendor>
            <Export-Package>${spring.osgi.export}</Export-Package>
            <Import-Package>${spring.osgi.import}</Import-Package>
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
@@ -554,7 +555,7 @@ limitations under the License.
            <!-- jar entries -->
            <Implementation-Title>Spring Dynamic Modules Framework</Implementation-Title>
            <Implementation-Version>${pom.version}</Implementation-Version>
-           <Implementation-Vendor>Spring Dynamic Modules Framework</Implementation-Vendor>
+           <Implementation-Vendor>SpringSource</Implementation-Vendor>
            <Implementation-Vendor-Id>org.springframework.osgi</Implementation-Vendor-Id>
            <!-- Spring specific entries -->
            <Spring-DM-Version>${pom.version}</Spring-DM-Version>
