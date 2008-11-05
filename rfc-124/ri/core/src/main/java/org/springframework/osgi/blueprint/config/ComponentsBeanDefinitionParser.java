@@ -44,10 +44,6 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 
 	private static final String DESCRIPTION = "description";
 
-	private Collection<String> usedNames = new LinkedHashSet<String>();
-
-	private ParseState parseState = new ParseState();
-
 
 	public BeanDefinition parse(Element componentsRootElement, ParserContext parserContext) {
 		// re-initialize defaults
@@ -109,7 +105,7 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 	 * @param parserContext
 	 */
 	protected void parseComponentElement(Element ele, ParserContext parserContext) {
-		BeanDefinitionHolder holder = new ComponentParser(parseState, usedNames).parseAsHolder(ele, parserContext);
+		BeanDefinitionHolder holder = new ComponentParser().parseAsHolder(ele, parserContext);
 		ParsingUtils.decorateAndRegister(ele, holder, parserContext);
 	}
 

@@ -19,6 +19,10 @@ package org.springframework.osgi.blueprint.extender.internal.activator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
+import org.osgi.service.blueprint.context.ModuleContext;
+import org.springframework.osgi.blueprint.context.ApplicationContext2ModuleContextAdapter;
+import org.springframework.osgi.blueprint.context.support.ModuleContextBehaviourBeanFactoryPostProcessor;
+import org.springframework.osgi.blueprint.context.support.ModuleContextServicePublisher;
 import org.springframework.osgi.blueprint.extender.internal.activator.support.BlueprintConfigUtils;
 import org.springframework.osgi.blueprint.extender.internal.event.EventAdminDispatcher;
 import org.springframework.osgi.blueprint.extender.internal.support.BlueprintExtenderConfiguration;
@@ -35,13 +39,13 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * RFC124 extension to the Spring DM extender.
  * 
  * @author Costin Leau
- * 
  */
 public class BlueprintModuleListener extends ContextLoaderListener {
 
 	private BundleContext bundleContext;
 	private EventAdminDispatcher dispatcher;
 	private Version bluePrintExtenderVersion;
+	private ModuleContextListenerManager listenerManager;
 
 
 	@Override
@@ -49,11 +53,13 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 		this.bundleContext = context;
 		this.dispatcher = new EventAdminDispatcher(bundleContext);
 		this.bluePrintExtenderVersion = OsgiBundleUtils.getBundleVersion(context.getBundle());
+		this.listenerManager = new ModuleContextListenerManager(context);
 		super.start(context);
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		listenerManager.destroy();
 		super.stop(context);
 	}
 
@@ -71,7 +77,6 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 		}
 
 		return true;
-
 	}
 
 	protected ExtenderConfiguration initExtenderConfiguration(BundleContext bundleContext) {
@@ -96,6 +101,12 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 
 	@Override
 	protected void preProcessRefresh(ConfigurableOsgiBundleApplicationContext context) {
+		// create the ModuleContext adapter
+		ModuleContext mc = new ApplicationContext2ModuleContextAdapter(context, context.getBundleContext());
+		// add service publisher
+		context.addApplicationListener(new ModuleContextServicePublisher(mc, context.getBundleContext()));
+		context.addBeanFactoryPostProcessor(new ModuleContextBehaviourBeanFactoryPostProcessor(mc));
+
 		dispatcher.beforeRefresh(context);
 		super.preProcessRefresh(context);
 	}
@@ -109,18 +120,27 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 	@Override
 	protected void postProcessRefresh(ConfigurableOsgiBundleApplicationContext context) {
 		dispatcher.afterRefresh(context);
+
+		Bundle bundle = context.getBundle();
+		listenerManager.contextCreated(bundle.getSymbolicName(), OsgiBundleUtils.getBundleVersion(bundle));
+
 		super.postProcessRefresh(context);
 	}
 
 	@Override
 	protected void postProcessRefreshFailure(DelegatedExecutionOsgiBundleApplicationContext context, Throwable th) {
 		dispatcher.refreshFailure(context, th);
+
+		Bundle bundle = context.getBundle();
+		listenerManager.contextCreationFailed(bundle.getSymbolicName(), OsgiBundleUtils.getBundleVersion(bundle), th);
+
 		super.postProcessRefreshFailure(context, th);
 	}
 
 	@Override
 	protected void addApplicationListener(OsgiBundleApplicationContextEventMulticaster multicaster) {
 		super.addApplicationListener(multicaster);
-		multicaster.addApplicationListener(new EventAdminDispatcher(bundleContext));
+		// monitor bootstrapping events
+		multicaster.addApplicationListener(dispatcher);
 	}
 }

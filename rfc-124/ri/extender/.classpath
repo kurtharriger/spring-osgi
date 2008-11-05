@@ -22,5 +22,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/rfc-124-1.0-SNAPSHOT/spring-osgi-extender-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/extender/src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/rfc-124-1.0-SNAPSHOT/spring-osgi-io-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/io/src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.osgi.compendium/1.0.1/org.osgi.compendium-1.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/rfc124/ri/core/rfc-124-1.0-SNAPSHOT/core-rfc-124-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
