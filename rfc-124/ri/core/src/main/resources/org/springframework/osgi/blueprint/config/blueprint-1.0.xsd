@@ -20,6 +20,10 @@
                 <xsd:element ref="type-converters" minOccurs="0" maxOccurs="1"/>
                 <xsd:choice minOccurs="0" maxOccurs="unbounded">
                     <xsd:element ref="component"/>
+                    <xsd:element ref="ref-list"/>
+                    <xsd:element ref="ref-set"/>
+                    <xsd:element ref="reference"/>
+                    <xsd:element ref="service"/>
                     <xsd:any namespace="##other" processContents="strict" minOccurs="0" 
                        maxOccurs="unbounded"/>
                 </xsd:choice>
@@ -30,6 +34,7 @@
             </xsd:attribute>
             <xsd:attribute name="default-destroy-method" type="xsd:string">
             </xsd:attribute>
+            <xsd:attributeGroup ref="defaults" />
             <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>

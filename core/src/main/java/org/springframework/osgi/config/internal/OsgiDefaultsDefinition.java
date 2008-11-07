@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.config;
+package org.springframework.osgi.config.internal;
 
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
  * @author Costin Leau
  * 
  */
-class OsgiDefaultsDefinition {
+public class OsgiDefaultsDefinition {
 
 	private static final String OSGI_NS = "http://www.springframework.org/schema/osgi";
 
@@ -46,11 +46,26 @@ class OsgiDefaultsDefinition {
 	private String cardinality = CARDINALITY_DEFAULT;
 
 
+	public OsgiDefaultsDefinition(Document document) {
+		Assert.notNull(document);
+		Element root = document.getDocumentElement();
+
+		String timeout = root.getAttributeNS(OSGI_NS, DEFAULT_TIMEOUT);
+
+		if (StringUtils.hasText(timeout))
+			setTimeout(timeout);
+
+		String cardinality = root.getAttributeNS(OSGI_NS, DEFAULT_CARDINALITY);
+
+		if (StringUtils.hasText(cardinality))
+			setCardinality(cardinality);
+	}
+
 	public String getTimeout() {
 		return timeout;
 	}
 
-	public void setTimeout(String timeout) {
+	protected void setTimeout(String timeout) {
 		this.timeout = timeout;
 	}
 
@@ -58,41 +73,7 @@ class OsgiDefaultsDefinition {
 		return cardinality;
 	}
 
-	public void setCardinality(String cardinality) {
+	protected void setCardinality(String cardinality) {
 		this.cardinality = cardinality;
-	}
-
-	/**
-	 * Initialize OSGi defaults.
-	 * 
-	 * @param document XML document
-	 * @return initialized {@link OsgiDefaultsDefinition} instance
-	 */
-	public static OsgiDefaultsDefinition initOsgiDefaults(Document document) {
-		Assert.notNull(document);
-		return initOsgiDefaults(document.getDocumentElement());
-	}
-
-	/**
-	 * Initialize OSGi defaults.
-	 * 
-	 * @param root root document element
-	 * @return initialized {@link OsgiDefaultsDefinition} instance
-	 */
-	public static OsgiDefaultsDefinition initOsgiDefaults(Element root) {
-		Assert.notNull(root);
-
-		OsgiDefaultsDefinition defaults = new OsgiDefaultsDefinition();
-		String timeout = root.getAttributeNS(OSGI_NS, DEFAULT_TIMEOUT);
-
-		if (StringUtils.hasText(timeout))
-			defaults.setTimeout(timeout);
-
-		String cardinality = root.getAttributeNS(OSGI_NS, DEFAULT_CARDINALITY);
-
-		if (StringUtils.hasText(cardinality))
-			defaults.setCardinality(cardinality);
-
-		return defaults;
 	}
 }

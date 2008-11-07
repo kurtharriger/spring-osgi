@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.config;
+package org.springframework.osgi.config.internal;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.config.internal.MethodUtils;
+import org.springframework.osgi.config.internal.util.MethodUtils;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.internal.ReflectionUtils;
 import org.springframework.util.Assert;
@@ -37,7 +37,7 @@ import org.springframework.util.StringUtils;
 /**
  * Adapter/wrapper class that handles listener with custom method invocation.
  * Similar in functionality to
- * {@link  org.springframework.osgi.config.OsgiServiceLifecycleListenerAdapter}.
+ * {@link  org.springframework.osgi.config.internal.OsgiServiceLifecycleListenerAdapter}.
  * 
  * @author Costin Leau
  * 

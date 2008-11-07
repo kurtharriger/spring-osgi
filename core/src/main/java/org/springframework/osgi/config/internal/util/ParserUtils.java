@@ -15,7 +15,7 @@
  *
  */
 
-package org.springframework.osgi.config.internal;
+package org.springframework.osgi.config.internal.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,32 +124,6 @@ public abstract class ParserUtils {
 	private static final AttributeCallback PROPERTY_REF_ATTRS_CALLBACK = new PropertyRefAttributeCallback();
 
 	private static final AttributeCallback PROPERTY_CONV_ATTRS_CALLBACK = new ConventionCallback();
-
-
-	/**
-	 * Wrapper callback used for parsing attributes (one at a time) that have
-	 * are non standard (ID, LAZY-INIT, DEPENDS-ON).
-	 * 
-	 * @author Costin Leau
-	 * 
-	 */
-	public static interface AttributeCallback {
-
-		/**
-		 * Process the given attribute using the contextual element and bean
-		 * builder. Normally, the callback will interact with the bean
-		 * definition and set some properties. <p/> If the callback has
-		 * intercepted an attribute, it can stop the invocation of the rest of
-		 * the callbacks on the stack by returning false.
-		 * 
-		 * @param parent parent element
-		 * @param attribute current intercepted attribute
-		 * @param builder builder holding the current bean definition
-		 * @return true if the rest of the callbacks should be called or false
-		 * otherwise.
-		 */
-		boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder);
-	}
 
 
 	/**

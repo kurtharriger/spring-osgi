@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.config;
+package org.springframework.osgi.config.internal;
 
 import java.util.Locale;
 import java.util.Set;
@@ -29,8 +29,8 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
-import org.springframework.osgi.config.internal.ParserUtils;
-import org.springframework.osgi.config.internal.ParserUtils.AttributeCallback;
+import org.springframework.osgi.config.internal.util.AttributeCallback;
+import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
@@ -46,7 +46,7 @@ import org.w3c.dom.NodeList;
  * @author Hal Hildebrand
  * @author Andy Piper
  */
-class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	// bean properties
 	private static final String TARGET_BEAN_NAME_PROP = "targetBeanName";

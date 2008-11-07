@@ -16,15 +16,15 @@
 
 package org.springframework.osgi.blueprint.config;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.parsing.ParseState;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.osgi.blueprint.config.internal.BlueprintCollectionBeanDefinitionParser;
+import org.springframework.osgi.blueprint.config.internal.BlueprintReferenceBeanDefinitionParser;
+import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
+import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -90,8 +90,17 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 		else if (DomUtils.nodeNameEquals(ele, ComponentParser.COMPONENT)) {
 			parseComponentElement(ele, parserContext);
 		}
-		else if (DomUtils.nodeNameEquals(ele, TypeConverterBeanDefinitionParser.TYPE_CONVERTERS)) {
-			parseConvertersElement(ele, parserContext);
+		else if (DomUtils.nodeNameEquals(ele, "reference")) {
+			parseReferenceElement(ele, parserContext);
+		}
+		else if (DomUtils.nodeNameEquals(ele, "service")) {
+			parseServiceElement(ele, parserContext);
+		}
+		else if (DomUtils.nodeNameEquals(ele, "ref-list")) {
+			parseListElement(ele, parserContext);
+		}
+		else if (DomUtils.nodeNameEquals(ele, "ref-set")) {
+			parseSetElement(ele, parserContext);
 		}
 		else {
 			throw new IllegalArgumentException("Unknown element " + ele);
@@ -117,7 +126,43 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 	 */
 	protected void parseConvertersElement(Element ele, ParserContext parserContext) {
 		BeanDefinitionParser parser = new TypeConverterBeanDefinitionParser();
-		BeanDefinition bd = parser.parse(ele, parserContext);
+		registerBeanDefinition(parserContext, parser.parse(ele, parserContext));
+	}
+
+	private void parseReferenceElement(Element ele, ParserContext parserContext) {
+		BeanDefinitionParser parser = new BlueprintReferenceBeanDefinitionParser();
+		registerBeanDefinition(parserContext, parser.parse(ele, parserContext));
+	}
+
+	private void parseServiceElement(Element ele, ParserContext parserContext) {
+		BeanDefinitionParser parser = new ServiceBeanDefinitionParser();
+		registerBeanDefinition(parserContext, parser.parse(ele, parserContext));
+	}
+
+	private void parseListElement(Element ele, ParserContext parserContext) {
+		BeanDefinitionParser parser = new BlueprintCollectionBeanDefinitionParser() {
+
+			@Override
+			protected CollectionType collectionType() {
+				return CollectionType.LIST;
+			}
+		};
+		registerBeanDefinition(parserContext, parser.parse(ele, parserContext));
+	}
+
+	private void parseSetElement(Element ele, ParserContext parserContext) {
+		BeanDefinitionParser parser = new BlueprintCollectionBeanDefinitionParser() {
+
+			@Override
+			protected CollectionType collectionType() {
+				return CollectionType.SET;
+			}
+		};
+
+		registerBeanDefinition(parserContext, parser.parse(ele, parserContext));
+	}
+
+	private void registerBeanDefinition(ParserContext parserContext, BeanDefinition bd) {
 		// register bd
 		parserContext.getRegistry().registerBeanDefinition(parserContext.getReaderContext().generateBeanName(bd), bd);
 	}

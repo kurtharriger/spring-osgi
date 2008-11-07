@@ -17,6 +17,10 @@
 package org.springframework.osgi.blueprint.config;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.osgi.blueprint.config.internal.BlueprintCollectionBeanDefinitionParser;
+import org.springframework.osgi.blueprint.config.internal.BlueprintReferenceBeanDefinitionParser;
+import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
+import org.springframework.osgi.service.importer.support.CollectionType;
 
 /**
  * Spring-based namespace handler for the blueprint/RFC-124 core namespace.
@@ -31,5 +35,23 @@ class BlueprintNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser(ComponentParser.COMPONENT, new ComponentBeanDefinitionParser());
 		registerBeanDefinitionParser(TypeConverterBeanDefinitionParser.TYPE_CONVERTERS,
 			new TypeConverterBeanDefinitionParser());
+
+		// Spring DM constructs
+		registerBeanDefinitionParser("reference", new BlueprintReferenceBeanDefinitionParser());
+
+		registerBeanDefinitionParser("ref-list", new BlueprintCollectionBeanDefinitionParser() {
+
+			protected CollectionType collectionType() {
+				return CollectionType.LIST;
+			}
+		});
+		registerBeanDefinitionParser("ref-set", new BlueprintCollectionBeanDefinitionParser() {
+
+			protected CollectionType collectionType() {
+				return CollectionType.SET;
+			}
+		});
+
+		registerBeanDefinitionParser("service", new ServiceBeanDefinitionParser());
 	}
 }
