@@ -20,12 +20,21 @@
     <javadoc.loc>${basedir}/../../../docs/src/javadoc</javadoc.loc>
 	<spring.osgi.license.loc>../../..</spring.osgi.license.loc>
 	<spring.osgi.import.pkg>
+        !org.springframework.osgi.bundle,
         org.osgi.service.blueprint*
     </spring.osgi.import.pkg>
 
-	<spring.osgi.export.pkg>
-        org.springframework.osgi.blueprint
-    </spring.osgi.export.pkg>
+    <spring.osgi.private.pkg>
+        org.springframework.osgi.blueprint.*internal*,
+        org.springframework.osgi.util.internal,
+        org.springframework.osgi.service.importer.support.internal.collection.comparator,
+        org.springframework.osgi.config.internal*
+    </spring.osgi.private.pkg>
+    
+	<spring.osgi.export>
+        !org.springframework.osgi.*internal*,
+        org.springframework.osgi.blueprint*;version=${spring.osgi.export.version}
+    </spring.osgi.export>
   
     <spring.osgi.symbolic.name>${symName.prefix}.blueprint.core</spring.osgi.symbolic.name>
     
@@ -38,7 +47,11 @@
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-core</artifactId>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-mock</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi.rfc124</groupId>
@@ -51,7 +64,7 @@
             <artifactId>com.springsource.org.junit</artifactId>
             <version>4.5.0</version>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
   </dependencies>
 
   
