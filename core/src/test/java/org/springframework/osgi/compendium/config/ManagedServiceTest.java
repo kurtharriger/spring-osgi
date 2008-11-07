@@ -17,14 +17,12 @@
 package org.springframework.osgi.compendium.config;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -35,7 +33,6 @@ import org.springframework.osgi.compendium.internal.cm.ManagedServiceInstanceTra
 import org.springframework.osgi.compendium.internal.cm.UpdateStrategy;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.mock.MockServiceReference;
 
 /**
  * @author Costin Leau

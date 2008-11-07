@@ -20,5 +20,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/rfc-124-1.0-SNAPSHOT/spring-osgi-core-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.osgi.compendium/1.0.1/org.osgi.compendium-1.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/rfc-124-1.0-SNAPSHOT/spring-osgi-mock-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_MOCK"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

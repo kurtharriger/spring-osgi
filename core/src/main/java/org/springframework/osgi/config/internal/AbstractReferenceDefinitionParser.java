@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.config;
+package org.springframework.osgi.config.internal;
 
 import java.util.Iterator;
 import java.util.List;
@@ -36,8 +36,8 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.core.enums.StaticLabeledEnumResolver;
-import org.springframework.osgi.config.internal.ParserUtils;
-import org.springframework.osgi.config.internal.ParserUtils.AttributeCallback;
+import org.springframework.osgi.config.internal.util.AttributeCallback;
+import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -64,7 +64,7 @@ import org.w3c.dom.NodeList;
  * @author Costin Leau
  * 
  */
-abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionParser {
+public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionParser {
 
 	/**
 	 * Attribute callback dealing with 'cardinality' attribute.
@@ -73,17 +73,11 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	 */
 	class ReferenceAttributesCallback implements AttributeCallback {
 
-		/** global cardinality setting */
-		public boolean isCardinalitySpecified = false;
-
-
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
 			String value = attribute.getValue();
 
-			// make sure the attribute is
 			if (CARDINALITY.equals(name)) {
-				isCardinalitySpecified = true;
 				builder.addPropertyValue(CARDINALITY_PROP, determineCardinality(value));
 				return false;
 			}
@@ -153,11 +147,8 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	 * @param document
 	 * @return
 	 */
-	private OsgiDefaultsDefinition resolveDefaults(Document document) {
-		if (defaults == null) {
-			defaults = OsgiDefaultsDefinition.initOsgiDefaults(document);
-		}
-		return defaults;
+	protected OsgiDefaultsDefinition resolveDefaults(Document document) {
+		return new OsgiDefaultsDefinition(document);
 	}
 
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
@@ -213,20 +204,25 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	}
 
 	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
-		if (defaults == null)
-			resolveDefaults(element.getOwnerDocument());
+		if (defaults == null) {
+			defaults = resolveDefaults(element.getOwnerDocument());
+		}
 
-		ReferenceAttributesCallback callback = new ReferenceAttributesCallback();
+		AttributeCallback callback = new ReferenceAttributesCallback();
 
 		parseAttributes(element, builder, new AttributeCallback[] { callback });
 
-		if (!callback.isCardinalitySpecified) {
+		if (!isCardinalitySpecified(builder)) {
 			applyDefaultCardinality(builder, defaults);
 		}
 
 		parseNestedElements(element, context, builder);
 
 		handleNestedDefinition(element, context, builder);
+	}
+
+	private boolean isCardinalitySpecified(BeanDefinitionBuilder builder) {
+		return (builder.getBeanDefinition().getPropertyValues().getPropertyValue(CARDINALITY_PROP) != null);
 	}
 
 	/**

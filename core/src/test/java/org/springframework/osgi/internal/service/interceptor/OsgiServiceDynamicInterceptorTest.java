@@ -32,7 +32,6 @@ import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceDynamicInterceptor;
-import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 
 /**
  * @author Costin Leau

@@ -9,7 +9,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.compendium.internal.OsgiConfig;
-import org.springframework.osgi.config.internal.ParserUtils;
+import org.springframework.osgi.config.internal.util.AttributeCallback;
+import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -49,7 +50,7 @@ class OsgiConfigDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	}
 
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		ParserUtils.parseCustomAttributes(element, builder, new ParserUtils.AttributeCallback() {
+		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback() {
 
 			public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 				String name = attribute.getLocalName();

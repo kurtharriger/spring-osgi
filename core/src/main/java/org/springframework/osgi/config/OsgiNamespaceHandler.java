@@ -14,11 +14,15 @@
  * limitations under the License.
  *
  */
+
 package org.springframework.osgi.config;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.osgi.config.internal.BundleBeanDefinitionParser;
+import org.springframework.osgi.config.internal.CollectionBeanDefinitionParser;
+import org.springframework.osgi.config.internal.ReferenceBeanDefinitionParser;
+import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
 import org.springframework.osgi.service.importer.support.CollectionType;
-
 
 /**
  * Namespace handler for Osgi definitions.
