@@ -78,6 +78,7 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		Resource[] res = patternLoader.getResources("classpath:org/**/*.file");
 		System.out.println("array count is " + res.length);
 		System.out.println(ObjectUtils.nullSafeToString(res));
+		printPathWithinContext(res);
 		assertTrue("bundle classpath jar not considered", containsString(res, "jar-folder.file"));
 	}
 
@@ -86,6 +87,7 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		Resource[] res = patternLoader.getResources("classpath*:org/**/*.file");
 		System.out.println("array count is " + res.length);
 		System.out.println(ObjectUtils.nullSafeToString(res));
+		printPathWithinContext(res);
 		assertTrue("bundle classpath jar not considered", containsString(res, "jar-folder.file"));
 	}
 
@@ -93,8 +95,8 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		// use org to make sure the bundle class is properly considered (especially for folder based classpath)
 		Resource[] res = patternLoader.getResources("classpath:*.file");
 		System.out.println("array count is " + res.length);
-
 		System.out.println(ObjectUtils.nullSafeToString(res));
+		printPathWithinContext(res);
 		assertTrue("bundle classpath jar not considered", containsString(res, "jar.file"));
 	}
 
@@ -104,6 +106,7 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		System.out.println("array count is " + res.length);
 
 		System.out.println(ObjectUtils.nullSafeToString(res));
+		printPathWithinContext(res);
 		assertTrue("bundle classpath jar not considered", containsString(res, "jar.file"));
 	}
 
@@ -143,6 +146,8 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 	public void testResourceAvailableOnlyInsideJarClasspath() throws Exception {
 		Resource[] resources = patternLoader.getResources("classpath*:jar.file");
 		assertNotNull(resources);
+		System.out.println("Arrays inside the jar");
+		printPathWithinContext(resources);
 		assertEquals(1, resources.length);
 		assertTrue(resources[0].exists());
 	}
@@ -152,7 +157,9 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		assertNotNull(resources);
 		assertEquals(1, resources.length);
 		assertTrue(resources[0].exists());
+		System.out.println("Arrays inside the classpath folder");
 		System.out.println(ObjectUtils.nullSafeToString((resources)));
+		printPathWithinContext(resources);
 	}
 
 	public void testResourceAvailableWithPatternOnPathsOnlyInsideFolderClasspath() throws Exception {
@@ -161,6 +168,7 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		assertEquals(1, resources.length);
 		assertTrue(resources[0].exists());
 		System.out.println(ObjectUtils.nullSafeToString((resources)));
+		printPathWithinContext(resources);
 	}
 
 	public void testResourceAvailableWithPatternOnlyInsideFolderClasspath() throws Exception {
@@ -169,6 +177,7 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		assertEquals(1, resources.length);
 		assertTrue(resources[0].exists());
 		System.out.println(ObjectUtils.nullSafeToString((resources)));
+		printPathWithinContext(resources);
 	}
 
 	private ResourcePatternResolver getNoRootCpBundleResourceResolver() {
@@ -182,12 +191,17 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		Resource[] res = resolver.getResources("classpath:root.file");
 		// since there is no pattern matching, the loader will return a non-existing resource
 		assertFalse("resource should not be found since / is not in the classpath", res[0].exists());
+		System.out.println("classpath:root.file resources");
+		printPathWithinContext(res);
 	}
 
 	public void testNoRootCpBundleResourceInRootNotFoundOnAllClasspaths() throws Exception {
 		ResourcePatternResolver resolver = getNoRootCpBundleResourceResolver();
 		Resource[] res = resolver.getResources("classpath*:root.file");
 		assertTrue("resource should not be found since / is not in the classpath", ObjectUtils.isEmpty(res));
+		System.out.println("root.file resources");
+		System.out.println("classpath*:root.file resources");
+		printPathWithinContext(res);
 	}
 
 	public void testNoRootCpBundleResourceInClassPathFound() throws Exception {
@@ -195,6 +209,8 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		Resource[] res = resolver.getResources("classpath*:cp.file");
 		assertFalse("resource should be found since it's on the classpath", ObjectUtils.isEmpty(res));
 		assertTrue("resource should be found since it's on the classpath", res[0].exists());
+		System.out.println("classpath*:cp.file resources");
+		printPathWithinContext(res);
 	}
 
 	public void testNoRootCpBundleResourceNestedInClassPathFound() throws Exception {
@@ -202,6 +218,8 @@ public class BundleClassPathWildcardTest extends BaseIoTest {
 		Resource[] res = resolver.getResources("classpath*:/some/nested/nested.file");
 		assertFalse("resource should be found since it's on the classpath", ObjectUtils.isEmpty(res));
 		assertTrue("resource should be found since it's on the classpath", res[0].exists());
+		System.out.println("classpath*:/some/nested/nested.file resources");
+		printPathWithinContext(res);
 	}
 
 	public void testNoRootCpBundleResourceNestedInPkgInClassPathFound() throws Exception {

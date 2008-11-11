@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
@@ -146,14 +147,14 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	}
 
 	/**
-	 * Find existing resources. This method returns the actual resources found
+	 * Finds existing resources. This method returns the actual resources found
 	 * w/o adding any extra decoration (such as non-existing resources).
 	 * 
-	 * @param locationPattern
-	 * @return
-	 * @throws IOException
+	 * @param locationPattern location pattern
+	 * @return found resources (w/o any decoration)
+	 * @throws IOException in case of I/O errors
 	 */
-	Resource[] findResources(String locationPattern) throws IOException {
+	protected Resource[] findResources(String locationPattern) throws IOException {
 		Assert.notNull(locationPattern, "Location pattern must not be null");
 		int type = OsgiResourceUtils.getSearchType(locationPattern);
 
@@ -178,8 +179,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
 					// consider bundle-space which can return multiple URLs
 				case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
-					URL[] urls = resource.getAllUrlsFromBundleSpace(locationPattern);
-					result = OsgiResourceUtils.convertURLArraytoResourceArray(urls);
+					result = resource.getAllUrlsFromBundleSpace(locationPattern);
 					break;
 				// for the rest go with the normal resolving
 				default:
@@ -271,15 +271,14 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			// classpath*: -> getResources()
 			String resourcePath = (String) iterator.next();
 			if (OsgiResourceUtils.PREFIX_TYPE_CLASS_ALL_SPACE == type) {
-				CollectionUtils.mergeArrayIntoCollection(
-					OsgiResourceUtils.convertURLEnumerationToResourceArray(bundle.getResources(resourcePath)),
-					resources);
+				CollectionUtils.mergeArrayIntoCollection(convertURLEnumerationToResourceArray(
+					bundle.getResources(resourcePath), resourcePath), resources);
 			}
 			// classpath -> getResource()
 			else {
 				URL url = bundle.getResource(resourcePath);
 				if (url != null)
-					resources.add(new UrlResource(url));
+					resources.add(new UrlContextResource(url, resourcePath));
 			}
 		}
 
@@ -293,6 +292,14 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	private String determineFolderPattern(String path) {
 		int index = path.lastIndexOf(FOLDER_SEPARATOR);
 		return (index > 0 ? path.substring(0, index + 1) : "");
+	}
+
+	private ContextResource[] convertURLEnumerationToResourceArray(Enumeration enm, String path) {
+		Set resources = new LinkedHashSet(4);
+		while (enm != null && enm.hasMoreElements()) {
+			resources.add(new UrlContextResource((URL) enm.nextElement(), path));
+		}
+		return (ContextResource[]) resources.toArray(new ContextResource[resources.size()]);
 	}
 
 	/**
@@ -412,7 +419,11 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				// 2. locate resource first from the bundle space (since it might not exist)
 				OsgiBundleResource entryResource = new OsgiBundleResource(bundle, entry);
 				// call the internal method to avoid catching an exception
-				URL url = entryResource.getResourceFromBundleSpace(entry);
+				URL url = null;
+				ContextResource res = entryResource.getResourceFromBundleSpace(entry);
+				if (res != null) {
+					url = res.getURL();
+				}
 
 				if (trace)
 					logger.trace("Classpath entry [" + entry + "] resolves to [" + url + "]");
@@ -693,7 +704,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				}
 				if (getPathMatcher().match(fullPattern, currPath)) {
 					if (path instanceof URL)
-						result.add(new UrlResource((URL) path));
+						result.add(new UrlContextResource((URL) path, currPath));
 					else
 						result.add(new OsgiBundleResource(bundle, currPath));
 

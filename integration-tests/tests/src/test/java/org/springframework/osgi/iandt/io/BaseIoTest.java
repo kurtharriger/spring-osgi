@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.osgi.framework.AdminPermission;
 import org.osgi.framework.Bundle;
+import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -120,4 +121,13 @@ public abstract class BaseIoTest extends BaseIntegrationTest {
 		list.add(new AdminPermission("(name=" + FRAGMENT_2 + ")", AdminPermission.RESOURCE));
 		return list;
 	}
+
+	protected void printPathWithinContext(Resource[] resources) {
+		for (int i = 0; i < resources.length; i++) {
+			Resource resource = resources[i];
+			assertTrue(resource instanceof ContextResource);
+			System.out.println("Path within context " + ((ContextResource) resource).getPathWithinContext());
+		}
+	}
+
 }

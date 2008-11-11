@@ -197,15 +197,16 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	 * @see org.osgi.framework.Bundle#getResource(String)
 	 */
 	public URL getURL() throws IOException {
+		ContextResource res = null;
 		URL url = null;
 
 		switch (searchType) {
 			// same as bundle space but with a different string
 			case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:
-				url = getResourceFromBundleSpace(pathWithoutPrefix);
+				res = getResourceFromBundleSpace(pathWithoutPrefix);
 				break;
 			case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_SPACE:
-				url = getResourceFromBundleSpace(pathWithoutPrefix);
+				res = getResourceFromBundleSpace(pathWithoutPrefix);
 				break;
 			case OsgiResourceUtils.PREFIX_TYPE_BUNDLE_JAR:
 				url = getResourceFromBundleJar(pathWithoutPrefix);
@@ -218,6 +219,10 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 				// just try to convert it to an URL
 				url = new URL(path);
 				break;
+		}
+
+		if (res != null) {
+			url = res.getURL();
 		}
 
 		if (url == null) {
@@ -239,8 +244,8 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	 * 
 	 * @see {@link org.osgi.framework.Bundle#findEntries(String, String, boolean)}
 	 */
-	URL getResourceFromBundleSpace(String bundlePath) throws IOException {
-		URL[] res = getAllUrlsFromBundleSpace(bundlePath);
+	ContextResource getResourceFromBundleSpace(String bundlePath) throws IOException {
+		ContextResource[] res = getAllUrlsFromBundleSpace(bundlePath);
 		return (ObjectUtils.isEmpty(res) ? null : res[0]);
 	}
 
@@ -416,7 +421,7 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	 * @return an array of URLs
 	 * @throws IOException
 	 */
-	URL[] getAllUrlsFromBundleSpace(String location) throws IOException {
+	ContextResource[] getAllUrlsFromBundleSpace(String location) throws IOException {
 		if (bundle == null)
 			throw new IllegalArgumentException(
 				"cannot locate items in bundle-space w/o a bundle; specify one when creating this resolver");
@@ -453,7 +458,7 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 				// we'll have to parse the string since some implementations
 				// do not normalize the resulting URL resulting in mismatches
 				String rootPath = OsgiResourceUtils.findUpperFolder(url.toExternalForm());
-				resources.add(new URL(rootPath));
+				resources.add(new UrlContextResource(rootPath));
 			}
 		}
 		else {
@@ -483,13 +488,15 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 			}
 
 			Enumeration candidates = bundle.findEntries(path, file, false);
+			// add the leading / to be consistent
+			String contextPath = OsgiResourceUtils.FOLDER_DELIMITER + location;
 
 			while (candidates != null && candidates.hasMoreElements()) {
-				resources.add((URL) candidates.nextElement());
+				resources.add(new UrlContextResource((URL) candidates.nextElement(), contextPath));
 			}
 		}
 
-		return (URL[]) resources.toArray(new URL[resources.size()]);
+		return (ContextResource[]) resources.toArray(new ContextResource[resources.size()]);
 	}
 
 	// TODO: can this return null or throw an exception

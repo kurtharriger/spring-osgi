@@ -7,21 +7,30 @@ Changes in version 1.2.0 M2 (2008-xx-yy)
 
 General
 * upgraded to Spring Framework 2.5.6
+* raised required Spring Framework version to 2.5.6
 * added support for compendium namespace (managed-service, config-properties)
 * incremented version of spring-osgi.xsd and spring-osgi-compendium.xsd
+
+Package org.springframework.osgi.context
+* removed deprecated method AbstractDelegatedExecutionApplicationContext#getContextClassLoader
+* introduced dedicated PostProcessor interfaces aware of DelegatedExecutionOsgiBundleApplicationContext's multi-stage
+  refresh
+
+Package org.springframework.osgi.extender
+* improved shutdown algorithm to deal with self-referenced and transitive service references
 
 Package org.springframework.osgi.io
 * improved existence check for bundle resources
 * fixed manifest headers parsing problem when dealing with nested whitespaces
 * fixed handling of optional required bundles
+* improved OsgiBundlePatternMatchingResolver to return ContextResources
+* changed OsgiBundlePatternMatchingResolver#findResources(String) visibility to protected
 
 Package org.springframework.osgi.service
 * refined single service proxies so that any waiting activity is interrupted on destruction
 * improved single service proxies to allow settings update at runtime
 * deprecated retryTimes parameter in OsgiServiceProxyFactoryBean
 
-Package org.springframework.osgi.extender
-* improved shutdown algorithm to deal with self-referenced and transitive service references
 
 Changes in version 1.2.0 M1 (2008-09-05)
 ----------------------------------------
