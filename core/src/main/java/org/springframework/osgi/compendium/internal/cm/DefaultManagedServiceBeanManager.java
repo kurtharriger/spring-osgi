@@ -122,7 +122,7 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 
 		this.cam = cam;
 		this.cam.setBeanManager(this);
-		this.beanFactory = ((beanFactory instanceof AbstractBeanFactory ? (AbstractBeanFactory) beanFactory : null);
+		this.beanFactory = ((beanFactory instanceof AbstractBeanFactory ? (AbstractBeanFactory) beanFactory : null));
 	}
 
 	public Object register(Object bean) {
