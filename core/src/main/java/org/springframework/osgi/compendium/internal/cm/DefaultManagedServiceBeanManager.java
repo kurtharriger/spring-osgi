@@ -17,7 +17,6 @@
 package org.springframework.osgi.compendium.internal.cm;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -26,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
-import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.core.CollectionFactory;
@@ -106,23 +104,7 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 	private final Map instanceRegistry = CollectionFactory.createConcurrentMap(8);
 	private final UpdateCallback updateCallback;
 	private final ConfigurationAdminManager cam;
-	private final BeanFactory beanFactory;
-
-	private final static Method initBeanWrapper;
-
-	static {
-		Method mt = null;
-		try {
-			mt = AbstractBeanFactory.class.getDeclaredMethod("registerCustomEditors",
-				new Class[] { PropertyEditorRegistry.class });
-
-			mt.setAccessible(true);
-		}
-		catch (NoSuchMethodException nsme) {
-			log.warn("Cannot find BeanWrapper initializing method; custom editors will be ignored...", nsme);
-		}
-		initBeanWrapper = mt;
-	}
+	private final AbstractBeanFactory beanFactory;
 
 
 	public DefaultManagedServiceBeanManager(UpdateStrategy updateStrategy, String methodName,
@@ -140,7 +122,7 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 
 		this.cam = cam;
 		this.cam.setBeanManager(this);
-		this.beanFactory = (beanFactory instanceof AbstractBeanFactory ? beanFactory : null);
+		this.beanFactory = ((beanFactory instanceof AbstractBeanFactory ? (AbstractBeanFactory) beanFactory : null);
 	}
 
 	public Object register(Object bean) {
@@ -178,19 +160,10 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 				log.trace("Applying injection to instance " + instance.getClass() + "@"
 						+ System.identityHashCode(instance) + " using map " + properties);
 			BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(instance);
-			// configure bean wrapper
-			// TODO: SPR-5208
-			if (DefaultManagedServiceBeanManager.initBeanWrapper != null) {
-				try {
-					DefaultManagedServiceBeanManager.initBeanWrapper.invoke(beanFactory, new Object[] { beanWrapper });
-				}
-				catch (Exception ex) {
-					log.debug("Cannot configure bean wrapper; ignoring custom editors", ex);
-					// reinitialize bean wrapper
-					beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(instance);
-				}
+			// configure bean wrapper (using method from Spring 2.5.6)
+			if (beanFactory != null) {
+				beanFactory.copyRegisteredEditorsTo(beanWrapper);
 			}
-
 			for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext();) {
 				Map.Entry entry = (Map.Entry) iterator.next();
 				String propertyName = (String) entry.getKey();
