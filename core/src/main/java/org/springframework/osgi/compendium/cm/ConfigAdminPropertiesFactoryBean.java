@@ -85,11 +85,13 @@ public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, Ini
 			if (cm != null) {
 				try {
 					Dictionary dict = cm.getConfiguration(persistentId).getProperties();
-					// copy properties into dictionary
-					for (Enumeration enm = dict.keys(); enm.hasMoreElements();) {
-						Object key = enm.nextElement();
-						Object value = dict.get(key);
-						properties.put(key, value);
+					if (dict != null) {
+						// copy properties into dictionary
+						for (Enumeration enm = dict.keys(); enm.hasMoreElements();) {
+							Object key = enm.nextElement();
+							Object value = dict.get(key);
+							properties.put(key, value);
+						}
 					}
 				}
 				catch (IOException ioe) {
@@ -134,7 +136,7 @@ public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, Ini
 	}
 
 	/**
-	 * Sets the local properties, e.g. via the "props" tag in XML bean
+	 * Sets the local properties, e.g. via the nested tag in XML bean
 	 * definitions. These can be considered defaults, to be overridden by
 	 * properties loaded from the Configuration Admin.
 	 */
