@@ -33,6 +33,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		System.out.println("*** Bundle-ClassPath is " + bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH));
 		Resource res[] = patternLoader.getResources("classpath*:/org/springframework/osgi/iandt/io/ClassSpaceWildcardTest.class");
 		assertEquals("invalid bundle-classpath entries should be skipped", 1, res.length);
+		printPathWithinContext(res);
 	}
 
 	// finds all files at root level
@@ -40,17 +41,20 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		Resource res[] = patternLoader.getResources("classpath:/*");
 		// only the bundle and its fragments should be considered (since no other META-INF/ is available on the classpath)
 		assertEquals("not enough packages found", 3, res.length);
+		printPathWithinContext(res);
 	}
 
 	// similar as the root test but inside META-INF
 	public void testWildcardAtFolderLevel() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath:/META-INF/*");
 		assertEquals("not enough packages found", 1, res.length);
+		printPathWithinContext(res);
 	}
 
 	public void testSingleClassWithWildcardAtFileLevel() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath:/org/springframework/osgi/iandt/io/Class*Test.class");
 		assertTrue("not enough packages found", res.length >= 1);
+		printPathWithinContext(res);
 	}
 
 	public void testClassPathRootWildcard() throws Exception {
@@ -62,32 +66,38 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		Resource res[] = patternLoader.getResources("classpath*:/META-INF/*");
 		// only the bundle and its fragments should be considered (since no other META-INF/ is available on the classpath)
 		assertEquals("not enough packages found", 3, res.length);
+		printPathWithinContext(res);
 	}
 
 	public void testAllClassPathWOWildcardAtFolderLevel() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath*:META-INF/");
 		// only the bundle and its fragments should be considered (since no other META-INF/ is available on the classpath)
 		assertEquals("not enough packages found", 3, res.length);
+		printPathWithinContext(res);
 	}
 
 	public void testAllClassPathWithWildcardAtFileLevel() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath:/org/springframework/osgi/iandt/io/Class*WildcardTest.class");
 		assertEquals("not enough packages found", 1, res.length);
+		printPathWithinContext(res);
 	}
 
 	public void testAllClassPathWithWithWildcardAtFileLevel() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath*:/org/springframework/osgi/iandt/io/Class*WildcardTest.class");
 		assertEquals("not enough packages found", 1, res.length);
+		printPathWithinContext(res);
 	}
 
 	public void testAllClassPathRootWildcard() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath:/**/springframework/osgi/**/ClassSpaceWildcardTest.class");
 		assertEquals("not enough packages found", 1, res.length);
+		printPathWithinContext(res);
 	}
 
 	public void testAllClassPathRootWithWildcard() throws Exception {
 		Resource res[] = patternLoader.getResources("classpath*:/**/springframework/osgi/**/ClassSpaceWildcardTest.class");
 		assertEquals("not enough packages found", 1, res.length);
+		printPathWithinContext(res);
 	}
 
 	//
@@ -98,6 +108,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		Resource res[] = patternLoader.getResources("classpath*:/**/springframework/osgi/iandt/io/*.class");
 		// at least 2 classes should be in there
 		assertTrue("not enough packages found", res.length > 1);
+		printPathWithinContext(res);
 	}
 
 	// EQ = 48
@@ -107,6 +118,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		Resource res[] = patternLoader.getResources("classpath*:/**/springframework/osgi/**");
 		System.out.println("resources count " + res.length);
 		assertTrue("not enough packages found", res.length > 10);
+		printPathWithinContext(res);
 	}
 
 	// ask for everything springframework :)
@@ -120,6 +132,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		System.out.println("resources w/ slash count " + resWitSlash.length);
 		assertEquals("slash should not make a difference", res.length, resWitSlash.length);
 		assertTrue("not enough packages found", res.length > 50);
+		printPathWithinContext(res);
 	}
 
 	// ask for everything org :)
@@ -133,6 +146,7 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		System.out.println("resources w/ slash count " + resWitSlash.length);
 		assertEquals("slash should not make a difference", res.length, resWitSlash.length);
 		assertTrue("not enough packages found", res.length > 100);
+		printPathWithinContext(res);
 	}
 
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
@@ -140,5 +154,4 @@ public class ClassSpaceWildcardTest extends BaseIoTest {
 		return (isFelix() && (testMethodName.equals("testAllClassPathWildcardAtFolderLevel")
 				|| testMethodName.equals("testWildcardAtRootFileLevel") || testMethodName.equals("testAllClassPathWOWildcardAtFolderLevel")));
 	}
-
 }
