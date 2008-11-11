@@ -1,17 +1,12 @@
 /*
- * Copyright 2006-2008 the original author or authors.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2006-2008 the original author or authors. Licensed under the Apache
+ * License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
+ * or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
 
 package org.springframework.osgi.context;
@@ -20,14 +15,15 @@ import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventM
 
 /**
  * Interface that redirect the application context crucial methods to a third
- * party executor to allow the initialization to be executed in stages.
- * 
- * The interface splits the <code>refresh</code> method in two parts:
+ * party executor to allow the initialization to be executed in stages. The
+ * interface splits the <code>refresh</code> method in two parts:
  * {@link #startRefresh()} and {@link #completeRefresh()}.
  * 
  * <p/><strong>Note:</strong> This interface is intended for usage only inside
  * Spring-DM framework. Relying on this interface is highly discouraged.
  * 
+ * @see DependencyAwareBeanFactoryPostProcessor
+ * @see DependencyInitializationAwareBeanPostProcessor
  * @author Costin Leau
  */
 public interface DelegatedExecutionOsgiBundleApplicationContext extends ConfigurableOsgiBundleApplicationContext {
@@ -68,9 +64,21 @@ public interface DelegatedExecutionOsgiBundleApplicationContext extends Configur
 	 * delegated context.
 	 * 
 	 * @param executor the executor of this application context, to which the
-	 * <code>refresh</code> method is delegated to
+	 *        <code>refresh</code> method is delegated to
 	 */
 	void setExecutor(OsgiBundleApplicationContextExecutor executor);
+
+	/**
+	 * Synchronization monitor for this
+	 * {@link org.springframework.context.ApplicationContext} in case multiple
+	 * threads can work with the application context lifecycle.
+	 * 
+	 * @return monitor for this application context
+	 * @deprecated any synchronization should be performed internally by the
+	 *             application context. This method will be removed w/o a
+	 *             replacement in future releases.
+	 */
+	Object getMonitor();
 
 	/**
 	 * Allows a delegated {@link OsgiBundleApplicationContextEventMulticaster},
@@ -81,8 +89,7 @@ public interface DelegatedExecutionOsgiBundleApplicationContext extends Configur
 	 * to decide whether this setter method is required or not.
 	 * 
 	 * @param multicaster the application multicaster used for sending events
-	 * triggered by the delegated execution.
-	 * 
+	 *        triggered by the delegated execution.
 	 * @see org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent
 	 */
 	void setDelegatedEventMulticaster(OsgiBundleApplicationContextEventMulticaster multicaster);
