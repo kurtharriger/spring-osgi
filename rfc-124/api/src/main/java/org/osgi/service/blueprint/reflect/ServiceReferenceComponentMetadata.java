@@ -1,5 +1,8 @@
 package org.osgi.service.blueprint.reflect;
 
+import java.util.Collection;
+import java.util.Set;
+
 
 /**
  * Metadata describing a reference to a service that is to be imported into the module
@@ -27,9 +30,9 @@ public interface ServiceReferenceComponentMetadata extends ComponentMetadata {
 	/**
 	 * The interface types that the matching service must support
 	 * 
-	 * @return an array of type names
+	 * @return an immutable set of type names
 	 */
-	String[] getInterfaceNames();
+	Set getInterfaceNames();
 	
 	/**
 	 * The filter expression that a matching service must pass
@@ -42,9 +45,8 @@ public interface ServiceReferenceComponentMetadata extends ComponentMetadata {
 	 * The set of listeners registered to receive bind and unbind events for
 	 * backing services.
 	 * 
-	 * @return an array of registered binding listeners, or an empty array
-	 * if no listeners are registered.
+	 * @return an immutable collection of registered BindingListenerMetadata
 	 */
-	BindingListenerMetadata[] getBindingListeners();
+	Collection /*<BindingListenerMetadata>*/ getBindingListeners();
 	
 }

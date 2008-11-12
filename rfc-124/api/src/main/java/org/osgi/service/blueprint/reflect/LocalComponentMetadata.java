@@ -1,5 +1,7 @@
 package org.osgi.service.blueprint.reflect;
 
+import java.util.Collection;
+
 
 /**
  * Metadata for a component defined locally with a module context.
@@ -46,31 +48,12 @@ public interface LocalComponentMetadata extends ComponentMetadata {
 	/**
 	 * The property injection metadata for this component.
 	 * 
-	 * @return an array containing one entry for each property to be injected. If
-	 * no property injection was specified for this component then an empty array
+	 * @return an immutable collection of PropertyInjectionMetadata, with one entry for each property to be injected. If
+	 * no property injection was specified for this component then an empty collection
 	 * will be returned.
 	 * 
 	 */
-	PropertyInjectionMetadata[] getPropertyInjectionMetadata();
-	
-	/**
-	 * The field injection metadata for this component.
-	 * 
-	 * @return an array containing one entry for each field to be injected. If no
-	 * field injection was specified for this component then an empty array will be
-	 * returned.
-	 * 
-	 */
-	FieldInjectionMetadata[] getFieldInjectionMetadata();
-	
-	/**
-	 * The method injection metadata for this component.
-	 * 
-	 * @return an array containing one entry for each method to be invoked using method
-	 * injection after constructing the component instance. If no method injection
-	 * was specified for this component then an empty array will be returned.
-	 */
-	MethodInjectionMetadata[] getMethodInjectionMetadata();
+	Collection /*<PropertyInjectionMetadata>*/ getPropertyInjectionMetadata();
 	
 	/**
 	 * Is this component to be lazily instantiated?
@@ -106,9 +89,9 @@ public interface LocalComponentMetadata extends ComponentMetadata {
 	 * 
 	 * @return a String indicating the scope specified for the component.
 	 * 
-	 * @see SCOPE_SINGLETON
-	 * @see SCOPE_PROTOTYPE
-	 * @see SCOPE_BUNDLE
+	 * @see #SCOPE_SINGLETON
+	 * @see #SCOPE_PROTOTYPE
+	 * @see #SCOPE_BUNDLE
 	 */
 	String getScope();
 }

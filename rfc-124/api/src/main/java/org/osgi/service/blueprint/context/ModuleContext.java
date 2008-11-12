@@ -1,11 +1,11 @@
 
 package org.osgi.service.blueprint.context;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
-import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
-import org.osgi.service.blueprint.reflect.ServiceExportComponentMetadata;
-import org.osgi.service.blueprint.reflect.ServiceReferenceComponentMetadata;
 
 /**
  * ModuleContext providing access to the components, service exports, and
@@ -59,24 +59,34 @@ public interface ModuleContext {
 
 
 	/**
-	 * The names of all the named components within the module context.
-	 * 
-	 * @return an array containing the names of all of the components within the
+	 * The set of component names recognized by the module context. This set only includes
+	 * the primary names of components, not any aliases.
+	 *  
+	 * @return an immutable set (of Strings) containing the names of all of the components within the
 	 * module.
 	 */
-	String[] getComponentNames();
+	Set getComponentNames();
+	
+	/**
+	 * The set of all component names recognized by the module context, including all
+	 * aliases.
+	 * 
+	 * @return an immutable set (of Strings) containing the names of all of the components within the
+	 * module, including aliases. 
+	 */
+	Set getAllComponentNames();
 
 	/**
 	 * Get the component instance for a given named component.
 	 * 
 	 * @param name the name of the component for which the instance is to be
-	 * retrieved
+	 * retrieved. Any of the aliases of a component may be used.
 	 * 
 	 * @return the component instance, the type of the returned object is
 	 * dependent on the component definition, and may be determined by
 	 * introspecting the component metadata.
 	 * 
-	 * @throws NoSuchNamedComponentException if the name specified is not the
+	 * @throws NoSuchComponentException if the name specified is not the
 	 * name of a component within the module.
 	 */
 	Object getComponent(String name) throws NoSuchComponentException;
@@ -85,11 +95,11 @@ public interface ModuleContext {
 	 * Get the component metadata for a given named component.
 	 * 
 	 * @param name the name of the component for which the metadata is to be
-	 * retrieved.
+	 * retrieved. Any of the aliases of a component may be used.
 	 * 
 	 * @return the component metadata for the component.
 	 * 
-	 * @throws NoSuchNamedComponentException if the name specified is not the
+	 * @throws NoSuchComponentException if the name specified is not the
 	 * name of a component within the module.
 	 */
 	ComponentMetadata getComponentMetadata(String name) throws NoSuchComponentException;
@@ -98,30 +108,24 @@ public interface ModuleContext {
 	 * Get the service reference metadata for every OSGi service referenced by
 	 * this module.
 	 * 
-	 * @return an array of metadata, with one entry for each referenced service.
-	 * If the module does not reference any services then an empty array will be
-	 * returned.
+	 * @return an immutable collection of ServiceReferenceComponentMetadata, with one entry for each referenced service.
 	 */
-	ServiceReferenceComponentMetadata[] getReferencedServicesMetadata();
+	Collection /*<ServiceReferenceComponentMetadata>*/ getReferencedServicesMetadata();
 
 	/**
 	 * Get the service export metadata for every service exported by this
 	 * module.
 	 * 
-	 * @return an array of metadata, with one entry for each service export. If
-	 * the module does not export any services then an empty array will be
-	 * returned.
+	 * @return an immutable collection of ServiceExportComponentMetadata, with one entry for each service export.
 	 */
-	ServiceExportComponentMetadata[] getExportedServicesMetadata();
+	Collection /*<ServiceExportComponentMetadata>*/ getExportedServicesMetadata();
 
 	/**
 	 * Get the metadata for all components defined locally within this module.
 	 * 
-	 * @return an array of metadata, with one entry for each component. If the
-	 * module does not define any local components then an empty array will be
-	 * returned.
+	 * @return an immutable collection of LocalComponentMetadata, with one entry for each component. 
 	 */
-	LocalComponentMetadata[] getLocalComponentsMetadata();
+	Collection /*<LocalComponentMetadata>*/ getLocalComponentsMetadata();
 
 	/**
 	 * Get the bundle context of the bundle this module context is associated

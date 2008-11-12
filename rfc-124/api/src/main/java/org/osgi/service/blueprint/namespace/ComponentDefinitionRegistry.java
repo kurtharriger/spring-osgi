@@ -1,5 +1,7 @@
 package org.osgi.service.blueprint.namespace;
 
+import java.util.Set;
+
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 
 /**
@@ -32,8 +34,10 @@ public interface ComponentDefinitionRegistry {
 	
 	/**
 	 * Get the names of all the registered components.
+	 * 
+	 * @return an immutable set (of Strings) containing the primary names of all registered components.
 	 */
-	String[] getComponentDefinitionNames();
+	Set getComponentDefinitionNames();
 	
 	/**
 	 * Register a new component definition.

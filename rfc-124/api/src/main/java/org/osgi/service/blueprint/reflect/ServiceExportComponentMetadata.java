@@ -1,6 +1,8 @@
 package org.osgi.service.blueprint.reflect;
 
+import java.util.Collection;
 import java.util.Properties;
+import java.util.Set;
 
 
 /**
@@ -44,9 +46,9 @@ public interface ServiceExportComponentMetadata extends ComponentMetadata {
 	 * The type names of the set of interface types that the service should be advertised
 	 * as supporting.
 	 * 
-	 * @return an array of type names, or an empty array if using auto-export
+	 * @return an immutable set of (String) type names, or an empty set if using auto-export
 	 */
-	String[] getInterfaceNames();
+	Set getInterfaceNames();
 	
 	/**
 	 * Return the auto-export mode specified.
@@ -74,9 +76,8 @@ public interface ServiceExportComponentMetadata extends ComponentMetadata {
 	 * The listeners that have registered to be notified when the exported service
 	 * is registered and unregistered with the framework.
 	 * 
-	 * @return an array of registration listeners, or an empty array if no listeners
-	 * have been specified.
+	 * @return an immutable collection of RegistrationListenerMetadata
 	 */
-	RegistrationListenerMetadata[] getRegistrationListeners();
+	Collection /*<RegistrationListenerMetadata>*/ getRegistrationListeners();
 	
 }
