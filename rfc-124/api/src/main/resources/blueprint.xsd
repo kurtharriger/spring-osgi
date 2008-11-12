@@ -65,7 +65,7 @@
 
    <xsd:attributeGroup name="componentAttributes">
         <xsd:attribute name="name" type="xsd:string"/>
-        <xsd:attribute name="class" type="xsd:string"/>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
         <xsd:attribute name="scope" type="xsd:string"/>
         <xsd:attribute name="lazy-init" default="default" type="defaultable-boolean"/>
         <xsd:attribute name="depends-on" type="xsd:string"/>
@@ -124,7 +124,6 @@
                 <xsd:restriction base="xsd:anyType">
                     <xsd:attribute name="component" type="xsd:string"/>
                     <xsd:attribute name="local" type="xsd:IDREF"/>
-                    <xsd:attribute name="parent" type="xsd:string"/>
                 </xsd:restriction>
             </xsd:complexContent>
         </xsd:complexType>
