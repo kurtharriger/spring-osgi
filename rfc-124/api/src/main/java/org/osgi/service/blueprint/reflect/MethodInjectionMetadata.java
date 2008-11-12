@@ -1,5 +1,7 @@
 package org.osgi.service.blueprint.reflect;
 
+import java.util.List;
+
 
 /**
  * Metadata describing a method to be invoked as part of component configuration.
@@ -19,8 +21,8 @@ public interface MethodInjectionMetadata {
 	 * The parameter specifications that determine which method to invoke
 	 * (in the case of overloading) and what arguments to pass to it.
 	 * 
-	 * @return an array of parameter specifications, or an empty array if the
+	 * @return an immutable List of ParameterSpecification, or an empty list if the
 	 * method takes no arguments.
 	 */
-	ParameterSpecification[] getParameterSpecifications();
+	List /*<ParameterSpecification>*/ getParameterSpecifications();
 }

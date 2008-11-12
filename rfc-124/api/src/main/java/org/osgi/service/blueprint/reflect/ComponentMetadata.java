@@ -1,6 +1,8 @@
 
 package org.osgi.service.blueprint.reflect;
 
+import java.util.Set;
+
 /**
  * Metadata for a component defined within a given module context.
  * 
@@ -21,18 +23,18 @@ public interface ComponentMetadata {
 	/**
 	 * Any aliases by which the component is also known.
 	 * 
-	 * @return an array of aliases by which the component is known (does not
+	 * @return an immutable set of (String) aliases by which the component is known (does not
 	 * include the component name as returned by getName()). If the component 
-	 * has no aliases then an empty array is returned.
+	 * has no aliases then an empty set is returned.
 	 */
-	String[] getAliases();
+	Set getAliases();
 	
 	/**
 	 * The names of any components listed in a "depends-on" attribute for this
 	 * component.
 	 * 
-	 * @return an array of component names for components that we have explicitly
-	 * declared a dependency, or an empty array if none.
+	 * @return an immutable set of component names for components that we have explicitly
+	 * declared a dependency on, or an empty set if none.
 	 */
-	String[] getExplicitDependencies();
+	Set getExplicitDependencies();
 }
