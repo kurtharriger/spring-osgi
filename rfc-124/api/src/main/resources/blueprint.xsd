@@ -102,6 +102,10 @@
                     <xsd:element ref="set"/>
                     <xsd:element ref="map"/>
                     <xsd:element ref="props"/>
+                    <xsd:element ref="ref-list"/>
+                    <xsd:element ref="ref-set"/>
+                    <xsd:element ref="reference"/>
+                    <xsd:element ref="service"/>
                     <xsd:any namespace="##other" processContents="strict"/>
                 </xsd:choice>
             </xsd:sequence>
@@ -164,6 +168,10 @@
                 <xsd:element ref="set"/>
                 <xsd:element ref="map"/>
                 <xsd:element ref="props"/>
+                <xsd:element ref="ref-list"/>
+                <xsd:element ref="ref-set"/>
+                <xsd:element ref="reference"/>
+                <xsd:element ref="service"/>
                 <xsd:any namespace="##other" processContents="strict" 
                   minOccurs="0" maxOccurs="unbounded"/>
             </xsd:choice>
@@ -184,6 +192,7 @@
     <xsd:element name="prop">
         <xsd:complexType mixed="true">
             <xsd:attribute name="key" type="xsd:string" use="required"/>
+            <xsd:attribute name="value" type="xsd:string" use="optional"/>
         </xsd:complexType>
     </xsd:element>
 
@@ -200,6 +209,10 @@
                 <xsd:element ref="set"/>
                 <xsd:element ref="map"/>
                 <xsd:element ref="props"/>
+                <xsd:element ref="ref-list"/>
+                <xsd:element ref="ref-set"/>
+                <xsd:element ref="reference"/>
+                <xsd:element ref="service"/>
                 <xsd:any namespace="##other" processContents="strict"/>
             </xsd:choice>
         </xsd:sequence>
