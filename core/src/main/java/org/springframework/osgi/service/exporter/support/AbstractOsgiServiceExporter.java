@@ -21,6 +21,7 @@ import java.util.Map;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationDecorator;
 
 /**
  * Base exporter class providing common functionality for registering (also

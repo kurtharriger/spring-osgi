@@ -15,17 +15,14 @@
  *
  */
 
-package org.springframework.osgi.config.internal;
+package org.springframework.osgi.config.internal.util;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
-import org.springframework.core.Conventions;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -38,118 +35,11 @@ import org.w3c.dom.NamedNodeMap;
  */
 public abstract class ParserUtils {
 
-	/**
-	 * Standard attribute callback. Deals with ID, DEPENDS-ON and LAZY-INIT
-	 * attribute.
-	 * 
-	 * @author Costin Leau
-	 * 
-	 */
-	public static class StandardAttributeCallback implements AttributeCallback {
-
-		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
-			String name = attribute.getLocalName();
-
-			if (BeanDefinitionParserDelegate.ID_ATTRIBUTE.equals(name)) {
-				return false;
-			}
-
-			if (BeanDefinitionParserDelegate.DEPENDS_ON_ATTRIBUTE.equals(name)) {
-				builder.getBeanDefinition().setDependsOn(
-					(StringUtils.tokenizeToStringArray(attribute.getValue(),
-						BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS)));
-				return false;
-			}
-			if (BeanDefinitionParserDelegate.LAZY_INIT_ATTRIBUTE.equals(name)) {
-				builder.setLazyInit(Boolean.getBoolean(attribute.getValue()));
-				return false;
-			}
-			return true;
-		}
-	}
-
-	/**
-	 * Convention callback that transforms "&lt;property-name&gt;-ref"
-	 * attributes into a bean definition that sets the give
-	 * &lt;property-name&gt; to a bean reference pointing to the attribute
-	 * value.
-	 * 
-	 * <p/> Thus attribute "comparator-ref='bla'" will have property
-	 * 'comparator' pointing to bean named 'bla'.
-	 * 
-	 * @see BeanDefinitionBuilder#addPropertyReference(String, String)
-	 * 
-	 * @author Costin Leau
-	 * 
-	 */
-	public static class PropertyRefAttributeCallback implements AttributeCallback {
-
-		private static final String PROPERTY_REF = "-ref";
-
-
-		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
-			String name = attribute.getLocalName();
-			if (name.endsWith(PROPERTY_REF)) {
-				String propertyName = name.substring(0, name.length() - PROPERTY_REF.length());
-				builder.addPropertyReference(propertyName, attribute.getValue());
-				return false;
-			}
-			return true;
-		}
-	}
-
-	/**
-	 * Callback relying on 'Spring' conventions. Normally this is the last
-	 * callback in the stack trying to convert the property name and then
-	 * setting it on the builder.
-	 * 
-	 * @see Conventions#attributeNameToPropertyName(String)
-	 * @see BeanDefinitionBuilder#addPropertyValue(String, Object)
-	 * 
-	 * @author Costin Leau
-	 */
-	public static class ConventionCallback implements AttributeCallback {
-
-		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
-			String name = attribute.getLocalName();
-			String propertyName = Conventions.attributeNameToPropertyName(name);
-			builder.addPropertyValue(propertyName, attribute.getValue());
-			return true;
-		}
-	}
-
-
 	private static final AttributeCallback STANDARD_ATTRS_CALLBACK = new StandardAttributeCallback();
 
 	private static final AttributeCallback PROPERTY_REF_ATTRS_CALLBACK = new PropertyRefAttributeCallback();
 
-	private static final AttributeCallback PROPERTY_CONV_ATTRS_CALLBACK = new ConventionCallback();
-
-
-	/**
-	 * Wrapper callback used for parsing attributes (one at a time) that have
-	 * are non standard (ID, LAZY-INIT, DEPENDS-ON).
-	 * 
-	 * @author Costin Leau
-	 * 
-	 */
-	public static interface AttributeCallback {
-
-		/**
-		 * Process the given attribute using the contextual element and bean
-		 * builder. Normally, the callback will interact with the bean
-		 * definition and set some properties. <p/> If the callback has
-		 * intercepted an attribute, it can stop the invocation of the rest of
-		 * the callbacks on the stack by returning false.
-		 * 
-		 * @param parent parent element
-		 * @param attribute current intercepted attribute
-		 * @param builder builder holding the current bean definition
-		 * @return true if the rest of the callbacks should be called or false
-		 * otherwise.
-		 */
-		boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder);
-	}
+	private static final AttributeCallback PROPERTY_CONV_ATTRS_CALLBACK = new ConventionsCallback();
 
 
 	/**

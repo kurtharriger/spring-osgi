@@ -3,25 +3,17 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:ctx="http://www.springframework.org/schema/context"
-	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd		
 		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd">
 
-	<!-- osgix:property-placeholder -->
 
-	<util:properties id="external-props"
-		location="org/springframework/osgi/config/properties.props" />
-
-	<osgix:cm-properties id="cmProps" persistent-id="com.xyz.myapp" />
-
-	<!-- placeholder -->
-	<ctx:property-placeholder properties-ref="cmProps" />
-
-	<!-- override -->
-	<ctx:property-override properties-ref="cmProps" />
-
+	<!-- osgix:managed-service-factory -->
+	<osgix:managed-service-factory id="msf" 
+			factory-pid="org.springframework.osgi.iandt.cm.managedservicefactory.ManagedServiceFactoryTest" 
+			auto-export="all-classes">
+		<bean class="java.lang.Object"/>
+	</osgix:managed-service-factory>
+	
 </beans>

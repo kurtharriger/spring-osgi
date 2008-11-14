@@ -23,8 +23,6 @@ import java.util.WeakHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.core.CollectionFactory;
@@ -134,6 +132,13 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 		return bean;
 	}
 
+	void injectConfigurationAdminInfo(Object instance, Map configuration) {
+		if (log.isTraceEnabled())
+			log.trace("Applying injection to instance " + instance.getClass() + "@" + System.identityHashCode(instance)
+					+ " using map " + configuration);
+		CMUtils.applyMapOntoInstance(instance, configuration, beanFactory);
+	}
+
 	public void unregister(Object bean) {
 		int hashCode = System.identityHashCode(bean);
 		if (log.isTraceEnabled())
@@ -145,33 +150,6 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 	public void updated(Map properties) {
 		if (updateCallback != null) {
 			updateCallback.update(properties);
-		}
-	}
-
-	/**
-	 * Injects the information found inside the Configuration Admin to the given
-	 * object instance.
-	 * 
-	 * @param bean bean instance to configure
-	 */
-	void injectConfigurationAdminInfo(Object instance, Map properties) {
-		if (properties != null && !properties.isEmpty()) {
-			if (log.isTraceEnabled())
-				log.trace("Applying injection to instance " + instance.getClass() + "@"
-						+ System.identityHashCode(instance) + " using map " + properties);
-			BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(instance);
-			// configure bean wrapper (using method from Spring 2.5.6)
-			if (beanFactory != null) {
-				beanFactory.copyRegisteredEditorsTo(beanWrapper);
-			}
-			for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext();) {
-				Map.Entry entry = (Map.Entry) iterator.next();
-				String propertyName = (String) entry.getKey();
-
-				if (beanWrapper.isWritableProperty(propertyName)) {
-					beanWrapper.setPropertyValue(propertyName, entry.getValue());
-				}
-			}
 		}
 	}
 }

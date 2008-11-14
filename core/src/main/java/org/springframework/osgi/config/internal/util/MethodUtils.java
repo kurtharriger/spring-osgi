@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.config.internal;
+package org.springframework.osgi.config.internal.util;
 
 import java.lang.reflect.Method;
 
