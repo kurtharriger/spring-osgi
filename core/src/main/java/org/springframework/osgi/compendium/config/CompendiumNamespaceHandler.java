@@ -27,9 +27,8 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 class CompendiumNamespaceHandler extends NamespaceHandlerSupport {
 
 	public void init() {
-		registerBeanDefinitionParser("property-placeholder", new OsgiPropertyPlaceholderDefinitionParser());
-		registerBeanDefinitionParser("config-properties", new ConfigPropertiesDefinitionParser());
-
+		registerBeanDefinitionParser("cm-properties", new ConfigPropertiesDefinitionParser());
+		registerBeanDefinitionParser("managed-service-factory", new ManagedServiceFactoryDefinitionParser());
 		registerBeanDefinitionDecorator("managed-service", new ManagedServiceDefinitionParser());
 	}
 }

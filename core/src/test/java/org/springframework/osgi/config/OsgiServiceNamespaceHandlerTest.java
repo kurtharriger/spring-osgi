@@ -123,6 +123,7 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		assertEquals(prop, exporter.getServiceProperties());
 
 		// Should be wrapped with a TCCL setting proxy
+		System.out.println(getServiceAtIndex(1));
 		assertNotSame(appContext.getBean("string"), getServiceAtIndex(1));
 
 		assertEquals("string", getTargetBeanName(exporter));

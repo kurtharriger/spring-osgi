@@ -23,6 +23,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.osgi.mock.MockServiceRegistration;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.service.exporter.SimpleOsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationDecorator;
 
 public class AbstractListenerAwareExporterTest extends TestCase {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.config;
+package org.springframework.osgi.config.internal.adapter;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -41,7 +41,8 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean, BeanFactoryAware {
+public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean,
+		BeanFactoryAware {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceLifecycleListenerAdapter.class);
 

@@ -29,6 +29,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.osgi.config.internal.adapter.OsgiServiceLifecycleListenerAdapter;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package org.springframework.osgi.config;
 
 import java.util.Locale;
@@ -22,8 +23,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.bundle.BundleFactoryBean;
-import org.springframework.osgi.config.internal.ParserUtils;
-import org.springframework.osgi.config.internal.ParserUtils.AttributeCallback;
+import org.springframework.osgi.config.internal.util.ParserUtils;
+import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,6 +39,7 @@ import org.w3c.dom.NodeList;
 class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	static class BundleActionCallback implements AttributeCallback {
+
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
 			if (ACTION.equals(name)) {
@@ -59,6 +61,7 @@ class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		}
 	};
 
+
 	private static final String ACTION = "action";
 
 	private static final String DESTROY_ACTION = "destroy-action";
@@ -70,6 +73,7 @@ class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	private static final String DESTROY_ACTION_PROP = "destroyAction";
 
 	private static final String BUNDLE_PROP = "bundle";
+
 
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		BundleActionCallback callback = new BundleActionCallback();

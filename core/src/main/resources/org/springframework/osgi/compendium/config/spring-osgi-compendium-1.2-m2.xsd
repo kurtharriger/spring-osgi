@@ -3,13 +3,16 @@
 <xsd:schema xmlns="http://www.springframework.org/schema/osgi-compendium"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:beans="http://www.springframework.org/schema/beans"
+            xmlns:osgi="http://www.springframework.org/schema/osgi"
             xmlns:tool="http://www.springframework.org/schema/tool"
             targetNamespace="http://www.springframework.org/schema/osgi-compendium"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified"
             version="1.2-m2">
 
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.springframework.org/schema/osgi"/>
     <xsd:import namespace="http://www.springframework.org/schema/tool"/>
 
     <xsd:annotation>
@@ -18,86 +21,9 @@
         ]]></xsd:documentation>
     </xsd:annotation>
 
-    <!-- property placeholder -->
-    
-    <xsd:element name="property-placeholder" type="TpropertyPlaceholder">
-    	<xsd:annotation>
-    		<xsd:documentation><![CDATA[
-    Defines a property placeholder that replaces property values using
-    delimited values ( ${...} by default) with properties sourced from
-    the Configuration Admin service under the given persistent id.
-    		]]></xsd:documentation>
-    		<xsd:appinfo>
-				<tool:annotation>
-					<tool:exports type="java.util.Properties"/>
-				</tool:annotation>
-			</xsd:appinfo>			
-    	</xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="TpropertyPlaceholder">
-        <xsd:complexContent>
-            <xsd:extension base="beans:identifiedType">
-                <xsd:sequence minOccurs="0" maxOccurs="1">
-                    <!-- nested properties declaration -->
-                    <xsd:element name="default-properties" type="beans:propsType" minOccurs="0" maxOccurs="1">
-                    	<xsd:annotation>
-                    		<xsd:documentation><![CDATA[
-    Default property value to use for placeholder replacement
-    when the associated keys cannot be found under the given
-    persistent id.
-                    		]]></xsd:documentation>
-                    	</xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="persistent-id" type="xsd:string" use="required">
-                	<xsd:annotation>
-                		<xsd:documentation><![CDATA[
-    The persistent-id to lookup in Configuration Admin. Must refer to the pid of 
-    a managed service, and not a managed service factory.
-                		]]></xsd:documentation>
-                	</xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="placeholder-prefix" type="xsd:string" use="optional" default="${">
-                	<xsd:annotation>
-                		<xsd:documentation><![CDATA[
-    The prefix to use for placeholder values. The default is '${'.
-                		]]></xsd:documentation>
-                	</xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="placeholder-suffix" type="xsd:string" use="optional" default="}">
-                	<xsd:annotation>
-                		<xsd:documentation><![CDATA[
-    The suffix to use for placeholder values. The default is '}'.
-                		]]></xsd:documentation>
-                	</xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="defaults-ref" type="xsd:string" use="optional">
-                	<xsd:annotation>
-                		<xsd:documentation><![CDATA[
-    Refers to a bean of type Properties or Map that supplies default placeholder 
-    replacement values to be used when the associated keys cannot be found under the given
-    persistent id. 
-                		]]></xsd:documentation>
-                	</xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!--  ELEMENTS BELOW THIS LINE ARE NOT SUPPORTED IN THE 1.0 RELEASE -->
-
     <!--  managed-service  -->
 
     <xsd:complexType name="TbaseManagedServiceType">
-		<xsd:attribute name="persistent-id" type="xsd:string" use="required">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-	The persistent-id under which the configuration for this bean is stored in 
-	the Configuration Admin service.
-				]]></xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
 		<xsd:attribute name="update-strategy" type="TupdateStrategyType" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
@@ -130,6 +56,14 @@
     <xsd:complexType name="TmanagedService">
         <xsd:complexContent>
             <xsd:extension base="TbaseManagedServiceType">
+		        <xsd:attribute name="persistent-id" type="xsd:string" use="required">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+	The persistent-id under which the configuration for this bean is stored in 
+	the Configuration Admin service.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -137,8 +71,8 @@
     <xsd:element name="managed-service" type="TmanagedService">
     	<xsd:annotation>
     		<xsd:documentation><![CDATA[
-    Defines a bean based on the given class name, and with properties autowired-by-name based
-    on the configuration stored under the given persistent id.
+    Defines a bean based on the given class name and configuration, with properties autowired-by-name 
+    based on the configuration stored under the given persistent id.
     		]]></xsd:documentation>
     	</xsd:annotation>
     </xsd:element>	
@@ -147,7 +81,101 @@
 
     <xsd:complexType name="TmanagedServiceFactory">
         <xsd:complexContent>
-            <xsd:extension base="TbaseManagedServiceType">
+            <xsd:extension base="beans:identifiedType">
+            	<xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element name="interfaces" type="beans:listOrSetType" minOccurs="0" maxOccurs="1">
+                    	<xsd:annotation>
+                    		<xsd:documentation><![CDATA[
+    The set of service interfaces to advertise in the service registry.
+                    		]]></xsd:documentation>
+                    	</xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="registration-listener" type="TserviceRegistrationListener" minOccurs="0" maxOccurs="unbounded">
+                    	<xsd:annotation>
+                    		<xsd:documentation><![CDATA[
+    Defines a listener that will be notified when this service is registered or unregistered in the
+    OSGi service registry.
+                    		]]></xsd:documentation>
+                    	</xsd:annotation>
+                	</xsd:element>
+	            	<!-- nested bean declaration -->
+                    <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip">
+   				       	<xsd:annotation>
+                    		<xsd:documentation><![CDATA[
+	    Defines the service definition template.
+                    		]]></xsd:documentation>
+                    	</xsd:annotation>
+                    </xsd:any>
+	           	</xsd:sequence>
+	           	<xsd:attribute name="factory-pid" type="xsd:string" use="required">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+	The persistent-id under which the configuration for this bean is stored in 
+	the Configuration Admin service.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="update-strategy" type="TupdateStrategyType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+	The strategy to use when the configuration data backing the beans defined by this element is 
+	updated. The default value is 'none', meaning that any update after the initial configuration
+	of the beans is ignored. A value of 'bean-managed' means that the method specified in the
+	'update-method' attribute will be invoked. A value of 'container-managed' means that the container
+	will autowire the bean instance by name with the new property set.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="update-method" type="xsd:string" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+	The update-method to invoke when using a 'bean-managed' update strategy.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>			
+				<xsd:attribute name="interface" type="xsd:token" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+    Defines the interface to advertise for this service in the service registry.
+                		]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation>
+								<tool:expected-type
+									type="java.lang.Class" />
+							</tool:annotation>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="depends-on" type="xsd:string" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+    Used to ensure that the service is not exported to the registry before the named bean
+    has been created. 
+                		]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="context-class-loader" type="TserviceClassLoaderOptions" default="unmanaged">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+    Defines how the context class loader will be managed when an operation is invoked on the 
+    exported service. The default value is 'unmanaged' which means that no management of 
+    the context class loader is attempted. A value of 'service-provider' guarantees that
+    the context class loader will have visibility of all the resources on the class path of 
+    bundle exporting the service.
+                		]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="auto-export" type="TautoExportModes" default="disabled">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+    Enables Spring to automatically manage the set of service interfaces advertised for the
+    service. By default this facility is disabled. A value of 'interfaces' advertises all 
+    of the Java interfaces supported by the exported service. A value of 'class-hierarchy' 
+    advertises all the Java classes in the hierarchy of the exported service. A value of 
+    'all-classes' advertises all Java interfaces and classes. 
+                		]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -155,15 +183,71 @@
     <xsd:element name="managed-service-factory" type="TmanagedServiceFactory">
     	<xsd:annotation>
     		<xsd:documentation><![CDATA[
-    Defines a collection of beans based on the given class name, and with properties autowired-by-name based
+    Defines a collection of beans based on the given class name, with properties autowired-by-name based
     on the configuration sets stored under the given factory persistent id.
     		]]></xsd:documentation>
     	</xsd:annotation>
     </xsd:element>
 
-    <!-- config-properties -->
+	<!-- copies from spring-osgi -->
+	
+	<xsd:simpleType name="TserviceClassLoaderOptions">
+        <xsd:restriction base="xsd:token">
+            <xsd:enumeration value="service-provider"/>
+            <xsd:enumeration value="unmanaged"/>
+        </xsd:restriction>
+    </xsd:simpleType>
 
-    <xsd:element name="config-properties" type="TconfigProperties">
+    <xsd:simpleType name="TautoExportModes">
+        <xsd:restriction base="xsd:token">
+            <xsd:enumeration value="disabled"/>
+            <xsd:enumeration value="interfaces"/>
+            <xsd:enumeration value="class-hierarchy"/>
+            <xsd:enumeration value="all-classes"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+	
+	<xsd:complexType name="TserviceRegistrationListener">
+    	<xsd:annotation>
+    		<xsd:documentation><![CDATA[
+    Defines a listener that will be notified when the bean is registered or unregistered in the OSGi Service Registry. 
+    Use either the 'ref' attribute or a nested bean declaration for the listener bean.
+    		]]></xsd:documentation>
+    	</xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+            <!-- nested bean declaration -->
+            <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
+        </xsd:sequence>
+
+        <!-- shortcut for bean references -->
+        <xsd:attribute name="ref" type="xsd:string" use="optional">
+        	<xsd:annotation>
+        		<xsd:documentation><![CDATA[
+    Refers by name to the bean that will receive register and unregister events.
+        		]]></xsd:documentation>
+        	</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="registration-method" type="xsd:token" use="optional">
+        	<xsd:annotation>
+        		<xsd:documentation><![CDATA[
+    The name of the method to be invoked when the service is registered.
+        		]]></xsd:documentation>
+        	</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="unregistration-method" type="xsd:token" use="optional">
+        	<xsd:annotation>
+        		<xsd:documentation><![CDATA[
+    The name of the method to be invoked when the service is unregistered.
+        		]]></xsd:documentation>
+        	</xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+	
+	<!-- end copying -->
+	
+	
+    <!-- cm-properties -->
+    <xsd:element name="cm-properties" type="TcmProperties">
     	<xsd:annotation>
     		<xsd:documentation source="java:org.springframework.osgi.compendium.cm.ConfigAdminPropertiesFactoryBean"><![CDATA[
     Exposes the properties found in the Configuration Admin service under the given persistent id.
@@ -176,14 +260,14 @@
     	</xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="TconfigProperties">
+    <xsd:complexType name="TcmProperties">
     	<xsd:complexContent>
     		<xsd:extension base="beans:propsType">
     			<xsd:attribute name="id" type="xsd:ID"/>
     		    <xsd:attribute name="persistent-id" type="xsd:string" use="required">
 		        	<xsd:annotation>
         				<xsd:documentation><![CDATA[
-    The persistent id under which the properties to be exported are registered.
+    The persistent id under which the properties reside.
         				]]></xsd:documentation>
         			</xsd:annotation>
         		</xsd:attribute>
@@ -196,9 +280,6 @@
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<!-- disabled for now
-				<xsd:anyAttribute namespace="##other" processContents="lax"/>
-				-->				
     		</xsd:extension>
     	</xsd:complexContent>
 	</xsd:complexType>

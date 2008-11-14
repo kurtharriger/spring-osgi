@@ -39,7 +39,7 @@ public class OsgiBundleScopeTest extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		scope = new OsgiBundleScope();
-		OsgiBundleScope.CALLING_BUNDLE.set(null);
+		OsgiBundleScope.EXTERNAL_BUNDLE.set(null);
 	}
 
 	/*
@@ -71,9 +71,9 @@ public class OsgiBundleScopeTest extends TestCase {
 	}
 
 	public void testIsExternalBundleCalling() {
-		assertFalse(scope.CALLING_BUNDLE.get() != null);
-		OsgiBundleScope.CALLING_BUNDLE.set(new Object());
-		assertTrue(scope.CALLING_BUNDLE.get() != null);
+		assertFalse(scope.EXTERNAL_BUNDLE.get() != null);
+		OsgiBundleScope.EXTERNAL_BUNDLE.set(new Object());
+		assertTrue(scope.EXTERNAL_BUNDLE.get() != null);
 	}
 
 	public void testLocalDestructionCallback() {
@@ -91,7 +91,7 @@ public class OsgiBundleScopeTest extends TestCase {
 	}
 
 	public void testDestructionCallbackPassedAround() {
-		OsgiBundleScope.CALLING_BUNDLE.set(new Object());
+		OsgiBundleScope.EXTERNAL_BUNDLE.set(new Object());
 
 		Runnable callback = new Runnable() {
 			public void run() {
@@ -99,6 +99,6 @@ public class OsgiBundleScopeTest extends TestCase {
 		};
 
 		scope.registerDestructionCallback("foo", callback);
-		assertSame(callback, OsgiBundleScope.CALLING_BUNDLE.get());
+		assertSame(callback, OsgiBundleScope.EXTERNAL_BUNDLE.get());
 	}
 }

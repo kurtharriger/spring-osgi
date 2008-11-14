@@ -18,27 +18,20 @@ package org.springframework.osgi.compendium.config;
 
 import java.util.Properties;
 
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
-import org.springframework.beans.factory.xml.NamespaceHandler;
+import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.core.Conventions;
 import org.springframework.osgi.compendium.cm.ConfigAdminPropertiesFactoryBean;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 
 /**
- * Simple namespace parser for osgix:config-properties. Extends Single bean
+ * Simple namespace parser for osgix:cm-properties. Extends Single bean
  * definition parser (instead of the simpleBeanDefParser) to properly filter
  * attributes based on the declared namespace.
  * 
  * @author Costin Leau
  */
-public class ConfigPropertiesDefinitionParser extends AbstractSingleBeanDefinitionParser {
+class ConfigPropertiesDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
 	private static final String PROPERTIES_PROP = "properties";
 
@@ -48,39 +41,10 @@ public class ConfigPropertiesDefinitionParser extends AbstractSingleBeanDefiniti
 	}
 
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		NamedNodeMap attributes = element.getAttributes();
-		String nsURI = element.getNamespaceURI();
-		for (int x = 0; x < attributes.getLength(); x++) {
-			Attr attribute = (Attr) attributes.item(x);
-			String attrURI = attribute.getNamespaceURI();
+		// parse attributes using conventions
+		super.doParse(element, parserContext, builder);
 
-			// check namespace equality
-			if (attrURI == null || attrURI.equals(nsURI)) {
-				if (!ID_ATTRIBUTE.equals(attribute.getLocalName())) {
-					String propertyName = Conventions.attributeNameToPropertyName(attribute.getLocalName());
-					Assert.state(StringUtils.hasText(propertyName), "Illegal property name discovered");
-					builder.addPropertyValue(propertyName, attribute.getValue());
-				}
-			}
-			// try to find the custom namespace
-			else {
-				BeanDefinitionHolder bdh = new BeanDefinitionHolder(builder.getRawBeanDefinition(), "<ignored>");
-
-				//				parserContext.getDelegate().decorateBeanDefinitionIfRequired(element, bdh);
-				//				parserContext.getDelegate().parseBeanDefinitionElement(element, builder.getRawBeanDefinition());
-
-				NamespaceHandler handler = parserContext.getReaderContext().getNamespaceHandlerResolver().resolve(
-					attrURI);
-				if (handler != null) {
-					handler.decorate(attribute, bdh, parserContext);
-				}
-				else {
-					parserContext.getReaderContext().warning(
-						"No Spring NamespaceHandler found for XML schema namespace [" + attrURI + "]", attribute);
-				}
-			}
-		}
-
+		// parse nested element (if any)
 		Properties parsedProps = parserContext.getDelegate().parsePropsElement(element);
 		if (!parsedProps.isEmpty()) {
 			if (builder.getRawBeanDefinition().getPropertyValues().contains(PROPERTIES_PROP)) {

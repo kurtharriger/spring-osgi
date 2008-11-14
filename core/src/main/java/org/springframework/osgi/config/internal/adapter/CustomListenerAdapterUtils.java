@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.config;
+package org.springframework.osgi.config.internal.adapter;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.osgi.config.internal.MethodUtils;
+import org.springframework.osgi.config.internal.util.MethodUtils;
 import org.springframework.osgi.util.internal.ReflectionUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;

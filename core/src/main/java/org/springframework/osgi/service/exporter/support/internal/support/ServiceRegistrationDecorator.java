@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.osgi.service.exporter.support;
+
+package org.springframework.osgi.service.exporter.support.internal.support;
 
 import java.util.Dictionary;
 import java.util.Map;
@@ -30,7 +31,7 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-class ServiceRegistrationDecorator implements ServiceRegistration {
+public class ServiceRegistrationDecorator implements ServiceRegistration {
 
 	/** actual service registration */
 	private final ServiceRegistration delegate;
@@ -38,6 +39,7 @@ class ServiceRegistrationDecorator implements ServiceRegistration {
 	private final OsgiServiceRegistrationListener[] listeners;
 
 	private final Object service;
+
 
 	public ServiceRegistrationDecorator(Object service, ServiceRegistration registration,
 			OsgiServiceRegistrationListener[] listeners) {

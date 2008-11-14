@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.osgi.config.internal.adapter.OsgiServiceRegistrationListenerAdapter;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 

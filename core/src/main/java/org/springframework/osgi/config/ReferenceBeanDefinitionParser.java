@@ -14,12 +14,13 @@
  * limitations under the License.
  *
  */
+
 package org.springframework.osgi.config;
 
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.osgi.config.internal.ParserUtils;
-import org.springframework.osgi.config.internal.ParserUtils.AttributeCallback;
+import org.springframework.osgi.config.internal.util.ParserUtils;
+import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.w3c.dom.Attr;
@@ -40,7 +41,9 @@ class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionParser {
 	 * @author Costin Leau
 	 */
 	static class TimeoutAttributeCallback implements AttributeCallback {
+
 		boolean isTimeoutSpecified = false;
+
 
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
@@ -53,11 +56,13 @@ class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionParser {
 		}
 	}
 
+
 	// call properties
 	private static final String TIMEOUT_PROP = "timeout";
 
 	// XML attributes/elements
 	protected static final String TIMEOUT = "timeout";
+
 
 	protected Class getBeanClass(Element element) {
 		return OsgiServiceProxyFactoryBean.class;
