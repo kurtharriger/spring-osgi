@@ -27,7 +27,7 @@ import org.springframework.osgi.iandt.cm.BaseConfigurationAdminTest;
 /**
  * @author Costin Leau
  */
-public class ConfigPropertiesTest extends BaseConfigurationAdminTest {
+public abstract class ConfigPropertiesTest extends BaseConfigurationAdminTest {
 
 	private Properties props;
 	private static final String SIMPLE = "simple";
