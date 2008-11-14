@@ -37,7 +37,7 @@ import org.springframework.osgi.util.OsgiServiceUtils;
  * 
  * @author Costin Leau
  */
-public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
+public abstract class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 
 	private Properties props;
 	private final String FPID = ManagedServiceFactoryTest.class.getName();

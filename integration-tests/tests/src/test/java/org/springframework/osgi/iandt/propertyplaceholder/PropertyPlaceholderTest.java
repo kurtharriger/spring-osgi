@@ -40,7 +40,7 @@ import org.springframework.osgi.util.OsgiServiceReferenceUtils;
  * @author Costin Leau
  * 
  */
-public class PropertyPlaceholderTest extends BaseIntegrationTest {
+public abstract class PropertyPlaceholderTest extends BaseIntegrationTest {
 
 	private final static String ID = "PropertyPlaceholderTest-123";
 
