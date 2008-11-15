@@ -34,13 +34,11 @@ import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
- * 
  * Integration test for OsgiPropertyPlaceholder.
  * 
  * @author Costin Leau
- * 
  */
-public abstract class PropertyPlaceholderTest extends BaseIntegrationTest {
+public class PropertyPlaceholderTest extends BaseIntegrationTest {
 
 	private final static String ID = "PropertyPlaceholderTest-123";
 
