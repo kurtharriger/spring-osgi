@@ -23,6 +23,7 @@ import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.compendium.internal.cm.ManagedServiceFactoryFactoryBean;
+import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.config.internal.util.ServiceAttributeCallback;
 import org.springframework.osgi.config.internal.util.ServiceParsingUtils;
@@ -53,7 +54,8 @@ class ManagedServiceFactoryDefinitionParser extends AbstractSimpleBeanDefinition
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
 		// do conversion for some of them (mainly enums) 
-		ParserUtils.parseCustomAttributes(element, builder, new ServiceAttributeCallback());
+		ParserUtils.parseCustomAttributes(element, builder, new AttributeCallback[] { new ServiceAttributeCallback(),
+			new UpdateStrategyAttributeCallback() });
 
 		// get nested elements
 		NodeList children = element.getChildNodes();

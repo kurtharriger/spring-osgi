@@ -16,8 +16,6 @@
 
 package org.springframework.osgi.compendium.config;
 
-import java.util.Locale;
-
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -26,8 +24,6 @@ import org.springframework.beans.factory.xml.BeanDefinitionDecorator;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.compendium.internal.cm.ManagedServiceInstanceTrackerPostProcessor;
 import org.springframework.osgi.config.internal.util.ParserUtils;
-import org.springframework.osgi.config.internal.util.AttributeCallback;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -39,35 +35,6 @@ import org.w3c.dom.Node;
  * 
  */
 class ManagedServiceDefinitionParser implements BeanDefinitionDecorator {
-
-	/**
-	 * Attribute callback dealing with update strategy attribute.
-	 * 
-	 * @author Costin Leau
-	 */
-	class UpdateStrategyAttributeCallback implements AttributeCallback {
-
-		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
-			String name = attribute.getLocalName();
-			String value = attribute.getValue();
-
-			// make sure the attribute is
-			if (UPDATE_STRATEGY.equals(name)) {
-				// convert constant to upper case to let Spring do the
-				// conversion
-				String val = value.toUpperCase(Locale.ENGLISH).replace('-', '_');
-				builder.addPropertyValue(UPDATE_STRATEGY_PROP, val);
-				return false;
-			}
-
-			return true;
-		}
-	};
-
-
-	private static final String UPDATE_STRATEGY = "update-strategy";
-	private static final String UPDATE_STRATEGY_PROP = "updateStrategy";
-
 
 	public BeanDefinitionHolder decorate(Node node, BeanDefinitionHolder definition, ParserContext parserContext) {
 		BeanDefinition trackingBppDef = createTrackerBpp((Element) node, definition);

@@ -101,8 +101,8 @@ public class DefaultManagedServiceBeanManagerTest extends TestCase {
 		Map props = new HashMap();
 		props.put("prop", "14");
 		OneSetter instance = new OneSetter();
-		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.NONE, null, cam, null);
-		msbm.injectConfigurationAdminInfo(instance, props);
+		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.CONTAINER_MANAGED, null, cam, null);
+		msbm.applyInitialInjection(instance, props);
 		assertEquals(new Long(14), instance.getProp());
 	}
 
@@ -114,8 +114,8 @@ public class DefaultManagedServiceBeanManagerTest extends TestCase {
 		props.put("none", "14");
 		props.put("float", "14");
 		MultipleSetters instance = new MultipleSetters();
-		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.NONE, null, cam, null);
-		msbm.injectConfigurationAdminInfo(instance, props);
+		msbm = new DefaultManagedServiceBeanManager(UpdateStrategy.CONTAINER_MANAGED, null, cam, null);
+		msbm.applyInitialInjection(instance, props);
 		assertEquals(new Double(14), instance.getDbl());
 		assertEquals(14, instance.getInteger());
 		assertEquals(new Long(14), instance.getProp());
