@@ -9,9 +9,9 @@
 		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd">
 
 	<!-- osgix:managed-service -->
-	<osgix:config-properties id="simple" persistent-id="simple"/>
+	<osgix:cm-properties id="simple" persistent-id="simple"/>
 	
-	<osgix:config-properties id="override" persistent-id="override">
+	<osgix:cm-properties id="override" persistent-id="override" local-override="true">
 		<prop key="spring">framework</prop>
-	</osgix:config-properties>
+	</osgix:cm-properties>
 </beans>

@@ -27,7 +27,7 @@ import org.springframework.osgi.iandt.cm.BaseConfigurationAdminTest;
 /**
  * @author Costin Leau
  */
-public abstract class ConfigPropertiesTest extends BaseConfigurationAdminTest {
+public class ConfigPropertiesTest extends BaseConfigurationAdminTest {
 
 	private Properties props;
 	private static final String SIMPLE = "simple";
@@ -72,6 +72,6 @@ public abstract class ConfigPropertiesTest extends BaseConfigurationAdminTest {
 		Object bean = applicationContext.getBean(OVERRIDE);
 		assertTrue(bean instanceof Properties);
 		assertFalse(props.equals(bean));
-		assertEquals("source", ((Properties) bean).getProperty("spring"));
+		assertEquals("framework", ((Properties) bean).getProperty("spring"));
 	}
 }
