@@ -37,7 +37,9 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.CollectionFactory;
@@ -83,9 +85,30 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		public void updated(String pid, Dictionary props) throws ConfigurationException {
 			if (log.isTraceEnabled())
 				log.trace("Configuration [" + pid + "] has been updated with properties " + props);
-			createOrUpdate(pid, props);
+			createOrUpdate(pid, new MapBasedDictionary(props));
+		}
+	}
+
+	/**
+	 * Simple processor that applies the ConfigurationAdmin configuration before
+	 * the bean is initialized.
+	 * 
+	 * @author Costin Leau
+	 */
+	private class InitialInjectionProcessor implements BeanPostProcessor {
+
+		public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+			if (log.isTraceEnabled()) {
+				log.trace("Applying initial injection for managed bean " + beanName);
+			}
+			CMUtils.applyMapOntoInstance(bean, initialInjectionProperties, beanFactory);
+
+			return bean;
 		}
 
+		public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+			return bean;
+		}
 	}
 
 
@@ -99,7 +122,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	/** bundle context */
 	private BundleContext bundleContext;
 	/** embedded bean factory for instance management */
-	private ConfigurableBeanFactory beanFactory;
+	private AbstractBeanFactory beanFactory;
 	/** the bean factory seen as a bdr */
 	private BeanDefinitionRegistry definitionRegistry;
 	/** bean definition template */
@@ -128,6 +151,11 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	// update configuration
 	private UpdateStrategy updateStrategy;
 	private String updateMethod;
+
+	// this fields gets set by the CF
+	// no synch is needed since the CF is guaranteed to be called sequentially
+	// Note this is needed since the CM config might have been updated (since everything is asynch)
+	public Map initialInjectionProperties;
 
 	/**
 	 * destroyed flag - used since some CM implementations still call the
@@ -175,6 +203,8 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 			}
 			// just to be on the safe side
 			bf.setBeanClassLoader(classLoader);
+			// add autowiring processor
+			bf.addBeanPostProcessor(new InitialInjectionProcessor());
 
 			beanFactory = bf;
 			definitionRegistry = bf;
@@ -200,7 +230,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		}
 	}
 
-	private void createOrUpdate(String pid, Dictionary props) {
+	private void createOrUpdate(String pid, Map props) {
 		synchronized (monitor) {
 			if (destroyed)
 				return;
@@ -214,12 +244,13 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		}
 	}
 
-	private void createInstance(String pid, Dictionary props) {
+	private void createInstance(String pid, Map props) {
 		synchronized (monitor) {
 			if (destroyed)
 				return;
 
 			definitionRegistry.registerBeanDefinition(pid, templateDefinition);
+			initialInjectionProperties = props;
 			// create instance
 			Object bean = beanFactory.getBean(pid);
 			registerService(pid, bean);
@@ -254,10 +285,10 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		return exporter;
 	}
 
-	private void updateInstance(String pid, Dictionary props) {
+	private void updateInstance(String pid, Map props) {
 		if (updateCallback != null) {
 			Object instance = beanFactory.getBean(pid);
-			updateCallback.update(instance, new MapBasedDictionary(props));
+			updateCallback.update(instance, props);
 		}
 	}
 
