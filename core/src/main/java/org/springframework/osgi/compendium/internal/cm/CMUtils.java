@@ -38,7 +38,9 @@ abstract class CMUtils {
 	 * Additionally, a bean factory can be passed in for copying property
 	 * editors inside the injector.
 	 * 
-	 * @param bean bean instance to configure
+	 * @param instance bean instance to configure
+	 * @param properties
+	 * @param beanFactory
 	 */
 	public static void applyMapOntoInstance(Object instance, Map properties, AbstractBeanFactory beanFactory) {
 		if (properties != null && !properties.isEmpty()) {
