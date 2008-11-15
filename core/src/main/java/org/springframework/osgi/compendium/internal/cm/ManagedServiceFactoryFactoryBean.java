@@ -47,6 +47,7 @@ import org.springframework.osgi.service.exporter.support.AutoExport;
 import org.springframework.osgi.service.exporter.support.ExportContextClassLoader;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.osgi.util.OsgiServiceUtils;
+import org.springframework.osgi.util.internal.MapBasedDictionary;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -82,8 +83,9 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		public void updated(String pid, Dictionary props) throws ConfigurationException {
 			if (log.isTraceEnabled())
 				log.trace("Configuration [" + pid + "] has been updated with properties " + props);
-			createInstance(pid, props);
+			createOrUpdate(pid, props);
 		}
+
 	}
 
 
@@ -108,6 +110,8 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	private ServiceRegistration configurationWatcher;
 	/** instance registrations */
 	private Map registeredServices = CollectionFactory.createConcurrentMap(8);
+	/** update callback */
+	private UpdateCallback updateCallback;
 
 	// exporting template
 	/** listeners */
@@ -118,14 +122,18 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	private ExportContextClassLoader ccl = ExportContextClassLoader.UNMANAGED;
 	/** interfaces */
 	private Class[] interfaces;
+	/** class loader */
+	private ClassLoader classLoader;
+
+	// update configuration
+	private UpdateStrategy updateStrategy;
+	private String updateMethod;
 
 	/**
 	 * destroyed flag - used since some CM implementations still call the
 	 * service even though it was unregistered
 	 */
 	private boolean destroyed = false;
-
-	private ClassLoader classLoader;
 
 
 	public void afterPropertiesSet() throws Exception {
@@ -142,6 +150,9 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		// make sure the scope is singleton
 		templateDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
 		createEmbeddedBeanFactory();
+
+		updateCallback = CMUtils.createCallback(updateStrategy, updateMethod, beanFactory);
+
 		registerService();
 	}
 
@@ -189,6 +200,20 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		}
 	}
 
+	private void createOrUpdate(String pid, Dictionary props) {
+		synchronized (monitor) {
+			if (destroyed)
+				return;
+
+			if (beanFactory.containsBean(pid)) {
+				updateInstance(pid, props);
+			}
+			else {
+				createInstance(pid, props);
+			}
+		}
+	}
+
 	private void createInstance(String pid, Dictionary props) {
 		synchronized (monitor) {
 			if (destroyed)
@@ -206,6 +231,10 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		Dictionary props = new Hashtable(3);
 		props.put(Constants.SERVICE_PID, beanName);
 
+		registeredServices.put(beanName, createExporter(beanName, bean));
+	}
+
+	private Object createExporter(String beanName, Object bean) {
 		OsgiServiceFactoryBean exporter = new OsgiServiceFactoryBean();
 		exporter.setAutoExport(autoExport);
 		exporter.setBeanClassLoader(classLoader);
@@ -222,8 +251,14 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		catch (Exception ex) {
 			throw new BeanCreationException("Cannot publish bean for pid " + beanName, ex);
 		}
+		return exporter;
+	}
 
-		registeredServices.put(beanName, exporter);
+	private void updateInstance(String pid, Dictionary props) {
+		if (updateCallback != null) {
+			Object instance = beanFactory.getBean(pid);
+			updateCallback.update(instance, new MapBasedDictionary(props));
+		}
 	}
 
 	private void destroyInstance(String pid) {
@@ -234,7 +269,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 
 			unregisterService(pid);
 			if (definitionRegistry.containsBeanDefinition(pid)) {
-				// remove definition and instace
+				// remove definition and instance
 				definitionRegistry.removeBeanDefinition(pid);
 			}
 		}
@@ -336,5 +371,19 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	 */
 	public void setInterfaces(Class[] interfaces) {
 		this.interfaces = interfaces;
+	}
+
+	/**
+	 * @param updateStrategy The updateStrategy to set.
+	 */
+	public void setUpdateStrategy(UpdateStrategy updateStrategy) {
+		this.updateStrategy = updateStrategy;
+	}
+
+	/**
+	 * @param updateMethod The updateMethod to set.
+	 */
+	public void setUpdateMethod(String updateMethod) {
+		this.updateMethod = updateMethod;
 	}
 }

@@ -16,17 +16,13 @@
 
 package org.springframework.osgi.compendium.internal.cm;
 
-import java.lang.ref.WeakReference;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.core.CollectionFactory;
-import org.springframework.util.Assert;
 
 /**
  * Default implementation for {@link ManagedServiceBeanManager}.
@@ -36,91 +32,22 @@ import org.springframework.util.Assert;
  */
 public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManager {
 
-	private interface UpdateCallback {
-
-		void update(Map properties);
-	}
-
-	private class BeanManagedUpdate implements UpdateCallback {
-
-		private final String methodName;
-		// class cache = keeps track of method adapters for each given class
-		// the cache becomes useful when dealing with FactoryBean which can returns
-		// different class types on each invocation
-		private final Map classCache = new WeakHashMap(2);
-
-
-		public BeanManagedUpdate(String methodName) {
-			this.methodName = methodName;
-		}
-
-		public void update(Map properties) {
-			for (Iterator iterator = instanceRegistry.values().iterator(); iterator.hasNext();) {
-				Object instance = iterator.next();
-				getUpdateMethod(instance).invoke(instance, properties);
-			}
-		}
-
-		/**
-		 * Returns a (lazily created) method adapter that invokes a predefined
-		 * method on the given instance.
-		 * 
-		 * @param instance object instance
-		 * @return method update method adapter
-		 */
-		private UpdateMethodAdapter getUpdateMethod(Object instance) {
-			Class type = instance.getClass();
-			WeakReference adapterReference = (WeakReference) classCache.get(type);
-			UpdateMethodAdapter adapter;
-			if (adapterReference != null) {
-				adapter = (UpdateMethodAdapter) adapterReference.get();
-				if (adapter != null)
-					return adapter;
-			}
-			adapter = new UpdateMethodAdapter(methodName, type);
-			classCache.put(type, new WeakReference(adapter));
-			return adapter;
-		}
-	}
-
-	private class ContainerManagedUpdate implements UpdateCallback {
-
-		public void update(Map properties) {
-			for (Iterator iterator = instanceRegistry.values().iterator(); iterator.hasNext();) {
-				Object instance = iterator.next();
-				synchronized (instance) {
-					injectConfigurationAdminInfo(instance, properties);
-				}
-			}
-		}
-	}
-
-
 	/** logger */
 	private static final Log log = LogFactory.getLog(DefaultManagedServiceBeanManager.class);
 
 	private final Map instanceRegistry = CollectionFactory.createConcurrentMap(8);
 	private final UpdateCallback updateCallback;
 	private final ConfigurationAdminManager cam;
-	private final AbstractBeanFactory beanFactory;
+	private final AbstractBeanFactory bf;
 
 
 	public DefaultManagedServiceBeanManager(UpdateStrategy updateStrategy, String methodName,
 			ConfigurationAdminManager cam, BeanFactory beanFactory) {
 
-		if (UpdateStrategy.BEAN_MANAGED.equals(updateStrategy)) {
-			Assert.hasText(methodName, "method name required when using 'bean-managed' strategy");
-			updateCallback = new BeanManagedUpdate(methodName);
-		}
-		else if (UpdateStrategy.CONTAINER_MANAGED.equals(updateStrategy)) {
-			updateCallback = new ContainerManagedUpdate();
-		}
-		else
-			updateCallback = null;
-
+		updateCallback = CMUtils.createCallback(updateStrategy, methodName, beanFactory);
+		bf = (beanFactory instanceof AbstractBeanFactory ? (AbstractBeanFactory) beanFactory : null);
 		this.cam = cam;
 		this.cam.setBeanManager(this);
-		this.beanFactory = ((beanFactory instanceof AbstractBeanFactory ? (AbstractBeanFactory) beanFactory : null));
 	}
 
 	public Object register(Object bean) {
@@ -128,15 +55,15 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 		if (log.isTraceEnabled())
 			log.trace("Start tracking instance " + bean.getClass().getName() + "@" + hashCode);
 		instanceRegistry.put(new Integer(hashCode), bean);
-		injectConfigurationAdminInfo(bean, cam.getConfiguration());
+		applyInitialInjection(bean, cam.getConfiguration());
 		return bean;
 	}
 
-	void injectConfigurationAdminInfo(Object instance, Map configuration) {
+	void applyInitialInjection(Object instance, Map configuration) {
 		if (log.isTraceEnabled())
 			log.trace("Applying injection to instance " + instance.getClass() + "@" + System.identityHashCode(instance)
 					+ " using map " + configuration);
-		CMUtils.applyMapOntoInstance(instance, configuration, beanFactory);
+		CMUtils.applyMapOntoInstance(instance, configuration, bf);
 	}
 
 	public void unregister(Object bean) {
@@ -149,7 +76,7 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 
 	public void updated(Map properties) {
 		if (updateCallback != null) {
-			updateCallback.update(properties);
+			CMUtils.bulkUpdate(updateCallback, instanceRegistry.values(), properties);
 		}
 	}
 }
