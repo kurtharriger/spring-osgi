@@ -2,7 +2,7 @@
 <!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <appendix id="appendix-osgi-repo">
-    <title>Spring-DM OSGi Repository</title>
+    <title>Spring DM OSGi Repository</title>
 
     <para>At the moment, most libraries are not released as OSGi bundles which means they cannot be used inside the OSGi space unless they
     are embedded in other bundles. Though there are <ulink url="http://www.aqute.biz/Code/Bnd">tools</ulink> that make the bundling 

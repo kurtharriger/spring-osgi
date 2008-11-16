@@ -17,14 +17,12 @@
 			be used with little or no effort at all. 
 			Please see <xref linkend="web"/> for details.
 			</para>
-
 			<section id="dm-1.1.x:web:spring-mvc">
 				<title>Spring-MVC Integration</title>
 				<para>Additionally, with 1.1.x it is possible to run Spring-MVC applications inside OSGi environments. See <xref linkend="web:spring-mvc"/>
 				for more information.</para>
 			</section>
 		</section>
-	
 		<section id="dm-1.1.x:io">
   		    <title>Classpath Resource Abstraction</title>
 			<para>1.1.x adds support for <literal>classpath:</literal> and <literal>classpath*:</literal> prefixes to the OSGi <interfacename>Resource</interfacename>
@@ -33,7 +31,6 @@
 			work out-of-the-box across multiple bundles on the supported OSGi platforms. See <xref linkend="bnd-app-ctx:osgi-resource"/> for more information.
 			</para>
 		</section>
-
 		<section id="dm-1.1.x:configuration">
   		    <title>Pluggable Extender Configuration</title>
 			<para>1.1.x makes it easy to change the default configuration for the various <link linkend="extender-pattern">extender</link>s used by Spring-DM. By using
@@ -42,13 +39,27 @@
 			regarding the OSGi Spring application contexts lifecycle. <xref linkend="bnd-app-ctx:extender"/> lists the available options and explains them in detail.  
 			</para>
 		</section>
-
 		<section id="dm-1.1.x:improved-class-loading">
   		    <title>Improved class loading</title>
 			<para>In 1.1.x, the proxy creation has been improved, leading to better package wiring for the managed bundles. See the FAQ for more information.  
 			</para>
 		</section>
-
     </section>
-
+    
+    <section id="dm-1.2.x">
+		<title>1.2.x</title>
+		
+		<section id="dm-1.2.x:security">
+			<title>Java 2 Security Integration</title>
+			<para>Since 1.2.x, Spring Dynamic Modules is aware of <ulink url="http://java.sun.com/javase/technologies/security/#overview">secured</ulink> 
+			environments by making use of dedicated <ulink url="http://java.sun.com/j2se/1.4.2/docs/guide/security/doprivileged.html">privileged blocks</ulink> 
+			for executing security sensitive code. Thus, Spring DM can run as a <emphasis>trusted</emphasis> library without requiring escalated 
+			permissions for its managed bundles. See <xref linkend="appendix-security"/> for more information.</para>
+		</section>
+		<section id="dm-1.2.x:compendium">
+			<title>Compendium Services Support</title>
+			<para>1.2.x provides integration with the <ulink url="http://www.osgi.org/javadoc/r4v401/org/osgi/service/cm/package-summary.html">Configuration Admin</ulink>, 
+			part of the OSGi compendium services. <xref linked="compendium"/> provides more details on the topic.</para>
+		</section>
+	</section>
 </chapter>

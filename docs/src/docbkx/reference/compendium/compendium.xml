@@ -2,7 +2,7 @@
 <!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 
-  <appendix id="appendix-compendium">
+  <chapter id="compendium">
     <title>Compendium Services</title>
 
     <para>The OSGi Service Platform Service Compendium specification defines a
@@ -120,4 +120,4 @@
         <xref linkend="appendix-roadmap"/> for more information.</para>
       </section>
     </section>
-  </appendix>
+  </chapter>

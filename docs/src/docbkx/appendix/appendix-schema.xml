@@ -5,10 +5,18 @@
 <appendix id="appendix-schema">
     <title>Spring Dynamic Modules Schema</title>
 
-    <programlisting><xi:include href="../../../../core/src/main/resources/org/springframework/osgi/config/spring-osgi-1.1.xsd" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <programlisting><xi:include href="../../../../core/src/main/resources/org/springframework/osgi/config/spring-osgi-1.2-m2.xsd" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude">
        <xi:fallback>
-    	<para><emphasis>FIXME:  SCHEMA LOCATION/NAME CHANGED</emphasis></para>
+    	<para><emphasis>FIXME: CORE SCHEMA LOCATION/NAME CHANGED</emphasis></para>
+  	   </xi:fallback>
+  	 </xi:include>
+    </programlisting>
+    
+    <programlisting><xi:include href="../../../../core/src/main/resources/org/springframework/osgi/compendium/config/spring-osgi-compendium-1.2-m2.xsd" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude">
+       <xi:fallback>
+    	<para><emphasis>FIXME: COMPENDIUM SCHEMA LOCATION/NAME CHANGED</emphasis></para>
   	   </xi:fallback>
   	 </xi:include>
     </programlisting>    
+    
 </appendix>
