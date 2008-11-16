@@ -409,7 +409,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       	<literal>false</literal>:</para>
       	
       	<programlisting language="java"><![CDATA[protected boolean createManifestOnlyFromTestClass() {
-	return true;
+	return false;
 }]]></programlisting> 
       	
       	<note>The time required to generate the manifest might increase depending on the number and size of classes in the bundle.</note>

@@ -62,6 +62,7 @@
 	  <xi:include href="reference/service-registry.xml"/>
 	  <xi:include href="reference/bundles.xml"/>
 	  <xi:include href="reference/web/web.xml"/>
+	  <xi:include href="reference/compendium/compendium.xml"/>
 	  <xi:include href="reference/testing.xml"/>
   </part>
   <part id="resources">
@@ -82,8 +83,8 @@
   <part id="appendixes">
       <title>Appendixes</title>
       <xi:include href="appendix/introduction.xml"/>
-	  <xi:include href="appendix/appendix-compendium.xml"/>
       <xi:include href="appendix/appendix-extensions.xml"/>
+      <xi:include href="appendix/appendix-security.xml"/>
       <xi:include href="appendix/appendix-pde.xml"/>
       <xi:include href="appendix/appendix-archetype.xml"/>
       <xi:include href="appendix/appendix-tips.xml"/>

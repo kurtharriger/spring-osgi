@@ -5,17 +5,15 @@
 	  Various appendixes outside the reference documentation.
       </para>
 
-      <para><xref linkend="appendix-compendium"/> describes the support provided
-      for the <ulink url="http://www2.osgi.org/Release4/Download">OSGi
-      Compendium Services</ulink>, including the Configuration Admin
-      service. While the support is included in the 1.0 distribution, it is not 
-      guaranteed (yet) to be maintained in a backward-compatible form in future point 
-      releases.</para>
-      
       <para><xref linkend="appendix-extensions"/> describes extensions that are included in
       the 1.0 distribution, but are not guaranteed to be maintained in a
       backward-compatible form in future point releases. We anticipate these
       features moving into the core specification over time.</para>
+
+      <para><xref linkend="appendix-security"/> provides information on how to run Spring DM 
+      in an OSGi environment with a <classname>SecurityManager</classname> enabled 
+      (Java 2 Security activated).
+      </para>
 
       <para><xref linkend="appendix-pde-integration"/> describes how to integrate Spring-DM
       with Eclipse Plug-in Development Environment.</para>
