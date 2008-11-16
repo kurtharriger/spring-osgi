@@ -8,11 +8,14 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd		
 		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd">
 
-
+	
+	<bean id="listener" class="org.springframework.osgi.iandt.cm.managedservicefactory.Listener"/>
+	
 	<!-- osgix:managed-service-factory -->
 	<osgix:managed-service-factory id="msf" 
 			factory-pid="org.springframework.osgi.iandt.cm.managedservicefactory.ManagedServiceFactoryTest" 
 			auto-export="all-classes">
+		<osgix:registration-listener ref="listener"/>
 		<bean class="java.lang.Object"/>
 	</osgix:managed-service-factory>
 	

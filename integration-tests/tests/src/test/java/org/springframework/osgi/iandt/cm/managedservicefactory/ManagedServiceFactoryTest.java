@@ -37,7 +37,7 @@ import org.springframework.osgi.util.OsgiServiceUtils;
  * 
  * @author Costin Leau
  */
-public abstract class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
+public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 
 	private Properties props;
 	private final String FPID = ManagedServiceFactoryTest.class.getName();
@@ -86,91 +86,38 @@ public abstract class ManagedServiceFactoryTest extends BaseConfigurationAdminTe
 		Dictionary newProps = new Properties();
 		newProps.put("new", "instance");
 
-		Collection stepA = (Collection) applicationContext.getBean("msf");
-		int sizeA = stepA.size();
+		int sizeA = Listener.instances.size();
 
 		updateAndWaitForConfig(newProps);
 
-		Collection stepB = (Collection) applicationContext.getBean("msf");
-		int sizeB = stepB.size();
-
+		int sizeB = Listener.instances.size();
 		assertEquals(sizeA + 1, sizeB);
 	}
 
 	public void testDestroyInstance() throws Exception {
-		Collection stepA = (Collection) applicationContext.getBean("msf");
-		int sizeA = stepA.size();
+		int sizeA = Listener.instances.size();
 
 		Configuration[] cfgs = cm.listConfigurations(FILTER);
 
-		final Object lock = new Object();
-		// delete configuration
-		bundleContext.registerService(ConfigurationListener.class.getName(), new ConfigurationListener() {
-
-			public void configurationEvent(ConfigurationEvent event) {
-				if (event.getType() == ConfigurationEvent.CM_DELETED) {
-					System.out.println("Deleting configuration " + event.getFactoryPid() + "|" + event.getPid());
-					synchronized (lock) {
-						lock.notify();
-					}
-				}
-
-			}
-
-		}, new Properties());
-
 		cfgs[cfgs.length - 1].delete();
 
-		synchronized (lock) {
-			lock.wait(10 * 1000);
+		synchronized (Listener.barrier) {
+			Listener.barrier.wait(10 * 1000);
 		}
 
-		Collection stepB = (Collection) applicationContext.getBean("msf");
-		
-		//assertEquals(sizeA - 1, stepB.size());
+		int sizeB = Listener.instances.size();
+		assertEquals(sizeA - 1, sizeB);
+	}
+
+	protected boolean createManifestOnlyFromTestClass() {
+		return false;
 	}
 
 	private void updateAndWaitForConfig(final Dictionary properties) throws Exception {
-		Dictionary props = new Hashtable(1);
-		props.put(ConfigurationPlugin.CM_TARGET, FPID);
-
-		final Object lock = new Object();
-
 		Configuration cfg = cm.createFactoryConfiguration(FPID, null);
-
-		ServiceRegistration reg = bundleContext.registerService(ConfigurationPlugin.class.getName(),
-			new ConfigurationPlugin() {
-
-				public void modifyConfiguration(ServiceReference reference, Dictionary prps) {
-					System.out.println("Received props " + prps);
-
-					Enumeration en = properties.keys();
-					while (en.hasMoreElements()) {
-						Object key = en.nextElement();
-						if (!properties.get(key).equals(prps.get(key))) {
-							System.out.println("Different dictionary received:\nExpected: " + properties
-									+ "\nReceived:" + prps);
-							return;
-						}
-					}
-					System.out.println("Received proper configuration - disabling waiting..");
-					synchronized (lock) {
-						lock.notify();
-					}
-
-				}
-			}, props);
-
-		try {
-			cfg.update(properties);
-
-			synchronized (lock) {
-				// wait up to 3 seconds
-				lock.wait(10 * 1000);
-			}
-		}
-		finally {
-			OsgiServiceUtils.unregisterService(reg);
+		cfg.update(properties);
+		synchronized (Listener.barrier) {
+			Listener.barrier.wait(10 * 1000);
 		}
 	}
 }
