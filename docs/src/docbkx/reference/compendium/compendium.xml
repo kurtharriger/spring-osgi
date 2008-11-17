@@ -8,76 +8,135 @@
     <para>The OSGi Service Platform Service Compendium specification defines a
     number of additional services that may be supported by OSGi
     implementations. Spring Dynamic Modules supports an additional
-    "compendium" namespace that provides support for some of these services.
+    "compendium" namespace that provides integration with some of these services.
     By convention, the prefix <literal>osgix</literal> is used for this
-    namespace.</para>
+    namespace:</para>
 
-    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+	<programlistingco>
+		<areaspec>
+			<areaset id="compendium:ns:xml:uri.prefix" coords="">
+				<area id="compendium:ns:xml:uri.prefix.1" coords="4 93"/>
+				<area id="compendium:ns:xml:uri.prefix.2" coords="4 10"/>
+			</areaset>
+			<area id="compendium:ns:xml:uri" coords="8 95"/>
+			<area id="compendium:ns:xml:uri.loc" coords="9 96"/>
+		</areaspec>
+    	<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/osgi"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
    xmlns:beans="http://www.springframework.org/schema/beans"
    xsi:schemaLocation="http://www.springframework.org/schema/osgi  
-        http://www.springframework.org/schema/osgi/spring-osgi.xsd
-        http://www.springframework.org/schema/osgi-compendium
-        http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
-        http://www.springframework.org/schema/beans   
-        http://www.springframework.org/schema/beans/spring-beans.xsd">
+       	http://www.springframework.org/schema/osgi/spring-osgi.xsd
+     http://www.springframework.org/schema/osgi-compendium
+       	http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+     http://www.springframework.org/schema/beans   
+       	http://www.springframework.org/schema/beans/spring-beans.xsd">
 
    <!-- use the OSGi namespace elements directly -->
    <service id="simpleServiceOsgi" ref="simpleService"
        interface="org.xyz.MyService" />
 
    <!-- qualify compendium namespace elements -->
-   <osgix:property-placeholder persistent-id="com.xyz.myapp"/>
+   <osgix:cm-properties id="cm" persistent-id="com.xyz.myapp"/>
 
 </beans:beans>]]></programlisting>
-
+		<calloutlist>
+			<callout arearefs="compendium:ns:xml:uri.prefix">
+				<para>Compendium namespace declaration (bound to <literal>osgix</literal> prefix)</para>
+			</callout>
+			<callout arearefs="compendium:ns:xml:uri">
+				<para>Schema location (namespace URI)</para>
+			</callout>
+			<callout arearefs="compendium:ns:xml:uri.loc">
+				<para>XML schema to use for the compendium namespace</para>
+			</callout>
+		</calloutlist>
+	</programlistingco>
+	
     <para>At present this namespace provides support for the Configuration
     Admin service. Support for other compendium services may be added in
     future releases.</para>
 
     <section id="compendium:cm">
-      <title> Configuration Admin</title>
+      <title>Configuration Admin</title>
+	
+	  <para>One of the most important compendium services, is the <ulink url="http://www.osgi.org/javadoc/r4v401/org/osgi/service/cm/package-summary.html">Configuration Admin</ulink>
+	  which, as a name implies, provides configuration to interested bundles through the OSGi service registry. Spring DM provides dedicated support
+	  for Configuration Admin (CM), allowing consumption and injection of the configuration data in a declarative way.</para>
+	  
+      <section id="compendium:cm:props">
+        <title>Configuration admin properties</title>
 
-      <section id="compendium:cm:ppc">
-        <title>Property placeholder support</title>
+        <para>In its simplest form, the CM can be seen as a configuration source, namely a <classname>Dictionary</classname> whose
+        keys are always <classname>String</classname>s. Spring DM can expose entries in the CM as a <classname>Properties</classname> object,
+        through the <literal>cm-properties</literal> element. A minimal declaration looks as follows:</para>
+        
+        <programlisting language="xml"><![CDATA[<osgix:cm-properties id="ds.cfg" persistent-id="data.source.office.1"/>]]></programlisting>
+        
+        <para>The configuration above, exposes the properties available in the CM under <emphasis>data.source.office.1</emphasis> entry as a bean named
+        <emphasis>ds.cfg</emphasis>. Those familiar with Spring's 
+        <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/xsd-config.html#xsd-config-body-schemas-util">util namespace</ulink> will
+        fin d<literal><![CDATA[<osgi:cm-properties/>]]></literal> identical with <literal><![CDATA[<util:properties/>]]></literal>.</para>
+        
+        <para>It is possible to specify a default set of property values to be used in the event that the configuration dictionary does not contain
+        an entry for a given key. The declaration is similar to the <literal>props</literal> element inside the Spring beans namespace:</para>
+        <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/osgi-compendium"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:beans="http://www.springframework.org/schema/beans"
+   xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+   xsi:schemaLocation="
+      http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/osgi-compendium 
+        http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd">
 
-		<sidebar>
-		  <title>Future directions</title>
-		  <para>Please note that in future releases, the property-placeholder
-		  element will be changed to be properly align with Spring Framework
-		  classes and namespace. That is, rather then provide a Spring-DM
-		  specific declaration, the <emphasis>traditional</emphasis> Spring
-		  Framework declaration can be used.
-		  </para>
-		</sidebar>
+   <osgix:cm-properties id="cfg.with.defaults" persistent-id="data.source.office.2">
+      <beans:prop key="host">localhost</beans:prop>
+      <beans:prop key="port">3306</beans:prop>
+   </osgix:cm-properties>
+
+</beans:beans>]]></programlisting>
+
+		<para>By default, the properties found in the Configuration Admin entry will override the local properties. Thus, for the previous example, if the 
+		<literal>data.source.office.2</literal> configuration contains a <emphasis>host</emphasis> entry, its value will override the locally defined
+		<literal>localhost</literal>. For cases where this behaviour is undesired, the attribute <literal>local-override</literal> 
+		(default <literal>false</literal>) allows one to revert the merging algorithm, forcing the local properties to override the entries in the CM.</para>
 		
-        <para>Spring Dynamic Modules provides support for sourcing bean
-        property values from the OSGi Configuration Administration service.
-        This support is enabled via the
-        <literal>property-placeholder</literal> element. The property
-        placeholder element provides for replacement of delimited string
-        values (placeholders) in bean property expressions with values sourced
-        from the configuration administration service. The required
-        <literal>persistent-id</literal> attribute specifies the persistent
-        identifier to be used as the key for the configuration dictionary. The
-        default delimiter for placeholder strings is "${...}".</para>
+		<para>Since <literal>cm-properties</literal> exposes the CM entries as <classname>Properties</classname>, it can be used with Spring's <classname>
+		<ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-factory-placeholderconfigurer">PropertyPlaceholderConfigurer</ulink></classname> 
+		and <classname><ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-factory-overrideconfigurer">PropertyOverrideConfigurer</ulink></classname> 
+		to externalize and customize environment-specific properties:</para>
+	
+		<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+   xmlns:ctx="http://www.springframework.org/schema/context"
+   xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	  http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	  http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/osgi-compendium 
+	  http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd">
 
-        <para>Given the declarations:</para>
+   <!-- Configuration Admin entry -->
+   <osgix:cm-properties id="cmProps" persistent-id="com.xyz.myapp">
+      <prop key="host">localhost</prop>
+   </osgix:cm-properties>
 
-        <programlisting language="xml"><![CDATA[<osgix:property-placeholder persistent-id="com.xyz.myapp"/>
+   <!-- placeholder configurer -->
+   <ctx:property-placeholder properties-ref="cmProps" />
 
-<bean id="someBean" class="AClass">
-  <property name="timeout" value="${timeout}"/>
-</bean>]]></programlisting>
-
-        <para>Then the <literal>timeout</literal> property of
-        <literal>someBean</literal> will be set using the value of the
-        <literal>timeout</literal> entry in the configuration dictionary
-        registered under the <literal>com.xyz.myapp</literal> persistent
-        id.</para>
-
+   <bean id="dataSource" ...>
+      <property name="host" value="${host}"/>
+  	  <property name="timeout" value="${timeout}"/>
+   </bean>
+	
+</beans>]]></programlisting>		 
+		
         <para>The placeholder strings are evaluated at the time that the bean
         is instantiated. Changes to the properties made via Configuration
         Admin subsequent to the creation of the bean do
@@ -88,22 +147,6 @@
         <literal>placeholder-prefix</literal> and
         <literal>placeholder-suffix</literal> attributes can be used to change
         the delimiter strings used for placeholder values.</para>
-
-        <para>It is possible to specify a default set of property values to be
-        used in the event that the configuration dictionary does not contain
-        an entry for a given key. The <literal>defaults-ref</literal>
-        attribute can be used to refer to a named bean of
-        <literal>Properties</literal> or <interfacename>Map</interfacename> type. Instead
-        of referring to an external bean, the
-        <literal>default-properties</literal> nested element may be used to
-        define an inline set of properties.</para>
-
-        <programlisting language="xml"><![CDATA[<osgix:property-placeholder persistent-id="com.xyz.myapp">
-  <default-properties> 
-     <property name="productCategory" value="E792"/>
-     <property name="businessUnit" value="811"/> 
-  </default-properties>
-</osgix:property-placeholder>]]></programlisting>
 
         <para>The <literal>persistent-id</literal> attribute must refer to the
         persistent-id of an OSGi <interfacename>ManagedService</interfacename>, it is a
@@ -119,5 +162,6 @@
         configuration objects is on the Spring Dynamic Modules road map. See
         <xref linkend="appendix-roadmap"/> for more information.</para>
       </section>
+      
     </section>
   </chapter>
