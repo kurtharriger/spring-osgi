@@ -16,5 +16,5 @@
 		<bean class="java.lang.Object"/>
 	</osgix:managed-service-factory>
 
-	<bean id="queueTracker" class="org.springframework.osgi.iandt.cm.managedservicefactory.Listener"/>
+	<bean id="listener" class="org.springframework.osgi.iandt.cm.managedservicefactory.Listener"/>
 </beans>
