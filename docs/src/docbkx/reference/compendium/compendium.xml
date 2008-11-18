@@ -66,7 +66,7 @@
 	  for Configuration Admin (CM), allowing consumption and injection of the configuration data in a declarative way.</para>
 	  
       <section id="compendium:cm:props">
-        <title>Configuration admin properties</title>
+        <title>Exposing Configuration Admin entries as <classname>Properties</classname></title>
 
         <para>In its simplest form, the CM can be seen as a configuration source, namely a <classname>Dictionary</classname> whose
         keys are always <classname>String</classname>s. Spring DM can expose entries in the CM as a <classname>Properties</classname> object,
@@ -75,7 +75,13 @@
         <programlisting language="xml"><![CDATA[<osgix:cm-properties id="ds.cfg" persistent-id="data.source.office.1"/>]]></programlisting>
         
         <para>The configuration above, exposes the properties available in the CM under <emphasis>data.source.office.1</emphasis> entry as a bean named
-        <emphasis>ds.cfg</emphasis>. Those familiar with Spring's 
+        <emphasis>ds.cfg</emphasis>.</para> 
+        <note><para>The <literal>persistent-id</literal> attribute must refer to the
+        persistent-id of an OSGi <interfacename>ManagedService</interfacename>, it is a
+        configuration error to specify a factory persistent id referring to a
+        <interfacename>ManagedServiceFactory</interfacename>.</para></note>
+        
+        <para>Those familiar with Spring's 
         <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/xsd-config.html#xsd-config-body-schemas-util">util namespace</ulink> will
         fin d<literal><![CDATA[<osgi:cm-properties/>]]></literal> identical with <literal><![CDATA[<util:properties/>]]></literal>.</para>
         
@@ -132,35 +138,151 @@
 
    <bean id="dataSource" ...>
       <property name="host" value="${host}"/>
-  	  <property name="timeout" value="${timeout}"/>
+      <property name="timeout" value="${timeout}"/>
    </bean>
 	
 </beans>]]></programlisting>		 
 		
-        <para>The placeholder strings are evaluated at the time that the bean
-        is instantiated. Changes to the properties made via Configuration
-        Admin subsequent to the creation of the bean do
-        <emphasis>not</emphasis> result in re-injection of property values.
-        See the <literal>managed-service</literal> and
-        <literal>managed-service-reference</literal> elements documented in
-        appendix B if you require this level of integration. The
-        <literal>placeholder-prefix</literal> and
-        <literal>placeholder-suffix</literal> attributes can be used to change
-        the delimiter strings used for placeholder values.</para>
-
-        <para>The <literal>persistent-id</literal> attribute must refer to the
-        persistent-id of an OSGi <interfacename>ManagedService</interfacename>, it is a
-        configuration error to specify a factory persistent id referring to a
-        <interfacename>ManagedServiceFactory</interfacename>.</para>
+        <para>An important aspect of <literal>cm-properties</literal> is does <emphasis>not</emphasis> reflect
+        any that any subsequent changes made to the entry it represents, made through the Configuration Admin API.
+        That is, once resolved, the <literal>cm-properties</literal> content remains the same, regardless of any updates
+        made the to CM entry it represents.</para>   
       </section>
 
-      <section id="compendium:cm:dict">
-        <title>Configuration Dictionaries</title>
+	  <section id="compendium:cm:managed-properties">
+	  	<title>Managed properties</title>
+	  	
+	  	<para>Based on a configuration admin entry, Spring DM can autowire by name, the properties of a given bean. To use this feature, define
+	  	a nested <literal>managed-properties</literal> inside the bean definition:</para>
+	  	
+	  	<programlisting language="xml"><![CDATA[<bean id="managedComponent" class="MessageTank">
+   <osgix:managed-properties persistent-id="com.xyz.messageservice"/> 
+</bean>]]></programlisting>
 
-        <para>Support for directly accessing configuration objects and their
-        associated dictionaries, and for instantiating beans directly from
-        configuration objects is on the Spring Dynamic Modules road map. See
-        <xref linkend="appendix-roadmap"/> for more information.</para>
+		<para>For each key in the dictionary stored by Configuration Admin under the given persistent id, 
+		if the bean type has a property with a matching name (following JavaBeans conventions), 
+		then that component property will be dependency injected with the value stored in Configuration Admin under the key. 
+		If the definition of <classname>SomeClass</classname> from the example above is as follows:</para>
+		<programlisting language="java"><![CDATA[public class MessageTank {
+  private int amount;
+  public int getAmount() { return this.amount; }
+  public void setAmount(int amount) { this.amount = amount; }
+}]]></programlisting>
+		<para>and the configuration dictionary stored under the pid <literal>com.xyz.messageservice</literal> contains an entry 
+		<literal>amount=200</literal>, then the <literal>setAmount</literal> method will be invoked on the bean 
+		instance during configuration, passing in the value <literal>200</literal>.</para>
+		<para>If a property value is defined both in the configuration dictionary stored in the Configuration Admin service and in a 
+		property element declaration nested in the component element, then the value from Configuration Admin takes precedence:</para>
+		
+		<programlisting language="xml"><![CDATA[<bean id="managedComponent" class="MessageTank">
+   <osgix:managed-properties persistent-id="com.xyz.messageservice"/>
+   <property name="amount" value="100"/>
+   <property name="threshold" value="500"/> 
+</bean>]]></programlisting>
+		
+		<para>Property values specified via property elements can therefore be treated as default values to be used if none is available through 
+		Configuration Admin.</para>
+		
+		<section id="compendium:cm:managed-properties:update">
+			<title>Configuration Admin Runtime Updates</title>
+			<para>A powerful feature of Configuration Admin is the ability to update (or delete) entries at runtime. That is, the configuration data 
+			stored in Configuration Admin may be updated after the bean has been created. By default, any post-creation updates will be ignored. However,
+			one can configure <literal>managed-properties</literal> element to receive configuration updates through the <literal>update-strategy</literal>
+			attribute, which can have a value of either <literal>bean-managed</literal> or <literal>container-managed</literal>.</para>
+		
+			<para><literal>bean-managed</literal> strategy will pass all the updates made to the configuration to a callback present on the bean, specified
+			through the <literal>update-method</literal> attribute (which becomes required). The update method must have one of the following signatures:</para>
+			
+			<programlisting language="java"><![CDATA[public void anyMethodName(Map properties)
+public void anyMethodName(Map<String,?> properties); // for Java 5]]></programlisting>
+
+		    <para>In contrast, the <literal>container-managed</literal> update strategy will re-inject bean properties by name based on the new properties 
+		    received in the update. For <literal>container-managed</literal> updates, the component class must provide setter methods for the component properties 
+		    that it wishes to have updated. Consider the following class definitions:</para>
+		    
+		    <programlisting language="java"><![CDATA[public class ContainerManagedBean {
+  // will be reinjected (since it has a setter)
+  private Integer integer;
+  // will not be reinjected (no setter present)
+  private Long waitTime; 
+  
+  public void setInteger(Integer integer) { this.integer = integer; }
+}
+
+public class SelfManagedBean {
+  
+  // update callback
+  public void updateCallback(Map properties) {
+	System.out.println("Received properties " + properties);
+	System.out.println("Props can be used as a Dictionary " + (Dictionary) properties);
+	// do more work ... 
+  }
+}]]></programlisting>
+		    
+		    <para>and configuraton:</para>
+		    
+		    <programlisting language="xml"><![CDATA[<bean id="containerManaged" class="ContainerManagedBean">
+	<osgix:managed-service persistent-id="labX" update-strategy="container-managed"/>
+	<property name="integer" value="23"/>
+</bean>
+	
+<bean id="beanManaged" class="SelfManagedBean">
+	<osgix:managed-service persistent-id="labY" update-strategy="bean-managed" update-method="updateCallback"/>
+</bean>]]></programlisting>
+		    <para>Any updates made to the CM entry <literal>labX</literal> will be automatically reinjected on existing instances of 
+		    <literal>containerManaged</literal> bean while the <literal>labY</literal> updates will be passed to <methodname>updateCallback</methodname>
+		    method.</para>
+		    
+		    <para>The update options are summarized in the table below:</para>
+		    <table id="compendium-cm-managed-properties-options" pgwide="1">
+          		<title>Managed Properties Update Options</title>
+          		<tgroup cols="3">
+          		  <colspec colname="c1" colwidth="2*"/>
+        		  <colspec colname="c2" colwidth="1*"/>
+				  <colspec colname="c3" colwidth="4*"/>
+	              <thead>
+               	  	<row>
+		              <entry><literal>update-strategy</literal></entry>
+		              <entry><literal>update-method</literal></entry>
+		              <entry>Behaviour</entry>
+		   			</row>
+	              </thead>
+	              <tbody>
+	              	<row>
+	              	  <entry><literal>container-managed</literal></entry>
+	              	  <entry><emphasis>ignored</emphasis></entry>
+	              	  <entry>Reinjects the bean properties, using the properties present in the update. The re-injection will be applied while locking (through
+	              	  a <literal>synchronized</literal> instruction) the bean instance. If the locking or re-injection strategy is not suitable, consider using
+	              	  the <literal>bean-managed</literal> approach.</entry>
+	              	</row>
+	              	<row>
+	              	  <entry><literal>bean-managed</literal></entry>
+	              	  <entry><emphasis>required</emphasis></entry>
+	              	  <entry>Invokes the <literal>update-method</literal> callback on the bean instance, passing the updated configuration (as a 
+	              	  <interfacename>Map</interfacename> object that can be safely cast to a <classname>Dictionary</classname> if needed). No locking is
+	              	  performed.</entry>
+	              	</row>
+	              </tbody>
+				</tgroup>
+			</table>	          	
+		</section>
+	  </section>
+	  
+      <section id="compendium:cm:dict">
+        <title>Direct access to configuration data</title>
+
+        <para>The simplest way to work directly with the configuration data stored under a given persistent id or factory persistent id, 
+        is to register a service that implements either the <interfacename>ManagedService</interfacename> or <interfacename>ManagedServiceFactory</interfacename>
+        interface and specify the pid that you are interested in as a service property (for more information, see the Configuration Admin chapter
+        in the OSGi compendium spec). For example:</para>
+        
+        <programlisting language="xml"><![CDATA[<osgi:service interface="org.osgi.service.cm.ManagedService" ref="myManagedService">
+  <osgi:service-properties>
+    <entry key="service.pid" value="my.managed.service.pid"/>
+  </osgi:service-properties>
+</osgi:service>
+
+<bean id="myManagedService" class="com.xyz.MyManagedService"/>]]></programlisting>
       </section>
       
     </section>
