@@ -17,21 +17,4 @@
 	</osgix:managed-service-factory>
 
 	<bean id="queueTracker" class="org.springframework.osgi.iandt.cm.managedservicefactory.Listener"/>
-
-	<osgix:managed-service-factory id="data-msf" 
-			factory-pid="org.springframework.osgi.iandt.cm.managedservicefactory.ManagedServiceFactoryTest" 
-			update-strategy="bean-managed"
-			update-method="refresh">
-		<osgix:interfaces>
-			<beans:value>java.util.Collection</beans:value>
-			<beans:value>java.util.Queue</beans:value>
-		</osgix:interfaces>
-		<osgix:registration-listener ref="queueTracker"/>
-		<bean class="com.xyz.ResizableQueue">
-			<property name="size" value="100"/>
-			<property name="concurrency" value="10"/>
-			<property name="fair" value="false"/>
-		</bean>
-	</osgix:managed-service-factory>
-	
 </beans>
