@@ -446,7 +446,6 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
                 <entry spanname="values">any integer value</entry>
                 <entry>Specify the service ranking to be used when advertising the service. Default value is 0.</entry>
               </row>
-              
             </tbody>
           </tgroup>
       </table>        
