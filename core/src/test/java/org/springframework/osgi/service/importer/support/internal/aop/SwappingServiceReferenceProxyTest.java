@@ -25,6 +25,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundle;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.osgi.service.importer.support.internal.aop.SwappingServiceReferenceProxy;
 
 /**
  * 
