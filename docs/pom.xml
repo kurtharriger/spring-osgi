@@ -125,4 +125,14 @@
     </pluginRepository>
   </pluginRepositories>
 
+  <distributionManagement>
+      <downloadUrl>http://www.springframework.org/osgi/</downloadUrl>
+      <site>
+          <id>static.springframework.org</id>
+          <name>SpringFramework.org</name>
+          <url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-osgi/snapshot-site/</url>
+      </site>
+  </distributionManagement>
+ 
+
 </project>
