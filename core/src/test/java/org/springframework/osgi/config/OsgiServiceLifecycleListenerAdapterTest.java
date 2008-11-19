@@ -34,7 +34,7 @@ import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.ServiceReferenceProxy;
-import org.springframework.osgi.service.importer.support.internal.aop.StaticServiceReferenceProxy;
+import org.springframework.osgi.service.importer.support.internal.aop.PublicStaticSwappingServiceReferenceProxy;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 
 /**
@@ -594,7 +594,7 @@ public class OsgiServiceLifecycleListenerAdapterTest extends TestCase {
 		}
 
 		public ServiceReferenceProxy getServiceReference() {
-			return new StaticServiceReferenceProxy(new MockServiceReference());
+			return new PublicStaticSwappingServiceReferenceProxy(new MockServiceReference());
 		}
 	}
 
