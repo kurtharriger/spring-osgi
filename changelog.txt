@@ -8,6 +8,7 @@ Changes in version 1.2.0 M2 (2008-xx-yy)
 General
 * upgraded to Spring Framework 2.5.6
 * raised required Spring Framework version to 2.5.6
+* upgraded to Knopflerfish 2.1.1
 * added support for compendium namespace (managed-service, config-properties)
 * incremented version of spring-osgi.xsd and spring-osgi-compendium.xsd
 
