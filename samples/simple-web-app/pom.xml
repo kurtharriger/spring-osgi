@@ -56,9 +56,9 @@
 	   <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>mx4j.osgi</artifactId>
-      <version>3.0.2-SNAPSHOT</version>
+      <groupId>net.sourceforge.mx4j</groupId>
+      <artifactId>com.springsource.mx4j</artifactId>
+      <version>3.0.2</version>
       <scope>test</scope>
     </dependency>  
     
