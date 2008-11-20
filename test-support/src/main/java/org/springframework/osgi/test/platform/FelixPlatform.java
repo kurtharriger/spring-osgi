@@ -33,7 +33,6 @@ import org.springframework.util.ReflectionUtils;
  * Apache Felix (1.0.3+) OSGi platform.
  * 
  * @author Costin Leau
- * 
  */
 public class FelixPlatform extends AbstractOsgiPlatform {
 
@@ -44,6 +43,8 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	private static final Log log = LogFactory.getLog(FelixPlatform.class);
 
 	private static final String FELIX_PROFILE_DIR_PROPERTY = "felix.cache.profiledir";
+	/** new property in 1.4.0 replacing cache.profiledir */
+	private static final String OSGI_STORAGE_PROPERTY = "org.osgi.framework.storage";
 
 	private BundleContext context;
 
@@ -62,6 +63,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		createStorageDir(props);
 		// disable logging
 		props.put("felix.log.level", "0");
+		
 		// use embedded mode
 		props.put("felix.embedded.execution", "true");
 		return props;
@@ -87,6 +89,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		}
 
 		configProperties.setProperty(FELIX_PROFILE_DIR_PROPERTY, this.felixStorageDir.getAbsolutePath());
+		configProperties.setProperty(OSGI_STORAGE_PROPERTY, this.felixStorageDir.getAbsolutePath());
 	}
 
 	public void start() throws Exception {
