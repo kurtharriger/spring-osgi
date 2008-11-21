@@ -21,21 +21,21 @@
     The biggest problems in running web applications in OSGi involve resource and class loading; there is no notion of <emphasis>bundle space</emphasis> or 
     <emphasis>imported packages</emphasis> in a web application. Each web container has its own class loading hierarchy and classpath assumption 
     which can conflict with the OSGi space. 
-    Spring-DM addresses these problems by bridging the web container and the OSGi space so loading is no longer a concern. Unique in its functionality, 
-    the web support in Spring-DM integrates directly with the web container so the WAR processing is literally handled by the server, giving full 
+    Spring DM addresses these problems by bridging the web container and the OSGi space so loading is no longer a concern. Unique in its functionality, 
+    the web support in Spring DM integrates directly with the web container so the WAR processing is literally handled by the server, giving full 
     access to its configuration and capabilities(non-blocking vs blocking IO, thread pool, specification support (Servlet 2.3, 2.4, 2.5) and so on).
-    The entire <literal>web.xml</literal> syntax is supported (without any parsing on Spring-DM behalf), as well as any custom configuration file 
-    particular to the target container. In short, everything that the target container supports is available to the OSGi WAR through Spring-DM.
+    The entire <literal>web.xml</literal> syntax is supported (without any parsing on Spring DM behalf), as well as any custom configuration file 
+    particular to the target container. In short, everything that the target container supports is available to the OSGi WAR through Spring DM.
     </para>
     
-    <tip>As a complement to this chapter, the Spring-DM distribution contains a number of web samples involving static resources, Servlets and JSPs running inside
+    <tip>As a complement to this chapter, the Spring DM distribution contains a number of web samples involving static resources, Servlets and JSPs running inside
     OSGi.</tip>
     
     <note>For more information on web applications on Java platform, please see the Servlet home <ulink url="http://java.sun.com/products/servlet/">page</ulink>.</note>
     
     <section id="web:supported-containers">
     	<title>Supported Web Containers</title>
-    	<para>Currently, Spring-DM supports <ulink url="http://tomcat.apache.org">Apache Tomcat</ulink> 5.5.x/6.0.x and 
+    	<para>Currently, Spring DM supports <ulink url="http://tomcat.apache.org">Apache Tomcat</ulink> 5.5.x/6.0.x and 
     	<ulink url="http://jetty.mortbay.org/">Jetty</ulink> 6.1.8+/6.2.x out of the box (other containers can be easily plugged in). The web support is JDK 1.4 
     	compatible. Please check the chosen container requirements for more information on the required JVM. In general, Servlet 2.4/JSP 2.0 require JDK 1.4 
     	while Servlet 2.5/JSP 2.1 require JDK 1.5.
@@ -55,29 +55,29 @@
 	      </para>
 	    </sidebar>
     	
-    	<para>Just like with non-WAR bundles, Spring-DM Web uses the <link linkend="extender-pattern">extender pattern</link> to detect and install WARs. However,
-    	one crucial difference from the standard Spring-DM <link linkend="bnd-app-ctx:extender">Extender</link> is that Spring-DM will 
+    	<para>Just like with non-WAR bundles, Spring DM Web uses the <link linkend="extender-pattern">extender pattern</link> to detect and install WARs. However,
+    	one crucial difference from the standard Spring DM <link linkend="bnd-app-ctx:extender">Extender</link> is that Spring DM will 
     	only trigger the install and uninstall of the WAR - the actual web application creation and thread management is delegated to the web container in 
-    	which the WAR is installed. That is, Spring-DM Web <emphasis>only</emphasis> dictates when a WAR is deployer to and undeployed from a web container; 
+    	which the WAR is installed. That is, Spring DM Web <emphasis>only</emphasis> dictates when a WAR is deployer to and undeployed from a web container; 
     	it is up to the web container to create and manage the equivalent web application.    
     	</para> 
-    	<para>To use Spring-DM Web, install:
+    	<para>To use Spring DM Web, install:
     	<itemizedlist>
     		<listitem>
-    			<literal>spring-osgi-web.jar</literal> - Spring-DM web support
+    			<literal>spring-osgi-web.jar</literal> - Spring DM web support
     		</listitem>
     		<listitem>
-    			<literal>spring-osgi-web-extender.jar</literal> - Spring-DM web extender
+    			<literal>spring-osgi-web-extender.jar</literal> - Spring DM web extender
 	   		</listitem>
     	</itemizedlist>
     	bundles to detect started OSGi WAR bundles (bundles with <literal>.war</literal> extension) and to deploy them to one of the supported web containers. 
     	By default, Tomcat will be used but this can be changed to Jetty or to another custom 
-    	server. When the war bundle is stopped, Spring-DM will also stop and uninstall the web application associated with it. Different from 
+    	server. When the war bundle is stopped, Spring DM will also stop and uninstall the web application associated with it. Different from 
     	<emphasis>traditional</emphasis> web development, the Servlet classes need to be explicitly imported as the OSGi class path always takes priority
     	(see <link linkend="web:classpath">below</link>).</para>
     	
     	<para>Since, when running a web application, it's the web container that does the bootstrapping and instantiation, there is no need to 
-    	place the Spring .xml files under <literal>META-INF/spring</literal> or use the Spring-DM <link linkend="app-deploy:headers">manifest entries</link>.
+    	place the Spring .xml files under <literal>META-INF/spring</literal> or use the Spring DM <link linkend="app-deploy:headers">manifest entries</link>.
     	Simply bundle your files in the WAR and use your web framework (or <interfacename>Servlet</interfacename>s/<interfacename>Listener</interfacename>s) 
     	to bootstrap the Spring container. See <xref linkend="web:spring-mvc"/> for Spring-MVC integration and/or Spring reference
     	<ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#context-create">documentation</ulink> for more information.
@@ -93,7 +93,7 @@
     	
     	<section id="web:classpath:static-resources">
     		<title>Static Resources</title>
-    		<para>When installing a WAR bundle, for static resources, Spring-DM will only consider what is available in the bundle space - this means what 
+    		<para>When installing a WAR bundle, for static resources, Spring DM will only consider what is available in the bundle space - this means what 
     		is available in the bundle jar and its attached fragments. Conforming to the Servlet spec, resources under <literal>WEB-INF</literal> folder
     		will be available through the <interfacename>ServletContext</interfacename> API but not to remote clients connecting to the web application.
     		In addition, any resource available in the classpath (imported packages, required bundles or dynamic imports) can be loaded and used by
@@ -116,7 +116,7 @@
 				<listitem><literal>WEB-INF/lib/*.jar</literal> - all jars under <literal>WEB-INF/lib</literal></listitem>
 			</itemizedlist>
 			<para>In addition, each container implementation can provide <emphasis>common</emphasis> libraries that are appended to the war classpath. Since OSGi, 
-			with its class wiring, versioning, reloading, superseeds the WAR classpath, Spring-DM will ignore the WAR predefined locations and will <emphasis>always</emphasis>
+			with its class wiring, versioning, reloading, superseeds the WAR classpath, Spring DM will ignore the WAR predefined locations and will <emphasis>always</emphasis>
 			use	the OSGi classpath instead. This means that classes imported by a WAR bundle can be used even if they are not present under <literal>WEB-INF/classes</literal>
 			folder or inside a jar under <literal>WEB-INF/lib</literal>. This also means that any class under <literal>WEB-INF/classes</literal> will not be considered
 			if it's not available in the WAR OSGi classpath.
@@ -125,7 +125,7 @@
 			<programlisting><![CDATA[Bundle-Classpath: .,WEB-INF/classes,WEB-INF/lib/some.jar,WEB-INF/lib/lib.jar]]></programlisting>
 			<para>Make sure the default <literal>Bundle-Classpath</literal> location (<literal>.</literal>) is present and there are no whitespaces between the commas.</para>
 			
-			<note>Since the OSGi API doesn't provide a hook for bundles to be pre-processed, Spring-DM cannot automate this process in a reliable way. However, we are 
+			<note>Since the OSGi API doesn't provide a hook for bundles to be pre-processed, Spring DM cannot automate this process in a reliable way. However, we are 
 			working on finding a suitable solution. Note that there are tools (<ulink url="http://www.aqute.biz/Code/Bnd">bnd</ulink>) that can add these entries 
 			during packaging.</note>
 
@@ -136,8 +136,8 @@
 
     	<section id="web:classpath:jsps">
     		<title>Java Server Pages</title>
-    		<para>For <ulink url="http://java.sun.com/products/jsp">JSPs</ulink>, Spring-DM integrates with Tomcat <ulink url="http://en.wikipedia.org/wiki/Tomcat_Jasper">Jasper 2</ulink> Engine 
-    		which means JSP 1.2, 2.0 and 2.1 are supported. OSGified versions for Jasper (from Tomcat 5.5.x and 6.0.x distribution respectively) are available in the Spring-DM OSGi 
+    		<para>For <ulink url="http://java.sun.com/products/jsp">JSPs</ulink>, Spring DM integrates with Tomcat <ulink url="http://en.wikipedia.org/wiki/Tomcat_Jasper">Jasper 2</ulink> Engine 
+    		which means JSP 1.2, 2.0 and 2.1 are supported. OSGified versions for Jasper (from Tomcat 5.5.x and 6.0.x distribution respectively) are available in the Spring DM OSGi 
     		repository. No imports on Jasper classes are required for the OSGi bundle.
     		</para>
     		
@@ -145,10 +145,10 @@
     			<title>Tag libraries</title>
     			<para>The JSP spec allows the creation of tag libraries to <quote>define declarative, modular functionality that can be reused by any JSP page</quote>. 
     			Also known as taglibs, these reusable components consist of Java classes (the tag implementation) and description files that indicate how the tags can be used.
-    			Spring-DM extends the JSP convention, of placing the taglibs either packed as a jar under <literal>WEB-INF/lib</literal> or unpacked under 
+    			Spring DM extends the JSP convention, of placing the taglibs either packed as a jar under <literal>WEB-INF/lib</literal> or unpacked under 
     			<literal>WEB-INF/classes</literal>, by detecting any taglib defined in the bundle classpath (imported packages or required bundles).</para>
     			  
-    			<para>Spring-DM will automatically look for any taglib file (<literal>*.tld</literal>) available in the bundle classpath and will make them available to the Jasper engine.
+    			<para>Spring DM will automatically look for any taglib file (<literal>*.tld</literal>) available in the bundle classpath and will make them available to the Jasper engine.
     			However, while the tag definitions are automatically discovered, the tag classes are not - again, the OSGi classpath takes priority. This means that in order to use a tag,
     			the war bundle would have to import the tag corresponding classes since otherwise, they are not seen by the bundle and the tag cannot be used.</para> 
     			
@@ -227,7 +227,7 @@
           </tgroup>
     	</table>
     	
-    	<para>Note that to properly support wars, whether they are using Servlet 2.5 or not, the Spring-DM web extender considers as WARs bundles that
+    	<para>Note that to properly support wars, whether they are using Servlet 2.5 or not, the Spring DM web extender considers as WARs bundles that
     	contains a <literal>.war</literal> extension.</para>
     	
     	<section id="web:configuration:changing-deployer">
@@ -262,12 +262,12 @@
 		        </calloutlist>		        
     		</programlistingco>
     		
-    		<para>Once the file is created, it should be bundled in an OSGi fragment attached to the Spring-DM Web Extender bundle by adding the 
+    		<para>Once the file is created, it should be bundled in an OSGi fragment attached to the Spring DM Web Extender bundle by adding the 
     		<literal>Fragment-Host</literal> header:</para>
 			<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.web.extender]]></programlisting>
 	
 			<para>Now the fragment can be deployed alongside <literal>spring-osgi-web.jar</literal> bundle to plug in Jetty.</para>
-			<para>A pre-packed Jetty fragment is available in the Spring-DM <link linkend="appendix-osgi-repo"> maven repository</link> under 
+			<para>A pre-packed Jetty fragment is available in the Spring DM <link linkend="appendix-osgi-repo"> maven repository</link> under 
 			<literal>jetty.web.extender.fragment.osgi</literal> artifactId.</para>
     	</section>
     </section>
@@ -276,7 +276,7 @@
     	<title>Customizing the standard deployers</title>
     	<para>By default, the out of the box deployers look up the needed services, at startup. As the services are considered mandatory, the deployers will wait for
     	them and, in case they are not found, will throw an exception. In cases where the default timeout or service lookup filter is not be appropriate, one
-    	can customize the service used through a Spring-DM <link linkend="service-registry:refs">reference</link>: 
+    	can customize the service used through a Spring DM <link linkend="service-registry:refs">reference</link>: 
     	</para>
     	
     	<programlistingco>
@@ -329,13 +329,13 @@
     	</programlistingco>
     	
     	<para>Make sure to add the packages on which your configuration depends to the fragment manifest (since the web extender bundle imports only the packages
-    	it needs: Spring-DM web support's). For the example above, one must import Catalina <interfacename>Service</interfacename>'s package. Since the 
+    	it needs: Spring DM web support's). For the example above, one must import Catalina <interfacename>Service</interfacename>'s package. Since the 
     	<interfacename>Service</interfacename> interface signature depends on the <interfacename>Connector</interfacename> class from another package, its package
     	needs to be imported as well - not doing so results in <classname>ClassNotFoundException/NoClassDefFoundError</classname>s:</para>
 
 		<programlisting><lineannotation># Catalina packages</lineannotation>
 Import-Package: org.apache.catalina,org.apache.catalina.connector
-<lineannotation># Spring-DM Web Extender</lineannotation>
+<lineannotation># Spring DM Web Extender</lineannotation>
 Fragment-Host: org.springframework.bundle.osgi.web.extender</programlisting>
     </section>
     
@@ -344,21 +344,21 @@ Fragment-Host: org.springframework.bundle.osgi.web.extender</programlisting>
     	<title>OSGi-ready libraries and web development</title>
     	
     	<para>Unfortunately, at the moment most libraries used for web development are not OSGi bundles, which means they cannot be used inside the OSGi space unless they
-    	are embedded in other bundles. To address this problem, the Spring-DM project has osgified most of the common libraries and made them available through a dedicated
+    	are embedded in other bundles. To address this problem, the Spring DM project has osgified most of the common libraries and made them available through a dedicated
     	Maven repository (which can be found in the <link linkend="appendix-osgi-repo">appendix</link>). Please note that the current repository, for now, is <emphasis>provided as-is</emphasis> without any support.
     	These being said, we hope you find it useful.</para>
     
     	<section id="web:osgi-artifacts:containers">
     	<title>Deploying web containers as OSGi bundles</title>
     	
-    	<para>Spring-DM web support expects the web containers to be installed as OSGi services. Since neither the Tomcat nor the Jetty distribution do this, 
-    	Spring-DM offers two simple yet useful OSGi <ulink url="http://www2.osgi.org/javadoc/r4/org/osgi/framework/BundleActivator.html">Activator</ulink>s for 
-    	both containers	at the Spring-DM OSGi repository. Once installed, these will programmatically start the appropriate web container based on a default configuration (which can be customized
+    	<para>Spring DM web support expects the web containers to be installed as OSGi services. Since neither the Tomcat nor the Jetty distribution do this, 
+    	Spring DM offers two simple yet useful OSGi <ulink url="http://www2.osgi.org/javadoc/r4/org/osgi/framework/BundleActivator.html">Activator</ulink>s for 
+    	both containers	at the Spring DM OSGi repository. Once installed, these will programmatically start the appropriate web container based on a default configuration (which can be customized
 		and publish it as an OSGi service. While the activators are generic, they can be easily customized for advance usages or even replaced - it's up to each 
 		deployer to decide how the server instances are looked up.</para>
 		
-		<note>The activator binaries and sources can be found either in the Spring-DM repository (see below) or under the <literal>lib/</literal> folder 
-		inside the Spring-DM (<literal>with-dependencies</literal>) distribution</note>
+		<note>The activator binaries and sources can be found either in the Spring DM repository (see below) or under the <literal>lib/</literal> folder 
+		inside the Spring DM (<literal>with-dependencies</literal>) distribution</note>
 		
 		<para>All entries in the repository belong to the <literal>org.springframework.osgi</literal> group and have an <literal>.osgi</literal> termination to differentiate
 		them from the original jars.</para>
@@ -385,7 +385,7 @@ Fragment-Host: org.springframework.bundle.osgi.web.extender</programlisting>
     		<title>Jetty 6.1.8+/6.2.0</title>
 			
 			<para>Since Jetty is OSGi-ready by default, the official distribution can be installed without any transformation/processing on the OSGi platform. However,
-			since there is no activator, Spring-DM provides one, similar in functionality to the one available for Tomcat. The activator has 
+			since there is no activator, Spring DM provides one, similar in functionality to the one available for Tomcat. The activator has 
 			<literal>jetty.start.osgi</literal> as artifact id. Just like the Tomcat case, a default configuration is included which starts a Jetty
 			instance on <literal>localhost</literal>, port <literal>8080</literal>. To change the defaults, place your Jetty configuration under 
 			<literal>etc/jetty.xml</literal> location.</para>			 
@@ -401,7 +401,7 @@ Fragment-Host: org.springframework.bundle.osgi.web.extender</programlisting>
 		<section id="web:osgi-artifacts:common-libraries">
     		<title>Common libraries</title>
 			
-			<para>The Servlet, Java Server Pages, Standard Taglib, Commons-EL and other web libraries are available as well in the Spring-DM repository. When browsing
+			<para>The Servlet, Java Server Pages, Standard Taglib, Commons-EL and other web libraries are available as well in the Spring DM repository. When browsing
 			use an <ulink url="http://aws.amazon.com/s3">S3</ulink> compatible application .</para>
 		</section>
 	</section>

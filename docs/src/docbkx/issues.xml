@@ -44,7 +44,7 @@
 	<section id="OSGI-237">
       <title>Publishing prototypes as OSGi services</title>
       	<para>Due to the way OSGi platform deals with OSGi services (it caches the instance and returns it every time), prototypes are not fully supported.
-      	Spring-DM publishes a proxy that on each call, delegates back to the target application context for retrieving the instance. While with other beans
+      	Spring DM publishes a proxy that on each call, delegates back to the target application context for retrieving the instance. While with other beans
       	this works, in case of prototypes, this results in one-instance-per-invocation which is incorrect. Additional functionality needs to be added
       	to fully support prototypes even though, as pointed out, this involves a knowledge between Client/Server regarding the publication contract.</para>
       	<para>See <ulink url="http://jira.springframework.org/browse/OSGI-237">OSGI-237</ulink></para> 

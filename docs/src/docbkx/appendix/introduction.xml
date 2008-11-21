@@ -15,14 +15,14 @@
       (Java 2 Security activated).
       </para>
 
-      <para><xref linkend="appendix-pde-integration"/> describes how to integrate Spring-DM
+      <para><xref linkend="appendix-pde-integration"/> describes how to integrate Spring DM
       with Eclipse Plug-in Development Environment.</para>
       
-      <para><xref linkend="appendix-archetype"/> describes the Spring-DM Maven 2 archetype
+      <para><xref linkend="appendix-archetype"/> describes the Spring DM Maven 2 archetype
       usage.</para>
 
       <para><xref linkend="appendix-tips"/> provides some useful OSGi tips, especially
-      meaningful when used along with Spring-DM.</para>
+      meaningful when used along with Spring DM.</para>
 
       <para><xref linkend="appendix-roadmap"/> describes some features that are included in
       the 1.0 distribution but are still considered early-access. The
@@ -30,7 +30,7 @@
       also discusses other planned features for which no implementation yet
       exists.</para>
 
-      <para><xref linkend="appendix-osgi-repo"/> describes the repository used by Spring-DM
+      <para><xref linkend="appendix-osgi-repo"/> describes the repository used by Spring DM
       for its osgi artifacts.</para>
 
       <para><xref linkend="appendix-schema"/> defines the schemas provided by Spring Dynamic

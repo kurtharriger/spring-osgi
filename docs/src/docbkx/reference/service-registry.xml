@@ -529,7 +529,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         The unregister callback is invoked during the service unregistration process, 
         no matter the cause (such as the owning bundle stopping).</para>
         
-        <para>Spring-DM will use the declared <literal>ServiceType</literal> argument type
+        <para>Spring DM will use the declared <literal>ServiceType</literal> argument type
         and invoke the registration/unregistration method only when a service of a compatible type
         will be registered/unregistered.</para>
         
@@ -540,15 +540,15 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         <section id="service-registry:export:lifecycle:interface">
         <title>Using <interfacename>OsgiServiceRegistrationListener</interfacename> interface</title>
         <para>
-        While we discourage, it is possible to implement a Spring-DM specific interface, namely 
+        While we discourage, it is possible to implement a Spring DM specific interface, namely 
         <interfacename>org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener</interfacename> which avoids the need
         to declare the <literal>registration-method</literal> and <literal>unregistration-method</literal>.
         However, by implementing <interfacename>OsgiServiceRegistrationListener</interfacename>, your code
-        becomes Spring-DM aware (which goes against the POJO philosophy).
+        becomes Spring DM aware (which goes against the POJO philosophy).
         </para>
         
         <para>It is possible for a listener to implement <interfacename>OsgiServiceRegistrationListener</interfacename> interface and
-        declare custom methods. In this case, the Spring-DM interface methods will be called first, followed by the custom methods.
+        declare custom methods. In this case, the Spring DM interface methods will be called first, followed by the custom methods.
         </para>
         </section>
       </section>
@@ -688,7 +688,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
    		  
    		  <para>will match only OSGi services that advertise <interfacename>MessageService</interfacename>
    		  interface and have the property named <literal>org.springframework.osgi.bean.name</literal> set
-   		  to value <literal>messageServiceBean</literal>. In short, this means finding all Spring-DM exported
+   		  to value <literal>messageServiceBean</literal>. In short, this means finding all Spring DM exported
    		  beans that implement interface <interfacename>MessageService</interfacename> and are named
    		  <literal>messageServiceBean</literal>.</para>
    		  
@@ -699,7 +699,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 
 		  <sidebar>
 		    <title><![CDATA[Nested <reference> declarations]]></title>
-		    <para>In order for Spring-DM to detect mandatory dependencies, any
+		    <para>In order for Spring DM to detect mandatory dependencies, any
 		    <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-inner-beans">nested/inner</ulink>
 		    reference declaration will be transformed into top-level
 		    one with a generated name.</para>
@@ -749,8 +749,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 		  <sidebar>
 		    <title>context class loader management on the importer and exporter</title>
 		    <para>
-		      Spring-DM has the ability to do context class loader management on both
-		      the importer and exporter side. Normally, if Spring-DM works on both sides,
+		      Spring DM has the ability to do context class loader management on both
+		      the importer and exporter side. Normally, if Spring DM works on both sides,
 		      only one side should have this feature enabled. However, if both sides 
 		      (importer and exporter) take advantage of this capability, the last
 		      entity in the call chain will win. This means that the exporter setting,
@@ -902,7 +902,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 		<section id="service-registry:refs:singular:property-editor">
 		<title>Getting a hold of the managed service reference</title>
         
-        <para>Spring-DM can automatically convert a managed OSGi service to 
+        <para>Spring DM can automatically convert a managed OSGi service to 
         service reference. That is, if the property into which a reference bean 
         is to be injected, has type <interfacename>ServiceReference</interfacename> (instead of the service
         interface supported by the reference), then the managed OSGi
@@ -942,22 +942,22 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 	</programlistingco>
 		
 		<note>
-		The injected <interfacename>ServiceReference</interfacename> is managed by Spring-DM and will change
+		The injected <interfacename>ServiceReference</interfacename> is managed by Spring DM and will change
 		at the same time as the referenced backing OSGi service instance.
 		</note>
 		
 		<para>There are cases when the managed <interfacename>ServiceReference</interfacename> is needed to get a hold of the OSGi service. Unfortunately,
 		most of the OSGi frameworks expect their own <interfacename>ServiceReference</interfacename> classes and will fail when the
-		Spring-DM managed reference is used. For such cases, one can get a hold of the native <interfacename>ServiceReference</interfacename> bound
+		Spring DM managed reference is used. For such cases, one can get a hold of the native <interfacename>ServiceReference</interfacename> bound
 		at that moment, by casting the reference object to <interfacename>ServiceReferenceProxy</interfacename> and then calling 
 		<methodname>getTargetServiceReference</methodname>. Using the example context above, one might use the following code:</para>
 		
 		<programlisting language="java"><![CDATA[ServiceReference nativeReference = ((ServiceReferenceProxy)serviceReference).getTargetServiceReference()]]></programlisting>
 		
-		<para>The returned <literal>nativeReference</literal> can be safely passed to the OSGi framework however, since it is not managed by Spring-DM,
+		<para>The returned <literal>nativeReference</literal> can be safely passed to the OSGi framework however, since it is not managed by Spring DM,
 		in time, it might refer to a service different then the one backing the imported OSGi service.</para>
 		<para>To avoid this desynchronization, consider using managed <interfacename>ServiceReference</interfacename> objects mainly for reading the
-		bound OSGi service properties rather then getting a hold of OSGi services (which can be simply injected by Spring-DM).</para>
+		bound OSGi service properties rather then getting a hold of OSGi services (which can be simply injected by Spring DM).</para>
 		</section>
    	</section>
 
@@ -986,7 +986,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 		
         <para>Sometimes an application needs access not simply to any service
         meeting some criteria, but to <emphasis>all</emphasis> services
-        meeting some criteria. Spring-DM allows the matching services may be held in a
+        meeting some criteria. Spring DM allows the matching services may be held in a
         <interfacename>List</interfacename> or <interfacename>Set</interfacename> 
         (optionally sorted).</para>
 
@@ -1048,7 +1048,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         interfaces that the corresponding service was registered with and that
         are visible to the bundle.</para>
 
-		<para>Spring-DM supports sorted collections as well, both for set and list.</para>
+		<para>Spring DM supports sorted collections as well, both for set and list.</para>
         <para>It is possible to specify a sorting order using either the
         <literal>comparator-ref</literal> attribute, or the nested
         <literal>comparator</literal> element. The
@@ -1093,11 +1093,11 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 		<section id="service-registry:refs:collection:greedy-proxying">
 			<title>Greedy Proxying</title>
 			
-			<para>All OSGi services imported by a Spring-DM service collection publish and are type-compatible with the classes
+			<para>All OSGi services imported by a Spring DM service collection publish and are type-compatible with the classes
 			declared by the <literal>interfaces</literal> property. However, some services might expose additional (optional) 
 			classes that could be relevant to your application.</para>
 			
-			<para>For these cases, Spring-DM collections offer a dedicated attribute called <literal>greedy-proxying</literal> which
+			<para>For these cases, Spring DM collections offer a dedicated attribute called <literal>greedy-proxying</literal> which
 			will cause the creates proxies to use <emphasis>all</emphasis> the classes advertised by the imported services, visible to the consuming
 			importing bundle. Thus, it is possible to cast the imported proxies to classes different then those specified in the
 			<literal>interfaces</literal>. For example, with the following list definition:
@@ -1279,14 +1279,14 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 
 		  <para>The recommend way of traversing a collection is by using an <interfacename>Iterator</interfacename>.
 		  However, since OSGi services can come and go, the content of the managed service collection will be adjusted
-		  accordingly. Spring-DM will transparently update all <interfacename>Iterator</interfacename>s held by 
+		  accordingly. Spring DM will transparently update all <interfacename>Iterator</interfacename>s held by 
 		  the user so it is possible to safely traverse the collection while it is being modified. Moreover, the 
 		  <interfacename>Iterator</interfacename>s will reflect all the changes made to the collection, even if 
 		  they occurred after the <interfacename>Iterator</interfacename>s were created (that is during the iteration).
 		  Consider a case where a collection shrinks significantly (for example a big number of OSGi
 		  services are shutdown) right after an iteration started.
 		  To avoid dealing with the resulting 'dead' service references,
-		  Spring-DM iterators do not take collection snapshots (that can be inaccurate) 
+		  Spring DM iterators do not take collection snapshots (that can be inaccurate) 
 		  but rather are updated on each service event so they reflect the latest collection state, 
 		  no matter how fast or slow the iteration is.</para>
 		  
@@ -1369,7 +1369,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       The <literal>listener</literal> element refers to a bean (either by name, 
       or by defining one inline)
       that will receive bind and unbind notifications. If this bean
-      implements Spring-DM's
+      implements Spring DM's
       <interfacename>org.springframework.osgi.service.importer.OsgiServiceLifecycleListener</interfacename>
       interface, then the <literal>bind</literal> and
       <literal>unbind</literal> operations in this interface will be
@@ -1515,13 +1515,13 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       <title>Accessing the caller <interfacename>BundleContext</interfacename></title>
       
       <para>It is sometime useful for an imported service to know which bundle is using it
-      at a certain time. To help with this scenarion, in Spring-DM imported services publish
+      at a certain time. To help with this scenarion, in Spring DM imported services publish
       the importing bundle <interfacename>BundleContext</interfacename> through 
       <classname>LocalBundleContext</classname> class. Each time a method on the importer is invoked,
       the caller <interfacename>BundleContext</interfacename> will be made available, using
       a <classname>ThreadLocal</classname>, through <methodname>getInvokerBundleContext()</methodname>.
       </para>
-      <para>Please be careful when using this class since it ties your code to Spring-DM API.</para>
+      <para>Please be careful when using this class since it ties your code to Spring DM API.</para>
     </section>
     
     </section>
@@ -1529,7 +1529,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
     <section id="service-registry:refs:listener-best-practices">
       <title>Exporter/Importer listener best practices</title>
       
-      <para>As mentioned above, Spring-DM exporter and importer allow listeners to be
+      <para>As mentioned above, Spring DM exporter and importer allow listeners to be
       used for receiving notifications on when services are bound, unbound, registered or 
       unregistered. Below you can find some guidance advices when working with listeners:
       </para>
@@ -1544,7 +1544,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       
       
       	<listitem>Use listener custom declaration as much as possible - it doesn't tie your code
-      	to Spring-DM API and it doesn't enforce certain signature names.</listitem>
+      	to Spring DM API and it doesn't enforce certain signature names.</listitem>
       	
       	<listitem>If find yourself repeating bind/unbind method declarations for your listener definitions,
       	consider using Spring <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-child-bean-definitions">
@@ -1553,7 +1553,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       	</listitem>
       	
       	<listitem>Prefer <interfacename>java.util.Map</interfacename> instead of <classname>java.util.Dictionary</classname>
-      	class. The first is an interface while the latter is a deprecated, abstract class. To preserve compatibility, Spring-DM
+      	class. The first is an interface while the latter is a deprecated, abstract class. To preserve compatibility, Spring DM
       	will pass to the listeners a <interfacename>Map</interfacename> implementation that can be casted, if needed, to a 
       	<classname>Dictionary</classname>.</listitem>
       	
@@ -1638,7 +1638,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
          The declaration above while valid, creates a dependecy between the <literal>listener</literal> and the importer it is defined upon. 
          In order to create the importer, the <literal>listener</literal> has to be resolved and created but in order to do that, 
          the importer called <literal>service</literal> needs to be retrieved (instantiated and configured). This cycle needs to be broken
-         down so that at least one bean can be fully created and configured. This scenario is supported by Spring-DM
+         down so that at least one bean can be fully created and configured. This scenario is supported by Spring DM
          for both exporter and importers however, if the listener is defined as a nested bean, the cycle cannot be resolved:</para> 
 
         <programlistingco>
@@ -1833,7 +1833,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
 		    <para>Import Spring Dynamic Modules schema and associate a prefix with its namespace 
 		    (<literal>osgi</literal> in this example). This is required since the global attributes
 		    have to be declared to an element (<literal>beans</literal>) belonging to another schema.
-		    To avoid ambiguity, the Spring-DM schema is imported under a specified prefix as well.</para>  
+		    To avoid ambiguity, the Spring DM schema is imported under a specified prefix as well.</para>  
 		</callout>
 
 		<callout arearefs="service-registry.global.ns.defaults.osgi.cardinality">

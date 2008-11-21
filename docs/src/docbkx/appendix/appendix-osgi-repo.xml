@@ -12,19 +12,19 @@
     providing 
     <quote>a collection of open source libraries commonly used for developing enterprise Java applications with the Spring Framework</quote> (taken
     from the Repository <ulink url="http://www.springsource.com/repository/app/faq">FAQ</ulink>). With the availability of the Bundle Repository,
-    the Spring-DM old repository (see below) has been deprecated and it is being used until migrating completely to SpringSource Repository. It is highly recommended
+    the Spring DM old repository (see below) has been deprecated and it is being used until migrating completely to SpringSource Repository. It is highly recommended
     that users migrate as well to SpringSource Repository as it provides significantly more libraries and it is intended to be a user-facing infrastructure component. 
     </para>
     
     <section id="appendix-osgi-repo:old-repo">
-    	<title>Spring-DM temporary OSGi Repository</title>
+    	<title>Spring DM temporary OSGi Repository</title>
     	
-    	<para>Unfortunately, not all Spring-DM dependencies are available in SpringSource Repository and thus Spring-DM still needs to maintain some of its own 
+    	<para>Unfortunately, not all Spring DM dependencies are available in SpringSource Repository and thus Spring DM still needs to maintain some of its own 
     	dedicated Maven <ulink url="http://maven.apache.org/guides/introduction/introduction-to-repositories.html">repository</ulink> available
 	    at <literal>http://maven.springframework.org/osgi</literal>.
 	    
 	    <warning>The repository is <emphasis>provided as-is</emphasis> without any kind of support. The repository structure/content
-	    can (and will) change until it becomes stable. Before using Spring-DM repository make sure the needed artifact are not available
+	    can (and will) change until it becomes stable. Before using Spring DM repository make sure the needed artifact are not available
 	    in SpringSource Repository. These being said, we hope you find it useful and we'd like to <ulink url="http://jira.springframework.org/browse/OSGI">know</ulink> 
 	    if there are improvement that can be made to it.</warning> 
 	    </para>
@@ -38,7 +38,7 @@
 		Additionally, to differentiate the <emphasis>OSGi</emphasis>-enabled artifacts from the original ones, all libraries are placed under
 		<literal>org.springframework.osgi</literal> group and their names contains a <literal>.osgi</literal> suffix.</para>
 		
-		<para>So for example, an OSGi version of <literal>mx4j-3.0.2</literal> jar is available in the Spring-DM OSGi repository under at:
+		<para>So for example, an OSGi version of <literal>mx4j-3.0.2</literal> jar is available in the Spring DM OSGi repository under at:
 		<literal>org/springframework/osgi/mx4j.osgi/3.0.2-SNAPSHOT/mx4j.osgi-3.0.2-SNAPSHOT.jar</literal></para>
 	</section>
 	
@@ -74,7 +74,7 @@
 		<title>Using the repository with Ant/Ivy</title>
 		
 		<para>When using <ulink url="http://ant.apache.org/">Ant</ulink> consider using the excellent <ulink url="http://ant.apache.org/ivy/">Ivy</ulink>
-		subproject for retrieving the OSGi dependencies from the Spring-DM repository as Ivy can work with a Maven-style repository. Please see the 
+		subproject for retrieving the OSGi dependencies from the Spring DM repository as Ivy can work with a Maven-style repository. Please see the 
 		Ivy <ulink url="http://ant.apache.org/ivy/history/latest-milestone/tutorial/start.html">tutorial</ulink> for more information.</para>
 	</section>
 	

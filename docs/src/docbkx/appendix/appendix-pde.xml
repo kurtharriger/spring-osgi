@@ -9,7 +9,7 @@
     In fact, Eclipse IDE is built on top of OSGi and uses at its core the Equinox OSGi implementation. Moreover, all the Eclipse 
     plug-ins are OSGi bundles. This makes Eclipse with PDE a very attractive tool for creating OSGi bundles.
     While Spring Dynamic Modules artifacts can be integrated as <emphasis>normal</emphasis> libraries, through 
-    <ulink url="http://www.springide.org">Spring IDE</ulink>, Spring-DM can be installed as a 
+    <ulink url="http://www.springide.org">Spring IDE</ulink>, Spring DM can be installed as a 
     <ulink url="http://help.eclipse.org/stable/index.jsp?topic=/org.eclipse.pde.doc.user/guide/tools/preference_pages/target_platform.htm">
     target platform</ulink> ready to be used with PDE.
    </para>
@@ -104,20 +104,20 @@
             </imageobject>
 
             <textobject>
-              <phrase>Select Spring-DM target platform</phrase>
+              <phrase>Select Spring DM target platform</phrase>
             </textobject>
           </mediaobject>
         </para>
         
-        <para>Select the Spring-DM version that you desire from the Pre-defined Target (1) drop box and press Load Target (2). Eclipse will load the target and all bundles defined
-        by it - this includes Spring-DM bundles and all of its dependencies (SLF4J is used for logging). The configuration can be customised appropriately by removing
+        <para>Select the Spring DM version that you desire from the Pre-defined Target (1) drop box and press Load Target (2). Eclipse will load the target and all bundles defined
+        by it - this includes Spring DM bundles and all of its dependencies (SLF4J is used for logging). The configuration can be customised appropriately by removing
         and adding bundles.</para>
         
         <para>In its current form, the plug-in offers two predefined targets - one for the stable released versions and one for the SNAPSHOT/nightly Spring DM jars. The latter
         does not contain any jars as it is expected for the user to download them manually. Simply locate the path where the plug-ins should be located (3), enter that folder 
         and do a </para>
         <programlisting><![CDATA[mvn install]]></programlisting> 
-        <para>The latest Spring-DM SNAPSHOT will be downloaded along with all of its dependencies.
+        <para>The latest Spring DM SNAPSHOT will be downloaded along with all of its dependencies.
         Simply click on the reload button (4) and Eclipse will pick up the bundles. </para>
    	 </step>
    	 
@@ -155,7 +155,7 @@
           
         </para>
         
-        <para>and the Spring-DM and its dependencies should be available in the plug-ins view:</para>
+        <para>and the Spring DM and its dependencies should be available in the plug-ins view:</para>
         <para>
 		  <inlinemediaobject>
             <imageobject role="fo">
