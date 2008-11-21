@@ -19,16 +19,7 @@ public interface ComponentMetadata {
 	 * defined inner component.
 	 */
 	String getName();
-	
-	/**
-	 * Any aliases by which the component is also known.
-	 * 
-	 * @return an immutable set of (String) aliases by which the component is known (does not
-	 * include the component name as returned by getName()). If the component 
-	 * has no aliases then an empty set is returned.
-	 */
-	Set getAliases();
-	
+		
 	/**
 	 * The names of any components listed in a "depends-on" attribute for this
 	 * component.

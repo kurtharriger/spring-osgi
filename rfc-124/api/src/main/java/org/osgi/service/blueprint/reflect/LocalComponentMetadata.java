@@ -16,7 +16,9 @@ public interface LocalComponentMetadata extends ComponentMetadata {
 	/**
 	 * The name of the class type specified for this component.
 	 * 
-	 * @return the name of the component class.
+	 * @return the name of the component class. If no class was specified
+	 * in the component definition (because the a factory component is used
+	 * instead) then this method will return null.
 	 */
 	String getClassName();
 	

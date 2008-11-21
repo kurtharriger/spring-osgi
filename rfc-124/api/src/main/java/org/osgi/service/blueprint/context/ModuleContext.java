@@ -46,21 +46,7 @@ public interface ModuleContext {
 	static final int BUNDLE_STOPPING = 2;
 
 	/**
-	 * Name of the property used to provide the symbolic name of the bundle on
-	 * whose behalf a ModuleContext service has been published.
-	 */
-	static final String SYMBOLIC_NAME_PROPERTY = "osgi.service.blueprint.symbolicname";
-
-	/**
-	 * Name of the property used to provide the version of the bundle on whose
-	 * behalf a ModuleContext service has been published.
-	 */
-	static final String VERSION_PROPERTY = "osgi.service.blueprint.version";
-
-
-	/**
-	 * The set of component names recognized by the module context. This set only includes
-	 * the primary names of components, not any aliases.
+	 * The set of component names recognized by the module context.
 	 *  
 	 * @return an immutable set (of Strings) containing the names of all of the components within the
 	 * module.
@@ -68,19 +54,24 @@ public interface ModuleContext {
 	Set getComponentNames();
 	
 	/**
-	 * The set of all component names recognized by the module context, including all
-	 * aliases.
+	 * Get the component instance for a given named component. If the component has 
+	 * not yet been instantiated, calling this operation will cause the component instance 
+	 * to be created and initialized. If the component
+	 * has a prototype scope then each call to getComponent will return a new
+	 * component instance. If the component has a bundle scope then the component
+	 * instance returned will be the instance for the caller's bundle (and that
+	 * instance will be instantiated if it has not already been created).
 	 * 
-	 * @return an immutable set (of Strings) containing the names of all of the components within the
-	 * module, including aliases. 
-	 */
-	Set getAllComponentNames();
-
-	/**
-	 * Get the component instance for a given named component.
+	 * Note: calling getComponent from logic executing during the instantiation and 
+	 * configuration of a component, before the init method (if specified) has returned,
+	 * may trigger a circular dependency (for a trivial example, consider a component
+	 * that looks itself up by name during its init method). Implementations of the 
+	 * Blueprint Service are not required to support cycles in the dependency graph
+	 * and may throw an exception if a cycle is detected. Implementations that can
+	 * support certain kinds of cycles are free to do so.
 	 * 
 	 * @param name the name of the component for which the instance is to be
-	 * retrieved. Any of the aliases of a component may be used.
+	 * retrieved.
 	 * 
 	 * @return the component instance, the type of the returned object is
 	 * dependent on the component definition, and may be determined by
@@ -95,7 +86,7 @@ public interface ModuleContext {
 	 * Get the component metadata for a given named component.
 	 * 
 	 * @param name the name of the component for which the metadata is to be
-	 * retrieved. Any of the aliases of a component may be used.
+	 * retrieved.
 	 * 
 	 * @return the component metadata for the component.
 	 * 
