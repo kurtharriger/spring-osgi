@@ -268,7 +268,7 @@
 	
 			<para>Now the fragment can be deployed alongside <literal>spring-osgi-web.jar</literal> bundle to plug in Jetty.</para>
 			<para>A pre-packed Jetty fragment is available in the Spring DM <link linkend="appendix-osgi-repo"> maven repository</link> under 
-			<literal>jetty.web.extender.fragment.osgi</literal> artifactId.</para>
+			<literal>jetty.web.extender.fragment.osgi</literal> artifactId (make sure to use version 1.0.1+).</para>
     	</section>
     </section>
     
