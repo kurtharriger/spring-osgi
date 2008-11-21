@@ -237,7 +237,7 @@ context ::= path ( ';' path ) * (';' directive) *
     	that is used internally as its configuration. To override a default setting of the extender, look up the appropriate bean
     	name from the table below, define it in a suitable manner and then attach it as a <link linkend="appendix-tips:fragments">fragment</link> to the 
     	<literal>spring-osgi-extender.jar</literal>, using:</para>
-		<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.extender]]></programlisting>    	  
+		<programlisting><![CDATA[Fragment-Host: org.springframework.osgi.extender]]></programlisting>    	  
     	
     	<para>The following beans are currently recognized by the extender:</para>
     	
@@ -443,22 +443,22 @@ context ::= path ( ';' path ) * (';' directive) *
       <itemizedlist>
         <listitem>
           <para>spring-core.jar (bundle symbolic name
-          <literal>org.springframework.bundle.spring.core</literal>)</para>
+          <literal>org.springframework.core</literal>)</para>
         </listitem>
 
         <listitem>
           <para>spring-context.jar (bundle symbolic name
-          <literal>org.springframework.bundle.spring.context</literal>)</para>
+          <literal>org.springframework.context</literal>)</para>
         </listitem>
 
         <listitem>
           <para>spring-beans.jar (bundle symbolic name
-          <literal>org.springframework.bundle.spring.beans</literal>)</para>
+          <literal>org.springframework.beans</literal>)</para>
         </listitem>
 
         <listitem>
           <para>spring-aop.jar (bundle symbolic name
-          <literal>org.springframework.bundle.spring.aop</literal>)</para>
+          <literal>org.springframework.aop</literal>)</para>
         </listitem>
       </itemizedlist>
 

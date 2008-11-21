@@ -30,20 +30,21 @@ import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener
 public class Listener implements OsgiServiceRegistrationListener {
 
 	public static final Map instances = Collections.synchronizedMap(new LinkedHashMap());
-	public static final Object barrier = new Object();
+	public static final Object regBarrier = new Object();
+	public static final Object unregBarrier = new Object();
 
 
 	public void registered(Object service, Map serviceProperties) throws Exception {
 		instances.put(service, serviceProperties);
-		synchronized (barrier) {
-			barrier.notify();
+		synchronized (regBarrier) {
+			regBarrier.notify();
 		}
 	}
 
 	public void unregistered(Object service, Map serviceProperties) throws Exception {
 		instances.remove(service);
-		synchronized (barrier) {
-			barrier.notify();
+		synchronized (unregBarrier) {
+			unregBarrier.notify();
 		}
 	}
 }

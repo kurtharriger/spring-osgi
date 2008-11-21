@@ -51,7 +51,7 @@
     <!-- decoration osgi import - used internally when the jars are pre-processed and bnd doens't have to know about it -->
     <spring.decorate.osgi.import>${spring.osgi.import}</spring.decorate.osgi.import>
     
-    <symName.prefix>org.springframework.bundle.osgi</symName.prefix>
+    <symName.prefix>org.springframework.osgi</symName.prefix>
     <spring.osgi.symbolic.name>${groupId}.${artifactId}</spring.osgi.symbolic.name>
 
     <!-- add license.txt to the resulting bundle -->
@@ -531,6 +531,11 @@ limitations under the License.
           <artifactId>maven-clover2-plugin</artifactId>
           <version>${clover.ver}</version>
         </plugin>
+        <plugin>
+          <groupId>com.springsource.bundlor</groupId>
+          <artifactId>com.springsource.bundlor.maven</artifactId>
+          <version>1.0.0.M1</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     
@@ -540,7 +545,6 @@ limitations under the License.
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
-
         <configuration>
           <obrRepository>NONE</obrRepository>
           <instructions>
@@ -568,7 +572,6 @@ limitations under the License.
         </configuration>
       </plugin>
       
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

@@ -46,7 +46,7 @@
         
 		<programlisting><![CDATA[Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Fragment-Host: org.springframework.bundle.osgi.extender
+Fragment-Host: org.springframework.osgi.extender
 Bundle-SymbolicName: org.mydomain.project.fragment
 Bundle-Name: my-fragment
 Bundle-Description: Fragment attached to Spring DM extender
@@ -62,7 +62,7 @@ Bundle-Description: Fragment attached to Spring DM extender
          </callout>
          <callout arearefs="appendix-tips:fragments.example.fh">
          	<para>The symbolic name of the bundle to which this fragment should be attached to. In this case, the value 
-         	<literal>org.springframework.bundle.osgi.extender</literal> points to the <literal>spring-osgi-extender.jar</literal>.
+         	<literal>org.springframework.osgi.extender</literal> points to the <literal>spring-osgi-extender.jar</literal>.
          	<literal>Fragment-Host</literal> is the <emphasis>key</emphasis> entry which tells the OSGi platform that the containing bundle is a of a 
          	special kind - it's a fragment.</para>
          </callout>
@@ -84,7 +84,7 @@ Bundle-Description: Fragment attached to Spring DM extender
 		
 		<para>When multiple bundles with the same symbolic names are present, one can add the bundle version to make sure the proper wiring is done:</para>
 		
-		<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.extender;bundle-version=1.1.0]]></programlisting>
+		<programlisting><![CDATA[Fragment-Host: org.springframework.osgi.extender;bundle-version=1.1.0]]></programlisting>
 		
 		<para>The default value for <literal>bundle-version</literal> (when it's not specified) is <literal>[0.0.0,&#8734;)</literal></para>
 		
