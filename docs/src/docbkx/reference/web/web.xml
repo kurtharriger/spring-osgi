@@ -177,7 +177,7 @@
     	an application context that is used internally as its configuration. To override a default setting of the web extender, look up the appropriate bean
     	name from the table below, define it in a suitable manner and then attach it as a <link linkend="appendix-tips:fragments">fragment</link> to the <literal>spring-osgi-web.jar</literal>,
     	using:</para>
-		<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.web.extender]]></programlisting>    	  
+		<programlisting><![CDATA[Fragment-Host: org.springframework.osgi.web.extender]]></programlisting>    	  
     	
     	<para>The following beans are currently recognized by the web extender:</para>
     	
@@ -264,7 +264,7 @@
     		
     		<para>Once the file is created, it should be bundled in an OSGi fragment attached to the Spring DM Web Extender bundle by adding the 
     		<literal>Fragment-Host</literal> header:</para>
-			<programlisting><![CDATA[Fragment-Host: org.springframework.bundle.osgi.web.extender]]></programlisting>
+			<programlisting><![CDATA[Fragment-Host: org.springframework.osgi.web.extender]]></programlisting>
 	
 			<para>Now the fragment can be deployed alongside <literal>spring-osgi-web.jar</literal> bundle to plug in Jetty.</para>
 			<para>A pre-packed Jetty fragment is available in the Spring DM <link linkend="appendix-osgi-repo"> maven repository</link> under 
@@ -336,7 +336,7 @@
 		<programlisting><lineannotation># Catalina packages</lineannotation>
 Import-Package: org.apache.catalina,org.apache.catalina.connector
 <lineannotation># Spring DM Web Extender</lineannotation>
-Fragment-Host: org.springframework.bundle.osgi.web.extender</programlisting>
+Fragment-Host: org.springframework.osgi.web.extender</programlisting>
     </section>
     
     

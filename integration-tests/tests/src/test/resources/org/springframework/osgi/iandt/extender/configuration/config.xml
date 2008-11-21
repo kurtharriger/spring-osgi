@@ -9,6 +9,6 @@
 
 	<osgi:reference id="appCtx"
 		interface="org.springframework.context.ApplicationContext"
-		filter="(Bundle-SymbolicName=org.springframework.bundle.osgi.extender)"
+		filter="(Bundle-SymbolicName=org.springframework.osgi.extender)"
 		cardinality="0..1" />
 </beans>

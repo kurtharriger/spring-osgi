@@ -95,17 +95,18 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 	}
 
 	public void testDestroyInstance() throws Exception {
-		int sizeA = Listener.instances.size();
-
 		Configuration[] cfgs = cm.listConfigurations(FILTER);
 
+		int sizeA = cfgs.length;
 		cfgs[cfgs.length - 1].delete();
+		System.out.println(Listener.instances);
 
-		synchronized (Listener.barrier) {
-			Listener.barrier.wait(10 * 1000);
+		synchronized (Listener.unregBarrier) {
+			Listener.unregBarrier.wait(10 * 1000);
 		}
 
 		int sizeB = Listener.instances.size();
+		System.out.println(Listener.instances);
 		assertEquals(sizeA - 1, sizeB);
 	}
 
@@ -116,8 +117,8 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 	private void updateAndWaitForConfig(final Dictionary properties) throws Exception {
 		Configuration cfg = cm.createFactoryConfiguration(FPID, null);
 		cfg.update(properties);
-		synchronized (Listener.barrier) {
-			Listener.barrier.wait(10 * 1000);
+		synchronized (Listener.regBarrier) {
+			Listener.regBarrier.wait(10 * 1000);
 		}
 	}
 }
