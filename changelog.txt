@@ -2,13 +2,15 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.2.0 M2 (2008-xx-yy)
+Changes in version 1.2.0 M2 (2008-11-yy)
 ----------------------------------------
 
 General
 * upgraded to Spring Framework 2.5.6
 * raised required Spring Framework version to 2.5.6
 * upgraded to Knopflerfish 2.1.1
+* aligned bundle symbolic names to Spring convention (changed prefix org.springframework.bundle.osgi. to 
+  org.springframework.osgi. )
 * added support for compendium namespace (managed-service, config-properties)
 * incremented version of spring-osgi.xsd and spring-osgi-compendium.xsd
 
