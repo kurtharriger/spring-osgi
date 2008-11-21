@@ -5,7 +5,7 @@
 <appendix id="appendix-tips">
     <title>Useful OSGi tips</title>
 	
-	<appendixinfo>This section describes several useful tips when running Spring-DM in OSGi. Note that this is not a FAQ - please see the Spring-DM 
+	<appendixinfo>This section describes several useful tips when running Spring DM in OSGi. Note that this is not a FAQ - please see the Spring DM 
 	<ulink url="http://www.springframework.org/osgi">home page</ulink> for one.</appendixinfo>
 	
 	<section id="appendix-tips:fragments">
@@ -13,7 +13,7 @@
 		<sidebar>
 			<title>Check the target OSGi platform fragment support</title>
 			<para>Before using fragments, make sure the target OSGi environment supports them (and to what degree). Out of the OSGi platforms on
-			which Spring-DM is tested upon, at the time of this writing, Apache Felix does not support fragments (it simply ignores them).</para>
+			which Spring DM is tested upon, at the time of this writing, Apache Felix does not support fragments (it simply ignores them).</para>
 		</sidebar>
 		
 		<para>Part of the OSGi R4 release, <emphasis>fragments</emphasis> are a very useful and powerful feature. A fragment is 
@@ -25,13 +25,13 @@
 		
 		<note>For a full description on fragments, please see the OSGi specification, section 3.14.</note>
 		
-		<para>In Spring-DM, fragments are useful for configuring various components such as the extenders. To do that, simply bundle the resources as you
+		<para>In Spring DM, fragments are useful for configuring various components such as the extenders. To do that, simply bundle the resources as you
 		normally would and add an extra entry to the bundle manifest:</para>
 		
 		<programlisting><![CDATA[Fragment-Host: <host bundle symbolic name>]]></programlisting>
 		
 		<para>This line indicates that the containing bundle is a fragment and that it should be attached to the host specified by a symbolic name. The fragment
-		and host bundle symbolic name should be different. For example, to attach a fragment (with extra configuration) the Spring-DM extender, one could use
+		and host bundle symbolic name should be different. For example, to attach a fragment (with extra configuration) the Spring DM extender, one could use
 		the following manifest:</para>
 		 
 		<programlistingco>
@@ -49,7 +49,7 @@ Bundle-ManifestVersion: 2
 Fragment-Host: org.springframework.bundle.osgi.extender
 Bundle-SymbolicName: org.mydomain.project.fragment
 Bundle-Name: my-fragment
-Bundle-Description: Fragment attached to Spring-DM extender
+Bundle-Description: Fragment attached to Spring DM extender
 ]]></programlisting>
 
 		<calloutlist>

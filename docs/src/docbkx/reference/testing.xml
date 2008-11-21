@@ -10,7 +10,7 @@
     no hard dependencies on OSGi, and the few OSGi APIs that you may interact
     with (such as <interfacename>BundleContext</interfacename>) are interface-based 
     and easy to mock. Whether you want to do unit testing or <ulink url="http://en.wikipedia.org/wiki/Integration_testing">
-    integration</ulink> testing, Spring-DM can ease your task.</para> 
+    integration</ulink> testing, Spring DM can ease your task.</para> 
     
     <section id="testing:mocks">
 
@@ -31,11 +31,11 @@
     Even though most OSGi API are interfaces and creating mocks using a specialized
     library like <ulink url="http://www.easymock.org/">EasyMock</ulink> is fairly
     simple, in practice the amount of code of setting the code (especially on JDK 1.4)
-    becomes cumbersome. To keep the tests short and concise, Spring-DM provides OSGi
+    becomes cumbersome. To keep the tests short and concise, Spring DM provides OSGi
     mocks under <literal>org.springframework.osgi.mock</literal> package.</para>
     
     <para>It's up to you to decide whether they are useful or not however, we make extensive
-    use of them inside Spring-DM test suite. Below you can find a code snippet that you
+    use of them inside Spring DM test suite. Below you can find a code snippet that you
     are likely to encounter in our code base:</para>
     
     <programlisting language="java"><![CDATA[private ServiceReference reference;
@@ -84,7 +84,7 @@ public void testComponent() throws Exception {
     
      <para>While JUnit4/TestNG overcome the class inheritance
      problem that appears when building base JUnit classes, by decoupling
-     the runner from the test through annotations, Spring-DM cannot use
+     the runner from the test through annotations, Spring DM cannot use
      them since it has to support Java 1.4.</para>
      <para>However, it is planned for the future to provide an optional,
      JVM 5-based testing extension to integrate the existing testing framework
@@ -100,7 +100,7 @@ public void testComponent() throws Exception {
     provides support for writing regular <literal>JUnit</literal> test cases that are then
     automatically executed in an OSGi environment.</para>
     
-    <para>In general, the scenario supported by Spring-DM testing framework is:</para>
+    <para>In general, the scenario supported by Spring DM testing framework is:</para>
 
     <itemizedlist>
       <listitem>
@@ -140,7 +140,7 @@ public void testComponent() throws Exception {
     (IDE, build (ant, maven), etc.) that can work with JUnit.</para>
 
     <para>The rest of this chapter details (with examples) the features
-    offered by Spring-DM testing suite.</para>
+    offered by Spring DM testing suite.</para>
     
     <section id="testing:integration:simple-test">
       <title>Creating a simple OSGi integration test</title>
@@ -198,7 +198,7 @@ spring-osgi-extender, etc... TestBundle-testOsgiPlatformStarts-com.your.package.
 ]]></programlisting>
 
     <para>As you can see, the testing framework installs the mandatory requirements required for running the 
-    test such as the Spring, Spring-DM, slf4j jars among others.</para>
+    test such as the Spring, Spring DM, slf4j jars among others.</para>
     
     </section>
 
@@ -217,7 +217,7 @@ spring-osgi-extender, etc... TestBundle-testOsgiPlatformStarts-com.your.package.
        </para>
      </sidebar>
       
-     <para>Besides the Spring-DM jars and the test itself is highly likely that you depend on 
+     <para>Besides the Spring DM jars and the test itself is highly likely that you depend on 
      several libraries or your own code for the integration test.</para> 
      
      <para>Consider the following test that relies on Apache Commons 
@@ -306,7 +306,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
 	  <para>However each manifest needs the following entry:</para>
 	  <quote>Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator</quote>
 	  <para>since without it, the testing infrastructure cannot function properly. Also, one needs to 
-	  import JUnit, Spring and Spring-DM specific packages used by the base test suite:</para>
+	  import JUnit, Spring and Spring DM specific packages used by the base test suite:</para>
       <programlisting><![CDATA[Import-Package: junit.framework,
   org.osgi.framework,
   org.apache.commons.logging,
@@ -325,7 +325,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       
       <para>By default, for the on-the-fly bundle, the testing infrastructure uses all the classes, xml and properties files
       found under <literal>./target/test-classes</literal> folder. This matches the project layout for maven which is used 
-      (at the moment by Spring-DM). These settings can be configured in two ways:</para>
+      (at the moment by Spring DM). These settings can be configured in two ways:</para>
    
       <orderedlist>
       
@@ -433,7 +433,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
     <section id="testing:integration:appContext">
       <title>Creating an OSGi application context</title>
       
-	  <para>Spring-DM testing suite builds on top of Spring testing classes. To create an application context
+	  <para>Spring DM testing suite builds on top of Spring testing classes. To create an application context
 	  (OSGi specific), one should just override <literal>getConfigLocations[]</literal> method and indicate
 	  the location of the application context configuration. At runtime, an OSGi application context will be created
 	  and cached for the lifetime of the test case.</para>
@@ -509,7 +509,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       </para>
     </section>
     
-    <para>Hopefully this chapter showed how Spring-DM testing infrastructure can simplify OSGi integration testing and 
+    <para>Hopefully this chapter showed how Spring DM testing infrastructure can simplify OSGi integration testing and 
     how it can be customized. Consider consulting the javadocs for more information.
     </para>
   </section>

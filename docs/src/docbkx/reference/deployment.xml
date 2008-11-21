@@ -229,8 +229,8 @@ context ::= path ( ';' path ) * (';' directive) *
     <section id="app-deploy:extender-configuration">
     	<title>Extender configuration options</title>
     	
-    	<para>Aside from bundle-specific configurations, Spring-DM allows the core extender generic behaviour be configured. This is useful when
-    	embedding Spring-DM inside a managed environment or when a bundles-wide functionality is desired. To allow for extensible configuration,
+    	<para>Aside from bundle-specific configurations, Spring DM allows the core extender generic behaviour be configured. This is useful when
+    	embedding Spring DM inside a managed environment or when a bundles-wide functionality is desired. To allow for extensible configuration,
     	the extender relies on OSGi <link linkend="appendix-tips:fragments">fragments</link> to override its defaults. The extender looks for all XML files 
     	under <literal>META-INF/spring/extender</literal> folder in its bundle space and assembled them into an application context 
     	(of type <classname>OsgiBundleXmlApplicationContext</classname>) 
@@ -288,7 +288,7 @@ context ::= path ( ';' path ) * (';' directive) *
                 <footnote>Part of <literal>org.springframework.context.event</literal> package</footnote>
                 </entry>
                 <entry><literal><ulink url="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/event/ApplicationEventMulticaster.html">
-                ApplicationEventMultiCaster</ulink></literal> used for propagating Spring-DM <link linkend="app-deploy:extender-configuration:events">events</link>
+                ApplicationEventMultiCaster</ulink></literal> used for propagating Spring DM <link linkend="app-deploy:extender-configuration:events">events</link>
                 to third parties. 
                 </entry>
                 <entry>An instance of <classname><ulink url="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/context/event/SimpleApplicationEventMulticaster.html">
@@ -348,7 +348,7 @@ context ::= path ( ';' path ) * (';' directive) *
               <row>
                 <entry><literal>process.annotations</literal></entry>
                 <entry><classname>java.lang.Boolean</classname></entry>
-                <entry>Flag indicating whether or not, the extender will process Spring-DM annotations. Note that this can be enabled in each process bundle
+                <entry>Flag indicating whether or not, the extender will process Spring DM annotations. Note that this can be enabled in each process bundle
                 by adding the appropriate bean post processor. See <xref linkend="appendix-extensions:annotations"/> for more information.</entry>
                 <entry>false</entry>
               </row>
@@ -362,11 +362,11 @@ context ::= path ( ';' path ) * (';' directive) *
     		<title>Listening to Extender events</title>
     		
     		<para>There are cases when the failure or succesful startup of an application context needs to be acknowledged for logging purposes (for example).
-    		For these cases, Spring-DM offers a dedicated package <literal>org.springframework.osgi.context.event</literal> which defines the events that
+    		For these cases, Spring DM offers a dedicated package <literal>org.springframework.osgi.context.event</literal> which defines the events that
     		OSGi application contexts can send during their lifecycle. At the moment, the following events are available:</para>
     		 
 	    	<table id="app-deploy:extender-configuration:events-table" pgwide="1">
-	          <title>Spring-DM build-in events</title>
+	          <title>Spring DM build-in events</title>
 	          <tgroup cols="2">
 	            <thead>
 	              <row>
@@ -394,13 +394,13 @@ context ::= path ( ';' path ) * (';' directive) *
 	    	</table>
     		
     		<para>Parties interested in receiving these events should implement <interfacename>OsgiBundleApplicationContextListener</interfacename> and
-    		then publish it as an OSGi service. The Spring-DM extender will automatically detect the listener and will send the events to it. By taking advantage
+    		then publish it as an OSGi service. The Spring DM extender will automatically detect the listener and will send the events to it. By taking advantage
     		of the OSGi service registry, the extender decouples the received from the event publisher and moreover, makes the registration/unregistration process
     		easier. For example, there is nothing special a client should do to unregister the listener - simply stopping the bundle will automatically 
     		unregister all its published services (including the listener), an event which will detected by the extender which will remove the listener.
     		Of course, it is also possible for the client to unregister the listener manually during a bundle lifecycle.
 			    		
-    		<note>The Spring-DM events semantics are slightly different then
+    		<note>The Spring DM events semantics are slightly different then
     		<ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#context-functionality-events">Spring's</ulink>. The OSGi events are
     		not sent to beans inside the <emphasis>causing</emphasis> application context but to other parties (possible beans in other application contexts)
     		interested in monitoring its behaviour.</note>
@@ -497,17 +497,17 @@ context ::= path ( ';' path ) * (';' directive) *
     	<para>Spring 2.0 introduced (among other things) <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/xsd-config.html">
     	easier</ulink> XML configuration and <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/extensible-xml.html">
     	extensible</ulink> XML authoring. The latter gives the ability of creating custom schemas that are discovered automatically (in non-OSGi environment)
-    	by the Spring XML infrastructure by including them in the classpath. Spring-DM is aware of this process and supports it in OSGi environments so
+    	by the Spring XML infrastructure by including them in the classpath. Spring DM is aware of this process and supports it in OSGi environments so
     	that custom schemas are available to bundles that use them without any extra code or manifest declaration.</para>
-    	<para>All bundles deployed in the OSGi space (whether they are <literal>Spring-powered</literal> or not) are scanned by Spring-DM for 
+    	<para>All bundles deployed in the OSGi space (whether they are <literal>Spring-powered</literal> or not) are scanned by Spring DM for 
     	custom Spring namespace declaration (by checking the bundle space for<literal>META-INF/spring.handlers</literal> and 
-    	<literal>META-INF/spring.schemas</literal>). If these are found, Spring-DM will make the schemas and the namespaces available through an OSGi
+    	<literal>META-INF/spring.schemas</literal>). If these are found, Spring DM will make the schemas and the namespaces available through an OSGi
     	service that will be automatically used by Spring-powered bundles. This mean that if you deploy a bundle that uses a custom schema, all you have to do
     	is deploy the library that provides the namespace parser and the schema.
     	Bundles that embedded inside their classpath libraries that provide custom schemas will use these over those available in the OSGi space. However,
     	the namespaces of the embedded libraries will not shared with other bundles, that is, they will not be seen by any other bundle.</para>
     	<para>
-    	In short, with using Spring-DM, custom Spring namespaces are supported transparently without any additional work. Embedded namespace providers will
+    	In short, with using Spring DM, custom Spring namespaces are supported transparently without any additional work. Embedded namespace providers will
     	have priority but will not be shared, as opposed to providers deployed as bundles which will be seen (and used) by others.</para>
     </section>
 

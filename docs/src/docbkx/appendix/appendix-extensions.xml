@@ -5,9 +5,9 @@
     <title>Extensions</title>
 
 	<sidebar>
-	  <title>Spring-DM and Spring annotations</title>
-	  <para>This chapter describes the annotations present in Spring-DM and how
-	  to enable/disable them. Spring-DM annotatations are separate from the <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/new-in-2.html#new-in-2-ioc-annotations">annotation</ulink> <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/new-in-2.html#new-in-2-ioc-component-scanning">support</ulink> in Spring
+	  <title>Spring DM and Spring annotations</title>
+	  <para>This chapter describes the annotations present in Spring DM and how
+	  to enable/disable them. Spring DM annotatations are separate from the <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/new-in-2.html#new-in-2-ioc-annotations">annotation</ulink> <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/new-in-2.html#new-in-2-ioc-component-scanning">support</ulink> in Spring
 	  framework; enabling or disabling one does not interfere with the other.</para>
 	</sidebar>
 		
@@ -62,12 +62,12 @@
 		currently two ways for enabling it:</para>
 		
 		<itemizedlist>
-			<listitem><para>through Spring-DM extender (see <xref linkend="app-deploy:extender-configuration"/>).</para>
+			<listitem><para>through Spring DM extender (see <xref linkend="app-deploy:extender-configuration"/>).</para>
 			  <para>This is an extender wide configuration which means all bundles started by the extender will have annotation injection applied to them.
 			  </para>
 			</listitem>
 			<listitem><para>by specifying a dedicated bean post processor</para>
-			<para>By specifying the Spring-DM annotation extension processor, one
+			<para>By specifying the Spring DM annotation extension processor, one
 			can enable <emphasis>per-bundle</emphasis> annotation injection. To do that, add the following to your bundle configuration:</para>
 			<programlisting><![CDATA[<!-- annotation processor -->
 <bean class="org.springframework.osgi.extensions.annotation.ServiceReferenceInjectionBeanPostProcessor"/>]]></programlisting>

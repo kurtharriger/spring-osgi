@@ -202,7 +202,7 @@
       the ultimate deployment environment.</para>
 
 	  <para>OSGi 4.0.x specification defines three different spaces from which a
-	  resource can be loaded. Spring-DM supports all of them through its dedicated OSGi-specific
+	  resource can be loaded. Spring DM supports all of them through its dedicated OSGi-specific
 	  application context and dedicated prefixes:</para>
 	  
 	  <table id="osgi-search-strategies" pgwide="1">

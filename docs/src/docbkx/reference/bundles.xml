@@ -5,7 +5,7 @@
   <chapter id="bundles">
     <title>Working with Bundles</title>
 
-    <para>Spring-DM offers a dedicated schema element for interacting with existing
+    <para>Spring DM offers a dedicated schema element for interacting with existing
     bundles or for installing new ones. While it is not intended to be used as a replacement
     for proper OSGi services, the <literal>bundle</literal> element offers a very
     easy way of executing actions on bundles based on the lifecycle of the application

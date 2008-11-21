@@ -5,7 +5,7 @@
     <title>Spring Dynamic Modules Maven Archetype</title>
     
 
-    <para>As part of the distribution, Spring-DM provides a Maven <ulink url="http://maven.apache.org/plugins/maven-archetype-plugin/">archetype</ulink>
+    <para>As part of the distribution, Spring DM provides a Maven <ulink url="http://maven.apache.org/plugins/maven-archetype-plugin/">archetype</ulink>
     which creates the basic structure of a Java project that uses Spring DM, especially useful to new users. To run the archetype (and create the new project),
     simply run the following command line: 
    	</para>

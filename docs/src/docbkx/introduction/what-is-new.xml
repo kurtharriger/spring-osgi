@@ -13,7 +13,7 @@
 		<section id="dm-1.1.x:web">
   		    <title>Web Support</title>
 			<para>The biggest feature in Spring Dynamic Modules 1.1.x is the transparent support for web applications on OSGi platforms. By integrating
-			directly with web containers (such as Apache Tomcat and Jetty), Spring-DM allows WARs using Servlet, JSP and taglib technologies to 
+			directly with web containers (such as Apache Tomcat and Jetty), Spring DM allows WARs using Servlet, JSP and taglib technologies to 
 			be used with little or no effort at all. 
 			Please see <xref linkend="web"/> for details.
 			</para>
@@ -33,7 +33,7 @@
 		</section>
 		<section id="dm-1.1.x:configuration">
   		    <title>Pluggable Extender Configuration</title>
-			<para>1.1.x makes it easy to change the default configuration for the various <link linkend="extender-pattern">extender</link>s used by Spring-DM. By using
+			<para>1.1.x makes it easy to change the default configuration for the various <link linkend="extender-pattern">extender</link>s used by Spring DM. By using
 			<link linkend="appendix-tips:fragments">fragments</link>, users can customize the way application contexts are started, the web container used 
 			for web deployment or the thread-pool for running Spring applications. Additionally, it is possible to receive events 
 			regarding the OSGi Spring application contexts lifecycle. <xref linkend="bnd-app-ctx:extender"/> lists the available options and explains them in detail.  

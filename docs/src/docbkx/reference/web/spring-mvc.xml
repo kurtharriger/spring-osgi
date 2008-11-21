@@ -5,14 +5,14 @@
 	<section id="web:spring-mvc">
 	   <title>Spring-MVC Integration</title>
 	   
-	   <para>Since 1.1, Spring-DM integrates closely with 
+	   <para>Since 1.1, Spring DM integrates closely with 
 	   <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/mvc.html">Spring-MVC</ulink> framework.
 	   This section details how Spring-MVC applications can be run into OSGi environments (it is assumed the reader 
 	   is familiar with Spring-MVC concepts and APIs).
 	   </para>
 	
      <para>In order to be properly used inside an OSGi platform, a Spring-MVC application needs to adapt to its new environment.
-     Spring-DM provides a dedicated, OSGi-aware, web application context (called <classname>OsgiBundleXmlWebApplicationContext</classname>) 
+     Spring DM provides a dedicated, OSGi-aware, web application context (called <classname>OsgiBundleXmlWebApplicationContext</classname>) 
      that offers the same functionality and behaviour to its Spring-MVC brethren, <classname>
      <ulink url="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/web/context/support/XmlWebApplicationContext.html">
      XmlWebApplicationContext</ulink></classname>. The application context is aware of the web application <interfacename>BundleContext</interfacename>
