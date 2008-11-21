@@ -2,7 +2,7 @@
 <!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 
-  <chapter id="compendium">
+  <chapter id="compendium" xmlns:xi="http://www.w3.org/2001/XInclude">
     <title>Compendium Services</title>
 
     <para>The OSGi Service Platform Service Compendium specification defines a
@@ -83,7 +83,7 @@
         
         <para>Those familiar with Spring's 
         <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/xsd-config.html#xsd-config-body-schemas-util">util namespace</ulink> will
-        fin d<literal><![CDATA[<osgi:cm-properties/>]]></literal> identical with <literal><![CDATA[<util:properties/>]]></literal>.</para>
+        find <literal><![CDATA[<osgi:cm-properties/>]]></literal> element similar to <literal><![CDATA[<util:properties/>]]></literal>.</para>
         
         <para>It is possible to specify a default set of property values to be used in the event that the configuration dictionary does not contain
         an entry for a given key. The declaration is similar to the <literal>props</literal> element inside the Spring beans namespace:</para>
@@ -484,3 +484,4 @@ public class SelfManagedBean {
       
     </section>
   </chapter>
+  

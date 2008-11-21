@@ -59,7 +59,7 @@
 		<section id="dm-1.2.x:compendium">
 			<title>Compendium Services Support</title>
 			<para>1.2.x provides integration with the <ulink url="http://www.osgi.org/javadoc/r4v401/org/osgi/service/cm/package-summary.html">Configuration Admin</ulink>, 
-			part of the OSGi compendium services. <xref linked="compendium"/> provides more details on the topic.</para>
+			part of the OSGi compendium services. <xref linkend="compendium"/> provides more details on the topic.</para>
 		</section>
 		<section id="dm-1.2.x:sym-name-change">
 			<title>Changed Spring DM symbolic names</title>
