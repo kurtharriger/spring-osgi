@@ -19,13 +19,12 @@ public interface ComponentDefinitionRegistry {
 
 	/**
 	 * Returns true iff the registry contains a component definition with
-	 * the given name as its component name or as an alias. 
+	 * the given name. 
 	 */
 	boolean containsComponentDefinition(String name);
 	
 	/**
-	 * Get the component definition for the component with the given name
-	 * or alias.
+	 * Get the component definition for the component with the given name.
 	 *
 	 * @return the matching component definition if present, or null if no
 	 * component with a matching name or alias is present.
@@ -35,14 +34,14 @@ public interface ComponentDefinitionRegistry {
 	/**
 	 * Get the names of all the registered components.
 	 * 
-	 * @return an immutable set (of Strings) containing the primary names of all registered components.
+	 * @return an immutable set (of Strings) containing the names of all registered components.
 	 */
 	Set getComponentDefinitionNames();
 	
 	/**
 	 * Register a new component definition.
 	 * 
-	 * @throws ComponentNameAlreadyInUseException if the name or one of the aliases of the 
+	 * @throws ComponentNameAlreadyInUseException if the name of the 
 	 * component definition to be registered is already in use by an existing component
 	 * definition.
 	 */
@@ -52,7 +51,7 @@ public interface ComponentDefinitionRegistry {
 	 * Remove a component definition from the registry. If no matching component
 	 * is present then this operation does nothing.
 	 * 
-	 * @param name the name (or an alias) of the component to be removed.
+	 * @param name the name of the component to be removed.
 	 */
 	void removeComponentDefinition(String name);
 	

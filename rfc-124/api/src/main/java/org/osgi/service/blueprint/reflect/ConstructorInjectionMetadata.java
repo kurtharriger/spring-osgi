@@ -14,7 +14,8 @@ public interface ConstructorInjectionMetadata {
 	 * and what arguments to pass to it.
 	 * 
 	 * @return an immutable list of ParameterSpecification, or an empty list if the
-	 * default constructor is to be invoked.
+	 * default constructor is to be invoked. The list is ordered by ascending parameter index.
+	 * I.e., the first parameter is first in the list, and so on.
 	 */
 	List /*ParameterSpecification*/ getParameterSpecifications();
 

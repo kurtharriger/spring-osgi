@@ -22,7 +22,8 @@ public interface MethodInjectionMetadata {
 	 * (in the case of overloading) and what arguments to pass to it.
 	 * 
 	 * @return an immutable List of ParameterSpecification, or an empty list if the
-	 * method takes no arguments.
+	 * method takes no arguments. The list is ordered by ascending parameter index.
+	 * I.e., the first parameter is first in the list, and so on.
 	 */
 	List /*<ParameterSpecification>*/ getParameterSpecifications();
 }

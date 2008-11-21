@@ -13,7 +13,7 @@ public class ComponentNameAlreadyInUseException extends RuntimeException {
 	}
 	
 	public String getMessage() {
-		return "Name or alias '" + this.duplicateName + "' is already in use by a registered component";
+		return "Name '" + this.duplicateName + "' is already in use by a registered component";
 	}
 	
 	public String getConflictingName() {

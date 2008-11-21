@@ -1,11 +1,12 @@
 
 package org.osgi.service.blueprint.context;
 
-import org.osgi.framework.Version;
+import org.osgi.framework.Bundle;
 
-public interface ModuleContextListener extends java.util.EventListener {
+public interface ModuleContextListener {
 
-	void contextCreated(String bundleSymbolicName, Version version);
+	void contextCreated(Bundle forBundle);
 
-	void contextCreationFailed(String bundleSymbolicName, Version version, Throwable rootCause);
+	void contextCreationFailed(Bundle forBundle, Throwable rootCause);
+	
 }
