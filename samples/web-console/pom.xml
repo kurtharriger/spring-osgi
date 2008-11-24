@@ -54,12 +54,6 @@
 	   <artifactId>com.springsource.junit</artifactId>
 	   <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>mx4j.osgi</artifactId>
-      <version>3.0.2-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>  
     
 	<dependency>
       <groupId>net.sourceforge.cglib</groupId>
