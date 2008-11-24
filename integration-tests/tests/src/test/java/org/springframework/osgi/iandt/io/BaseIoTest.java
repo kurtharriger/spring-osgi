@@ -126,8 +126,8 @@ public abstract class BaseIoTest extends BaseIntegrationTest {
 		for (int i = 0; i < resources.length; i++) {
 			Resource resource = resources[i];
 			assertTrue(resource instanceof ContextResource);
-			System.out.println("Path within context " + ((ContextResource) resource).getPathWithinContext());
+			// Disabled print out
+			//System.out.println("Path within context " + ((ContextResource) resource).getPathWithinContext());
 		}
 	}
-
 }
