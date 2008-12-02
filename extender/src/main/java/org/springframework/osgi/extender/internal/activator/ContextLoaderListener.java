@@ -46,6 +46,8 @@ import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
+import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceDependencySorter;
@@ -844,6 +846,18 @@ public class ContextLoaderListener implements BundleActivator {
 		createListenersList();
 		// register the listener that does the dispatching
 		multicaster.addApplicationListener(new ListListenerAdapter(applicationListeners));
+
+		// Register an error handle if required
+		if (extenderConfiguration.shouldInstallContextErrorHandler()) {
+			multicaster.addApplicationListener(new OsgiBundleApplicationContextListener() {
+				public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
+				   if (event instanceof OsgiBundleContextFailedEvent) {
+					   log.error("Context creation error for [" + event.getBundle().getSymbolicName() + "]",
+						   ((OsgiBundleContextFailedEvent)event).getFailureCause());
+				   }
+				}
+			});
+		}
 
 		if (log.isDebugEnabled())
 			log.debug("Initialization of OSGi listeners service completed...");

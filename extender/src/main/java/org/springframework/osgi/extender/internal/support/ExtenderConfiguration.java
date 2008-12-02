@@ -77,6 +77,8 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private static final String PROCESS_ANNOTATIONS_KEY = "process.annotations";
 
+ 	private static final String INSTALL_CONTEXT_ERROR_HANDLER_KEY = "install.context.error.handler";
+
 	private static final String EXTENDER_CFG_LOCATION = "META-INF/spring/extender";
 
 	private static final String XML_PATTERN = "*.xml";
@@ -91,6 +93,7 @@ public class ExtenderConfiguration implements DisposableBean {
 	//
 	private static final long DEFAULT_SHUTDOWN_WAIT = 10 * 1000;
 	private static final boolean DEFAULT_PROCESS_ANNOTATION = false;
+	private static final boolean DEFAULT_INSTALL_CONTEXT_ERROR_HANDLER = true;
 
 	private ConfigurableOsgiBundleApplicationContext extenderConfiguration;
 
@@ -105,6 +108,8 @@ public class ExtenderConfiguration implements DisposableBean {
 	private long shutdownWaitTime;
 
 	private boolean processAnnotation;
+
+	private boolean installContextErrorHandler;
 
 	private OsgiBundleApplicationContextEventMulticaster eventMulticaster;
 
@@ -198,6 +203,7 @@ public class ExtenderConfiguration implements DisposableBean {
 		synchronized (lock) {
 			shutdownWaitTime = getShutdownWaitTime(properties);
 			processAnnotation = getProcessAnnotations(properties);
+			installContextErrorHandler = getInstallContextErrorHandler(properties);
 		}
 
 		// load default dependency factories
@@ -276,6 +282,7 @@ public class ExtenderConfiguration implements DisposableBean {
 		Properties properties = new Properties();
 		properties.setProperty(SHUTDOWN_WAIT_KEY, "" + DEFAULT_SHUTDOWN_WAIT);
 		properties.setProperty(PROCESS_ANNOTATIONS_KEY, "" + DEFAULT_PROCESS_ANNOTATION);
+		properties.setProperty(INSTALL_CONTEXT_ERROR_HANDLER_KEY, "" + DEFAULT_INSTALL_CONTEXT_ERROR_HANDLER);
 
 		return properties;
 	}
@@ -366,6 +373,10 @@ public class ExtenderConfiguration implements DisposableBean {
 				|| Boolean.getBoolean(AUTO_ANNOTATION_PROCESSING);
 	}
 
+	private boolean getInstallContextErrorHandler(Properties properties) {
+		return Boolean.valueOf(properties.getProperty(INSTALL_CONTEXT_ERROR_HANDLER_KEY)).booleanValue();
+	}
+
 	/**
 	 * Returns the taskExecutor.
 	 * 
@@ -408,6 +419,15 @@ public class ExtenderConfiguration implements DisposableBean {
 	public boolean shouldProcessAnnotation() {
 		synchronized (lock) {
 			return processAnnotation;
+		}
+	}
+
+	/**
+	 * @return true if an error handler should be installed for context creation.
+	 */
+	public boolean shouldInstallContextErrorHandler() {
+		synchronized (lock) {
+			return installContextErrorHandler;
 		}
 	}
 

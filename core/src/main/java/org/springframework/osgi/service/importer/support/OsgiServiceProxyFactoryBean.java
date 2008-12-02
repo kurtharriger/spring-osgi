@@ -90,7 +90,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	private long retryTimeout;
 	private RetryTemplate retryTemplate;
 
-	/** proxy casted to a specific interface to allow specific method calls */
+	/** proxy cast to a specific interface to allow specific method calls */
 	private ImportedOsgiServiceProxy proxy;
 
 	/** proxy infrastructure hook exposed to allow clean up */
