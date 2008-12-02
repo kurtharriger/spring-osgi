@@ -194,7 +194,9 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 				});
 		}
 		catch (Throwable th) {
-			logger.error("Refresh error", th);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Refresh error", th);
+			}
 			sendFailedEvent(th);
 			// propagate exception to the caller
 			// rethrow the problem w/o rewrapping
@@ -290,7 +292,9 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 				});
 		}
 		catch (Throwable th) {
-			logger.error("Pre refresh error", th);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Pre refresh error", th);
+			}
 			// send failure event
 			sendFailedEvent(th);
 			// rethrow the problem w/o rewrapping
@@ -363,7 +367,9 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 				});
 		}
 		catch (Throwable th) {
-			logger.error("Post refresh error", th);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Post refresh error", th);
+			}
 			// post notification
 			sendFailedEvent(th);
 			// rethrow the problem w/o rewrapping

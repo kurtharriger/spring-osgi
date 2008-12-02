@@ -5,6 +5,16 @@ http://www.springframework.org/osgi
 Changes in version 1.2.0 RC1 (2009-xx-yy)
 -----------------------------------------
 
+General 
+
+* added support for disabling the ApplicationContext error
+handler through extender configuration.
+
+Package org.springframework.osgi.extender
+* added support for install.context.error.handler property
+
+Package org.springframework.osgi.context.support
+* error handling is delegated to the multicaster unless debug is on
 
 Changes in version 1.2.0 M2 (2008-11-24)
 ----------------------------------------

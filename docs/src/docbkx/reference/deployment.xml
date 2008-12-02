@@ -352,6 +352,12 @@ context ::= path ( ';' path ) * (';' directive) *
                 by adding the appropriate bean post processor. See <xref linkend="appendix-extensions:annotations"/> for more information.</entry>
                 <entry>false</entry>
               </row>
+              <row>
+                <entry><literal>install.context.error.handler</literal></entry>
+                <entry><classname>java.lang.Boolean</classname></entry>
+                <entry>Flag indicating whether, or not, the extender will log ApplicationContext errors by default. Users with their own error handling capability will typically want to disable this.</entry>
+                <entry>true</entry>
+              </row>
             </tbody>
           </tgroup>
     	</table>
