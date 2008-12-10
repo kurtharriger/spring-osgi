@@ -130,12 +130,15 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 					logWrongState(ContextState.DEPENDENCIES_RESOLVED);
 					return;
 				}
-				// otherwise update the state
-				state = ContextState.STARTED;
 			}
 
 			// Continue with the refresh process...
 			delegateContext.completeRefresh();
+
+			// Once we are done, tell the world
+			synchronized (monitor) {
+				state = ContextState.STARTED;
+			}
 		}
 	}
 
