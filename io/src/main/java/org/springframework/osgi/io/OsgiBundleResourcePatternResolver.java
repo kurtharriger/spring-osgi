@@ -279,7 +279,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			else {
 				URL url = bundle.getResource(resourcePath);
 				if (url != null)
-					resources.add(new UrlResource(url));
+					resources.add(new UrlContextResource(url, resourcePath));
 			}
 		}
 
@@ -693,7 +693,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				}
 				if (getPathMatcher().match(fullPattern, currPath)) {
 					if (path instanceof URL)
-						result.add(new UrlResource((URL) path));
+						result.add(new UrlContextResource((URL) path, currPath));
 					else
 						result.add(new OsgiBundleResource(bundle, currPath));
 

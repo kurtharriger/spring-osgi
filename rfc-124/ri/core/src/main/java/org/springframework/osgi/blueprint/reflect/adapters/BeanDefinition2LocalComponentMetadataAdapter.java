@@ -1,19 +1,21 @@
+
 package org.springframework.osgi.blueprint.reflect.adapters;
+
+import java.util.Collection;
+import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.ConstructorInjectionMetadata;
-import org.osgi.service.blueprint.reflect.FieldInjectionMetadata;
 import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
 import org.osgi.service.blueprint.reflect.MethodInjectionMetadata;
-import org.osgi.service.blueprint.reflect.PropertyInjectionMetadata;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 
-class BeanDefinition2LocalComponentMetadataAdapter implements
-		LocalComponentMetadata {
-	
+class BeanDefinition2LocalComponentMetadataAdapter implements LocalComponentMetadata {
+
 	private final BeanDefinition beanDef;
-	
+
+
 	public BeanDefinition2LocalComponentMetadataAdapter(BeanDefinition def) {
 		this.beanDef = def;
 	}
@@ -24,7 +26,7 @@ class BeanDefinition2LocalComponentMetadataAdapter implements
 
 	public ConstructorInjectionMetadata getConstructorInjectionMetadata() {
 		ConstructorArgumentValues cons = this.beanDef.getConstructorArgumentValues();
-		return  null;//ConstructorArgumentValues2ConstructorInjectionMetadataAdapter(cons);
+		return null;//ConstructorArgumentValues2ConstructorInjectionMetadataAdapter(cons);
 	}
 
 	public String getDestroyMethodName() {
@@ -40,11 +42,6 @@ class BeanDefinition2LocalComponentMetadataAdapter implements
 		return null;
 	}
 
-	public FieldInjectionMetadata[] getFieldInjectionMetadata() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public String getInitMethodName() {
 		// TODO Auto-generated method stub
 		return null;
@@ -56,11 +53,6 @@ class BeanDefinition2LocalComponentMetadataAdapter implements
 	}
 
 	public LocalComponentMetadata getParent() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public PropertyInjectionMetadata[] getPropertyInjectionMetadata() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -85,7 +77,7 @@ class BeanDefinition2LocalComponentMetadataAdapter implements
 		return null;
 	}
 
-	public String[] getExplicitDependencies() {
+	public Set<String> getExplicitDependencies() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -94,4 +86,7 @@ class BeanDefinition2LocalComponentMetadataAdapter implements
 		return null;
 	}
 
+	public Collection getPropertyInjectionMetadata() {
+		return null;
+	}
 }

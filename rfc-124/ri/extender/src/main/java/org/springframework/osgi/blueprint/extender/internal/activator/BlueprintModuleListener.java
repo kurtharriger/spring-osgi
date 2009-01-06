@@ -122,7 +122,7 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 		dispatcher.afterRefresh(context);
 
 		Bundle bundle = context.getBundle();
-		listenerManager.contextCreated(bundle.getSymbolicName(), OsgiBundleUtils.getBundleVersion(bundle));
+		listenerManager.contextCreated(bundle);
 
 		super.postProcessRefresh(context);
 	}
@@ -132,7 +132,7 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 		dispatcher.refreshFailure(context, th);
 
 		Bundle bundle = context.getBundle();
-		listenerManager.contextCreationFailed(bundle.getSymbolicName(), OsgiBundleUtils.getBundleVersion(bundle), th);
+		listenerManager.contextCreationFailed(bundle, th);
 
 		super.postProcessRefreshFailure(context, th);
 	}

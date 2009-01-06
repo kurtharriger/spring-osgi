@@ -1,17 +1,20 @@
+
 package org.springframework.osgi.blueprint.reflect.adapters;
 
+import java.util.Collection;
 import java.util.Properties;
+import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.RegistrationListenerMetadata;
 import org.osgi.service.blueprint.reflect.ServiceExportComponentMetadata;
 import org.osgi.service.blueprint.reflect.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 
-class BeanDefinition2ServiceExportComponentMetadataAdapter implements
-		ServiceExportComponentMetadata {
-	
+class BeanDefinition2ServiceExportComponentMetadataAdapter implements ServiceExportComponentMetadata {
+
 	private final BeanDefinition beanDef;
-	
+
+
 	public BeanDefinition2ServiceExportComponentMetadataAdapter(BeanDefinition def) {
 		this.beanDef = def;
 	}
@@ -26,7 +29,7 @@ class BeanDefinition2ServiceExportComponentMetadataAdapter implements
 		return null;
 	}
 
-	public String[] getInterfaceNames() {
+	public Set<String> getInterfaceNames() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -36,7 +39,7 @@ class BeanDefinition2ServiceExportComponentMetadataAdapter implements
 		return 0;
 	}
 
-	public RegistrationListenerMetadata[] getRegistrationListeners() {
+	public Collection getRegistrationListeners() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -51,7 +54,7 @@ class BeanDefinition2ServiceExportComponentMetadataAdapter implements
 		return null;
 	}
 
-	public String[] getExplicitDependencies() {
+	public Set<String> getExplicitDependencies() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -60,5 +63,4 @@ class BeanDefinition2ServiceExportComponentMetadataAdapter implements
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
