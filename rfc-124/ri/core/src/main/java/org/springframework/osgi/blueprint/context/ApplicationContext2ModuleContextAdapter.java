@@ -18,7 +18,11 @@
 package org.springframework.osgi.blueprint.context;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.context.ModuleContext;
@@ -32,6 +36,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.osgi.blueprint.reflect.adapters.ComponentMetadataFactory;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Default {@link ModuleContext} implementation. Wraps a Spring's
@@ -75,38 +80,41 @@ public class ApplicationContext2ModuleContextAdapter implements ModuleContext {
 		}
 	}
 
-	public String[] getComponentNames() {
-		return this.applicationContext.getBeanDefinitionNames();
+	public Set<String> getComponentNames() {
+		String[] names = this.applicationContext.getBeanDefinitionNames();
+		Set<String> components = new LinkedHashSet<String>(names.length);
+		CollectionUtils.mergeArrayIntoCollection(names, components);
+		return Collections.unmodifiableSet(components);
 	}
 
-	public ServiceExportComponentMetadata[] getExportedServicesMetadata() {
+	public Collection<ServiceExportComponentMetadata> getExportedServicesMetadata() {
 		List<ServiceExportComponentMetadata> serviceMetadata = new ArrayList<ServiceExportComponentMetadata>();
 		for (ComponentMetadata metadata : getComponentMetadataForAllComponents()) {
 			if (metadata instanceof ServiceExportComponentMetadata) {
 				serviceMetadata.add((ServiceExportComponentMetadata) metadata);
 			}
 		}
-		return serviceMetadata.toArray(new ServiceExportComponentMetadata[serviceMetadata.size()]);
+		return serviceMetadata;
 	}
 
-	public ServiceReferenceComponentMetadata[] getReferencedServicesMetadata() {
+	public Collection<ServiceReferenceComponentMetadata> getReferencedServicesMetadata() {
 		List<ServiceReferenceComponentMetadata> references = new ArrayList<ServiceReferenceComponentMetadata>();
 		for (ComponentMetadata metadata : getComponentMetadataForAllComponents()) {
 			if (metadata instanceof ServiceReferenceComponentMetadata) {
 				references.add((ServiceReferenceComponentMetadata) metadata);
 			}
 		}
-		return references.toArray(new ServiceReferenceComponentMetadata[references.size()]);
+		return references;
 	}
 
-	public LocalComponentMetadata[] getLocalComponentsMetadata() {
+	public Collection<LocalComponentMetadata> getLocalComponentsMetadata() {
 		List<LocalComponentMetadata> localMetadata = new ArrayList<LocalComponentMetadata>();
 		for (ComponentMetadata metadata : getComponentMetadataForAllComponents()) {
 			if (metadata instanceof LocalComponentMetadata) {
 				localMetadata.add((LocalComponentMetadata) metadata);
 			}
 		}
-		return localMetadata.toArray(new LocalComponentMetadata[localMetadata.size()]);
+		return localMetadata;
 	}
 
 	public BundleContext getBundleContext() {

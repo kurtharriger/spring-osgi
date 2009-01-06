@@ -1,6 +1,12 @@
+
 package org.springframework.osgi.blueprint.reflect;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.ComponentValue;
 import org.osgi.service.blueprint.reflect.ReferenceNameValue;
@@ -8,18 +14,19 @@ import org.osgi.service.blueprint.reflect.ReferenceValue;
 import org.osgi.service.blueprint.reflect.RegistrationListenerMetadata;
 import org.osgi.service.blueprint.reflect.ServiceExportComponentMetadata;
 import org.osgi.service.blueprint.reflect.Value;
+import org.springframework.util.CollectionUtils;
 
-public class MutableServiceExportComponentMetadata extends
-		MutableComponentMetadata implements ServiceExportComponentMetadata {
-	
+public class MutableServiceExportComponentMetadata extends MutableComponentMetadata implements
+		ServiceExportComponentMetadata {
+
 	private int exportMode = ServiceExportComponentMetadata.EXPORT_MODE_DISABLED;
 	private Value exportedComponent;
 	private String[] interfaceNames;
 	private int ranking;
 	private RegistrationListenerMetadata[] listeners = new RegistrationListenerMetadata[0];
 	private Properties serviceProperties = new Properties();
-	
-	
+
+
 	public MutableServiceExportComponentMetadata(String name, Value exportedComponent, String[] interfaces) {
 		super(name);
 		if (exportedComponent == null) {
@@ -35,7 +42,7 @@ public class MutableServiceExportComponentMetadata extends
 	public int getAutoExportMode() {
 		return this.exportMode;
 	}
-	
+
 	public void setAutoExportMode(int exportMode) {
 		if ((exportMode < EXPORT_MODE_DISABLED) || (exportMode > EXPORT_MODE_ALL)) {
 			throw new IllegalArgumentException("unrecognised export mode: " + exportMode);
@@ -46,7 +53,7 @@ public class MutableServiceExportComponentMetadata extends
 	public Value getExportedComponent() {
 		return this.exportedComponent;
 	}
-	
+
 	public void setExportedComponent(Value exportedComponent) {
 		if (exportedComponent == null) {
 			throw new IllegalArgumentException("exportedComponent cannot be null");
@@ -58,16 +65,15 @@ public class MutableServiceExportComponentMetadata extends
 	}
 
 	private boolean isComponentBasedValue(Value exportedComponent) {
-		return ( (exportedComponent instanceof ComponentValue) ||
-				 (exportedComponent instanceof ReferenceValue) ||
-				 (exportedComponent instanceof ReferenceNameValue)
-			   );
+		return ((exportedComponent instanceof ComponentValue) || (exportedComponent instanceof ReferenceValue) || (exportedComponent instanceof ReferenceNameValue));
 	}
 
-	public String[] getInterfaceNames() {
-		return this.interfaceNames;
+	public Set<String> getInterfaceNames() {
+		Set<String> intfs = new LinkedHashSet<String>(interfaceNames.length);
+		CollectionUtils.mergeArrayIntoCollection(interfaceNames, intfs);
+		return Collections.unmodifiableSet(intfs);
 	}
-	
+
 	public void setInterfaceNames(String[] interfaceNames) {
 		if ((interfaceNames == null) || (interfaceNames.length == 0)) {
 			throw new IllegalArgumentException("must be at least one interface name");
@@ -78,15 +84,15 @@ public class MutableServiceExportComponentMetadata extends
 	public int getRanking() {
 		return this.ranking;
 	}
-	
+
 	public void setRanking(int ranking) {
 		this.ranking = ranking;
 	}
 
-	public RegistrationListenerMetadata[] getRegistrationListeners() {
-		return this.listeners;
+	public Collection getRegistrationListeners() {
+		return Collections.unmodifiableList(Arrays.asList(listeners));
 	}
-	
+
 	public void setRegistrationListenerMetadata(RegistrationListenerMetadata[] listeners) {
 		if (listeners == null) {
 			this.listeners = new RegistrationListenerMetadata[0];
@@ -102,7 +108,7 @@ public class MutableServiceExportComponentMetadata extends
 	public Properties getServiceProperties() {
 		return this.serviceProperties;
 	}
-	
+
 	public void setServiceProperties(Properties serviceProperties) {
 		if (serviceProperties == null) {
 			this.serviceProperties = new Properties();
@@ -111,5 +117,4 @@ public class MutableServiceExportComponentMetadata extends
 			this.serviceProperties = serviceProperties;
 		}
 	}
-
 }

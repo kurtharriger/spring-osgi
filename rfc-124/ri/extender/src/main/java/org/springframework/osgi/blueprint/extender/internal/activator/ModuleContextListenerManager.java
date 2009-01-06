@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Version;
 import org.osgi.service.blueprint.context.ModuleContextListener;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.importer.support.Cardinality;
@@ -71,10 +71,10 @@ class ModuleContextListenerManager implements ModuleContextListener, DisposableB
 		}
 	}
 
-	public void contextCreated(String symName, Version version) {
+	public void contextCreated(Bundle bundle) {
 		for (ModuleContextListener listener : listeners) {
 			try {
-				listener.contextCreated(symName, version);
+				listener.contextCreated(bundle);
 			}
 			catch (Exception ex) {
 				log.warn("#contextCreated threw exception when calling listener " + System.identityHashCode(listener),
@@ -83,10 +83,10 @@ class ModuleContextListenerManager implements ModuleContextListener, DisposableB
 		}
 	}
 
-	public void contextCreationFailed(String symName, Version version, Throwable ex) {
+	public void contextCreationFailed(Bundle bundle, Throwable ex) {
 		for (ModuleContextListener listener : listeners) {
 			try {
-				listener.contextCreationFailed(symName, version, ex);
+				listener.contextCreationFailed(bundle, ex);
 			}
 			catch (Exception excep) {
 				log.warn("#contextCreationFailed threw exception when calling listener "

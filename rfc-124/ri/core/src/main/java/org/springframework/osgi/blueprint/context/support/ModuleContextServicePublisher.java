@@ -83,11 +83,9 @@ public class ModuleContextServicePublisher implements ApplicationListener {
 
 		Bundle bundle = bundleContext.getBundle();
 		// add RFC124 properties
-		serviceProperties.put(ModuleContext.SYMBOLIC_NAME_PROPERTY, bundle.getSymbolicName());
 		serviceProperties.put(Constants.BUNDLE_SYMBOLICNAME, bundle.getSymbolicName());
 
 		Version version = OsgiBundleUtils.getBundleVersion(bundle);
-		serviceProperties.put(ModuleContext.VERSION_PROPERTY, version);
 		serviceProperties.put(Constants.BUNDLE_VERSION, version);
 
 		log.info("Publishing ModuleContext as OSGi service with properties " + serviceProperties);

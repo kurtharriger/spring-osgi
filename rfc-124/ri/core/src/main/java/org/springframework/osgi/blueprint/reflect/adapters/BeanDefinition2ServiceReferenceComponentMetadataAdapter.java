@@ -1,19 +1,22 @@
+
 package org.springframework.osgi.blueprint.reflect.adapters;
 
-import org.osgi.service.blueprint.reflect.BindingListenerMetadata;
+import java.util.Collection;
+import java.util.Set;
+
 import org.osgi.service.blueprint.reflect.ServiceReferenceComponentMetadata;
 import org.springframework.beans.factory.config.BeanDefinition;
 
-class BeanDefinition2ServiceReferenceComponentMetadataAdapter implements
-		ServiceReferenceComponentMetadata {
-	
+class BeanDefinition2ServiceReferenceComponentMetadataAdapter implements ServiceReferenceComponentMetadata {
+
 	private final BeanDefinition beanDef;
-	
+
+
 	public BeanDefinition2ServiceReferenceComponentMetadataAdapter(BeanDefinition def) {
 		this.beanDef = def;
 	}
 
-	public BindingListenerMetadata[] getBindingListeners() {
+	public Collection getBindingListeners() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -23,7 +26,7 @@ class BeanDefinition2ServiceReferenceComponentMetadataAdapter implements
 		return null;
 	}
 
-	public String[] getInterfaceNames() {
+	public Set getInterfaceNames() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -38,7 +41,7 @@ class BeanDefinition2ServiceReferenceComponentMetadataAdapter implements
 		return null;
 	}
 
-	public String[] getExplicitDependencies() {
+	public Set getExplicitDependencies() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -47,5 +50,4 @@ class BeanDefinition2ServiceReferenceComponentMetadataAdapter implements
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
