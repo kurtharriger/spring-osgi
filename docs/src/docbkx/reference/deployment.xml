@@ -481,11 +481,24 @@ context ::= path ( ';' path ) * (';' directive) *
         </listitem>
 
         <listitem>
-          <para>commons-logging API (SLF4J version highly recommended)</para>
+          <para>commons-logging API (<ulink url="http://www.slf4j.org/">SLF4J</ulink> version <emphasis>highly</emphasis> recommended:</para>
+          <itemizedlist>
+            <listitem>
+               <para>SLF4J API (com.springsource.sfl4j.api.jar)</para>
+            </listitem>
+            <listitem>
+               <para>SLF4J Implementation Bridge (such as Log4j - com.springsource.sfl4j.log4j.jar)</para>
+            </listitem>
+            <listitem>
+               <para>SLF4J commons logging adapter (com.springsource.sfl4j.org.apache.commons.logging.jar)</para>
+            </listitem>
+            
+          </itemizedlist>
+          <para>)</para>
         </listitem>
         
         <listitem>
-          <para>logging implementation such as log4j</para>
+          <para>logging implementation suitable for commons-logging (such as log4j)</para>
         </listitem>
         
       </itemizedlist>
