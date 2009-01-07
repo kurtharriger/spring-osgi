@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.springframework.osgi.mock.MockBundle;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Costin Leau
@@ -54,11 +55,40 @@ public class OsgiHeaderUtilsTest extends TestCase {
 		assertEquals(path2, cp[1]);
 	}
 
+	public void testGetBundleClassPathWithWhiteSpaces() {
+		Properties props = new Properties();
+		String path1 = ".";
+		String path2 = "WEB-INF/";
+		props.setProperty(Constants.BUNDLE_CLASSPATH, " " + path1 + " ,  " + path2 + "   ");
+		Bundle bundle = new MockBundle(props);
+		String[] cp = OsgiHeaderUtils.getBundleClassPath(bundle);
+
+		// check for spaces
+		assertSame(cp[0], cp[0].trim());
+		assertSame(cp[1], cp[1].trim());
+		// check result
+		assertEquals(2, cp.length);
+		assertEquals(path1, cp[0]);
+		assertEquals(path2, cp[1]);
+	}
+
 	public void testGetRequireBundleUndeclared() throws Exception {
 		Properties props = new Properties();
 		Bundle bundle = new MockBundle(props);
 		String[] rb = OsgiHeaderUtils.getRequireBundle(bundle);
 		assertEquals(0, rb.length);
+	}
+
+	public void testGetRequireBundleWithMultipleBundlesAttributesAndWhitespaces() throws Exception {
+		Properties props = new Properties();
+		String pkg2 = "foo.bar";
+		props.setProperty(Constants.REQUIRE_BUNDLE, "  " + PKG + ";visibility:=reexport;bundle-version=\"1.0\" ,\t  "
+				+ pkg2 + "\n  ");
+		Bundle bundle = new MockBundle(props);
+		String[] rb = OsgiHeaderUtils.getRequireBundle(bundle);
+
+		assertSame(rb[0], rb[0].trim());
+		assertSame(rb[1], rb[1].trim());
 	}
 
 	public void testGetRequireBundleWMultipleUnversionedEntries() throws Exception {

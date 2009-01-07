@@ -138,7 +138,7 @@ public class OsgiBundleResourceTest extends TestCase {
 
 		resource = new OsgiBundleResource(mock, location);
 
-		assertSame(result, resource.getResourceFromBundleSpace(location));
+		assertEquals(result, resource.getResourceFromBundleSpace(location).getURL());
 		control.verify();
 	}
 
