@@ -214,25 +214,6 @@ public class ChainedClassLoader extends ClassLoader {
 		}
 	}
 
-	private Class doLoadClass(String name, List classLoaders) throws ClassNotFoundException {
-		Class clazz = null;
-
-		synchronized (classLoaders) {
-			for (int i = 0; i < classLoaders.size(); i++) {
-				ClassLoader loader = (ClassLoader) classLoaders.get(i);
-				try {
-					clazz = loader.loadClass(name);
-					return clazz;
-				}
-				catch (ClassNotFoundException e) {
-					// keep moving through the class loaders
-				}
-			}
-		}
-
-		return clazz;
-	}
-
 	private Class doLoadClass(String name) throws ClassNotFoundException {
 		Class clazz = doLoadClass(name, loaders);
 
@@ -254,6 +235,25 @@ public class ChainedClassLoader extends ClassLoader {
 		else {
 			throw new ClassNotFoundException(name);
 		}
+	}
+
+	private Class doLoadClass(String name, List classLoaders) throws ClassNotFoundException {
+		Class clazz = null;
+
+		synchronized (classLoaders) {
+			for (int i = 0; i < classLoaders.size(); i++) {
+				ClassLoader loader = (ClassLoader) classLoaders.get(i);
+				try {
+					clazz = loader.loadClass(name);
+					return clazz;
+				}
+				catch (ClassNotFoundException e) {
+					// keep moving through the class loaders
+				}
+			}
+		}
+
+		return clazz;
 	}
 
 	/**
