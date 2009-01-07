@@ -59,5 +59,4 @@ public class ImportedBundle {
 	public String toString() {
 		return importingBundle.toString();
 	}
-
 }
