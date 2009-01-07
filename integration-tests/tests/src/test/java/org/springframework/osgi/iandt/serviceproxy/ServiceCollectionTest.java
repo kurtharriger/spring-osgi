@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.serviceproxy;
 
 import java.util.Collection;
@@ -26,11 +27,13 @@ import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceCollection;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.util.ClassUtils;
+
 abstract class ServiceCollectionTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "net.sourceforge.cglib, com.springsource.net.sf.cglib, 2.1.3" };
 	}
+
 	protected ServiceRegistration publishService(Object obj) throws Exception {
 		return bundleContext.registerService(obj.getClass().getName(), obj, null);
 	}

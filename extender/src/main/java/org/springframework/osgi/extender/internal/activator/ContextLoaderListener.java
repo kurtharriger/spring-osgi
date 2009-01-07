@@ -328,10 +328,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 	/** dynamicList clean up hook */
 	private DisposableBean applicationListenersCleaner;
-	/** Spring compatibility checker */
-	private SpringTypeCompatibilityChecker compatibilityChecker;
-	/** Spring version used */
-	private Bundle wiredSpringBundle;
+
 	/** shutdown task executor */
 	private TaskExecutor shutdownTaskExecutor;
 
@@ -361,10 +358,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 		this.extenderVersion = OsgiBundleUtils.getBundleVersion(context.getBundle());
 		log.info("Starting [" + bundleContext.getBundle().getSymbolicName() + "] bundle v.[" + extenderVersion + "]");
-
-		detectSpringVersion(context);
-
-		compatibilityChecker = new SpringTypeCompatibilityChecker(bundleContext);
 
 		// Step 1 : discover existing namespaces (in case there are fragments with custom XML definitions)
 		nsManager = new NamespaceManager(context);
@@ -423,32 +416,6 @@ public class ContextLoaderListener implements BundleActivator {
 			}
 		}
 
-	}
-
-	private void detectSpringVersion(BundleContext context) {
-		boolean debug = log.isDebugEnabled();
-
-		// use PackageAdmin internally to determine the wired Spring version
-		ServiceReference ref = bundleContext.getServiceReference(PackageAdmin.class.getName());
-		if (ref != null) {
-			PackageAdmin pa = (PackageAdmin) bundleContext.getService(ref);
-			wiredSpringBundle = pa.getBundle(Assert.class);
-		}
-		else {
-			if (debug) {
-				log.debug("PackageAdmin not available; falling back to raw class loading for detecting the wired Spring bundle");
-			}
-			wiredSpringBundle = SpringTypeCompatibilityChecker.findOriginatingBundle(context, Assert.class);
-			if (wiredSpringBundle == null) {
-				throw new IllegalStateException("Impossible to find the originating Spring bundle for " + Assert.class
-						+ "; bailing out");
-			}
-		}
-
-		if (debug)
-			log.debug("Spring-DM v.[" + extenderVersion + "] is wired to Spring core bundle "
-					+ OsgiStringUtils.nullSafeSymbolicName(wiredSpringBundle) + " version ["
-					+ OsgiBundleUtils.getBundleVersion(wiredSpringBundle) + "]");
 	}
 
 	/**
@@ -726,19 +693,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 		if (localApplicationContext == null) {
 			log.debug("No application context created for bundle " + bundleString);
-			return;
-		}
-
-		// an application context has been created - do type filtering
-		// filtering could be applied before creating the application context but then user might disable this by accident
-		// so its best to do this inside the extender itself (this could change in the future)
-
-		if (compatibilityChecker.checkCompatibility(bundle)) {
-			log.debug("Bundle " + bundleString + " is Spring type compatible with Spring-DM");
-
-		}
-		else {
-			log.debug("Ignoring bundle " + bundleString + " as it's Spring incompatible with Spring-DM...");
 			return;
 		}
 
