@@ -171,9 +171,9 @@ public void testOsgiPlatformStarts() throws Exception {
 1.3.0
 OSGi/Minimum-1.0,OSGi/Minimum-1.1,JRE-1.1,J2SE-1.2,J2SE-1.3,J2SE-1.4}]]></programlisting>    
     
-    <remark>It's likely that you will see other log statements made by the testing
-    framework during your test execution by these can be disabled and have only an informative
-    value as they don't affect your test execution.</remark>
+    <remark>It is likely that you will see different log statements made by the testing
+    framework during your own test execution, but these can be disabled as they only have an informative
+    value and do not affect the actual execution.</remark>
     
     <para>Note that you did not have to create any bundle, write any MANIFEST or
     bother with imports or exports, let alone starting and shutting down the OSGi
