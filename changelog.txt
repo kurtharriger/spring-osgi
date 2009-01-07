@@ -11,6 +11,12 @@ General
 Package org.springframework.osgi.context
 * improved proxying of classes that are boot delegated outside the OSGi environment
 
+Package org.springframework.osgi.io
+* fixed manifest headers parsing problem when dealing with nested whitespaces
+* fixed handling of optional required bundles
+* improved OsgiBundlePatternMatchingResolver to return ContextResources
+* changed OsgiBundlePatternMatchingResolver#findResources(String) visibility to protected
+
 
 Changes in version 1.1.2 (2008-10-03)
 -------------------------------------
