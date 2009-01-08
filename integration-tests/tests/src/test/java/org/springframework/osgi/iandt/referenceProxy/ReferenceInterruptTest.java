@@ -38,7 +38,6 @@ public class ReferenceInterruptTest extends BaseIntegrationTest {
 		proxyFactory.setCardinality(Cardinality.C_0__1);
 		proxyFactory.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
 		proxyFactory.setInterfaces(new Class[] { Shape.class });
-		proxyFactory.setRetryTimes(0);
 		proxyFactory.setTimeout(initialWait);
 		proxyFactory.afterPropertiesSet();
 

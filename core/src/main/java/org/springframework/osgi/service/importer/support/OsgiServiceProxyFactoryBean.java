@@ -86,7 +86,6 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
-	private int retriesNumber;
 	private long retryTimeout;
 	private RetryTemplate retryTemplate;
 
@@ -159,7 +158,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 
 		lookupAdvice.setListeners(listeners);
 		synchronized (monitor) {
-			lookupAdvice.setRetryParams(retriesNumber, retryTimeout);
+			lookupAdvice.setRetryTimeout(retryTimeout);
 			retryTemplate = lookupAdvice.getRetryTemplate();
 		}
 		lookupAdvice.setApplicationEventPublisher(applicationEventPublisher);
@@ -221,43 +220,6 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	}
 
 	/**
-	 * Sets how many times should this importer attempt to rebind to a target
-	 * service if the backing service currently used is unregistered. Default is
-	 * 3 times.
-	 * 
-	 * <p/> It is possible to change this property after initialization however,
-	 * the changes will <b>not</b> be applied on the running proxy until
-	 * {@link #setTimeout(long)} is called. Thus, to change both the number of
-	 * retries and timeout, after initialization, one should call first {{@link #setRetryTimes(int)}
-	 * followed by {@link #setTimeout(long)}. If the timeout value is
-	 * unchanged, retrieve the current value through {@link #getTimeout()} and
-	 * pass it again to {@link #setTimeout(long)}.
-	 * 
-	 * @param maxRetries The maxRetries to set.
-	 * @deprecated will be removed after 1.2.0 M2 with no replacement. Consider
-	 * using {@link #setTimeout(long)} instead.
-	 */
-	public void setRetryTimes(int maxRetries) {
-		synchronized (monitor) {
-			this.retriesNumber = maxRetries;
-		}
-	}
-
-	/**
-	 * Returns the number of attempts to rebind a target service before giving
-	 * up.
-	 * 
-	 * @return number of retries to find a matching service before failing *
-	 * @deprecated will be removed after 1.2.0 M2 with no replacement. Consider
-	 * using {@link #getTimeout(long)} instead.
-	 */
-	public int getRetryTimes() {
-		synchronized (monitor) {
-			return this.retriesNumber;
-		}
-	}
-
-	/**
 	 * Sets how long (in milliseconds) should this importer wait between failed
 	 * attempts at rebinding to a service that has been unregistered.
 	 * 
@@ -266,20 +228,18 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	 * Any in-flight waiting will be restarted using the new values. Note that
 	 * if both values are the same, no restart will be applied.
 	 * 
-	 * @param millisBetweenRetries The millisBetweenRetries to set.
+	 * @param timeoutInMillis Timeout to set, in milliseconds
 	 */
-	public void setTimeout(long millisBetweenRetries) {
+	public void setTimeout(long timeoutInMillis) {
 		RetryTemplate rt;
-		int retries;
 
 		synchronized (monitor) {
-			this.retryTimeout = millisBetweenRetries;
+			this.retryTimeout = timeoutInMillis;
 			rt = retryTemplate;
-			retries = this.retriesNumber;
 		}
 
 		if (rt != null) {
-			rt.reset(retries, millisBetweenRetries);
+			rt.reset(timeoutInMillis);
 		}
 	}
 

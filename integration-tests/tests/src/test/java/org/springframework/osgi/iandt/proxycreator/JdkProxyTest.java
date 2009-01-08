@@ -41,13 +41,13 @@ public class JdkProxyTest extends BaseIntegrationTest {
 		SomeInterfaceImplementation target = new SomeInterfaceImplementation();
 		SomeInterface proxy = createJDKProxy(handler, target);
 
-		target.INVOCATION = 0;
+		SomeInterfaceImplementation.INVOCATION = 0;
 		// invoke method on the proxy
 		String str = proxy.doSmth();
 		// print out the proxy message
 		System.out.println("Proxy returned " + str);
 		// assert the target wasn't touched
-		assertEquals(0, target.INVOCATION);
+		assertEquals(0, SomeInterfaceImplementation.INVOCATION);
 		// check proxy again
 		assertSame(handler, Proxy.getInvocationHandler(proxy));
 

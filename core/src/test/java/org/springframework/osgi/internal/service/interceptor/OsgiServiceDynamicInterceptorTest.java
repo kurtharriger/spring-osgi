@@ -32,7 +32,6 @@ import org.springframework.osgi.mock.MockFilter;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceDynamicInterceptor;
-import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 
 /**
  * @author Costin Leau
@@ -118,7 +117,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 
 		interceptor.setRequiredAtStartup(false);
 
-		interceptor.setRetryParams(3, 1);
+		interceptor.setRetryTimeout(1);
 		interceptor.setProxy(new Object());
 		interceptor.setServiceImporter(new Object());
 
@@ -192,7 +191,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		createInterceptor(new MockFilter(nullFilter));
 		ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING, reference);
 		listener.serviceChanged(event);
-		interceptor.getRetryTemplate().reset(3, 1000);
+		interceptor.getRetryTemplate().reset(3000);
 		long now = System.currentTimeMillis();
 		try {
 			interceptor.invoke(invocation);
@@ -203,7 +202,7 @@ public class OsgiServiceDynamicInterceptorTest extends TestCase {
 		}
 
 		// service is up
-		interceptor.getRetryTemplate().reset(3, 1);
+		interceptor.getRetryTemplate().reset(1);
 
 		assertTrue("Call did not block for 3000ms, actually blocked for " + (System.currentTimeMillis() - now) + "ms",
 			(System.currentTimeMillis() - now) >= 3000);

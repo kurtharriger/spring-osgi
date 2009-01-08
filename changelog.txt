@@ -8,13 +8,16 @@ Changes in version 1.2.0 RC1 (2009-xx-yy)
 General
 * various documentation improvements and fixes
 
-Package org.springframework.osgi.context.support
+Package org.springframework.osgi.context
 * improved proxying of classes that are boot delegated outside the OSGi environment
 * error handling is delegated to the multicaster unless debug is on
 
 Package org.springframework.osgi.extender
 * added support for disabling the ApplicationContext error handler through extender configuration
 * added support for install.context.error.handler property
+
+Package org.springframework.osgi.service
+* removed deprecated retryTimes parameter in OsgiServiceProxyFactoryBean
 
 
 Changes in version 1.2.0 M2 (2008-11-24)
