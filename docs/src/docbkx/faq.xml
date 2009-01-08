@@ -336,7 +336,7 @@
 	  </section>
 	  
 	  <section id="jdk-crippled-jta-api">
-        <title><emphasis>java.lang.NoClassDefFoundError: javax/transaction/...</emphasis> when trying to do data access</title>
+          <title>I keep getting <emphasis>java.lang.NoClassDefFoundError: javax/transaction/...</emphasis> when trying to do data access..</title>
         
           <para>
           This problem is likely to be caused by bad class wiring. All 1.3+ JDKs include incomplete <emphasis>javax.transaction</emphasis> 
@@ -352,6 +352,14 @@
           <para>
           Note that JTA 1.1 is compatible with version 1.0.1.
           </para>
+	  </section>
+	  
+	  <section id="incomplete-osgi-jar">
+	  	 <title>When doing integration testing I receive <emphasis>java.lang.NoClassDefFoundError: org.osgi.vendor.framework property not set</emphasis>... </title>
+	  	 
+	  	 <para>Remove the official OSGi jars (osgi.jar or osgi-r4-core.jar) from the classpath and use only the actual OSGi platform (Equinox/Knopflerfish/Felix) 
+	  	 jars. The former provides only the public classes without an actual implementation and thus cannot be used during runtime, only during the compilation stage.
+	  	 </para>
 	  </section>
       <!-- this should be part of an OSGi intro more likely -->
 
