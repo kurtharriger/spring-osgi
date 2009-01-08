@@ -51,7 +51,7 @@ public class RetryTemplateTest extends TestCase {
 
 	public void testTemplateReset() throws Exception {
 		long initialWaitTime = 20 * 1000;
-		template = new RetryTemplate(0, initialWaitTime, lock);
+		template = new RetryTemplate(initialWaitTime, lock);
 
 		long start = System.currentTimeMillis();
 
@@ -67,7 +67,7 @@ public class RetryTemplateTest extends TestCase {
 					throw new RuntimeException(e);
 				}
 				System.out.println("About to reset template...");
-				template.reset(0, 0);
+				template.reset(0);
 				System.out.println("Resetted template...");
 			}
 		};

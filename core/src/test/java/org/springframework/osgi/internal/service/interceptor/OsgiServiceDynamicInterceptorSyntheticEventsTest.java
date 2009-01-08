@@ -102,7 +102,7 @@ public class OsgiServiceDynamicInterceptorSyntheticEventsTest extends TestCase {
 		interceptor.setListeners(new OsgiServiceLifecycleListener[] { listener });
 		interceptor.setServiceImporter(new Object());
 
-		interceptor.setRetryParams(1, 1);
+		interceptor.setRetryTimeout(1);
 	}
 
 	protected void tearDown() throws Exception {

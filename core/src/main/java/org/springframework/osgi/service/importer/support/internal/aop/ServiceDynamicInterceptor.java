@@ -72,8 +72,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 */
 	private class EventSenderRetryTemplate extends RetryTemplate {
 
-		public EventSenderRetryTemplate(int retryNumbers, long waitTime) {
-			super(retryNumbers, waitTime, lock);
+		public EventSenderRetryTemplate(long waitTime) {
+			super(waitTime, lock);
 		}
 
 		public EventSenderRetryTemplate() {
@@ -82,8 +82,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 		public Object execute(RetryCallback callback) {
 			//send event
-			publishEvent(new OsgiServiceDependencyWaitStartingEvent(eventSource, dependency, this.getWaitTime()
-					* this.getRetryNumbers()));
+			publishEvent(new OsgiServiceDependencyWaitStartingEvent(eventSource, dependency, this.getWaitTime()));
 
 			Object result = null;
 
@@ -496,8 +495,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		return referenceDelegate;
 	}
 
-	public void setRetryParams(int numberRetries, long timeout) {
-		retryTemplate.reset(numberRetries, timeout);
+	public void setRetryTimeout(long timeout) {
+		retryTemplate.reset(timeout);
 	}
 
 	public RetryTemplate getRetryTemplate() {

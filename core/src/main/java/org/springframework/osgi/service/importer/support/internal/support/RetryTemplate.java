@@ -30,30 +30,24 @@ public class RetryTemplate {
 
 	public static final long DEFAULT_WAIT_TIME = 1000;
 
-	public static final int DEFAULT_RETRY_NUMBER = 3;
-
 	private final Object monitor = new Object();
 	private final Object notificationLock;
 
 	private long waitTime = DEFAULT_WAIT_TIME;
 
-	private int retryNumbers = DEFAULT_RETRY_NUMBER;
 
-
-	public RetryTemplate(int retryNumbers, long waitTime, Object notificationLock) {
-		Assert.isTrue(retryNumbers >= 0, "retryNumbers must be positive");
+	public RetryTemplate(long waitTime, Object notificationLock) {
 		Assert.isTrue(waitTime >= 0, "waitTime must be positive");
 		Assert.notNull(notificationLock, "notificationLock must be non null");
 
 		synchronized (monitor) {
-			this.retryNumbers = retryNumbers;
 			this.waitTime = waitTime;
 			this.notificationLock = notificationLock;
 		}
 	}
 
 	public RetryTemplate(Object notificationLock) {
-		this(DEFAULT_RETRY_NUMBER, DEFAULT_WAIT_TIME, notificationLock);
+		this(DEFAULT_WAIT_TIME, notificationLock);
 	}
 
 	/**
@@ -73,14 +67,12 @@ public class RetryTemplate {
 		Assert.notNull(notificationLock, "notificationLock is required");
 
 		long waitTime;
-		int retryNumbers;
 
 		synchronized (monitor) {
 			waitTime = this.waitTime;
-			retryNumbers = this.retryNumbers;
 		}
 
-		int count = -1;
+		boolean retry = false;
 		synchronized (notificationLock) {
 			do {
 				Object result = callback.doWithRetry();
@@ -97,19 +89,18 @@ public class RetryTemplate {
 						throw new RuntimeException("Retry failed; interrupted while waiting", ex);
 					}
 				}
-				count++;
+				retry = false;
 
 				// handle reset cases
 				synchronized (monitor) {
 					// has there been a reset in place ?
-					if (waitTime != this.waitTime || retryNumbers != this.retryNumbers) {
+					if (waitTime != this.waitTime) {
 						// start counting again
-						count = -1;
+						retry = true;
 						waitTime = this.waitTime;
-						retryNumbers = this.retryNumbers;
 					}
 				}
-			} while (count < retryNumbers);
+			} while (retry);
 		}
 		return callback.doWithRetry();
 	}
@@ -121,20 +112,13 @@ public class RetryTemplate {
 	 * @param retriesNumber
 	 * @param waitTime
 	 */
-	public void reset(int retriesNumber, long waitTime) {
+	public void reset(long waitTime) {
 		synchronized (monitor) {
-			this.retryNumbers = retriesNumber;
 			this.waitTime = waitTime;
 		}
 
 		synchronized (notificationLock) {
 			notificationLock.notifyAll();
-		}
-	}
-
-	public int getRetryNumbers() {
-		synchronized (monitor) {
-			return retryNumbers;
 		}
 	}
 
@@ -150,7 +134,7 @@ public class RetryTemplate {
 		if (other instanceof RetryTemplate) {
 			RetryTemplate oth = (RetryTemplate) other;
 
-			return (getWaitTime() == oth.getWaitTime() && getRetryNumbers() == oth.getRetryNumbers());
+			return (getWaitTime() == oth.getWaitTime());
 		}
 		return false;
 	}

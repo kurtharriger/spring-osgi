@@ -133,7 +133,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 	public void testClassLoadingOptionsConstant() throws Exception {
 		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.CLIENT);
 		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.SERVICE_PROVIDER);
-		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.CLIENT.UNMANAGED);
+		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
 	}
 
 }

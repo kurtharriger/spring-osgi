@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.context;
 
 import junit.framework.TestCase;
@@ -32,6 +33,7 @@ public class OsgiBundleScopeTest extends TestCase {
 	ObjectFactory objFactory;
 
 	OsgiBundleScope scope;
+
 
 	/*
 	 * (non-Javadoc)
@@ -54,6 +56,7 @@ public class OsgiBundleScopeTest extends TestCase {
 
 	public void testLocalBeans() {
 		ObjectFactory factory = new ObjectFactory() {
+
 			public Object getObject() throws BeansException {
 				return new Object();
 			}
@@ -71,9 +74,9 @@ public class OsgiBundleScopeTest extends TestCase {
 	}
 
 	public void testIsExternalBundleCalling() {
-		assertFalse(scope.EXTERNAL_BUNDLE.get() != null);
+		assertFalse(OsgiBundleScope.EXTERNAL_BUNDLE.get() != null);
 		OsgiBundleScope.EXTERNAL_BUNDLE.set(new Object());
-		assertTrue(scope.EXTERNAL_BUNDLE.get() != null);
+		assertTrue(OsgiBundleScope.EXTERNAL_BUNDLE.get() != null);
 	}
 
 	public void testLocalDestructionCallback() {
@@ -81,6 +84,7 @@ public class OsgiBundleScopeTest extends TestCase {
 		final Object[] callbackCalls = new Object[1];
 
 		scope.registerDestructionCallback("foo", new Runnable() {
+
 			public void run() {
 				callbackCalls[0] = Boolean.TRUE;
 			}
@@ -94,6 +98,7 @@ public class OsgiBundleScopeTest extends TestCase {
 		OsgiBundleScope.EXTERNAL_BUNDLE.set(new Object());
 
 		Runnable callback = new Runnable() {
+
 			public void run() {
 			}
 		};

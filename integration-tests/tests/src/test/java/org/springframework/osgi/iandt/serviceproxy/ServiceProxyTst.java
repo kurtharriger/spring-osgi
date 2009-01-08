@@ -67,7 +67,7 @@ public abstract class ServiceProxyTst extends AbstractConfigurableBundleCreatorT
 		// fast retry
 		interceptor.setRequiredAtStartup(true);
 		interceptor.afterPropertiesSet();
-		interceptor.getRetryTemplate().reset(1, 1);
+		interceptor.getRetryTemplate().reset(1);
 		return interceptor;
 
 	}

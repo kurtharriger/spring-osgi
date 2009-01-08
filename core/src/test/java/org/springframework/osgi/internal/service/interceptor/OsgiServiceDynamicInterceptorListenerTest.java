@@ -30,7 +30,6 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceDynamicInterceptor;
-import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 
 /**
  * Test for the listener rebinding behavior. Makes sure the bind/unbind contract
@@ -68,7 +67,7 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 		interceptor.setProxy(new Object());
 		interceptor.setServiceImporter(new Object());
 
-		interceptor.setRetryParams(1, 1);
+		interceptor.setRetryTimeout(1);
 
 		SimpleTargetSourceLifecycleListener.BIND = 0;
 		SimpleTargetSourceLifecycleListener.UNBIND = 0;

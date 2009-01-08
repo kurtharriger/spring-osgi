@@ -49,7 +49,7 @@ public class OsgiReferenceToServiceReferenceConversionTest extends TestCase {
 		private static ServiceReference reference;
 
 		public void setServiceReference(ServiceReference ref) {
-			this.reference = ref;
+			RefContainer.reference = ref;
 		}
 	}
 
