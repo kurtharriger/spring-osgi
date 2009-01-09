@@ -195,7 +195,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 						// discover a new reference only if we are still running
 						if (!isDestroyed) {
 							newReference = OsgiServiceReferenceUtils.getServiceReference(bundleContext,
-								(filter == null ? null : filter.toString()));
+								filterClassName, (filter == null ? null : filter.toString()));
 
 							// we have a rebind (a new service was bound)
 							// so another candidate has to be searched from the existing candidates
@@ -331,6 +331,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	private final BundleContext bundleContext;
 
+	private final String filterClassName;
+
 	private final Filter filter;
 
 	/** TCCL to set when calling listeners */
@@ -385,8 +387,10 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private List stateListeners = Collections.EMPTY_LIST;
 
 
-	public ServiceDynamicInterceptor(BundleContext context, Filter filter, ClassLoader classLoader) {
+	public ServiceDynamicInterceptor(BundleContext context, String filterClassName, Filter filter,
+			ClassLoader classLoader) {
 		this.bundleContext = context;
+		this.filterClassName = filterClassName;
 		this.filter = filter;
 		this.classLoader = classLoader;
 

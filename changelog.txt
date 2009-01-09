@@ -11,6 +11,7 @@ General
 Package org.springframework.osgi.context
 * improved proxying of classes that are boot delegated outside the OSGi environment
 * error handling is delegated to the multicaster unless debug is on
+* improved type filtering for tracked services 
 
 Package org.springframework.osgi.extender
 * added support for disabling the ApplicationContext error handler through extender configuration
@@ -18,6 +19,7 @@ Package org.springframework.osgi.extender
 
 Package org.springframework.osgi.service
 * removed deprecated retryTimes parameter in OsgiServiceProxyFactoryBean
+* improved type filtering for tracked services
 
 
 Changes in version 1.2.0 M2 (2008-11-24)

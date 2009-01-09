@@ -61,7 +61,7 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 			}
 		};
 
-		interceptor = new ServiceDynamicInterceptor(bundleContext, null, getClass().getClassLoader());
+		interceptor = new ServiceDynamicInterceptor(bundleContext, null, null, getClass().getClassLoader());
 		interceptor.setListeners(new OsgiServiceLifecycleListener[] { listener });
 		interceptor.setRequiredAtStartup(false);
 		interceptor.setProxy(new Object());
