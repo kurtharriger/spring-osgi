@@ -62,7 +62,7 @@ public abstract class ServiceProxyTst extends AbstractConfigurableBundleCreatorT
 
 	private Advice createCardinalityAdvice(Class clazz) {
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
-		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext,
+		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext, null,
 			OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null)), classLoader);
 		// fast retry
 		interceptor.setRequiredAtStartup(true);
