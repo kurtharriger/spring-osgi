@@ -22,6 +22,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.Version;
@@ -33,6 +34,7 @@ import org.osgi.service.event.EventHandler;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.rfc124.iandt.BaseRFC124IntegrationTest;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * Integration test that checks basic behaviour signs of the RFC 124 Extender.
@@ -79,13 +81,14 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 		Thread.sleep(1000 * 3);
 	}
 
-	public void testModuleContextService() throws Exception {
+	public void tstModuleContextService() throws Exception {
 		installTestBundle();
 		final boolean[] receviedEvent = new boolean[1];
 		ServiceListener notifier = new ServiceListener() {
 
 			public void serviceChanged(ServiceEvent event) {
-				if (event.getServiceReference().getProperty(ModuleContext.SYMBOLIC_NAME_PROPERTY) != null) {
+				//ModuleContext.SYMBOLIC_NAME_PROPERTY was removed - need to find a replacement
+				if (event.getServiceReference().getProperty(Constants.BUNDLE_SYMBOLICNAME) != null) {
 					logger.info("Found service "
 							+ OsgiServiceReferenceUtils.getServicePropertiesSnapshotAsMap(event.getServiceReference()));
 
@@ -114,20 +117,20 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 	}
 
 	public void testModuleContextListener() throws Exception {
-		final List<String> contexts = new ArrayList<String>();
+		final List<Bundle> contexts = new ArrayList<Bundle>();
 		ModuleContextListener listener = new ModuleContextListener() {
 
-			public void contextCreated(String symName, Version version) {
-				addToList(symName, version);
+			public void contextCreated(Bundle bundle) {
+				addToList(bundle);
 			}
 
-			public void contextCreationFailed(String symName, Version version, Throwable ex) {
-				addToList(symName, version);
+			public void contextCreationFailed(Bundle bundle, Throwable ex) {
+				addToList(bundle);
 			}
 
-			private void addToList(String symName, Version version) {
+			private void addToList(Bundle bundle) {
 				synchronized (contexts) {
-					contexts.add(symName + "|" + version);
+					contexts.add(bundle);
 					contexts.notify();
 				}
 			}
@@ -140,6 +143,14 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 		synchronized (contexts) {
 			contexts.wait(2 * 1000 * 60);
 			assertFalse("no event received", contexts.isEmpty());
+		}
+	}
+
+	public void testLogInstalledBundles() throws Exception {
+		for (Bundle bundle : bundleContext.getBundles()) {
+			System.out.println("[" + bundle.getBundleId() + "] " + OsgiStringUtils.bundleStateAsString(bundle) + " "
+					+ OsgiStringUtils.nullSafeName(bundle) + "|" + bundle.getSymbolicName() + " @ "
+					+ bundle.getLocation());
 		}
 	}
 

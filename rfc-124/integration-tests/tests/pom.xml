@@ -11,7 +11,11 @@
     <packaging>jar</packaging>
     <name>Spring OSGi RFC 124 Integration Tests</name>
     <url>http://www.springframework.org/osgi</url>
-  
+
+    <properties>
+        <source-jdk>1.5</source-jdk>  
+    </properties>
+    
     <dependencies>
 
         <!-- config admin (from Felix) -->
