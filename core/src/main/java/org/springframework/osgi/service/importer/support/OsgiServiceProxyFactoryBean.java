@@ -37,6 +37,7 @@ import org.springframework.osgi.service.importer.support.internal.controller.Imp
 import org.springframework.osgi.service.importer.support.internal.controller.ImporterInternalActions;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
+import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -150,7 +151,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		final OsgiServiceLifecycleListener tcclListener = tcclAdvice.new ServiceProviderTCCLListener();
 
 		final ServiceDynamicInterceptor lookupAdvice = new ServiceDynamicInterceptor(getBundleContext(),
-			getUnifiedFilter(), getAopClassLoader());
+			ClassUtils.getParticularClass(getInterfaces()).getName(), getUnifiedFilter(), getAopClassLoader());
 
 		lookupAdvice.setRequiredAtStartup(getCardinality().isMandatory());
 

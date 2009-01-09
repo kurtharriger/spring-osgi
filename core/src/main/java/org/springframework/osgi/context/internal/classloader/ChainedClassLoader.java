@@ -24,7 +24,6 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osgi.framework.Bundle;
 import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.util.Assert;
 
@@ -47,33 +46,6 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  */
 public class ChainedClassLoader extends ClassLoader {
-
-	/**
-	 * list of special class loaders, outside OSGi, that might be used by the
-	 * user through boot delegation
-	 */
-	private static final List knownNonOsgiLoaders = new ArrayList();
-
-	// add the known, non-OSGi class loaders
-	// note that the order is important
-	static {
-		// start with the framework class loader
-		// then get all its parents (normally the this should be fwk -> (*) -> app -> ext -> boot)
-		// where (*) represents some optional loaders for cases where the framework is embedded
-
-		AccessController.doPrivileged(new PrivilegedAction() {
-
-			public Object run() {
-
-				ClassLoader classLoader = getFwkClassLoader();
-				addNonOsgiClassLoader(classLoader);
-				// get the system class loader
-				classLoader = ClassLoader.getSystemClassLoader();
-				addNonOsgiClassLoader(classLoader);
-				return null;
-			}
-		});
-	}
 
 	/** list of loaders */
 	private final List loaders = new ArrayList();
@@ -100,7 +72,7 @@ public class ChainedClassLoader extends ClassLoader {
 	 * @param loaders array of non-null class loaders
 	 */
 	public ChainedClassLoader(ClassLoader[] loaders) {
-		this(loaders, getFwkClassLoader());
+		this(loaders, ClassUtils.getFwkClassLoader());
 	}
 
 	/**
@@ -122,31 +94,6 @@ public class ChainedClassLoader extends ClassLoader {
 				Assert.notNull(classLoader, "null classloaders not allowed");
 				addClassLoader(classLoader);
 			}
-		}
-	}
-
-	private static ClassLoader getFwkClassLoader() {
-		return (ClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
-
-			public Object run() {
-				return Bundle.class.getClassLoader();
-			}
-		});
-	}
-
-	/**
-	 * Special static method used during the class initialization.
-	 * 
-	 * @param classLoader non OSGi class loader
-	 */
-	private static void addNonOsgiClassLoader(ClassLoader classLoader) {
-		while (classLoader != null) {
-			synchronized (knownNonOsgiLoaders) {
-				if (!knownNonOsgiLoaders.contains(classLoader)) {
-					knownNonOsgiLoaders.add(classLoader);
-				}
-			}
-			classLoader = classLoader.getParent();
 		}
 	}
 
@@ -297,24 +244,22 @@ public class ChainedClassLoader extends ClassLoader {
 	private boolean addNonOsgiLoader(ClassLoader classLoader) {
 		synchronized (nonOsgiLoaders) {
 			if (!nonOsgiLoaders.contains(classLoader)) {
-				synchronized (knownNonOsgiLoaders) {
-					int index = knownNonOsgiLoaders.indexOf(classLoader);
-					// add the class loader to the list if there is a match
-					if (index >= 0) {
-						int insertIndex = 0;
-						// but consider the defined order
-						for (int i = 0; i < nonOsgiLoaders.size(); i++) {
-							int presentLoaderIndex = knownNonOsgiLoaders.indexOf((ClassLoader) nonOsgiLoaders.get(i));
-							if (presentLoaderIndex >= 0 && presentLoaderIndex < index) {
-								insertIndex = i + 1;
-							}
-							else {
-								continue;
-							}
+				int index = ClassUtils.knownNonOsgiLoaders.indexOf(classLoader);
+				// add the class loader to the list if there is a match
+				if (index >= 0) {
+					int insertIndex = 0;
+					// but consider the defined order
+					for (int i = 0; i < nonOsgiLoaders.size(); i++) {
+						int presentLoaderIndex = ClassUtils.knownNonOsgiLoaders.indexOf((ClassLoader) nonOsgiLoaders.get(i));
+						if (presentLoaderIndex >= 0 && presentLoaderIndex < index) {
+							insertIndex = i + 1;
 						}
-						nonOsgiLoaders.add(insertIndex, classLoader);
-						return true;
+						else {
+							continue;
+						}
 					}
+					nonOsgiLoaders.add(insertIndex, classLoader);
+					return true;
 				}
 			}
 		}

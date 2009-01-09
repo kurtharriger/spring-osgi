@@ -78,16 +78,16 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	public void afterPropertiesSet() {
 		Assert.notNull(this.bundleContext, "Required 'bundleContext' property was not set.");
 		Assert.notNull(classLoader, "Required 'classLoader' property was not set.");
-		Assert.notNull(interfaces, "Required 'interfaces' property was not set.");
+		Assert.notEmpty(interfaces, "Required 'interfaces' property was not set.");
+		Assert.noNullElements(interfaces, "Null 'interfaces' entries not allowed.");
+
 		// validate specified classes
 		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(interfaces),
 			"more then one concrete class specified; cannot create proxy.");
 
 		this.listeners = (listeners == null ? new OsgiServiceLifecycleListener[0] : listeners);
 
-		getUnifiedFilter(); // eager initialization of the cache to catch filter
-		// errors
-		Assert.notNull(interfaces, "Required serviceTypes property not specified.");
+		getUnifiedFilter(); // eager initialization of the cache to catch filter errors
 	}
 
 	/**

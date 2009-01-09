@@ -178,6 +178,7 @@ public abstract class OsgiServiceReferenceUtils {
 		// use #getServiceReferences(BundleContext, String, String) method to
 		// speed the service lookup process by
 		// giving one class as a hint to the OSGi implementation
+		// additionally this allows type filtering
 
 		String clazz = (ObjectUtils.isEmpty(classes) ? null : classes[0]);
 		return getServiceReferences(bundleContext, clazz, OsgiFilterUtils.unifyFilter(classes, filter));
@@ -245,7 +246,7 @@ public abstract class OsgiServiceReferenceUtils {
 	 * 
 	 * @param reference OSGi service reference
 	 * @return a <code>Dictionary</code> containing the service reference
-	 * properties taken as a snapshot
+	 *         properties taken as a snapshot
 	 */
 	public static Dictionary getServicePropertiesSnapshot(ServiceReference reference) {
 		return new MapBasedDictionary(getServicePropertiesSnapshotAsMap(reference));
@@ -259,7 +260,7 @@ public abstract class OsgiServiceReferenceUtils {
 	 * 
 	 * @param reference OSGi service reference
 	 * @return a <code>Map</code> containing the service reference properties
-	 * taken as a snapshot
+	 *         taken as a snapshot
 	 */
 	public static Map getServicePropertiesSnapshotAsMap(ServiceReference reference) {
 		Assert.notNull(reference);
@@ -288,7 +289,7 @@ public abstract class OsgiServiceReferenceUtils {
 	 * 
 	 * @param reference OSGi service reference
 	 * @return a <code>Dictionary</code> containing the latest service
-	 * reference properties
+	 *         reference properties
 	 */
 	public static Dictionary getServiceProperties(ServiceReference reference) {
 		return new MapBasedDictionary(getServicePropertiesAsMap(reference));
@@ -305,7 +306,7 @@ public abstract class OsgiServiceReferenceUtils {
 	 * 
 	 * @param reference OSGi service reference
 	 * @return a <code>Map</code> containing the latest service reference
-	 * properties
+	 *         properties
 	 * @see #getServiceProperties(ServiceReference)
 	 */
 	public static Map getServicePropertiesAsMap(ServiceReference reference) {
@@ -320,7 +321,7 @@ public abstract class OsgiServiceReferenceUtils {
 	 * @param bundleContext OSGi bundle context
 	 * @param filter valid OSGi filter (can be <code>null</code>)
 	 * @return true if the filter matches at least one OSGi service, false
-	 * otherwise
+	 *         otherwise
 	 */
 	public static boolean isServicePresent(BundleContext bundleContext, String filter) {
 		return !ObjectUtils.isEmpty(getServiceReferences(bundleContext, filter));

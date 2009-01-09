@@ -20,7 +20,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -28,6 +27,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
+import org.springframework.osgi.util.internal.ClassUtils;
 
 /**
  * Utility class for easy, but reliable, tracking of OSGi services. It does
@@ -56,6 +56,7 @@ abstract class TrackingUtil {
 
 		private final Object fallbackObject;
 		private final BundleContext context;
+		private final String filterClassName;
 		private final String filter;
 		private final boolean securityOn;
 		private final Object lock = new Object();
@@ -64,9 +65,10 @@ abstract class TrackingUtil {
 		private boolean bundleContextInvalidated = false;
 
 
-		public OsgiServiceHandler(Object fallbackObject, BundleContext bundleContext, String filter) {
+		public OsgiServiceHandler(Object fallbackObject, BundleContext bundleContext, String filterClass, String filter) {
 			this.fallbackObject = fallbackObject;
 			this.context = bundleContext;
+			this.filterClassName = filterClass;
 			this.filter = filter;
 			this.securityOn = (System.getSecurityManager() != null);
 		}
@@ -127,7 +129,7 @@ abstract class TrackingUtil {
 		}
 
 		private Object getTarget(BundleContext context, String filter) {
-			ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(context, filter);
+			ServiceReference ref = OsgiServiceReferenceUtils.getServiceReference(context, filterClassName, filter);
 			return (ref != null ? context.getService(ref) : null);
 		}
 	}
@@ -144,10 +146,10 @@ abstract class TrackingUtil {
 	 * @param classes array of classes used during proxy weaving
 	 * @param filter OSGi filter (can be null)
 	 * @param classLoader class loader to use - normally
-	 * classes.getClassLoader()
+	 *        classes.getClassLoader()
 	 * @param context bundle context used for searching the services
 	 * @param fallbackObject object to fall back onto if no OSGi service is
-	 * found.
+	 *        found.
 	 * @return the proxy doing the lookup on each method invocation
 	 */
 	static Object getService(Class[] classes, String filter, ClassLoader classLoader, BundleContext context,
@@ -155,6 +157,7 @@ abstract class TrackingUtil {
 		// mold the proxy
 		String flt = OsgiFilterUtils.unifyFilter(classes, filter);
 
-		return Proxy.newProxyInstance(classLoader, classes, new OsgiServiceHandler(fallbackObject, context, flt));
+		return Proxy.newProxyInstance(classLoader, classes, new OsgiServiceHandler(fallbackObject, context,
+			ClassUtils.getParticularClass(classes).getName(), flt));
 	}
 }
