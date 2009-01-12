@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.util.internal;
 
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.osgi.framework.Bundle;
@@ -38,6 +44,81 @@ import org.springframework.util.ObjectUtils;
  * 
  */
 public abstract class ClassUtils {
+
+	private static class ReadOnlySetFromMap implements Set {
+
+		private final Set keys;
+
+
+		public ReadOnlySetFromMap(Map lookupMap) {
+			keys = lookupMap.keySet();
+		}
+
+		public boolean add(Object o) {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean addAll(Collection c) {
+			throw new UnsupportedOperationException();
+		}
+
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean contains(Object o) {
+			return keys.contains(o);
+		}
+
+		public boolean containsAll(Collection c) {
+			return keys.containsAll(c);
+		}
+
+		public boolean isEmpty() {
+			return keys.isEmpty();
+		}
+
+		public Iterator iterator() {
+			return keys.iterator();
+		}
+
+		public boolean remove(Object o) {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean removeAll(Collection c) {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean retainAll(Collection c) {
+			throw new UnsupportedOperationException();
+		}
+
+		public int size() {
+			return keys.size();
+		}
+
+		public Object[] toArray() {
+			return keys.toArray();
+		}
+
+		public Object[] toArray(Object[] array) {
+			return keys.toArray(array);
+		}
+
+		public String toString() {
+			return keys.toString();
+		}
+
+		public int hashCode() {
+			return keys.hashCode();
+		}
+
+		public boolean equals(Object o) {
+			return o == this || keys.equals(o);
+		}
+	}
+
 
 	/**
 	 * Include only the interfaces inherited from superclasses or implemented by
@@ -62,6 +143,77 @@ public abstract class ClassUtils {
 		"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap", CollectionFactory.class.getClassLoader());
 
 	/**
+	 * List of special class loaders, outside OSGi, that might be used by the
+	 * user through boot delegation. read-only.
+	 */
+	public static final List knownNonOsgiLoaders;
+
+	/**
+	 * Set of special class loaders, outside OSGi, that might be used by the
+	 * user through boot delegation. read-only.
+	 */
+	public static final Set knownNonOsgiLoadersSet;
+
+	// add the known, non-OSGi class loaders
+	// note that the order is important
+	static {
+		// start with the framework class loader
+		// then get all its parents (normally the this should be fwk -> (*) -> app -> ext -> boot)
+		// where (*) represents some optional loaders for cases where the framework is embedded
+
+		final Map lookupMap = CollectionFactory.createConcurrentMap(8);
+		final List lookupList = Collections.synchronizedList(new ArrayList());
+
+		AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+
+				ClassLoader classLoader = getFwkClassLoader();
+				addNonOsgiClassLoader(classLoader, lookupList, lookupMap);
+
+				// get the system class loader
+				classLoader = ClassLoader.getSystemClassLoader();
+				addNonOsgiClassLoader(classLoader, lookupList, lookupMap);
+
+				return null;
+			}
+		});
+
+		// wrap the fields as read-only collections
+		knownNonOsgiLoaders = Collections.unmodifiableList(lookupList);
+		knownNonOsgiLoadersSet = new ReadOnlySetFromMap(lookupMap);
+
+	}
+
+
+	public static ClassLoader getFwkClassLoader() {
+		return (ClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
+
+			public Object run() {
+				return Bundle.class.getClassLoader();
+			}
+		});
+	}
+
+	/**
+	 * Special static method used during the class initialization.
+	 * 
+	 * @param classLoader non OSGi class loader
+	 */
+	private static void addNonOsgiClassLoader(ClassLoader classLoader, List list, Map map) {
+		while (classLoader != null) {
+			synchronized (list) {
+				if (!map.containsKey(classLoader)) {
+					list.add(classLoader);
+					map.put(classLoader, Boolean.TRUE);
+				}
+			}
+			classLoader = classLoader.getParent();
+		}
+	}
+
+
+	/**
 	 * Simple class loading abstraction working on both ClassLoader and Bundle
 	 * classes.
 	 * 
@@ -69,9 +221,11 @@ public abstract class ClassUtils {
 	 * 
 	 */
 	private static class ClassLoaderBridge {
+
 		private final Bundle bundle;
 
 		private final ClassLoader classLoader;
+
 
 		public ClassLoaderBridge(Bundle bundle) {
 			Assert.notNull(bundle);
@@ -94,6 +248,7 @@ public abstract class ClassUtils {
 				className, bundle));
 		}
 	}
+
 
 	/**
 	 * Return an array of parent classes for the given class. The mode paramater
@@ -330,7 +485,7 @@ public abstract class ClassUtils {
 	 * 
 	 * @param classes an array of classes
 	 * @return true if at least two classes unrelated to each other are found,
-	 * false otherwise
+	 *         false otherwise
 	 */
 	public static boolean containsUnrelatedClasses(Class[] classes) {
 		if (ObjectUtils.isEmpty(classes))
@@ -442,7 +597,7 @@ public abstract class ClassUtils {
 	 * @param classNames array of classnames to load (in FQN format)
 	 * @param classLoader classloader used for loading the classes
 	 * @return an array of classes (can be smaller then the array of class
-	 * names) w/o duplicates
+	 *         names) w/o duplicates
 	 */
 	public static Class[] loadClasses(String[] classNames, ClassLoader classLoader) {
 		if (ObjectUtils.isEmpty(classNames))
@@ -471,7 +626,7 @@ public abstract class ClassUtils {
 	 * @param classes array of classes (can be null)
 	 * @param modifier class modifier
 	 * @return array of classes (w/o duplicates) which does not have the given
-	 * modifier
+	 *         modifier
 	 */
 	public static Class[] excludeClassesWithModifier(Class[] classes, int modifier) {
 		if (ObjectUtils.isEmpty(classes))
@@ -486,4 +641,30 @@ public abstract class ClassUtils {
 		return (Class[]) clazzes.toArray(new Class[clazzes.size()]);
 	}
 
+	/**
+	 * Returns the first matching class from the given array, that doens't
+	 * belong to common libraries such as the JDK or OSGi API. Useful for
+	 * filtering OSGi services by type to prevent class cast problems.
+	 * 
+	 * <p/> No sanity checks are done on the given array class.
+	 * 
+	 * @param classes array of classes
+	 * @return a 'particular' (non JDK/OSGi) class if one is found. Else the
+	 *         first available entry is returned.
+	 */
+	public static Class getParticularClass(Class[] classes) {
+		for (int i = 0; i < classes.length; i++) {
+			Class clazz = classes[i];
+			ClassLoader loader = clazz.getClassLoader();
+			// quick boot/system check
+			if (loader != null) {
+				// consider known loaders 
+				if (!knownNonOsgiLoadersSet.contains(loader)) {
+					return clazz;
+				}
+			}
+		}
+
+		return classes[0];
+	}
 }
