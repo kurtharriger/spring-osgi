@@ -202,11 +202,11 @@ public class ContextLoaderListener implements BundleActivator {
 			Bundle bundle = event.getBundle();
 
 			switch (event.getType()) {
-				case BundleEvent.RESOLVED: {
+				case BundleEvent.STARTED: {
 					maybeAddNamespaceHandlerFor(bundle);
 					break;
 				}
-				case BundleEvent.UNRESOLVED: {
+				case BundleEvent.STOPPED: {
 					maybeRemoveNameSpaceHandlerFor(bundle);
 					break;
 				}

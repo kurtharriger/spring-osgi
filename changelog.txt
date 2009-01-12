@@ -16,6 +16,7 @@ Package org.springframework.osgi.context
 Package org.springframework.osgi.extender
 * added support for disabling the ApplicationContext error handler through extender configuration
 * added support for install.context.error.handler property
+* changed namespace handlers lifecycle to depend on bundle events STARTED/STOPPED instead of RESOLVED/UNRESOLVED
 
 Package org.springframework.osgi.service
 * removed deprecated retryTimes parameter in OsgiServiceProxyFactoryBean
