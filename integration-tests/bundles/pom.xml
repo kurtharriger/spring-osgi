@@ -60,6 +60,7 @@
     <module>extender.fragment.bundle</module>
     <module>jdk.proxy.bundle</module>
     <module>extender.listener.bundle</module>
+    <module>namespace.own.consumer.bundle</module>
     <module>web.bundles</module>
   </modules>
 
