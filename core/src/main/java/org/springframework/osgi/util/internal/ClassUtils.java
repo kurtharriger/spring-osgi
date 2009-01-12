@@ -20,10 +20,12 @@ import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.osgi.framework.Bundle;
@@ -42,6 +44,81 @@ import org.springframework.util.ObjectUtils;
  * 
  */
 public abstract class ClassUtils {
+
+	private static class ReadOnlySetFromMap implements Set {
+
+		private final Set keys;
+
+
+		public ReadOnlySetFromMap(Map lookupMap) {
+			keys = lookupMap.keySet();
+		}
+
+		public boolean add(Object o) {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean addAll(Collection c) {
+			throw new UnsupportedOperationException();
+		}
+
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean contains(Object o) {
+			return keys.contains(o);
+		}
+
+		public boolean containsAll(Collection c) {
+			return keys.containsAll(c);
+		}
+
+		public boolean isEmpty() {
+			return keys.isEmpty();
+		}
+
+		public Iterator iterator() {
+			return keys.iterator();
+		}
+
+		public boolean remove(Object o) {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean removeAll(Collection c) {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean retainAll(Collection c) {
+			throw new UnsupportedOperationException();
+		}
+
+		public int size() {
+			return keys.size();
+		}
+
+		public Object[] toArray() {
+			return keys.toArray();
+		}
+
+		public Object[] toArray(Object[] array) {
+			return keys.toArray(array);
+		}
+
+		public String toString() {
+			return keys.toString();
+		}
+
+		public int hashCode() {
+			return keys.hashCode();
+		}
+
+		public boolean equals(Object o) {
+			return o == this || keys.equals(o);
+		}
+	}
+
 
 	/**
 	 * Include only the interfaces inherited from superclasses or implemented by
@@ -66,12 +143,16 @@ public abstract class ClassUtils {
 		"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap", CollectionFactory.class.getClassLoader());
 
 	/**
-	 * list of special class loaders, outside OSGi, that might be used by the
-	 * user through boot delegation.
+	 * List of special class loaders, outside OSGi, that might be used by the
+	 * user through boot delegation. read-only.
 	 */
-	public static final List knownNonOsgiLoaders = Collections.synchronizedList(new ArrayList());
+	public static final List knownNonOsgiLoaders;
 
-	private static final Set knownNonOsgiLoadersSet = Collections.synchronizedSet(new LinkedHashSet());
+	/**
+	 * Set of special class loaders, outside OSGi, that might be used by the
+	 * user through boot delegation. read-only.
+	 */
+	public static final Set knownNonOsgiLoadersSet;
 
 	// add the known, non-OSGi class loaders
 	// note that the order is important
@@ -80,18 +161,28 @@ public abstract class ClassUtils {
 		// then get all its parents (normally the this should be fwk -> (*) -> app -> ext -> boot)
 		// where (*) represents some optional loaders for cases where the framework is embedded
 
+		final Map lookupMap = CollectionFactory.createConcurrentMap(8);
+		final List lookupList = Collections.synchronizedList(new ArrayList());
+
 		AccessController.doPrivileged(new PrivilegedAction() {
 
 			public Object run() {
 
 				ClassLoader classLoader = getFwkClassLoader();
-				addNonOsgiClassLoader(classLoader);
+				addNonOsgiClassLoader(classLoader, lookupList, lookupMap);
+
 				// get the system class loader
 				classLoader = ClassLoader.getSystemClassLoader();
-				addNonOsgiClassLoader(classLoader);
+				addNonOsgiClassLoader(classLoader, lookupList, lookupMap);
+
 				return null;
 			}
 		});
+
+		// wrap the fields as read-only collections
+		knownNonOsgiLoaders = Collections.unmodifiableList(lookupList);
+		knownNonOsgiLoadersSet = new ReadOnlySetFromMap(lookupMap);
+
 	}
 
 
@@ -109,12 +200,12 @@ public abstract class ClassUtils {
 	 * 
 	 * @param classLoader non OSGi class loader
 	 */
-	private static void addNonOsgiClassLoader(ClassLoader classLoader) {
+	private static void addNonOsgiClassLoader(ClassLoader classLoader, List list, Map map) {
 		while (classLoader != null) {
-			synchronized (knownNonOsgiLoaders) {
-				if (!knownNonOsgiLoaders.contains(classLoader)) {
-					knownNonOsgiLoaders.add(classLoader);
-					knownNonOsgiLoadersSet.add(classLoader);
+			synchronized (list) {
+				if (!map.containsKey(classLoader)) {
+					list.add(classLoader);
+					map.put(classLoader, Boolean.TRUE);
 				}
 			}
 			classLoader = classLoader.getParent();

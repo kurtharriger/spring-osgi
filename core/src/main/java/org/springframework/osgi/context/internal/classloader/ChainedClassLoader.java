@@ -239,29 +239,33 @@ public class ChainedClassLoader extends ClassLoader {
 	 * respected regardless of the user configuration.
 	 * 
 	 * @param classLoader
-	 * @return true if the class loader was added, false otherwise
+	 * @return true if the class loader was added/is known, false otherwise
 	 */
 	private boolean addNonOsgiLoader(ClassLoader classLoader) {
-		synchronized (nonOsgiLoaders) {
-			if (!nonOsgiLoaders.contains(classLoader)) {
-				int index = ClassUtils.knownNonOsgiLoaders.indexOf(classLoader);
-				// add the class loader to the list if there is a match
-				if (index >= 0) {
-					int insertIndex = 0;
-					// but consider the defined order
-					for (int i = 0; i < nonOsgiLoaders.size(); i++) {
-						int presentLoaderIndex = ClassUtils.knownNonOsgiLoaders.indexOf((ClassLoader) nonOsgiLoaders.get(i));
-						if (presentLoaderIndex >= 0 && presentLoaderIndex < index) {
-							insertIndex = i + 1;
+		// check if the classloader is known or not before doing any locking 
+		if (ClassUtils.knownNonOsgiLoadersSet.contains(classLoader)) {
+			synchronized (nonOsgiLoaders) {
+				if (!nonOsgiLoaders.contains(classLoader)) {
+					int index = ClassUtils.knownNonOsgiLoaders.indexOf(classLoader);
+					// add the class loader to the list if there is a match
+					if (index >= 0) {
+						int insertIndex = 0;
+						// but consider the defined order
+						for (int i = 0; i < nonOsgiLoaders.size(); i++) {
+							int presentLoaderIndex = ClassUtils.knownNonOsgiLoaders.indexOf((ClassLoader) nonOsgiLoaders.get(i));
+							if (presentLoaderIndex >= 0 && presentLoaderIndex < index) {
+								insertIndex = i + 1;
+							}
+							else {
+								continue;
+							}
 						}
-						else {
-							continue;
-						}
+						nonOsgiLoaders.add(insertIndex, classLoader);
+						return true;
 					}
-					nonOsgiLoaders.add(insertIndex, classLoader);
-					return true;
 				}
 			}
+			return true;
 		}
 		return false;
 	}
