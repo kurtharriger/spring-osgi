@@ -69,6 +69,14 @@ public class NonOSGiLoaderProxyTest extends BaseIntegrationTest {
 		public int compare(Object arg0, Object arg1) {
 			return 0;
 		}
+
+		public boolean isWrapperFor(Class iface) {
+			return false;
+		}
+
+		public Object unwrap(Class c) {
+			return null;
+		}
 	}
 
 

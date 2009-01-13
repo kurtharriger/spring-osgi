@@ -36,8 +36,8 @@ import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitEndedEvent;
-import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitTimedOutEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitStartingEvent;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitTimedOutEvent;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.service.importer.support.internal.support.DefaultRetryCallback;
 import org.springframework.osgi.service.importer.support.internal.support.RetryCallback;
@@ -80,34 +80,28 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			super(lock);
 		}
 
-		public Object execute(RetryCallback callback) {
+		protected void callbackFailed(long stop) {
+			publishEvent(new OsgiServiceDependencyWaitTimedOutEvent(eventSource, dependency, stop));
+		}
+
+		protected void callbackSucceeded(long stop) {
+			publishEvent(new OsgiServiceDependencyWaitEndedEvent(eventSource, dependency, stop));
+		}
+
+		protected void onMissingTarget() {
 			//send event
 			publishEvent(new OsgiServiceDependencyWaitStartingEvent(eventSource, dependency, this.getWaitTime()));
+		}
+	}
 
-			Object result = null;
+	private class ServiceLookUpCallback extends DefaultRetryCallback {
 
-			long start = System.currentTimeMillis();
-			long stop;
+		public Object doWithRetry() {
+			// before checking for a service, check whether the proxy is still valid
+			if (destroyed && !isDuringDestruction)
+				throw new ServiceProxyDestroyedException();
 
-			try {
-				result = super.execute(callback);
-				stop = System.currentTimeMillis() - start;
-			}
-			catch (RuntimeException exception) {
-				stop = System.currentTimeMillis() - start;
-				publishEvent(new OsgiServiceDependencyWaitTimedOutEvent(eventSource, dependency, stop));
-				throw exception;
-			}
-
-			// send finalization event
-			if (callback.isComplete(result)) {
-				publishEvent(new OsgiServiceDependencyWaitEndedEvent(eventSource, dependency, stop));
-			}
-			else {
-				publishEvent(new OsgiServiceDependencyWaitTimedOutEvent(eventSource, dependency, stop));
-			}
-
-			return result;
+			return (wrapper != null) ? wrapper.getService() : null;
 		}
 	}
 
@@ -278,7 +272,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 			try {
 				synchronized (lock) {
 					if (wrapper != null && wrapper.isServiceAlive()) {
-						// if have a higher rank service
+						// if there is a higher rank service
 						if (serviceRanking > wrapper.getServiceRanking()) {
 							updated = true;
 							updateReferenceHolders(ref);
@@ -365,6 +359,9 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	/** retry template */
 	private final RetryTemplate retryTemplate = new EventSenderRetryTemplate();
 
+	/** retry callback */
+	private final RetryCallback retryCallback = new ServiceLookUpCallback();
+
 	/** dependable service importer */
 	private Object eventSource;
 
@@ -414,16 +411,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	 */
 	private Object lookupService() {
 		synchronized (lock) {
-			return (Object) retryTemplate.execute(new DefaultRetryCallback() {
-
-				public Object doWithRetry() {
-					// before checking for a service, check whether the proxy is still valid
-					if (destroyed && !isDuringDestruction)
-						throw new ServiceProxyDestroyedException();
-
-					return (wrapper != null) ? wrapper.getService() : null;
-				}
-			});
+			return (Object) retryTemplate.execute(retryCallback);
 		}
 	}
 

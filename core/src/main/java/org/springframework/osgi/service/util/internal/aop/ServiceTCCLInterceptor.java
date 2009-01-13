@@ -4,7 +4,6 @@ package org.springframework.osgi.service.util.internal.aop;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.osgi.util.internal.PrivilegedUtils;
-import org.springframework.osgi.util.internal.PrivilegedUtils.UnprivilegedThrowableExecution;
 import org.springframework.util.ObjectUtils;
 
 /**
