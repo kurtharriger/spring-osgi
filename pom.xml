@@ -73,7 +73,7 @@
    
    <!-- platform versions -->
    <equinox.ver>3.2.2</equinox.ver>
-   <kf.ver>2.1.1</kf.ver>
+   <kf.ver>2.2.0</kf.ver>
    <felix.ver>1.0.4</felix.ver>
    
    <!-- javadoc configuration -->
