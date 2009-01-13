@@ -22,6 +22,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-extender"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
 	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.2.0/framework-2.2.0.jar" sourcepath="/KF_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/1.0.4/org.apache.felix.main-1.0.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/1.4.1/org.apache.felix.main-1.4.1.jar" sourcepath="/FELIX_SRC"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
