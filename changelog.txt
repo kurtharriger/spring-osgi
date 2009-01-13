@@ -7,6 +7,7 @@ Changes in version 1.2.0 RC1 (2009-xx-yy)
 
 General
 * various documentation improvements and fixes
+* upgraded to Knopflerfish 2.2.0
 
 Package org.springframework.osgi.context
 * improved proxying of classes that are boot delegated outside the OSGi environment

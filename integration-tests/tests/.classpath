@@ -25,7 +25,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="var" path="M2_REPO/org/objectweb/asm/com.springsource.org.objectweb.asm/2.2.3/com.springsource.org.objectweb.asm-2.2.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.1.0/framework-2.1.0.jar" sourcepath="/KF_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.2.0/framework-2.2.0.jar" sourcepath="/KF_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/scoped.bundle.a/1.2.0-rc1-SNAPSHOT/scoped.bundle.a-1.2.0-rc1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/scoped.bundle.b/1.2.0-rc1-SNAPSHOT/scoped.bundle.b-1.2.0-rc1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/scoped.bundle.common/1.2.0-rc1-SNAPSHOT/scoped.bundle.common-1.2.0-rc1-SNAPSHOT.jar"/>
