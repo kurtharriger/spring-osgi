@@ -63,9 +63,6 @@ public class RetryTemplate {
 	 * @return
 	 */
 	public Object execute(RetryCallback callback) {
-		Assert.notNull(callback, "callback is required");
-		Assert.notNull(notificationLock, "notificationLock is required");
-
 		long waitTime;
 
 		synchronized (monitor) {
@@ -73,19 +70,30 @@ public class RetryTemplate {
 		}
 
 		boolean retry = false;
+		long start, stop = 0;
 		synchronized (notificationLock) {
 			do {
 				Object result = callback.doWithRetry();
 				if (callback.isComplete(result))
 					return result;
 
+				if (!retry) {
+					onMissingTarget();
+
+				}
+
+				start = System.currentTimeMillis();
+
 				if (waitTime > 0) {
 					// Do NOT use Thread.sleep() here - it does not release
 					// locks.
 					try {
 						notificationLock.wait(waitTime);
+						stop = System.currentTimeMillis() - start;
 					}
 					catch (InterruptedException ex) {
+						stop = System.currentTimeMillis() - start;
+						callbackFailed(stop);
 						throw new RuntimeException("Retry failed; interrupted while waiting", ex);
 					}
 				}
@@ -102,7 +110,40 @@ public class RetryTemplate {
 				}
 			} while (retry);
 		}
-		return callback.doWithRetry();
+		Object result = callback.doWithRetry();
+
+		if (callback.isComplete(result)) {
+			callbackSucceeded(stop);
+		}
+		else {
+			callbackFailed(stop);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Template method invoked if the backing service is missing.
+	 */
+	protected void onMissingTarget() {
+	}
+
+	/**
+	 * Template method invoked when the retry succeeded.
+	 * 
+	 * @param stop the time it took to execute the call (including waiting for
+	 *        the service)
+	 */
+	protected void callbackSucceeded(long stop) {
+	}
+
+	/**
+	 * Template method invoked when the retry has failed.
+	 * 
+	 * @param stop the time it took to execute the call (including waiting for
+	 *        the service)
+	 */
+	protected void callbackFailed(long stop) {
 	}
 
 	/**
