@@ -27,11 +27,14 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 
@@ -43,7 +46,7 @@ import org.springframework.osgi.util.internal.MapBasedDictionary;
  * @see org.osgi.service.cm.ConfigurationAdmin
  * @see ManagedService
  */
-class ConfigurationAdminManager {
+class ConfigurationAdminManager implements DisposableBean {
 
 	/**
 	 * Configuration Admin whiteboard 'listener'.
@@ -78,6 +81,8 @@ class ConfigurationAdminManager {
 	private boolean initialized = false;
 	private ManagedServiceBeanManager beanManager;
 	private final Object monitor = new Object();
+
+	private ServiceRegistration registration;
 
 
 	/**
@@ -131,7 +136,12 @@ class ConfigurationAdminManager {
 		props.put(Constants.BUNDLE_SYMBOLICNAME, OsgiStringUtils.nullSafeSymbolicName(bundle));
 		props.put(Constants.BUNDLE_VERSION, OsgiBundleUtils.getBundleVersion(bundle));
 
-		bundleContext.registerService(ManagedService.class.getName(), new ConfigurationWatcher(), props);
+		ServiceRegistration reg = bundleContext.registerService(ManagedService.class.getName(),
+			new ConfigurationWatcher(), props);
+
+		synchronized (monitor) {
+			this.registration = reg;
+		}
 	}
 
 	private void initProperties() {
@@ -147,6 +157,18 @@ class ConfigurationAdminManager {
 					throw new BeanInitializationException("Cannot retrieve configuration for pid=" + pid, ioe);
 				}
 			}
+		}
+	}
+
+	public void destroy() {
+		ServiceRegistration reg = null;
+		synchronized (monitor) {
+			reg = this.registration;
+			this.registration = null;
+		}
+
+		if (OsgiServiceUtils.unregisterService(reg)) {
+			log.trace("Shutting down CM tracker for pid [" + pid + "]");
 		}
 	}
 }

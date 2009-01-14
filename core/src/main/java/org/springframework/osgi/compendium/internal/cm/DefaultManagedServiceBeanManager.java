@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.core.CollectionFactory;
 
@@ -30,7 +31,7 @@ import org.springframework.core.CollectionFactory;
  * @author Costin Leau
  * 
  */
-public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManager {
+public class DefaultManagedServiceBeanManager implements DisposableBean, ManagedServiceBeanManager {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(DefaultManagedServiceBeanManager.class);
@@ -78,5 +79,12 @@ public class DefaultManagedServiceBeanManager implements ManagedServiceBeanManag
 		if (updateCallback != null) {
 			CMUtils.bulkUpdate(updateCallback, instanceRegistry.values(), properties);
 		}
+	}
+
+	public void destroy() {
+		// unregister CM services
+		cam.destroy();
+		// remove the tracked beans
+		instanceRegistry.clear();
 	}
 }
