@@ -14,6 +14,7 @@ Package org.springframework.osgi.context
 * improved proxying of classes that are boot delegated outside the OSGi environment
 * error handling is delegated to the multicaster unless debug is on
 * improved type filtering for tracked services 
+* improved AbstractOsgiBundleApplicationContext to republish the context OSGi service during #refresh calls
 
 Package org.springframework.osgi.extender
 * added support for disabling the ApplicationContext error handler through extender configuration

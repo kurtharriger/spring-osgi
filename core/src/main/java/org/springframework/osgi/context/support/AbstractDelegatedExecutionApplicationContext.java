@@ -133,11 +133,6 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	/** monitor used during refresh/close */
 	private final Object startupShutdownMonitor = new Object();
 
-	/** monitor for available flag */
-	private final Object availableMonitor = new Object();
-
-	private boolean available = false;
-
 	/** Delegated multicaster */
 	private OsgiBundleApplicationContextEventMulticaster delegatedMulticaster;
 
@@ -160,12 +155,6 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 */
 	public AbstractDelegatedExecutionApplicationContext(ApplicationContext parent) {
 		super(parent);
-	}
-
-	boolean isAvailable() {
-		synchronized (availableMonitor) {
-			return available;
-		}
 	}
 
 	/**
@@ -222,9 +211,6 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 	// Adds behaviour for isAvailable flag.
 	protected void doClose() {
-		synchronized (availableMonitor) {
-			available = false;
-		}
 		executor.close();
 	}
 
@@ -380,16 +366,6 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 				throw (Error) th;
 			}
 		}
-	}
-
-	protected void finishRefresh() {
-		super.finishRefresh();
-
-		synchronized (availableMonitor) {
-			available = true;
-		}
-		// publish the context only after all the beans have been published
-		publishContextAsOsgiServiceIfNecessary();
 	}
 
 	// customized to handle DependencyAwareBeanFactoryPostProcessor classes
