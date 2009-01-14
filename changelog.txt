@@ -23,9 +23,11 @@ Package org.springframework.osgi.extender
 Package org.springframework.osgi.service
 * removed deprecated retryTimes parameter in OsgiServiceProxyFactoryBean
 * improved type filtering for tracked services
+* fixed visibility issue when invoking non-public proxied methods 
 
 Package org.springframework.osgi.service
 * improved FelixOsgiPlatform to support API changes in Felix 1.4.x
+
 
 Changes in version 1.2.0 M2 (2008-11-24)
 ----------------------------------------
