@@ -10,6 +10,9 @@ General
 * upgraded to Felix 1.4.1
 * upgraded to Knopflerfish 2.2.0
 
+Package org.springframework.osgi.compendium
+* fixed OSGi service unregistration of <managed-service/> listeners
+
 Package org.springframework.osgi.context
 * improved proxying of classes that are boot delegated outside the OSGi environment
 * error handling is delegated to the multicaster unless debug is on

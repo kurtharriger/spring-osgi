@@ -20,6 +20,7 @@ import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
@@ -34,10 +35,10 @@ import org.springframework.osgi.context.BundleContextAware;
  * 
  */
 public class ManagedServiceInstanceTrackerPostProcessor implements BeanFactoryAware, BundleContextAware,
-		InitializingBean, BeanPostProcessor, DestructionAwareBeanPostProcessor {
+		InitializingBean, BeanPostProcessor, DestructionAwareBeanPostProcessor, DisposableBean {
 
 	private final String trackedBean;
-	private ManagedServiceBeanManager managedServiceManager;
+	private DefaultManagedServiceBeanManager managedServiceManager;
 	private String pid;
 	private String updateMethod;
 	private UpdateStrategy updateStrategy;
@@ -52,6 +53,10 @@ public class ManagedServiceInstanceTrackerPostProcessor implements BeanFactoryAw
 	public void afterPropertiesSet() throws Exception {
 		ConfigurationAdminManager cam = new ConfigurationAdminManager(pid, bundleContext);
 		managedServiceManager = new DefaultManagedServiceBeanManager(updateStrategy, updateMethod, cam, beanFactory);
+	}
+
+	public void destroy() throws Exception {
+		managedServiceManager.destroy();
 	}
 
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
