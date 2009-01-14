@@ -16,17 +16,14 @@
 
 package org.springframework.osgi.service.importer.support.internal.aop;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceReference;
 import org.springframework.aop.TargetSource;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.util.Assert;
 
 /**
  * Around interceptor for OSGi service invokers. Uses method invocation to
@@ -58,20 +55,7 @@ public abstract class ServiceInvoker implements MethodInterceptor, ServiceRefere
 	 * @throws Throwable
 	 */
 	protected Object doInvoke(Object service, MethodInvocation invocation) throws Throwable {
-		Assert.notNull(service, "service should not be null!");
-		Method method = invocation.getMethod();
-		try {
-			return method.invoke(service, invocation.getArguments());
-		}
-		catch (IllegalAccessException ex) {
-			throw (RuntimeException) new IllegalAccessException(
-				"The invoked method ["
-						+ method.getName()
-						+ "] cannot be accessed. This usually occurs when proxying classes with final methods (which cannot be proxied). Consider using interfaces instead. If this is not an option, call only non-final methods.").initCause(ex);
-		}
-		catch (InvocationTargetException ex) {
-			throw ex.getTargetException();
-		}
+		return AopUtils.invokeJoinpointUsingReflection(service, invocation.getMethod(), invocation.getArguments());
 	}
 
 	public final Object invoke(MethodInvocation invocation) throws Throwable {
