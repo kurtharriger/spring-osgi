@@ -192,16 +192,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * Unregister the ApplicationContext OSGi service (in case there is any).
 	 */
 	protected void doClose() {
-		if (!OsgiServiceUtils.unregisterService(serviceRegistration)) {
-			logger.info("Unpublishing application context OSGi service for bundle "
-					+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
-			serviceRegistration = null;
-		}
-		else {
-			if (publishContextAsService)
-				logger.info("Application Context service already unpublished");
-		}
-
+		unpublishContextAsOsgiService();
 		// call super class
 		super.doClose();
 	}
@@ -232,6 +223,18 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 */
 	protected String[] getDefaultConfigLocations() {
 		return null;
+	}
+
+	protected void prepareRefresh() {
+		super.prepareRefresh();
+		// unpublish the service (if there is any) during the refresh
+		unpublishContextAsOsgiService();
+	}
+
+	protected void finishRefresh() {
+		super.finishRefresh();
+		// publish the context only after all the beans have been published
+		publishContextAsOsgiServiceIfNecessary();
 	}
 
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
@@ -309,13 +312,13 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	/**
-	 * Publish the application context as an OSGi service. The method internally
-	 * takes care of parsing the bundle headers and determined if actual
-	 * publishing is required or not.
+	 * Publishes the application context as an OSGi service. The method
+	 * internally takes care of parsing the bundle headers and determined if
+	 * actual publishing is required or not.
 	 * 
 	 */
-	void publishContextAsOsgiServiceIfNecessary() {
-		if (publishContextAsService) {
+	private void publishContextAsOsgiServiceIfNecessary() {
+		if (publishContextAsService && serviceRegistration == null) {
 			Dictionary serviceProperties = new MapBasedDictionary();
 
 			customizeApplicationContextServiceProperties((Map) serviceProperties);
@@ -349,6 +352,21 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	/**
+	 * Unpublishes the application context OSGi service.
+	 */
+	private void unpublishContextAsOsgiService() {
+		if (!OsgiServiceUtils.unregisterService(serviceRegistration)) {
+			logger.info("Unpublishing application context OSGi service for bundle "
+					+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
+			serviceRegistration = null;
+		}
+		else {
+			if (publishContextAsService)
+				logger.info("Application Context service already unpublished");
+		}
+	}
+
+	/**
 	 * Customizes the properties of the application context OSGi service. This
 	 * method is called only if the application context will be published as an
 	 * OSGi service.
@@ -363,7 +381,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * available inside the same bundle).
 	 * 
 	 * @param serviceProperties service properties map (can be casted to
-	 * {@link Dictionary})
+	 *        {@link Dictionary})
 	 */
 	protected void customizeApplicationContextServiceProperties(Map serviceProperties) {
 		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getBundleSymbolicName());

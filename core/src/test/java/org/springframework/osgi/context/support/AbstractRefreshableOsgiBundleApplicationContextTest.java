@@ -25,10 +25,13 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.io.OsgiBundleResource;
+import org.springframework.osgi.mock.MockBundleContext;
+import org.springframework.osgi.mock.MockServiceRegistration;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
 /**
@@ -38,6 +41,9 @@ import org.springframework.osgi.util.BundleDelegatingClassLoader;
 public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCase {
 
 	private AbstractOsgiBundleApplicationContext context;
+	private Bundle bundle;
+	private BundleContext bundleCtx;
+	private MockControl bundleCtrl, bundleCtxCtrl;
 
 
 	protected void setUp() throws Exception {
@@ -46,6 +52,15 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 			protected void loadBeanDefinitions(DefaultListableBeanFactory arg0) throws IOException, BeansException {
 			}
 		};
+
+		bundleCtxCtrl = MockControl.createStrictControl(BundleContext.class);
+		bundleCtx = (BundleContext) bundleCtxCtrl.getMock();
+
+		bundleCtrl = MockControl.createNiceControl(Bundle.class);
+		bundle = (Bundle) bundleCtrl.getMock();
+
+		bundleCtxCtrl.expectAndReturn(bundleCtx.getBundle(), bundle);
+
 	}
 
 	protected void tearDown() throws Exception {
@@ -53,13 +68,6 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 	}
 
 	public void testBundleContext() throws Exception {
-		MockControl bundleCtxCtrl = MockControl.createStrictControl(BundleContext.class);
-		BundleContext bundleCtx = (BundleContext) bundleCtxCtrl.getMock();
-
-		MockControl bundleCtrl = MockControl.createNiceControl(Bundle.class);
-		Bundle bundle = (Bundle) bundleCtrl.getMock();
-
-		bundleCtxCtrl.expectAndReturn(bundleCtx.getBundle(), bundle);
 
 		String location = "osgibundle://someLocation";
 		Resource bundleResource = new OsgiBundleResource(bundle, location);
@@ -82,5 +90,35 @@ public class AbstractRefreshableOsgiBundleApplicationContextTest extends TestCas
 
 		bundleCtrl.verify();
 		bundleCtxCtrl.verify();
+	}
+
+	public void testServicePublicationBetweenRefreshes() throws Exception {
+		final int[] counters = new int[] { 0, 0 };
+
+		MockBundleContext mCtx = new MockBundleContext() {
+
+			public ServiceRegistration registerService(String clazz[], Object service, Dictionary properties) {
+				counters[0]++;
+				return new MockServiceRegistration(clazz, properties) {
+
+					public void unregister() {
+						counters[1]++;
+					}
+				};
+			}
+
+		};
+		context.setBundleContext(mCtx);
+
+		assertEquals(counters[0], 0);
+		assertEquals(counters[1], 0);
+
+		context.refresh();
+		assertEquals(counters[0], 1);
+		assertEquals(counters[1], 0);
+
+		context.refresh();
+		assertEquals(counters[0], 1);
+		assertEquals(counters[1], 1);
 	}
 }
