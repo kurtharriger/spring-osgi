@@ -23,8 +23,8 @@ http://maven.apache.org/guides/introduction/introduction-to-profiles.html
 The following Maven profiles are available for selecting an OSGi platform:
 
 equinox - Equinox 3.2.x
-knopflerfish - Knopflerfish 2.0.x/2.1.x
-felix - Apache Felix 1.0.x
+knopflerfish - Knopflerfish 2.0.x/2.1.x/2.2.x
+felix - Apache Felix 1.0.x/1.4.x
 
 The OSGi platform should be always specified otherwise the project will not compile.
 We recommend that new users try building using Eclipse Equinox platform which is
