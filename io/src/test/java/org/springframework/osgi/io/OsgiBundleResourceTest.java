@@ -16,17 +16,19 @@
 
 package org.springframework.osgi.io;
 
-import java.io.InputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.osgi.framework.Bundle;
+import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.mock.ArrayEnumerator;
 import org.springframework.osgi.mock.MockBundle;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Costin Leau
@@ -120,6 +122,49 @@ public class OsgiBundleResourceTest extends TestCase {
 		resource = new OsgiBundleResource(bundle, "file:foo123123");
 		resource.getURL();
 		assertFalse(resource.exists());
+	}
+
+	public void testFileWithSpecialCharsInTheNameBeingResolved() throws Exception {
+		String name = "file:./target/test-classes/test-file";
+		FileSystemResourceLoader fileLoader = new FileSystemResourceLoader();
+		fileLoader.setClassLoader(getClass().getClassLoader());
+
+		Resource fileRes = fileLoader.getResource(name);
+		resource = new OsgiBundleResource(bundle, name);
+
+		testFileVsOsgiFileResolution(fileRes, resource);
+	}
+
+	public void testFileWithEmptyCharsInTheNameBeingResolved() throws Exception {
+		String name = "file:./target/test-classes/test file";
+		FileSystemResourceLoader fileLoader = new FileSystemResourceLoader();
+		fileLoader.setClassLoader(getClass().getClassLoader());
+
+		Resource fileRes = fileLoader.getResource(name);
+		resource = new OsgiBundleResource(bundle, name);
+
+		testFileVsOsgiFileResolution(fileRes, resource);
+	}
+
+	public void testFileWithNormalCharsInTheNameBeingResolved() throws Exception {
+		String name = "file:.project";
+		FileSystemResourceLoader fileLoader = new FileSystemResourceLoader();
+		fileLoader.setClassLoader(getClass().getClassLoader());
+
+		Resource fileRes = fileLoader.getResource(name);
+
+		resource = new OsgiBundleResource(bundle, name);
+		testFileVsOsgiFileResolution(fileRes, resource);
+	}
+
+	private void testFileVsOsgiFileResolution(Resource fileRes, Resource otherRes) throws Exception {
+		assertNotNull(fileRes.getURL());
+		assertNotNull(fileRes.getFile());
+		assertTrue(fileRes.getFile().exists());
+
+		assertNotNull(otherRes.getURL());
+		assertNotNull(otherRes.getFile());
+		assertTrue(StringUtils.pathEquals(fileRes.getFile().getAbsolutePath(), otherRes.getFile().getAbsolutePath()));
 	}
 
 	/**

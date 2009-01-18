@@ -24,6 +24,10 @@ Package org.springframework.osgi.extender
 * added support for install.context.error.handler property
 * changed namespace handlers lifecycle to depend on bundle events STARTED/STOPPED instead of RESOLVED/UNRESOLVED
 
+Package org.springframework.osgi.extender
+* improved OsgiBundleResource#getFile() file detection method
+* eliminated existance check on resolved files for OsgiBundleResource#getFile()
+
 Package org.springframework.osgi.service
 * removed deprecated retryTimes parameter in OsgiServiceProxyFactoryBean
 * improved type filtering for tracked services
