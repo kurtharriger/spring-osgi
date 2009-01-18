@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
@@ -191,7 +190,7 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	 * 
 	 * @return URL to this resource
 	 * @throws IOException if the resource cannot be resolved as URL, i.e. if
-	 * the resource is not available as descriptor
+	 *         the resource is not available as descriptor
 	 * 
 	 * @see org.osgi.framework.Bundle#getEntry(String)
 	 * @see org.osgi.framework.Bundle#getResource(String)
@@ -295,7 +294,7 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	 * @return the resource handle for the relative resource
 	 * @throws IOException if the relative resource cannot be determined
 	 * @see org.springframework.util.StringUtils#applyRelativePath(String,
-	 * String)
+	 *      String)
 	 */
 	public Resource createRelative(String relativePath) {
 		String pathToUse = StringUtils.applyRelativePath(this.path, relativePath);
@@ -322,7 +321,7 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	 * 
 	 * @return File handle to this resource
 	 * @throws IOException if the resource cannot be resolved as absolute file
-	 * path, i.e. if the resource is not available in a file system
+	 *         path, i.e. if the resource is not available in a file system
 	 */
 	public File getFile() throws IOException {
 		// locate the file inside the bundle only known prefixes
@@ -340,16 +339,12 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 		}
 
 		try {
-			URL url = new URL(path);
-			File file = new File(url.getPath());
-			if (file.exists())
-				return file;
+			return ResourceUtils.getFile(getURI(), getDescription());
 		}
-		catch (MalformedURLException mue) {
-			// falls back to the default implementation
+		catch (IOException ioe) {
+			throw (IOException) new FileNotFoundException(getDescription()
+					+ " cannot be resolved to absolute file path").initCause(ioe);
 		}
-
-		return super.getFile();
 	}
 
 	/**
