@@ -34,6 +34,31 @@ public class RetryTemplateTest extends TestCase {
 	private Object lock;
 
 
+	private static class CountingCallback implements RetryCallback {
+
+		private int count = 0;
+		public final static int WAKES_THRESHOLD = 7;
+
+
+		public synchronized Object doWithRetry() {
+			System.out.println("woken up");
+			count++;
+			return null;
+		}
+
+		public boolean isComplete(Object result) {
+			// postpone completion X times
+			if (getCount() == WAKES_THRESHOLD)
+				return true;
+			return false;
+		}
+
+		public synchronized int getCount() {
+			return count;
+		}
+	}
+
+
 	protected void setUp() throws Exception {
 		lock = new Object();
 		callback = new DefaultRetryCallback() {
@@ -46,7 +71,6 @@ public class RetryTemplateTest extends TestCase {
 
 	protected void tearDown() throws Exception {
 		template = null;
-		lock = null;
 	}
 
 	public void testTemplateReset() throws Exception {
@@ -79,5 +103,44 @@ public class RetryTemplateTest extends TestCase {
 
 		long waitingTime = stop - start;
 		assertTrue("Template not stopped in time", waitingTime < initialWaitTime);
+	}
+
+	public void testSpuriousWakeup() throws Exception {
+		// wait 20s
+		long initialWaitTime = 20 * 1000;
+		final CountingCallback callback = new CountingCallback();
+		template = new RetryTemplate(0, initialWaitTime, lock);
+
+		Runnable spuriousTask = new Runnable() {
+
+			public void run() {
+				try {
+					// start sending notifications to the lock
+					do {
+						// sleep for a while
+						Thread.sleep(50);
+
+						synchronized (lock) {
+							lock.notifyAll();
+						}
+						System.out.println("sent notification");
+					} while (!callback.isComplete(null));
+				}
+				catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
+
+		Thread th = new Thread(spuriousTask, "wake-up thread");
+		th.start();
+
+		long start = System.currentTimeMillis();
+		template.execute(callback);
+		long stop = System.currentTimeMillis();
+		long waited = stop - start;
+
+		assertEquals(CountingCallback.WAKES_THRESHOLD, callback.getCount());
+		assertTrue(waited < initialWaitTime);
 	}
 }
