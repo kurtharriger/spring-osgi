@@ -59,12 +59,12 @@ public class NamespaceProviderAndConsumerTest extends BaseIntegrationTest {
 
 	public void testNamespaceFilesOnTheClassPath() throws Exception {
 		Bundle bundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext, BND_SYM_NAME);
-		assertNotNull(bundle);
+		assertNotNull("cannot find handler bundle", bundle);
 		URL handlers = bundle.getResource("META-INF/spring.handlers");
 		URL schemas = bundle.getResource("META-INF/spring.schemas");
 
-		assertNotNull(handlers);
-		assertNotNull(schemas);
+		assertNotNull("cannot find a handler inside the custom bundle", handlers);
+		assertNotNull("cannot find a schema inside the custom bundle", schemas);
 	}
 
 	public void testNSBundlePublishedOkay() throws Exception {
