@@ -19,6 +19,7 @@ Package org.springframework.osgi.io
 
 Package org.springframework.osgi.service
 * fixed visibility issue when invoking non-public proxied methods 
+* improved waiting code to deal with spurious or accidental wakeups
 
 
 Changes in version 1.1.2 (2008-10-03)

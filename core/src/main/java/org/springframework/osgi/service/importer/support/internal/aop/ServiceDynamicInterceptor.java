@@ -83,7 +83,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		public Object execute(RetryCallback callback) {
 			//send event
 			publishEvent(new OsgiServiceDependencyWaitStartingEvent(eventSource, dependency, this.getWaitTime()
-					* this.getRetryNumbers()));
+					* (this.getRetryNumbers() + 1)));
 
 			Object result = null;
 

@@ -31,6 +31,8 @@ public class RetryTemplate {
 	public static final long DEFAULT_WAIT_TIME = 1000;
 
 	public static final int DEFAULT_RETRY_NUMBER = 3;
+	// wait threshold (in millis)
+	private static final long WAIT_THRESHOLD = 4;
 
 	private final Object monitor = new Object();
 	private final Object notificationLock;
@@ -81,36 +83,47 @@ public class RetryTemplate {
 		}
 
 		int count = -1;
-		synchronized (notificationLock) {
-			do {
-				Object result = callback.doWithRetry();
-				if (callback.isComplete(result))
-					return result;
+		long waitLeft = waitTime;
+		do {
+			Object result = callback.doWithRetry();
 
-				if (waitTime > 0) {
-					// Do NOT use Thread.sleep() here - it does not release
-					// locks.
-					try {
-						notificationLock.wait(waitTime);
+			if (callback.isComplete(result))
+				return result;
+
+			if (waitLeft > 0) {
+				try {
+					long start = System.currentTimeMillis();
+
+					synchronized (notificationLock) {
+						notificationLock.wait(waitLeft);
 					}
-					catch (InterruptedException ex) {
-						throw new RuntimeException("Retry failed; interrupted while waiting", ex);
-					}
+
+					waitLeft -= (System.currentTimeMillis() - start);
 				}
+				catch (InterruptedException ex) {
+					throw new RuntimeException("Retry failed; interrupted while waiting", ex);
+				}
+			}
+			// did we wait enough ?
+			if (waitLeft <= WAIT_THRESHOLD) {
 				count++;
+				waitLeft = waitTime;
+			}
+			// handle reset cases
+			synchronized (monitor) {
+				// has there been a reset in place ?
+				if (waitTime != this.waitTime || retryNumbers != this.retryNumbers) {
+					waitTime = this.waitTime;
+					retryNumbers = this.retryNumbers;
 
-				// handle reset cases
-				synchronized (monitor) {
-					// has there been a reset in place ?
-					if (waitTime != this.waitTime || retryNumbers != this.retryNumbers) {
-						// start counting again
-						count = -1;
-						waitTime = this.waitTime;
-						retryNumbers = this.retryNumbers;
-					}
+					// start counting again
+					count = -1;
+					waitLeft = waitTime;
 				}
-			} while (count < retryNumbers);
-		}
+			}
+		} while (count < retryNumbers);
+
+		// last try (out of the loop)
 		return callback.doWithRetry();
 	}
 
