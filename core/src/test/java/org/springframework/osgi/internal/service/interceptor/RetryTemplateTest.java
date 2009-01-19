@@ -41,7 +41,6 @@ public class RetryTemplateTest extends TestCase {
 
 
 		public synchronized Object doWithRetry() {
-			System.out.println("woken up");
 			count++;
 			return null;
 		}
@@ -51,6 +50,39 @@ public class RetryTemplateTest extends TestCase {
 			if (getCount() == WAKES_THRESHOLD)
 				return true;
 			return false;
+		}
+
+		public synchronized int getCount() {
+			return count;
+		}
+	}
+
+	private static class WaitForRetriesCallback implements RetryCallback {
+
+		private int count = 0;
+		public final static int NR_RETRIES = 3;
+		public final Object retryNotification = new Object();
+		private boolean shouldReturn = false;
+
+
+		public synchronized Object doWithRetry() {
+			count++;
+			return null;
+		}
+
+		public synchronized boolean isComplete(Object result) {
+
+			if (getCount() == NR_RETRIES) {
+				synchronized (retryNotification) {
+					retryNotification.notifyAll();
+				}
+			}
+
+			return shouldReturn;
+		}
+
+		public synchronized void setShouldReturn(boolean value) {
+			shouldReturn = value;
 		}
 
 		public synchronized int getCount() {
@@ -123,7 +155,6 @@ public class RetryTemplateTest extends TestCase {
 						synchronized (lock) {
 							lock.notifyAll();
 						}
-						System.out.println("sent notification");
 					} while (!callback.isComplete(null));
 				}
 				catch (InterruptedException e) {
@@ -142,5 +173,47 @@ public class RetryTemplateTest extends TestCase {
 
 		assertEquals(CountingCallback.WAKES_THRESHOLD, callback.getCount());
 		assertTrue(waited < initialWaitTime);
+	}
+
+	public void testSpuriousWakeupWitRetry() throws Exception {
+
+		long initialWaitTime = 20 * 10;
+		final WaitForRetriesCallback callback = new WaitForRetriesCallback();
+		template = new RetryTemplate(WaitForRetriesCallback.NR_RETRIES * 2, initialWaitTime, lock);
+
+		Runnable spuriousTask = new Runnable() {
+
+			public void run() {
+				try {
+					synchronized (callback.retryNotification) {
+						// wait up to 10 mins for the retry to pass
+						callback.retryNotification.wait(10 * 1000 * 60);
+					}
+
+					// done, change the result and end the waiting 
+					callback.setShouldReturn(true);
+
+					synchronized (lock) {
+						lock.notifyAll();
+					}
+
+					assertTrue(callback.isComplete(null));
+				}
+				catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
+
+		Thread th = new Thread(spuriousTask, "spurious wake-up thread");
+		th.start();
+
+		long start = System.currentTimeMillis();
+		template.execute(callback);
+		long stop = System.currentTimeMillis();
+		long waited = stop - start;
+
+		assertEquals(WaitForRetriesCallback.NR_RETRIES + 1, callback.getCount());
+		assertTrue(waited < (WaitForRetriesCallback.NR_RETRIES + 1) * initialWaitTime);
 	}
 }
