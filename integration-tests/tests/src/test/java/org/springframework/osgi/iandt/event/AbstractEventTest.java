@@ -40,8 +40,8 @@ public abstract class AbstractEventTest extends BaseIntegrationTest {
 	/** lock */
 	protected final Object lock = new Object();
 
-	/** wait 30 seconds max */
-	protected final long TIME_OUT = 60 * 1000;
+	/** wait X minutes max */
+	protected final long TIME_OUT = 3* 60 * 1000;
 
 
 	protected void onSetUp() throws Exception {
