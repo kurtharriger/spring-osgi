@@ -98,15 +98,16 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	private class InitialInjectionProcessor implements BeanPostProcessor {
 
 		public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-			if (log.isTraceEnabled()) {
-				log.trace("Applying initial injection for managed bean " + beanName);
-			}
-			CMUtils.applyMapOntoInstance(bean, initialInjectionProperties, beanFactory);
-
 			return bean;
 		}
 
 		public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+			CMUtils.applyMapOntoInstance(bean, initialInjectionProperties, beanFactory);
+
+			if (log.isTraceEnabled()) {
+				log.trace("Applying initial injection for managed bean " + beanName);
+			}
+
 			return bean;
 		}
 	}

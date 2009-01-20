@@ -105,4 +105,9 @@ public class TestBean {
 		this.props = properties;
 	}
 
+	public void init() {
+		if (this.props == null && string == null)
+			throw new IllegalStateException("Arguments not initialized before init() method called");
+	}
+
 }

@@ -41,5 +41,14 @@
 		<osgix:managed-service persistent-id="beanManaged" update-strategy="bean-managed" update-method="update"/>
 		<property name="integer" value="23"/>
 	</bean>
+
+
+	<bean id="containerManagedWithInit" class="org.springframework.osgi.iandt.cm.managedservice.TestBean" init-method="init">
+		<osgix:managed-service persistent-id="containerManaged" update-strategy="container-managed"/>
+	</bean>
+
+	<bean id="beanManagedWithInit" class="org.springframework.osgi.iandt.cm.managedservice.TestBean" init-method="init">
+		<osgix:managed-service persistent-id="containerManaged" update-strategy="bean-managed" update-method="update"/>
+	</bean>
 	
 </beans>
