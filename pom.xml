@@ -571,7 +571,24 @@ limitations under the License.
           </instructions>
         </configuration>
       </plugin>
-      
+      <!--
+      <plugin>
+        <groupId>com.springsource.bundlor</groupId>
+        <artifactId>com.springsource.bundlor.maven</artifactId>
+        <executions>
+          <execution>
+            <id>bundlor</id>
+            <phase>package</phase>
+            <goals>
+               <goal>transform</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+           <manifestTemplatePath>template.mf</manifestTemplatePath>
+        </configuration>
+      </plugin>
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -982,6 +999,13 @@ limitations under the License.
         <name>Atlassian Maven 2.x Repository</name>
         <url>http://repository.atlassian.com/maven2</url>
     </pluginRepository>
+    
+    <pluginRepository>
+        <id>com.springsource.repository.bundles.milestone</id>
+        <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Milestones</name>
+        <url>http://repository.springsource.com/maven/bundles/milestone</url>
+    </pluginRepository>
+
   </pluginRepositories>
 
   <repositories>
