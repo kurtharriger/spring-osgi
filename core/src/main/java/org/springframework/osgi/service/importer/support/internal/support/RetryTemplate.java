@@ -35,6 +35,9 @@ public class RetryTemplate {
 
 	private long waitTime = DEFAULT_WAIT_TIME;
 
+	// wait threshold (in millis)
+	private static final long WAIT_THRESHOLD = 3;
+
 
 	public RetryTemplate(long waitTime, Object notificationLock) {
 		Assert.isTrue(waitTime >= 0, "waitTime must be positive");
@@ -70,56 +73,76 @@ public class RetryTemplate {
 		}
 
 		boolean retry = false;
-		long start, stop = 0;
-		synchronized (notificationLock) {
-			do {
-				Object result = callback.doWithRetry();
-				if (callback.isComplete(result))
-					return result;
 
-				if (!retry) {
-					onMissingTarget();
+		long initialStart = 0, start = 0, stop = 0;
+		long waitLeft = waitTime;
 
+		boolean startWaiting = false;
+
+		do {
+			Object result = callback.doWithRetry();
+
+			if (callback.isComplete(result)) {
+
+				if (startWaiting) {
+					callbackSucceeded(stop);
 				}
+				return result;
+			}
 
-				start = System.currentTimeMillis();
+			if (!startWaiting) {
+				startWaiting = true;
+				onMissingTarget();
+				// initial wait
+				initialStart = System.currentTimeMillis();
+			}
 
-				if (waitTime > 0) {
-					// Do NOT use Thread.sleep() here - it does not release
-					// locks.
-					try {
+			if (waitLeft > 0) {
+				try {
+					start = System.currentTimeMillis();
+					synchronized (notificationLock) {
+						// Do NOT use Thread.sleep() here - it does not release
+						// locks.
 						notificationLock.wait(waitTime);
-						stop = System.currentTimeMillis() - start;
 					}
-					catch (InterruptedException ex) {
-						stop = System.currentTimeMillis() - start;
-						callbackFailed(stop);
-						throw new RuntimeException("Retry failed; interrupted while waiting", ex);
-					}
+					// local wait timer
+					stop = System.currentTimeMillis();
+					waitLeft -= (stop - start);
+					// total wait timer
+					stop -= initialStart;
 				}
-				retry = false;
+				catch (InterruptedException ex) {
+					stop = System.currentTimeMillis() - initialStart;
+					callbackFailed(stop);
+					throw new RuntimeException("Retry failed; interrupted while waiting", ex);
+				}
+			}
 
-				// handle reset cases
-				synchronized (monitor) {
-					// has there been a reset in place ?
-					if (waitTime != this.waitTime) {
-						// start counting again
-						retry = true;
-						waitTime = this.waitTime;
-					}
+			retry = false;
+
+			// handle reset cases
+			synchronized (monitor) {
+				// has there been a reset in place ?
+				if (waitTime != this.waitTime) {
+					// start counting again
+					retry = true;
+					waitTime = this.waitTime;
+					waitLeft = waitTime;
 				}
-			} while (retry);
-		}
+			}
+		} while (retry || waitLeft > WAIT_THRESHOLD);
+
 		Object result = callback.doWithRetry();
+		stop = System.currentTimeMillis() - initialStart;
 
 		if (callback.isComplete(result)) {
 			callbackSucceeded(stop);
+			return result;
 		}
 		else {
 			callbackFailed(stop);
+			return null;
 		}
-
-		return result;
 	}
 
 	/**
