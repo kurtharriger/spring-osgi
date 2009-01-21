@@ -179,7 +179,6 @@ public class RetryTemplateTest extends TestCase {
 
 	protected void tearDown() throws Exception {
 		template = null;
-		monitor = null;
 	}
 
 	// reset test - a separate thread reset a template that waits for a long time
