@@ -38,6 +38,9 @@ Package org.springframework.osgi.service
 Package org.springframework.osgi.service
 * improved FelixOsgiPlatform to support API changes in Felix 1.4.x
 
+Package org.springframework.osgi.web
+* fixed extender configuration race condition
+
 
 Changes in version 1.2.0 M2 (2008-11-24)
 ----------------------------------------
