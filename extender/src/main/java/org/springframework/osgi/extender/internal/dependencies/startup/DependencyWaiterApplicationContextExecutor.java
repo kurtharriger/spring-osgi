@@ -137,6 +137,10 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 			// Once we are done, tell the world
 			synchronized (monitor) {
+				// Close might have been called in the meantime
+				if (state != ContextState.DEPENDENCIES_RESOLVED) {
+					return;
+				}
 				state = ContextState.STARTED;
 			}
 		}
@@ -323,24 +327,51 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				return;
 			}
 
-			if (debug)
+			if (debug) {
 				log.debug("Closing appCtx for " + getDisplayName());
-
-			if (dependencyDetector != null) {
-				dependencyDetector.deregister();
 			}
 
-			if (state == ContextState.STARTED) {
+			// It's possible for the delegateContext to already be in startRefresh() or completeRefresh().
+			// If this is the case then its important to wait for these tasks to complete and then close normally
+			// If we simply exit then the bundle may suddnely become invalid under our feet, e.g. if this
+			// was triggered by a Bundle update or uininstall.
+
+			// Context is in stageOne(), wait until stageOne() is complete
+			// and destroy singletons
+			if (state == ContextState.RESOLVING_DEPENDENCIES) {
+				if (debug)
+					log.debug("Cleaning up appCtx " + getDisplayName());
+				synchronized (delegateContext.getMonitor()) {
+					delegateContext.getBeanFactory().destroySingletons();
+					state = ContextState.INTERRUPTED;
+				}
+			}
+			// Context is in stageTwo(), wait until stageTwo() is complete and
+			// close normally.
+			else if (state == ContextState.DEPENDENCIES_RESOLVED) {
+				if (debug)
+					log.debug("Shutting down appCtx " + getDisplayName() + " once stageTwo() is complete");
+				synchronized (delegateContext.getMonitor()) {
+					state = ContextState.STOPPED;
+					normalShutdown = true;
+				}
+			}
+			// Context is running, shut it down
+			else if (state == ContextState.STARTED) {
 				if (debug)
 					log.debug("Shutting down normally appCtx " + getDisplayName());
-				// close the context only if it was actually started
 				state = ContextState.STOPPED;
 				normalShutdown = true;
 			}
+			// Something else going on
 			else {
 				if (debug)
 					log.debug("No need to stop context (it hasn't been started yet)");
 				state = ContextState.INTERRUPTED;
+			}
+			// Clean up the detector
+			if (dependencyDetector != null) {
+				dependencyDetector.deregister();
 			}
 		}
 		try {
