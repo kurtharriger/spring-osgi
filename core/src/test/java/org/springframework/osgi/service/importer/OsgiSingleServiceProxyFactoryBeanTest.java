@@ -50,6 +50,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.serviceFactoryBean = new OsgiServiceProxyFactoryBean();
+		this.serviceFactoryBean.setBeanClassLoader(getClass().getClassLoader());
 		// this.serviceFactoryBean.setApplicationContext(new
 		// GenericApplicationContext());
 		this.mockControl = MockControl.createControl(BundleContext.class);
@@ -101,7 +102,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 		}
 	}
 
-	public void testGetObjectType() {
+	public void tstGetObjectType() {
 		this.serviceFactoryBean.setInterfaces(new Class[] { ApplicationContext.class });
 		assertEquals(ApplicationContext.class, this.serviceFactoryBean.getObjectType());
 	}
