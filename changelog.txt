@@ -34,8 +34,9 @@ Package org.springframework.osgi.service
 * improved type filtering for tracked services
 * fixed visibility issue when invoking non-public proxied methods 
 * improved waiting code to deal with spurious or accidental wakeups
+* fixed issue with OsgiServiceProxyFactoryBean that caused autowiring to fail in some cases
 
-Package org.springframework.osgi.service
+Package org.springframework.osgi.test
 * improved FelixOsgiPlatform to support API changes in Felix 1.4.x
 
 Package org.springframework.osgi.web

@@ -27,6 +27,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.springframework.aop.SpringProxy;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
@@ -102,9 +103,18 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 		}
 	}
 
-	public void tstGetObjectType() {
+	public void testGetObjectTypeCompositeInterface() {
 		this.serviceFactoryBean.setInterfaces(new Class[] { ApplicationContext.class });
-		assertEquals(ApplicationContext.class, this.serviceFactoryBean.getObjectType());
+		assertTrue("composite interface not properly created",
+			ApplicationContext.class.isAssignableFrom(this.serviceFactoryBean.getObjectType()));
+		assertTrue("mixing interface not introduced",
+			ImportedOsgiServiceProxy.class.isAssignableFrom(this.serviceFactoryBean.getObjectType()));
+	}
+
+	public void testObjectTypeWOCompositeInterface() {
+		this.serviceFactoryBean.setInterfaces(new Class[] { AbstractApplicationContext.class });
+		assertNull("should not be able to create composite interface when a class is specified",
+			this.serviceFactoryBean.getObjectType());
 	}
 
 	// OsgiServiceUtils are tested independently in error cases, here we
