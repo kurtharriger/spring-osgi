@@ -64,14 +64,14 @@
       <para>The extender bundle creates applications contexts asynchronously.
       This behaviour ensures that starting an OSGi Service Platform is fast and
       that bundles with service inter-dependencies do not cause deadlock on
-      startup. A Spring-powered bundle may therefore transition to the STARTED
+      startup. A Spring-powered bundle may therefore transition to the ACTIVE
       state before its application context has been created. It is possible to
       force synchronous creation of application contexts on a bundle-by-bundle
       basis. See <xref linkend="app-deploy:headers"/> for information on how to specify this
       behaviour.</para>
 
       <para>If application context creation fails for any reason then the
-      failure cause is logged. The bundle remains in the STARTED state. There
+      failure cause is logged. The bundle remains in the ACTIVE state. There
       will be no services exported to the registry from the application
       context in this scenario.</para>
 
