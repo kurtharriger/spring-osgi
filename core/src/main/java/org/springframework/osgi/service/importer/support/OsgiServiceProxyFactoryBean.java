@@ -16,6 +16,7 @@
 
 package org.springframework.osgi.service.importer.support;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -125,11 +126,30 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	 * {@inheritDoc}
 	 * 
 	 * Returns the managed proxy type. If the proxy is not created when this
-	 * method is invoked, only the first interface/class will be returned.
+	 * method is invoked, the method will try to create a composite interface
+	 * (if only interfaces are specified) or null otherwise.
 	 */
 	public Class getObjectType() {
-		return (proxy != null ? proxy.getClass() : (ObjectUtils.isEmpty(getInterfaces()) ? Object.class
-				: getInterfaces()[0]));
+		synchronized (monitor) {
+			if (proxy != null) {
+				return proxy.getClass();
+			}
+			// no proxy defined, try to create a composite interface
+			Class[] intfs = getInterfaces();
+			if (!ObjectUtils.isEmpty(intfs)) {
+				for (int index = 0; index < intfs.length; index++) {
+					// concrete class found, need to create an actual proxy
+					if (!intfs[index].isInterface()) {
+						return null;
+					}
+				}
+				Class[] cls = (Class[]) ObjectUtils.addObjectToArray(intfs, ImportedOsgiServiceProxy.class);
+				return Proxy.getProxyClass(getAopClassLoader(), cls);
+			}
+		}
+
+		// unable to determine the type, returning null
+		return null;
 	}
 
 	/**
@@ -302,10 +322,14 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		Assert.notNull(cardinality);
 		Assert.isTrue(cardinality.isSingle(), "only singular cardinality ('X..1') accepted");
 		super.setCardinality(cardinality);
-		this.mandatory = cardinality.isMandatory();
+		synchronized (monitor) {
+			this.mandatory = cardinality.isMandatory();
+		}
 	}
 
 	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-		this.applicationEventPublisher = applicationEventPublisher;
+		synchronized (monitor) {
+			this.applicationEventPublisher = applicationEventPublisher;
+		}
 	}
 }
