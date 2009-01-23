@@ -51,6 +51,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.serviceFactoryBean = new OsgiServiceProxyFactoryBean();
+		this.serviceFactoryBean.setBeanClassLoader(getClass().getClassLoader());
 		// this.serviceFactoryBean.setApplicationContext(new
 		// GenericApplicationContext());
 		this.mockControl = MockControl.createControl(BundleContext.class);
