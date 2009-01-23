@@ -18,12 +18,12 @@ package org.springframework.osgi.iandt.componentscanning;
 
 import java.awt.Shape;
 
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 
 /**
  * @author Costin Leau
  */
-public class OrderedComponentScanningTest extends AbstractConfigurableBundleCreatorTests {
+public class OrderedComponentScanningTest extends BaseIntegrationTest {
 
 	private static final String BEAN_NAME = "componentBean";
 
@@ -47,12 +47,6 @@ public class OrderedComponentScanningTest extends AbstractConfigurableBundleCrea
 		assertNotNull(bean.getSetterInjection());
 		assertNotNull(bean.getConstructorInjection());
 		assertNotNull(bean.getFieldInjection());
-	}
-
-	protected String[] getBundleContentPattern() {
-		String pkg = getClass().getPackage().getName().replace('.', '/').concat("/");
-		String[] patterns = new String[] { pkg + "**/*" };
-		return patterns;
 	}
 
 	@Override
