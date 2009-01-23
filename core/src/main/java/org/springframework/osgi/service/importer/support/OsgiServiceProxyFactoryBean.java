@@ -126,7 +126,8 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	 * {@inheritDoc}
 	 * 
 	 * Returns the managed proxy type. If the proxy is not created when this
-	 * method is invoked, only the first interface/class will be returned.
+	 * method is invoked, the method will try to create a composite interface (if only
+	 * interfaces are specified) or null otherwise.
 	 */
 	public Class getObjectType() {
 		synchronized (monitor) {
