@@ -70,9 +70,10 @@
     			<literal>spring-osgi-web-extender.jar</literal> - Spring DM web extender
 	   		</listitem>
     	</itemizedlist>
-    	bundles to detect started OSGi WAR bundles (bundles with <literal>.war</literal> extension) and to deploy them to one of the supported web containers. 
-    	By default, Tomcat will be used but this can be changed to Jetty or to another custom 
-    	server. When the war bundle is stopped, Spring DM will also stop and uninstall the web application associated with it. Different from 
+    	bundles to detect started OSGi WAR bundles and to deploy them to one of the supported web containers. Note that the web extender consider a war a bundle
+    	that has trailing <literal>.war</literal> in its location or contains a <literal>WEB-INF</literal> entry. 
+    	By default, Tomcat will be used but this can be changed to Jetty or to another custom server. When the war bundle is stopped, 
+    	Spring DM will also stop and uninstall the web application associated with it. Different from 
     	<emphasis>traditional</emphasis> web development, the Servlet classes need to be explicitly imported as the OSGi class path always takes priority
     	(see <link linkend="web:classpath">below</link>).</para>
     	
