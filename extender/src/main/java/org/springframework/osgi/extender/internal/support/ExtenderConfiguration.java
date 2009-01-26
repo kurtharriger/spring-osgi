@@ -53,10 +53,7 @@ import org.springframework.util.ObjectUtils;
  * Configuration class for the extender. Takes care of locating the extender
  * specific configurations and merging the results with the defaults.
  * 
- * <p/> Note that this configuration will consider mandatory options required by
- * 
  * @author Costin Leau
- * 
  */
 public class ExtenderConfiguration implements DisposableBean {
 
@@ -77,7 +74,7 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private static final String PROCESS_ANNOTATIONS_KEY = "process.annotations";
 
- 	private static final String INSTALL_CONTEXT_ERROR_HANDLER_KEY = "install.context.error.handler";
+	private static final String INSTALL_CONTEXT_ERROR_HANDLER_KEY = "install.context.error.handler";
 
 	private static final String EXTENDER_CFG_LOCATION = "META-INF/spring/extender";
 
@@ -414,7 +411,7 @@ public class ExtenderConfiguration implements DisposableBean {
 	 * Indicates if the process annotation is enabled or not.
 	 * 
 	 * @return Returns true if the annotation should be processed or not
-	 * otherwise.
+	 *         otherwise.
 	 */
 	public boolean shouldProcessAnnotation() {
 		synchronized (lock) {
@@ -423,7 +420,8 @@ public class ExtenderConfiguration implements DisposableBean {
 	}
 
 	/**
-	 * @return true if an error handler should be installed for context creation.
+	 * @return true if an error handler should be installed for context
+	 *         creation.
 	 */
 	public boolean shouldInstallContextErrorHandler() {
 		synchronized (lock) {
