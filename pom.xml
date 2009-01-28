@@ -902,7 +902,7 @@ limitations under the License.
             <link>http://cglib.sourceforge.net/apidocs</link>
             <link>http://logging.apache.org/log4j/docs/api/</link>
             <link>http://jakarta.apache.org/commons/logging/apidocs/</link>
-            <link>http://junit.sourceforge.net/javadoc/</link>
+            <link>http://junit.org/junit/javadoc/3.8.1/</link>
             <link>http://aopalliance.sourceforge.net/doc/</link>
             <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
             <link>http://tomcat.apache.org/tomcat-5.5-doc/catalina/docs/api/</link>
