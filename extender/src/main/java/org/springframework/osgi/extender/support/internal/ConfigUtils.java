@@ -103,10 +103,8 @@ public abstract class ConfigUtils {
 
 	public static final long DIRECTIVE_TIMEOUT_DEFAULT = 5 * 60; // 5 minutes
 
-	public static final long DIRECTIVE_NO_TIMEOUT = -2L; // Indicates wait
+	public static final long DIRECTIVE_NO_TIMEOUT = -2L; // Indicates wait forever
 
-
-	// forever
 
 	public static boolean matchExtenderVersionRange(Bundle bundle, Version versionToMatch) {
 		Assert.notNull(bundle);
@@ -221,7 +219,7 @@ public abstract class ConfigUtils {
 	}
 
 	/**
-	 * Shortuct method to retrieve directive values. Used internally by the
+	 * Shortcut method to retrieve directive values. Used internally by the
 	 * dedicated getXXX.
 	 * 
 	 * @param directiveName
@@ -235,6 +233,22 @@ public abstract class ConfigUtils {
 				return directive;
 		}
 		return null;
+	}
+
+	/**
+	 * Returns true if the given directive is present or false otherwise.
+	 * 
+	 * @param headers
+	 * @param directiveName
+	 * @return
+	 */
+	public static boolean isDirectiveDefined(Dictionary headers, String directiveName) {
+		String header = getSpringContextHeader(headers);
+		if (header != null) {
+			String directive = getDirectiveValue(header, directiveName);
+			return (directive != null);
+		}
+		return false;
 	}
 
 	/**
