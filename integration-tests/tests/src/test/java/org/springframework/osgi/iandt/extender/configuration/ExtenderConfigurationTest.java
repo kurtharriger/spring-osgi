@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.iandt.extender.configuration;
 
+import java.util.Properties;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
@@ -64,6 +66,13 @@ public class ExtenderConfigurationTest extends BaseIntegrationTest {
 		Object bean = context.getBean("shutdownTaskExecutor");
 		assertTrue("unexpected type", bean instanceof TaskExecutor);
 	}
+
+	public void testCustomProperties() throws Exception {
+		assertTrue(context.containsBean("extenderProperties"));
+		Object bean = context.getBean("extenderProperties");
+		assertTrue("unexpected type", bean instanceof Properties);
+	}
+
 
 	// felix doesn't support fragments, so disable this test
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {

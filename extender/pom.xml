@@ -60,7 +60,12 @@
 		  <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
 		  <version>3.1.0</version>
 		  <scope>test</scope>
-	    </dependency> 
+	    </dependency>
+	    <dependency>
+            <groupId>org.aopalliance</groupId>
+            <artifactId>com.springsource.org.aopalliance</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 </project>

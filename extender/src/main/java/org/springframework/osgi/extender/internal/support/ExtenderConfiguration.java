@@ -44,6 +44,7 @@ import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.internal.dependencies.startup.MandatoryImporterDependencyFactory;
 import org.springframework.osgi.extender.support.DefaultOsgiApplicationContextCreator;
+import org.springframework.osgi.extender.support.internal.ConfigUtils;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 import org.springframework.util.Assert;
@@ -74,6 +75,8 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private static final String PROCESS_ANNOTATIONS_KEY = "process.annotations";
 
+	private static final String WAIT_FOR_DEPS_TIMEOUT_KEY = "dependencies.wait.time";
+
 	private static final String INSTALL_CONTEXT_ERROR_HANDLER_KEY = "install.context.error.handler";
 
 	private static final String EXTENDER_CFG_LOCATION = "META-INF/spring/extender";
@@ -88,6 +91,9 @@ public class ExtenderConfiguration implements DisposableBean {
 	//
 	// defaults
 	//
+
+	// default dependency wait time (in seconds)
+	private static final long DEFAULT_DEP_WAIT = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
 	private static final long DEFAULT_SHUTDOWN_WAIT = 10 * 1000;
 	private static final boolean DEFAULT_PROCESS_ANNOTATION = false;
 	private static final boolean DEFAULT_INSTALL_CONTEXT_ERROR_HANDLER = true;
@@ -102,7 +108,7 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private boolean isMulticasterManagedInternally;
 
-	private long shutdownWaitTime;
+	private long shutdownWaitTime, dependencyWaitTime;
 
 	private boolean processAnnotation;
 
@@ -199,6 +205,7 @@ public class ExtenderConfiguration implements DisposableBean {
 
 		synchronized (lock) {
 			shutdownWaitTime = getShutdownWaitTime(properties);
+			dependencyWaitTime = getDependencyWaitTime(properties);
 			processAnnotation = getProcessAnnotations(properties);
 			installContextErrorHandler = getInstallContextErrorHandler(properties);
 		}
@@ -262,13 +269,15 @@ public class ExtenderConfiguration implements DisposableBean {
 		List urls = new ArrayList(4);
 		while (enm != null && enm.hasMoreElements()) {
 			URL configURL = (URL) enm.nextElement();
-			String configURLAsString = configURL.toExternalForm();
-			try {
-				urls.add(URLDecoder.decode(configURLAsString, "UTF8"));
-			}
-			catch (UnsupportedEncodingException uee) {
-				log.warn("UTF8 encoding not supported, using the platform default");
-				urls.add(URLDecoder.decode(configURLAsString));
+			if (configURL != null) {
+				String configURLAsString = configURL.toExternalForm();
+				try {
+					urls.add(URLDecoder.decode(configURLAsString, "UTF8"));
+				}
+				catch (UnsupportedEncodingException uee) {
+					log.warn("UTF8 encoding not supported, using the platform default");
+					urls.add(URLDecoder.decode(configURLAsString));
+				}
 			}
 		}
 
@@ -279,6 +288,7 @@ public class ExtenderConfiguration implements DisposableBean {
 		Properties properties = new Properties();
 		properties.setProperty(SHUTDOWN_WAIT_KEY, "" + DEFAULT_SHUTDOWN_WAIT);
 		properties.setProperty(PROCESS_ANNOTATIONS_KEY, "" + DEFAULT_PROCESS_ANNOTATION);
+		properties.setProperty(WAIT_FOR_DEPS_TIMEOUT_KEY, "" + DEFAULT_DEP_WAIT);
 		properties.setProperty(INSTALL_CONTEXT_ERROR_HANDLER_KEY, "" + DEFAULT_INSTALL_CONTEXT_ERROR_HANDLER);
 
 		return properties;
@@ -300,7 +310,7 @@ public class ExtenderConfiguration implements DisposableBean {
 						ExtenderConfiguration.class.getClassLoader());
 				}
 				catch (ClassNotFoundException cnfe) {
-					log.warn("Spring-DM annotation package not found, annotation processing disabled.", cnfe);
+					log.warn("Spring DM annotation package not found, annotation processing disabled.", cnfe);
 					return;
 				}
 				Object processor = BeanUtils.instantiateClass(annotationProcessor);
@@ -365,6 +375,11 @@ public class ExtenderConfiguration implements DisposableBean {
 		return Long.parseLong(properties.getProperty(SHUTDOWN_WAIT_KEY));
 	}
 
+	private long getDependencyWaitTime(Properties properties) {
+		// convert into ms
+		return Long.parseLong(properties.getProperty(WAIT_FOR_DEPS_TIMEOUT_KEY)) * 1000;
+	}
+
 	private boolean getProcessAnnotations(Properties properties) {
 		return Boolean.valueOf(properties.getProperty(PROCESS_ANNOTATIONS_KEY)).booleanValue()
 				|| Boolean.getBoolean(AUTO_ANNOTATION_PROCESSING);
@@ -416,6 +431,17 @@ public class ExtenderConfiguration implements DisposableBean {
 	public boolean shouldProcessAnnotation() {
 		synchronized (lock) {
 			return processAnnotation;
+		}
+	}
+
+	/**
+	 * Returns the dependencyWaitTime.
+	 * 
+	 * @return Returns the dependencyWaitTime
+	 */
+	public long getDependencyWaitTime() {
+		synchronized (lock) {
+			return dependencyWaitTime;
 		}
 	}
 

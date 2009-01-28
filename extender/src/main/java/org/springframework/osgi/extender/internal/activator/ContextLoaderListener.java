@@ -24,8 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
-import java.util.Collection;
-import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +34,6 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
-import org.osgi.service.packageadmin.PackageAdmin;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.core.CollectionFactory;
@@ -44,14 +41,14 @@ import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
-import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
+import org.springframework.osgi.extender.internal.dependencies.shutdown.BundleDependencyComparator;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceDependencySorter;
-import org.springframework.osgi.extender.internal.dependencies.shutdown.BundleDependencyComparator;
 import org.springframework.osgi.extender.internal.dependencies.startup.DependencyWaiterApplicationContextExecutor;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 import org.springframework.osgi.extender.internal.support.NamespaceManager;
@@ -65,7 +62,6 @@ import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.util.Assert;
 
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'.
@@ -484,8 +480,7 @@ public class ContextLoaderListener implements BundleActivator {
 				for (int j = 0; j < services.length; j++) {
 					if (BundleDependencyComparator.isSpringManagedService(services[j])) {
 						Bundle used = services[j].getBundle();
-						if (!used.equals(bundleContext.getBundle())
-							&& !usedBundles.contains(used)) {
+						if (!used.equals(bundleContext.getBundle()) && !usedBundles.contains(used)) {
 							usedBundles.add(used);
 							buffer.append("\n  Using [" + used.getSymbolicName() + "]");
 						}
@@ -746,7 +741,25 @@ public class ContextLoaderListener implements BundleActivator {
 				localApplicationContext, !config.isCreateAsynchronously(),
 				extenderConfiguration.getDependencyFactories());
 
+			long timeout;
+			// check whether a timeout has been defined
+
+			if (ConfigUtils.isDirectiveDefined(bundle.getHeaders(), ConfigUtils.DIRECTIVE_TIMEOUT)) {
+				timeout = config.getTimeout();
+				if (debug)
+					log.debug("Setting bundle-defined, wait-for-dependencies timeout value=" + timeout
+							+ " ms, for bundle " + bundleString);
+
+			}
+			else {
+				timeout = extenderConfiguration.getDependencyWaitTime();
+				if (debug)
+					log.debug("Setting globally defined wait-for-dependencies timeout value=" + timeout
+							+ " ms, for bundle " + bundleString);
+			}
+
 			appCtxExecutor.setTimeout(config.getTimeout());
+
 			appCtxExecutor.setWatchdog(timer);
 			appCtxExecutor.setTaskExecutor(executor);
 			appCtxExecutor.setMonitoringCounter(contextsStarted);
@@ -804,11 +817,12 @@ public class ContextLoaderListener implements BundleActivator {
 		// Register an error handle if required
 		if (extenderConfiguration.shouldInstallContextErrorHandler()) {
 			multicaster.addApplicationListener(new OsgiBundleApplicationContextListener() {
+
 				public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
-				   if (event instanceof OsgiBundleContextFailedEvent) {
-					   log.error("Context creation error for [" + event.getBundle().getSymbolicName() + "]",
-						   ((OsgiBundleContextFailedEvent)event).getFailureCause());
-				   }
+					if (event instanceof OsgiBundleContextFailedEvent) {
+						log.error("Context creation error for [" + event.getBundle().getSymbolicName() + "]",
+							((OsgiBundleContextFailedEvent) event).getFailureCause());
+					}
 				}
 			});
 		}
