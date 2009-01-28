@@ -63,12 +63,30 @@
 
       <para>The extender bundle creates applications contexts asynchronously.
       This behaviour ensures that starting an OSGi Service Platform is fast and
-      that bundles with service inter-dependencies do not cause deadlock on
-      startup. A Spring-powered bundle may therefore transition to the ACTIVE
-      state before its application context has been created. It is possible to
-      force synchronous creation of application contexts on a bundle-by-bundle
-      basis. See <xref linkend="app-deploy:headers"/> for information on how to specify this
-      behaviour.</para>
+      that bundles with service inter-dependencies do not cause deadlock (waiting for each other) on
+      startup.</para>
+      <para>The extender considers only bundles successfully started, that is, bundles in 
+      <emphasis>ACTIVE</emphasis> state; bundles in other states are ignored.    
+      Therefore a Spring-powered bundle will have its application context created <emphasis>after</emphasis>
+      it has been started. It is possible to force synchronous/serialized creation of application contexts 
+      for started bundles, on a bundle-by-bundle basis. See <xref linkend="app-deploy:headers"/> for information 
+      on how to specify this behaviour.</para>
+      
+      
+      <para><mediaobject>
+        <imageobject role="fo">
+		  <imagedata fileref="../src/docbkx/resources/images/start-diagram.png" format="PNG" align="center"/>
+        </imageobject>
+		<imageobject role="html">
+          <imagedata fileref="images/start-diagram.png" format="PNG" align="center"/>
+        </imageobject>
+        
+          <textobject>
+            <phrase>Application Context Sequence Diagram</phrase>
+          </textobject>
+        
+      </mediaobject></para>
+      
 
       <para>If application context creation fails for any reason then the
       failure cause is logged. The bundle remains in the ACTIVE state. There
@@ -104,9 +122,8 @@
         <para>It is possible to change the application context creation
         semantics so that application context creation fails if all mandatory
         services are not immediately available upon startup (see section 4.1).
-        When configured to not wait for dependencies, a bundle with
-        unsatisfied mandatory dependencies will be stopped, leaving the bundle
-        in the <emphasis>RESOLVED</emphasis> state.</para>
+        However, regardless of the configuration chosen, the failure of the
+        application context will not change the bundle state.</para>
       </section>
 
       <section id="bnd-app-ctx:app-creation:app-ctx-publication">
@@ -154,14 +171,29 @@
 
       <para>A bundle in the resolved state may be uninstalled: packages that
       were exported by an uninstalled bundle continue to be available to
-      bundles that imported them (but not to newly installed bundles).</para>
-
-      <para>A bundle in the resolved state may also be updated. The update
+      bundles that imported them (but not to newly installed bundles).A bundle 
+      in the resolved state may also be updated. The update
       process migrates from one version of a bundle to another version of the
       same bundle.</para>
 
       <para>Finally of course, a resolved bundle can be started, which
-      transitions it to the active state.</para>
+      transitions it to the active state. See below a diagram of the main states and
+      their transitions:</para>
+      
+      <para><mediaobject>
+        <imageobject role="fo">
+		  <imagedata fileref="../src/docbkx/resources/images/bundle-states.png" format="PNG" align="center"/>
+        </imageobject>
+		<imageobject role="html">
+          <imagedata fileref="images/bundle-states.png" format="PNG" align="center"/>
+        </imageobject>
+        
+          <textobject>
+            <phrase>Bundle States</phrase>
+          </textobject>
+        
+      </mediaobject></para>
+      
 
       <para>The OSGi <literal>PackageAdmin</literal>
       <literal>refreshPackages</literal> operation refreshes packages across
@@ -302,6 +334,12 @@
       bundle is being shutdown, the application context will be destroyed as well,
       all exported services being unregistered and all service imported dispose of.
       </para>
+      
+      <para>As opposed to the application creation, the application context is destroyed in a synchronized manner,
+      on the same thread that stops the bundle. This is required since once stopped, a bundle can not longer be used
+      (even for class loading) preventing the application context shutdown from executing correctly.
+      </para>
+      
       
       <para>Note however that a bundle can be closed individually or as part of a bigger
       event such as shutting down the entire OSGi platform. In this case or when the extender
