@@ -1709,7 +1709,6 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
 		</note>
 	    	                  
       </section>
-      
     </section> 
     
     <section id="service-registry:refs:global-defaults">
