@@ -61,16 +61,9 @@
     <section id="bnd-app-ctx:app-creation">
       <title>Application Context Creation</title>
 
-      <para>The extender bundle creates applications contexts asynchronously.
-      This behaviour ensures that starting an OSGi Service Platform is fast and
-      that bundles with service inter-dependencies do not cause deadlock (waiting for each other) on
-      startup.</para>
-      <para>The extender considers only bundles successfully started, that is, bundles in 
-      <emphasis>ACTIVE</emphasis> state; bundles in other states are ignored.    
-      Therefore a Spring-powered bundle will have its application context created <emphasis>after</emphasis>
-      it has been started. It is possible to force synchronous/serialized creation of application contexts 
-      for started bundles, on a bundle-by-bundle basis. See <xref linkend="app-deploy:headers"/> for information 
-      on how to specify this behaviour.</para>
+      <para>The extender bundle creates applications contexts asynchronously, on a different thread then the one starting the bundle.
+      This behaviour ensures that starting an OSGi Service Platform is fast and that bundles with service inter-dependencies do not 
+      cause deadlock (waiting for each other) on startup, as pictured below: </para>
       
       
       <para><mediaobject>
@@ -87,6 +80,12 @@
         
       </mediaobject></para>
       
+      <para>The extender considers only bundles successfully started, that is, bundles in 
+      <emphasis>ACTIVE</emphasis> state; bundles in other states are ignored.    
+      Therefore a Spring-powered bundle will have its application context created <emphasis>after</emphasis>
+      it has been started. It is possible to force synchronous/serialized creation of application contexts 
+      for started bundles, on a bundle-by-bundle basis. See <xref linkend="app-deploy:headers"/> for information 
+      on how to specify this behaviour.</para>
 
       <para>If application context creation fails for any reason then the
       failure cause is logged. The bundle remains in the ACTIVE state. There
@@ -177,8 +176,9 @@
       same bundle.</para>
 
       <para>Finally of course, a resolved bundle can be started, which
-      transitions it to the active state. See below a diagram of the main states and
-      their transitions:</para>
+      transitions it to the active state.</para>
+      
+      <para>The diagram below represents the bundle states and its transitions:</para>
       
       <para><mediaobject>
         <imageobject role="fo">
@@ -340,11 +340,25 @@
       (even for class loading) preventing the application context shutdown from executing correctly.
       </para>
       
+      <para><mediaobject>
+        <imageobject role="fo">
+		  <imagedata fileref="../src/docbkx/resources/images/stop-diagram.png" format="PNG" align="center"/>
+        </imageobject>
+		<imageobject role="html">
+          <imagedata fileref="images/stop-diagram.png" format="PNG" align="center"/>
+        </imageobject>
+        
+          <textobject>
+            <phrase>Application Context Sequence Diagram</phrase>
+          </textobject>
+        
+      </mediaobject></para>
       
-      <para>Note however that a bundle can be closed individually or as part of a bigger
+      
+      <para>Note that a bundle can be closed individually or as part of a bigger
       event such as shutting down the entire OSGi platform. In this case or when the extender
-      bundle is being closed down, the managed application contexts will be closed in a managed
-      manner based on the service dependencies between them. Please see the next section for more
+      bundle is being closed down, the application contexts will be closed in a managed
+      manner, based on the service dependencies between them. Please see the next section for more
       details.</para>
     </section>
     
