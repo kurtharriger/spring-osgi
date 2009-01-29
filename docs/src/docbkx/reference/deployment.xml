@@ -340,7 +340,7 @@ context ::= path ( ';' path ) * (';' directive) *
             <tbody>
               <row>
                 <entry><literal>shutdown.wait.time</literal></entry>
-                <entry><classname>java.lang.Number</classname></entry>
+                <entry><classname>java.lang.Long</classname></entry>
                 <entry>The amount of time the extender will wait for each application context to shutdown gracefully. Expressed in milliseconds.</entry>
                 <entry>10000 ms (10 s)</entry>
               </row>
@@ -352,6 +352,15 @@ context ::= path ( ';' path ) * (';' directive) *
                 by adding the appropriate bean post processor. See <xref linkend="appendix-extensions:annotations"/> for more information.</entry>
                 <entry>false</entry>
               </row>
+              
+              <row>
+                <entry><literal>dependencies.wait.time</literal></entry>
+                <entry><classname>java.lang.Long</classname></entry>
+                <entry>The amount of time the newly created application contexts will wait for their mandatory service dependencies during startup. Expressed
+                in seconds. This settings is used only if the context owning bundle manifest does <emphasis>not</emphasis> define a value. </entry>
+                <entry>300 s (5 min)</entry>
+              </row>
+              
               <row>
                 <entry><literal>install.context.error.handler</literal></entry>
                 <entry><classname>java.lang.Boolean</classname></entry>
