@@ -40,6 +40,7 @@ Package org.springframework.osgi.service
 
 Package org.springframework.osgi.test
 * improved FelixOsgiPlatform to support API changes in Felix 1.4.x
+* improved exception descriptions
 
 Package org.springframework.osgi.web
 * fixed extender configuration race condition

@@ -220,7 +220,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	}
 
 	private Manifest createManifestFrom(Resource resource) {
-		Assert.notNull(resource);
+		Assert.notNull(resource, "unable to create manifest for empty resources");
 		try {
 			return new Manifest(resource.getInputStream());
 		}
