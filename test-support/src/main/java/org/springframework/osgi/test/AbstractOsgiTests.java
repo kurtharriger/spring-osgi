@@ -252,7 +252,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 			for (int i = 0; i < bundles.length; i++) {
 				bundles[i] = installBundle(bundleResources[i]);
 			}
-			
+
 			// start bundles
 			for (int i = 0; i < bundles.length; i++) {
 				startBundle(bundles[i]);
@@ -305,8 +305,8 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * @throws Exception
 	 */
 	private Bundle installBundle(Resource location) throws Exception {
-		Assert.notNull(platformContext);
-		Assert.notNull(location);
+		Assert.notNull(platformContext, "the OSGi platform is not set");
+		Assert.notNull(location, "cannot install from a null location");
 		if (logger.isDebugEnabled())
 			logger.debug("Installing bundle from location " + location.getDescription());
 
