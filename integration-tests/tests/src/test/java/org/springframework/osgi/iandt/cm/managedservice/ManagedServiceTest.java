@@ -93,6 +93,7 @@ public class ManagedServiceTest extends BaseConfigurationAdminTest {
 	}
 
 	public void testPrototype() throws Exception {
+		prepareConfiguration(cm);
 		final TestBean bean = (TestBean) applicationContext.getBean(PROTO);
 		assertEquals(new Integer(54321), bean.getInteger());
 		assertEquals(PROTO, bean.getString());
