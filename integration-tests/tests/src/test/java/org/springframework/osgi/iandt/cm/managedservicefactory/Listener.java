@@ -36,6 +36,7 @@ public class Listener implements OsgiServiceRegistrationListener {
 
 	public void registered(Object service, Map serviceProperties) throws Exception {
 		instances.put(service, serviceProperties);
+		System.out.println("added service "+ serviceProperties);
 		synchronized (regBarrier) {
 			regBarrier.notify();
 		}
@@ -43,6 +44,7 @@ public class Listener implements OsgiServiceRegistrationListener {
 
 	public void unregistered(Object service, Map serviceProperties) throws Exception {
 		instances.remove(service);
+		System.out.println("removed service "+ serviceProperties);
 		synchronized (unregBarrier) {
 			unregBarrier.notify();
 		}

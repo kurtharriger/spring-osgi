@@ -16,21 +16,15 @@
 
 package org.springframework.osgi.iandt.cm.managedservicefactory;
 
-import java.util.Collection;
 import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.cm.ConfigurationEvent;
-import org.osgi.service.cm.ConfigurationListener;
-import org.osgi.service.cm.ConfigurationPlugin;
 import org.springframework.osgi.iandt.cm.BaseConfigurationAdminTest;
-import org.springframework.osgi.util.OsgiServiceUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * Integration test for managed-service-factory element.
@@ -56,6 +50,7 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 
 	protected void onSetUp() throws Exception {
 		super.onSetUp();
+		Listener.instances.clear();
 		initProperties();
 	}
 
@@ -65,8 +60,7 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 		localCopy.setProperty("simple", "simple");
 
 		// prepare one instance
-		Configuration cfg = configAdmin.createFactoryConfiguration(FPID, null);
-		cfg.update(localCopy);
+		updateAndWaitForConfig(configAdmin, localCopy);
 	}
 
 	public void testConfigurationCreation() throws Exception {
@@ -95,12 +89,10 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 	}
 
 	public void testDestroyInstance() throws Exception {
+		prepareConfiguration(cm);
 		Configuration[] cfgs = cm.listConfigurations(FILTER);
-
 		int sizeA = cfgs.length;
-		cfgs[cfgs.length - 1].delete();
-		System.out.println(Listener.instances);
-
+		cfgs[0].delete();
 		synchronized (Listener.unregBarrier) {
 			Listener.unregBarrier.wait(10 * 1000);
 		}
@@ -109,15 +101,32 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 		assertEquals(sizeA - 1, sizeB);
 	}
 
+	public void testPublishedServices() throws Exception {
+		prepareConfiguration(cm);
+		
+		ServiceReference refs[] = bundleContext.getServiceReferences(Map.class.getName(), null);
+
+		assertNotNull(refs);
+		assertTrue(refs.length > 0);
+		for (int i = 0; i < refs.length; i++) {
+			ServiceReference serviceReference = refs[i];
+			System.out.println(OsgiStringUtils.nullSafeToString(refs[i]));
+		}
+	}
+
 	protected boolean createManifestOnlyFromTestClass() {
 		return false;
 	}
 
-	private void updateAndWaitForConfig(final Dictionary properties) throws Exception {
+	private void updateAndWaitForConfig(ConfigurationAdmin cm, final Dictionary properties) throws Exception {
 		Configuration cfg = cm.createFactoryConfiguration(FPID, null);
 		cfg.update(properties);
 		synchronized (Listener.regBarrier) {
 			Listener.regBarrier.wait(10 * 1000);
 		}
+	}
+
+	private void updateAndWaitForConfig(final Dictionary properties) throws Exception {
+		updateAndWaitForConfig(cm, properties);
 	}
 }

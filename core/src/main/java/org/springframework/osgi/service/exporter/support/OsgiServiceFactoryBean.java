@@ -495,18 +495,6 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * @param register whether to register the service or not. The default is
 	 *        true.
 	 */
-	public void setRegisterAtStartup(boolean register) {
-		registerAtStartup = register;
-	}
-
-	/**
-	 * Controls whether the service actually gets published or not. This can be
-	 * used by application context creators to control service creation without
-	 * blocking the creation of the context
-	 * 
-	 * @param register whether to register the service or not. The default is
-	 *        true.
-	 */
 	public void setRegisterService(boolean register) {
 		registerService = register;
 		// Use targetClass as a proxy for afterPropertiesSet() being called.
