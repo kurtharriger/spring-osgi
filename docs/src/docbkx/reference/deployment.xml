@@ -357,8 +357,8 @@ context ::= path ( ';' path ) * (';' directive) *
                 <entry><literal>dependencies.wait.time</literal></entry>
                 <entry><classname>java.lang.Long</classname></entry>
                 <entry>The amount of time the newly created application contexts will wait for their mandatory service dependencies during startup. Expressed
-                in seconds. This settings is used only if the context owning bundle manifest does <emphasis>not</emphasis> define a value. </entry>
-                <entry>300 s (5 min)</entry>
+                in milliseconds. This settings is used only if the context owning bundle manifest does <emphasis>not</emphasis> define a value. </entry>
+                <entry>300000 ms (300 s or 5 min)</entry>
               </row>
               
               <row>

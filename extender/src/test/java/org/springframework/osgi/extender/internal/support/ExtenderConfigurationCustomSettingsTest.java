@@ -79,7 +79,7 @@ public class ExtenderConfigurationCustomSettingsTest extends TestCase {
 	}
 
 	public void testShutdownWaitTime() throws Exception {
-		// 10 seconds in ms
+		// 300 ms
 		assertEquals(300, config.getShutdownWaitTime());
 	}
 
@@ -88,8 +88,8 @@ public class ExtenderConfigurationCustomSettingsTest extends TestCase {
 	}
 
 	public void testDependencyWaitTime() throws Exception {
-		// 5 minutes in ms
-		assertEquals(200 * 1000, config.getDependencyWaitTime());
+		// 200 ms
+		assertEquals(200, config.getDependencyWaitTime());
 	}
 
 	public void testPostProcessors() throws Exception {
