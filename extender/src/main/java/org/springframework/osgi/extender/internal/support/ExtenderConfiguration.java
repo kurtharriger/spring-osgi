@@ -92,8 +92,8 @@ public class ExtenderConfiguration implements DisposableBean {
 	// defaults
 	//
 
-	// default dependency wait time (in seconds)
-	private static final long DEFAULT_DEP_WAIT = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT;
+	// default dependency wait time (in milliseconds)
+	private static final long DEFAULT_DEP_WAIT = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT * 1000;
 	private static final long DEFAULT_SHUTDOWN_WAIT = 10 * 1000;
 	private static final boolean DEFAULT_PROCESS_ANNOTATION = false;
 	private static final boolean DEFAULT_INSTALL_CONTEXT_ERROR_HANDLER = true;
@@ -376,8 +376,7 @@ public class ExtenderConfiguration implements DisposableBean {
 	}
 
 	private long getDependencyWaitTime(Properties properties) {
-		// convert into ms
-		return Long.parseLong(properties.getProperty(WAIT_FOR_DEPS_TIMEOUT_KEY)) * 1000;
+		return Long.parseLong(properties.getProperty(WAIT_FOR_DEPS_TIMEOUT_KEY));
 	}
 
 	private boolean getProcessAnnotations(Properties properties) {
