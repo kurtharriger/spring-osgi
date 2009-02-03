@@ -25,6 +25,7 @@ import java.util.PropertyPermission;
 import org.osgi.framework.AdminPermission;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationPermission;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -91,7 +92,7 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 
 	protected String[] getTestBundlesNames() {
 		// felix configuration admin implementation
-		return new String[] { "org.apache.felix, org.apache.felix.configadmin, 1.0.4" };
+		return new String[] { "org.apache.felix, org.apache.felix.configadmin, 1.0.10" };
 	}
 
 	protected String[] getBundleContentPattern() {
@@ -106,6 +107,16 @@ public abstract class BaseConfigurationAdminTest extends BaseIntegrationTest {
 			ConfigurationAdmin.class.getName(), null);
 		Assert.notNull(ref, "Configuration Admin not present");
 		cm = (ConfigurationAdmin) bundleContext.getService(ref);
+	}
+
+	protected void onTearDown() throws Exception {
+		Configuration cfgs[] = cm.listConfigurations(null);
+		if (cfgs != null) {
+			for (int i = 0; i < cfgs.length; i++) {
+				Configuration configuration = cfgs[i];
+				configuration.delete();
+			}
+		}
 	}
 
 	/**

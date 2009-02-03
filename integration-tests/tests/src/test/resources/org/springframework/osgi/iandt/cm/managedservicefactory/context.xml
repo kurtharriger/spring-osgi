@@ -11,9 +11,9 @@
 	<!-- osgix:managed-service-factory -->
 	<osgix:managed-service-factory id="msf" 
 			factory-pid="org.springframework.osgi.iandt.cm.managedservicefactory.ManagedServiceFactoryTest" 
-			auto-export="all-classes">
+			auto-export="interfaces">
 		<osgix:registration-listener ref="listener"/>
-		<bean class="java.lang.Object"/>
+		<bean class="java.util.LinkedHashMap"/>
 	</osgix:managed-service-factory>
 
 	<bean id="listener" class="org.springframework.osgi.iandt.cm.managedservicefactory.Listener"/>
