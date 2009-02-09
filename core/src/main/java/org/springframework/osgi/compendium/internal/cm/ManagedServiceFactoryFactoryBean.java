@@ -17,6 +17,7 @@
 package org.springframework.osgi.compendium.internal.cm;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
@@ -48,6 +49,7 @@ import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener
 import org.springframework.osgi.service.exporter.support.AutoExport;
 import org.springframework.osgi.service.exporter.support.ExportContextClassLoader;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
+import org.springframework.osgi.service.importer.support.internal.collection.DynamicCollection;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 import org.springframework.util.Assert;
@@ -132,10 +134,16 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	private BeanFactory owningBeanFactory;
 	/** configuration watcher registration */
 	private ServiceRegistration configurationWatcher;
-	/** instance registrations */
-	private Map registeredServices = CollectionFactory.createConcurrentMap(8);
+
 	/** update callback */
 	private UpdateCallback updateCallback;
+
+	/** inner bean service registrations */
+	private final DynamicCollection serviceRegistrations = new DynamicCollection(8);
+	/** read-only view of the registration */
+	private final Collection userReturnedCollection = Collections.unmodifiableCollection(serviceRegistrations);
+	/** lookup map between exporters and associated pids */
+	private final Map serviceExporters = CollectionFactory.createConcurrentMap(8);
 
 	// exporting template
 	/** listeners */
@@ -186,6 +194,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	}
 
 	public void destroy() throws Exception {
+
 		synchronized (monitor) {
 			destroyed = true;
 			// remove factory service
@@ -193,6 +202,10 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 			configurationWatcher = null;
 			// destroy instances
 			destroyFactory();
+		}
+
+		synchronized (serviceRegistrations) {
+			serviceRegistrations.clear();
 		}
 	}
 
@@ -214,7 +227,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 
 	private void registerService() {
 		synchronized (monitor) {
-			Dictionary props = new Hashtable();
+			Dictionary props = new Hashtable(2);
 			props.put(Constants.SERVICE_PID, factoryPid);
 
 			configurationWatcher = bundleContext.registerService(ManagedServiceFactory.class.getName(),
@@ -258,15 +271,22 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		}
 	}
 
-	private void registerService(String beanName, Object bean) {
+	private void registerService(String pid, Object bean) {
 		// add properties
-		Dictionary props = new Hashtable(3);
-		props.put(Constants.SERVICE_PID, beanName);
+		Dictionary props = new Hashtable(2);
+		props.put(Constants.SERVICE_PID, pid);
 
-		registeredServices.put(beanName, createExporter(beanName, bean));
+		OsgiServiceFactoryBean exporter = createExporter(pid, bean);
+		serviceExporters.put(pid, exporter);
+		try {
+			serviceRegistrations.add(exporter.getObject());
+		}
+		catch (Exception ex) {
+			throw new BeanCreationException("Cannot publish bean for pid " + pid, ex);
+		}
 	}
 
-	private Object createExporter(String beanName, Object bean) {
+	private OsgiServiceFactoryBean createExporter(String beanName, Object bean) {
 		OsgiServiceFactoryBean exporter = new OsgiServiceFactoryBean();
 		exporter.setAutoExport(autoExport);
 		exporter.setBeanClassLoader(classLoader);
@@ -299,8 +319,8 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 			if (destroyed)
 				return;
 
-			unregisterService(pid);
 			if (definitionRegistry.containsBeanDefinition(pid)) {
+				unregisterService(pid);
 				// remove definition and instance
 				definitionRegistry.removeBeanDefinition(pid);
 			}
@@ -308,19 +328,25 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	}
 
 	private void unregisterService(String pid) {
-		OsgiServiceFactoryBean exporterFactory = (OsgiServiceFactoryBean) registeredServices.remove(pid);
+		OsgiServiceFactoryBean exporterFactory = (OsgiServiceFactoryBean) serviceExporters.remove(pid);
 
 		if (exporterFactory != null) {
 
-			if (log.isTraceEnabled()) {
-				try {
-					log.trace("Unpublishing bean for pid " + pid + " w/ registration " + exporterFactory.getObject());
-				}
-				catch (Exception ex) {
-					// log the exception and continue
-					log.error("Could not retrieve registration for pid " + pid, ex);
-				}
+			Object registration = null;
+			try {
+				registration = exporterFactory.getObject();
 			}
+			catch (Exception ex) {
+				// log the exception and continue
+				log.error("Could not retrieve registration for pid " + pid, ex);
+			}
+
+			if (log.isTraceEnabled()) {
+				log.trace("Unpublishing bean for pid " + pid + " w/ registration " + registration);
+			}
+			// remove service registration
+			serviceRegistrations.remove(registration);
+
 			exporterFactory.destroy();
 		}
 	}
@@ -338,7 +364,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	}
 
 	public Object getObject() throws Exception {
-		return registeredServices.values();
+		return userReturnedCollection;
 	}
 
 	public Class getObjectType() {
@@ -346,7 +372,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	}
 
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	/**
