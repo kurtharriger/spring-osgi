@@ -2,7 +2,7 @@ SPRING DYNAMIC MODULES FRAMEWORK CHANGELOG
 ==========================================
 http://www.springframework.org/osgi
 
-Changes in version 1.2.0 RC1 (2009-xx-yy)
+Changes in version 1.2.0 RC1 (2009-02-yy)
 -----------------------------------------
 
 General
@@ -25,7 +25,7 @@ Package org.springframework.osgi.extender
 * added support for install.context.error.handler property
 * changed namespace handlers lifecycle to depend on bundle events STARTED/STOPPED instead of RESOLVED/UNRESOLVED
 * removed type compatibility check for custom namespace handlers as it caused false warnings in some cases
-+ add extender configuration setting for controlling the default bundle service dependency wait time
++ added extender configuration setting for controlling the default bundle service dependency wait time
 
 Package org.springframework.osgi.io
 * improved OsgiBundleResource#getFile() file detection method
@@ -37,10 +37,15 @@ Package org.springframework.osgi.service
 * fixed visibility issue when invoking non-public proxied methods 
 * improved waiting code to deal with spurious or accidental wakeups
 * fixed issue with OsgiServiceProxyFactoryBean that caused autowiring to fail in some cases
+* fixed dynamic iterator race condition triggered by fluctuating collection ends
 
 Package org.springframework.osgi.test
 * improved FelixOsgiPlatform to support API changes in Felix 1.4.x
 * improved exception descriptions
+* fixed issue with imported classes in the default package
+
+Package org.springframework.osgi.util
+* fixed minor displaying problem in OsgiStringUtils
 
 Package org.springframework.osgi.web
 * fixed extender configuration race condition

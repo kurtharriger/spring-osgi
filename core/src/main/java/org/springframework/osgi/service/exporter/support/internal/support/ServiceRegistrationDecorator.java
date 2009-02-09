@@ -79,7 +79,7 @@ public class ServiceRegistrationDecorator implements ServiceRegistration {
 	}
 
 	public String toString() {
-		return "ServiceWrapper for " + delegate.toString();
+		return "ServiceRegistrationWrapper for " + delegate.toString();
 	}
 
 }
