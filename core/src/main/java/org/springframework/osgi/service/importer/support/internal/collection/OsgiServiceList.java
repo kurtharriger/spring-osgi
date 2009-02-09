@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support.internal.collection;
 
 import java.util.Collection;
@@ -23,7 +24,6 @@ import java.util.RandomAccess;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
-
 
 /**
  * OSGi service dynamic collection - allows iterating while the underlying
@@ -44,25 +44,19 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 		// dynamic iterator
 		private final ListIterator iter;
 
+
 		public OsgiServiceListIterator(int index) {
 			iter = storage.listIterator(index);
 		}
 
 		public Object next() {
-			synchronized (serviceProxies) {
-				mandatoryServiceCheck();
-				Object proxy = iter.next();
-				return (proxy == null ? tailDeadProxy : proxy);
-			}
+			mandatoryServiceCheck();
+			return iter.next();
 		}
 
 		public Object previous() {
-			synchronized (serviceProxies) {
-				mandatoryServiceCheck();
-				Object proxy = iter.previous();
-
-				return (proxy == null ? headDeadProxy : proxy);
-			}
+			mandatoryServiceCheck();
+			return iter.previous();
 		}
 
 		//
@@ -105,13 +99,12 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 
 	};
 
-	// dead proxy at the head of the collection
-	protected volatile Object headDeadProxy;
 
 	/**
 	 * cast the collection to a specialized collection
 	 */
 	protected List storage;
+
 
 	public OsgiServiceList(Filter filter, BundleContext context, ClassLoader classLoader,
 			ServiceProxyCreator proxyCreator) {
@@ -126,16 +119,6 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 	public Object get(int index) {
 		mandatoryServiceCheck();
 		return storage.get(index);
-	}
-
-	/**
-	 * Override to determine head proxies.
-	 */
-	protected void checkDeadProxies(Object proxy, int proxyCollectionPos) {
-		// head of collection
-		if (proxyCollectionPos == 0)
-			headDeadProxy = proxy;
-		super.checkDeadProxies(proxy, proxyCollectionPos);
 	}
 
 	public int indexOf(Object o) {
@@ -181,5 +164,4 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 	public boolean addAll(int index, Collection c) {
 		throw new UnsupportedOperationException();
 	}
-
 }

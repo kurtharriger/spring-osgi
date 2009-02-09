@@ -16,11 +16,15 @@
 
 package org.springframework.osgi.iandt.cm.managedservicefactory;
 
+import java.util.Collection;
 import java.util.Dictionary;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.springframework.osgi.iandt.cm.BaseConfigurationAdminTest;
@@ -103,7 +107,7 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 
 	public void testPublishedServices() throws Exception {
 		prepareConfiguration(cm);
-		
+
 		ServiceReference refs[] = bundleContext.getServiceReferences(Map.class.getName(), null);
 
 		assertNotNull(refs);
@@ -111,6 +115,32 @@ public class ManagedServiceFactoryTest extends BaseConfigurationAdminTest {
 		for (int i = 0; i < refs.length; i++) {
 			ServiceReference serviceReference = refs[i];
 			System.out.println(OsgiStringUtils.nullSafeToString(refs[i]));
+		}
+	}
+
+	public void testReturnedObjects() throws Exception {
+		Dictionary newProps = new Properties();
+		newProps.put("new", "instance");
+
+		updateAndWaitForConfig(newProps);
+
+		Object bean = applicationContext.getBean("msf");
+		assertTrue(bean instanceof Collection);
+		assertFalse(bean instanceof List);
+		Collection col = (Collection) bean;
+
+		// check the read-only nature of the collection
+		try {
+			assertTrue(col.add(new Object()));
+			fail("the collection should be read-only - write operations should throw an exception");
+		}
+		catch (Exception ex) {
+			// expected
+		}
+		for (Iterator iterator = col.iterator(); iterator.hasNext();) {
+			Object item = (Object) iterator.next();
+			System.out.println(item);
+			assertTrue(item instanceof ServiceRegistration);
 		}
 	}
 

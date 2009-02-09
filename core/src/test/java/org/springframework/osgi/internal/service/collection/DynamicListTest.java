@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.internal.service.collection;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class DynamicListTest extends TestCase {
 	private List dynamicList;
 
 	private ListIterator iter;
+
 
 	protected void setUp() throws Exception {
 		dynamicList = new DynamicList();
@@ -156,12 +158,22 @@ public class DynamicListTest extends TestCase {
 
 	public void testListIteratorHasNextHasPrevious() {
 		Object a = new Object();
-
 		dynamicList.add(a);
-		assertSame(iter.next(), iter.previous());
+		assertEquals(1, dynamicList.size());
 
+		// go forward and back
+		assertSame(iter.next(), iter.previous());
 		assertFalse(iter.hasPrevious());
-		iter.next();
+		assertSame(a, iter.next());
+		try {
+			iter.previous();
+		}
+		catch (NoSuchElementException nsee) {
+			// expected (since the previous hasPrevious returned false
+		}
+
+		assertTrue(iter.hasPrevious());
+
 		assertSame(iter.previous(), iter.next());
 		assertFalse(iter.hasNext());
 	}
@@ -194,9 +206,9 @@ public class DynamicListTest extends TestCase {
 
 		try {
 			iter.remove();
-			fail("should have thrown " + ArrayIndexOutOfBoundsException.class);
+			fail("should have thrown " + IndexOutOfBoundsException.class + " or one of its subclasses");
 		}
-		catch (ArrayIndexOutOfBoundsException ex) {
+		catch (IndexOutOfBoundsException ex) {
 			// expected
 		}
 	}
@@ -230,13 +242,13 @@ public class DynamicListTest extends TestCase {
 		}
 	}
 
-	public void testListIteratorSet() {
+	public void testListIteratorSetWithNext() {
 		Object a = new Object();
 		Object b = new Object();
 		Object c = new Object();
 
 		dynamicList.add(a);
-		
+
 		try {
 			iter.set(c);
 			fail("should have thrown " + IllegalStateException.class);
@@ -244,22 +256,22 @@ public class DynamicListTest extends TestCase {
 		catch (IllegalStateException ex) {
 			// expected
 		}
-		
+
 		iter.next();
 		iter.set(b);
 
 		assertEquals(1, dynamicList.size());
 		assertSame(b, dynamicList.get(0));
 		assertFalse(iter.hasNext());
-		
+
 		iter.set(c);
-		
+
 		assertEquals(1, dynamicList.size());
 		assertSame(c, dynamicList.get(0));
 		assertFalse(iter.hasNext());
-	
+
 		iter.add(b);
-		
+
 		try {
 			iter.set(c);
 			fail("should have thrown " + IllegalStateException.class);
@@ -267,13 +279,13 @@ public class DynamicListTest extends TestCase {
 		catch (IllegalStateException ex) {
 			// expected
 		}
-		
+
 		assertTrue(iter.hasNext());
-		
+
 		iter.next();
 		iter.set(c);
 		iter.remove();
-		
+
 		try {
 			iter.set(c);
 			fail("should have thrown " + IllegalStateException.class);
@@ -281,5 +293,66 @@ public class DynamicListTest extends TestCase {
 		catch (IllegalStateException ex) {
 			// expected
 		}
+	}
+
+	public void testListIteratorSetWithPrevious() {
+		Object a = new Object();
+		Object b = new Object();
+		Object c = new Object();
+
+		dynamicList.add(a);
+
+		try {
+			iter.set(c);
+			fail("should have thrown " + IllegalStateException.class);
+		}
+		catch (IllegalStateException ex) {
+			// expected
+		}
+
+		iter.next();
+		iter.previous();
+		iter.set(b);
+
+		assertEquals(1, dynamicList.size());
+		assertSame(b, dynamicList.get(0));
+		assertTrue(iter.hasNext());
+		// move forward and back
+		assertSame(iter.next(), iter.previous());
+
+		iter.set(c);
+
+		assertEquals(1, dynamicList.size());
+		assertSame(c, dynamicList.get(0));
+		assertTrue(iter.hasNext());
+		// move forward and back
+		assertSame(iter.next(), iter.previous());
+
+		iter.add(b);
+
+		try {
+			iter.set(c);
+			fail("should have thrown " + IllegalStateException.class);
+		}
+		catch (IllegalStateException ex) {
+			// expected
+		}
+
+		assertTrue(iter.hasNext());
+		// move forward and back
+		assertSame(iter.next(), iter.previous());
+
+		iter.set(c);
+		assertSame(c, dynamicList.get(1));
+		iter.remove();
+
+		try {
+			iter.set(c);
+			fail("should have thrown " + IllegalStateException.class);
+		}
+		catch (IllegalStateException ex) {
+			// expected
+		}
+		assertSame(c, dynamicList.get(0));
 	}
 }

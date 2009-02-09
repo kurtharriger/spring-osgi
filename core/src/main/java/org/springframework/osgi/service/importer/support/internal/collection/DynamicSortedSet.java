@@ -122,5 +122,4 @@ public class DynamicSortedSet extends DynamicSet implements SortedSet {
 	public SortedSet tailSet(Object fromElement) {
 		throw new UnsupportedOperationException();
 	}
-
 }
