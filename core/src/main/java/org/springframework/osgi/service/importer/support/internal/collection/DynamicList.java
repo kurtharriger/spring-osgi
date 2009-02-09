@@ -40,6 +40,29 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 	 */
 	private class DynamicListIterator extends DynamicIterator implements ListIterator {
 
+		/**
+		 * Similar to {@link DynamicIterator#tailGhost} in functionality but
+		 * representing the last seen object in the head of the collection.
+		 */
+		protected volatile Object headGhost = null;
+
+		// flag used for enforcing the iterator consistency:
+		// null - do not enforce anything
+		// true - should not throw exception
+		// false - should throw exception
+		/**
+		 * Iterator variable - not thread-safe/synchronized since only one
+		 * thread should use the iterator.
+		 */
+		protected Boolean hasPrevious = null;
+
+		/**
+		 * Boolean field used by the {@link #set(Object)} and {@link #remove()}operation.
+		 * True indicates next() was called, and false previous().
+		 */
+		private boolean previousOperationCalled = true;
+
+
 		private DynamicListIterator(int index) {
 			super.cursor = index;
 		}
@@ -53,12 +76,23 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 			}
 		}
 
+		/**
+		 * Updates the hasPrevious field.
+		 * 
+		 * Internal unprotected method to avoid nested synchronization blocks.
+		 * To execute this code, one needs the storage, iteratorsLock and
+		 * iterator lock.
+		 * 
+		 * @return
+		 */
 		private boolean unsafeHasPrevious() {
-			return (cursor - 1 >= 0);
+			hasPrevious = (cursor - 1 >= 0 ? Boolean.TRUE : Boolean.FALSE);
+			return hasPrevious.booleanValue();
 		}
 
 		public boolean hasPrevious() {
 			synchronized (lock) {
+				headGhost = null;
 				return unsafeHasPrevious();
 			}
 		}
@@ -69,17 +103,54 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 			}
 		}
 
+		public Object next() {
+			previousOperationCalled = true;
+			return super.next();
+		}
+
 		public Object previous() {
-			removalAllowed = true;
-			synchronized (storage) {
-				synchronized (lock) {
-					if (unsafeHasPrevious()) {
-						return storage.get(--cursor);
+			try {
+				removalAllowed = true;
+				previousOperationCalled = false;
+				// no enforcement
+				if (hasPrevious == null) {
+					synchronized (storage) {
+						synchronized (lock) {
+							if (unsafeHasPrevious())
+								return storage.get(--cursor);
+							else
+								throw new NoSuchElementException();
+						}
 					}
 				}
+				// need to return an object no matter what
+				else if (hasPrevious.booleanValue()) {
+					synchronized (storage) {
+						synchronized (lock) {
+							// if there is an element available, return it
+							if (unsafeHasPrevious()) {
+								return storage.get(--cursor);
+							}
+							else {
+								// otherwise return the last one seen
+								return headGhost;
+							}
+						}
+					}
+				}
+				// should throw exception no matter what
+				else {
+					throw new NoSuchElementException();
+				}
 			}
-
-			throw new NoSuchElementException();
+			finally {
+				// no matter what, reset hasPrevious
+				hasPrevious = null;
+				// remove ghost object
+				synchronized (lock) {
+					headGhost = null;
+				}
+			}
 		}
 
 		public int previousIndex() {
@@ -93,9 +164,36 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 				throw new IllegalStateException();
 			synchronized (storage) {
 				synchronized (lock) {
-					storage.set(cursor - 1, o);
+					int index = (previousOperationCalled ? cursor - 1 : cursor);
+					if (index < 0) {
+						index = 0;
+					}
+					else {
+						int length = storage.size();
+						if (index > length) {
+							index = length;
+						}
+					}
+					storage.set(index, o);
 				}
 			}
+		}
+
+		protected int removalIndex(int cursor) {
+			int index = (previousOperationCalled ? cursor - 1 : cursor);
+			if (index < 0) {
+				index = 0;
+			}
+			else {
+				int length;
+				synchronized (storage) {
+					length = storage.size();
+				}
+				if (index > length) {
+					index = length;
+				}
+			}
+			return index;
 		}
 	}
 
@@ -171,5 +269,4 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 			return storage.subList(fromIndex, toIndex);
 		}
 	}
-
 }

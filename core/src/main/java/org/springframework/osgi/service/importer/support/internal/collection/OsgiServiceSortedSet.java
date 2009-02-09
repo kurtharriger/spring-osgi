@@ -88,5 +88,4 @@ public class OsgiServiceSortedSet extends OsgiServiceSet implements SortedSet {
 		mandatoryServiceCheck();
 		return storage.subSet(fromElement, toElement);
 	}
-
 }

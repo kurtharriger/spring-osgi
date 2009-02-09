@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.internal.service.collection;
 
 import java.util.ArrayList;
@@ -32,9 +33,11 @@ import org.springframework.osgi.service.importer.support.internal.collection.Dyn
  * 
  */
 public class DynamicCollectionIteratorTest extends TestCase {
+
 	private Collection dynamicCollection;
 
 	private Iterator iter;
+
 
 	protected void setUp() throws Exception {
 		dynamicCollection = new DynamicCollection();
@@ -321,7 +324,119 @@ public class DynamicCollectionIteratorTest extends TestCase {
 		assertTrue(iter.hasNext());
 		dynamicCollection.remove(a);
 
-		iter.next(); // should successed
+		assertSame(a, iter.next()); // should successed
 	}
 
+	// 4. double check hasNext() true -> next() will return the last object for each
+	// iterator
+	public void testMultiIteratorHasNextConsistency() throws Exception {
+		assertTrue(dynamicCollection.isEmpty());
+		assertFalse(iter.hasNext());
+
+		Iterator iter1 = dynamicCollection.iterator();
+
+		Object a = new Object();
+		Object b = new Object();
+		Object c = new Object();
+		dynamicCollection.add(a);
+		dynamicCollection.add(b);
+
+		Iterator iter2 = dynamicCollection.iterator();
+
+		dynamicCollection.add(c);
+
+		Iterator iter3 = dynamicCollection.iterator();
+
+		// iter2 goes in the middle
+		assertSame(a, iter2.next());
+		// iter3 approaches the end
+		assertSame(a, iter3.next());
+		assertSame(b, iter3.next());
+
+		// check hasNext() and force next()
+		assertTrue(iter3.hasNext());
+		assertTrue(iter1.hasNext());
+		assertTrue(iter2.hasNext());
+
+		dynamicCollection.remove(c);
+		dynamicCollection.remove(b);
+		dynamicCollection.remove(a);
+
+		assertSame(a, iter1.next());
+		assertSame(b, iter2.next());
+		assertSame(c, iter3.next());
+	}
+
+	// similar test to the one above but the removal order is different
+	public void testMultiIteratorHasNextConsistencyGhostUpdate() throws Exception {
+		assertTrue(dynamicCollection.isEmpty());
+		assertFalse(iter.hasNext());
+
+		Iterator iter1 = dynamicCollection.iterator();
+
+		Object a = new Object();
+		Object b = new Object();
+		Object c = new Object();
+		dynamicCollection.add(a);
+		dynamicCollection.add(b);
+
+		Iterator iter2 = dynamicCollection.iterator();
+
+		dynamicCollection.add(c);
+
+		Iterator iter3 = dynamicCollection.iterator();
+
+		// iter2 goes in the middle
+		assertSame(a, iter2.next());
+		// iter3 approaches the end
+		assertSame(a, iter3.next());
+		assertSame(b, iter3.next());
+
+		// check hasNext() and force next()
+		assertTrue(iter3.hasNext());
+		assertTrue(iter1.hasNext());
+		assertTrue(iter2.hasNext());
+
+		dynamicCollection.remove(a);
+		dynamicCollection.remove(b);
+		dynamicCollection.remove(c);
+
+		assertSame(c, iter1.next());
+		assertSame(c, iter2.next());
+		assertSame(c, iter3.next());
+	}
+
+	public void testMultipleIteratorsPositionAfterCompleteRemoval() throws Exception {
+		Iterator iter1 = dynamicCollection.iterator();
+		Object a = new Object();
+		Object b = new Object();
+		Object c = new Object();
+		dynamicCollection.add(a);
+		dynamicCollection.add(b);
+		dynamicCollection.add(c);
+		Iterator iter2 = dynamicCollection.iterator();
+
+		// iter1 goes in the middle
+		assertSame(a, iter1.next());
+		// iter2 approaches the end
+		assertSame(a, iter2.next());
+		assertSame(b, iter2.next());
+
+		// check hasNext() and force next()
+		assertTrue(iter1.hasNext());
+		assertTrue(iter2.hasNext());
+
+		dynamicCollection.remove(c);
+		dynamicCollection.remove(b);
+		dynamicCollection.remove(a);
+
+		assertSame(b, iter1.next());
+		assertSame(c, iter2.next());
+
+		dynamicCollection.add(a);
+
+		// note: the iterator will return the previous elements if they've just been added to the collection  
+		assertSame(a, iter1.next());
+		assertSame(a, iter2.next());
+	}
 }

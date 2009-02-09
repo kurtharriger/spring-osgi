@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.importer.support.internal.collection;
 
 import java.util.Collection;
@@ -29,7 +30,6 @@ import java.util.Set;
  */
 public class DynamicSet extends DynamicCollection implements Set {
 
-	
 	public DynamicSet() {
 		super();
 	}
@@ -63,5 +63,4 @@ public class DynamicSet extends DynamicCollection implements Set {
 
 		return result;
 	}
-
 }

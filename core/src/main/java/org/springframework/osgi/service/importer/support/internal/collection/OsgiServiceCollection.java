@@ -116,8 +116,6 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 							ppc = (ProxyPlusCallback) servicesIdMap.remove(serviceId);
 							if (ppc != null) {
 								proxy = ppc.proxy;
-								// before removal, allow analysis
-								checkDeadProxies(proxy);
 								// remove service proxy
 								collectionModified = serviceProxies.remove(proxy);
 								// invalidate it
@@ -190,11 +188,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		}
 
 		public Object next() {
-			synchronized (serviceProxies) {
-				mandatoryServiceCheck();
-				Object proxy = iter.next();
-				return (proxy == null ? tailDeadProxy : proxy);
-			}
+			mandatoryServiceCheck();
+			return iter.next();
 		}
 
 		public void remove() {
@@ -218,15 +213,6 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	 * The dynamic collection.
 	 */
 	protected DynamicCollection serviceProxies;
-
-	/**
-	 * Recall the last proxy for the rare case, where a service goes down
-	 * between the #hasNext() and #next() call of an iterator.
-	 * 
-	 * Subclasses should implement their own strategy when it comes to assign a
-	 * value to it through
-	 */
-	protected volatile Object tailDeadProxy;
 
 	private boolean serviceRequiredAtStartup = true;
 
@@ -341,29 +327,6 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	private void invalidateProxy(ProxyPlusCallback ppc) {
 		// don't do anything (the proxy will simply thrown an exception if still in use)
-	}
-
-	/**
-	 * Hook for tracking the last disappearing service to cope with the rare
-	 * case, where the last service in the collection disappears between calls
-	 * to hasNext() and next() on an iterator at the end of the collection.
-	 * 
-	 * @param proxy
-	 */
-	protected void checkDeadProxies(Object proxy, int proxyCollectionPos) {
-		if (proxyCollectionPos == serviceProxies.size() - 1)
-			tailDeadProxy = proxy;
-	}
-
-	/**
-	 * Private method, computing the index and share it with subclasses.
-	 * 
-	 * @param proxy
-	 */
-	private void checkDeadProxies(Object proxy) {
-		// no need for a collection lock (already have it)
-		int index = serviceProxies.indexOf(proxy);
-		checkDeadProxies(proxy, index);
 	}
 
 	public void setServiceImporter(Object importer) {

@@ -113,5 +113,4 @@ public class DynamicSortedList extends DynamicList {
 	public Object set(int index, Object o) {
 		throw new UnsupportedOperationException("This is a sorted list; it is illegal to specify the element position");
 	}
-
 }
