@@ -213,7 +213,8 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 	 * only the test class will be searched for dependencies.
 	 * 
 	 * @return true if only the test hierarchy is searched for dependencies or
-	 * false if all classes discovered in the test archive need to be parsed.
+	 *         false if all classes discovered in the test archive need to be
+	 *         parsed.
 	 */
 	protected boolean createManifestOnlyFromTestClass() {
 		return true;
@@ -382,10 +383,17 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 				for (Iterator iterator = classes.iterator(); iterator.hasNext();) {
 					Class classToInspect = (Class) iterator.next();
 
-					clazzPackage = classToInspect.getPackage().getName();
-					String classFile = ClassUtils.getClassFileName(classToInspect);
-					entries.put(classToInspect.getName().replace('.', '/').concat(ClassUtils.CLASS_FILE_SUFFIX),
-						new InputStreamResource(classToInspect.getResourceAsStream(classFile)));
+					Package pkg = classToInspect.getPackage();
+					if (pkg != null) {
+						clazzPackage = pkg.getName();
+						String classFile = ClassUtils.getClassFileName(classToInspect);
+						entries.put(classToInspect.getName().replace('.', '/').concat(ClassUtils.CLASS_FILE_SUFFIX),
+							new InputStreamResource(classToInspect.getResourceAsStream(classFile)));
+					}
+					// handle default package
+					else {
+						logger.warn("Could not find package for class " + classToInspect + "; ignoring...");
+					}
 				}
 
 				clazz = clazz.getSuperclass();
