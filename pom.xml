@@ -20,12 +20,12 @@
   <properties>
     <!-- Spring version -->
     <spring.maven.artifact.version>2.5.6</spring.maven.artifact.version>
-    <spring.base.version>2.5.4</spring.base.version>
+    <spring.base.version>0.0.0</spring.base.version>
     
     <!-- Felix BND plugin settings -->
     
     <!--- Spring OSGi packages imported version (respect the OSGi naming pattern)-->
-    <spring.osgi.import.version>1.2.0.m2</spring.osgi.import.version>
+    <spring.osgi.import.version>0.0.0</spring.osgi.import.version>
     
     <!--- Spring OSGi packages exported version -->
     <spring.osgi.export.version>1.2.0.m2</spring.osgi.export.version>
@@ -39,6 +39,11 @@
     <spring.osgi.export>!${spring.osgi.private.pkg}, ${spring.osgi.export.pkg}*;version=${spring.osgi.export.version}</spring.osgi.export>
     
     <!-- add spring packages since the tool doesn't always picks up the versions -->
+    <!--
+    ;version=${spring.osgi.import.version},
+    ;version=${spring.base.version},
+    
+    -->
     <spring.osgi.import>
         ${spring.osgi.import.pkg},
         org.springframework.osgi*;version=${spring.osgi.import.version},
@@ -224,6 +229,10 @@ limitations under the License.
     <module>web</module>
     <module>web-extender</module>
     <module>bundle-archetype</module>
+
+    <!-- rfc 124 module -->
+    <module>rfc-124</module>
+
     <!-- unused at the moment
     <module>release</module>
     -->
@@ -509,7 +518,7 @@ limitations under the License.
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>1.4.0</version>
+          <version>1.4.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

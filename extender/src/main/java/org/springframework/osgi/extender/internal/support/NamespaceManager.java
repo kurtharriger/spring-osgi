@@ -16,6 +16,10 @@
 
 package org.springframework.osgi.extender.internal.support;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
@@ -28,6 +32,7 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.xml.sax.EntityResolver;
 
 /**
@@ -97,8 +102,34 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 			return;
 		}
 
-		boolean hasHandlers = bundle.findEntries(META_INF, SPRING_HANDLERS, false) != null;
-		boolean hasSchemas = bundle.findEntries(META_INF, SPRING_SCHEMAS, false) != null;
+		// FIXME: temporary hack
+		// since embedded libraries are not discovered by findEntries and inlining them doesn't work
+		// (due to resource classes such as namespace handler definitions)
+		// we use getResource
+
+		boolean hasHandlers = false, hasSchemas = false;
+		// RFC 124 bundle
+		if (context.getBundle().equals(bundle)) {
+
+			try {
+				Enumeration handlers = bundle.getResources(META_INF + SPRING_HANDLERS);
+				Enumeration schemas = bundle.getResources(META_INF + SPRING_SCHEMAS);
+
+				hasHandlers = handlers != null;
+				hasSchemas = schemas != null;
+
+				if (hasHandlers && log.isDebugEnabled()) {
+					log.debug("Found RFC 124 handlers: " + Collections.list(schemas));
+				}
+			}
+			catch (IOException ioe) {
+				log.warn("Cannot discover RFC 124 own namespaces", ioe);
+			}
+		}
+		else {
+			hasHandlers = bundle.findEntries(META_INF, SPRING_HANDLERS, false) != null;
+			hasSchemas = bundle.findEntries(META_INF, SPRING_SCHEMAS, false) != null;
+		}
 
 		// if the bundle defines handlers
 		if (hasHandlers) {

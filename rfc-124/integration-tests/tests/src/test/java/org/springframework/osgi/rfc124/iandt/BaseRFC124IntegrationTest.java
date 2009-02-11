@@ -171,17 +171,28 @@ public abstract class BaseRFC124IntegrationTest extends AbstractConfigurableBund
 
 	protected String[] getTestFrameworkBundlesNames() {
 		String[] bundles = super.getTestFrameworkBundlesNames();
+		String[] matches = new String[] { "4j", "asm", "osgi-test", "junit" };
 
 		List list = new ArrayList(bundles.length);
-		CollectionUtils.mergeArrayIntoCollection(bundles, list);
+		for (int i = 0; i < bundles.length; i++) {
+			String bundle = bundles[i];
+			for (int j = 0; j < matches.length; j++) {
+				String match = matches[j];
+				if (bundle.indexOf(match) > -1) {
+					list.add(bundle);
+				}
+			}
+		}
+		System.out.println(ObjectUtils.nullSafeToString(bundles));
+
 		// install event admin
 		list.add("org.apache.felix, org.apache.felix.eventadmin, 1.0.0");
 
-		// install rfc 124
+		// install the rfc 124 big bundle
 		list.add("org.springframework.osgi.rfc124,api," + getSpringDMVersion());
-		list.add("org.springframework.osgi.rfc124.ri,core," + getSpringDMVersion());
-		list.add("org.springframework.osgi.rfc124.ri,extender," + getSpringDMVersion());
+		list.add("org.springframework.osgi.rfc124.ri,all," + getSpringDMVersion());
 
+		System.out.println(list);
 		return (String[]) list.toArray(new String[list.size()]);
 	}
 

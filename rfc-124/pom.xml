@@ -19,6 +19,7 @@
   <modules>
     <module>api</module>
     <module>ri</module>
+    <module>packaging</module>
   </modules>
   
 </project>
