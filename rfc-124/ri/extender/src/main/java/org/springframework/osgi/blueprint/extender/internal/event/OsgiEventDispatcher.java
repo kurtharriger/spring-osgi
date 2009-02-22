@@ -16,14 +16,20 @@
 
 package org.springframework.osgi.blueprint.extender.internal.event;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
+import org.osgi.service.blueprint.context.ModuleContextEventConstants;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
@@ -47,15 +53,8 @@ class OsgiEventDispatcher implements EventDispatcher {
 
 	private final BundleContext bundleContext;
 	private final PublishType publisher;
-
-	// constants
-	private static final String ROOT_TOPIC = "org/osgi/service/blueprint/context/";
-	private static final String CREATING_TOPIC = ROOT_TOPIC + "CREATING";
-	private static final String CREATED_TOPIC = ROOT_TOPIC + "CREATED";
-	private static final String DESTROYING_TOPIC = ROOT_TOPIC + "DESTROYING";
-	private static final String DESTROYED_TOPIC = ROOT_TOPIC + "DESTROYED";
-	private static final String WAITING_TOPIC = ROOT_TOPIC + "WAITING";
-	private static final String FAILURE_TOPIC = ROOT_TOPIC + "FAILURE";
+	// match the class inside object class (and use a non backing reference group)
+	private static final Pattern PATTERN = Pattern.compile("objectClass=(?:[^\\)]+)");
 
 
 	public OsgiEventDispatcher(BundleContext bundleContext, PublishType publisher) {
@@ -65,22 +64,22 @@ class OsgiEventDispatcher implements EventDispatcher {
 
 	public void afterClose(ConfigurableOsgiBundleApplicationContext context) {
 		Dictionary<String, Object> props = init(context.getBundle());
-		sendEvent(new Event(DESTROYED_TOPIC, props));
+		sendEvent(new Event(ModuleContextEventConstants.TOPIC_DESTROYED, props));
 	}
 
 	public void afterRefresh(ConfigurableOsgiBundleApplicationContext context) {
 		Dictionary<String, Object> props = init(context.getBundle());
-		sendEvent(new Event(CREATED_TOPIC, props));
+		sendEvent(new Event(ModuleContextEventConstants.TOPIC_CREATED, props));
 	}
 
 	public void beforeClose(ConfigurableOsgiBundleApplicationContext context) {
 		Dictionary<String, Object> props = init(context.getBundle());
-		sendEvent(new Event(DESTROYING_TOPIC, props));
+		sendEvent(new Event(ModuleContextEventConstants.TOPIC_DESTROYING, props));
 	}
 
 	public void beforeRefresh(ConfigurableOsgiBundleApplicationContext context) {
 		Dictionary<String, Object> props = init(context.getBundle());
-		sendEvent(new Event(CREATING_TOPIC, props));
+		sendEvent(new Event(ModuleContextEventConstants.TOPIC_CREATING, props));
 	}
 
 	public void refreshFailure(ConfigurableOsgiBundleApplicationContext context, Throwable th) {
@@ -90,7 +89,7 @@ class OsgiEventDispatcher implements EventDispatcher {
 		props.put(EventConstants.EXCEPTION_CLASS, th.getClass().getName());
 		props.put(EventConstants.EXCEPTION_MESSAGE, th.getMessage());
 
-		sendEvent(new Event(FAILURE_TOPIC, props));
+		sendEvent(new Event(ModuleContextEventConstants.TOPIC_FAILURE, props));
 	}
 
 	public void waiting(BootstrappingDependencyEvent event) {
@@ -99,12 +98,29 @@ class OsgiEventDispatcher implements EventDispatcher {
 		OsgiServiceDependency dependency = dependencyEvent.getServiceDependency();
 
 		Filter filter = dependency.getServiceFilter();
-		// FIXME: the spec refers to a SERVICE_FILTER property 
 		props.put(EventConstants.EVENT_FILTER, filter.toString());
-		// FIXME: idem, prop SERVICE_CLASS doesn't exist
-		// moreover the filter already contains this info
-		// props.put(EventConstants.SERVICE_OBJECTCLASS, "FIXME");
-		sendEvent(new Event(WAITING_TOPIC, props));
+		// FIXME: there should be a constant for this
+		props.put("service.Filter", filter.toString());
+		props.put(EventConstants.SERVICE_OBJECTCLASS, extractObjectClassFromFilter(filter));
+		sendEvent(new Event(ModuleContextEventConstants.TOPIC_WAITING, props));
+	}
+
+	private String[] extractObjectClassFromFilter(Filter filter) {
+		if (filter == null) {
+			return new String[0];
+		}
+		List<String> matches = null;
+		String filterString = filter.toString();
+		Matcher matcher = PATTERN.matcher(filterString);
+		while (matcher.find()) {
+			if (matches == null) {
+				matches = new ArrayList<String>(8);
+			}
+
+			matches.add(matcher.group());
+		}
+
+		return (matches == null ? new String[0] : matches.toArray(new String[matches.size()]));
 	}
 
 	private Dictionary<String, Object> init(Bundle bundle) {
@@ -115,11 +131,18 @@ class OsgiEventDispatcher implements EventDispatcher {
 
 		props.put(EventConstants.BUNDLE, bundle);
 		props.put(EventConstants.BUNDLE_ID, bundle.getBundleId());
+		// sym name
 		props.put(EventConstants.BUNDLE_SYMBOLICNAME, bundle.getSymbolicName());
-
 		props.put(Constants.BUNDLE_SYMBOLICNAME, bundle.getSymbolicName());
-		// FIXME: the spec refers to a BUNDLE_VERSION prop - is this the one?
-		props.put(Constants.BUNDLE_VERSION, OsgiBundleUtils.getBundleVersion(bundle));
+		// version
+		Version version = OsgiBundleUtils.getBundleVersion(bundle);
+		props.put(Constants.BUNDLE_VERSION, version);
+		props.put(ModuleContextEventConstants.BUNDLE_VERSION, version);
+		// extender bundle info
+		Bundle extenderBundle = bundleContext.getBundle();
+		props.put(ModuleContextEventConstants.EXTENDER_BUNDLE, extenderBundle);
+		props.put(ModuleContextEventConstants.EXTENDER_ID, extenderBundle.getBundleId());
+		props.put(ModuleContextEventConstants.EXTENDER_SYMBOLICNAME, extenderBundle.getSymbolicName());
 
 		return props;
 	}

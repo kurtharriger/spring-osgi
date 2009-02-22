@@ -59,12 +59,6 @@
         </dependency>
         
         <dependency>
-          <groupId>edu.emory.mathcs.backport</groupId>
-          <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
-          <version>3.1.0</version>
-        </dependency> 
-
-        <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
           <version>${slf4j.version}</version>
@@ -87,7 +81,6 @@
           <artifactId>log4j.osgi</artifactId>
           <version>1.2.15-SNAPSHOT</version>
         </dependency>
-
 
         <dependency>  
             <groupId>net.sourceforge.cglib</groupId>

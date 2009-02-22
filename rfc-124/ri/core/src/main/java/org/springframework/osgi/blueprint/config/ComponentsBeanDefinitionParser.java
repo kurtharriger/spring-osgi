@@ -43,6 +43,10 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 	public static final String NAMESPACE_URI = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
 
 	private static final String DESCRIPTION = "description";
+	private static final String REFERENCE = "reference";
+	private static final String SERVICE = "service";
+	private static final String REF_LIST = "ref-list";
+	private static final String REF_SET = "ref-set";
 
 
 	public BeanDefinition parse(Element componentsRootElement, ParserContext parserContext) {
@@ -102,6 +106,9 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 		else if (DomUtils.nodeNameEquals(ele, "ref-set")) {
 			parseSetElement(ele, parserContext);
 		}
+		else if (DomUtils.nodeNameEquals(ele, TypeConverterBeanDefinitionParser.TYPE_CONVERTERS)) {
+			parseConvertersElement(ele, parserContext);
+		}
 		else {
 			throw new IllegalArgumentException("Unknown element " + ele);
 		}
@@ -126,17 +133,17 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 	 */
 	protected void parseConvertersElement(Element ele, ParserContext parserContext) {
 		BeanDefinitionParser parser = new TypeConverterBeanDefinitionParser();
-		registerBeanDefinition(parserContext, parser.parse(ele, parserContext));
+		parser.parse(ele, parserContext);
 	}
 
 	private void parseReferenceElement(Element ele, ParserContext parserContext) {
 		BeanDefinitionParser parser = new BlueprintReferenceBeanDefinitionParser();
-		registerBeanDefinition(parserContext, parser.parse(ele, parserContext));
+		parser.parse(ele, parserContext);
 	}
 
 	private void parseServiceElement(Element ele, ParserContext parserContext) {
 		BeanDefinitionParser parser = new ServiceBeanDefinitionParser();
-		registerBeanDefinition(parserContext, parser.parse(ele, parserContext));
+		parser.parse(ele, parserContext);
 	}
 
 	private void parseListElement(Element ele, ParserContext parserContext) {
@@ -147,7 +154,7 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 				return CollectionType.LIST;
 			}
 		};
-		registerBeanDefinition(parserContext, parser.parse(ele, parserContext));
+		parser.parse(ele, parserContext);
 	}
 
 	private void parseSetElement(Element ele, ParserContext parserContext) {
@@ -159,11 +166,6 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 			}
 		};
 
-		registerBeanDefinition(parserContext, parser.parse(ele, parserContext));
-	}
-
-	private void registerBeanDefinition(ParserContext parserContext, BeanDefinition bd) {
-		// register bd
-		parserContext.getRegistry().registerBeanDefinition(parserContext.getReaderContext().generateBeanName(bd), bd);
+		parser.parse(ele, parserContext);
 	}
 }

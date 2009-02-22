@@ -1,7 +1,22 @@
+/*
+ * Copyright (c) OSGi Alliance (2000, 2008). All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.osgi.service.blueprint.reflect;
 
 import java.util.Collection;
-import java.util.Dictionary;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -36,7 +51,7 @@ public interface ServiceExportComponentMetadata extends ComponentMetadata {
 	
 	/**
 	 * The component that is to be exported as a service. Value must refer to a component and
-	 * therefore be either a ComponentValue, ReferenceValue, or ReferenceNameValue.
+	 * therefore be either a ComponentValue or ReferenceValue.
 	 * 
 	 * @return the component to be exported as a service.
 	 */
@@ -44,7 +59,7 @@ public interface ServiceExportComponentMetadata extends ComponentMetadata {
 	
 	/**
 	 * The type names of the set of interface types that the service should be advertised
-	 * as supporting.
+	 * as supporting, as specified in the component declaration.
 	 * 
 	 * @return an immutable set of (String) type names, or an empty set if using auto-export
 	 */
@@ -60,10 +75,10 @@ public interface ServiceExportComponentMetadata extends ComponentMetadata {
 	/**
 	 * The user declared properties to be advertised with the service.
 	 * 
-	 * @return Dictionary containing the set of user declared service properties (may be
+	 * @return Map containing the set of user declared service properties (may be
 	 * empty if no properties were specified).
 	 */
-	Dictionary getServiceProperties();
+	Map getServiceProperties();
 
 	/**
 	 * The ranking value to use when advertising the service

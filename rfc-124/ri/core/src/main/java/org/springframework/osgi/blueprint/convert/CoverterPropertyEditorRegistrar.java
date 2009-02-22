@@ -43,7 +43,7 @@ public class CoverterPropertyEditorRegistrar implements PropertyEditorRegistrar 
 
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
 		for (Converter converter : converters) {
-			registry.registerCustomEditor(converter.getTargetClass(), new ConverterPropertyEditorAdapter(converter));
+			registry.registerCustomEditor(converter.getTargetClass(), new ConverterToPropertyEditorAdapter(converter));
 		}
 	}
 }

@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.blueprint.config;
 
+import java.util.Arrays;
+
 import junit.framework.TestCase;
 
 import org.osgi.framework.BundleContext;
@@ -27,6 +29,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Costin Leau
@@ -63,7 +66,8 @@ public class SpringDmRfc124Test extends TestCase {
 		context = null;
 	}
 
-	public void testReference() throws Exception {
-
+	public void testContainerSanity() throws Exception {
+		System.out.println(Arrays.toString(context.getBeanDefinitionNames()));
+		assertEquals(5, context.getBeanDefinitionCount());
 	}
 }

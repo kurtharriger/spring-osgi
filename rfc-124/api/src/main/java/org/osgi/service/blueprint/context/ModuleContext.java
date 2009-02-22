@@ -1,4 +1,18 @@
-
+/*
+ * Copyright (c) OSGi Alliance (2000, 2008). All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.osgi.service.blueprint.context;
 
 import java.util.Collection;
@@ -80,7 +94,7 @@ public interface ModuleContext {
 	 * @throws NoSuchComponentException if the name specified is not the
 	 * name of a component within the module.
 	 */
-	Object getComponent(String name) throws NoSuchComponentException;
+	Object getComponent(String name);
 
 	/**
 	 * Get the component metadata for a given named component.
@@ -93,7 +107,7 @@ public interface ModuleContext {
 	 * @throws NoSuchComponentException if the name specified is not the
 	 * name of a component within the module.
 	 */
-	ComponentMetadata getComponentMetadata(String name) throws NoSuchComponentException;
+	ComponentMetadata getComponentMetadata(String name);
 
 	/**
 	 * Get the service reference metadata for every OSGi service referenced by

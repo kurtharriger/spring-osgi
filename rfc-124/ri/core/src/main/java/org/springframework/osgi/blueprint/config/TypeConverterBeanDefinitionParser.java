@@ -21,11 +21,11 @@ import java.util.List;
 
 import org.osgi.service.blueprint.convert.Converter;
 import org.springframework.beans.PropertyEditorRegistrar;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.xml.BeanDefinitionParser;
+import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.blueprint.convert.CoverterPropertyEditorRegistrar;
@@ -45,13 +45,13 @@ import org.w3c.dom.Element;
  * @author Costin Leau
  * 
  */
-public class TypeConverterBeanDefinitionParser implements BeanDefinitionParser {
+public class TypeConverterBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 	private static final String EDITOR_CONFIGURER_PROPERTY = "propertyEditorRegistrars";
 	public static final String TYPE_CONVERTERS = "type-converters";
 
 
-	public BeanDefinition parse(Element element, ParserContext parserContext) {
+	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 
 		BeanDefinitionBuilder registrarDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(CoverterPropertyEditorRegistrar.class);
 
@@ -77,5 +77,10 @@ public class TypeConverterBeanDefinitionParser implements BeanDefinitionParser {
 		// build the CustomEditorConfigurer
 		return BeanDefinitionBuilder.genericBeanDefinition(CustomEditorConfigurer.class).addPropertyValue(
 			EDITOR_CONFIGURER_PROPERTY, registrarDefinitionBuilder.getBeanDefinition()).getBeanDefinition();
+	}
+
+	@Override
+	protected boolean shouldGenerateId() {
+		return true;
 	}
 }

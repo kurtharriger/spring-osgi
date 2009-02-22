@@ -20,8 +20,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.service.blueprint.context.ModuleContext;
-import org.springframework.osgi.blueprint.context.ApplicationContext2ModuleContextAdapter;
-import org.springframework.osgi.blueprint.context.support.ModuleContextBehaviourBeanFactoryPostProcessor;
+import org.springframework.osgi.blueprint.context.SpringModuleContext;
 import org.springframework.osgi.blueprint.context.support.ModuleContextServicePublisher;
 import org.springframework.osgi.blueprint.extender.internal.activator.support.BlueprintConfigUtils;
 import org.springframework.osgi.blueprint.extender.internal.event.EventAdminDispatcher;
@@ -101,11 +100,11 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 
 	@Override
 	protected void preProcessRefresh(ConfigurableOsgiBundleApplicationContext context) {
+		BundleContext bundleContext = context.getBundleContext();
 		// create the ModuleContext adapter
-		ModuleContext mc = new ApplicationContext2ModuleContextAdapter(context, context.getBundleContext());
+		ModuleContext mc = new SpringModuleContext(context, bundleContext);
 		// add service publisher
-		context.addApplicationListener(new ModuleContextServicePublisher(mc, context.getBundleContext()));
-		context.addBeanFactoryPostProcessor(new ModuleContextBehaviourBeanFactoryPostProcessor(mc));
+		context.addApplicationListener(new ModuleContextServicePublisher(mc));
 
 		dispatcher.beforeRefresh(context);
 		super.preProcessRefresh(context);

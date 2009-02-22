@@ -66,6 +66,5 @@ public class TypeConverterTest extends TestCase {
 		Object prop = component.getPropA();
 		assertTrue(prop instanceof TestComponent);
 		assertEquals("sergey", ((TestComponent) prop).getPropA());
-
 	}
 }
