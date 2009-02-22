@@ -27,6 +27,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
 import org.osgi.service.blueprint.context.ModuleContext;
+import org.osgi.service.blueprint.context.ModuleContextEventConstants;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -41,7 +42,8 @@ import org.springframework.util.ObjectUtils;
  * an OSGi service. The bean listens for the start/stop events inside an
  * {@link ApplicationContext} to register/unregister the equivalent service.
  * 
- * <b>Note:</b> This component is stateful and should not be shared.
+ * <b>Note:</b> This component is stateful and should not be shared by multiple
+ * threads.
  * 
  * @author Costin Leau
  * 
@@ -63,9 +65,9 @@ public class ModuleContextServicePublisher implements ApplicationListener {
 	 * @param moduleContext
 	 * @param bundleContext
 	 */
-	public ModuleContextServicePublisher(ModuleContext moduleContext, BundleContext bundleContext) {
+	public ModuleContextServicePublisher(ModuleContext moduleContext) {
 		this.moduleContext = moduleContext;
-		this.bundleContext = bundleContext;
+		this.bundleContext = moduleContext.getBundleContext();
 	}
 
 	public void onApplicationEvent(ApplicationEvent event) {
@@ -83,10 +85,14 @@ public class ModuleContextServicePublisher implements ApplicationListener {
 
 		Bundle bundle = bundleContext.getBundle();
 		// add RFC124 properties
+
 		serviceProperties.put(Constants.BUNDLE_SYMBOLICNAME, bundle.getSymbolicName());
+		// FIXME: replace with ModuleContextEventConstants
+		serviceProperties.put("bundle.symbolicName", bundle.getSymbolicName());
 
 		Version version = OsgiBundleUtils.getBundleVersion(bundle);
 		serviceProperties.put(Constants.BUNDLE_VERSION, version);
+		serviceProperties.put(ModuleContextEventConstants.BUNDLE_VERSION, version);
 
 		log.info("Publishing ModuleContext as OSGi service with properties " + serviceProperties);
 

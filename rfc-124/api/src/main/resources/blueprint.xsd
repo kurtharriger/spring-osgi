@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<!--
+	/*
+	* $Revision: 6400 $
+	* 
+	* Copyright (c) OSGi Alliance (2008). All Rights Reserved.
+	* 
+	* Licensed under the Apache License, Version 2.0 (the "License");
+	* you may not use this file except in compliance with the License.
+	* You may obtain a copy of the License at
+	*
+	*      http://www.apache.org/licenses/LICENSE-2.0
+	*
+	* Unless required by applicable law or agreed to in writing, software
+	* distributed under the License is distributed on an "AS IS" BASIS,
+	* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	* See the License for the specific language governing permissions and
+	* limitations under the License.
+	*/
+	-->
 <xsd:schema xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             targetNamespace="http://www.osgi.org/xmlns/blueprint/v1.0.0"
@@ -8,7 +27,7 @@
 
     <!-- Schema elements for core component declarations -->
 
-    <xsd:complexType name="identifiedType" abstract="true">
+    <xsd:complexType name="TidentifiedType" abstract="true">
         <xsd:attribute name="id" type="xsd:ID">
         </xsd:attribute>
     </xsd:complexType>
@@ -66,7 +85,7 @@
    <xsd:attributeGroup name="componentAttributes">
         <xsd:attribute name="class" type="xsd:string"/>
         <xsd:attribute name="scope" type="xsd:string"/>
-        <xsd:attribute name="lazy-init" default="default" type="defaultable-boolean"/>
+        <xsd:attribute name="lazy-init" default="default" type="Tdefaultable-boolean"/>
         <xsd:attribute name="depends-on" type="xsd:string"/>
         <xsd:attribute name="init-method" type="xsd:string"/>
         <xsd:attribute name="destroy-method" type="xsd:string"/>
@@ -78,7 +97,7 @@
    <xsd:element name="component">
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="identifiedType">
+                <xsd:extension base="TidentifiedType">
                     <xsd:group ref="componentElements"/>
                     <xsd:attributeGroup ref="componentAttributes"/>
                 </xsd:extension>
@@ -97,6 +116,7 @@
                 <xsd:element ref="list"/>
                 <xsd:element ref="set"/>
                 <xsd:element ref="map"/>
+                <xsd:element ref="array"/>
                 <xsd:element ref="props"/>
                 <xsd:element ref="ref-list"/>
                 <xsd:element ref="ref-set"/>
@@ -118,6 +138,7 @@
                 <xsd:element ref="list"/>
                 <xsd:element ref="set"/>
                 <xsd:element ref="map"/>
+                <xsd:element ref="array"/>
                 <xsd:element ref="props"/>
                 <xsd:element ref="ref-list"/>
                 <xsd:element ref="ref-set"/>
@@ -143,7 +164,7 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="property" type="propertyType"/>
+    <xsd:element name="property" type="TpropertyType"/>
 
     <xsd:element name="ref">
         <xsd:complexType>
@@ -179,11 +200,12 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="list" type="listOrSetType"/>
-    <xsd:element name="set" type="listOrSetType"/>
-    <xsd:element name="map" type="mapType"/>
-    <xsd:element name="entry" type="entryType"/>
-    <xsd:element name="props" type="propsType"/>
+    <xsd:element name="list" type="TlistSetArrayType"/>
+    <xsd:element name="set" type="TlistSetArrayType"/>
+    <xsd:element name="map" type="TmapType"/>
+    <xsd:element name="array" type="TlistSetArrayType"/>
+    <xsd:element name="entry" type="TentryType"/>
+    <xsd:element name="props" type="TpropsType"/>
     <xsd:element name="key">
         <xsd:complexType>
 	    	<xsd:group ref="keyElement"/>
@@ -197,7 +219,7 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:complexType name="propertyType">
+    <xsd:complexType name="TpropertyType">
         <xsd:sequence>
             <xsd:element ref="description" minOccurs="0"/>
 	        <xsd:group ref="valueElement"/>
@@ -210,21 +232,21 @@
   <!-- Collection Types -->
 
     <!-- base collection type -->
-    <xsd:complexType name="baseCollectionType"/>
+    <xsd:complexType name="TbaseCollectionType"/>
 
     <!-- base type for collections that have (possibly) typed nested values -->
-    <xsd:complexType name="typedCollectionType">
+    <xsd:complexType name="TtypedCollectionType">
         <xsd:complexContent>
-            <xsd:extension base="baseCollectionType">
+            <xsd:extension base="TbaseCollectionType">
                 <xsd:attribute name="value-type" type="xsd:string"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <!-- 'map' element type -->
-    <xsd:complexType name="mapType">
+    <xsd:complexType name="TmapType">
         <xsd:complexContent>
-            <xsd:extension base="typedCollectionType">
+            <xsd:extension base="TtypedCollectionType">
                 <xsd:sequence>
                     <xsd:choice minOccurs="0" maxOccurs="unbounded">
                         <xsd:element ref="entry"/>
@@ -236,7 +258,7 @@
     </xsd:complexType>
 
     <!-- 'entry' element type -->
-    <xsd:complexType name="entryType">
+    <xsd:complexType name="TentryType">
         <xsd:sequence>
             <xsd:element ref="key" minOccurs="0"/>
             <xsd:group ref="valueElement"/>
@@ -248,18 +270,18 @@
     </xsd:complexType>
 
     <!-- 'list' and 'set' collection type -->
-    <xsd:complexType name="listOrSetType">
+    <xsd:complexType name="TlistSetArrayType">
         <xsd:complexContent>
-            <xsd:extension base="typedCollectionType">
+            <xsd:extension base="TtypedCollectionType">
                 <xsd:group ref="valueElement" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <!-- 'props' collection type -->
-    <xsd:complexType name="propsType">
+    <xsd:complexType name="TpropsType">
         <xsd:complexContent>
-            <xsd:extension base="baseCollectionType">
+            <xsd:extension base="TbaseCollectionType">
                 <xsd:sequence>
                     <xsd:choice minOccurs="0" maxOccurs="unbounded">
                         <xsd:element ref="prop"/>
@@ -270,53 +292,50 @@
     </xsd:complexType>
 
     <!-- simple internal types -->
-    <xsd:simpleType name="defaultable-boolean">
+    <xsd:simpleType name="Tdefaultable-boolean">
         <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="default"/>
             <xsd:enumeration value="true"/>
             <xsd:enumeration value="false"/>
         </xsd:restriction>
     </xsd:simpleType>
-   
-     <!-- Elements from Spring Dynamic Modules project -->
     
     <xsd:attributeGroup name="defaults">
       <xsd:attribute name="default-timeout" type="xsd:long" default="300000"/>
-      <xsd:attribute name="default-availability" type="Tavailability" default="required"/>
+      <xsd:attribute name="default-availability" type="Tavailability" default="mandatory"/>
     </xsd:attributeGroup>
     
-    <xsd:simpleType name="TdefaultCardinalityOptions">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="1..X"/>           
-            <xsd:enumeration value="0..X"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-	
     <!-- reference -->
     <xsd:element name="reference" type="TsingleReference"/>
 
 
     <xsd:complexType name="Treference">
       <xsd:complexContent>
-        <xsd:extension base="identifiedType">
+        <xsd:extension base="TidentifiedType">
           <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="interfaces" type="listOrSetType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="interfaces" type="TlistSetArrayType" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="listener" type="Tlistener" minOccurs="0" maxOccurs="unbounded"/>
           </xsd:sequence>
           <xsd:attribute name="interface" use="optional" type="xsd:token"/>
           <xsd:attribute name="filter" use="optional" type="xsd:string"/>
           <xsd:attribute name="component-name" type="xsd:string" use="optional"/>
-          <xsd:attribute name="availability" use="optional" type="Tavailability" default="required"/>
+          <xsd:attribute name="availability" use="optional" type="Tavailability" default="mandatory"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
     
  
     <xsd:complexType name="Tlistener">
-        <xsd:sequence minOccurs="0" maxOccurs="1">
-            <!-- nested component declaration -->
-            <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
-        </xsd:sequence>
+     	<xsd:choice>
+			<xsd:element ref="ref"/>
+         	<xsd:element ref="component"/>
+			<xsd:element ref="reference"/>
+			<xsd:element ref="service"/>
+         	<xsd:sequence minOccurs="0" maxOccurs="1">
+            	<!-- nested component declaration -->
+            	<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
+        	</xsd:sequence>
+     	</xsd:choice>        
 
         <!-- shortcut for component references -->
         <xsd:attribute name="ref" type="xsd:string" use="optional"/>
@@ -335,7 +354,7 @@
    
    <xsd:simpleType name="Tavailability">
         <xsd:restriction base="xsd:token">
-            <xsd:enumeration value="required"/>
+            <xsd:enumeration value="mandatory"/>
             <xsd:enumeration value="optional"/>
         </xsd:restriction>
    </xsd:simpleType>
@@ -352,23 +371,30 @@
             <xsd:element name="comparator" type="Tcomparator"/>
           </xsd:sequence>
           <xsd:attribute name="comparator-ref" type="xsd:string" use="optional"/>
+		  <xsd:attribute name="member-type" type="TmemberType" use="optional"/>
+		  <xsd:attribute name="ordering-basis" type="TorderingBasis" use="optional"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
-	
+
+   <xsd:simpleType name="TmemberType">
+        <xsd:restriction base="xsd:token">
+            <xsd:enumeration value="service-instance"/>
+            <xsd:enumeration value="service-reference"/>
+        </xsd:restriction>
+   </xsd:simpleType>
 	
    <xsd:complexType name="Tcomparator">
      <xsd:choice>
-         <xsd:element name="natural" type="TnaturalOrdering"/>
-         <xsd:sequence minOccurs="1" maxOccurs="1">
+		<xsd:element ref="ref"/>
+      	<xsd:element ref="component"/>
+		<xsd:element ref="reference"/>
+		<xsd:element ref="service"/>
+        <xsd:sequence minOccurs="1" maxOccurs="1">
             <!-- nested component declaration -->
             <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
         </xsd:sequence>
      </xsd:choice>
-   </xsd:complexType>
-	
-   <xsd:complexType name="TnaturalOrdering">
-     <xsd:attribute name="basis" type="TorderingBasis" use="required"/>
    </xsd:complexType>
 	
    <xsd:simpleType name="TorderingBasis">
@@ -384,7 +410,7 @@
 
    <xsd:complexType name="Tservice">
       <xsd:complexContent>
-        <xsd:extension base="identifiedType">
+        <xsd:extension base="TidentifiedType">
           <xsd:choice>
           	<xsd:group ref="serviceElements"/>
           	<!-- nested component declaration -->
@@ -401,19 +427,25 @@
    
    <xsd:group name="serviceElements">
           <xsd:sequence>
-            <xsd:element name="interfaces" type="listOrSetType" minOccurs="0"/>
-            <xsd:element name="service-properties" minOccurs="0" type="mapType"/>
+            <xsd:element name="interfaces" type="TlistSetArrayType" minOccurs="0"/>
+            <xsd:element name="service-properties" minOccurs="0" type="TmapType"/>
             <xsd:element name="registration-listener" type="TserviceRegistrationListener" 
                    minOccurs="0" maxOccurs="unbounded"/>
           </xsd:sequence>
    </xsd:group>
 
    <xsd:complexType name="TserviceRegistrationListener">
-        <xsd:sequence minOccurs="0" maxOccurs="1">
-            <!-- nested component declaration -->
-            <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
-        </xsd:sequence>
-
+    	<xsd:choice>
+			<xsd:element ref="ref"/>
+        	<xsd:element ref="component"/>
+			<xsd:element ref="reference"/>
+			<xsd:element ref="service"/>
+        	<xsd:sequence minOccurs="0" maxOccurs="1">
+           		<!-- nested component declaration -->
+           		<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
+       		</xsd:sequence>
+    	</xsd:choice>        
+ 
         <!-- shortcut for component references -->
         <xsd:attribute name="ref" type="xsd:string" use="optional"/>
         <xsd:attribute name="registration-method" type="xsd:token" use="required"/>
