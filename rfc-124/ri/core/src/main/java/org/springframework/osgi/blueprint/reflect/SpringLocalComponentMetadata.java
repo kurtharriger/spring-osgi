@@ -20,13 +20,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.ConstructorInjectionMetadata;
 import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
 import org.osgi.service.blueprint.reflect.MethodInjectionMetadata;
 import org.osgi.service.blueprint.reflect.PropertyInjectionMetadata;
+import org.osgi.service.blueprint.reflect.Value;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.util.StringUtils;
@@ -42,7 +41,7 @@ class SpringLocalComponentMetadata extends SpringComponentMetadata implements Lo
 	private final ConstructorInjectionMetadata constructorMetadata;
 	private final MethodInjectionMetadata methodMetadata;
 	private final Collection<PropertyInjectionMetadata> propertyMetadata;
-	private final ComponentMetadata factoryComponent;
+	private final Value factoryComponent;
 
 
 	/**
@@ -69,18 +68,7 @@ class SpringLocalComponentMetadata extends SpringComponentMetadata implements Lo
 
 		final String factoryName = beanDefinition.getFactoryBeanName();
 		if (StringUtils.hasText(factoryName)) {
-			// FIXME: refactor this into a top-level class
-			factoryComponent = new ComponentMetadata() {
-
-				public Set<String> getExplicitDependencies() {
-					throw new UnsupportedOperationException(
-						"the dependencies for factory components aren't resolved yet");
-				}
-
-				public String getName() {
-					return factoryName;
-				}
-			};
+			factoryComponent = new SimpleReferenceValue(factoryName);
 		}
 		else {
 			factoryComponent = null;
@@ -99,7 +87,7 @@ class SpringLocalComponentMetadata extends SpringComponentMetadata implements Lo
 		return beanDefinition.getInitMethodName();
 	}
 
-	public ComponentMetadata getFactoryComponent() {
+	public Value getFactoryComponent() {
 		return factoryComponent;
 	}
 

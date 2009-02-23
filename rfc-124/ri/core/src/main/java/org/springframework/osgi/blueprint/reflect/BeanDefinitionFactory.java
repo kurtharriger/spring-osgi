@@ -17,7 +17,6 @@
 package org.springframework.osgi.blueprint.reflect;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +26,7 @@ import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
 import org.osgi.service.blueprint.reflect.MethodInjectionMetadata;
 import org.osgi.service.blueprint.reflect.ParameterSpecification;
 import org.osgi.service.blueprint.reflect.PropertyInjectionMetadata;
+import org.osgi.service.blueprint.reflect.ReferenceValue;
 import org.osgi.service.blueprint.reflect.ServiceExportComponentMetadata;
 import org.osgi.service.blueprint.reflect.ServiceReferenceComponentMetadata;
 import org.osgi.service.blueprint.reflect.UnaryServiceReferenceComponentMetadata;
@@ -35,7 +35,6 @@ import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
-import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -97,9 +96,9 @@ class BeanDefinitionFactory implements MetadataConstants {
 		MethodInjectionMetadata methodMetadata = metadata.getFactoryMethodMetadata();
 		if (methodMetadata != null) {
 			builder.setFactoryMethod(methodMetadata.getName());
-			ComponentMetadata factory = metadata.getFactoryComponent();
+			ReferenceValue factory = (ReferenceValue) metadata.getFactoryComponent();
 			if (factory != null) {
-				builder.getRawBeanDefinition().setFactoryBeanName(factory.getName());
+				builder.getRawBeanDefinition().setFactoryBeanName(factory.getComponentName());
 			}
 		}
 
