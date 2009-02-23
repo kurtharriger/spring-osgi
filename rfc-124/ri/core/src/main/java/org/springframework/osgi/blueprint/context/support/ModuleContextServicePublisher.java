@@ -53,6 +53,9 @@ public class ModuleContextServicePublisher implements ApplicationListener {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ModuleContextServicePublisher.class);
 
+	private static final String BLUEPRINT_SYMNAME = "osgi.blueprint.context.symbolicname";
+	private static final String BLUEPRINT_VERSION = "osgi.blueprint.context.version";
+
 	private final ModuleContext moduleContext;
 	private final BundleContext bundleContext;
 	/** registration */
@@ -86,13 +89,13 @@ public class ModuleContextServicePublisher implements ApplicationListener {
 		Bundle bundle = bundleContext.getBundle();
 		// add RFC124 properties
 
-		serviceProperties.put(Constants.BUNDLE_SYMBOLICNAME, bundle.getSymbolicName());
-		// FIXME: replace with ModuleContextEventConstants
-		serviceProperties.put("bundle.symbolicName", bundle.getSymbolicName());
+		String symName = bundle.getSymbolicName();
+		serviceProperties.put(Constants.BUNDLE_SYMBOLICNAME, symName);
+		serviceProperties.put(BLUEPRINT_SYMNAME, symName);
 
 		Version version = OsgiBundleUtils.getBundleVersion(bundle);
 		serviceProperties.put(Constants.BUNDLE_VERSION, version);
-		serviceProperties.put(ModuleContextEventConstants.BUNDLE_VERSION, version);
+		serviceProperties.put(BLUEPRINT_VERSION, version);
 
 		log.info("Publishing ModuleContext as OSGi service with properties " + serviceProperties);
 
