@@ -50,9 +50,8 @@ public class SimplePropertyInjectionMetadata implements PropertyInjectionMetadat
 	 */
 	public SimplePropertyInjectionMetadata(PropertyValue propertyValue) {
 		this.name = propertyValue.getName();
-		this.value = null;
-		throw new UnsupportedOperationException("Don't know how to convert value " + propertyValue.getValue());
-		//(propertyValue.isConverted() ? propertyValue.getConvertedValue() : propertyValue.getValue());
+		Object value = (propertyValue.isConverted() ? propertyValue.getConvertedValue() : propertyValue.getValue());
+		this.value = ValueFactory.buildValue(value);
 	}
 
 	public String getName() {

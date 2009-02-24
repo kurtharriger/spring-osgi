@@ -16,12 +16,15 @@
 
 package org.springframework.osgi.blueprint.metadata;
 
+import java.net.Socket;
+import java.util.Collection;
 import java.util.List;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.ConstructorInjectionMetadata;
 import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
 import org.osgi.service.blueprint.reflect.ParameterSpecification;
+import org.osgi.service.blueprint.reflect.PropertyInjectionMetadata;
 import org.osgi.service.blueprint.reflect.TypedStringValue;
 
 /**
@@ -52,5 +55,15 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 		assertEquals(0, param.getIndex());
 		assertEquals("int", param.getTypeName());
 		assertEquals("3", ((TypedStringValue) param.getValue()).getStringValue());
+	}
+
+	public void testValueInlined() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("propertyValueInline");
+		assertEquals(Socket.class.getName(), localMetadata.getClassName());
+		Collection<PropertyInjectionMetadata> props = localMetadata.getPropertyInjectionMetadata();
+		assertEquals(1, props.size());
+		PropertyInjectionMetadata prop = props.iterator().next();
+		assertEquals("keepAlive", prop.getName());
+		assertTrue(prop.getValue() instanceof TypedStringValue);
 	}
 }

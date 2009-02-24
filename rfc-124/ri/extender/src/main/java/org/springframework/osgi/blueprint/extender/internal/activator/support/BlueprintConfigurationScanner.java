@@ -42,7 +42,7 @@ public class BlueprintConfigurationScanner implements ConfigurationScanner {
 
 
 	public String[] getConfigurations(Bundle bundle) {
-		String[] locations = BlueprintConfigUtils.getHeaderLocations(bundle.getHeaders());
+		String[] locations = BlueprintConfigUtils.getBlueprintHeaderLocations(bundle.getHeaders());
 
 		// if no location is specified in the header, try the defaults
 		if (ObjectUtils.isEmpty(locations)) {

@@ -242,21 +242,27 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 
 		enforceExporterImporterDependency(beanFactory);
 
-		// add bundleContext bean
-		if (!beanFactory.containsLocalBean(BUNDLE_CONTEXT_BEAN_NAME)) {
-			logger.debug("Registering BundleContext as a bean named " + BUNDLE_CONTEXT_BEAN_NAME);
-			beanFactory.registerSingleton(BUNDLE_CONTEXT_BEAN_NAME, this.bundleContext);
-		}
-		else {
-			logger.warn("A bean named " + BUNDLE_CONTEXT_BEAN_NAME
-					+ " already exists; the bundleContext will not be registered as a bean");
-		}
+		// add predefined beans
+		// bundleContext
+		addPredefinedBean(beanFactory, BUNDLE_CONTEXT_BEAN_NAME, this.bundleContext);
+		addPredefinedBean(beanFactory, BUNDLE_BEAN_NAME, this.bundle);
 
 		// register property editors
 		registerPropertyEditors(beanFactory);
 
 		// register a 'bundle' scope
 		beanFactory.registerScope(OsgiBundleScope.SCOPE_NAME, new OsgiBundleScope());
+	}
+
+	private void addPredefinedBean(ConfigurableListableBeanFactory beanFactory, String name, Object value) {
+		// add bundleContext bean
+		if (!beanFactory.containsLocalBean(name)) {
+			logger.debug("Registering pre-defined bean named " + name);
+			beanFactory.registerSingleton(name, value);
+		}
+		else {
+			logger.warn("A bean named " + name + " already exists; aborting registration of the predefined value...");
+		}
 	}
 
 	/**

@@ -6,4 +6,8 @@
 		
     <component name="component" class="java.lang.Object"/>
 
+    <component name="unicodeChar" class="java.lang.Character">
+        <constructor-arg value="\u2122"/>
+    </component>
+    
 </components>
