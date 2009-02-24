@@ -16,10 +16,15 @@
 
 package org.springframework.osgi.blueprint.extender.internal.activator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.service.blueprint.context.ModuleContext;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.blueprint.context.SpringModuleContext;
 import org.springframework.osgi.blueprint.context.support.ModuleContextServicePublisher;
 import org.springframework.osgi.blueprint.extender.internal.activator.support.BlueprintConfigUtils;
@@ -99,12 +104,32 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 	}
 
 	@Override
-	protected void preProcessRefresh(ConfigurableOsgiBundleApplicationContext context) {
+	protected void preProcessRefresh(final ConfigurableOsgiBundleApplicationContext context) {
 		BundleContext bundleContext = context.getBundleContext();
 		// create the ModuleContext adapter
-		ModuleContext mc = new SpringModuleContext(context, bundleContext);
+		final ModuleContext mc = new SpringModuleContext(context, bundleContext);
 		// add service publisher
 		context.addApplicationListener(new ModuleContextServicePublisher(mc));
+		// add moduleContext bean
+		context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
+
+			private static final String MODULE_CONTEXT_BEAN_NAME = "moduleContext";
+
+
+			public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+				Log logger = LogFactory.getLog(context.getClass());
+
+				// add bundleContext bean
+				if (!beanFactory.containsLocalBean(MODULE_CONTEXT_BEAN_NAME)) {
+					logger.debug("Registering pre-defined bean named " + MODULE_CONTEXT_BEAN_NAME);
+					beanFactory.registerSingleton(MODULE_CONTEXT_BEAN_NAME, mc);
+				}
+				else {
+					logger.warn("A bean named " + MODULE_CONTEXT_BEAN_NAME
+							+ " already exists; aborting registration of the predefined value...");
+				}
+			}
+		});
 
 		dispatcher.beforeRefresh(context);
 		super.preProcessRefresh(context);

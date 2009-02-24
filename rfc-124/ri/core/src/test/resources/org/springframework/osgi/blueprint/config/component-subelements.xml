@@ -7,6 +7,10 @@
 
 	<description>Configuration with sub-elements</description>
 
+	<component id="char" class="java.lang.Character">
+		<constructor-arg type="char" value="\u0000"/>
+	</component>
+	
 	<component id="constructor-arg" class="java.lang.Integer">
 		<description>description</description>
 		<constructor-arg index="0" type="int" value="3" />
