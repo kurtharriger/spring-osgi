@@ -16,9 +16,15 @@
 
 package org.springframework.osgi.blueprint.extender.internal.activator.support;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.List;
 
+import org.osgi.framework.Constants;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.support.internal.ConfigUtils;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * RFC124-version of {@link ConfigUtils} class. Basically a small util class
@@ -28,6 +34,12 @@ import org.springframework.osgi.extender.support.internal.ConfigUtils;
  * 
  */
 public class BlueprintConfigUtils {
+
+	private static final String EQUALS = "=";
+
+	private static final String SEMI_COLON = ";";
+
+	private static final String COMMA = ",";
 
 	/** Manifest entry name for configuring Blueprint modules */
 	public static final String BLUEPRINT_HEADER = "Bundle-Blueprint";
@@ -54,6 +66,13 @@ public class BlueprintConfigUtils {
 		return (header != null ? header.toString().trim() : null);
 	}
 
+	public static String getSymNameHeader(Dictionary headers) {
+		Object header = null;
+		if (headers != null)
+			header = headers.get(Constants.BUNDLE_SYMBOLICNAME);
+		return (header != null ? header.toString().trim() : null);
+	}
+
 	/**
 	 * Shortcut method to retrieve directive values. Used internally by the
 	 * dedicated getXXX.
@@ -63,6 +82,25 @@ public class BlueprintConfigUtils {
 	 */
 	private static String getDirectiveValue(Dictionary headers, String directiveName) {
 		String header = getBlueprintHeader(headers);
+		if (header != null) {
+			String directive = ConfigUtils.getDirectiveValue(header, directiveName);
+			if (directive != null)
+				return directive;
+		}
+		return null;
+	}
+
+	/**
+	 * Shortcut method for retrieving the directive values. Different then
+	 * {@link #getDirectiveValue(Dictionary, String)} since it looks at the
+	 * Bundle-Symbolic header and not at Spring-Context.
+	 * 
+	 * @param headers
+	 * @param directiveName
+	 * @return
+	 */
+	private static String getBlueprintDirectiveValue(Dictionary headers, String directiveName) {
+		String header = getSymNameHeader(headers);
 		if (header != null) {
 			String directive = ConfigUtils.getDirectiveValue(header, directiveName);
 			if (directive != null)
@@ -83,7 +121,7 @@ public class BlueprintConfigUtils {
 	 * @return
 	 */
 	public static long getTimeOut(Dictionary headers) {
-		String value = getDirectiveValue(headers, BLUEPRINT_TIMEOUT);
+		String value = getBlueprintDirectiveValue(headers, BLUEPRINT_TIMEOUT);
 
 		if (value != null) {
 			if (ConfigUtils.DIRECTIVE_TIMEOUT_VALUE_NONE.equalsIgnoreCase(value)) {
@@ -104,7 +142,7 @@ public class BlueprintConfigUtils {
 	 * @return
 	 */
 	public static boolean getWaitForDependencies(Dictionary headers) {
-		String value = getDirectiveValue(headers, BLUEPRINT_WAIT_FOR_DEPS);
+		String value = getBlueprintDirectiveValue(headers, BLUEPRINT_WAIT_FOR_DEPS);
 
 		return (value != null ? Boolean.valueOf(value).booleanValue() : ConfigUtils.DIRECTIVE_WAIT_FOR_DEPS_DEFAULT);
 	}
@@ -144,11 +182,40 @@ public class BlueprintConfigUtils {
 	 * {@link org.springframework.core.io.ResourceLoader} for loading the
 	 * configurations.
 	 * 
+	 * Different from {@link ConfigUtils#getLocationsFromHeader(String, String)}
+	 * since , is used for separating clauses while ; is used inside a clause to
+	 * allow parameters or directives besides paths.
+	 * 
 	 * @param headers bundle headers
 	 * @return array of locations specified (if any)
 	 */
-	public static String[] getHeaderLocations(Dictionary headers) {
-		return ConfigUtils.getLocationsFromHeader(getBlueprintHeader(headers),
-			BlueprintConfigurationScanner.DEFAULT_CONFIG);
+	public static String[] getBlueprintHeaderLocations(Dictionary headers) {
+		String header = getBlueprintHeader(headers);
+
+		List<String> ctxEntries = new ArrayList<String>(4);
+		if (StringUtils.hasText(header)) {
+			String[] clauses = header.split(COMMA);
+			for (String clause : clauses) {
+				// split into directives
+				String[] directives = clause.split(SEMI_COLON);
+				if (!ObjectUtils.isEmpty(directives)) {
+					// check if it's a path or not
+					for (String directive : directives) {
+						if (!directive.contains(EQUALS)) {
+							ctxEntries.add(directive.trim());
+						}
+					}
+				}
+			}
+		}
+
+		// replace * with a 'digestable' location
+		for (int i = 0; i < ctxEntries.size(); i++) {
+			String ctxEntry = ctxEntries.get(i);
+			if (ConfigUtils.CONFIG_WILDCARD.equals(ctxEntry))
+				ctxEntry = OsgiBundleXmlApplicationContext.DEFAULT_CONFIG_LOCATION;
+		}
+
+		return (String[]) ctxEntries.toArray(new String[ctxEntries.size()]);
 	}
 }
