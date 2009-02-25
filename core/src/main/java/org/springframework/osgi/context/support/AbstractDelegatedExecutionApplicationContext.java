@@ -218,11 +218,8 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 				});
 		}
 		catch (Throwable th) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Close error", th);
-			}
 			// send failure event
-			sendFailedEvent(th);
+			sendClosedEvent(th);
 			// rethrow the problem w/o rewrapping
 			if (th instanceof RuntimeException) {
 				throw (RuntimeException) th;
@@ -611,6 +608,11 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	private void sendClosedEvent() {
 		if (delegatedMulticaster != null)
 			delegatedMulticaster.multicastEvent(new OsgiBundleContextClosedEvent(this, this.getBundle()));
+	}
+
+	private void sendClosedEvent(Throwable cause) {
+		if (delegatedMulticaster != null)
+			delegatedMulticaster.multicastEvent(new OsgiBundleContextClosedEvent(this, this.getBundle(), cause));
 	}
 
 	/**
