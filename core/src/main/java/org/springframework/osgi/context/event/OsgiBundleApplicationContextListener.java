@@ -29,7 +29,8 @@ import java.util.EventListener;
  * 
  * @see OsgiBundleContextRefreshedEvent
  * @see OsgiBundleContextFailedEvent
- * 
+ * @see OsgiBundleContextClosedEvent
+ *
  * @author Costin Leau
  */
 public interface OsgiBundleApplicationContextListener extends EventListener {
