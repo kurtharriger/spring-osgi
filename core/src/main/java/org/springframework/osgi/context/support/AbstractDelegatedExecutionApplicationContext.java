@@ -16,6 +16,12 @@
 
 package org.springframework.osgi.context.support;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -30,10 +36,11 @@ import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.DependencyAwareBeanFactoryPostProcessor;
-import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
 import org.springframework.osgi.context.DependencyInitializationAwareBeanPostProcessor;
+import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticasterAdapter;
+import org.springframework.osgi.context.event.OsgiBundleContextClosedEvent;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.util.OsgiBundleUtils;
@@ -43,36 +50,30 @@ import org.springframework.osgi.util.internal.PrivilegedUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * OSGi-specific application context that delegates the execution of its life
  * cycle methods to a different class. The main reason behind this is to
  * <em>break</em> the startup of the application context in steps that can be
  * executed asynchronously.
- * 
+ * <p/>
  * <p/> <p/> The {@link #refresh()} and {@link #close()} methods delegate their
  * execution to an {@link OsgiBundleApplicationContextExecutor} class that
  * chooses how to call the lifecycle methods.
- * 
+ * <p/>
  * <p/> <p/> One can still call the 'traditional' lifecycle methods through
  * {@link #normalRefresh()} and {@link #normalClose()}.
- * 
+ *
  * @author Costin Leau
  * @see DelegatedExecutionOsgiBundleApplicationContext
  */
 public abstract class AbstractDelegatedExecutionApplicationContext extends AbstractOsgiBundleApplicationContext
-		implements DelegatedExecutionOsgiBundleApplicationContext {
+	implements DelegatedExecutionOsgiBundleApplicationContext {
 
 	/**
 	 * Executor that offers the traditional way of <code>refreshing</code>/<code>closing</code>
 	 * of an ApplicationContext (no conditions have to be met and the refresh
 	 * happens in only one step).
-	 * 
+	 *
 	 * @author Costin Leau
 	 */
 	private static class NoDependenciesWaitRefreshExecutor implements OsgiBundleApplicationContextExecutor {
@@ -116,10 +117,10 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 		public Object postProcessAfterInitialization(Object bean, String beanName) {
 			if (!(bean instanceof BeanPostProcessor)
-					&& this.beanFactory.getBeanPostProcessorCount() < this.beanPostProcessorTargetCount) {
+				&& this.beanFactory.getBeanPostProcessorCount() < this.beanPostProcessorTargetCount) {
 				if (logger.isInfoEnabled()) {
 					logger.info("Bean '" + beanName + "' is not eligible for getting processed by all "
-							+ "BeanPostProcessors (for example: not eligible for auto-proxying)");
+						+ "BeanPostProcessors (for example: not eligible for auto-proxying)");
 				}
 			}
 			return bean;
@@ -127,13 +128,19 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	}
 
 
-	/** Default executor */
+	/**
+	 * Default executor
+	 */
 	private OsgiBundleApplicationContextExecutor executor = new NoDependenciesWaitRefreshExecutor(this);
 
-	/** monitor used during refresh/close */
+	/**
+	 * monitor used during refresh/close
+	 */
 	private final Object startupShutdownMonitor = new Object();
 
-	/** Delegated multicaster */
+	/**
+	 * Delegated multicaster
+	 */
 	private OsgiBundleApplicationContextEventMulticaster delegatedMulticaster;
 
 	private ContextClassLoaderProvider cclProvider;
@@ -150,7 +157,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	/**
 	 * Constructs a new
 	 * <code>AbstractDelegatedExecutionApplicationContext</code> instance.
-	 * 
+	 *
 	 * @param parent parent application context
 	 */
 	public AbstractDelegatedExecutionApplicationContext(ApplicationContext parent) {
@@ -199,14 +206,32 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	}
 
 	public void normalClose() {
-		PrivilegedUtils.executeWithCustomTCCL(contextClassLoaderProvider().getContextClassLoader(),
-			new PrivilegedUtils.UnprivilegedExecution() {
+		try {
+			PrivilegedUtils.executeWithCustomTCCL(contextClassLoaderProvider().getContextClassLoader(),
+				new PrivilegedUtils.UnprivilegedExecution() {
 
-				public Object run() {
-					AbstractDelegatedExecutionApplicationContext.super.doClose();
-					return null;
-				}
-			});
+					public Object run() {
+						AbstractDelegatedExecutionApplicationContext.super.doClose();
+						sendClosedEvent();
+						return null;
+					}
+				});
+		}
+		catch (Throwable th) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Close error", th);
+			}
+			// send failure event
+			sendFailedEvent(th);
+			// rethrow the problem w/o rewrapping
+			if (th instanceof RuntimeException) {
+				throw (RuntimeException) th;
+			}
+			else {
+				throw (Error) th;
+			}
+		}
+
 	}
 
 	// Adds behaviour for isAvailable flag.
@@ -235,7 +260,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 							if (!OsgiBundleUtils.isBundleActive(getBundle())) {
 								throw new ApplicationContextException(
 									"Unable to refresh application context: bundle is "
-											+ OsgiStringUtils.bundleStateAsString(getBundle()));
+										+ OsgiStringUtils.bundleStateAsString(getBundle()));
 							}
 
 							ConfigurableListableBeanFactory beanFactory = null;
@@ -377,11 +402,11 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	/**
 	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
 	 * respecting explicit order if given.
-	 * <p>
+	 * <p/>
 	 * Must be called before singleton instantiation. Very similar to
 	 * {@link AbstractApplicationContext#invokeBeanFactoryPostProcessors} but
 	 * allowing exclusion of a certain type.
-	 * 
+	 *
 	 * @param beanFactory
 	 * @param type
 	 * @param exclude
@@ -447,7 +472,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 
 	/**
 	 * Invoke given post processors.
-	 * 
+	 *
 	 * @param beanFactory
 	 * @param postProcessors
 	 */
@@ -468,14 +493,14 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	/**
 	 * Instantiate and invoke all registered BeanPostProcessor beans, respecting
 	 * explicit order if given.
-	 * <p>
+	 * <p/>
 	 * Must be called before any instantiation of application beans. Very
 	 * similar to
 	 * {@link AbstractApplicationContext#invokeBeanFactoryPostProcessors} but
 	 * allowing exclusion of a certain type.
 	 */
 	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, Class type, Class exclude,
-			boolean check) {
+	                                          boolean check) {
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(type, true, false);
 
 		if (check) {
@@ -560,9 +585,9 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * Sets the OSGi multicaster by using a Spring
 	 * {@link ApplicationEventMulticaster}. This method is added as a
 	 * covenience.
-	 * 
+	 *
 	 * @param multicaster Spring multi-caster used for propagating OSGi specific
-	 *        events
+	 *                    events
 	 * @see OsgiBundleApplicationContextEventMulticasterAdapter
 	 */
 	public void setDelegatedEventMulticaster(ApplicationEventMulticaster multicaster) {
@@ -583,6 +608,11 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 			delegatedMulticaster.multicastEvent(new OsgiBundleContextRefreshedEvent(this, this.getBundle()));
 	}
 
+	private void sendClosedEvent() {
+		if (delegatedMulticaster != null)
+			delegatedMulticaster.multicastEvent(new OsgiBundleContextClosedEvent(this, this.getBundle()));
+	}
+
 	/**
 	 * private method used for doing lazy-init-if-not-set for cclProvider
 	 */
@@ -599,7 +629,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * Sets the {@link ContextClassLoaderProvider} used by this OSGi application
 	 * context instance. By default, {@link DefaultContextClassLoaderProvider}
 	 * is used.
-	 * 
+	 *
 	 * @param contextClassLoaderProvider context class loader provider to use
 	 * @see ContextClassLoaderProvider
 	 * @see DefaultContextClassLoaderProvider
