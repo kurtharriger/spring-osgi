@@ -36,8 +36,11 @@ import org.springframework.core.JdkVersion;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticasterAdapter;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
+import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
@@ -69,6 +72,8 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "osgiApplicationEventMulticaster";
 
+	private static final String CONTEXT_LISTENER_NAME = "osgiApplicationContextListener";
+
 	private static final String PROPERTIES_NAME = "extenderProperties";
 
 	private static final String SHUTDOWN_WAIT_KEY = "shutdown.wait.time";
@@ -76,8 +81,6 @@ public class ExtenderConfiguration implements DisposableBean {
 	private static final String PROCESS_ANNOTATIONS_KEY = "process.annotations";
 
 	private static final String WAIT_FOR_DEPS_TIMEOUT_KEY = "dependencies.wait.time";
-
-	private static final String INSTALL_CONTEXT_ERROR_HANDLER_KEY = "install.context.error.handler";
 
 	private static final String EXTENDER_CFG_LOCATION = "META-INF/spring/extender";
 
@@ -96,7 +99,6 @@ public class ExtenderConfiguration implements DisposableBean {
 	private static final long DEFAULT_DEP_WAIT = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT * 1000;
 	private static final long DEFAULT_SHUTDOWN_WAIT = 10 * 1000;
 	private static final boolean DEFAULT_PROCESS_ANNOTATION = false;
-	private static final boolean DEFAULT_INSTALL_CONTEXT_ERROR_HANDLER = true;
 
 	private ConfigurableOsgiBundleApplicationContext extenderConfiguration;
 
@@ -112,9 +114,9 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private boolean processAnnotation;
 
-	private boolean installContextErrorHandler;
-
 	private OsgiBundleApplicationContextEventMulticaster eventMulticaster;
+
+	private OsgiBundleApplicationContextListener contextEventListener;
 
 	private boolean forceThreadShutdown;
 
@@ -152,6 +154,8 @@ public class ExtenderConfiguration implements DisposableBean {
 				shutdownTaskExecutor = createDefaultShutdownTaskExecutor();
 				eventMulticaster = createDefaultEventMulticaster();
 				contextCreator = createDefaultApplicationContextCreator();
+				contextEventListener = createDefaultApplicationContextListener();
+
 			}
 			classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
 		}
@@ -182,6 +186,10 @@ public class ExtenderConfiguration implements DisposableBean {
 				contextCreator = extenderConfiguration.containsBean(CONTEXT_CREATOR_NAME) ? (OsgiApplicationContextCreator) extenderConfiguration.getBean(
 					CONTEXT_CREATOR_NAME, OsgiApplicationContextCreator.class)
 						: createDefaultApplicationContextCreator();
+
+				contextEventListener = extenderConfiguration.containsBean(CONTEXT_LISTENER_NAME) ? (OsgiBundleApplicationContextListener) extenderConfiguration.getBean(
+					CONTEXT_LISTENER_NAME, OsgiBundleApplicationContextListener.class)
+						: createDefaultApplicationContextListener();
 			}
 
 			// get post processors
@@ -207,7 +215,6 @@ public class ExtenderConfiguration implements DisposableBean {
 			shutdownWaitTime = getShutdownWaitTime(properties);
 			dependencyWaitTime = getDependencyWaitTime(properties);
 			processAnnotation = getProcessAnnotations(properties);
-			installContextErrorHandler = getInstallContextErrorHandler(properties);
 		}
 
 		// load default dependency factories
@@ -289,7 +296,6 @@ public class ExtenderConfiguration implements DisposableBean {
 		properties.setProperty(SHUTDOWN_WAIT_KEY, "" + DEFAULT_SHUTDOWN_WAIT);
 		properties.setProperty(PROCESS_ANNOTATIONS_KEY, "" + DEFAULT_PROCESS_ANNOTATION);
 		properties.setProperty(WAIT_FOR_DEPS_TIMEOUT_KEY, "" + DEFAULT_DEP_WAIT);
-		properties.setProperty(INSTALL_CONTEXT_ERROR_HANDLER_KEY, "" + DEFAULT_INSTALL_CONTEXT_ERROR_HANDLER);
 
 		return properties;
 	}
@@ -371,6 +377,10 @@ public class ExtenderConfiguration implements DisposableBean {
 		return new DefaultOsgiApplicationContextCreator();
 	}
 
+	private OsgiBundleApplicationContextListener createDefaultApplicationContextListener() {
+		return new DefaultOsgiBundleApplicationContextListener();
+	}
+
 	private long getShutdownWaitTime(Properties properties) {
 		return Long.parseLong(properties.getProperty(SHUTDOWN_WAIT_KEY));
 	}
@@ -382,10 +392,6 @@ public class ExtenderConfiguration implements DisposableBean {
 	private boolean getProcessAnnotations(Properties properties) {
 		return Boolean.valueOf(properties.getProperty(PROCESS_ANNOTATIONS_KEY)).booleanValue()
 				|| Boolean.getBoolean(AUTO_ANNOTATION_PROCESSING);
-	}
-
-	private boolean getInstallContextErrorHandler(Properties properties) {
-		return Boolean.valueOf(properties.getProperty(INSTALL_CONTEXT_ERROR_HANDLER_KEY)).booleanValue();
 	}
 
 	/**
@@ -407,6 +413,17 @@ public class ExtenderConfiguration implements DisposableBean {
 	public TaskExecutor getShutdownTaskExecutor() {
 		synchronized (lock) {
 			return shutdownTaskExecutor;
+		}
+	}
+
+	/**
+	 * Returns the contextEventListener.
+	 * 
+	 * @return Returns the contextEventListener
+	 */
+	public OsgiBundleApplicationContextListener getContextEventListener() {
+		synchronized (lock) {
+			return contextEventListener;
 		}
 	}
 
@@ -441,16 +458,6 @@ public class ExtenderConfiguration implements DisposableBean {
 	public long getDependencyWaitTime() {
 		synchronized (lock) {
 			return dependencyWaitTime;
-		}
-	}
-
-	/**
-	 * @return true if an error handler should be installed for context
-	 *         creation.
-	 */
-	public boolean shouldInstallContextErrorHandler() {
-		synchronized (lock) {
-			return installContextErrorHandler;
 		}
 	}
 
