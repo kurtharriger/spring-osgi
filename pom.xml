@@ -556,10 +556,24 @@ limitations under the License.
           <instructions>
            <!-- bundle specific conf -->
            <Bundle-Name>${artifactId}</Bundle-Name>
+           <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
+           <Bundle-Vendor>SpringSource</Bundle-Vendor>
            <Export-Package>${spring.osgi.export}</Export-Package>
            <Import-Package>${spring.osgi.import}</Import-Package>
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
            <Include-Resource>${spring.osgi.include.res}</Include-Resource>
+           <!-- jar entries -->
+           <Implementation-Title>Spring Dynamic Modules Framework</Implementation-Title>
+           <Implementation-Version>${pom.version}</Implementation-Version>
+           <Implementation-Vendor>SpringSource</Implementation-Vendor>
+           <Implementation-Vendor-Id>org.springframework.osgi</Implementation-Vendor-Id>
+           <!-- Spring specific entries -->
+           <Spring-DM-Version>${pom.version}</Spring-DM-Version>
+           <Spring-Version>${spring.maven.artifact.version}</Spring-Version>
+           <!-- build version properties -->
+           <Build-Plan>${env.buildPlan}</Build-Plan>
+           <Build-Number>${env.buildNumber}</Build-Number>
+           <SVN-Revision>${env.svnRevision}</SVN-Revision>
           </instructions>
         </configuration>
       </plugin>

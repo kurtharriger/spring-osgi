@@ -194,5 +194,4 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 		this.namespacePlugins.destroy();
 		this.namespacePlugins = null;
 	}
-
 }

@@ -376,7 +376,13 @@ public class ContextLoaderListener implements BundleActivator {
 		nsManager.afterPropertiesSet();
 
 		// Step 2: initialize the extender configuration
-		extenderConfiguration = new ExtenderConfiguration(context);
+		try {
+			extenderConfiguration = new ExtenderConfiguration(context);
+		}
+		catch (Exception ex) {
+			log.error("Unable to process extender configuration", ex);
+			throw ex;
+		}
 
 		// initialize the configuration once namespace handlers have been detected
 		this.taskExecutor = extenderConfiguration.getTaskExecutor();
@@ -813,19 +819,7 @@ public class ContextLoaderListener implements BundleActivator {
 		createListenersList();
 		// register the listener that does the dispatching
 		multicaster.addApplicationListener(new ListListenerAdapter(applicationListeners));
-
-		// Register an error handle if required
-		if (extenderConfiguration.shouldInstallContextErrorHandler()) {
-			multicaster.addApplicationListener(new OsgiBundleApplicationContextListener() {
-
-				public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
-					if (event instanceof OsgiBundleContextFailedEvent) {
-						log.error("Context creation error for [" + event.getBundle().getSymbolicName() + "]",
-							((OsgiBundleContextFailedEvent) event).getFailureCause());
-					}
-				}
-			});
-		}
+		multicaster.addApplicationListener(extenderConfiguration.getContextEventListener());
 
 		if (log.isDebugEnabled())
 			log.debug("Initialization of OSGi listeners service completed...");

@@ -18,9 +18,11 @@ package org.springframework.osgi.iandt.extender.configuration;
 
 import java.util.Properties;
 
+import org.osgi.framework.ServiceReference;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 
 /**
@@ -47,6 +49,11 @@ public class ExtenderConfigurationTest extends BaseIntegrationTest {
 	}
 
 	public void testExtenderConfigAppCtxPublished() throws Exception {
+		ServiceReference[] refs = bundleContext.getAllServiceReferences(
+			"org.springframework.context.ApplicationContext", null);
+		for (int i = 0; i < refs.length; i++) {
+			System.out.println(OsgiStringUtils.nullSafeToString(refs[i]));
+		}
 		assertNotNull(context);
 	}
 
@@ -72,7 +79,6 @@ public class ExtenderConfigurationTest extends BaseIntegrationTest {
 		Object bean = context.getBean("extenderProperties");
 		assertTrue("unexpected type", bean instanceof Properties);
 	}
-
 
 	// felix doesn't support fragments, so disable this test
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
