@@ -89,6 +89,15 @@
    <!-- security options for integration testing -->
    <security.argLine></security.argLine>
    <policy.url>..${file.separator}policy.all</policy.url>
+   
+   <!-- bundlor settings -->
+   <!-- disabled on jdk1.4 -->
+   <bundlor.enabled>false</bundlor.enabled>
+   <!-- common version ranges -->
+   <spring.version.range>"[${spring.base.version},3.0)"</spring.version.range>
+   <spring.osgi.version.range>"[${spring.osgi.import.version},${spring.osgi.import.version}]"</spring.osgi.version.range>
+   <logging.version.range>"[1.0,2.0)"</logging.version.range>
+
   </properties>
 
   <!-- ============================================= -->
@@ -482,9 +491,6 @@ limitations under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>2.3</version>
-          <!-- we cannot depend on a snapshot
-          <version>2.4-SNAPSHOT</version>
-           -->
         </plugin>
         <plugin>
           <groupId>org.apache.felix</groupId>
@@ -534,7 +540,7 @@ limitations under the License.
         <plugin>
           <groupId>com.springsource.bundlor</groupId>
           <artifactId>com.springsource.bundlor.maven</artifactId>
-          <version>1.0.0.M1</version>
+          <version>1.0.0.M1A</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -550,28 +556,15 @@ limitations under the License.
           <instructions>
            <!-- bundle specific conf -->
            <Bundle-Name>${artifactId}</Bundle-Name>
-           <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
-           <Bundle-Vendor>SpringSource</Bundle-Vendor>
            <Export-Package>${spring.osgi.export}</Export-Package>
            <Import-Package>${spring.osgi.import}</Import-Package>
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
            <Include-Resource>${spring.osgi.include.res}</Include-Resource>
-           <!-- jar entries -->
-           <Implementation-Title>Spring Dynamic Modules Framework</Implementation-Title>
-           <Implementation-Version>${pom.version}</Implementation-Version>
-           <Implementation-Vendor>SpringSource</Implementation-Vendor>
-           <Implementation-Vendor-Id>org.springframework.osgi</Implementation-Vendor-Id>
-           <!-- Spring specific entries -->
-           <Spring-DM-Version>${pom.version}</Spring-DM-Version>
-           <Spring-Version>${spring.maven.artifact.version}</Spring-Version>
-           <!-- build version properties -->
-           <Build-Plan>${env.buildPlan}</Build-Plan>
-           <Build-Number>${env.buildNumber}</Build-Number>
-           <SVN-Revision>${env.svnRevision}</SVN-Revision>
           </instructions>
         </configuration>
       </plugin>
-      <!--
+
+<!--
       <plugin>
         <groupId>com.springsource.bundlor</groupId>
         <artifactId>com.springsource.bundlor.maven</artifactId>
@@ -585,10 +578,37 @@ limitations under the License.
           </execution>
         </executions>
         <configuration>
-           <manifestTemplatePath>template.mf</manifestTemplatePath>
+           <manifestTemplatePath>${basedir}/template.mf</manifestTemplatePath>
+           <manifestHeaders><![CDATA[Bundle-Name: ${artifactId}
+Bundle-Version: ${spring.osgi.bundle.version}
+Bundle-SymbolicName: ${spring.osgi.symbolic.name}
+Bundle-Vendor: SpringSource
+Bundle-DocURL: http://www.springframework.org/osgi
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
+Implementation-Title: Spring Dynamic Modules Framework
+Implementation-Version: ${pom.version}
+Implementation-Vendor: SpringSource
+Implementation-Vendor-Id: org.springframework.osgi
+Spring-DM-Version: ${pom.version}
+Spring-Version: ${spring.maven.artifact.version}
+Build-Plan: ${env.buildPlan}
+Build-Number: ${env.buildNumber}
+SVN-Revision: ${env.svnRevision}
+Ignored-Existing-Headers: 
+ Tool,
+ Ignore-Package,
+ Private-Package,
+ Created-By,
+ Bnd-LastModified
+]]></manifestHeaders> 
+           <packagings>
+               <packaging>bundle</packaging>
+           </packagings>
+           <enabled>${bundlor.enabled}</enabled>
+           <failOnWarnings>false</failOnWarnings>
         </configuration>
       </plugin>
-      -->
+-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -745,6 +765,8 @@ limitations under the License.
         <properties>
           <!-- use default mtc version for core -->
           <jdk-classifier></jdk-classifier>
+          <!-- enable bundlor -->
+          <bundlor.enabled>true</bundlor.enabled>
         </properties>
     </profile>
 
@@ -1006,6 +1028,16 @@ limitations under the License.
         <url>http://repository.springsource.com/maven/bundles/milestone</url>
     </pluginRepository>
 
+
+    <pluginRepository>
+        <id>com.springsource.repository.bundles.snapshot</id>
+        <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Snapshots</name>
+        <url>http://repository.springsource.com/maven/bundles/snapshot</url>
+        <snapshots>
+         <enabled>true</enabled>
+        </snapshots>
+    </pluginRepository>
+
   </pluginRepositories>
 
   <repositories>
@@ -1024,6 +1056,8 @@ limitations under the License.
         <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
         <url>http://repository.springsource.com/maven/bundles/release</url>
     </repository>
+    
+   
     <repository>
         <id>spring-release</id>
         <name>Spring Portfolio Release Repository</name>
@@ -1055,6 +1089,7 @@ limitations under the License.
          <enabled>true</enabled>
         </snapshots>
     </repository>
+    
     <repository>
         <id>i21-s3-osgi-repo</id>
         <name>i21 osgi artifacts repo</name>

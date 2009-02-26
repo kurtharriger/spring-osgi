@@ -14,6 +14,7 @@
   
   <properties>
 	<clover.skip>true</clover.skip>
+	<bundlor.enabled>true</bundlor.enabled>
   </properties>
   
   <modules>
