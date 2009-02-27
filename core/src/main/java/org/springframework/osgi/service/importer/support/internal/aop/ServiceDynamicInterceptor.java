@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -38,6 +40,7 @@ import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitEndedEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitStartingEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitTimedOutEvent;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.service.importer.support.internal.support.DefaultRetryCallback;
 import org.springframework.osgi.service.importer.support.internal.support.RetryCallback;
@@ -129,6 +132,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 				int ranking = (rank == null ? 0 : rank.intValue());
 
 				boolean debug = log.isDebugEnabled();
+				boolean publicDebug = PUBLIC_LOGGER.isDebugEnabled();
 
 				switch (event.getType()) {
 
@@ -218,7 +222,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 								wrapper = null;
 							}
 
-							if (debug) {
+							if (debug || publicDebug) {
 								String message = "Service reference [" + ref + "] was unregistered";
 								if (serviceRemoved) {
 									message += " and unbound from the service proxy";
@@ -226,7 +230,10 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 								else {
 									message += " but did not affect the service proxy";
 								}
-								log.debug(message);
+								if (debug)
+									log.debug(message);
+								if (publicDebug)
+									PUBLIC_LOGGER.debug(message);
 							}
 
 							// update internal state listeners (unsatisfied event)
@@ -297,13 +304,19 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 				}
 			}
 			finally {
-				if (log.isDebugEnabled()) {
+				boolean debug = log.isDebugEnabled();
+				boolean publicDebug = PUBLIC_LOGGER.isDebugEnabled();
+
+				if (debug || publicDebug) {
 					String message = "Service reference [" + ref + "]";
 					if (updated)
 						message += " bound to proxy";
 					else
 						message += " not bound to proxy";
-					log.debug(message);
+					if (debug)
+						log.debug(message);
+					if (publicDebug)
+						PUBLIC_LOGGER.debug(message);
 				}
 			}
 		}
@@ -322,6 +335,9 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 
 	private static final int hashCode = ServiceDynamicInterceptor.class.hashCode() * 13;
+
+	/** public logger */
+	private static final Log PUBLIC_LOGGER = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
 	private final BundleContext bundleContext;
 
@@ -450,9 +466,14 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		if (serviceRequiredAtStartup) {
 			if (debug)
 				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
+
+			PUBLIC_LOGGER.info("Looking for mandatory OSGi service dependency for bean [" + sourceName
+					+ "] matching filter " + filter);
 			Object target = getTarget();
 			if (debug)
 				log.debug("Service retrieved " + target);
+
+			PUBLIC_LOGGER.info("Found mandatory OSGi service for bean [" + sourceName + "]");
 		}
 	}
 
