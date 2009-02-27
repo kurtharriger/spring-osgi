@@ -38,6 +38,7 @@ import org.springframework.osgi.service.importer.DefaultOsgiServiceDependency;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.internal.aop.ProxyPlusCallback;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
@@ -201,6 +202,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	private static final Log log = LogFactory.getLog(OsgiServiceCollection.class);
 
+	private static final Log PUBLIC_LOGGER = LogFactory.getLog(OsgiServiceCollectionProxyFactoryBean.class);
+
 	// map of services
 	// the service id is used as key while the service proxy is used for
 	// values
@@ -262,18 +265,23 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		// create service proxies collection
 		this.serviceProxies = createInternalDynamicStorage();
 
-		boolean trace = log.isTraceEnabled();
-
 		dependency = new DefaultOsgiServiceDependency(sourceName, filter, serviceRequiredAtStartup);
 
-		if (trace)
+		if (log.isTraceEnabled())
 			log.trace("Adding osgi listener for services matching [" + filter + "]");
 		OsgiListenerUtils.addServiceListener(context, listener, filter);
 
 		if (serviceRequiredAtStartup) {
-			if (trace)
-				log.trace("1..x cardinality - looking for service [" + filter + "] at startup...");
+
+			if (log.isDebugEnabled())
+				log.debug("1..x cardinality - looking for service [" + filter + "] at startup...");
+
+			PUBLIC_LOGGER.info("Looking for mandatory OSGi service dependency for bean [" + sourceName
+					+ "] matching filter " + filter);
+
 			mandatoryServiceCheck();
+
+			PUBLIC_LOGGER.info("Found mandatory OSGi service for bean [" + sourceName + "]");
 		}
 	}
 

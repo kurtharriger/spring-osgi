@@ -37,6 +37,7 @@ Package org.springframework.osgi.service
 * improved waiting code to deal with spurious or accidental wakeups
 * fixed issue with OsgiServiceProxyFactoryBean that caused autowiring to fail in some cases
 * fixed dynamic iterator race condition triggered by fluctuating collection ends
+* improved logging for mandatory service importers to help diagnose missing required OSGi services
 
 Package org.springframework.osgi.test
 * improved FelixOsgiPlatform to support API changes in Felix 1.4.x

@@ -126,8 +126,8 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	 * {@inheritDoc}
 	 * 
 	 * Returns the managed proxy type. If the proxy is not created when this
-	 * method is invoked, the method will try to create a composite interface (if only
-	 * interfaces are specified) or null otherwise.
+	 * method is invoked, the method will try to create a composite interface
+	 * (if only interfaces are specified) or null otherwise.
 	 */
 	public Class getObjectType() {
 		synchronized (monitor) {
@@ -188,6 +188,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		// has been created
 		lookupAdvice.setStateListeners(stateListeners);
 		lookupAdvice.setServiceImporter(this);
+		lookupAdvice.setServiceImporterName(getBeanName());
 
 		// create a proxy creator using the existing context
 		ServiceProxyCreator creator = new AbstractServiceProxyCreator(getInterfaces(), getAopClassLoader(),
