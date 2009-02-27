@@ -319,7 +319,17 @@ context ::= path ( ';' path ) * (';' directive) *
                 is useful as it allows customization of the bean factory such as adding/removing/changing existing bean definitions or adding new bean
                 instances.</entry>
                 <entry>The Extender default behaviour applies.</entry>
-              </row>              
+              </row>
+              
+              <row id="extender-configuration-options:contextListener">
+                <entry><literal>osgiApplicationContextListener</literal></entry>
+                <entry><interfacename>OsgiBundleApplicationContextListener</interfacename>
+                <footnote id="extender-configuration-options:event.pkg"><literal>org.springframework.osgi.context.event package</literal></footnote>
+                </entry>
+                <entry>Application context event listener registered automatically by the extender.</entry>
+                <entry>Default implementation provides logging of the managed application contexts lifecycle.</entry>
+              </row>
+
             </tbody>
           </tgroup>
     	</table>
@@ -361,12 +371,6 @@ context ::= path ( ';' path ) * (';' directive) *
                 <entry>300000 ms (300 s or 5 min)</entry>
               </row>
               
-              <row>
-                <entry><literal>install.context.error.handler</literal></entry>
-                <entry><classname>java.lang.Boolean</classname></entry>
-                <entry>Flag indicating whether, or not, the extender will log ApplicationContext errors by default. Users with their own error handling capability will typically want to disable this.</entry>
-                <entry>true</entry>
-              </row>
             </tbody>
           </tgroup>
     	</table>
@@ -404,6 +408,14 @@ context ::= path ( ';' path ) * (';' directive) *
 	                of an application context - before, during or after refresh. Usually the cause indicates an error in the configuration - syntax typo,
 	                incorrect wiring, missing bean and so forth.</entry>
 	              </row>
+
+	              <row>
+	                <entry><classname>OsgiBundleContextClosedEvent</classname></entry>
+	                <entry>Published when an OSGi application context is closed after a successful refresh (normally issued a Spring bundle is being stopped).
+	                </entry>
+	              </row>
+	              
+	              
 	            </tbody>
 	          </tgroup>
 	    	</table>
