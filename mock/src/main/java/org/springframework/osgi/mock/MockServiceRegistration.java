@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.util.Dictionary;
@@ -26,6 +27,7 @@ import org.osgi.framework.ServiceRegistration;
  * <p/> The mock allows the service properties modification (through
  * {@link #setProperties(Dictionary)}) as long as the underlying reference is
  * of type {@link MockServiceReference}.
+ * 
  * @author Costin Leau
  * 
  */
@@ -33,36 +35,50 @@ public class MockServiceRegistration implements ServiceRegistration {
 
 	private ServiceReference reference;
 
+
+	/**
+	 * Constructs a new <code>MockServiceRegistration</code> instance using
+	 * defaults.
+	 * 
+	 */
 	public MockServiceRegistration() {
 		this(null);
 	}
 
+	/**
+	 * Constructs a new <code>MockServiceRegistration</code> instance with the
+	 * given properties.
+	 * 
+	 * @param props registration properties
+	 */
 	public MockServiceRegistration(Dictionary props) {
 		this(null, props);
 	}
 
+	/**
+	 * Constructs a new <code>MockServiceRegistration</code> instance using
+	 * the given class names and properties.
+	 * 
+	 * @param clazz
+	 * @param props
+	 */
 	public MockServiceRegistration(String[] clazz, Dictionary props) {
 		reference = new MockServiceReference(null, props, this, clazz);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.ServiceRegistration#getReference()
-	 */
 	public ServiceReference getReference() {
 		return reference;
 	}
 
+	/**
+	 * Sets the service reference associated with this registration.
+	 * 
+	 * @param reference service reference
+	 */
 	public void setReference(ServiceReference reference) {
 		this.reference = reference;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.ServiceRegistration#setProperties(java.util.Dictionary)
-	 */
 	public void setProperties(Dictionary props) {
 		if (reference instanceof MockServiceReference)
 			((MockServiceReference) reference).setProperties(props);
@@ -71,11 +87,6 @@ public class MockServiceRegistration implements ServiceRegistration {
 					+ MockServiceReference.class.getName());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.ServiceRegistration#unregister()
-	 */
 	public void unregister() {
 	}
 
@@ -90,5 +101,4 @@ public class MockServiceRegistration implements ServiceRegistration {
 	public int hashCode() {
 		return MockServiceRegistration.class.hashCode() * 13 + reference.hashCode();
 	}
-
 }

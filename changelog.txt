@@ -30,6 +30,10 @@ Package org.springframework.osgi.io
 * improved OsgiBundleResource#getFile() file detection method
 * eliminated existance check on resolved files for OsgiBundleResource#getFile()
 
+Package org.springframework.osgi.mock
+* added option to set the MockBundle internal class loader
+* changed (slightly) the MockBundleContext default properties
+
 Package org.springframework.osgi.service
 * removed deprecated retryTimes parameter in OsgiServiceProxyFactoryBean
 * improved type filtering for tracked services
