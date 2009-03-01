@@ -755,27 +755,27 @@ limitations under the License.
             <configuration>
                <manifestTemplatePath>${basedir}/template.mf</manifestTemplatePath>
                <manifestHeaders><![CDATA[Bundle-Name: ${artifactId}
-    Bundle-Version: ${spring.osgi.bundle.version}
-    Bundle-SymbolicName: ${spring.osgi.symbolic.name}
-    Bundle-Vendor: SpringSource
-    Bundle-DocURL: http://www.springframework.org/osgi
-    Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
-    Implementation-Title: Spring Dynamic Modules Framework
-    Implementation-Version: ${pom.version}
-    Implementation-Vendor: SpringSource
-    Implementation-Vendor-Id: org.springframework.osgi
-    Spring-DM-Version: ${pom.version}
-    Spring-Version: ${spring.maven.artifact.version}
-    Build-Plan: ${env.buildPlan}
-    Build-Number: ${env.buildNumber}
-    SVN-Revision: ${env.svnRevision}
-    Ignored-Existing-Headers: 
-     Tool,
-     Ignore-Package,
-     Private-Package,
-     Created-By,
-     Bnd-LastModified
-    ]]></manifestHeaders> 
+Bundle-Version: ${spring.osgi.bundle.version}
+Bundle-SymbolicName: ${spring.osgi.symbolic.name}
+Bundle-Vendor: SpringSource
+Bundle-DocURL: http://www.springframework.org/osgi
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
+Implementation-Title: Spring Dynamic Modules Framework
+Implementation-Version: ${pom.version}
+Implementation-Vendor: SpringSource
+Implementation-Vendor-Id: org.springframework.osgi
+Spring-DM-Version: ${pom.version}
+Spring-Version: ${spring.maven.artifact.version}
+Build-Plan: ${env.buildPlan}
+Build-Number: ${env.buildNumber}
+SVN-Revision: ${env.svnRevision}
+Ignored-Existing-Headers: 
+ Tool,
+ Ignore-Package,
+ Private-Package,
+ Created-By,
+ Bnd-LastModified
+]]></manifestHeaders> 
                <packagings>
                    <packaging>bundle</packaging>
                </packagings>
