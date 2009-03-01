@@ -41,8 +41,14 @@ class DefaultBundleContextProperties extends Properties {
 	}
 
 	private static String getVersion() {
-		Package pkg = DefaultBundleContextProperties.class.getPackage();
-		return (pkg != null ? pkg.getImplementationVersion() : "unknown");
+		Package pkg = MockBundleContext.class.getPackage();
+		if (pkg != null) {
+			String version = pkg.getImplementationVersion();
+			if (version != null)
+				return version;
+		}
+
+		return "unknown";
 	}
 
 	protected void initProperties() {

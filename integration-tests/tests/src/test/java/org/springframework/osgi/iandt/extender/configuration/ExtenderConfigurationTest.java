@@ -16,8 +16,10 @@
 
 package org.springframework.osgi.iandt.extender.configuration;
 
+import java.util.List;
 import java.util.Properties;
 
+import org.osgi.framework.AdminPermission;
 import org.osgi.framework.ServiceReference;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.task.TaskExecutor;
@@ -83,5 +85,11 @@ public class ExtenderConfigurationTest extends BaseIntegrationTest {
 	// felix doesn't support fragments, so disable this test
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
 		return getPlatformName().indexOf("elix") > -1;
+	}
+
+	protected List getTestPermissions() {
+		List list = super.getTestPermissions();
+		list.add(new AdminPermission("*", AdminPermission.METADATA));
+		return list;
 	}
 }
