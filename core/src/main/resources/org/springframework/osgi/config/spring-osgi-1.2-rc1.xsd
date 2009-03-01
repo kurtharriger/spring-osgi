@@ -7,7 +7,7 @@
             targetNamespace="http://www.springframework.org/schema/osgi"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified"
-            version="1.2-m2">
+            version="1.2-rc1">
 
 	<xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
