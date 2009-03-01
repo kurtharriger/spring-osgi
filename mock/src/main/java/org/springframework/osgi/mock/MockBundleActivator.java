@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import org.osgi.framework.BundleActivator;
@@ -20,23 +21,17 @@ import org.osgi.framework.BundleContext;
 
 /**
  * BundleActivator mock.
- * <p/>
- * Doesn't provide any functionality.
+ * 
+ * <p/> Doesn't provide any functionality.
+ * 
  * @author Costin Leau
- *
+ * 
  */
 public class MockBundleActivator implements BundleActivator {
 
-	/* (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
 	public void start(BundleContext context) throws Exception {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
 	public void stop(BundleContext context) throws Exception {
 	}
-
 }

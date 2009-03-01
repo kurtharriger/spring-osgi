@@ -50,31 +50,80 @@ public class MockServiceReference implements ServiceReference {
 	private String[] objectClass = new String[] { Object.class.getName() };
 
 
+	/**
+	 * Constructs a new <code>MockServiceReference</code> instance using
+	 * defaults.
+	 */
 	public MockServiceReference() {
 		this(null, null, null);
 	}
 
+	/**
+	 * Constructs a new <code>MockServiceReference</code> instance associated
+	 * with the given bundle.
+	 * 
+	 * @param bundle associated reference bundle
+	 */
 	public MockServiceReference(Bundle bundle) {
 		this(bundle, null, null);
 	}
 
+	/**
+	 * Constructs a new <code>MockServiceReference</code> instance matching
+	 * the given class namess.
+	 * 
+	 * @param classes associated class names
+	 */
 	public MockServiceReference(String[] classes) {
 		this(null, null, null, classes);
 
 	}
 
+	/**
+	 * Constructs a new <code>MockServiceReference</code> instance associated
+	 * with the given bundle and matching the given class names.
+	 * 
+	 * @param bundle associated bundle
+	 * @param classes matching class names
+	 */
 	public MockServiceReference(Bundle bundle, String[] classes) {
 		this(bundle, null, null, classes);
 	}
 
+	/**
+	 * Constructs a new <code>MockServiceReference</code> instance associated
+	 * with the given service registration.
+	 * 
+	 * @param registration service registration
+	 */
 	public MockServiceReference(ServiceRegistration registration) {
 		this(null, null, registration);
 	}
 
+	/**
+	 * Constructs a new <code>MockServiceReference</code> instance associated
+	 * with the given bundle, service registration and having the given service
+	 * properties.
+	 * 
+	 * @param bundle associated bundle
+	 * @param properties reference properties
+	 * @param registration associated service registrations
+	 */
 	public MockServiceReference(Bundle bundle, Dictionary properties, ServiceRegistration registration) {
 		this(bundle, properties, registration, null);
 	}
 
+	/**
+	 * Constructs a new <code>MockServiceReference</code> instance. This
+	 * constructor gives access to all the parameters of the mock service
+	 * reference such as associated bundle, reference properties, service
+	 * registration and reference class names.
+	 * 
+	 * @param bundle associated bundle
+	 * @param properties reference properties
+	 * @param registration service registration
+	 * @param classes reference class names
+	 */
 	public MockServiceReference(Bundle bundle, Dictionary properties, ServiceRegistration registration, String[] classes) {
 		this.bundle = (bundle == null ? new MockBundle() : bundle);
 		// this.registration = (registration == null ? new
@@ -129,6 +178,11 @@ public class MockServiceReference implements ServiceReference {
 		return false;
 	}
 
+	/**
+	 * Sets the properties associated with this reference.
+	 * 
+	 * @param properties
+	 */
 	public void setProperties(Dictionary properties) {
 		if (properties != null) {
 			// copy mandatory properties
@@ -156,7 +210,9 @@ public class MockServiceReference implements ServiceReference {
 	}
 
 	/**
-	 * Return a hash code based on the class and service id.
+	 * {@inheritDoc}
+	 * 
+	 * Returns a hash code based on the class and service id.
 	 */
 	public int hashCode() {
 		return MockServiceReference.class.hashCode() * 13 + (int) serviceId;

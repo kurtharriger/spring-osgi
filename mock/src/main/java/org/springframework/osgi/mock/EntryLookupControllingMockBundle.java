@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.net.URL;
@@ -22,10 +23,10 @@ import java.util.Enumeration;
 import org.osgi.framework.BundleContext;
 
 /**
- * Mock Bundle that allows the entry to return on future calls.
+ * Dedicated Mock Bundle that provides control over the returned entries for
+ * lookup calls.
  * 
  * @author Adrian Colyer
- * 
  */
 public class EntryLookupControllingMockBundle extends MockBundle {
 
@@ -33,6 +34,13 @@ public class EntryLookupControllingMockBundle extends MockBundle {
 
 	protected URL nextEntryResult = null;
 
+
+	/**
+	 * Constructs a new <code>EntryLookupControllingMockBundle</code>
+	 * instance.
+	 * 
+	 * @param headers
+	 */
 	public EntryLookupControllingMockBundle(Dictionary headers) {
 		super(headers);
 	}

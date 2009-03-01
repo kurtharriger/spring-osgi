@@ -31,13 +31,10 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
 /**
- * Bundle Mock.
- * 
- * <p/> The mock will the thread current classloader for loading
- * classes/resources.
+ * Bundle mock. Except resource/class loading operations (which are executed on
+ * its internal class loader), the rest of the methods are dummies.
  * 
  * @author Costin Leau
- * 
  */
 public class MockBundle implements Bundle {
 
@@ -73,22 +70,52 @@ public class MockBundle implements Bundle {
 	}
 
 
+	/**
+	 * Constructs a new <code>MockBundle</code> instance using default values.
+	 * 
+	 */
 	public MockBundle() {
 		this(null, null, null);
 	}
 
+	/**
+	 * Constructs a new <code>MockBundle</code> instance with the given bundle
+	 * headers.
+	 * 
+	 * @param headers bundle headers
+	 */
 	public MockBundle(Dictionary headers) {
 		this(null, headers, null);
 	}
 
+	/**
+	 * Constructs a new <code>MockBundle</code> instance associated with the
+	 * given bundle context.
+	 * 
+	 * @param context associated bundle context
+	 */
 	public MockBundle(BundleContext context) {
 		this(null, null, context);
 	}
 
+	/**
+	 * Constructs a new <code>MockBundle</code> instance with the given
+	 * symbolic name.
+	 * 
+	 * @param symName bundle symbolic name
+	 */
 	public MockBundle(String symName) {
 		this(symName, null, null);
 	}
 
+	/**
+	 * Constructs a new <code>MockBundle</code> instance using the given
+	 * bundle symbolic name, properties and associated bundle context.
+	 * 
+	 * @param symName bundle symbolic name
+	 * @param headers bundle headers
+	 * @param context associated bundle context
+	 */
 	public MockBundle(String symName, Dictionary headers, BundleContext context) {
 		this.symName = ((symName != null && symName.length() > 0) ? symName : SYMBOLIC_NAME);
 		defaultHeaders.put("Bundle-SymbolicName", this.symName);
@@ -103,7 +130,7 @@ public class MockBundle implements Bundle {
 	 * filePattern);
 	 * 
 	 * @see org.osgi.framework.Bundle#findEntries(java.lang.String,
-	 * java.lang.String, boolean)
+	 *      java.lang.String, boolean)
 	 */
 	public Enumeration findEntries(String path, String filePattern, boolean recurse) {
 		Enumeration enm = null;
@@ -222,8 +249,26 @@ public class MockBundle implements Bundle {
 		return symName;
 	}
 
+	/**
+	 * Sets the location for this mock bundle.
+	 * 
+	 * @param location bundle location
+	 */
 	public void setLocation(String location) {
 		this.location = location;
 	}
 
+	/**
+	 * Sets the class loader internally used by the bundle to mock the loading
+	 * operations. By default, the MockBundle uses its own class loader.
+	 * 
+	 * @param loader mock bundle class loader
+	 */
+	public void setClassLoader(ClassLoader loader) {
+		if (loader == null) {
+			throw new IllegalArgumentException("A non-null class loader expected");
+		}
+
+		this.loader = loader;
+	}
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.util.Properties;
@@ -29,6 +30,7 @@ class DefaultBundleContextProperties extends Properties {
 
 	private static final long serialVersionUID = 7814061041669242672L;
 
+
 	public DefaultBundleContextProperties() {
 		this(null);
 	}
@@ -38,13 +40,17 @@ class DefaultBundleContextProperties extends Properties {
 		initProperties();
 	}
 
+	private static String getVersion() {
+		Package pkg = DefaultBundleContextProperties.class.getPackage();
+		return (pkg != null ? pkg.getImplementationVersion() : "unknown");
+	}
+
 	protected void initProperties() {
-		put(Constants.FRAMEWORK_VERSION, "1.0-SNAPSHOT");
-		put(Constants.FRAMEWORK_VENDOR, "Interface21");
+		put(Constants.FRAMEWORK_VERSION, getVersion());
+		put(Constants.FRAMEWORK_VENDOR, "SpringSource");
 		put(Constants.FRAMEWORK_LANGUAGE, System.getProperty("user.language"));
 		put(Constants.FRAMEWORK_OS_NAME, System.getProperty("os.name"));
 		put(Constants.FRAMEWORK_OS_VERSION, System.getProperty("os.version"));
 		put(Constants.FRAMEWORK_PROCESSOR, System.getProperty("os.arch"));
 	}
-
 }

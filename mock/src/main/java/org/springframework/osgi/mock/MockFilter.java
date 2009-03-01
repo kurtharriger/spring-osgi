@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.util.Dictionary;
@@ -23,46 +24,40 @@ import org.osgi.framework.ServiceReference;
 /**
  * Filter mock.
  * 
- * <p/>
- * Just a no-op interface implementation.
- * @author Costin Leau
+ * <p/> Just a no-op interface implementation.
  * 
+ * @author Costin Leau
  */
 public class MockFilter implements Filter {
 
 	private String filter;
 
+
+	/**
+	 * Constructs a new <code>MockFilter</code> instance.
+	 * 
+	 */
 	public MockFilter() {
 		this("<no filter>");
 	}
 
+	/**
+	 * Constructs a new <code>MockFilter</code> instance.
+	 * 
+	 * @param filter OSGi filter
+	 */
 	public MockFilter(String filter) {
 		this.filter = filter;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Filter#match(org.osgi.framework.ServiceReference)
-	 */
 	public boolean match(ServiceReference reference) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Filter#match(java.util.Dictionary)
-	 */
 	public boolean match(Dictionary dictionary) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.Filter#matchCase(java.util.Dictionary)
-	 */
 	public boolean matchCase(Dictionary dictionary) {
 		return false;
 	}

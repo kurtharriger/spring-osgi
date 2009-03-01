@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.io.File;
@@ -40,7 +41,7 @@ import org.osgi.framework.ServiceRegistration;
  * 
  * <p/> Can be configured to use a predefined Bundle or/and configuration. By
  * default, will create an internal MockBundle. Most of the operations are no-op
- * (as annonymous classes with specific functionality can be created per use
+ * (as anonymous classes with specific functionality can be created per use
  * basis).
  * 
  * @author Costin Leau
@@ -56,14 +57,31 @@ public class MockBundleContext implements BundleContext {
 
 	protected Set serviceListeners, bundleListeners;
 
+
+	/**
+	 * Constructs a new <code>MockBundleContext</code> instance. The
+	 * associated bundle will be created automatically.
+	 */
 	public MockBundleContext() {
 		this(null, null);
 	}
 
+	/**
+	 * Constructs a new <code>MockBundleContext</code> instance.
+	 * 
+	 * @param bundle associated bundle
+	 */
 	public MockBundleContext(Bundle bundle) {
 		this(bundle, null);
 	}
 
+	/**
+	 * Constructs a new <code>MockBundleContext</code> instance allowing both
+	 * the bundle and the context properties to be specified.
+	 * 
+	 * @param bundle associated bundle
+	 * @param props context properties
+	 */
 	public MockBundleContext(Bundle bundle, Properties props) {
 		this.bundle = (bundle == null ? new MockBundle(this) : bundle);
 		properties = new Properties(DEFAULT_PROPERTIES);
@@ -75,28 +93,13 @@ public class MockBundleContext implements BundleContext {
 		this.bundleListeners = new LinkedHashSet(2);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#addBundleListener(org.osgi.framework.BundleListener)
-	 */
 	public void addBundleListener(BundleListener listener) {
 		bundleListeners.add(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#addFrameworkListener(org.osgi.framework.FrameworkListener)
-	 */
 	public void addFrameworkListener(FrameworkListener listener) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#addServiceListener(org.osgi.framework.ServiceListener)
-	 */
 	public void addServiceListener(ServiceListener listener) {
 		try {
 			addServiceListener(listener, null);
@@ -106,106 +109,48 @@ public class MockBundleContext implements BundleContext {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#addServiceListener(org.osgi.framework.ServiceListener,
-	 * java.lang.String)
-	 */
 	public void addServiceListener(ServiceListener listener, String filter) throws InvalidSyntaxException {
 		if (listener == null)
 			throw new IllegalArgumentException("non-null listener required");
 		this.serviceListeners.add(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#createFilter(java.lang.String)
-	 */
 	public Filter createFilter(String filter) throws InvalidSyntaxException {
 		return new MockFilter(filter);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#getAllServiceReferences(java.lang.String,
-	 * java.lang.String)
-	 */
 	public ServiceReference[] getAllServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 		return new ServiceReference[] {};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#getBundle()
-	 */
 	public Bundle getBundle() {
 		return bundle;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#getBundle(long)
-	 */
 	public Bundle getBundle(long id) {
 		return bundle;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#getBundles()
-	 */
 	public Bundle[] getBundles() {
 		return new Bundle[] { bundle };
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#getDataFile(java.lang.String)
-	 */
 	public File getDataFile(String filename) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#getProperty(java.lang.String)
-	 */
 	public String getProperty(String key) {
 		return properties.getProperty(key);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#getService(org.osgi.framework.ServiceReference)
-	 */
 	public Object getService(ServiceReference reference) {
 		return new Object();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#getServiceReference(java.lang.String)
-	 */
 	public ServiceReference getServiceReference(String clazz) {
 		return new MockServiceReference(getBundle(), new String[] { clazz });
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#getServiceReferences(java.lang.String,
-	 * java.lang.String)
-	 */
 	public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 		// Some jiggery-pokery to get round the fact that we don't ever use the
 		// clazz
@@ -224,23 +169,12 @@ public class MockBundleContext implements BundleContext {
 		return new ServiceReference[] { new MockServiceReference(getBundle(), new String[] { clazz }) };
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#installBundle(java.lang.String)
-	 */
 	public Bundle installBundle(String location) throws BundleException {
 		MockBundle bundle = new MockBundle();
 		bundle.setLocation(location);
 		return bundle;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#installBundle(java.lang.String,
-	 * java.io.InputStream)
-	 */
 	public Bundle installBundle(String location, InputStream input) throws BundleException {
 		try {
 			input.close();
@@ -251,12 +185,6 @@ public class MockBundleContext implements BundleContext {
 		return installBundle(location);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#registerService(java.lang.String[],
-	 * java.lang.Object, java.util.Dictionary)
-	 */
 	public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
 		MockServiceRegistration reg = new MockServiceRegistration(properties);
 
@@ -273,66 +201,51 @@ public class MockBundleContext implements BundleContext {
 		return reg;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#registerService(java.lang.String,
-	 * java.lang.Object, java.util.Dictionary)
-	 */
 	public ServiceRegistration registerService(String clazz, Object service, Dictionary properties) {
 		return registerService(new String[] { clazz }, service, properties);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#removeBundleListener(org.osgi.framework.BundleListener)
-	 */
 	public void removeBundleListener(BundleListener listener) {
 		bundleListeners.remove(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#removeFrameworkListener(org.osgi.framework.FrameworkListener)
-	 */
 	public void removeFrameworkListener(FrameworkListener listener) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#removeServiceListener(org.osgi.framework.ServiceListener)
-	 */
 	public void removeServiceListener(ServiceListener listener) {
 		serviceListeners.remove(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleContext#ungetService(org.osgi.framework.ServiceReference)
-	 */
 	public boolean ungetService(ServiceReference reference) {
 		return false;
 	}
 
+	/**
+	 * Sets the bundle associated with this context.
+	 * 
+	 * @param bundle associated bundle
+	 */
 	public void setBundle(Bundle bundle) {
 		this.bundle = bundle;
 	}
 
 	// hooks
-
 	/**
-	 * Handy method when mocking with listeners is required.
+	 * Returns a set of registered service listeners. Handy method when mocking
+	 * with listeners is required.
+	 * 
+	 * @return set of registered service listeners
 	 */
 	public Set getServiceListeners() {
 		return serviceListeners;
 	}
 
+	/**
+	 * Returns a set of registered bundle listeners.
+	 * 
+	 * @return set of registered bundle listeners
+	 */
 	public Set getBundleListeners() {
 		return bundleListeners;
 	}
-
 }
