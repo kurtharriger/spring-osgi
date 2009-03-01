@@ -92,7 +92,7 @@
    
    <!-- bundlor settings -->
    <!-- disabled on jdk1.4 -->
-   <bundlor.enabled>false</bundlor.enabled>
+   <bundlor.enabled>true</bundlor.enabled>
    <!-- common version ranges -->
    <spring.version.range>"[${spring.base.version},3.0)"</spring.version.range>
    <spring.osgi.version.range>"[${spring.osgi.import.version},${spring.osgi.import.version}]"</spring.osgi.version.range>
@@ -737,7 +737,7 @@ limitations under the License.
           <!-- enable bundlor -->
           <bundlor.enabled>true</bundlor.enabled>
         </properties>
-        
+<!--        
         <build>
           <plugins>
            <plugin>
@@ -785,8 +785,9 @@ Ignored-Existing-Headers:
            </plugin>
           </plugins>
         </build>
+-->
     </profile>
-
+    
     <!-- integration testing profile -->
     <profile>
       <id>it</id>
