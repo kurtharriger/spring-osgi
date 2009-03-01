@@ -41,10 +41,10 @@
     <!-- add spring packages since the tool doesn't always picks up the versions -->
     <spring.osgi.import>
         ${spring.osgi.import.pkg},
-        org.springframework.osgi*;version=${spring.osgi.import.version},
-        org.springframework*;version=${spring.base.version},
+        org.springframework.osgi*;version=${spring.osgi.version.range},
+        org.springframework*;version=${spring.version.range},
         org.osgi.framework;version=1.3,
-        org.apache.commons.logging*,
+        org.apache.commons.logging*;version=${logging.version.range},
         *;resolution:=optional
     </spring.osgi.import>
 
@@ -578,51 +578,6 @@ limitations under the License.
         </configuration>
       </plugin>
 
-<!--
-      <plugin>
-        <groupId>com.springsource.bundlor</groupId>
-        <artifactId>com.springsource.bundlor.maven</artifactId>
-        <executions>
-          <execution>
-            <id>bundlor</id>
-            <phase>package</phase>
-            <goals>
-               <goal>transform</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-           <manifestTemplatePath>${basedir}/template.mf</manifestTemplatePath>
-           <manifestHeaders><![CDATA[Bundle-Name: ${artifactId}
-Bundle-Version: ${spring.osgi.bundle.version}
-Bundle-SymbolicName: ${spring.osgi.symbolic.name}
-Bundle-Vendor: SpringSource
-Bundle-DocURL: http://www.springframework.org/osgi
-Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
-Implementation-Title: Spring Dynamic Modules Framework
-Implementation-Version: ${pom.version}
-Implementation-Vendor: SpringSource
-Implementation-Vendor-Id: org.springframework.osgi
-Spring-DM-Version: ${pom.version}
-Spring-Version: ${spring.maven.artifact.version}
-Build-Plan: ${env.buildPlan}
-Build-Number: ${env.buildNumber}
-SVN-Revision: ${env.svnRevision}
-Ignored-Existing-Headers: 
- Tool,
- Ignore-Package,
- Private-Package,
- Created-By,
- Bnd-LastModified
-]]></manifestHeaders> 
-           <packagings>
-               <packaging>bundle</packaging>
-           </packagings>
-           <enabled>${bundlor.enabled}</enabled>
-           <failOnWarnings>false</failOnWarnings>
-        </configuration>
-      </plugin>
--->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -782,6 +737,54 @@ Ignored-Existing-Headers:
           <!-- enable bundlor -->
           <bundlor.enabled>true</bundlor.enabled>
         </properties>
+        
+        <build>
+          <plugins>
+           <plugin>
+            <groupId>com.springsource.bundlor</groupId>
+            <artifactId>com.springsource.bundlor.maven</artifactId>
+            <executions>
+              <execution>
+                <id>bundlor</id>
+                <phase>package</phase>
+                <goals>
+                   <goal>transform</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+               <manifestTemplatePath>${basedir}/template.mf</manifestTemplatePath>
+               <manifestHeaders><![CDATA[Bundle-Name: ${artifactId}
+    Bundle-Version: ${spring.osgi.bundle.version}
+    Bundle-SymbolicName: ${spring.osgi.symbolic.name}
+    Bundle-Vendor: SpringSource
+    Bundle-DocURL: http://www.springframework.org/osgi
+    Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
+    Implementation-Title: Spring Dynamic Modules Framework
+    Implementation-Version: ${pom.version}
+    Implementation-Vendor: SpringSource
+    Implementation-Vendor-Id: org.springframework.osgi
+    Spring-DM-Version: ${pom.version}
+    Spring-Version: ${spring.maven.artifact.version}
+    Build-Plan: ${env.buildPlan}
+    Build-Number: ${env.buildNumber}
+    SVN-Revision: ${env.svnRevision}
+    Ignored-Existing-Headers: 
+     Tool,
+     Ignore-Package,
+     Private-Package,
+     Created-By,
+     Bnd-LastModified
+    ]]></manifestHeaders> 
+               <packagings>
+                   <packaging>bundle</packaging>
+               </packagings>
+               <enabled>${bundlor.enabled}</enabled>
+               <failOnWarnings>false</failOnWarnings>
+            </configuration>
+           </plugin>
+          </plugins>
+        </build>
     </profile>
 
     <!-- integration testing profile -->
