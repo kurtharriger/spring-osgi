@@ -15,7 +15,10 @@
   <properties>
      <spring.osgi.private.pkg></spring.osgi.private.pkg>
      <spring.osgi.license.loc>../../..</spring.osgi.license.loc>
+     <bundlor.enabled>false</bundlor.enabled>
   </properties>
+  
+
   <modules>
     <module>weather-dao</module>
     <module>weather-extension</module>

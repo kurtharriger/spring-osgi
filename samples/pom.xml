@@ -12,10 +12,6 @@
   <name>Spring OSGi Samples</name>
   <url>http://www.springframework.org/osgi</url>
   
-  <properties>
-    <bundlor.enabled>false</bundlor.enabled>
-  </properties>
-  
   <modules>
     <module>simple-service</module>
     <module>weather</module>
