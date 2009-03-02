@@ -540,7 +540,7 @@ limitations under the License.
         <plugin>
           <groupId>com.springsource.bundlor</groupId>
           <artifactId>com.springsource.bundlor.maven</artifactId>
-          <version>1.0.0.M1A</version>
+          <version>1.0.0.BUILD-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -737,7 +737,7 @@ limitations under the License.
           <!-- enable bundlor -->
           <bundlor.enabled>true</bundlor.enabled>
         </properties>
-<!--        
+
         <build>
           <plugins>
            <plugin>
@@ -781,11 +781,12 @@ Ignored-Existing-Headers:
                </packagings>
                <enabled>${bundlor.enabled}</enabled>
                <failOnWarnings>false</failOnWarnings>
+               <removeNullHeaders>true</removeNullHeaders>
             </configuration>
            </plugin>
           </plugins>
         </build>
--->
+
     </profile>
     
     <!-- integration testing profile -->
