@@ -38,6 +38,7 @@
   
   <modules>
     <module>simple.bundle</module>
+    <module>error.bundle</module>
   </modules>
 
  <build>

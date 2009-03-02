@@ -17,10 +17,10 @@
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.log4j/1.5.0/com.springsource.slf4j.log4j-1.5.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/rfc124/api/rfc-124-1.0-SNAPSHOT/api-rfc-124-1.0-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/rfc-124-1.0-SNAPSHOT/spring-osgi-core-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/rfc-124-1.0-SNAPSHOT/spring-osgi-core-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_RFC_124/core/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/rfc-124-1.0-SNAPSHOT/spring-osgi-extender-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/extender/src/main/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/rfc-124-1.0-SNAPSHOT/spring-osgi-io-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/io/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/rfc-124-1.0-SNAPSHOT/spring-osgi-extender-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_RFC_124/extender/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/rfc-124-1.0-SNAPSHOT/spring-osgi-io-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_RFC_124/io/src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.osgi.compendium/1.0.1/org.osgi.compendium-1.0.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/rfc124/ri/core/rfc-124-1.0-SNAPSHOT/core-rfc-124-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
