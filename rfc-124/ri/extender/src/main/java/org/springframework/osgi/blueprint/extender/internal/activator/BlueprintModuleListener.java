@@ -32,7 +32,6 @@ import org.springframework.osgi.blueprint.extender.internal.activator.support.Bl
 import org.springframework.osgi.blueprint.extender.internal.event.EventAdminDispatcher;
 import org.springframework.osgi.blueprint.extender.internal.support.BlueprintExtenderConfiguration;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
-import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.extender.internal.activator.ContextLoaderListener;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
@@ -162,7 +161,7 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 	}
 
 	@Override
-	protected void postProcessRefreshFailure(DelegatedExecutionOsgiBundleApplicationContext context, Throwable th) {
+	protected void postProcessRefreshFailure(ConfigurableOsgiBundleApplicationContext context, Throwable th) {
 		dispatcher.refreshFailure(context, th);
 
 		Bundle bundle = context.getBundle();

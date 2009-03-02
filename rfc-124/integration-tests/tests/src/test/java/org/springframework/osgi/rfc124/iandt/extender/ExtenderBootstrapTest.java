@@ -66,7 +66,16 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 		EventHandler handler = new EventHandler() {
 
 			public void handleEvent(Event event) {
-				System.out.println("Received event " + event);
+				StringBuilder builder = new StringBuilder();
+				builder.append("Received event ").append(event).append(" w/ properties \n");
+
+				String[] propNames = event.getPropertyNames();
+
+				for (String propName : propNames) {
+					builder.append(propName).append("=").append(event.getProperty(propName));
+				}
+
+				System.out.println(builder.toString());
 			}
 		};
 

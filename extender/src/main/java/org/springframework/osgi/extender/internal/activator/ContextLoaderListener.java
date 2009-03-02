@@ -41,8 +41,11 @@ import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
+import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
+import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceDependencySorter;
@@ -245,6 +248,20 @@ public class ContextLoaderListener implements BundleActivator {
 				}
 				default:
 					break;
+			}
+		}
+	}
+
+	private class RefreshEventPropagater implements OsgiBundleApplicationContextListener {
+
+		public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
+			if (event instanceof OsgiBundleContextRefreshedEvent) {
+				postProcessRefresh((ConfigurableOsgiBundleApplicationContext) event.getApplicationContext());
+			}
+			if (event instanceof OsgiBundleContextFailedEvent) {
+				OsgiBundleContextFailedEvent failureEvent = (OsgiBundleContextFailedEvent) event;
+				postProcessRefreshFailure(((ConfigurableOsgiBundleApplicationContext) event.getApplicationContext()),
+					failureEvent.getFailureCause());
 			}
 		}
 	}
@@ -739,18 +756,17 @@ public class ContextLoaderListener implements BundleActivator {
 
 		localApplicationContext.setDelegatedEventMulticaster(multicaster);
 
+		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
+
+		final boolean asynch = config.isCreateAsynchronously();
+
 		// create refresh runnable
 		Runnable contextRefresh = new Runnable() {
 
 			public void run() {
+				// post refresh events are caught through events
 				preProcessRefresh(localApplicationContext);
-				try {
-					localApplicationContext.refresh();
-					postProcessRefresh(localApplicationContext);
-				}
-				catch (Throwable th) {
-					postProcessRefreshFailure(localApplicationContext, th);
-				}
+				localApplicationContext.refresh();
 			}
 		};
 
@@ -758,12 +774,10 @@ public class ContextLoaderListener implements BundleActivator {
 		// chosen based on the sync/async configuration
 		TaskExecutor executor = null;
 
-		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
-
 		String creationType;
 
 		// synch/asynch context creation
-		if (config.isCreateAsynchronously()) {
+		if (asynch) {
 			// for the async stuff use the executor
 			executor = taskExecutor;
 			creationType = "Asynchronous";
@@ -781,8 +795,7 @@ public class ContextLoaderListener implements BundleActivator {
 		// wait/no wait for dependencies behaviour
 		if (config.isWaitForDependencies()) {
 			DependencyWaiterApplicationContextExecutor appCtxExecutor = new DependencyWaiterApplicationContextExecutor(
-				localApplicationContext, !config.isCreateAsynchronously(),
-				extenderConfiguration.getDependencyFactories());
+				localApplicationContext, !asynch, extenderConfiguration.getDependencyFactories());
 
 			appCtxExecutor.setTimeout(config.getTimeout());
 			appCtxExecutor.setWatchdog(timer);
@@ -806,7 +819,7 @@ public class ContextLoaderListener implements BundleActivator {
 	protected void postProcessRefresh(ConfigurableOsgiBundleApplicationContext context) {
 	}
 
-	protected void postProcessRefreshFailure(DelegatedExecutionOsgiBundleApplicationContext localApplicationContext,
+	protected void postProcessRefreshFailure(ConfigurableOsgiBundleApplicationContext localApplicationContext,
 			Throwable th) {
 	}
 
@@ -872,6 +885,7 @@ public class ContextLoaderListener implements BundleActivator {
 	protected void initListenerService() {
 		multicaster = extenderConfiguration.getEventMulticaster();
 
+		multicaster.addApplicationListener(new RefreshEventPropagater());
 		addApplicationListener(multicaster);
 
 		if (log.isDebugEnabled())
