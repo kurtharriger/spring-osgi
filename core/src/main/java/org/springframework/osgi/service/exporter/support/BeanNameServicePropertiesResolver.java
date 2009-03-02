@@ -25,6 +25,7 @@ import org.osgi.framework.Constants;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -50,11 +51,15 @@ public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesR
 		InitializingBean {
 
 	private BundleContext bundleContext;
+	// FIXME: should these be externalized or not
+	private static final String BLUEPRINT_COMP_NAME = "osgi.service.blueprint.compname";
 
 
 	public Map getServiceProperties(String beanName) {
 		Map p = new MapBasedDictionary();
 		p.put(BEAN_NAME_PROPERTY_KEY, beanName);
+		p.put(BLUEPRINT_COMP_NAME, beanName);
+
 		String name = getSymbolicName();
 		if (StringUtils.hasLength(name)) {
 			p.put(Constants.BUNDLE_SYMBOLICNAME, name);
@@ -67,7 +72,7 @@ public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesR
 	}
 
 	private String getBundleVersion() {
-		return (String) this.bundleContext.getBundle().getHeaders().get(Constants.BUNDLE_VERSION);
+		return OsgiBundleUtils.getBundleVersion(bundleContext.getBundle()).toString();
 	}
 
 	private String getSymbolicName() {
@@ -81,5 +86,4 @@ public class BeanNameServicePropertiesResolver implements OsgiServicePropertiesR
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(bundleContext, "required property bundleContext has not been set");
 	}
-
 }

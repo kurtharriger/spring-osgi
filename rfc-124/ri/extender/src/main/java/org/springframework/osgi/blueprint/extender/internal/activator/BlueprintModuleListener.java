@@ -27,6 +27,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.blueprint.context.SpringModuleContext;
 import org.springframework.osgi.blueprint.context.support.ModuleContextServicePublisher;
+import org.springframework.osgi.blueprint.convert.SpringConversionService;
 import org.springframework.osgi.blueprint.extender.internal.activator.support.BlueprintConfigUtils;
 import org.springframework.osgi.blueprint.extender.internal.event.EventAdminDispatcher;
 import org.springframework.osgi.blueprint.extender.internal.support.BlueprintExtenderConfiguration;
@@ -114,18 +115,27 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 		context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
 
 			private static final String MODULE_CONTEXT_BEAN_NAME = "moduleContext";
+			private static final String CONVERSION_SERVICE_BEAN_NAME = "conversionService";
 
 
 			public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+				// lazy logger evaluation
 				Log logger = LogFactory.getLog(context.getClass());
 
-				// add bundleContext bean
-				if (!beanFactory.containsLocalBean(MODULE_CONTEXT_BEAN_NAME)) {
-					logger.debug("Registering pre-defined bean named " + MODULE_CONTEXT_BEAN_NAME);
-					beanFactory.registerSingleton(MODULE_CONTEXT_BEAN_NAME, mc);
+				// add module context bean
+				addPredefinedBean(beanFactory, MODULE_CONTEXT_BEAN_NAME, mc, logger);
+				addPredefinedBean(beanFactory, CONVERSION_SERVICE_BEAN_NAME, new SpringConversionService(beanFactory),
+					logger);
+			}
+
+			private void addPredefinedBean(ConfigurableListableBeanFactory beanFactory, String beanName, Object value,
+					Log logger) {
+				if (!beanFactory.containsLocalBean(beanName)) {
+					logger.debug("Registering pre-defined bean named " + beanName);
+					beanFactory.registerSingleton(beanName, value);
 				}
 				else {
-					logger.warn("A bean named " + MODULE_CONTEXT_BEAN_NAME
+					logger.warn("A bean named " + beanName
 							+ " already exists; aborting registration of the predefined value...");
 				}
 			}
