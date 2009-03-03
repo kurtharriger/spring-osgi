@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import org.osgi.service.blueprint.reflect.ComponentValue;
 import org.osgi.service.blueprint.reflect.ListValue;
 import org.osgi.service.blueprint.reflect.MapValue;
+import org.osgi.service.blueprint.reflect.NullValue;
 import org.osgi.service.blueprint.reflect.PropertiesValue;
 import org.osgi.service.blueprint.reflect.ReferenceNameValue;
 import org.osgi.service.blueprint.reflect.ReferenceValue;
@@ -71,6 +72,10 @@ class BeanMetadataElementFactory {
 			TypedStringValue typedString = (TypedStringValue) value;
 			return new org.springframework.beans.factory.config.TypedStringValue(typedString.getStringValue(),
 				typedString.getTypeName());
+		}
+
+		if (value instanceof NullValue) {
+			return new org.springframework.beans.factory.config.TypedStringValue(null);
 		}
 
 		if (value instanceof ComponentValue) {

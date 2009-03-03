@@ -39,4 +39,9 @@
 			</beans:list>
 		</property>
 	</component>
+	
+	<beans:bean id="nan" factory-method="valueOf" class="java.lang.Double">
+       <constructor-arg value="NaN" type="double"/>
+    </beans:bean> 
+	
 </components>

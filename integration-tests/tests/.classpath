@@ -18,10 +18,10 @@
 	<classpathentry kind="var" path="M2_REPO/net/sourceforge/cglib/com.springsource.net.sf.cglib/2.1.3/com.springsource.net.sf.cglib-2.1.3.jar" sourcepath="/CGLIB_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/junit/com.springsource.junit/3.8.2/com.springsource.junit-3.8.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.apache.felix.main/1.0.4/org.apache.felix.main-1.0.4.jar" sourcepath="/FELIX_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/rfc-124-1.0-SNAPSHOT/spring-osgi-core-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/rfc-124-1.0-SNAPSHOT/spring-osgi-core-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_RFC_124/core"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/felix/org.osgi.compendium/1.0.1/org.osgi.compendium-1.0.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/rfc-124-1.0-SNAPSHOT/spring-osgi-test-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/test-support/src/main/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/rfc-124-1.0-SNAPSHOT/spring-osgi-io-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/io/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-test/rfc-124-1.0-SNAPSHOT/spring-osgi-test-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_RFC_124/test-support/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-io/rfc-124-1.0-SNAPSHOT/spring-osgi-io-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_RFC_124/io/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="var" path="M2_REPO/org/objectweb/asm/com.springsource.org.objectweb.asm/2.2.3/com.springsource.org.objectweb.asm-2.2.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
@@ -36,6 +36,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/servlet-api.osgi/2.5-SNAPSHOT/servlet-api.osgi-2.5-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/jasper.osgi/5.5.23-SNAPSHOT/jasper.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/JASPER_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/catalina.osgi/5.5.23-SNAPSHOT/catalina.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/CATALINA_5.5.X"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/rfc-124-1.0-SNAPSHOT/spring-osgi-extender-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/extender/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/rfc-124-1.0-SNAPSHOT/spring-osgi-extender-rfc-124-1.0-SNAPSHOT.jar" sourcepath="/OSGI_RFC_124/extender/src/main/java"/>
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>

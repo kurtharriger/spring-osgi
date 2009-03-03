@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <components xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
@@ -6,6 +7,7 @@
 	default-init-method="init">
 
 	<description>Configuration with sub-elements</description>
+
 
 	<component id="char" class="java.lang.Character">
 		<constructor-arg type="char" value="\u0000"/>
@@ -93,4 +95,34 @@
 			</props>
 		</property>
 	</component>
+
+	<component id="null" 
+		class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="propA">
+			<null/>
+		</property>
+	</component>
+	
+	<component id="compZeroLengthString" class="org.springframework.osgi.blueprint.TestComponent">
+       <property name="propA" value=""/>
+    </component> 
+   
+    <!-- 
+	<component id="dateConstructor"
+	 	class="org.springframework.osgi.blueprint.DateConstructor">
+	 	<constructor-arg value="6/1/1999" type="java.util.Date"/> 
+	</component>
+	--> 
+	
+	<component id="nan" factory-method="valueOf" class="java.lang.Double">
+       <constructor-arg value="NaN" type="double"/>
+    </component>
+    
+    <component id="ambigousConstructor" class="org.springframework.osgi.blueprint.AmbigousTestComponent">
+       <constructor-arg type="java.lang.String" value="compThreeArgOverride"/>
+       <constructor-arg  type="java.lang.Object" value="true">
+       </constructor-arg>
+       <constructor-arg type="java.lang.String"><null/></constructor-arg>
+   </component>
+   
 </components>

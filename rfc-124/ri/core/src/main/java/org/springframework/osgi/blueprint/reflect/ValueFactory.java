@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
+import org.osgi.service.blueprint.reflect.NullValue;
 import org.osgi.service.blueprint.reflect.Value;
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -67,7 +68,9 @@ class ValueFactory {
 			}
 			// typed String
 			if (metadata instanceof TypedStringValue) {
-				return new SimpleTypedStringValue((TypedStringValue) metadata);
+				// check if it's a <null/>
+				TypedStringValue typedString = (TypedStringValue) metadata;
+				return (typedString.getValue() == null ? NullValue.NULL : new SimpleTypedStringValue(typedString));
 			}
 
 			// bean definition
