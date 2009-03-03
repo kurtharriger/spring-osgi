@@ -23,6 +23,7 @@ import java.util.List;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.ConstructorInjectionMetadata;
 import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
+import org.osgi.service.blueprint.reflect.NullValue;
 import org.osgi.service.blueprint.reflect.ParameterSpecification;
 import org.osgi.service.blueprint.reflect.PropertyInjectionMetadata;
 import org.osgi.service.blueprint.reflect.TypedStringValue;
@@ -65,5 +66,19 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 		PropertyInjectionMetadata prop = props.iterator().next();
 		assertEquals("keepAlive", prop.getName());
 		assertTrue(prop.getValue() instanceof TypedStringValue);
+	}
+
+	public void testNullProperty() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("null");
+		Collection<PropertyInjectionMetadata> props = localMetadata.getPropertyInjectionMetadata();
+		assertEquals(1, props.size());
+		PropertyInjectionMetadata prop = props.iterator().next();
+		assertEquals("propA", prop.getName());
+		assertEquals(NullValue.NULL, prop.getValue());
+	}
+	
+	public void testNanDouble() throws Exception {
+		System.out.println(moduleContext.getComponent("nan"));
+		
 	}
 }
