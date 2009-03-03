@@ -84,7 +84,7 @@
    <source-jdk>1.4</source-jdk>
    <clover.ver>2.3.1</clover.ver>
    <clover.argLine></clover.argLine>
-   <clover.skip>false</clover.skip>
+   <clover.skip>true</clover.skip>
    
    <!-- security options for integration testing -->
    <security.argLine></security.argLine>
