@@ -137,6 +137,7 @@ class ValueFactory {
 			throw new IllegalArgumentException("Unsupported metadata type " + metadata.getClass());
 		}
 
-		throw new UnsupportedOperationException("Cannot handle non metadata elements");
+		throw new UnsupportedOperationException("Cannot handle non metadata elements " + metadata + "| class "
+				+ metadata.getClass());
 	}
 }

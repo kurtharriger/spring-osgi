@@ -479,10 +479,13 @@ class ComponentParser {
 			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.PROPS_ELEMENT)) {
 				return parserContext.getDelegate().parsePropsElement(ele);
 			}
-			else {
-				error("Unknown property sub-element: [" + ele.getNodeName() + "]", ele);
-				return null;
+
+			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.PROPS_ELEMENT)) {
+				return parserContext.getDelegate().parsePropsElement(ele);
 			}
+
+			// maybe it's a nested service/reference/ref-list/ref-set
+			return parserContext.getDelegate().parseCustomElement(ele, bd);
 		}
 	}
 
