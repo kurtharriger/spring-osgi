@@ -92,7 +92,7 @@
    
    <!-- bundlor settings -->
    <!-- disabled on jdk1.4 -->
-   <bundlor.enabled>true</bundlor.enabled>
+   <bundlor.enabled>false</bundlor.enabled>
    <!-- common version ranges -->
    <spring.version.range>"[${spring.base.version},3.0)"</spring.version.range>
    <spring.osgi.version.range>"[${spring.osgi.import.version},${spring.osgi.import.version}]"</spring.osgi.version.range>
@@ -559,7 +559,7 @@ limitations under the License.
            <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
            <Bundle-Vendor>SpringSource</Bundle-Vendor>
            <Export-Package>${spring.osgi.export}</Export-Package>
-           <Import-Package>${spring.osgi.import}</Import-Package>
+           <Import-Package>${spring.decorate.osgi.import}</Import-Package>
            <Private-Package>${spring.osgi.private.pkg}</Private-Package>
            <Include-Resource>${spring.osgi.include.res}</Include-Resource>
            <!-- jar entries -->
@@ -769,12 +769,15 @@ Spring-Version: ${spring.maven.artifact.version}
 Build-Plan: ${env.buildPlan}
 Build-Number: ${env.buildNumber}
 SVN-Revision: ${env.svnRevision}
+Excluded-Imports: com_cenqua_clover*
 Ignored-Existing-Headers: 
  Tool,
  Ignore-Package,
  Private-Package,
  Created-By,
- Bnd-LastModified
+ Bnd-LastModified,
+ Import-Package,
+ Export-Package
 ]]></manifestHeaders> 
                <packagings>
                    <packaging>bundle</packaging>
