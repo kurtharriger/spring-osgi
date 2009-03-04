@@ -103,6 +103,9 @@ public class ManagedServiceTest extends BaseConfigurationAdminTest {
 		localCopy.put("string", newString);
 		// update properties
 		waitForCfgChangeToPropagate(PROTO, localCopy);
+		// force another update (just to be sure)
+		waitForCfgChangeToPropagate(PROTO, localCopy);
+		Thread.sleep(1000 * 5);
 		// check new instance
 		TestBean anotherBeanInstance = (TestBean) applicationContext.getBean(PROTO);
 		assertNotSame(bean, anotherBeanInstance);
