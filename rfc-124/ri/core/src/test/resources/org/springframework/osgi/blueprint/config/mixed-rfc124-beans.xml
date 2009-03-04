@@ -45,5 +45,11 @@
 	<beans:bean id="nan" factory-method="valueOf" class="java.lang.Double">
        <constructor-arg value="NaN" type="double"/>
     </beans:bean> 
+
+	<component id="char" class="java.lang.Character">
+       <constructor-arg>
+       	 <value>&#0120;</value>
+       </constructor-arg>
+    </component> 
 	
 </components>

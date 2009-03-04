@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint.config;
+package org.springframework.osgi.blueprint.config.internal;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -32,9 +32,9 @@ import org.w3c.dom.NodeList;
  * 
  * @author Costin Leau
  */
-class ParsingUtils {
+public class ParsingUtils {
 
-	static BeanDefinitionHolder decorateAndRegister(Element ele, BeanDefinitionHolder bdHolder,
+	public static BeanDefinitionHolder decorateAndRegister(Element ele, BeanDefinitionHolder bdHolder,
 			ParserContext parserContext) {
 		if (bdHolder != null) {
 			bdHolder = decorateBeanDefinitionIfRequired(ele, bdHolder, parserContext);
@@ -43,7 +43,7 @@ class ParsingUtils {
 		return register(ele, bdHolder, parserContext);
 	}
 
-	static BeanDefinitionHolder register(Element ele, BeanDefinitionHolder bdHolder, ParserContext parserContext) {
+	public static BeanDefinitionHolder register(Element ele, BeanDefinitionHolder bdHolder, ParserContext parserContext) {
 		if (bdHolder != null) {
 			try {
 				// Register the final decorated instance.
@@ -60,8 +60,8 @@ class ParsingUtils {
 		return bdHolder;
 	}
 
-	static BeanDefinitionHolder decorateBeanDefinitionIfRequired(Element ele, BeanDefinitionHolder originalDefinition,
-			ParserContext parserContext) {
+	public static BeanDefinitionHolder decorateBeanDefinitionIfRequired(Element ele,
+			BeanDefinitionHolder originalDefinition, ParserContext parserContext) {
 
 		BeanDefinitionHolder finalDefinition = originalDefinition;
 
@@ -83,7 +83,7 @@ class ParsingUtils {
 		return finalDefinition;
 	}
 
-	static BeanDefinitionHolder decorateIfRequired(Node node, BeanDefinitionHolder originalDef,
+	public static BeanDefinitionHolder decorateIfRequired(Node node, BeanDefinitionHolder originalDef,
 			ParserContext parserContext) {
 
 		String namespaceUri = node.getNamespaceURI();
@@ -105,11 +105,11 @@ class ParsingUtils {
 		return originalDef;
 	}
 
-	static boolean isRFC124Namespace(Node node) {
-		return (ComponentsBeanDefinitionParser.NAMESPACE_URI.equals(node.getNamespaceURI()));
+	public static boolean isRFC124Namespace(Node node) {
+		return (ComponentParser.NAMESPACE_URI.equals(node.getNamespaceURI()));
 	}
 
-	static boolean isRFC124Namespace(String namespaceURI) {
-		return (ComponentsBeanDefinitionParser.NAMESPACE_URI.equals(namespaceURI));
+	public static boolean isRFC124Namespace(String namespaceURI) {
+		return (ComponentParser.NAMESPACE_URI.equals(namespaceURI));
 	}
 }

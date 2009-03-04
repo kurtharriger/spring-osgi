@@ -23,6 +23,8 @@ import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.blueprint.config.internal.BlueprintCollectionBeanDefinitionParser;
 import org.springframework.osgi.blueprint.config.internal.BlueprintReferenceBeanDefinitionParser;
+import org.springframework.osgi.blueprint.config.internal.ComponentParser;
+import org.springframework.osgi.blueprint.config.internal.ParsingUtils;
 import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.util.xml.DomUtils;
@@ -39,10 +41,9 @@ import org.w3c.dom.NodeList;
 class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 
 	static final String COMPONENTS = "components";
-	// RFC 124 namespace
-	public static final String NAMESPACE_URI = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
 
 	private static final String DESCRIPTION = "description";
+	private static final String COMPONENT = "component";
 	private static final String REFERENCE = "reference";
 	private static final String SERVICE = "service";
 	private static final String REF_LIST = "ref-list";
@@ -66,7 +67,7 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 					ParsingUtils.decorateAndRegister(ele, holder, parserContext);
 				}
 				// handle own components
-				else if (NAMESPACE_URI.equals(namespaceUri)) {
+				else if (ComponentParser.NAMESPACE_URI.equals(namespaceUri)) {
 					parseTopLevelElement(ele, parserContext);
 				}
 				// leave the delegate to find a parser for it
@@ -91,19 +92,19 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 		if (DomUtils.nodeNameEquals(ele, DESCRIPTION)) {
 			// ignore description for now
 		}
-		else if (DomUtils.nodeNameEquals(ele, ComponentParser.COMPONENT)) {
+		else if (DomUtils.nodeNameEquals(ele, COMPONENT)) {
 			parseComponentElement(ele, parserContext);
 		}
-		else if (DomUtils.nodeNameEquals(ele, "reference")) {
+		else if (DomUtils.nodeNameEquals(ele, REFERENCE)) {
 			parseReferenceElement(ele, parserContext);
 		}
-		else if (DomUtils.nodeNameEquals(ele, "service")) {
+		else if (DomUtils.nodeNameEquals(ele, SERVICE)) {
 			parseServiceElement(ele, parserContext);
 		}
-		else if (DomUtils.nodeNameEquals(ele, "ref-list")) {
+		else if (DomUtils.nodeNameEquals(ele, REF_LIST)) {
 			parseListElement(ele, parserContext);
 		}
-		else if (DomUtils.nodeNameEquals(ele, "ref-set")) {
+		else if (DomUtils.nodeNameEquals(ele, REF_SET)) {
 			parseSetElement(ele, parserContext);
 		}
 		else if (DomUtils.nodeNameEquals(ele, TypeConverterBeanDefinitionParser.TYPE_CONVERTERS)) {

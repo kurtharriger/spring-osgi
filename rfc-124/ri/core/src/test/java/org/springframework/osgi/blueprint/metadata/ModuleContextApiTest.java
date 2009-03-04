@@ -34,7 +34,7 @@ public class ModuleContextApiTest extends BaseMetadataTest {
 
 	public void testComponentNames() throws Exception {
 		Set<String> names = (Set<String>) moduleContext.getComponentNames();
-		assertEquals(6, names.size());
+		assertEquals(7, names.size());
 	}
 
 	public void testBundleContext() {

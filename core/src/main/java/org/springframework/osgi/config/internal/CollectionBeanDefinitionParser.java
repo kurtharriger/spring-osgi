@@ -18,6 +18,7 @@ package org.springframework.osgi.config.internal;
 
 import java.util.Comparator;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
@@ -148,8 +149,7 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 						nestedComparator = parseNaturalComparator(beanDef);
 					else
 						// we have a nested definition
-						nestedComparator = context.getDelegate().parsePropertySubElement(beanDef,
-							builder.getBeanDefinition());
+						nestedComparator = parsePropertySubElement(context, beanDef, builder.getBeanDefinition());
 				}
 			}
 

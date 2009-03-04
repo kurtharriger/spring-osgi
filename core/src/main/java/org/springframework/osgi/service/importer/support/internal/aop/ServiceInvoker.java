@@ -64,7 +64,7 @@ public abstract class ServiceInvoker implements MethodInterceptor, ServiceRefere
 			return method.invoke(service, invocation.getArguments());
 		}
 		catch (IllegalAccessException ex) {
-			throw (RuntimeException) new IllegalAccessException(
+			throw new IllegalAccessException(
 				"The invoked method ["
 						+ method.getName()
 						+ "] cannot be accessed. This usually occurs when proxying classes with final methods (which cannot be proxied). Consider using interfaces instead. If this is not an option, call only non-final methods.").initCause(ex);

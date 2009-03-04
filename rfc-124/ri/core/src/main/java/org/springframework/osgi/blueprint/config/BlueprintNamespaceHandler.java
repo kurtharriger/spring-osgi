@@ -19,6 +19,7 @@ package org.springframework.osgi.blueprint.config;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.osgi.blueprint.config.internal.BlueprintCollectionBeanDefinitionParser;
 import org.springframework.osgi.blueprint.config.internal.BlueprintReferenceBeanDefinitionParser;
+import org.springframework.osgi.blueprint.config.internal.ComponentParser;
 import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
 import org.springframework.osgi.service.importer.support.CollectionType;
 
