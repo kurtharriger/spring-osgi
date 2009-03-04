@@ -7,3 +7,4 @@ Import-Template:
  org.apache.commons.logging.*;version=${logging.version.range},
  *;resolution:=optional
 Unversioned-Imports: 
+ *
