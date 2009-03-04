@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint.config;
+package org.springframework.osgi.blueprint.config.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,12 +64,14 @@ import org.w3c.dom.NodeList;
  * @author Costin Leau
  * 
  */
-class ComponentParser {
+public class ComponentParser {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(ComponentParser.class);
 
-	static final String COMPONENT = "component";
+	public static final String COMPONENT = "component";
+
+	public static final String NAMESPACE_URI = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
 
 	private static final String FACTORY_COMPONENT_ATTR = "factory-component";
 
@@ -411,8 +413,16 @@ class ComponentParser {
 		}
 	}
 
-	static Object parsePropertySubElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
+	public static Object parsePropertySubElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
 		return new ComponentParser(parserContext).parsePropertySubElement(ele, bd, null);
+	}
+
+	public static Map parsePropertyMapElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
+		return new ComponentParser(parserContext).parseMapElement(ele, bd);
+	}
+
+	public static Set parsePropertySetElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
+		return new ComponentParser(parserContext).parseSetElement(ele, bd);
 	}
 
 	/**
@@ -437,7 +447,7 @@ class ComponentParser {
 			return parserContext.getDelegate().parsePropertySubElement(ele, bd);
 		}
 		// let the delegate handle other ns
-		else if (!ComponentsBeanDefinitionParser.NAMESPACE_URI.equals(namespaceUri)) {
+		else if (!NAMESPACE_URI.equals(namespaceUri)) {
 			return parserContext.getDelegate().parseCustomElement(ele);
 		}
 

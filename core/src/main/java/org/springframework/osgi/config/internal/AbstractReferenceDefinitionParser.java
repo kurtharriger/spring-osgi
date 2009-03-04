@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.BeanReferenceFactoryBean;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -338,7 +339,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 				parserContext.getReaderContext().error(
 					"either 'interface' attribute or <intefaces> sub-element has be specified", parent);
 			}
-			Set interfaces = parserContext.getDelegate().parseSetElement(element, builder.getBeanDefinition());
+			Set interfaces = parsePropertySetElement(parserContext, element, builder.getBeanDefinition());
 			builder.addPropertyValue(INTERFACES_PROP, interfaces);
 		}
 	}
@@ -377,7 +378,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 						context.getReaderContext().error(
 							"nested bean declaration is not allowed if 'ref' attribute has been specified", beanDef);
 
-					target = context.getDelegate().parsePropertySubElement(beanDef, builder.getBeanDefinition());
+					target = parsePropertySubElement(context, beanDef, builder.getBeanDefinition());
 
 					// if this is a bean reference (nested <ref>), extract the name
 					if (target instanceof RuntimeBeanReference) {
@@ -418,5 +419,13 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		}
 
 		builder.addPropertyValue(LISTENERS_PROP, listenersRef);
+	}
+
+	protected Object parsePropertySubElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
+		return context.getDelegate().parsePropertySubElement(beanDef, beanDefinition);
+	}
+
+	protected Set parsePropertySetElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
+		return context.getDelegate().parseSetElement(beanDef, beanDefinition);
 	}
 }

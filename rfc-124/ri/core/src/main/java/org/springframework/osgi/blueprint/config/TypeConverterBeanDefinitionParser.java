@@ -28,6 +28,7 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.osgi.blueprint.config.internal.ComponentParser;
 import org.springframework.osgi.blueprint.convert.CoverterPropertyEditorRegistrar;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;

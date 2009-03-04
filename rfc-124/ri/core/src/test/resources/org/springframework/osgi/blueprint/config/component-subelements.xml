@@ -123,6 +123,19 @@
        <constructor-arg  type="java.lang.Object" value="true">
        </constructor-arg>
        <constructor-arg type="java.lang.String"><null/></constructor-arg>
-   </component>
+    </component>
+   
+    <component id="nestedArgs" class="java.lang.Boolean">
+	   <constructor-arg type="java.lang.String">
+	   		<value type="java.lang.Boolean">true</value>
+	   </constructor-arg>
+	</component>
+
+    <component id="nestedArgs2" class="java.lang.Boolean">
+	   <constructor-arg type="boolean">
+	   		<value>true</value>
+	   </constructor-arg>
+	</component>
+   
    
 </components>

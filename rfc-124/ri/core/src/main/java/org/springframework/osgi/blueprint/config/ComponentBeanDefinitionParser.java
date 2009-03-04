@@ -19,6 +19,7 @@ package org.springframework.osgi.blueprint.config;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.osgi.blueprint.config.internal.ComponentParser;
 import org.w3c.dom.Element;
 
 /**

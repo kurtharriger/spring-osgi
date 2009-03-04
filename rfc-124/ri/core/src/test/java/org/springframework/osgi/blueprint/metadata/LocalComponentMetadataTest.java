@@ -76,9 +76,31 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 		assertEquals("propA", prop.getName());
 		assertEquals(NullValue.NULL, prop.getValue());
 	}
-	
+
+	public void testConstructorAndNestedValueTypes() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("nestedArgs");
+		List<ParameterSpecification> params = localMetadata.getConstructorInjectionMetadata().getParameterSpecifications();
+		assertEquals(1, params.size());
+		ParameterSpecification param = params.get(0);
+		assertEquals(String.class.getName(), param.getTypeName());
+		System.out.println("Param value is " + param.getValue());
+		TypedStringValue stv = (TypedStringValue) param.getValue();
+		assertEquals(Boolean.class.getName(), stv.getTypeName());
+	}
+
+	public void testConstructorAndNestedValueWOTypes() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("nestedArgs2");
+		List<ParameterSpecification> params = localMetadata.getConstructorInjectionMetadata().getParameterSpecifications();
+		assertEquals(1, params.size());
+		ParameterSpecification param = params.get(0);
+		assertEquals(boolean.class.getName(), param.getTypeName());
+		System.out.println("Param value is " + param.getValue());
+		TypedStringValue stv = (TypedStringValue) param.getValue();
+		assertEquals(null, stv.getTypeName());
+	}
+
 	public void testNanDouble() throws Exception {
 		System.out.println(moduleContext.getComponent("nan"));
-		
+
 	}
 }

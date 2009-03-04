@@ -17,6 +17,7 @@
 package org.springframework.osgi.config.internal;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
@@ -180,7 +181,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 				parserContext.getReaderContext().error(
 					"either 'interface' attribute or <intefaces> sub-element has be specified", parent);
 			}
-			Set interfaces = parserContext.getDelegate().parseSetElement(element, builder.getBeanDefinition());
+			Set interfaces = parsePropertySetElement(parserContext, element, builder.getBeanDefinition());
 			builder.addPropertyValue(INTERFACES_PROP, interfaces);
 			return true;
 		}
@@ -195,7 +196,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 		if (PROPS_ID.equals(name)) {
 			if (DomUtils.getChildElementsByTagName(element, BeanDefinitionParserDelegate.ENTRY_ELEMENT).size() > 0) {
-				Object props = parserContext.getDelegate().parseMapElement(element, builder.getRawBeanDefinition());
+				Object props = parsePropertyMapElement(parserContext, element, builder.getRawBeanDefinition());
 				builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
 			}
 			else {
@@ -213,7 +214,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 		if (parent.hasAttribute(REF))
 			parserContext.getReaderContext().error(
 				"nested bean definition/reference cannot be used when attribute 'ref' is specified", parent);
-		return parserContext.getDelegate().parsePropertySubElement(element, builder.getBeanDefinition());
+		return parsePropertySubElement(parserContext, element, builder.getBeanDefinition());
 	}
 
 	// osgi:listener
@@ -238,7 +239,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 						"nested bean declaration is not allowed if 'ref' attribute has been specified",
 						nestedDefinition);
 
-				target = context.getDelegate().parsePropertySubElement(nestedDefinition, builder.getBeanDefinition());
+				target = parsePropertySubElement(context, nestedDefinition, builder.getBeanDefinition());
 				// if this is a bean reference (nested <ref>), extract the name
 				if (target instanceof RuntimeBeanReference) {
 					targetName = ((RuntimeBeanReference) target).getBeanName();
@@ -279,5 +280,17 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 	protected boolean shouldGenerateIdAsFallback() {
 		return true;
+	}
+
+	protected Object parsePropertySubElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
+		return context.getDelegate().parsePropertySubElement(beanDef, beanDefinition);
+	}
+
+	protected Set parsePropertySetElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
+		return context.getDelegate().parseSetElement(beanDef, beanDefinition);
+	}
+
+	protected Map parsePropertyMapElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
+		return context.getDelegate().parseMapElement(beanDef, beanDefinition);
 	}
 }
