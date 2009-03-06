@@ -29,6 +29,6 @@ class CompendiumNamespaceHandler extends NamespaceHandlerSupport {
 	public void init() {
 		registerBeanDefinitionParser("cm-properties", new ConfigPropertiesDefinitionParser());
 		registerBeanDefinitionParser("managed-service-factory", new ManagedServiceFactoryDefinitionParser());
-		registerBeanDefinitionDecorator("managed-service", new ManagedServiceDefinitionParser());
+		registerBeanDefinitionDecorator("managed-properties", new ManagedPropertiesDefinitionParser());
 	}
 }

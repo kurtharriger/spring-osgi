@@ -42,7 +42,7 @@ import org.springframework.osgi.mock.MockServiceRegistration;
  * @author Costin Leau
  * 
  */
-public class ManagedServiceTest extends TestCase {
+public class ManagedPropertiesTest extends TestCase {
 
 	private GenericApplicationContext appContext;
 	private int unregistrationCounter;

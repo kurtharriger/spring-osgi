@@ -23,7 +23,7 @@
 
     <!--  managed-service  -->
 
-    <xsd:complexType name="TbaseManagedServiceType">
+    <xsd:complexType name="TbaseManagedPropertiesType">
 		<xsd:attribute name="update-strategy" type="TupdateStrategyType" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
@@ -53,9 +53,9 @@
 	</xsd:simpleType>
 	
     
-    <xsd:complexType name="TmanagedService">
+    <xsd:complexType name="TmanagedProperties">
         <xsd:complexContent>
-            <xsd:extension base="TbaseManagedServiceType">
+            <xsd:extension base="TbaseManagedPropertiesType">
 		        <xsd:attribute name="persistent-id" type="xsd:string" use="required">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
@@ -68,7 +68,7 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	
-    <xsd:element name="managed-service" type="TmanagedService">
+    <xsd:element name="managed-properties" type="TmanagedProperties">
     	<xsd:annotation>
     		<xsd:documentation><![CDATA[
     Defines a bean based on the given class name and configuration, with properties autowired-by-name 

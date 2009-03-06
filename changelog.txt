@@ -13,6 +13,7 @@ General
 Package org.springframework.osgi.compendium
 * fixed OSGi service unregistration of <managed-service/> listeners
 * fixed property injection to occur before the initializing method is invoked for <managed-service-factory/> beans
+* renamed <managed-service/> to <managed-properties/> to better reflect the intent
 
 Package org.springframework.osgi.context
 * improved proxying of classes that are boot delegated outside the OSGi environment
