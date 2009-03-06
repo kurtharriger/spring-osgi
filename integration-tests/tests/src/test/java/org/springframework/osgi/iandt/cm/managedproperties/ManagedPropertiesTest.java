@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.cm.managedservice;
+package org.springframework.osgi.iandt.cm.managedproperties;
 
 import java.util.Dictionary;
 import java.util.Iterator;
@@ -31,7 +31,7 @@ import org.springframework.osgi.iandt.cm.BaseConfigurationAdminTest;
  * @author Costin Leau
  * 
  */
-public class ManagedServiceTest extends BaseConfigurationAdminTest {
+public class ManagedPropertiesTest extends BaseConfigurationAdminTest {
 
 	private final String ID = getClass().getName();
 	private Properties props;
@@ -40,7 +40,7 @@ public class ManagedServiceTest extends BaseConfigurationAdminTest {
 
 
 	protected String[] getConfigLocations() {
-		return new String[] { "org/springframework/osgi/iandt/cm/managedservice/managedService.xml" };
+		return new String[] { "org/springframework/osgi/iandt/cm/managedproperties/managedProperties.xml" };
 	}
 
 	private void initProperties() {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.cm.managedservice;
+package org.springframework.osgi.iandt.cm.managedproperties;
 
 /**
  * Taken from Spring reference documentation.

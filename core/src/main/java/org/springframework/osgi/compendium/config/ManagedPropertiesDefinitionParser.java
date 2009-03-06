@@ -34,7 +34,7 @@ import org.w3c.dom.Node;
  * @author Costin Leau
  * 
  */
-class ManagedServiceDefinitionParser implements BeanDefinitionDecorator {
+class ManagedPropertiesDefinitionParser implements BeanDefinitionDecorator {
 
 	public BeanDefinitionHolder decorate(Node node, BeanDefinitionHolder definition, ParserContext parserContext) {
 		BeanDefinition trackingBppDef = createTrackerBpp((Element) node, definition);
