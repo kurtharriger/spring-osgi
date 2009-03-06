@@ -17,6 +17,7 @@
 package org.springframework.osgi.iandt;
 
 import java.io.File;
+import java.io.FilePermission;
 import java.lang.reflect.ReflectPermission;
 import java.security.Permission;
 import java.util.ArrayList;
