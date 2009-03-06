@@ -239,6 +239,8 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		// required by Spring
 		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
 		perms.add(new ReflectPermission("*", "suppressAccessChecks"));
+		// logging permission
+		perms.add(new FilePermission("-", "WRITE"));
 		return perms;
 	}
 
