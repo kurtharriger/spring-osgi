@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 <xsd:schema xmlns="http://www.springframework.org/schema/osgi"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:beans="http://www.springframework.org/schema/beans"
-            xmlns:tool="http://www.springframework.org/schema/tool"
-            targetNamespace="http://www.springframework.org/schema/osgi"
-            elementFormDefault="qualified"
-            attributeFormDefault="unqualified"
-            version="1.2-rc1">
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:tool="http://www.springframework.org/schema/tool"
+        targetNamespace="http://www.springframework.org/schema/osgi"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        version="1.2-rc1">
 
 	<xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
@@ -437,7 +437,7 @@
                     	</xsd:annotation>
                     </xsd:element>
                     <!-- nested bean declaration -->
-                    <xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="skip"/>
+                	<xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="skip"/>
                 </xsd:sequence>
                 <xsd:attribute name="ref" type="xsd:string" use="optional">
                 	<xsd:annotation>
