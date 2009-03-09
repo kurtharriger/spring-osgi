@@ -4,7 +4,7 @@
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi</artifactId>
   <packaging>pom</packaging>
-  <version>1.2.0-rc1</version>
+  <version>1.2.0-rc2-SNAPSHOT</version>
   <name>Spring Dynamic Modules</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
