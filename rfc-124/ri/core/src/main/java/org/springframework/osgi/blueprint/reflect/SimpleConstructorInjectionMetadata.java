@@ -16,17 +16,13 @@
 
 package org.springframework.osgi.blueprint.reflect;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.osgi.service.blueprint.reflect.ConstructorInjectionMetadata;
 import org.osgi.service.blueprint.reflect.ParameterSpecification;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
-import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
+import org.springframework.util.StringUtils;
 
 /**
  * Simple implementation for {@link ConstructorInjectionMetadata} interface.
@@ -55,25 +51,9 @@ public class SimpleConstructorInjectionMetadata implements ConstructorInjectionM
 	 * @param definition
 	 */
 	public SimpleConstructorInjectionMetadata(BeanDefinition definition) {
-		ConstructorArgumentValues ctorValues = definition.getConstructorArgumentValues();
-
-		// get indexed values
-		Map<Integer, ValueHolder> indexedArguments = ctorValues.getIndexedArgumentValues();
-
-		List<ParameterSpecification> temp = new ArrayList<ParameterSpecification>(indexedArguments.size());
-
-		for (Iterator<Map.Entry<Integer, ValueHolder>> iterator = indexedArguments.entrySet().iterator(); iterator.hasNext();) {
-			Map.Entry<Integer, ValueHolder> entry = iterator.next();
-			temp.add(new SimpleParameterSpecification(entry.getKey(), entry.getValue()));
-		}
-
-		// get generic arguments
-		List<ValueHolder> args = ctorValues.getGenericArgumentValues();
-		for (ValueHolder arg : args) {
-			temp.add(new SimpleParameterSpecification(-1, arg));
-		}
-
-		params = Collections.unmodifiableList(temp);
+		// check if we have a factory-method definition or not 
+		params = (StringUtils.hasText(definition.getFactoryBeanName()) ? Collections.<ParameterSpecification> emptyList()
+				: MetadataUtils.getParameterList(definition.getConstructorArgumentValues()));
 	}
 
 	public List<ParameterSpecification> getParameterSpecifications() {

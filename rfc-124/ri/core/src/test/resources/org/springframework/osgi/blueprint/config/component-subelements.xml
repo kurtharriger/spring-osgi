@@ -136,6 +136,11 @@
 	   		<value>true</value>
 	   </constructor-arg>
 	</component>
-   
+    
+    <component id="staticFactory" factory-method="staticMethod" class="org.springframework.osgi.blueprint.FactoryComponent">
+       <constructor-arg value="String" index="1"/>
+       <constructor-arg value="123" index="2"/>
+       <constructor-arg value="981" index="0"/>
+    </component>
    
 </components>

@@ -52,12 +52,19 @@ class SpringLocalComponentMetadata extends SpringComponentMetadata implements Lo
 	public SpringLocalComponentMetadata(BeanDefinition definition) {
 		super(definition);
 
-		constructorMetadata = new SimpleConstructorInjectionMetadata(definition);
-		methodMetadata = (StringUtils.hasText(beanDefinition.getFactoryMethodName()) ? new SimpleMethodInjectionMetadata(
-			definition)
-				: null);
+		final String factoryName = definition.getFactoryBeanName();
+		if (StringUtils.hasText(factoryName)) {
+			factoryComponent = new SimpleReferenceValue(factoryName);
+			methodMetadata = new SimpleMethodInjectionMetadata(definition);
+		}
+		else {
+			factoryComponent = null;
+			methodMetadata = null;
+		}
 
-		List<PropertyValue> pvs = (List<PropertyValue>) definition.getPropertyValues().getPropertyValueList();
+		constructorMetadata = new SimpleConstructorInjectionMetadata(definition);
+
+		List<PropertyValue> pvs = definition.getPropertyValues().getPropertyValueList();
 		List<PropertyInjectionMetadata> props = new ArrayList<PropertyInjectionMetadata>(pvs.size());
 
 		for (PropertyValue propertyValue : pvs) {
@@ -65,14 +72,6 @@ class SpringLocalComponentMetadata extends SpringComponentMetadata implements Lo
 		}
 
 		propertyMetadata = Collections.unmodifiableCollection(props);
-
-		final String factoryName = beanDefinition.getFactoryBeanName();
-		if (StringUtils.hasText(factoryName)) {
-			factoryComponent = new SimpleReferenceValue(factoryName);
-		}
-		else {
-			factoryComponent = null;
-		}
 	}
 
 	public String getClassName() {
