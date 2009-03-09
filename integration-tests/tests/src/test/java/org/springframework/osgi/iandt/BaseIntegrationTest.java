@@ -241,7 +241,7 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
 		perms.add(new ReflectPermission("*", "suppressAccessChecks"));
 		// logging permission
-		perms.add(new FilePermission("-", "WRITE"));
+		perms.add(new FilePermission("-", "read,write,delete"));
 		return perms;
 	}
 
@@ -256,7 +256,7 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		perms.add(new ServicePermission("*", ServicePermission.GET));
 		perms.add(new PropertyPermission("*", "read,write"));
 		// logging permission
-		perms.add(new FilePermission("-", "WRITE"));
+		perms.add(new FilePermission("-", "read,write,delete"));
 
 		// required by Spring
 		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
