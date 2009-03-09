@@ -16,8 +16,16 @@
 
 package org.springframework.osgi.blueprint.reflect;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.osgi.service.blueprint.reflect.ParameterSpecification;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 
 /**
@@ -39,5 +47,32 @@ abstract class MetadataUtils {
 
 	static Object getValue(ValueHolder valueHolder) {
 		return (valueHolder.isConverted() ? valueHolder.getConvertedValue() : valueHolder.getValue());
+	}
+
+	static List<ParameterSpecification> getParameterList(ConstructorArgumentValues ctorValues) {
+		List<ParameterSpecification> temp;
+
+		// get indexed values
+		Map<Integer, ValueHolder> indexedArguments = ctorValues.getIndexedArgumentValues();
+
+		// check first the indexed arguments
+		if (!indexedArguments.isEmpty()) {
+			temp = new ArrayList<ParameterSpecification>(indexedArguments.size());
+
+			for (Iterator<Map.Entry<Integer, ValueHolder>> iterator = indexedArguments.entrySet().iterator(); iterator.hasNext();) {
+				Map.Entry<Integer, ValueHolder> entry = iterator.next();
+				temp.add(new SimpleParameterSpecification(entry.getKey(), entry.getValue()));
+			}
+		}
+		else {
+			// followed by the generic arguments
+			List<ValueHolder> args = ctorValues.getGenericArgumentValues();
+			temp = new ArrayList<ParameterSpecification>(args.size());
+			for (ValueHolder arg : args) {
+				temp.add(new SimpleParameterSpecification(-1, arg));
+			}
+		}
+
+		return Collections.unmodifiableList(temp);
 	}
 }

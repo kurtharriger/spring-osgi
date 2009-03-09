@@ -101,6 +101,22 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 
 	public void testNanDouble() throws Exception {
 		System.out.println(moduleContext.getComponent("nan"));
+	}
 
+	public void testStaticFactoryArguments() throws Exception {
+		System.err.println("********* test DISABLED");
+		if (false) {
+			LocalComponentMetadata localMetadata = getLocalMetadata("staticFactory");
+			List<ParameterSpecification> params = localMetadata.getConstructorInjectionMetadata().getParameterSpecifications();
+
+			for (ParameterSpecification param : params) {
+				System.out.println("StaticFactory param " + param.getIndex());
+			}
+
+			assertEquals(3, params.size());
+			assertEquals(1, params.get(0).getIndex());
+			assertEquals(2, params.get(1).getIndex());
+			assertEquals(0, params.get(2).getIndex());
+		}
 	}
 }

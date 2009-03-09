@@ -17,6 +17,7 @@
 package org.springframework.osgi.iandt;
 
 import java.io.File;
+import java.io.FilePermission;
 import java.lang.reflect.ReflectPermission;
 import java.security.Permission;
 import java.util.ArrayList;
@@ -239,6 +240,8 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		// required by Spring
 		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
 		perms.add(new ReflectPermission("*", "suppressAccessChecks"));
+		// logging permission
+		perms.add(new FilePermission("-", "WRITE"));
 		return perms;
 	}
 
