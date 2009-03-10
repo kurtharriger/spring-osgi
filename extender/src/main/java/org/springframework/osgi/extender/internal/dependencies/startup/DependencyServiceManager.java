@@ -255,12 +255,14 @@ public class DependencyServiceManager {
 		dependencyFactories.addAll(localFactories.values());
 
         // Sanity check that the bundle hasn't been pulled from underneath our feet.
+        /*
         try {
-            bundleContext.getBundle();
+             bundleContext.getBundle();
         } catch (IllegalStateException ise) {
             throw new IllegalStateException("Dependency management could not be completed for ["
                     + context.getDisplayName() +"] because the BundleContext is no longer valid.");
         }
+        */
 
         for (Iterator iterator = dependencyFactories.iterator(); iterator.hasNext();) {
 			OsgiServiceDependencyFactory dependencyFactory = (OsgiServiceDependencyFactory) iterator.next();
