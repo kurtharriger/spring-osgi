@@ -21,6 +21,8 @@ import java.io.FilePermission;
 import java.lang.reflect.ReflectPermission;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PropertyPermission;
@@ -41,6 +43,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.test.provisioning.ArtifactLocator;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -128,6 +131,7 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 			if (event.getType() == BundleEvent.INSTALLED) {
 				Bundle bnd = event.getBundle();
 				String location = bnd.getLocation();
+				// iandt bundles
 				if (location.indexOf("iandt") > -1 || location.indexOf("integration-tests") > -1) {
 					logger.trace("Discovered I&T test...");
 					List perms = getIAndTPermissions();
@@ -137,6 +141,7 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 							+ OsgiStringUtils.nullSafeNameAndSymName(bnd) + "@" + location);
 					pa.setPermissions(location, pi);
 				}
+				// on the fly test
 				else if (location.indexOf("onTheFly") > -1) {
 					logger.trace("Discovered on the fly test...");
 					List perms = getTestPermissions();
@@ -146,6 +151,25 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 					logger.info("About to set permissions " + perms + " for OnTheFly bundle "
 							+ OsgiStringUtils.nullSafeNameAndSymName(bnd) + "@" + location);
 					pa.setPermissions(location, pi);
+				}
+				// logging bundle
+				else if (bnd.getSymbolicName().indexOf("log4j.osgi") > -1) {
+					logger.trace("Setting permissions on log4j bundle " + OsgiStringUtils.nullSafeNameAndSymName(bnd));
+					List perms = new ArrayList();
+					// defaults
+					perms.add(new PackagePermission("*", PackagePermission.EXPORT));
+					perms.add(new PackagePermission("*", PackagePermission.IMPORT));
+					perms.add(new BundlePermission("*", BundlePermission.HOST));
+					perms.add(new BundlePermission("*", BundlePermission.PROVIDE));
+					perms.add(new BundlePermission("*", BundlePermission.REQUIRE));
+					perms.add(new ServicePermission("*", ServicePermission.REGISTER));
+					perms.add(new ServicePermission("*", ServicePermission.GET));
+					
+					perms.add(new FilePermission("-", "read,write,delete"));
+					PermissionInfo[] defaultPerm = pa.getDefaultPermissions();
+					if (defaultPerm != null)
+						CollectionUtils.mergeArrayIntoCollection(defaultPerm, perms);
+					pa.setPermissions(location, getPIFromPermissions(perms));
 				}
 			}
 		}
@@ -240,8 +264,6 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		// required by Spring
 		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
 		perms.add(new ReflectPermission("*", "suppressAccessChecks"));
-		// logging permission
-		perms.add(new FilePermission("-", "read,write,delete"));
 		return perms;
 	}
 
@@ -255,8 +277,6 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		perms.add(new ServicePermission("*", ServicePermission.REGISTER));
 		perms.add(new ServicePermission("*", ServicePermission.GET));
 		perms.add(new PropertyPermission("*", "read,write"));
-		// logging permission
-		perms.add(new FilePermission("-", "read,write,delete"));
 
 		// required by Spring
 		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
