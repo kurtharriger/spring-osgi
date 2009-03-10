@@ -147,7 +147,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		classLoader = null;
 	}
 
-	private void executeAction(BundleAction action) {
+	protected void executeAction(BundleAction action) {
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		try {
 			if (pushBundleAsContextClassLoader) {
