@@ -17,7 +17,11 @@
 package org.springframework.osgi.blueprint.reflect;
 
 import org.osgi.service.blueprint.reflect.BindingListenerMetadata;
+import org.osgi.service.blueprint.reflect.ReferenceValue;
+import org.osgi.service.blueprint.reflect.TypedStringValue;
 import org.osgi.service.blueprint.reflect.Value;
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 
 /**
  * Simple implementation for {@link BindingListenerMetadata} interface.
@@ -26,9 +30,26 @@ import org.osgi.service.blueprint.reflect.Value;
  */
 public class SimpleBindingListenerMetadata implements BindingListenerMetadata {
 
+	private static final String BIND_PROP = "bindMethod";
+	private static final String UNBIND_PROP = "unbindMethod";
+	private static final String LISTENER_NAME = "targetBeanName";
 	private final String bindMethodName, unbindMethodName;
 	private final Value listenerComponent;
 
+
+	public SimpleBindingListenerMetadata(AbstractBeanDefinition beanDefinition) {
+		MutablePropertyValues pvs = beanDefinition.getPropertyValues();
+		bindMethodName = (String) MetadataUtils.getValue(pvs, BIND_PROP);
+		unbindMethodName = (String) MetadataUtils.getValue(pvs, UNBIND_PROP);
+
+		// listener reference
+		if (pvs.contains(LISTENER_NAME)) {
+			listenerComponent = new SimpleReferenceValue((String) MetadataUtils.getValue(pvs, LISTENER_NAME));
+		}
+		else {
+			listenerComponent = null;
+		}
+	}
 
 	/**
 	 * Constructs a new <code>SimpleBindingListenerMetadata</code> instance.

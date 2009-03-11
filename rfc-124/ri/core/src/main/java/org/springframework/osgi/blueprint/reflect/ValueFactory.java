@@ -156,13 +156,13 @@ class ValueFactory {
 				ManagedProperties properties = (ManagedProperties) metadata;
 				Properties props = new Properties();
 				// convert properties items
-				Set<Map.Entry<Object, Object>> entrySet = (Set<Map.Entry<Object, Object>>) properties.entrySet();
+				Set<Map.Entry<Object, Object>> entrySet = properties.entrySet();
 
 				for (Iterator<Map.Entry<Object, Object>> iterator = entrySet.iterator(); iterator.hasNext();) {
 					Map.Entry<Object, Object> next = iterator.next();
-					Object key = ValueFactory.buildValue(next.getKey());
-					Object value = ValueFactory.buildValue(next.getValue());
-					props.put(key, value);
+					TypedStringValue key = (TypedStringValue) next.getKey();
+					TypedStringValue value = (TypedStringValue) next.getValue();
+					props.put(key.getValue(), value.getValue());
 				}
 
 				return new SimplePropertiesValue(props);

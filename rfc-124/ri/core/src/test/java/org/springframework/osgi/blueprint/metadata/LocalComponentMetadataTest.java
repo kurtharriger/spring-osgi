@@ -26,6 +26,7 @@ import org.osgi.service.blueprint.reflect.ListValue;
 import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
 import org.osgi.service.blueprint.reflect.NullValue;
 import org.osgi.service.blueprint.reflect.ParameterSpecification;
+import org.osgi.service.blueprint.reflect.PropertiesValue;
 import org.osgi.service.blueprint.reflect.PropertyInjectionMetadata;
 import org.osgi.service.blueprint.reflect.TypedStringValue;
 
@@ -117,6 +118,13 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 		for (TypedStringValue typedString : list) {
 			assertNull(typedString.getTypeName());
 		}
+	}
+
+	public void testPropertiesMetadata() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("props");
+		PropertyInjectionMetadata prop = (PropertyInjectionMetadata) localMetadata.getPropertyInjectionMetadata().iterator().next();
+		PropertiesValue propsValue = (PropertiesValue) prop.getValue();
+		assertEquals("two", propsValue.getPropertiesValue().getProperty("one"));
 	}
 
 	// SPR-5554

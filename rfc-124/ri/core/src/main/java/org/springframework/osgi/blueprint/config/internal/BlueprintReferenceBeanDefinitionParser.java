@@ -46,7 +46,7 @@ public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinit
 	@Override
 	protected Object determineCardinality(String value) {
 		// required
-		return super.determineCardinality(value.startsWith("r") ? "1" : "0");
+		return super.determineCardinality(value.startsWith("m") ? "1" : "0");
 	}
 
 	@Override

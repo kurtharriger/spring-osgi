@@ -18,6 +18,8 @@ package org.springframework.osgi.blueprint.reflect;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 
 /**
  * Holder for various constants used by metadata factories.
@@ -28,8 +30,8 @@ interface MetadataConstants {
 
 	// common properties shared across the metadata factories
 	static final Class<?> EXPORTER_CLASS = OsgiServiceFactoryBean.class;
-	static final Class<?> SINGLE_SERVICE_IMPORTER_CLASS = OsgiServiceFactoryBean.class;
-	static final Class<?> MULTI_SERVICE_IMPORTER_CLASS = OsgiServiceFactoryBean.class;
+	static final Class<?> SINGLE_SERVICE_IMPORTER_CLASS = OsgiServiceProxyFactoryBean.class;
+	static final Class<?> MULTI_SERVICE_IMPORTER_CLASS = OsgiServiceCollectionProxyFactoryBean.class;
 
 	// component metadata attribute holder (for spring bean definitions)
 	static final String SPRING_DM_PREFIX = "spring.osgi.";

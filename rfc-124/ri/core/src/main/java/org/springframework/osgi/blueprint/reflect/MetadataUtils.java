@@ -39,7 +39,7 @@ abstract class MetadataUtils {
 	static Object getValue(PropertyValues pvs, String name) {
 		if (pvs.contains(name)) {
 			PropertyValue pv = pvs.getPropertyValue(name);
-			return (String) (pv.isConverted() ? pv.getConvertedValue() : pv.getValue());
+			return (pv.isConverted() ? pv.getConvertedValue() : pv.getValue());
 		}
 
 		return null;

@@ -42,18 +42,18 @@ class ComponentMetadataFactory implements MetadataConstants {
 		if (metadata instanceof ComponentMetadata)
 			return (ComponentMetadata) metadata;
 
-		// if no name has been given look for one
+		// if no name has been given, look for one
 		if (name == null) {
 			name = (String) beanDefinition.getAttribute(COMPONENT_NAME);
 		}
 
 		if (isServiceExporter(beanDefinition)) {
-			return new SpringServiceExportComponentMetadata(beanDefinition);
+			return new SpringServiceExportComponentMetadata(name, beanDefinition);
 		}
 
 		if (isServiceImporter(beanDefinition)) {
 			// TODO: need to further distinguish unary and collection references
-			return new SpringServiceReferenceComponentMetadata(beanDefinition);
+			return new SpringServiceReferenceComponentMetadata(name, beanDefinition);
 		}
 
 		return new SpringLocalComponentMetadata(name, beanDefinition);
