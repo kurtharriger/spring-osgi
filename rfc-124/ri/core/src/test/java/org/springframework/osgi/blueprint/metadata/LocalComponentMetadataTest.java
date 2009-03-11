@@ -41,7 +41,9 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 	private LocalComponentMetadata getLocalMetadata(String name) {
 		ComponentMetadata metadata = moduleContext.getComponentMetadata(name);
 		assertTrue(metadata instanceof LocalComponentMetadata);
-		return (LocalComponentMetadata) metadata;
+		LocalComponentMetadata localMetadata = (LocalComponentMetadata) metadata;
+		assertEquals("the registered name doesn't match the component name", name, localMetadata.getName());
+		return localMetadata;
 	}
 
 	public void testConstructorArg() throws Exception {
@@ -101,6 +103,8 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 
 	public void testNanDouble() throws Exception {
 		System.out.println(moduleContext.getComponent("nan"));
+		LocalComponentMetadata localMetadata = getLocalMetadata("set");
+		System.out.println(localMetadata.getPropertyInjectionMetadata());
 	}
 
 	public void testStaticFactoryArguments() throws Exception {

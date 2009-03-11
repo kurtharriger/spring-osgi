@@ -19,6 +19,8 @@ package org.springframework.osgi.blueprint.namespace;
 import org.osgi.service.blueprint.namespace.ComponentDefinitionRegistry;
 import org.osgi.service.blueprint.namespace.ParserContext;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.osgi.blueprint.reflect.MetadataFactory;
 import org.w3c.dom.Node;
 
@@ -30,6 +32,7 @@ import org.w3c.dom.Node;
  */
 public class SpringParserContext implements ParserContext {
 
+	private static final String COMPONENT_NAME_ATTR = "spring.osgi.component.name";
 	private final org.springframework.beans.factory.xml.ParserContext parserContext;
 	private final ComponentDefinitionRegistry registry;
 
@@ -44,7 +47,26 @@ public class SpringParserContext implements ParserContext {
 	}
 
 	public ComponentMetadata getEnclosingComponent() {
-		return MetadataFactory.buildComponentMetadataFor(parserContext.getContainingBeanDefinition());
+		BeanDefinition def = parserContext.getContainingBeanDefinition();
+		if (def != null) {
+			String beanName = null;
+			// check the short firsts
+			if (!def.hasAttribute(COMPONENT_NAME_ATTR)) {
+				BeanDefinitionRegistry defRegistry = parserContext.getRegistry();
+				String[] names = defRegistry.getBeanDefinitionNames();
+				for (String name : names) {
+					// TODO: is the equality check enough?
+					if (def == defRegistry.getBeanDefinition(name)) {
+						beanName = name;
+					}
+				}
+			}
+
+			return MetadataFactory.buildComponentMetadataFor(beanName, def);
+		}
+		else {
+			return null;
+		}
 	}
 
 	public Node getSourceNode() {

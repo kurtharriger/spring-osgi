@@ -32,17 +32,20 @@ import org.osgi.service.blueprint.reflect.Value;
 public class SimpleListValue implements ListValue {
 
 	private final List<Value> list;
+	private final String valueType;
 
 
 	/**
 	 * Constructs a new <code>SimpleListValue</code> instance.
 	 * 
-	 * @param set
+	 * @param array of values
+	 * @param valueType value type
 	 */
-	public SimpleListValue(Value... values) {
+	public SimpleListValue(Value[] values, String valueType) {
 		List<Value> vals = new ArrayList<Value>(values.length);
 		Collections.addAll(vals, values);
 		list = Collections.unmodifiableList(vals);
+		this.valueType = valueType;
 	}
 
 	public List<Value> getList() {
@@ -50,6 +53,6 @@ public class SimpleListValue implements ListValue {
 	}
 
 	public String getValueType() {
-		throw new UnsupportedOperationException();
+		return valueType;
 	}
 }

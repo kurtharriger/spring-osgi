@@ -40,6 +40,9 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedProperties;
 import org.springframework.beans.factory.support.ManagedSet;
+import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedList;
+import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedMap;
+import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedSet;
 
 /**
  * Adapter between OSGi's Blueprint {@link Value} and Spring
@@ -50,13 +53,18 @@ import org.springframework.beans.factory.support.ManagedSet;
  */
 class BeanMetadataElementFactory {
 
+	static BeanMetadataElement buildBeanMetadata(Value value) {
+		return buildBeanMetadata(value, null);
+	}
+
 	/**
 	 * Creates the equivalent Spring metadata for the given value.
 	 * 
 	 * @param value
+	 * @param defaultTypeName
 	 * @return
 	 */
-	static BeanMetadataElement buildBeanMetadata(Value value) {
+	static BeanMetadataElement buildBeanMetadata(Value value, String defaultTypeName) {
 
 		if (value instanceof ReferenceValue) {
 			ReferenceValue reference = (ReferenceValue) value;
@@ -70,8 +78,12 @@ class BeanMetadataElementFactory {
 
 		if (value instanceof TypedStringValue) {
 			TypedStringValue typedString = (TypedStringValue) value;
+			String specifiedType = typedString.getTypeName();
+			if (specifiedType == null) {
+				specifiedType = defaultTypeName;
+			}
 			return new org.springframework.beans.factory.config.TypedStringValue(typedString.getStringValue(),
-				typedString.getTypeName());
+				specifiedType);
 		}
 
 		if (value instanceof NullValue) {
@@ -86,23 +98,25 @@ class BeanMetadataElementFactory {
 		if (value instanceof ListValue) {
 			ListValue listValue = (ListValue) value;
 			List<Value> list = (List<Value>) listValue.getList();
-			ManagedList managedList = new ManagedList();
+			String defaultType = listValue.getValueType();
+			ManagedList managedList = new TempManagedList(list.size(), defaultType);
 
 			for (Value val : list) {
-				managedList.add(BeanMetadataElementFactory.buildBeanMetadata(val));
+				managedList.add(BeanMetadataElementFactory.buildBeanMetadata(val, defaultType));
 			}
 			return managedList;
 		}
 
 		if (value instanceof SetValue) {
 			SetValue setValue = (SetValue) value;
-
 			Set<Value> set = (Set<Value>) setValue.getSet();
-			ManagedSet managedSet = new ManagedSet();
+			String defaultType = setValue.getValueType();
+
+			ManagedSet managedSet = new TempManagedSet(set.size(), defaultType);
 
 			for (Iterator<Value> iterator = set.iterator(); iterator.hasNext();) {
 				Value val = iterator.next();
-				managedSet.add(BeanMetadataElementFactory.buildBeanMetadata(val));
+				managedSet.add(BeanMetadataElementFactory.buildBeanMetadata(val, defaultType));
 			}
 
 			return managedSet;
@@ -110,15 +124,16 @@ class BeanMetadataElementFactory {
 
 		if (value instanceof MapValue) {
 			MapValue mapValue = (MapValue) value;
-
 			Map<Value, Value> map = (Map<Value, Value>) mapValue.getMap();
-			ManagedMap managedMap = new ManagedMap();
+			String defaultKeyType = mapValue.getKeyType();
+			String defaultValueType = mapValue.getValueType();
+			ManagedMap managedMap = new TempManagedMap(map.size(), defaultKeyType, defaultValueType);
 			Set<Entry<Value, Value>> entrySet = map.entrySet();
 
 			for (Iterator<Entry<Value, Value>> iterator = entrySet.iterator(); iterator.hasNext();) {
 				Entry<Value, Value> entry = iterator.next();
-				managedMap.put(BeanMetadataElementFactory.buildBeanMetadata(entry.getKey()),
-					BeanMetadataElementFactory.buildBeanMetadata(entry.getValue()));
+				managedMap.put(BeanMetadataElementFactory.buildBeanMetadata(entry.getKey(), defaultKeyType),
+					BeanMetadataElementFactory.buildBeanMetadata(entry.getValue(), defaultValueType));
 			}
 		}
 

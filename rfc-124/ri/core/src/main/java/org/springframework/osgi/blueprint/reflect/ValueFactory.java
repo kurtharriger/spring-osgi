@@ -27,6 +27,7 @@ import org.osgi.service.blueprint.reflect.NullValue;
 import org.osgi.service.blueprint.reflect.Value;
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
@@ -34,6 +35,9 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedProperties;
 import org.springframework.beans.factory.support.ManagedSet;
+import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedList;
+import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedMap;
+import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedSet;
 
 /**
  * Adapter between Spring {@link BeanMetadataElement} and OSGi's Blueprint
@@ -75,35 +79,57 @@ class ValueFactory {
 
 			// bean definition
 			if (metadata instanceof BeanDefinition) {
-				ComponentMetadata componentMetadata = MetadataFactory.buildComponentMetadataFor((BeanDefinition) metadata);
+				ComponentMetadata componentMetadata = MetadataFactory.buildComponentMetadataFor(null,
+					(BeanDefinition) metadata);
 				return new SimpleComponentValue((LocalComponentMetadata) componentMetadata);
 			}
 
-			// managed...
+			// bean definition holder (used for inner beans/components)
+			if (metadata instanceof BeanDefinitionHolder) {
+				BeanDefinitionHolder holder = (BeanDefinitionHolder) metadata;
+
+				ComponentMetadata componentMetadata = MetadataFactory.buildComponentMetadataFor(holder.getBeanName(),
+					holder.getBeanDefinition());
+				return new SimpleComponentValue((LocalComponentMetadata) componentMetadata);
+			}
+
+			// managedXXX...
 			if (metadata instanceof ManagedList) {
 				ManagedList list = (ManagedList) metadata;
+
 				Value[] values = new Value[list.size()];
 				// convert list objects
 				for (int i = 0; i < values.length; i++) {
 					Object element = list.get(i);
 					values[i] = ValueFactory.buildValue(element);
 				}
-				return new SimpleListValue(values);
+				String defaultType = null;
+				if (list instanceof TempManagedList) {
+					defaultType = ((TempManagedList) list).getDefaultTypeClassName();
+				}
+				return new SimpleListValue(values, defaultType);
 			}
 
 			if (metadata instanceof ManagedSet) {
 				ManagedSet set = (ManagedSet) metadata;
+
 				Value[] values = new Value[set.size()];
 				int i = 0;
 				// convert set objects
 				for (Object element : set) {
 					values[i++] = ValueFactory.buildValue(element);
 				}
-				return new SimpleSetValue(values);
+				String defaultType = null;
+				if (set instanceof TempManagedSet) {
+					defaultType = ((TempManagedSet) set).getDefaultTypeClassName();
+				}
+
+				return new SimpleSetValue(values, defaultType);
 			}
 
 			if (metadata instanceof ManagedMap) {
 				ManagedMap map = (ManagedMap) metadata;
+
 				Value[] keys = new Value[map.size()];
 				Value[] values = new Value[map.size()];
 				int i = 0;
@@ -115,7 +141,14 @@ class ValueFactory {
 					values[i] = ValueFactory.buildValue(next.getValue());
 					i++;
 				}
-				return new SimpleMapValue(keys, values);
+
+				String defaultKeyType = null, defaultValueType = null;
+				if (map instanceof TempManagedMap) {
+					defaultKeyType = ((TempManagedMap) map).getKeyDefaultTypeClassName();
+					defaultValueType = ((TempManagedMap) map).getValueDefaultTypeClassName();
+				}
+
+				return new SimpleMapValue(keys, defaultKeyType, values, defaultValueType);
 			}
 
 			if (metadata instanceof ManagedProperties) {

@@ -51,7 +51,7 @@ class SpringServiceReferenceComponentMetadata extends SpringComponentMetadata im
 	 * @param definition bean definition
 	 */
 	public SpringServiceReferenceComponentMetadata(BeanDefinition definition) {
-		super(definition);
+		super(null, definition);
 	}
 
 	public Collection<BindingListenerMetadata> getBindingListeners() {

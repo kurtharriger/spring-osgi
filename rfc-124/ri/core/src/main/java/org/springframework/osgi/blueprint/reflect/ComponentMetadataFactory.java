@@ -32,14 +32,20 @@ class ComponentMetadataFactory implements MetadataConstants {
 	/**
 	 * Builds a component metadata from the given bean definition.
 	 * 
+	 * @param name bean name
 	 * @param beanDefinition
 	 * @return
 	 */
-	ComponentMetadata buildMetadata(BeanDefinition beanDefinition) {
+	ComponentMetadata buildMetadata(String name, BeanDefinition beanDefinition) {
 		// shortcut (to avoid re-rewrapping)
 		Object metadata = beanDefinition.getAttribute(COMPONENT_METADATA_ATTRIBUTE);
 		if (metadata instanceof ComponentMetadata)
 			return (ComponentMetadata) metadata;
+
+		// if no name has been given look for one
+		if (name == null) {
+			name = (String) beanDefinition.getAttribute(COMPONENT_NAME);
+		}
 
 		if (isServiceExporter(beanDefinition)) {
 			return new SpringServiceExportComponentMetadata(beanDefinition);
@@ -50,7 +56,7 @@ class ComponentMetadataFactory implements MetadataConstants {
 			return new SpringServiceReferenceComponentMetadata(beanDefinition);
 		}
 
-		return new SpringLocalComponentMetadata(beanDefinition);
+		return new SpringLocalComponentMetadata(name, beanDefinition);
 
 	}
 

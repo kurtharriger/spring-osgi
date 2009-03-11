@@ -21,7 +21,6 @@ import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
 import org.osgi.service.blueprint.reflect.ServiceExportComponentMetadata;
 import org.osgi.service.blueprint.reflect.ServiceReferenceComponentMetadata;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 
 /**
  * Adapter factory that allows translating Spring metadata into Blueprint
@@ -46,10 +45,11 @@ public class MetadataFactory {
 	 * {@link LocalComponentMetadata}, {@link ServiceExportComponentMetadata},
 	 * or {@link ServiceReferenceComponentMetadata}).
 	 * 
+	 * @param name bean name
 	 * @param beanDefinition Spring bean definition
 	 * @return an OSGi component metadata.
 	 */
-	public static ComponentMetadata buildComponentMetadataFor(BeanDefinition beanDefinition) {
-		return blueprintFactory.buildMetadata(beanDefinition);
+	public static ComponentMetadata buildComponentMetadataFor(String name, BeanDefinition beanDefinition) {
+		return blueprintFactory.buildMetadata(name, beanDefinition);
 	}
 }

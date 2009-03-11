@@ -32,7 +32,9 @@ interface MetadataConstants {
 	static final Class<?> MULTI_SERVICE_IMPORTER_CLASS = OsgiServiceFactoryBean.class;
 
 	// component metadata attribute holder (for spring bean definitions)
-	static final String COMPONENT_METADATA_ATTRIBUTE = "spring.osgi." + ComponentMetadata.class.getName();
+	static final String SPRING_DM_PREFIX = "spring.osgi.";
+	static final String COMPONENT_METADATA_ATTRIBUTE = SPRING_DM_PREFIX + ComponentMetadata.class.getName();
+	static final String COMPONENT_NAME = SPRING_DM_PREFIX + "component.name";
 
 	// exporter properties
 	static String EXPORTER_RANKING_PROP = "ranking";
