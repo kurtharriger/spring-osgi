@@ -14,32 +14,27 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint.reflect;
+package org.springframework.osgi.blueprint;
 
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.osgi.service.blueprint.reflect.PropertiesValue;
+import org.osgi.framework.ServiceReference;
 
 /**
- * Simple implementation for {@link PropertiesValue} interface.
- * 
  * @author Costin Leau
  */
-public class SimplePropertiesValue implements PropertiesValue {
+public class ImporterListener {
 
-	private final Properties properties;
+	public static final List bind = new ArrayList();
+	public static final List unbind = new ArrayList();
 
 
-	/**
-	 * Constructs a new <code>SimplePropertiesValue</code> instance.
-	 * 
-	 * @param properties
-	 */
-	public SimplePropertiesValue(Properties properties) {
-		this.properties = properties;
+	public void bind(ServiceReference ref) {
+		bind.add(ref);
 	}
 
-	public Properties getPropertiesValue() {
-		return properties;
+	public void unbind(ServiceReference ref) {
+		unbind.add(ref);
 	}
 }

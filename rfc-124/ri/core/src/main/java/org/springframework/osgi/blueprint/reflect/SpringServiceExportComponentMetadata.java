@@ -30,10 +30,11 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 	 * Constructs a new <code>SpringServiceExportComponentMetadata</code>
 	 * instance.
 	 * 
+	 * @param name bean name
 	 * @param definition bean definition
 	 */
-	public SpringServiceExportComponentMetadata(BeanDefinition definition) {
-		super(null, definition);
+	public SpringServiceExportComponentMetadata(String name, BeanDefinition definition) {
+		super(name, definition);
 
 		MutablePropertyValues propertyValues = definition.getPropertyValues();
 	}
