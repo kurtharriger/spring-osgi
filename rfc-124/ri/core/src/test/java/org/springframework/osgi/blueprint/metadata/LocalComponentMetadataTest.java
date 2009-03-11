@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.ConstructorInjectionMetadata;
+import org.osgi.service.blueprint.reflect.ListValue;
 import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
 import org.osgi.service.blueprint.reflect.NullValue;
 import org.osgi.service.blueprint.reflect.ParameterSpecification;
@@ -107,6 +108,18 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 		System.out.println(localMetadata.getPropertyInjectionMetadata());
 	}
 
+	public void testCollectionWithDefaultType() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("listWDefaultType");
+		PropertyInjectionMetadata prop = (PropertyInjectionMetadata) localMetadata.getPropertyInjectionMetadata().iterator().next();
+		ListValue listValue = (ListValue) prop.getValue();
+		assertEquals(Double.class.getName(), listValue.getValueType());
+		List<TypedStringValue> list = listValue.getList();
+		for (TypedStringValue typedString : list) {
+			assertNull(typedString.getTypeName());
+		}
+	}
+
+	// SPR-5554
 	public void testStaticFactoryArguments() throws Exception {
 		System.err.println("********* test DISABLED");
 		if (false) {

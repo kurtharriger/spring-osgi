@@ -88,7 +88,8 @@ class ValueFactory {
 			if (metadata instanceof BeanDefinitionHolder) {
 				BeanDefinitionHolder holder = (BeanDefinitionHolder) metadata;
 
-				ComponentMetadata componentMetadata = MetadataFactory.buildComponentMetadataFor(holder.getBeanName(),
+				// we ignore the name even though one was specified
+				ComponentMetadata componentMetadata = MetadataFactory.buildComponentMetadataFor(null,
 					holder.getBeanDefinition());
 				return new SimpleComponentValue((LocalComponentMetadata) componentMetadata);
 			}

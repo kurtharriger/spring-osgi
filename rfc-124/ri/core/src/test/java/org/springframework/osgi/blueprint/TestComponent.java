@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.blueprint;
 
+import org.osgi.framework.ServiceReference;
+
 /**
  * Just a simple component used by the namespace tests.
  * 
@@ -26,6 +28,7 @@ public class TestComponent {
 
 	private Object propA;
 	private Object propB;
+	private ServiceReference serviceReference;
 
 
 	public Object getPropA() {
@@ -42,5 +45,13 @@ public class TestComponent {
 
 	public void setPropB(Object propB) {
 		this.propB = propB;
+	}
+
+	public ServiceReference getServiceReference() {
+		return serviceReference;
+	}
+
+	public void setServiceReference(ServiceReference serviceReference) {
+		this.serviceReference = serviceReference;
 	}
 }

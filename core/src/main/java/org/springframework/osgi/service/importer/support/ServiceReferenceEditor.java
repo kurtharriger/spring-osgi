@@ -62,7 +62,14 @@ public class ServiceReferenceEditor extends PropertyEditorSupport {
 			super.setValue(new ServiceReferenceDelegate((ImportedOsgiServiceProxy) value));
 			return;
 		}
-		throw new IllegalArgumentException("expected a service of type " + ImportedOsgiServiceProxy.class.getName());
+
+		if (value instanceof ServiceReference) {
+			super.setValue(value);
+			return;
+		}
+
+		throw new IllegalArgumentException("expected a service of type " + ImportedOsgiServiceProxy.class.getName()
+				+ " but received " + value.getClass());
 	}
 
 	/**
@@ -74,5 +81,4 @@ public class ServiceReferenceEditor extends PropertyEditorSupport {
 	public String getAsText() {
 		return null;
 	}
-
 }

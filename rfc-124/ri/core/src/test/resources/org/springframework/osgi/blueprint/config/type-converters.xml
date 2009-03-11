@@ -26,4 +26,11 @@
 			<value type="org.springframework.osgi.blueprint.config.ComponentHolder">rachmaninoff</value> 
 		</property>
 	</component>
+	
+	<component id="serviceReference" class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="serviceReference" ref="referenceFactory"/>
+	</component>
+	
+	<component id="referenceFactory" class="org.springframework.osgi.blueprint.ReferenceDelegateFactory"/>
+	
 </components>
