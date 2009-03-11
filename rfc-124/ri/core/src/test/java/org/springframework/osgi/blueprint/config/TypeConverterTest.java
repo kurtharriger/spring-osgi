@@ -56,7 +56,7 @@ public class TypeConverterTest extends TestCase {
 
 	public void testNumberOfBeans() throws Exception {
 		System.out.println("The beans declared are: " + ObjectUtils.nullSafeToString(context.getBeanDefinitionNames()));
-		assertEquals("not enough beans found", 3, context.getBeanDefinitionCount());
+		assertTrue("not enough beans found", context.getBeanDefinitionCount() >= 3);
 	}
 
 	public void testReferenceToConverter() throws Exception {
@@ -78,5 +78,10 @@ public class TypeConverterTest extends TestCase {
 		Object converted = cs.convert("1", Long.class);
 		assertNotNull(converted);
 		assertEquals(Long.valueOf("1"), converted);
+	}
+
+	public void testReferenceDelegate() throws Exception {
+		TestComponent comp = (TestComponent) context.getBean("serviceReference");
+		System.out.println(comp.getServiceReference());
 	}
 }

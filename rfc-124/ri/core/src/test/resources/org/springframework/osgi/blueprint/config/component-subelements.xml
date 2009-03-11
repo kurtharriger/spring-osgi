@@ -58,6 +58,17 @@
 		</property>
 	</component>
 
+	<component id="listWDefaultType"
+		class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="propA">
+			<description>ignored</description>
+			<list value-type="java.lang.Double">
+                <value>0.0</value>
+                <value>1.0</value>
+			</list>
+		</property>
+	</component>
+
 	<component id="set"
 		class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">

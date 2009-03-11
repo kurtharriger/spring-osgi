@@ -17,6 +17,7 @@
 package org.springframework.osgi.blueprint.reflect;
 
 import org.osgi.service.blueprint.reflect.TypedStringValue;
+import org.springframework.osgi.blueprint.config.internal.temporary.SpecifiedTypeStringValue;
 
 /**
  * Simple implementation for {@link TypedStringValue} interface. Understands
@@ -42,7 +43,14 @@ public class SimpleTypedStringValue implements TypedStringValue {
 	}
 
 	public SimpleTypedStringValue(org.springframework.beans.factory.config.TypedStringValue typedStringValue) {
-		this.typeName = typedStringValue.getTargetTypeName();
+		if (typedStringValue instanceof SpecifiedTypeStringValue) {
+			SpecifiedTypeStringValue customType = (SpecifiedTypeStringValue) typedStringValue;
+			this.typeName = customType.getSpecifiedType();
+		}
+		else {
+			this.typeName = typedStringValue.getTargetTypeName();
+		}
+
 		this.value = typedStringValue.getValue();
 	}
 

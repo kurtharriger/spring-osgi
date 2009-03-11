@@ -43,6 +43,7 @@ import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.osgi.blueprint.config.internal.temporary.SpecifiedTypeStringValue;
 import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedList;
 import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedMap;
 import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedSet;
@@ -542,11 +543,15 @@ public class ComponentParser {
 		// It's a literal value.
 		String value = DomUtils.getTextValue(ele);
 		String typeClassName = ele.getAttribute(BeanDefinitionParserDelegate.TYPE_ATTRIBUTE);
+		String specifiedType = null; 
 		if (!StringUtils.hasText(typeClassName)) {
 			typeClassName = defaultTypeClassName;
 		}
+		else {
+			specifiedType = typeClassName;
+		}
 		try {
-			return buildTypedStringValue(value, typeClassName, ele);
+			return buildTypedStringValue(value, typeClassName, specifiedType, ele);
 		}
 		catch (ClassNotFoundException ex) {
 			error("Type class [" + typeClassName + "] not found for <value> element", ele, ex);
@@ -559,7 +564,7 @@ public class ComponentParser {
 	 * 
 	 * @see org.springframework.beans.factory.config.TypedStringValue
 	 */
-	private Object buildTypedStringValue(String value, String targetTypeName, Element ele)
+	private Object buildTypedStringValue(String value, String targetTypeName, String specifiedValue, Element ele)
 			throws ClassNotFoundException {
 
 		ClassLoader classLoader = parserContext.getReaderContext().getBeanClassLoader();
@@ -569,10 +574,10 @@ public class ComponentParser {
 		}
 		else if (classLoader != null) {
 			Class<?> targetType = ClassUtils.forName(targetTypeName, classLoader);
-			typedValue = new TypedStringValue(value, targetType);
+			typedValue = new SpecifiedTypeStringValue(value, targetType, specifiedValue);
 		}
 		else {
-			typedValue = new TypedStringValue(value, targetTypeName);
+			typedValue = new SpecifiedTypeStringValue(value, targetTypeName, specifiedValue);
 		}
 		typedValue.setSource(parserContext.extractSource(ele));
 		return typedValue;
@@ -583,6 +588,9 @@ public class ComponentParser {
 	 */
 	private List<?> parseListElement(Element collectionEle, BeanDefinition bd) {
 		String defaultTypeClassName = collectionEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
+		if (!StringUtils.hasText(defaultTypeClassName)) {
+			defaultTypeClassName = null;
+		}
 		NodeList nl = collectionEle.getChildNodes();
 		ManagedList list = new TempManagedList(nl.getLength(), defaultTypeClassName);
 		list.setSource(parserContext.extractSource(collectionEle));
@@ -602,6 +610,9 @@ public class ComponentParser {
 	 */
 	private Set<?> parseSetElement(Element collectionEle, BeanDefinition bd) {
 		String defaultTypeClassName = collectionEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
+		if (!StringUtils.hasText(defaultTypeClassName)) {
+			defaultTypeClassName = null;
+		}
 		NodeList nl = collectionEle.getChildNodes();
 		ManagedSet set = new TempManagedSet(nl.getLength(), defaultTypeClassName);
 		set.setSource(parserContext.extractSource(collectionEle));
@@ -621,8 +632,13 @@ public class ComponentParser {
 	 */
 	private Map<?, ?> parseMapElement(Element mapEle, BeanDefinition bd) {
 		String defaultKeyTypeClassName = mapEle.getAttribute(BeanDefinitionParserDelegate.KEY_TYPE_ATTRIBUTE);
+		if (!StringUtils.hasText(defaultKeyTypeClassName)) {
+			defaultKeyTypeClassName = null;
+		}
 		String defaultValueTypeClassName = mapEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
-
+		if (!StringUtils.hasText(defaultValueTypeClassName)) {
+			defaultValueTypeClassName = null;
+		}		
 		List<Element> entryEles = DomUtils.getChildElementsByTagName(mapEle, BeanDefinitionParserDelegate.ENTRY_ELEMENT);
 		ManagedMap map = new TempManagedMap(entryEles.size(), defaultKeyTypeClassName, defaultValueTypeClassName);
 		map.setMergeEnabled(parserContext.getDelegate().parseMergeAttribute(mapEle));
@@ -731,7 +747,7 @@ public class ComponentParser {
 	 */
 	private Object buildTypedStringValueForMap(String value, String defaultTypeClassName, Element entryEle) {
 		try {
-			return buildTypedStringValue(value, defaultTypeClassName, entryEle);
+			return buildTypedStringValue(value, defaultTypeClassName, null, entryEle);
 		}
 		catch (ClassNotFoundException ex) {
 			error("Type class [" + defaultTypeClassName + "] not found for Map key/value type", entryEle, ex);
