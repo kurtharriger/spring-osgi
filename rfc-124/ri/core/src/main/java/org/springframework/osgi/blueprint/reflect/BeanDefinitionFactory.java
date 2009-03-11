@@ -58,6 +58,8 @@ class BeanDefinitionFactory implements MetadataConstants {
 		AbstractBeanDefinition definition = buildBeanDefinition(metadata);
 		// add common properties
 		definition.setAttribute(MetadataConstants.COMPONENT_METADATA_ATTRIBUTE, metadata);
+		definition.setAttribute(MetadataConstants.COMPONENT_NAME, metadata.getName());
+
 		Set<String> dependencies = metadata.getExplicitDependencies();
 		definition.setDependsOn(dependencies.toArray(new String[dependencies.size()]));
 		return definition;

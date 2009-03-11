@@ -33,6 +33,7 @@ import org.springframework.util.Assert;
 public class SimpleMapValue implements MapValue {
 
 	private final Map<Value, Value> map;
+	private final String keyValueType, valueValueType;
 
 
 	/**
@@ -40,13 +41,16 @@ public class SimpleMapValue implements MapValue {
 	 * 
 	 * @param set
 	 */
-	public SimpleMapValue(Value[] keys, Value[] values) {
+	public SimpleMapValue(Value[] keys, String keyValueType, Value[] values, String valueValueType) {
 		Assert.state(keys.length == values.length, "the keys and values arrays must of the same length");
 		Map<Value, Value> vals = new LinkedHashMap<Value, Value>(keys.length);
 		for (int i = 0; i < keys.length; i++) {
 			vals.put(keys[i], values[i]);
 		}
 		map = Collections.unmodifiableMap(vals);
+
+		this.keyValueType = keyValueType;
+		this.valueValueType = valueValueType;
 	}
 
 	public Map<Value, Value> getMap() {
@@ -54,10 +58,10 @@ public class SimpleMapValue implements MapValue {
 	}
 
 	public String getKeyType() {
-		throw new UnsupportedOperationException();
+		return keyValueType;
 	}
 
 	public String getValueType() {
-		throw new UnsupportedOperationException();
+		return valueValueType;
 	}
 }

@@ -31,6 +31,7 @@ import org.osgi.service.blueprint.reflect.Value;
 public class SimpleSetValue implements SetValue {
 
 	private final Set<Value> set;
+	private final String valueType;
 
 
 	/**
@@ -38,10 +39,11 @@ public class SimpleSetValue implements SetValue {
 	 * 
 	 * @param set
 	 */
-	public SimpleSetValue(Value... values) {
+	public SimpleSetValue(Value[] values, String valueType) {
 		Set<Value> vals = new LinkedHashSet<Value>(values.length);
 		Collections.addAll(vals, values);
 		set = Collections.unmodifiableSet(vals);
+		this.valueType = valueType;
 	}
 
 	public Set<Value> getSet() {
@@ -49,6 +51,6 @@ public class SimpleSetValue implements SetValue {
 	}
 
 	public String getValueType() {
-		throw new UnsupportedOperationException();
+		return valueType;
 	}
 }

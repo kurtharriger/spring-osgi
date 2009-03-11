@@ -76,8 +76,7 @@ public class SpringModuleContext implements ModuleContext {
 	public ComponentMetadata getComponentMetadata(String name) throws NoSuchComponentException {
 		if (applicationContext.containsBeanDefinition(name)) {
 			BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(name);
-
-			return MetadataFactory.buildComponentMetadataFor(beanDefinition);
+			return MetadataFactory.buildComponentMetadataFor(name, beanDefinition);
 		}
 		else {
 			throw new NoSuchComponentException(name);
@@ -134,7 +133,8 @@ public class SpringModuleContext implements ModuleContext {
 		List<ComponentMetadata> metadata = new ArrayList<ComponentMetadata>();
 		String[] components = applicationContext.getBeanDefinitionNames();
 		for (String beanName : components) {
-			metadata.add(MetadataFactory.buildComponentMetadataFor(getBeanFactory().getBeanDefinition(beanName)));
+			metadata.add(MetadataFactory.buildComponentMetadataFor(beanName, getBeanFactory().getBeanDefinition(
+				beanName)));
 		}
 		return metadata;
 	}

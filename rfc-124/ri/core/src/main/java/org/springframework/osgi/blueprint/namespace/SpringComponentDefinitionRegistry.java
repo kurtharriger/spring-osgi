@@ -54,7 +54,7 @@ public class SpringComponentDefinitionRegistry implements ComponentDefinitionReg
 			}
 		}
 
-		return MetadataFactory.buildComponentMetadataFor(this.beanRegistry.getBeanDefinition(nameOfBeanWereLookingFor));
+		return MetadataFactory.buildComponentMetadataFor(name, beanRegistry.getBeanDefinition(nameOfBeanWereLookingFor));
 	}
 
 	public Set<String> getComponentDefinitionNames() {

@@ -47,10 +47,11 @@ class SpringLocalComponentMetadata extends SpringComponentMetadata implements Lo
 	/**
 	 * Constructs a new <code>SpringLocalComponentMetadata</code> instance.
 	 * 
+	 * @param name bean name
 	 * @param definition Spring bean definition
 	 */
-	public SpringLocalComponentMetadata(BeanDefinition definition) {
-		super(definition);
+	public SpringLocalComponentMetadata(String name, BeanDefinition definition) {
+		super(name, definition);
 
 		final String factoryName = definition.getFactoryBeanName();
 		if (StringUtils.hasText(factoryName)) {

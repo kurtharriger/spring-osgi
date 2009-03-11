@@ -23,7 +23,7 @@
 			<beans:bean class="java.lang.Object" />
 		</property>
 	</component>
-
+	
 	<component
 		class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">

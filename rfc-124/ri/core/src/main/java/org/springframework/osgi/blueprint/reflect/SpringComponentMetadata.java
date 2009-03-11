@@ -35,14 +35,16 @@ import org.springframework.util.ObjectUtils;
  */
 public class SpringComponentMetadata implements ComponentMetadata {
 
+	protected final String name;
 	protected final AbstractBeanDefinition beanDefinition;
 
 
 	// FIXME: allow rare-non abstract bean definition as well 
-	public SpringComponentMetadata(BeanDefinition definition) {
+	public SpringComponentMetadata(String name, BeanDefinition definition) {
 		if (!(definition instanceof AbstractBeanDefinition)) {
-			throw new IllegalArgumentException("Unknown bean definition passed in");
+			throw new IllegalArgumentException("Unknown bean definition passed in" + definition);
 		}
+		this.name = name;
 		this.beanDefinition = (AbstractBeanDefinition) definition;
 	}
 
@@ -61,6 +63,6 @@ public class SpringComponentMetadata implements ComponentMetadata {
 	}
 
 	public String getName() {
-		throw new UnsupportedOperationException();
+		return name;
 	}
 }

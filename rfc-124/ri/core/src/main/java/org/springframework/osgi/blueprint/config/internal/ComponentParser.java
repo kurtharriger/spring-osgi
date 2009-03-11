@@ -43,6 +43,9 @@ import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedList;
+import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedMap;
+import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedSet;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -490,10 +493,6 @@ public class ComponentParser {
 				return parserContext.getDelegate().parsePropsElement(ele);
 			}
 
-			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.PROPS_ELEMENT)) {
-				return parserContext.getDelegate().parsePropsElement(ele);
-			}
-
 			// maybe it's a nested service/reference/ref-list/ref-set
 			return parserContext.getDelegate().parseCustomElement(ele, bd);
 		}
@@ -585,7 +584,7 @@ public class ComponentParser {
 	private List<?> parseListElement(Element collectionEle, BeanDefinition bd) {
 		String defaultTypeClassName = collectionEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
 		NodeList nl = collectionEle.getChildNodes();
-		ManagedList list = new ManagedList(nl.getLength());
+		ManagedList list = new TempManagedList(nl.getLength(), defaultTypeClassName);
 		list.setSource(parserContext.extractSource(collectionEle));
 		list.setMergeEnabled(parserContext.getDelegate().parseMergeAttribute(collectionEle));
 		for (int i = 0; i < nl.getLength(); i++) {
@@ -604,7 +603,7 @@ public class ComponentParser {
 	private Set<?> parseSetElement(Element collectionEle, BeanDefinition bd) {
 		String defaultTypeClassName = collectionEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
 		NodeList nl = collectionEle.getChildNodes();
-		ManagedSet set = new ManagedSet(nl.getLength());
+		ManagedSet set = new TempManagedSet(nl.getLength(), defaultTypeClassName);
 		set.setSource(parserContext.extractSource(collectionEle));
 		set.setMergeEnabled(parserContext.getDelegate().parseMergeAttribute(collectionEle));
 		for (int i = 0; i < nl.getLength(); i++) {
@@ -625,7 +624,7 @@ public class ComponentParser {
 		String defaultValueTypeClassName = mapEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
 
 		List<Element> entryEles = DomUtils.getChildElementsByTagName(mapEle, BeanDefinitionParserDelegate.ENTRY_ELEMENT);
-		ManagedMap map = new ManagedMap(entryEles.size());
+		ManagedMap map = new TempManagedMap(entryEles.size(), defaultKeyTypeClassName, defaultValueTypeClassName);
 		map.setMergeEnabled(parserContext.getDelegate().parseMergeAttribute(mapEle));
 		map.setSource(parserContext.extractSource(mapEle));
 
