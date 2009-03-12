@@ -25,7 +25,7 @@ import org.springframework.osgi.config.internal.CollectionBeanDefinitionParser;
 import org.springframework.osgi.config.internal.OsgiDefaultsDefinition;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
-import org.springframework.osgi.service.importer.support.CollectionType;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -36,6 +36,34 @@ import org.w3c.dom.Element;
 public abstract class BlueprintCollectionBeanDefinitionParser extends CollectionBeanDefinitionParser {
 
 	private class BlueprintAttrCallback extends BlueprintReferenceAttributeCallback {
+
+		private static final String ORDERING_NAME = "ordering-basis";
+		private static final String MEMBER_TYPE = "member-type";
+		private static final String SERVICE_ORDER = "service";
+		private static final String SERVICE_REF_OREDER = "service-reference";
+
+
+		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
+			if (super.process(parent, attribute, builder)) {
+
+				String name = attribute.getLocalName();
+				String value = attribute.getValue();
+
+				if (ORDERING_NAME.equals(name)) {
+					//builder.addPropertyValue(CARDINALITY_PROP, determineAvailability(value));
+					return false;
+				}
+
+				if (MEMBER_TYPE.equals(name)) {
+					//builder.addPropertyValue(CARDINALITY_PROP, determineAvailability(value));
+					return false;
+				}
+
+				return true;
+			}
+
+			return false;
+		}
 
 		@Override
 		public Object determineAvailability(String value) {
@@ -62,11 +90,6 @@ public abstract class BlueprintCollectionBeanDefinitionParser extends Collection
 		AttributeCallback blueprintCallback = new BlueprintAttrCallback();
 		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(
 			new AttributeCallback[] { blueprintCallback }, callbacks));
-	}
-
-	@Override
-	protected CollectionType collectionType() {
-		return null;
 	}
 
 	@Override

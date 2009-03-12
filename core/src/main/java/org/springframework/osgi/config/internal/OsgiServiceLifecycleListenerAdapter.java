@@ -119,7 +119,6 @@ class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListene
 				throw new IllegalArgumentException("Custom bind method [" + bindMethod + "] not found on " + beanName
 						+ "class " + clazz);
 			}
-
 		}
 
 		unbindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unbindMethod);

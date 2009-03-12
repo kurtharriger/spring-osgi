@@ -18,7 +18,9 @@ package org.springframework.osgi.blueprint.reflect;
 
 import org.osgi.service.blueprint.reflect.CollectionBasedServiceReferenceComponentMetadata;
 import org.osgi.service.blueprint.reflect.Value;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.osgi.service.importer.support.CollectionType;
 
 /**
  * @author Costin Leau
@@ -26,7 +28,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 class SpringCollectionBasedServiceReferenceComponentMetadata extends SpringServiceReferenceComponentMetadata implements
 		CollectionBasedServiceReferenceComponentMetadata {
 
-	private final Class<?> collectionType = null;
+	private static final String COLLECTION_PROP = "collectionType";
+
+	private final Class<?> collectionType;
 	private final Value comparator = null;
 	private final int memberType = 0;
 	private final int comparisonBasis = 0;
@@ -43,6 +47,10 @@ class SpringCollectionBasedServiceReferenceComponentMetadata extends SpringServi
 	public SpringCollectionBasedServiceReferenceComponentMetadata(String name, BeanDefinition definition) {
 		super(name, definition);
 
+		//
+		MutablePropertyValues pvs = definition.getPropertyValues();
+		CollectionType colType = (CollectionType) MetadataUtils.getValue(pvs, COLLECTION_PROP);
+		collectionType = colType.getCollectionClass();
 	}
 
 	public Class<?> getCollectionType() {
