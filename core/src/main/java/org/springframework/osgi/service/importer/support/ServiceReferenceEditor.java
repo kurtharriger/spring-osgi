@@ -59,10 +59,18 @@ public class ServiceReferenceEditor extends PropertyEditorSupport {
 		}
 
 		if (value instanceof ImportedOsgiServiceProxy) {
-			super.setValue(new ServiceReferenceDelegate((ImportedOsgiServiceProxy) value));
+			ImportedOsgiServiceProxy serviceProxy = (ImportedOsgiServiceProxy) value;
+			super.setValue(serviceProxy.getServiceReference());
 			return;
 		}
-		throw new IllegalArgumentException("expected a service of type " + ImportedOsgiServiceProxy.class.getName());
+
+		if (value instanceof ServiceReference) {
+			super.setValue(value);
+			return;
+		}
+
+		throw new IllegalArgumentException("Expected a service of type " + ImportedOsgiServiceProxy.class.getName()
+				+ " but received type " + value.getClass());
 	}
 
 	/**
@@ -74,5 +82,4 @@ public class ServiceReferenceEditor extends PropertyEditorSupport {
 	public String getAsText() {
 		return null;
 	}
-
 }
