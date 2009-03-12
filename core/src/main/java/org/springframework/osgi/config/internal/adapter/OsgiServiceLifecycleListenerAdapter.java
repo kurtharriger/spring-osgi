@@ -106,7 +106,6 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 				log.debug(clazz.getName() + " is a lifecycle listener");
 
 		bindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, bindMethod);
-		unbindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unbindMethod);
 
 		if (StringUtils.hasText(bindMethod)) {
 			// determine methods using ServiceReference signature
@@ -115,13 +114,28 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 
 			if (bindReference != null)
 				org.springframework.util.ReflectionUtils.makeAccessible(bindReference);
+
+			else if (bindMethods.isEmpty()) {
+				String beanName = (target == null ? "" : " bean [" + targetBeanName + "] ;");
+				throw new IllegalArgumentException("Custom bind method [" + bindMethod
+						+ "] (with proper signature) not found on " + beanName + "class " + clazz);
+			}
 		}
+
+		unbindMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unbindMethod);
+
 		if (StringUtils.hasText(unbindMethod)) {
 			unbindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, unbindMethod,
 				new Class[] { ServiceReference.class });
 
 			if (unbindReference != null)
 				org.springframework.util.ReflectionUtils.makeAccessible(unbindReference);
+
+			else if (unbindMethods.isEmpty()) {
+				String beanName = (target == null ? "" : " bean [" + targetBeanName + "] ;");
+				throw new IllegalArgumentException("Custom unbind method [" + unbindMethod
+						+ "] (with proper signature) not found on " + beanName + "class " + clazz);
+			}
 		}
 
 		if (!isLifecycleListener
