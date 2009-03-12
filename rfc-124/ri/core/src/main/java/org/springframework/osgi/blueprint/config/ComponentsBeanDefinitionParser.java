@@ -23,6 +23,7 @@ import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.blueprint.config.internal.BlueprintCollectionBeanDefinitionParser;
 import org.springframework.osgi.blueprint.config.internal.BlueprintReferenceBeanDefinitionParser;
+import org.springframework.osgi.blueprint.config.internal.BlueprintServiceDefinitionParser;
 import org.springframework.osgi.blueprint.config.internal.ComponentParser;
 import org.springframework.osgi.blueprint.config.internal.ParsingUtils;
 import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
@@ -143,7 +144,7 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 	private void parseServiceElement(Element ele, ParserContext parserContext) {
-		BeanDefinitionParser parser = new ServiceBeanDefinitionParser();
+		BeanDefinitionParser parser = new BlueprintServiceDefinitionParser();
 		parser.parse(ele, parserContext);
 	}
 

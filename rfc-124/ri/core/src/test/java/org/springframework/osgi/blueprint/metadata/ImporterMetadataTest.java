@@ -19,9 +19,12 @@ package org.springframework.osgi.blueprint.metadata;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.osgi.service.blueprint.reflect.BindingListenerMetadata;
+import org.osgi.service.blueprint.reflect.CollectionBasedServiceReferenceComponentMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.ComponentValue;
 import org.osgi.service.blueprint.reflect.ReferenceValue;
@@ -99,5 +102,31 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 		ServiceReferenceComponentMetadata metadata = getReferenceMetadata("timeout");
 		assertTrue(metadata instanceof UnaryServiceReferenceComponentMetadata);
 		assertEquals(1234, ((UnaryServiceReferenceComponentMetadata) metadata).getTimeout());
+	}
+
+	public void testSimpleList() throws Exception {
+		CollectionBasedServiceReferenceComponentMetadata metadata = (CollectionBasedServiceReferenceComponentMetadata) getReferenceMetadata("simpleList");
+		assertEquals(List.class, metadata.getCollectionType());
+		System.out.println(metadata.getComparator());
+	}
+
+	public void testNestedComparator() throws Exception {
+		CollectionBasedServiceReferenceComponentMetadata metadata = (CollectionBasedServiceReferenceComponentMetadata) getReferenceMetadata("nestedComparator");
+		assertEquals(List.class, metadata.getCollectionType());
+		System.out.println(metadata.getComparator());
+	}
+
+	public void testNestedRefComparator() throws Exception {
+	}
+
+	public void testMemberType() throws Exception {
+		CollectionBasedServiceReferenceComponentMetadata metadata = (CollectionBasedServiceReferenceComponentMetadata) getReferenceMetadata("memberType");
+		assertEquals(Set.class, metadata.getCollectionType());
+	}
+
+	public void testSortedSet() throws Exception {
+		CollectionBasedServiceReferenceComponentMetadata metadata = (CollectionBasedServiceReferenceComponentMetadata) getReferenceMetadata("sortedSet");
+		System.out.println(metadata.getCollectionType());
+		assertEquals(SortedSet.class, metadata.getCollectionType());
 	}
 }

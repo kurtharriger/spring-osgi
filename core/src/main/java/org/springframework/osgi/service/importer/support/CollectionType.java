@@ -82,7 +82,7 @@ public class CollectionType extends StaticLabeledEnum {
 	 * 
 	 * @return collection class
 	 */
-	Class getCollectionClass() {
+	public Class getCollectionClass() {
 		return collectionClass;
 	}
 
