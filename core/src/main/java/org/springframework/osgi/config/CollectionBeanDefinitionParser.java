@@ -166,7 +166,7 @@ abstract class CollectionBeanDefinitionParser extends AbstractReferenceDefinitio
 		// used
 		// so that the object natural ordering is used.
 
-		if (comparatorElement != null) {
+		if (comparatorElement != null || hasComparatorRef) {
 			if (CollectionType.LIST.equals(collectionType()))
 				builder.addPropertyValue(COLLECTION_TYPE_PROP, CollectionType.SORTED_LIST);
 
