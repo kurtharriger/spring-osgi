@@ -37,4 +37,28 @@ public class ImporterListener {
 	public void unbind(ServiceReference ref) {
 		unbind.add(ref);
 	}
+
+	public void refBind(ServiceReference ref) {
+		bind.add(ref);
+	}
+
+	public void refUnbind(ServiceReference ref) {
+		unbind.add(ref);
+	}
+
+	public void bindM(ServiceReference ref) {
+		bind.add(ref);
+	}
+
+	public void unbindM(ServiceReference ref) {
+		unbind.add(ref);
+	}
+
+	public void up(ServiceReference ref) {
+		bind.add(ref);
+	}
+
+	public void down(ServiceReference ref) {
+		unbind.add(ref);
+	}
 }

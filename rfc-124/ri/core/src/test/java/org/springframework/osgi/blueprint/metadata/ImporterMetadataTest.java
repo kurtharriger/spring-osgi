@@ -17,11 +17,16 @@
 package org.springframework.osgi.blueprint.metadata;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.osgi.service.blueprint.reflect.BindingListenerMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.osgi.service.blueprint.reflect.ComponentValue;
+import org.osgi.service.blueprint.reflect.ReferenceValue;
 import org.osgi.service.blueprint.reflect.ServiceReferenceComponentMetadata;
+import org.osgi.service.blueprint.reflect.UnaryServiceReferenceComponentMetadata;
 
 /**
  * @author Costin Leau
@@ -49,7 +54,7 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 		assertEquals(Cloneable.class.getName(), intfs.iterator().next());
 		assertEquals(ServiceReferenceComponentMetadata.MANDATORY_AVAILABILITY,
 			metadata.getServiceAvailabilitySpecification());
-
+		assertEquals(0, metadata.getBindingListeners().size());
 	}
 
 	public void testBeanWithOptions() throws Exception {
@@ -59,19 +64,40 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 		assertEquals(Serializable.class.getName(), intfs.iterator().next());
 		assertEquals(ServiceReferenceComponentMetadata.OPTIONAL_AVAILABILITY,
 			metadata.getServiceAvailabilitySpecification());
-		System.out.println(metadata.getBindingListeners());
-
+		Collection<BindingListenerMetadata> listeners = metadata.getBindingListeners();
+		assertEquals(1, listeners.size());
 	}
 
 	public void testMultipleInterfaces() throws Exception {
 		ServiceReferenceComponentMetadata metadata = getReferenceMetadata("multipleInterfaces");
 		Set<String> intfs = metadata.getInterfaceNames();
-		System.out.println(intfs);
 		Iterator<String> iter = intfs.iterator();
 		assertEquals(Cloneable.class.getName(), iter.next());
 		assertEquals(Serializable.class.getName(), iter.next());
 		assertEquals(ServiceReferenceComponentMetadata.MANDATORY_AVAILABILITY,
 			metadata.getServiceAvailabilitySpecification());
-		System.out.println(metadata.getBindingListeners());
+		assertEquals(0, metadata.getBindingListeners().size());
+	}
+
+	public void testMultipleListeners() throws Exception {
+		ServiceReferenceComponentMetadata metadata = getReferenceMetadata("multipleListeners");
+		Collection<BindingListenerMetadata> listeners = metadata.getBindingListeners();
+		assertEquals(3, listeners.size());
+
+		Iterator<BindingListenerMetadata> iterator = listeners.iterator();
+		BindingListenerMetadata listener = iterator.next();
+		assertEquals("bindM", listener.getBindMethodName());
+		assertEquals("unbindM", listener.getUnbindMethodName());
+		assertTrue(listener.getListenerComponent() instanceof ReferenceValue);
+		listener = iterator.next();
+		assertTrue(listener.getListenerComponent() instanceof ComponentValue);
+		listener = iterator.next();
+		assertTrue(listener.getListenerComponent() instanceof ReferenceValue);
+	}
+
+	public void testTimeout() throws Exception {
+		ServiceReferenceComponentMetadata metadata = getReferenceMetadata("timeout");
+		assertTrue(metadata instanceof UnaryServiceReferenceComponentMetadata);
+		assertEquals(1234, ((UnaryServiceReferenceComponentMetadata) metadata).getTimeout());
 	}
 }

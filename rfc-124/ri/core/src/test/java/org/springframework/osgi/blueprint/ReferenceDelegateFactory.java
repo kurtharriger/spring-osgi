@@ -16,27 +16,22 @@
 
 package org.springframework.osgi.blueprint;
 
-import java.lang.reflect.Constructor;
-
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.ServiceReferenceProxy;
+import org.springframework.osgi.service.importer.support.internal.aop.StaticServiceReferenceProxy;
 
 /**
  * @author Costin Leau
  */
 public class ReferenceDelegateFactory implements FactoryBean {
 
-	private final Class clazz;
 	private final ServiceReference ref;
 
 
 	public ReferenceDelegateFactory() throws Exception {
-		clazz = Class.forName("org.springframework.osgi.service.importer.support.ServiceReferenceDelegate", true,
-			getClass().getClassLoader());
-
 		ref = new MockServiceReference();
 	}
 
@@ -44,18 +39,15 @@ public class ReferenceDelegateFactory implements FactoryBean {
 		ImportedOsgiServiceProxy mockProxy = new ImportedOsgiServiceProxy() {
 
 			public ServiceReferenceProxy getServiceReference() {
-				return null;
+				return new StaticServiceReferenceProxy(ref);
 			}
 		};
 
-		Constructor ctor = clazz.getDeclaredConstructor(ImportedOsgiServiceProxy.class);
-		ctor.setAccessible(true);
-		Object instance = ctor.newInstance(mockProxy);
-		return instance;
+		return mockProxy;
 	}
 
 	public Class getObjectType() {
-		return clazz;
+		return ImportedOsgiServiceProxy.class;
 	}
 
 	public boolean isSingleton() {

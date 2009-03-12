@@ -18,6 +18,7 @@ package org.springframework.osgi.blueprint.config;
 
 import junit.framework.TestCase;
 
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.blueprint.convert.ConversionService;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -25,6 +26,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.blueprint.TestComponent;
 import org.springframework.osgi.blueprint.convert.SpringConversionService;
+import org.springframework.osgi.service.importer.support.ServiceReferenceEditor;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -42,6 +44,7 @@ public class TypeConverterTest extends TestCase {
 	protected void setUp() throws Exception {
 		context = new GenericApplicationContext();
 		context.setClassLoader(getClass().getClassLoader());
+		context.getBeanFactory().registerCustomEditor(ServiceReference.class, ServiceReferenceEditor.class);
 		reader = new XmlBeanDefinitionReader(context);
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
 		context.refresh();
@@ -82,6 +85,6 @@ public class TypeConverterTest extends TestCase {
 
 	public void testReferenceDelegate() throws Exception {
 		TestComponent comp = (TestComponent) context.getBean("serviceReference");
-		System.out.println(comp.getServiceReference());
+		assertNotNull(comp.getServiceReference());
 	}
 }

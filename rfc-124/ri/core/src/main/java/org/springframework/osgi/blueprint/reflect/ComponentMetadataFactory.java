@@ -51,9 +51,11 @@ class ComponentMetadataFactory implements MetadataConstants {
 			return new SpringServiceExportComponentMetadata(name, beanDefinition);
 		}
 
-		if (isServiceImporter(beanDefinition)) {
-			// TODO: need to further distinguish unary and collection references
-			return new SpringServiceReferenceComponentMetadata(name, beanDefinition);
+		if (isSingleServiceImporter(beanDefinition)) {
+			return new SpringUnaryServiceReferenceComponentMetadata(name, beanDefinition);
+		}
+		if (isCollectionImporter(beanDefinition)) {
+			return new SpringCollectionBasedServiceReferenceComponentMetadata(name, beanDefinition);
 		}
 
 		return new SpringLocalComponentMetadata(name, beanDefinition);
@@ -64,9 +66,12 @@ class ComponentMetadataFactory implements MetadataConstants {
 		return checkBeanDefinitionClassCompatibility(beanDefinition, EXPORTER_CLASS);
 	}
 
-	private static boolean isServiceImporter(BeanDefinition beanDefinition) {
-		return (checkBeanDefinitionClassCompatibility(beanDefinition, SINGLE_SERVICE_IMPORTER_CLASS) || checkBeanDefinitionClassCompatibility(
-			beanDefinition, MULTI_SERVICE_IMPORTER_CLASS));
+	private static boolean isSingleServiceImporter(BeanDefinition beanDefinition) {
+		return checkBeanDefinitionClassCompatibility(beanDefinition, SINGLE_SERVICE_IMPORTER_CLASS);
+	}
+
+	private static boolean isCollectionImporter(BeanDefinition beanDefinition) {
+		return checkBeanDefinitionClassCompatibility(beanDefinition, MULTI_SERVICE_IMPORTER_CLASS);
 	}
 
 	private static boolean checkBeanDefinitionClassCompatibility(BeanDefinition definition, Class<?> clazz) {
