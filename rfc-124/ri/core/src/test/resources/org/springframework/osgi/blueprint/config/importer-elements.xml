@@ -6,15 +6,15 @@
 		http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
 
 	<description>Importer configuration</description>
-
+	
 	<component id="listener"
 		class="org.springframework.osgi.blueprint.ImporterListener" />
-
 	<reference id="simple" interface="java.lang.Cloneable" />
 
 	<reference id="options" interface="java.io.Serializable"
 		availability="optional" component-name="foo" filter="(name=foo)">
-		<listener bind-method="bind" unbind-method="unbind" ref="listener"/>
+		<listener bind-method="bind" unbind-method="unbind"
+			ref="listener" />
 	</reference>
 
 	<reference id="multipleInterfaces">
@@ -24,4 +24,23 @@
 		</interfaces>
 	</reference>
 
+	<reference id="multipleListeners">
+		<interfaces>
+			<value>java.lang.Cloneable</value>
+			<value>java.io.Serializable</value>
+		</interfaces>
+		<listener bind-method="bindM" unbind-method="unbindM"
+			ref="listener" />
+		
+		<listener bind-method="up" unbind-method="down">
+			<component id="inner"
+				class="org.springframework.osgi.blueprint.ImporterListener" />
+		</listener>
+		<listener bind-method="refBind" unbind-method="refUnbind">
+			<ref component="listener" />
+		</listener>
+	</reference>
+	
+	<reference id="timeout" interface="java.lang.Cloneable" timeout="1234"/>
+	
 </components>

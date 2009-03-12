@@ -39,9 +39,7 @@ import org.springframework.osgi.service.importer.support.Cardinality;
  * @author Adrian Colyer
  * @author Costin Leau
  */
-// FIXME: the raw bean definition might be unsuitable. If it has been resolved, the instantiated
-// bean instance might be better
-class SpringServiceReferenceComponentMetadata extends SpringComponentMetadata implements
+abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMetadata implements
 		ServiceReferenceComponentMetadata {
 
 	private static final String FILTER_PROP = "filter";

@@ -32,7 +32,8 @@ public class SimpleBindingListenerMetadata implements BindingListenerMetadata {
 
 	private static final String BIND_PROP = "bindMethod";
 	private static final String UNBIND_PROP = "unbindMethod";
-	private static final String LISTENER_NAME = "targetBeanName";
+	private static final String LISTENER_NAME_PROP = "targetBeanName";
+	private static final String LISTENER_PROP = "target";
 	private final String bindMethodName, unbindMethodName;
 	private final Value listenerComponent;
 
@@ -43,11 +44,12 @@ public class SimpleBindingListenerMetadata implements BindingListenerMetadata {
 		unbindMethodName = (String) MetadataUtils.getValue(pvs, UNBIND_PROP);
 
 		// listener reference
-		if (pvs.contains(LISTENER_NAME)) {
-			listenerComponent = new SimpleReferenceValue((String) MetadataUtils.getValue(pvs, LISTENER_NAME));
+		if (pvs.contains(LISTENER_NAME_PROP)) {
+			listenerComponent = new SimpleReferenceValue((String) MetadataUtils.getValue(pvs, LISTENER_NAME_PROP));
 		}
 		else {
-			listenerComponent = null;
+			// convert the BeanDefinitionHolder
+			listenerComponent = ValueFactory.buildValue(MetadataUtils.getValue(pvs, LISTENER_PROP));
 		}
 	}
 
@@ -75,5 +77,4 @@ public class SimpleBindingListenerMetadata implements BindingListenerMetadata {
 	public String getUnbindMethodName() {
 		return unbindMethodName;
 	}
-
 }

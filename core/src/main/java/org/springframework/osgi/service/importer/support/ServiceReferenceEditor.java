@@ -59,7 +59,9 @@ public class ServiceReferenceEditor extends PropertyEditorSupport {
 		}
 
 		if (value instanceof ImportedOsgiServiceProxy) {
-			super.setValue(new ServiceReferenceDelegate((ImportedOsgiServiceProxy) value));
+			ImportedOsgiServiceProxy referenceProxy = (ImportedOsgiServiceProxy) value;
+			// inject static proxy
+			super.setValue(referenceProxy.getServiceReference().getTargetServiceReference());
 			return;
 		}
 
