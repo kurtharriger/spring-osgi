@@ -26,8 +26,10 @@ import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
 import org.osgi.service.blueprint.reflect.NullValue;
 import org.osgi.service.blueprint.reflect.Value;
 import org.springframework.beans.BeanMetadataElement;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.BeanReferenceFactoryBean;
 import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
@@ -47,6 +49,10 @@ import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedS
  * @author Costin Leau
  */
 class ValueFactory {
+
+	private static final String BEAN_REF_FB_CLASS_NAME = BeanReferenceFactoryBean.class.getName();
+	private static final String BEAN_REF_NAME_PROP = "targetBeanName";
+
 
 	/**
 	 * Creates the equivalent value for the given Spring metadata. Since
@@ -79,8 +85,13 @@ class ValueFactory {
 
 			// bean definition
 			if (metadata instanceof BeanDefinition) {
-				ComponentMetadata componentMetadata = MetadataFactory.buildComponentMetadataFor(null,
-					(BeanDefinition) metadata);
+				// check special alias case
+				BeanDefinition def = (BeanDefinition) metadata;
+				if (BEAN_REF_FB_CLASS_NAME.equals(def.getBeanClassName())) {
+					return new SimpleReferenceValue((String) MetadataUtils.getValue(def.getPropertyValues(),
+						BEAN_REF_NAME_PROP));
+				}
+				ComponentMetadata componentMetadata = MetadataFactory.buildComponentMetadataFor(null, def);
 				return new SimpleComponentValue((LocalComponentMetadata) componentMetadata);
 			}
 

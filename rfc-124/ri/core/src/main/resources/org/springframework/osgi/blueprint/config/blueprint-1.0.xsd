@@ -23,7 +23,7 @@
             targetNamespace="http://www.osgi.org/xmlns/blueprint/v1.0.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified"
-            version="1.0-rc2">
+            version="1.0.0">
 
     <!-- Schema elements for core component declarations -->
 
@@ -431,6 +431,7 @@
             <xsd:element name="service-properties" minOccurs="0" type="TmapType"/>
             <xsd:element name="registration-listener" type="TserviceRegistrationListener" 
                    minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="component" minOccurs="0" maxOccurs="1"/>
           </xsd:sequence>
    </xsd:group>
 

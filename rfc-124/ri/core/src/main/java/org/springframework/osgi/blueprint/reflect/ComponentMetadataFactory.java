@@ -36,7 +36,7 @@ class ComponentMetadataFactory implements MetadataConstants {
 	 * @param beanDefinition
 	 * @return
 	 */
-	ComponentMetadata buildMetadata(String name, BeanDefinition beanDefinition) {
+	static ComponentMetadata buildMetadata(String name, BeanDefinition beanDefinition) {
 		// shortcut (to avoid re-rewrapping)
 		Object metadata = beanDefinition.getAttribute(COMPONENT_METADATA_ATTRIBUTE);
 		if (metadata instanceof ComponentMetadata)
@@ -59,7 +59,6 @@ class ComponentMetadataFactory implements MetadataConstants {
 		}
 
 		return new SpringLocalComponentMetadata(name, beanDefinition);
-
 	}
 
 	private static boolean isServiceExporter(BeanDefinition beanDefinition) {

@@ -14,28 +14,24 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+package org.springframework.osgi.rfc124.iandt.core;
 
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.osgi.rfc124.iandt.BaseRFC124IntegrationTest;
+import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * @author Costin Leau
  */
-public class ExporterListener {
+public class ExporterTest extends BaseRFC124IntegrationTest {
 
-	public static final List bind = new ArrayList();
-	public static final List unbind = new ArrayList();
-
-
-	public void up(ServiceRegistration reg, Map serviceProperties) {
-		bind.add(reg);
+	@Override
+	protected String[] getConfigLocations() {
+		return new String[] { "org/springframework/osgi/rfc124/iandt/core/exporter-test.xml" };
 	}
 
-	public void down(ServiceRegistration reg, Map serviceProperties) {
-		unbind.add(reg);
+	public void testExportedServiceProperties() throws Exception {
+		ServiceRegistration reg = (ServiceRegistration) applicationContext.getBean("simple");
+		System.out.println(OsgiStringUtils.nullSafeToString(reg.getReference()));
 	}
 }
