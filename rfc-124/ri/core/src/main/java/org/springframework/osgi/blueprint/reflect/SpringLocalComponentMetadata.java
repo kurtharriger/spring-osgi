@@ -39,7 +39,7 @@ import org.springframework.util.StringUtils;
 class SpringLocalComponentMetadata extends SpringComponentMetadata implements LocalComponentMetadata {
 
 	private final ConstructorInjectionMetadata constructorMetadata;
-	private final MethodInjectionMetadata methodMetadata;
+	private final MethodInjectionMetadata factoryMethodMetadata;
 	private final Collection<PropertyInjectionMetadata> propertyMetadata;
 	private final Value factoryComponent;
 
@@ -53,14 +53,20 @@ class SpringLocalComponentMetadata extends SpringComponentMetadata implements Lo
 	public SpringLocalComponentMetadata(String name, BeanDefinition definition) {
 		super(name, definition);
 
-		final String factoryName = definition.getFactoryBeanName();
-		if (StringUtils.hasText(factoryName)) {
-			factoryComponent = new SimpleReferenceValue(factoryName);
-			methodMetadata = new SimpleMethodInjectionMetadata(definition);
+		final String factoryMethod = definition.getFactoryMethodName();
+		if (StringUtils.hasText(factoryMethod)) {
+			factoryMethodMetadata = new SimpleMethodInjectionMetadata(definition);
+			String factory = definition.getFactoryBeanName();
+			if (StringUtils.hasText(factory)) {
+				factoryComponent = new SimpleReferenceValue(factory);
+			}
+			else {
+				factoryComponent = null;
+			}
 		}
 		else {
 			factoryComponent = null;
-			methodMetadata = null;
+			factoryMethodMetadata = null;
 		}
 
 		constructorMetadata = new SimpleConstructorInjectionMetadata(definition);
@@ -92,7 +98,7 @@ class SpringLocalComponentMetadata extends SpringComponentMetadata implements Lo
 	}
 
 	public MethodInjectionMetadata getFactoryMethodMetadata() {
-		return methodMetadata;
+		return factoryMethodMetadata;
 	}
 
 	public String getInitMethodName() {

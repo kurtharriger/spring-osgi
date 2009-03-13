@@ -10,9 +10,9 @@
 
 
 	<component id="char" class="java.lang.Character">
-		<constructor-arg type="char" value="\u0000"/>
+		<constructor-arg type="char" value="\u0000" />
 	</component>
-	
+
 	<component id="constructor-arg" class="java.lang.Integer">
 		<description>description</description>
 		<constructor-arg index="0" type="int" value="3" />
@@ -63,8 +63,8 @@
 		<property name="propA">
 			<description>ignored</description>
 			<list value-type="java.lang.Double">
-                <value>0.0</value>
-                <value>1.0</value>
+				<value>0.0</value>
+				<value>1.0</value>
 			</list>
 		</property>
 	</component>
@@ -90,8 +90,10 @@
 				<entry key="foo" value="bar" />
 				<entry key-ref="list" value-ref="set" />
 				<entry>
-					<key><ref component="set"/></key>
-					<ref component="list"/>
+					<key>
+						<ref component="set" />
+					</key>
+					<ref component="list" />
 				</entry>
 			</map>
 		</property>
@@ -107,51 +109,75 @@
 		</property>
 	</component>
 
-	<component id="null" 
+	<component id="null"
 		class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
-			<null/>
+			<null />
 		</property>
 	</component>
-	
-	<component id="compZeroLengthString" class="org.springframework.osgi.blueprint.TestComponent">
-       <property name="propA" value=""/>
-    </component> 
-   
-    <!-- 
-	<component id="dateConstructor"
-	 	class="org.springframework.osgi.blueprint.DateConstructor">
-	 	<constructor-arg value="6/1/1999" type="java.util.Date"/> 
-	</component>
-	--> 
-	
-	<component id="nan" factory-method="valueOf" class="java.lang.Double">
-       <constructor-arg value="NaN" type="double"/>
-    </component>
-    
-    <component id="ambigousConstructor" class="org.springframework.osgi.blueprint.AmbigousTestComponent">
-       <constructor-arg type="java.lang.String" value="compThreeArgOverride"/>
-       <constructor-arg  type="java.lang.Object" value="true">
-       </constructor-arg>
-       <constructor-arg type="java.lang.String"><null/></constructor-arg>
-    </component>
-   
-    <component id="nestedArgs" class="java.lang.Boolean">
-	   <constructor-arg type="java.lang.String">
-	   		<value type="java.lang.Boolean">true</value>
-	   </constructor-arg>
+
+	<component id="compZeroLengthString"
+		class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="propA" value="" />
 	</component>
 
-    <component id="nestedArgs2" class="java.lang.Boolean">
-	   <constructor-arg type="boolean">
-	   		<value>true</value>
-	   </constructor-arg>
+	<!-- 
+		<component id="dateConstructor"
+		class="org.springframework.osgi.blueprint.DateConstructor">
+		<constructor-arg value="6/1/1999" type="java.util.Date"/> 
+		</component>
+	-->
+
+	<component id="nan" factory-method="valueOf"
+		class="java.lang.Double">
+		<constructor-arg value="NaN" type="double" />
 	</component>
-    
-    <component id="staticFactory" factory-method="staticMethod" class="org.springframework.osgi.blueprint.FactoryComponent">
-       <constructor-arg value="String" index="1"/>
-       <constructor-arg value="123" index="2"/>
-       <constructor-arg value="981" index="0"/>
-    </component>
-   
+
+	<component id="ambigousConstructor"
+		class="org.springframework.osgi.blueprint.AmbigousTestComponent">
+		<constructor-arg type="java.lang.String"
+			value="compThreeArgOverride" />
+		<constructor-arg type="java.lang.Object" value="true">
+		</constructor-arg>
+		<constructor-arg type="java.lang.String">
+			<null />
+		</constructor-arg>
+	</component>
+
+	<component id="nestedArgs" class="java.lang.Boolean">
+		<constructor-arg type="java.lang.String">
+			<value type="java.lang.Boolean">true</value>
+		</constructor-arg>
+	</component>
+
+	<component id="nestedArgs2" class="java.lang.Boolean">
+		<constructor-arg type="boolean">
+			<value>true</value>
+		</constructor-arg>
+	</component>
+
+	<component id="staticFactory" factory-method="staticMethod"
+		class="org.springframework.osgi.blueprint.FactoryComponent">
+		<constructor-arg value="String" index="1" />
+		<constructor-arg value="123" index="2" />
+		<constructor-arg value="981" index="0" />
+	</component>
+
+	<component id="namedComparator"
+		class="org.springframework.osgi.blueprint.DummyComparator" />
+
+	<component id="nestedRef"
+		class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="propA">
+			<ref-list availability="optional">
+				<interfaces>
+					<value>java.util.Map</value>
+					<value>java.io.Serializable</value>
+				</interfaces>
+				<comparator>
+					<ref component="namedComparator" />
+				</comparator>
+			</ref-list>
+		</property>
+	</component>
 </components>

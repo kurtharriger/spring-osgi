@@ -34,6 +34,8 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.blueprint.TestComponent;
+import org.springframework.osgi.context.support.BundleContextAwareProcessor;
+import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -47,11 +49,16 @@ public class ComponentSubElementTest extends TestCase {
 
 	private GenericApplicationContext context;
 	private XmlBeanDefinitionReader reader;
+	protected MockBundleContext bundleContext;
 
 
 	protected void setUp() throws Exception {
+		bundleContext = new MockBundleContext();
+
 		context = new GenericApplicationContext();
 		context.setClassLoader(getClass().getClassLoader());
+		context.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
+
 		reader = new XmlBeanDefinitionReader(context);
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
 		context.refresh();

@@ -17,11 +17,15 @@
 package org.springframework.osgi.blueprint.metadata;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.osgi.service.blueprint.reflect.ComponentValue;
+import org.osgi.service.blueprint.reflect.ReferenceValue;
+import org.osgi.service.blueprint.reflect.RegistrationListenerMetadata;
 import org.osgi.service.blueprint.reflect.ServiceExportComponentMetadata;
 
 /**
@@ -50,9 +54,11 @@ public class ExporterMetadataTest extends BaseMetadataTest {
 		assertEquals(1, intfs.size());
 		assertEquals(Map.class.getName(), intfs.iterator().next());
 		assertEquals(123, metadata.getRanking());
-		System.out.println(metadata.getExportedComponent());
 		assertTrue(metadata.getRegistrationListeners().isEmpty());
-		System.out.println(metadata.getServiceProperties());
+
+		assertTrue(metadata.getExportedComponent() instanceof ReferenceValue);
+		Map props = metadata.getServiceProperties();
+		assertEquals("lip", props.get("fat"));
 	}
 
 	public void testNestedBean() throws Exception {
@@ -66,8 +72,20 @@ public class ExporterMetadataTest extends BaseMetadataTest {
 		assertEquals(Serializable.class.getName(), iterator.next());
 
 		assertEquals(0, metadata.getRanking());
-		assertTrue(metadata.getRegistrationListeners().isEmpty());
-		System.out.println(metadata.getServiceProperties());
-	}
 
+		Collection<RegistrationListenerMetadata> listeners = metadata.getRegistrationListeners();
+		Iterator<RegistrationListenerMetadata> iter = listeners.iterator();
+		RegistrationListenerMetadata listener = iter.next();
+
+		assertEquals("up", listener.getRegistrationMethodName());
+		assertEquals("down", listener.getUnregistrationMethodName());
+		assertEquals("listener", ((ReferenceValue) listener.getListenerComponent()).getComponentName());
+
+		listener = iter.next();
+		assertEquals("up", listener.getRegistrationMethodName());
+		assertEquals("down", listener.getUnregistrationMethodName());
+		assertTrue(listener.getListenerComponent() instanceof ComponentValue);
+
+		assertTrue(metadata.getExportedComponent() instanceof ComponentValue);
+	}
 }

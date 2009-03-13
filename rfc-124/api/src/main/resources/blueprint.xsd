@@ -23,7 +23,7 @@
             targetNamespace="http://www.osgi.org/xmlns/blueprint/v1.0.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified"
-            version="1.0-rc2">
+            version="1.0.0">
 
     <!-- Schema elements for core component declarations -->
 

@@ -127,6 +127,11 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 		assertEquals("two", propsValue.getPropertiesValue().getProperty("one"));
 	}
 
+	public void testNestedRef() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("nestedRef");
+		
+	}
+	
 	// SPR-5554
 	public void testStaticFactoryArguments() throws Exception {
 		System.err.println("********* test DISABLED");
