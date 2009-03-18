@@ -24,11 +24,14 @@ import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.ConstructorInjectionMetadata;
 import org.osgi.service.blueprint.reflect.ListValue;
 import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
+import org.osgi.service.blueprint.reflect.MethodInjectionMetadata;
 import org.osgi.service.blueprint.reflect.NullValue;
 import org.osgi.service.blueprint.reflect.ParameterSpecification;
 import org.osgi.service.blueprint.reflect.PropertiesValue;
 import org.osgi.service.blueprint.reflect.PropertyInjectionMetadata;
+import org.osgi.service.blueprint.reflect.ReferenceValue;
 import org.osgi.service.blueprint.reflect.TypedStringValue;
+import org.osgi.service.blueprint.reflect.Value;
 
 /**
  * @author Costin Leau
@@ -129,11 +132,11 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 
 	public void testNestedRef() throws Exception {
 		LocalComponentMetadata localMetadata = getLocalMetadata("nestedRef");
-		
+
 	}
-	
+
 	// SPR-5554
-	public void testStaticFactoryArguments() throws Exception {
+	public void testStaticFactoryArgumentsOrder() throws Exception {
 		System.err.println("********* test DISABLED");
 		if (false) {
 			LocalComponentMetadata localMetadata = getLocalMetadata("staticFactory");
@@ -148,5 +151,52 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 			assertEquals(2, params.get(1).getIndex());
 			assertEquals(0, params.get(2).getIndex());
 		}
+	}
+
+	public void testFactoryMethod() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("noArgStaticFactory");
+		MethodInjectionMetadata methodMetadata = localMetadata.getFactoryMethodMetadata();
+		assertNotNull(methodMetadata);
+		assertEquals("staticMethod", methodMetadata.getName());
+		List params = methodMetadata.getParameterSpecifications();
+		assertNotNull(params);
+		assertTrue(params.isEmpty());
+	}
+
+	public void testFactoryArgMethod() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("oneArgStaticFactory");
+		assertNull(localMetadata.getFactoryComponent());
+		MethodInjectionMetadata methodMetadata = localMetadata.getFactoryMethodMetadata();
+		assertNotNull(methodMetadata);
+		assertEquals("staticMethod", methodMetadata.getName());
+		List params = methodMetadata.getParameterSpecifications();
+		assertNotNull(params);
+		assertEquals(1, params.size());
+	}
+
+	public void testInstanceFactoryMethod() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("noArgInstanceFactory");
+		MethodInjectionMetadata methodMetadata = localMetadata.getFactoryMethodMetadata();
+		assertNotNull(methodMetadata);
+		assertEquals("instanceMethod", methodMetadata.getName());
+		List params = methodMetadata.getParameterSpecifications();
+		assertNotNull(params);
+		assertTrue(params.isEmpty());
+		Value factoryComponent = localMetadata.getFactoryComponent();
+		assertTrue(factoryComponent instanceof ReferenceValue);
+		assertEquals("instanceFactory", ((ReferenceValue) factoryComponent).getComponentName());
+	}
+
+	public void testInstanceFactoryArgMethod() throws Exception {
+		LocalComponentMetadata localMetadata = getLocalMetadata("oneArgInstanceFactory");
+		MethodInjectionMetadata methodMetadata = localMetadata.getFactoryMethodMetadata();
+		assertNotNull(methodMetadata);
+		assertEquals("instanceMethod", methodMetadata.getName());
+		List params = methodMetadata.getParameterSpecifications();
+		assertNotNull(params);
+		assertEquals(1, params.size());
+		Value factoryComponent = localMetadata.getFactoryComponent();
+		assertTrue(factoryComponent instanceof ReferenceValue);
+		assertEquals("instanceFactory", ((ReferenceValue) factoryComponent).getComponentName());
 	}
 }

@@ -13,8 +13,15 @@
 		<component
 			class="org.springframework.osgi.blueprint.config.TestComponentConverter" />
 		<ref component="converterB" />
+		<component id="asianRegionCodeConverter" 
+			class="org.springframework.osgi.blueprint.config.AsianRegionCodeConverter"/>
 	</type-converters>
 
+	<component id="asianCodeExample" class="org.springframework.osgi.blueprint.config.RegionCodeComponent"> 
+		<constructor-arg value="blaBla"/>
+		<constructor-arg value="CN+86"/>
+	</component>
+	
 	<component id="converterB"
 		class="org.springframework.osgi.blueprint.config.ComponentHolderConverter" />
 

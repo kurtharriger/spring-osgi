@@ -14,34 +14,27 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint;
+package org.springframework.osgi.blueprint.config;
 
 /**
  * @author Costin Leau
  */
-public class FactoryComponent {
+public class RegionCodeComponent {
 
-	public static Object staticMethod(Long arg1, String arg2, Integer arg3) {
-		return arg3;
+	private final String component;
+	private final RegionCode regionCode;
+
+
+	public RegionCodeComponent(String componentId, RegionCode regionCode) {
+		this.component = componentId;
+		this.regionCode = regionCode;
 	}
 
-	public static Object staticMethod(Object arg) {
-		return arg;
+	public String getComponent() {
+		return component;
 	}
 
-	public static Object staticMethod() {
-		return new Object();
-	}
-
-	public Object instanceMethod() {
-		return new Object();
-	}
-
-	public Object instanceMethod(Object arg) {
-		return arg;
-	}
-
-	public Object instanceMethod(Long arg1, String arg2, Integer arg3) {
-		return arg1;
+	public RegionCode getRegionCode() {
+		return regionCode;
 	}
 }

@@ -89,12 +89,12 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 
 	@Override
 	protected void maybeAddNamespaceHandlerFor(Bundle bundle) {
-		log.warn("Igorning namespace handling");
+		log.debug("Ignoring namespace handling");
 	}
 
 	@Override
 	protected void maybeRemoveNameSpaceHandlerFor(Bundle bundle) {
-		log.warn("Igorning namespace handling");
+		log.debug("Ignoring namespace handling");
 	}
 
 	@Override

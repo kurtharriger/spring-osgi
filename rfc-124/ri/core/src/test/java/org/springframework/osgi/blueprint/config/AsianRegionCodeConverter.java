@@ -14,34 +14,29 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint;
+package org.springframework.osgi.blueprint.config;
+
+import org.osgi.service.blueprint.convert.Converter;
 
 /**
+ * Taken from the TCK.
+ * 
  * @author Costin Leau
  */
-public class FactoryComponent {
+public class AsianRegionCodeConverter implements Converter {
 
-	public static Object staticMethod(Long arg1, String arg2, Integer arg3) {
-		return arg3;
+	private Class targetClass = RegionCode.class;
+
+
+	public Object convert(Object source) throws Exception {
+		if (source instanceof String) {
+			return new AsianRegionCode((String) source);
+		}
+		// we're supposed to throw an exception if we can't convert
+		throw new Exception("Unconvertable object type");
 	}
 
-	public static Object staticMethod(Object arg) {
-		return arg;
-	}
-
-	public static Object staticMethod() {
-		return new Object();
-	}
-
-	public Object instanceMethod() {
-		return new Object();
-	}
-
-	public Object instanceMethod(Object arg) {
-		return arg;
-	}
-
-	public Object instanceMethod(Long arg1, String arg2, Integer arg3) {
-		return arg1;
+	public Class getTargetClass() {
+		return targetClass;
 	}
 }
