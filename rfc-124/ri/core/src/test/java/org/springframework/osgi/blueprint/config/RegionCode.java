@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint;
+package org.springframework.osgi.blueprint.config;
 
 /**
+ * Taken from the RFC TCK.
+ * 
  * @author Costin Leau
  */
-public class FactoryComponent {
+public class RegionCode {
 
-	public static Object staticMethod(Long arg1, String arg2, Integer arg3) {
-		return arg3;
+	protected String code;
+
+
+	public RegionCode(String code) {
+		this.code = code;
 	}
 
-	public static Object staticMethod(Object arg) {
-		return arg;
+	public String getCode() {
+		return this.code;
 	}
 
-	public static Object staticMethod() {
-		return new Object();
-	}
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (o.getClass() != this.getClass())
+			return false; // this guarantee its subclass could never be equal with it.
 
-	public Object instanceMethod() {
-		return new Object();
-	}
+		return this.code.equals(((RegionCode) o).getCode());
 
-	public Object instanceMethod(Object arg) {
-		return arg;
-	}
-
-	public Object instanceMethod(Long arg1, String arg2, Integer arg3) {
-		return arg1;
 	}
 }

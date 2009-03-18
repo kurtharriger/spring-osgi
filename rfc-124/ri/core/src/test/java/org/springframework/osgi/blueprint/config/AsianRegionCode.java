@@ -14,34 +14,19 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint;
+package org.springframework.osgi.blueprint.config;
 
 /**
  * @author Costin Leau
  */
-public class FactoryComponent {
+public class AsianRegionCode extends RegionCode {
 
-	public static Object staticMethod(Long arg1, String arg2, Integer arg3) {
-		return arg3;
-	}
-
-	public static Object staticMethod(Object arg) {
-		return arg;
-	}
-
-	public static Object staticMethod() {
-		return new Object();
-	}
-
-	public Object instanceMethod() {
-		return new Object();
-	}
-
-	public Object instanceMethod(Object arg) {
-		return arg;
-	}
-
-	public Object instanceMethod(Long arg1, String arg2, Integer arg3) {
-		return arg1;
+	/**
+	 * Constructs a new <code>AsianRegionCode</code> instance.
+	 * 
+	 * @param code
+	 */
+	public AsianRegionCode(String code) {
+		super(code);
 	}
 }

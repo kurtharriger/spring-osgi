@@ -16,13 +16,11 @@
 
 package org.springframework.osgi.blueprint.reflect;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.osgi.service.blueprint.reflect.MethodInjectionMetadata;
 import org.osgi.service.blueprint.reflect.ParameterSpecification;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.util.StringUtils;
 
 /**
  * Simple implementation for {@link MethodInjectionMetadata} interface.
@@ -55,8 +53,7 @@ public class SimpleMethodInjectionMetadata implements MethodInjectionMetadata {
 	public SimpleMethodInjectionMetadata(BeanDefinition definition) {
 		this.name = definition.getFactoryMethodName();
 
-		params = (StringUtils.hasText(definition.getFactoryBeanName()) ? Collections.<ParameterSpecification> emptyList()
-				: MetadataUtils.getParameterList(definition.getConstructorArgumentValues()));
+		params = MetadataUtils.getParameterList(definition.getConstructorArgumentValues());
 	}
 
 	public String getName() {

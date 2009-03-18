@@ -162,6 +162,21 @@
 		<constructor-arg value="123" index="2" />
 		<constructor-arg value="981" index="0" />
 	</component>
+	
+	
+	<component id="noArgStaticFactory" class="org.springframework.osgi.blueprint.FactoryComponent" factory-method="staticMethod"/>
+
+    <component id="oneArgStaticFactory" class="org.springframework.osgi.blueprint.FactoryComponent" factory-method="staticMethod">
+        <constructor-arg value="iridium"/>
+    </component>
+
+	<component id="instanceFactory" class="org.springframework.osgi.blueprint.FactoryComponent"/>
+	
+	<component id="noArgInstanceFactory"  factory-method="instanceMethod" factory-component="instanceFactory"/>
+
+    <component id="oneArgInstanceFactory" factory-component="instanceFactory" factory-method="instanceMethod">
+        <constructor-arg value="iridium"/>
+    </component>
 
 	<component id="namedComparator"
 		class="org.springframework.osgi.blueprint.DummyComparator" />
