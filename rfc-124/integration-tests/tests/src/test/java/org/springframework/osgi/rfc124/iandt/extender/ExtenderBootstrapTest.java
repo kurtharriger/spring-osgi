@@ -72,7 +72,7 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 				String[] propNames = event.getPropertyNames();
 
 				for (String propName : propNames) {
-					builder.append(propName).append("=").append(event.getProperty(propName));
+					builder.append(propName).append("=").append(event.getProperty(propName)).append("\n");
 				}
 
 				System.out.println(builder.toString());

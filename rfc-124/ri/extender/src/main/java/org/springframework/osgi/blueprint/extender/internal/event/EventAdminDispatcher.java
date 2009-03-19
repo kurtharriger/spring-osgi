@@ -41,7 +41,7 @@ public class EventAdminDispatcher implements OsgiBundleApplicationContextListene
 	/** logger */
 	private static final Log log;
 
-	/** Whether the Commons Collections 3.x library is present on the classpath */
+	/** Whether the Event Admin library is present on the classpath */
 	private static final boolean eventAdminAvailable;
 
 	static {
