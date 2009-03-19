@@ -365,4 +365,23 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		return true;
 	}
 
+	public void testServiceFactory() throws Exception {
+		ServiceFactory factory = new ServiceFactory() {
+
+			public Object getService(Bundle bundle, ServiceRegistration registration) {
+				return null;
+			}
+
+			public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
+			}
+		};
+
+		ctx = new MockBundleContext();
+		exporter.setBundleContext(ctx);
+		exporter.setBeanFactory(beanFactory);
+		exporter.setInterfaces(new Class[] { Serializable.class, Cloneable.class });
+		exporter.setTarget(factory);
+		beanFactoryControl.replay();
+		exporter.afterPropertiesSet();
+	}
 }
