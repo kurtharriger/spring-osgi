@@ -260,9 +260,12 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		}
 		// check visibility type
 		else {
-			for (int interfaceIndex = 0; interfaceIndex < interfaces.length; interfaceIndex++) {
-				Class intf = interfaces[interfaceIndex];
-				Assert.isAssignable(intf, targetClass, "Exported service object does not implement the given interface: ");
+			if (!ServiceFactory.class.isAssignableFrom(targetClass)) {
+				for (int interfaceIndex = 0; interfaceIndex < interfaces.length; interfaceIndex++) {
+					Class intf = interfaces[interfaceIndex];
+					Assert.isAssignable(intf, targetClass,
+						"Exported service object does not implement the given interface: ");
+				}
 			}
 		}
 
