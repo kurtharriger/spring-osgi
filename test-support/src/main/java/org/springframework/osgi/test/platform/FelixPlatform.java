@@ -94,7 +94,7 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 	public void start() throws Exception {
 		if (platform == null) {
 			// initialize properties and set them as system wide so Felix can pick them up
-			System.getProperties().putAll(getPlatformProperties());
+			System.getProperties().putAll(getConfigurationProperties());
 
 			platform = configureFelix();
 			platform.start();
