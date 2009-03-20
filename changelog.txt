@@ -13,6 +13,9 @@ Package org.springframework.osgi.service
 * improved error reporting for importer and exporter listeners configured with non-existing or incorrect custom methods
 * fixed validation bug that prevent ServiceFactory beans from being exported with specified interfaces
 
+Package org.springframework.osgi.test
+* fixed initialization bug in FelixPlatform that ignored custom settings
+
 
 Changes in version 1.2.0 RC1 (2009-03-09)
 -----------------------------------------
