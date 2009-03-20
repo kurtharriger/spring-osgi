@@ -31,6 +31,10 @@ public class AmbigousTestComponent {
 		this.obj = arg3;
 	}
 
+	public AmbigousTestComponent() {
+
+	}
+
 	public String getStr1() {
 		return str1;
 	}
@@ -41,5 +45,13 @@ public class AmbigousTestComponent {
 
 	public Object getObj() {
 		return obj;
+	}
+
+	public void setAmbigousProp(int prop) {
+		System.out.println("int setter called");
+	}
+	
+	public void setAmbigousProp(Object prop) {
+		System.out.println("Object setter called");
 	}
 }

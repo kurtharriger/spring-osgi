@@ -150,4 +150,8 @@ public class ComponentSubElementTest extends TestCase {
 		assertEquals("two", props.get("one"));
 		assertEquals("smith", props.get("aero"));
 	}
+
+	public void testAmbigousComponent() throws Exception {
+		System.out.println(context.getBean("ambigousComponent"));
+	}
 }
