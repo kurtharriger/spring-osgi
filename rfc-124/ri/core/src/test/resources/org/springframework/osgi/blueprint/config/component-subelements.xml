@@ -195,4 +195,10 @@
 			</ref-list>
 		</property>
 	</component>
+	
+	<component id="ambigousComponent" class="org.springframework.osgi.blueprint.AmbigousTestComponent">
+		<property name="ambigousProp">
+			<value type="java.lang.String">123</value>
+		</property>
+	</component>
 </components>

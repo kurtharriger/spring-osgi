@@ -52,7 +52,7 @@ public class SimpleConstructorInjectionMetadata implements ConstructorInjectionM
 	 */
 	public SimpleConstructorInjectionMetadata(BeanDefinition definition) {
 		// check if we have a factory-method definition or not 
-		params = (StringUtils.hasText(definition.getFactoryBeanName()) ? Collections.<ParameterSpecification> emptyList()
+		params = (StringUtils.hasText(definition.getFactoryMethodName()) ? Collections.<ParameterSpecification> emptyList()
 				: MetadataUtils.getParameterList(definition.getConstructorArgumentValues()));
 	}
 

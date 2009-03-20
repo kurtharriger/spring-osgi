@@ -161,6 +161,7 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 		List params = methodMetadata.getParameterSpecifications();
 		assertNotNull(params);
 		assertTrue(params.isEmpty());
+		assertTrue(localMetadata.getConstructorInjectionMetadata().getParameterSpecifications().isEmpty());
 	}
 
 	public void testFactoryArgMethod() throws Exception {
@@ -172,6 +173,7 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 		List params = methodMetadata.getParameterSpecifications();
 		assertNotNull(params);
 		assertEquals(1, params.size());
+		assertTrue(localMetadata.getConstructorInjectionMetadata().getParameterSpecifications().isEmpty());
 	}
 
 	public void testInstanceFactoryMethod() throws Exception {
@@ -185,6 +187,7 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 		Value factoryComponent = localMetadata.getFactoryComponent();
 		assertTrue(factoryComponent instanceof ReferenceValue);
 		assertEquals("instanceFactory", ((ReferenceValue) factoryComponent).getComponentName());
+		assertTrue(localMetadata.getConstructorInjectionMetadata().getParameterSpecifications().isEmpty());
 	}
 
 	public void testInstanceFactoryArgMethod() throws Exception {
@@ -198,5 +201,6 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 		Value factoryComponent = localMetadata.getFactoryComponent();
 		assertTrue(factoryComponent instanceof ReferenceValue);
 		assertEquals("instanceFactory", ((ReferenceValue) factoryComponent).getComponentName());
+		assertTrue(localMetadata.getConstructorInjectionMetadata().getParameterSpecifications().isEmpty());
 	}
 }
