@@ -146,7 +146,7 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 		};
 
 		installTestBundle();
-		bundleContext.registerService(ModuleContextListener.class.getName(), listener, new Hashtable());
+		bundleContext.registerService(ModuleContextListener.class.getName(), listener, null);
 
 		testBundle.start();
 		synchronized (contexts) {

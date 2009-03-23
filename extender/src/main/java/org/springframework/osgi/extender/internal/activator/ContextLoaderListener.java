@@ -556,9 +556,7 @@ public class ContextLoaderListener implements BundleActivator {
 						contextClosingDown[0] = context;
 						// eliminate context
 						closedContexts.remove(context);
-						if (log.isDebugEnabled())
-							log.debug("Closing appCtx " + context.getDisplayName());
-						context.close();
+						closeApplicationContext(context);
 					}
 
 					public String toString() {
@@ -864,15 +862,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 
 			public void run() {
-				if (context.isActive()) {
-					preProcessClose(context);
-					try {
-						context.close();
-					}
-					finally {
-						postProcessClose(context);
-					}
-				}
+				closeApplicationContext(context);
 			}
 
 			public String toString() {
@@ -880,6 +870,25 @@ public class ContextLoaderListener implements BundleActivator {
 			}
 
 		}, extenderConfiguration.getShutdownWaitTime(), shutdownTaskExecutor);
+	}
+
+	/**
+	 * Closes an application context. This is a convenience methods that invokes
+	 * the event notification as well.
+	 * 
+	 * @param ctx
+	 */
+	private void closeApplicationContext(ConfigurableOsgiBundleApplicationContext ctx) {
+		if (log.isDebugEnabled())
+			log.debug("Closing application context " + ctx.getDisplayName());
+
+		preProcessClose(ctx);
+		try {
+			ctx.close();
+		}
+		finally {
+			postProcessClose(ctx);
+		}
 	}
 
 	protected void initListenerService() {

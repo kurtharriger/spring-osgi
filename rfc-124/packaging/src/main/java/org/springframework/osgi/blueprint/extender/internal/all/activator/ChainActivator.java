@@ -40,7 +40,7 @@ public class ChainActivator implements BundleActivator {
 	}
 
 	public void stop(BundleContext context) throws Exception {
-		for (int i = CHAIN.length - 1; i < 0; i--) {
+		for (int i = CHAIN.length - 1; i >= 0; i--) {
 			CHAIN[i].stop(context);
 		}
 	}
