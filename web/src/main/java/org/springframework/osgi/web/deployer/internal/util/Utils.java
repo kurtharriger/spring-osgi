@@ -78,6 +78,7 @@ public abstract class Utils {
 				targetFile.mkdir();
 			else {
 				try {
+					targetFile.createNewFile();
 					OutputStream targetStream = new FileOutputStream(targetFile);
 					if (trace)
 						log.trace("Copying " + url + " to " + targetFile);
