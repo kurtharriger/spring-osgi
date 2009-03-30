@@ -50,8 +50,6 @@ public abstract class Utils {
 	private static final String SLASH = "/";
 
 
-	// might have to improve this method to cope with missing folder entries ...
-
 	/**
 	 * Copies the given bundle content to the given target folder. This means
 	 * unpacking the bundle archive. In case of a failure, an exception is
@@ -75,10 +73,15 @@ public abstract class Utils {
 			File targetFile = new File(targetFolder, entryPath);
 			// folder are a special case, we have to create them rather then copy
 			if (entryPath.endsWith("/"))
-				targetFile.mkdir();
+				targetFile.mkdirs();
 			else {
 				try {
-					targetFile.createNewFile();
+					// handle missing parent folders
+					File parent = targetFile.getParentFile();
+					if (!parent.exists()) {
+						parent.mkdirs();
+					}
+
 					OutputStream targetStream = new FileOutputStream(targetFile);
 					if (trace)
 						log.trace("Copying " + url + " to " + targetFile);
