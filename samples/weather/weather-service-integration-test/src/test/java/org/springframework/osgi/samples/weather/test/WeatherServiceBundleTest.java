@@ -65,7 +65,7 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
      */
     protected String[] getTestBundlesNames() {
     	List bundles = new ArrayList();
-    	bundles.add("org.springframework, spring-context,"+ getSpringVersion());
+    	bundles.add("org.springframework, org.springframework.context,"+ getSpringVersion());
     	bundles.add("org.springframework.osgi.samples, weather-extension,"+ getSpringDMVersion());
     	bundles.add("org.springframework.osgi.samples, wiring-bundle," +getSpringDMVersion());
     	
