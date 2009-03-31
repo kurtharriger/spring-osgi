@@ -4,7 +4,7 @@
 
 1. MOTIVATION
 
-As the name implies, this is a simple web application that runs inside OSGi through Spring-DM.
+As the name implies, this is a simple web application that runs inside OSGi through Spring DM.
 
 The demo contains 3 maven projects:
 

@@ -19,7 +19,7 @@
 
   <properties>
     <!-- Spring version -->
-    <spring.maven.artifact.version>2.5.6</spring.maven.artifact.version>
+    <spring.maven.artifact.version>2.5.6.A</spring.maven.artifact.version>
     <spring.base.version>2.5.6</spring.base.version>
     
     <!-- Felix BND plugin settings -->
@@ -285,78 +285,67 @@ limitations under the License.
         <!-- Spring -->
         <dependency>
           <groupId>org.springframework</groupId>
-          <artifactId>spring-core</artifactId>
-          <version>${spring.maven.artifact.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-core</artifactId>
-          <version>${spring.maven.artifact.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-aop</artifactId>
-          <version>${spring.maven.artifact.version}</version>
-          <exclusions>
-             <exclusion>
-              <groupId>aopalliance</groupId>
-              <artifactId>aopalliance</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
-            </exclusion>
-        </exclusions>
-        </dependency>
-        <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-beans</artifactId>
+          <artifactId>org.springframework.aop</artifactId>
           <version>${spring.maven.artifact.version}</version>
           <exclusions>
             <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
+              <groupId>org.apache.commons</groupId>
+              <artifactId>com.springsource.org.apache.commons.logging</artifactId>
             </exclusion>
           </exclusions>
         </dependency>
         <dependency>
           <groupId>org.springframework</groupId>
-          <artifactId>spring-core</artifactId>
+          <artifactId>org.springframework.beans</artifactId>
           <version>${spring.maven.artifact.version}</version>
           <exclusions>
             <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
+              <groupId>org.apache.commons</groupId>
+              <artifactId>com.springsource.org.apache.commons.logging</artifactId>
             </exclusion>
           </exclusions>
         </dependency>
         <dependency>
           <groupId>org.springframework</groupId>
-          <artifactId>spring-context</artifactId>
+          <artifactId>org.springframework.core</artifactId>
           <version>${spring.maven.artifact.version}</version>
           <exclusions>
             <exclusion>
-              <groupId>aopalliance</groupId>
-              <artifactId>aopalliance</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
+              <groupId>org.apache.commons</groupId>
+              <artifactId>com.springsource.org.apache.commons.logging</artifactId>
             </exclusion>
           </exclusions>
         </dependency>
         <dependency>
           <groupId>org.springframework</groupId>
-          <artifactId>spring-test</artifactId>
+          <artifactId>org.springframework.context</artifactId>
           <version>${spring.maven.artifact.version}</version>
           <exclusions>
             <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
+              <groupId>org.apache.commons</groupId>
+              <artifactId>com.springsource.org.apache.commons.logging</artifactId>
             </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>org.springframework.context.support</artifactId>
+          <version>${spring.maven.artifact.version}</version>
+          <exclusions>
             <exclusion>
-              <groupId>junit</groupId>
-              <artifactId>junit</artifactId>
+              <groupId>org.apache.commons</groupId>
+              <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>org.springframework.test</artifactId>
+          <version>${spring.maven.artifact.version}</version>
+          <exclusions>
+            <exclusion>
+              <groupId>org.apache.commons</groupId>
+              <artifactId>com.springsource.org.apache.commons.logging</artifactId>
             </exclusion>
           </exclusions>
         </dependency>
@@ -367,31 +356,23 @@ limitations under the License.
         </dependency>
         <dependency>
           <groupId>org.springframework</groupId>
-          <artifactId>spring-web</artifactId>
+          <artifactId>org.springframework.web</artifactId>
           <version>${spring.maven.artifact.version}</version>
           <exclusions>
             <exclusion>
-              <groupId>aopalliance</groupId>
-              <artifactId>aopalliance</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
+              <groupId>org.apache.commons</groupId>
+              <artifactId>com.springsource.org.apache.commons.logging</artifactId>
             </exclusion>
           </exclusions>
         </dependency>
         <dependency>
           <groupId>org.springframework</groupId>
-          <artifactId>spring-webmvc</artifactId>
+          <artifactId>org.springframework.web.servlet</artifactId>
           <version>${spring.maven.artifact.version}</version>
           <exclusions>
             <exclusion>
-              <groupId>aopalliance</groupId>
-              <artifactId>aopalliance</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
+              <groupId>org.apache.commons</groupId>
+              <artifactId>com.springsource.org.apache.commons.logging</artifactId>
             </exclusion>
           </exclusions>
         </dependency>
@@ -540,7 +521,7 @@ limitations under the License.
         <plugin>
           <groupId>com.springsource.bundlor</groupId>
           <artifactId>com.springsource.bundlor.maven</artifactId>
-          <version>1.0.0.M1B</version>
+          <version>1.0.0.M2</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1078,8 +1059,6 @@ Ignored-Existing-Headers:
         <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
         <url>http://repository.springsource.com/maven/bundles/release</url>
     </repository>
-    
-   
     <repository>
         <id>spring-release</id>
         <name>Spring Portfolio Release Repository</name>

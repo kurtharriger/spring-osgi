@@ -69,9 +69,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>servlet-api.osgi</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <groupId>javax.servlet</groupId>
+      <artifactId>com.springsource.javax.servlet</artifactId>
+      <version>2.4.0</version>
     </dependency>
 
 	<!-- required for Depedency resolver -->
@@ -89,13 +89,13 @@
 
 	<dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
+      <artifactId>org.springframework.web</artifactId>
 	  <optional>true</optional>
     </dependency>
 
 	<dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
+      <artifactId>org.springframework.web.servlet</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -115,12 +115,12 @@
    <!-- they are transitive so it makes sense to use a property instead -->
    <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-aop</artifactId>
+      <artifactId>org.springframework.aop</artifactId>
 	  <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
+      <artifactId>org.springframework.core</artifactId>
     </dependency>    
     <dependency>
       <groupId>org.osgi</groupId>

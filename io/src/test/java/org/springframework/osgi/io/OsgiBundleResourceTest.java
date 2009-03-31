@@ -286,4 +286,11 @@ public class OsgiBundleResourceTest extends TestCase {
 	public void testLastModified() throws Exception {
 		assertTrue("last modified should be non zero", resource.lastModified() > 0);
 	}
+	
+	public void testNonExistingFile() throws Exception {
+		resource = new OsgiBundleResource(bundle, "file:/some/non.existing.file");
+		File file = resource.getFile();
+		assertNotNull(file);
+		assertFalse(file.exists());
+	}
 }

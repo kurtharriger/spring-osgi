@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PropertyPermission;
 
-import org.osgi.framework.AdminPermission;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -48,7 +47,7 @@ public abstract class BaseWebIntegrationTest extends BaseIntegrationTest {
 		//System.setProperty("VERBOSE", "false");
 
 		// Servlet/JSP artifacts
-		col.add("org.springframework.osgi, servlet-api.osgi, 2.5-SNAPSHOT");
+		col.add("javax.servlet, com.springsource.javax.servlet, 2.4.0");
 		col.add("org.springframework.osgi, jsp-api.osgi, 2.0-SNAPSHOT");
 
 		// JSP compiler

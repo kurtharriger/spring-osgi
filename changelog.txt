@@ -5,6 +5,10 @@ http://www.springframework.org/osgi
 Changes in version 1.2.0 final (2009-03-xx)
 -------------------------------------------
 
+General
+* improved web-console sample (added more documentation and bundles from the SpringSource Enterprise
+Bundle Repository)
+
 Package org.springframework.osgi.config
 * fixed collection parsing bug that ignored inlined comparators during detection of ordered types
 
@@ -15,6 +19,9 @@ Package org.springframework.osgi.service
 
 Package org.springframework.osgi.test
 * fixed initialization bug in FelixPlatform that ignored custom settings
+
+Package org.springframework.osgi.web
+* improved unpacking of war bundles with missing entries
 
 
 Changes in version 1.2.0 RC1 (2009-03-09)
