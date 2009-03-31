@@ -7,10 +7,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="var" path="M2_REPO/org/junit/com.springsource.junit/3.8.2/com.springsource.junit-3.8.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-test/2.5.6/spring-test-2.5.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/2.5.6/spring-core-2.5.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.6/spring-context-2.5.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/2.5.6/spring-beans-2.5.6.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.test/2.5.6.A/org.springframework.test-2.5.6.A.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/2.5.6.A/org.springframework.core-2.5.6.A.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/2.5.6.A/org.springframework.context-2.5.6.A.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/2.5.6.A/org.springframework.beans-2.5.6.A.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.api/1.5.0/com.springsource.slf4j.api-1.5.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.0/com.springsource.slf4j.org.apache.commons.logging-1.5.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.log4j/1.5.0/com.springsource.slf4j.log4j-1.5.0.jar"/>

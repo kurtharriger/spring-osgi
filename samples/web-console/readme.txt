@@ -5,12 +5,19 @@
 1. MOTIVATION
 
 This sample demos a Spring-MVC annotation-based web application that runs inside OSGi through
-Spring-DM.
+Spring DM, featuring class path scanning and various Spring taglib. Additionally, the web 
+application interacts with the OSGi enviroment through the UI.
+
 
 The demo contains 3 maven projects:
 
+* catalina.config
+which adds a default configuration and some resources to the Tomcat 6.0.x version from
+SpringSource Enterprise Bundle (for more information see the Notes section).
+
 * logging
-which creates an OSGi fragment with a global log4j configuration.
+which creates an OSGi fragment with a global log4j configuration (for more information see
+the Notes section).
 
 * war
 which contains the actual demo war. The bundle contains the Spring 2.5 MVC application and
@@ -63,3 +70,11 @@ logging module and then update the log4j bundle (update <log4j.bundle.id>). Note
 platforms (Windows) the jar locking prevents the file to be updated while the OSGi platform is
 running. In this cases, you need to shutdown the platform first (close) before building the
 project.
+
+b. Catalina Configuration
+
+At the time of this release, the Tomcat Catalina bundle contains only the server binaries, without
+any of its default resources. To keep the example and the configuration at a minimum, the sample
+provides a simple fragment that 'enhances' the Catalina bundle with resources from the official 
+distribution. It's likely that in other setups, the Catalina package can already contain such resources
+or it is already has its defaults configured. In such cases, there is no need for this fragment.

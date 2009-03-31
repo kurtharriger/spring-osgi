@@ -47,7 +47,7 @@ public class OsgiHttpIntegrationTest extends AbstractConfigurableBundleCreatorTe
 		List col = new ArrayList();
 
 		// Servlet/JSP artifacts
-		col.add(SPRING_OSGI_GROUP + ", servlet-api.osgi, 2.5-SNAPSHOT");
+		col.add("javax.servlet, com.springsource.javax.servlet, 2.4.0");
 		col.add(SPRING_OSGI_GROUP + ", jsp-api.osgi, 2.0-SNAPSHOT");
 
 		// JSP compiler

@@ -3,7 +3,7 @@
 
 
   <h1>
-  Spring-DM OSGi Web Console
+  Spring DM OSGi Web Console
   </h1>
 
   <h2>Introduction</h2>
@@ -176,7 +176,7 @@
   This sample requires:
   <ul>
     <li>an OSGi 4.0+ platform</li>
-    <li>Spring-DM 1.1 + dependencies</li>
+    <li>Spring DM 1.1 + dependencies</li>
     <li>Apache Tomcat 5.5.x+</li>
     <li>Apache Jasper 2 Engine </li>
   </ul>

@@ -51,7 +51,7 @@
   
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
+      <artifactId>org.springframework.context</artifactId>
       <scope>test</scope>
     </dependency>
 
