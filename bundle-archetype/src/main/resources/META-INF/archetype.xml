@@ -15,6 +15,7 @@
     <resource>.classpath</resource>
     <resource>.project</resource>
     <resource>build.properties</resource>
+    <resource>template.mf</resource>
   </resources>
 
   <testSources>

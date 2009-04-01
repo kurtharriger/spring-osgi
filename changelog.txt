@@ -8,6 +8,7 @@ Changes in version 1.2.0 final (2009-03-xx)
 General
 * improved web-console sample (added more documentation and bundles from the SpringSource Enterprise
 Bundle Repository)
+* updated archetype to support both Bundlor and Felix Bundle plugin
 
 Package org.springframework.osgi.config
 * fixed collection parsing bug that ignored inlined comparators during detection of ordered types
