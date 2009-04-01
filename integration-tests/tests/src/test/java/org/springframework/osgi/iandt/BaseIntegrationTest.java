@@ -19,6 +19,7 @@ package org.springframework.osgi.iandt;
 import java.io.File;
 import java.io.FilePermission;
 import java.lang.reflect.ReflectPermission;
+import java.security.AllPermission;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -157,15 +158,7 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 					logger.trace("Setting permissions on log4j bundle " + OsgiStringUtils.nullSafeNameAndSymName(bnd));
 					List perms = new ArrayList();
 					// defaults
-					perms.add(new PackagePermission("*", PackagePermission.EXPORT));
-					perms.add(new PackagePermission("*", PackagePermission.IMPORT));
-					perms.add(new BundlePermission("*", BundlePermission.HOST));
-					perms.add(new BundlePermission("*", BundlePermission.PROVIDE));
-					perms.add(new BundlePermission("*", BundlePermission.REQUIRE));
-					perms.add(new ServicePermission("*", ServicePermission.REGISTER));
-					perms.add(new ServicePermission("*", ServicePermission.GET));
-					
-					perms.add(new FilePermission("-", "read,write,delete"));
+					perms.add(new AllPermission());
 					PermissionInfo[] defaultPerm = pa.getDefaultPermissions();
 					if (defaultPerm != null)
 						CollectionUtils.mergeArrayIntoCollection(defaultPerm, perms);
