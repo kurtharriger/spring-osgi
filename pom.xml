@@ -86,6 +86,8 @@
    <clover.argLine></clover.argLine>
    <clover.skip>false</clover.skip>
    
+   <findbugs.skip>false</findbugs.skip>
+   
    <!-- security options for integration testing -->
    <security.argLine></security.argLine>
    <policy.url>..${file.separator}policy.all</policy.url>
@@ -958,6 +960,7 @@ Ignored-Existing-Headers:
           <debug>true</debug>
           <relaxed>true</relaxed>
           -->
+          <skip>${findbugs.skip}</skip>
         </configuration>
       </plugin>
 

@@ -13,6 +13,9 @@
   <description>Spring OSGi Maven2 Archetype</description>  
   <url>http://www.springframework.org/osgi</url>
   
+  <properties>
+    <findbugs.skip>true</findbugs.skip>
+  </properties>
   
   <build>
     <resources>

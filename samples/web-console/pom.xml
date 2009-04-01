@@ -11,6 +11,10 @@
   <name>Spring OSGi Samples: OSGi Web Console</name>
   <url>http://www.springframework.org/osgi</url>
   <packaging>pom</packaging>
+
+  <properties>
+    <source.jdk>1.5</source.jdk>
+  </properties>
   
   <modules>
     <module>catalina.config</module>
