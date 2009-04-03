@@ -1013,7 +1013,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         and <literal>1..N</literal>.</para>
         
         <para>A cardinality value of
-        <literal>0..n</literal> indicates that it is permissible for their to
+        <literal>0..n</literal> indicates that it is permissible to
         be no matching services. A cardinality value of
         <literal>1..n</literal> indicates that at least one matching service
         is required at all times. Such a reference is considered a
@@ -1077,7 +1077,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         or based on the services themselves (in which case the services must be
         <interfacename>Comparable</interfacename>).</para>
 
-        <programlisting language="xml"><![CDATA[<list id="myServices" interface"com.xyz.MyService">
+        <programlisting language="xml"><![CDATA[<list id="myServices" interface="com.xyz.MyService">
   <comparator><natural basis="services"/></comparator>
 </list>
 
