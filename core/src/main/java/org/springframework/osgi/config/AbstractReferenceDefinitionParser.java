@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.BeanReferenceFactoryBean;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -207,6 +208,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	private AbstractBeanDefinition createBeanReferenceDefinition(String beanName) {
 		GenericBeanDefinition def = new GenericBeanDefinition();
 		def.setBeanClass(BeanReferenceFactoryBean.class);
+		def.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		MutablePropertyValues mpv = new MutablePropertyValues();
 		mpv.addPropertyValue(TARGET_BEAN_NAME_PROP, beanName);
 		def.setPropertyValues(mpv);
