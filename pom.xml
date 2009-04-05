@@ -96,7 +96,7 @@
    <!-- disabled on jdk1.4 -->
    <bundlor.enabled>false</bundlor.enabled>
    <!-- common version ranges -->
-   <spring.version.range>"[${spring.base.version},3.0)"</spring.version.range>
+   <spring.version.range>"[${spring.base.version},4.0)"</spring.version.range>
    <spring.osgi.version.range>"[${spring.osgi.import.version},${spring.osgi.import.version}]"</spring.osgi.version.range>
    <logging.version.range>"[1.0,2.0)"</logging.version.range>
 
