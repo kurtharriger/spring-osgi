@@ -9,9 +9,11 @@ General
 * improved web-console sample (added more documentation and bundles from the SpringSource Enterprise
 Bundle Repository)
 * updated archetype to support both Bundlor and Felix Bundle plugin
+* increased Spring import range up to version 4
 
 Package org.springframework.osgi.config
 * fixed collection parsing bug that ignored inlined comparators during detection of ordered types
+* improved definition of generated beans for better IDE integration
 
 Package org.springframework.osgi.service
 * fixed conversion of ServiceReferences in ServiceReferenceEditor
