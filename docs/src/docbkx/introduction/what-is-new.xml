@@ -34,7 +34,7 @@
 			<para>To minimize the number of repositories used and the confusion caused by OSGified vs non-OSGified artifacts especially to users using Spring dm Server,
 			after 1.2.0 RC1, Spring Dynamic Modules aligned as many of its dependencies as possible with SpringSource <ulink url="http://www.springsource.com/repository">EBR</ulink>.
 			In practice this means that Spring framework artifacts, such as <literal>spring-aop.jar</literal> can be now found as <literal>org.springframework.aop.jar</literal>;
-			We apologize for any inconvenience created to users relying on these naming conventions.
+			We apologize for any inconvenience created to users relying on these naming conventions.</para>
 		</section>
 	</section>
     
