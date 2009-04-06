@@ -102,12 +102,35 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 
 		// if the bundle defines handlers
 		if (hasHandlers) {
-			addHandler(bundle);
+			// check type compatibility between the bundle's and spring-extender's spring version
+			if (hasCompatibleNamespaceType(bundle)) {
+				addHandler(bundle);
+			}
+			else {
+				if (log.isDebugEnabled())
+					log.debug("Bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
+							+ "] declares namespace handlers but is not compatible with extender [" + extenderInfo
+							+ "]; ignoring...");
+			}
 		}
 		else {
 			// bundle declares only schemas, add it though the handlers might not be compatible...
 			if (hasSchemas)
 				addHandler(bundle);
+		}
+	}
+
+	private boolean hasCompatibleNamespaceType(Bundle bundle) {
+		try {
+			Class type = bundle.loadClass(NS_HANDLER_RESOLVER_CLASS_NAME);
+			return NamespaceHandlerResolver.class.equals(type);
+		}
+		catch (Throwable th) {
+			// if the interface is not wired, ignore the bundle
+			log.warn("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " cannot see class ["
+					+ NS_HANDLER_RESOLVER_CLASS_NAME + "]; ignoring its namespace handlers");
+
+			return false;
 		}
 	}
 
