@@ -48,7 +48,7 @@
     that users running Eclipse PDE can use it right away.</para>
     
    <section id="archetype:generated-content">
-   	<title>Generated Project Features at-a-glance</title>
+   	<title>Generated Project Features At-A-Glance</title>
    	
    	<itemizedlist>
    		<listitem>Packaged as an OSGi bundle</listitem>

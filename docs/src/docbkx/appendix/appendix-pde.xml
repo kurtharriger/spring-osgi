@@ -20,7 +20,7 @@
      and install process.</para>
    
    	 <step>
-   	 	<title>Set up nightly update site</title>
+   	 	<title>Set Up Nightly Update Site</title>
    	 	<para>At the moment, the OSGi extension is available only on Spring-IDE nightly builds update site. Add it to the Eclipse configuration by
    	 	opening the software update menu:
    	 	</para>
@@ -122,7 +122,7 @@
    	 </step>
    	 
    	 <step>
-   	 	<title>Select PDE perspective</title>
+   	 	<title>Select PDE Perspective</title>
    	 	<para>Once the installation is completed just select the PDE perspective:</para>
         <para>
 		  <inlinemediaobject>

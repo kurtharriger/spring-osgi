@@ -15,6 +15,17 @@
       </para>
     </sidebar>
 
+    <sidebar>
+      <title>Deployment scenarios</title>
+      <para>
+      Users new to OSGi can benefit greatly from the SpringSource dm Server <ulink url="http://www.springsource.org/dmserver">documentation</ulink> which explains
+      how OSGi can work in various development and production scenarios.
+      </para>
+    </sidebar>
+    
+    This will help you to understand how osgi can work in a development / production environment. The programmer guide describes the sophisticated eclipse tooling in detail.
+    
+
     <para>A major feature introduced in the 1.1.0 release is <emphasis>support for web applications</emphasis> which enables easy deployment of web artifacts 
     to OSGi.</para>
     <para>
@@ -44,7 +55,7 @@
     </section>
     
     <section id="web:usage">
-    	<title>Web support usage</title>
+    	<title>Web Support Usage</title>
     	
 	    <sidebar>
 	      <title>WAR vs Web Application</title>
@@ -87,7 +98,7 @@
     </section>
     
     <section id="web:classpath">
-    	<title>WAR classpath in OSGi</title>
+    	<title>WAR Classpath In OSGi</title>
     	
     	<para>The servlet specification defines a number of rules and locations which special meaning inside a WAR. This section will explain how these are
     	handled in an OSGi environment.</para>
@@ -143,7 +154,7 @@
     		</para>
     		
     		<section id="web:classpath:jsps:taglibs">
-    			<title>Tag libraries</title>
+    			<title>Tag Libraries</title>
     			<para>The JSP spec allows the creation of tag libraries to <quote>define declarative, modular functionality that can be reused by any JSP page</quote>. 
     			Also known as taglibs, these reusable components consist of Java classes (the tag implementation) and description files that indicate how the tags can be used.
     			Spring DM extends the JSP convention, of placing the taglibs either packed as a jar under <literal>WEB-INF/lib</literal> or unpacked under 
@@ -171,7 +182,7 @@
     </section>
     
     <section id="web:configuration">
-    	<title>Configuring the web extender</title>
+    	<title>Configuring The Web Extender</title>
     	
     	<para>Just like the <link linkend="app-deploy:extender-configuration">core extender</link>, the web extender can be configured by using OSGi <link linkend="appendix-tips:fragments">fragments</link>.
     	Following a similar pattern, the web extender looks for all XMLs under <literal>META-INF/spring/extender</literal> folder in <emphasis>its</emphasis> bundle space and assembles them into
@@ -232,7 +243,7 @@
     	contains a <literal>.war</literal> extension.</para>
     	
     	<section id="web:configuration:changing-deployer">
-    		<title>Changing the war deployer</title>
+    		<title>Changing The War Deployer</title>
     	
     		<para>To change the Tomcat deployer to Jetty for example, one can create a configuration file <literal>META-INF/spring/extender/jetty-deployer.xml</literal> with
     		the following content:</para>
@@ -274,7 +285,7 @@
     </section>
     
     <section id="web:configuration:customizing-deployer">
-    	<title>Customizing the standard deployers</title>
+    	<title>Customizing The Standard Deployers</title>
     	<para>By default, the out of the box deployers look up the needed services, at startup. As the services are considered mandatory, the deployers will wait for
     	them and, in case they are not found, will throw an exception. In cases where the default timeout or service lookup filter is not be appropriate, one
     	can customize the service used through a Spring DM <link linkend="service-registry:refs">reference</link>: 
@@ -342,7 +353,7 @@ Fragment-Host: org.springframework.osgi.web.extender</programlisting>
     
     
     <section id="web:osgi-artifacts">
-    	<title>OSGi-ready libraries and web development</title>
+    	<title>OSGi-ready Libraries And Web Development</title>
     	
     	<para>Unfortunately, at the moment most libraries used for web development are not OSGi bundles, which means they cannot be used inside the OSGi space unless they
     	are embedded in other bundles. To address this problem, the Spring DM project has osgified most of the common libraries and made them available through a dedicated
@@ -350,7 +361,7 @@ Fragment-Host: org.springframework.osgi.web.extender</programlisting>
     	These being said, we hope you find it useful.</para>
     
     	<section id="web:osgi-artifacts:containers">
-    	<title>Deploying web containers as OSGi bundles</title>
+    	<title>Deploying Web Containers As OSGi Bundles</title>
     	
     	<para>Spring DM web support expects the web containers to be installed as OSGi services. Since neither the Tomcat nor the Jetty distribution do this, 
     	Spring DM offers two simple yet useful OSGi <ulink url="http://www2.osgi.org/javadoc/r4/org/osgi/framework/BundleActivator.html">Activator</ulink>s for 
@@ -400,7 +411,7 @@ Fragment-Host: org.springframework.osgi.web.extender</programlisting>
 		</section>
 
 		<section id="web:osgi-artifacts:common-libraries">
-    		<title>Common libraries</title>
+    		<title>Common Libraries</title>
 			
 			<para>The Servlet, Java Server Pages, Standard Taglib, Commons-EL and other web libraries are available as well in the Spring DM repository. When browsing
 			use an <ulink url="http://aws.amazon.com/s3">S3</ulink> compatible application .</para>

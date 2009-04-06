@@ -143,7 +143,7 @@ public void testComponent() throws Exception {
     offered by Spring DM testing suite.</para>
     
     <section id="testing:integration:simple-test">
-      <title>Creating a simple OSGi integration test</title>
+      <title>Creating A Simple OSGi Integration Test</title>
      
       <para>
       While the testing framework contains several classes that offer specific
@@ -203,7 +203,7 @@ spring-osgi-extender, etc... TestBundle-testOsgiPlatformStarts-com.your.package.
     </section>
 
     <section id="testing:integration:provisioning">
-     <title>Installing test prerequisites</title>
+     <title>Installing Test Prerequisites</title>
      
      <sidebar>
        <title>OSGi-friendly libraries</title>
@@ -274,7 +274,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
     </section>
 
     <section id="testing:integration:advanced-topics">
-      <title>Advanced testing framework topics</title>
+      <title>Advanced Testing Framework Topics</title>
       
       <para>The testing framework allows a lot of customization to be made. This chapter
       details some of the existing hooks that you might want to know about. However, these
@@ -282,7 +282,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
       </para>
     
     <section id="testing:integration:customize-manifest">
-      <title>Customizing the test manifest</title>
+      <title>Customizing The Test Manifest</title>
       <para>There are cases where the auto-generated test manifest does not suite the needs of the test.
       For example the manifest requires some different headers or a certain package needs to be an optional import.</para>
       <para>
@@ -321,7 +321,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
     </section>
     
     <section id="testing:integration:specify-test-jar-content">
-      <title>Customizing test bundle content</title>
+      <title>Customizing Test Bundle Content</title>
       
       <para>By default, for the on-the-fly bundle, the testing infrastructure uses all the classes, xml and properties files
       found under <literal>./target/test-classes</literal> folder. This matches the project layout for maven which is used 
@@ -382,7 +382,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
     </section>
     
     <section id="testing:integration:understanding-manifest-creator">
-      <title>Understanding the <code>MANIFEST.MF</code> generation</title>
+      <title>Understanding The <code>MANIFEST.MF</code> Generation</title>
       
       <para>A useful feature of the testing framework represents the automatic creation of the test manifest based on the test bundle content. The manifest 
       creator component uses byte-code analysis to determine the packages imported by the test classes so that it can generate the proper OSGi directives for them.
@@ -431,7 +431,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
 
 
     <section id="testing:integration:appContext">
-      <title>Creating an OSGi application context</title>
+      <title>Creating An OSGi Application Context</title>
       
 	  <para>Spring DM testing suite builds on top of Spring testing classes. To create an application context
 	  (OSGi specific), one should just override <literal>getConfigLocations[]</literal> method and indicate
@@ -444,7 +444,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
     </section>
     
     <section id="testing:integration:specify-platform">
-      <title>Specifying the OSGi platform to use</title>
+      <title>Specifying The OSGi Platform To Use</title>
       
       <para>The testing framework supports out of the box, three OSGi 4.0 implementations namely:
       Equinox, Knopflerfish and Felix. To be used, these should be in the test classpath. By default,
@@ -478,7 +478,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
 
 
     <section id="testing:integration:specify-test-wait-time">
-      <title>Waiting for the test dependencies</title>
+      <title>Waiting For The Test Dependencies</title>
       
       <para>A built-in feature of the testing framework is the ability to wait until all dependencies are deployed before
       starting the test execution. Since the OSGi platforms are concurrent by nature, installing a bundle doesn't mean that
@@ -490,7 +490,7 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
     </section>
     
     <section id="testing:integration:performance">
-      <title>Testing framework performance</title>
+      <title>Testing Framework Performance</title>
       
       <para>Considering all the functionality offered by the testing framework, one might wonder if this doesn't become a 
       performance bottleneck. First, it's worth noting that all the work done automatically by the testing infrastructure 
@@ -515,4 +515,3 @@ Reason: Missing Constraint: Import-Package: org.apache.commons.lang.time; versio
   </section>
   
 </chapter>
-

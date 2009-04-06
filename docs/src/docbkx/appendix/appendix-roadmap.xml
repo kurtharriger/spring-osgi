@@ -26,7 +26,7 @@
     </section>
 
     <section>
-      <title>Start level integration</title>
+      <title>Start Level Integration</title>
 
       <para>A future release of Spring Dynamic Modules may offer the following
       additional guarantee with respect to application context creation and
@@ -48,7 +48,7 @@
     </section>
 
     <section>
-      <title>Web library integration</title>
+      <title>Web Library Integration</title>
 
       <para>While support for generic and Spring-MVC web applications is available in 1.1.0,
       in the future we'd like to provide integration (if needed) with other popular web libraries 
@@ -56,7 +56,7 @@
     </section>
 
     <section>
-      <title>ORM/Persistence support</title>
+      <title>ORM/Persistence Support</title>
 
       <para>Care needs to be taken when using JPA or Hibernate under OSGi as
       the persistence engines must have visibility of the persistent types and
@@ -70,7 +70,7 @@
     </section>
 
 	<section>
-	  <title>OSGi standards</title>
+	  <title>OSGi Standards</title>
 	
 	  <para>While OSGi 4.0 is currently required, work is underway to take advantage of the
 	  new features available in 4.1. SpringSource is an active participant in the 

@@ -121,7 +121,7 @@
     dedicated configuration file for all OSGi-related declarations.</para>
 
     <section id="service-registry:export">
-      <title>Exporting a Spring bean as an OSGi service</title>
+      <title>Exporting A Spring Bean As An OSGi Service</title>
 
       <para>The <literal>service</literal> element is used to define a bean
       representing an exported OSGi service. At a minimum you must specify the
@@ -181,8 +181,8 @@
 <bean id="beanToBeExported" scope="bundle" class="com.xyz.MessageServiceImpl"/>]]></programlisting>
 
       <section id="service-registry:export:intfs">
-        <title>Controlling the set of advertised service interfaces for
-        an exported service</title>
+        <title>Controlling The Set Of Advertised Service Interfaces For
+        An Exported Service</title>
 
         <para>The OSGi Service Platform Core Specification defines the term
         <emphasis>service interface</emphasis> to represent the specification
@@ -212,7 +212,7 @@
 		</para>
 	  
 	  <section id="service-registry:export:auto-export">
-	    <title>Detecting the advertised interfaces at runtime</title>
+	    <title>Detecting The Advertised Interfaces At Runtime</title>
 		<sidebar>
 			<title>Hierarchy visibility</title>
 			
@@ -295,8 +295,8 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       
 
       <section id="service-registry:export:props">
-        <title>Controlling the set of advertised properties for an
-        exported service</title>
+        <title>Controlling The Set Of Advertised Properties For An
+        Exported Service</title>
 
         <para>As previously described, an exported service is always
         registered with the service property
@@ -329,7 +329,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       </section>
 
       <section id="service-registry:export:depends-on">
-        <title>The depends-on attribute</title>
+        <title>The depends-on Attribute</title>
 
         <para>Spring will manage explicit dependencies of a service element,
         ensuring for example that the bean to be exported as a service is
@@ -344,7 +344,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       </section>
       
       <section id="service-registry:export:ccl">
-        <title>The context-class-loader attribute</title>
+        <title>The context-class-loader Attribute</title>
         
         <para>The OSGi Service Platform Core Specification (most current
         version is 4.1 at time of writing) does not specify what types and
@@ -370,7 +370,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       </section>
       
       <section id="service-registry:export:ranking">
-        <title>The ranking attribute</title>
+        <title>The ranking Attribute</title>
 
         <para>When registering a service with the service registry, you may
         optionally specify a service ranking (see section 5.2.5 of the OSGi
@@ -386,7 +386,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 
 
       <section id="service-registry:export:service:attributes">
-       <title><literal>service</literal> element attribute</title>
+       <title><literal>service</literal> Element Attributes</title>
        <para>
        As a summary, the following table lists the attributes names, possible values and
        a short description for each of them.
@@ -452,7 +452,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       </section>
 
       <section id="service-registry:export:lifecycle">
-        <title>Service registration and unregistration lifecycle</title>
+        <title>Service Registration And Unregistration Lifecycle</title>
 
         <para>The service defined by a <literal>service</literal> element is
         registered with the OSGi service registry when the application context
@@ -538,7 +538,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         this argument can be cast, if needed, to a <literal>java.util.Dictionary</literal>.</para>
         
         <section id="service-registry:export:lifecycle:interface">
-        <title>Using <interfacename>OsgiServiceRegistrationListener</interfacename> interface</title>
+        <title>Using <interfacename>OsgiServiceRegistrationListener</interfacename> Interface</title>
         <para>
         While we discourage, it is possible to implement a Spring DM specific interface, namely 
         <interfacename>org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener</interfacename> which avoids the need
@@ -555,7 +555,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
     </section>
 
     <section id="service-registry:refs">
-      <title>Defining references to OSGi services</title>
+      <title>Defining References To OSGi Services</title>
 
       <para>Spring Dynamic Modules supports the declaration of beans that
       represent services accessed via the OSGi Service Registry. In this
@@ -578,7 +578,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 
 
       <section id="service-registry:refs:singular">
-        <title>Referencing an individual service</title>
+        <title>Referencing An Individual Service</title>
 
       	<para>The <literal>reference</literal> element is used to define a
         reference to a service in the service registry.</para>
@@ -592,7 +592,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         from the OSGi spec for more information on the service selection algorithm).</para>
         
         <section id="service-registry:refs:singular:interface">
-          <title>Controlling the set of advertised interfaces for the imported service</title>
+          <title>Controlling The Set Of Advertised Interfaces For The Imported Service</title>
           
 	        <para>The <literal>interface</literal> attribute identifies the service
 	        interface that a matching service must implement. For example, the
@@ -633,7 +633,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         
           
         <section id="service-registry:refs:singular:filter">
-          <title>The <literal>filter</literal> attribute</title>
+          <title>The <literal>filter</literal> Attribute</title>
 
           <para>The optional <literal>filter</literal> attribute can be used
           to specify an OSGi filter expression and constrains the service
@@ -651,7 +651,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section>
 
         <section id="service-registry:refs:singular:bean-name">
-          <title>The <literal>bean-name</literal> attribute</title>
+          <title>The <literal>bean-name</literal> Attribute</title>
 
           <para>The <literal>bean-name</literal> attribute is a convenient
           short-cut for specifying a filter expression that matches on the
@@ -695,7 +695,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section>
 
         <section id="service-registry:refs:singular:cardinality">
-          <title>The <literal>cardinality</literal> attribute</title>
+          <title>The <literal>cardinality</literal> Attribute</title>
 
 		  <sidebar>
 		    <title><![CDATA[Nested <reference> declarations]]></title>
@@ -724,7 +724,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section>
 
         <section id="service-registry:refs:singular:depends-on">
-          <title>The depends-on attribute</title>
+          <title>The depends-on Attribute</title>
 
           <para>The <literal>depends-on</literal> attribute is used to specify
           that the service reference should not be looked up in the service
@@ -733,7 +733,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section>
 
         <section id="service-registry:refs:singular:tccl">
-          <title>The context-class-loader attribute</title>
+          <title>The context-class-loader Attribute</title>
 
           <para>The OSGi Service Platform Core Specification (latest
           version is 4.1 at time of writing) does not specify what types and
@@ -786,7 +786,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         
         
       	<section id="service-registry:refs:singular:reference:attributes">
-      	<title><literal>reference</literal> element attributes</title>
+      	<title><literal>reference</literal> Element Attributes</title>
        	<para>
        	As a summary, the following table lists the <literal>reference</literal> element 
        	attributes names, possible values and a short description for each of them.
@@ -862,7 +862,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 	     
 	          
        <section id="service-registry:refs:singular:dynamics">
-         <title><literal>reference</literal> and OSGi Service Dynamics</title>
+         <title><literal>reference</literal> And OSGi Service Dynamics</title>
          <para>
 	      The bean defined by the <literal>reference</literal> element
 	      is unchanged throughout the lifetime of the application context
@@ -900,7 +900,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section>        
 
 		<section id="service-registry:refs:singular:property-editor">
-		<title>Getting a hold of the managed service reference</title>
+		<title>Getting A Hold Of The Managed Service Reference</title>
         
         <para>Spring DM can automatically convert a managed OSGi service to 
         service reference. That is, if the property into which a reference bean 
@@ -962,7 +962,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
    	</section>
 
       <section id="service-registry:refs:collection">
-        <title>Referencing a collection of services</title>
+        <title>Referencing A Collection Of Services</title>
 
 		<sidebar>
 		 <title>Natural vs custom ordering</title>
@@ -1126,7 +1126,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 		</section>		
 		
 		<section id="service-registry:refs:collection:attributes">
-			<title>Collection (<literal>list</literal> and <literal>set</literal>) element attributes</title>
+			<title>Collection (<literal>list</literal> And <literal>set</literal>) Element Attributes</title>
 		<para>
 		<literal>list</literal> and <literal>set</literal> elements support all the attributes available to
 		<literal>reference</literal> element except the <literal>timeout</literal> attribute.
@@ -1243,7 +1243,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
 		</section>
 		
 		<section id="service-registry:refs:collection:dynamics">
-         <title><literal>list</literal> / <literal>set</literal> and OSGi Service Dynamics</title>
+         <title><literal>list</literal> / <literal>set</literal> And OSGi Service Dynamics</title>
          <para>
           A collection of OSGi services will change its content during the lifetime
           of the application context since it needs to reflect the state of the OSGi
@@ -1275,7 +1275,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
         </section> 
 		
 		<section id="service-registry:refs:collection:iterator">
-		  <title><interfacename>Iterator</interfacename> contract and service collections</title>
+		  <title><interfacename>Iterator</interfacename> Contract And Service Collections</title>
 
 		  <para>The recommend way of traversing a collection is by using an <interfacename>Iterator</interfacename>.
 		  However, since OSGi services can come and go, the content of the managed service collection will be adjusted
@@ -1348,7 +1348,7 @@ public interface SubInterface extends SuperInterface {}]]></programlisting>
       
       
      <section id="service-registry:refs:dynamics">
-      <title>Dealing with the dynamics of OSGi imported services</title>
+      <title>Dealing With The Dynamics Of OSGi Imported Services</title>
 
       <para>Whether you are using <literal>reference</literal>
       or <literal>set</literal> or <literal>list</literal>, Spring Dynamic
@@ -1498,7 +1498,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
     </section>
     
     <section id="service-registry:refs:listener-and-proxies">
-       <title>Listener and service proxies</title>
+       <title>Listener And Service Proxies</title>
        <para>While the importer listener provides access to the OSGi service bound at a certain point, it is important to note that the given argument is <emphasis>not</emphasis> 
        the actual service but a <emphasis>proxy</emphasis>. This can have subtle side effects especially with regards to service class name 
        and identity. The reason behind using a proxy is to prevent the listener from holding strong reference to the service (which can disappear
@@ -1512,7 +1512,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
     </section>
     
     <section id="service-registry:refs:invoker-bundle-context">
-      <title>Accessing the caller <interfacename>BundleContext</interfacename></title>
+      <title>Accessing The Caller <interfacename>BundleContext</interfacename></title>
       
       <para>It is sometime useful for an imported service to know which bundle is using it
       at a certain time. To help with this scenarion, in Spring DM imported services publish
@@ -1527,7 +1527,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
     </section>
     
     <section id="service-registry:refs:listener-best-practices">
-      <title>Exporter/Importer listener best practices</title>
+      <title>Exporter/Importer Listener Best Practices</title>
       
       <para>As mentioned above, Spring DM exporter and importer allow listeners to be
       used for receiving notifications on when services are bound, unbound, registered or 
@@ -1598,7 +1598,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
       </itemizedlist>
       
       <section id="service-registry:refs:listener-best-practices:cycles">
-         <title>Listener and cyclic dependencies</title>
+         <title>Listener And Cyclic Dependencies</title>
          
          <para>There are cases where an exporter/importer listener needs a reference back to the bean it is defined on:</para>
          
@@ -1712,7 +1712,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
     </section> 
     
     <section id="service-registry:refs:global-defaults">
-      <title>Service importer global defaults</title>
+      <title>Service Importer Global Defaults</title>
 
   	  <para>The <literal>osgi</literal> namespace offers two
   	  global attributes for specifying default behaviours for all
@@ -1879,7 +1879,7 @@ public void anyMethodName(ServiceReference ref);]]></programlisting>
     
     <section id="service-registry:export-import-relationship">
     
-     <title>Relationship between the service exporter and service importer</title>
+     <title>Relationship Between The Service Exporter And Service Importer</title>
        	
         <para>An exported service may depend, either directly or indirectly,
         on other services in order to perform its function. If one of these

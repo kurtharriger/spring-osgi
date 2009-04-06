@@ -66,7 +66,7 @@
 	  for Configuration Admin (CM), allowing consumption and injection of the configuration data in a declarative way.</para>
 	  
       <section id="compendium:cm:props">
-        <title>Exposing Configuration Admin entries as <classname>Properties</classname></title>
+        <title>Exposing Configuration Admin Entries As <classname>Properties</classname></title>
 
         <para>In its simplest form, the CM can be seen as a configuration source, namely a <classname>Dictionary</classname> whose
         keys are always <classname>String</classname>s. Spring DM can expose entries in the CM as a <classname>Properties</classname> object,
@@ -150,7 +150,7 @@
       </section>
 
 	  <section id="compendium:cm:managed-properties">
-	  	<title>Managed properties</title>
+	  	<title>Managed Properties</title>
 	  	
 	  	<para>Based on a configuration admin entry, Spring DM can autowire by name, the properties of a given bean. To use this feature, define
 	  	a nested <literal>managed-properties</literal> inside the bean definition:</para>
@@ -276,7 +276,7 @@ public class SelfManagedBean {
 	  </section>
 	  
 	  <section id="compendium:cm:managed-service-factories">
-	  	<title>Managed service factories</title>
+	  	<title>Managed Service Factories</title>
 	  	
 	  	<para>The Configuration Admin service supports a notion of a <emphasis>managed service factory</emphasis>(see section 104.6 in the Compendium Specification). 
 	  	A managed service factory is identified by a factory pid which allows <emphasis>multiple</emphasis> <interfacename>Configuration</interfacename> objects 
@@ -471,7 +471,7 @@ public class SelfManagedBean {
 	  </section>
 	  
       <section id="compendium:cm:dict">
-        <title>Direct access to configuration data</title>
+        <title>Direct Access To Configuration Data</title>
 
         <para>The simplest way to work directly with the configuration data stored under a given persistent id or factory persistent id, 
         is to register a service that implements either the <interfacename>ManagedService</interfacename> or <interfacename>ManagedServiceFactory</interfacename>
