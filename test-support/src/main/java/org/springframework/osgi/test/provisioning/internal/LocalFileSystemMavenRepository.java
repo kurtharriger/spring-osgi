@@ -249,5 +249,4 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 					+ " could not be found").initCause(ioEx);
 		}
 	}
-
 }
