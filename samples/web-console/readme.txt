@@ -6,7 +6,7 @@
 
 This sample demos a Spring-MVC annotation-based web application that runs inside OSGi through
 Spring DM, featuring class path scanning and various Spring taglib. Additionally, the web 
-application interacts with the OSGi enviroment through the UI.
+application interacts with the OSGi environment through the UI.
 
 
 The demo contains 3 maven projects:

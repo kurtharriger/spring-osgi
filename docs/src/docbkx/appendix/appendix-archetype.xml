@@ -34,8 +34,10 @@
     <para>In both cases, the result of the commands is a Maven 2 project that defines two packages (one public and one private) and two Spring configurations:
     <literal>src/main/resources/META-INF/spring/bundle-context.xml</literal> and <literal>src/main/resources/META-INF/spring/bundle-context-osgi.xml</literal> 
     The project is packaged as an OSGi bundle.</para>
-    <para>Notice that by default, the project does not contain a MANIFEST.MF for your project. The Maven infrastructure will generate it, through Apache
-    Felix <ulink url="http://felix.apache.org/site/maven-bundle-plugin-bnd.html">bundle plug-in</ulink>. To do that, run the following (from the project root):</para>
+    <para>Notice that by default, the project does not contain a MANIFEST.MF for your project. The Maven infrastructure will generate it, either through SpringSource
+    <ulink url="http://www.springsource.org/bundlor">Bundlor</ulink> (the default) or Apache Felix 
+    <ulink url="http://felix.apache.org/site/maven-bundle-plugin-bnd.html">bundle plug-in</ulink>. 
+    To generate the manifest, run the following (from the project root):</para>
     
     <programlisting><![CDATA[mvn package]]></programlisting>
     
@@ -43,10 +45,8 @@
     while Spring configuration files under <literal>src/main/resources/META-INF</literal> directory.</note>
     
     <para>This will compile your project, pack it as a jar and create the OSGi manifest based on your classes under <literal>/META-INF</literal> folder (so
-    that users running Eclipse PDE can use it right away. To generate the manifest, without creating the OSGi bundle, simply run: 
-    </para>   
-    <programlisting><![CDATA[mvn org.apache.felix:maven-bundle-plugin:manifest]]></programlisting>
-   
+    that users running Eclipse PDE can use it right away.</para>
+    
    <section id="archetype:generated-content">
    	<title>Generated Project Features at-a-glance</title>
    	
