@@ -43,8 +43,6 @@ import org.xml.sax.InputSource;
  * using some maven API.... but I can't find any good doc.
  * 
  * @author Adrian Colyer
- * 
- * 
  */
 public class MavenPackagedArtifactFinder {
 
@@ -127,7 +125,7 @@ public class MavenPackagedArtifactFinder {
 	private File findRootMavenProjectDir(File dir) {
 		File lastFoundMavenProjectDir = dir;
 		File parentDir = dir.getParentFile();
-		while (isMavenProjectDirectory(parentDir)) {
+		while (parentDir != null && isMavenProjectDirectory(parentDir)) {
 			lastFoundMavenProjectDir = parentDir;
 			parentDir = parentDir.getParentFile();
 		}

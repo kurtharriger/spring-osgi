@@ -22,6 +22,7 @@ Package org.springframework.osgi.service
 
 Package org.springframework.osgi.test
 * fixed initialization bug in FelixPlatform that ignored custom settings
+* fixed NPE when locating Maven artifacts in repositories mapped as virtual drives
 
 Package org.springframework.osgi.web
 * improved unpacking of war bundles with missing entries
