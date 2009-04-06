@@ -3,7 +3,7 @@
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 
   <chapter id="bundles">
-    <title>Working with Bundles</title>
+    <title>Working With Bundles</title>
 
     <para>Spring DM offers a dedicated schema element for interacting with existing
     bundles or for installing new ones. While it is not intended to be used as a replacement

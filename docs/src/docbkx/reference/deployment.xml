@@ -55,7 +55,7 @@
     no associated application context.</para>
 
     <section id="app-deploy:headers">
-      <title>Bundle format and Manifest headers</title>
+      <title>Bundle Format And Manifest Headers</title>
 
       <para>Each application module should be packaged as an OSGi bundle. A
       bundle is essentially a jar file with a
@@ -227,7 +227,7 @@ context ::= path ( ';' path ) * (';' directive) *
     </section>
     
     <section id="app-deploy:extender-configuration">
-    	<title>Extender configuration options</title>
+    	<title>Extender Configuration Options</title>
     	
     	<para>Aside from bundle-specific configurations, Spring DM allows the core extender generic behaviour be configured. This is useful when
     	embedding Spring DM inside a managed environment or when a bundles-wide functionality is desired. To allow for extensible configuration,
@@ -378,7 +378,7 @@ context ::= path ( ';' path ) * (';' directive) *
     	<note>Since an application context is used, the full power of the Spring IoC container can be used for creating the extender configuration beans</note>
     	
     	<section id="app-deploy:extender-configuration:events">
-    		<title>Listening to Extender events</title>
+    		<title>Listening To Extender Events</title>
     		
     		<para>There are cases when the failure or succesful startup of an application context needs to be acknowledged for logging purposes (for example).
     		For these cases, Spring DM offers a dedicated package <literal>org.springframework.osgi.context.event</literal> which defines the events that
@@ -437,7 +437,7 @@ context ::= path ( ';' path ) * (';' directive) *
     
 
     <section id="app-deploy:required-libraries">
-      <title>Required Spring Framework and Spring Dynamic Modules
+      <title>Required Spring Framework And Spring Dynamic Modules
       Bundles</title>
 
       <para>The Spring Dynamic Modules project provides an number of bundle
@@ -532,7 +532,7 @@ context ::= path ( ';' path ) * (';' directive) *
     </section>
     
     <section id="app-deploy:spring-namespaces">
-    	<title>Spring XML authoring support</title>
+    	<title>Spring XML Authoring Support</title>
     	
     	<para>Spring 2.0 introduced (among other things) <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/xsd-config.html">
     	easier</ulink> XML configuration and <ulink url="http://static.springframework.org/spring/docs/2.5.x/reference/extensible-xml.html">
@@ -552,7 +552,7 @@ context ::= path ( ';' path ) * (';' directive) *
     </section>
 
     <section id="app-deploy:imports-exports">
-      <title>Importing and Exporting packages</title>
+      <title>Importing and Exporting Packages</title>
 
       <para>Refer to the OSGi Service Platform for details of the
       <literal>Import-Package</literal> and <literal>Export-Package</literal>
@@ -565,7 +565,7 @@ context ::= path ( ';' path ) * (';' directive) *
     </section>
 
     <section id="app-deploy:ext-libs">
-      <title>Considerations when using external libraries</title>
+      <title>Considerations When Using External Libraries</title>
 
       <sidebar>
       	<title>What is the context class loader?</title>
@@ -623,7 +623,7 @@ context ::= path ( ';' path ) * (';' directive) *
     </section>
 
     <section id="app-deploy:troubleshooting">
-      <title>Diagnosing problems</title>
+      <title>Diagnosing Problems</title>
 
       <para>Your chosen OSGi platform implementation should be able to provide
       you with a good deal of information about the current status of the OSGi

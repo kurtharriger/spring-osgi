@@ -17,7 +17,7 @@
     features migrating into the core specification in future releases.</para>
 
     <section id="appendix-extensions:annotations">
-      <title>Annotation-based injection</title>
+      <title>Annotation-Based Injection</title>
 
       <para>The
       <literal>org.springframework.osgi.extensions.annotation</literal> bundle
@@ -56,7 +56,7 @@
       information.</para>
       
       <section id="appendix-extensions:annotations:enable">
-		<title>Enabling/Disabling annotation processing</title>
+		<title>Enabling/Disabling Annotation Processing</title>
 		
 		<para>By default, as Spring-OSGi is JDK 1.4 compatible, annotation injection is disabled. There are
 		currently two ways for enabling it:</para>

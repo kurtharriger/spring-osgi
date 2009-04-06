@@ -17,7 +17,7 @@
     </para>
     
     <section id="appendix-osgi-repo:old-repo">
-    	<title>Spring DM temporary OSGi Repository</title>
+    	<title>Spring DM Temporary OSGi Repository</title>
     	
     	<para>Unfortunately, not all Spring DM dependencies are available in SpringSource Repository and thus Spring DM still needs to maintain some of its own 
     	dedicated Maven <ulink url="http://maven.apache.org/guides/introduction/introduction-to-repositories.html">repository</ulink> available
@@ -30,7 +30,7 @@
 	    </para>
 
 	<section id="appendix-osgi-repo:conventions">
-		<title>Repository conventions</title>
+		<title>Repository Conventions</title>
 		
 		<para>Currently, all the artifacts published in the repository are marked as <literal>SNAPSHOT</literal>s meaning that, in time, their
 		content can change. This allows clients to download possible manifest updates made to the libraries. We foresee that, as the library usage
@@ -43,7 +43,7 @@
 	</section>
 	
 	<section id="appendix-osgi-repo:browsing">
-		<title>Browsing the repository content</title>
+		<title>Browsing The Repository Content</title>
 		
 		<para>The repository is currently hosted at Amazon <ulink url="http://aws.amazon.com/s3">S3</ulink>. To browse the repository structure,
 		use a S3 compatible browser (such as <ulink url="http://s3browse.com/explore/maven.springframework.org/osgi/org/springframework/osgi/">this</ulink> one)
@@ -52,7 +52,7 @@
 	</section>
 	
 	<section id="appendix-osgi-repo:maven">
-		<title>Using the repository with Maven</title>
+		<title>Using The Repository With Maven</title>
 		
 		<para>The use the repository, simply add it ot the <literal>repositories</literal> group; since the repository 
 		contains <literal>SNAPSHOT</literal> artifacts, make sure to mark it accordingly:</para>
@@ -71,7 +71,7 @@
 	</section>
 
 	<section id="appendix-osgi-repo:ant">
-		<title>Using the repository with Ant/Ivy</title>
+		<title>Using The Repository With Ant/Ivy</title>
 		
 		<para>When using <ulink url="http://ant.apache.org/">Ant</ulink> consider using the excellent <ulink url="http://ant.apache.org/ivy/">Ivy</ulink>
 		subproject for retrieving the OSGi dependencies from the Spring DM repository as Ivy can work with a Maven-style repository. Please see the 

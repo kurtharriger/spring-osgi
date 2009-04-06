@@ -217,7 +217,7 @@
     </section>
 
     <section id="bnd-app-ctx:osgi-resource">
-      <title>The Resource abstraction</title>
+      <title>The Resource Abstraction</title>
 
       <para>The Spring Framework defines a resource abstraction for loading
       resources within an application context (see <ulink
@@ -363,7 +363,7 @@
     </section>
     
     <section id="bnd-app-ctx:access-bnd-ctx:stop-extender">
-      <title>Stopping the extender bundle</title>
+      <title>Stopping the Extender Bundle</title>
 
       <para>If the extender bundle is stopped, then all the application
       contexts created by the extender will be destroyed. Application contexts
