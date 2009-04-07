@@ -47,9 +47,6 @@
                        maxOccurs="unbounded"/>
                 </xsd:choice>
             </xsd:sequence>
-            <xsd:attribute name="default-lazy-init" default="false" type="xsd:boolean"/>
-            <xsd:attribute name="default-init-method" type="xsd:string"/>
-            <xsd:attribute name="default-destroy-method" type="xsd:string"/>
             <xsd:attributeGroup ref="defaults" />
             <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
@@ -62,7 +59,7 @@
     </xsd:element>
 
    <xsd:element name="type-converters">
-   		<xsd:complexType mixed="true">
+   		<xsd:complexType>
 	        <xsd:choice minOccurs="0" maxOccurs="unbounded">
 	           <xsd:element ref="component"/>
 	           <xsd:element ref="ref"/>
@@ -248,9 +245,7 @@
         <xsd:complexContent>
             <xsd:extension base="TtypedCollectionType">
                 <xsd:sequence>
-                    <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                        <xsd:element ref="entry"/>
-                    </xsd:choice>
+                    <xsd:element ref="entry" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="key-type" type="xsd:string"/>
             </xsd:extension>
@@ -283,9 +278,7 @@
         <xsd:complexContent>
             <xsd:extension base="TbaseCollectionType">
                 <xsd:sequence>
-                    <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                        <xsd:element ref="prop"/>
-                    </xsd:choice>
+                    <xsd:element ref="prop" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -301,6 +294,9 @@
     </xsd:simpleType>
     
     <xsd:attributeGroup name="defaults">
+      <xsd:attribute name="default-lazy-init" default="false" type="xsd:boolean"/>
+      <xsd:attribute name="default-init-method" type="xsd:string"/>
+      <xsd:attribute name="default-destroy-method" type="xsd:string"/>
       <xsd:attribute name="default-timeout" type="xsd:long" default="300000"/>
       <xsd:attribute name="default-availability" type="Tavailability" default="mandatory"/>
     </xsd:attributeGroup>
@@ -331,10 +327,8 @@
          	<xsd:element ref="component"/>
 			<xsd:element ref="reference"/>
 			<xsd:element ref="service"/>
-         	<xsd:sequence minOccurs="0" maxOccurs="1">
-            	<!-- nested component declaration -->
-            	<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
-        	</xsd:sequence>
+           	<!-- nested component declaration -->
+           	<xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="lax"/>
      	</xsd:choice>        
 
         <!-- shortcut for component references -->
@@ -390,10 +384,8 @@
       	<xsd:element ref="component"/>
 		<xsd:element ref="reference"/>
 		<xsd:element ref="service"/>
-        <xsd:sequence minOccurs="1" maxOccurs="1">
-            <!-- nested component declaration -->
-            <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
-        </xsd:sequence>
+        <!-- nested component declaration -->
+        <xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="lax"/>
      </xsd:choice>
    </xsd:complexType>
 	
@@ -414,7 +406,7 @@
           <xsd:choice>
           	<xsd:group ref="serviceElements"/>
           	<!-- nested component declaration -->
-          	<xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="skip"/>
+          	<xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="lax"/>
           </xsd:choice>
           <xsd:attribute name="interface" type="xsd:token" use="optional"/>
           <xsd:attribute name="ref" type="xsd:string" use="optional"/>
@@ -441,10 +433,7 @@
         	<xsd:element ref="component"/>
 			<xsd:element ref="reference"/>
 			<xsd:element ref="service"/>
-        	<xsd:sequence minOccurs="0" maxOccurs="1">
-           		<!-- nested component declaration -->
-           		<xsd:any namespace="##other" minOccurs="1" maxOccurs="1" processContents="skip"/>
-       		</xsd:sequence>
+        	<xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="lax"/>
     	</xsd:choice>        
  
         <!-- shortcut for component references -->
