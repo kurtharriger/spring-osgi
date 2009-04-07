@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.springframework.osgi.samples.web-console</groupId>
     <artifactId>web-console</artifactId>
-    <version>1.2.0-rc2-SNAPSHOT</version>
+    <version>1.2.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi.samples.web-console</groupId>
