@@ -29,12 +29,14 @@ import org.springframework.osgi.blueprint.context.SpringModuleContext;
 import org.springframework.osgi.blueprint.context.support.ModuleContextServicePublisher;
 import org.springframework.osgi.blueprint.convert.SpringConversionService;
 import org.springframework.osgi.blueprint.extender.internal.activator.support.BlueprintConfigUtils;
+import org.springframework.osgi.blueprint.extender.internal.activator.support.ModuleContextConfig;
 import org.springframework.osgi.blueprint.extender.internal.event.EventAdminDispatcher;
 import org.springframework.osgi.blueprint.extender.internal.support.BlueprintExtenderConfiguration;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.extender.internal.activator.ContextLoaderListener;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
+import org.springframework.osgi.extender.support.ApplicationContextConfiguration;
 import org.springframework.osgi.extender.support.internal.ConfigUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -175,5 +177,9 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 		super.addApplicationListener(multicaster);
 		// monitor bootstrapping events
 		multicaster.addApplicationListener(dispatcher);
+	}
+
+	protected ApplicationContextConfiguration createContextConfig(Bundle bundle) {
+		return new ModuleContextConfig(bundle);
 	}
 }

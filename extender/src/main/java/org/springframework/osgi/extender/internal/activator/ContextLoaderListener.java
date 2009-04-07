@@ -671,6 +671,10 @@ public class ContextLoaderListener implements BundleActivator {
 			nsManager.maybeRemoveNameSpaceHandlerFor(bundle);
 	}
 
+	protected ApplicationContextConfiguration createContextConfig(Bundle bundle) {
+		return new ApplicationContextConfiguration(bundle);
+	}
+
 	/**
 	 * Context creation is a potentially long-running activity (certainly more
 	 * than we want to do on the synchronous event callback).
@@ -754,7 +758,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 		localApplicationContext.setDelegatedEventMulticaster(multicaster);
 
-		ApplicationContextConfiguration config = new ApplicationContextConfiguration(bundle);
+		ApplicationContextConfiguration config = createContextConfig(bundle);
 
 		final boolean asynch = config.isCreateAsynchronously();
 
