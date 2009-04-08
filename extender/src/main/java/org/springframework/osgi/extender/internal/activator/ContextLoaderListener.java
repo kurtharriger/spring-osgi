@@ -483,15 +483,17 @@ public class ContextLoaderListener implements BundleActivator {
 				buffer.append("\nBundle [" + bundles[i].getSymbolicName() + "]");
 				ServiceReference[] services = bundles[i].getServicesInUse();
 				HashSet usedBundles = new HashSet();
-				for (int j = 0; j < services.length; j++) {
-					if (BundleDependencyComparator.isSpringManagedService(services[j])) {
-						Bundle used = services[j].getBundle();
-						if (!used.equals(bundleContext.getBundle()) && !usedBundles.contains(used)) {
-							usedBundles.add(used);
-							buffer.append("\n  Using [" + used.getSymbolicName() + "]");
+				if (services != null) {
+					for (int j = 0; j < services.length; j++) {
+						if (BundleDependencyComparator.isSpringManagedService(services[j])) {
+							Bundle used = services[j].getBundle();
+							if (!used.equals(bundleContext.getBundle()) && !usedBundles.contains(used)) {
+								usedBundles.add(used);
+								buffer.append("\n  Using [" + used.getSymbolicName() + "]");
+							}
 						}
-					}
 
+					}
 				}
 			}
 			buffer.append("\n}");
