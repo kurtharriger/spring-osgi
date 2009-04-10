@@ -40,7 +40,7 @@ configurations.
 2. RELEASE INFO
 
 The Spring Dynamic Modules for OSGi(tm) Service Platforms is targeted at OSGi R4 and 
-above, and JDK level 1.4 and above.
+above, and JDK level 5.0 and above.
 
 Release contents:
 * "src" contains the Java source files for the framework

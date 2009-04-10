@@ -86,17 +86,10 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>edu.emory.mathcs.backport</groupId>
-      <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
-      <version>3.1.0</version>
-      <scope>provided</scope>
-    </dependency> 
-    <dependency>
         <groupId>multithreadedtc</groupId>
         <artifactId>multithreadedtc</artifactId>
         <version>1.01</version>
         <scope>test</scope>
-        <classifier>${jdk-classifier}</classifier>
         <exclusions>      
       	 <exclusion>
           <groupId>backport-util-concurrent</groupId>
@@ -104,18 +97,6 @@
       	 </exclusion>
         </exclusions> 
     </dependency>
-	<dependency>
-		<groupId>net.sf.retrotranslator</groupId>
-		<artifactId>retrotranslator-runtime</artifactId>
-		<version>1.2.3</version>
-		<scope>test</scope>
-		<exclusions>      
-      	 <exclusion>
-          <groupId>backport-util-concurrent</groupId>
-	      <artifactId>backport-util-concurrent</artifactId>
-      	 </exclusion>
-		</exclusions> 
-	</dependency> 
     
   </dependencies>
 </project>
