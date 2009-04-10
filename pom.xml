@@ -988,7 +988,7 @@ Ignored-Existing-Headers:
         <site>
             <id>static.springframework.org</id>
             <name>SpringFramework.org</name>
-            <url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-osgi/snapshot-site/</url>
+            <url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-osgi/snapshot-site/1.2.x/</url>
         </site>
         <repository>
             <id>spring-milestone</id>
