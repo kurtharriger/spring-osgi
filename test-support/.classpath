@@ -5,12 +5,12 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar" sourcepath="/JUNIT_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/2.5.6.A/org.springframework.core-2.5.6.A.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/3.0.0.BUILD-SNAPSHOT/org.springframework.core-3.0.0.BUILD-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/easymock/easymock/1.2_Java1.3/easymock-1.2_Java1.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.test/2.5.6.A/org.springframework.test-2.5.6.A.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/2.5.6.A/org.springframework.context-2.5.6.A.jar" sourcepath="/SPRING_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/2.5.6.A/org.springframework.beans-2.5.6.A.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.test/3.0.0.BUILD-SNAPSHOT/org.springframework.test-3.0.0.BUILD-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/3.0.0.BUILD-SNAPSHOT/org.springframework.context-3.0.0.BUILD-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/3.0.0.BUILD-SNAPSHOT/org.springframework.beans-3.0.0.BUILD-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.api/1.5.0/com.springsource.slf4j.api-1.5.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.0/com.springsource.slf4j.org.apache.commons.logging-1.5.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.log4j/1.5.0/com.springsource.slf4j.log4j-1.5.0.jar"/>
@@ -18,7 +18,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-mock/2.0.0-m1-SNAPSHOT/spring-osgi-mock-2.0.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0-m1-SNAPSHOT/spring-osgi-core-2.0.0-m1-SNAPSHOT.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-extender"/>
 	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
 	<classpathentry kind="var" path="M2_REPO/knopflerfish/framework/2.2.0/framework-2.2.0.jar" sourcepath="/KF_SRC"/>
