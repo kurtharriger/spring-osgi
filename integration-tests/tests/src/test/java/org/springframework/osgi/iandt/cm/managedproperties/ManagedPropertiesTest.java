@@ -46,7 +46,7 @@ public class ManagedPropertiesTest extends BaseConfigurationAdminTest {
 	private void initProperties() {
 		System.out.println("Import " + org.springframework.beans.factory.config.CustomEditorConfigurer.class);
 		props = new Properties();
-		props.setProperty("class", System.class.getName());
+		props.setProperty("clazz", System.class.getName());
 		props.setProperty("integer", "54321");
 	}
 
@@ -130,6 +130,7 @@ public class ManagedPropertiesTest extends BaseConfigurationAdminTest {
 		//assertEquals(System.class, simple.getClazz());
 		assertEquals(new Integer(54321), bean.getInteger());
 		assertEquals(newString, bean.getString());
+		System.out.println(bean.getClazz());
 	}
 
 	public void testBeanManagedBean() throws Exception {

@@ -8,8 +8,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="target/classes"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/trivial.tests/1.2.0/trivial.tests-1.2.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/trivial.tests/2.0.0-m1-SNAPSHOT/trivial.tests-2.0.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/junit/com.springsource.junit/3.8.2/com.springsource.junit-3.8.2.jar" sourcepath="M2_REPO/org/junit/com.springsource.junit/3.8.2/com.springsource.junit-3.8.2-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/trivial/1.2.0/trivial-1.2.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/trivial/2.0.0-m1-SNAPSHOT/trivial-2.0.0-m1-SNAPSHOT.jar"/>
 	
 </classpath>

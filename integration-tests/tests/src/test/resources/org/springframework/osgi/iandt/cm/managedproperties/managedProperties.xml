@@ -35,6 +35,7 @@
 	
 	<bean id="containerManaged" class="org.springframework.osgi.iandt.cm.managedproperties.TestBean">
 		<osgix:managed-properties persistent-id="containerManaged" update-strategy="container-managed"/>
+		<property name="clazz" value="java.lang.Object"/>
 	</bean>
 	
 	<bean id="beanManaged" class="org.springframework.osgi.iandt.cm.managedproperties.TestBean">
