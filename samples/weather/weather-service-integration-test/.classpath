@@ -6,11 +6,11 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/org/junit/com.springsource.junit/3.8.2/com.springsource.junit-3.8.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/2.5.6.A/org.springframework.context-2.5.6.Ajar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.test/2.5.6.A/org.springframework.test-2.5.6.Ajar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/3.0.0.BUILD-SNAPSHOT/org.springframework.context-3.0.0.BUILD-SNAPSHOTjar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.test/3.0.0.BUILD-SNAPSHOT/org.springframework.test-3.0.0.BUILD-SNAPSHOTjar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Weather Sample Service Bundle"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-test-support"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/2.5.6.A/org.springframework.core-2.5.6.A.jar" sourcepath="/SPRING_SRC"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/3.0.0.BUILD-SNAPSHOT/org.springframework.core-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_core/1.0/osgi_R4_core-1.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
