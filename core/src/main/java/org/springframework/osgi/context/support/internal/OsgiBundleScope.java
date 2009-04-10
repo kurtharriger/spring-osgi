@@ -19,6 +19,7 @@ package org.springframework.osgi.context.support.internal;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +29,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.Scope;
-import org.springframework.core.CollectionFactory;
+import org.springframework.core.NamedThreadLocal;
 import org.springframework.util.Assert;
 
 /**
@@ -70,7 +71,7 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 		private ServiceFactory decoratedServiceFactory;
 
 		/** destruction callbacks for bean instances */
-		private final Map callbacks = CollectionFactory.createConcurrentMap(4);
+		private final Map<Bundle, Runnable> callbacks = new ConcurrentHashMap<Bundle, Runnable>(4);
 
 
 		public BundleScopeServiceFactory(ServiceFactory serviceFactory) {
@@ -124,7 +125,7 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 				decoratedServiceFactory.ungetService(bundle, registration, service);
 
 				// then apply the destruction callback (if any)
-				Runnable callback = (Runnable) callbacks.remove(bundle);
+				Runnable callback = callbacks.remove(bundle);
 				if (callback != null)
 					callback.run();
 			}
@@ -141,14 +142,16 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 	 * {@link BundleScopeServiceFactory} (there is only one scope instance but
 	 * multiple BSSFs).
 	 */
-	public static final ThreadLocal EXTERNAL_BUNDLE = new ThreadLocal();
+	public static final ThreadLocal<Object> EXTERNAL_BUNDLE = new NamedThreadLocal<Object>(
+		"Current in-creation scoped bean");
 
 	/**
-	 * Map of localBeans imported by the current bundle from other bundles. This map
-	 * is sychronized and is used by
-	 * {@link org.springframework.osgi.context.support.internal.OsgiBundleScope}.
+	 * Map of localBeans imported by the current bundle from other bundles. This
+	 * map is sychronized and is used by
+	 * {@link org.springframework.osgi.context.support.internal.OsgiBundleScope}
+	 * .
 	 */
-	private final Map localBeans = new LinkedHashMap(4);
+	private final Map<String, Object> localBeans = new LinkedHashMap<String, Object>(4);
 
 	/**
 	 * Unsynchronized map of callbacks for the services used by the running
@@ -157,14 +160,14 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 	 * Uses the bean name as key and as value, a list of callbacks associated
 	 * with the bean instances.
 	 */
-	private final Map destructionCallbacks = new LinkedHashMap(8);
+	private final Map<String, Runnable> destructionCallbacks = new LinkedHashMap<String, Runnable>(8);
 
 
 	private boolean isExternalBundleCalling() {
 		return (EXTERNAL_BUNDLE.get() != null);
 	}
 
-	public Object get(String name, ObjectFactory objectFactory) {
+	public Object get(String name, ObjectFactory<?> objectFactory) {
 		// outside bundle calling (no need to cache things)
 		if (isExternalBundleCalling()) {
 			Object bean = objectFactory.getObject();
@@ -209,6 +212,10 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 		throw new UnsupportedOperationException();
 	}
 
+	public Object resolveContextualObject(String key) {
+		return null;
+	}
+
 	/*
 	 * Clean up the scope (context refresh/close()).
 	 */
@@ -218,8 +225,8 @@ public class OsgiBundleScope implements Scope, DisposableBean {
 		// handle only the local cache/localBeans
 		// the ServiceFactory object will be destroyed upon service
 		// unregistration
-		for (Iterator iter = destructionCallbacks.entrySet().iterator(); iter.hasNext();) {
-			Map.Entry entry = (Map.Entry) iter.next();
+		for (Iterator<Map.Entry<String, Runnable>> iter = destructionCallbacks.entrySet().iterator(); iter.hasNext();) {
+			Map.Entry<String, Runnable> entry = iter.next();
 			Runnable callback = (Runnable) entry.getValue();
 
 			if (debug)

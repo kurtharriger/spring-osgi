@@ -14,9 +14,11 @@
  * limitations under the License.
  *
  */
+
 package org.springframework.osgi.service.importer.support;
 
 import org.osgi.framework.BundleContext;
+import org.springframework.core.NamedInheritableThreadLocal;
 
 /**
  * Class containing static methods used to obtain information about the current
@@ -42,7 +44,9 @@ public abstract class LocalBundleContext {
 	/**
 	 * ThreadLocal holder for the invoker context.
 	 */
-	private final static ThreadLocal invokerBundleContext = new InheritableThreadLocal();
+	private final static ThreadLocal<BundleContext> invokerBundleContext = new NamedInheritableThreadLocal<BundleContext>(
+		"Current invoker bundle context");
+
 
 	/**
 	 * Try to get the current invoker bundle context. Note that this can be
@@ -51,7 +55,7 @@ public abstract class LocalBundleContext {
 	 * @return the invoker bundle context (can be null)
 	 */
 	public static BundleContext getInvokerBundleContext() {
-		return (BundleContext) invokerBundleContext.get();
+		return invokerBundleContext.get();
 	}
 
 	/**
@@ -59,13 +63,12 @@ public abstract class LocalBundleContext {
 	 * cleaning up the thread-local when the invocation ends.
 	 * 
 	 * @param bundleContext invoker bundle context
-	 * @return the old context in case there was one; maybe <code>null</code>
-	 * is none is set
+	 * @return the old context in case there was one; maybe <code>null</code> is
+	 *         none is set
 	 */
 	static BundleContext setInvokerBundleContext(BundleContext bundleContext) {
-		BundleContext old = (BundleContext) invokerBundleContext.get();
+		BundleContext old = invokerBundleContext.get();
 		invokerBundleContext.set(bundleContext);
 		return old;
 	}
-
 }
