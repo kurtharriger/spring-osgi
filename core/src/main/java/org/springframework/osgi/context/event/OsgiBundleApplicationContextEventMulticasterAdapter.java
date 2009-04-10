@@ -77,6 +77,7 @@ public class OsgiBundleApplicationContextEventMulticasterAdapter implements
 	 */
 	public void removeApplicationListener(OsgiBundleApplicationContextListener osgiListener) {
 		Assert.notNull(null);
-		delegatedMulticaster.removeApplicationListener(new ApplicationListenerAdapter(osgiListener));
+		//FIXME:
+		//delegatedMulticaster.removeApplicationListener(new ApplicationListenerAdapter(osgiListener));
 	}
 }

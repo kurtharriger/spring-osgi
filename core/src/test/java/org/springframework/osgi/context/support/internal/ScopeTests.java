@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.context.support.internal;
 
 import java.util.Properties;
@@ -36,33 +37,25 @@ public class ScopeTests extends TestCase {
 
 	private static Runnable callback = null;
 
+
 	private static abstract class AbstractScope implements Scope {
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.springframework.beans.factory.config.Scope#getConversationId()
-		 */
 		public String getConversationId() {
 			System.out.println("returning conversation id");
 			return null;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.springframework.beans.factory.config.Scope#registerDestructionCallback(java.lang.String,
-		 * java.lang.Runnable)
-		 */
 		public void registerDestructionCallback(String name, Runnable cb) {
 			System.out.println("registering callback " + cb + " for bean " + name);
 			callback = cb;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.springframework.beans.factory.config.Scope#remove(java.lang.String)
-		 */
 		public Object remove(String name) {
 			System.out.println("destroying bean " + name);
+			return null;
+		}
+
+		public Object resolveContextualObject(String arg0) {
 			return null;
 		}
 	}
@@ -84,7 +77,9 @@ public class ScopeTests extends TestCase {
 
 	}
 
+
 	private DefaultListableBeanFactory bf;
+
 
 	private class ScopedXmlFactory extends XmlBeanFactory {
 
@@ -99,6 +94,7 @@ public class ScopeTests extends TestCase {
 		}
 
 	}
+
 
 	protected void setUp() throws Exception {
 		Resource file = new ClassPathResource("scopes.xml");
@@ -145,7 +141,7 @@ public class ScopeTests extends TestCase {
 		props.put("foo", "bar");
 
 		bf.destroyScopedBean("a");
-		
+
 		System.out.println(ObjectUtils.nullSafeToString(bf.getRegisteredScopeNames()));
 		//assertTrue(props.isEmpty());
 	}
