@@ -23,7 +23,6 @@
 		org.apache.commons.logging
 	</spring.osgi.import.pkg>
 
-	<source-jdk>1.5</source-jdk>
   </properties>
   
   <dependencies>

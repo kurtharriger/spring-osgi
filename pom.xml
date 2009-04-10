@@ -72,16 +72,13 @@
    <slf4j.version>1.5.0</slf4j.version>
    
    <!-- platform versions -->
-   <equinox.ver>3.2.2</equinox.ver>
+   <equinox.ver>3.4.3</equinox.ver>
    <kf.ver>2.2.0</kf.ver>
    <felix.ver>1.4.1</felix.ver>
    
    <!-- javadoc configuration -->
    <javadoc.loc>${basedir}/docs/src/javadoc</javadoc.loc>
    
-   <!-- JDK classifier property -->
-   <jdk-classifier>jdk14</jdk-classifier>
-   <source-jdk>1.4</source-jdk>
    <clover.ver>2.3.1</clover.ver>
    <clover.argLine></clover.argLine>
    <clover.skip>false</clover.skip>
@@ -93,8 +90,7 @@
    <policy.url>..${file.separator}policy.all</policy.url>
    
    <!-- bundlor settings -->
-   <!-- disabled on jdk1.4 -->
-   <bundlor.enabled>false</bundlor.enabled>
+   <bundlor.enabled>true</bundlor.enabled>
    <!-- common version ranges -->
    <spring.version.range>"[${spring.base.version},4.0)"</spring.version.range>
    <spring.osgi.version.range>"[${spring.osgi.import.version},${spring.osgi.import.version}]"</spring.osgi.version.range>
@@ -235,6 +231,8 @@ limitations under the License.
     <module>web</module>
     <module>web-extender</module>
     <module>bundle-archetype</module>
+    <module>annotation</module>
+
     <!-- unused at the moment
     <module>release</module>
     -->
@@ -560,6 +558,55 @@ limitations under the License.
           </instructions>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <groupId>com.springsource.bundlor</groupId>
+        <artifactId>com.springsource.bundlor.maven</artifactId>
+        <executions>
+          <execution>
+            <id>bundlor</id>
+            <phase>package</phase>
+            <goals>
+               <goal>transform</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+           <manifestTemplatePath>${basedir}/template.mf</manifestTemplatePath>
+           <manifestHeaders><![CDATA[Bundle-Name: ${artifactId}
+Bundle-Version: ${spring.osgi.bundle.version}
+Bundle-SymbolicName: ${spring.osgi.symbolic.name}
+Bundle-Vendor: SpringSource
+Bundle-DocURL: http://www.springframework.org/osgi
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
+Implementation-Title: Spring Dynamic Modules Framework
+Implementation-Version: ${pom.version}
+Implementation-Vendor: SpringSource
+Implementation-Vendor-Id: org.springframework.osgi
+Spring-DM-Version: ${pom.version}
+Spring-Version: ${spring.maven.artifact.version}
+Build-Plan: ${env.buildPlan}
+Build-Number: ${env.buildNumber}
+SVN-Revision: ${env.svnRevision}
+Excluded-Imports: com_cenqua_clover*
+Ignored-Existing-Headers: 
+ Tool,
+ Ignore-Package,
+ Private-Package,
+ Created-By,
+ Bnd-LastModified,
+ Import-Package,
+ Export-Package
+]]></manifestHeaders> 
+           <packagings>
+               <packaging>bundle</packaging>
+           </packagings>
+           <enabled>${bundlor.enabled}</enabled>
+           <failOnWarnings>false</failOnWarnings>
+           <removeNullHeaders>true</removeNullHeaders>
+        </configuration>
+      </plugin>
+     
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -577,8 +624,8 @@ limitations under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
-            <source>${source-jdk}</source>
-            <target>${source-jdk}</target>
+            <source>1.5</source>
+            <target>1.5</target>
             <debug>true</debug>
           </configuration>
       </plugin>
@@ -605,7 +652,7 @@ limitations under the License.
               the previous unless a different folder is used for the root
               <historyDir>${basedir}/clover/history</historyDir>
               -->
-              <jdk>${source-jdk}</jdk>
+              <jdk>1.5</jdk>
               <includesTestSourceRoots>false</includesTestSourceRoots>
               <skip>${clover.skip}</skip>
 
@@ -705,76 +752,6 @@ limitations under the License.
       </properties>
     </profile>
 
-    <!-- VM 1.5/tiger source files (such as annotations) -->
-    <profile>
-      <id>jdk-1.5+</id>
-        <activation>
-          <jdk>!1.4</jdk>
-        </activation>
-        <modules>
-          <module>annotation</module>
-        </modules>
-        <properties>
-          <!-- use default mtc version for core -->
-          <jdk-classifier></jdk-classifier>
-          <!-- enable bundlor -->
-          <bundlor.enabled>true</bundlor.enabled>
-        </properties>
-
-        <build>
-          <plugins>
-           <plugin>
-            <groupId>com.springsource.bundlor</groupId>
-            <artifactId>com.springsource.bundlor.maven</artifactId>
-            <executions>
-              <execution>
-                <id>bundlor</id>
-                <phase>package</phase>
-                <goals>
-                   <goal>transform</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-               <manifestTemplatePath>${basedir}/template.mf</manifestTemplatePath>
-               <manifestHeaders><![CDATA[Bundle-Name: ${artifactId}
-Bundle-Version: ${spring.osgi.bundle.version}
-Bundle-SymbolicName: ${spring.osgi.symbolic.name}
-Bundle-Vendor: SpringSource
-Bundle-DocURL: http://www.springframework.org/osgi
-Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
-Implementation-Title: Spring Dynamic Modules Framework
-Implementation-Version: ${pom.version}
-Implementation-Vendor: SpringSource
-Implementation-Vendor-Id: org.springframework.osgi
-Spring-DM-Version: ${pom.version}
-Spring-Version: ${spring.maven.artifact.version}
-Build-Plan: ${env.buildPlan}
-Build-Number: ${env.buildNumber}
-SVN-Revision: ${env.svnRevision}
-Excluded-Imports: com_cenqua_clover*
-Ignored-Existing-Headers: 
- Tool,
- Ignore-Package,
- Private-Package,
- Created-By,
- Bnd-LastModified,
- Import-Package,
- Export-Package
-]]></manifestHeaders> 
-               <packagings>
-                   <packaging>bundle</packaging>
-               </packagings>
-               <enabled>${bundlor.enabled}</enabled>
-               <failOnWarnings>false</failOnWarnings>
-               <removeNullHeaders>true</removeNullHeaders>
-            </configuration>
-           </plugin>
-          </plugins>
-        </build>
-
-    </profile>
-    
     <!-- integration testing profile -->
     <profile>
       <id>it</id>
@@ -913,7 +890,6 @@ Ignored-Existing-Headers:
           </groups>
           <excludePackageNames>*internal:*samples:org.springframework.osgi.config:org.springframework.osgi.compendium.config:org.springframework.osgi.iandt*</excludePackageNames>
 
-          <!-- enabled as this is the recommandation on 1.4 -->
           <breakiterator>true</breakiterator>
           <quiet>true</quiet>
           <verbose>false</verbose>
@@ -1052,6 +1028,7 @@ Ignored-Existing-Headers:
         <name>Eclipse Repository</name>
         <url>http://repo1.maven.org/eclipse/</url>
     </repository>
+    
     <repository>
         <id>com.springsource.repository.bundles.external</id>
         <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
@@ -1062,6 +1039,15 @@ Ignored-Existing-Headers:
         <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
         <url>http://repository.springsource.com/maven/bundles/release</url>
     </repository>
+    <repository>
+        <id>com.springsource.repository.bundles.snapshot</id>
+        <name>SpringSource Enterprise Bundle Repository - Snapshots</name>
+        <url>http://repository.springsource.com/maven/bundles/snapshot</url>
+        <snapshots>
+         <enabled>true</enabled>
+        </snapshots>
+    </repository>
+    
     <repository>
         <id>spring-release</id>
         <name>Spring Portfolio Release Repository</name>

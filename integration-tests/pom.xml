@@ -20,6 +20,7 @@
   <modules>
     <module>bundles</module>
     <module>tests</module>
+    <module>tests-tiger</module>
   </modules>
   
   <build>
@@ -33,16 +34,4 @@
 	  </plugins>
   </build>
   
-  <profiles>
-    <profile>
-      <id>jdk-1.5+</id>
-        <activation>
-          <jdk>!1.4</jdk>
-        </activation>
-        <modules>
-          <module>tests-tiger</module>
-        </modules>
-    </profile>
-  </profiles>
-
 </project>
