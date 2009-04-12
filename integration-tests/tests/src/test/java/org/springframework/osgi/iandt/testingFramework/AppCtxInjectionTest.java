@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.testingFramework;
 
-import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import org.springframework.osgi.iandt.BaseIntegrationTest;
 
@@ -28,16 +30,18 @@ import org.springframework.osgi.iandt.BaseIntegrationTest;
  */
 public class AppCtxInjectionTest extends BaseIntegrationTest {
 
-	private Serializable serializable;
+	private HashMap map;
 
-	public void setSerializable(Serializable serializable) {
-		this.serializable = serializable;
+
+	public void setMap(HashMap map) {
+		this.map = map;
 	}
 
 	@SuppressWarnings("deprecation")
 	public void testInjection() throws Exception {
-		assertNotNull(serializable);
-		assertEquals(applicationContext.getBean("injected-bean"), serializable);
+		System.out.println(Arrays.toString(applicationContext.getBeanDefinitionNames()));
+		assertNotNull(map);
+		assertEquals(applicationContext.getBean("injected-bean"), map);
 	}
 
 	protected String[] getConfigLocations() {

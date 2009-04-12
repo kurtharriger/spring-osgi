@@ -26,7 +26,7 @@ import java.beans.PropertyEditorSupport;
  */
 public class ExoticTypeCustomEditor extends PropertyEditorSupport {
 
-	private String format;
+	private String format = "upperCase";
 
 
 	public void setFormat(String format) {

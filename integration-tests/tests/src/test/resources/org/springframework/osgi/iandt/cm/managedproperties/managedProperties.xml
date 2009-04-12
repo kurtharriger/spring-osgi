@@ -13,11 +13,8 @@
 	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 	  <property name="customEditors">
 	    <map>
-	      <entry key="org.springframework.osgi.iandt.cm.managedproperties.ExoticType">
-	        <bean class="org.springframework.osgi.iandt.cm.managedproperties.ExoticTypeCustomEditor">
-	          <property name="format" value="upperCase"/>
-	        </bean>
-	      </entry>
+	      <entry key="org.springframework.osgi.iandt.cm.managedproperties.ExoticType" 
+	      	value="org.springframework.osgi.iandt.cm.managedproperties.ExoticTypeCustomEditor"/>
 	    </map>
 	  </property>
 	</bean>

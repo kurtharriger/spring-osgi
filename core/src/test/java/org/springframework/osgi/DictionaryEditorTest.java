@@ -35,8 +35,7 @@ public class DictionaryEditorTest extends AbstractDependencyInjectionSpringConte
 	}
 
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
-		// FIXME
-		//beanFactory.registerCustomEditor(Dictionary.class, new PropertiesEditor());
+		beanFactory.registerCustomEditor(Dictionary.class, PropertiesEditor.class);
 		super.customizeBeanFactory(beanFactory);
 	}
 
