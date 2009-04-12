@@ -98,7 +98,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 	 */
 	private void initialize() {
 
-		Class clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
+		Class<?> clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
 
 		isLifecycleListener = OsgiServiceLifecycleListener.class.isAssignableFrom(clazz);
 		if (isLifecycleListener)
@@ -110,7 +110,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		if (StringUtils.hasText(bindMethod)) {
 			// determine methods using ServiceReference signature
 			bindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, bindMethod,
-				new Class[] { ServiceReference.class });
+				new Class<?>[] { ServiceReference.class });
 
 			if (bindReference != null)
 				org.springframework.util.ReflectionUtils.makeAccessible(bindReference);
@@ -126,7 +126,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 
 		if (StringUtils.hasText(unbindMethod)) {
 			unbindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, unbindMethod,
-				new Class[] { ServiceReference.class });
+				new Class<?>[] { ServiceReference.class });
 
 			if (unbindReference != null)
 				org.springframework.util.ReflectionUtils.makeAccessible(unbindReference);

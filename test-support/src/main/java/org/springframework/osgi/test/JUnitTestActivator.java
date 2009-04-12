@@ -86,7 +86,7 @@ public class JUnitTestActivator implements BundleActivator {
 
 		try {
 			// use bundle to load the classes
-			Class clazz = context.getBundle().loadClass(testClass);
+			Class<?> clazz = context.getBundle().loadClass(testClass);
 			TestCase test = (TestCase) clazz.newInstance();
 			// wrap the test with the OsgiJUnitTestAdapter
 			OsgiJUnitTest osgiTest = new OsgiJUnitTestAdapter(test);

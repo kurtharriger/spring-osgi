@@ -83,7 +83,7 @@ public abstract class DebugUtils {
 	 * @param classes (optional) array of classes that will be used for loading
 	 * the problematic class
 	 */
-	public static void debugClassLoadingThrowable(Throwable loadingThrowable, Bundle bundle, Class[] classes) {
+	public static void debugClassLoadingThrowable(Throwable loadingThrowable, Bundle bundle, Class<?>[] classes) {
 
 		String className = null;
 		// NoClassDefFoundError
@@ -247,7 +247,7 @@ public abstract class DebugUtils {
 			if (hasExport != null) {
 				log.trace("Bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "] contains resource [" + cname
 						+ "] and it is correctly exported as version [" + hasExport + "]");
-				Class c = null;
+				Class<?> c = null;
 				try {
 					c = bundle.loadClass(name);
 				}

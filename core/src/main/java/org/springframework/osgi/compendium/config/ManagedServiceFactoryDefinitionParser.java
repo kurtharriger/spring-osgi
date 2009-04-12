@@ -43,7 +43,7 @@ class ManagedServiceFactoryDefinitionParser extends AbstractSimpleBeanDefinition
 	private static final String LISTENERS_PROP = "listeners";
 
 
-	protected Class getBeanClass(Element element) {
+	protected Class<?> getBeanClass(Element element) {
 		return ManagedServiceFactoryFactoryBean.class;
 	}
 

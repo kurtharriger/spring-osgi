@@ -128,36 +128,36 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 	public void testInitWithOnlyJustTarget() throws Exception {
 		exporter.setTarget(new Object());
-		exporter.setInterfaces(new Class[] { Object.class });
+		exporter.setInterfaces(new Class<?>[] { Object.class });
 		exporter.afterPropertiesSet();
 	}
 
 	public void testAutoDetectClassesForPublishingDisabled() throws Exception {
 		exporter.setAutoExport(AutoExport.DISABLED);
-		Class[] clazz = AutoExport.DISABLED.getExportedClasses(Integer.class);
+		Class<?>[] clazz = AutoExport.DISABLED.getExportedClasses(Integer.class);
 		assertNotNull(clazz);
 		assertEquals(0, clazz.length);
 	}
 
 	public void testAutoDetectClassesForPublishingInterfaces() throws Exception {
 		exporter.setAutoExport(AutoExport.INTERFACES);
-		Class[] clazz = AutoExport.INTERFACES.getExportedClasses(HashMap.class);
-		Class[] expected = new Class[] { Cloneable.class, Serializable.class, Map.class };
+		Class<?>[] clazz = AutoExport.INTERFACES.getExportedClasses(HashMap.class);
+		Class<?>[] expected = new Class<?>[] { Cloneable.class, Serializable.class, Map.class };
 
 		assertTrue(compareArrays(expected, clazz));
 	}
 
 	public void testAutoDetectClassesForPublishingClassHierarchy() throws Exception {
 		exporter.setAutoExport(AutoExport.CLASS_HIERARCHY);
-		Class[] clazz = AutoExport.CLASS_HIERARCHY.getExportedClasses(HashMap.class);
-		Class[] expected = new Class[] { HashMap.class, AbstractMap.class };
+		Class<?>[] clazz = AutoExport.CLASS_HIERARCHY.getExportedClasses(HashMap.class);
+		Class<?>[] expected = new Class<?>[] { HashMap.class, AbstractMap.class };
 		assertTrue(compareArrays(expected, clazz));
 	}
 
 	public void testAutoDetectClassesForPublishingAll() throws Exception {
 		exporter.setAutoExport(AutoExport.ALL_CLASSES);
-		Class[] clazz = AutoExport.ALL_CLASSES.getExportedClasses(HashMap.class);
-		Class[] expected = new Class[] { Map.class, Cloneable.class, Serializable.class, HashMap.class,
+		Class<?>[] clazz = AutoExport.ALL_CLASSES.getExportedClasses(HashMap.class);
+		Class<?>[] expected = new Class<?>[] { Map.class, Cloneable.class, Serializable.class, HashMap.class,
 			AbstractMap.class };
 		assertTrue(compareArrays(expected, clazz));
 	}
@@ -183,7 +183,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 	}
 
 	public void testRegisterService() throws Exception {
-		Class[] clazz = new Class[] { Serializable.class, HashMap.class, Cloneable.class, Map.class,
+		Class<?>[] clazz = new Class<?>[] { Serializable.class, HashMap.class, Cloneable.class, Map.class,
 			LinkedHashMap.class };
 
 		String[] names = new String[clazz.length];
@@ -205,7 +205,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 		Object proxy = MockControl.createControl(ServiceFactory.class).getMock();
 		exporter.setTarget(proxy);
-		exporter.setInterfaces(new Class[] { ServiceFactory.class });
+		exporter.setInterfaces(new Class<?>[] { ServiceFactory.class });
 		String beanName = "boo";
 		exporter.setTargetBeanName(beanName);
 
@@ -262,13 +262,13 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 		String beanName = "fooBar";
 		exporter.setTargetBeanName(beanName);
-		exporter.setInterfaces(new Class[] { service.getClass() });
+		exporter.setInterfaces(new Class<?>[] { service.getClass() });
 		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
 		beanFactoryControl.replay();
 		exporter.afterPropertiesSet();
-		exporter.registerService(new Class[] { service.getClass() }, new Properties());
+		exporter.registerService(new Class<?>[] { service.getClass() }, new Properties());
 
 		assertSame(service, factory[0].getService(null, null));
 		beanFactoryControl.verify();
@@ -309,10 +309,10 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		exporter.setBundleContext(ctx);
 		exporter.setBeanFactory(beanFactory);
 		exporter.setTargetBeanName(beanName);
-		exporter.setInterfaces(new Class[] { service.getClass() });
+		exporter.setInterfaces(new Class<?>[] { service.getClass() });
 
 		exporter.afterPropertiesSet();
-		exporter.registerService(new Class[] { actualService.getClass() }, new Properties());
+		exporter.registerService(new Class<?>[] { actualService.getClass() }, new Properties());
 		assertSame(actualService, factory[0].getService(null, null));
 		beanFactoryControl.verify();
 	}
@@ -337,11 +337,11 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 		// give an actual target object not a target reference
 		exporter.setTarget(service);
-		exporter.setInterfaces(new Class[] { service.getClass() });
+		exporter.setInterfaces(new Class<?>[] { service.getClass() });
 
 		beanFactoryControl.replay();
 		exporter.afterPropertiesSet();
-		exporter.registerService(new Class[] { service.getClass() }, new Properties());
+		exporter.registerService(new Class<?>[] { service.getClass() }, new Properties());
 
 		assertSame(service, factory[0].getService(null, null));
 		beanFactoryControl.verify();
@@ -379,7 +379,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		ctx = new MockBundleContext();
 		exporter.setBundleContext(ctx);
 		exporter.setBeanFactory(beanFactory);
-		exporter.setInterfaces(new Class[] { Serializable.class, Cloneable.class });
+		exporter.setInterfaces(new Class<?>[] { Serializable.class, Cloneable.class });
 		exporter.setTarget(factory);
 		beanFactoryControl.replay();
 		exporter.afterPropertiesSet();

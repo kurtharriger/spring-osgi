@@ -37,7 +37,7 @@ public class ReferenceInterruptTest extends BaseIntegrationTest {
 		proxyFactory.setBundleContext(bundleContext);
 		proxyFactory.setCardinality(Cardinality.C_0__1);
 		proxyFactory.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
-		proxyFactory.setInterfaces(new Class[] { Shape.class });
+		proxyFactory.setInterfaces(new Class<?>[] { Shape.class });
 		proxyFactory.setTimeout(initialWait);
 		proxyFactory.afterPropertiesSet();
 

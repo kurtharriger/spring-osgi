@@ -53,7 +53,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 		fb.setCardinality(Cardinality.C_0__N);
 		// look for collections
-		fb.setInterfaces(new Class[] { ArrayList.class });
+		fb.setInterfaces(new Class<?>[] { ArrayList.class });
 		fb.afterPropertiesSet();
 
 		List registrations = new ArrayList(3);
@@ -96,7 +96,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 	public void testFactoryBeanForMultipleServicesAsClasses() throws Exception {
 
 		fb.setCardinality(Cardinality.C_0__N);
-		fb.setInterfaces(new Class[] { Date.class });
+		fb.setInterfaces(new Class<?>[] { Date.class });
 		fb.afterPropertiesSet();
 
 		List registrations = new ArrayList(3);
@@ -145,7 +145,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 	public void testIteratorWhenServiceGoesDown() throws Exception {
 		fb.setCardinality(Cardinality.C_0__N);
-		fb.setInterfaces(new Class[] { Date.class });
+		fb.setInterfaces(new Class<?>[] { Date.class });
 		fb.afterPropertiesSet();
 
 		long time = 123;
@@ -189,7 +189,7 @@ public class MultiServiceProxyFactoryBeanTest extends ServiceBaseTest {
 
 	public void testProxyDestruction() throws Exception {
 		fb.setCardinality(Cardinality.C_0__N);
-		fb.setInterfaces(new Class[] { Date.class });
+		fb.setInterfaces(new Class<?>[] { Date.class });
 		fb.afterPropertiesSet();
 
 		long time = 123;

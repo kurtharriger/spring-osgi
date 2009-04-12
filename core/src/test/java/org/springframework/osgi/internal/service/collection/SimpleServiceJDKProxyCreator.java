@@ -37,7 +37,7 @@ import org.springframework.util.ReflectionUtils;
  */
 public class SimpleServiceJDKProxyCreator implements ServiceProxyCreator {
 
-	private Class[] classes;
+	private Class<?>[] classes;
 
 	private ClassLoader loader;
 
@@ -82,7 +82,7 @@ public class SimpleServiceJDKProxyCreator implements ServiceProxyCreator {
 	}
 
 
-	public SimpleServiceJDKProxyCreator(BundleContext context, Class[] classes, ClassLoader loader) {
+	public SimpleServiceJDKProxyCreator(BundleContext context, Class<?>[] classes, ClassLoader loader) {
 		// add Spring-DM proxies
 		Object[] obj = ObjectUtils.addObjectToArray(classes, ImportedOsgiServiceProxy.class);
 		this.classes = (Class[]) ObjectUtils.addObjectToArray(obj, SpringProxy.class);
@@ -92,7 +92,7 @@ public class SimpleServiceJDKProxyCreator implements ServiceProxyCreator {
 		this.context = context;
 	}
 
-	public SimpleServiceJDKProxyCreator(BundleContext context, Class[] classes) {
+	public SimpleServiceJDKProxyCreator(BundleContext context, Class<?>[] classes) {
 		this(context, classes, SimpleServiceJDKProxyCreator.class.getClassLoader());
 	}
 

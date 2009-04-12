@@ -124,7 +124,7 @@ public class OsgiServiceProxyEqualityTest extends TestCase {
 		bundleContext = null;
 	}
 
-	private Object createProxy(Object target, Class intf, Advice[] advices) {
+	private Object createProxy(Object target, Class<?> intf, Advice[] advices) {
 		ProxyFactory factory = new ProxyFactory();
 		factory.addInterface(intf);
 		if (advices != null)

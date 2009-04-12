@@ -91,7 +91,7 @@ public class ManagedServiceFactoryTest extends TestCase {
 	public void testBasicExportAttributes() throws Exception {
 		Object factory = appContext.getBean("&simple");
 		Object intfs = TestUtils.getFieldValue(factory, "interfaces");
-		assertTrue(Arrays.equals((Object[]) intfs, new Class[] { Object.class }));
+		assertTrue(Arrays.equals((Object[]) intfs, new Class<?>[] { Object.class }));
 		Object autoExport = TestUtils.getFieldValue(factory, "autoExport");
 		assertEquals(AutoExport.ALL_CLASSES, autoExport);
 	}
@@ -99,7 +99,7 @@ public class ManagedServiceFactoryTest extends TestCase {
 	public void testNestedInterfaceElement() throws Exception {
 		Object factory = appContext.getBean("&ccl");
 		Object intfs = TestUtils.getFieldValue(factory, "interfaces");
-		assertTrue(Arrays.equals((Object[]) intfs, new Class[] { Map.class, Serializable.class }));
+		assertTrue(Arrays.equals((Object[]) intfs, new Class<?>[] { Map.class, Serializable.class }));
 	}
 
 	public void testCCLAttribute() throws Exception {

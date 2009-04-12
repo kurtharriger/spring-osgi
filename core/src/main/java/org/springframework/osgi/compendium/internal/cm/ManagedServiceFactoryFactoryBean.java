@@ -153,7 +153,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	/** ccl */
 	private ExportContextClassLoader ccl = ExportContextClassLoader.UNMANAGED;
 	/** interfaces */
-	private Class[] interfaces;
+	private Class<?>[] interfaces;
 	/** class loader */
 	private ClassLoader classLoader;
 
@@ -367,7 +367,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		return userReturnedCollection;
 	}
 
-	public Class getObjectType() {
+	public Class<?> getObjectType() {
 		return Collection.class;
 	}
 
@@ -427,7 +427,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	/**
 	 * @param interfaces The interfaces to set.
 	 */
-	public void setInterfaces(Class[] interfaces) {
+	public void setInterfaces(Class<?>[] interfaces) {
 		this.interfaces = interfaces;
 	}
 

@@ -26,7 +26,7 @@ public class MyServiceFactory implements SmartFactoryBean {
     }
 
 
-    public Class getObjectType() {
+    public Class<?> getObjectType() {
         return MyService.class;
     }
 

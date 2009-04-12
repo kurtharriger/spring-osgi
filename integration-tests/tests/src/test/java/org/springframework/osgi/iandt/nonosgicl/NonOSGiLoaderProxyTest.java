@@ -70,11 +70,11 @@ public class NonOSGiLoaderProxyTest extends BaseIntegrationTest {
 			return 0;
 		}
 
-		public boolean isWrapperFor(Class iface) {
+		public boolean isWrapperFor(Class<?> iface) {
 			return false;
 		}
 
-		public Object unwrap(Class c) {
+		public Object unwrap(Class<?> c) {
 			return null;
 		}
 	}

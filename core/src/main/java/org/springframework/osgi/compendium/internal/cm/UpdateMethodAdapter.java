@@ -56,7 +56,7 @@ class UpdateMethodAdapter {
 	 * @param methodName
 	 * @return
 	 */
-	static Map determineUpdateMethod(final Class target, final String methodName) {
+	static Map determineUpdateMethod(final Class<?> target, final String methodName) {
 		Assert.notNull(target);
 		Assert.notNull(methodName);
 
@@ -71,11 +71,11 @@ class UpdateMethodAdapter {
 					if (!MethodUtils.isBridge(method) && Modifier.isPublic(method.getModifiers())
 							&& (void.class.equals(method.getReturnType())) && methodName.equals(method.getName())) {
 						// check the argument types
-						Class[] args = method.getParameterTypes();
+						Class<?>[] args = method.getParameterTypes();
 
 						// Properties can be passed as Map or Dictionary
 						if (args != null && args.length == 1) {
-							Class propertiesType = args[0];
+							Class<?> propertiesType = args[0];
 							if (propertiesType.isAssignableFrom(Map.class)
 									|| propertiesType.isAssignableFrom(Dictionary.class)) {
 
@@ -134,7 +134,7 @@ class UpdateMethodAdapter {
 	 * @param methodName
 	 * @param type
 	 */
-	UpdateMethodAdapter(String methodName, Class type) {
+	UpdateMethodAdapter(String methodName, Class<?> type) {
 		this.methods = determineUpdateMethod(type, methodName);
 	}
 

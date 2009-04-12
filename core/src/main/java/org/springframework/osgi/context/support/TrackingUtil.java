@@ -152,7 +152,7 @@ abstract class TrackingUtil {
 	 *        found.
 	 * @return the proxy doing the lookup on each method invocation
 	 */
-	static Object getService(Class[] classes, String filter, ClassLoader classLoader, BundleContext context,
+	static Object getService(Class<?>[] classes, String filter, ClassLoader classLoader, BundleContext context,
 			Object fallbackObject) {
 		// mold the proxy
 		String flt = OsgiFilterUtils.unifyFilter(classes, filter);

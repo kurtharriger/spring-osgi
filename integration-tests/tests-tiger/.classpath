@@ -6,7 +6,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-test-support"/>
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-core/2.0.0-m1-SNAPSHOT/spring-osgi-core-2.0.0-m1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/core"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.0/com.springsource.slf4j.org.apache.commons.logging-1.5.0.jar"/>	
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.6/com.springsource.slf4j.org.apache.commons.logging-1.5.6.jar"/>	
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/2.5.6/spring-context-2.5.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/2.5.6/spring-aop-2.5.6.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/aopalliance/com.springsource.org.aopalliance/1.0.0/com.springsource.org.aopalliance-1.0.0.jar"/>

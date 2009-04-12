@@ -37,7 +37,7 @@ public class ChainedClassLoaderTest extends TestCase {
 	protected void setUp() throws Exception {
 		emptyCL = new URLClassLoader(new URL[0], null) {
 
-			public Class loadClass(String name) throws ClassNotFoundException {
+			public Class<?> loadClass(String name) throws ClassNotFoundException {
 				throw new ClassNotFoundException(name);
 			}
 

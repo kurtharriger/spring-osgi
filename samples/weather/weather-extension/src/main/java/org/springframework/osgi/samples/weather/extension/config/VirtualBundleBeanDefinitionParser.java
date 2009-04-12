@@ -72,7 +72,7 @@ class VirtualBundleBeanDefinitionParser extends AbstractSimpleBeanDefinitionPars
 		return !DEPENDS_ON.equalsIgnoreCase(attributeName) && super.isEligibleAttribute(attributeName);
 	}
 
-	protected Class getBeanClass(Element element) {
+	protected Class<?> getBeanClass(Element element) {
 		return VirtualBundleFactoryBean.class;
 	}
 

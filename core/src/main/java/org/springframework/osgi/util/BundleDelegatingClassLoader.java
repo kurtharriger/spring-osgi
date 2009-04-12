@@ -94,7 +94,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		this.bridge = bridgeLoader;
 	}
 
-	protected Class findClass(String name) throws ClassNotFoundException {
+	protected Class<?> findClass(String name) throws ClassNotFoundException {
 		try {
 			return this.backingBundle.loadClass(name);
 		}
@@ -150,8 +150,8 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		return resource;
 	}
 
-	protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
-		Class clazz = null;
+	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+		Class<?> clazz = null;
 		try {
 			clazz = findClass(name);
 		}

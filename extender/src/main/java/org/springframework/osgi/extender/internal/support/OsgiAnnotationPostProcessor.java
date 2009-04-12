@@ -52,7 +52,7 @@ public class OsgiAnnotationPostProcessor implements OsgiBeanFactoryPostProcessor
 		Bundle bundle = bundleContext.getBundle();
 		try {
 			// Try and load the annotation code using the bundle classloader
-			Class annotationBppClass = bundle.loadClass(ANNOTATION_BPP_CLASS);
+			Class<?> annotationBppClass = bundle.loadClass(ANNOTATION_BPP_CLASS);
 			// instantiate the class
 			final BeanPostProcessor annotationBeanPostProcessor = (BeanPostProcessor) BeanUtils.instantiateClass(annotationBppClass);
 

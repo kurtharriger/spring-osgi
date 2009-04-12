@@ -33,16 +33,16 @@ class CachingAopClassLoaderFactory implements InternalAopClassLoaderFactory {
 
 	private static final String CGLIB_CLASS = "net.sf.cglib.proxy.Enhancer";
 	/** CGLIB class (if it's present) */
-	private final Class cglibClass;
+	private final Class<?> cglibClass;
 
 	/** class loader -> aop class loader cache */
-	private final Map cache = new WeakHashMap();
+	private final Map<ClassLoader, WeakReference<ChainedClassLoader>> cache = new WeakHashMap<ClassLoader, WeakReference<ChainedClassLoader>>();
 
 
 	CachingAopClassLoaderFactory() {
 		// load CGLIB through Spring-AOP
 		ClassLoader springAopClassLoader = ProxyFactory.class.getClassLoader();
-		Class clazz = null;
+		Class<?> clazz = null;
 		try {
 			clazz = springAopClassLoader.loadClass(CGLIB_CLASS);
 		}
@@ -56,10 +56,10 @@ class CachingAopClassLoaderFactory implements InternalAopClassLoaderFactory {
 		// search key (should be fast as the default classloader (BundleDelegatingClassLoader) has identity equality/hashcode)
 		synchronized (cache) {
 			ChainedClassLoader aopClassLoader = null;
-			WeakReference loaderReference = (WeakReference) cache.get(classLoader);
+			WeakReference<ChainedClassLoader> loaderReference = cache.get(classLoader);
 
 			if (loaderReference != null) {
-				aopClassLoader = (ChainedClassLoader) loaderReference.get();
+				aopClassLoader = loaderReference.get();
 			}
 
 			// no associated class loader found, create one and put it in the cache
@@ -76,7 +76,7 @@ class CachingAopClassLoaderFactory implements InternalAopClassLoaderFactory {
 				}
 
 				// save the class loader as a weak reference (since it refers to the given class loader)
-				cache.put(classLoader, new WeakReference(aopClassLoader));
+				cache.put(classLoader, new WeakReference<ChainedClassLoader>(aopClassLoader));
 			}
 			return aopClassLoader;
 		}

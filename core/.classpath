@@ -16,9 +16,9 @@
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-io"/>
 	<classpathentry kind="var" path="M2_REPO/multithreadedtc/multithreadedtc/1.01/multithreadedtc-1.01.jar" sourcepath="/MTC_SRC"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.0/com.springsource.slf4j.org.apache.commons.logging-1.5.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.api/1.5.0/com.springsource.slf4j.api-1.5.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.log4j/1.5.0/com.springsource.slf4j.log4j-1.5.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.org.apache.commons.logging/1.5.6/com.springsource.slf4j.org.apache.commons.logging-1.5.6.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.api/1.5.6/com.springsource.slf4j.api-1.5.6.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/com.springsource.slf4j.log4j/1.5.6/com.springsource.slf4j.log4j-1.5.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/log4j.osgi/1.2.15-SNAPSHOT/log4j.osgi-1.2.15-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/edu/emory/mathcs/backport/com.springsource.edu.emory.mathcs.backport/3.1.0/com.springsource.edu.emory.mathcs.backport-3.1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.test/3.0.0.BUILD-SNAPSHOT/org.springframework.test-3.0.0.BUILD-SNAPSHOT.jar"/>

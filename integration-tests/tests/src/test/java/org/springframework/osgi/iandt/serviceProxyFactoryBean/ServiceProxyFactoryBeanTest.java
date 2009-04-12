@@ -51,7 +51,7 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 		ServiceRegistration reg = publishService(date);
 
 		fb.setCardinality(Cardinality.C_1__1);
-		fb.setInterfaces(new Class[] { Date.class });
+		fb.setInterfaces(new Class<?>[] { Date.class });
 		fb.afterPropertiesSet();
 
 		try {
@@ -69,7 +69,7 @@ public class ServiceProxyFactoryBeanTest extends ServiceBaseTest {
 		long time = 1234;
 		Date date = new Date(time);
 
-		Class[] intfs = new Class[] { Comparable.class, Serializable.class, Cloneable.class };
+		Class<?>[] intfs = new Class<?>[] { Comparable.class, Serializable.class, Cloneable.class };
 
 		String[] classes = new String[] { Comparable.class.getName(), Serializable.class.getName(),
 			Cloneable.class.getName(), Date.class.getName() };

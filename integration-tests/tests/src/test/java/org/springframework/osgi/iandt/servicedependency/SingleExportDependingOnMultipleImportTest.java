@@ -125,7 +125,7 @@ public class SingleExportDependingOnMultipleImportTest extends BaseIntegrationTe
 		assertTrue("service A + B + C up, exporter should be up as well", isExporterStarted());
 	}
 
-	private void checkAndTakeDownService(String beanName, Class type, String bundleSymName) throws Exception {
+	private void checkAndTakeDownService(String beanName, Class<?> type, String bundleSymName) throws Exception {
 		ServiceReference ref = bundleContext.getServiceReference(type.getName());
 		Object service = bundleContext.getService(ref);
 		Assert.isInstanceOf(type, service);

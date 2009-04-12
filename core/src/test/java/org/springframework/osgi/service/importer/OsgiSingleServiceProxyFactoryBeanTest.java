@@ -92,7 +92,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 
 	public void testAfterPropertiesSetBadFilter() throws Exception {
 		this.serviceFactoryBean.setBundleContext(this.bundleContext);
-		this.serviceFactoryBean.setInterfaces(new Class[] { ApplicationContext.class });
+		this.serviceFactoryBean.setInterfaces(new Class<?>[] { ApplicationContext.class });
 		this.serviceFactoryBean.setFilter("this is not a valid filter expression");
 		try {
 			this.serviceFactoryBean.afterPropertiesSet();
@@ -104,7 +104,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testGetObjectTypeCompositeInterface() {
-		this.serviceFactoryBean.setInterfaces(new Class[] { ApplicationContext.class });
+		this.serviceFactoryBean.setInterfaces(new Class<?>[] { ApplicationContext.class });
 		assertTrue("composite interface not properly created",
 			ApplicationContext.class.isAssignableFrom(this.serviceFactoryBean.getObjectType()));
 		assertTrue("mixing interface not introduced",
@@ -112,7 +112,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testObjectTypeWOCompositeInterface() {
-		this.serviceFactoryBean.setInterfaces(new Class[] { AbstractApplicationContext.class });
+		this.serviceFactoryBean.setInterfaces(new Class<?>[] { AbstractApplicationContext.class });
 		assertNull("should not be able to create composite interface when a class is specified",
 			this.serviceFactoryBean.getObjectType());
 	}
@@ -124,7 +124,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 	// finds the service.
 	public void testGetObjectWithFilterOnly() throws Exception {
 		this.serviceFactoryBean.setBundleContext(new MockBundleContext());
-		this.serviceFactoryBean.setInterfaces(new Class[] { Serializable.class });
+		this.serviceFactoryBean.setInterfaces(new Class<?>[] { Serializable.class });
 		String filter = "(beanName=myBean)";
 		this.serviceFactoryBean.setFilter(filter);
 

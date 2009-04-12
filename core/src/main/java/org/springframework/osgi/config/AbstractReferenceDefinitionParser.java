@@ -113,7 +113,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	};
 
 
-	// Class properties
+	// Class<?> properties
 	private static final String LISTENERS_PROP = "listeners";
 
 	private static final String CARDINALITY_PROP = "cardinality";
@@ -165,7 +165,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
 
-		Class beanClass = getBeanClass(element);
+		Class<?> beanClass = getBeanClass(element);
 		Assert.notNull(beanClass);
 
 		if (beanClass != null) {
@@ -278,7 +278,7 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 	 * @param element
 	 * @return
 	 */
-	protected abstract Class getBeanClass(Element element);
+	protected abstract Class<?> getBeanClass(Element element);
 
 	/**
 	 * Utility method declared for reusability. It maintains the

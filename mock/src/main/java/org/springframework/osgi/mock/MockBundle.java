@@ -206,7 +206,7 @@ public class MockBundle implements Bundle {
 		return true;
 	}
 
-	public Class loadClass(String name) throws ClassNotFoundException {
+	public Class<?> loadClass(String name) throws ClassNotFoundException {
 		return loader.loadClass(name);
 	}
 

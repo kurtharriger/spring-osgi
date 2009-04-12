@@ -52,8 +52,8 @@ public class ChainedClassLoader extends ClassLoader {
 		return url;
 	}
 
-	public Class loadClass(String name) throws ClassNotFoundException {
-		Class clazz = null;
+	public Class<?> loadClass(String name) throws ClassNotFoundException {
+		Class<?> clazz = null;
 		for (int i = 0; i < loaders.length; i++) {
 			ClassLoader loader = loaders[i];
 			try {

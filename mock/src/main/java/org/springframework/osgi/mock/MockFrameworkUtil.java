@@ -56,7 +56,7 @@ public class MockFrameworkUtil {
 	MockFrameworkUtil() {
 		// detect filter implementation
 		ClassLoader cl = getClass().getClassLoader();
-		Class filterClz = null;
+		Class<?> filterClz = null;
 		// try Equinox
 		filterClz = loadClass(cl, EQUINOX_CLS);
 		// try KF
@@ -71,14 +71,14 @@ public class MockFrameworkUtil {
 			throw new IllegalStateException("cannot find Equinox, Knopflerfish or Felix on the classpath");
 
 		try {
-			filterConstructor = filterClz.getConstructor(new Class[] { String.class });
+			filterConstructor = filterClz.getConstructor(new Class<?>[] { String.class });
 		}
 		catch (NoSuchMethodException e) {
 			throw new IllegalArgumentException("found invalid filter class " + filterClz);
 		}
 	}
 
-	private Class loadClass(ClassLoader loader, String className) {
+	private Class<?> loadClass(ClassLoader loader, String className) {
 		try {
 			return loader.loadClass(className);
 		}

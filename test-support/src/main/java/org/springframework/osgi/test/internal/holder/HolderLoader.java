@@ -52,7 +52,7 @@ public class HolderLoader {
 	public HolderLoader() {
 		// try to load the holder using the app ClassLoader
 		ClassLoader appCL = Bundle.class.getClassLoader();
-		Class clazz;
+		Class<?> clazz;
 		try {
 			clazz = appCL.loadClass(HOLDER_CLASS_NAME);
 		}

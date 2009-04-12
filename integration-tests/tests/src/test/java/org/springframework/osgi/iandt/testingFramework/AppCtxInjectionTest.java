@@ -34,6 +34,7 @@ public class AppCtxInjectionTest extends BaseIntegrationTest {
 		this.serializable = serializable;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void testInjection() throws Exception {
 		assertNotNull(serializable);
 		assertEquals(applicationContext.getBean("injected-bean"), serializable);

@@ -23,7 +23,7 @@ package org.springframework.osgi.compendium;
 public class OneSetter {
 
 	private Long prop;
-	private Class clz;
+	private Class<?> clz;
 
 	public Long getProp() {
 		return prop;
@@ -38,14 +38,14 @@ public class OneSetter {
 	 *
 	 * @return Returns the clz
 	 */
-	public Class getClz() {
+	public Class<?> getClz() {
 		return clz;
 	}
 
 	/**
 	 * @param clz The clz to set.
 	 */
-	public void setClz(Class clz) {
+	public void setClz(Class<?> clz) {
 		this.clz = clz;
 	}
 }

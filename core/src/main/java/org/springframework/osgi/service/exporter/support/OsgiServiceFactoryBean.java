@@ -117,11 +117,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private int ranking;
 	private String targetBeanName;
 	private boolean hasNamedBean;
-	private Class[] interfaces;
+	private Class<?>[] interfaces;
 	private AutoExport autoExport = AutoExport.DISABLED;
 	private ExportContextClassLoader contextClassLoader = ExportContextClassLoader.UNMANAGED;
 	private Object target;
-	private Class targetClass;
+	private Class<?> targetClass;
 	/** Default value is same as non-ordered */
 	private int order = Ordered.LOWEST_PRECEDENCE;
 	private ClassLoader classLoader;
@@ -193,7 +193,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		else {
 			if (!ServiceFactory.class.isAssignableFrom(targetClass)) {
 				for (int interfaceIndex = 0; interfaceIndex < interfaces.length; interfaceIndex++) {
-					Class intf = interfaces[interfaceIndex];
+					Class<?> intf = interfaces[interfaceIndex];
 					Assert.isAssignable(intf, targetClass,
 						"Exported service object does not implement the given interface: ");
 				}
@@ -257,11 +257,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		Dictionary serviceProperties = mergeServiceProperties(beanName);
 
-		Class[] intfs = interfaces;
+		Class<?>[] intfs = interfaces;
 
 		// filter classes based on visibility
 		ClassLoader beanClassLoader = ClassUtils.getClassLoader(targetClass);
-		Class[] autoDetectedClasses = ClassUtils.getVisibleClasses(autoExport.getExportedClasses(targetClass),
+		Class<?>[] autoDetectedClasses = ClassUtils.getVisibleClasses(autoExport.getExportedClasses(targetClass),
 			beanClassLoader);
 
 		if (log.isTraceEnabled())
@@ -274,7 +274,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		CollectionUtils.mergeArrayIntoCollection(intfs, classes);
 		CollectionUtils.mergeArrayIntoCollection(autoDetectedClasses, classes);
 
-		Class[] mergedClasses = (Class[]) classes.toArray(new Class[classes.size()]);
+		Class<?>[] mergedClasses = (Class[]) classes.toArray(new Class[classes.size()]);
 
 		ServiceRegistration reg = registerService(mergedClasses, serviceProperties);
 
@@ -288,7 +288,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * @param serviceProperties
 	 * @return the ServiceRegistration
 	 */
-	ServiceRegistration registerService(Class[] classes, Dictionary serviceProperties) {
+	ServiceRegistration registerService(Class<?>[] classes, Dictionary serviceProperties) {
 		Assert.notEmpty(
 			classes,
 			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
@@ -343,7 +343,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		return serviceRegistration;
 	}
 
-	public Class getObjectType() {
+	public Class<?> getObjectType() {
 		return (serviceRegistration != null ? serviceRegistration.getClass() : ServiceRegistration.class);
 	}
 
@@ -539,7 +539,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * @return interfaces under which the target will be published as an OSGi
 	 *         service
 	 */
-	public Class[] getInterfaces() {
+	public Class<?>[] getInterfaces() {
 		return interfaces;
 	}
 
@@ -549,7 +549,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * 
 	 * @param interfaces array of classes to advertise
 	 */
-	public void setInterfaces(Class[] interfaces) {
+	public void setInterfaces(Class<?>[] interfaces) {
 		this.interfaces = interfaces;
 	}
 

@@ -141,7 +141,7 @@ public class ChainedClassLoader extends ClassLoader {
 		return url;
 	}
 
-	public Class loadClass(final String name) throws ClassNotFoundException {
+	public Class<?> loadClass(final String name) throws ClassNotFoundException {
 
 		if (System.getSecurityManager() != null) {
 			try {
@@ -161,8 +161,8 @@ public class ChainedClassLoader extends ClassLoader {
 		}
 	}
 
-	private Class doLoadClass(String name) throws ClassNotFoundException {
-		Class clazz = doLoadClass(name, loaders);
+	private Class<?> doLoadClass(String name) throws ClassNotFoundException {
+		Class<?> clazz = doLoadClass(name, loaders);
 
 		if (clazz != null) {
 			return clazz;
@@ -184,8 +184,8 @@ public class ChainedClassLoader extends ClassLoader {
 		}
 	}
 
-	private Class doLoadClass(String name, List classLoaders) throws ClassNotFoundException {
-		Class clazz = null;
+	private Class<?> doLoadClass(String name, List classLoaders) throws ClassNotFoundException {
+		Class<?> clazz = null;
 
 		synchronized (classLoaders) {
 			for (int i = 0; i < classLoaders.size(); i++) {
@@ -209,7 +209,7 @@ public class ChainedClassLoader extends ClassLoader {
 	 * 
 	 * @param clazz
 	 */
-	public void addClassLoader(final Class clazz) {
+	public void addClassLoader(final Class<?> clazz) {
 		Assert.notNull(clazz, "a non-null class required");
 		addClassLoader((ClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
 

@@ -50,7 +50,7 @@ public class PublishingServiceFactory implements ServiceFactory {
 	/** proxy cache in case the given bean has a non-singleton scope */
 	private final Map proxyCache;
 
-	private final Class[] classes;
+	private final Class<?>[] classes;
 	private final Object target;
 	private final BeanFactory beanFactory;
 	private final String targetBeanName;
@@ -74,7 +74,7 @@ public class PublishingServiceFactory implements ServiceFactory {
 	 * @param aopClassLoader
 	 * @param bundleContext
 	 */
-	public PublishingServiceFactory(Class[] classes, Object target, BeanFactory beanFactory, String targetBeanName,
+	public PublishingServiceFactory(Class<?>[] classes, Object target, BeanFactory beanFactory, String targetBeanName,
 			boolean createTCCLProxy, ClassLoader classLoader, ClassLoader aopClassLoader, BundleContext bundleContext) {
 		super();
 		this.classes = classes;

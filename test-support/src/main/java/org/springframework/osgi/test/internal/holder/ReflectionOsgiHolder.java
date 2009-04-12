@@ -46,13 +46,13 @@ class ReflectionOsgiHolder extends OsgiTestInfoHolder {
 	ReflectionOsgiHolder(Object twinInstance) {
 		Assert.notNull(twinInstance);
 		this.instance = twinInstance;
-		Class clazz = instance.getClass();
+		Class<?> clazz = instance.getClass();
 		GET_TEST_BUNDLE_ID = ReflectionUtils.findMethod(clazz, "getTestBundleId");
 		GET_TEST_CLASS_NAME = ReflectionUtils.findMethod(clazz, "getTestClassName");
 		GET_TEST_METHOD_NAME = ReflectionUtils.findMethod(clazz, "getTestMethodName");
 
-		ADD_TEST_ERROR = ReflectionUtils.findMethod(clazz, "addTestError", new Class[] { Throwable.class });
-		ADD_TEST_FAILURE = ReflectionUtils.findMethod(clazz, "addTestFailure", new Class[] { Throwable.class });
+		ADD_TEST_ERROR = ReflectionUtils.findMethod(clazz, "addTestError", new Class<?>[] { Throwable.class });
+		ADD_TEST_FAILURE = ReflectionUtils.findMethod(clazz, "addTestFailure", new Class<?>[] { Throwable.class });
 
 	}
 

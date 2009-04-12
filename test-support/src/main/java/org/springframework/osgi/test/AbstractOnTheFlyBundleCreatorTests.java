@@ -369,7 +369,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 			entries = new LinkedHashMap(4);
 
 			// get current class (test class that bootstraps the OSGi infrastructure)
-			Class clazz = getClass();
+			Class<?> clazz = getClass();
 			String clazzPackage = null;
 			String endPackage = AbstractOnTheFlyBundleCreatorTests.class.getPackage().getName();
 
@@ -381,7 +381,7 @@ public abstract class AbstractOnTheFlyBundleCreatorTests extends AbstractDepende
 				CollectionUtils.mergeArrayIntoCollection(clazz.getDeclaredClasses(), classes);
 
 				for (Iterator iterator = classes.iterator(); iterator.hasNext();) {
-					Class classToInspect = (Class) iterator.next();
+					Class<?> classToInspect = (Class) iterator.next();
 
 					Package pkg = classToInspect.getPackage();
 					if (pkg != null) {

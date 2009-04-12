@@ -64,7 +64,7 @@ class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionParser {
 	protected static final String TIMEOUT = "timeout";
 
 
-	protected Class getBeanClass(Element element) {
+	protected Class<?> getBeanClass(Element element) {
 		return OsgiServiceProxyFactoryBean.class;
 	}
 

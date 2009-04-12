@@ -104,12 +104,12 @@ public abstract class Utils {
 	 * 
 	 * @return proxy to the found OSGi service
 	 */
-	public static Object createServerServiceProxy(BundleContext bundleContext, Class proxyType, String serviceName) {
+	public static Object createServerServiceProxy(BundleContext bundleContext, Class<?> proxyType, String serviceName) {
 
 		OsgiServiceProxyFactoryBean proxyFB = new OsgiServiceProxyFactoryBean();
 		proxyFB.setBundleContext(bundleContext);
 		proxyFB.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
-		proxyFB.setInterfaces(new Class[] { proxyType });
+		proxyFB.setInterfaces(new Class<?>[] { proxyType });
 		// use the spring-dm class loader to generate the proxy (since it can see all the needed server classes)
 		proxyFB.setBeanClassLoader(proxyType.getClassLoader());
 		// wait 5 seconds
@@ -130,7 +130,7 @@ public abstract class Utils {
 	 * @return chained classloader containing javax. packages and the sever
 	 * classes + Jasper/JSP compiler (if present)
 	 */
-	public static ClassLoader chainedWebClassLoaders(Class serverClass) {
+	public static ClassLoader chainedWebClassLoaders(Class<?> serverClass) {
 		Assert.notNull(serverClass);
 		ClassLoader serverLoader = serverClass.getClassLoader();
 		ClassLoader jasperLoader = findClassLoaderFor(JasperUtils.JASPER_CLASS, serverLoader);
@@ -164,7 +164,7 @@ public abstract class Utils {
 	 */
 	private static ClassLoader findClassLoaderFor(String className, ClassLoader classLoader) {
 		try {
-			Class clazz = ClassUtils.forName(className, classLoader);
+			Class<?> clazz = ClassUtils.forName(className, classLoader);
 			return clazz.getClassLoader();
 		}
 		catch (Exception ex) {
@@ -182,7 +182,7 @@ public abstract class Utils {
 	 * @param serverClass class defining the container running the webapp
 	 * @return an URLClassLoader suitable for loading the web app classes.
 	 */
-	public static URLClassLoader createWebAppClassLoader(Bundle bundle, Class serverClass) {
+	public static URLClassLoader createWebAppClassLoader(Bundle bundle, Class<?> serverClass) {
 		// create a chained classloader for server classes (like Jasper)
 		ClassLoader serverClassLoader = chainedWebClassLoaders(serverClass);
 		// hook that with the bundle

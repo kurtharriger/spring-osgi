@@ -49,7 +49,7 @@ public class ServiceRefAwareWithMultiServiceTest extends ServiceBaseTest {
 
 	public void testProxyForMultipleCardinality() throws Exception {
 		fb.setCardinality(Cardinality.C_0__N);
-		fb.setInterfaces(new Class[] { Date.class });
+		fb.setInterfaces(new Class<?>[] { Date.class });
 		fb.afterPropertiesSet();
 
 		List registrations = new ArrayList(3);

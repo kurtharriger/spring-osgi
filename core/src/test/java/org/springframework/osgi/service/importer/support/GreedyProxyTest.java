@@ -46,12 +46,12 @@ public class GreedyProxyTest extends TestCase {
 
 
 	protected void setUp() throws Exception {
-		Class[] classes = new Class[] { Serializable.class, Comparable.class };
+		Class<?>[] classes = new Class<?>[] { Serializable.class, Comparable.class };
 
 		proxyCreator = createProxyCreator(classes);
 	}
 
-	private StaticServiceProxyCreator createProxyCreator(Class[] classes) {
+	private StaticServiceProxyCreator createProxyCreator(Class<?>[] classes) {
 		ClassLoader cl = getClass().getClassLoader();
 		BundleContext ctx = new MockBundleContext();
 		return new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoader.UNMANAGED, true);
@@ -68,7 +68,7 @@ public class GreedyProxyTest extends TestCase {
 		return (String[]) list.toArray(new String[list.size()]);
 	}
 
-	private boolean containsClass(Class[] classes, Class clazz) {
+	private boolean containsClass(Class<?>[] classes, Class<?> clazz) {
 		for (int i = 0; i < classes.length; i++) {
 			if (clazz.equals(classes[i]))
 				return true;
@@ -81,7 +81,7 @@ public class GreedyProxyTest extends TestCase {
 
 		MockServiceReference ref = new MockServiceReference(addExtraIntfs(extraClasses));
 
-		Class[] clazzes = proxyCreator.discoverProxyClasses(ref);
+		Class<?>[] clazzes = proxyCreator.discoverProxyClasses(ref);
 		assertTrue(containsClass(clazzes, Cloneable.class));
 		assertTrue(containsClass(clazzes, Runnable.class));
 		assertTrue(containsClass(clazzes, Serializable.class));
@@ -92,7 +92,7 @@ public class GreedyProxyTest extends TestCase {
 
 		MockServiceReference ref = new MockServiceReference(addExtraIntfs(extraClasses));
 
-		Class[] clazzes = proxyCreator.discoverProxyClasses(ref);
+		Class<?>[] clazzes = proxyCreator.discoverProxyClasses(ref);
 		assertEquals(2, clazzes.length);
 		assertTrue(containsClass(clazzes, Serializable.class));
 		assertTrue(containsClass(clazzes, Comparable.class));
@@ -102,7 +102,7 @@ public class GreedyProxyTest extends TestCase {
 		String[] extraClasses = new String[] { SupportedValuesAttribute.class.getName(), LabeledEnum.class.getName() };
 
 		MockServiceReference ref = new MockServiceReference(addExtraIntfs(extraClasses));
-		Class[] clazzes = proxyCreator.discoverProxyClasses(ref);
+		Class<?>[] clazzes = proxyCreator.discoverProxyClasses(ref);
 		assertEquals(2, clazzes.length);
 		assertTrue(containsClass(clazzes, LabeledEnum.class));
 		assertFalse(containsClass(clazzes, Comparable.class));
@@ -112,7 +112,7 @@ public class GreedyProxyTest extends TestCase {
 	public void testExcludeFinalClass() throws Exception {
 		String[] extraClasses = new String[] { Object.class.getName(), Byte.class.getName() };
 		MockServiceReference ref = new MockServiceReference(addExtraIntfs(extraClasses));
-		Class[] clazzes = proxyCreator.discoverProxyClasses(ref);
+		Class<?>[] clazzes = proxyCreator.discoverProxyClasses(ref);
 		assertEquals(2, clazzes.length);
 		assertFalse(containsClass(clazzes, Byte.class));
 		assertTrue(containsClass(clazzes, Comparable.class));
@@ -123,31 +123,31 @@ public class GreedyProxyTest extends TestCase {
 		String[] extraClasses = new String[] { Object.class.getName() };
 
 		MockServiceReference ref = new MockServiceReference(addExtraIntfs(extraClasses));
-		Class[] clazzes = proxyCreator.discoverProxyClasses(ref);
+		Class<?>[] clazzes = proxyCreator.discoverProxyClasses(ref);
 		assertEquals(2, clazzes.length);
 		assertFalse(containsClass(clazzes, Object.class));
 	}
 
 	public void testAllowConcreteClasses() throws Exception {
-		Class[] classes = new Class[] { Serializable.class, Comparable.class, Date.class };
+		Class<?>[] classes = new Class<?>[] { Serializable.class, Comparable.class, Date.class };
 		proxyCreator = createProxyCreator(classes);
 
 		String[] extraClasses = new String[] { LinkedHashMap.class.getName(), Date.class.getName() };
 
 		MockServiceReference ref = new MockServiceReference(addExtraIntfs(extraClasses));
-		Class[] clazzes = proxyCreator.discoverProxyClasses(ref);
+		Class<?>[] clazzes = proxyCreator.discoverProxyClasses(ref);
 		assertEquals(2, clazzes.length);
 		assertTrue(containsClass(clazzes, LinkedHashMap.class));
 		assertTrue(containsClass(clazzes, Date.class));
 	}
 
 	public void testRemoveParentsWithClassesAndInterfaces() throws Exception {
-		Class[] classes = new Class[] { Serializable.class, Comparable.class, Date.class };
+		Class<?>[] classes = new Class<?>[] { Serializable.class, Comparable.class, Date.class };
 		proxyCreator = createProxyCreator(classes);
 		String[] extraClasses = new String[] { Time.class.getName(), Cloneable.class.getName() };
 		MockServiceReference ref = new MockServiceReference(addExtraIntfs(extraClasses));
 
-		Class[] clazzes = proxyCreator.discoverProxyClasses(ref);
+		Class<?>[] clazzes = proxyCreator.discoverProxyClasses(ref);
 		assertEquals(1, clazzes.length);
 		assertTrue(containsClass(clazzes, Time.class));
 	}

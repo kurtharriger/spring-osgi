@@ -43,7 +43,7 @@ class LogUtils {
 	 * @param logName log name
 	 * @return logger implementation
 	 */
-	public static Log createLogger(Class logName) {
+	public static Log createLogger(Class<?> logName) {
 		Log logger;
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 		// push the logger class classloader (useful when dealing with commons-logging 1.0.x

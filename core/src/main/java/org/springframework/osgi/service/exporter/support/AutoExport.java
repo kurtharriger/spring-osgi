@@ -32,10 +32,10 @@ public abstract class AutoExport extends StaticLabeledEnum {
 
 		private static final long serialVersionUID = -8297270116184239840L;
 
-		private final Class[] clazz = new Class[0];
+		private final Class<?>[] clazz = new Class[0];
 
 
-		Class[] getExportedClasses(Class targetClass) {
+		Class<?>[] getExportedClasses(Class<?> targetClass) {
 			return clazz;
 		}
 	};
@@ -49,7 +49,7 @@ public abstract class AutoExport extends StaticLabeledEnum {
 		private static final long serialVersionUID = -8336152449611885031L;
 
 
-		public Class[] getExportedClasses(Class targetClass) {
+		public Class<?>[] getExportedClasses(Class<?> targetClass) {
 			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.INCLUDE_INTERFACES);
 		}
 	};
@@ -63,7 +63,7 @@ public abstract class AutoExport extends StaticLabeledEnum {
 		private static final long serialVersionUID = 6464782616822538297L;
 
 
-		public Class[] getExportedClasses(Class targetClass) {
+		public Class<?>[] getExportedClasses(Class<?> targetClass) {
 			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.INCLUDE_CLASS_HIERARCHY);
 
 		}
@@ -78,7 +78,7 @@ public abstract class AutoExport extends StaticLabeledEnum {
 		private static final long serialVersionUID = -6628398711158262852L;
 
 
-		public Class[] getExportedClasses(Class targetClass) {
+		public Class<?>[] getExportedClasses(Class<?> targetClass) {
 			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.INCLUDE_ALL_CLASSES);
 		}
 	};
@@ -90,7 +90,7 @@ public abstract class AutoExport extends StaticLabeledEnum {
 	 * @param targetClass class to be exported into OSGi
 	 * @return array of classes that will be published for the OSGi service.
 	 */
-	abstract Class[] getExportedClasses(Class targetClass);
+	abstract Class<?>[] getExportedClasses(Class<?> targetClass);
 
 	/**
 	 * Constructs a new <code>AutoExport</code> instance.

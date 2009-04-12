@@ -82,7 +82,7 @@ abstract class CollectionBeanDefinitionParser extends AbstractReferenceDefinitio
 	private static final String BASIS = "basis";
 
 
-	protected Class getBeanClass(Element element) {
+	protected Class<?> getBeanClass(Element element) {
 		return OsgiServiceCollectionProxyFactoryBean.class;
 	}
 

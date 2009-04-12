@@ -106,7 +106,7 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		assertSame(OsgiServiceFactoryBean.class, bean.getClass());
 		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) bean;
 
-		assertTrue(Arrays.equals(new Class[] { Serializable.class }, getInterfaces(exporter)));
+		assertTrue(Arrays.equals(new Class<?>[] { Serializable.class }, getInterfaces(exporter)));
 		assertEquals("string", getTargetBeanName(exporter));
 		assertEquals(appContext.getBean("string"), getTarget(exporter));
 
@@ -116,7 +116,7 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 	public void testBiggerService() throws Exception {
 		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) appContext.getBean("&manyOptions");
 
-		assertTrue(Arrays.equals(new Class[] { Serializable.class, CharSequence.class }, getInterfaces(exporter)));
+		assertTrue(Arrays.equals(new Class<?>[] { Serializable.class, CharSequence.class }, getInterfaces(exporter)));
 		Properties prop = new Properties();
 		prop.setProperty("foo", "bar");
 		prop.setProperty("white", "horse");
@@ -132,7 +132,7 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 
 	public void testNestedService() throws Exception {
 		OsgiServiceFactoryBean exporter = (OsgiServiceFactoryBean) appContext.getBean("&nestedService");
-		assertTrue(Arrays.equals(new Class[] { Object.class }, getInterfaces(exporter)));
+		assertTrue(Arrays.equals(new Class<?>[] { Object.class }, getInterfaces(exporter)));
 
 		Object service = getServiceAtIndex(2);
 		assertSame(HashMap.class, service.getClass());
@@ -207,7 +207,7 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		return (OsgiServiceRegistrationListener[]) TestUtils.getFieldValue(exporter, "listeners");
 	}
 
-	private Class[] getInterfaces(OsgiServiceFactoryBean exporter) {
+	private Class<?>[] getInterfaces(OsgiServiceFactoryBean exporter) {
 		return (Class[]) TestUtils.getFieldValue(exporter, "interfaces");
 	}
 

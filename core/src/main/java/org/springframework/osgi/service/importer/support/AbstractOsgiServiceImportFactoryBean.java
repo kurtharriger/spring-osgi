@@ -54,7 +54,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	private ImportContextClassLoader contextClassLoader = ImportContextClassLoader.CLIENT;
 
 	// not required to be an interface, but usually should be...
-	private Class[] interfaces;
+	private Class<?>[] interfaces;
 
 	// filter used to narrow service matches, may be null
 	private String filter;
@@ -128,7 +128,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	 * 
 	 * @param interfaces array of advertised classes.
 	 */
-	public void setInterfaces(Class[] interfaces) {
+	public void setInterfaces(Class<?>[] interfaces) {
 		this.interfaces = interfaces;
 	}
 
@@ -214,7 +214,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	 * 
 	 * @return interfaces advertised by services in the OSGi space
 	 */
-	public Class[] getInterfaces() {
+	public Class<?>[] getInterfaces() {
 		return interfaces;
 	}
 

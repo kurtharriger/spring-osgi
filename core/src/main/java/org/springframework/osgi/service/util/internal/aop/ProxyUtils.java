@@ -34,13 +34,13 @@ import org.springframework.osgi.util.internal.ClassUtils;
  */
 public abstract class ProxyUtils {
 
-	public static Object createProxy(Class[] classes, Object target, ClassLoader classLoader,
+	public static Object createProxy(Class<?>[] classes, Object target, ClassLoader classLoader,
 			BundleContext bundleContext, List advices) {
 		return createProxy(classes, target, classLoader, bundleContext,
 			(advices != null ? (Advice[]) advices.toArray(new Advice[advices.size()]) : new Advice[0]));
 	}
 
-	public static Object createProxy(Class[] classes, Object target, final ClassLoader classLoader,
+	public static Object createProxy(Class<?>[] classes, Object target, final ClassLoader classLoader,
 			BundleContext bundleContext, Advice[] advices) {
 		final ProxyFactory factory = new ProxyFactory();
 

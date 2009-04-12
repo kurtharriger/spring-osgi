@@ -97,7 +97,7 @@ class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		}
 	}
 
-	protected Class getBeanClass(Element element) {
+	protected Class<?> getBeanClass(Element element) {
 		return BundleFactoryBean.class;
 	}
 

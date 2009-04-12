@@ -91,7 +91,7 @@ public class CollectionImporterTest extends BaseIntegrationTest {
 		assertTrue("service A,B up -> exporterB up", isExporterBStarted());
 	}
 
-	private void checkAndTakeDownService(String beanName, Class type, String bundleSymName) throws Exception {
+	private void checkAndTakeDownService(String beanName, Class<?> type, String bundleSymName) throws Exception {
 		ServiceReference ref = bundleContext.getServiceReference(type.getName());
 		Object service = bundleContext.getService(ref);
 		Assert.isInstanceOf(type, service);

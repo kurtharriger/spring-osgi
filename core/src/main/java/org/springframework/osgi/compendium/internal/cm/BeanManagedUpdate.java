@@ -52,7 +52,7 @@ class BeanManagedUpdate implements UpdateCallback {
 	 */
 	private UpdateMethodAdapter getUpdateMethod(Object instance) {
 		UpdateMethodAdapter adapter;
-		Class type = instance.getClass();
+		Class<?> type = instance.getClass();
 
 		WeakReference adapterReference = (WeakReference) classCache.get(type);
 		if (adapterReference != null) {

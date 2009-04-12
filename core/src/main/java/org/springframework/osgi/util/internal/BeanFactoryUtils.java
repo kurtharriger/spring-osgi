@@ -50,7 +50,7 @@ public abstract class BeanFactoryUtils {
 	 * @return bean names
 	 */
 	public static String[] getTransitiveDependenciesForBean(ConfigurableListableBeanFactory beanFactory,
-			String beanName, boolean rawFactoryBeans, Class type) {
+			String beanName, boolean rawFactoryBeans, Class<?> type) {
 		Assert.notNull(beanFactory);
 		Assert.hasText(beanName);
 

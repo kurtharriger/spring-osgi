@@ -151,8 +151,8 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		assertFalse(bean instanceof OsgiServiceSortedList);
 		assertTrue(bean instanceof List);
 
-		Class[] intfs = getInterfaces(factoryBean);
-		assertTrue(Arrays.equals(new Class[] { Serializable.class }, intfs));
+		Class<?>[] intfs = getInterfaces(factoryBean);
+		assertTrue(Arrays.equals(new Class<?>[] { Serializable.class }, intfs));
 	}
 
 	public void testSimpleSortedSet() {
@@ -163,8 +163,8 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		assertFalse(bean instanceof OsgiServiceSortedSet);
 		assertTrue(bean instanceof SortedSet);
 
-		Class[] intfs = getInterfaces(factoryBean);
-		assertTrue(Arrays.equals(new Class[] { Externalizable.class }, intfs));
+		Class<?>[] intfs = getInterfaces(factoryBean);
+		assertTrue(Arrays.equals(new Class<?>[] { Externalizable.class }, intfs));
 	}
 
 	public void testSortedSetWithNaturalOrderingOnRefs() throws Exception {
@@ -176,8 +176,8 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		assertNotNull(comp);
 		assertSame(ServiceReferenceComparator.class, comp.getClass());
 
-		Class[] intfs = getInterfaces(factoryBean);
-		assertTrue(Arrays.equals(new Class[] { Externalizable.class }, intfs));
+		Class<?>[] intfs = getInterfaces(factoryBean);
+		assertTrue(Arrays.equals(new Class<?>[] { Externalizable.class }, intfs));
 
 		OsgiServiceLifecycleListener[] listeners = getListeners(factoryBean);
 		assertEquals(2, listeners.length);
@@ -198,11 +198,11 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 		assertFalse(bean instanceof OsgiServiceSortedList);
 		assertTrue(bean instanceof List);
 
-		Class[] intfs = getInterfaces(factoryBean);
-		assertTrue(Arrays.equals(new Class[] { Externalizable.class }, intfs));
+		Class<?>[] intfs = getInterfaces(factoryBean);
+		assertTrue(Arrays.equals(new Class<?>[] { Externalizable.class }, intfs));
 	}
 
-	private Class[] getInterfaces(Object proxy) {
+	private Class<?>[] getInterfaces(Object proxy) {
 		return (Class[]) TestUtils.getFieldValue(proxy, "interfaces");
 	}
 

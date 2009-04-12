@@ -50,7 +50,7 @@ abstract class ServiceCollectionTest extends BaseIntegrationTest {
 		try {
 			Thread.currentThread().setContextClassLoader(classLoader);
 			collection.setRequiredAtStartup(false);
-			// collection.setInterfaces(new Class[] { Date.class });
+			// collection.setInterfaces(new Class<?>[] { Date.class });
 			collection.afterPropertiesSet();
 		}
 		finally {
