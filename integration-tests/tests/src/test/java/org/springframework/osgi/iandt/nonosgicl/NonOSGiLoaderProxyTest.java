@@ -74,7 +74,7 @@ public class NonOSGiLoaderProxyTest extends BaseIntegrationTest {
 			return false;
 		}
 
-		public Object unwrap(Class<?> c) {
+		public <T> T unwrap(Class<T> iface) throws SQLException {
 			return null;
 		}
 	}
