@@ -310,7 +310,7 @@ public class ExtenderConfiguration implements DisposableBean {
 		if (processAnnotation) {
 			if (JdkVersion.isAtLeastJava15()) {
 				// dependency processor
-				Class annotationProcessor = null;
+				Class<?> annotationProcessor = null;
 				try {
 					annotationProcessor = Class.forName(ANNOTATION_DEPENDENCY_FACTORY, false,
 						ExtenderConfiguration.class.getClassLoader());

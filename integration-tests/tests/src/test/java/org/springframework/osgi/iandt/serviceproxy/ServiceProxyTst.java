@@ -48,7 +48,7 @@ public abstract class ServiceProxyTst extends AbstractConfigurableBundleCreatorT
 		return bundleContext.registerService(obj.getClass().getName(), obj, null);
 	}
 
-	private Object createProxy(final Class clazz, Advice cardinalityInterceptor) {
+	private Object createProxy(final Class<?> clazz, Advice cardinalityInterceptor) {
 		ProxyFactory factory = new ProxyFactory();
 		factory.setProxyTargetClass(true);
 		factory.setOptimize(true);
@@ -60,7 +60,7 @@ public abstract class ServiceProxyTst extends AbstractConfigurableBundleCreatorT
 		return factory.getProxy(ProxyFactory.class.getClassLoader());
 	}
 
-	private Advice createCardinalityAdvice(Class clazz) {
+	private Advice createCardinalityAdvice(Class<?> clazz) {
 		ClassLoader classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundleContext.getBundle());
 		ServiceDynamicInterceptor interceptor = new ServiceDynamicInterceptor(bundleContext, null,
 			OsgiFilterUtils.createFilter(OsgiFilterUtils.unifyFilter(clazz, null)), classLoader);

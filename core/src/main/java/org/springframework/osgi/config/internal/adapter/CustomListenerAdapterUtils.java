@@ -62,7 +62,7 @@ abstract class CustomListenerAdapterUtils {
 	 * @param possibleArgumentTypes
 	 * @return
 	 */
-	static Map determineCustomMethods(final Class target, final String methodName, final Class[] possibleArgumentTypes) {
+	static Map determineCustomMethods(final Class<?> target, final String methodName, final Class<?>[] possibleArgumentTypes) {
 
 		if (!StringUtils.hasText(methodName)) {
 			return Collections.EMPTY_MAP;
@@ -80,14 +80,14 @@ abstract class CustomListenerAdapterUtils {
 				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 					if (!MethodUtils.isBridge(method) && methodName.equals(method.getName())) {
 						// take a look at the variables
-						Class[] args = method.getParameterTypes();
+						Class<?>[] args = method.getParameterTypes();
 
 						// Properties can be passed as Map or Dictionary
 						if (args != null && args.length == 2) {
-							Class propType = args[1];
+							Class<?> propType = args[1];
 
 							for (int i = 0; i < possibleArgumentTypes.length; i++) {
-								Class clazz = possibleArgumentTypes[i];
+								Class<?> clazz = possibleArgumentTypes[i];
 								if (clazz.isAssignableFrom(propType)) {
 
 									if (trace)
@@ -121,8 +121,8 @@ abstract class CustomListenerAdapterUtils {
 	 * @param methodName
 	 * @return
 	 */
-	static Map determineCustomMethods(Class target, final String methodName) {
-		return determineCustomMethods(target, methodName, new Class[] { Dictionary.class, Map.class });
+	static Map determineCustomMethods(Class<?> target, final String methodName) {
+		return determineCustomMethods(target, methodName, new Class<?>[] { Dictionary.class, Map.class });
 	}
 
 	/**
@@ -144,7 +144,7 @@ abstract class CustomListenerAdapterUtils {
 			Object[] args = new Object[] { service, properties };
 			for (Iterator iter = methods.entrySet().iterator(); iter.hasNext();) {
 				Map.Entry entry = (Map.Entry) iter.next();
-				Class key = (Class) entry.getKey();
+				Class<?> key = (Class) entry.getKey();
 				Method method = (Method) entry.getValue();
 				// find the compatible types (accept null service)
 				if (service == null || key.isInstance(service)) {

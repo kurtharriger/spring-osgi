@@ -239,7 +239,7 @@ public abstract class ClassUtils {
 			this.bundle = null;
 		}
 
-		public Class loadClass(String className) throws ClassNotFoundException {
+		public Class<?> loadClass(String className) throws ClassNotFoundException {
 			return (bundle == null ? classLoader.loadClass(className) : bundle.loadClass(className));
 		}
 
@@ -271,8 +271,8 @@ public abstract class ClassUtils {
 	 * 
 	 * @return array of classes extended or implemented by the given class
 	 */
-	public static Class[] getClassHierarchy(Class clazz, int mode) {
-		Class[] classes = null;
+	public static Class<?>[] getClassHierarchy(Class<?> clazz, int mode) {
+		Class<?>[] classes = null;
 
 		if (clazz != null && isModeValid(mode)) {
 
@@ -280,7 +280,7 @@ public abstract class ClassUtils {
 			boolean includeClasses = includesMode(mode, INCLUDE_CLASS_HIERARCHY);
 			boolean includeInterfaces = includesMode(mode, INCLUDE_INTERFACES);
 
-			Class clz = clazz;
+			Class<?> clz = clazz;
 			do {
 				if (includeClasses) {
 					composingClasses.add(clz);
@@ -308,7 +308,7 @@ public abstract class ClassUtils {
 	 * @param loader
 	 * @return
 	 */
-	public static Class[] getVisibleClassHierarchy(Class clazz, int mode, ClassLoader loader) {
+	public static Class<?>[] getVisibleClassHierarchy(Class<?> clazz, int mode, ClassLoader loader) {
 		if (clazz == null)
 			return new Class[0];
 
@@ -324,7 +324,7 @@ public abstract class ClassUtils {
 	 * @param bundle bundle used for class visibility
 	 * @return array of visible classes part of the hierarchy
 	 */
-	public static Class[] getVisibleClassHierarchy(Class clazz, int mode, Bundle bundle) {
+	public static Class<?>[] getVisibleClassHierarchy(Class<?> clazz, int mode, Bundle bundle) {
 		return getVisibleClasses(getClassHierarchy(clazz, mode), bundle);
 	}
 
@@ -334,7 +334,7 @@ public abstract class ClassUtils {
 	 * 
 	 * @return
 	 */
-	public static Class[] getVisibleClasses(Class[] classes, ClassLoader classLoader) {
+	public static Class<?>[] getVisibleClasses(Class<?>[] classes, ClassLoader classLoader) {
 		return getVisibleClasses(classes, new ClassLoaderBridge(classLoader));
 	}
 
@@ -344,11 +344,11 @@ public abstract class ClassUtils {
 	 * 
 	 * @return
 	 */
-	public static Class[] getVisibleClasses(Class[] classes, Bundle bundle) {
+	public static Class<?>[] getVisibleClasses(Class<?>[] classes, Bundle bundle) {
 		return getVisibleClasses(classes, new ClassLoaderBridge(bundle));
 	}
 
-	private static Class[] getVisibleClasses(Class[] classes, ClassLoaderBridge loader) {
+	private static Class<?>[] getVisibleClasses(Class<?>[] classes, ClassLoaderBridge loader) {
 		if (ObjectUtils.isEmpty(classes))
 			return classes;
 
@@ -357,7 +357,7 @@ public abstract class ClassUtils {
 
 		// filter class collection based on visibility
 		for (Iterator iter = classSet.iterator(); iter.hasNext();) {
-			Class clzz = (Class) iter.next();
+			Class<?> clzz = (Class) iter.next();
 			if (!loader.canSee(clzz.getName())) {
 				iter.remove();
 			}
@@ -372,7 +372,7 @@ public abstract class ClassUtils {
 	 * @param clazz
 	 * @return all interfaces implemented by the given class.
 	 */
-	public static Class[] getAllInterfaces(Class clazz) {
+	public static Class<?>[] getAllInterfaces(Class<?> clazz) {
 		Assert.notNull(clazz);
 		return getAllInterfaces(clazz, new LinkedHashSet(8));
 	}
@@ -384,8 +384,8 @@ public abstract class ClassUtils {
 	 * @param interfaces
 	 * @return
 	 */
-	private static Class[] getAllInterfaces(Class clazz, Set interfaces) {
-		Class[] intfs = clazz.getInterfaces();
+	private static Class<?>[] getAllInterfaces(Class<?> clazz, Set interfaces) {
+		Class<?>[] intfs = clazz.getInterfaces();
 		CollectionUtils.mergeArrayIntoCollection(intfs, interfaces);
 
 		for (int i = 0; i < intfs.length; i++) {
@@ -423,7 +423,7 @@ public abstract class ClassUtils {
 	 * @param clazz
 	 * @return
 	 */
-	public static ClassLoader getClassLoader(Class clazz) {
+	public static ClassLoader getClassLoader(Class<?> clazz) {
 		Assert.notNull(clazz);
 		ClassLoader loader = clazz.getClassLoader();
 		return (loader == null ? ClassLoader.getSystemClassLoader() : loader);
@@ -456,7 +456,7 @@ public abstract class ClassUtils {
 	 * @param array
 	 * @return
 	 */
-	public static String[] toStringArray(Class[] array) {
+	public static String[] toStringArray(Class<?>[] array) {
 		if (ObjectUtils.isEmpty(array))
 			return new String[0];
 
@@ -487,11 +487,11 @@ public abstract class ClassUtils {
 	 * @return true if at least two classes unrelated to each other are found,
 	 *         false otherwise
 	 */
-	public static boolean containsUnrelatedClasses(Class[] classes) {
+	public static boolean containsUnrelatedClasses(Class<?>[] classes) {
 		if (ObjectUtils.isEmpty(classes))
 			return false;
 
-		Class clazz = null;
+		Class<?> clazz = null;
 		// check if is more then one class specified
 		for (int i = 0; i < classes.length; i++) {
 			if (!classes[i].isInterface()) {
@@ -524,7 +524,7 @@ public abstract class ClassUtils {
 	 * @param classes array of classes
 	 * @return a new array without superclasses
 	 */
-	public static Class[] removeParents(Class[] classes) {
+	public static Class<?>[] removeParents(Class<?>[] classes) {
 		if (ObjectUtils.isEmpty(classes))
 			return new Class[0];
 
@@ -545,7 +545,7 @@ public abstract class ClassUtils {
 		do {
 			dirty = false;
 			for (int i = 0; i < clazz.size(); i++) {
-				Class currentClass = (Class) clazz.get(i);
+				Class<?> currentClass = (Class) clazz.get(i);
 				for (int j = 0; j < clazz.size(); j++) {
 					if (i != j) {
 						if (currentClass.isAssignableFrom((Class) clazz.get(j))) {
@@ -572,12 +572,12 @@ public abstract class ClassUtils {
 	 * @param factory
 	 * @param classes
 	 */
-	public static void configureFactoryForClass(ProxyFactory factory, Class[] classes) {
+	public static void configureFactoryForClass(ProxyFactory factory, Class<?>[] classes) {
 		if (ObjectUtils.isEmpty(classes))
 			return;
 
 		for (int i = 0; i < classes.length; i++) {
-			Class clazz = classes[i];
+			Class<?> clazz = classes[i];
 
 			if (clazz.isInterface()) {
 				factory.addInterface(clazz);
@@ -599,7 +599,7 @@ public abstract class ClassUtils {
 	 * @return an array of classes (can be smaller then the array of class
 	 *         names) w/o duplicates
 	 */
-	public static Class[] loadClasses(String[] classNames, ClassLoader classLoader) {
+	public static Class<?>[] loadClasses(String[] classNames, ClassLoader classLoader) {
 		if (ObjectUtils.isEmpty(classNames))
 			return new Class[0];
 
@@ -628,7 +628,7 @@ public abstract class ClassUtils {
 	 * @return array of classes (w/o duplicates) which does not have the given
 	 *         modifier
 	 */
-	public static Class[] excludeClassesWithModifier(Class[] classes, int modifier) {
+	public static Class<?>[] excludeClassesWithModifier(Class<?>[] classes, int modifier) {
 		if (ObjectUtils.isEmpty(classes))
 			return new Class[0];
 
@@ -652,9 +652,9 @@ public abstract class ClassUtils {
 	 * @return a 'particular' (non JDK/OSGi) class if one is found. Else the
 	 *         first available entry is returned.
 	 */
-	public static Class getParticularClass(Class[] classes) {
+	public static Class<?> getParticularClass(Class<?>[] classes) {
 		for (int i = 0; i < classes.length; i++) {
-			Class clazz = classes[i];
+			Class<?> clazz = classes[i];
 			ClassLoader loader = clazz.getClassLoader();
 			// quick boot/system check
 			if (loader != null) {

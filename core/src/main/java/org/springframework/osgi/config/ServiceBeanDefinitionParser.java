@@ -48,7 +48,7 @@ class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	private static final String REF = "ref";
 
 
-	protected Class getBeanClass(Element element) {
+	protected Class<?> getBeanClass(Element element) {
 		return OsgiServiceFactoryBean.class;
 	}
 

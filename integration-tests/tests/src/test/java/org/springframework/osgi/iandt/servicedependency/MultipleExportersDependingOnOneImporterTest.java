@@ -67,7 +67,7 @@ public class MultipleExportersDependingOnOneImporterTest extends BaseIntegration
 		doServiceTestOn("simple-bean", SimpleBean.class);
 	}
 
-	protected void doServiceTestOn(String beanName, Class type) throws Exception {
+	protected void doServiceTestOn(String beanName, Class<?> type) throws Exception {
 		ServiceReference ref = bundleContext.getServiceReference(type.getName());
 		Object service = bundleContext.getService(ref);
 		Assert.isInstanceOf(type, service);

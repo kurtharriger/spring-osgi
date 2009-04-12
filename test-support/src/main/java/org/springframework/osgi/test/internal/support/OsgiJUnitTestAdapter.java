@@ -47,7 +47,7 @@ public class OsgiJUnitTestAdapter implements OsgiJUnitTest {
 
 			// determine methods
 			injectBundleContext = org.springframework.util.ReflectionUtils.findMethod(target.getClass(),
-				"injectBundleContext", new Class[] { BundleContext.class });
+				"injectBundleContext", new Class<?>[] { BundleContext.class });
 			org.springframework.util.ReflectionUtils.makeAccessible(injectBundleContext);
 
 			runTest = org.springframework.util.ReflectionUtils.findMethod(target.getClass(), "osgiRunTest");

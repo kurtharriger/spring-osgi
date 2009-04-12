@@ -57,7 +57,7 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 	protected final ClassLoader classLoader;
 
 	/** proxy classes (for static generation) */
-	protected final Class[] classes;
+	protected final Class<?>[] classes;
 
 	/** client bundle context */
 	protected final BundleContext bundleContext;
@@ -65,7 +65,7 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 	private final ImportContextClassLoader iccl;
 
 
-	AbstractServiceProxyCreator(Class[] classes, ClassLoader aopClassLoader, ClassLoader bundleClassLoader,
+	AbstractServiceProxyCreator(Class<?>[] classes, ClassLoader aopClassLoader, ClassLoader bundleClassLoader,
 			BundleContext bundleContext, ImportContextClassLoader iccl) {
 		Assert.notNull(bundleContext);
 		Assert.notNull(aopClassLoader);
@@ -130,7 +130,7 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 		}
 	}
 
-	Class[] getInterfaces(ServiceReference reference) {
+	Class<?>[] getInterfaces(ServiceReference reference) {
 		return classes;
 	}
 

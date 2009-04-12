@@ -114,11 +114,11 @@ public class FelixPlatform extends AbstractOsgiPlatform {
 		Constructor ctr = null;
 		// check for Felix 1.4.x constructor
 		try {
-			ctr = Felix.class.getConstructor(new Class[] { Map.class });
+			ctr = Felix.class.getConstructor(new Class<?>[] { Map.class });
 			is14 = true;
 		}
 		catch (NoSuchMethodException nsme) {
-			ctr = Felix.class.getConstructor(new Class[] { Map.class, List.class });
+			ctr = Felix.class.getConstructor(new Class<?>[] { Map.class, List.class });
 		}
 
 		Object[] params = commonFelixSetup();

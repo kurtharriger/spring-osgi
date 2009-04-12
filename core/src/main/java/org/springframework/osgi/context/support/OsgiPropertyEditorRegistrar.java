@@ -79,9 +79,9 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 		for (Iterator iterator = configuration.entrySet().iterator(); iterator.hasNext();) {
 			Map.Entry entry = (Map.Entry) iterator.next();
 			// key represents type
-			Class key;
+			Class<?> key;
 			// value represents property editor
-			Class editorClass;
+			Class<?> editorClass;
 			try {
 				key = classLoader.loadClass((String) entry.getKey());
 				editorClass = classLoader.loadClass((String) entry.getValue());
@@ -101,7 +101,7 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
 		for (Iterator iterator = editors.entrySet().iterator(); iterator.hasNext();) {
 			Map.Entry editor = (Map.Entry) iterator.next();
-			Class type = (Class) editor.getKey();
+			Class<?> type = (Class) editor.getKey();
 			PropertyEditor editorInstance;
 			editorInstance = (PropertyEditor) BeanUtils.instantiateClass(((Class) editor.getValue()));
 			registry.registerCustomEditor(type, editorInstance);

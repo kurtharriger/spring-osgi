@@ -114,7 +114,7 @@ public abstract class AbstractOsgiCollectionTest extends TestCase {
 
 	abstract OsgiServiceCollection createCollection();
 
-	protected ServiceProxyCreator createProxyCreator(Class[] classes) {
+	protected ServiceProxyCreator createProxyCreator(Class<?>[] classes) {
 		return new SimpleServiceJDKProxyCreator(context, classes, getClass().getClassLoader());
 	}
 

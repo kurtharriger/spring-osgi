@@ -129,13 +129,13 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	 * method is invoked, the method will try to create a composite interface
 	 * (if only interfaces are specified) or null otherwise.
 	 */
-	public Class getObjectType() {
+	public Class<?> getObjectType() {
 		synchronized (monitor) {
 			if (proxy != null) {
 				return proxy.getClass();
 			}
 			// no proxy defined, try to create a composite interface
-			Class[] intfs = getInterfaces();
+			Class<?>[] intfs = getInterfaces();
 			if (!ObjectUtils.isEmpty(intfs)) {
 				for (int index = 0; index < intfs.length; index++) {
 					// concrete class found, need to create an actual proxy
@@ -143,7 +143,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 						return null;
 					}
 				}
-				Class[] cls = (Class[]) ObjectUtils.addObjectToArray(intfs, ImportedOsgiServiceProxy.class);
+				Class<?>[] cls = (Class[]) ObjectUtils.addObjectToArray(intfs, ImportedOsgiServiceProxy.class);
 				return Proxy.getProxyClass(getAopClassLoader(), cls);
 			}
 		}

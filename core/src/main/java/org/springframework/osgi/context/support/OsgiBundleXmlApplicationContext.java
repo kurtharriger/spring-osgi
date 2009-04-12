@@ -256,12 +256,12 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 
 	private NamespaceHandlerResolver lookupNamespaceHandlerResolver(final BundleContext bundleContext,
 			final Object fallbackObject) {
-		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class[] { NamespaceHandlerResolver.class }, null,
+		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class<?>[] { NamespaceHandlerResolver.class }, null,
 			NamespaceHandlerResolver.class.getClassLoader(), bundleContext, fallbackObject);
 	}
 
 	private EntityResolver lookupEntityResolver(final BundleContext bundleContext, final Object fallbackObject) {
-		return (EntityResolver) TrackingUtil.getService(new Class[] { EntityResolver.class }, null,
+		return (EntityResolver) TrackingUtil.getService(new Class<?>[] { EntityResolver.class }, null,
 			EntityResolver.class.getClassLoader(), bundleContext, fallbackObject);
 	}
 

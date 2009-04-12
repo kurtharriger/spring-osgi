@@ -836,7 +836,7 @@ public class ContextLoaderListener implements BundleActivator {
 		fb.setBundleContext(bundleContext);
 		fb.setCardinality(Cardinality.C_0__N);
 		fb.setCollectionType(CollectionType.LIST);
-		fb.setInterfaces(new Class[] { OsgiBundleApplicationContextListener.class });
+		fb.setInterfaces(new Class<?>[] { OsgiBundleApplicationContextListener.class });
 		fb.setBeanClassLoader(extenderConfiguration.getClassLoader());
 		fb.afterPropertiesSet();
 

@@ -58,7 +58,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 
 		fb.setCardinality(Cardinality.C_1__1);
 
-		fb.setInterfaces(new Class[] { Date.class });
+		fb.setInterfaces(new Class<?>[] { Date.class });
 		fb.afterPropertiesSet();
 
 		ImportedOsgiServiceProxy refAware = null;
@@ -97,7 +97,7 @@ public class ServiceRefAwareWithSingleServiceTest extends ServiceBaseTest {
 
 		fb.setCardinality(Cardinality.C_1__1);
 		fb.setFilter("(&(foo=bar)(george=michael))");
-		fb.setInterfaces(new Class[] { Date.class });
+		fb.setInterfaces(new Class<?>[] { Date.class });
 		fb.afterPropertiesSet();
 
 		try {

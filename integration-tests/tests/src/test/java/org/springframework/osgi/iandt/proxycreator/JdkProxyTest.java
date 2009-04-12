@@ -67,6 +67,6 @@ public class JdkProxyTest extends BaseIntegrationTest {
 
 	private SomeInterface createJDKProxy(InvocationHandler handler, SomeInterface target) {
 		return (SomeInterface) Proxy.newProxyInstance(target.getClass().getClassLoader(),
-			new Class[] { SomeInterface.class }, handler);
+			new Class<?>[] { SomeInterface.class }, handler);
 	}
 }

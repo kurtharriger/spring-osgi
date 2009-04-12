@@ -35,7 +35,7 @@ public class OsgiServiceListTest extends AbstractOsgiCollectionTest {
 	}
 
 	OsgiServiceCollection createCollection() {
-		return new OsgiServiceList(null, context, getClass().getClassLoader(), createProxyCreator(new Class[] {
+		return new OsgiServiceList(null, context, getClass().getClassLoader(), createProxyCreator(new Class<?>[] {
 				Wrapper.class, Comparable.class }));
 	}
 

@@ -57,7 +57,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 	 * @param iccl
 	 * @param greedyProxying
 	 */
-	StaticServiceProxyCreator(Class[] classes, ClassLoader aopClassLoader, ClassLoader bundleClassLoader,
+	StaticServiceProxyCreator(Class<?>[] classes, ClassLoader aopClassLoader, ClassLoader bundleClassLoader,
 			BundleContext bundleContext, ImportContextClassLoader iccl, boolean greedyProxying) {
 		super(classes, aopClassLoader, bundleClassLoader, bundleContext, iccl);
 		this.greedyProxying = greedyProxying;
@@ -98,7 +98,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 	 * @param ref
 	 * @return
 	 */
-	Class[] discoverProxyClasses(ServiceReference ref) {
+	Class<?>[] discoverProxyClasses(ServiceReference ref) {
 		boolean trace = log.isTraceEnabled();
 
 		if (trace)
@@ -110,7 +110,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 			log.trace("Discovered raw classes " + ObjectUtils.nullSafeToString(classNames));
 
 		// try to get as many classes as possible
-		Class[] classes = ClassUtils.loadClasses(classNames, classLoader);
+		Class<?>[] classes = ClassUtils.loadClasses(classNames, classLoader);
 
 		if (trace)
 			log.trace("Visible classes are " + ObjectUtils.nullSafeToString(classes));
@@ -125,7 +125,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 		if (interfacesOnlyProxying) {
 			Set clazzes = new LinkedHashSet(classes.length);
 			for (int classIndex = 0; classIndex < classes.length; classIndex++) {
-				Class clazz = classes[classIndex];
+				Class<?> clazz = classes[classIndex];
 				if (clazz.isInterface())
 					clazzes.add(clazz);
 			}
@@ -144,9 +144,9 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 		return classes;
 	}
 
-	Class[] getInterfaces(ServiceReference reference) {
+	Class<?>[] getInterfaces(ServiceReference reference) {
 		if (greedyProxying) {
-			Class[] clazzes = discoverProxyClasses(reference);
+			Class<?>[] clazzes = discoverProxyClasses(reference);
 			if (log.isTraceEnabled())
 				log.trace("generating 'greedy' service proxy using classes " + ObjectUtils.nullSafeToString(clazzes)
 						+ " over " + ObjectUtils.nullSafeToString(this.classes));

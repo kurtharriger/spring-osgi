@@ -51,10 +51,10 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 
-		Class[] intfs = getInterfaces();
+		Class<?>[] intfs = getInterfaces();
 
 		for (int i = 0; i < intfs.length; i++) {
-			Class intf = intfs[i];
+			Class<?> intf = intfs[i];
 			aopClassLoader.addClassLoader(intf);
 		}
 		initialized = true;

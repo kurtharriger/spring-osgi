@@ -37,10 +37,10 @@ public class InfrastructureProxyTest extends TestCase {
 
 	private StaticServiceProxyCreator proxyCreator;
 
-	private final Class[] classes = new Class[] { Serializable.class, Comparable.class };
+	private final Class<?>[] classes = new Class<?>[] { Serializable.class, Comparable.class };
 
 
-	private StaticServiceProxyCreator createProxyCreator(BundleContext ctx, Class[] classes) {
+	private StaticServiceProxyCreator createProxyCreator(BundleContext ctx, Class<?>[] classes) {
 		ClassLoader cl = getClass().getClassLoader();
 		if (ctx == null) {
 			ctx = new MockBundleContext();

@@ -36,7 +36,7 @@ class ConfigPropertiesDefinitionParser extends AbstractSimpleBeanDefinitionParse
 	private static final String PROPERTIES_PROP = "properties";
 
 
-	protected Class getBeanClass(Element element) {
+	protected Class<?> getBeanClass(Element element) {
 		return ConfigAdminPropertiesFactoryBean.class;
 	}
 

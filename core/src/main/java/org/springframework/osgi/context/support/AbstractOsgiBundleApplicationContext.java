@@ -276,7 +276,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 				// create the service manager
 				ClassLoader loader = AbstractOsgiBundleApplicationContext.class.getClassLoader();
 				try {
-					Class managerClass = loader.loadClass(EXPORTER_IMPORTER_DEPENDENCY_MANAGER);
+					Class<?> managerClass = loader.loadClass(EXPORTER_IMPORTER_DEPENDENCY_MANAGER);
 					return BeanUtils.instantiateClass(managerClass);
 				}
 				catch (ClassNotFoundException cnfe) {
@@ -328,11 +328,11 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 			}
 
 			// export only interfaces
-			Class[] classes = org.springframework.osgi.util.internal.ClassUtils.getClassHierarchy(getClass(),
+			Class<?>[] classes = org.springframework.osgi.util.internal.ClassUtils.getClassHierarchy(getClass(),
 				org.springframework.osgi.util.internal.ClassUtils.INCLUDE_INTERFACES);
 
 			// filter classes based on visibility
-			Class[] filterClasses = org.springframework.osgi.util.internal.ClassUtils.getVisibleClasses(classes,
+			Class<?>[] filterClasses = org.springframework.osgi.util.internal.ClassUtils.getVisibleClasses(classes,
 				this.getClass().getClassLoader());
 
 			String[] serviceNames = org.springframework.osgi.util.internal.ClassUtils.toStringArray(filterClasses);

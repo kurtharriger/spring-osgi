@@ -67,7 +67,7 @@ public class OsgiServiceInvokerTest extends TestCase {
 
 	public void testExceptionUnwrapping() throws Throwable {
 		MethodInvocation invocation = new MockMethodInvocation(Integer.class.getMethod("parseInt",
-			new Class[] { String.class }), new Object[] { "invalid number" });
+			new Class<?>[] { String.class }), new Object[] { "invalid number" });
 
 		try {
 			invoker.invoke(invocation);

@@ -98,7 +98,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 
 
 	// FactoryBean methods
-	public Class getObjectType() {
+	public Class<?> getObjectType() {
 		return (bundle != null ? bundle.getClass() : Bundle.class);
 	}
 

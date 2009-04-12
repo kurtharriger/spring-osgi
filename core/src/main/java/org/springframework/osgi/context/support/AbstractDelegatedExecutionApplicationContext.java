@@ -408,7 +408,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * @param type
 	 * @param exclude
 	 */
-	private void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory, Class type, Class exclude) {
+	private void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory, Class<?> type, Class<?> exclude) {
 		// Invoke factory processors registered with the context instance.
 		for (Iterator it = getBeanFactoryPostProcessors().iterator(); it.hasNext();) {
 			BeanFactoryPostProcessor factoryProcessor = (BeanFactoryPostProcessor) it.next();
@@ -496,7 +496,7 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	 * {@link AbstractApplicationContext#invokeBeanFactoryPostProcessors} but
 	 * allowing exclusion of a certain type.
 	 */
-	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, Class type, Class exclude,
+	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, Class<?> type, Class<?> exclude,
 	                                          boolean check) {
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(type, true, false);
 

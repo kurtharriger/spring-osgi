@@ -109,7 +109,7 @@ public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, Ini
 		return properties;
 	}
 
-	public Class getObjectType() {
+	public Class<?> getObjectType() {
 		return Properties.class;
 	}
 

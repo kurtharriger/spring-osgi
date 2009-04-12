@@ -37,7 +37,7 @@ abstract class BaseServiceReferenceProxy implements ServiceReferenceProxy {
 	protected static final Comparator COMPARATOR;
 
 	static {
-		Class comparatorClass = ServiceReferenceComparator.class;
+		Class<?> comparatorClass = ServiceReferenceComparator.class;
 		COMPARATOR = (Comparator) BeanUtils.instantiateClass(comparatorClass);
 	}
 }

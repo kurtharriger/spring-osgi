@@ -51,35 +51,35 @@ import org.springframework.util.ObjectUtils;
 public class ClassUtilsTest extends TestCase {
 
 	public void testAutoDetectClassesForPublishingDisabled() throws Exception {
-		Class[] clazz = ClassUtils.getClassHierarchy(Integer.class, ClassUtils.INCLUDE_INTERFACES);
+		Class<?>[] clazz = ClassUtils.getClassHierarchy(Integer.class, ClassUtils.INCLUDE_INTERFACES);
 		assertFalse(ObjectUtils.isEmpty(clazz));
 		assertEquals(2, clazz.length);
 	}
 
 	public void testAutoDetectClassesForPublishingInterfaces() throws Exception {
-		Class[] clazz = ClassUtils.getClassHierarchy(HashMap.class, ClassUtils.INCLUDE_INTERFACES);
-		Class[] expected = new Class[] { Cloneable.class, Serializable.class, Map.class };
+		Class<?>[] clazz = ClassUtils.getClassHierarchy(HashMap.class, ClassUtils.INCLUDE_INTERFACES);
+		Class<?>[] expected = new Class<?>[] { Cloneable.class, Serializable.class, Map.class };
 
 		assertTrue(compareArrays(expected, clazz));
 	}
 
 	public void testAutoDetectClassesForPublishingClassHierarchy() throws Exception {
-		Class[] clazz = ClassUtils.getClassHierarchy(HashMap.class, ClassUtils.INCLUDE_CLASS_HIERARCHY);
-		Class[] expected = new Class[] { HashMap.class, AbstractMap.class };
+		Class<?>[] clazz = ClassUtils.getClassHierarchy(HashMap.class, ClassUtils.INCLUDE_CLASS_HIERARCHY);
+		Class<?>[] expected = new Class<?>[] { HashMap.class, AbstractMap.class };
 		assertTrue(compareArrays(expected, clazz));
 	}
 
 	public void testAutoDetectClassesForPublishingAll() throws Exception {
-		Class[] clazz = ClassUtils.getClassHierarchy(HashMap.class, ClassUtils.INCLUDE_ALL_CLASSES);
-		Class[] expected = new Class[] { Map.class, Cloneable.class, Serializable.class, HashMap.class,
+		Class<?>[] clazz = ClassUtils.getClassHierarchy(HashMap.class, ClassUtils.INCLUDE_ALL_CLASSES);
+		Class<?>[] expected = new Class<?>[] { Map.class, Cloneable.class, Serializable.class, HashMap.class,
 				AbstractMap.class };
 
 		assertTrue(compareArrays(expected, clazz));
 	}
 
 	public void testInterfacesHierarchy() {
-		Class[] clazz = ClassUtils.getAllInterfaces(DelegatedExecutionOsgiBundleApplicationContext.class);
-		Class[] expected = { ConfigurableOsgiBundleApplicationContext.class, ConfigurableApplicationContext.class,
+		Class<?>[] clazz = ClassUtils.getAllInterfaces(DelegatedExecutionOsgiBundleApplicationContext.class);
+		Class<?>[] expected = { ConfigurableOsgiBundleApplicationContext.class, ConfigurableApplicationContext.class,
 				ApplicationContext.class, Lifecycle.class, ListableBeanFactory.class, HierarchicalBeanFactory.class,
 				MessageSource.class, ApplicationEventPublisher.class, ResourcePatternResolver.class, BeanFactory.class,
 				ResourceLoader.class };
@@ -88,10 +88,10 @@ public class ClassUtilsTest extends TestCase {
 	}
 
 	public void testAppContextClassHierarchy() {
-		Class[] clazz = ClassUtils.getClassHierarchy(OsgiBundleXmlApplicationContext.class,
+		Class<?>[] clazz = ClassUtils.getClassHierarchy(OsgiBundleXmlApplicationContext.class,
 			ClassUtils.INCLUDE_ALL_CLASSES);
 
-		Class[] expected = new Class[] { OsgiBundleXmlApplicationContext.class,
+		Class<?>[] expected = new Class<?>[] { OsgiBundleXmlApplicationContext.class,
 				AbstractDelegatedExecutionApplicationContext.class, AbstractOsgiBundleApplicationContext.class,
 				AbstractRefreshableApplicationContext.class, AbstractApplicationContext.class,
 				DefaultResourceLoader.class, ResourceLoader.class,

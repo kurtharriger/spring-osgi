@@ -81,7 +81,7 @@ public abstract class AbstractConfigurableOsgiTests extends AbstractOsgiTests {
 
 		if (StringUtils.hasText(platformClassName)) {
 			if (ClassUtils.isPresent(platformClassName, currentCL)) {
-				Class platformClass = ClassUtils.resolveClassName(platformClassName, currentCL);
+				Class<?> platformClass = ClassUtils.resolveClassName(platformClassName, currentCL);
 				if (OsgiPlatform.class.isAssignableFrom(platformClass)) {
 					if (trace)
 						logger.trace("Instantiating platform wrapper...");

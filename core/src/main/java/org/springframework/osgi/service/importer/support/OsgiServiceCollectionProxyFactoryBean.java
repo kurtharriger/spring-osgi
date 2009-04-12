@@ -174,7 +174,7 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	 * 
 	 * Returns the managed collection type.
 	 */
-	public Class getObjectType() {
+	public Class<?> getObjectType() {
 		return (proxy != null ? proxy.getClass() : collectionType.getCollectionClass());
 	}
 

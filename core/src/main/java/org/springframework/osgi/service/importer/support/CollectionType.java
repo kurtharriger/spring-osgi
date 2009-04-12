@@ -74,7 +74,7 @@ public class CollectionType extends StaticLabeledEnum {
 	public static final CollectionType SORTED_SET = new CollectionType(5, "SORTED_SET", SortedSet.class);
 
 	/** collection type */
-	private final Class collectionClass;
+	private final Class<?> collectionClass;
 
 
 	/**
@@ -82,11 +82,11 @@ public class CollectionType extends StaticLabeledEnum {
 	 * 
 	 * @return collection class
 	 */
-	Class getCollectionClass() {
+	Class<?> getCollectionClass() {
 		return collectionClass;
 	}
 
-	private CollectionType(int code, String label, Class collectionClass) {
+	private CollectionType(int code, String label, Class<?> collectionClass) {
 		super(code, label);
 		this.collectionClass = collectionClass;
 	}

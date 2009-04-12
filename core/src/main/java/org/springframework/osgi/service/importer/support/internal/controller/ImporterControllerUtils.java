@@ -34,7 +34,7 @@ public abstract class ImporterControllerUtils {
 	private static final Field singleProxyField, collectionProxyField;
 
 	static {
-		Class clazz = null;
+		Class<?> clazz = null;
 		try {
 			clazz = OsgiServiceProxyFactoryBean.class;
 			singleProxyField = clazz.getDeclaredField(FIELD_NAME);

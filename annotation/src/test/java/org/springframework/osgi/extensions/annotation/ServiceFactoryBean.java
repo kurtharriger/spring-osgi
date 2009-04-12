@@ -29,7 +29,7 @@ public class ServiceFactoryBean extends ServiceBean implements FactoryBean {
 		return new ServiceBean();
 	}
 
-	public Class getObjectType() {
+	public Class<?> getObjectType() {
 		return ServiceBean.class;
 	}
 

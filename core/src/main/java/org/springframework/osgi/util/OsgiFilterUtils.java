@@ -64,7 +64,7 @@ public abstract class OsgiFilterUtils {
 	 * @return an OSGi filter concatenating the given parameters
 	 * @see #unifyFilter(String, String)
 	 */
-	public static String unifyFilter(Class clazz, String filter) {
+	public static String unifyFilter(Class<?> clazz, String filter) {
 		if (clazz != null)
 			return unifyFilter(clazz.getName(), filter);
 		return unifyFilter((String) null, filter);
@@ -80,7 +80,7 @@ public abstract class OsgiFilterUtils {
 	 * @return an OSGi filter concatenating the given parameters
 	 * @see #unifyFilter(String[], String)
 	 */
-	public static String unifyFilter(Class[] classes, String filter) {
+	public static String unifyFilter(Class<?>[] classes, String filter) {
 		if (ObjectUtils.isEmpty(classes))
 			return unifyFilter(new String[0], filter);
 

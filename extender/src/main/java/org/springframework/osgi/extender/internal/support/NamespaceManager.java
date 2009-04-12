@@ -122,7 +122,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 
 	private boolean hasCompatibleNamespaceType(Bundle bundle) {
 		try {
-			Class type = bundle.loadClass(NS_HANDLER_RESOLVER_CLASS_NAME);
+			Class<?> type = bundle.loadClass(NS_HANDLER_RESOLVER_CLASS_NAME);
 			return NamespaceHandlerResolver.class.equals(type);
 		}
 		catch (Throwable th) {

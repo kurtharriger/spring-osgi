@@ -27,7 +27,7 @@ public class TestBean {
 
 	private String string;
 	private Integer integer;
-	private Class clazz;
+	private Class<?> clazz;
 	private Map props;
 	private ExoticType exoticType;
 
@@ -85,14 +85,14 @@ public class TestBean {
 	 * 
 	 * @return Returns the clazz
 	 */
-	public Class getClazz() {
+	public Class<?> getClazz() {
 		return clazz;
 	}
 
 	/**
 	 * @param clazz The clazz to set.
 	 */
-	public void setClazz(Class clazz) {
+	public void setClazz(Class<?> clazz) {
 		this.clazz = clazz;
 	}
 

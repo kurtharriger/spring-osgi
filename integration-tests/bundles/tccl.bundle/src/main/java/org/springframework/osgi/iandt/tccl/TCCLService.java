@@ -11,7 +11,7 @@ public interface TCCLService {
 	/**
 	 * Return the TCCL class loader used during the service invocation.
 	 * 
-	 * @return TCCL Class Loader
+	 * @return TCCL Class<?> Loader
 	 */
 	public ClassLoader getTCCL();
 

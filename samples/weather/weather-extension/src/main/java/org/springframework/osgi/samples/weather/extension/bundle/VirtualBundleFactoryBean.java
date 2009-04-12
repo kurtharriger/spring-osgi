@@ -88,7 +88,7 @@ public class VirtualBundleFactoryBean implements InitializingBean, FactoryBean, 
 		return getBundle();
 	}
 
-	public Class getObjectType() {
+	public Class<?> getObjectType() {
 		return (bundle == null ? Bundle.class : bundle.getClass());
 	}
 
