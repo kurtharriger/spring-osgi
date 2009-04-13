@@ -39,7 +39,8 @@ import org.osgi.framework.ServiceRegistration;
 /**
  * BundleContext mock.
  * 
- * <p/> Can be configured to use a predefined Bundle or/and configuration. By
+ * <p/>
+ * Can be configured to use a predefined Bundle or/and configuration. By
  * default, will create an internal MockBundle. Most of the operations are no-op
  * (as anonymous classes with specific functionality can be created per use
  * basis).
@@ -59,8 +60,8 @@ public class MockBundleContext implements BundleContext {
 
 
 	/**
-	 * Constructs a new <code>MockBundleContext</code> instance. The
-	 * associated bundle will be created automatically.
+	 * Constructs a new <code>MockBundleContext</code> instance. The associated
+	 * bundle will be created automatically.
 	 */
 	public MockBundleContext() {
 		this(null, null);
@@ -156,12 +157,12 @@ public class MockBundleContext implements BundleContext {
 		// clazz
 		if (clazz == null)
 			if (filter != null) {
-				{
-					int i = filter.indexOf(Constants.OBJECTCLASS + "=");
-					if (i > 0) {
-						clazz = filter.substring(i + Constants.OBJECTCLASS.length() + 1);
-						clazz = clazz.substring(0, clazz.indexOf(")"));
-					}
+				// flatten filter since the constants might be case insensitive
+				String flattenFilter = filter.toLowerCase();
+				int i = flattenFilter.indexOf(Constants.OBJECTCLASS.toLowerCase() + "=");
+				if (i > 0) {
+					clazz = filter.substring(i + Constants.OBJECTCLASS.length() + 1);
+					clazz = clazz.substring(0, clazz.indexOf(")"));
 				}
 			}
 			else
