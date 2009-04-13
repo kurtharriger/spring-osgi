@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.testingFramework;
 
 import org.osgi.framework.Constants;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
@@ -28,9 +30,10 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  * @author Costin Leau
  * 
  */
-public class OsgiPlatformTest extends AbstractConfigurableBundleCreatorTests {
+public class OsgiPlatformTest extends BaseIntegrationTest {
 
 	private String platform;
+
 
 	protected void onSetUp() {
 		platform = getPlatformName();

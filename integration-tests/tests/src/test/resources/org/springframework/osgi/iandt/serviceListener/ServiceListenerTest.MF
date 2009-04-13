@@ -8,4 +8,5 @@ Import-Package: junit.framework,
  org.springframework.aop,
  org.springframework.core.io,
  org.springframework.osgi.test,
+org.springframework.osgi.test.platform,
  org.springframework.osgi.iandt.service.listener

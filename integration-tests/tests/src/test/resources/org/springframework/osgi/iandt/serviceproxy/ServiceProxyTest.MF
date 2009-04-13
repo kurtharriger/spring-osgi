@@ -14,6 +14,7 @@ Import-Package: junit.framework,
   org.springframework.osgi.service.support.cardinality,
   org.springframework.osgi.util,
   org.springframework.osgi.test,
+  org.springframework.osgi.test.platform,
   org.aopalliance.aop,
   org.aopalliance.intercept,
   org.springframework.util

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.iandt.testingFramework;
 
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 
 /**
  * Test to check if the testcase is properly packaged in a bundle jar and deploy
@@ -26,18 +27,13 @@ import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
  * @author Costin Leau
  * 
  */
-public class BundleCreationTst extends AbstractConfigurableBundleCreatorTests {
+public class BundleCreationTst extends BaseIntegrationTest {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.osgi.test.OsgiTest#getBundles()
-	 */
 	protected String[] getBundleLocations() {
 		// no test bundle is included
 		return new String[] {};
 	}
-	
+
 	public void testAssertionPass() {
 		assertTrue(true);
 	}

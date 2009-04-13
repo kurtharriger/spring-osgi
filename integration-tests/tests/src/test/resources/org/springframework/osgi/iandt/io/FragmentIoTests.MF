@@ -11,6 +11,7 @@ Import-Package: junit.framework,
  org.springframework.util,
  org.springframework.osgi.util,
  org.springframework.osgi.test,
+ org.springframework.osgi.test.platform,
  org.springframework.osgi.test.provisioning,
  org.springframework.test,
  org.apache.commons.logging
