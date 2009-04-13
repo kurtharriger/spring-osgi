@@ -17,13 +17,14 @@
 package org.springframework.osgi.iandt.cycles;
 
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 
 /**
  * @author Costin Leau
  * 
  */
-public class ExporterCycleTest extends AbstractConfigurableBundleCreatorTests {
+public class ExporterCycleTest extends BaseIntegrationTest {
 
 	private ListenerA listenerA;
 	private ListenerB listenerB;

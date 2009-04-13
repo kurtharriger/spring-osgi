@@ -17,13 +17,10 @@
 package org.springframework.osgi.iandt;
 
 import java.io.File;
-import java.io.FilePermission;
 import java.lang.reflect.ReflectPermission;
 import java.security.AllPermission;
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PropertyPermission;
@@ -42,6 +39,7 @@ import org.osgi.service.permissionadmin.PermissionAdmin;
 import org.osgi.service.permissionadmin.PermissionInfo;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.platform.OsgiPlatform;
 import org.springframework.osgi.test.provisioning.ArtifactLocator;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.CollectionUtils;
@@ -53,9 +51,10 @@ import org.springframework.util.StringUtils;
  * creating bundles only with the classes within a package as opposed to all
  * resources available in the target folder.
  * 
- * <p/> Additionally, the class checks for the presence Clover if a certain
- * property is set and uses a special setup to use the instrumented jars instead
- * of the naked ones.
+ * <p/>
+ * Additionally, the class checks for the presence Clover if a certain property
+ * is set and uses a special setup to use the instrumented jars instead of the
+ * naked ones.
  * 
  * @author Costin Leau
  * 
@@ -277,4 +276,12 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 
 		return perms;
 	}
+
+	@Override
+	protected OsgiPlatform createPlatform() {
+		OsgiPlatform platform = super.createPlatform();
+		platform.getConfigurationProperties().setProperty("felix.fragment.validation", "warning");
+		return platform;
+	}
+
 }
