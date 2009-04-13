@@ -31,7 +31,7 @@ public class SearchPatternValidator implements Validator {
 	private static final String COLON = ":";
 
 
-	public boolean supports(Class<?> clazz) {
+	public boolean supports(Class clazz) {
 		return String.class.equals(clazz);
 	}
 
