@@ -23,6 +23,7 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.core.JdkVersion;
 import org.springframework.osgi.samples.weather.service.WeatherService;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.platform.OsgiPlatform;
 
 /**
  * Starts up an OSGi environment (equinox, knopflerfish, or
@@ -108,4 +109,11 @@ public class WeatherServiceBundleTest extends AbstractConfigurableBundleCreatorT
     protected long getDefaultWaitTime(){
          return 10L;
     }
+    
+    /* work-around Felix 1.4.x which doesn't fully support fragments and throws an exception by default */
+	protected OsgiPlatform createPlatform() {
+		OsgiPlatform platform = super.createPlatform();
+		platform.getConfigurationProperties().setProperty("felix.fragment.validation", "warning");
+		return platform;
+	}
 }

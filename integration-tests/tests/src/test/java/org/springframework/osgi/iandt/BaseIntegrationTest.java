@@ -283,5 +283,4 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		platform.getConfigurationProperties().setProperty("felix.fragment.validation", "warning");
 		return platform;
 	}
-
 }

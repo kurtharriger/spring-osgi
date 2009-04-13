@@ -2,6 +2,7 @@
 package org.springframework.osgi.iandt.annotationProxy;
 
 import org.osgi.framework.Bundle;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.iandt.annotation.proxy.ServiceReferer;
 import org.springframework.osgi.iandt.simpleservice.MyService;
 import org.springframework.osgi.service.ServiceUnavailableException;
@@ -11,7 +12,7 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 /**
  * @author Andy Piper
  */
-public class AnnotationProxyTest extends AbstractConfigurableBundleCreatorTests {
+public class AnnotationProxyTest extends BaseIntegrationTest {
 
 	private static final String ANNOTATION_CONST = "org.springframework.osgi.extender.annotation.auto.processing";
 
