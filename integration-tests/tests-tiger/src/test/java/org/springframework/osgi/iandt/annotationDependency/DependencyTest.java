@@ -4,13 +4,14 @@ package org.springframework.osgi.iandt.annotationDependency;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.iandt.BaseIntegrationTest;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * @author Hal Hildebrand Date: Dec 1, 2006 Time: 3:56:43 PM
  */
-public class DependencyTest extends AbstractConfigurableBundleCreatorTests {
+public class DependencyTest extends BaseIntegrationTest {
 
 	private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.annotation.dependencies.Dependent";
 

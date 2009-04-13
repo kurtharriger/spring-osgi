@@ -19,6 +19,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.samples.simpleservice.MyService;
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.platform.OsgiPlatform;
 
 /**
  * Starts up an OSGi environment (equinox, knopflerfish, or 
@@ -96,5 +97,12 @@ public class SimpleServiceBundleTest extends AbstractConfigurableBundleCreatorTe
         } finally {
             bundleContext.ungetService(ref);
         }
+	}
+	
+    /* work-around Felix 1.4.x which doesn't fully support fragments and throws an exception by default */
+	protected OsgiPlatform createPlatform() {
+		OsgiPlatform platform = super.createPlatform();
+		platform.getConfigurationProperties().setProperty("felix.fragment.validation", "warning");
+		return platform;
 	}
 }

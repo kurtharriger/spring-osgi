@@ -17,6 +17,7 @@
 package org.springframework.osgi.iandt;
 
 import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
+import org.springframework.osgi.test.platform.OsgiPlatform;
 
 /**
  * Base test class used for improving performance of integration tests by
@@ -33,5 +34,12 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		String[] patterns = new String[] { BaseIntegrationTest.class.getName().replace('.', '/').concat(".class"),
 			pkg + "**/*" };
 		return patterns;
+	}
+
+	@Override
+	protected OsgiPlatform createPlatform() {
+		OsgiPlatform platform = super.createPlatform();
+		platform.getConfigurationProperties().setProperty("felix.fragment.validation", "warning");
+		return platform;
 	}
 }
