@@ -232,7 +232,7 @@ limitations under the License.
     <module>web-extender</module>
     <module>bundle-archetype</module>
     <module>annotation</module>
-
+    <module>rfc-124</module>
     <!-- unused at the moment
     <module>release</module>
     -->

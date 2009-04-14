@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-class StaticServiceReferenceProxy extends BaseServiceReferenceProxy {
+public class StaticServiceReferenceProxy extends BaseServiceReferenceProxy {
 
 	private static final int HASH_CODE = StaticServiceReferenceProxy.class.hashCode() * 13;
 

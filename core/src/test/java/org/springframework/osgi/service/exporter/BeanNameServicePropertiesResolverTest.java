@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package org.springframework.osgi.service.exporter;
 
 import java.util.Map;
@@ -33,23 +34,22 @@ import org.springframework.osgi.service.exporter.support.BeanNameServiceProperti
  */
 public class BeanNameServicePropertiesResolverTest extends TestCase {
 
-
 	public void testAfterPropertiesSetNoBundleContext() throws Exception {
 		try {
 			new BeanNameServicePropertiesResolver().afterPropertiesSet();
-			fail( "Should have thrown IllegalArgumentException");
-		} 
+			fail("Should have thrown IllegalArgumentException");
+		}
 		catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
-	
+
 	public void testGetServiceProperties() {
 		MockControl bundleContextControl = MockControl.createControl(BundleContext.class);
 		BundleContext mockContext = (BundleContext) bundleContextControl.getMock();
 		MockControl bundleControl = MockControl.createControl(Bundle.class);
 		Bundle mockBundle = (Bundle) bundleControl.getMock();
-		
+
 		mockContext.getBundle();
 		bundleContextControl.setReturnValue(mockBundle);
 		mockBundle.getSymbolicName();
@@ -58,23 +58,23 @@ public class BeanNameServicePropertiesResolverTest extends TestCase {
 		bundleContextControl.setReturnValue(mockBundle);
 		mockBundle.getHeaders();
 		Properties props = new Properties();
-		props.put(Constants.BUNDLE_VERSION,"1.0.0");
+		props.put(Constants.BUNDLE_VERSION, "1.0.0");
 		bundleControl.setReturnValue(props);
-		
+
 		bundleContextControl.replay();
 		bundleControl.replay();
-		
+
 		BeanNameServicePropertiesResolver resolver = new BeanNameServicePropertiesResolver();
 		resolver.setBundleContext(mockContext);
 		Map ret = resolver.getServiceProperties("myBean");
-		
+
 		bundleControl.verify();
 		bundleContextControl.verify();
-		
-		assertEquals("3 properties",3,ret.size());
-		assertEquals("symbolic-name",ret.get("Bundle-SymbolicName"));
-		assertEquals("1.0.0",ret.get("Bundle-Version"));
-		assertEquals("myBean",ret.get("org.springframework.osgi.bean.name"));
+
+		assertEquals("4 properties", 4, ret.size());
+		assertEquals("symbolic-name", ret.get("Bundle-SymbolicName"));
+		assertEquals("1.0.0", ret.get("Bundle-Version"));
+		assertEquals("myBean", ret.get("org.springframework.osgi.bean.name"));
+		assertEquals("myBean", ret.get("osgi.service.blueprint.compname"));
 	}
-	
 }

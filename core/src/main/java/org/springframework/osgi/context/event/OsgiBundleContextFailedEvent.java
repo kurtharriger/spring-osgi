@@ -20,7 +20,8 @@ import org.osgi.framework.Bundle;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Event raised when an <code>ApplicationContext</code> failed.
+ * Event raised when the initialization of an <code>ApplicationContext</code>
+ * failed.
  * 
  * @author Costin Leau
  * 

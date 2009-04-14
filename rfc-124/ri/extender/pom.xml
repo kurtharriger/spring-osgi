@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <artifactId>spring-osgi</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>rfc-124-1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi.rfc124.ri</groupId>
+  <artifactId>extender</artifactId>
+  <packaging>bundle</packaging>
+  <name>Spring OSGi RFC 124 RI: Extender</name>
+  <url>http://www.springframework.org/osgi</url>
+  
+  <description>
+  Spring/OSGi Blueprint Service Extender. Listens for and bootstraps Blueprint modules.
+  </description>
+
+
+  <properties>
+    <javadoc.loc>${basedir}/../../../docs/src/javadoc</javadoc.loc>
+	<spring.osgi.license.loc>../../..</spring.osgi.license.loc>
+	
+
+    <!-- use the name defined by the RFC 124 spec -->
+    <spring.osgi.symbolic.name>
+        org.osgi.service.blueprint.extender
+    </spring.osgi.symbolic.name>
+    
+    <spring.osgi.private.pkg>
+        org.springframework.osgi.extender*,
+        org.springframework.osgi.io.*internal*,
+        org.springframework.osgi.blueprint.extender.*internal*
+    </spring.osgi.private.pkg>
+
+	<spring.osgi.import.pkg>
+        !org.springframework.osgi.extender*,
+        !org.springframework.osgi.io.*internal*,
+        org.osgi.service.event;version=1.1;resolution:=optional,
+        org.osgi.service.packageadmin;version=1.2,
+        org.osgi.service.blueprint*
+    </spring.osgi.import.pkg>
+    
+    <spring.osgi.export></spring.osgi.export>
+    
+  	<clover.skip>true</clover.skip>
+  	<source-jdk>1.5</source-jdk>
+  </properties>
+  
+  <!-- shared dependencies -->
+  <dependencies>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-extender</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.rfc124</groupId>
+            <artifactId>api</artifactId>
+            <scope>provided</scope>
+            <version>rfc-124-1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.rfc124.ri</groupId>
+            <artifactId>core</artifactId>
+            <scope>provided</scope>
+            <version>rfc-124-1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit</groupId>
+            <artifactId>com.springsource.org.junit</artifactId>
+            <version>4.5.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>        
+  </dependencies>
+
+</project>

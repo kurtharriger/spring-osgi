@@ -327,7 +327,20 @@ public abstract class ConfigUtils {
 	 * @return array of locations specified (if any)
 	 */
 	public static String[] getHeaderLocations(Dictionary headers) {
-		String header = getSpringContextHeader(headers);
+		return getLocationsFromHeader(getSpringContextHeader(headers),
+			OsgiBundleXmlApplicationContext.DEFAULT_CONFIG_LOCATION);
+
+	}
+
+	/**
+	 * Similar to {@link #getHeaderLocations(Dictionary)} but looks at a
+	 * specified header directly.
+	 * 
+	 * @param header header to look at
+	 * @param defaultValue default locations if none is specified
+	 * @return
+	 */
+	public static String[] getLocationsFromHeader(String header, String defaultValue) {
 
 		String[] ctxEntries;
 		if (StringUtils.hasText(header) && !(';' == header.charAt(0))) {
@@ -339,7 +352,7 @@ public abstract class ConfigUtils {
 			// replace * with a 'digestable' location
 			for (int i = 0; i < ctxEntries.length; i++) {
 				if (CONFIG_WILDCARD.equals(ctxEntries[i]))
-					ctxEntries[i] = OsgiBundleXmlApplicationContext.DEFAULT_CONFIG_LOCATION;
+					ctxEntries[i] = defaultValue;
 			}
 		}
 		else {

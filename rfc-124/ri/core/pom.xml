@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <artifactId>spring-osgi</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>rfc-124-1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi.rfc124.ri</groupId>
+  <artifactId>core</artifactId>
+  <packaging>bundle</packaging>
+  <name>Spring OSGi RFC 124 RI: Core</name>
+  <url>http://www.springframework.org/osgi</url>
+  <description>
+  Spring/OSGi Blueprint Service RI core.
+  </description>
+  
+  <properties>
+  
+    <javadoc.loc>${basedir}/../../../docs/src/javadoc</javadoc.loc>
+	<spring.osgi.license.loc>../../..</spring.osgi.license.loc>
+	<spring.osgi.import.pkg>
+        !org.springframework.osgi.bundle,
+        org.osgi.service.blueprint*
+    </spring.osgi.import.pkg>
+
+    <spring.osgi.private.pkg>
+        org.springframework.osgi.blueprint.*internal*,
+        org.springframework.osgi.util.internal,
+        org.springframework.osgi.service.importer.support.internal.collection.comparator,
+        org.springframework.osgi.config.internal*
+    </spring.osgi.private.pkg>
+    
+	<spring.osgi.export>
+        !org.springframework.osgi.*internal*,
+        org.springframework.osgi.blueprint*;version=${spring.osgi.export.version}
+    </spring.osgi.export>
+  
+    <spring.osgi.symbolic.name>${symName.prefix}.blueprint.core</spring.osgi.symbolic.name>
+    
+  	<clover.skip>true</clover.skip>
+  	<source-jdk>1.5</source-jdk>
+  </properties>
+  
+  <!-- shared dependencies -->
+  <dependencies>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-mock</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.rfc124</groupId>
+            <artifactId>api</artifactId>
+            <scope>provided</scope>
+            <version>rfc-124-1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit</groupId>
+            <artifactId>com.springsource.org.junit</artifactId>
+            <version>4.5.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aopalliance</groupId>
+            <artifactId>com.springsource.org.aopalliance</artifactId>
+            <scope>test</scope>
+        </dependency>
+  </dependencies>
+
+  
+</project>

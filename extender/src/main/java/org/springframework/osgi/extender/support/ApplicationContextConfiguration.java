@@ -101,15 +101,15 @@ public class ApplicationContextConfiguration {
 		buf.append("AppCtxCfg [Bundle=");
 		buf.append(OsgiStringUtils.nullSafeSymbolicName(bundle));
 		buf.append("]isSpringBundle=");
-		buf.append(isSpringPoweredBundle);
+		buf.append(isSpringPoweredBundle());
 		buf.append("|async=");
-		buf.append(asyncCreation);
+		buf.append(isCreateAsynchronously());
 		buf.append("|wait-for-deps=");
-		buf.append(waitForDeps);
+		buf.append(isWaitForDependencies());
 		buf.append("|publishCtx=");
-		buf.append(publishContextAsService);
+		buf.append(isPublishContextAsService());
 		buf.append("|timeout=");
-		buf.append(timeout / 1000);
+		buf.append(getTimeout() / 1000);
 		buf.append("s");
 		toString = buf.toString();
 		if (log.isTraceEnabled()) {
