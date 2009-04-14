@@ -48,10 +48,10 @@ import org.springframework.util.Assert;
 public class ChainedClassLoader extends ClassLoader {
 
 	/** list of loaders */
-	private final List loaders = new ArrayList();
+	private final List<ClassLoader> loaders = new ArrayList<ClassLoader>();
 
 	/** list of special, non-osgi loaders, added by the user */
-	private final List nonOsgiLoaders = new ArrayList();
+	private final List<ClassLoader> nonOsgiLoaders = new ArrayList<ClassLoader>();
 
 	/** parent class loader */
 	private final ClassLoader parent;
@@ -128,11 +128,11 @@ public class ChainedClassLoader extends ClassLoader {
 		return (parent != null ? parent.getResource(name) : url);
 	}
 
-	private URL doGetResource(String name, List classLoaders) {
+	private URL doGetResource(String name, List<ClassLoader> classLoaders) {
 		URL url = null;
 		synchronized (classLoaders) {
 			for (int i = 0; i < classLoaders.size(); i++) {
-				ClassLoader loader = (ClassLoader) classLoaders.get(i);
+				ClassLoader loader = classLoaders.get(i);
 				url = loader.getResource(name);
 				if (url != null)
 					return url;
@@ -184,12 +184,12 @@ public class ChainedClassLoader extends ClassLoader {
 		}
 	}
 
-	private Class<?> doLoadClass(String name, List classLoaders) throws ClassNotFoundException {
+	private Class<?> doLoadClass(String name, List<ClassLoader> classLoaders) throws ClassNotFoundException {
 		Class<?> clazz = null;
 
 		synchronized (classLoaders) {
 			for (int i = 0; i < classLoaders.size(); i++) {
-				ClassLoader loader = (ClassLoader) classLoaders.get(i);
+				ClassLoader loader = classLoaders.get(i);
 				try {
 					clazz = loader.loadClass(name);
 					return clazz;
@@ -252,7 +252,7 @@ public class ChainedClassLoader extends ClassLoader {
 						int insertIndex = 0;
 						// but consider the defined order
 						for (int i = 0; i < nonOsgiLoaders.size(); i++) {
-							int presentLoaderIndex = ClassUtils.knownNonOsgiLoaders.indexOf((ClassLoader) nonOsgiLoaders.get(i));
+							int presentLoaderIndex = ClassUtils.knownNonOsgiLoaders.indexOf(nonOsgiLoaders.get(i));
 							if (presentLoaderIndex >= 0 && presentLoaderIndex < index) {
 								insertIndex = i + 1;
 							}
