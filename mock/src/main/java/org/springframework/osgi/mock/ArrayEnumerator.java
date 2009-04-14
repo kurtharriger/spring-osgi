@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.mock;
 
 import java.util.Enumeration;
@@ -22,13 +23,14 @@ import java.util.NoSuchElementException;
  * Simple enumeration mock backed by an array of objects.
  * 
  */
-public class ArrayEnumerator implements Enumeration {
+public class ArrayEnumerator<E> implements Enumeration<E> {
 
-	private final Object[] source;
+	private final E[] source;
 
 	private int index = 0;
 
-	public ArrayEnumerator(Object[] source) {
+
+	public ArrayEnumerator(E[] source) {
 		this.source = source;
 	}
 
@@ -36,7 +38,7 @@ public class ArrayEnumerator implements Enumeration {
 		return source.length > index;
 	}
 
-	public Object nextElement() {
+	public E nextElement() {
 		if (hasMoreElements())
 			return (source[index++]);
 		else

@@ -257,7 +257,8 @@ public abstract class ClassUtils {
 	 * This method is normally used for publishing services and determing the
 	 * {@link org.osgi.framework.Constants#OBJECTCLASS} property.
 	 * 
-	 * <p/> Note: this method does class expansion returning parent as well as
+	 * <p/>
+	 * Note: this method does class expansion returning parent as well as
 	 * children classes.
 	 * 
 	 * </p>
@@ -352,12 +353,12 @@ public abstract class ClassUtils {
 		if (ObjectUtils.isEmpty(classes))
 			return classes;
 
-		Set classSet = new LinkedHashSet(classes.length);
+		Set<Class<?>> classSet = new LinkedHashSet<Class<?>>(classes.length);
 		CollectionUtils.mergeArrayIntoCollection(classes, classSet);
 
 		// filter class collection based on visibility
-		for (Iterator iter = classSet.iterator(); iter.hasNext();) {
-			Class<?> clzz = (Class) iter.next();
+		for (Iterator<Class<?>> iter = classSet.iterator(); iter.hasNext();) {
+			Class<?> clzz = iter.next();
 			if (!loader.canSee(clzz.getName())) {
 				iter.remove();
 			}
@@ -374,7 +375,7 @@ public abstract class ClassUtils {
 	 */
 	public static Class<?>[] getAllInterfaces(Class<?> clazz) {
 		Assert.notNull(clazz);
-		return getAllInterfaces(clazz, new LinkedHashSet(8));
+		return getAllInterfaces(clazz, new LinkedHashSet<Class<?>>(8));
 	}
 
 	/**
@@ -384,7 +385,7 @@ public abstract class ClassUtils {
 	 * @param interfaces
 	 * @return
 	 */
-	private static Class<?>[] getAllInterfaces(Class<?> clazz, Set interfaces) {
+	private static Class<?>[] getAllInterfaces(Class<?> clazz, Set<Class<?>> interfaces) {
 		Class<?>[] intfs = clazz.getInterfaces();
 		CollectionUtils.mergeArrayIntoCollection(intfs, interfaces);
 
@@ -646,7 +647,8 @@ public abstract class ClassUtils {
 	 * belong to common libraries such as the JDK or OSGi API. Useful for
 	 * filtering OSGi services by type to prevent class cast problems.
 	 * 
-	 * <p/> No sanity checks are done on the given array class.
+	 * <p/>
+	 * No sanity checks are done on the given array class.
 	 * 
 	 * @param classes array of classes
 	 * @return a 'particular' (non JDK/OSGi) class if one is found. Else the

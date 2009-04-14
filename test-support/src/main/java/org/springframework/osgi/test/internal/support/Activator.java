@@ -37,8 +37,7 @@ public class Activator implements BundleActivator {
 
 
 	public void start(BundleContext context) throws Exception {
-		registration = context.registerService(TestRunnerService.class.getName(), new OsgiJUnitService(),
-			new Hashtable());
+		registration = context.registerService(TestRunnerService.class.getName(), new OsgiJUnitService(), null);
 
 		// add also the bundle id so that AbstractOsgiTest can determine its BundleContext when used in an environment
 		// where the system bundle is treated as a special case.
