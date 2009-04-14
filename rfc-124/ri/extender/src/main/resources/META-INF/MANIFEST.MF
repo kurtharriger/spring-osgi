@@ -1,0 +1,3 @@
+Bundle-Name: Spring-DM-Blueprint-Extender
+Bundle-SymbolicName: org.osgi.service.blueprint.extender
+Bundle-Activator: org.springframework.osgi.blueprint.extender.internal.activator.BlueprintModuleListener

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<components xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+
+	<description>Importer configuration</description>
+
+	
+	<component id="listener"
+		class="org.springframework.osgi.blueprint.ImporterListener" />
+	<reference id="simple" interface="java.lang.Cloneable" />
+
+	<reference id="options" interface="java.io.Serializable"
+		availability="optional" component-name="foo" filter="(name=foo)">
+		<listener bind-method="bind" unbind-method="unbind"
+			ref="listener" />
+	</reference>
+
+	<reference id="multipleInterfaces">
+		<interfaces>
+			<value>java.lang.Cloneable</value>
+			<value>java.io.Serializable</value>
+		</interfaces>
+	</reference>
+
+	<reference id="multipleListeners">
+		<interfaces>
+			<value>java.lang.Cloneable</value>
+			<value>java.io.Serializable</value>
+		</interfaces>
+		<listener bind-method="bindM" unbind-method="unbindM"
+			ref="listener" />
+
+		<listener bind-method="up" unbind-method="down">
+			<component id="inner"
+				class="org.springframework.osgi.blueprint.ImporterListener" />
+		</listener>
+		<listener bind-method="refBind" unbind-method="refUnbind">
+			<ref component="listener" />
+		</listener>
+	</reference>
+
+	<reference id="timeout" interface="java.lang.Cloneable"
+		timeout="1234" />
+	
+	<!-- collections -->
+	<component id="comparator"
+		class="org.springframework.osgi.blueprint.DummyComparator" />
+
+	<ref-list id="simpleList" interface="java.lang.Cloneable"
+		comparator-ref="comparator" />
+
+	<ref-list id="nestedComparator" interface="java.lang.Cloneable">
+		<comparator>
+			<component
+				class="org.springframework.osgi.blueprint.DummyComparator" />
+		</comparator>
+	</ref-list>
+
+	<ref-list id="nestedRefComparator" interface="java.lang.Cloneable"
+		ordering-basis="service-reference">
+		<comparator>
+			<ref component="comparator" />
+		</comparator>
+	</ref-list>
+
+	<ref-set id="memberType" interface="java.io.Serializable"
+		member-type="service-reference" />
+	 
+	<ref-set id="sortedSet" interface="java.io.Serializable"
+		comparator-ref="comparator" />
+
+</components>

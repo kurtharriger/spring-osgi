@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <artifactId>spring-osgi</artifactId>
+    <groupId>org.springframework.osgi</groupId>
+    <version>rfc-124-1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.osgi.rfc124.ri</groupId>
+  <artifactId>all</artifactId>
+  <packaging>bundle</packaging>
+  <name>Spring OSGi RFC 124 RI: Big Bundle</name>
+  <url>http://www.springframework.org/osgi</url>
+  
+  <description>
+    Spring/OSGi Blueprint Service Extender and Core Bundle.
+  </description>
+
+
+  <properties>
+    <javadoc.loc>${basedir}/../../../docs/src/javadoc</javadoc.loc>
+	<spring.osgi.license.loc>../..</spring.osgi.license.loc>
+	
+
+    <!-- use the name defined by the RFC 124 spec -->
+    <spring.osgi.symbolic.name>
+        org.osgi.service.blueprint.all
+    </spring.osgi.symbolic.name>
+    
+    <spring.osgi.private.pkg>
+        org.springframework.osgi.blueprint.extender.*internal*
+    </spring.osgi.private.pkg>
+
+	<spring.osgi.import.pkg>
+        org.osgi.service.event;version=1.1;resolution:=optional,
+        org.osgi.service.packageadmin;version=1.2,
+        org.osgi.service.blueprint*
+    </spring.osgi.import.pkg>
+
+    <!-- override property to eliminate mandatory imports on embedded libraries -->
+    <spring.osgi.import>
+        ${spring.osgi.import.pkg},
+        org.osgi.framework;version=1.3,
+        *;resolution:=optional
+    </spring.osgi.import>
+    
+    <spring.osgi.export>org.springframework*</spring.osgi.export>
+    
+  	<clover.skip>true</clover.skip>
+  	<source-jdk>1.5</source-jdk>
+  </properties>
+  
+  <!-- shared dependencies -->
+  <dependencies>
+  
+        <dependency>
+          <groupId>org.aopalliance</groupId>
+          <artifactId>com.springsource.org.aopalliance</artifactId>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+          <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>com.springsource.slf4j.api</artifactId>
+          <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>com.springsource.slf4j.log4j</artifactId>
+          <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.springframework.osgi</groupId>
+          <artifactId>log4j.osgi</artifactId>
+          <version>1.2.15-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>  
+            <groupId>net.sourceforge.cglib</groupId>
+            <artifactId>com.springsource.net.sf.cglib</artifactId>  
+            <version>2.1.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-core</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-extender</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.rfc124</groupId>
+            <artifactId>api</artifactId>
+            <scope>provided</scope>
+            <version>rfc-124-1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.rfc124.ri</groupId>
+            <artifactId>core</artifactId>
+            <version>rfc-124-1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.osgi.rfc124.ri</groupId>
+            <artifactId>extender</artifactId>
+            <version>rfc-124-1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit</groupId>
+            <artifactId>com.springsource.org.junit</artifactId>
+            <version>4.5.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>        
+  </dependencies>
+
+  <build>
+    <plugins>
+       <!-- OSGi Felix bundle plugin -->
+       <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <obrRepository>NONE</obrRepository>
+          <instructions>
+           <!-- bundle specific conf -->
+           <Bundle-Name>${artifactId}</Bundle-Name>
+           <Bundle-Version>1.0.0.rfc124</Bundle-Version>
+           <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
+           <Export-Package>${spring.osgi.export}</Export-Package>
+           <Import-Package>${spring.osgi.import}</Import-Package>
+           <Private-Package>${spring.osgi.private.pkg}</Private-Package>
+           <Include-Resource>${spring.osgi.include.res}</Include-Resource>
+           <!-- jar entries -->
+           <Implementation-Title>Spring Dynamic Modules Framework</Implementation-Title>
+           <Implementation-Version>${pom.version}</Implementation-Version>
+           <Implementation-Vendor>SpringSource</Implementation-Vendor>
+           <Implementation-Vendor-Id>org.springframework.osgi</Implementation-Vendor-Id>
+           <!-- Spring specific entries -->
+           <Spring-DM-Version>${pom.version}</Spring-DM-Version>
+           <Spring-Version>${spring.maven.artifact.version}</Spring-Version>
+           <!-- build version properties -->
+           <Build-Plan>${env.buildPlan}</Build-Plan>
+           <Build-Number>${env.buildNumber}</Build-Number>
+           <SVN-Revision>${env.svnRevision}</SVN-Revision>
+           
+           <!-- embedded dependencies -->
+           <Embed-Dependency>*;scope=compile|runtime|provided|system;inline=false</Embed-Dependency>
+           <Embed-Transitive>true</Embed-Transitive>
+           <Embed-StripVersion>true</Embed-StripVersion>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>  
+
+</project>

@@ -40,10 +40,14 @@ public interface ConfigurableOsgiBundleApplicationContext extends ConfigurableAp
 	static final String APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME = "org.springframework.context.service.name";
 
 	/**
-	 * Bean name under which the OSGi bundle context is published as a
-	 * singleton.
+	 * Name of the bundle context bean
 	 */
 	static final String BUNDLE_CONTEXT_BEAN_NAME = "bundleContext";
+
+	/**
+	 * Name of the bundle bean
+	 */
+	static final String BUNDLE_BEAN_NAME = "bundle";
 
 
 	/**

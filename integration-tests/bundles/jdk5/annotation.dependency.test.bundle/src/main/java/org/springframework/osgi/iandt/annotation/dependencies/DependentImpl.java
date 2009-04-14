@@ -2,10 +2,10 @@ package org.springframework.osgi.iandt.annotation.dependencies;
 
 import java.util.Set;
 
-import org.springframework.osgi.iandt.simpleservice2.MyService2;
-import org.springframework.osgi.iandt.simpleservice.MyService;
 import org.springframework.osgi.extensions.annotation.ServiceReference;
 import org.springframework.osgi.extensions.annotation.ServiceReferenceCardinality;
+import org.springframework.osgi.iandt.simpleservice.MyService;
+import org.springframework.osgi.iandt.simpleservice2.MyService2;
 
 /**
  * @author Andy Piper

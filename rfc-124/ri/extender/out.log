@@ -1,0 +1,178 @@
+[MANIFEST extender-rfc-124-1.0-SNAPSHOT.jar]
+Bnd-LastModified            1225739268765                                     
+Build-Jdk                   1.6.0_07                                          
+Built-By                    costin                                            
+Bundle-Activator            org.springframework.osgi.blueprint.extender.internal.activator.BlueprintModuleListener
+Bundle-Description          Spring/OSGi Blueprint Service Extender. Listens for and bootstraps Blueprint modules.
+Bundle-DocURL               http://www.springframework.org                    
+Bundle-License              http://www.apache.org/licenses/LICENSE-2.0        
+Bundle-ManifestVersion      2                                                 
+Bundle-Name                 extender                                          
+Bundle-SymbolicName         org.osgi.service.blueprint.extender               
+Bundle-Vendor               Spring Framework                                  
+Bundle-Version              1.0.0.rfc124                                      
+Created-By                  Apache Maven Bundle Plugin                        
+Implementation-Title        Spring Dynamic Modules Framework                  
+Implementation-Vendor       Spring Dynamic Modules Framework                  
+Implementation-Vendor-Id    org.springframework.osgi                          
+Implementation-Version      rfc-124-1.0-SNAPSHOT                              
+Import-Package              org.apache.commons.logging,org.osgi.framework;version="1.3",org.osgi.service.event;resolution:=optional;version="1.1",org.osgi.service.packageadmin;version="1.2",org.springframework.beans;version="2.5.4",org.springframework.beans.factory;version="2.5.4",org.springframework.beans.factory.config;version="2.5.4",org.springframework.beans.factory.xml;version="2.5.4",org.springframework.context;version="2.5.4",org.springframework.context.event;version="2.5.4",org.springframework.core;version="2.5.4",org.springframework.core.enums;version="2.5.4",org.springframework.core.io;version="2.5.4",org.springframework.core.task;version="2.5.4",org.springframework.osgi;version="1.2.0.m2",org.springframework.osgi.context;version="1.2.0.m2",org.springframework.osgi.context.event;version="1.2.0.m2",org.springframework.osgi.context.support;version="1.2.0.m2",org.springframework.osgi.service.importer;version="1.2.0.m2",org.springframework.osgi.service.importer.event;version="1.2.0.m2",org.springframework.osgi.service.importer.support;version="1.2.0.m2",org.springframework.osgi.util;version="1.2.0.m2",org.springframework.scheduling.timer;version="2.5.4",org.springframework.util;version="2.5.4",org.xml.sax;resolution:=optional
+Manifest-Version            1.0                                               
+Private-Package             org.springframework.osgi.blueprint.extender.internal.activator,org.springframework.osgi.blueprint.extender.internal.activator.support,org.springframework.osgi.blueprint.extender.internal.event,org.springframework.osgi.blueprint.extender.internal.support,org.springframework.osgi.extender,org.springframework.osgi.extender.event,org.springframework.osgi.extender.internal.activator,org.springframework.osgi.extender.internal.dependencies.shutdown,org.springframework.osgi.extender.internal.dependencies.startup,org.springframework.osgi.extender.internal.support,org.springframework.osgi.extender.internal.util,org.springframework.osgi.extender.internal.util.concurrent,org.springframework.osgi.extender.support,org.springframework.osgi.extender.support.internal,org.springframework.osgi.extender.support.scanning,org.springframework.osgi.io.internal,org.springframework.osgi.io.internal.resolver
+Spring-DM-Version           rfc-124-1.0-SNAPSHOT                              
+Spring-Version              2.5.6-SNAPSHOT                                    
+Tool                        Bnd-0.0.238                                       
+
+[IMPEXP]
+Import-Package
+  org.apache.commons.logging                                          
+  org.osgi.framework          {version=1.3}                           
+  org.osgi.service.event      {resolution:=optional, version=1.1}     
+  org.osgi.service.packageadmin{version=1.2}                           
+  org.springframework.beans   {version=2.5.4}                         
+  org.springframework.beans.factory{version=2.5.4}                         
+  org.springframework.beans.factory.config{version=2.5.4}                         
+  org.springframework.beans.factory.xml{version=2.5.4}                         
+  org.springframework.context {version=2.5.4}                         
+  org.springframework.context.event{version=2.5.4}                         
+  org.springframework.core    {version=2.5.4}                         
+  org.springframework.core.enums{version=2.5.4}                         
+  org.springframework.core.io {version=2.5.4}                         
+  org.springframework.core.task{version=2.5.4}                         
+  org.springframework.osgi    {version=1.2.0.m2}                      
+  org.springframework.osgi.context{version=1.2.0.m2}                      
+  org.springframework.osgi.context.event{version=1.2.0.m2}                      
+  org.springframework.osgi.context.support{version=1.2.0.m2}                      
+  org.springframework.osgi.service.importer{version=1.2.0.m2}                      
+  org.springframework.osgi.service.importer.event{version=1.2.0.m2}                      
+  org.springframework.osgi.service.importer.support{version=1.2.0.m2}                      
+  org.springframework.osgi.util{version=1.2.0.m2}                      
+  org.springframework.scheduling.timer{version=2.5.4}                         
+  org.springframework.util    {version=2.5.4}                         
+  org.xml.sax                 {resolution:=optional}                  
+[USES]
+org.springframework.osgi.blueprint.extender.internal.activatororg.apache.commons.logging
+                                        org.osgi.framework
+                                        org.springframework.osgi.blueprint.extender.internal.event
+                                        org.springframework.osgi.context
+                                        org.springframework.osgi.context.event
+                                        org.springframework.osgi.extender.internal.activator
+org.springframework.osgi.blueprint.extender.internal.activator.supportorg.apache.commons.logging
+                                        org.osgi.framework
+                                        org.springframework.osgi.extender.support
+                                        org.springframework.osgi.extender.support.internal
+                                        org.springframework.osgi.extender.support.scanning
+                                        org.springframework.osgi.util
+                                        org.springframework.util
+org.springframework.osgi.blueprint.extender.internal.eventorg.apache.commons.logging
+                                        org.osgi.framework
+                                        org.osgi.service.event
+                                        org.springframework.osgi.context
+                                        org.springframework.osgi.context.event
+                                        org.springframework.osgi.extender.event
+                                        org.springframework.osgi.service.importer
+                                        org.springframework.osgi.service.importer.event
+                                        org.springframework.osgi.util
+                                        org.springframework.util
+org.springframework.osgi.blueprint.extender.internal.supportorg.osgi.framework
+                                        org.springframework.osgi.extender
+                                        org.springframework.osgi.extender.internal.support
+org.springframework.osgi.extender       org.osgi.framework
+                                        org.springframework.beans
+                                        org.springframework.beans.factory.config
+                                        org.springframework.osgi.context
+org.springframework.osgi.extender.event org.osgi.framework
+                                        org.springframework.context
+                                        org.springframework.osgi.context.event
+                                        org.springframework.osgi.service.importer.event
+                                        org.springframework.util
+org.springframework.osgi.extender.internal.activatororg.apache.commons.logging
+                                        org.osgi.framework
+                                        org.osgi.service.packageadmin
+                                        org.springframework.beans.factory
+                                        org.springframework.beans.factory.config
+                                        org.springframework.core
+                                        org.springframework.core.task
+                                        org.springframework.osgi.context
+                                        org.springframework.osgi.context.event
+                                        org.springframework.osgi.extender
+                                        org.springframework.osgi.extender.internal.dependencies.shutdown
+                                        org.springframework.osgi.extender.internal.dependencies.startup
+                                        org.springframework.osgi.extender.internal.support
+                                        org.springframework.osgi.extender.internal.util.concurrent
+                                        org.springframework.osgi.extender.support
+                                        org.springframework.osgi.extender.support.internal
+                                        org.springframework.osgi.io.internal.resolver
+                                        org.springframework.osgi.service.importer.support
+                                        org.springframework.osgi.util
+                                        org.springframework.util
+org.springframework.osgi.extender.internal.dependencies.shutdownorg.apache.commons.logging
+                                        org.osgi.framework
+                                        org.springframework.osgi.util
+                                        org.springframework.util
+org.springframework.osgi.extender.internal.dependencies.startuporg.apache.commons.logging
+                                        org.osgi.framework
+                                        org.springframework.beans
+                                        org.springframework.beans.factory
+                                        org.springframework.beans.factory.config
+                                        org.springframework.context
+                                        org.springframework.core.enums
+                                        org.springframework.core.task
+                                        org.springframework.osgi.context
+                                        org.springframework.osgi.context.event
+                                        org.springframework.osgi.extender
+                                        org.springframework.osgi.extender.event
+                                        org.springframework.osgi.extender.internal.util
+                                        org.springframework.osgi.extender.internal.util.concurrent
+                                        org.springframework.osgi.service.importer
+                                        org.springframework.osgi.service.importer.event
+                                        org.springframework.osgi.service.importer.support
+                                        org.springframework.osgi.util
+                                        org.springframework.util
+org.springframework.osgi.extender.internal.supportorg.apache.commons.logging
+                                        org.osgi.framework
+                                        org.springframework.beans
+                                        org.springframework.beans.factory
+                                        org.springframework.beans.factory.config
+                                        org.springframework.beans.factory.xml
+                                        org.springframework.context.event
+                                        org.springframework.core
+                                        org.springframework.core.task
+                                        org.springframework.osgi
+                                        org.springframework.osgi.context
+                                        org.springframework.osgi.context.event
+                                        org.springframework.osgi.context.support
+                                        org.springframework.osgi.extender
+                                        org.springframework.osgi.extender.internal.dependencies.startup
+                                        org.springframework.osgi.extender.support
+                                        org.springframework.osgi.util
+                                        org.springframework.scheduling.timer
+                                        org.springframework.util
+                                        org.xml.sax
+org.springframework.osgi.extender.internal.utilorg.springframework.osgi.extender.internal.util.concurrentorg.apache.commons.logging
+                                        org.springframework.beans.factory
+                                        org.springframework.core.task
+                                        org.springframework.util
+org.springframework.osgi.extender.supportorg.apache.commons.logging
+                                        org.osgi.framework
+                                        org.springframework.beans.factory
+                                        org.springframework.osgi.context
+                                        org.springframework.osgi.context.support
+                                        org.springframework.osgi.extender
+                                        org.springframework.osgi.extender.support.internal
+                                        org.springframework.osgi.extender.support.scanning
+                                        org.springframework.osgi.util
+                                        org.springframework.util
+org.springframework.osgi.extender.support.internalorg.apache.commons.logging
+                                        org.osgi.framework
+                                        org.springframework.util
+org.springframework.osgi.extender.support.scanningorg.osgi.framework
+                                        org.springframework.osgi.extender.support.internal
+                                        org.springframework.util
+org.springframework.osgi.io.internal    org.osgi.framework
+                                        org.springframework.core.io
+                                        org.springframework.util
+org.springframework.osgi.io.internal.resolverorg.osgi.framework
+                                        org.osgi.service.packageadmin
+                                        org.springframework.osgi.io.internal
+                                        org.springframework.util

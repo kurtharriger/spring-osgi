@@ -219,6 +219,19 @@ public class ExtenderConfiguration implements DisposableBean {
 
 		// load default dependency factories
 		addDefaultDependencyFactories();
+
+		// allow post processing
+		contextCreator = postProcess(contextCreator);
+	}
+
+	/**
+	 * Allows post processing of the context creator.
+	 * 
+	 * @param contextCreator
+	 * @return
+	 */
+	protected OsgiApplicationContextCreator postProcess(OsgiApplicationContextCreator contextCreator) {
+		return contextCreator;
 	}
 
 	/**
@@ -300,7 +313,7 @@ public class ExtenderConfiguration implements DisposableBean {
 		return properties;
 	}
 
-	private void addDefaultDependencyFactories() {
+	protected void addDefaultDependencyFactories() {
 		boolean debug = log.isDebugEnabled();
 
 		// default JDK 1.4 processor
