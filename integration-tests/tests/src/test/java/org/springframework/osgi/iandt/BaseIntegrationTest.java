@@ -258,6 +258,7 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		perms.add(new ReflectPermission("*", "suppressAccessChecks"));
 		// logging permission
 		perms.add(new FilePermission("-", "WRITE"));
+		perms.add(new FilePermission("-", "READ"));
 		return perms;
 	}
 
