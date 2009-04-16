@@ -349,7 +349,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				synchronized (delegateContext.getMonitor()) {
 					if (delegateContext.isActive()) {
 						try {
-							delegateContext.close();
+							delegateContext.getBeanFactory().destroySingletons();
 						}
 						catch (Exception ex) {
 							log.trace("Caught exception while interrupting context refresh ", ex);
