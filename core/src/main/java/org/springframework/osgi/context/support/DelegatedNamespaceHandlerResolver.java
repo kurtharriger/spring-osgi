@@ -37,7 +37,8 @@ class DelegatedNamespaceHandlerResolver implements NamespaceHandlerResolver {
 	/** logger */
 	private static final Log log = LogFactory.getLog(DelegatedNamespaceHandlerResolver.class);
 
-	private final Map resolvers = new LinkedHashMap(2);
+	private final Map<NamespaceHandlerResolver, String> resolvers = new LinkedHashMap<NamespaceHandlerResolver, String>(
+		2);
 
 
 	public void addNamespaceHandler(NamespaceHandlerResolver resolver, String resolverToString) {
@@ -48,9 +49,9 @@ class DelegatedNamespaceHandlerResolver implements NamespaceHandlerResolver {
 	public NamespaceHandler resolve(String namespaceUri) {
 		boolean trace = log.isTraceEnabled();
 
-		for (Iterator iterator = resolvers.entrySet().iterator(); iterator.hasNext();) {
-			Map.Entry entry = (Map.Entry) iterator.next();
-			NamespaceHandlerResolver handlerResolver = (NamespaceHandlerResolver) entry.getKey();
+		for (Iterator<Map.Entry<NamespaceHandlerResolver, String>> iterator = resolvers.entrySet().iterator(); iterator.hasNext();) {
+			Map.Entry<NamespaceHandlerResolver, String> entry = iterator.next();
+			NamespaceHandlerResolver handlerResolver = entry.getKey();
 			if (trace)
 				log.trace("Trying to resolve namespace [" + namespaceUri + "] through resolver " + entry.getValue());
 			NamespaceHandler handler = handlerResolver.resolve(namespaceUri);
