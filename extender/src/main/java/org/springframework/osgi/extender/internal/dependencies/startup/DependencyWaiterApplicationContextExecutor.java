@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
@@ -43,7 +44,10 @@ import java.util.TimerTask;
  * {@link ConfigurableApplicationContext#refresh()} in two pieces so that beans
  * are not actually created unless the OSGi service imported are present.
  * 
- * <p/> <p/> <p/> Supports both asynch and synch behaviour.
+ * <p/>
+ * <p/>
+ * <p/>
+ * Supports both asynch and synch behaviour.
  * 
  * @author Hal Hildebrand
  * @author Costin Leau
@@ -196,9 +200,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 * Start the first stage of the application context refresh. Determines the
 	 * service dependencies and if there are any, registers a OSGi service
 	 * dependencyDetector which will continue the refresh process
-	 * asynchronously. <p/> Based on the {@link #synchronousWait}, the current
-	 * thread can simply end if there are any dependencies (the default) or wait
-	 * to either timeout or have all its dependencies met.
+	 * asynchronously.
+	 * <p/>
+	 * Based on the {@link #synchronousWait}, the current thread can simply end
+	 * if there are any dependencies (the default) or wait to either timeout or
+	 * have all its dependencies met.
 	 */
 	protected void stageOne() {
 
@@ -342,7 +348,9 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				if (debug)
 					log.debug("Cleaning up appCtx " + getDisplayName());
 				synchronized (delegateContext.getMonitor()) {
-					delegateContext.getBeanFactory().destroySingletons();
+					if (delegateContext.isActive()) {
+						delegateContext.getBeanFactory().destroySingletons();
+					}
 					state = ContextState.INTERRUPTED;
 				}
 			}
@@ -390,7 +398,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 	/**
 	 * Fail creating the context. Figure out unsatisfied dependencies and
-	 * provide a very nice log message before closing the appContext. <p/>
+	 * provide a very nice log message before closing the appContext.
+	 * <p/>
 	 * Normally this method is called when an exception is caught.
 	 * 
 	 * @param t - the offending Throwable which caused our demise

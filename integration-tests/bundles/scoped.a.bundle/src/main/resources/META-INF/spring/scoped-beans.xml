@@ -6,6 +6,7 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd"
        default-lazy-init="false">
 
+
     <bean id="a.service" class="org.springframework.osgi.iandt.scope.common.HashCodeScopeTestService" scope="bundle"/>
 
     <osgi:service ref="a.service" interface="org.springframework.osgi.iandt.scope.common.ScopeTestService"/>
