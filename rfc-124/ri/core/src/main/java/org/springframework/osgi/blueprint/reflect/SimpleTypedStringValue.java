@@ -17,7 +17,7 @@
 package org.springframework.osgi.blueprint.reflect;
 
 import org.osgi.service.blueprint.reflect.TypedStringValue;
-import org.springframework.osgi.blueprint.config.internal.temporary.SpecifiedTypeStringValue;
+import org.springframework.util.StringUtils;
 
 /**
  * Simple implementation for {@link TypedStringValue} interface. Understands
@@ -38,19 +38,13 @@ public class SimpleTypedStringValue implements TypedStringValue {
 	 * @param value
 	 */
 	public SimpleTypedStringValue(String typeName, String value) {
-		this.typeName = typeName;
+		this.typeName = (StringUtils.hasText(typeName) ? typeName : null);
 		this.value = value;
 	}
 
 	public SimpleTypedStringValue(org.springframework.beans.factory.config.TypedStringValue typedStringValue) {
-		if (typedStringValue instanceof SpecifiedTypeStringValue) {
-			SpecifiedTypeStringValue customType = (SpecifiedTypeStringValue) typedStringValue;
-			this.typeName = customType.getSpecifiedType();
-		}
-		else {
-			this.typeName = typedStringValue.getTargetTypeName();
-		}
-
+		String specifiedType = typedStringValue.getSpecifiedTypeName();
+		this.typeName = (StringUtils.hasText(specifiedType) ? specifiedType : null);
 		this.value = typedStringValue.getValue();
 	}
 

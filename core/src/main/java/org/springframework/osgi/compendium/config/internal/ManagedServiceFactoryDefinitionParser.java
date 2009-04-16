@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.compendium.config;
+package org.springframework.osgi.compendium.config.internal;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -36,7 +36,7 @@ import org.w3c.dom.NodeList;
  * 
  * @author Costin Leau
  */
-class ManagedServiceFactoryDefinitionParser extends AbstractSimpleBeanDefinitionParser {
+public class ManagedServiceFactoryDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
 	private static final String TEMPLATE_PROP = "templateDefinition";
 	private static final String LISTENER = "registration-listener";

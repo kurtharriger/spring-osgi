@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.osgi.service.blueprint.reflect.ListValue;
 import org.osgi.service.blueprint.reflect.Value;
+import org.springframework.util.StringUtils;
 
 /**
  * Simple implementation for {@link ListValue} interface.
@@ -45,7 +46,7 @@ public class SimpleListValue implements ListValue {
 		List<Value> vals = new ArrayList<Value>(values.length);
 		Collections.addAll(vals, values);
 		list = Collections.unmodifiableList(vals);
-		this.valueType = valueType;
+		this.valueType = (StringUtils.hasText(valueType) ? valueType : null);
 	}
 
 	public List<Value> getList() {

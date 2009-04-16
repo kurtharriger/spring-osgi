@@ -115,6 +115,28 @@ public class ComponentSubElementTest extends TestCase {
 		assertTrue(nested.getValue() instanceof BeanDefinitionHolder);
 	}
 
+	public void testArray() throws Exception {
+		TestComponent cmpn = (TestComponent) context.getBean("array");
+		Object prop = cmpn.getPropA();
+		assertTrue(prop instanceof Object[]);
+		Object[] array = (Object[]) prop;
+		assertEquals(Character.class, array[0].getClass());
+		assertEquals("literal2", array[1]);
+		assertNull(array[2]);
+	}
+
+	public void testMixedCollection() throws Exception {
+		TestComponent cmpn = (TestComponent) context.getBean("mixedCollection");
+		Object prop = cmpn.getPropA();
+		assertTrue(prop instanceof List);
+		List<?> list = (List<?>) prop;
+		assertEquals("literal", list.get(0));
+		assertEquals(Integer[].class, list.get(1).getClass());
+		assertEquals(int[].class, list.get(2).getClass());
+		assertEquals(new Integer(2), ((Integer[]) list.get(1))[0]);
+		assertEquals(5, ((int[]) list.get(2))[1]);
+	}
+
 	public void testList() throws Exception {
 		TestComponent cmpn = (TestComponent) context.getBean("list");
 		Object prop = cmpn.getPropA();

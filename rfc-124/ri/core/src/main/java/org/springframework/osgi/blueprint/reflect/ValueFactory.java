@@ -26,7 +26,6 @@ import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
 import org.osgi.service.blueprint.reflect.NullValue;
 import org.osgi.service.blueprint.reflect.Value;
 import org.springframework.beans.BeanMetadataElement;
-import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.BeanReferenceFactoryBean;
@@ -37,9 +36,6 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedProperties;
 import org.springframework.beans.factory.support.ManagedSet;
-import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedList;
-import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedMap;
-import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedSet;
 
 /**
  * Adapter between Spring {@link BeanMetadataElement} and OSGi's Blueprint
@@ -115,11 +111,7 @@ class ValueFactory {
 					Object element = list.get(i);
 					values[i] = ValueFactory.buildValue(element);
 				}
-				String defaultType = null;
-				if (list instanceof TempManagedList) {
-					defaultType = ((TempManagedList) list).getDefaultTypeClassName();
-				}
-				return new SimpleListValue(values, defaultType);
+				return new SimpleListValue(values, list.getElementTypeName());
 			}
 
 			if (metadata instanceof ManagedSet) {
@@ -131,12 +123,7 @@ class ValueFactory {
 				for (Object element : set) {
 					values[i++] = ValueFactory.buildValue(element);
 				}
-				String defaultType = null;
-				if (set instanceof TempManagedSet) {
-					defaultType = ((TempManagedSet) set).getDefaultTypeClassName();
-				}
-
-				return new SimpleSetValue(values, defaultType);
+				return new SimpleSetValue(values, set.getElementTypeName());
 			}
 
 			if (metadata instanceof ManagedMap) {
@@ -155,12 +142,7 @@ class ValueFactory {
 				}
 
 				String defaultKeyType = null, defaultValueType = null;
-				if (map instanceof TempManagedMap) {
-					defaultKeyType = ((TempManagedMap) map).getKeyDefaultTypeClassName();
-					defaultValueType = ((TempManagedMap) map).getValueDefaultTypeClassName();
-				}
-
-				return new SimpleMapValue(keys, defaultKeyType, values, defaultValueType);
+				return new SimpleMapValue(keys, map.getKeyTypeName(), values, map.getValueTypeName());
 			}
 
 			if (metadata instanceof ManagedProperties) {

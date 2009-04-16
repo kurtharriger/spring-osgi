@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.compendium.config;
+package org.springframework.osgi.compendium.config.internal;
 
 import java.util.Locale;
 
@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class UpdateStrategyAttributeCallback implements AttributeCallback {
+public class UpdateStrategyAttributeCallback implements AttributeCallback {
 
 	private static final String UPDATE_STRATEGY = "update-strategy";
 	private static final String UPDATE_STRATEGY_PROP = "updateStrategy";

@@ -26,7 +26,6 @@ import org.springframework.osgi.blueprint.config.internal.BlueprintReferenceBean
 import org.springframework.osgi.blueprint.config.internal.BlueprintServiceDefinitionParser;
 import org.springframework.osgi.blueprint.config.internal.ComponentParser;
 import org.springframework.osgi.blueprint.config.internal.ParsingUtils;
-import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;

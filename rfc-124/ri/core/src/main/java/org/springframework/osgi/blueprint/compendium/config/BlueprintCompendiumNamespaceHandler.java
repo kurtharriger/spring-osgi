@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.compendium.config;
+package org.springframework.osgi.blueprint.compendium.config;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.osgi.compendium.config.internal.ConfigPropertiesDefinitionParser;
@@ -22,12 +22,17 @@ import org.springframework.osgi.compendium.config.internal.ManagedPropertiesDefi
 import org.springframework.osgi.compendium.config.internal.ManagedServiceFactoryDefinitionParser;
 
 /**
- * Namespace handler for OSGi Compendium definitions.
+ * Spring-based namespace handler for the blueprint/RFC-124 compendium/osgix
+ * namespace.
  * 
  * @author Costin Leau
- * 
  */
-class CompendiumNamespaceHandler extends NamespaceHandlerSupport {
+public class BlueprintCompendiumNamespaceHandler extends NamespaceHandlerSupport {
+
+	static final String MANAGED_PROPS = "managed-properties";
+	static final String MANAGED_FACTORY_PROPS = "managed-service-factory";
+	static final String CM_PROPS = "cm-properties";
+
 
 	public void init() {
 		registerBeanDefinitionParser("cm-properties", new ConfigPropertiesDefinitionParser());

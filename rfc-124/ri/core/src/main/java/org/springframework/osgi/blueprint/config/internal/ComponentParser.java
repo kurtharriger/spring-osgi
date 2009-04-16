@@ -38,15 +38,12 @@ import org.springframework.beans.factory.parsing.ParseState;
 import org.springframework.beans.factory.parsing.PropertyEntry;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
+import org.springframework.beans.factory.support.ManagedArray;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.osgi.blueprint.config.internal.temporary.SpecifiedTypeStringValue;
-import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedList;
-import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedMap;
-import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedSet;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -60,13 +57,12 @@ import org.w3c.dom.NodeList;
  * elements. Borrows heavily from {@link BeanDefinitionParserDelegate}.
  * 
  * <b>Note</b>: Due to its stateful nature, this class is not thread safe.
- * <b>Note</b>: Since the namespace is important when parsing elements and
- * since mixed elements, from both rfc124 and Spring can coexist in the same
- * file, reusing the {@link BeanDefinitionParserDelegate delegate} isn't
- * entirely possible since the two state needs to be kept in synch.
+ * <b>Note</b>: Since the namespace is important when parsing elements and since
+ * mixed elements, from both rfc124 and Spring can coexist in the same file,
+ * reusing the {@link BeanDefinitionParserDelegate delegate} isn't entirely
+ * possible since the two state needs to be kept in synch.
  * 
  * @author Costin Leau
- * 
  */
 public class ComponentParser {
 
@@ -128,9 +124,8 @@ public class ComponentParser {
 
 	/**
 	 * Parses the supplied <code>&lt;component&gt;</code> element. May return
-	 * <code>null</code> if there were errors during parse. Errors are
-	 * reported to the
-	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+	 * <code>null</code> if there were errors during parse. Errors are reported
+	 * to the {@link org.springframework.beans.factory.parsing.ProblemReporter}.
 	 */
 	private BeanDefinitionHolder parseComponentDefinitionElement(Element ele, BeanDefinition containingBean) {
 
@@ -421,11 +416,11 @@ public class ComponentParser {
 		return new ComponentParser(parserContext).parsePropertySubElement(ele, bd, null);
 	}
 
-	public static Map parsePropertyMapElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
+	public static Map<?, ?> parsePropertyMapElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
 		return new ComponentParser(parserContext).parseMapElement(ele, bd);
 	}
 
-	public static Set parsePropertySetElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
+	public static Set<?> parsePropertySetElement(ParserContext parserContext, Element ele, BeanDefinition bd) {
 		return new ComponentParser(parserContext).parseSetElement(ele, bd);
 	}
 
@@ -439,10 +434,10 @@ public class ComponentParser {
 	 * namespace becomes important as mixed rfc124/bean content can coexist.
 	 * 
 	 * @param ele subelement of property element; we don't know which yet
-	 * @param defaultTypeClassName the default type (class name) for any
-	 * <code>&lt;value&gt;</code> tag that might be created
+	 * @param defaultValueType the default type (class name) for any
+	 *        <code>&lt;value&gt;</code> tag that might be created
 	 */
-	private Object parsePropertySubElement(Element ele, BeanDefinition bd, String defaultTypeClassName) {
+	private Object parsePropertySubElement(Element ele, BeanDefinition bd, String defaultValueType) {
 		// skip other namespace
 		String namespaceUri = ele.getNamespaceURI();
 
@@ -472,7 +467,7 @@ public class ComponentParser {
 				return parseIdRefElement(ele);
 			}
 			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.VALUE_ELEMENT)) {
-				return parseValueElement(ele, defaultTypeClassName);
+				return parseValueElement(ele, defaultValueType);
 			}
 			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.NULL_ELEMENT)) {
 				// It's a distinguished null value. Let's wrap it in a TypedStringValue
@@ -480,6 +475,9 @@ public class ComponentParser {
 				TypedStringValue nullHolder = new TypedStringValue(null);
 				nullHolder.setSource(parserContext.extractSource(ele));
 				return nullHolder;
+			}
+			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.ARRAY_ELEMENT)) {
+				return parseArrayElement(ele, bd);
 			}
 			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.LIST_ELEMENT)) {
 				return parseListElement(ele, bd);
@@ -536,25 +534,25 @@ public class ComponentParser {
 	 * Return a typed String value Object for the given value element.
 	 * 
 	 * @param ele element
-	 * @param defaultTypeClassName type class name
+	 * @param defaultTypeName type class name
 	 * @return typed String value Object
 	 */
-	private Object parseValueElement(Element ele, String defaultTypeClassName) {
+	private Object parseValueElement(Element ele, String defaultTypeName) {
 		// It's a literal value.
 		String value = DomUtils.getTextValue(ele);
-		String typeClassName = ele.getAttribute(BeanDefinitionParserDelegate.TYPE_ATTRIBUTE);
-		String specifiedType = null; 
-		if (!StringUtils.hasText(typeClassName)) {
-			typeClassName = defaultTypeClassName;
-		}
-		else {
-			specifiedType = typeClassName;
+		String specifiedTypeName = ele.getAttribute(BeanDefinitionParserDelegate.TYPE_ATTRIBUTE);
+		String typeName = specifiedTypeName;
+		if (!StringUtils.hasText(typeName)) {
+			typeName = defaultTypeName;
 		}
 		try {
-			return buildTypedStringValue(value, typeClassName, specifiedType, ele);
+			TypedStringValue typedValue = buildTypedStringValue(value, typeName);
+			typedValue.setSource(extractSource(ele));
+			typedValue.setSpecifiedTypeName(specifiedTypeName);
+			return typedValue;
 		}
 		catch (ClassNotFoundException ex) {
-			error("Type class [" + typeClassName + "] not found for <value> element", ele, ex);
+			error("Type class [" + typeName + "] not found for <value> element", ele, ex);
 			return value;
 		}
 	}
@@ -564,91 +562,95 @@ public class ComponentParser {
 	 * 
 	 * @see org.springframework.beans.factory.config.TypedStringValue
 	 */
-	private Object buildTypedStringValue(String value, String targetTypeName, String specifiedValue, Element ele)
-			throws ClassNotFoundException {
+	private TypedStringValue buildTypedStringValue(String value, String targetTypeName) throws ClassNotFoundException {
 
 		ClassLoader classLoader = parserContext.getReaderContext().getBeanClassLoader();
-		TypedStringValue typedValue = null;
+		TypedStringValue typedValue;
 		if (!StringUtils.hasText(targetTypeName)) {
 			typedValue = new TypedStringValue(value);
 		}
 		else if (classLoader != null) {
 			Class<?> targetType = ClassUtils.forName(targetTypeName, classLoader);
-			typedValue = new SpecifiedTypeStringValue(value, targetType, specifiedValue);
+			typedValue = new TypedStringValue(value, targetType);
 		}
 		else {
-			typedValue = new SpecifiedTypeStringValue(value, targetTypeName, specifiedValue);
+			typedValue = new TypedStringValue(value, targetTypeName);
 		}
-		typedValue.setSource(parserContext.extractSource(ele));
 		return typedValue;
+	}
+
+	/**
+	 * Parse an array element.
+	 */
+	public Object parseArrayElement(Element arrayEle, BeanDefinition bd) {
+		String elementType = arrayEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
+		NodeList nl = arrayEle.getChildNodes();
+		ManagedArray target = new ManagedArray(elementType, nl.getLength());
+		target.setSource(extractSource(arrayEle));
+		target.setElementTypeName(elementType);
+		target.setMergeEnabled(parseMergeAttribute(arrayEle));
+		parseCollectionElements(nl, target, bd, elementType);
+		return target;
 	}
 
 	/**
 	 * Parse a list element.
 	 */
-	private List<?> parseListElement(Element collectionEle, BeanDefinition bd) {
-		String defaultTypeClassName = collectionEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
-		if (!StringUtils.hasText(defaultTypeClassName)) {
-			defaultTypeClassName = null;
-		}
+	public List<?> parseListElement(Element collectionEle, BeanDefinition bd) {
+		String defaultElementType = collectionEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
 		NodeList nl = collectionEle.getChildNodes();
-		ManagedList list = new TempManagedList(nl.getLength(), defaultTypeClassName);
-		list.setSource(parserContext.extractSource(collectionEle));
-		list.setMergeEnabled(parserContext.getDelegate().parseMergeAttribute(collectionEle));
-		for (int i = 0; i < nl.getLength(); i++) {
-			Node node = nl.item(i);
-			if (node instanceof Element
-					&& !DomUtils.nodeNameEquals(node, BeanDefinitionParserDelegate.DESCRIPTION_ELEMENT)) {
-				list.add(parsePropertySubElement((Element) node, bd, defaultTypeClassName));
-			}
-		}
-		return list;
+		ManagedList<Object> target = new ManagedList<Object>(nl.getLength());
+		target.setSource(extractSource(collectionEle));
+		target.setElementTypeName(defaultElementType);
+		target.setMergeEnabled(parseMergeAttribute(collectionEle));
+		parseCollectionElements(nl, target, bd, defaultElementType);
+		return target;
 	}
 
 	/**
 	 * Parse a set element.
 	 */
-	private Set<?> parseSetElement(Element collectionEle, BeanDefinition bd) {
-		String defaultTypeClassName = collectionEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
-		if (!StringUtils.hasText(defaultTypeClassName)) {
-			defaultTypeClassName = null;
-		}
+	public Set<?> parseSetElement(Element collectionEle, BeanDefinition bd) {
+		String defaultElementType = collectionEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
 		NodeList nl = collectionEle.getChildNodes();
-		ManagedSet set = new TempManagedSet(nl.getLength(), defaultTypeClassName);
-		set.setSource(parserContext.extractSource(collectionEle));
-		set.setMergeEnabled(parserContext.getDelegate().parseMergeAttribute(collectionEle));
-		for (int i = 0; i < nl.getLength(); i++) {
-			Node node = nl.item(i);
+		ManagedSet<Object> target = new ManagedSet<Object>(nl.getLength());
+		target.setSource(extractSource(collectionEle));
+		target.setElementTypeName(defaultElementType);
+		target.setMergeEnabled(parseMergeAttribute(collectionEle));
+		parseCollectionElements(nl, target, bd, defaultElementType);
+		return target;
+	}
+
+	protected void parseCollectionElements(NodeList elementNodes, Collection<Object> target, BeanDefinition bd,
+			String defaultElementType) {
+
+		for (int i = 0; i < elementNodes.getLength(); i++) {
+			Node node = elementNodes.item(i);
 			if (node instanceof Element
 					&& !DomUtils.nodeNameEquals(node, BeanDefinitionParserDelegate.DESCRIPTION_ELEMENT)) {
-				set.add(parsePropertySubElement((Element) node, bd, defaultTypeClassName));
+				target.add(parsePropertySubElement((Element) node, bd, defaultElementType));
 			}
 		}
-		return set;
 	}
 
 	/**
 	 * Parse a map element.
 	 */
-	private Map<?, ?> parseMapElement(Element mapEle, BeanDefinition bd) {
-		String defaultKeyTypeClassName = mapEle.getAttribute(BeanDefinitionParserDelegate.KEY_TYPE_ATTRIBUTE);
-		if (!StringUtils.hasText(defaultKeyTypeClassName)) {
-			defaultKeyTypeClassName = null;
-		}
-		String defaultValueTypeClassName = mapEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
-		if (!StringUtils.hasText(defaultValueTypeClassName)) {
-			defaultValueTypeClassName = null;
-		}		
+	public Map<?, ?> parseMapElement(Element mapEle, BeanDefinition bd) {
+		String defaultKeyType = mapEle.getAttribute(BeanDefinitionParserDelegate.KEY_TYPE_ATTRIBUTE);
+		String defaultValueType = mapEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
+
 		List<Element> entryEles = DomUtils.getChildElementsByTagName(mapEle, BeanDefinitionParserDelegate.ENTRY_ELEMENT);
-		ManagedMap map = new TempManagedMap(entryEles.size(), defaultKeyTypeClassName, defaultValueTypeClassName);
-		map.setMergeEnabled(parserContext.getDelegate().parseMergeAttribute(mapEle));
-		map.setSource(parserContext.extractSource(mapEle));
+		ManagedMap<Object, Object> map = new ManagedMap<Object, Object>(entryEles.size());
+		map.setSource(extractSource(mapEle));
+		map.setKeyTypeName(defaultKeyType);
+		map.setValueTypeName(defaultValueType);
+		map.setMergeEnabled(parseMergeAttribute(mapEle));
 
 		for (Element entryEle : entryEles) {
 			// Should only have one value child element: ref, value, list, etc.
 			// Optionally, there might be a key child element.
 			NodeList entrySubNodes = entryEle.getChildNodes();
-
 			Element keyEle = null;
 			Element valueEle = null;
 			for (int j = 0; j < entrySubNodes.getLength(); j++) {
@@ -685,7 +687,7 @@ public class ComponentParser {
 			}
 			if (hasKeyAttribute) {
 				key = buildTypedStringValueForMap(entryEle.getAttribute(BeanDefinitionParserDelegate.KEY_ATTRIBUTE),
-					defaultKeyTypeClassName, entryEle);
+					defaultKeyType, entryEle);
 			}
 			else if (hasKeyRefAttribute) {
 				String refName = entryEle.getAttribute(BeanDefinitionParserDelegate.KEY_REF_ATTRIBUTE);
@@ -693,11 +695,11 @@ public class ComponentParser {
 					error("<entry> element contains empty 'key-ref' attribute", entryEle);
 				}
 				RuntimeBeanReference ref = new RuntimeBeanReference(refName);
-				ref.setSource(parserContext.extractSource(entryEle));
+				ref.setSource(extractSource(entryEle));
 				key = ref;
 			}
 			else if (keyEle != null) {
-				key = parseKeyElement(keyEle, bd, defaultKeyTypeClassName);
+				key = parseKeyElement(keyEle, bd, defaultKeyType);
 			}
 			else {
 				error("<entry> element must specify a key", entryEle);
@@ -714,8 +716,7 @@ public class ComponentParser {
 			}
 			if (hasValueAttribute) {
 				value = buildTypedStringValueForMap(
-					entryEle.getAttribute(BeanDefinitionParserDelegate.VALUE_ATTRIBUTE), defaultValueTypeClassName,
-					entryEle);
+					entryEle.getAttribute(BeanDefinitionParserDelegate.VALUE_ATTRIBUTE), defaultValueType, entryEle);
 			}
 			else if (hasValueRefAttribute) {
 				String refName = entryEle.getAttribute(BeanDefinitionParserDelegate.VALUE_REF_ATTRIBUTE);
@@ -723,11 +724,11 @@ public class ComponentParser {
 					error("<entry> element contains empty 'value-ref' attribute", entryEle);
 				}
 				RuntimeBeanReference ref = new RuntimeBeanReference(refName);
-				ref.setSource(parserContext.extractSource(entryEle));
+				ref.setSource(extractSource(entryEle));
 				value = ref;
 			}
 			else if (valueEle != null) {
-				value = parsePropertySubElement(valueEle, bd, defaultValueTypeClassName);
+				value = parsePropertySubElement(valueEle, bd, defaultValueType);
 			}
 			else {
 				error("<entry> element must specify a value", entryEle);
@@ -740,17 +741,23 @@ public class ComponentParser {
 		return map;
 	}
 
+	private boolean parseMergeAttribute(Element element) {
+		return parserContext.getDelegate().parseMergeAttribute(element);
+	}
+
 	/**
 	 * Build a typed String value Object for the given raw value.
 	 * 
 	 * @see org.springframework.beans.factory.config.TypedStringValue
 	 */
-	private Object buildTypedStringValueForMap(String value, String defaultTypeClassName, Element entryEle) {
+	private Object buildTypedStringValueForMap(String value, String defaultTypeName, Element entryEle) {
 		try {
-			return buildTypedStringValue(value, defaultTypeClassName, null, entryEle);
+			TypedStringValue typedValue = buildTypedStringValue(value, defaultTypeName);
+			typedValue.setSource(extractSource(entryEle));
+			return typedValue;
 		}
 		catch (ClassNotFoundException ex) {
-			error("Type class [" + defaultTypeClassName + "] not found for Map key/value type", entryEle, ex);
+			error("Type class [" + defaultTypeName + "] not found for Map key/value type", entryEle, ex);
 			return value;
 		}
 	}
@@ -758,7 +765,7 @@ public class ComponentParser {
 	/**
 	 * Parse a key sub-element of a map element.
 	 */
-	private Object parseKeyElement(Element keyEle, BeanDefinition bd, String defaultKeyTypeClassName) {
+	private Object parseKeyElement(Element keyEle, BeanDefinition bd, String defaultKeyTypeName) {
 		NodeList nl = keyEle.getChildNodes();
 		Element subElement = null;
 		for (int i = 0; i < nl.getLength(); i++) {
@@ -773,7 +780,7 @@ public class ComponentParser {
 				}
 			}
 		}
-		return parsePropertySubElement(subElement, bd, defaultKeyTypeClassName);
+		return parsePropertySubElement(subElement, bd, defaultKeyTypeName);
 	}
 
 	// util methods (used as shortcuts)

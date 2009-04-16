@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.compendium.config;
+package org.springframework.osgi.compendium.config.internal;
 
 import java.util.Properties;
 
@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class ConfigPropertiesDefinitionParser extends AbstractSimpleBeanDefinitionParser {
+public class ConfigPropertiesDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
 	private static final String PROPERTIES_PROP = "properties";
 
