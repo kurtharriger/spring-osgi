@@ -24,6 +24,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,7 +34,6 @@ import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
-import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.xml.sax.EntityResolver;
@@ -94,7 +94,7 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 	private static final Log log = LogFactory.getLog(NamespacePlugins.class);
 
-	private final Map plugins = CollectionFactory.createConcurrentMap(5);
+	private final Map<Bundle, Plugin> plugins = new ConcurrentHashMap<Bundle, Plugin>(8);
 
 
 	public void addHandler(Bundle bundle) {
@@ -119,9 +119,9 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 	public NamespaceHandler resolve(final String namespaceUri) {
 		if (System.getSecurityManager() != null) {
-			return (NamespaceHandler) AccessController.doPrivileged(new PrivilegedAction() {
+			return AccessController.doPrivileged(new PrivilegedAction<NamespaceHandler>() {
 
-				public Object run() {
+				public NamespaceHandler run() {
 					return doResolve(namespaceUri);
 				}
 			});
@@ -135,9 +135,9 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 	public InputSource resolveEntity(final String publicId, final String systemId) throws SAXException, IOException {
 		if (System.getSecurityManager() != null) {
 			try {
-				return (InputSource) AccessController.doPrivileged(new PrivilegedExceptionAction() {
+				return AccessController.doPrivileged(new PrivilegedExceptionAction<InputSource>() {
 
-					public Object run() throws Exception {
+					public InputSource run() throws Exception {
 						return doResolveEntity(publicId, systemId);
 					}
 				});
@@ -158,12 +158,13 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 	private NamespaceHandler doResolve(String namespaceUri) {
 		boolean debug = log.isDebugEnabled();
+		boolean trace = log.isTraceEnabled();
 
 		if (debug)
 			log.debug("Trying to resolving namespace handler for " + namespaceUri);
 
-		for (Iterator i = plugins.values().iterator(); i.hasNext();) {
-			Plugin plugin = (Plugin) i.next();
+		for (Iterator<Plugin> i = plugins.values().iterator(); i.hasNext();) {
+			Plugin plugin = i.next();
 			try {
 				NamespaceHandler handler = plugin.resolve(namespaceUri);
 				if (handler != null) {
@@ -175,10 +176,9 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 				}
 			}
 			catch (IllegalArgumentException ex) {
-				if (debug)
-					log.debug("Namespace handler for " + namespaceUri + " not found inside "
+				if (trace)
+					log.trace("Namespace handler for " + namespaceUri + " not found inside "
 							+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()));
-
 			}
 		}
 		return null;
@@ -186,12 +186,13 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 	private InputSource doResolveEntity(String publicId, String systemId) throws SAXException, IOException {
 		boolean debug = log.isDebugEnabled();
+		boolean trace = log.isTraceEnabled();
 
 		if (debug)
 			log.debug("Trying to resolving entity for " + publicId + "|" + systemId);
 
 		if (systemId != null) {
-			for (Iterator i = plugins.values().iterator(); i.hasNext();) {
+			for (Iterator<Plugin> i = plugins.values().iterator(); i.hasNext();) {
 				InputSource inputSource;
 				Plugin plugin = (Plugin) i.next();
 				try {
@@ -205,8 +206,8 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 
 				}
 				catch (FileNotFoundException ex) {
-					if (debug)
-						log.debug("XML schema for " + publicId + "|" + systemId + " not found inside "
+					if (trace)
+						log.trace("XML schema for " + publicId + "|" + systemId + " not found inside "
 								+ OsgiStringUtils.nullSafeNameAndSymName(plugin.getBundle()), ex);
 				}
 			}
