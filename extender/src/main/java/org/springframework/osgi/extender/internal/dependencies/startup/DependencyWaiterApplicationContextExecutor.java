@@ -16,11 +16,17 @@
 
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
@@ -31,13 +37,6 @@ import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
-
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Dependency waiter executor that breaks the 'traditional'
@@ -339,8 +338,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 			// It's possible for the delegateContext to already be in startRefresh() or completeRefresh().
 			// If this is the case then its important to wait for these tasks to complete and then close normally
-			// If we simply exit then the bundle may suddnely become invalid under our feet, e.g. if this
-			// was triggered by a Bundle update or uininstall.
+			// If we simply exit then the bundle may suddenly become invalid under our feet, e.g. if this
+			// was triggered by a Bundle update or uninstall.
 
 			// Context is in stageOne(), wait until stageOne() is complete
 			// and destroy singletons
@@ -349,7 +348,12 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 					log.debug("Cleaning up appCtx " + getDisplayName());
 				synchronized (delegateContext.getMonitor()) {
 					if (delegateContext.isActive()) {
-						delegateContext.getBeanFactory().destroySingletons();
+						try {
+							delegateContext.close();
+						}
+						catch (Exception ex) {
+							log.trace("Caught exception while interrupting context refresh ", ex);
+						}
 					}
 					state = ContextState.INTERRUPTED;
 				}
