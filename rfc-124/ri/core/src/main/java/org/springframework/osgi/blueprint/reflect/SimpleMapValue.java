@@ -23,6 +23,7 @@ import java.util.Map;
 import org.osgi.service.blueprint.reflect.MapValue;
 import org.osgi.service.blueprint.reflect.Value;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Simple implementation for {@link MapValue} interface.
@@ -49,8 +50,8 @@ public class SimpleMapValue implements MapValue {
 		}
 		map = Collections.unmodifiableMap(vals);
 
-		this.keyValueType = keyValueType;
-		this.valueValueType = valueValueType;
+		this.keyValueType = (StringUtils.hasText(keyValueType) ? keyValueType : null);
+		this.valueValueType = (StringUtils.hasText(valueValueType) ? valueValueType : null);
 	}
 
 	public Map<Value, Value> getMap() {

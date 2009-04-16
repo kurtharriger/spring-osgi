@@ -37,8 +37,10 @@ public class DummyApplicationEventMulticaster implements ApplicationEventMultica
 	public void removeApplicationListener(ApplicationListener arg0) {
 	}
 
+	public void removeApplicationListenerBean(String arg0) {
+	}
+
 	public void addApplicationListenerBean(String listenerBeanName) {
 	}
-	
-	
+
 }

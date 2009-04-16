@@ -44,6 +44,35 @@
 		</property>
 	</component>
 
+	<component id="array"
+		class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="propA">
+			<description>ignored</description>
+				<array>
+					<ref component="char"/>
+					<value>literal2</value>
+					<null/>
+				</array>
+		</property>
+	</component>
+	
+	<component id="mixedCollection" 
+		class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="propA">
+			<list value-type="java.lang.String">
+				<value>literal</value>
+				<array value-type="java.lang.Integer">
+					<value>2</value>
+					<value>4</value>
+				</array>
+				<array value-type="int">
+					<value>3</value>
+					<value>5</value>
+				</array>
+			</list>
+		</property>
+	</component>
+
 	<component id="list"
 		class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">

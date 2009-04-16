@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.SetValue;
 import org.osgi.service.blueprint.reflect.Value;
+import org.springframework.util.StringUtils;
 
 /**
  * Simple implementation for {@link SetValue} interface.
@@ -43,7 +44,7 @@ public class SimpleSetValue implements SetValue {
 		Set<Value> vals = new LinkedHashSet<Value>(values.length);
 		Collections.addAll(vals, values);
 		set = Collections.unmodifiableSet(vals);
-		this.valueType = valueType;
+		this.valueType = (StringUtils.hasText(valueType) ? valueType : null);
 	}
 
 	public Set<Value> getSet() {

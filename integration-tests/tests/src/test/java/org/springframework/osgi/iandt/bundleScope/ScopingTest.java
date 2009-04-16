@@ -16,6 +16,7 @@
 
 package org.springframework.osgi.iandt.bundleScope;
 
+import java.security.AllPermission;
 import java.util.List;
 import java.util.Properties;
 
@@ -183,9 +184,8 @@ public class ScopingTest extends BaseIntegrationTest {
 	 */
 	protected List getTestPermissions() {
 		List perms = super.getTestPermissions();
-		perms.add(new AdminPermission("(name=org.springframework.osgi.iandt.scope.a)", AdminPermission.RESOURCE));
-		perms.add(new AdminPermission("(name=org.springframework.osgi.iandt.scope.a)", AdminPermission.METADATA));
-		perms.add(new AdminPermission("(name=org.springframework.osgi.iandt.scope.a)", AdminPermission.CLASS));
+		perms.add(new AdminPermission("(name=org.springframework.osgi.iandt.scope.a)", "*"));
+		perms.add(new AllPermission());
 		return perms;
 	}
 }

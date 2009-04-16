@@ -252,8 +252,7 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		perms.add(new BundlePermission("*", BundlePermission.REQUIRE));
 		perms.add(new ServicePermission("*", ServicePermission.REGISTER));
 		perms.add(new ServicePermission("*", ServicePermission.GET));
-		perms.add(new PropertyPermission("org.springframework.osgi.*", "read"));
-		perms.add(new PropertyPermission("org.springframework.osgi.iandt.*", "write"));
+		perms.add(new PropertyPermission("*", "read,write"));
 		// required by Spring
 		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
 		perms.add(new ReflectPermission("*", "suppressAccessChecks"));

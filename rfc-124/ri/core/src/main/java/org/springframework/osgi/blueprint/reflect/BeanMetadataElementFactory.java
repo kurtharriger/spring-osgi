@@ -40,9 +40,6 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedProperties;
 import org.springframework.beans.factory.support.ManagedSet;
-import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedList;
-import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedMap;
-import org.springframework.osgi.blueprint.config.internal.temporary.TempManagedSet;
 
 /**
  * Adapter between OSGi's Blueprint {@link Value} and Spring
@@ -99,7 +96,8 @@ class BeanMetadataElementFactory {
 			ListValue listValue = (ListValue) value;
 			List<Value> list = (List<Value>) listValue.getList();
 			String defaultType = listValue.getValueType();
-			ManagedList managedList = new TempManagedList(list.size(), defaultType);
+			ManagedList managedList = new ManagedList(list.size());
+			managedList.setElementTypeName(defaultType);
 
 			for (Value val : list) {
 				managedList.add(BeanMetadataElementFactory.buildBeanMetadata(val, defaultType));
@@ -112,7 +110,8 @@ class BeanMetadataElementFactory {
 			Set<Value> set = (Set<Value>) setValue.getSet();
 			String defaultType = setValue.getValueType();
 
-			ManagedSet managedSet = new TempManagedSet(set.size(), defaultType);
+			ManagedSet managedSet = new ManagedSet(set.size());
+			managedSet.setElementTypeName(defaultType);
 
 			for (Iterator<Value> iterator = set.iterator(); iterator.hasNext();) {
 				Value val = iterator.next();
@@ -127,7 +126,10 @@ class BeanMetadataElementFactory {
 			Map<Value, Value> map = (Map<Value, Value>) mapValue.getMap();
 			String defaultKeyType = mapValue.getKeyType();
 			String defaultValueType = mapValue.getValueType();
-			ManagedMap managedMap = new TempManagedMap(map.size(), defaultKeyType, defaultValueType);
+			ManagedMap managedMap = new ManagedMap(map.size());
+			managedMap.setKeyTypeName(defaultKeyType);
+			managedMap.setValueTypeName(defaultValueType);
+
 			Set<Entry<Value, Value>> entrySet = map.entrySet();
 
 			for (Iterator<Entry<Value, Value>> iterator = entrySet.iterator(); iterator.hasNext();) {

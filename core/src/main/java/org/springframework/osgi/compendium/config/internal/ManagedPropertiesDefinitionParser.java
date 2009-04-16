@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.compendium.config;
+package org.springframework.osgi.compendium.config.internal;
 
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -34,7 +34,7 @@ import org.w3c.dom.Node;
  * @author Costin Leau
  * 
  */
-class ManagedPropertiesDefinitionParser implements BeanDefinitionDecorator {
+public class ManagedPropertiesDefinitionParser implements BeanDefinitionDecorator {
 
 	public BeanDefinitionHolder decorate(Node node, BeanDefinitionHolder definition, ParserContext parserContext) {
 		BeanDefinition trackingBppDef = createTrackerBpp((Element) node, definition);
