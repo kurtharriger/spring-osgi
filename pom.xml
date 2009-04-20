@@ -183,9 +183,9 @@
     <developer>
       <id>andypiper</id>
       <name>Andy Piper</name>
-      <email>andy at bea.com</email>
-      <organization>BEA</organization>
-      <organizationUrl>http://www.bea.com</organizationUrl>
+      <email>andy at oracle.com</email>
+      <organization>Oracle</organization>
+      <organizationUrl>http://www.oracle.com</organizationUrl>
       <roles>
         <role>Developer</role>
       </roles>
