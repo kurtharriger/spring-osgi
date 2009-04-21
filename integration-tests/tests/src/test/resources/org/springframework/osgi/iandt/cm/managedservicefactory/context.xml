@@ -12,7 +12,6 @@
 	<osgix:managed-service-factory id="msf" 
 			factory-pid="org.springframework.osgi.iandt.cm.managedservicefactory.ManagedServiceFactoryTest" 
 			auto-export="interfaces">
-		<osgi:service-properties ref="dynamic-override" />
 		<osgix:registration-listener ref="listener"/>
 		<bean class="java.util.LinkedHashMap"/>
 	</osgix:managed-service-factory>
