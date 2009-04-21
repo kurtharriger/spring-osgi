@@ -20,9 +20,12 @@ package org.springframework.osgi.service.exporter.support;
 
 import java.io.Serializable;
 import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -53,6 +56,28 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 	private MockControl ctxCtrl;
 
 	private BundleContext ctx;
+
+
+	class UpdateableProperties extends Properties implements ServicePropertiesListenerManager {
+
+		public List<ServicePropertiesChangeListener> listeners = new ArrayList<ServicePropertiesChangeListener>();
+
+
+		public void addListener(ServicePropertiesChangeListener listener) {
+			listeners.add(listener);
+		}
+
+		public void removeListener(ServicePropertiesChangeListener listener) {
+			listeners.remove(listener);
+		}
+
+		public void update() {
+			ServicePropertiesChangeEvent event = new ServicePropertiesChangeEvent(this);
+			for (ServicePropertiesChangeListener listener : listeners) {
+				listener.propertiesChange(event);
+			}
+		}
+	}
 
 
 	protected void setUp() throws Exception {
@@ -383,5 +408,28 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		exporter.setTarget(factory);
 		beanFactoryControl.replay();
 		exporter.afterPropertiesSet();
+	}
+
+	public void testUpdateableProperties() throws Exception {
+		UpdateableProperties properties = new UpdateableProperties();
+		properties.setProperty("steve", "vai");
+
+		exporter.setServiceProperties(properties);
+		exporter.setTarget("string");
+		exporter.setBeanName("string");
+		exporter.setInterfaces(new Class<?>[] { Serializable.class });
+		beanFactoryControl.replay();
+		exporter.afterPropertiesSet();
+
+		ServiceRegistration reg = exporter.getObject();
+		assertEquals("vai", reg.getReference().getProperty("steve"));
+		assertNull(reg.getReference().getProperty("updated"));
+
+		properties.setProperty("steve", "jobs");
+		properties.setProperty("updated", "true");
+		properties.update();
+
+		assertEquals("jobs", reg.getReference().getProperty("steve"));
+		assertNotNull(reg.getReference().getProperty("updated"));
 	}
 }

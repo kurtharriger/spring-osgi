@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.service.exporter.support;
 
 import java.util.Dictionary;
@@ -36,12 +37,13 @@ public class ServiceRegistrationWrapperTest extends TestCase {
 
 	private MockControl mc;
 
+
 	protected void setUp() throws Exception {
 		mc = MockControl.createControl(ServiceRegistration.class);
 		actualRegistration = (ServiceRegistration) mc.getMock();
 
 		registration = new ServiceRegistrationDecorator(new Object(), actualRegistration,
-				new OsgiServiceRegistrationListener[] { new SimpleOsgiServiceRegistrationListener() });
+			new OsgiServiceRegistrationListener[] { new SimpleOsgiServiceRegistrationListener() });
 		SimpleOsgiServiceRegistrationListener.REGISTERED = 0;
 		SimpleOsgiServiceRegistrationListener.UNREGISTERED = 0;
 	}
@@ -104,5 +106,4 @@ public class ServiceRegistrationWrapperTest extends TestCase {
 		// check listener hasn't been called
 		assertEquals(0, SimpleOsgiServiceRegistrationListener.UNREGISTERED);
 	}
-
 }
