@@ -57,22 +57,24 @@ import org.springframework.util.StringUtils;
 /**
  * FactoryBean that transparently publishes other beans in the same application
  * context as OSGi services returning the ServiceRegistration for the given
- * object. Also known as an <em>exporter</em> this class handle the
- * registration and unregistration of an OSGi service for the backing/target
- * object.
+ * object. Also known as an <em>exporter</em> this class handle the registration
+ * and unregistration of an OSGi service for the backing/target object.
  * 
- * <p/> The service properties used when publishing the service are determined
- * by the OsgiServicePropertiesResolver. The default implementation uses
+ * <p/>
+ * The service properties used when publishing the service are determined by the
+ * OsgiServicePropertiesResolver. The default implementation uses
  * <ul>
  * <li>BundleSymbolicName=&lt;bundle symbolic name&gt;</li>
  * <li>BundleVersion=&lt;bundle version&gt;</li>
  * <li>org.springframework.osgi.bean.name="&lt;bean name&gt;</li>
  * </ul>
  * 
- * <p/> <strong>Note:</strong>If thread context class loader management is used ({@link #setContextClassLoader(ExportContextClassLoader)},
- * since proxying is required, the target class has to meet certain criterion
- * described in the Spring AOP documentation. In short, final classes are not
- * supported when class enhancement is used.
+ * <p/>
+ * <strong>Note:</strong>If thread context class loader management is used (
+ * {@link #setContextClassLoader(ExportContextClassLoader)}, since proxying is
+ * required, the target class has to meet certain criterion described in the
+ * Spring AOP documentation. In short, final classes are not supported when
+ * class enhancement is used.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -106,22 +108,39 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		}
 	};
 
+	/**
+	 * Callback that propagates the changes in the service properties to the
+	 * registration object.
+	 * 
+	 * @author Costin Leau
+	 */
+	private class PropertiesMonitor implements ServicePropertiesChangeListener {
+
+		public void propertiesChange(ServicePropertiesChangeEvent event) {
+			serviceProperties = event.getServiceProperties();
+			Dictionary dictionary = mergeServiceProperties(serviceProperties, beanName);
+			if (serviceRegistration != null) {
+				serviceRegistration.setProperties(dictionary);
+			}
+		}
+	}
+
 
 	private static final Log log = LogFactory.getLog(OsgiServiceFactoryBean.class);
 
-	private BundleContext bundleContext;
-	private OsgiServicePropertiesResolver propertiesResolver;
-	private BeanFactory beanFactory;
-	private ServiceRegistration serviceRegistration;
-	private Map serviceProperties;
-	private int ranking;
-	private String targetBeanName;
+	private volatile BundleContext bundleContext;
+	private volatile OsgiServicePropertiesResolver propertiesResolver;
+	private volatile BeanFactory beanFactory;
+	private volatile ServiceRegistration serviceRegistration;
+	private volatile Map serviceProperties;
+	private volatile int ranking;
+	private volatile String targetBeanName;
 	private boolean hasNamedBean;
-	private Class<?>[] interfaces;
+	private volatile Class<?>[] interfaces;
 	private AutoExport autoExport = AutoExport.DISABLED;
-	private ExportContextClassLoader contextClassLoader = ExportContextClassLoader.UNMANAGED;
-	private Object target;
-	private Class<?> targetClass;
+	private volatile ExportContextClassLoader contextClassLoader = ExportContextClassLoader.UNMANAGED;
+	private volatile Object target;
+	private volatile Class<?> targetClass;
 	/** Default value is same as non-ordered */
 	private int order = Ordered.LOWEST_PRECEDENCE;
 	private ClassLoader classLoader;
@@ -223,10 +242,10 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		}
 	}
 
-	private Dictionary mergeServiceProperties(String beanName) {
-		MapBasedDictionary props = new MapBasedDictionary(propertiesResolver.getServiceProperties(beanName));
+	private Dictionary mergeServiceProperties(Map serviceProperties, String beanName) {
+		MapBasedDictionary props = new MapBasedDictionary();
 
-		props.putAll((Map) props);
+		props.putAll(propertiesResolver.getServiceProperties(beanName));
 
 		// add service properties
 		if (serviceProperties != null)
@@ -255,7 +274,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		// if we have a nested bean / non-Spring managed object
 		String beanName = (!hasNamedBean ? ObjectUtils.getIdentityHexString(target) : targetBeanName);
 
-		Dictionary serviceProperties = mergeServiceProperties(beanName);
+		Dictionary serviceProperties = mergeServiceProperties(this.serviceProperties, beanName);
 
 		Class<?>[] intfs = interfaces;
 
@@ -269,7 +288,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 					+ ObjectUtils.nullSafeToString(autoDetectedClasses));
 
 		// filter duplicates
-		Set classes = new LinkedHashSet(intfs.length + autoDetectedClasses.length);
+		Set<Class<?>> classes = new LinkedHashSet<Class<?>>(intfs.length + autoDetectedClasses.length);
 
 		CollectionUtils.mergeArrayIntoCollection(intfs, classes);
 		CollectionUtils.mergeArrayIntoCollection(autoDetectedClasses, classes);
@@ -336,8 +355,9 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p/> Returns a {@link ServiceRegistration} to the OSGi service for the
-	 * target object.
+	 * <p/>
+	 * Returns a {@link ServiceRegistration} to the OSGi service for the target
+	 * object.
 	 */
 	public Object getObject() throws Exception {
 		return serviceRegistration;
@@ -379,7 +399,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * operations on the exposed target bean. By default,
 	 * {@link ExportContextClassLoader#UNMANAGED} is used.
 	 * 
-	 * <p/> <strong>Note:</strong> Since proxying is required for context class
+	 * <p/>
+	 * <strong>Note:</strong> Since proxying is required for context class
 	 * loader manager, the target class has to meet certain criterias described
 	 * in the Spring AOP documentation. In short, final classes are not
 	 * supported when class enhancement is used.
@@ -460,7 +481,10 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	}
 
 	/**
-	 * Sets the properties used when exposing the target as an OSGi service.
+	 * Sets the properties used when exposing the target as an OSGi service. If
+	 * the given argument implements ({@link ServicePropertiesChangeListener}),
+	 * any updates to the properties will be reflected by the service
+	 * registration.
 	 * 
 	 * @param serviceProperties properties used for exporting the target as an
 	 *        OSGi service

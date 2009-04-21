@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.util.internal;
 
 import java.util.Collection;
@@ -30,21 +31,24 @@ import org.springframework.util.Assert;
  * Dictionary implementation through Hashtable, the class itself is always
  * synchronized and does not maintain the internal order.
  * 
- * <p/> This simple wrapper, accepts any type of Map as backing storage allowing
- * more options in choosing the appropriate implementation. By default, a
+ * <p/>
+ * This simple wrapper, accepts any type of Map as backing storage allowing more
+ * options in choosing the appropriate implementation. By default, a
  * {@link java.util.LinkedHashMap} is used, if no Map is specified.
  * 
- * <p/> This implementation will enforce the Dictionary behaviour over the map
- * when it comes to handling null values. As opposed to a Map, the Dictionary
- * always throws {@link NullPointerException} if a given argument is null.
+ * <p/>
+ * This implementation will enforce the Dictionary behaviour over the map when
+ * it comes to handling null values. As opposed to a Map, the Dictionary always
+ * throws {@link NullPointerException} if a given argument is null.
  * 
  * @see java.util.Map
  * @see java.util.Dictionary
  * @author Costin Leau
  */
-public class MapBasedDictionary extends Dictionary implements Map {
+public class MapBasedDictionary<K, V> extends Dictionary<K, V> implements Map<K, V> {
 
-	private Map map;
+	private Map<K, V> map;
+
 
 	/**
 	 * Enumeration wrapper around an Iterator.
@@ -52,16 +56,17 @@ public class MapBasedDictionary extends Dictionary implements Map {
 	 * @author Costin Leau
 	 * 
 	 */
-	private static class IteratorBasedEnumeration implements Enumeration {
+	private static class IteratorBasedEnumeration<E> implements Enumeration<E> {
 
-		private Iterator it;
+		private Iterator<E> it;
 
-		public IteratorBasedEnumeration(Iterator it) {
+
+		public IteratorBasedEnumeration(Iterator<E> it) {
 			Assert.notNull(it);
 			this.it = it;
 		}
 
-		public IteratorBasedEnumeration(Collection col) {
+		public IteratorBasedEnumeration(Collection<E> col) {
 			this(col.iterator());
 		}
 
@@ -69,14 +74,14 @@ public class MapBasedDictionary extends Dictionary implements Map {
 			return it.hasNext();
 		}
 
-		public Object nextElement() {
+		public E nextElement() {
 			return it.next();
 		}
-
 	}
 
-	public MapBasedDictionary(Map map) {
-		this.map = (map == null ? new LinkedHashMap() : map);
+
+	public MapBasedDictionary(Map<K, V> map) {
+		this.map = (map == null ? new LinkedHashMap<K, V>() : map);
 	}
 
 	/**
@@ -84,11 +89,11 @@ public class MapBasedDictionary extends Dictionary implements Map {
 	 * 
 	 */
 	public MapBasedDictionary() {
-		this.map = new LinkedHashMap();
+		this.map = new LinkedHashMap<K, V>();
 	}
 
 	public MapBasedDictionary(int initialCapacity) {
-		this.map = new LinkedHashMap(initialCapacity);
+		this.map = new LinkedHashMap<K, V>(initialCapacity);
 	}
 
 	/**
@@ -97,11 +102,11 @@ public class MapBasedDictionary extends Dictionary implements Map {
 	 * 
 	 * @param dictionary
 	 */
-	public MapBasedDictionary(Dictionary dictionary) {
-		this(new LinkedHashMap(), dictionary);
+	public MapBasedDictionary(Dictionary<? extends K, ? extends V> dictionary) {
+		this(new LinkedHashMap<K, V>(), dictionary);
 	}
 
-	public MapBasedDictionary(Map map, Dictionary dictionary) {
+	public MapBasedDictionary(Map<K, V> map, Dictionary<? extends K, ? extends V> dictionary) {
 		this(map);
 		if (dictionary != null)
 			putAll(dictionary);
@@ -119,11 +124,11 @@ public class MapBasedDictionary extends Dictionary implements Map {
 		return map.containsValue(value);
 	}
 
-	public Set entrySet() {
+	public Set<Map.Entry<K, V>> entrySet() {
 		return map.entrySet();
 	}
 
-	public Object get(Object key) {
+	public V get(Object key) {
 		if (key == null)
 			throw new NullPointerException();
 		return map.get(key);
@@ -133,31 +138,31 @@ public class MapBasedDictionary extends Dictionary implements Map {
 		return map.isEmpty();
 	}
 
-	public Set keySet() {
+	public Set<K> keySet() {
 		return map.keySet();
 	}
-	
-	public Object put(Object key, Object value) {
+
+	public V put(K key, V value) {
 		if (key == null || value == null)
 			throw new NullPointerException();
 
 		return map.put(key, value);
 	}
 
-	public void putAll(Map t) {
+	public void putAll(Map<? extends K, ? extends V> t) {
 		map.putAll(t);
 	}
 
-	public void putAll(Dictionary dictionary) {
+	public <T extends K> void putAll(Dictionary<T, ? extends V> dictionary) {
 		if (dictionary != null)
 			// copy the dictionary
-			for (Enumeration enm = dictionary.keys(); enm.hasMoreElements();) {
-				Object key = enm.nextElement();
+			for (Enumeration<T> enm = dictionary.keys(); enm.hasMoreElements();) {
+				T key = enm.nextElement();
 				map.put(key, dictionary.get(key));
 			}
 	}
 
-	public Object remove(Object key) {
+	public V remove(Object key) {
 		if (key == null)
 			throw new NullPointerException();
 
@@ -168,16 +173,16 @@ public class MapBasedDictionary extends Dictionary implements Map {
 		return map.size();
 	}
 
-	public Collection values() {
+	public Collection<V> values() {
 		return map.values();
 	}
 
-	public Enumeration elements() {
-		return new IteratorBasedEnumeration(map.values());
+	public Enumeration<V> elements() {
+		return new IteratorBasedEnumeration<V>(map.values());
 	}
 
-	public Enumeration keys() {
-		return new IteratorBasedEnumeration(map.keySet());
+	public Enumeration<K> keys() {
+		return new IteratorBasedEnumeration<K>(map.keySet());
 	}
 
 	public String toString() {
@@ -193,5 +198,4 @@ public class MapBasedDictionary extends Dictionary implements Map {
 	public int hashCode() {
 		return map.hashCode();
 	}
-
 }

@@ -19,23 +19,16 @@ package org.springframework.osgi.compendium.internal.cm;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
-import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
 
 /**
@@ -130,14 +123,7 @@ class ConfigurationAdminManager implements DisposableBean {
 		if (log.isTraceEnabled())
 			log.trace("Initial properties for pid [" + pid + "] are " + properties);
 
-		Properties props = new Properties();
-		props.put(Constants.SERVICE_PID, pid);
-		Bundle bundle = bundleContext.getBundle();
-		props.put(Constants.BUNDLE_SYMBOLICNAME, OsgiStringUtils.nullSafeSymbolicName(bundle));
-		props.put(Constants.BUNDLE_VERSION, OsgiBundleUtils.getBundleVersion(bundle));
-
-		ServiceRegistration reg = bundleContext.registerService(ManagedService.class.getName(),
-			new ConfigurationWatcher(), props);
+		ServiceRegistration reg = CMUtils.registerManagedService(bundleContext, new ConfigurationWatcher(), pid);
 
 		synchronized (monitor) {
 			this.registration = reg;
@@ -145,18 +131,12 @@ class ConfigurationAdminManager implements DisposableBean {
 	}
 
 	private void initProperties() {
-		ServiceReference ref = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
-		if (ref != null) {
-			ConfigurationAdmin cm = (ConfigurationAdmin) bundleContext.getService(ref);
-			if (cm != null) {
-				try {
-					properties = new MapBasedDictionary(cm.getConfiguration(pid).getProperties());
-				}
-				catch (IOException ioe) {
-					// FIXME: consider adding a custom/different exception
-					throw new BeanInitializationException("Cannot retrieve configuration for pid=" + pid, ioe);
-				}
-			}
+		try {
+			properties = CMUtils.getConfiguration(bundleContext, pid);
+		}
+		catch (IOException ioe) {
+			// FIXME: consider adding a custom/different exception
+			throw new BeanInitializationException("Cannot retrieve configuration for pid=" + pid, ioe);
 		}
 	}
 

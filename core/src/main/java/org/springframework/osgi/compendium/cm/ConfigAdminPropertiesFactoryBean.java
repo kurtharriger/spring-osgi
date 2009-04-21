@@ -17,18 +17,33 @@
 package org.springframework.osgi.compendium.cm;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.osgi.compendium.internal.cm.CMUtils;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.service.exporter.support.ServicePropertiesChangeEvent;
+import org.springframework.osgi.service.exporter.support.ServicePropertiesChangeListener;
+import org.springframework.osgi.service.exporter.support.ServicePropertiesListenerManager;
+import org.springframework.osgi.util.OsgiServiceUtils;
+import org.springframework.osgi.util.internal.MapBasedDictionary;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -45,25 +60,89 @@ import org.springframework.util.CollectionUtils;
  * @see ConfigurationAdmin
  * @see org.springframework.core.io.support.PropertiesFactoryBean
  */
-public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, InitializingBean, FactoryBean {
+public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, InitializingBean, DisposableBean,
+		FactoryBean<Properties> {
 
-	private String persistentId;
-	private Properties props;
+	@SuppressWarnings("unchecked")
+	private class ConfigurationWatcher implements ManagedService {
+
+		public void updated(Dictionary props) throws ConfigurationException {
+			if (log.isTraceEnabled())
+				log.trace("Configuration [" + persistentId + "] has been updated with properties " + props);
+
+			// update properties
+			initProperties(properties, new MapBasedDictionary(props));
+			// inform listeners
+			((ChangeableProperties) properties).notifyListeners();
+		}
+	}
+
+	private class ChangeableProperties extends Properties implements ServicePropertiesListenerManager {
+
+		private List<ServicePropertiesChangeListener> listeners = Collections.synchronizedList(new ArrayList<ServicePropertiesChangeListener>(
+			4));
+
+
+		public void addListener(ServicePropertiesChangeListener listener) {
+			if (listener != null) {
+				listeners.add(listener);
+			}
+		}
+
+		public void removeListener(ServicePropertiesChangeListener listener) {
+			if (listener != null) {
+				listeners.remove(listener);
+			}
+		}
+
+		void notifyListeners() {
+			ServicePropertiesChangeEvent event = new ServicePropertiesChangeEvent(this);
+			synchronized (listeners) {
+				for (Iterator<ServicePropertiesChangeListener> iterator = listeners.iterator(); iterator.hasNext();) {
+					ServicePropertiesChangeListener listener = iterator.next();
+					listener.propertiesChange(event);
+				}
+			}
+		}
+	}
+
+
+	/** logger */
+	private static final Log log = LogFactory.getLog(ConfigAdminPropertiesFactoryBean.class);
+
+	private volatile String persistentId;
+	private volatile Properties properties;
 	private BundleContext bundleContext;
 	private boolean localOverride = false;
 	private Properties localProperties;
+	private volatile boolean dynamic = false;
+	private volatile ServiceRegistration registration;
 
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.hasText(persistentId, "persistentId property is required");
 		Assert.notNull(bundleContext, "bundleContext property is required");
+
+		if (dynamic) {
+			// create special Properties object
+			properties = new ChangeableProperties();
+			// init properties
+			// copy config admin properties
+			try {
+				initProperties(properties, CMUtils.getConfiguration(bundleContext, persistentId));
+			}
+			catch (IOException ioe) {
+				throw new BeanInitializationException("Cannot retrieve configuration for pid=" + persistentId, ioe);
+			}
+
+			// perform eager registration
+			registration = CMUtils.registerManagedService(bundleContext, new ConfigurationWatcher(), persistentId);
+		}
 	}
 
-	public Object getObject() throws Exception {
-		if (props == null) {
-			props = readProperties();
-		}
-		return props;
+	public void destroy() throws Exception {
+		OsgiServiceUtils.unregisterService(registration);
+		registration = null;
 	}
 
 	/**
@@ -71,46 +150,43 @@ public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, Ini
 	 * 
 	 * @return
 	 */
-	private Properties readProperties() {
-		Properties properties = new Properties();
+	private Properties initProperties(Properties target, Map<?, ?> cmConfig) {
 
-		// merge the local properties (upfront)
-		if (localProperties != null && !localOverride) {
-			CollectionUtils.mergePropertiesIntoMap(localProperties, properties);
-		}
+		synchronized (target) {
+			target.clear();
 
-		ServiceReference ref = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
-		if (ref != null) {
-			ConfigurationAdmin cm = (ConfigurationAdmin) bundleContext.getService(ref);
-			if (cm != null) {
-				try {
-					Dictionary dict = cm.getConfiguration(persistentId).getProperties();
-					if (dict != null) {
-						// copy properties into dictionary
-						for (Enumeration enm = dict.keys(); enm.hasMoreElements();) {
-							Object key = enm.nextElement();
-							Object value = dict.get(key);
-							properties.put(key, value);
-						}
-					}
-				}
-				catch (IOException ioe) {
-					// FIXME: consider adding a custom/different exception
-					throw new BeanInitializationException("Cannot retrieve configuration for pid=" + persistentId, ioe);
-				}
+			// merge the local properties (upfront)
+			if (localProperties != null && !localOverride) {
+				CollectionUtils.mergePropertiesIntoMap(localProperties, target);
 			}
-		}
 
-		// merge local properties (if needed)
-		if (localProperties != null && localOverride) {
-			CollectionUtils.mergePropertiesIntoMap(localProperties, properties);
+			target.putAll(cmConfig);
+
+			// merge local properties (if needed)
+			if (localProperties != null && localOverride) {
+				CollectionUtils.mergePropertiesIntoMap(localProperties, target);
+			}
+
+			return target;
+		}
+	}
+
+	public Properties getObject() throws Exception {
+		// if static, perform lazy initialization
+		if (properties == null) {
+			try {
+				properties = initProperties(new Properties(), CMUtils.getConfiguration(bundleContext, persistentId));
+			}
+			catch (IOException ioe) {
+				throw new BeanInitializationException("Cannot retrieve configuration for pid=" + persistentId, ioe);
+			}
 		}
 
 		return properties;
 	}
 
-	public Class<?> getObjectType() {
-		return Properties.class;
+	public Class<? extends Properties> getObjectType() {
+		return (dynamic ? ChangeableProperties.class : Properties.class);
 	}
 
 	public boolean isSingleton() {
@@ -157,5 +233,28 @@ public class ConfigAdminPropertiesFactoryBean implements BundleContextAware, Ini
 
 	public void setBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
+	}
+
+	/**
+	 * Indicates whether the returned properties object is dynamic or not.
+	 * 
+	 * @return boolean indicating if the configuration object is dynamic
+	 */
+	public boolean isDynamic() {
+		return dynamic;
+	}
+
+	/**
+	 * Indicates if the returned configuration is dynamic or static. A static
+	 * configuration (default) ignores any updates made to the configuration
+	 * admin entry that it maps. A dynamic configuration on the other hand will
+	 * reflect the changes in its content. Third parties can be notified through
+	 * the {@link ServicePropertiesChangeListener} contract.
+	 * 
+	 * @param dynamic whether the returned object reflects the changes in the
+	 *        configuration admin or not.
+	 */
+	public void setDynamic(boolean dynamic) {
+		this.dynamic = dynamic;
 	}
 }
