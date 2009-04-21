@@ -14,4 +14,11 @@
 	<osgix:cm-properties id="override" persistent-id="override" local-override="true">
 		<prop key="spring">framework</prop>
 	</osgix:cm-properties>
+
+	<osgix:cm-properties id="dynamic-simple" persistent-id="dynamic-simple" dynamic="true"/>
+	
+	<osgix:cm-properties id="dynamic-override" persistent-id="dynamic-override" local-override="true" dynamic="true">
+		<prop key="spring">framework</prop>
+	</osgix:cm-properties>
+	
 </beans>

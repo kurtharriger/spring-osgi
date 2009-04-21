@@ -23,6 +23,7 @@ import java.util.Properties;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.springframework.osgi.iandt.cm.BaseConfigurationAdminTest;
+import org.springframework.osgi.service.exporter.support.ServicePropertiesListenerManager;
 
 /**
  * @author Costin Leau
@@ -32,6 +33,8 @@ public class ConfigPropertiesTest extends BaseConfigurationAdminTest {
 	private Properties props;
 	private static final String SIMPLE = "simple";
 	private static final String OVERRIDE = "override";
+	private static final String DYNAMIC_SIMPLE = "dynamic-simple";
+	private static final String DYNAMIC_OVERRIDE = "dynamic-override";
 
 
 	protected String[] getConfigLocations() {
@@ -56,6 +59,12 @@ public class ConfigPropertiesTest extends BaseConfigurationAdminTest {
 
 		cfg = configAdmin.getConfiguration(OVERRIDE);
 		cfg.update(props);
+
+		cfg = configAdmin.getConfiguration(DYNAMIC_SIMPLE);
+		cfg.update(props);
+
+		cfg = configAdmin.getConfiguration(DYNAMIC_OVERRIDE);
+		cfg.update(props);
 	}
 
 	public void testSimpleConfigAdminConfig() throws Exception {
@@ -68,10 +77,50 @@ public class ConfigPropertiesTest extends BaseConfigurationAdminTest {
 	}
 
 	public void testOverrideConfigAdminConfig() throws Exception {
-
 		Object bean = applicationContext.getBean(OVERRIDE);
 		assertTrue(bean instanceof Properties);
 		assertFalse(props.equals(bean));
 		assertEquals("framework", ((Properties) bean).getProperty("spring"));
+	}
+
+	public void testDynamicNoOverride() throws Exception {
+		Object bean = applicationContext.getBean(DYNAMIC_SIMPLE);
+		assertTrue(bean instanceof ServicePropertiesListenerManager);
+		assertFalse(props.equals(bean));
+		Properties prop = (Properties) bean;
+		// make sure the properties update has been propagated
+		if (prop.size() > 0) {
+			assertEquals("source", prop.getProperty("spring"));
+		}
+		assertNull(prop.getProperty("steve"));
+		Configuration cfg = cm.getConfiguration(DYNAMIC_SIMPLE);
+
+		Properties newProps = new Properties();
+		newProps.setProperty("spring", "osgi");
+		newProps.setProperty("steve", "vai");
+
+		waitForCfgChangeToPropagate(DYNAMIC_SIMPLE, newProps);
+
+		assertEquals("osgi", prop.getProperty("spring"));
+		assertEquals("vai", prop.getProperty("steve"));
+	}
+
+	public void testDynamicOverride() throws Exception {
+		Object bean = applicationContext.getBean(DYNAMIC_OVERRIDE);
+		assertTrue(bean instanceof ServicePropertiesListenerManager);
+		assertFalse(props.equals(bean));
+		Properties prop = (Properties) bean;
+		assertEquals("framework", prop.getProperty("spring"));
+		assertNull(prop.getProperty("steve"));
+		Configuration cfg = cm.getConfiguration(DYNAMIC_OVERRIDE);
+
+		Properties newProps = new Properties();
+		newProps.setProperty("spring", "osgi");
+		newProps.setProperty("steve", "vai");
+
+		waitForCfgChangeToPropagate(DYNAMIC_OVERRIDE, newProps);
+
+		assertEquals("framework", prop.getProperty("spring"));
+		assertEquals("vai", prop.getProperty("steve"));
 	}
 }

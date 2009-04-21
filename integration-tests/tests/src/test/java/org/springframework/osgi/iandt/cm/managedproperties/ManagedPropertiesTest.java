@@ -16,15 +16,11 @@
 
 package org.springframework.osgi.iandt.cm.managedproperties;
 
-import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.Properties;
 
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.cm.ConfigurationPlugin;
 import org.springframework.osgi.iandt.cm.BaseConfigurationAdminTest;
 
 /**
@@ -149,47 +145,6 @@ public class ManagedPropertiesTest extends BaseConfigurationAdminTest {
 		for (Iterator iterator = localCopy.keySet().iterator(); iterator.hasNext();) {
 			Object key = iterator.next();
 			assertEquals(localCopy.get(key), bean.getProps().get(key));
-		}
-	}
-
-	private void waitForCfgChangeToPropagate(final String pid, final Properties newProperties) throws Exception {
-		final Object monitor = new Object();
-		final boolean[] receivedEvent = new boolean[] { false };
-
-		// the current implementation of configuration admin seems to be prone to threading errors
-		// (especially race conditions where event for updates are cumulated and not propagated properly
-		// due to the asynch nature) so this plugin only expects one event really without checking the source
-		ConfigurationPlugin cp = new ConfigurationPlugin() {
-
-			public void modifyConfiguration(ServiceReference reference, Dictionary properties) {
-				synchronized (monitor) {
-					receivedEvent[0] = true;
-					monitor.notify();
-				}
-			}
-		};
-		Properties props = new Properties();
-		props.setProperty(Constants.SERVICE_PID, pid);
-		props.setProperty("cm.target", pid);
-
-		bundleContext.registerService(ConfigurationPlugin.class.getName(), cp, props);
-
-		// update configuration
-		Configuration cfg = cm.getConfiguration(pid);
-		System.out.println("Updating properties w/ " + newProperties);
-		cfg.update(newProperties);
-		// wait a bit since the plugin might receive the old configuration if we move too fast...
-		Thread.sleep(1000);
-
-		// wait up to 5 minutes for the even to propagate
-		synchronized (monitor) {
-			if (!receivedEvent[0]) {
-				// double check if the properties have been already applied before waiting (since then the event is not propagated anymore since it's not
-				// considered new)
-
-				monitor.wait(5 * 60 * 1000);
-				assertTrue("Configuration " + pid + " hasn't been updated in 5 minutes...", receivedEvent[0]);
-			}
 		}
 	}
 }

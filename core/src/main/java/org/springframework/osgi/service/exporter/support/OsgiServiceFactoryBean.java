@@ -83,7 +83,8 @@ import org.springframework.util.StringUtils;
  * 
  */
 public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implements BeanClassLoaderAware,
-		BeanFactoryAware, BeanNameAware, BundleContextAware, FactoryBean, InitializingBean, Ordered {
+		BeanFactoryAware, BeanNameAware, BundleContextAware, FactoryBean<ServiceRegistration>, InitializingBean,
+		Ordered {
 
 	/**
 	 * Wrapper around internal commands.
@@ -133,6 +134,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private volatile BeanFactory beanFactory;
 	private volatile ServiceRegistration serviceRegistration;
 	private volatile Map serviceProperties;
+	private volatile ServicePropertiesChangeListener propertiesListener;
 	private volatile int ranking;
 	private volatile String targetBeanName;
 	private boolean hasNamedBean;
@@ -218,6 +220,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 				}
 			}
 		}
+		// check service properties listener
+		if (serviceProperties instanceof ServicePropertiesListenerManager) {
+			propertiesListener = new PropertiesMonitor();
+			((ServicePropertiesListenerManager) serviceProperties).addListener(propertiesListener);
+		}
 
 		boolean shouldRegisterAtStartup;
 		synchronized (lock) {
@@ -226,6 +233,17 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		if (shouldRegisterAtStartup)
 			registerService();
+	}
+
+	public void destroy() {
+		if (propertiesListener != null) {
+			if (serviceProperties instanceof ServicePropertiesListenerManager) {
+				((ServicePropertiesListenerManager) serviceProperties).removeListener(propertiesListener);
+			}
+			propertiesListener = null;
+		}
+
+		super.destroy();
 	}
 
 	private void addBeanFactoryDependency() {
@@ -359,11 +377,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * Returns a {@link ServiceRegistration} to the OSGi service for the target
 	 * object.
 	 */
-	public Object getObject() throws Exception {
+	public ServiceRegistration getObject() throws Exception {
 		return serviceRegistration;
 	}
 
-	public Class<?> getObjectType() {
+	public Class<? extends ServiceRegistration> getObjectType() {
 		return (serviceRegistration != null ? serviceRegistration.getClass() : ServiceRegistration.class);
 	}
 

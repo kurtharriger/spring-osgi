@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,12 +44,13 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.core.CollectionFactory;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.service.exporter.support.AutoExport;
 import org.springframework.osgi.service.exporter.support.ExportContextClassLoader;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
+import org.springframework.osgi.service.exporter.support.ServicePropertiesChangeEvent;
+import org.springframework.osgi.service.exporter.support.ServicePropertiesChangeListener;
 import org.springframework.osgi.service.importer.support.internal.collection.DynamicCollection;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
@@ -65,7 +67,7 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  */
 public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanClassLoaderAware, BeanFactoryAware,
-		BundleContextAware, DisposableBean, FactoryBean {
+		BundleContextAware, DisposableBean, FactoryBean<Collection> {
 
 	/**
 	 * Configuration Admin whiteboard 'listener'.
@@ -141,9 +143,10 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	/** inner bean service registrations */
 	private final DynamicCollection serviceRegistrations = new DynamicCollection(8);
 	/** read-only view of the registration */
-	private final Collection userReturnedCollection = Collections.unmodifiableCollection(serviceRegistrations);
+	private final Collection<ServiceRegistration> userReturnedCollection = Collections.unmodifiableCollection(serviceRegistrations);
 	/** lookup map between exporters and associated pids */
-	private final Map serviceExporters = CollectionFactory.createConcurrentMap(8);
+	private final Map<String, OsgiServiceFactoryBean> serviceExporters = new ConcurrentHashMap<String, OsgiServiceFactoryBean>(
+		8);
 
 	// exporting template
 	/** listeners */
@@ -171,6 +174,9 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	 * service even though it was unregistered
 	 */
 	private boolean destroyed = false;
+
+	private volatile Map serviceProperties;
+	private volatile ServicePropertiesChangeListener propertiesListener;
 
 
 	public void afterPropertiesSet() throws Exception {
@@ -328,7 +334,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	}
 
 	private void unregisterService(String pid) {
-		OsgiServiceFactoryBean exporterFactory = (OsgiServiceFactoryBean) serviceExporters.remove(pid);
+		OsgiServiceFactoryBean exporterFactory = serviceExporters.remove(pid);
 
 		if (exporterFactory != null) {
 
@@ -363,11 +369,11 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		}
 	}
 
-	public Object getObject() throws Exception {
+	public Collection getObject() throws Exception {
 		return userReturnedCollection;
 	}
 
-	public Class<?> getObjectType() {
+	public Class<Collection> getObjectType() {
 		return Collection.class;
 	}
 
@@ -443,5 +449,18 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	 */
 	public void setUpdateMethod(String updateMethod) {
 		this.updateMethod = updateMethod;
+	}
+
+	/**
+	 * Sets the properties used when exposing the target as an OSGi service. If
+	 * the given argument implements ({@link ServicePropertiesChangeListener}),
+	 * any updates to the properties will be reflected by the service
+	 * registration.
+	 * 
+	 * @param serviceProperties properties used for exporting the target as an
+	 *        OSGi service
+	 */
+	public void setServiceProperties(Map serviceProperties) {
+		this.serviceProperties = serviceProperties;
 	}
 }

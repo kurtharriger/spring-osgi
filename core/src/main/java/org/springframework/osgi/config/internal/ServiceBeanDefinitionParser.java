@@ -33,6 +33,7 @@ import org.springframework.core.Conventions;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
+import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -195,12 +196,32 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 		String name = element.getLocalName();
 
 		if (PROPS_ID.equals(name)) {
+			Object props = null;
+			// check inlined ref
+			String ref = element.getAttribute(REF).trim();
+
+			boolean hasRef = StringUtils.hasText(ref);
+
 			if (DomUtils.getChildElementsByTagName(element, BeanDefinitionParserDelegate.ENTRY_ELEMENT).size() > 0) {
-				Object props = parsePropertyMapElement(parserContext, element, builder.getRawBeanDefinition());
+				if (hasRef) {
+					parserContext.getReaderContext().error(
+						"Nested service properties definition cannot be used when attribute 'ref' is specified",
+						element);
+				}
+				else {
+					props = parsePropertyMapElement(parserContext, element, builder.getRawBeanDefinition());
+				}
+			}
+
+			if (hasRef) {
+				props = new RuntimeBeanReference(ref);
+			}
+
+			if (props != null) {
 				builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
 			}
 			else {
-				parserContext.getReaderContext().error("Invalid service property type", element);
+				parserContext.getReaderContext().error("Invalid service property declaration", element);
 			}
 			return true;
 		}
