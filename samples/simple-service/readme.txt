@@ -24,3 +24,7 @@ several operations on it.
 
 This directory contains the source files.
 For building, Maven 2 and JDK 1.4+ are required.
+
+To build and run the sample, use the following command:
+
+# mvn -P equinox clean install
