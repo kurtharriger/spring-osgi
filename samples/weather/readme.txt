@@ -43,6 +43,9 @@ the service.
 
 This directory contains the source files.
 For building, Maven 2 and JDK 1.4+ are required.
+To build the samples and execute the integration tests, type at the root project:
+
+# mvn -P equinox clean install
 
 This samples uses Apache Felix BND plugin (http://felix.apache.org/site/maven-bundle-plugin-bnd.html)
 which automatically generates the OSGi entries inside the MANIFEST.MF file. While the file

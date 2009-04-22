@@ -145,7 +145,7 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 				// on the fly test
 				else if (location.indexOf("onTheFly") > -1) {
 					logger.trace("Discovered on the fly test...");
-					List perms = getTestPermissions();
+					List<Permission> perms = getTestPermissions();
 
 					// define permission info
 					PermissionInfo[] pi = getPIFromPermissions(perms);
@@ -156,7 +156,7 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 				// logging bundle
 				else if (bnd.getSymbolicName().indexOf("log4j.osgi") > -1) {
 					logger.trace("Setting permissions on log4j bundle " + OsgiStringUtils.nullSafeNameAndSymName(bnd));
-					List perms = new ArrayList();
+					List<Permission> perms = new ArrayList<Permission>();
 					// defaults
 					perms.add(new AllPermission());
 					PermissionInfo[] defaultPerm = pa.getDefaultPermissions();
@@ -195,7 +195,6 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 
 	protected void preProcessBundleContext(BundleContext context) throws Exception {
 		super.preProcessBundleContext(context);
-		PermissionManager pm = new PermissionManager(context);
 
 		if (isCloverEnabled()) {
 			logger.warn("Test coverage instrumentation (Clover) enabled");
@@ -243,8 +242,8 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 	 * 
 	 * @return
 	 */
-	protected List getTestPermissions() {
-		List perms = new ArrayList();
+	protected List<Permission> getTestPermissions() {
+		List<Permission> perms = new ArrayList<Permission>();
 		perms.add(new PackagePermission("*", PackagePermission.EXPORT));
 		perms.add(new PackagePermission("*", PackagePermission.IMPORT));
 		perms.add(new BundlePermission("*", BundlePermission.HOST));
@@ -257,13 +256,13 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
 		perms.add(new ReflectPermission("*", "suppressAccessChecks"));
 		// logging permission
-		perms.add(new FilePermission("-", "WRITE"));
-		perms.add(new FilePermission("-", "READ"));
+		perms.add(new FilePermission("-", "write"));
+		perms.add(new FilePermission("-", "read"));
 		return perms;
 	}
 
-	protected List getIAndTPermissions() {
-		List perms = new ArrayList();
+	protected List<Permission> getIAndTPermissions() {
+		List<Permission> perms = new ArrayList<Permission>();
 		// export package
 		perms.add(new PackagePermission("*", PackagePermission.EXPORT));
 		perms.add(new PackagePermission("*", PackagePermission.IMPORT));
@@ -276,6 +275,10 @@ public abstract class BaseIntegrationTest extends AbstractConfigurableBundleCrea
 		// required by Spring
 		perms.add(new RuntimePermission("*", "accessDeclaredMembers"));
 		perms.add(new ReflectPermission("*", "suppressAccessChecks"));
+
+		// logging permission
+		perms.add(new FilePermission("-", "write"));
+		perms.add(new FilePermission("-", "read"));
 
 		return perms;
 	}
