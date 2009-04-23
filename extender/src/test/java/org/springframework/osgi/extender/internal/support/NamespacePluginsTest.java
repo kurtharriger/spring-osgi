@@ -48,7 +48,7 @@ public class NamespacePluginsTest extends TestCase {
 
 	public void testCanResolveNamespaceFromBundleAfterAddingPlugin() throws IOException, SAXException {
 		Bundle b = new MockBundle();
-		this.namespacePlugins.addHandler(b);
+		this.namespacePlugins.addPlugin(b, false);
 		NamespaceHandler handler = this.namespacePlugins.resolve("http://www.springframework.org/schema/testme");
 		assertNotNull("should find handler", handler);
 		assertTrue("should be TestHandler", handler instanceof TestHandler);
@@ -56,15 +56,15 @@ public class NamespacePluginsTest extends TestCase {
 
 	public void testCantResolveNamespaceAfterRemovingPlugin() throws IOException, SAXException {
 		Bundle b = new MockBundle();
-		this.namespacePlugins.addHandler(b);
-		this.namespacePlugins.removeHandler(b);
+		this.namespacePlugins.addPlugin(b, false);
+		this.namespacePlugins.removePlugin(b);
 		assertNull("Should be unable to resolve namespace",
 			this.namespacePlugins.resolve("http://www.springframework.org/schema/testme"));
 	}
 
 	public void testCanResolveEntityAfterAddingPlugin() throws IOException, SAXException {
 		Bundle b = new MockBundle();
-		this.namespacePlugins.addHandler(b);
+		this.namespacePlugins.addPlugin(b, false);
 		InputSource resolver = this.namespacePlugins.resolveEntity("public-id",
 			"http://www.springframework.org/schema/beans/testme.xsd");
 		assertNotNull("Should find resolver", resolver);
@@ -72,8 +72,8 @@ public class NamespacePluginsTest extends TestCase {
 
 	public void testCantResolveEntityAfterRemovingPlugin() throws IOException, SAXException {
 		Bundle b = new MockBundle();
-		this.namespacePlugins.addHandler(b);
-		this.namespacePlugins.removeHandler(b);
+		this.namespacePlugins.addPlugin(b, false);
+		this.namespacePlugins.removePlugin(b);
 		InputSource resolver = this.namespacePlugins.resolveEntity("public-id",
 			"http://www.springframework.org/schema/beans/testme.xsd");
 		assertNull("Should be unable to resolve entity", resolver);
