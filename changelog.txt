@@ -14,8 +14,16 @@ General
 Package org.springframework.osgi.context
 * improved serviceability by using NamedThreadLocal
 
+Package org.springframework.osgi.compendium
+* enhanced cm-properties to reflect Config Admin changes in the returned Properties object
+* added new custom destruction callback to managed service factory objects
+
 Package org.springframework.osgi.service
 * improved serviceability by using NamedInheritableThreadLocal
+* introduced support for dynamic service properties
+
+Package org.springframework.osgi.util
+* improved fallback mechanism for OSGi r4.1 features running in OSGi r4.0 platforms
 
 
 Changes in version 1.2.0 final (2009-04-09)

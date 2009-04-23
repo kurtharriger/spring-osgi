@@ -22,6 +22,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,15 +42,14 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.beans.factory.support.AbstractBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.osgi.compendium.internal.cm.ManagedFactoryDisposableInvoker.DestructionCodes;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.service.exporter.support.AutoExport;
 import org.springframework.osgi.service.exporter.support.ExportContextClassLoader;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
-import org.springframework.osgi.service.exporter.support.ServicePropertiesChangeEvent;
 import org.springframework.osgi.service.exporter.support.ServicePropertiesChangeListener;
 import org.springframework.osgi.service.importer.support.internal.collection.DynamicCollection;
 import org.springframework.osgi.util.OsgiServiceUtils;
@@ -116,6 +116,34 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		}
 	}
 
+	/**
+	 * Simple associating cache between types and disposable invoker.
+	 * 
+	 * @author Costin Leau
+	 */
+	private class DestructionInvokerCache {
+
+		private final String methodName;
+		final ConcurrentMap<Class<?>, ManagedFactoryDisposableInvoker> cache = new ConcurrentHashMap<Class<?>, ManagedFactoryDisposableInvoker>(
+			4);
+
+
+		DestructionInvokerCache(String methodName) {
+			this.methodName = methodName;
+		}
+
+		ManagedFactoryDisposableInvoker getInvoker(Class<?> type) {
+			ManagedFactoryDisposableInvoker invoker = cache.get(type);
+			// non-atomic check for the destruction invoker (duplicate invokers are okay)
+			if (invoker == null) {
+				invoker = new ManagedFactoryDisposableInvoker(type, methodName);
+				cache.put(type, invoker);
+			}
+			return invoker;
+		}
+
+	}
+
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(ManagedServiceFactoryFactoryBean.class);
@@ -127,11 +155,9 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	/** bundle context */
 	private BundleContext bundleContext;
 	/** embedded bean factory for instance management */
-	private AbstractBeanFactory beanFactory;
-	/** the bean factory seen as a bdr */
-	private BeanDefinitionRegistry definitionRegistry;
+	private DefaultListableBeanFactory beanFactory;
 	/** bean definition template */
-	private BeanDefinition templateDefinition;
+	private RootBeanDefinition templateDefinition;
 	/** owning bean factory - can be null */
 	private BeanFactory owningBeanFactory;
 	/** configuration watcher registration */
@@ -176,7 +202,8 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	private boolean destroyed = false;
 
 	private volatile Map serviceProperties;
-	private volatile ServicePropertiesChangeListener propertiesListener;
+	/** special destruction invoker for managed-components/template beans */
+	private volatile DestructionInvokerCache destructionInvokerFactory;
 
 
 	public void afterPropertiesSet() throws Exception {
@@ -190,13 +217,23 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 				"No service interface(s) specified and auto-export discovery disabled; change at least one of these properties");
 		}
 
-		// make sure the scope is singleton
-		templateDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
+		processTemplateDefinition();
 		createEmbeddedBeanFactory();
 
 		updateCallback = CMUtils.createCallback(updateStrategy, updateMethod, beanFactory);
 
 		registerService();
+	}
+
+	private void processTemplateDefinition() {
+		// make sure the scope is singleton
+		templateDefinition.setScope(BeanDefinition.SCOPE_SINGLETON);
+		// let the special invoker handle the destroy method
+		String destroyMethod = templateDefinition.getDestroyMethodName();
+		templateDefinition.setDestroyMethodName(null);
+		// prevent Spring for calling DiposableBean (it's already handled by the invoker)
+		templateDefinition.registerExternallyManagedDestroyMethod("destroy");
+		destructionInvokerFactory = new DestructionInvokerCache(destroyMethod);
 	}
 
 	public void destroy() throws Exception {
@@ -209,6 +246,9 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 			// destroy instances
 			destroyFactory();
 		}
+
+		destructionInvokerFactory.cache.clear();
+		destructionInvokerFactory = null;
 
 		synchronized (serviceRegistrations) {
 			serviceRegistrations.clear();
@@ -227,7 +267,6 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 			bf.addBeanPostProcessor(new InitialInjectionProcessor());
 
 			beanFactory = bf;
-			definitionRegistry = bf;
 		}
 	}
 
@@ -244,9 +283,16 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	// no monitor since the calling method already holds it
 	private void destroyFactory() {
 		if (beanFactory != null) {
-			beanFactory.destroySingletons();
+			// destroy singletons manually to prevent multiple calls of the destruction contract (DisposableBean)
+			// being called by both the factory and the special invoker
+			String[] singletonBeans = beanFactory.getSingletonNames();
+			for (String sigletonName : singletonBeans) {
+				Object singleton = beanFactory.getBean(sigletonName);
+				beanFactory.removeBeanDefinition(sigletonName);
+				ManagedFactoryDisposableInvoker invoker = destructionInvokerFactory.getInvoker(singleton.getClass());
+				invoker.destroy(sigletonName, singleton, DestructionCodes.BUNDLE_STOPPING);
+			}
 			beanFactory = null;
-			definitionRegistry = null;
 		}
 	}
 
@@ -269,10 +315,11 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 			if (destroyed)
 				return;
 
-			definitionRegistry.registerBeanDefinition(pid, templateDefinition);
+			beanFactory.registerBeanDefinition(pid, templateDefinition);
 			initialInjectionProperties = props;
 			// create instance
 			Object bean = beanFactory.getBean(pid);
+
 			registerService(pid, bean);
 		}
 	}
@@ -325,10 +372,13 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 			if (destroyed)
 				return;
 
-			if (definitionRegistry.containsBeanDefinition(pid)) {
+			if (beanFactory.containsBeanDefinition(pid)) {
 				unregisterService(pid);
+				Object singleton = beanFactory.getBean(pid);
 				// remove definition and instance
-				definitionRegistry.removeBeanDefinition(pid);
+				beanFactory.removeBeanDefinition(pid);
+				ManagedFactoryDisposableInvoker invoker = destructionInvokerFactory.getInvoker(singleton.getClass());
+				invoker.destroy(pid, singleton, DestructionCodes.CM_ENTRY_DELETED);
 			}
 		}
 	}
@@ -405,7 +455,8 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	 */
 	public void setTemplateDefinition(BeanDefinition[] templateDefinition) {
 		if (templateDefinition != null && templateDefinition.length > 0) {
-			this.templateDefinition = templateDefinition[0];
+			this.templateDefinition = new RootBeanDefinition();
+			this.templateDefinition.overrideFrom(templateDefinition[0]);
 		}
 		else {
 			this.templateDefinition = null;
