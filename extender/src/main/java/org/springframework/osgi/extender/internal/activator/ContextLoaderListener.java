@@ -19,11 +19,13 @@ package org.springframework.osgi.extender.internal.activator;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +38,6 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.core.CollectionFactory;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
@@ -47,6 +48,7 @@ import org.springframework.osgi.context.event.OsgiBundleApplicationContextListen
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
+import org.springframework.osgi.extender.OsgiBeanFactoryPostProcessor;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.BundleDependencyComparator;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ComparatorServiceDependencySorter;
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceDependencySorter;
@@ -67,17 +69,20 @@ import org.springframework.osgi.util.OsgiStringUtils;
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'.
  * 
- * <p/> The class listens to bundle events and manages the creation and
- * destruction of application contexts for bundles that have one or both of:
+ * <p/>
+ * The class listens to bundle events and manages the creation and destruction
+ * of application contexts for bundles that have one or both of:
  * <ul>
- * <li> A manifest header entry Spring-Context
- * <li> XML files in META-INF/spring folder
+ * <li>A manifest header entry Spring-Context
+ * <li>XML files in META-INF/spring folder
  * </ul>
  * 
- * <p/> The extender also discovers any Spring namespace/schema handlers in
- * resolved bundles and makes them available through a dedicated OSGi service.
+ * <p/>
+ * The extender also discovers any Spring namespace/schema handlers in resolved
+ * bundles and makes them available through a dedicated OSGi service.
  * 
- * <p/> The extender behaviour can be customized by attaching fragments to the
+ * <p/>
+ * The extender behaviour can be customized by attaching fragments to the
  * extender bundle. On startup, the extender will look for
  * <code>META-INF/spring/*.xml</code> files and merge them into an application
  * context. From the resulting context, the context will look for beans with
@@ -107,7 +112,8 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * </tr>
  * </table>
  * 
- * <p/> <code>extenderProperties</code> recognises the following properties:
+ * <p/>
+ * <code>extenderProperties</code> recognises the following properties:
  * 
  * <table border="1">
  * <tr>
@@ -118,8 +124,8 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * <tr>
  * <td><code>shutdown.wait.time</code></td>
  * <td>Number</td>
- * <td>The amount of time the extender will wait for each application context
- * to shutdown gracefully. Expressed in milliseconds.</td>
+ * <td>The amount of time the extender will wait for each application context to
+ * shutdown gracefully. Expressed in milliseconds.</td>
  * </tr>
  * <tr>
  * <td><code>process.annotations</code></td>
@@ -128,7 +134,8 @@ import org.springframework.osgi.util.OsgiStringUtils;
  * </tr>
  * </table>
  * 
- * <p/> Note: The extender configuration context is created during the bundle
+ * <p/>
+ * Note: The extender configuration context is created during the bundle
  * activation (a synchronous OSGi lifecycle callback) and should contain only
  * simple bean definitions that will not delay context initialisation.
  * </p>
@@ -282,7 +289,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * The contexts we are currently managing. Keys are bundle ids, values are
 	 * ServiceDependentOsgiApplicationContexts for the application context
 	 */
-	private final Map managedContexts;
+	private final Map<Long, ConfigurableOsgiBundleApplicationContext> managedContexts;
 
 	/** Task executor used for bootstraping the Spring contexts in async mode */
 	private TaskExecutor taskExecutor;
@@ -291,7 +298,7 @@ public class ContextLoaderListener implements BundleActivator {
 	private OsgiApplicationContextCreator contextCreator;
 
 	/** BFPP list */
-	private List postProcessors;
+	private List<OsgiBeanFactoryPostProcessor> postProcessors;
 
 	/**
 	 * Task executor which uses the same thread for running tasks. Used when
@@ -335,7 +342,7 @@ public class ContextLoaderListener implements BundleActivator {
 	private OsgiBundleApplicationContextEventMulticaster multicaster;
 
 	/** listeners interested in monitoring managed OSGi appCtxs */
-	private List applicationListeners;
+	private List<?> applicationListeners;
 
 	/** dynamicList clean up hook */
 	private DisposableBean applicationListenersCleaner;
@@ -346,17 +353,20 @@ public class ContextLoaderListener implements BundleActivator {
 
 	/** Required by the BundleActivator contract */
 	public ContextLoaderListener() {
-		this.managedContexts = CollectionFactory.createConcurrentMap(16);
+		this.managedContexts = new ConcurrentHashMap<Long, ConfigurableOsgiBundleApplicationContext>(16);
 	}
 
 	/**
-	 * <p/> Called by OSGi when this bundle is started. Finds all previously
-	 * resolved bundles and adds namespace handlers for them if necessary.
+	 * <p/>
+	 * Called by OSGi when this bundle is started. Finds all previously resolved
+	 * bundles and adds namespace handlers for them if necessary.
 	 * </p>
-	 * <p/> Creates application contexts for bundles started before the extender
-	 * was started.
+	 * <p/>
+	 * Creates application contexts for bundles started before the extender was
+	 * started.
 	 * </p>
-	 * <p/> Registers a namespace/entity resolving service for use by web app
+	 * <p/>
+	 * Registers a namespace/entity resolving service for use by web app
 	 * contexts.
 	 * </p>
 	 * 
@@ -369,7 +379,6 @@ public class ContextLoaderListener implements BundleActivator {
 
 		this.extenderVersion = OsgiBundleUtils.getBundleVersion(context.getBundle());
 		log.info("Starting [" + bundleContext.getBundle().getSymbolicName() + "] bundle v.[" + extenderVersion + "]");
-
 
 		// Step 1 : discover existing namespaces (in case there are fragments with custom XML definitions)
 		nsManager = new NamespaceManager(context);
@@ -504,8 +513,8 @@ public class ContextLoaderListener implements BundleActivator {
 		Bundle[] bundles = new Bundle[managedContexts.size()];
 
 		int i = 0;
-		for (Iterator it = managedContexts.values().iterator(); it.hasNext();) {
-			ConfigurableOsgiBundleApplicationContext context = (ConfigurableOsgiBundleApplicationContext) it.next();
+		for (Iterator<ConfigurableOsgiBundleApplicationContext> it = managedContexts.values().iterator(); it.hasNext();) {
+			ConfigurableOsgiBundleApplicationContext context = it.next();
 			bundles[i++] = context.getBundle();
 		}
 
@@ -520,7 +529,7 @@ public class ContextLoaderListener implements BundleActivator {
 			for (i = 0; i < bundles.length; i++) {
 				buffer.append("\nBundle [" + bundles[i].getSymbolicName() + "]");
 				ServiceReference[] services = bundles[i].getServicesInUse();
-				HashSet usedBundles = new HashSet();
+				Set<Bundle> usedBundles = new LinkedHashSet<Bundle>();
 				if (services != null) {
 					for (int j = 0; j < services.length; j++) {
 						if (BundleDependencyComparator.isSpringManagedService(services[j])) {
@@ -538,8 +547,8 @@ public class ContextLoaderListener implements BundleActivator {
 			log.debug(buffer);
 		}
 
-		final List taskList = new ArrayList(managedContexts.size());
-		final List closedContexts = Collections.synchronizedList(new ArrayList());
+		final List<Runnable> taskList = new ArrayList<Runnable>(managedContexts.size());
+		final List<ConfigurableOsgiBundleApplicationContext> closedContexts = Collections.synchronizedList(new ArrayList<ConfigurableOsgiBundleApplicationContext>());
 		final Object[] contextClosingDown = new Object[1];
 
 		for (i = 0; i < bundles.length; i++) {
@@ -645,7 +654,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 	/**
 	 * Utility method that does extender range versioning and approapriate
-
+	 * 
 	 * logging.
 	 * 
 	 * @param bundle
@@ -665,7 +674,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 	protected void maybeAddNamespaceHandlerFor(Bundle bundle) {
 		if (handlerBundleMatchesExtenderVersion(bundle))
-			nsManager.maybeAddNamespaceHandlerFor(bundle);
+			nsManager.maybeAddNamespaceHandlerFor(bundle, false);
 	}
 
 	protected void maybeRemoveNameSpaceHandlerFor(Bundle bundle) {
@@ -681,11 +690,13 @@ public class ContextLoaderListener implements BundleActivator {
 	 * Context creation is a potentially long-running activity (certainly more
 	 * than we want to do on the synchronous event callback).
 	 * 
-	 * <p/>Based on our configuration, the context can be started on the same
-	 * thread or on a different one.
+	 * <p/>
+	 * Based on our configuration, the context can be started on the same thread
+	 * or on a different one.
 	 * 
-	 * <p/> Kick off a background activity to create an application context for
-	 * the given bundle if needed.
+	 * <p/>
+	 * Kick off a background activity to create an application context for the
+	 * given bundle if needed.
 	 * 
 	 * <b>Note:</b> Make sure to do the fastest filtering first to avoid
 	 * slow-downs on platforms with a big number of plugins and wiring (i.e.
@@ -861,8 +872,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * @param bundle
 	 */
 	protected void maybeCloseApplicationContextFor(Bundle bundle) {
-		final ConfigurableOsgiBundleApplicationContext context = (ConfigurableOsgiBundleApplicationContext) managedContexts.remove(new Long(
-			bundle.getBundleId()));
+		final ConfigurableOsgiBundleApplicationContext context = (ConfigurableOsgiBundleApplicationContext) managedContexts.remove(Long.valueOf(bundle.getBundleId()));
 		if (context == null) {
 			return;
 		}
@@ -874,7 +884,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 			public void run() {
 				closeApplicationContext(context);
-				}
+			}
 
 			public String toString() {
 				return toString;
@@ -933,6 +943,6 @@ public class ContextLoaderListener implements BundleActivator {
 		fb.afterPropertiesSet();
 
 		applicationListenersCleaner = fb;
-		applicationListeners = (List) fb.getObject();
+		applicationListeners = (List<?>) fb.getObject();
 	}
 }

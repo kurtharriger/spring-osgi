@@ -32,7 +32,6 @@ import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.xml.sax.EntityResolver;
 
 /**
@@ -46,11 +45,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 
 	private static final Log log = LogFactory.getLog(NamespaceManager.class);
 
-	private static final String NS_HANDLER_RESOLVER_CLASS_NAME = NamespaceHandlerResolver.class.getName();
-
-	/**
-	 * The set of all namespace plugins known to the extender
-	 */
+	/** The set of all namespace plugins known to the extender */
 	private NamespacePlugins namespacePlugins;
 
 	/**
@@ -59,9 +54,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	 */
 	private ServiceRegistration nsResolverRegistration, enResolverRegistration = null;
 
-	/**
-	 * OSGi Environment.
-	 */
+	/** OSGi Environment */
 	private final BundleContext context;
 
 	private final String extenderInfo;
@@ -74,9 +67,9 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 
 
 	/**
-	 * Constructor.
+	 * Constructs a new <code>NamespaceManager</code> instance.
 	 * 
-	 * @param extenderBundleContext
+	 * @param context containing bundle context
 	 */
 	public NamespaceManager(BundleContext context) {
 		this.context = context;
@@ -89,41 +82,44 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	}
 
 	/**
-	 * If this bundle defines handler mapping or schema mapping resources, then
-	 * register it with the namespace plugin handler.
+	 * Registers the namespace plugin handler if this bundle defines handler
+	 * mapping or schema mapping resources.
 	 * 
-	 * <p/> This method considers only the bundle space and not the class space.
+	 * <p/>
+	 * This method considers only the bundle space and not the class space.
 	 * 
-	 * @param bundle
+	 * @param bundle target bundle
+	 * @param isLazyBundle indicator if the bundle analyzed is lazily activated
 	 */
-	public void maybeAddNamespaceHandlerFor(Bundle bundle) {
+	public void maybeAddNamespaceHandlerFor(Bundle bundle, boolean isLazyBundle) {
 		// Ignore system bundle
 		if (OsgiBundleUtils.isSystemBundle(bundle)) {
 			return;
 		}
 
-		// FIXME: temporary hack
+		boolean debug = log.isDebugEnabled();
+		// FIXME: RFC-124 big bundle temporary hack
 		// since embedded libraries are not discovered by findEntries and inlining them doesn't work
 		// (due to resource classes such as namespace handler definitions)
 		// we use getResource
 
 		boolean hasHandlers = false, hasSchemas = false;
-		// RFC 124 bundle
+		// extender/RFC 124 bundle
 		if (context.getBundle().equals(bundle)) {
 
 			try {
-				Enumeration handlers = bundle.getResources(META_INF + SPRING_HANDLERS);
-				Enumeration schemas = bundle.getResources(META_INF + SPRING_SCHEMAS);
+				Enumeration<?> handlers = bundle.getResources(META_INF + SPRING_HANDLERS);
+				Enumeration<?> schemas = bundle.getResources(META_INF + SPRING_SCHEMAS);
 
 				hasHandlers = handlers != null;
 				hasSchemas = schemas != null;
 
-				if (hasHandlers && log.isDebugEnabled()) {
-					log.debug("Found RFC 124 handlers: " + Collections.list(schemas));
+				if (hasHandlers && debug) {
+					log.debug("Found namespace handlers: " + Collections.list(schemas));
 				}
 			}
 			catch (IOException ioe) {
-				log.warn("Cannot discover RFC 124 own namespaces", ioe);
+				log.warn("Cannot discover own namespaces", ioe);
 			}
 		}
 		else {
@@ -133,70 +129,55 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 
 		// if the bundle defines handlers
 		if (hasHandlers) {
-			// check type compatibility between the bundle's and spring-extender's spring version
-			if (hasCompatibleNamespaceType(bundle)) {
-				addHandler(bundle);
+
+			if (debug)
+				log.debug("Adding as " + (isLazyBundle ? " lazy " : "") + "namespace handler resolver bundle "
+						+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
+
+			if (isLazyBundle) {
+				this.namespacePlugins.addPlugin(bundle, isLazyBundle);
 			}
 			else {
-				if (log.isDebugEnabled())
-					log.debug("Bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
-							+ "] declares namespace handlers but is not compatible with extender [" + extenderInfo
-							+ "]; ignoring...");
+				// check type compatibility between the bundle's and spring-extender's spring version
+				if (hasCompatibleNamespaceType(bundle)) {
+					this.namespacePlugins.addPlugin(bundle, isLazyBundle);
+				}
+				else {
+					if (debug)
+						log.debug("Bundle [" + OsgiStringUtils.nullSafeNameAndSymName(bundle)
+								+ "] declares namespace handlers but is not compatible with extender [" + extenderInfo
+								+ "]; ignoring...");
+				}
 			}
 		}
 		else {
 			// bundle declares only schemas, add it though the handlers might not be compatible...
+			// FIXME: check should not be performed for these bundles
 			if (hasSchemas)
-				addHandler(bundle);
+				this.namespacePlugins.addPlugin(bundle, isLazyBundle);
 		}
 	}
 
 	private boolean hasCompatibleNamespaceType(Bundle bundle) {
-		try {
-			Class<?> type = bundle.loadClass(NS_HANDLER_RESOLVER_CLASS_NAME);
-			return NamespaceHandlerResolver.class.equals(type);
-		}
-		catch (Throwable th) {
-			// if the interface is not wired, ignore the bundle
-			log.warn("Bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " cannot see class ["
-					+ NS_HANDLER_RESOLVER_CLASS_NAME + "]; ignoring its namespace handlers");
-
-			return false;
-		}
+		return namespacePlugins.isTypeCompatible(bundle);
 	}
 
 	/**
-	 * Add this bundle to those known to provide handler or schema mappings.
-	 * This method expects that the validity check (whatever that is) has been
-	 * already done.
+	 * Removes the target bundle from the set of those known to provide handler
+	 * or schema mappings.
 	 * 
-	 * @param bundle
-	 */
-	protected void addHandler(Bundle bundle) {
-		Assert.notNull(bundle);
-		if (log.isDebugEnabled()) {
-			log.debug("Adding namespace handler resolver for " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
-		}
-
-		this.namespacePlugins.addHandler(bundle);
-	}
-
-	/**
-	 * Remove this bundle from the set of those known to provide handler or
-	 * schema mappings.
-	 * 
-	 * @param bundle
+	 * @param bundle handler bundle
 	 */
 	public void maybeRemoveNameSpaceHandlerFor(Bundle bundle) {
 		Assert.notNull(bundle);
-		boolean removed = this.namespacePlugins.removeHandler(bundle);
+		boolean removed = this.namespacePlugins.removePlugin(bundle);
 		if (removed && log.isDebugEnabled()) {
 			log.debug("Removed namespace handler resolver for " + OsgiStringUtils.nullSafeNameAndSymName(bundle));
 		}
 	}
 
 	/**
-	 * Register the NamespacePlugins instance as an Osgi Resolver service
+	 * Registers the NamespacePlugins instance as an Osgi Resolver service
 	 */
 	private void registerResolverServices() {
 		if (log.isDebugEnabled()) {
@@ -212,7 +193,7 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 	}
 
 	/**
-	 * Unregister the NamespaceHandler and EntityResolver service
+	 * Unregisters the NamespaceHandler and EntityResolver service
 	 */
 	private void unregisterResolverService() {
 
@@ -228,9 +209,6 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 		this.enResolverRegistration = null;
 	}
 
-	/**
-	 * @return Returns the namespacePlugins.
-	 */
 	public NamespacePlugins getNamespacePlugins() {
 		return namespacePlugins;
 	}

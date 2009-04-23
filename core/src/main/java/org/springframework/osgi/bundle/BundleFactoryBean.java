@@ -43,30 +43,33 @@ import org.springframework.util.StringUtils;
 /**
  * {@link Bundle} installer.
  * 
- * <p/> This {@link FactoryBean} allows customers to use Spring to drive bundle
+ * <p/>
+ * This {@link FactoryBean} allows customers to use Spring to drive bundle
  * management. Bundles states can be modified using the <code>action</code>
  * (defaults to <em>start</em>) and <code>destroyAction</code> (not set by
  * default) parameters.
  * 
- * <p/> For example, to automatically install and start a bundle from the local
- * maven repository (assuming the bundle has been already retrieved), one can
- * use the following configuration:
+ * <p/>
+ * For example, to automatically install and start a bundle from the local maven
+ * repository (assuming the bundle has been already retrieved), one can use the
+ * following configuration:
  * 
- * <pre class="code">
- * &lt;osgi:bundle id=&quot;aBundle&quot; symbolic-name=&quot;org.company.bundles.a&quot;
- *  location=&quot;file:${localRepository}/org/company/bundles/a/${pom.version}/a-${pom.version}.jar&quot; 
- *  action=&quot;start&quot;/&gt;
- * </pre>
+ * <pre class="code"> &lt;osgi:bundle id=&quot;aBundle&quot;
+ * symbolic-name=&quot;org.company.bundles.a&quot;
+ * location=&quot;file:${localRepository
+ * }/org/company/bundles/a/${pom.version}/a-${pom.version}.jar&quot;
+ * action=&quot;start&quot;/&gt; </pre>
  * 
  * 
- * <p/><strong>Note:</strong> Pay attention when installing bundles
- * dynamically since classes can be loaded aggressively.
+ * <p/>
+ * <strong>Note:</strong> Pay attention when installing bundles dynamically
+ * since classes can be loaded aggressively.
  * 
  * @author Andy Piper
  * @author Costin Leau
  * @see BundleAction
  */
-public class BundleFactoryBean implements FactoryBean, BundleContextAware, InitializingBean, DisposableBean,
+public class BundleFactoryBean implements FactoryBean<Bundle>, BundleContextAware, InitializingBean, DisposableBean,
 		ResourceLoaderAware {
 
 	private static Log log = LogFactory.getLog(BundleFactoryBean.class);
@@ -98,7 +101,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 
 
 	// FactoryBean methods
-	public Class<?> getObjectType() {
+	public Class<? extends Bundle> getObjectType() {
 		return (bundle != null ? bundle.getClass() : Bundle.class);
 	}
 
@@ -106,7 +109,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 		return true;
 	}
 
-	public Object getObject() throws Exception {
+	public Bundle getObject() throws Exception {
 		return bundle;
 	}
 
@@ -367,7 +370,7 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	 * ClassLoader. The default is <code>false</code>.
 	 * 
 	 * @param pushBundleAsContextClassLoader true if the thread context class
-	 * loader will be set to the target bundle or false otherwise
+	 *        loader will be set to the target bundle or false otherwise
 	 */
 	public void setPushBundleAsContextClassLoader(boolean pushBundleAsContextClassLoader) {
 		this.pushBundleAsContextClassLoader = pushBundleAsContextClassLoader;
@@ -414,5 +417,4 @@ public class BundleFactoryBean implements FactoryBean, BundleContextAware, Initi
 	public void setBundle(Bundle bundle) {
 		this.bundle = bundle;
 	}
-
 }

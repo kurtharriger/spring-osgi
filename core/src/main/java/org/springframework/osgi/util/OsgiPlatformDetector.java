@@ -39,6 +39,19 @@ public abstract class OsgiPlatformDetector {
 
 	private static final String[] FELIX_LABELS = new String[] { "Apache Software Foundation", "Felix", "felix" };
 
+	private static final boolean isR41;
+
+	static {
+		boolean methodAvailable = false;
+		try {
+			methodAvailable = (Bundle.class.getMethod("start", new Class[] { int.class }) != null);
+		}
+		catch (Exception ex) {
+		}
+
+		isR41 = methodAvailable;
+	}
+
 
 	/**
 	 * Returns true if the given bundle context belongs to the Equinox platform.
@@ -56,7 +69,7 @@ public abstract class OsgiPlatformDetector {
 	 * 
 	 * @param bundleContext OSGi bundle context
 	 * @return true if the context indicates Knopflerfish platform, false
-	 * otherwise
+	 *         otherwise
 	 */
 	public static boolean isKnopflerfish(BundleContext bundleContext) {
 		return determinePlatform(bundleContext, KF_LABELS);
@@ -116,4 +129,13 @@ public abstract class OsgiPlatformDetector {
 		return "" + sysBundle.getHeaders().get(Constants.BUNDLE_VERSION);
 	}
 
+	/**
+	 * Determines if the current running platform implements OSGi Release 4.1
+	 * API or not.
+	 * 
+	 * @return if the running platform implements OSGi 4.1 API
+	 */
+	public static boolean isR41() {
+		return isR41;
+	}
 }
