@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ class CachingBundleClassLoaderFactory implements BundleClassLoaderFactory {
 	 * @return key generated for the given bundle
 	 */
 	private Object createKeyFor(Bundle bundle) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		// add the bundle id first
 		buffer.append(bundle.getBundleId());
 		// followed by its update time (in hex to reduce its length)

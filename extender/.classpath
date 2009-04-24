@@ -8,7 +8,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/osgi/osgi_R4_compendium/1.0/osgi_R4_compendium-1.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spring-osgi-mock"/>
 	<classpathentry kind="var" path="M2_REPO/easymock/easymock/1.2_Java1.3/easymock-1.2_Java1.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.4.3/org.eclipse.osgi-3.4.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.context/3.0.0.BUILD-SNAPSHOT/org.springframework.context-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.core/3.0.0.BUILD-SNAPSHOT/org.springframework.core-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="/SPRING_SRC"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.beans/3.0.0.BUILD-SNAPSHOT/org.springframework.beans-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/org.springframework.beans/3.0.0.BUILD-SNAPSHOT/org.springframework.beans-3.0.0.BUILD-SNAPSHOT-sources.jar"/>

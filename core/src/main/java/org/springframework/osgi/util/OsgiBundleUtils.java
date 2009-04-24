@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.osgi.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Dictionary;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -177,6 +178,35 @@ public abstract class OsgiBundleUtils {
 	public static boolean isBundleResolved(Bundle bundle) {
 		Assert.notNull(bundle, "bundle is required");
 		return (bundle.getState() >= Bundle.RESOLVED);
+	}
+
+	/**
+	 * Indicates if the given bundle is lazily activated or not. That is, the
+	 * bundle has a lazy activation policy and a STARTING state. Bundles that
+	 * have been lazily started but have been activated will return false.
+	 * 
+	 * <p/>
+	 * On OSGi R4.0 platforms, this method will always return false.
+	 * 
+	 * @param bundle OSGi bundle
+	 * @return true if the bundle is lazily activated, false otherwise.
+	 */
+	public static boolean isBundleLazyActivated(Bundle bundle) {
+		Assert.notNull(bundle, "bundle is required");
+
+		if (OsgiPlatformDetector.isR41()) {
+			if (bundle.getState() == Bundle.STARTING) {
+				Dictionary<Object, Object> headers = bundle.getHeaders();
+				if (headers != null) {
+					Object val = headers.get(Constants.BUNDLE_ACTIVATIONPOLICY);
+					if (val instanceof String) {
+						String value = ((String) val).trim();
+						return (value.startsWith(Constants.ACTIVATION_LAZY));
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	/**

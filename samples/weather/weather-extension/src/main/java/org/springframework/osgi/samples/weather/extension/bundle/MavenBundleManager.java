@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -331,7 +331,7 @@ class MavenBundleManager
 	 * @return
 	 */
 	private String getImportPackageHeader(Project project) {
-		StringBuffer imports = new StringBuffer();
+		StringBuilder imports = new StringBuilder();
 		for (Iterator iter = project.getImports().iterator(); iter.hasNext();) {
 			PackageSpecification packageImport = (PackageSpecification) iter.next();
 			if (imports.length() > 0) {
@@ -354,10 +354,10 @@ class MavenBundleManager
 	 * @throws IOException
 	 */
 	private String getExportPackageHeader(Project project) throws IOException {
-		StringBuffer exports;
+		StringBuilder exports;
 		URL jarPath = project.getJarPath(localRepository.toString());
 		if (!project.getExports().isEmpty()) {
-			exports = new StringBuffer();
+			exports = new StringBuilder();
 			for (Iterator iter = project.getExports().iterator(); iter.hasNext();) {
 				PackageSpecification packageExport = (PackageSpecification) iter.next();
 				if (exports.length() > 0) {
@@ -381,7 +381,7 @@ class MavenBundleManager
 	 * @return
 	 */
 	private String getRequireBundleHeaders(Project project) {
-		StringBuffer requireBundle = new StringBuffer();
+		StringBuilder requireBundle = new StringBuilder();
 		for (Iterator iterator = project.getDependencies().iterator(); iterator.hasNext();) {
 			Artifact dependency = (Artifact) iterator.next();
 			if (requireBundle.length() > 0) {
@@ -401,7 +401,7 @@ class MavenBundleManager
 	private static String coerceToOsgiVersion(String version) {
 		int partsFound = 0;
 		String[] versionParts = new String[]{"0", "0", "0"};
-		StringBuffer qualifier = new StringBuffer();
+		StringBuilder qualifier = new StringBuilder();
 		for (StringTokenizer stringTokenizer = new StringTokenizer(version, ".-"); stringTokenizer.hasMoreTokens();) {
 			String part = stringTokenizer.nextToken();
 			if (partsFound < 4) {
@@ -418,7 +418,7 @@ class MavenBundleManager
 			}
 		}
 
-		StringBuffer osgiVersion = new StringBuffer();
+		StringBuilder osgiVersion = new StringBuilder();
 		osgiVersion.append(versionParts[0]).append(".").append(versionParts[1]).append(".").append(versionParts[2]);
 		if (qualifier.length() > 0) {
 			osgiVersion.append(".").append(qualifier);
@@ -449,10 +449,10 @@ class MavenBundleManager
 	 * @return
 	 * @throws IOException
 	 */
-	private static StringBuffer createExportList(URL jarPath) throws IOException {
+	private static StringBuilder createExportList(URL jarPath) throws IOException {
 		Set packages = determinePackagesIncludedInJar(jarPath);
 
-		StringBuffer exports = new StringBuffer();
+		StringBuilder exports = new StringBuilder();
 		for (Iterator iterator = packages.iterator(); iterator.hasNext();) {
 			String packageName = (String) iterator.next();
 			if (exports.length() > 0) {

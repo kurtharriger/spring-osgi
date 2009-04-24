@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ public abstract class OsgiHeaderUtils {
 		// consider , as a delimiter only if a quote is not encountered
 		List tokens = new ArrayList(2);
 
-		StringBuffer token = new StringBuffer();
+		StringBuilder token = new StringBuilder();
 		boolean ignoreComma = false;
 		for (int stringIndex = 0; stringIndex < headerContent.length(); stringIndex++) {
 			char currentChar = headerContent.charAt(stringIndex);

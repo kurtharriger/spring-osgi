@@ -97,7 +97,7 @@ public class ApplicationContextConfiguration {
 		this.waitForDeps = ConfigUtils.getWaitForDependencies(headers);
 
 		// create toString
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		buf.append("AppCtxCfg [Bundle=");
 		buf.append(OsgiStringUtils.nullSafeSymbolicName(bundle));
 		buf.append("]isSpringBundle=");

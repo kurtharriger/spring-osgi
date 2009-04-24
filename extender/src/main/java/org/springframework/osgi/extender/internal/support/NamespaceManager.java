@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,17 +130,13 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 		// if the bundle defines handlers
 		if (hasHandlers) {
 
-			if (debug)
-				log.debug("Adding as " + (isLazyBundle ? " lazy " : "") + "namespace handler resolver bundle "
-						+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
-
 			if (isLazyBundle) {
-				this.namespacePlugins.addPlugin(bundle, isLazyBundle);
+				this.namespacePlugins.addPlugin(bundle, isLazyBundle, true);
 			}
 			else {
 				// check type compatibility between the bundle's and spring-extender's spring version
 				if (hasCompatibleNamespaceType(bundle)) {
-					this.namespacePlugins.addPlugin(bundle, isLazyBundle);
+					this.namespacePlugins.addPlugin(bundle, isLazyBundle, false);
 				}
 				else {
 					if (debug)
@@ -152,9 +148,8 @@ public class NamespaceManager implements InitializingBean, DisposableBean {
 		}
 		else {
 			// bundle declares only schemas, add it though the handlers might not be compatible...
-			// FIXME: check should not be performed for these bundles
 			if (hasSchemas)
-				this.namespacePlugins.addPlugin(bundle, isLazyBundle);
+				this.namespacePlugins.addPlugin(bundle, isLazyBundle, false);
 		}
 	}
 

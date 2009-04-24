@@ -59,7 +59,7 @@ public class ExtenderTest extends BaseIntegrationTest {
 		assertNull("Guinea pig has already been started",
 			System.getProperty("org.springframework.osgi.iandt.lifecycle.GuineaPig.close"));
 
-		StringBuffer filter = new StringBuffer();
+		StringBuilder filter = new StringBuilder();
 		filter.append("(&");
 		filter.append("(").append(Constants.OBJECTCLASS).append("=").append(ApplicationContext.class.getName()).append(
 			")");

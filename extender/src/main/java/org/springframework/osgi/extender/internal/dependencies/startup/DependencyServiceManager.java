@@ -321,7 +321,7 @@ public class DependencyServiceManager {
 	 */
 	protected String createDependencyFilter() {
 		boolean multiple = unsatisfiedDependencies.size() > 1;
-		StringBuffer sb = new StringBuffer(100 * unsatisfiedDependencies.size());
+		StringBuilder sb = new StringBuilder(100 * unsatisfiedDependencies.size());
 		if (multiple) {
 			sb.append("(|");
 		}

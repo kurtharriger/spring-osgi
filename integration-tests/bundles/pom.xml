@@ -62,19 +62,8 @@
     <module>extender.listener.bundle</module>
     <module>namespace.own.consumer.bundle</module>
     <module>web.bundles</module>
+    <module>jdk5</module>
   </modules>
-
-  <profiles>
-    <profile>
-      <id>jdk-1.5+</id>
-      <activation>
-        <jdk>!1.4</jdk>
-      </activation>
-      <modules>
-       <module>jdk5</module>
-	  </modules>
-   </profile>
-  </profiles>
 
  <build>
     <plugins>
