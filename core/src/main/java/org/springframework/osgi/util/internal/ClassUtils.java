@@ -27,11 +27,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.Bundle;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.core.CollectionFactory;
-import org.springframework.core.JdkVersion;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -45,12 +44,12 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class ClassUtils {
 
-	private static class ReadOnlySetFromMap implements Set {
+	private static class ReadOnlySetFromMap<E> implements Set<E> {
 
-		private final Set keys;
+		private final Set<E> keys;
 
 
-		public ReadOnlySetFromMap(Map lookupMap) {
+		public ReadOnlySetFromMap(Map<E, ?> lookupMap) {
 			keys = lookupMap.keySet();
 		}
 
@@ -58,7 +57,7 @@ public abstract class ClassUtils {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean addAll(Collection c) {
+		public boolean addAll(Collection<? extends E> c) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -70,7 +69,7 @@ public abstract class ClassUtils {
 			return keys.contains(o);
 		}
 
-		public boolean containsAll(Collection c) {
+		public boolean containsAll(Collection<?> c) {
 			return keys.containsAll(c);
 		}
 
@@ -78,7 +77,7 @@ public abstract class ClassUtils {
 			return keys.isEmpty();
 		}
 
-		public Iterator iterator() {
+		public Iterator<E> iterator() {
 			return keys.iterator();
 		}
 
@@ -86,11 +85,11 @@ public abstract class ClassUtils {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean removeAll(Collection c) {
+		public boolean removeAll(Collection<?> c) {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean retainAll(Collection c) {
+		public boolean retainAll(Collection<?> c) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -102,7 +101,7 @@ public abstract class ClassUtils {
 			return keys.toArray();
 		}
 
-		public Object[] toArray(Object[] array) {
+		public <T> T[] toArray(T[] array) {
 			return keys.toArray(array);
 		}
 
@@ -136,23 +135,17 @@ public abstract class ClassUtils {
 	 */
 	public static final int INCLUDE_ALL_CLASSES = INCLUDE_INTERFACES | INCLUDE_CLASS_HIERARCHY;
 
-	/** Whether the backport-concurrent library is present on the classpath */
-	// the CollectionFactory classloader is used since this creates the map
-	// internally
-	private static final boolean backportConcurrentAvailable = org.springframework.util.ClassUtils.isPresent(
-		"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap", CollectionFactory.class.getClassLoader());
-
 	/**
 	 * List of special class loaders, outside OSGi, that might be used by the
 	 * user through boot delegation. read-only.
 	 */
-	public static final List knownNonOsgiLoaders;
+	public static final List<ClassLoader> knownNonOsgiLoaders;
 
 	/**
 	 * Set of special class loaders, outside OSGi, that might be used by the
 	 * user through boot delegation. read-only.
 	 */
-	public static final Set knownNonOsgiLoadersSet;
+	public static final Set<ClassLoader> knownNonOsgiLoadersSet;
 
 	// add the known, non-OSGi class loaders
 	// note that the order is important
@@ -161,10 +154,10 @@ public abstract class ClassUtils {
 		// then get all its parents (normally the this should be fwk -> (*) -> app -> ext -> boot)
 		// where (*) represents some optional loaders for cases where the framework is embedded
 
-		final Map lookupMap = CollectionFactory.createConcurrentMap(8);
-		final List lookupList = Collections.synchronizedList(new ArrayList());
+		final Map<ClassLoader, Boolean> lookupMap = new ConcurrentHashMap<ClassLoader, Boolean>(8);
+		final List<ClassLoader> lookupList = Collections.synchronizedList(new ArrayList<ClassLoader>());
 
-		AccessController.doPrivileged(new PrivilegedAction() {
+		AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 			public Object run() {
 
@@ -181,15 +174,15 @@ public abstract class ClassUtils {
 
 		// wrap the fields as read-only collections
 		knownNonOsgiLoaders = Collections.unmodifiableList(lookupList);
-		knownNonOsgiLoadersSet = new ReadOnlySetFromMap(lookupMap);
+		knownNonOsgiLoadersSet = new ReadOnlySetFromMap<ClassLoader>(lookupMap);
 
 	}
 
 
 	public static ClassLoader getFwkClassLoader() {
-		return (ClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
+		return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
 
-			public Object run() {
+			public ClassLoader run() {
 				return Bundle.class.getClassLoader();
 			}
 		});
@@ -200,7 +193,8 @@ public abstract class ClassUtils {
 	 * 
 	 * @param classLoader non OSGi class loader
 	 */
-	private static void addNonOsgiClassLoader(ClassLoader classLoader, List list, Map map) {
+	private static void addNonOsgiClassLoader(ClassLoader classLoader, List<ClassLoader> list,
+			Map<ClassLoader, Boolean> map) {
 		while (classLoader != null) {
 			synchronized (list) {
 				if (!map.containsKey(classLoader)) {
@@ -277,7 +271,7 @@ public abstract class ClassUtils {
 
 		if (clazz != null && isModeValid(mode)) {
 
-			Set composingClasses = new LinkedHashSet();
+			Set<Class<?>> composingClasses = new LinkedHashSet<Class<?>>();
 			boolean includeClasses = includesMode(mode, INCLUDE_CLASS_HIERARCHY);
 			boolean includeInterfaces = includesMode(mode, INCLUDE_INTERFACES);
 
@@ -471,16 +465,6 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Check the present of appropriate concurrent collection in the classpath.
-	 * This means backport-concurrent on Java 1.4, or Java5+.
-	 * 
-	 * @return true if a ConcurrentHashMap is available on the classpath.
-	 */
-	public static boolean concurrentLibAvailable() {
-		return (backportConcurrentAvailable || JdkVersion.isAtLeastJava15());
-	}
-
-	/**
 	 * Determining if multiple classes(not interfaces) are specified, without
 	 * any relation to each other. Interfaces will simply be ignored.
 	 * 
@@ -529,7 +513,7 @@ public abstract class ClassUtils {
 		if (ObjectUtils.isEmpty(classes))
 			return new Class[0];
 
-		List clazz = new ArrayList(classes.length);
+		List<Class<?>> clazz = new ArrayList<Class<?>>(classes.length);
 		for (int i = 0; i < classes.length; i++) {
 			clazz.add(classes[i]);
 		}
@@ -546,10 +530,10 @@ public abstract class ClassUtils {
 		do {
 			dirty = false;
 			for (int i = 0; i < clazz.size(); i++) {
-				Class<?> currentClass = (Class) clazz.get(i);
+				Class<?> currentClass = clazz.get(i);
 				for (int j = 0; j < clazz.size(); j++) {
 					if (i != j) {
-						if (currentClass.isAssignableFrom((Class) clazz.get(j))) {
+						if (currentClass.isAssignableFrom(clazz.get(j))) {
 							clazz.remove(i);
 							i--;
 							dirty = true;
@@ -605,7 +589,7 @@ public abstract class ClassUtils {
 			return new Class[0];
 
 		Assert.notNull(classLoader, "classLoader is required");
-		Set classes = new LinkedHashSet(classNames.length);
+		Set<Class<?>> classes = new LinkedHashSet<Class<?>>(classNames.length);
 
 		for (int i = 0; i < classNames.length; i++) {
 			try {
@@ -633,7 +617,7 @@ public abstract class ClassUtils {
 		if (ObjectUtils.isEmpty(classes))
 			return new Class[0];
 
-		Set clazzes = new LinkedHashSet(classes.length);
+		Set<Class<?>> clazzes = new LinkedHashSet<Class<?>>(classes.length);
 
 		for (int i = 0; i < classes.length; i++) {
 			if ((modifier & classes[i].getModifiers()) == 0)

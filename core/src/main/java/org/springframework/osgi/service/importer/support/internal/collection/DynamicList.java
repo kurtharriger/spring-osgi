@@ -30,7 +30,7 @@ import java.util.RandomAccess;
  * @author Costin Leau
  * 
  */
-public class DynamicList<T> extends DynamicCollection<T> implements List<T>, RandomAccess {
+public class DynamicList<E> extends DynamicCollection<E> implements List<E>, RandomAccess {
 
 	/**
 	 * List iterator.
@@ -38,13 +38,13 @@ public class DynamicList<T> extends DynamicCollection<T> implements List<T>, Ran
 	 * @author Costin Leau
 	 * 
 	 */
-	private class DynamicListIterator extends DynamicIterator implements ListIterator<T> {
+	private class DynamicListIterator extends DynamicIterator implements ListIterator<E> {
 
 		/**
 		 * Similar to {@link DynamicIterator#tailGhost} in functionality but
 		 * representing the last seen object in the head of the collection.
 		 */
-		protected volatile T headGhost = null;
+		protected volatile E headGhost = null;
 
 		// flag used for enforcing the iterator consistency:
 		// null - do not enforce anything
@@ -67,7 +67,7 @@ public class DynamicList<T> extends DynamicCollection<T> implements List<T>, Ran
 			super.cursor = index;
 		}
 
-		public void add(T o) {
+		public void add(E o) {
 			removalAllowed = false;
 			synchronized (storage) {
 				synchronized (lock) {
@@ -103,12 +103,12 @@ public class DynamicList<T> extends DynamicCollection<T> implements List<T>, Ran
 			}
 		}
 
-		public T next() {
+		public E next() {
 			previousOperationCalled = true;
 			return super.next();
 		}
 
-		public T previous() {
+		public E previous() {
 			try {
 				removalAllowed = true;
 				previousOperationCalled = false;
@@ -159,7 +159,7 @@ public class DynamicList<T> extends DynamicCollection<T> implements List<T>, Ran
 			}
 		}
 
-		public void set(T o) {
+		public void set(E o) {
 			if (!removalAllowed)
 				throw new IllegalStateException();
 			synchronized (storage) {
@@ -202,7 +202,7 @@ public class DynamicList<T> extends DynamicCollection<T> implements List<T>, Ran
 		super();
 	}
 
-	public DynamicList(Collection<? extends T> c) {
+	public DynamicList(Collection<? extends E> c) {
 		super(c);
 	}
 
@@ -210,17 +210,17 @@ public class DynamicList<T> extends DynamicCollection<T> implements List<T>, Ran
 		super(size);
 	}
 
-	public void add(int index, T o) {
+	public void add(int index, E o) {
 		super.add(index, o);
 	}
 
-	public boolean addAll(int index, Collection<? extends T> c) {
+	public boolean addAll(int index, Collection<? extends E> c) {
 		synchronized (storage) {
 			return storage.addAll(index, c);
 		}
 	}
 
-	public T get(int index) {
+	public E get(int index) {
 		synchronized (storage) {
 			return storage.get(index);
 		}
@@ -238,7 +238,7 @@ public class DynamicList<T> extends DynamicCollection<T> implements List<T>, Ran
 		}
 	}
 
-	public ListIterator<T> listIterator() {
+	public ListIterator<E> listIterator() {
 		DynamicListIterator iter = new DynamicListIterator(0);
 
 		synchronized (iterators) {
@@ -248,15 +248,15 @@ public class DynamicList<T> extends DynamicCollection<T> implements List<T>, Ran
 		return iter;
 	}
 
-	public ListIterator<T> listIterator(int index) {
+	public ListIterator<E> listIterator(int index) {
 		return new DynamicListIterator(index);
 	}
 
-	public T remove(int index) {
+	public E remove(int index) {
 		return super.remove(index);
 	}
 
-	public T set(int index, T o) {
+	public E set(int index, E o) {
 		synchronized (storage) {
 			return storage.set(index, o);
 		}
@@ -264,7 +264,7 @@ public class DynamicList<T> extends DynamicCollection<T> implements List<T>, Ran
 
 	// TODO: test behavior to see if the returned list properly behaves under
 	// dynamic circumstances
-	public List<T> subList(int fromIndex, int toIndex) {
+	public List<E> subList(int fromIndex, int toIndex) {
 		synchronized (storage) {
 			return storage.subList(fromIndex, toIndex);
 		}

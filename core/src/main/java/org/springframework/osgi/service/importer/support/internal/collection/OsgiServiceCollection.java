@@ -51,9 +51,10 @@ import org.springframework.util.Assert;
  * storage is being shrunk/expanded. This collection is read-only - its content
  * is being retrieved dynamically from the OSGi platform.
  * 
- * <p/> This collection and its iterators are thread-safe. That is, multiple
- * threads can access the collection. However, since the collection is
- * read-only, it cannot be modified by the client.
+ * <p/>
+ * This collection and its iterators are thread-safe. That is, multiple threads
+ * can access the collection. However, since the collection is read-only, it
+ * cannot be modified by the client.
  * 
  * @see Collection
  * @author Costin Leau
@@ -77,7 +78,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				boolean collectionModified = false;
 
 				ProxyPlusCallback ppc = null;
-				Object proxy = null;
+				ImportedOsgiServiceProxy proxy = null;
 
 				// flag used for sending state events 
 				boolean shouldInformStateListeners = false;
@@ -154,8 +155,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 		private void notifySatisfiedStateListeners() {
 			synchronized (stateListeners) {
-				for (Iterator iterator = stateListeners.iterator(); iterator.hasNext();) {
-					ImporterStateListener stateListener = (ImporterStateListener) iterator.next();
+				for (ImporterStateListener stateListener : stateListeners) {
 					stateListener.importerSatisfied(eventSource, dependency);
 				}
 			}
@@ -163,8 +163,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 		private void notifyUnsatisfiedStateListeners() {
 			synchronized (stateListeners) {
-				for (Iterator iterator = stateListeners.iterator(); iterator.hasNext();) {
-					ImporterStateListener stateListener = (ImporterStateListener) iterator.next();
+				for (ImporterStateListener stateListener : stateListeners) {
 					stateListener.importerUnsatisfied(eventSource, dependency);
 				}
 			}
@@ -177,10 +176,10 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	 * @author Costin Leau
 	 * 
 	 */
-	protected class OsgiServiceIterator implements Iterator {
+	protected class OsgiServiceIterator implements Iterator<ImportedOsgiServiceProxy> {
 
 		// dynamic thread-safe iterator
-		private final Iterator iter = serviceProxies.iterator();
+		private final Iterator<ImportedOsgiServiceProxy> iter = serviceProxies.iterator();
 
 
 		public boolean hasNext() {
@@ -188,7 +187,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 			return iter.hasNext();
 		}
 
-		public Object next() {
+		public ImportedOsgiServiceProxy next() {
 			mandatoryServiceCheck();
 			return iter.next();
 		}
@@ -205,17 +204,13 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	private static final Log PUBLIC_LOGGER = LogFactory.getLog(OsgiServiceCollectionProxyFactoryBean.class);
 
 	// map of services
-	// the service id is used as key while the service proxy is used for
-	// values
-	// Map<ServiceId, ImporterProxy>
-	// 
 	// NOTE: this collection is protected by the 'serviceProxies' lock.
-	protected final Map servicesIdMap = new LinkedHashMap(8);
+	protected final Map<Long, ProxyPlusCallback> servicesIdMap = new LinkedHashMap<Long, ProxyPlusCallback>(8);
 
 	/**
 	 * The dynamic collection.
 	 */
-	protected DynamicCollection serviceProxies;
+	protected DynamicCollection<ImportedOsgiServiceProxy> serviceProxies;
 
 	private boolean serviceRequiredAtStartup = true;
 
@@ -234,7 +229,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	private final ServiceListener listener;
 
 	/** state listener */
-	private List stateListeners = Collections.EMPTY_LIST;
+	private List<ImporterStateListener> stateListeners = Collections.<ImporterStateListener> emptyList();
 
 	private final Object lock = new Object();
 
@@ -289,8 +284,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		OsgiListenerUtils.removeServiceListener(context, listener);
 
 		synchronized (serviceProxies) {
-			for (Iterator iterator = serviceProxies.iterator(); iterator.hasNext();) {
-				ImportedOsgiServiceProxy serviceProxy = (ImportedOsgiServiceProxy) iterator.next();
+			for (Iterator<ImportedOsgiServiceProxy> iterator = serviceProxies.iterator(); iterator.hasNext();) {
+				ImportedOsgiServiceProxy serviceProxy = iterator.next();
 				ServiceReference ref = serviceProxy.getServiceReference();
 
 				// get first the destruction callback
@@ -326,11 +321,11 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	}
 
 	/**
-	 * Create the dynamic storage used internally. The storage <strong>has</strong>
-	 * to be thread-safe.
+	 * Create the dynamic storage used internally. The storage
+	 * <strong>has</strong> to be thread-safe.
 	 */
-	protected DynamicCollection createInternalDynamicStorage() {
-		return new DynamicCollection();
+	protected DynamicCollection<ImportedOsgiServiceProxy> createInternalDynamicStorage() {
+		return new DynamicCollection<ImportedOsgiServiceProxy>();
 	}
 
 	private void invalidateProxy(ProxyPlusCallback ppc) {
@@ -345,7 +340,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		this.sourceName = name;
 	}
 
-	public Iterator iterator() {
+	public Iterator<ImportedOsgiServiceProxy> iterator() {
 		return new OsgiServiceIterator();
 	}
 
@@ -425,7 +420,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		this.serviceRequiredAtStartup = serviceRequiredAtStartup;
 	}
 
-	public void setStateListeners(List stateListeners) {
+	public void setStateListeners(List<ImporterStateListener> stateListeners) {
 		synchronized (lock) {
 			this.stateListeners = stateListeners;
 		}

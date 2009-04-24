@@ -29,22 +29,22 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public class DynamicSortedList<T> extends DynamicList<T> {
+public class DynamicSortedList<E> extends DynamicList<E> {
 
-	private final Comparator<? super T> comparator;
+	private final Comparator<? super E> comparator;
 
 
 	public DynamicSortedList() {
-		this((Comparator<? super T>) null);
+		this((Comparator<? super E>) null);
 	}
 
-	public DynamicSortedList(Comparator<? super T> c) {
+	public DynamicSortedList(Comparator<? super E> c) {
 		super();
 		this.comparator = c;
 
 	}
 
-	public DynamicSortedList(Collection<? extends T> c) {
+	public DynamicSortedList(Collection<? extends E> c) {
 		this.comparator = null;
 		addAll(c);
 	}
@@ -57,7 +57,7 @@ public class DynamicSortedList<T> extends DynamicList<T> {
 	// this is very similar but not identical from DynamicSortedSet
 	// the main difference is that duplicates are accepted
 	@SuppressWarnings("unchecked")
-	public boolean add(T o) {
+	public boolean add(E o) {
 		Assert.notNull(o);
 
 		if (comparator == null && !(o instanceof Comparable))
@@ -78,10 +78,10 @@ public class DynamicSortedList<T> extends DynamicList<T> {
 				while (index + 1 < storage.size() && stillEqual) {
 
 					stillEqual = false;
-					T next = storage.get(index + 1);
+					E next = storage.get(index + 1);
 
 					if ((comparator != null ? comparator.compare(o, next) == 0
-							: ((Comparable<T>) o).compareTo(next) == 0)) {
+							: ((Comparable<E>) o).compareTo(next) == 0)) {
 						stillEqual = true;
 						index++;
 					}
@@ -104,15 +104,15 @@ public class DynamicSortedList<T> extends DynamicList<T> {
 	// DISABLED OPERATIONS
 	// 
 
-	public void add(int index, T o) {
+	public void add(int index, E o) {
 		throw new UnsupportedOperationException("This is a sorted list; it is illegal to specify the element position");
 	}
 
-	public boolean addAll(int index, Collection<? extends T> c) {
+	public boolean addAll(int index, Collection<? extends E> c) {
 		throw new UnsupportedOperationException("This is a sorted list; it is illegal to specify the element position");
 	}
 
-	public T set(int index, T o) {
+	public E set(int index, E o) {
 		throw new UnsupportedOperationException("This is a sorted list; it is illegal to specify the element position");
 	}
 }
