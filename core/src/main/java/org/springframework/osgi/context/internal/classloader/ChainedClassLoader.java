@@ -31,14 +31,16 @@ import org.springframework.util.Assert;
  * Chaining class loader implementation that delegates the resource and class
  * loading to a number of class loaders passed in.
  * 
- * <p/> This class loader parent (by default the AppClassLoader) can be
- * specified and will be added automatically as the last entry in the list.
+ * <p/>
+ * This class loader parent (by default the AppClassLoader) can be specified and
+ * will be added automatically as the last entry in the list.
  * 
- * <p/> Additionally, the class space of this class loader can be extended at
- * runtime (by allowing more class loaders to be added).
+ * <p/>
+ * Additionally, the class space of this class loader can be extended at runtime
+ * (by allowing more class loaders to be added).
  * 
- * <strong>Note:</strong>non-OSGi class loaders are considered as special
- * cases. As there are classes that are loaded by the Boot, Ext, App and Fwk
+ * <strong>Note:</strong>non-OSGi class loaders are considered as special cases.
+ * As there are classes that are loaded by the Boot, Ext, App and Fwk
  * ClassLoaders through boot delegation, this implementation tries to identify
  * them and place them last in the chain. Otherwise, these loaders can pull in
  * classes from outside OSGi causing {@link ClassCastException}s.
@@ -99,9 +101,9 @@ public class ChainedClassLoader extends ClassLoader {
 
 	public URL getResource(final String name) {
 		if (System.getSecurityManager() != null) {
-			return (URL) AccessController.doPrivileged(new PrivilegedAction() {
+			return AccessController.doPrivileged(new PrivilegedAction<URL>() {
 
-				public Object run() {
+				public URL run() {
 					return doGetResource(name);
 				}
 			});
@@ -145,9 +147,9 @@ public class ChainedClassLoader extends ClassLoader {
 
 		if (System.getSecurityManager() != null) {
 			try {
-				return (Class) AccessController.doPrivileged(new PrivilegedExceptionAction() {
+				return AccessController.doPrivileged(new PrivilegedExceptionAction<Class<?>>() {
 
-					public Object run() throws Exception {
+					public Class<?> run() throws Exception {
 						return doLoadClass(name);
 					}
 				});
@@ -211,9 +213,9 @@ public class ChainedClassLoader extends ClassLoader {
 	 */
 	public void addClassLoader(final Class<?> clazz) {
 		Assert.notNull(clazz, "a non-null class required");
-		addClassLoader((ClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
+		addClassLoader(AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
 
-			public Object run() {
+			public ClassLoader run() {
 				return ClassUtils.getClassLoader(clazz);
 			}
 		}));

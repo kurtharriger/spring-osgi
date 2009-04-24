@@ -28,18 +28,13 @@ import org.springframework.osgi.util.BundleDelegatingClassLoader;
  * Default implementation for {@link BundleClassLoaderFactory}.
  * 
  * @author Costin Leau
- * 
  */
 class CachingBundleClassLoaderFactory implements BundleClassLoaderFactory {
 
 	private static final String DELIMITER = "|";
-	/**
-	 * bundleToClassLoader cache
-	 * 
-	 * since a bundle can be refreshed, the map will return a map of class
-	 * loaders
-	 */
-	private final Map cache = new WeakHashMap();
+
+	/** bundle -> map of class loaders (as a bundle can be refreshed) */
+	private final Map<Bundle, Map<Object, WeakReference<ClassLoader>>> cache = new WeakHashMap<Bundle, Map<Object, WeakReference<ClassLoader>>>();
 
 
 	public ClassLoader createClassLoader(Bundle bundle) {
@@ -47,26 +42,26 @@ class CachingBundleClassLoaderFactory implements BundleClassLoaderFactory {
 		// create a bundle identity object
 		Object key = createKeyFor(bundle);
 
-		Map loaders = null;
+		Map<Object, WeakReference<ClassLoader>> loaders = null;
 		// get associated class loaders (if any)
 		synchronized (cache) {
-			loaders = (Map) cache.get(bundle);
+			loaders = cache.get(bundle);
 			if (loaders == null) {
-				loaders = new HashMap(4);
+				loaders = new HashMap<Object, WeakReference<ClassLoader>>(4);
 				loader = createBundleClassLoader(bundle);
-				loaders.put(key, new WeakReference(loader));
+				loaders.put(key, new WeakReference<ClassLoader>(loader));
 				return loader;
 			}
 		}
 		// check the associated loaders
 		synchronized (loaders) {
-			WeakReference reference = (WeakReference) loaders.get(key);
+			WeakReference<ClassLoader> reference = loaders.get(key);
 			if (reference != null)
 				loader = (ClassLoader) reference.get();
 			// loader not found (or already recycled)
 			if (loader == null) {
 				loader = createBundleClassLoader(bundle);
-				loaders.put(key, new WeakReference(loader));
+				loaders.put(key, new WeakReference<ClassLoader>(loader));
 			}
 			return loader;
 		}

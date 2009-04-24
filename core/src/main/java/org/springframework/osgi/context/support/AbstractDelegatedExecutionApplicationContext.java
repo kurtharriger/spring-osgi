@@ -45,7 +45,6 @@ import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.osgi.util.internal.PrivilegedUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -245,11 +244,6 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 	}
 
 	public void startRefresh() {
-
-		// check concurrent collection (which are mandatory)
-		if (!ClassUtils.concurrentLibAvailable())
-			throw new IllegalStateException(
-				"JVM 5+ or backport-concurrent library (for JVM 1.4) required; see the FAQ for more details");
 
 		try {
 			PrivilegedUtils.executeWithCustomTCCL(contextClassLoaderProvider().getContextClassLoader(),

@@ -28,13 +28,13 @@ import java.util.Set;
  * @author Costin Leau
  * 
  */
-public class DynamicSet extends DynamicCollection implements Set {
+public class DynamicSet<E> extends DynamicCollection<E> implements Set<E> {
 
 	public DynamicSet() {
 		super();
 	}
 
-	public DynamicSet(Collection c) {
+	public DynamicSet(Collection<? extends E> c) {
 		super(c);
 	}
 
@@ -42,7 +42,7 @@ public class DynamicSet extends DynamicCollection implements Set {
 		super(size);
 	}
 
-	public boolean add(Object o) {
+	public boolean add(E o) {
 		synchronized (storage) {
 			if (storage.contains(o))
 				return false;
@@ -51,12 +51,12 @@ public class DynamicSet extends DynamicCollection implements Set {
 		return true;
 	}
 
-	public boolean addAll(Collection c) {
+	public boolean addAll(Collection<? extends E> c) {
 		if (c == null)
 			throw new NullPointerException();
 		boolean result = false;
 		synchronized (storage) {
-			for (Iterator iter = c.iterator(); iter.hasNext();) {
+			for (Iterator<? extends E> iter = c.iterator(); iter.hasNext();) {
 				result |= add(iter.next());
 			}
 		}

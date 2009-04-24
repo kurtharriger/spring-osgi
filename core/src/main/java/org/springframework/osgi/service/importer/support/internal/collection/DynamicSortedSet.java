@@ -31,16 +31,16 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * 
  */
-public class DynamicSortedSet extends DynamicSet implements SortedSet {
+public class DynamicSortedSet<E> extends DynamicSet<E> implements SortedSet<E> {
 
-	private final Comparator comparator;
+	private final Comparator<? super E> comparator;
 
 
 	public DynamicSortedSet() {
-		this((Comparator) null);
+		this((Comparator<? super E>) null);
 	}
 
-	public DynamicSortedSet(Collection c) {
+	public DynamicSortedSet(Collection<? extends E> c) {
 		comparator = null;
 		addAll(c);
 	}
@@ -50,21 +50,21 @@ public class DynamicSortedSet extends DynamicSet implements SortedSet {
 		comparator = null;
 	}
 
-	public DynamicSortedSet(SortedSet ss) {
+	public DynamicSortedSet(SortedSet<E> ss) {
 		this.comparator = ss.comparator();
 		addAll(ss);
 	}
 
-	public DynamicSortedSet(Comparator c) {
+	public DynamicSortedSet(Comparator<? super E> c) {
 		this.comparator = c;
 
 	}
 
-	public Comparator comparator() {
+	public Comparator<? super E> comparator() {
 		return comparator;
 	}
 
-	public boolean add(Object o) {
+	public boolean add(E o) {
 		Assert.notNull(o);
 
 		if (comparator == null && !(o instanceof Comparable))
@@ -93,7 +93,7 @@ public class DynamicSortedSet extends DynamicSet implements SortedSet {
 		return super.remove(o);
 	}
 
-	public Object first() {
+	public E first() {
 		synchronized (storage) {
 			if (storage.isEmpty())
 				throw new NoSuchElementException();
@@ -102,11 +102,11 @@ public class DynamicSortedSet extends DynamicSet implements SortedSet {
 		}
 	}
 
-	public SortedSet headSet(Object toElement) {
+	public SortedSet<E> headSet(Object toElement) {
 		throw new UnsupportedOperationException();
 	}
 
-	public Object last() {
+	public E last() {
 		synchronized (storage) {
 			if (storage.isEmpty())
 				throw new NoSuchElementException();
@@ -115,11 +115,11 @@ public class DynamicSortedSet extends DynamicSet implements SortedSet {
 		}
 	}
 
-	public SortedSet subSet(Object fromElement, Object toElement) {
+	public SortedSet<E> subSet(Object fromElement, Object toElement) {
 		throw new UnsupportedOperationException();
 	}
 
-	public SortedSet tailSet(Object fromElement) {
+	public SortedSet<E> tailSet(Object fromElement) {
 		throw new UnsupportedOperationException();
 	}
 }

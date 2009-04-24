@@ -67,13 +67,13 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	 * 
 	 * @param bundle bundle used for class loading and resource acquisition
 	 * @param bridge class loader used as fall back in case the bundle cannot
-	 * load a class or find a resource. Can be <code>null</code>
+	 *        load a class or find a resource. Can be <code>null</code>
 	 * @return class loader adapter over the given bundle and class loader
 	 */
 	public static BundleDelegatingClassLoader createBundleClassLoaderFor(final Bundle bundle, final ClassLoader bridge) {
-		return (BundleDelegatingClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
+		return AccessController.doPrivileged(new PrivilegedAction<BundleDelegatingClassLoader>() {
 
-			public Object run() {
+			public BundleDelegatingClassLoader run() {
 				return new BundleDelegatingClassLoader(bundle, bridge);
 			}
 		});
@@ -128,13 +128,14 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 		return url;
 	}
 
-	protected Enumeration findResources(String name) throws IOException {
+	@SuppressWarnings("unchecked")
+	protected Enumeration<URL> findResources(String name) throws IOException {
 		boolean trace = log.isTraceEnabled();
 
 		if (trace)
 			log.trace("Looking for resources " + name);
 
-		Enumeration enm = this.backingBundle.getResources(name);
+		Enumeration<URL> enm = this.backingBundle.getResources(name);
 
 		if (trace && enm != null && enm.hasMoreElements())
 			log.trace("Found resource " + name + " at " + this.backingBundle.getLocation());
@@ -179,5 +180,4 @@ public class BundleDelegatingClassLoader extends ClassLoader {
 	public Bundle getBundle() {
 		return backingBundle;
 	}
-
 }
