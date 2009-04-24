@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public abstract class OsgiUtils {
 		String version = (String) bundle.getHeaders().get(Constants.BUNDLE_VERSION);
 		String symName = bundle.getSymbolicName();
 
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		buf.append(name);
 		buf.append(" ");
 		buf.append(symName);

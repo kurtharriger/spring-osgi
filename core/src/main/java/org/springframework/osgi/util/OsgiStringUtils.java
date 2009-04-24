@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  * 
  */
+@SuppressWarnings("unchecked")
 public abstract class OsgiStringUtils {
 
 	/** Constant over the Bundle events */
@@ -103,7 +104,8 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Returns a String representation for the given <code>FrameworkEvent</code>.
+	 * Returns a String representation for the given <code>FrameworkEvent</code>
+	 * .
 	 * 
 	 * @param event OSGi <code>FrameworkEvent</code> (can be <code>null</code>)
 	 * @return String representation of the given event
@@ -130,7 +132,7 @@ public abstract class OsgiStringUtils {
 		if (reference == null)
 			return NULL_STRING;
 
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		Bundle owningBundle = reference.getBundle();
 
 		buf.append("ServiceReference [").append(OsgiStringUtils.nullSafeSymbolicName(owningBundle)).append("] ");
@@ -192,8 +194,7 @@ public abstract class OsgiStringUtils {
 	}
 
 	/**
-	 * Returns the name of the given <code>Bundle</code> in a null-safe
-	 * manner.
+	 * Returns the name of the given <code>Bundle</code> in a null-safe manner.
 	 * 
 	 * @param bundle OSGi bundle (can be <code>null</code>)
 	 * @return bundle name
@@ -229,7 +230,7 @@ public abstract class OsgiStringUtils {
 		if (dict == null)
 			return NULL_STRING;
 
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		String name = (String) dict.get(org.osgi.framework.Constants.BUNDLE_NAME);
 		if (name == null)
 			buf.append(NULL_STRING);
@@ -247,5 +248,4 @@ public abstract class OsgiStringUtils {
 
 		return buf.toString();
 	}
-
 }

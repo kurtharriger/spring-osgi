@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ public class WarLoaderListener implements BundleActivator {
 				if (localConfig.shouldUndeployWarsAtShutdown()) {
 
 					final List bundles = new ArrayList(bundlesToDeployments.keySet());
-					StringBuffer bundlesToString = new StringBuffer("\n");
+					StringBuilder bundlesToString = new StringBuilder("\n");
 					for (Iterator iterator = bundles.iterator(); iterator.hasNext();) {
 						Bundle bundle = (Bundle) iterator.next();
 						bundlesToString.append("[ ");

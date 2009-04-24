@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -286,7 +286,7 @@ public abstract class AbstractOsgiTests extends AbstractOptionalDependencyInject
 	 * 
 	 */
 	private void logPlatformInfo(BundleContext context) {
-		StringBuffer platformInfo = new StringBuffer();
+		StringBuilder platformInfo = new StringBuilder();
 
 		// add platform information
 		platformInfo.append(osgiPlatform);

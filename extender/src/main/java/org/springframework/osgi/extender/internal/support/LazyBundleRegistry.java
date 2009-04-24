@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package org.springframework.osgi.extender.internal.support;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -104,9 +106,7 @@ class LazyBundleRegistry<T> {
 	/** active, valid bundles */
 	private final ConcurrentMap<Bundle, T> activeBundles = new ConcurrentHashMap<Bundle, T>(8);
 	/** lazy bundles (potentially invalid) */
-	private final ConcurrentMap<Bundle, Object> lazyBundles = new ConcurrentHashMap<Bundle, Object>(8);
-	/** dummy value for concurrent hash maps */
-	private static final Object VALUE = new Object();
+	private final ConcurrentMap<Bundle, Boolean> lazyBundles = new ConcurrentHashMap<Bundle, Boolean>(8);
 
 	/**
 	 * Queue of bundles that have been activated and validated and should be
@@ -128,9 +128,9 @@ class LazyBundleRegistry<T> {
 		this.log = log;
 	}
 
-	void add(Bundle bundle, boolean isLazy) {
+	void add(Bundle bundle, boolean isLazy, boolean applyCondition) {
 		if (isLazy) {
-			lazyBundles.put(bundle, VALUE);
+			lazyBundles.put(bundle, Boolean.valueOf(applyCondition));
 		}
 		else {
 			activeBundles.put(bundle, activator.activate(bundle));
@@ -177,20 +177,22 @@ class LazyBundleRegistry<T> {
 			}
 
 			// nothing found, look into lazy bundles 
-			for (Iterator<Bundle> i = lazyBundles.keySet().iterator(); i.hasNext();) {
-				Bundle bundle = i.next();
+			for (Iterator<Map.Entry<Bundle, Boolean>> i = lazyBundles.entrySet().iterator(); i.hasNext();) {
+				Entry<Bundle, Boolean> entry = i.next();
+				Bundle bundle = entry.getKey();
+				Boolean applyCondition = entry.getValue();
 
-				if (condition.pass(bundle)) {
-					// promote bundles
+				if (Boolean.FALSE.equals(applyCondition)
+						|| (Boolean.TRUE.equals(applyCondition) && condition.pass(bundle))) {
+					// promote bundle
 					T result = activeBundles.putIfAbsent(bundle, activator.activate(bundle));
 					if (result == null) {
+						result = activeBundles.get(bundle);
 						synchronized (promotionQueue) {
 							promotionQueue.add(bundle);
 						}
 					}
-					else {
-						result = activeBundles.get(bundle);
-					}
+					
 					if (result != null) {
 						V value = action.operate(result);
 						if (value != null) {

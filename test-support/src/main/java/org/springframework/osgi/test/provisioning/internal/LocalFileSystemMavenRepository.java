@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,7 +182,7 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 				catch (IllegalStateException illStateEx) {
 					Resource localMavenBundle = localMavenBundle(groupId, artifactId, version, type);
 					if (log.isDebugEnabled()) {
-						StringBuffer buf = new StringBuffer();
+						StringBuilder buf = new StringBuilder();
 						buf.append("[");
 						buf.append(groupId);
 						buf.append("|");
@@ -209,7 +209,7 @@ public class LocalFileSystemMavenRepository implements ArtifactLocator {
 	 * @return
 	 */
 	protected Resource localMavenBundle(String groupId, String artifact, String version, String type) {
-		StringBuffer location = new StringBuffer(groupId.replace('.', SLASH_CHAR));
+		StringBuilder location = new StringBuilder(groupId.replace('.', SLASH_CHAR));
 		location.append(SLASH_CHAR);
 		location.append(artifact);
 		location.append(SLASH_CHAR);

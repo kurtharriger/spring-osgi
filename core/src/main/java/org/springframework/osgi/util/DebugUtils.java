@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ public abstract class DebugUtils {
 			debugClassLoading(bundle, className, null);
 
 			if (!ObjectUtils.isEmpty(classes) && log.isDebugEnabled()) {
-				StringBuffer message = new StringBuffer();
+				StringBuilder message = new StringBuilder();
 
 				// Check out all the classes.
 				for (int i = 0; i < classes.length; i++) {
@@ -414,7 +414,7 @@ public abstract class DebugUtils {
 		// spit the statement into packages but consider "
 		List pkgs = new ArrayList(2);
 
-		StringBuffer pkg = new StringBuffer();
+		StringBuilder pkg = new StringBuilder();
 		boolean ignoreComma = false;
 		for (int stringIndex = 0; stringIndex < stmt.length(); stringIndex++) {
 			char currentChar = stmt.charAt(stringIndex);
@@ -424,7 +424,7 @@ public abstract class DebugUtils {
 				}
 				else {
 					pkgs.add(pkg.toString());
-					pkg = new StringBuffer();
+					pkg = new StringBuilder();
 					ignoreComma = false;
 				}
 			}

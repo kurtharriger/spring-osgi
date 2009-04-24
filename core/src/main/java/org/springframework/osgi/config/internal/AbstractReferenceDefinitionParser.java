@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		AbstractBeanDefinition def = builder.getBeanDefinition();
 
 		if (parserContext.isNested()) {
-			StringBuffer id = new StringBuffer();
+			StringBuilder id = new StringBuilder();
 			String value = element.getAttribute(AbstractBeanDefinitionParser.ID_ATTRIBUTE);
 			if (StringUtils.hasText(value)) {
 				id.append(value);

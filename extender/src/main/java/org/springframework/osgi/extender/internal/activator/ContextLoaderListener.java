@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
@@ -156,6 +157,30 @@ public class ContextLoaderListener implements BundleActivator {
 	private abstract class BaseListener implements SynchronousBundleListener {
 
 		/**
+		 * common cache used for tracking down bundles started lazily so they
+		 * don't get processed twice (once when started lazy, once when started
+		 * fully)
+		 */
+		protected Map<Bundle, Object> lazyBundleCache = new WeakHashMap<Bundle, Object>();
+		/** dummy value for the bundle cache */
+		private final Object VALUE = new Object();
+
+
+		// caches the bundle
+		protected void push(Bundle bundle) {
+			synchronized (lazyBundleCache) {
+				lazyBundleCache.put(bundle, VALUE);
+			}
+		}
+
+		// checks the presence of the bundle as well as removing it
+		protected boolean pop(Bundle bundle) {
+			synchronized (lazyBundleCache) {
+				return (lazyBundleCache.remove(bundle) != null);
+			}
+		}
+
+		/**
 		 * A bundle has been started, stopped, resolved, or unresolved. This
 		 * method is a synchronous callback, do not do any long-running work in
 		 * this thread.
@@ -167,15 +192,13 @@ public class ContextLoaderListener implements BundleActivator {
 			boolean trace = log.isTraceEnabled();
 
 			// check if the listener is still alive
-			synchronized (monitor) {
-				if (isClosed) {
-					if (trace)
-						log.trace("Listener is closed; events are being ignored");
-					return;
-				}
+			if (isClosed) {
+				if (trace)
+					log.trace("Listener is closed; events are being ignored");
+				return;
 			}
 			if (trace) {
-				log.debug("Processing bundle event [" + OsgiStringUtils.nullSafeToString(event) + "] for bundle ["
+				log.trace("Processing bundle event [" + OsgiStringUtils.nullSafeToString(event) + "] for bundle ["
 						+ OsgiStringUtils.nullSafeSymbolicName(event.getBundle()) + "]");
 			}
 			try {
@@ -206,11 +229,18 @@ public class ContextLoaderListener implements BundleActivator {
 			Bundle bundle = event.getBundle();
 
 			switch (event.getType()) {
+				case BundleEvent.LAZY_ACTIVATION: {
+					push(bundle);
+					maybeAddNamespaceHandlerFor(bundle, true);
+				}
 				case BundleEvent.STARTED: {
-					maybeAddNamespaceHandlerFor(bundle);
+					if (!pop(bundle)) {
+						maybeAddNamespaceHandlerFor(bundle, false);
+					}
 					break;
 				}
 				case BundleEvent.STOPPED: {
+					pop(bundle);
 					maybeRemoveNameSpaceHandlerFor(bundle);
 					break;
 				}
@@ -334,7 +364,7 @@ public class ContextLoaderListener implements BundleActivator {
 	 * flag indicating whether the context is down or not - useful during
 	 * shutdown
 	 */
-	private boolean isClosed = false;
+	private volatile boolean isClosed = false;
 
 	/** This extender version */
 	private Version extenderVersion;
@@ -384,22 +414,6 @@ public class ContextLoaderListener implements BundleActivator {
 		nsManager = new NamespaceManager(context);
 		initNamespaceHandlers(bundleContext);
 
-		// register listener first to make sure any bundles in INSTALLED state
-		// are not lost
-		nsListener = new NamespaceBundleLister();
-		context.addBundleListener(nsListener);
-
-		Bundle[] previousBundles = context.getBundles();
-
-		for (int i = 0; i < previousBundles.length; i++) {
-			Bundle bundle = previousBundles[i];
-			if (OsgiBundleUtils.isBundleResolved(bundle)) {
-				maybeAddNamespaceHandlerFor(bundle);
-			}
-		}
-
-		// discovery finished, publish the resolvers/parsers in the OSGi space
-		nsManager.afterPropertiesSet();
 		// Step 2: initialize the extender configuration
 		extenderConfiguration = new ExtenderConfiguration(context);
 		extenderConfiguration = initExtenderConfiguration(bundleContext);
@@ -435,8 +449,11 @@ public class ContextLoaderListener implements BundleActivator {
 
 		for (int i = 0; i < previousBundles.length; i++) {
 			Bundle bundle = previousBundles[i];
-			if (OsgiBundleUtils.isBundleResolved(bundle)) {
-				maybeAddNamespaceHandlerFor(bundle);
+			if (OsgiBundleUtils.isBundleActive(bundle)) {
+				maybeAddNamespaceHandlerFor(bundle, false);
+			}
+			else if (OsgiBundleUtils.isBundleLazyActivated(bundle)) {
+				maybeAddNamespaceHandlerFor(bundle, true);
 			}
 		}
 
@@ -522,7 +539,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 		boolean debug = log.isDebugEnabled();
 
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 
 		if (debug) {
 			buffer.append("Shutdown order is: {");
@@ -672,9 +689,9 @@ public class ContextLoaderListener implements BundleActivator {
 		return true;
 	}
 
-	protected void maybeAddNamespaceHandlerFor(Bundle bundle) {
+	protected void maybeAddNamespaceHandlerFor(Bundle bundle, boolean isLazy) {
 		if (handlerBundleMatchesExtenderVersion(bundle))
-			nsManager.maybeAddNamespaceHandlerFor(bundle, false);
+			nsManager.maybeAddNamespaceHandlerFor(bundle, isLazy);
 	}
 
 	protected void maybeRemoveNameSpaceHandlerFor(Bundle bundle) {

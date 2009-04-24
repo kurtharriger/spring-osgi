@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,14 +130,14 @@ public class NamespacePlugins implements NamespaceHandlerResolver, EntityResolve
 	 * @param bundle
 	 * @param lazyBundle
 	 */
-	void addPlugin(Bundle bundle, boolean lazyBundle) {
+	void addPlugin(Bundle bundle, boolean lazyBundle, boolean applyCondition) {
 		boolean debug = log.isDebugEnabled();
 
 		if (debug)
-			log.debug("Adding " + (lazyBundle ? "lazy " : "") + "handler "
+			log.debug("Adding as " + (lazyBundle ? "lazy " : "") + "namespace handler bundle "
 					+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 
-		pluginRegistry.add(bundle, lazyBundle);
+		pluginRegistry.add(bundle, lazyBundle, applyCondition);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ import java.util.RandomAccess;
  * <code>ListIterator</list>.
  * 
  * @author Costin Leau
- *
+ * 
  */
-public class DynamicList extends DynamicCollection implements List, RandomAccess {
+public class DynamicList<T> extends DynamicCollection<T> implements List<T>, RandomAccess {
 
 	/**
 	 * List iterator.
@@ -38,13 +38,13 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 	 * @author Costin Leau
 	 * 
 	 */
-	private class DynamicListIterator extends DynamicIterator implements ListIterator {
+	private class DynamicListIterator extends DynamicIterator implements ListIterator<T> {
 
 		/**
 		 * Similar to {@link DynamicIterator#tailGhost} in functionality but
 		 * representing the last seen object in the head of the collection.
 		 */
-		protected volatile Object headGhost = null;
+		protected volatile T headGhost = null;
 
 		// flag used for enforcing the iterator consistency:
 		// null - do not enforce anything
@@ -57,8 +57,8 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 		protected Boolean hasPrevious = null;
 
 		/**
-		 * Boolean field used by the {@link #set(Object)} and {@link #remove()}operation.
-		 * True indicates next() was called, and false previous().
+		 * Boolean field used by the {@link #set(Object)} and {@link #remove()}
+		 * operation. True indicates next() was called, and false previous().
 		 */
 		private boolean previousOperationCalled = true;
 
@@ -67,7 +67,7 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 			super.cursor = index;
 		}
 
-		public void add(Object o) {
+		public void add(T o) {
 			removalAllowed = false;
 			synchronized (storage) {
 				synchronized (lock) {
@@ -103,12 +103,12 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 			}
 		}
 
-		public Object next() {
+		public T next() {
 			previousOperationCalled = true;
 			return super.next();
 		}
 
-		public Object previous() {
+		public T previous() {
 			try {
 				removalAllowed = true;
 				previousOperationCalled = false;
@@ -159,7 +159,7 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 			}
 		}
 
-		public void set(Object o) {
+		public void set(T o) {
 			if (!removalAllowed)
 				throw new IllegalStateException();
 			synchronized (storage) {
@@ -202,7 +202,7 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 		super();
 	}
 
-	public DynamicList(Collection c) {
+	public DynamicList(Collection<? extends T> c) {
 		super(c);
 	}
 
@@ -210,17 +210,17 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 		super(size);
 	}
 
-	public void add(int index, Object o) {
+	public void add(int index, T o) {
 		super.add(index, o);
 	}
 
-	public boolean addAll(int index, Collection c) {
+	public boolean addAll(int index, Collection<? extends T> c) {
 		synchronized (storage) {
 			return storage.addAll(index, c);
 		}
 	}
 
-	public Object get(int index) {
+	public T get(int index) {
 		synchronized (storage) {
 			return storage.get(index);
 		}
@@ -238,8 +238,8 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 		}
 	}
 
-	public ListIterator listIterator() {
-		ListIterator iter = new DynamicListIterator(0);
+	public ListIterator<T> listIterator() {
+		DynamicListIterator iter = new DynamicListIterator(0);
 
 		synchronized (iterators) {
 			iterators.put(iter, null);
@@ -248,15 +248,15 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 		return iter;
 	}
 
-	public ListIterator listIterator(int index) {
+	public ListIterator<T> listIterator(int index) {
 		return new DynamicListIterator(index);
 	}
 
-	public Object remove(int index) {
+	public T remove(int index) {
 		return super.remove(index);
 	}
 
-	public Object set(int index, Object o) {
+	public T set(int index, T o) {
 		synchronized (storage) {
 			return storage.set(index, o);
 		}
@@ -264,7 +264,7 @@ public class DynamicList extends DynamicCollection implements List, RandomAccess
 
 	// TODO: test behavior to see if the returned list properly behaves under
 	// dynamic circumstances
-	public List subList(int fromIndex, int toIndex) {
+	public List<T> subList(int fromIndex, int toIndex) {
 		synchronized (storage) {
 			return storage.subList(fromIndex, toIndex);
 		}

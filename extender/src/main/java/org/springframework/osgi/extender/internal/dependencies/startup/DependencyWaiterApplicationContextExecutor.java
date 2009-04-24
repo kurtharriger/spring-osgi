@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -413,7 +413,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		// this will not thrown any exceptions (it just logs them)
 		close();
 
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 
 		synchronized (monitor) {
 			if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
@@ -430,7 +430,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			}
 		}
 
-		final StringBuffer message = new StringBuffer();
+		final StringBuilder message = new StringBuilder();
 		message.append("Unable to create application context for [");
 		AccessController.doPrivileged(new PrivilegedAction() {
 
