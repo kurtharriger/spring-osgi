@@ -35,7 +35,8 @@ import org.springframework.osgi.service.exporter.support.internal.controller.Exp
  * @author Costin Leau
  * 
  */
-public class MandatoryDependencyBeanPostProcessor implements BeanFactoryAware, BeanPostProcessor, DestructionAwareBeanPostProcessor {
+public class MandatoryDependencyBeanPostProcessor implements BeanFactoryAware, BeanPostProcessor,
+		DestructionAwareBeanPostProcessor {
 
 	private MandatoryServiceDependencyManager manager;
 	private ConfigurableBeanFactory beanFactory;

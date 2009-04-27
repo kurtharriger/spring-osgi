@@ -22,7 +22,7 @@
         <dependency>
 		   <groupId>org.apache.felix</groupId>
 		   <artifactId>org.apache.felix.configadmin</artifactId>
-		   <version>1.0.4</version>
+		   <version>1.0.10</version>
 		   <scope>provided</scope>
 		   <exclusions>
             <exclusion>
@@ -120,13 +120,6 @@
       		<artifactId>com.springsource.org.aopalliance</artifactId>
       		<scope>provided</scope>
     	</dependency>
-
-
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.osgi.compendium</artifactId>
-			<scope>provided</scope>
-		</dependency>
 
 
 

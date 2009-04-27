@@ -41,9 +41,9 @@ public class DependencyServiceManager {
 
 	private static final Log log = LogFactory.getLog(DependencyServiceManager.class);
 
-	protected final Map dependencies = Collections.synchronizedMap(new LinkedHashMap());
+	protected final Map<MandatoryServiceDependency, String> dependencies = Collections.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
 
-	protected final Map unsatisfiedDependencies = Collections.synchronizedMap(new LinkedHashMap());
+	protected final Map<MandatoryServiceDependency, String> unsatisfiedDependencies = Collections.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
 
 	private final ContextExecutorStateAccessor contextStateAccessor;
 
@@ -62,7 +62,7 @@ public class DependencyServiceManager {
 	private final long waitTime;
 
 	/** dependency factories */
-	private List dependencyFactories;
+	private List<OsgiServiceDependencyFactory> dependencyFactories;
 
 
 	/**
@@ -134,7 +134,7 @@ public class DependencyServiceManager {
 			boolean trace = log.isTraceEnabled();
 			boolean debug = log.isDebugEnabled();
 
-			for (Iterator i = dependencies.keySet().iterator(); i.hasNext();) {
+			for (Iterator<MandatoryServiceDependency> i = dependencies.keySet().iterator(); i.hasNext();) {
 				MandatoryServiceDependency dependency = (MandatoryServiceDependency) i.next();
 
 				// check if there is a match on the service
@@ -187,11 +187,11 @@ public class DependencyServiceManager {
 	 * @param executeIfDone
 	 */
 	public DependencyServiceManager(ContextExecutorStateAccessor executor,
-			DelegatedExecutionOsgiBundleApplicationContext context, List dependencyFactories, Runnable executeIfDone,
-			long maxWaitTime) {
+			DelegatedExecutionOsgiBundleApplicationContext context,
+			List<OsgiServiceDependencyFactory> dependencyFactories, Runnable executeIfDone, long maxWaitTime) {
 		this.contextStateAccessor = executor;
 		this.context = context;
-		this.dependencyFactories = new ArrayList(8);
+		this.dependencyFactories = new ArrayList<OsgiServiceDependencyFactory>(8);
 
 		if (dependencyFactories != null)
 			this.dependencyFactories.addAll(dependencyFactories);
@@ -246,27 +246,17 @@ public class DependencyServiceManager {
 		if (trace)
 			log.trace("Looking for dependency factories inside bean factory [" + beanFactory.toString() + "]");
 
-		Map localFactories = BeanFactoryUtils.beansOfTypeIncludingAncestors(beanFactory,
-			OsgiServiceDependencyFactory.class, true, false);
+		Map<String, OsgiServiceDependencyFactory> localFactories = BeanFactoryUtils.beansOfTypeIncludingAncestors(
+			beanFactory, OsgiServiceDependencyFactory.class, true, false);
 
 		if (debug)
 			log.debug("Discovered local dependency factories: " + localFactories.keySet());
 
 		dependencyFactories.addAll(localFactories.values());
 
-        // Sanity check that the bundle hasn't been pulled from underneath our feet.
-        /*
-        try {
-             bundleContext.getBundle();
-        } catch (IllegalStateException ise) {
-            throw new IllegalStateException("Dependency management could not be completed for ["
-                    + context.getDisplayName() +"] because the BundleContext is no longer valid.");
-        }
-        */
-
-        for (Iterator iterator = dependencyFactories.iterator(); iterator.hasNext();) {
-			OsgiServiceDependencyFactory dependencyFactory = (OsgiServiceDependencyFactory) iterator.next();
-			Collection discoveredDependencies = null;
+		for (Iterator<OsgiServiceDependencyFactory> iterator = dependencyFactories.iterator(); iterator.hasNext();) {
+			OsgiServiceDependencyFactory dependencyFactory = iterator.next();
+			Collection<OsgiServiceDependency> discoveredDependencies = null;
 
 			try {
 				discoveredDependencies = dependencyFactory.getServiceDependencies(bundleContext, beanFactory);
@@ -279,8 +269,8 @@ public class DependencyServiceManager {
 			}
 			// add the dependencies one by one
 			if (discoveredDependencies != null)
-				for (Iterator dependencyIterator = discoveredDependencies.iterator(); dependencyIterator.hasNext();) {
-					OsgiServiceDependency dependency = (OsgiServiceDependency) dependencyIterator.next();
+				for (Iterator<OsgiServiceDependency> dependencyIterator = discoveredDependencies.iterator(); dependencyIterator.hasNext();) {
+					OsgiServiceDependency dependency = dependencyIterator.next();
 					MandatoryServiceDependency msd = new MandatoryServiceDependency(bundleContext, dependency);
 					dependencies.put(msd, dependency.getBeanName());
 
@@ -297,7 +287,7 @@ public class DependencyServiceManager {
 		return unsatisfiedDependencies.isEmpty();
 	}
 
-	public Map getUnsatisfiedDependencies() {
+	public Map<MandatoryServiceDependency, String> getUnsatisfiedDependencies() {
 		return unsatisfiedDependencies;
 	}
 
@@ -325,8 +315,8 @@ public class DependencyServiceManager {
 		if (multiple) {
 			sb.append("(|");
 		}
-		for (Iterator i = unsatisfiedDependencies.keySet().iterator(); i.hasNext();) {
-			sb.append(((MandatoryServiceDependency) i.next()).filterAsString);
+		for (Iterator<MandatoryServiceDependency> i = unsatisfiedDependencies.keySet().iterator(); i.hasNext();) {
+			sb.append((i.next()).filterAsString);
 		}
 		if (multiple) {
 			sb.append(')');
@@ -344,8 +334,8 @@ public class DependencyServiceManager {
 
 	// event notification
 	private void sendInitialDependencyEvents() {
-		for (Iterator iterator = unsatisfiedDependencies.keySet().iterator(); iterator.hasNext();) {
-			MandatoryServiceDependency entry = (MandatoryServiceDependency) iterator.next();
+		for (Iterator<MandatoryServiceDependency> iterator = unsatisfiedDependencies.keySet().iterator(); iterator.hasNext();) {
+			MandatoryServiceDependency entry = iterator.next();
 			OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context,
 				entry.getServiceDependency(), waitTime);
 			BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context,

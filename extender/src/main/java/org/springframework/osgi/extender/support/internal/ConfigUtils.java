@@ -106,10 +106,10 @@ public abstract class ConfigUtils {
 	public static final long DIRECTIVE_NO_TIMEOUT = -2L; // Indicates wait forever
 
 
-	public static boolean matchExtenderVersionRange(Bundle bundle, Version versionToMatch) {
+	public static boolean matchExtenderVersionRange(Bundle bundle, String header, Version versionToMatch) {
 		Assert.notNull(bundle);
 		// get version range
-		String range = (String) bundle.getHeaders().get(EXTENDER_VERSION);
+		String range = (String) bundle.getHeaders().get(header);
 
 		boolean trace = log.isTraceEnabled();
 
@@ -118,7 +118,7 @@ public abstract class ConfigUtils {
 			return true;
 
 		if (trace)
-			log.trace("discovered " + EXTENDER_VERSION + " header w/ value=" + range);
+			log.trace("discovered " + header + " header w/ value=" + range);
 
 		// do we have a range or not ?
 		range = StringUtils.trimWhitespace(range);

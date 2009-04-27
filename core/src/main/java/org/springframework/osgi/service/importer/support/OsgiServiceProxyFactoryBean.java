@@ -49,7 +49,8 @@ import org.springframework.util.ObjectUtils;
  * the select service goes away (at any point in time), the proxy will
  * automatically search for a replacement without the user intervention.
  * 
- * <p/> Note that the proxy instance remains the same and only the backing OSGi
+ * <p/>
+ * Note that the proxy instance remains the same and only the backing OSGi
  * service changes. Due to the dynamic nature of OSGi, the backing object can
  * change during method invocations.
  * 
@@ -101,7 +102,8 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	private ApplicationEventPublisher applicationEventPublisher;
 
 	/** internal listeners */
-	private final List stateListeners = Collections.synchronizedList(new ArrayList(4));
+	private final List<ImporterStateListener> stateListeners = Collections.synchronizedList(new ArrayList<ImporterStateListener>(
+		4));
 
 	private final ImporterInternalActions controller;
 	/** convenience field * */
@@ -245,10 +247,11 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	 * Sets how long (in milliseconds) should this importer wait between failed
 	 * attempts at rebinding to a service that has been unregistered.
 	 * 
-	 * <p/> It is possible to change this value after initialization (while the
-	 * proxy is in place). The new values will be used immediately by the proxy.
-	 * Any in-flight waiting will be restarted using the new values. Note that
-	 * if both values are the same, no restart will be applied.
+	 * <p/>
+	 * It is possible to change this value after initialization (while the proxy
+	 * is in place). The new values will be used immediately by the proxy. Any
+	 * in-flight waiting will be restarted using the new values. Note that if
+	 * both values are the same, no restart will be applied.
 	 * 
 	 * @param timeoutInMillis Timeout to set, in milliseconds
 	 */
@@ -281,8 +284,9 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p/>Since this implementation creates a managed proxy, only
-	 * <em>single</em> cardinalities are accepted.
+	 * <p/>
+	 * Since this implementation creates a managed proxy, only <em>single</em>
+	 * cardinalities are accepted.
 	 */
 	public void setCardinality(Cardinality cardinality) {
 		Assert.notNull(cardinality);

@@ -43,7 +43,7 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 		ServiceReferenceComponentMetadata {
 
 	private static final String FILTER_PROP = "filter";
-	private static final String INTERFACES_PROP = "interfaces";
+	private static final String INTERFACES_PROP = "interfaceNames";
 	private static final String CARDINALITY_PROP = "cardinality";
 	private static final String SERVICE_NAME_PROP = "serviceBeanName";
 	private static final String LISTENERS_PROP = "listeners";

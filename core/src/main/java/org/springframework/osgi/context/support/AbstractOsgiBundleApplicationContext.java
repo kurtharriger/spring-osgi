@@ -72,10 +72,10 @@ import org.springframework.util.StringUtils;
  * <p>
  * In addition to the special beans detected by
  * <code>AbstractApplicationContext</code>, this class registers the
- * <code>BundleContextAwareProcessor</code> for processing beans that
- * implement the <code>BundleContextAware</code> interface. Also it interprets
- * resource paths as OSGi bundle resources (either from the bundle class space,
- * bundle space or jar space).
+ * <code>BundleContextAwareProcessor</code> for processing beans that implement
+ * the <code>BundleContextAware</code> interface. Also it interprets resource
+ * paths as OSGi bundle resources (either from the bundle class space, bundle
+ * space or jar space).
  * 
  * <p>
  * This application context implementation offers the OSGi-specific,
@@ -135,8 +135,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	/**
-	 * Creates a new <code>AbstractOsgiBundleApplicationContext</code> with
-	 * the given parent context.
+	 * Creates a new <code>AbstractOsgiBundleApplicationContext</code> with the
+	 * given parent context.
 	 * 
 	 * @param parent the parent context
 	 */
@@ -147,7 +147,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p/> Will automatically determine the bundle, create a new
+	 * <p/>
+	 * Will automatically determine the bundle, create a new
 	 * <code>ResourceLoader</code> (and set its <code>ClassLoader</code> (if
 	 * none is set already) to a custom implementation that will delegate the
 	 * calls to the bundle).
@@ -276,7 +277,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	private void enforceExporterImporterDependency(ConfigurableListableBeanFactory beanFactory) {
 		Object instance = null;
 
-		instance = AccessController.doPrivileged(new PrivilegedAction() {
+		instance = AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 			public Object run() {
 				// create the service manager
@@ -323,11 +324,12 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * actual publishing is required or not.
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	private void publishContextAsOsgiServiceIfNecessary() {
 		if (publishContextAsService && serviceRegistration == null) {
-			Dictionary serviceProperties = new MapBasedDictionary();
+			Dictionary<Object, Object> serviceProperties = new MapBasedDictionary<Object, Object>();
 
-			customizeApplicationContextServiceProperties((Map) serviceProperties);
+			customizeApplicationContextServiceProperties((Map<Object, Object>) serviceProperties);
 
 			if (logger.isInfoEnabled()) {
 				logger.info("Publishing application context as OSGi service with properties " + serviceProperties);
@@ -377,7 +379,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * method is called only if the application context will be published as an
 	 * OSGi service.
 	 * 
-	 * <p/>The default implementation stores the bundle symbolic name under
+	 * <p/>
+	 * The default implementation stores the bundle symbolic name under
 	 * {@link Constants#BUNDLE_SYMBOLICNAME} and
 	 * {@link ConfigurableOsgiBundleApplicationContext#APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME}
 	 * and the bundle version under {@link Constants#BUNDLE_VERSION} property.
@@ -389,7 +392,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * @param serviceProperties service properties map (can be casted to
 	 *        {@link Dictionary})
 	 */
-	protected void customizeApplicationContextServiceProperties(Map serviceProperties) {
+	protected void customizeApplicationContextServiceProperties(Map<Object, Object> serviceProperties) {
 		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getBundleSymbolicName());
 		serviceProperties.put(Constants.BUNDLE_SYMBOLICNAME, getBundleSymbolicName());
 		serviceProperties.put(Constants.BUNDLE_VERSION, OsgiBundleUtils.getBundleVersion(bundle));

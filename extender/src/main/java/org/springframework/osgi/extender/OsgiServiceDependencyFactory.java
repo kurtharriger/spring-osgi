@@ -37,6 +37,6 @@ public interface OsgiServiceDependencyFactory {
 	 * @throws InvalidSyntaxException in case of OSGi filters errors
 	 * @throws BundleException in case of OSGi bundle errors
 	 */
-	Collection getServiceDependencies(BundleContext bundleContext, ConfigurableListableBeanFactory beanFactory)
-			throws BeansException, InvalidSyntaxException, BundleException;
+	Collection<OsgiServiceDependency> getServiceDependencies(BundleContext bundleContext,
+			ConfigurableListableBeanFactory beanFactory) throws BeansException, InvalidSyntaxException, BundleException;
 }
