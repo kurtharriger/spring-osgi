@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.service.importer.support;
 
+import java.util.Arrays;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
@@ -41,8 +43,8 @@ import org.springframework.util.ObjectUtils;
  * @author Adrian Colyer
  * @author Hal Hildebrand
  */
-public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBean, InitializingBean, DisposableBean,
-		BundleContextAware, BeanClassLoaderAware, BeanNameAware {
+public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBean<Object>, InitializingBean,
+		DisposableBean, BundleContextAware, BeanClassLoaderAware, BeanNameAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
 
@@ -56,12 +58,15 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	// not required to be an interface, but usually should be...
 	private Class<?>[] interfaces;
 
+	// user defined interface names
+	private String[] interfaceNames;
+
 	// filter used to narrow service matches, may be null
 	private String filter;
 
 	// Cumulated filter string between the specified classes/interfaces and the
 	// given filter
-	private Filter unifiedFilter;
+	private volatile Filter unifiedFilter;
 
 	// service lifecycle listener
 	private OsgiServiceLifecycleListener[] listeners;
@@ -78,16 +83,55 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	public void afterPropertiesSet() {
 		Assert.notNull(this.bundleContext, "Required 'bundleContext' property was not set.");
 		Assert.notNull(classLoader, "Required 'classLoader' property was not set.");
-		Assert.notEmpty(interfaces, "Required 'interfaces' property was not set.");
-		Assert.noNullElements(interfaces, "Null 'interfaces' entries not allowed.");
 
-		// validate specified classes
-		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(interfaces),
-			"more then one concrete class specified; cannot create proxy.");
+		if (ObjectUtils.isEmpty(interfaces) && ObjectUtils.isEmpty(interfaceNames)) {
+			throw new IllegalArgumentException("either 'interfaces' or 'interfacesNames' property need to to be set");
+		}
+		if (!ObjectUtils.isEmpty(interfaces) && !ObjectUtils.isEmpty(interfaceNames)) {
+			throw new IllegalArgumentException(
+				"only one of 'interfaces' and 'interfacesNames' properties need to to be set");
+		}
+
+		if (!ObjectUtils.isEmpty(interfaces)) {
+			Assert.noNullElements(interfaces, "Null 'interfaces' entries not allowed.");
+
+			validateInterfaces();
+
+			interfaceNames = new String[interfaces.length];
+
+			for (int i = 0; i < interfaces.length; i++) {
+				interfaceNames[i] = interfaces[i].getName();
+			}
+		}
+
+		if (!ObjectUtils.isEmpty(interfaceNames)) {
+			Assert.noNullElements(interfaceNames, "Null 'interfacesNames' entries not allowed.");
+		}
 
 		this.listeners = (listeners == null ? new OsgiServiceLifecycleListener[0] : listeners);
 
 		getUnifiedFilter(); // eager initialization of the cache to catch filter errors
+	}
+
+	// validation the relationship between classes
+	private void validateInterfaces() {
+		// validate specified classes
+		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(interfaces),
+			"more then one concrete class specified; cannot create proxy.");
+	}
+
+	// load the interface classes (if only the names are known)
+	private void resolveClasses() {
+		interfaces = new Class<?>[interfaceNames.length];
+
+		for (int i = 0; i < interfaceNames.length; i++) {
+			interfaces[i] = org.springframework.util.ClassUtils.resolveClassName(interfaceNames[i], classLoader);
+		}
+
+		if (log.isDebugEnabled())
+			log.debug("Resolved classes " + Arrays.toString(interfaceNames));
+		validateInterfaces();
+
 	}
 
 	/**
@@ -102,11 +146,11 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 			return unifiedFilter;
 		}
 
-		String filterWithClasses = OsgiFilterUtils.unifyFilter(interfaces, filter);
+		String filterWithClasses = OsgiFilterUtils.unifyFilter(interfaceNames, filter);
 
 		boolean trace = log.isTraceEnabled();
 		if (trace)
-			log.trace("Unified classes=" + ObjectUtils.nullSafeToString(interfaces) + " and filter=[" + filter
+			log.trace("Unified classes=" + ObjectUtils.nullSafeToString(interfaceNames) + " and filter=[" + filter
 					+ "]  in=[" + filterWithClasses + "]");
 
 		// add the serviceBeanName constraint
@@ -130,6 +174,15 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	 */
 	public void setInterfaces(Class<?>[] interfaces) {
 		this.interfaces = interfaces;
+	}
+
+	/**
+	 * Sets the names of the classes that the imported service advertises.
+	 * 
+	 * @param interfaceNames array of advertised classes.
+	 */
+	public void setInterfaceNames(String[] interfaceNames) {
+		this.interfaceNames = interfaceNames;
 	}
 
 	/**
@@ -212,10 +265,29 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	/**
 	 * Returns the interfaces used for discovering the imported service(s).
 	 * 
+	 * <p/>
+	 * Note that this method will trigger class loading if the classes have not
+	 * been resolved (if {@link #setInterfaceNames(String[])} was used). On OSGi
+	 * R4.1 platform, this will cause activation of lazy bundles. If unsure, use
+	 * {@link #getInterfaceNames()} instead.
+	 * 
 	 * @return interfaces advertised by services in the OSGi space
 	 */
 	public Class<?>[] getInterfaces() {
+		if (interfaces == null) {
+			resolveClasses();
+		}
 		return interfaces;
+	}
+
+	/**
+	 * Returns the interface names used for discovering the imported service(s).
+	 * 
+	 * @return interfaces advertised by services in the OSGi space
+	 * @see #getInterfaces()
+	 */
+	public String[] getInterfaceNames() {
+		return interfaceNames;
 	}
 
 	/**

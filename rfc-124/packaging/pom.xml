@@ -44,7 +44,10 @@
         *;resolution:=optional
     </spring.osgi.import>
     
-    <spring.osgi.export>org.springframework*</spring.osgi.export>
+    <spring.osgi.export>
+        org.springframework.osgi*;version=${spring.osgi.export.version},
+        org.springframework*;version=${spring.base.version}
+    </spring.osgi.export>
     
   	<clover.skip>true</clover.skip>
   	<source-jdk>1.5</source-jdk>

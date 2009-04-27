@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.osgi.extender.internal.util;
 
 import java.util.Dictionary;
@@ -33,6 +34,7 @@ public class ConfigUtilsVersioningTest extends TestCase {
 
 	private Version min, max, version;
 
+
 	protected void setUp() throws Exception {
 		props = new Properties();
 		bundle = new MockBundle(props);
@@ -52,39 +54,39 @@ public class ConfigUtilsVersioningTest extends TestCase {
 	}
 
 	public void testNoVersion() {
-		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, Version.emptyVersion));
+		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, Version.emptyVersion));
 	}
 
 	public void testLeftOpenRange() {
 		String ver = "(1.2, 1.3]";
 		addVersion(ver);
 
-		assertFalse(ConfigUtils.matchExtenderVersionRange(bundle, min));
-		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, version));
+		assertFalse(ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, min));
+		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, version));
 	}
 
 	public void testRightOpenRange() {
 		String ver = "[1.2, 1.3)";
 		addVersion(ver);
 
-		assertFalse(ConfigUtils.matchExtenderVersionRange(bundle, max));
-		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, version));
+		assertFalse(ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, max));
+		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, version));
 	}
 
 	public void testLeftCloseRange() {
 		String ver = "[1.2, 1.3]";
 		addVersion(ver);
 
-		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, min));
-		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, version));
+		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, min));
+		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, version));
 	}
 
 	public void testRightCloseRange() {
 		String ver = "[1.2, 1.3]";
 		addVersion(ver);
 
-		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, max));
-		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, version));
+		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, max));
+		assertTrue(ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, version));
 	}
 
 	public void testTooManyCommas() {
@@ -92,7 +94,7 @@ public class ConfigUtilsVersioningTest extends TestCase {
 		addVersion(ver);
 
 		try {
-			ConfigUtils.matchExtenderVersionRange(bundle, Version.emptyVersion);
+			ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, Version.emptyVersion);
 			fail("should have thrown exception; invalid range");
 		}
 		catch (IllegalArgumentException ex) {
@@ -105,7 +107,7 @@ public class ConfigUtilsVersioningTest extends TestCase {
 		addVersion(ver);
 
 		try {
-			ConfigUtils.matchExtenderVersionRange(bundle, Version.emptyVersion);
+			ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, Version.emptyVersion);
 			fail("should have thrown exception; invalid range");
 		}
 		catch (IllegalArgumentException ex) {
@@ -118,7 +120,7 @@ public class ConfigUtilsVersioningTest extends TestCase {
 		addVersion(ver);
 
 		try {
-			ConfigUtils.matchExtenderVersionRange(bundle, Version.emptyVersion);
+			ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, Version.emptyVersion);
 			fail("should have thrown exception; invalid range");
 		}
 		catch (IllegalArgumentException ex) {
@@ -132,7 +134,7 @@ public class ConfigUtilsVersioningTest extends TestCase {
 		addVersion(ver);
 
 		try {
-			ConfigUtils.matchExtenderVersionRange(bundle, Version.emptyVersion);
+			ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, Version.emptyVersion);
 			fail("should have thrown exception; invalid range");
 		}
 		catch (IllegalArgumentException ex) {
@@ -146,7 +148,7 @@ public class ConfigUtilsVersioningTest extends TestCase {
 		addVersion(ver);
 
 		try {
-			ConfigUtils.matchExtenderVersionRange(bundle, Version.emptyVersion);
+			ConfigUtils.matchExtenderVersionRange(bundle, ConfigUtils.EXTENDER_VERSION, Version.emptyVersion);
 			fail("should have thrown exception; invalid range");
 		}
 		catch (IllegalArgumentException ex) {

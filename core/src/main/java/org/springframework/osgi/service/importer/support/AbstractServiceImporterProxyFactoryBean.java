@@ -24,6 +24,7 @@ import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.osgi.context.internal.classloader.ChainedClassLoader;
 import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
+import org.springframework.util.Assert;
 
 /**
  * Package protected class that provides the common aop infrastructure
@@ -38,7 +39,7 @@ import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
  * 
  */
 abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServiceImportFactoryBean implements
-		SmartFactoryBean {
+		SmartFactoryBean<Object> {
 
 	private boolean initialized = false;
 
@@ -57,6 +58,7 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 			Class<?> intf = intfs[i];
 			aopClassLoader.addClassLoader(intf);
 		}
+
 		initialized = true;
 	}
 
@@ -158,7 +160,7 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	 */
 	public void setBeanClassLoader(final ClassLoader classLoader) {
 		super.setBeanClassLoader(classLoader);
-		AccessController.doPrivileged(new PrivilegedAction() {
+		AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 			public Object run() {
 				aopClassLoader = ClassLoaderFactory.getAopClassLoaderFor(classLoader);

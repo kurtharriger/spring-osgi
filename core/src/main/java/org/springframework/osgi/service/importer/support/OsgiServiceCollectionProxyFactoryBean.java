@@ -48,43 +48,46 @@ import org.springframework.util.Assert;
  * the collection. If a service that matches the criteria disappears (is
  * unregistered), it will be automatically removed from the collection.
  * 
- * <p/>Due to the dynamic nature of OSGi services, the collection content can
- * change at runtime, even during iteration. This implementation will correctly
- * update all the collection <code>Iterator</code>s so they reflect the
- * collection content. This approach (as opposed to the 'snapshot' strategy)
- * prevents dealing with <em>dead</em> services which can appear when imported
- * services go down while iterating. This means that iterating while the
- * collection is being changed is safe.
+ * <p/>
+ * Due to the dynamic nature of OSGi services, the collection content can change
+ * at runtime, even during iteration. This implementation will correctly update
+ * all the collection <code>Iterator</code>s so they reflect the collection
+ * content. This approach (as opposed to the 'snapshot' strategy) prevents
+ * dealing with <em>dead</em> services which can appear when imported services
+ * go down while iterating. This means that iterating while the collection is
+ * being changed is safe.
  * 
- * <p/>Note that the <code>Iterator</code> still has to be fulfilled meaning
- * the <code>next()</code> method always obey the result of the previous
+ * <p/>
+ * Note that the <code>Iterator</code> still has to be fulfilled meaning the
+ * <code>next()</code> method always obey the result of the previous
  * <code>hasNext()</code> invocation:
  * 
- * <p/> <table border="1">
+ * <p/>
+ * <table border="1">
  * <tr>
  * <th><code>hasNext()</code> returned value</th>
- * <th><code>next()</code> behaviour</th>
- * </th>
+ * <th><code>next()</code> behaviour</th> </th>
  * <tr>
- * <td> <code>true</code> </td>
+ * <td> <code>true</code></td>
  * <td><em>Always</em> return a non-null value, even when the collection has
  * shrunk as services when away. This means returning a proxy that will throw an
  * exception on an invocation that requires the backing service to be present.</td>
  * </tr>
  * <tr>
  * <td><code>false</code></td>
- * <td>per <code>Iterator</code> contract,
- * <code>NoSuchElementException</code> is thrown. This applies even if other
- * services are added to the collection.</td>
+ * <td>per <code>Iterator</code> contract, <code>NoSuchElementException</code>
+ * is thrown. This applies even if other services are added to the collection.</td>
  * </tr>
  * </table>
  * 
- * <p/> Due to the dynamic nature of OSGi, <code>hasNext()</code> invocation
- * made on the same <code>Iterator</code> can return different values based on
- * the services availability. However, as explained above, <code>next()</code>
- * will always obey the result of the last <code>hasNext()</code> method.
+ * <p/>
+ * Due to the dynamic nature of OSGi, <code>hasNext()</code> invocation made on
+ * the same <code>Iterator</code> can return different values based on the
+ * services availability. However, as explained above, <code>next()</code> will
+ * always obey the result of the last <code>hasNext()</code> method.
  * 
- * <p/><strong>Note:</strong> Even though the collection and its iterators
+ * <p/>
+ * <strong>Note:</strong> Even though the collection and its iterators
  * communicate in a thread-safe manner, iterators themselves are not
  * thread-safe. Concurrent access on the iterators should be properly
  * synchronized. Due to the light nature of the iterators, consider creating a
@@ -147,7 +150,8 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	private boolean greedyProxying = false;
 
 	/** internal listeners */
-	private final List stateListeners = Collections.synchronizedList(new ArrayList(4));
+	private final List<ImporterStateListener> stateListeners = Collections.synchronizedList(new ArrayList<ImporterStateListener>(
+		4));
 
 	private final ImporterInternalActions controller;
 
@@ -163,7 +167,7 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 		if (getCardinality() == null)
 			setCardinality(Cardinality.C_1__N);
 
-		// create shared proxy creator ( reused for each new service
+		// create shared proxy creator (reused for each new service
 		// joining the collection)
 		proxyCreator = new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBeanClassLoader(),
 			getBundleContext(), getContextClassLoader(), greedyProxying);
@@ -256,13 +260,14 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	 * <em>sorted</em> collection even though, the specified collection type
 	 * does not imply ordering.
 	 * 
-	 * <p/> Thus, instead of list a sorted list will be created and instead of a
-	 * set, a sorted set.
+	 * <p/>
+	 * Thus, instead of list a sorted list will be created and instead of a set,
+	 * a sorted set.
 	 * 
 	 * @see #setCollectionType(CollectionType)
 	 * 
 	 * @param comparator Comparator (can be null) used for ordering the
-	 * resulting collection.
+	 *        resulting collection.
 	 */
 	public void setComparator(Comparator comparator) {
 		this.comparator = comparator;
@@ -281,7 +286,7 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	 * @see CollectionType
 	 * 
 	 * @param collectionType the collection type as string using one of the
-	 * values above.
+	 *        values above.
 	 */
 	public void setCollectionType(CollectionType collectionType) {
 		Assert.notNull(collectionType);
@@ -292,7 +297,8 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p/>Since this implementation creates a managed collection, only
+	 * <p/>
+	 * Since this implementation creates a managed collection, only
 	 * <em>multiple</em> cardinalities are accepted.
 	 */
 	public void setCardinality(Cardinality cardinality) {
@@ -313,15 +319,16 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	 * specified classes are used for generating the the imported OSGi service
 	 * proxies.
 	 * 
-	 * <p/><b>Note:</b>Greedy proxying will use the proxy mechanism dictated
-	 * by this factory configuration. This means that if JDK proxies are used,
-	 * greedy proxing will consider only additional interfaces exposed by the
-	 * OSGi service and none of the extra classes. When CGLIB is used, all extra
+	 * <p/>
+	 * <b>Note:</b>Greedy proxying will use the proxy mechanism dictated by this
+	 * factory configuration. This means that if JDK proxies are used, greedy
+	 * proxing will consider only additional interfaces exposed by the OSGi
+	 * service and none of the extra classes. When CGLIB is used, all extra
 	 * published classes (whether interfaces or <em>non-final</em> concrete
 	 * classes) will be considered.
 	 * 
 	 * @param greedyProxying true if greedy proxying should be enabled, false
-	 * otherwise.
+	 *        otherwise.
 	 */
 	public void setGreedyProxying(boolean greedyProxying) {
 		this.greedyProxying = greedyProxying;

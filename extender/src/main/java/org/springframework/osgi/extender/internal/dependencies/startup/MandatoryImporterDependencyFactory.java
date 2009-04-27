@@ -39,12 +39,11 @@ import org.springframework.util.StringUtils;
  * Default mandatory importer dependency factory.
  * 
  * @author Costin Leau
- * 
  */
 public class MandatoryImporterDependencyFactory implements OsgiServiceDependencyFactory {
 
-	public Collection getServiceDependencies(BundleContext bundleContext, ConfigurableListableBeanFactory beanFactory)
-			throws BeansException, InvalidSyntaxException, BundleException {
+	public Collection<OsgiServiceDependency> getServiceDependencies(BundleContext bundleContext,
+			ConfigurableListableBeanFactory beanFactory) throws BeansException, InvalidSyntaxException, BundleException {
 
 		String[] singleBeans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory,
 			OsgiServiceProxyFactoryBean.class, true, false);
@@ -54,13 +53,13 @@ public class MandatoryImporterDependencyFactory implements OsgiServiceDependency
 
 		String[] beans = StringUtils.concatenateStringArrays(singleBeans, collectionBeans);
 
-		List beansCollections = new ArrayList(beans.length);
+		List<OsgiServiceDependency> beansCollections = new ArrayList<OsgiServiceDependency>(beans.length);
 
 		for (int i = 0; i < beans.length; i++) {
 			String beanName = (beans[i].startsWith(BeanFactory.FACTORY_BEAN_PREFIX) ? beans[i]
 					: BeanFactory.FACTORY_BEAN_PREFIX + beans[i]);
 
-			SmartFactoryBean reference = (SmartFactoryBean) beanFactory.getBean(beanName);
+			SmartFactoryBean<?> reference = beanFactory.getBean(beanName, SmartFactoryBean.class);
 
 			OsgiServiceDependency dependency;
 			if (reference instanceof OsgiServiceProxyFactoryBean) {

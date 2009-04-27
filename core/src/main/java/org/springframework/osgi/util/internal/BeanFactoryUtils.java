@@ -45,7 +45,7 @@ public abstract class BeanFactoryUtils {
 	 * @param beanFactory beans bean factory
 	 * @param beanName root bean name
 	 * @param rawFactoryBeans consider the factory bean itself or the its
-	 * product
+	 *        product
 	 * @param type type of the beans returned (null to return all beans)
 	 * @return bean names
 	 */
@@ -56,14 +56,14 @@ public abstract class BeanFactoryUtils {
 
 		Assert.isTrue(beanFactory.containsBean(beanName), "no bean by name [" + beanName + "] can be found");
 
-		Set beans = new LinkedHashSet();
+		Set<String> beans = new LinkedHashSet<String>();
 
 		getTransitiveBeans(beanFactory, beanName, rawFactoryBeans, beans);
 
 		if (type != null) {
 			// filter by type
-			for (Iterator iter = beans.iterator(); iter.hasNext();) {
-				String bean = (String) iter.next();
+			for (Iterator<String> iter = beans.iterator(); iter.hasNext();) {
+				String bean = iter.next();
 				if (!beanFactory.isTypeMatch(bean, type)) {
 					iter.remove();
 				}
@@ -74,7 +74,7 @@ public abstract class BeanFactoryUtils {
 	}
 
 	private static void getTransitiveBeans(ConfigurableListableBeanFactory beanFactory, String beanName,
-			boolean rawFactoryBeans, Set beanNames) {
+			boolean rawFactoryBeans, Set<String> beanNames) {
 		String transformedBeanName = org.springframework.beans.factory.BeanFactoryUtils.transformedBeanName(beanName);
 		// strip out '&' just in case
 		String[] beans = beanFactory.getDependenciesForBean(transformedBeanName);

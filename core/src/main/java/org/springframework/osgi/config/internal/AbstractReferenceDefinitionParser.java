@@ -27,16 +27,19 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.BeanReferenceFactoryBean;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
+import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.core.enums.StaticLabeledEnumResolver;
+import org.springframework.osgi.config.internal.adapter.ToStringClassAdapter;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.service.importer.support.Cardinality;
@@ -89,7 +92,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 			}
 
 			else if (INTERFACE.equals(name)) {
-				builder.addPropertyValue(INTERFACES_PROP, value);
+				builder.addPropertyValue(INTERFACE_NAMES_PROP, value);
 				return false;
 			}
 
@@ -113,7 +116,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 	private static final String SERVICE_BEAN_NAME_PROP = "serviceBeanName";
 
-	private static final String INTERFACES_PROP = "interfaces";
+	private static final String INTERFACE_NAMES_PROP = "interfaceNames";
 
 	private static final String CCL_PROP = "contextClassLoader";
 
@@ -155,7 +158,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
 
-		Class beanClass = getBeanClass(element);
+		Class<?> beanClass = getBeanClass(element);
 		Assert.notNull(beanClass);
 
 		if (beanClass != null) {
@@ -272,7 +275,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	 * @param element
 	 * @return
 	 */
-	protected abstract Class getBeanClass(Element element);
+	protected abstract Class<?> getBeanClass(Element element);
 
 	/**
 	 * Utility method declared for reusability. It maintains the
@@ -339,8 +342,23 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 				parserContext.getReaderContext().error(
 					"either 'interface' attribute or <intefaces> sub-element has be specified", parent);
 			}
-			Set interfaces = parsePropertySetElement(parserContext, element, builder.getBeanDefinition());
-			builder.addPropertyValue(INTERFACES_PROP, interfaces);
+
+			Set<?> parsedInterfaces = parsePropertySetElement(parserContext, element, builder.getBeanDefinition());
+			Set<Object> interfaces = new ManagedSet<Object>(parsedInterfaces.size());
+
+			for (Iterator<?> iterator = parsedInterfaces.iterator(); iterator.hasNext();) {
+				Object intf = iterator.next();
+				if (intf instanceof TypedStringValue || intf instanceof String) {
+					interfaces.add(intf);
+				}
+				else {
+					// add adapter definition for bean references (which can be classes)
+					interfaces.add(BeanDefinitionBuilder.genericBeanDefinition(ToStringClassAdapter.class).addConstructorArgValue(
+						intf).getBeanDefinition());
+				}
+			}
+
+			builder.addPropertyValue(INTERFACE_NAMES_PROP, interfaces);
 		}
 	}
 
@@ -352,12 +370,12 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	 * @param builder
 	 */
 	protected void parseListeners(Element element, ParserContext context, BeanDefinitionBuilder builder) {
-		List listeners = DomUtils.getChildElementsByTagName(element, LISTENER);
+		List<Element> listeners = DomUtils.getChildElementsByTagName(element, LISTENER);
 
-		ManagedList listenersRef = new ManagedList();
+		ManagedList<Object> listenersRef = new ManagedList<Object>();
 		// loop on listeners
-		for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-			Element listnr = (Element) iter.next();
+		for (Iterator<Element> iter = listeners.iterator(); iter.hasNext();) {
+			Element listnr = iter.next();
 
 			// wrapper target object
 			Object target = null;
@@ -425,7 +443,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		return context.getDelegate().parsePropertySubElement(beanDef, beanDefinition);
 	}
 
-	protected Set parsePropertySetElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
+	protected Set<?> parsePropertySetElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
 		return context.getDelegate().parseSetElement(beanDef, beanDefinition);
 	}
 }

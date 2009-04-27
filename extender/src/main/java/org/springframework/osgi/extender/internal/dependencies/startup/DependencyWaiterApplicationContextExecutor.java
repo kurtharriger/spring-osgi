@@ -34,6 +34,7 @@ import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationC
 import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
+import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
@@ -97,7 +98,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	/** delegated multicaster */
 	private OsgiBundleApplicationContextEventMulticaster delegatedMulticaster;
 
-	private List dependencyFactories;
+	private List<OsgiServiceDependencyFactory> dependencyFactories;
 
 
 	/**
@@ -151,7 +152,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 
 	public DependencyWaiterApplicationContextExecutor(DelegatedExecutionOsgiBundleApplicationContext delegateContext,
-			boolean syncWait, List dependencyFactories) {
+			boolean syncWait, List<OsgiServiceDependencyFactory> dependencyFactories) {
 		this.delegateContext = delegateContext;
 		this.delegateContext.setExecutor(this);
 		this.synchronousWait = syncWait;
@@ -420,8 +421,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 				buf.append("none");
 			}
 			else {
-				for (Iterator dependencies = dependencyDetector.getUnsatisfiedDependencies().keySet().iterator(); dependencies.hasNext();) {
-					MandatoryServiceDependency dependency = (MandatoryServiceDependency) dependencies.next();
+				for (Iterator<MandatoryServiceDependency> dependencies = dependencyDetector.getUnsatisfiedDependencies().keySet().iterator(); dependencies.hasNext();) {
+					MandatoryServiceDependency dependency = dependencies.next();
 					buf.append(dependency.toString());
 					if (dependencies.hasNext()) {
 						buf.append(", ");
@@ -432,7 +433,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 		final StringBuilder message = new StringBuilder();
 		message.append("Unable to create application context for [");
-		AccessController.doPrivileged(new PrivilegedAction() {
+		AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 			public Object run() {
 				message.append(OsgiStringUtils.nullSafeSymbolicName(getBundle()));
@@ -466,9 +467,9 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		log.warn("Timeout occurred before finding service dependencies for [" + delegateContext.getDisplayName() + "]");
 
 		e = new ApplicationContextException("Application context initialization for '"
-				+ (String) AccessController.doPrivileged(new PrivilegedAction() {
+				+ AccessController.doPrivileged(new PrivilegedAction<String>() {
 
-					public Object run() {
+					public String run() {
 						return OsgiStringUtils.nullSafeSymbolicName(getBundle());
 					}
 				}) + "' has timed out");
