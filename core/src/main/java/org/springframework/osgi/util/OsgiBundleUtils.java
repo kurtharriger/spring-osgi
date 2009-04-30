@@ -191,6 +191,7 @@ public abstract class OsgiBundleUtils {
 	 * @param bundle OSGi bundle
 	 * @return true if the bundle is lazily activated, false otherwise.
 	 */
+	@SuppressWarnings("unchecked")
 	public static boolean isBundleLazyActivated(Bundle bundle) {
 		Assert.notNull(bundle, "bundle is required");
 

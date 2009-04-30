@@ -110,7 +110,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 			log.trace("Discovered raw classes " + ObjectUtils.nullSafeToString(classNames));
 
 		// try to get as many classes as possible
-		Class<?>[] classes = ClassUtils.loadClasses(classNames, classLoader);
+		Class<?>[] classes = ClassUtils.loadClassesIfPossible(classNames, classLoader);
 
 		if (trace)
 			log.trace("Visible classes are " + ObjectUtils.nullSafeToString(classes));

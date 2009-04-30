@@ -243,8 +243,11 @@ public class ContextLoaderListener implements BundleActivator {
 			}
 
 			switch (event.getType()) {
+				case BundleEvent.LAZY_ACTIVATION: {
+					lifecycleManager.maybeCreateApplicationContextFor(bundle, true);
+				}
 				case BundleEvent.STARTED: {
-					lifecycleManager.maybeCreateApplicationContextFor(bundle);
+					lifecycleManager.maybeCreateApplicationContextFor(bundle, false);
 					break;
 				}
 				case BundleEvent.STOPPING: {
@@ -425,14 +428,20 @@ public class ContextLoaderListener implements BundleActivator {
 		// Instantiate all previously resolved bundles which are Spring
 		// powered
 		for (int i = 0; i < previousBundles.length; i++) {
-			if (OsgiBundleUtils.isBundleActive(previousBundles[i])) {
-				try {
-					lifecycleManager.maybeCreateApplicationContextFor(previousBundles[i]);
+			boolean isLazy = false;
+			try {
+				if (OsgiBundleUtils.isBundleLazyActivated(previousBundles[i])) {
+					isLazy = true;
+					lifecycleManager.maybeCreateApplicationContextFor(previousBundles[i], true);
+
 				}
-				catch (Throwable e) {
-					log.warn("Cannot start bundle " + OsgiStringUtils.nullSafeSymbolicName(previousBundles[i])
-							+ " due to", e);
+				else if (OsgiBundleUtils.isBundleActive(previousBundles[i])) {
+					lifecycleManager.maybeCreateApplicationContextFor(previousBundles[i], false);
 				}
+			}
+			catch (Throwable e) {
+				log.warn("Cannot create context for" + (isLazy ? " lazy" : "") + " bundle "
+						+ OsgiStringUtils.nullSafeSymbolicName(previousBundles[i]) + " due to", e);
 			}
 		}
 	}

@@ -70,7 +70,7 @@ public abstract class BeanFactoryUtils {
 			}
 		}
 
-		return (String[]) beans.toArray(new String[beans.size()]);
+		return beans.toArray(new String[beans.size()]);
 	}
 
 	private static void getTransitiveBeans(ConfigurableListableBeanFactory beanFactory, String beanName,

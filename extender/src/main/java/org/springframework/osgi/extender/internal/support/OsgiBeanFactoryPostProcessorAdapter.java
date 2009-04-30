@@ -44,10 +44,11 @@ public class OsgiBeanFactoryPostProcessorAdapter implements BeanFactoryPostProce
 
 	private final BundleContext bundleContext;
 
-	private List osgiPostProcessors;
+	private List<OsgiBeanFactoryPostProcessor> osgiPostProcessors;
 
 
-	public OsgiBeanFactoryPostProcessorAdapter(BundleContext bundleContext, List postProcessors) {
+	public OsgiBeanFactoryPostProcessorAdapter(BundleContext bundleContext,
+			List<OsgiBeanFactoryPostProcessor> postProcessors) {
 		this.bundleContext = bundleContext;
 		this.osgiPostProcessors = postProcessors;
 	}
@@ -57,8 +58,8 @@ public class OsgiBeanFactoryPostProcessorAdapter implements BeanFactoryPostProce
 
 		Exception processingException = null;
 
-		for (Iterator iterator = osgiPostProcessors.iterator(); iterator.hasNext();) {
-			OsgiBeanFactoryPostProcessor osgiPostProcessor = (OsgiBeanFactoryPostProcessor) iterator.next();
+		for (Iterator<OsgiBeanFactoryPostProcessor> iterator = osgiPostProcessors.iterator(); iterator.hasNext();) {
+			OsgiBeanFactoryPostProcessor osgiPostProcessor = iterator.next();
 			if (trace)
 				log.trace("Calling OsgiBeanFactoryPostProcessor " + osgiPostProcessor + " for bean factory "
 						+ beanFactory);

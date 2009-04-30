@@ -43,8 +43,7 @@ import org.springframework.util.ObjectUtils;
  * @author Adrian Colyer
  * @author Hal Hildebrand
  */
-public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBean<Object>, InitializingBean,
-		DisposableBean, BundleContextAware, BeanClassLoaderAware, BeanNameAware {
+public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBean<Object>, InitializingBean, DisposableBean, BundleContextAware, BeanClassLoaderAware, BeanNameAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
 
@@ -122,11 +121,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 
 	// load the interface classes (if only the names are known)
 	private void resolveClasses() {
-		interfaces = new Class<?>[interfaceNames.length];
-
-		for (int i = 0; i < interfaceNames.length; i++) {
-			interfaces[i] = org.springframework.util.ClassUtils.resolveClassName(interfaceNames[i], classLoader);
-		}
+		interfaces = ClassUtils.loadClasses(interfaceNames, classLoader);
 
 		if (log.isDebugEnabled())
 			log.debug("Resolved classes " + Arrays.toString(interfaceNames));
@@ -274,7 +269,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	 * @return interfaces advertised by services in the OSGi space
 	 */
 	public Class<?>[] getInterfaces() {
-		if (interfaces == null) {
+		if (ObjectUtils.isEmpty(interfaces)) {
 			resolveClasses();
 		}
 		return interfaces;

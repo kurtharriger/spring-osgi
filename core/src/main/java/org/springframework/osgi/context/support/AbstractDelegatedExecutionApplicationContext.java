@@ -256,9 +256,10 @@ public abstract class AbstractDelegatedExecutionApplicationContext extends Abstr
 							if (ObjectUtils.isEmpty(getConfigLocations())) {
 								setConfigLocations(getDefaultConfigLocations());
 							}
-							if (!OsgiBundleUtils.isBundleActive(getBundle())) {
+							if (!OsgiBundleUtils.isBundleActive(getBundle())
+									&& !OsgiBundleUtils.isBundleLazyActivated(getBundle())) {
 								throw new ApplicationContextException(
-									"Unable to refresh application context: bundle is "
+									"Unable to refresh application context: bundle is neither active nor lazy-activated but "
 											+ OsgiStringUtils.bundleStateAsString(getBundle()));
 							}
 

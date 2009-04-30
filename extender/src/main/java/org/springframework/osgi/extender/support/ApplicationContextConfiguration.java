@@ -71,7 +71,7 @@ public class ApplicationContextConfiguration {
 	 * internally for discovering Spring-powered bundles.
 	 * 
 	 * @param bundle bundle for which the application context configuration is
-	 * created
+	 *        created
 	 */
 	public ApplicationContextConfiguration(Bundle bundle) {
 		this(bundle, new DefaultConfigurationScanner());
@@ -123,7 +123,8 @@ public class ApplicationContextConfiguration {
 	 * True if this bundle has at least one defined application context
 	 * configuration file.
 	 * 
-	 * <p/> A bundle is "Spring-Powered" if it has at least one configuration
+	 * <p/>
+	 * A bundle is "Spring-Powered" if it has at least one configuration
 	 * resource.
 	 */
 	public boolean isSpringPoweredBundle() {
@@ -163,7 +164,7 @@ public class ApplicationContextConfiguration {
 	 * Indicates if the configuration must wait for dependencies.
 	 * 
 	 * @return true if the configuration indicates that dependencies should be
-	 * waited for.
+	 *         waited for.
 	 */
 	public boolean isWaitForDependencies() {
 		return waitForDeps;

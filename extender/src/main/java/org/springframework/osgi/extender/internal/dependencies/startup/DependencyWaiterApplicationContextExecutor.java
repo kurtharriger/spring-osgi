@@ -20,6 +20,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
@@ -35,7 +37,10 @@ import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
+import org.springframework.osgi.extender.internal.support.LazyLatchFactoryDelegate;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
+import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
+import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 
@@ -53,7 +58,7 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  */
 public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApplicationContextExecutor,
-		ContextExecutorStateAccessor {
+		ContextExecutorAccessor {
 
 	private static final Log log = LogFactory.getLog(DependencyWaiterApplicationContextExecutor.class);
 
@@ -100,6 +105,12 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 	private List<OsgiServiceDependencyFactory> dependencyFactories;
 
+	/** flag indicating whether the bundle (if lazy) has been activated or not */
+	private volatile boolean activated;
+
+	private final boolean isLazyBundle;
+	private final Integer contextHash;
+
 
 	/**
 	 * The task for the watch dog.
@@ -114,9 +125,9 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	/**
-	 * Create the Runnable action which will complete the context creation
-	 * process. This process can be called synchronously or asynchronously,
-	 * depending on context configuration and availability of dependencies.
+	 * Runnable action which will complete the context creation process. This
+	 * process can be called synchronously or asynchronously, depending on
+	 * context configuration and availability of dependencies.
 	 * 
 	 * @author Hal Hildebrand
 	 * @author Costin Leau
@@ -134,29 +145,51 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 					logWrongState(ContextState.DEPENDENCIES_RESOLVED);
 					return;
 				}
+				else {
+					state = ContextState.STARTED;
+				}
 			}
 
 			// Continue with the refresh process...
 			delegateContext.completeRefresh();
+		}
+	}
 
-			// Once we are done, tell the world
+	private class LazyActivationTask implements Runnable {
+
+		private final DelegatedExecutionOsgiBundleApplicationContext applicationContext;
+
+
+		LazyActivationTask(DelegatedExecutionOsgiBundleApplicationContext context) {
+			this.applicationContext = context;
+		}
+
+		public void run() {
+			// simply instantiate the exporters
+			// which will do the rest
+			if (log.isDebugEnabled()) {
+				log.debug("Lazily publishing services for context " + applicationContext);
+			}
+
 			synchronized (monitor) {
-				// Close might have been called in the meantime
-				if (state != ContextState.DEPENDENCIES_RESOLVED) {
-					return;
+				if (!state.isDown()) {
+					Map<String, OsgiServiceFactoryBean> exporters = BeanFactoryUtils.beansOfTypeIncludingAncestors(
+						applicationContext.getBeanFactory(), OsgiServiceFactoryBean.class, true, false);
 				}
-				state = ContextState.STARTED;
 			}
 		}
 	}
 
 
 	public DependencyWaiterApplicationContextExecutor(DelegatedExecutionOsgiBundleApplicationContext delegateContext,
-			boolean syncWait, List<OsgiServiceDependencyFactory> dependencyFactories) {
+			boolean syncWait, List<OsgiServiceDependencyFactory> dependencyFactories, boolean isLazyBundle) {
 		this.delegateContext = delegateContext;
 		this.delegateContext.setExecutor(this);
 		this.synchronousWait = syncWait;
 		this.dependencyFactories = dependencyFactories;
+		this.isLazyBundle = isLazyBundle;
+		this.activated = !isLazyBundle;
+		this.contextHash = System.identityHashCode(delegateContext);
 
 		synchronized (monitor) {
 			watchdogTask = new WatchDogTask();
@@ -176,7 +209,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		init();
 
 		// start the first stage
-		stageOne();
+		waitForDependencies();
 	}
 
 	/**
@@ -197,7 +230,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	/**
-	 * Start the first stage of the application context refresh. Determines the
+	 * Starts the first stage of the application context refresh. Determines the
 	 * service dependencies and if there are any, registers a OSGi service
 	 * dependencyDetector which will continue the refresh process
 	 * asynchronously.
@@ -206,7 +239,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 * if there are any dependencies (the default) or wait to either timeout or
 	 * have all its dependencies met.
 	 */
-	protected void stageOne() {
+	protected void waitForDependencies() {
 
 		boolean debug = log.isDebugEnabled();
 
@@ -246,7 +279,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 					public void run() {
 						// no waiting involved, just call stageTwo
-						stageTwo();
+						publishLazyExportersIfNeeded();
 					}
 				};
 
@@ -256,7 +289,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			// all dependencies are met, just go with stageTwo
 			if (dl.isSatisfied()) {
 				log.info("No outstanding OSGi service dependencies, completing initialization for " + getDisplayName());
-				stageTwo();
+				publishLazyExportersIfNeeded();
 			}
 
 			else {
@@ -281,7 +314,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 						timeout();
 					}
 					else
-						stageTwo();
+						publishLazyExportersIfNeeded();
 				}
 				else {
 					// start the watchdog (we're asynch)
@@ -295,7 +328,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 	}
 
-	protected void stageTwo() {
+	/**
+	 * Second phase. Since DM 2.0, this activates lazy service exports (if
+	 * possible), otherwise moves to phase three.
+	 */
+	protected void publishLazyExportersIfNeeded() {
 		boolean debug = log.isDebugEnabled();
 
 		if (debug)
@@ -312,9 +349,47 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			state = ContextState.DEPENDENCIES_RESOLVED;
 		}
 
-		// always delegate to the taskExecutor since we might be called by the
-		// OSGi platform listener
+		if (isLazyBundle) {
+			if (OsgiBundleUtils.isBundleLazyActivated(delegateContext.getBundle()) && !activated) {
+				taskExecutor.execute(new LazyActivationTask(delegateContext));
+			}
+			else {
+				if (debug) {
+					log.debug("Context " + getDisplayName()
+							+ " was started lazy but has been activated in the meantime; executing normal startup");
+				}
+				fullyInitializeContext();
+			}
+		}
+		else {
+			fullyInitializeContext();
+		}
+	}
+
+	protected void fullyInitializeContext() {
+		boolean debug = log.isDebugEnabled();
+
+		if (debug)
+			log.debug("Starting stage three for " + getDisplayName());
+
 		taskExecutor.execute(new CompleteRefreshTask());
+	}
+
+	public void activate() {
+		activated = true;
+		LazyLatchFactoryDelegate.removeLatch(contextHash);
+
+		boolean shouldCallStageThree = false;
+		synchronized (monitor) {
+			shouldCallStageThree = (state == ContextState.DEPENDENCIES_RESOLVED);
+		}
+
+		if (shouldCallStageThree) {
+			fullyInitializeContext();
+		}
+		else {
+			log.debug("No need to invoke stage three, context is " + state);
+		}
 	}
 
 	/**
@@ -325,6 +400,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		boolean debug = log.isDebugEnabled();
 
 		boolean normalShutdown = false;
+
+		LazyLatchFactoryDelegate.removeLatch(contextHash);
 
 		synchronized (monitor) {
 
@@ -407,9 +484,9 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 * <p/>
 	 * Normally this method is called when an exception is caught.
 	 * 
-	 * @param t - the offending Throwable which caused our demise
+	 * @param th - the offending Throwable which caused our demise
 	 */
-	private void fail(Throwable t) {
+	public void fail(Throwable th) {
 
 		// this will not thrown any exceptions (it just logs them)
 		close();
@@ -443,11 +520,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		message.append("], unsatisfied dependencies: ");
 		message.append(buf.toString());
 
-		log.error(message.toString(), t);
+		log.error(message.toString(), th);
 
 		// send notification
 		delegatedMulticaster.multicastEvent(new OsgiBundleContextFailedEvent(delegateContext,
-			delegateContext.getBundle(), t));
+			delegateContext.getBundle(), th));
 	}
 
 	/**
