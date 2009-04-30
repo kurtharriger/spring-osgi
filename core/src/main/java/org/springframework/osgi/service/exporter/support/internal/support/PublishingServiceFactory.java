@@ -48,7 +48,7 @@ public class PublishingServiceFactory implements ServiceFactory {
 	private final Object monitor = new Object();
 
 	/** proxy cache in case the given bean has a non-singleton scope */
-	private final Map proxyCache;
+	private final Map<Object, WeakReference<Object>> proxyCache;
 
 	private final Class<?>[] classes;
 	private final Object target;
@@ -62,7 +62,7 @@ public class PublishingServiceFactory implements ServiceFactory {
 
 	/**
 	 * Constructs a new <code>PublishingServiceFactory</code> instance. Since
-	 * its an internal class, this constructor accepts a number of paramters to
+	 * its an internal class, this constructor accepts a number of parameters to
 	 * sacrifice readability for thread-safety.
 	 * 
 	 * @param classes
@@ -87,7 +87,7 @@ public class PublishingServiceFactory implements ServiceFactory {
 		this.aopClassLoader = aopClassLoader;
 		this.bundleContext = bundleContext;
 
-		proxyCache = (createTCCLProxy ? new WeakHashMap(4) : null);
+		proxyCache = (createTCCLProxy ? new WeakHashMap<Object, WeakReference<Object>>(4) : null);
 	}
 
 	private Object getBean() {
@@ -108,16 +108,15 @@ public class PublishingServiceFactory implements ServiceFactory {
 		if (createTCCLProxy) {
 			// check proxy cache
 			synchronized (proxyCache) {
-				Object proxy = proxyCache.get(bn);
-				if (proxy == null) {
-					proxy = createCLLProxy(bn);
-					proxyCache.put(bn, new WeakReference(proxy));
+				WeakReference<Object> value = proxyCache.get(bn);
+				if (value == null) {
+					Object proxy = createCLLProxy(bn);
+					proxyCache.put(bn, new WeakReference<Object>(proxy));
 					bn = proxy;
 				}
 				else {
-					bn = ((WeakReference) proxy).get();
+					bn = value.get();
 				}
-
 			}
 		}
 
@@ -161,7 +160,7 @@ public class PublishingServiceFactory implements ServiceFactory {
 
 		if (createTCCLProxy) {
 			synchronized (proxyCache) {
-				proxyCache.values().remove(new WeakReference(service));
+				proxyCache.values().remove(new WeakReference<Object>(service));
 			}
 		}
 	}

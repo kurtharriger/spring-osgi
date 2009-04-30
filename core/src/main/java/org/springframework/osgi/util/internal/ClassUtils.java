@@ -245,8 +245,9 @@ public abstract class ClassUtils {
 
 
 	/**
-	 * Return an array of parent classes for the given class. The mode paramater
-	 * indicates whether only interfaces should be included, classes or both.
+	 * Returns an array of parent classes for the given class. The mode
+	 * paramater indicates whether only interfaces should be included, classes
+	 * or both.
 	 * 
 	 * This method is normally used for publishing services and determing the
 	 * {@link org.osgi.framework.Constants#OBJECTCLASS} property.
@@ -294,9 +295,9 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Sugar method, determining the class hierarchy of a given class and then
-	 * filtering based on the given classloader. If a null classloader, the one
-	 * of the given class will be used.
+	 * Sugar method that determines the class hierarchy of a given class and
+	 * then filtering based on the given classloader. If a null classloader, the
+	 * one of the given class will be used.
 	 * 
 	 * @param clazz
 	 * @param mode
@@ -324,7 +325,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Given an array of classes, eliminate the ones that cannot be loaded by
+	 * Given an array of classes, eliminates the ones that cannot be loaded by
 	 * the given classloader.
 	 * 
 	 * @return
@@ -334,7 +335,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Given an array of classes, eliminate the ones that cannot be loaded by
+	 * Given an array of classes, eliminates the ones that cannot be loaded by
 	 * the given bundle.
 	 * 
 	 * @return
@@ -361,7 +362,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Get all interfaces implemented by the given class. This method returns
+	 * Gets all interfaces implemented by the given class. This method returns
 	 * both parent and children interfaces (i.e. Map and SortedMap).
 	 * 
 	 * @param clazz
@@ -373,7 +374,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Recursive implementation for getting all interfaces.
+	 * Gets all the interfaces recursively.
 	 * 
 	 * @param clazz
 	 * @param interfaces
@@ -391,8 +392,8 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Check the present of a class inside a bundle. This method returns true if
-	 * the given bundle can load the given class or false otherwise.
+	 * Checks the present of a class inside a bundle. This method returns true
+	 * if the given bundle can load the given class or false otherwise.
 	 * 
 	 * @param className
 	 * @param bundle
@@ -412,7 +413,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return the classloader for the given class. This method deals with JDK
+	 * Returns the classloader for the given class. This method deals with JDK
 	 * classes which return by default, a null classloader.
 	 * 
 	 * @param clazz
@@ -425,7 +426,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Test if testedMode includes an expected mode.
+	 * Tests if testedMode includes an expected mode.
 	 * 
 	 * @param testedMode
 	 * @param mode
@@ -436,7 +437,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Test if a mode is valid.
+	 * Tests if a mode is valid.
 	 * 
 	 * @param mode
 	 * @return
@@ -446,7 +447,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return an array of class string names for the given classes.
+	 * Returns an array of class string names for the given classes.
 	 * 
 	 * @param array
 	 * @return
@@ -465,8 +466,8 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Determining if multiple classes(not interfaces) are specified, without
-	 * any relation to each other. Interfaces will simply be ignored.
+	 * Determines if multiple classes(not interfaces) are specified, without any
+	 * relation to each other. Interfaces will simply be ignored.
 	 * 
 	 * @param classes an array of classes
 	 * @return true if at least two classes unrelated to each other are found,
@@ -499,7 +500,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Parse the given class array and eliminate parents of existing classes.
+	 * Parses the given class array and eliminate parents of existing classes.
 	 * Useful when creating proxies to minimize the number of implemented
 	 * interfaces and redundant class information.
 	 * 
@@ -548,8 +549,9 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Based on the given class, properly instruct the ProxyFactory proxies. For
-	 * additional sanity checks on the passed classes, check the methods below.
+	 * Based on the given class, properly instructs the ProxyFactory proxies.
+	 * For additional sanity checks on the passed classes, check the methods
+	 * below.
 	 * 
 	 * @see #containsUnrelatedClasses(Class[])
 	 * @see #removeParents(Class[])
@@ -575,7 +577,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Load classes with the given name, using the given classloader.
+	 * Loads classes with the given name, using the given classloader.
 	 * {@link ClassNotFoundException} exceptions are being ignored. The return
 	 * class array will not contain duplicates.
 	 * 
@@ -584,7 +586,7 @@ public abstract class ClassUtils {
 	 * @return an array of classes (can be smaller then the array of class
 	 *         names) w/o duplicates
 	 */
-	public static Class<?>[] loadClasses(String[] classNames, ClassLoader classLoader) {
+	public static Class<?>[] loadClassesIfPossible(String[] classNames, ClassLoader classLoader) {
 		if (ObjectUtils.isEmpty(classNames))
 			return new Class[0];
 
@@ -604,7 +606,29 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Exclude classes from the given array, which match the given modifier.
+	 * Loads and returns the classes given as names, using the given class
+	 * loader. Throws IllegalArgument exception if the classes cannot be loaded.
+	 * 
+	 * @param classNames array of class names
+	 * @param classLoader class loader for loading the classes
+	 * @return the loaded classes
+	 */
+	public static Class<?>[] loadClasses(String[] classNames, ClassLoader classLoader) {
+		if (ObjectUtils.isEmpty(classNames))
+			return new Class[0];
+
+		Assert.notNull(classLoader, "classLoader is required");
+		Set<Class<?>> classes = new LinkedHashSet<Class<?>>(classNames.length);
+
+		for (int i = 0; i < classNames.length; i++) {
+			classes.add(org.springframework.util.ClassUtils.resolveClassName(classNames[i], classLoader));
+		}
+
+		return (Class[]) classes.toArray(new Class[classes.size()]);
+	}
+
+	/**
+	 * Excludes classes from the given array, which match the given modifier.
 	 * 
 	 * @see Modifier
 	 * 

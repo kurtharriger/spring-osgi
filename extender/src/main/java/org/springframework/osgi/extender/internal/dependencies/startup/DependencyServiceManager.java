@@ -45,7 +45,7 @@ public class DependencyServiceManager {
 
 	protected final Map<MandatoryServiceDependency, String> unsatisfiedDependencies = Collections.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
 
-	private final ContextExecutorStateAccessor contextStateAccessor;
+	private final ContextExecutorAccessor contextStateAccessor;
 
 	private final BundleContext bundleContext;
 
@@ -124,9 +124,10 @@ public class DependencyServiceManager {
 					executeIfDone.run();
 				}
 			}
-			catch (Throwable e) {
+			catch (Throwable th) {
 				// frameworks will simply not log exception for event handlers
-				log.error("Exception during dependency processing for " + context.getDisplayName(), e);
+				log.error("Exception during dependency processing for " + context.getDisplayName(), th);
+				contextStateAccessor.fail(th);
 			}
 		}
 
@@ -186,7 +187,7 @@ public class DependencyServiceManager {
 	 * @param context
 	 * @param executeIfDone
 	 */
-	public DependencyServiceManager(ContextExecutorStateAccessor executor,
+	public DependencyServiceManager(ContextExecutorAccessor executor,
 			DelegatedExecutionOsgiBundleApplicationContext context,
 			List<OsgiServiceDependencyFactory> dependencyFactories, Runnable executeIfDone, long maxWaitTime) {
 		this.contextStateAccessor = executor;

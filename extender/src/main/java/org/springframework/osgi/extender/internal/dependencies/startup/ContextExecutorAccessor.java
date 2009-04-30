@@ -19,12 +19,17 @@ package org.springframework.osgi.extender.internal.dependencies.startup;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 
 /**
+ * Decoupling interface between the executor and the dependency service
+ * listener.
+ * 
  * @author Costin Leau
  * 
  */
-public interface ContextExecutorStateAccessor {
+public interface ContextExecutorAccessor {
 
 	ContextState getContextState();
 
 	OsgiBundleApplicationContextEventMulticaster getEventMulticaster();
+
+	void fail(Throwable th);
 }
