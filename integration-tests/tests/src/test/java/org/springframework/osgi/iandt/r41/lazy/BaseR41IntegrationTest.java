@@ -46,13 +46,11 @@ public abstract class BaseR41IntegrationTest extends BaseIntegrationTest {
 		Method m = null;
 		try {
 			m = Bundle.class.getMethod("start", new Class[] { int.class });
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 		}
 
 		START_LAZY_METHOD = m;
 	}
-
 
 	@Override
 	protected boolean isDisabledInThisEnvironment(String testMethodName) {
@@ -62,7 +60,7 @@ public abstract class BaseR41IntegrationTest extends BaseIntegrationTest {
 	protected String[] getBundleContentPattern() {
 		String pkg = getClass().getPackage().getName().replace('.', '/').concat("/");
 		String[] patterns = new String[] { BaseR41IntegrationTest.class.getName().replace('.', '/').concat("*.class"),
-			BaseIntegrationTest.class.getName().replace('.', '/').concat("*.class"), pkg + "**/*" };
+				BaseIntegrationTest.class.getName().replace('.', '/').concat("*.class"), pkg + "**/*" };
 		return patterns;
 	}
 
@@ -83,7 +81,7 @@ public abstract class BaseR41IntegrationTest extends BaseIntegrationTest {
 			Bundle bundle = context.installBundle(resource.getDescription(), resource.getInputStream());
 			startBundleLazy(bundle);
 			assertTrue("the lazy bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " has been activated",
-				OsgiBundleUtils.isBundleLazyActivated(bundle));
+					OsgiBundleUtils.isBundleLazyActivated(bundle));
 		}
 	}
 
@@ -102,9 +100,8 @@ public abstract class BaseR41IntegrationTest extends BaseIntegrationTest {
 			latch.countDown();
 		}
 		try {
-			latch.await(2, TimeUnit.MINUTES);
-		}
-		finally {
+			latch.await(2 * 60, TimeUnit.SECONDS);
+		} finally {
 			bundleContext.removeServiceListener(sl);
 		}
 		return OsgiServiceReferenceUtils.getServiceReference(bundleContext, filter);
