@@ -32,9 +32,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
@@ -47,13 +45,11 @@ import org.springframework.osgi.extender.internal.dependencies.shutdown.Comparat
 import org.springframework.osgi.extender.internal.dependencies.shutdown.ServiceDependencySorter;
 import org.springframework.osgi.extender.internal.dependencies.startup.DependencyWaiterApplicationContextExecutor;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
-import org.springframework.osgi.extender.internal.support.LazyLatchFactoryDelegate;
 import org.springframework.osgi.extender.internal.support.OsgiBeanFactoryPostProcessorAdapter;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.extender.internal.util.concurrent.RunnableTimedExecution;
 import org.springframework.osgi.extender.support.ApplicationContextConfiguration;
 import org.springframework.osgi.extender.support.internal.ConfigUtils;
-import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
@@ -66,86 +62,6 @@ import org.springframework.osgi.util.OsgiStringUtils;
  */
 class LifecycleManager implements DisposableBean {
 
-	/**
-	 * Holder class providing lazy loading-related information for managed OSGi
-	 * contexts.
-	 * 
-	 * @author Costin Leau
-	 */
-	private static class ContextLazyInfo {
-
-		/** executor */
-		volatile DependencyWaiterApplicationContextExecutor executor;
-		final Integer contextHash;
-
-
-		ContextLazyInfo(Integer hash) {
-			this.contextHash = hash;
-		}
-
-		/** activate bundle */
-		void eagerLoading() {
-			// remove any existing latches
-			LazyLatchFactoryDelegate.removeLatch(contextHash);
-
-			// if the bundle is waiting for dependencies
-			// activate it
-			if (executor != null) {
-				executor.activate();
-			}
-		}
-	}
-
-	/**
-	 * Task executed for lazy activated bundles.
-	 * 
-	 * @author Costin Leau
-	 */
-	private class LazyActivationTask extends CompleteRefreshTask {
-
-		private final String EXPORTER_CLASS_NAME = OsgiServiceFactoryBean.class.getName();
-
-
-		public LazyActivationTask(ConfigurableOsgiBundleApplicationContext applicationContext) {
-			super(applicationContext);
-		}
-
-		public void run() {
-			super.run();
-			// discover the exporters
-			ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
-			String[] names = beanFactory.getBeanDefinitionNames();
-			for (String name : names) {
-				BeanDefinition definition = beanFactory.getBeanDefinition(name);
-				if (EXPORTER_CLASS_NAME.equals(definition.getBeanClassName())) {
-					beanFactory.getBean(name);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Task executed for completing the application context refresh.
-	 * 
-	 * @author Costin Leau
-	 */
-	private class CompleteRefreshTask implements Runnable {
-
-		protected final ConfigurableOsgiBundleApplicationContext applicationContext;
-
-
-		public CompleteRefreshTask(ConfigurableOsgiBundleApplicationContext applicationContext) {
-			this.applicationContext = applicationContext;
-		}
-
-		public void run() {
-			// post refresh events are caught through events
-			processor.preProcessRefresh(applicationContext);
-			applicationContext.refresh();
-		}
-	}
-
-
 	/** logger */
 	private static final Log log = LogFactory.getLog(LifecycleManager.class);
 
@@ -154,9 +70,6 @@ class LifecycleManager implements DisposableBean {
 	 * ServiceDependentOsgiApplicationContexts for the application context
 	 */
 	private final Map<Long, ConfigurableOsgiBundleApplicationContext> managedContexts = new ConcurrentHashMap<Long, ConfigurableOsgiBundleApplicationContext>(
-		16);
-
-	private final Map<ConfigurableOsgiBundleApplicationContext, ContextLazyInfo> contextLazyInfo = new ConcurrentHashMap<ConfigurableOsgiBundleApplicationContext, ContextLazyInfo>(
 		16);
 
 	/** listener counter - used to properly synchronize shutdown */
@@ -236,32 +149,18 @@ class LifecycleManager implements DisposableBean {
 	 * slow-downs on platforms with a big number of plugins and wiring (i.e.
 	 * Eclipse platform).
 	 * 
-	 * @param bundle target bundle
-	 * @param isLazy if the bundle is lazily activated
+	 * @param bundle
 	 */
-	protected void maybeCreateApplicationContextFor(Bundle bundle, boolean isLazy) {
+	protected void maybeCreateApplicationContextFor(Bundle bundle) {
 
 		boolean debug = log.isDebugEnabled();
-		String bundleString = (debug ? "[" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "]" : null);
+		String bundleString = "[" + OsgiStringUtils.nullSafeNameAndSymName(bundle) + "]";
 
 		final Long bundleId = new Long(bundle.getBundleId());
 
-		ConfigurableOsgiBundleApplicationContext context = managedContexts.get(bundleId);
-
-		if (context != null) {
-			// check if a lazy bundle was started...
-			ContextLazyInfo lazyInfo;
-			if (!isLazy && (lazyInfo = contextLazyInfo.remove(context)) != null) {
-				// no more lazy loading
-				lazyInfo.eagerLoading();
-				if (debug) {
-					log.debug("Lazy bundle " + bundleString + " was started");
-				}
-			}
-			else {
-				if (debug) {
-					log.debug("Bundle " + bundleString + " is already managed; ignoring...");
-				}
+		if (managedContexts.containsKey(bundleId)) {
+			if (debug) {
+				log.debug("Bundle " + bundleString + " is already managed; ignoring...");
 			}
 			return;
 		}
@@ -273,13 +172,13 @@ class LifecycleManager implements DisposableBean {
 		BundleContext localBundleContext = OsgiBundleUtils.getBundleContext(bundle);
 
 		if (debug)
-			log.debug("Scanning" + (isLazy ? " lazy" : "") + " bundle " + bundleString + " for configurations...");
+			log.debug("Scanning bundle " + bundleString + " for configurations...");
 
 		// initialize context
 		final DelegatedExecutionOsgiBundleApplicationContext localApplicationContext;
 
 		if (debug)
-			log.debug("Creating an application context for " + (isLazy ? " lazy" : "") + " bundle " + bundleString);
+			log.debug("Creating an application context for bundle " + bundleString);
 
 		try {
 			localApplicationContext = contextCreator.createApplicationContext(localBundleContext);
@@ -298,7 +197,7 @@ class LifecycleManager implements DisposableBean {
 		BeanFactoryPostProcessor processingHook = new OsgiBeanFactoryPostProcessorAdapter(localBundleContext,
 			postProcessors);
 
-		// add in the osgi post processors
+		// add in the post processors
 		localApplicationContext.addBeanFactoryPostProcessor(processingHook);
 
 		// add the context to the tracker
@@ -308,36 +207,23 @@ class LifecycleManager implements DisposableBean {
 
 		ApplicationContextConfiguration config = contextConfigurationFactory.createConfiguration(bundle);
 
-		TaskExecutor executor = configureExecutor(config, debug, bundleString);
+		final boolean asynch = config.isCreateAsynchronously();
 
-		DependencyWaiterApplicationContextExecutor contextExecutor = configureDependencyWaiting(
-			localApplicationContext, config, executor, isLazy, debug, bundleString);
+		// create refresh runnable
+		Runnable contextRefresh = new Runnable() {
 
-		Runnable task = new CompleteRefreshTask(localApplicationContext);
+			public void run() {
+				// post refresh events are caught through events
+				processor.preProcessRefresh(localApplicationContext);
+				localApplicationContext.refresh();
+			}
+		};
 
-		// check lazy initialization
-		if (isLazy) {
-			// save context
-			Integer hash = Integer.valueOf(System.identityHashCode(localApplicationContext));
-			final ContextLazyInfo info = new ContextLazyInfo(hash);
-			info.executor = contextExecutor;
-			contextLazyInfo.put(localApplicationContext, info);
-			// add latch
-			LazyLatchFactoryDelegate.addLatch(hash);
-			task = new LazyActivationTask(localApplicationContext);
-		}
-
-		executor.execute(task);
-	}
-
-	private TaskExecutor configureExecutor(ApplicationContextConfiguration config, boolean debug, String bundleString) {
 		// executor used for creating the appCtx
 		// chosen based on the sync/async configuration
 		TaskExecutor executor = null;
 
 		String creationType;
-
-		final boolean asynch = config.isCreateAsynchronously();
 
 		// synch/asynch context creation
 		if (asynch) {
@@ -355,18 +241,10 @@ class LifecycleManager implements DisposableBean {
 			log.debug(creationType + " context creation for bundle " + bundleString);
 		}
 
-		return executor;
-	}
-
-	private DependencyWaiterApplicationContextExecutor configureDependencyWaiting(
-			DelegatedExecutionOsgiBundleApplicationContext context, ApplicationContextConfiguration config,
-			TaskExecutor executor, boolean isLazy, boolean debug, String bundleString) {
-		Bundle bundle = context.getBundle();
-
 		// wait/no wait for dependencies behaviour
 		if (config.isWaitForDependencies()) {
 			DependencyWaiterApplicationContextExecutor appCtxExecutor = new DependencyWaiterApplicationContextExecutor(
-				context, !config.isCreateAsynchronously(), extenderConfiguration.getDependencyFactories(), isLazy);
+				localApplicationContext, !asynch, extenderConfiguration.getDependencyFactories());
 
 			long timeout;
 			// check whether a timeout has been defined
@@ -386,18 +264,20 @@ class LifecycleManager implements DisposableBean {
 			}
 
 			appCtxExecutor.setTimeout(config.getTimeout());
+
 			appCtxExecutor.setWatchdog(timer);
 			appCtxExecutor.setTaskExecutor(executor);
 			appCtxExecutor.setMonitoringCounter(contextsStarted);
+			// set events publisher
 			appCtxExecutor.setDelegatedMulticaster(this.multicaster);
 
 			contextsStarted.increment();
-
-			return appCtxExecutor;
 		}
 		else {
-			return null;
+			// do nothing; by default contexts do not wait for services.
 		}
+
+		executor.execute(contextRefresh);
 	}
 
 	/**
@@ -405,10 +285,10 @@ class LifecycleManager implements DisposableBean {
 	 * however, we *have* to do it synchronously during the event process as the
 	 * BundleContext object is not valid once we return from this method.
 	 * 
-	 * @param bundle target bundle
+	 * @param bundle
 	 */
 	protected void maybeCloseApplicationContextFor(Bundle bundle) {
-		final ConfigurableOsgiBundleApplicationContext context = managedContexts.remove(Long.valueOf(bundle.getBundleId()));
+		final ConfigurableOsgiBundleApplicationContext context = (ConfigurableOsgiBundleApplicationContext) managedContexts.remove(Long.valueOf(bundle.getBundleId()));
 		if (context == null) {
 			return;
 		}
@@ -451,9 +331,6 @@ class LifecycleManager implements DisposableBean {
 	public void destroy() {
 		// first stop the watchdog
 		stopTimer();
-
-		// cleanup lazy latches
-		LazyLatchFactoryDelegate.clear();
 
 		// destroy bundles
 		Bundle[] bundles = new Bundle[managedContexts.size()];

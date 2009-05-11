@@ -38,8 +38,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
@@ -47,9 +45,6 @@ import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterController;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
-import org.springframework.osgi.service.exporter.support.internal.support.LazyLatchFactory;
-import org.springframework.osgi.service.exporter.support.internal.support.LazyObjectFactory;
-import org.springframework.osgi.service.exporter.support.internal.support.LazyServiceFactory;
 import org.springframework.osgi.service.exporter.support.internal.support.PublishingServiceFactory;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
@@ -89,7 +84,7 @@ import org.springframework.util.StringUtils;
  */
 public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implements BeanClassLoaderAware,
 		BeanFactoryAware, BeanNameAware, BundleContextAware, FactoryBean<ServiceRegistration>, InitializingBean,
-		Ordered, ApplicationContextAware {
+		Ordered {
 
 	/**
 	 * Wrapper around internal commands.
@@ -142,32 +137,30 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private volatile ServicePropertiesChangeListener propertiesListener;
 	private volatile int ranking;
 	private volatile String targetBeanName;
-	private volatile boolean hasNamedBean;
+	private boolean hasNamedBean;
 	private volatile Class<?>[] interfaces;
-	private volatile String[] interfaceNames;
-	private volatile AutoExport autoExport = AutoExport.DISABLED;
+	private AutoExport autoExport = AutoExport.DISABLED;
 	private volatile ExportContextClassLoader contextClassLoader = ExportContextClassLoader.UNMANAGED;
 	private volatile Object target;
 	private volatile Class<?> targetClass;
 	/** Default value is same as non-ordered */
 	private int order = Ordered.LOWEST_PRECEDENCE;
-	private volatile ClassLoader classLoader;
+	private ClassLoader classLoader;
 	/** class loader used by the aop infrastructure */
-	private volatile ClassLoader aopClassLoader;
+	private ClassLoader aopClassLoader;
+
 	/** exporter bean name */
-	private volatile String beanName;
+	private String beanName;
 	/** registration sanity flag */
-	private volatile boolean serviceRegistered = false;
+	private boolean serviceRegistered = false;
 	/** register at startup by default */
-	private volatile boolean registerAtStartup = true;
+	private boolean registerAtStartup = true;
 	/** register the service by default */
-	private volatile boolean registerService = true;
+	private boolean registerService = true;
 	/** synchronization lock */
 	private final Object lock = new Object();
 	/** internal behaviour controller */
 	private final ExporterController controller;
-	private volatile ApplicationContext applicationContext;
-	private volatile Integer contextHashKey;
 
 
 	public OsgiServiceFactoryBean() {
@@ -180,29 +173,10 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		hasNamedBean = StringUtils.hasText(targetBeanName);
 
 		Assert.isTrue(hasNamedBean || target != null, "Either 'targetBeanName' or 'target' properties have to be set.");
+
 		// if we have a name, we need a bean factory
 		if (hasNamedBean) {
 			Assert.notNull(beanFactory, "Required property 'beanFactory' has not been set.");
-		}
-
-		contextHashKey = System.identityHashCode(applicationContext);
-
-		boolean debug = log.isDebugEnabled();
-
-		// check if lazy loading is possible
-		if (isLazyLoading()) {
-			if (target != null) {
-				if (debug) {
-					log.debug("Lazy class loading disabled: target object already specified");
-				}
-				cancelLazyLoading();
-			}
-			else if (!AutoExport.DISABLED.equals(autoExport)) {
-				if (debug) {
-					log.debug("Lazy class loading disabled: autoexport enabled = " + autoExport);
-				}
-				cancelLazyLoading();
-			}
 		}
 
 		// initialize bean only when dealing with singletons and named beans
@@ -210,44 +184,27 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			Assert.isTrue(beanFactory.containsBean(targetBeanName), "Cannot locate bean named '" + targetBeanName
 					+ "' inside the running bean factory.");
 
-			if (!isLazyLoading())
-				if (beanFactory.isSingleton(targetBeanName)) {
-					target = beanFactory.getBean(targetBeanName);
-					targetClass = target.getClass();
-				}
-				else {
-					targetClass = beanFactory.getType(targetBeanName);
-				}
+			if (beanFactory.isSingleton(targetBeanName)) {
+				target = beanFactory.getBean(targetBeanName);
+				targetClass = target.getClass();
+			}
+			else {
+				targetClass = beanFactory.getType(targetBeanName);
+			}
+
 			// when running inside a container, add the dependency between this bean and the target one
 			addBeanFactoryDependency();
 		}
-		else {
+		else
 			targetClass = target.getClass();
-		}
 
 		if (propertiesResolver == null) {
 			propertiesResolver = new BeanNameServicePropertiesResolver();
 			((BeanNameServicePropertiesResolver) propertiesResolver).setBundleContext(bundleContext);
 		}
 
-		if (!ObjectUtils.isEmpty(interfaces) && !ObjectUtils.isEmpty(interfaceNames)) {
-			throw new IllegalArgumentException("Set either property 'interfaces' or 'interfacesNames' but not both");
-		}
-
-		if (ObjectUtils.isEmpty(interfaceNames) && interfaces != null) {
-			interfaceNames = new String[interfaces.length];
-			for (int i = 0; i < interfaces.length; i++) {
-				interfaceNames[i] = interfaces[i].getName();
-			}
-		}
-		else {
-			if (!isLazyLoading()) {
-				resolveClasses();
-			}
-		}
-
 		// sanity check
-		if (ObjectUtils.isEmpty(interfaceNames)) {
+		if (interfaces == null) {
 			if (AutoExport.DISABLED.equals(autoExport))
 				throw new IllegalArgumentException(
 					"No service interface(s) specified and auto-export discovery disabled; change at least one of these properties.");
@@ -255,7 +212,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		}
 		// check visibility type
 		else {
-			if (targetClass != null && !ServiceFactory.class.isAssignableFrom(targetClass)) {
+			if (!ServiceFactory.class.isAssignableFrom(targetClass)) {
 				for (int interfaceIndex = 0; interfaceIndex < interfaces.length; interfaceIndex++) {
 					Class<?> intf = interfaces[interfaceIndex];
 					Assert.isAssignable(intf, targetClass,
@@ -303,16 +260,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		}
 	}
 
-	private boolean isLazyLoading() {
-		return LazyLatchFactory.hasLatch(contextHashKey);
-	}
-
-	private void cancelLazyLoading() {
-		LazyLatchFactory.removeLatch(contextHashKey);
-	}
-
 	private Dictionary mergeServiceProperties(Map serviceProperties, String beanName) {
-		MapBasedDictionary<Object, Object> props = new MapBasedDictionary<Object, Object>();
+		MapBasedDictionary props = new MapBasedDictionary();
 
 		props.putAll(propertiesResolver.getServiceProperties(beanName));
 
@@ -345,45 +294,28 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		Dictionary serviceProperties = mergeServiceProperties(this.serviceProperties, beanName);
 
-		Class<?>[] intfs = autodetectExportClasses();
+		Class<?>[] intfs = interfaces;
 
-		ServiceRegistration reg = null;
-		if (ObjectUtils.isEmpty(intfs) || isLazyLoading()) {
-			reg = registerLazyService(serviceProperties);
-		}
-		else {
-			reg = registerService(intfs, serviceProperties);
-		}
+		// filter classes based on visibility
+		ClassLoader beanClassLoader = ClassUtils.getClassLoader(targetClass);
+		Class<?>[] autoDetectedClasses = ClassUtils.getVisibleClasses(autoExport.getExportedClasses(targetClass),
+			beanClassLoader);
+
+		if (log.isTraceEnabled())
+			log.trace("Autoexport mode [" + autoExport + "] discovered on class [" + targetClass + "] classes "
+					+ ObjectUtils.nullSafeToString(autoDetectedClasses));
+
+		// filter duplicates
+		Set<Class<?>> classes = new LinkedHashSet<Class<?>>(intfs.length + autoDetectedClasses.length);
+
+		CollectionUtils.mergeArrayIntoCollection(intfs, classes);
+		CollectionUtils.mergeArrayIntoCollection(autoDetectedClasses, classes);
+
+		Class<?>[] mergedClasses = (Class[]) classes.toArray(new Class[classes.size()]);
+
+		ServiceRegistration reg = registerService(mergedClasses, serviceProperties);
 
 		serviceRegistration = notifyListeners(target, (Map) serviceProperties, reg);
-	}
-
-	private Class<?>[] autodetectExportClasses() {
-		if (!autoExport.equals(AutoExport.DISABLED)) {
-
-			resolveClasses();
-			Class<?>[] intfs = interfaces;
-
-			// filter classes based on visibility
-			ClassLoader beanClassLoader = ClassUtils.getClassLoader(targetClass);
-			Class<?>[] autoDetectedClasses = ClassUtils.getVisibleClasses(autoExport.getExportedClasses(targetClass),
-				beanClassLoader);
-
-			if (log.isTraceEnabled())
-				log.trace("Autoexport mode [" + autoExport + "] discovered on class [" + targetClass + "] classes "
-						+ ObjectUtils.nullSafeToString(autoDetectedClasses));
-
-			// filter duplicates
-			Set<Class<?>> classes = new LinkedHashSet<Class<?>>(intfs.length + autoDetectedClasses.length);
-
-			CollectionUtils.mergeArrayIntoCollection(intfs, classes);
-			CollectionUtils.mergeArrayIntoCollection(autoDetectedClasses, classes);
-
-			return classes.toArray(new Class[classes.size()]);
-		}
-		else {
-			return new Class<?>[0];
-		}
 	}
 
 	/**
@@ -393,51 +325,26 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * @param serviceProperties
 	 * @return the ServiceRegistration
 	 */
-	ServiceRegistration registerLazyService(Dictionary serviceProperties) {
-
-		LazyObjectFactory lof = new LazyObjectFactory() {
-
-			@Override
-			public ServiceFactory createObject() {
-				resolveClasses();
-				return createServiceFactory(interfaces);
-			}
-		};
-
-		ServiceFactory lazyFactory = new LazyServiceFactory(lof, bundleContext.getBundle(), applicationContext,
-			beanName);
-		return doRegisterService(interfaceNames.clone(), lazyFactory, serviceProperties);
-	}
-
 	ServiceRegistration registerService(Class<?>[] classes, Dictionary serviceProperties) {
+		Assert.notEmpty(
+			classes,
+			"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
+
+		// create an array of classnames (used for registering the service)
 		String[] names = ClassUtils.toStringArray(classes);
-		return doRegisterService(names.clone(), createServiceFactory(classes), serviceProperties);
-	}
-
-	private ServiceFactory createServiceFactory(Class<?>[] classes) {
-		return new PublishingServiceFactory(classes, target, beanFactory, targetBeanName,
-			(contextClassLoader == ExportContextClassLoader.SERVICE_PROVIDER), classLoader, aopClassLoader,
-			bundleContext);
-	}
-
-	private ServiceRegistration doRegisterService(String[] names, ServiceFactory serviceFactory,
-			Dictionary serviceProperties) {
-		Assert.notEmpty(names);
 		// sort the names in alphabetical order (eases debugging)
 		Arrays.sort(names);
+
 		log.info("Publishing service under classes [" + ObjectUtils.nullSafeToString(names) + "]");
+
+		ServiceFactory serviceFactory = new PublishingServiceFactory(classes, target, beanFactory, targetBeanName,
+			(contextClassLoader == ExportContextClassLoader.SERVICE_PROVIDER), classLoader, aopClassLoader,
+			bundleContext);
 
 		if (isBeanBundleScoped())
 			serviceFactory = new OsgiBundleScope.BundleScopeServiceFactory(serviceFactory);
 
 		return bundleContext.registerService(names, serviceFactory, serviceProperties);
-	}
-
-	private void resolveClasses() {
-		// resolve interfaces
-		if (interfaces == null) {
-			interfaces = ClassUtils.loadClasses(interfaceNames, classLoader);
-		}
 	}
 
 	private boolean isBeanBundleScoped() {
@@ -575,7 +482,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 *        service classes.
 	 * 
 	 * @see AutoExport
-	 * @see #setLazyClassLoadingIfPossible(boolean)
+	 * 
 	 */
 	public void setAutoExport(AutoExport classExporter) {
 		Assert.notNull(classExporter);
@@ -669,13 +576,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	/**
 	 * Returns the interfaces that will be considered when exporting the target
-	 * as an OSGi service. If {@link #setInterfaceNames(String[])} was used on
-	 * setup, this method will resolve the classes and return them to the
-	 * client.
-	 * 
-	 * <b>Note:</b> In most cases, using {@link #getInterfaceNames()} instead is
-	 * better, as it doesn't need to load the classes (which can trigger
-	 * unneeded activation for lazy bundles).
+	 * as an OSGi service.
 	 * 
 	 * @return interfaces under which the target will be published as an OSGi
 	 *         service
@@ -685,29 +586,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	}
 
 	/**
-	 * Returns the names of the interfaces that will be considered when
-	 * exporting the target as an OSGi service. If
-	 * {@link #setInterfaces(Class[])} was used on setup, this method will infer
-	 * the class names automatically.
-	 * 
-	 * @return names of the interfaces under which the target will be published
-	 *         as an OSGi service
-	 */
-	public String[] getInterfaceNames() {
-		return interfaceNames;
-	}
-
-	/**
-	 * Sets the interfaces advertised by the service. These will be advertised
-	 * in the OSGi space and are considered when looking for a service.
-	 * 
-	 * <b>Note:</b> In most cases, using {@link #setInterfaceNames(String[])}
-	 * instead is better as it doesn't cause the client to load the classes
-	 * (which can trigger unneeded activation for lazy bundles).
-	 * 
-	 * <b>Note:</b> Use either {@link #setInterfaces(Class[])} or
-	 * {@link #setInterfaceNames(String[])} but not both, for setting an
-	 * exported service interfaces.
+	 * Sets the interfaces advertised by the service.These will be advertised in
+	 * the OSGi space and are considered when looking for a service.
 	 * 
 	 * @param interfaces array of classes to advertise
 	 */
@@ -715,28 +595,12 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		this.interfaces = interfaces;
 	}
 
-	/**
-	 * Sets the names of the interfaces advertised by the service. These will be
-	 * advertised in the OSGi space and are considered when looking for a
-	 * service.
-	 * 
-	 * <b>Note:</b> Use either {@link #setInterfaces(Class[])} or
-	 * {@link #setInterfaceNames(String[])} but not both, for setting an
-	 * exported service interfaces.
-	 * 
-	 * 
-	 * @param interfaceNames array of class names to advertise the service under
-	 */
-	public void setInterfaceNames(String[] interfaceNames) {
-		this.interfaceNames = interfaceNames;
-	}
-
 	public int getOrder() {
 		return order;
 	}
 
 	/**
-	 * Sets the ordering which will apply to this class's implementation of
+	 * Set the ordering which will apply to this class's implementation of
 	 * Ordered, used when applying multiple BeanPostProcessors.
 	 * <p>
 	 * Default value is <code>Integer.MAX_VALUE</code>, meaning that it's
@@ -760,9 +624,5 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 	public void setBeanName(String name) {
 		this.beanName = name;
-	}
-
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.applicationContext = applicationContext;
 	}
 }

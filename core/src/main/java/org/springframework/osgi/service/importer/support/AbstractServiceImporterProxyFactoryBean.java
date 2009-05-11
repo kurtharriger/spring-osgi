@@ -24,13 +24,11 @@ import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.osgi.context.internal.classloader.ChainedClassLoader;
 import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
-import org.springframework.util.Assert;
 
 /**
- * Package protected class that provides the common aop infrastructure
- * functionality for OSGi service importers. Provides most of the constructs
- * required for assembling the service proxies, leaving subclasses to decide on
- * the service cardinality (one service or multiple) and proxy weaving.
+ * Package protected class that provides the common aop infrastructure functionality for OSGi service importers.
+ * Provides most of the constructs required for assembling the service proxies, leaving subclasses to decide on the
+ * service cardinality (one service or multiple) and proxy weaving.
  * 
  * 
  * @author Costin Leau
@@ -47,7 +45,6 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 
 	/** aop classloader */
 	private ChainedClassLoader aopClassLoader;
-
 
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
@@ -68,8 +65,7 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 			if (callback != null) {
 				callback.run();
 			}
-		}
-		finally {
+		} finally {
 			proxy = null;
 
 		}
@@ -114,8 +110,7 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	}
 
 	/**
-	 * {@inheritDoc} The object returned by this FactoryBean is a not a
-	 * prototype.
+	 * {@inheritDoc} The object returned by this FactoryBean is a not a prototype.
 	 * 
 	 * @return false (the managed object is not a prototype)
 	 */
@@ -124,8 +119,8 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	}
 
 	/**
-	 * Creates the proxy tracking the matching OSGi services. This method is
-	 * guaranteed to be called only once, normally during initialization.
+	 * Creates the proxy tracking the matching OSGi services. This method is guaranteed to be called only once, normally
+	 * during initialization.
 	 * 
 	 * @return OSGi service tracking proxy.
 	 * @see #getProxyDestructionCallback()
@@ -133,9 +128,8 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	abstract Object createProxy();
 
 	/**
-	 * Returns the destruction callback associated with the proxy created by
-	 * this object. The callback is called once, during the destruction process
-	 * of the {@link FactoryBean}.
+	 * Returns the destruction callback associated with the proxy created by this object. The callback is called once,
+	 * during the destruction process of the {@link FactoryBean}.
 	 * 
 	 * @return destruction callback for the service proxy.
 	 * @see #createProxy()
@@ -154,9 +148,8 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * The class will automatically chain this classloader with the AOP
-	 * infrastructure classes (even if these are not visible to the user) so
-	 * that the proxy creation can be completed successfully.
+	 * The class will automatically chain this classloader with the AOP infrastructure classes (even if these are not
+	 * visible to the user) so that the proxy creation can be completed successfully.
 	 */
 	public void setBeanClassLoader(final ClassLoader classLoader) {
 		super.setBeanClassLoader(classLoader);

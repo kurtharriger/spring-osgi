@@ -32,7 +32,7 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 
 	private static final String AUTO_EXPORT_PROP = "autoExport";
 	private static final String RANKING_PROP = "ranking";
-	private static final String INTERFACE_NAMES_PROP = "interfaceNames";
+	private static final String INTERFACES_PROP = "interfaces";
 	private static final String SERVICE_NAME_PROP = "targetBeanName";
 	private static final String SERVICE_INSTANCE_PROP = "target";
 	private static final String SERVICE_PROPERTIES_PROP = "serviceProperties";
@@ -80,7 +80,7 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 		}
 
 		// interfaces
-		Object value = MetadataUtils.getValue(pvs, INTERFACE_NAMES_PROP);
+		Object value = MetadataUtils.getValue(pvs, INTERFACES_PROP);
 
 		if (value != null) {
 			Set<String> intfs = new LinkedHashSet<String>(4);

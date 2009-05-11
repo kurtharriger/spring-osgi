@@ -52,6 +52,7 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 
 	public void testSimpleBean() throws Exception {
 		ServiceReferenceComponentMetadata metadata = getReferenceMetadata("simple");
+		System.out.println(metadata.getClass().getName());
 		assertNull(metadata.getFilter());
 		Set<String> intfs = metadata.getInterfaceNames();
 		assertEquals(Cloneable.class.getName(), intfs.iterator().next());
