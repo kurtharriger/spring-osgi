@@ -23,7 +23,6 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,12 +55,14 @@ import org.springframework.util.StringUtils;
 /**
  * OSGi-aware {@link ResourcePatternResolver}.
  * 
- * Can find resources in the <em>bundle jar</em> and <em>bundle space</em>.
- * See {@link OsgiBundleResource} for more information.
+ * Can find resources in the <em>bundle jar</em> and <em>bundle space</em>. See
+ * {@link OsgiBundleResource} for more information.
  * 
- * <p/><b>ClassPath support</b>
+ * <p/>
+ * <b>ClassPath support</b>
  * 
- * <p/>As mentioned by {@link PathMatchingResourcePatternResolver}, class-path
+ * <p/>
+ * As mentioned by {@link PathMatchingResourcePatternResolver}, class-path
  * pattern matching needs to resolve the class-path structure to a file-system
  * location (be it an actual folder or a jar). Inside the OSGi environment this
  * is problematic as the bundles can be loaded in memory directly from input
@@ -75,13 +76,15 @@ import org.springframework.util.StringUtils;
  * Depending on the configuration of running environment, this might cause
  * significant IO activity which can affect performance.
  * 
- * <p/><b>Note:</b> Currently, <em>static</em> imports as well as
- * <code>Bundle-Classpath</code> and <code>Required-Bundle</code> entries
- * are supported. Support for <code>DynamicPackage-Import</code> depends on
- * how/when the underlying platform does the wiring between the dynamically
- * imported bundle and the given bundle.
+ * <p/>
+ * <b>Note:</b> Currently, <em>static</em> imports as well as
+ * <code>Bundle-Classpath</code> and <code>Required-Bundle</code> entries are
+ * supported. Support for <code>DynamicPackage-Import</code> depends on how/when
+ * the underlying platform does the wiring between the dynamically imported
+ * bundle and the given bundle.
  * 
- * <p/><b>Portability Note:</b> Since it relies only on the OSGi API, this
+ * <p/>
+ * <b>Portability Note:</b> Since it relies only on the OSGi API, this
  * implementation depends heavily on how closely the platform implements the
  * OSGi spec. While significant tests have been made to ensure compatibility,
  * one <em>might</em> experience different behaviour especially when dealing
@@ -213,13 +216,15 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * bundle classpath and then it will inspect the bundle space of each of
 	 * them individually.
 	 * 
-	 * <p/> Since the bundle space is considered, runtime classpath entries such
-	 * as dynamic imports are not supported (yet).
+	 * <p/>
+	 * Since the bundle space is considered, runtime classpath entries such as
+	 * dynamic imports are not supported (yet).
 	 * 
 	 * @param locationPattern
 	 * @param type
 	 * @return classpath resources
 	 */
+	@SuppressWarnings("unchecked")
 	private Resource[] findClassPathMatchingResources(String locationPattern, int type) throws IOException {
 
 		if (resolver == null)
@@ -231,7 +236,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		// eliminate classpath path
 		final String path = OsgiResourceUtils.stripPrefix(locationPattern);
 
-		final Collection foundPaths = new LinkedHashSet();
+		final Collection<String> foundPaths = new LinkedHashSet<String>();
 
 		// 1. search the imported packages
 
@@ -239,7 +244,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		final String rootDirPath = determineFolderPattern(path);
 
 		if (System.getSecurityManager() != null) {
-			AccessController.doPrivileged(new PrivilegedAction() {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 				public Object run() {
 					for (int i = 0; i < importedBundles.length; i++) {
@@ -265,11 +270,10 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		findSyntheticClassPathMatchingResource(bundle, path, foundPaths);
 
 		// 3. resolve the entries using the official class-path method (as some of them might be hidden)
-		List resources = new ArrayList(foundPaths.size());
+		List<Resource> resources = new ArrayList<Resource>(foundPaths.size());
 
-		for (Iterator iterator = foundPaths.iterator(); iterator.hasNext();) {
+		for (String resourcePath : foundPaths) {
 			// classpath*: -> getResources()
-			String resourcePath = (String) iterator.next();
 			if (OsgiResourceUtils.PREFIX_TYPE_CLASS_ALL_SPACE == type) {
 				CollectionUtils.mergeArrayIntoCollection(convertURLEnumerationToResourceArray(
 					bundle.getResources(resourcePath), resourcePath), resources);
@@ -294,10 +298,10 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		return (index > 0 ? path.substring(0, index + 1) : "");
 	}
 
-	private ContextResource[] convertURLEnumerationToResourceArray(Enumeration enm, String path) {
-		Set resources = new LinkedHashSet(4);
+	private ContextResource[] convertURLEnumerationToResourceArray(Enumeration<URL> enm, String path) {
+		Set<ContextResource> resources = new LinkedHashSet<ContextResource>(4);
 		while (enm != null && enm.hasMoreElements()) {
-			resources.add(new UrlContextResource((URL) enm.nextElement(), path));
+			resources.add(new UrlContextResource(enm.nextElement(), path));
 		}
 		return (ContextResource[]) resources.toArray(new ContextResource[resources.size()]);
 	}
@@ -310,8 +314,9 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @param path path used for pattern matching
 	 * @param foundPaths collection of found results
 	 */
+	@SuppressWarnings("unchecked")
 	private void findImportedBundleMatchingResource(final ImportedBundle importedBundle, String rootPath, String path,
-			final Collection foundPaths) {
+			final Collection<String> foundPaths) {
 
 		final boolean trace = logger.isTraceEnabled();
 
@@ -335,9 +340,9 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			// if the imported package matches the path
 			if (matcher.matchStart(path, pkg)) {
 				// start the JAR analysis
-				Enumeration entries = importedBundle.getBundle().getEntryPaths(pkg);
+				Enumeration<String> entries = importedBundle.getBundle().getEntryPaths(pkg);
 				while (entries != null && entries.hasMoreElements()) {
-					String entry = (String) entries.nextElement();
+					String entry = entries.nextElement();
 					if (startsWithSlash)
 						entry = FOLDER_SEPARATOR + entry;
 
@@ -360,7 +365,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @param foundPaths
 	 * @throws IOException
 	 */
-	private void findSyntheticClassPathMatchingResource(Bundle bundle, String path, Collection foundPaths)
+	private void findSyntheticClassPathMatchingResource(Bundle bundle, String path, Collection<String> foundPaths)
 			throws IOException {
 		// 1. bundle space lookup
 		OsgiBundleResourcePatternResolver localPatternResolver = new OsgiBundleResourcePatternResolver(bundle);
@@ -376,7 +381,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			foundPaths.add(foundResources[j].getURL().getPath());
 		}
 		// 2. Bundle-Classpath lookup (on the path stripped of the prefix)
-		Collection cpMatchingPaths = findBundleClassPathMatchingPaths(bundle, path);
+		Collection<String> cpMatchingPaths = findBundleClassPathMatchingPaths(bundle, path);
 
 		if (trace)
 			logger.trace("Found Bundle-ClassPath matches " + cpMatchingPaths);
@@ -395,9 +400,9 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @return
 	 * @throws IOException
 	 */
-	private Collection findBundleClassPathMatchingPaths(Bundle bundle, String pattern) throws IOException {
+	private Collection<String> findBundleClassPathMatchingPaths(Bundle bundle, String pattern) throws IOException {
 		// list of strings pointing to the matching resources 
-		List list = new ArrayList(4);
+		List<String> list = new ArrayList<String>(4);
 
 		boolean trace = logger.isTraceEnabled();
 		if (trace)
@@ -449,10 +454,10 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @param list
 	 * @param ur
 	 */
-	private void findBundleClassPathMatchingJarEntries(List list, URL url, String pattern) throws IOException {
+	private void findBundleClassPathMatchingJarEntries(List<String> list, URL url, String pattern) throws IOException {
 		// get the stream to the resource and read it as a jar
 		JarInputStream jis = new JarInputStream(url.openStream());
-		Set result = new LinkedHashSet(8);
+		Set<String> result = new LinkedHashSet<String>(8);
 
 		// parse the jar and do pattern matching
 		try {
@@ -497,7 +502,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @param pattern
 	 * @throws IOException
 	 */
-	private void findBundleClassPathMatchingFolders(List list, Bundle bundle, String cpEntryPath, String pattern)
+	private void findBundleClassPathMatchingFolders(List<String> list, Bundle bundle, String cpEntryPath, String pattern)
 			throws IOException {
 		// append path to the pattern and do a normal search
 		// folder/<pattern> starts being applied
@@ -525,7 +530,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		Resource[] resources = localResolver.getResources(bundlePathPattern);
 
 		boolean trace = logger.isTraceEnabled();
-		List foundResources = (trace ? new ArrayList(resources.length) : null);
+		List<String> foundResources = (trace ? new ArrayList<String>(resources.length) : null);
 
 		try {
 			// skip when dealing with non-existing resources
@@ -567,7 +572,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 			logger.trace("Found root resources for [" + rootDirPath + "] :"
 					+ ObjectUtils.nullSafeToString(rootDirResources));
 
-		Set result = new LinkedHashSet();
+		Set<Resource> result = new LinkedHashSet<Resource>();
 		for (int i = 0; i < rootDirResources.length; i++) {
 			Resource rootDirResource = rootDirResources[i];
 			if (isJarResource(rootDirResource)) {
@@ -580,7 +585,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 		if (logger.isTraceEnabled()) {
 			logger.trace("Resolved location pattern [" + locationPattern + "] to resources " + result);
 		}
-		return (Resource[]) result.toArray(new Resource[result.size()]);
+		return result.toArray(new Resource[result.size()]);
 	}
 
 	/**
@@ -609,7 +614,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @see OsgiBundleResource#BUNDLE_URL_PREFIX
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver#getResources(java.lang.String)
 	 */
-	private Set doFindPathMatchingFileResources(Resource rootDirResource, String subPattern, int searchType)
+	private Set<Resource> doFindPathMatchingFileResources(Resource rootDirResource, String subPattern, int searchType)
 			throws IOException {
 
 		String rootPath = null;
@@ -630,7 +635,7 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 				cleanPath = cleanPath + FOLDER_SEPARATOR;
 			}
 			String fullPattern = cleanPath + subPattern;
-			Set result = new LinkedHashSet();
+			Set<Resource> result = new LinkedHashSet<Resource>();
 			doRetrieveMatchingBundleEntries(bundle, fullPattern, cleanPath, result, searchType);
 			return result;
 		}
@@ -650,10 +655,10 @@ public class OsgiBundleResourcePatternResolver extends PathMatchingResourcePatte
 	 * @param searchType the search strategy to use
 	 * @throws IOException
 	 */
-	private void doRetrieveMatchingBundleEntries(Bundle bundle, String fullPattern, String dir, Set result,
+	private void doRetrieveMatchingBundleEntries(Bundle bundle, String fullPattern, String dir, Set<Resource> result,
 			int searchType) throws IOException {
 
-		Enumeration candidates;
+		Enumeration<?> candidates;
 
 		switch (searchType) {
 			case OsgiResourceUtils.PREFIX_TYPE_NOT_SPECIFIED:

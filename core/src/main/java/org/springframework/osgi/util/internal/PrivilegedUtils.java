@@ -28,25 +28,25 @@ import java.security.PrivilegedActionException;
  */
 public abstract class PrivilegedUtils {
 
-	private static class GetTCCLAction implements PrivilegedAction {
+	private static class GetTCCLAction implements PrivilegedAction<ClassLoader> {
 
-		public Object run() {
+		public ClassLoader run() {
 			return Thread.currentThread().getContextClassLoader();
 		}
 
 		public ClassLoader getTCCL() {
-			return (ClassLoader) AccessController.doPrivileged(this);
+			return AccessController.doPrivileged(this);
 		}
 	}
 
-	public interface UnprivilegedThrowableExecution {
+	public interface UnprivilegedThrowableExecution<T> {
 
-		public Object run() throws Throwable;
+		public T run() throws Throwable;
 	}
 
-	public interface UnprivilegedExecution {
+	public interface UnprivilegedExecution<T> {
 
-		public Object run();
+		public T run();
 	}
 
 
@@ -69,13 +69,13 @@ public abstract class PrivilegedUtils {
 	 * @param execution
 	 * @return
 	 */
-	public static Object executeWithCustomTCCL(final ClassLoader customClassLoader,
-			final UnprivilegedExecution execution) {
+	public static <T> T executeWithCustomTCCL(final ClassLoader customClassLoader,
+			final UnprivilegedExecution<T> execution) {
 		final Thread currentThread = Thread.currentThread();
 		final ClassLoader oldTCCL = getTCCLAction.getTCCL();
 
 		try {
-			AccessController.doPrivileged(new PrivilegedAction() {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 				public Object run() {
 					currentThread.setContextClassLoader(customClassLoader);
@@ -85,7 +85,7 @@ public abstract class PrivilegedUtils {
 			return execution.run();
 		}
 		finally {
-			AccessController.doPrivileged(new PrivilegedAction() {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 				public Object run() {
 					currentThread.setContextClassLoader(oldTCCL);
@@ -108,13 +108,13 @@ public abstract class PrivilegedUtils {
 	 * @return
 	 * @throws Throwable
 	 */
-	public static Object executeWithCustomTCCL(final ClassLoader customClassLoader,
-			final UnprivilegedThrowableExecution execution) throws Throwable {
+	public static <T> T executeWithCustomTCCL(final ClassLoader customClassLoader,
+			final UnprivilegedThrowableExecution<T> execution) throws Throwable {
 		final Thread currentThread = Thread.currentThread();
 		final ClassLoader oldTCCL = getTCCLAction.getTCCL();
 
 		try {
-			AccessController.doPrivileged(new PrivilegedAction() {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 				public Object run() {
 					currentThread.setContextClassLoader(customClassLoader);
@@ -127,7 +127,7 @@ public abstract class PrivilegedUtils {
 			throw pae.getCause();
 		}
 		finally {
-			AccessController.doPrivileged(new PrivilegedAction() {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 				public Object run() {
 					currentThread.setContextClassLoader(oldTCCL);

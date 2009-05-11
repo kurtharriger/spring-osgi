@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>spring-osgi-integration-test-bundles</artifactId>
+        <groupId>org.springframework.osgi.iandt</groupId>
+        <version>2.0.0-m1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.springframework.osgi.iandt</groupId>
+    <artifactId>lazy.export.no.import.bundle</artifactId>
+	<packaging>jar</packaging>
+    <name>Spring OSGi Test Bundle: Lazy Bundle With Just Exports</name>
+    <description>A lazy bundle with exports</description>
+    <url>http://www.springframework.org/osgi</url>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>lazy.companion.bundle</artifactId>
+            <scope>provided</scope>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+</project>
+

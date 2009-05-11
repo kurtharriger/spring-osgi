@@ -1,0 +1,8 @@
+Bundle-Name: lazy-export-no-import-test
+Bundle-SymbolicName: org.springframework.osgi.iandt.lazy.export.no.import
+Bundle-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Activator: org.springframework.osgi.iandt.activator.Activator
+Bundle-ActivationPolicy: lazy
+Export-Package: org.springframework.osgi.iandt.lazy
+Import-Package: org.osgi.framework,org.springframework.osgi.iandt.lazy.companion,org.springframework.beans.factory,org.apache.commons.logging

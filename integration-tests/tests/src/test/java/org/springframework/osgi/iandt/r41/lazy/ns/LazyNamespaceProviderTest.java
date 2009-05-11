@@ -16,11 +16,7 @@
 
 package org.springframework.osgi.iandt.r41.lazy.ns;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.springframework.core.io.Resource;
 import org.springframework.osgi.iandt.r41.lazy.BaseR41IntegrationTest;
-import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
  * Integration test that checks if lazy namespace providers are lazily analyzed.
@@ -29,16 +25,9 @@ import org.springframework.osgi.util.OsgiBundleUtils;
  */
 public class LazyNamespaceProviderTest extends BaseR41IntegrationTest {
 
-	/*
-	 * Install the namespace provider lazily. 
-	 */
 	@Override
-	protected void postProcessBundleContext(BundleContext context) throws Exception {
-		super.postProcessBundleContext(context);
-		Resource resource = locateBundle("org.springframework.osgi.iandt, ns.own.consumer," + getSpringDMVersion());
-		Bundle bundle = context.installBundle(resource.getDescription(), resource.getInputStream());
-		startBundleLazy(bundle);
-		assertTrue("the lazy bundle has been initialized", OsgiBundleUtils.isBundleLazyActivated(bundle));
+	protected String[] lazyBundles() {
+		return new String[] { "org.springframework.osgi.iandt, ns.own.consumer," + getSpringDMVersion() };
 	}
 
 	// check that the namespace is being picked up through the test configuration file

@@ -18,7 +18,6 @@ package org.springframework.osgi.context.support;
 
 import java.beans.PropertyEditor;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -47,7 +46,7 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 	private static final String PROPERTIES_FILE = "/org/springframework/osgi/context/support/internal/default-property-editors.properties";
 
-	private final Map editors;
+	private final Map<Class<?>, Class<? extends PropertyEditor>> editors;
 
 
 	OsgiPropertyEditorRegistrar() {
@@ -61,23 +60,22 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 			editorsConfig.load(getClass().getResourceAsStream(PROPERTIES_FILE));
 		}
 		catch (IOException ex) {
-			throw (RuntimeException) new IllegalStateException(
-				"cannot load default property editors configuration").initCause(ex);
+			throw (RuntimeException) new IllegalStateException("cannot load default property editors configuration").initCause(ex);
 		}
 
 		if (log.isTraceEnabled())
 			log.trace("Loaded property editors configuration " + editorsConfig);
-		editors = new LinkedHashMap(editorsConfig.size());
+		editors = new LinkedHashMap<Class<?>, Class<? extends PropertyEditor>>(editorsConfig.size());
 
 		createEditors(classLoader, editorsConfig);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void createEditors(ClassLoader classLoader, Properties configuration) {
 
 		boolean trace = log.isTraceEnabled();
 
-		for (Iterator iterator = configuration.entrySet().iterator(); iterator.hasNext();) {
-			Map.Entry entry = (Map.Entry) iterator.next();
+		for (Map.Entry<Object, Object> entry : configuration.entrySet()) {
 			// key represents type
 			Class<?> key;
 			// value represents property editor
@@ -94,16 +92,15 @@ class OsgiPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 			if (trace)
 				log.trace("Adding property editor[" + editorClass + "] for type[" + key + "]");
-			editors.put(key, editorClass);
+			editors.put(key, (Class<? extends PropertyEditor>) editorClass);
 		}
 	}
 
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
-		for (Iterator iterator = editors.entrySet().iterator(); iterator.hasNext();) {
-			Map.Entry editor = (Map.Entry) iterator.next();
-			Class<?> type = (Class) editor.getKey();
+		for (Map.Entry<Class<?>, Class<? extends PropertyEditor>> entry : editors.entrySet()) {
+			Class<?> type = entry.getKey();
 			PropertyEditor editorInstance;
-			editorInstance = (PropertyEditor) BeanUtils.instantiateClass(((Class) editor.getValue()));
+			editorInstance = BeanUtils.instantiate(entry.getValue());
 			registry.registerCustomEditor(type, editorInstance);
 		}
 	}

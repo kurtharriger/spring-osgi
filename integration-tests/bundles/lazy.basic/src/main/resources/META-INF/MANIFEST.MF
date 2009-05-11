@@ -1,0 +1,8 @@
+Bundle-Name: basic-lazy-test
+Bundle-SymbolicName: org.springframework.osgi.iandt.lazy.basic
+Bundle-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Activator: org.springframework.osgi.iandt.activator.Activator
+Bundle-ActivationPolicy: lazy
+Export-Package: org.springframework.osgi.iandt.lazy
+Import-Package: org.osgi.framework

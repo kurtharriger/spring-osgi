@@ -132,10 +132,10 @@ public abstract class OsgiResourceUtils {
 		return res;
 	}
 
-	public static Resource[] convertURLEnumerationToResourceArray(Enumeration enm) {
-		Set resources = new LinkedHashSet(4);
+	public static Resource[] convertURLEnumerationToResourceArray(Enumeration<URL> enm) {
+		Set<UrlResource> resources = new LinkedHashSet<UrlResource>(4);
 		while (enm != null && enm.hasMoreElements()) {
-			resources.add(new UrlResource((URL) enm.nextElement()));
+			resources.add(new UrlResource(enm.nextElement()));
 		}
 		return (Resource[]) resources.toArray(new Resource[resources.size()]);
 	}

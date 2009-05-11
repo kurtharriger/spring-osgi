@@ -52,7 +52,8 @@ import org.xml.sax.EntityResolver;
  * XML file.
  * </p>
  * 
- * <p/> <b>This is the main ApplicationContext class for OSGi environments.</b>
+ * <p/>
+ * <b>This is the main ApplicationContext class for OSGi environments.</b>
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -77,8 +78,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * Creates a new <code>OsgiBundleXmlApplicationContext</code> with the
-	 * given parent context.
+	 * Creates a new <code>OsgiBundleXmlApplicationContext</code> with the given
+	 * parent context.
 	 * 
 	 * @param parent the parent context
 	 */
@@ -87,8 +88,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * Creates a new <code>OsgiBundleXmlApplicationContext</code> with the
-	 * given configLocations.
+	 * Creates a new <code>OsgiBundleXmlApplicationContext</code> with the given
+	 * configLocations.
 	 * 
 	 * @param configLocations array of configuration resources
 	 */
@@ -97,8 +98,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * Creates a new <code>OsgiBundleXmlApplicationContext</code> with the
-	 * given configLocations and parent context.
+	 * Creates a new <code>OsgiBundleXmlApplicationContext</code> with the given
+	 * configLocations and parent context.
 	 * 
 	 * @param configLocations array of configuration resources
 	 * @param parent the parent context
@@ -111,20 +112,20 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p/> Loads the bean definitions via an
-	 * <code>XmlBeanDefinitionReader</code>.
+	 * <p/>
+	 * Loads the bean definitions via an <code>XmlBeanDefinitionReader</code>.
 	 */
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
 		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
-		// Configure the bean definition reader with this context's
+		// Configure the bean definition reader with the context
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
 
 		final Object[] resolvers = new Object[2];
 
-		AccessController.doPrivileged(new PrivilegedAction() {
+		AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 			public Object run() {
 				resolvers[0] = createNamespaceHandlerResolver(getBundleContext(), getClassLoader());
@@ -162,7 +163,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * into Resource instances.
 	 * 
 	 * @throws org.springframework.beans.BeansException in case of bean
-	 * registration errors
+	 *         registration errors
 	 * @throws java.io.IOException if the required XML document isn't found
 	 * @see #refreshBeanFactory
 	 * @see #getConfigLocations
@@ -184,8 +185,9 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * environment for actual localisation. By default, the bundle space will be
 	 * used for locating the resources.
 	 * 
-	 * <p/> <strong>Note:</strong> Instead of overriding this method, consider
-	 * using the Spring-DM specific header inside your manifest bundle.
+	 * <p/>
+	 * <strong>Note:</strong> Instead of overriding this method, consider using
+	 * the Spring-DM specific header inside your manifest bundle.
 	 * 
 	 * @return default XML configuration locations
 	 */
@@ -200,9 +202,9 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * take priority over namespace provided by other bundles.
 	 * 
 	 * @param bundleContext the OSGi context of which the resolver should be
-	 * aware of
+	 *        aware of
 	 * @param bundleClassLoader classloader for creating the OSGi namespace
-	 * resolver proxy
+	 *        resolver proxy
 	 * @return a OSGi aware namespace handler resolver
 	 */
 	private NamespaceHandlerResolver createNamespaceHandlerResolver(BundleContext bundleContext,
@@ -226,15 +228,15 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 
 	/**
 	 * Similar to
-	 * {@link #createNamespaceHandlerResolver(BundleContext, ClassLoader, ClassLoader)},
-	 * this method creates a special OSGi entity resolver that considers the
+	 * {@link #createNamespaceHandlerResolver(BundleContext, ClassLoader, ClassLoader)}
+	 * , this method creates a special OSGi entity resolver that considers the
 	 * bundle class path first, falling back to the entity resolver service
 	 * provided by the Spring DM extender.
 	 * 
 	 * @param bundleContext the OSGi context of which the resolver should be
-	 * aware of
+	 *        aware of
 	 * @param bundleClassLoader classloader for creating the OSGi namespace
-	 * resolver proxy
+	 *        resolver proxy
 	 * @return a OSGi aware entity resolver
 	 */
 	private EntityResolver createEntityResolver(BundleContext bundleContext, ClassLoader bundleClassLoader) {
@@ -244,7 +246,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		// hook in OSGi namespace resolver
 		EntityResolver osgiServiceEntityResolver = lookupEntityResolver(bundleContext, localEntityResolver);
 
-		DelegatedEntityResolver delegate = new DelegatedEntityResolver();
+		ChainedEntityResolver delegate = new ChainedEntityResolver();
 		delegate.addEntityResolver(localEntityResolver, "LocalEntityResolver for bundle "
 				+ OsgiStringUtils.nullSafeNameAndSymName(bundleContext.getBundle()));
 
@@ -256,8 +258,8 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 
 	private NamespaceHandlerResolver lookupNamespaceHandlerResolver(final BundleContext bundleContext,
 			final Object fallbackObject) {
-		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class<?>[] { NamespaceHandlerResolver.class }, null,
-			NamespaceHandlerResolver.class.getClassLoader(), bundleContext, fallbackObject);
+		return (NamespaceHandlerResolver) TrackingUtil.getService(new Class<?>[] { NamespaceHandlerResolver.class },
+			null, NamespaceHandlerResolver.class.getClassLoader(), bundleContext, fallbackObject);
 	}
 
 	private EntityResolver lookupEntityResolver(final BundleContext bundleContext, final Object fallbackObject) {

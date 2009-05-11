@@ -101,9 +101,9 @@ public abstract class OsgiUtils {
 
 		// run into a privileged block
 		if (System.getSecurityManager() != null) {
-			return (BundleContext) AccessController.doPrivileged(new PrivilegedAction() {
+			return AccessController.doPrivileged(new PrivilegedAction<BundleContext>() {
 
-				public Object run() {
+				public BundleContext run() {
 					return getBundleContextWithPrivileges(bundle);
 				}
 			});

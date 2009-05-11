@@ -52,8 +52,6 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 		props.setProperty("osgi.instance.area", "eclipse_config");
 		props.setProperty("osgi.user.area", "eclipse_config");
 
-		// props.setProperty("osgi.java.profile.bootdelegation", "ignore");
-
 		// props.setProperty("eclipse.consoleLog", "true");
 		// props.setProperty("osgi.debug", "");
 
@@ -76,7 +74,7 @@ public class EquinoxPlatform extends AbstractOsgiPlatform {
 
 			final Field field = EclipseStarter.class.getDeclaredField("context");
 
-			AccessController.doPrivileged(new PrivilegedAction() {
+			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 				public Object run() {
 					field.setAccessible(true);

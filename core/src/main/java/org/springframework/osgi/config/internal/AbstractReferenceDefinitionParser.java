@@ -344,21 +344,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 			}
 
 			Set<?> parsedInterfaces = parsePropertySetElement(parserContext, element, builder.getBeanDefinition());
-			Set<Object> interfaces = new ManagedSet<Object>(parsedInterfaces.size());
-
-			for (Iterator<?> iterator = parsedInterfaces.iterator(); iterator.hasNext();) {
-				Object intf = iterator.next();
-				if (intf instanceof TypedStringValue || intf instanceof String) {
-					interfaces.add(intf);
-				}
-				else {
-					// add adapter definition for bean references (which can be classes)
-					interfaces.add(BeanDefinitionBuilder.genericBeanDefinition(ToStringClassAdapter.class).addConstructorArgValue(
-						intf).getBeanDefinition());
-				}
-			}
-
-			builder.addPropertyValue(INTERFACE_NAMES_PROP, interfaces);
+			builder.addPropertyValue(INTERFACE_NAMES_PROP, ParserUtils.convertClassesToStrings(parsedInterfaces));
 		}
 	}
 

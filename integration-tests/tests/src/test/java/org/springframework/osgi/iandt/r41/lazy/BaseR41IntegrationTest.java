@@ -17,9 +17,19 @@
 package org.springframework.osgi.iandt.r41.lazy;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
+import org.osgi.framework.ServiceReference;
+import org.springframework.core.io.Resource;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
+import org.springframework.osgi.util.OsgiBundleUtils;
+import org.springframework.osgi.util.OsgiServiceReferenceUtils;
+import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -51,7 +61,7 @@ public abstract class BaseR41IntegrationTest extends BaseIntegrationTest {
 
 	protected String[] getBundleContentPattern() {
 		String pkg = getClass().getPackage().getName().replace('.', '/').concat("/");
-		String[] patterns = new String[] { BaseR41IntegrationTest.class.getName().replace('.', '/').concat(".class"),
+		String[] patterns = new String[] { BaseR41IntegrationTest.class.getName().replace('.', '/').concat("*.class"),
 			BaseIntegrationTest.class.getName().replace('.', '/').concat("*.class"), pkg + "**/*" };
 		return patterns;
 	}
@@ -60,5 +70,43 @@ public abstract class BaseR41IntegrationTest extends BaseIntegrationTest {
 		if (bundle != null) {
 			ReflectionUtils.invokeMethod(START_LAZY_METHOD, bundle, START_ACTIVATION_POLICY);
 		}
+	}
+
+	protected abstract String[] lazyBundles();
+
+	@Override
+	protected void postProcessBundleContext(BundleContext context) throws Exception {
+		super.postProcessBundleContext(context);
+
+		Resource[] res = locateBundles(lazyBundles());
+		for (Resource resource : res) {
+			Bundle bundle = context.installBundle(resource.getDescription(), resource.getInputStream());
+			startBundleLazy(bundle);
+			assertTrue("the lazy bundle " + OsgiStringUtils.nullSafeNameAndSymName(bundle) + " has been activated",
+				OsgiBundleUtils.isBundleLazyActivated(bundle));
+		}
+	}
+
+	protected ServiceReference getServiceReference(final String filter) throws Exception {
+		final CountDownLatch latch = new CountDownLatch(1);
+
+		ServiceListener sl = new ServiceListener() {
+
+			public void serviceChanged(ServiceEvent event) {
+				latch.countDown();
+			}
+		};
+
+		bundleContext.addServiceListener(sl, filter);
+		if (OsgiServiceReferenceUtils.getServiceReference(bundleContext, filter) != null) {
+			latch.countDown();
+		}
+		try {
+			latch.await(2, TimeUnit.MINUTES);
+		}
+		finally {
+			bundleContext.removeServiceListener(sl);
+		}
+		return OsgiServiceReferenceUtils.getServiceReference(bundleContext, filter);
 	}
 }

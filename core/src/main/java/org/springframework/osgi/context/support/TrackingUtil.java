@@ -35,9 +35,10 @@ import org.springframework.osgi.util.internal.ClassUtils;
  * class uses raw JDK proxies and thus is usable only with interfaces. This
  * allows to create simple proxies with minimal class dependencies.
  * 
- * <p/> This class can be seen as a much shorter, less featured version of
- * {@link org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean}.
- * It is intended for the bootstrap areas of the project where no classloading
+ * <p/>
+ * This class can be seen as a much shorter, less featured version of
+ * {@link org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean}
+ * . It is intended for the bootstrap areas of the project where no classloading
  * or listeners are required.
  * 
  * @author Costin Leau
@@ -61,7 +62,9 @@ abstract class TrackingUtil {
 		private final boolean securityOn;
 		private final Object lock = new Object();
 
-		/** flag used to bypass the OSGi space if the context becomes unavailable */
+		/**
+		 * flag used to bypass the OSGi space if the context becomes unavailable
+		 */
 		private boolean bundleContextInvalidated = false;
 
 
@@ -95,7 +98,7 @@ abstract class TrackingUtil {
 			if (!isBundleInvalid) {
 				try {
 					if (securityOn) {
-						target = AccessController.doPrivileged(new PrivilegedAction() {
+						target = AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 							public Object run() {
 								return getTarget(context, filter);
@@ -140,8 +143,8 @@ abstract class TrackingUtil {
 	 * delegates the method invocation to it. In case no service is found, the
 	 * fallback object is used.
 	 * 
-	 * <p/> Since JDK proxies are used to create services only interfaces are
-	 * used.
+	 * <p/>
+	 * Since JDK proxies are used to create services only interfaces are used.
 	 * 
 	 * @param classes array of classes used during proxy weaving
 	 * @param filter OSGi filter (can be null)
