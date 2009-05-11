@@ -64,11 +64,10 @@
     <module>web.bundles</module>
     <module>jdk5</module>
     <!-- lazy bundles -->
+    <module>lazy.companion.bundle</module>
     <module>lazy.basic</module>
     <module>lazy.export.no.import</module>
-    <!--
     <module>lazy.export.import</module>
-    -->
   </modules>
 
  <build>
