@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Dictionary;
-import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
@@ -31,23 +30,17 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
-import org.springframework.beans.factory.support.AbstractBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
-import org.springframework.context.weaving.LoadTimeWeaverAwareProcessor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.internal.classloader.ClassLoaderFactory;
-import org.springframework.osgi.context.internal.classloader.ResourceClassLoader;
 import org.springframework.osgi.context.support.internal.OsgiBundleScope;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
@@ -243,23 +236,6 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		super.finishRefresh();
 		// publish the context only after all the beans have been published
 		publishContextAsOsgiServiceIfNecessary();
-	}
-
-	@Override
-	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-		if (OsgiBundleUtils.isBundleLazyActivated(bundle)) {
-			if (beanFactory.getTempClassLoader() == null) {
-				beanFactory.setTempClassLoader(new ResourceClassLoader(getClassLoader(), getBundleContext()));
-
-				logger.info("Using a temporary class loader for lazy activation for application context "
-						+ getDisplayName());
-			}
-			else {
-				logger.info("Lazy actvation detected but no temporary class loader used; one is already set");
-			}
-		}
-
-		super.prepareBeanFactory(beanFactory);
 	}
 
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {

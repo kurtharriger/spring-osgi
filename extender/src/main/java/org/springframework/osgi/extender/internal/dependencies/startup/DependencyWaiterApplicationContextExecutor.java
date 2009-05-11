@@ -20,7 +20,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,7 +27,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.task.TaskExecutor;
@@ -37,22 +35,15 @@ import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
-import org.springframework.osgi.extender.internal.support.LazyLatchFactoryDelegate;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
-import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
-import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 
 /**
- * Dependency waiter executor that breaks the 'traditional'
- * {@link ConfigurableApplicationContext#refresh()} in two pieces so that beans
- * are not actually created unless the OSGi service imported are present.
+ * Dependency waiter executor that breaks the 'traditional' {@link ConfigurableApplicationContext#refresh()} in two
+ * pieces so that beans are not actually created unless the OSGi service imported are present.
  * 
- * <p/>
- * <p/>
- * <p/>
- * Supports both asynch and synch behaviour.
+ * <p/> <p/> <p/> Supports both asynch and synch behaviour.
  * 
  * @author Hal Hildebrand
  * @author Costin Leau
@@ -63,8 +54,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	private static final Log log = LogFactory.getLog(DependencyWaiterApplicationContextExecutor.class);
 
 	/**
-	 * this class monitor. Since multiple threads will access this object, we
-	 * have to use synchronization to guarantee thread visibility
+	 * this class monitor. Since multiple threads will access this object, we have to use synchronization to guarantee
+	 * thread visibility
 	 */
 	private final Object monitor = new Object();
 
@@ -89,8 +80,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	private TaskExecutor taskExecutor;
 
 	/**
-	 * A synchronized counter used by the Listener to determine the number of
-	 * children to wait for when shutting down.
+	 * A synchronized counter used by the Listener to determine the number of children to wait for when shutting down.
 	 */
 	private Counter monitorCounter;
 
@@ -105,13 +95,6 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 	private List<OsgiServiceDependencyFactory> dependencyFactories;
 
-	/** flag indicating whether the bundle (if lazy) has been activated or not */
-	private volatile boolean activated;
-
-	private final boolean isLazyBundle;
-	private final Integer contextHash;
-
-
 	/**
 	 * The task for the watch dog.
 	 * 
@@ -125,9 +108,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	/**
-	 * Runnable action which will complete the context creation process. This
-	 * process can be called synchronously or asynchronously, depending on
-	 * context configuration and availability of dependencies.
+	 * Create the Runnable action which will complete the context creation process. This process can be called
+	 * synchronously or asynchronously, depending on context configuration and availability of dependencies.
 	 * 
 	 * @author Hal Hildebrand
 	 * @author Costin Leau
@@ -145,51 +127,28 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 					logWrongState(ContextState.DEPENDENCIES_RESOLVED);
 					return;
 				}
-				else {
-					state = ContextState.STARTED;
-				}
 			}
 
 			// Continue with the refresh process...
 			delegateContext.completeRefresh();
-		}
-	}
 
-	private class LazyActivationTask implements Runnable {
-
-		private final DelegatedExecutionOsgiBundleApplicationContext applicationContext;
-
-
-		LazyActivationTask(DelegatedExecutionOsgiBundleApplicationContext context) {
-			this.applicationContext = context;
-		}
-
-		public void run() {
-			// simply instantiate the exporters
-			// which will do the rest
-			if (log.isDebugEnabled()) {
-				log.debug("Lazily publishing services for context " + applicationContext);
-			}
-
+			// Once we are done, tell the world
 			synchronized (monitor) {
-				if (!state.isDown()) {
-					Map<String, OsgiServiceFactoryBean> exporters = BeanFactoryUtils.beansOfTypeIncludingAncestors(
-						applicationContext.getBeanFactory(), OsgiServiceFactoryBean.class, true, false);
+				// Close might have been called in the meantime
+				if (state != ContextState.DEPENDENCIES_RESOLVED) {
+					return;
 				}
+				state = ContextState.STARTED;
 			}
 		}
 	}
-
 
 	public DependencyWaiterApplicationContextExecutor(DelegatedExecutionOsgiBundleApplicationContext delegateContext,
-			boolean syncWait, List<OsgiServiceDependencyFactory> dependencyFactories, boolean isLazyBundle) {
+			boolean syncWait, List<OsgiServiceDependencyFactory> dependencyFactories) {
 		this.delegateContext = delegateContext;
 		this.delegateContext.setExecutor(this);
 		this.synchronousWait = syncWait;
 		this.dependencyFactories = dependencyFactories;
-		this.isLazyBundle = isLazyBundle;
-		this.activated = !isLazyBundle;
-		this.contextHash = System.identityHashCode(delegateContext);
 
 		synchronized (monitor) {
 			watchdogTask = new WatchDogTask();
@@ -197,9 +156,8 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	/**
-	 * Provide a continuation like approach to the application context. Will
-	 * execute just some parts of refresh and then leave the rest of to be
-	 * executed after a number of conditions have been met.
+	 * Provide a continuation like approach to the application context. Will execute just some parts of refresh and then
+	 * leave the rest of to be executed after a number of conditions have been met.
 	 */
 	public void refresh() throws BeansException, IllegalStateException {
 		if (log.isDebugEnabled())
@@ -209,7 +167,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		init();
 
 		// start the first stage
-		waitForDependencies();
+		stageOne();
 	}
 
 	/**
@@ -230,16 +188,12 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	/**
-	 * Starts the first stage of the application context refresh. Determines the
-	 * service dependencies and if there are any, registers a OSGi service
-	 * dependencyDetector which will continue the refresh process
-	 * asynchronously.
-	 * <p/>
-	 * Based on the {@link #synchronousWait}, the current thread can simply end
-	 * if there are any dependencies (the default) or wait to either timeout or
-	 * have all its dependencies met.
+	 * Start the first stage of the application context refresh. Determines the service dependencies and if there are
+	 * any, registers a OSGi service dependencyDetector which will continue the refresh process asynchronously. <p/>
+	 * Based on the {@link #synchronousWait}, the current thread can simply end if there are any dependencies (the
+	 * default) or wait to either timeout or have all its dependencies met.
 	 */
-	protected void waitForDependencies() {
+	protected void stageOne() {
 
 		boolean debug = log.isDebugEnabled();
 
@@ -273,13 +227,12 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 						waitBarrier.decrement();
 					}
 				};
-			}
-			else
+			} else
 				task = new Runnable() {
 
 					public void run() {
 						// no waiting involved, just call stageTwo
-						publishLazyExportersIfNeeded();
+						stageTwo();
 					}
 				};
 
@@ -289,7 +242,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			// all dependencies are met, just go with stageTwo
 			if (dl.isSatisfied()) {
 				log.info("No outstanding OSGi service dependencies, completing initialization for " + getDisplayName());
-				publishLazyExportersIfNeeded();
+				stageTwo();
 			}
 
 			else {
@@ -312,27 +265,20 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 					// if waiting times out...
 					if (waitBarrier.waitForZero(timeout)) {
 						timeout();
-					}
-					else
-						publishLazyExportersIfNeeded();
-				}
-				else {
+					} else
+						stageTwo();
+				} else {
 					// start the watchdog (we're asynch)
 					startWatchDog();
 				}
 			}
-		}
-		catch (Throwable e) {
+		} catch (Throwable e) {
 			fail(e);
 		}
 
 	}
 
-	/**
-	 * Second phase. Since DM 2.0, this activates lazy service exports (if
-	 * possible), otherwise moves to phase three.
-	 */
-	protected void publishLazyExportersIfNeeded() {
+	protected void stageTwo() {
 		boolean debug = log.isDebugEnabled();
 
 		if (debug)
@@ -349,59 +295,19 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			state = ContextState.DEPENDENCIES_RESOLVED;
 		}
 
-		if (isLazyBundle) {
-			if (OsgiBundleUtils.isBundleLazyActivated(delegateContext.getBundle()) && !activated) {
-				taskExecutor.execute(new LazyActivationTask(delegateContext));
-			}
-			else {
-				if (debug) {
-					log.debug("Context " + getDisplayName()
-							+ " was started lazy but has been activated in the meantime; executing normal startup");
-				}
-				fullyInitializeContext();
-			}
-		}
-		else {
-			fullyInitializeContext();
-		}
-	}
-
-	protected void fullyInitializeContext() {
-		boolean debug = log.isDebugEnabled();
-
-		if (debug)
-			log.debug("Starting stage three for " + getDisplayName());
-
+		// always delegate to the taskExecutor since we might be called by the
+		// OSGi platform listener
 		taskExecutor.execute(new CompleteRefreshTask());
 	}
 
-	public void activate() {
-		activated = true;
-		LazyLatchFactoryDelegate.removeLatch(contextHash);
-
-		boolean shouldCallStageThree = false;
-		synchronized (monitor) {
-			shouldCallStageThree = (state == ContextState.DEPENDENCIES_RESOLVED);
-		}
-
-		if (shouldCallStageThree) {
-			fullyInitializeContext();
-		}
-		else {
-			log.debug("No need to invoke stage three, context is " + state);
-		}
-	}
-
 	/**
-	 * The application context is being shutdown. Deregister the listener and
-	 * prevent classes from being loaded since it's Doom's day.
+	 * The application context is being shutdown. Deregister the listener and prevent classes from being loaded since
+	 * it's Doom's day.
 	 */
 	public void close() {
 		boolean debug = log.isDebugEnabled();
 
 		boolean normalShutdown = false;
-
-		LazyLatchFactoryDelegate.removeLatch(contextHash);
 
 		synchronized (monitor) {
 
@@ -428,8 +334,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 					if (delegateContext.isActive()) {
 						try {
 							delegateContext.getBeanFactory().destroySingletons();
-						}
-						catch (Exception ex) {
+						} catch (Exception ex) {
 							log.trace("Caught exception while interrupting context refresh ", ex);
 						}
 					}
@@ -468,25 +373,21 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			if (normalShutdown) {
 				delegateContext.normalClose();
 			}
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			log.fatal("Could not succesfully close context " + delegateContext, ex);
-		}
-		finally {
+		} finally {
 			monitorCounter.decrement();
 		}
 
 	}
 
 	/**
-	 * Fail creating the context. Figure out unsatisfied dependencies and
-	 * provide a very nice log message before closing the appContext.
-	 * <p/>
-	 * Normally this method is called when an exception is caught.
+	 * Fail creating the context. Figure out unsatisfied dependencies and provide a very nice log message before closing
+	 * the appContext. <p/> Normally this method is called when an exception is caught.
 	 * 
-	 * @param th - the offending Throwable which caused our demise
+	 * @param t - the offending Throwable which caused our demise
 	 */
-	public void fail(Throwable th) {
+	public void fail(Throwable t) {
 
 		// this will not thrown any exceptions (it just logs them)
 		close();
@@ -496,9 +397,9 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		synchronized (monitor) {
 			if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
 				buf.append("none");
-			}
-			else {
-				for (Iterator<MandatoryServiceDependency> dependencies = dependencyDetector.getUnsatisfiedDependencies().keySet().iterator(); dependencies.hasNext();) {
+			} else {
+				for (Iterator<MandatoryServiceDependency> dependencies = dependencyDetector
+						.getUnsatisfiedDependencies().keySet().iterator(); dependencies.hasNext();) {
 					MandatoryServiceDependency dependency = dependencies.next();
 					buf.append(dependency.toString());
 					if (dependencies.hasNext()) {
@@ -520,11 +421,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		message.append("], unsatisfied dependencies: ");
 		message.append(buf.toString());
 
-		log.error(message.toString(), th);
+		log.error(message.toString(), t);
 
 		// send notification
-		delegatedMulticaster.multicastEvent(new OsgiBundleContextFailedEvent(delegateContext,
-			delegateContext.getBundle(), th));
+		delegatedMulticaster.multicastEvent(new OsgiBundleContextFailedEvent(delegateContext, delegateContext
+				.getBundle(), t));
 	}
 
 	/**
@@ -641,8 +542,7 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	}
 
 	/**
-	 * Pass in the context counter. Used by the listener to track the number of
-	 * contexts started.
+	 * Pass in the context counter. Used by the listener to track the number of contexts started.
 	 * 
 	 * @param asynchCounter
 	 */

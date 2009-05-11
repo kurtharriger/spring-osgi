@@ -16,8 +16,6 @@
 
 package org.springframework.osgi.service.importer.support;
 
-import java.util.Arrays;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
@@ -36,14 +34,14 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Base class for importing OSGi services. Provides the common properties and
- * contracts between importers.
+ * Base class for importing OSGi services. Provides the common properties and contracts between importers.
  * 
  * @author Costin Leau
  * @author Adrian Colyer
  * @author Hal Hildebrand
  */
-public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBean<Object>, InitializingBean, DisposableBean, BundleContextAware, BeanClassLoaderAware, BeanNameAware {
+public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBean<Object>, InitializingBean,
+		DisposableBean, BundleContextAware, BeanClassLoaderAware, BeanNameAware {
 
 	private static final Log log = LogFactory.getLog(AbstractOsgiServiceImportFactoryBean.class);
 
@@ -57,15 +55,12 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	// not required to be an interface, but usually should be...
 	private Class<?>[] interfaces;
 
-	// user defined interface names
-	private String[] interfaceNames;
-
 	// filter used to narrow service matches, may be null
 	private String filter;
 
 	// Cumulated filter string between the specified classes/interfaces and the
 	// given filter
-	private volatile Filter unifiedFilter;
+	private Filter unifiedFilter;
 
 	// service lifecycle listener
 	private OsgiServiceLifecycleListener[] listeners;
@@ -78,61 +73,24 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	/** bean name */
 	private String beanName = "";
 
-
 	public void afterPropertiesSet() {
 		Assert.notNull(this.bundleContext, "Required 'bundleContext' property was not set.");
 		Assert.notNull(classLoader, "Required 'classLoader' property was not set.");
+		Assert.notEmpty(interfaces, "Required 'interfaces' property was not set.");
+		Assert.noNullElements(interfaces, "Null 'interfaces' entries not allowed.");
 
-		if (ObjectUtils.isEmpty(interfaces) && ObjectUtils.isEmpty(interfaceNames)) {
-			throw new IllegalArgumentException("either 'interfaces' or 'interfacesNames' property need to to be set");
-		}
-		if (!ObjectUtils.isEmpty(interfaces) && !ObjectUtils.isEmpty(interfaceNames)) {
-			throw new IllegalArgumentException(
-				"only one of 'interfaces' and 'interfacesNames' properties need to to be set");
-		}
-
-		if (!ObjectUtils.isEmpty(interfaces)) {
-			Assert.noNullElements(interfaces, "Null 'interfaces' entries not allowed.");
-
-			validateInterfaces();
-
-			interfaceNames = new String[interfaces.length];
-
-			for (int i = 0; i < interfaces.length; i++) {
-				interfaceNames[i] = interfaces[i].getName();
-			}
-		}
-
-		if (!ObjectUtils.isEmpty(interfaceNames)) {
-			Assert.noNullElements(interfaceNames, "Null 'interfacesNames' entries not allowed.");
-		}
+		// validate specified classes
+		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(interfaces),
+				"more then one concrete class specified; cannot create proxy.");
 
 		this.listeners = (listeners == null ? new OsgiServiceLifecycleListener[0] : listeners);
 
 		getUnifiedFilter(); // eager initialization of the cache to catch filter errors
 	}
 
-	// validation the relationship between classes
-	private void validateInterfaces() {
-		// validate specified classes
-		Assert.isTrue(!ClassUtils.containsUnrelatedClasses(interfaces),
-			"more then one concrete class specified; cannot create proxy.");
-	}
-
-	// load the interface classes (if only the names are known)
-	private void resolveClasses() {
-		interfaces = ClassUtils.loadClasses(interfaceNames, classLoader);
-
-		if (log.isDebugEnabled())
-			log.debug("Resolved classes " + Arrays.toString(interfaceNames));
-		validateInterfaces();
-
-	}
-
 	/**
-	 * Assembles the configuration properties into one unified OSGi filter. Note
-	 * that this implementation creates the filter on the first call and caches
-	 * it afterwards.
+	 * Assembles the configuration properties into one unified OSGi filter. Note that this implementation creates the
+	 * filter on the first call and caches it afterwards.
 	 * 
 	 * @return unified filter based on this factory bean configuration
 	 */
@@ -141,16 +99,17 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 			return unifiedFilter;
 		}
 
-		String filterWithClasses = OsgiFilterUtils.unifyFilter(interfaceNames, filter);
+		String filterWithClasses = OsgiFilterUtils.unifyFilter(interfaces, filter);
 
 		boolean trace = log.isTraceEnabled();
 		if (trace)
-			log.trace("Unified classes=" + ObjectUtils.nullSafeToString(interfaceNames) + " and filter=[" + filter
+			log.trace("Unified classes=" + ObjectUtils.nullSafeToString(interfaces) + " and filter=[" + filter
 					+ "]  in=[" + filterWithClasses + "]");
 
 		// add the serviceBeanName constraint
 		String filterWithServiceBeanName = OsgiFilterUtils.unifyFilter(
-			OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY, new String[] { serviceBeanName }, filterWithClasses);
+				OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY, new String[] { serviceBeanName },
+				filterWithClasses);
 
 		if (trace)
 			log.trace("Unified serviceBeanName [" + ObjectUtils.nullSafeToString(serviceBeanName) + "] and filter=["
@@ -172,17 +131,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	}
 
 	/**
-	 * Sets the names of the classes that the imported service advertises.
-	 * 
-	 * @param interfaceNames array of advertised classes.
-	 */
-	public void setInterfaceNames(String[] interfaceNames) {
-		this.interfaceNames = interfaceNames;
-	}
-
-	/**
-	 * Sets the thread context class loader management strategy to use for
-	 * services imported by this service. By default
+	 * Sets the thread context class loader management strategy to use for services imported by this service. By default
 	 * {@link ImportContextClassLoader#CLIENT} is used.
 	 * 
 	 * @param contextClassLoader import context class loader management strategy
@@ -198,9 +147,8 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	}
 
 	/**
-	 * Sets the OSGi service filter. The filter will be concatenated with the
-	 * rest of the configuration properties specified (such as interfaces) so
-	 * there is no need to include them in the filter.
+	 * Sets the OSGi service filter. The filter will be concatenated with the rest of the configuration properties
+	 * specified (such as interfaces) so there is no need to include them in the filter.
 	 * 
 	 * @param filter OSGi filter describing the importing OSGi service
 	 */
@@ -209,8 +157,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	}
 
 	/**
-	 * Sets the lifecycle listeners interested in receiving events for this
-	 * importer.
+	 * Sets the lifecycle listeners interested in receiving events for this importer.
 	 * 
 	 * @param listeners importer listeners
 	 */
@@ -219,10 +166,9 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	}
 
 	/**
-	 * Sets the OSGi service bean name. This setting should be normally used
-	 * when the imported service has been exported by Spring DM exporter. You
-	 * may specify additional filtering criteria if needed (using the filter
-	 * property) but this is not required.
+	 * Sets the OSGi service bean name. This setting should be normally used when the imported service has been exported
+	 * by Spring DM exporter. You may specify additional filtering criteria if needed (using the filter property) but
+	 * this is not required.
 	 * 
 	 * @param serviceBeanName importer service bean name
 	 */
@@ -260,29 +206,10 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	/**
 	 * Returns the interfaces used for discovering the imported service(s).
 	 * 
-	 * <p/>
-	 * Note that this method will trigger class loading if the classes have not
-	 * been resolved (if {@link #setInterfaceNames(String[])} was used). On OSGi
-	 * R4.1 platform, this will cause activation of lazy bundles. If unsure, use
-	 * {@link #getInterfaceNames()} instead.
-	 * 
 	 * @return interfaces advertised by services in the OSGi space
 	 */
 	public Class<?>[] getInterfaces() {
-		if (ObjectUtils.isEmpty(interfaces)) {
-			resolveClasses();
-		}
 		return interfaces;
-	}
-
-	/**
-	 * Returns the interface names used for discovering the imported service(s).
-	 * 
-	 * @return interfaces advertised by services in the OSGi space
-	 * @see #getInterfaces()
-	 */
-	public String[] getInterfaceNames() {
-		return interfaceNames;
 	}
 
 	/**
@@ -322,8 +249,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	}
 
 	/**
-	 * Sets the importer cardinality (0..1, 1..1, 0..N, or 1..N). Default is
-	 * 1..X.
+	 * Sets the importer cardinality (0..1, 1..1, 0..N, or 1..N). Default is 1..X.
 	 * 
 	 * @param cardinality importer cardinality.
 	 */
@@ -333,8 +259,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	}
 
 	/**
-	 * Returns the bean name associated with the instance of this class (when
-	 * running inside the Spring container).
+	 * Returns the bean name associated with the instance of this class (when running inside the Spring container).
 	 * 
 	 * @return component bean name
 	 */

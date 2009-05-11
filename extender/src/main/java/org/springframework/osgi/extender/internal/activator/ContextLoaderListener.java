@@ -17,7 +17,6 @@
 
 package org.springframework.osgi.extender.internal.activator;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -30,8 +29,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
@@ -42,14 +39,11 @@ import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 import org.springframework.osgi.extender.internal.support.NamespaceManager;
 import org.springframework.osgi.extender.support.internal.ConfigUtils;
-import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
-import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.osgi.util.internal.ClassUtils;
 
 /**
  * Osgi Extender that bootstraps 'Spring powered bundles'.
@@ -216,7 +210,6 @@ public class ContextLoaderListener implements BundleActivator {
 				case BundleEvent.LAZY_ACTIVATION: {
 					push(bundle);
 					maybeAddNamespaceHandlerFor(bundle, true);
-					break;
 				}
 				case BundleEvent.STARTED: {
 					if (!pop(bundle)) {
@@ -250,12 +243,8 @@ public class ContextLoaderListener implements BundleActivator {
 			}
 
 			switch (event.getType()) {
-				case BundleEvent.LAZY_ACTIVATION: {
-					lifecycleManager.maybeCreateApplicationContextFor(bundle, true);
-					break;
-				}
 				case BundleEvent.STARTED: {
-					lifecycleManager.maybeCreateApplicationContextFor(bundle, false);
+					lifecycleManager.maybeCreateApplicationContextFor(bundle);
 					break;
 				}
 				case BundleEvent.STOPPING: {
@@ -369,9 +358,6 @@ public class ContextLoaderListener implements BundleActivator {
 		versionMatcher = new DefaultVersionMatcher(getManagedBundleExtenderVersionHeader(), extenderVersion);
 		processor = createContextProcessor();
 
-		// init cache (to prevent ad-hoc Java Bean discovery on lazy bundles)
-		initJavaBeansCache();
-
 		// Step 1 : discover existing namespaces (in case there are fragments with custom XML definitions)
 		nsManager = new NamespaceManager(context);
 		initNamespaceHandlers(bundleContext);
@@ -439,20 +425,14 @@ public class ContextLoaderListener implements BundleActivator {
 		// Instantiate all previously resolved bundles which are Spring
 		// powered
 		for (int i = 0; i < previousBundles.length; i++) {
-			boolean isLazy = false;
-			try {
-				if (OsgiBundleUtils.isBundleLazyActivated(previousBundles[i])) {
-					isLazy = true;
-					lifecycleManager.maybeCreateApplicationContextFor(previousBundles[i], true);
-
+			if (OsgiBundleUtils.isBundleActive(previousBundles[i])) {
+				try {
+					lifecycleManager.maybeCreateApplicationContextFor(previousBundles[i]);
 				}
-				else if (OsgiBundleUtils.isBundleActive(previousBundles[i])) {
-					lifecycleManager.maybeCreateApplicationContextFor(previousBundles[i], false);
+				catch (Throwable e) {
+					log.warn("Cannot start bundle " + OsgiStringUtils.nullSafeSymbolicName(previousBundles[i])
+							+ " due to", e);
 				}
-			}
-			catch (Throwable e) {
-				log.warn("Cannot create context for" + (isLazy ? " lazy" : "") + " bundle "
-						+ OsgiStringUtils.nullSafeSymbolicName(previousBundles[i]) + " due to", e);
 			}
 		}
 	}
@@ -484,8 +464,6 @@ public class ContextLoaderListener implements BundleActivator {
 				isClosed = true;
 		}
 		log.info("Stopping [" + bundleContext.getBundle().getSymbolicName() + "] bundle v.[" + extenderVersion + "]");
-
-		destroyJavaBeansCache();
 
 		// remove the bundle listeners (we are closing down)
 		if (contextListener != null) {
@@ -521,21 +499,6 @@ public class ContextLoaderListener implements BundleActivator {
 		}
 
 		extenderConfiguration.destroy();
-	}
-
-	private void initJavaBeansCache() {
-		Class<?>[] classes = new Class<?>[] { OsgiServiceFactoryBean.class, OsgiServiceProxyFactoryBean.class,
-			OsgiServiceCollectionProxyFactoryBean.class };
-
-		CachedIntrospectionResults.acceptClassLoader(OsgiStringUtils.class.getClassLoader());
-
-		for (Class<?> clazz : classes) {
-			BeanUtils.getPropertyDescriptors(clazz);
-		}
-	}
-
-	private void destroyJavaBeansCache() {
-		CachedIntrospectionResults.clearClassLoader(OsgiStringUtils.class.getClassLoader());
 	}
 
 	protected void maybeAddNamespaceHandlerFor(Bundle bundle, boolean isLazy) {

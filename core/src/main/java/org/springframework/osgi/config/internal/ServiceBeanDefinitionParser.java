@@ -57,7 +57,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 	private static final String LISTENERS_PROP = "listeners";
 
-	private static final String INTERFACE_NAMES_PROP = "interfaceNames";
+	private static final String INTERFACES_PROP = "interfaces";
 
 	private static final String AUTOEXPORT_PROP = "autoExport";
 
@@ -91,7 +91,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 				String name = attribute.getLocalName();
 
 				if (INTERFACE.equals(name)) {
-					bldr.addPropertyValue(INTERFACE_NAMES_PROP, attribute.getValue());
+					bldr.addPropertyValue(INTERFACES_PROP, attribute.getValue());
 					return false;
 				}
 				else if (REF.equals(name)) {
@@ -182,8 +182,8 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 				parserContext.getReaderContext().error(
 					"either 'interface' attribute or <intefaces> sub-element has be specified", parent);
 			}
-			Set<?> interfaces = parsePropertySetElement(parserContext, element, builder.getBeanDefinition());
-			builder.addPropertyValue(INTERFACE_NAMES_PROP, ParserUtils.convertClassesToStrings(interfaces));
+			Set interfaces = parsePropertySetElement(parserContext, element, builder.getBeanDefinition());
+			builder.addPropertyValue(INTERFACES_PROP, interfaces);
 			return true;
 		}
 
