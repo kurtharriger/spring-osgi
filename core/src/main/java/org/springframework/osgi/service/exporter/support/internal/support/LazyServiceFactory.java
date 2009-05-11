@@ -25,7 +25,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 
 /**
@@ -46,33 +46,40 @@ public class LazyServiceFactory implements ServiceFactory {
 	// FIXME: make this configurable
 	private static final long lazyInitWait = 1000 * 60 * 5;
 
-	// root of all things Java
-	private static final String OBJECT = Object.class.getName();
+	private static final String OBJECT = "@sgi";
 	private final ObjectFactory<ServiceFactory> factory;
 	private final Bundle bundle;
-	private final ConfigurableOsgiBundleApplicationContext context;
+	private final ApplicationContext context;
+	private final String contextInfo;
+	private final String exporterName;
 	private volatile boolean initialized = false;
 
 
-	public <T> LazyServiceFactory(ObjectFactory<ServiceFactory> factory, Bundle bundle,
-			ConfigurableOsgiBundleApplicationContext context) {
+	public <T> LazyServiceFactory(ObjectFactory<ServiceFactory> factory, Bundle bundle, ApplicationContext context,
+			String exporterName) {
 		this.factory = factory;
 		this.bundle = bundle;
 		this.context = context;
+		this.contextInfo = (context != null ? context.getDisplayName() : "null");
+		this.exporterName = exporterName;
 	}
 
 	public Object getService(Bundle bundle, ServiceRegistration registration) {
 		if (!initialized) {
 			initialized = true;
-			triggerLazyActivation(bundle);
+			if (log.isDebugEnabled()) {
+				log.debug("Lazy exporter [" + exporterName + " ] invoked; triggering activation for context "
+						+ contextInfo);
+			}
+			triggerLazyActivation();
 			waitForContextRefresh();
 		}
 		return factory.getObject().getService(bundle, registration);
 	}
 
-	private void triggerLazyActivation(Bundle bnd) {
+	private void triggerLazyActivation() {
 		try {
-			bnd.loadClass(OBJECT);
+			bundle.loadClass(OBJECT);
 		}
 		catch (Exception ex) {
 			// ignore it
@@ -83,12 +90,12 @@ public class LazyServiceFactory implements ServiceFactory {
 		try {
 			CountDownLatch latch = LazyLatchFactory.getLatch(System.identityHashCode(context));
 			if (latch != null && !latch.await(lazyInitWait, TimeUnit.MILLISECONDS)) {
-				throw new IllegalStateException("Lazy exported service timed out waiting for startup of context "
-						+ context.getDisplayName());
+				throw new IllegalStateException("Lazy exporter [" + exporterName
+						+ "] timed out waiting for startup of context " + contextInfo);
 			}
 		}
 		catch (InterruptedException ex) {
-			String message = "Lazy exported service from context " + context.getDisplayName() + " was interrupted";
+			String message = "Lazy exporter [" + exporterName + "] in context " + contextInfo + " was interrupted";
 			log.info(message);
 			throw new IllegalStateException(message, ex);
 		}

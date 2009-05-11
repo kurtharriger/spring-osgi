@@ -221,8 +221,9 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			// when running inside a container, add the dependency between this bean and the target one
 			addBeanFactoryDependency();
 		}
-		else
+		else {
 			targetClass = target.getClass();
+		}
 
 		if (propertiesResolver == null) {
 			propertiesResolver = new BeanNameServicePropertiesResolver();
@@ -237,6 +238,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			interfaceNames = new String[interfaces.length];
 			for (int i = 0; i < interfaces.length; i++) {
 				interfaceNames[i] = interfaces[i].getName();
+			}
+		}
+		else {
+			if (!isLazyLoading()) {
+				resolveClasses();
 			}
 		}
 
@@ -398,7 +404,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			}
 		};
 
-		ServiceFactory lazyFactory = new LazyServiceFactory(lof, bundleContext.getBundle(), null);
+		ServiceFactory lazyFactory = new LazyServiceFactory(lof, bundleContext.getBundle(), applicationContext,
+			beanName);
 		return doRegisterService(interfaceNames.clone(), lazyFactory, serviceProperties);
 	}
 

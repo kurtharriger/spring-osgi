@@ -18,9 +18,14 @@
 package org.springframework.osgi.config.internal.util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedSet;
+import org.springframework.osgi.config.internal.adapter.ToStringClassAdapter;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.w3c.dom.Attr;
@@ -124,5 +129,30 @@ public abstract class ParserUtils {
 		System.arraycopy(callbacksA, 0, newCallbacks, 0, callbacksA.length);
 		System.arraycopy(callbacksB, 0, newCallbacks, callbacksA.length, callbacksB.length);
 		return newCallbacks;
+	}
+
+	/**
+	 * Utility method used for maintaining backwards compatibility by converting
+	 * Class objects to String (using their class names). Used by importer and
+	 * exporter parsing to set the 'interfaces' property.
+	 * 
+	 * @param parsedClasses collection of parsed classes
+	 * @return a collection of converted (if necessary) metadata
+	 */
+	public static Set<?> convertClassesToStrings(Set<?> parsedClasses) {
+		Set<Object> interfaces = new ManagedSet<Object>(parsedClasses.size());
+
+		for (Object clazz : parsedClasses) {
+			if (clazz instanceof TypedStringValue || clazz instanceof String) {
+				interfaces.add(clazz);
+			}
+			else {
+				// add adapter definition for bean references (which can be classes)
+				interfaces.add(BeanDefinitionBuilder.genericBeanDefinition(ToStringClassAdapter.class).addConstructorArgValue(
+					clazz).getBeanDefinition());
+			}
+		}
+
+		return interfaces;
 	}
 }

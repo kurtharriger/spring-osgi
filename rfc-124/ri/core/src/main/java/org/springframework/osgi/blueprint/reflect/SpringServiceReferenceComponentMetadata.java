@@ -43,7 +43,7 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 		ServiceReferenceComponentMetadata {
 
 	private static final String FILTER_PROP = "filter";
-	private static final String INTERFACES_PROP = "interfaceNames";
+	private static final String INTERFACE_NAMES_PROP = "interfaceNames";
 	private static final String CARDINALITY_PROP = "cardinality";
 	private static final String SERVICE_NAME_PROP = "serviceBeanName";
 	private static final String LISTENERS_PROP = "listeners";
@@ -75,7 +75,7 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 				: ServiceReferenceComponentMetadata.OPTIONAL_AVAILABILITY);
 
 		// interfaces
-		Object value = MetadataUtils.getValue(pvs, INTERFACES_PROP);
+		Object value = MetadataUtils.getValue(pvs, INTERFACE_NAMES_PROP);
 
 		Set<String> intfs = new LinkedHashSet<String>(4);
 		// interface attribute used
@@ -91,8 +91,8 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 					intfs.add(tsv.getValue());
 				}
 			}
-
 		}
+		
 		interfaces = Collections.unmodifiableSet(intfs);
 
 		// listeners

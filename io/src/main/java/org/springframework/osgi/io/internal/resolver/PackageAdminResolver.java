@@ -19,7 +19,6 @@ package org.springframework.osgi.io.internal.resolver;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,12 +37,14 @@ import org.springframework.util.ObjectUtils;
 /**
  * {@link PackageAdmin} based dependency resolver.
  * 
- * <p/> This implementation uses the OSGi PackageAdmin service to determine
+ * <p/>
+ * This implementation uses the OSGi PackageAdmin service to determine
  * dependencies between bundles. Since it's highly dependent on an external
  * service, it might be better to use a listener based implementation for poor
  * performing environments.
  * 
- * <p/> This implementation does consider required bundles.
+ * <p/>
+ * This implementation does consider required bundles.
  * 
  * @author Costin Leau
  * 
@@ -67,7 +68,7 @@ public class PackageAdminResolver implements DependencyResolver {
 		PackageAdmin pa = getPackageAdmin();
 
 		// create map with bundles as keys and a list of packages as value
-		Map importedBundles = new LinkedHashMap(8);
+		Map<Bundle, List<String>> importedBundles = new LinkedHashMap<Bundle, List<String>>(8);
 
 		// 1. consider required bundles first
 
@@ -120,12 +121,11 @@ public class PackageAdminResolver implements DependencyResolver {
 			}
 		}
 
-		List importedBundlesList = new ArrayList(importedBundles.size());
+		List<ImportedBundle> importedBundlesList = new ArrayList<ImportedBundle>(importedBundles.size());
 
-		for (Iterator iterator = importedBundles.entrySet().iterator(); iterator.hasNext();) {
-			Map.Entry entry = (Map.Entry) iterator.next();
-			Bundle importedBundle = (Bundle) entry.getKey();
-			List packages = (List) entry.getValue();
+		for (Map.Entry<Bundle, List<String>> entry : importedBundles.entrySet()) {
+			Bundle importedBundle = entry.getKey();
+			List<String> packages = entry.getValue();
 			importedBundlesList.add(new ImportedBundle(importedBundle,
 				(String[]) packages.toArray(new String[packages.size()])));
 		}
@@ -140,11 +140,11 @@ public class PackageAdminResolver implements DependencyResolver {
 	 * @param bundle
 	 * @param packageName
 	 */
-	private void addImportedBundle(Map map, ExportedPackage expPackage) {
+	private void addImportedBundle(Map<Bundle, List<String>> map, ExportedPackage expPackage) {
 		Bundle bnd = expPackage.getExportingBundle();
-		List packages = (List) map.get(bnd);
+		List<String> packages = map.get(bnd);
 		if (packages == null) {
-			packages = new ArrayList(4);
+			packages = new ArrayList<String>(4);
 			map.put(bnd, packages);
 		}
 		packages.add(new String(expPackage.getName()));
@@ -159,10 +159,10 @@ public class PackageAdminResolver implements DependencyResolver {
 	 * @param bundle
 	 * @param pkgs
 	 */
-	private void addExportedPackages(Map map, Bundle bundle, ExportedPackage[] pkgs) {
-		List packages = (List) map.get(bundle);
+	private void addExportedPackages(Map<Bundle, List<String>> map, Bundle bundle, ExportedPackage[] pkgs) {
+		List<String> packages = map.get(bundle);
 		if (packages == null) {
-			packages = new ArrayList(pkgs.length);
+			packages = new ArrayList<String>(pkgs.length);
 			map.put(bundle, packages);
 		}
 		for (int i = 0; i < pkgs.length; i++) {
@@ -172,9 +172,9 @@ public class PackageAdminResolver implements DependencyResolver {
 
 	private PackageAdmin getPackageAdmin() {
 
-		return (PackageAdmin) AccessController.doPrivileged(new PrivilegedAction() {
+		return AccessController.doPrivileged(new PrivilegedAction<PackageAdmin>() {
 
-			public Object run() {
+			public PackageAdmin run() {
 				ServiceReference ref = bundleContext.getServiceReference(PackageAdmin.class.getName());
 				if (ref == null)
 					throw new IllegalStateException(PackageAdmin.class.getName() + " service is required");

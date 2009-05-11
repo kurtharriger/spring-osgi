@@ -31,9 +31,10 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
@@ -102,16 +103,24 @@ class LifecycleManager implements DisposableBean {
 	 */
 	private class LazyActivationTask extends CompleteRefreshTask {
 
+		private final String EXPORTER_CLASS_NAME = OsgiServiceFactoryBean.class.getName();
+
+
 		public LazyActivationTask(ConfigurableOsgiBundleApplicationContext applicationContext) {
 			super(applicationContext);
 		}
 
 		public void run() {
 			super.run();
-			// simply instantiate the exporters
-			// which will do the rest
-			Map<String, OsgiServiceFactoryBean> exporters = BeanFactoryUtils.beansOfTypeIncludingAncestors(
-				applicationContext.getBeanFactory(), OsgiServiceFactoryBean.class, true, false);
+			// discover the exporters
+			ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
+			String[] names = beanFactory.getBeanDefinitionNames();
+			for (String name : names) {
+				BeanDefinition definition = beanFactory.getBeanDefinition(name);
+				if (EXPORTER_CLASS_NAME.equals(definition.getBeanClassName())) {
+					beanFactory.getBean(name);
+				}
+			}
 		}
 	}
 

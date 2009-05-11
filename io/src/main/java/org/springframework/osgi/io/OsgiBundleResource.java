@@ -40,16 +40,18 @@ import org.springframework.util.StringUtils;
 /**
  * Resource implementation for OSGi environments.
  * 
- * <p/> Lazy evaluation of the resource will be used.
+ * <p/>
+ * Lazy evaluation of the resource will be used.
  * 
  * This implementation allows resource location inside:
  * 
  * <ul>
- * <li><em>bundle space</em> - if <code>osgibundle:</code>/{@link #BUNDLE_URL_PREFIX}
- * prefix is being used or none is specified. This space cotnains the bundle jar
- * and its attached fragments.</li>
- * <li><em>bundle jar</em> - if <code>osgibundlejar:</code>/{@link #BUNDLE_JAR_URL_PREFIX}
- * is specified. This space contains just the bundle jar.</li>
+ * <li><em>bundle space</em> - if <code>osgibundle:</code>/
+ * {@link #BUNDLE_URL_PREFIX} prefix is being used or none is specified. This
+ * space cotnains the bundle jar and its attached fragments.</li>
+ * <li><em>bundle jar</em> - if <code>osgibundlejar:</code>/
+ * {@link #BUNDLE_JAR_URL_PREFIX} is specified. This space contains just the
+ * bundle jar.</li>
  * <li><em>class space</em> - if
  * {@link org.springframework.util.ResourceUtils#CLASSPATH_URL_PREFIX} is
  * encountered. This space contains the bundle classpath, namely the bundle jar,
@@ -59,18 +61,21 @@ import org.springframework.util.StringUtils;
  * For more explanations on resource locations in OSGi, please see the
  * <em>Access to Resources</em> chapter from the OSGi spec.
  * 
- * <p/> OSGi framework specific prefixes (such as <code>bundleentry:</code>
- * and <code>bundleresource:</code>under Equinox, <code>bundle:</code>
- * under Knopflefish and Felix, etc..) are supported. Resources outside the OSGi
- * space (<code>file:</code>, <code>http:</code>, etc..) are supported as
- * well as the path is being resolved to an <code>URL</code>.
+ * <p/>
+ * OSGi framework specific prefixes (such as <code>bundleentry:</code> and
+ * <code>bundleresource:</code>under Equinox, <code>bundle:</code> under
+ * Knopflefish and Felix, etc..) are supported. Resources outside the OSGi space
+ * (<code>file:</code>, <code>http:</code>, etc..) are supported as well as the
+ * path is being resolved to an <code>URL</code>.
  * 
- * <p/>If no prefix is specified, the <em>bundle space</em> will be used for
+ * <p/>
+ * If no prefix is specified, the <em>bundle space</em> will be used for
  * locating a resource.
  * 
- * <p/> <strong>Note:</strong> When the <em>bundle space</em> (bundle jar and
- * its attached fragments) is being searched, multiple URLs can be found but
- * this implementation will return only the first one. Consider using
+ * <p/>
+ * <strong>Note:</strong> When the <em>bundle space</em> (bundle jar and its
+ * attached fragments) is being searched, multiple URLs can be found but this
+ * implementation will return only the first one. Consider using
  * {@link OsgiBundleResourcePatternResolver} to retrieve all entries.
  * 
  * @author Costin Leau
@@ -163,18 +168,17 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	}
 
 	/**
-	 * Returns an <code>InputStream</code> to this resource. This
-	 * implementation opens an
-	 * <code>InputStream<code> for the given <code>URL</code>. It sets the
-	 * <em>UseCaches</em> flag to <code>false</code>, mainly to avoid jar file
-	 * locking on Windows.
+	 * Returns an <code>InputStream</code> to this resource. This implementation
+	 * opens an <code>InputStream<code> for the given <code>URL</code>. It sets
+	 * the <em>UseCaches</em> flag to <code>false</code>, mainly to avoid jar
+	 * file locking on Windows.
 	 * 
 	 * @return input stream to the underlying resource
 	 * @throws IOException if the stream could not be opened
 	 * @see java.net.URL#openConnection()
 	 * @see java.net.URLConnection#setUseCaches(boolean)
 	 * @see java.net.URLConnection#getInputStream()
-	 *
+	 * 
 	 */
 	public InputStream getInputStream() throws IOException {
 		URLConnection con = getURL().openConnection();
@@ -287,8 +291,8 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 
 	/**
 	 * Returns a resource relative to this resource. This implementation creates
-	 * an <code>OsgiBundleResource</code>, applying the given path relative
-	 * to the path of the underlying resource of this descriptor.
+	 * an <code>OsgiBundleResource</code>, applying the given path relative to
+	 * the path of the underlying resource of this descriptor.
 	 * 
 	 * @param relativePath the relative path (relative to this resource)
 	 * @return the resource handle for the relative resource
@@ -313,11 +317,11 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	}
 
 	/**
-	 * Returns a <code>File</code> handle for this resource. This method does
-	 * a best-effort attempt to locate the bundle resource on the file system.
-	 * It is strongly recommended to use {@link #getInputStream()} method
-	 * instead which works no matter if the bundles are saved (in exploded form
-	 * or not) on the file system.
+	 * Returns a <code>File</code> handle for this resource. This method does a
+	 * best-effort attempt to locate the bundle resource on the file system. It
+	 * is strongly recommended to use {@link #getInputStream()} method instead
+	 * which works no matter if the bundles are saved (in exploded form or not)
+	 * on the file system.
 	 * 
 	 * @return File handle to this resource
 	 * @throws IOException if the resource cannot be resolved as absolute file
@@ -348,7 +352,8 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	}
 
 	/**
-	 * <p/> This implementation returns a description that includes the bundle
+	 * <p/>
+	 * This implementation returns a description that includes the bundle
 	 * location.
 	 */
 	public String getDescription() {
@@ -365,8 +370,8 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	}
 
 	/**
-	 * <p/> This implementation compares the underlying bundle and path
-	 * locations.
+	 * <p/>
+	 * This implementation compares the underlying bundle and path locations.
 	 */
 	public boolean equals(Object obj) {
 		if (obj == this) {
@@ -380,8 +385,9 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	}
 
 	/**
-	 * <p/> This implementation returns the hash code of the underlying class
-	 * path location.
+	 * <p/>
+	 * This implementation returns the hash code of the underlying class path
+	 * location.
 	 */
 	public int hashCode() {
 		return this.path.hashCode();
@@ -416,13 +422,14 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	 * @return an array of URLs
 	 * @throws IOException
 	 */
+	@SuppressWarnings("unchecked")
 	ContextResource[] getAllUrlsFromBundleSpace(String location) throws IOException {
 		if (bundle == null)
 			throw new IllegalArgumentException(
 				"cannot locate items in bundle-space w/o a bundle; specify one when creating this resolver");
 
 		Assert.notNull(location);
-		Set resources = new LinkedHashSet(5);
+		Set<UrlContextResource> resources = new LinkedHashSet<UrlContextResource>(5);
 
 		location = StringUtils.cleanPath(location);
 		location = OsgiResourceUtils.stripPrefix(location);
@@ -441,13 +448,13 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 			// we could ask for a known entry (such as META-INF)
 			// but not all jars have a dedicated entry for it
 			// so we'll just ask for whatever is present in the root
-			Enumeration candidates = bundle.findEntries("/", null, false);
+			Enumeration<URL> candidates = bundle.findEntries("/", null, false);
 
 			// since there can be multiple root paths (when fragments are present)
 			// iterate on all candidates
 			while (candidates != null && candidates.hasMoreElements()) {
 
-				URL url = (URL) candidates.nextElement();
+				URL url = candidates.nextElement();
 
 				// determined the root path
 				// we'll have to parse the string since some implementations
@@ -482,12 +489,12 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 					file = location.substring(separatorIndex + 1);
 			}
 
-			Enumeration candidates = bundle.findEntries(path, file, false);
+			Enumeration<URL> candidates = bundle.findEntries(path, file, false);
 			// add the leading / to be consistent
 			String contextPath = OsgiResourceUtils.FOLDER_DELIMITER + location;
 
 			while (candidates != null && candidates.hasMoreElements()) {
-				resources.add(new UrlContextResource((URL) candidates.nextElement(), contextPath));
+				resources.add(new UrlContextResource(candidates.nextElement(), contextPath));
 			}
 		}
 
@@ -506,9 +513,10 @@ public class OsgiBundleResource extends AbstractResource implements ContextResou
 	 * of a <code>Resource</code> handle only guarantees a valid descriptor
 	 * handle.
 	 * 
-	 * <p/>The existence check is done by opening an InputStream to the
-	 * underlying resource (overriding the default implementation which checks
-	 * first for the presence of a File).
+	 * <p/>
+	 * The existence check is done by opening an InputStream to the underlying
+	 * resource (overriding the default implementation which checks first for
+	 * the presence of a File).
 	 */
 	public boolean exists() {
 		try {

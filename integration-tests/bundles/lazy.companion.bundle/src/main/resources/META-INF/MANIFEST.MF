@@ -1,0 +1,6 @@
+Bundle-Name: lazy-companion-bundle
+Bundle-SymbolicName: org.springframework.osgi.iandt.lazy.companion
+Bundle-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-ActivationPolicy: lazy
+Export-Package: org.springframework.osgi.iandt.lazy.companion
