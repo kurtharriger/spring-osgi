@@ -24,8 +24,8 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.osgi.service.blueprint.context.ModuleContext;
-import org.osgi.service.blueprint.context.NoSuchComponentException;
+import org.osgi.service.blueprint.container.BlueprintContainer;
+import org.osgi.service.blueprint.container.NoSuchComponentException;
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.blueprint.TestComponent;
-import org.springframework.osgi.blueprint.context.SpringModuleContext;
+import org.springframework.osgi.blueprint.context.SpringBlueprintContainer;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 
@@ -50,10 +50,9 @@ public class ComponentSubElementTest extends TestCase {
 	private static final String CONFIG = "component-subelements.xml";
 
 	private GenericApplicationContext context;
-	private ModuleContext moduleContext;
+	private BlueprintContainer BlueprintContainer;
 	private XmlBeanDefinitionReader reader;
 	protected MockBundleContext bundleContext;
-
 
 	protected void setUp() throws Exception {
 		bundleContext = new MockBundleContext();
@@ -66,7 +65,7 @@ public class ComponentSubElementTest extends TestCase {
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
 		context.refresh();
 
-		moduleContext = new SpringModuleContext(context, bundleContext);
+		BlueprintContainer = new SpringBlueprintContainer(context, bundleContext);
 	}
 
 	protected void tearDown() throws Exception {
@@ -184,10 +183,9 @@ public class ComponentSubElementTest extends TestCase {
 
 	public void testDependsOnTest() throws Exception {
 		try {
-			System.out.println(moduleContext.getComponent("dependsOnComponent"));
+			System.out.println(BlueprintContainer.getComponent("dependsOnComponent"));
 			fail("expected validation exception");
-		}
-		catch (NoSuchComponentException nsce) {
+		} catch (NoSuchComponentException nsce) {
 		}
 	}
 }

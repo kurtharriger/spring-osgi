@@ -22,9 +22,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.service.blueprint.reflect.ParameterSpecification;
+import org.osgi.service.blueprint.reflect.BeanArgument;
+import org.osgi.service.blueprint.reflect.BeanProperty;
+import org.osgi.service.blueprint.reflect.MapEntry;
+import org.osgi.service.blueprint.reflect.Metadata;
+import org.osgi.service.blueprint.reflect.NonNullMetadata;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 
@@ -49,28 +54,49 @@ abstract class MetadataUtils {
 		return (valueHolder.isConverted() ? valueHolder.getConvertedValue() : valueHolder.getValue());
 	}
 
-	static List<ParameterSpecification> getParameterList(ConstructorArgumentValues ctorValues) {
-		List<ParameterSpecification> temp;
+	static List<BeanArgument> getBeanArguments(BeanDefinition definition) {
+		List<BeanArgument> temp;
+
+		ConstructorArgumentValues ctorValues = definition.getConstructorArgumentValues();
 
 		// get indexed values
 		Map<Integer, ValueHolder> indexedArguments = ctorValues.getIndexedArgumentValues();
 
 		// check first the indexed arguments
 		if (!indexedArguments.isEmpty()) {
-			temp = new ArrayList<ParameterSpecification>(indexedArguments.size());
+			temp = new ArrayList<BeanArgument>(indexedArguments.size());
 
-			for (Iterator<Map.Entry<Integer, ValueHolder>> iterator = indexedArguments.entrySet().iterator(); iterator.hasNext();) {
+			for (Iterator<Map.Entry<Integer, ValueHolder>> iterator = indexedArguments.entrySet().iterator(); iterator
+					.hasNext();) {
 				Map.Entry<Integer, ValueHolder> entry = iterator.next();
-				temp.add(new SimpleParameterSpecification(entry.getKey(), entry.getValue()));
+				temp.add(new SimpleBeanArgument(entry.getKey(), entry.getValue()));
 			}
-		}
-		else {
+		} else {
 			// followed by the generic arguments
 			List<ValueHolder> args = ctorValues.getGenericArgumentValues();
-			temp = new ArrayList<ParameterSpecification>(args.size());
-			for (ValueHolder arg : args) {
-				temp.add(new SimpleParameterSpecification(-1, arg));
+			temp = new ArrayList<BeanArgument>(args.size());
+			for (int i = 0; i < args.size(); i++) {
+				ValueHolder arg = args.get(i);
+				temp.add(new SimpleBeanArgument(i, arg));
 			}
+		}
+
+		return Collections.unmodifiableList(temp);
+	}
+
+	static List<BeanProperty> getBeanProperties(BeanDefinition definition) {
+		List<BeanProperty> temp;
+
+		List<PropertyValue> pvs = definition.getPropertyValues().getPropertyValueList();
+
+		if (pvs.isEmpty()) {
+			return Collections.<BeanProperty> emptyList();
+		} else {
+			temp = new ArrayList<BeanProperty>(pvs.size());
+		}
+
+		for (PropertyValue propertyValue : pvs) {
+			temp.add(new SimpleBeanProperty(propertyValue));
 		}
 
 		return Collections.unmodifiableList(temp);

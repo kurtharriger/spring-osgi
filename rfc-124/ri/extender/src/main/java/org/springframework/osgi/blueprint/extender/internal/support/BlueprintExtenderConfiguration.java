@@ -17,7 +17,7 @@
 package org.springframework.osgi.blueprint.extender.internal.support;
 
 import org.osgi.framework.BundleContext;
-import org.springframework.osgi.blueprint.extender.internal.activator.support.BlueprintModuleContextCreator;
+import org.springframework.osgi.blueprint.extender.internal.activator.support.BlueprintContainerCreator;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 
@@ -31,7 +31,7 @@ import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 public class BlueprintExtenderConfiguration extends ExtenderConfiguration {
 
 	private final Object lock = new Object();
-	private OsgiApplicationContextCreator contextCreator = new BlueprintModuleContextCreator();
+	private OsgiApplicationContextCreator contextCreator = new BlueprintContainerCreator();
 
 
 	/**

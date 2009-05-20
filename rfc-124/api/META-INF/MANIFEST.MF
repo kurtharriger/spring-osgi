@@ -3,7 +3,7 @@ Bundle-Name: Blueprint Service API
 Bundle-SymbolicName: org.osgi.service.blueprint
 Bundle-Version: 1.0.0
 Bundle-Vendor: OSGi Alliance
-Export-Package: org.osgi.service.blueprint.context;version="1.0.0",
+Export-Package: org.osgi.service.blueprint.container;version="1.0.0",
  org.osgi.service.blueprint.convert;version="1.0.0",
  org.osgi.service.blueprint.namespace;version="1.0.0",
  org.osgi.service.blueprint.reflect;version="1.0.0"

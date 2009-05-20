@@ -29,7 +29,6 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
-import org.osgi.service.blueprint.context.ModuleContextEventConstants;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
@@ -40,11 +39,9 @@ import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEven
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
- * Actual {@link EventAdmin} dispatcher. Implemented as a package-protected
- * generic class that can be further configured by the user-facing classes. The
- * additional benefit is that being a separate class, this class can be used
- * only when the org.osgi.service.event package is available, w/o triggering
- * runtime class loading.
+ * Actual {@link EventAdmin} dispatcher. Implemented as a package-protected generic class that can be further configured
+ * by the user-facing classes. The additional benefit is that being a separate class, this class can be used only when
+ * the org.osgi.service.event package is available, w/o triggering runtime class loading.
  * 
  * @author Costin Leau
  * 
@@ -56,7 +53,6 @@ class OsgiEventDispatcher implements EventDispatcher {
 	// match the class inside object class (and use a non backing reference group)
 	private static final Pattern PATTERN = Pattern.compile("objectClass=(?:[^\\)]+)");
 
-
 	public OsgiEventDispatcher(BundleContext bundleContext, PublishType publisher) {
 		this.bundleContext = bundleContext;
 		this.publisher = publisher;
@@ -64,22 +60,22 @@ class OsgiEventDispatcher implements EventDispatcher {
 
 	public void afterClose(ConfigurableOsgiBundleApplicationContext context) {
 		Dictionary<String, Object> props = init(context.getBundle());
-		sendEvent(new Event(ModuleContextEventConstants.TOPIC_DESTROYED, props));
+		sendEvent(new Event(org.osgi.service.blueprint.container.EventConstants.TOPIC_DESTROYED, props));
 	}
 
 	public void afterRefresh(ConfigurableOsgiBundleApplicationContext context) {
 		Dictionary<String, Object> props = init(context.getBundle());
-		sendEvent(new Event(ModuleContextEventConstants.TOPIC_CREATED, props));
+		sendEvent(new Event(org.osgi.service.blueprint.container.EventConstants.TOPIC_CREATED, props));
 	}
 
 	public void beforeClose(ConfigurableOsgiBundleApplicationContext context) {
 		Dictionary<String, Object> props = init(context.getBundle());
-		sendEvent(new Event(ModuleContextEventConstants.TOPIC_DESTROYING, props));
+		sendEvent(new Event(org.osgi.service.blueprint.container.EventConstants.TOPIC_DESTROYING, props));
 	}
 
 	public void beforeRefresh(ConfigurableOsgiBundleApplicationContext context) {
 		Dictionary<String, Object> props = init(context.getBundle());
-		sendEvent(new Event(ModuleContextEventConstants.TOPIC_CREATING, props));
+		sendEvent(new Event(org.osgi.service.blueprint.container.EventConstants.TOPIC_CREATING, props));
 	}
 
 	public void refreshFailure(ConfigurableOsgiBundleApplicationContext context, Throwable th) {
@@ -89,7 +85,7 @@ class OsgiEventDispatcher implements EventDispatcher {
 		props.put(EventConstants.EXCEPTION_CLASS, th.getClass().getName());
 		props.put(EventConstants.EXCEPTION_MESSAGE, th.getMessage());
 
-		sendEvent(new Event(ModuleContextEventConstants.TOPIC_FAILURE, props));
+		sendEvent(new Event(org.osgi.service.blueprint.container.EventConstants.TOPIC_FAILURE, props));
 	}
 
 	public void waiting(BootstrappingDependencyEvent event) {
@@ -102,7 +98,7 @@ class OsgiEventDispatcher implements EventDispatcher {
 		// FIXME: there should be a constant for this
 		props.put("service.Filter", filter.toString());
 		props.put(EventConstants.SERVICE_OBJECTCLASS, extractObjectClassFromFilter(filter));
-		sendEvent(new Event(ModuleContextEventConstants.TOPIC_WAITING, props));
+		sendEvent(new Event(org.osgi.service.blueprint.container.EventConstants.TOPIC_WAITING, props));
 	}
 
 	private String[] extractObjectClassFromFilter(Filter filter) {
@@ -137,12 +133,13 @@ class OsgiEventDispatcher implements EventDispatcher {
 		// version
 		Version version = OsgiBundleUtils.getBundleVersion(bundle);
 		props.put(Constants.BUNDLE_VERSION, version);
-		props.put(ModuleContextEventConstants.BUNDLE_VERSION, version);
+		//props.put(org.osgi.service.blueprint.container.EventConstants.BUNDLE_VERSION, version);
 		// extender bundle info
 		Bundle extenderBundle = bundleContext.getBundle();
-		props.put(ModuleContextEventConstants.EXTENDER_BUNDLE, extenderBundle);
-		props.put(ModuleContextEventConstants.EXTENDER_ID, extenderBundle.getBundleId());
-		props.put(ModuleContextEventConstants.EXTENDER_SYMBOLICNAME, extenderBundle.getSymbolicName());
+		props.put(org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE, extenderBundle);
+		props.put(org.osgi.service.blueprint.container.EventConstants.EXTENDER_ID, extenderBundle.getBundleId());
+		props.put(org.osgi.service.blueprint.container.EventConstants.EXTENDER_SYMBOLICNAME, extenderBundle
+				.getSymbolicName());
 
 		return props;
 	}
