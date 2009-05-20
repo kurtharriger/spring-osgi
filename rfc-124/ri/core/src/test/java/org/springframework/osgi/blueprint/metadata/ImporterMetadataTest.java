@@ -23,13 +23,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.osgi.service.blueprint.reflect.BindingListenerMetadata;
-import org.osgi.service.blueprint.reflect.CollectionBasedServiceReferenceComponentMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
-import org.osgi.service.blueprint.reflect.ComponentValue;
-import org.osgi.service.blueprint.reflect.ReferenceValue;
-import org.osgi.service.blueprint.reflect.ServiceReferenceComponentMetadata;
-import org.osgi.service.blueprint.reflect.UnaryServiceReferenceComponentMetadata;
+import org.osgi.service.blueprint.reflect.Listener;
+import org.osgi.service.blueprint.reflect.RefCollectionMetadata;
+import org.osgi.service.blueprint.reflect.RefMetadata;
+import org.osgi.service.blueprint.reflect.ReferenceMetadata;
+import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
+import org.osgi.service.blueprint.reflect.Target;
 
 /**
  * @author Costin Leau
@@ -42,77 +42,74 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 		return "/org/springframework/osgi/blueprint/config/importer-elements.xml";
 	}
 
-	private ServiceReferenceComponentMetadata getReferenceMetadata(String name) {
-		ComponentMetadata metadata = moduleContext.getComponentMetadata(name);
-		assertTrue(metadata instanceof ServiceReferenceComponentMetadata);
-		ServiceReferenceComponentMetadata referenceMetadata = (ServiceReferenceComponentMetadata) metadata;
-		assertEquals("the registered name doesn't match the component name", name, referenceMetadata.getName());
+	private ServiceReferenceMetadata getReferenceMetadata(String name) {
+		ComponentMetadata metadata = BlueprintContainer.getComponentMetadata(name);
+		assertTrue(metadata instanceof ServiceReferenceMetadata);
+		ServiceReferenceMetadata referenceMetadata = (ServiceReferenceMetadata) metadata;
+		assertEquals("the registered name doesn't match the component name", name, referenceMetadata.getId());
 		return referenceMetadata;
 	}
 
 	public void testSimpleBean() throws Exception {
-		ServiceReferenceComponentMetadata metadata = getReferenceMetadata("simple");
+		ServiceReferenceMetadata metadata = getReferenceMetadata("simple");
 		System.out.println(metadata.getClass().getName());
 		assertNull(metadata.getFilter());
-		Set<String> intfs = metadata.getInterfaceNames();
+		List<String> intfs = metadata.getInterfaceNames();
 		assertEquals(Cloneable.class.getName(), intfs.iterator().next());
-		assertEquals(ServiceReferenceComponentMetadata.MANDATORY_AVAILABILITY,
-			metadata.getServiceAvailabilitySpecification());
-		assertEquals(0, metadata.getBindingListeners().size());
+		assertEquals(ReferenceMetadata.AVAILABILITY_MANDATORY, metadata.getAvailability());
+		assertEquals(0, metadata.getServiceListeners().size());
 	}
 
 	public void testBeanWithOptions() throws Exception {
-		ServiceReferenceComponentMetadata metadata = getReferenceMetadata("options");
+		ServiceReferenceMetadata metadata = getReferenceMetadata("options");
 		assertEquals("(name=foo)", metadata.getFilter());
-		Set<String> intfs = metadata.getInterfaceNames();
+		List<String> intfs = metadata.getInterfaceNames();
 		assertEquals(Serializable.class.getName(), intfs.iterator().next());
-		assertEquals(ServiceReferenceComponentMetadata.OPTIONAL_AVAILABILITY,
-			metadata.getServiceAvailabilitySpecification());
-		Collection<BindingListenerMetadata> listeners = metadata.getBindingListeners();
+		assertEquals(ReferenceMetadata.AVAILABILITY_OPTIONAL, metadata.getAvailability());
+		Collection<Listener> listeners = metadata.getServiceListeners();
 		assertEquals(1, listeners.size());
 	}
 
 	public void testMultipleInterfaces() throws Exception {
-		ServiceReferenceComponentMetadata metadata = getReferenceMetadata("multipleInterfaces");
-		Set<String> intfs = metadata.getInterfaceNames();
+		ServiceReferenceMetadata metadata = getReferenceMetadata("multipleInterfaces");
+		List<String> intfs = metadata.getInterfaceNames();
 		Iterator<String> iter = intfs.iterator();
 		assertEquals(Cloneable.class.getName(), iter.next());
 		assertEquals(Serializable.class.getName(), iter.next());
-		assertEquals(ServiceReferenceComponentMetadata.MANDATORY_AVAILABILITY,
-			metadata.getServiceAvailabilitySpecification());
-		assertEquals(0, metadata.getBindingListeners().size());
+		assertEquals(ReferenceMetadata.AVAILABILITY_MANDATORY, metadata.getAvailability());
+		assertEquals(0, metadata.getServiceListeners().size());
 	}
 
 	public void testMultipleListeners() throws Exception {
-		ServiceReferenceComponentMetadata metadata = getReferenceMetadata("multipleListeners");
-		Collection<BindingListenerMetadata> listeners = metadata.getBindingListeners();
+		ServiceReferenceMetadata metadata = getReferenceMetadata("multipleListeners");
+		Collection<Listener> listeners = metadata.getServiceListeners();
 		assertEquals(3, listeners.size());
 
-		Iterator<BindingListenerMetadata> iterator = listeners.iterator();
-		BindingListenerMetadata listener = iterator.next();
+		Iterator<Listener> iterator = listeners.iterator();
+		Listener listener = iterator.next();
 		assertEquals("bindM", listener.getBindMethodName());
 		assertEquals("unbindM", listener.getUnbindMethodName());
-		assertTrue(listener.getListenerComponent() instanceof ReferenceValue);
+		assertTrue(listener.getListenerComponent() instanceof RefMetadata);
 		listener = iterator.next();
-		assertTrue(listener.getListenerComponent() instanceof ComponentValue);
+		assertTrue(listener.getListenerComponent() instanceof Target);
 		listener = iterator.next();
-		assertTrue(listener.getListenerComponent() instanceof ReferenceValue);
+		assertTrue(listener.getListenerComponent() instanceof RefMetadata);
 	}
 
 	public void testTimeout() throws Exception {
-		ServiceReferenceComponentMetadata metadata = getReferenceMetadata("timeout");
-		assertTrue(metadata instanceof UnaryServiceReferenceComponentMetadata);
-		assertEquals(1234, ((UnaryServiceReferenceComponentMetadata) metadata).getTimeout());
+		ServiceReferenceMetadata metadata = getReferenceMetadata("timeout");
+		assertTrue(metadata instanceof ReferenceMetadata);
+		assertEquals(1234, ((ReferenceMetadata) metadata).getTimeout());
 	}
 
 	public void testSimpleList() throws Exception {
-		CollectionBasedServiceReferenceComponentMetadata metadata = (CollectionBasedServiceReferenceComponentMetadata) getReferenceMetadata("simpleList");
+		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("simpleList");
 		assertEquals(List.class, metadata.getCollectionType());
 		System.out.println(metadata.getComparator());
 	}
 
 	public void testNestedComparator() throws Exception {
-		CollectionBasedServiceReferenceComponentMetadata metadata = (CollectionBasedServiceReferenceComponentMetadata) getReferenceMetadata("nestedComparator");
+		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("nestedComparator");
 		assertEquals(List.class, metadata.getCollectionType());
 		System.out.println(metadata.getComparator());
 	}
@@ -121,12 +118,12 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 	}
 
 	public void testMemberType() throws Exception {
-		CollectionBasedServiceReferenceComponentMetadata metadata = (CollectionBasedServiceReferenceComponentMetadata) getReferenceMetadata("memberType");
+		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("memberType");
 		assertEquals(Set.class, metadata.getCollectionType());
 	}
 
 	public void testSortedSet() throws Exception {
-		CollectionBasedServiceReferenceComponentMetadata metadata = (CollectionBasedServiceReferenceComponentMetadata) getReferenceMetadata("sortedSet");
+		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("sortedSet");
 		System.out.println(metadata.getCollectionType());
 		assertEquals(SortedSet.class, metadata.getCollectionType());
 	}

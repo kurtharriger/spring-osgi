@@ -19,10 +19,10 @@ package org.springframework.osgi.blueprint.extender.internal.activator.support;
 import java.util.Dictionary;
 import java.util.Properties;
 
+import junit.framework.TestCase;
+
 import org.springframework.beans.propertyeditors.CharacterEditor;
 import org.springframework.util.ObjectUtils;
-
-import junit.framework.TestCase;
 
 /**
  * Test intended mainly for checking the header parsing.

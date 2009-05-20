@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2000, 2008). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2008, 2009). All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,22 @@
  */
 package org.osgi.service.blueprint.reflect;
 
-import java.util.Set;
 
 /**
- * Metadata for a component defined within a given module context.
- * 
- * @see LocalComponentMetadata
- * @see ServiceReferenceComponentMetadata
- * @see ServiceExportComponentMetadata
+ * Base class for all components.
+ *
+ * @see BeanMetadata
+ * @see ServiceReferenceMetadata
+ * @see ServiceMetadata
  */
-public interface ComponentMetadata {
-	
+public interface ComponentMetadata extends NonNullMetadata {
+
 	/**
-	 * The name of the component.
-	 * 
-	 * @return component name. The component name may be null if this is an anonymously
+	 * The id of the component.
+	 *
+	 * ### renamed to getId
+	 * @return component id. The component id can be <code>null</code> if this is an anonymously
 	 * defined inner component.
 	 */
-	String getName();
-		
-	/**
-	 * The names of any components listed in a "depends-on" attribute for this
-	 * component.
-	 * 
-	 * @return an immutable set of component names for components that we have explicitly
-	 * declared a dependency on, or an empty set if none.
-	 */
-	Set getExplicitDependencies();
+	String getId();
 }

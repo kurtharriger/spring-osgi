@@ -18,11 +18,11 @@ package org.springframework.osgi.blueprint.metadata;
 
 import junit.framework.TestCase;
 
-import org.osgi.service.blueprint.context.ModuleContext;
+import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.osgi.blueprint.context.SpringModuleContext;
+import org.springframework.osgi.blueprint.context.SpringBlueprintContainer;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 
@@ -34,10 +34,9 @@ import org.springframework.osgi.mock.MockBundleContext;
 public abstract class BaseMetadataTest extends TestCase {
 
 	protected GenericApplicationContext applicationContext;
-	protected ModuleContext moduleContext;
+	protected BlueprintContainer BlueprintContainer;
 	private XmlBeanDefinitionReader reader;
 	protected MockBundleContext bundleContext;
-
 
 	protected void setUp() throws Exception {
 		bundleContext = new MockBundleContext();
@@ -48,7 +47,7 @@ public abstract class BaseMetadataTest extends TestCase {
 		reader = new XmlBeanDefinitionReader(applicationContext);
 		reader.loadBeanDefinitions(new ClassPathResource(getConfig(), getClass()));
 		applicationContext.refresh();
-		moduleContext = new SpringModuleContext(applicationContext, bundleContext);
+		BlueprintContainer = new SpringBlueprintContainer(applicationContext, bundleContext);
 	}
 
 	protected abstract String getConfig();
@@ -56,7 +55,7 @@ public abstract class BaseMetadataTest extends TestCase {
 	protected void tearDown() throws Exception {
 		applicationContext.close();
 		applicationContext = null;
-		moduleContext = null;
+		BlueprintContainer = null;
 		bundleContext = null;
 	}
 }

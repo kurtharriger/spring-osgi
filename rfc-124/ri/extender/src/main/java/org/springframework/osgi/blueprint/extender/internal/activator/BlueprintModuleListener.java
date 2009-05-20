@@ -19,7 +19,7 @@ package org.springframework.osgi.blueprint.extender.internal.activator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.blueprint.extender.internal.activator.support.BlueprintConfigUtils;
-import org.springframework.osgi.blueprint.extender.internal.activator.support.ModuleContextConfig;
+import org.springframework.osgi.blueprint.extender.internal.activator.support.BlueprintContainerConfig;
 import org.springframework.osgi.blueprint.extender.internal.event.EventAdminDispatcher;
 import org.springframework.osgi.blueprint.extender.internal.support.BlueprintExtenderConfiguration;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
@@ -37,12 +37,12 @@ import org.springframework.osgi.extender.support.ApplicationContextConfiguration
 public class BlueprintModuleListener extends ContextLoaderListener {
 
 	private volatile EventAdminDispatcher dispatcher;
-	private volatile ModuleContextListenerManager listenerManager;
+	private volatile BlueprintContainerListenerManager listenerManager;
 
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		this.listenerManager = new ModuleContextListenerManager(context);
+		this.listenerManager = new BlueprintContainerListenerManager(context);
 		this.dispatcher = new EventAdminDispatcher(context);
 
 		super.start(context);
@@ -64,14 +64,14 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 		return new ApplicationContextConfigurationFactory() {
 
 			public ApplicationContextConfiguration createConfiguration(Bundle bundle) {
-				return new ModuleContextConfig(bundle);
+				return new BlueprintContainerConfig(bundle);
 			}
 		};
 	}
 
 	@Override
 	protected OsgiContextProcessor createContextProcessor() {
-		return new BlueprintContextProcessor(dispatcher, listenerManager);
+		return new BlueprintContainerProcessor(dispatcher, listenerManager);
 	}
 
 	@Override
@@ -97,6 +97,6 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 	}
 
 	protected ApplicationContextConfiguration createContextConfig(Bundle bundle) {
-		return new ModuleContextConfig(bundle);
+		return new BlueprintContainerConfig(bundle);
 	}
 }

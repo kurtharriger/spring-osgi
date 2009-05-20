@@ -25,9 +25,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
-import org.osgi.framework.Version;
-import org.osgi.service.blueprint.context.ModuleContext;
-import org.osgi.service.blueprint.context.ModuleContextListener;
+import org.osgi.service.blueprint.container.BlueprintContainer;
+import org.osgi.service.blueprint.container.BlueprintContainerListener;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
@@ -46,7 +45,6 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 
 	private Bundle testBundle;
 	private final Object monitor = new Object();
-
 
 	@Override
 	protected void onSetUp() throws Exception {
@@ -96,7 +94,7 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 		ServiceListener notifier = new ServiceListener() {
 
 			public void serviceChanged(ServiceEvent event) {
-				//ModuleContext.SYMBOLIC_NAME_PROPERTY was removed - need to find a replacement
+				// ModuleContext.SYMBOLIC_NAME_PROPERTY was removed - need to find a replacement
 				if (event.getServiceReference().getProperty(Constants.BUNDLE_SYMBOLICNAME) != null) {
 					logger.info("Found service "
 							+ OsgiServiceReferenceUtils.getServicePropertiesSnapshotAsMap(event.getServiceReference()));
@@ -121,13 +119,13 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 		bundleContext.removeServiceListener(notifier);
 
 		testBundle.stop();
-		assertNull("module context service should be unpublished",
-			bundleContext.getServiceReference(ModuleContext.class.getName()));
+		assertNull("module context service should be unpublished", bundleContext
+				.getServiceReference(BlueprintContainer.class.getName()));
 	}
 
 	public void testModuleContextListener() throws Exception {
 		final List<Bundle> contexts = new ArrayList<Bundle>();
-		ModuleContextListener listener = new ModuleContextListener() {
+		BlueprintContainerListener listener = new BlueprintContainerListener() {
 
 			public void contextCreated(Bundle bundle) {
 				addToList(bundle);
@@ -146,7 +144,7 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 		};
 
 		installTestBundle();
-		bundleContext.registerService(ModuleContextListener.class.getName(), listener, null);
+		bundleContext.registerService(BlueprintContainerListener.class.getName(), listener, null);
 
 		testBundle.start();
 		synchronized (contexts) {
@@ -165,7 +163,7 @@ public class ExtenderBootstrapTest extends BaseRFC124IntegrationTest {
 
 	private void installTestBundle() throws Exception {
 		Resource bundleResource = getLocator().locateArtifact("org.springframework.osgi.rfc124.iandt", "simple.bundle",
-			getSpringDMVersion());
+				getSpringDMVersion());
 		testBundle = bundleContext.installBundle(bundleResource.getDescription(), bundleResource.getInputStream());
 	}
 }

@@ -19,13 +19,10 @@ package org.springframework.osgi.blueprint.reflect;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.osgi.service.blueprint.reflect.BindingListenerMetadata;
-import org.osgi.service.blueprint.reflect.ServiceReferenceComponentMetadata;
+import org.osgi.service.blueprint.reflect.Listener;
+import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.TypedStringValue;
@@ -33,14 +30,13 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.osgi.service.importer.support.Cardinality;
 
 /**
- * Default {@link ServiceReferenceComponentMetadata} implementation based on
- * Spring's {@link BeanDefinition}.
+ * Default {@link ServiceReferenceComponentMetadata} implementation based on Spring's {@link BeanDefinition}.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
  */
 abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMetadata implements
-		ServiceReferenceComponentMetadata {
+		ServiceReferenceMetadata {
 
 	private static final String FILTER_PROP = "filter";
 	private static final String INTERFACES_PROP = "interfaces";
@@ -51,13 +47,11 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 	private final String componentName;
 	private final String filter;
 	private final int availability;
-	private final Set<String> interfaces;
-	private final Collection<BindingListenerMetadata> listeners;
-
+	private final List<String> interfaces;
+	private final Collection<Listener> listeners;
 
 	/**
-	 * Constructs a new <code>SpringServiceReferenceComponentMetadata</code>
-	 * instance.
+	 * Constructs a new <code>SpringServiceReferenceComponentMetadata</code> instance.
 	 * 
 	 * @param name bean name
 	 * @param definition bean definition
@@ -71,13 +65,13 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 
 		Cardinality cardinality = (Cardinality) MetadataUtils.getValue(pvs, CARDINALITY_PROP);
 
-		availability = (cardinality == null || cardinality.isMandatory() ? ServiceReferenceComponentMetadata.MANDATORY_AVAILABILITY
-				: ServiceReferenceComponentMetadata.OPTIONAL_AVAILABILITY);
+		availability = (cardinality == null || cardinality.isMandatory() ? ServiceReferenceMetadata.AVAILABILITY_MANDATORY
+				: ServiceReferenceMetadata.AVAILABILITY_OPTIONAL);
 
 		// interfaces
 		Object value = MetadataUtils.getValue(pvs, INTERFACES_PROP);
 
-		Set<String> intfs = new LinkedHashSet<String>(4);
+		List<String> intfs = new ArrayList<String>(4);
 		// interface attribute used
 		if (value instanceof String) {
 			intfs.add((String) value);
@@ -85,32 +79,30 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 
 		else {
 			if (value instanceof Collection) {
-				Collection values = (Collection) value;
-				for (Iterator iterator = values.iterator(); iterator.hasNext();) {
-					TypedStringValue tsv = (TypedStringValue) iterator.next();
+				Collection<TypedStringValue> values = (Collection) value;
+
+				for (TypedStringValue tsv : values) {
 					intfs.add(tsv.getValue());
 				}
 			}
-
 		}
-		interfaces = Collections.unmodifiableSet(intfs);
+		interfaces = Collections.unmodifiableList(intfs);
 
 		// listeners
-		List<BindingListenerMetadata> foundListeners = new ArrayList<BindingListenerMetadata>(4);
-		List<? extends AbstractBeanDefinition> listenerDefinitions = (List<? extends AbstractBeanDefinition>) MetadataUtils.getValue(
-			pvs, LISTENERS_PROP);
+		List<Listener> foundListeners = new ArrayList<Listener>(4);
+		List<? extends AbstractBeanDefinition> listenerDefinitions = (List) MetadataUtils.getValue(pvs, LISTENERS_PROP);
 
 		if (listenerDefinitions != null) {
 			for (AbstractBeanDefinition beanDef : listenerDefinitions) {
-				foundListeners.add(new SimpleBindingListenerMetadata(beanDef));
+				foundListeners.add(new SimpleListenerMetadata(beanDef));
 			}
 		}
 
 		listeners = Collections.unmodifiableCollection(foundListeners);
 	}
 
-	public Collection<BindingListenerMetadata> getBindingListeners() {
-		return listeners;
+	public int getAvailability() {
+		return availability;
 	}
 
 	public String getComponentName() {
@@ -121,11 +113,11 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 		return filter;
 	}
 
-	public Set<String> getInterfaceNames() {
+	public List<String> getInterfaceNames() {
 		return interfaces;
 	}
 
-	public int getServiceAvailabilitySpecification() {
-		return availability;
+	public Collection<Listener> getServiceListeners() {
+		return listeners;
 	}
 }

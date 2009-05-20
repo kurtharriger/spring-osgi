@@ -19,7 +19,6 @@ package org.springframework.osgi.blueprint.extender.internal.activator.support;
 import java.util.Enumeration;
 
 import org.osgi.framework.Bundle;
-import org.springframework.osgi.extender.support.internal.ConfigUtils;
 import org.springframework.osgi.extender.support.scanning.ConfigurationScanner;
 import org.springframework.osgi.io.OsgiBundleResource;
 import org.springframework.util.ObjectUtils;

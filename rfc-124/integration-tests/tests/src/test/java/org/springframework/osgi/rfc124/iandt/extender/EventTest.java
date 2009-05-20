@@ -26,13 +26,12 @@ import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.blueprint.context.ModuleContextListener;
+import org.osgi.service.blueprint.container.BlueprintContainerListener;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.rfc124.iandt.BaseRFC124IntegrationTest;
-import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
  * Check whether events are raised at the right time.
@@ -46,7 +45,7 @@ public class EventTest extends BaseRFC124IntegrationTest {
 		final List<Bundle> startedBundles = new ArrayList<Bundle>();
 		final Map<Bundle, Throwable> failedBundles = new LinkedHashMap<Bundle, Throwable>();
 
-		ModuleContextListener listener = new ModuleContextListener() {
+		BlueprintContainerListener listener = new BlueprintContainerListener() {
 
 			public void contextCreated(Bundle bundle) {
 				startedBundles.add(bundle);
@@ -58,7 +57,8 @@ public class EventTest extends BaseRFC124IntegrationTest {
 		};
 
 		// register Blueprint registration
-		ServiceRegistration reg = bundleContext.registerService(ModuleContextListener.class.getName(), listener, null);
+		ServiceRegistration reg = bundleContext.registerService(BlueprintContainerListener.class.getName(), listener,
+				null);
 
 		EventHandler handler = new EventHandler() {
 
@@ -83,9 +83,9 @@ public class EventTest extends BaseRFC124IntegrationTest {
 
 		System.out.println("Installed Bundles " + Arrays.toString(bundleContext.getBundles()));
 		Resource bundleResource = getLocator().locateArtifact("org.springframework.osgi.rfc124.iandt", "error.bundle",
-			getSpringDMVersion());
-		Bundle failingBundle = bundleContext.installBundle(bundleResource.getDescription(),
-			bundleResource.getInputStream());
+				getSpringDMVersion());
+		Bundle failingBundle = bundleContext.installBundle(bundleResource.getDescription(), bundleResource
+				.getInputStream());
 
 		// start bundle
 		failingBundle.start();

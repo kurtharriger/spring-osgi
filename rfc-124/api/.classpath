@@ -4,6 +4,6 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
-	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.2.2/org.eclipse.osgi-3.2.2.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
+	<classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/org.eclipse.osgi/3.5.0.v20090513/org.eclipse.osgi-3.5.0.v20090513.jar" sourcepath="/EQUINOX_SRC/src.zip"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
