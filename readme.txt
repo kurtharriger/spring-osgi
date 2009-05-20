@@ -73,8 +73,8 @@ exact list of Spring-DM project dependencies see the respective Maven2 pom.xml f
 
 * spring-osgi-extender-${version}.jar
 - Contents: The Spring Dynamic Modules Extender
-- Dependencies: sl4fj, spring-osgi-core 
-			    [Log4J]
+- Dependencies: sl4fj, spring-osgi-core
+			    [Log4J, spring-osgi-annotation]
 
 * spring-osgi-io-${version}.jar
 - Contents: The Spring Dynamic Modules IO library

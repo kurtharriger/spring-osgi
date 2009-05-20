@@ -19,9 +19,11 @@ package org.springframework.osgi.mock;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.osgi.framework.Bundle;
@@ -29,10 +31,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 
 /**
- * Bundle mock. Except resource/class loading operations (which are executed on
- * its internal class loader), the rest of the methods are dummies.
+ * Bundle mock. Except resource/class loading operations (which are executed on its internal class loader), the rest of
+ * the methods are dummies.
  * 
  * @author Costin Leau
  */
@@ -40,7 +43,7 @@ public class MockBundle implements Bundle {
 
 	private String location;
 
-	private Dictionary headers;
+	private final Dictionary headers;
 
 	private static int GENERAL_BUNDLE_ID = 0;
 
@@ -51,12 +54,13 @@ public class MockBundle implements Bundle {
 
 	private ClassLoader loader = getClass().getClassLoader();
 
-	private Dictionary defaultHeaders = new Hashtable(0);
+	private final Dictionary defaultHeaders = new Hashtable(0);
 
 	private final String SYMBOLIC_NAME = "Mock-Bundle_" + System.currentTimeMillis();
 
 	private final String symName;
 
+	private final Version version;
 
 	private static class EmptyEnumeration implements Enumeration {
 
@@ -69,7 +73,6 @@ public class MockBundle implements Bundle {
 		}
 	}
 
-
 	/**
 	 * Constructs a new <code>MockBundle</code> instance using default values.
 	 * 
@@ -79,8 +82,7 @@ public class MockBundle implements Bundle {
 	}
 
 	/**
-	 * Constructs a new <code>MockBundle</code> instance with the given bundle
-	 * headers.
+	 * Constructs a new <code>MockBundle</code> instance with the given bundle headers.
 	 * 
 	 * @param headers bundle headers
 	 */
@@ -89,8 +91,7 @@ public class MockBundle implements Bundle {
 	}
 
 	/**
-	 * Constructs a new <code>MockBundle</code> instance associated with the
-	 * given bundle context.
+	 * Constructs a new <code>MockBundle</code> instance associated with the given bundle context.
 	 * 
 	 * @param context associated bundle context
 	 */
@@ -99,8 +100,7 @@ public class MockBundle implements Bundle {
 	}
 
 	/**
-	 * Constructs a new <code>MockBundle</code> instance with the given
-	 * symbolic name.
+	 * Constructs a new <code>MockBundle</code> instance with the given symbolic name.
 	 * 
 	 * @param symName bundle symbolic name
 	 */
@@ -109,8 +109,8 @@ public class MockBundle implements Bundle {
 	}
 
 	/**
-	 * Constructs a new <code>MockBundle</code> instance using the given
-	 * bundle symbolic name, properties and associated bundle context.
+	 * Constructs a new <code>MockBundle</code> instance using the given bundle symbolic name, properties and associated
+	 * bundle context.
 	 * 
 	 * @param symName bundle symbolic name
 	 * @param headers bundle headers
@@ -123,22 +123,20 @@ public class MockBundle implements Bundle {
 		this.location = "<default location>";
 		this.headers = (headers == null ? defaultHeaders : headers);
 		this.bundleContext = (context == null ? new MockBundleContext(this) : context);
+		this.version = getVersion(headers);
 	}
 
 	/**
-	 * Delegates to the classloader. Identical to classLoader.getResources(path +
-	 * filePattern);
+	 * Delegates to the classloader. Identical to classLoader.getResources(path + filePattern);
 	 * 
-	 * @see org.osgi.framework.Bundle#findEntries(java.lang.String,
-	 *      java.lang.String, boolean)
+	 * @see org.osgi.framework.Bundle#findEntries(java.lang.String, java.lang.String, boolean)
 	 */
 	public Enumeration findEntries(String path, String filePattern, boolean recurse) {
 		Enumeration enm = null;
 
 		try {
 			enm = loader.getResources(path + "/" + filePattern);
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			// catch to allow nice behavior
 			System.err.println("returning an empty enumeration as cannot load resource; exception " + ex);
 		}
@@ -233,6 +231,25 @@ public class MockBundle implements Bundle {
 	public void update(InputStream in) throws BundleException {
 	}
 
+	public Version getVersion() {
+		return version;
+	}
+
+	private static Version getVersion(Dictionary headers) {
+		if (headers != null) {
+			Object header = headers.get(Constants.BUNDLE_VERSION);
+			if (header instanceof String) {
+				return Version.parseVersion((String) header);
+			}
+		}
+
+		return Version.emptyVersion;
+	}
+
+	public Map getSignerCertificates(int signerType) {
+		return Collections.emptyMap();
+	}
+
 	// chiefly here so that compilers/find-bugs don't complain about the
 	// "unused" bundleContext field.
 	// also enables OsgiResoureUtils.getBundleContext to find the context via
@@ -259,8 +276,8 @@ public class MockBundle implements Bundle {
 	}
 
 	/**
-	 * Sets the class loader internally used by the bundle to mock the loading
-	 * operations. By default, the MockBundle uses its own class loader.
+	 * Sets the class loader internally used by the bundle to mock the loading operations. By default, the MockBundle
+	 * uses its own class loader.
 	 * 
 	 * @param loader mock bundle class loader
 	 */

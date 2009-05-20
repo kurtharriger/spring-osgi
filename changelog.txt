@@ -23,6 +23,9 @@ Package org.springframework.osgi.service
 * improved serviceability by using NamedInheritableThreadLocal
 * introduced support for dynamic service properties
 
+Package org.springframework.osgi.mock
+* added OSGi 4.2 methods to the package
+
 Package org.springframework.osgi.util
 * improved fallback mechanism for OSGi r4.1 features running in OSGi r4.0 platforms
 
