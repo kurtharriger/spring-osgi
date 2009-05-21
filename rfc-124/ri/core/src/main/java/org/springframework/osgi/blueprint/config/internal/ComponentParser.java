@@ -53,14 +53,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Stateful class that handles the parsing details of a &lt;component&gt;
- * elements. Borrows heavily from {@link BeanDefinitionParserDelegate}.
+ * Stateful class that handles the parsing details of a &lt;component&gt; elements. Borrows heavily from
+ * {@link BeanDefinitionParserDelegate}.
  * 
- * <b>Note</b>: Due to its stateful nature, this class is not thread safe.
- * <b>Note</b>: Since the namespace is important when parsing elements and since
- * mixed elements, from both rfc124 and Spring can coexist in the same file,
- * reusing the {@link BeanDefinitionParserDelegate delegate} isn't entirely
- * possible since the two state needs to be kept in synch.
+ * <b>Note</b>: Due to its stateful nature, this class is not thread safe. <b>Note</b>: Since the namespace is important
+ * when parsing elements and since mixed elements, from both rfc124 and Spring can coexist in the same file, reusing the
+ * {@link BeanDefinitionParserDelegate delegate} isn't entirely possible since the two state needs to be kept in synch.
  * 
  * @author Costin Leau
  */
@@ -69,7 +67,9 @@ public class ComponentParser {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ComponentParser.class);
 
+	public static final String BEAN = "bean";
 	public static final String COMPONENT = "component";
+	public static final String CONSTRUCTOR_ARG = "argument";
 
 	public static final String NAMESPACE_URI = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
 
@@ -81,14 +81,12 @@ public class ComponentParser {
 
 	private ParserContext parserContext;
 
-
 	public ComponentParser() {
 		this(null, null);
 	}
 
 	/**
-	 * Constructs a new <code>ComponentParser</code> instance. Used by certain
-	 * reusable static methods.
+	 * Constructs a new <code>ComponentParser</code> instance. Used by certain reusable static methods.
 	 * 
 	 * @param parserContext
 	 */
@@ -123,9 +121,8 @@ public class ComponentParser {
 	}
 
 	/**
-	 * Parses the supplied <code>&lt;component&gt;</code> element. May return
-	 * <code>null</code> if there were errors during parse. Errors are reported
-	 * to the {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+	 * Parses the supplied <code>&lt;component&gt;</code> element. May return <code>null</code> if there were errors
+	 * during parse. Errors are reported to the {@link org.springframework.beans.factory.parsing.ProblemReporter}.
 	 */
 	private BeanDefinitionHolder parseComponentDefinitionElement(Element ele, BeanDefinition containingBean) {
 
@@ -136,7 +133,7 @@ public class ComponentParser {
 		List<String> aliases = new ArrayList<String>(4);
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr,
-				BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS);
+					BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
@@ -168,15 +165,15 @@ public class ComponentParser {
 
 		try {
 			// create definition
-			beanDefinition = BeanDefinitionReaderUtils.createBeanDefinition(null, className,
-				parserContext.getReaderContext().getBeanClassLoader());
+			beanDefinition = BeanDefinitionReaderUtils.createBeanDefinition(null, className, parserContext
+					.getReaderContext().getBeanClassLoader());
 
 			// parse attributes
 			parseAttributes(ele, beanName, beanDefinition);
 
 			// parse description
 			beanDefinition.setDescription(DomUtils.getChildElementValueByTagName(ele,
-				BeanDefinitionParserDelegate.DESCRIPTION_ELEMENT));
+					BeanDefinitionParserDelegate.DESCRIPTION_ELEMENT));
 
 			parseConstructorArgElements(ele, beanDefinition);
 			parsePropertyElements(ele, beanDefinition);
@@ -184,11 +181,9 @@ public class ComponentParser {
 			beanDefinition.setResource(parserContext.getReaderContext().getResource());
 			beanDefinition.setSource(extractSource(ele));
 
-		}
-		catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			error("Bean class [" + className + "] not found", ele, ex);
-		}
-		catch (NoClassDefFoundError err) {
+		} catch (NoClassDefFoundError err) {
 			error("Class that bean class [" + className + "] depends on not found", ele, err);
 		}
 
@@ -196,10 +191,9 @@ public class ComponentParser {
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {
-						beanName = BeanDefinitionReaderUtils.generateBeanName(beanDefinition,
-							parserContext.getRegistry(), true);
-					}
-					else {
+						beanName = BeanDefinitionReaderUtils.generateBeanName(beanDefinition, parserContext
+								.getRegistry(), true);
+					} else {
 						beanName = parserContext.getReaderContext().generateBeanName(beanDefinition);
 						// TODO: should we support 2.0 behaviour (see below):
 						// 
@@ -211,8 +205,7 @@ public class ComponentParser {
 						log.debug("Neither XML 'id' nor 'name' specified - " + "using generated bean name [" + beanName
 								+ "]");
 					}
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					error(ex.getMessage(), ele, ex);
 					return null;
 				}
@@ -225,7 +218,7 @@ public class ComponentParser {
 
 	private AbstractBeanDefinition parseAttributes(Element ele, String beanName, AbstractBeanDefinition beanDefinition) {
 		AbstractBeanDefinition bd = parserContext.getDelegate().parseBeanDefinitionAttributes(ele, beanName, null,
-			beanDefinition);
+				beanDefinition);
 
 		// handle factory component
 		String componentFactory = ele.getAttribute(FACTORY_COMPONENT_ATTR);
@@ -237,8 +230,7 @@ public class ComponentParser {
 	}
 
 	/**
-	 * Validate that the specified bean name and aliases have not been used
-	 * already.
+	 * Validate that the specified bean name and aliases have not been used already.
 	 */
 	private boolean checkNameUniqueness(String beanName, Collection<String> aliases, Collection<String> usedNames) {
 		String foundName = null;
@@ -268,8 +260,7 @@ public class ComponentParser {
 		NodeList nl = ele.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
-			if (node instanceof Element
-					&& DomUtils.nodeNameEquals(node, BeanDefinitionParserDelegate.CONSTRUCTOR_ARG_ELEMENT)) {
+			if (node instanceof Element && DomUtils.nodeNameEquals(node, CONSTRUCTOR_ARG)) {
 				parseConstructorArgElement((Element) node, beanDefinition);
 			}
 		}
@@ -287,8 +278,7 @@ public class ComponentParser {
 			hasIndex = true;
 			try {
 				index = Integer.parseInt(indexAttr);
-			}
-			catch (NumberFormatException ex) {
+			} catch (NumberFormatException ex) {
 				error("Attribute 'index' of tag 'constructor-arg' must be an integer", ele);
 			}
 
@@ -309,12 +299,10 @@ public class ComponentParser {
 
 			if (hasIndex) {
 				values.addIndexedArgumentValue(index, valueHolder);
-			}
-			else {
+			} else {
 				values.addGenericArgumentValue(valueHolder);
 			}
-		}
-		finally {
+		} finally {
 			this.parseState.pop();
 		}
 	}
@@ -353,8 +341,7 @@ public class ComponentParser {
 			PropertyValue pv = new PropertyValue(propertyName, val);
 			pv.setSource(parserContext.extractSource(ele));
 			bd.getPropertyValues().addPropertyValue(pv);
-		}
-		finally {
+		} finally {
 			this.parseState.pop();
 		}
 	}
@@ -373,8 +360,7 @@ public class ComponentParser {
 				// Child element is what we're looking for.
 				if (subElement != null) {
 					error(elementName + " must not contain more than one sub-element", ele);
-				}
-				else {
+				} else {
 					subElement = (Element) node;
 				}
 			}
@@ -395,17 +381,14 @@ public class ComponentParser {
 			RuntimeBeanReference ref = new RuntimeBeanReference(refName);
 			ref.setSource(parserContext.extractSource(ele));
 			return ref;
-		}
-		else if (hasValueAttribute) {
-			TypedStringValue valueHolder = new TypedStringValue(
-				ele.getAttribute(BeanDefinitionParserDelegate.VALUE_ATTRIBUTE));
+		} else if (hasValueAttribute) {
+			TypedStringValue valueHolder = new TypedStringValue(ele
+					.getAttribute(BeanDefinitionParserDelegate.VALUE_ATTRIBUTE));
 			valueHolder.setSource(parserContext.extractSource(ele));
 			return valueHolder;
-		}
-		else if (subElement != null) {
+		} else if (subElement != null) {
 			return parsePropertySubElement(subElement, bd, null);
-		}
-		else {
+		} else {
 			// Neither child element nor "ref" or "value" attribute found.
 			error(elementName + " must specify a ref or value", ele);
 			return null;
@@ -425,17 +408,15 @@ public class ComponentParser {
 	}
 
 	/**
-	 * Parse a value, ref or collection sub-element of a property or
-	 * constructor-arg element. This method is called from several places to
-	 * handle reusable elements such as idref, ref, null, value and so on.
+	 * Parse a value, ref or collection sub-element of a property or constructor-arg element. This method is called from
+	 * several places to handle reusable elements such as idref, ref, null, value and so on.
 	 * 
-	 * In fact, this method is the main reason why the
-	 * BeanDefinitionParserDelegate is not used in full since the element
-	 * namespace becomes important as mixed rfc124/bean content can coexist.
+	 * In fact, this method is the main reason why the BeanDefinitionParserDelegate is not used in full since the
+	 * element namespace becomes important as mixed rfc124/bean content can coexist.
 	 * 
 	 * @param ele subelement of property element; we don't know which yet
-	 * @param defaultValueType the default type (class name) for any
-	 *        <code>&lt;value&gt;</code> tag that might be created
+	 * @param defaultValueType the default type (class name) for any <code>&lt;value&gt;</code> tag that might be
+	 * created
 	 */
 	private Object parsePropertySubElement(Element ele, BeanDefinition bd, String defaultValueType) {
 		// skip other namespace
@@ -452,7 +433,7 @@ public class ComponentParser {
 
 		// 
 		else {
-			if (DomUtils.nodeNameEquals(ele, COMPONENT)) {
+			if (DomUtils.nodeNameEquals(ele, BEAN)) {
 				BeanDefinitionHolder bdHolder = parseComponentDefinitionElement(ele, bd);
 				if (bdHolder != null) {
 					bdHolder = ParsingUtils.decorateBeanDefinitionIfRequired(ele, bdHolder, parserContext);
@@ -462,33 +443,25 @@ public class ComponentParser {
 
 			if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.REF_ELEMENT)) {
 				return parseRefElement(ele);
-			}
-			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.IDREF_ELEMENT)) {
+			} else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.IDREF_ELEMENT)) {
 				return parseIdRefElement(ele);
-			}
-			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.VALUE_ELEMENT)) {
+			} else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.VALUE_ELEMENT)) {
 				return parseValueElement(ele, defaultValueType);
-			}
-			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.NULL_ELEMENT)) {
+			} else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.NULL_ELEMENT)) {
 				// It's a distinguished null value. Let's wrap it in a TypedStringValue
 				// object in order to preserve the source location.
 				TypedStringValue nullHolder = new TypedStringValue(null);
 				nullHolder.setSource(parserContext.extractSource(ele));
 				return nullHolder;
-			}
-			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.ARRAY_ELEMENT)) {
+			} else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.ARRAY_ELEMENT)) {
 				return parseArrayElement(ele, bd);
-			}
-			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.LIST_ELEMENT)) {
+			} else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.LIST_ELEMENT)) {
 				return parseListElement(ele, bd);
-			}
-			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.SET_ELEMENT)) {
+			} else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.SET_ELEMENT)) {
 				return parseSetElement(ele, bd);
-			}
-			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.MAP_ELEMENT)) {
+			} else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.MAP_ELEMENT)) {
 				return parseMapElement(ele, bd);
-			}
-			else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.PROPS_ELEMENT)) {
+			} else if (DomUtils.nodeNameEquals(ele, BeanDefinitionParserDelegate.PROPS_ELEMENT)) {
 				return parserContext.getDelegate().parsePropsElement(ele);
 			}
 
@@ -501,7 +474,7 @@ public class ComponentParser {
 		// A generic reference to any name of any component.
 		String refName = ele.getAttribute(COMPONENT);
 		if (!StringUtils.hasLength(refName)) {
-			error("'component' is required for <ref> element", ele);
+			error("'" + COMPONENT + "' is required for <ref> element", ele);
 			return null;
 		}
 
@@ -518,7 +491,7 @@ public class ComponentParser {
 		// A generic reference to any name of any bean/component.
 		String refName = ele.getAttribute(COMPONENT);
 		if (!StringUtils.hasLength(refName)) {
-			error("'component' is required for <idref> element", ele);
+			error("'" + COMPONENT + "' is required for <idref> element", ele);
 			return null;
 		}
 		if (!StringUtils.hasText(refName)) {
@@ -550,8 +523,7 @@ public class ComponentParser {
 			typedValue.setSource(extractSource(ele));
 			typedValue.setSpecifiedTypeName(specifiedTypeName);
 			return typedValue;
-		}
-		catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			error("Type class [" + typeName + "] not found for <value> element", ele, ex);
 			return value;
 		}
@@ -568,12 +540,10 @@ public class ComponentParser {
 		TypedStringValue typedValue;
 		if (!StringUtils.hasText(targetTypeName)) {
 			typedValue = new TypedStringValue(value);
-		}
-		else if (classLoader != null) {
+		} else if (classLoader != null) {
 			Class<?> targetType = ClassUtils.forName(targetTypeName, classLoader);
 			typedValue = new TypedStringValue(value, targetType);
-		}
-		else {
+		} else {
 			typedValue = new TypedStringValue(value, targetTypeName);
 		}
 		return typedValue;
@@ -640,7 +610,8 @@ public class ComponentParser {
 		String defaultKeyType = mapEle.getAttribute(BeanDefinitionParserDelegate.KEY_TYPE_ATTRIBUTE);
 		String defaultValueType = mapEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
 
-		List<Element> entryEles = DomUtils.getChildElementsByTagName(mapEle, BeanDefinitionParserDelegate.ENTRY_ELEMENT);
+		List<Element> entryEles = DomUtils
+				.getChildElementsByTagName(mapEle, BeanDefinitionParserDelegate.ENTRY_ELEMENT);
 		ManagedMap<Object, Object> map = new ManagedMap<Object, Object>(entryEles.size());
 		map.setSource(extractSource(mapEle));
 		map.setKeyTypeName(defaultKeyType);
@@ -660,17 +631,14 @@ public class ComponentParser {
 					if (DomUtils.nodeNameEquals(candidateEle, BeanDefinitionParserDelegate.KEY_ELEMENT)) {
 						if (keyEle != null) {
 							error("<entry> element is only allowed to contain one <key> sub-element", entryEle);
-						}
-						else {
+						} else {
 							keyEle = candidateEle;
 						}
-					}
-					else {
+					} else {
 						// Child element is what we're looking for.
 						if (valueEle != null) {
 							error("<entry> element must not contain more than one value sub-element", entryEle);
-						}
-						else {
+						} else {
 							valueEle = candidateEle;
 						}
 					}
@@ -687,9 +655,8 @@ public class ComponentParser {
 			}
 			if (hasKeyAttribute) {
 				key = buildTypedStringValueForMap(entryEle.getAttribute(BeanDefinitionParserDelegate.KEY_ATTRIBUTE),
-					defaultKeyType, entryEle);
-			}
-			else if (hasKeyRefAttribute) {
+						defaultKeyType, entryEle);
+			} else if (hasKeyRefAttribute) {
 				String refName = entryEle.getAttribute(BeanDefinitionParserDelegate.KEY_REF_ATTRIBUTE);
 				if (!StringUtils.hasText(refName)) {
 					error("<entry> element contains empty 'key-ref' attribute", entryEle);
@@ -697,11 +664,9 @@ public class ComponentParser {
 				RuntimeBeanReference ref = new RuntimeBeanReference(refName);
 				ref.setSource(extractSource(entryEle));
 				key = ref;
-			}
-			else if (keyEle != null) {
+			} else if (keyEle != null) {
 				key = parseKeyElement(keyEle, bd, defaultKeyType);
-			}
-			else {
+			} else {
 				error("<entry> element must specify a key", entryEle);
 			}
 
@@ -716,9 +681,8 @@ public class ComponentParser {
 			}
 			if (hasValueAttribute) {
 				value = buildTypedStringValueForMap(
-					entryEle.getAttribute(BeanDefinitionParserDelegate.VALUE_ATTRIBUTE), defaultValueType, entryEle);
-			}
-			else if (hasValueRefAttribute) {
+						entryEle.getAttribute(BeanDefinitionParserDelegate.VALUE_ATTRIBUTE), defaultValueType, entryEle);
+			} else if (hasValueRefAttribute) {
 				String refName = entryEle.getAttribute(BeanDefinitionParserDelegate.VALUE_REF_ATTRIBUTE);
 				if (!StringUtils.hasText(refName)) {
 					error("<entry> element contains empty 'value-ref' attribute", entryEle);
@@ -726,11 +690,9 @@ public class ComponentParser {
 				RuntimeBeanReference ref = new RuntimeBeanReference(refName);
 				ref.setSource(extractSource(entryEle));
 				value = ref;
-			}
-			else if (valueEle != null) {
+			} else if (valueEle != null) {
 				value = parsePropertySubElement(valueEle, bd, defaultValueType);
-			}
-			else {
+			} else {
 				error("<entry> element must specify a value", entryEle);
 			}
 
@@ -755,8 +717,7 @@ public class ComponentParser {
 			TypedStringValue typedValue = buildTypedStringValue(value, defaultTypeName);
 			typedValue.setSource(extractSource(entryEle));
 			return typedValue;
-		}
-		catch (ClassNotFoundException ex) {
+		} catch (ClassNotFoundException ex) {
 			error("Type class [" + defaultTypeName + "] not found for Map key/value type", entryEle, ex);
 			return value;
 		}
@@ -774,8 +735,7 @@ public class ComponentParser {
 				// Child element is what we're looking for.
 				if (subElement != null) {
 					error("<key> element must not contain more than one value sub-element", keyEle);
-				}
-				else {
+				} else {
 					subElement = (Element) node;
 				}
 			}

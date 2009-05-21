@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint.compendium.config;
+package org.springframework.osgi.blueprint.compendium.cm.config;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.osgi.compendium.config.internal.ConfigPropertiesDefinitionParser;
@@ -27,7 +27,7 @@ import org.springframework.osgi.compendium.config.internal.ManagedServiceFactory
  * 
  * @author Costin Leau
  */
-public class BlueprintCompendiumNamespaceHandler extends NamespaceHandlerSupport {
+public class BlueprintCmNamespaceHandler extends NamespaceHandlerSupport {
 
 	static final String MANAGED_PROPS = "managed-properties";
 	static final String MANAGED_FACTORY_PROPS = "managed-service-factory";

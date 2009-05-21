@@ -37,8 +37,7 @@ public class BlueprintDefaultsDefinition extends OsgiDefaultsDefinition {
 
 	private static final String TIMEOUT_DEFAULT = "300000";
 
-	private static final String CARDINALITY_DEFAULT = "required";
-
+	private static final String CARDINALITY_DEFAULT = "mandatory";
 
 	/**
 	 * Constructs a new <code>BlueprintDefaultsDefinition</code> instance.
