@@ -1,2 +1,2 @@
 http\://www.osgi.org/xmlns/blueprint/v1.0.0=org.springframework.osgi.blueprint.config.BlueprintNamespaceHandler
-http\://www.osgi.org/xmlns/blueprint-compendium/v1.0.0=org.springframework.osgi.blueprint.compendium.config.BlueprintCompendiumNamespaceHandler
+http\://www.osgi.org/xmlns/blueprint-cm/v1.0.0=org.springframework.osgi.blueprint.compendium.cm.config.BlueprintCmNamespaceHandler
