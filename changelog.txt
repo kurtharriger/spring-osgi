@@ -19,6 +19,9 @@ Package org.springframework.osgi.compendium
 * enhanced cm-properties to reflect Config Admin changes in the returned Properties object
 * added new custom destruction callback to managed service factory objects
 
+Package org.springframework.osgi.extender
+* added JavaBean cache initialization for known types to reduce the number of class lookups
+
 Package org.springframework.osgi.service
 * improved serviceability by using NamedInheritableThreadLocal
 * introduced support for dynamic service properties

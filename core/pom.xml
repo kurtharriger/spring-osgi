@@ -97,6 +97,12 @@
       	 </exclusion>
         </exclusions> 
     </dependency>
+    <dependency>
+        <groupId>org.springframework.osgi.rfc124</groupId>
+        <artifactId>api</artifactId>
+        <scope>provided</scope>
+        <version>2.0.0-m1-SNAPSHOT</version>
+    </dependency>
     
   </dependencies>
 </project>

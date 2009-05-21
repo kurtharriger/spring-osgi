@@ -56,7 +56,7 @@ public class TypeConverterBeanDefinitionParser extends AbstractBeanDefinitionPar
 
 		BeanDefinitionBuilder registrarDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(CoverterPropertyEditorRegistrar.class);
 
-		List<Element> components = DomUtils.getChildElementsByTagName(element, ComponentParser.COMPONENT);
+		List<Element> components = DomUtils.getChildElementsByTagName(element, ComponentParser.BEAN);
 		List<Element> componentRefs = DomUtils.getChildElementsByTagName(element,
 			BeanDefinitionParserDelegate.REF_ELEMENT);
 

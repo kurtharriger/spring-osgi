@@ -16,42 +16,40 @@
 
 package org.springframework.osgi.blueprint.reflect;
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
-import org.osgi.service.blueprint.reflect.ComponentValue;
-import org.osgi.service.blueprint.reflect.ListValue;
-import org.osgi.service.blueprint.reflect.MapValue;
-import org.osgi.service.blueprint.reflect.NullValue;
-import org.osgi.service.blueprint.reflect.PropertiesValue;
-import org.osgi.service.blueprint.reflect.ReferenceNameValue;
-import org.osgi.service.blueprint.reflect.ReferenceValue;
-import org.osgi.service.blueprint.reflect.SetValue;
-import org.osgi.service.blueprint.reflect.TypedStringValue;
-import org.osgi.service.blueprint.reflect.Value;
+import org.osgi.service.blueprint.reflect.CollectionMetadata;
+import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.osgi.service.blueprint.reflect.IdRefMetadata;
+import org.osgi.service.blueprint.reflect.MapEntry;
+import org.osgi.service.blueprint.reflect.MapMetadata;
+import org.osgi.service.blueprint.reflect.Metadata;
+import org.osgi.service.blueprint.reflect.NullMetadata;
+import org.osgi.service.blueprint.reflect.PropsMetadata;
+import org.osgi.service.blueprint.reflect.RefMetadata;
+import org.osgi.service.blueprint.reflect.ValueMetadata;
 import org.springframework.beans.BeanMetadataElement;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.ManagedArray;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedProperties;
 import org.springframework.beans.factory.support.ManagedSet;
 
 /**
- * Adapter between OSGi's Blueprint {@link Value} and Spring
- * {@link BeanMetadataElement}.
+ * Adapter between OSGi's Blueprint {@link Value} and Spring {@link BeanMetadataElement}.
  * 
  * @see ValueFactory
  * @author Costin Leau
  */
 class BeanMetadataElementFactory {
 
-	static BeanMetadataElement buildBeanMetadata(Value value) {
-		return buildBeanMetadata(value, null);
+	static BeanMetadataElement buildBeanMetadata(Metadata metadata) {
+		return buildBeanMetadata(metadata, null);
 	}
 
 	/**
@@ -61,95 +59,95 @@ class BeanMetadataElementFactory {
 	 * @param defaultTypeName
 	 * @return
 	 */
-	static BeanMetadataElement buildBeanMetadata(Value value, String defaultTypeName) {
+	static BeanMetadataElement buildBeanMetadata(Metadata value, String defaultTypeName) {
 
-		if (value instanceof ReferenceValue) {
-			ReferenceValue reference = (ReferenceValue) value;
-			return new RuntimeBeanReference(reference.getComponentName());
-		}
-
-		if (value instanceof ReferenceNameValue) {
-			ReferenceNameValue reference = (ReferenceNameValue) value;
-			return new RuntimeBeanNameReference(reference.getReferenceName());
-		}
-
-		if (value instanceof TypedStringValue) {
-			TypedStringValue typedString = (TypedStringValue) value;
+		if (value instanceof ValueMetadata) {
+			ValueMetadata typedString = (ValueMetadata) value;
 			String specifiedType = typedString.getTypeName();
 			if (specifiedType == null) {
 				specifiedType = defaultTypeName;
 			}
 			return new org.springframework.beans.factory.config.TypedStringValue(typedString.getStringValue(),
-				specifiedType);
+					specifiedType);
 		}
 
-		if (value instanceof NullValue) {
+		if (value instanceof ComponentMetadata) {
+			ComponentMetadata component = (ComponentMetadata) value;
+			return MetadataFactory.buildBeanDefinitionFor(component);
+		}
+
+		// null vs non-null check
+		if (value instanceof NullMetadata) {
 			return new org.springframework.beans.factory.config.TypedStringValue(null);
 		}
 
-		if (value instanceof ComponentValue) {
-			ComponentValue component = (ComponentValue) value;
-			return MetadataFactory.buildBeanDefinitionFor(component.getComponentMetadata());
+		if (value instanceof RefMetadata) {
+			RefMetadata reference = (RefMetadata) value;
+			return new RuntimeBeanReference(reference.getComponentId());
 		}
 
-		if (value instanceof ListValue) {
-			ListValue listValue = (ListValue) value;
-			List<Value> list = (List<Value>) listValue.getList();
-			String defaultType = listValue.getValueType();
-			ManagedList managedList = new ManagedList(list.size());
-			managedList.setElementTypeName(defaultType);
+		if (value instanceof IdRefMetadata) {
+			IdRefMetadata reference = (IdRefMetadata) value;
+			return new RuntimeBeanNameReference(reference.getComponentId());
+		}
 
-			for (Value val : list) {
-				managedList.add(BeanMetadataElementFactory.buildBeanMetadata(val, defaultType));
+		if (value instanceof CollectionMetadata) {
+			CollectionMetadata collection = (CollectionMetadata) value;
+
+			Class<?> type = collection.getCollectionClass();
+			List<Metadata> values = collection.getValues();
+
+			Collection coll;
+			if (List.class.isAssignableFrom(type)) {
+				ManagedList<BeanMetadataElement> list = new ManagedList<BeanMetadataElement>(values.size());
+				list.setElementTypeName(collection.getValueTypeName());
+				coll = list;
+			} else if (Set.class.isAssignableFrom(type)) {
+				ManagedSet<BeanMetadataElement> set = new ManagedSet<BeanMetadataElement>(values.size());
+				set.setElementTypeName(collection.getValueTypeName());
+				coll = set;
+			} else if (Object[].class.isAssignableFrom(type)) {
+				ManagedArray array = new ManagedArray(collection.getValueTypeName(), values.size());
+				coll = array;
+			} else {
+				throw new IllegalArgumentException("Cannot create collection for type " + type);
 			}
-			return managedList;
-		}
 
-		if (value instanceof SetValue) {
-			SetValue setValue = (SetValue) value;
-			Set<Value> set = (Set<Value>) setValue.getSet();
-			String defaultType = setValue.getValueType();
-
-			ManagedSet managedSet = new ManagedSet(set.size());
-			managedSet.setElementTypeName(defaultType);
-
-			for (Iterator<Value> iterator = set.iterator(); iterator.hasNext();) {
-				Value val = iterator.next();
-				managedSet.add(BeanMetadataElementFactory.buildBeanMetadata(val, defaultType));
+			for (Metadata val : values) {
+				coll.add(BeanMetadataElementFactory.buildBeanMetadata(val, collection.getValueTypeName()));
 			}
-
-			return managedSet;
+			return (BeanMetadataElement) coll;
 		}
 
-		if (value instanceof MapValue) {
-			MapValue mapValue = (MapValue) value;
-			Map<Value, Value> map = (Map<Value, Value>) mapValue.getMap();
-			String defaultKeyType = mapValue.getKeyType();
-			String defaultValueType = mapValue.getValueType();
-			ManagedMap managedMap = new ManagedMap(map.size());
+		if (value instanceof MapMetadata) {
+			MapMetadata mapValue = (MapMetadata) value;
+			List<MapEntry> entries = mapValue.getEntries();
+			String defaultKeyType = mapValue.getKeyTypeName();
+			String defaultValueType = mapValue.getValueTypeName();
+
+			ManagedMap<BeanMetadataElement, BeanMetadataElement> managedMap = new ManagedMap<BeanMetadataElement, BeanMetadataElement>(
+					entries.size());
 			managedMap.setKeyTypeName(defaultKeyType);
 			managedMap.setValueTypeName(defaultValueType);
 
-			Set<Entry<Value, Value>> entrySet = map.entrySet();
+			for (MapEntry mapEntry : entries) {
+				managedMap.put(BeanMetadataElementFactory.buildBeanMetadata(mapEntry.getKey(), defaultKeyType),
+						BeanMetadataElementFactory.buildBeanMetadata(mapEntry.getValue(), defaultValueType));
 
-			for (Iterator<Entry<Value, Value>> iterator = entrySet.iterator(); iterator.hasNext();) {
-				Entry<Value, Value> entry = iterator.next();
-				managedMap.put(BeanMetadataElementFactory.buildBeanMetadata(entry.getKey(), defaultKeyType),
-					BeanMetadataElementFactory.buildBeanMetadata(entry.getValue(), defaultValueType));
 			}
+
+			return managedMap;
 		}
 
-		if (value instanceof PropertiesValue) {
-			PropertiesValue propertiesValue = (PropertiesValue) value;
+		if (value instanceof PropsMetadata) {
+			PropsMetadata propertiesValue = (PropsMetadata) value;
 
-			Properties properties = propertiesValue.getPropertiesValue();
+			List<MapEntry> entries = propertiesValue.getEntries();
 			ManagedProperties managedProperties = new ManagedProperties();
-			Set entrySet = managedProperties.entrySet();
 
-			for (Iterator<Entry<Value, Value>> iterator = entrySet.iterator(); iterator.hasNext();) {
-				Entry<Value, Value> entry = iterator.next();
-				managedProperties.put(BeanMetadataElementFactory.buildBeanMetadata(entry.getKey()),
-					BeanMetadataElementFactory.buildBeanMetadata(entry.getValue()));
+			for (MapEntry mapEntry : entries) {
+				managedProperties.put(BeanMetadataElementFactory.buildBeanMetadata(mapEntry.getKey()),
+						BeanMetadataElementFactory.buildBeanMetadata(mapEntry.getValue()));
 			}
 		}
 

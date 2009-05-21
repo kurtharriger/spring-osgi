@@ -1,19 +1,15 @@
-
 package org.springframework.osgi.blueprint.reflect;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.osgi.service.blueprint.reflect.RegistrationListenerMetadata;
-import org.osgi.service.blueprint.reflect.ServiceExportComponentMetadata;
-import org.osgi.service.blueprint.reflect.Value;
+import org.osgi.service.blueprint.reflect.MapEntry;
+import org.osgi.service.blueprint.reflect.RegistrationListener;
+import org.osgi.service.blueprint.reflect.ServiceMetadata;
+import org.osgi.service.blueprint.reflect.Target;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.TypedStringValue;
@@ -22,13 +18,12 @@ import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.service.exporter.support.AutoExport;
 
 /**
- * Default {@link SpringServiceExportComponentMetadata} implementation based on
- * Spring's {@link BeanDefinition}.
+ * Default {@link ServiceMetadata} implementation based on Spring's {@link BeanDefinition}.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
  */
-class SpringServiceExportComponentMetadata extends SpringComponentMetadata implements ServiceExportComponentMetadata {
+class SpringServiceExportComponentMetadata extends SpringComponentMetadata implements ServiceMetadata {
 
 	private static final String AUTO_EXPORT_PROP = "autoExport";
 	private static final String RANKING_PROP = "ranking";
@@ -39,20 +34,19 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 	private static final String LISTENERS_PROP = "listeners";
 
 	private final int autoExport;
-	private final Set<String> interfaces;
+	private final List<String> interfaces;
 	private final int ranking;
-	private final Value component;
-	private final Map<String, ? extends Object> serviceProperties;
-	private final Collection<RegistrationListenerMetadata> listeners;
-
+	private final Target component;
+	private final List<MapEntry> serviceProperties;
+	private final Collection<RegistrationListener> listeners;
 
 	/**
-	 * Constructs a new <code>SpringServiceExportComponentMetadata</code>
-	 * instance.
+	 * Constructs a new <code>SpringServiceExportComponentMetadata</code> instance.
 	 * 
 	 * @param name bean name
 	 * @param definition bean definition
 	 */
+	@SuppressWarnings("unchecked")
 	public SpringServiceExportComponentMetadata(String name, BeanDefinition definition) {
 		super(name, definition);
 
@@ -60,30 +54,29 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 
 		String autoExp = (String) MetadataUtils.getValue(pvs, AUTO_EXPORT_PROP);
 		// convert the internal numbers
-		autoExport = ((AutoExport) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(AutoExport.class, autoExp)).shortValue() + 1;
+		autoExport = ((AutoExport) StaticLabeledEnumResolver.instance()
+				.getLabeledEnumByLabel(AutoExport.class, autoExp)).shortValue() + 1;
 		// ranking
 		if (pvs.contains(RANKING_PROP)) {
 			String rank = (String) MetadataUtils.getValue(pvs, RANKING_PROP);
 			ranking = Integer.valueOf(rank).intValue();
-		}
-		else {
+		} else {
 			ranking = 0;
 		}
 
 		// component
 		if (pvs.contains(SERVICE_NAME_PROP)) {
 			String compName = (String) MetadataUtils.getValue(pvs, SERVICE_NAME_PROP);
-			component = new SimpleReferenceValue(compName);
-		}
-		else {
-			component = ValueFactory.buildValue(MetadataUtils.getValue(pvs, SERVICE_INSTANCE_PROP));
+			component = new SimpleRefMetadata(compName);
+		} else {
+			component = (Target) ValueFactory.buildValue(MetadataUtils.getValue(pvs, SERVICE_INSTANCE_PROP));
 		}
 
 		// interfaces
 		Object value = MetadataUtils.getValue(pvs, INTERFACES_PROP);
 
 		if (value != null) {
-			Set<String> intfs = new LinkedHashSet<String>(4);
+			List<String> intfs = new ArrayList<String>(4);
 			// interface attribute used
 			if (value instanceof String) {
 				intfs.add((String) value);
@@ -91,51 +84,33 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 
 			else {
 				if (value instanceof Collection) {
-					Collection values = (Collection) value;
-					for (Iterator iterator = values.iterator(); iterator.hasNext();) {
-						TypedStringValue tsv = (TypedStringValue) iterator.next();
+					Collection<TypedStringValue> values = (Collection) value;
+
+					for (TypedStringValue tsv : values) {
 						intfs.add(tsv.getValue());
 					}
 				}
 			}
-			interfaces = Collections.unmodifiableSet(intfs);
-		}
-		else {
-			interfaces = Collections.<String> emptySet();
+			interfaces = Collections.unmodifiableList(intfs);
+		} else {
+			interfaces = Collections.emptyList();
 		}
 
+		// service properties
 		if (pvs.contains(SERVICE_PROPERTIES_PROP)) {
 			Map props = (Map) MetadataUtils.getValue(pvs, SERVICE_PROPERTIES_PROP);
-			Map convertedProps = new LinkedHashMap(props.size());
-			Set<Map.Entry> entrySet = props.entrySet();
-			for (Iterator<Map.Entry> iterator = entrySet.iterator(); iterator.hasNext();) {
-				Map.Entry entry = iterator.next();
-				Object key = entry.getKey();
-				Object val = entry.getValue();
-
-				if (key instanceof TypedStringValue) {
-					key = ((TypedStringValue) key).getValue();
-				}
-
-				if (val instanceof TypedStringValue) {
-					val = ((TypedStringValue) val).getValue();
-				}
-				convertedProps.put(key, val);
-			}
-			serviceProperties = Collections.unmodifiableMap(convertedProps);
-		}
-		else {
-			serviceProperties = Collections.<String, Object> emptyMap();
+			serviceProperties = ValueFactory.getEntries(props);
+		} else {
+			serviceProperties = Collections.emptyList();
 		}
 
 		// listeners
-		List<RegistrationListenerMetadata> foundListeners = new ArrayList<RegistrationListenerMetadata>(4);
-		List<? extends AbstractBeanDefinition> listenerDefinitions = (List<? extends AbstractBeanDefinition>) MetadataUtils.getValue(
-			pvs, LISTENERS_PROP);
+		List<RegistrationListener> foundListeners = new ArrayList<RegistrationListener>(4);
+		List<? extends AbstractBeanDefinition> listenerDefinitions = (List) MetadataUtils.getValue(pvs, LISTENERS_PROP);
 
 		if (listenerDefinitions != null) {
 			for (AbstractBeanDefinition beanDef : listenerDefinitions) {
-				foundListeners.add(new SpringRegistrationListenerMetadata(beanDef));
+				foundListeners.add(new SimpleRegistrationListener(beanDef));
 			}
 		}
 
@@ -146,11 +121,7 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 		return autoExport;
 	}
 
-	public Value getExportedComponent() {
-		return component;
-	}
-
-	public Set<String> getInterfaceNames() {
+	public List<String> getInterfaceNames() {
 		return interfaces;
 	}
 
@@ -158,11 +129,15 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 		return ranking;
 	}
 
-	public Collection<RegistrationListenerMetadata> getRegistrationListeners() {
+	public Collection<RegistrationListener> getRegistrationListeners() {
 		return listeners;
 	}
 
-	public Map<String, ? extends Object> getServiceProperties() {
+	public Target getServiceComponent() {
+		return component;
+	}
+
+	public List<MapEntry> getServiceProperties() {
 		return serviceProperties;
 	}
 }

@@ -29,14 +29,13 @@ import org.w3c.dom.Element;
  */
 public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParser {
 
-	
 	@Override
-	protected Map parsePropertyMapElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
+	protected Map<?, ?> parsePropertyMapElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
 		return ComponentParser.parsePropertyMapElement(context, beanDef, beanDefinition);
 	}
 
 	@Override
-	protected Set parsePropertySetElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
+	protected Set<?> parsePropertySetElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
 		return ComponentParser.parsePropertySetElement(context, beanDef, beanDefinition);
 	}
 
@@ -44,6 +43,4 @@ public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParse
 	protected Object parsePropertySubElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
 		return ComponentParser.parsePropertySubElement(context, beanDef, beanDefinition);
 	}
-	
-	
 }

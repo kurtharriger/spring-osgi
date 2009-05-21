@@ -33,22 +33,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Namespace parser handling the root &lt;components&gt; element from RFC124
- * (the equivalent of Spring's &lt;beans&gt; element).
+ * Namespace parser handling the root &lt;components&gt; element from RFC124 (the equivalent of Spring's &lt;beans&gt;
+ * element).
  * 
  * @author Costin Leau
  */
 class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 
-	static final String COMPONENTS = "components";
+	static final String BLUEPRINT = "blueprint";
 
 	private static final String DESCRIPTION = "description";
-	private static final String COMPONENT = "component";
-	private static final String REFERENCE = "reference";
-	private static final String SERVICE = "service";
-	private static final String REF_LIST = "ref-list";
-	private static final String REF_SET = "ref-set";
-
+	private static final String BEAN = "bean";
+	static final String REFERENCE = "reference";
+	static final String SERVICE = "service";
+	static final String REF_LIST = "ref-list";
+	static final String REF_SET = "ref-set";
 
 	public BeanDefinition parse(Element componentsRootElement, ParserContext parserContext) {
 		// re-initialize defaults
@@ -81,8 +80,8 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 	/**
-	 * Parses the top elements belonging to the RFC 124 namespace. Namely these
-	 * are &lt;component&gt;, &lt;description&gt; and &lt;type-converters&gt;
+	 * Parses the top elements belonging to the RFC 124 namespace. Namely these are &lt;component&gt;,
+	 * &lt;description&gt; and &lt;type-converters&gt;
 	 * 
 	 * @param ele
 	 * @param parserContext
@@ -91,26 +90,19 @@ class ComponentsBeanDefinitionParser implements BeanDefinitionParser {
 		// description
 		if (DomUtils.nodeNameEquals(ele, DESCRIPTION)) {
 			// ignore description for now
-		}
-		else if (DomUtils.nodeNameEquals(ele, COMPONENT)) {
+		} else if (DomUtils.nodeNameEquals(ele, BEAN)) {
 			parseComponentElement(ele, parserContext);
-		}
-		else if (DomUtils.nodeNameEquals(ele, REFERENCE)) {
+		} else if (DomUtils.nodeNameEquals(ele, REFERENCE)) {
 			parseReferenceElement(ele, parserContext);
-		}
-		else if (DomUtils.nodeNameEquals(ele, SERVICE)) {
+		} else if (DomUtils.nodeNameEquals(ele, SERVICE)) {
 			parseServiceElement(ele, parserContext);
-		}
-		else if (DomUtils.nodeNameEquals(ele, REF_LIST)) {
+		} else if (DomUtils.nodeNameEquals(ele, REF_LIST)) {
 			parseListElement(ele, parserContext);
-		}
-		else if (DomUtils.nodeNameEquals(ele, REF_SET)) {
+		} else if (DomUtils.nodeNameEquals(ele, REF_SET)) {
 			parseSetElement(ele, parserContext);
-		}
-		else if (DomUtils.nodeNameEquals(ele, TypeConverterBeanDefinitionParser.TYPE_CONVERTERS)) {
+		} else if (DomUtils.nodeNameEquals(ele, TypeConverterBeanDefinitionParser.TYPE_CONVERTERS)) {
 			parseConvertersElement(ele, parserContext);
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("Unknown element " + ele);
 		}
 	}

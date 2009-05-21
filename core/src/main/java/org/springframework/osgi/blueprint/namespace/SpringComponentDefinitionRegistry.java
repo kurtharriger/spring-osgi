@@ -1,4 +1,3 @@
-
 package org.springframework.osgi.blueprint.namespace;
 
 import java.util.Collections;
@@ -14,8 +13,7 @@ import org.springframework.osgi.blueprint.reflect.MetadataFactory;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Default {@link ComponentDefinitionRegistry} implementation based on Spring's
- * {@link BeanDefinitionRegistry}.
+ * Default {@link ComponentDefinitionRegistry} implementation based on Spring's {@link BeanDefinitionRegistry}.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -24,7 +22,6 @@ import org.springframework.util.CollectionUtils;
 public class SpringComponentDefinitionRegistry implements ComponentDefinitionRegistry {
 
 	private final BeanDefinitionRegistry beanRegistry;
-
 
 	public SpringComponentDefinitionRegistry(BeanDefinitionRegistry beanRegistry) {
 		this.beanRegistry = beanRegistry;
@@ -54,7 +51,8 @@ public class SpringComponentDefinitionRegistry implements ComponentDefinitionReg
 			}
 		}
 
-		return MetadataFactory.buildComponentMetadataFor(name, beanRegistry.getBeanDefinition(nameOfBeanWereLookingFor));
+		return MetadataFactory
+				.buildComponentMetadataFor(name, beanRegistry.getBeanDefinition(nameOfBeanWereLookingFor));
 	}
 
 	public Set<String> getComponentDefinitionNames() {
@@ -65,8 +63,7 @@ public class SpringComponentDefinitionRegistry implements ComponentDefinitionReg
 	}
 
 	public void registerComponentDefinition(ComponentMetadata component) throws ComponentNameAlreadyInUseException {
-		String name = component.getName();
-
+		String name = component.getId();
 		if (containsComponentDefinition(name)) {
 			throw new ComponentNameAlreadyInUseException(name);
 		}

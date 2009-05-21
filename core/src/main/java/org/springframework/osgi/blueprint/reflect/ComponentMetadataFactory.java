@@ -52,13 +52,13 @@ class ComponentMetadataFactory implements MetadataConstants {
 		}
 
 		if (isSingleServiceImporter(beanDefinition)) {
-			return new SpringUnaryServiceReferenceComponentMetadata(name, beanDefinition);
+			return new SpringReferenceMetadata(name, beanDefinition);
 		}
 		if (isCollectionImporter(beanDefinition)) {
-			return new SpringCollectionBasedServiceReferenceComponentMetadata(name, beanDefinition);
+			return new SpringRefCollectionMetadata(name, beanDefinition);
 		}
 
-		return new SpringLocalComponentMetadata(name, beanDefinition);
+		return new SpringBeanMetadata(name, beanDefinition);
 	}
 
 	private static boolean isServiceExporter(BeanDefinition beanDefinition) {

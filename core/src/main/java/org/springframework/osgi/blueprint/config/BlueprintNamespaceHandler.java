@@ -32,27 +32,30 @@ import org.springframework.osgi.service.importer.support.CollectionType;
 class BlueprintNamespaceHandler extends NamespaceHandlerSupport {
 
 	public void init() {
-		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.COMPONENTS, new ComponentsBeanDefinitionParser());
-		registerBeanDefinitionParser(ComponentParser.COMPONENT, new ComponentBeanDefinitionParser());
+		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.BLUEPRINT, new ComponentsBeanDefinitionParser());
+		registerBeanDefinitionParser(ComponentParser.BEAN, new ComponentBeanDefinitionParser());
 		registerBeanDefinitionParser(TypeConverterBeanDefinitionParser.TYPE_CONVERTERS,
-			new TypeConverterBeanDefinitionParser());
+				new TypeConverterBeanDefinitionParser());
 
 		// Spring DM constructs
-		registerBeanDefinitionParser("reference", new BlueprintReferenceBeanDefinitionParser());
+		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REFERENCE,
+				new BlueprintReferenceBeanDefinitionParser());
 
-		registerBeanDefinitionParser("ref-list", new BlueprintCollectionBeanDefinitionParser() {
+		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REF_LIST,
+				new BlueprintCollectionBeanDefinitionParser() {
 
-			protected CollectionType collectionType() {
-				return CollectionType.LIST;
-			}
-		});
-		registerBeanDefinitionParser("ref-set", new BlueprintCollectionBeanDefinitionParser() {
+					protected CollectionType collectionType() {
+						return CollectionType.LIST;
+					}
+				});
+		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.REF_SET,
+				new BlueprintCollectionBeanDefinitionParser() {
 
-			protected CollectionType collectionType() {
-				return CollectionType.SET;
-			}
-		});
+					protected CollectionType collectionType() {
+						return CollectionType.SET;
+					}
+				});
 
-		registerBeanDefinitionParser("service", new BlueprintServiceDefinitionParser());
+		registerBeanDefinitionParser(ComponentsBeanDefinitionParser.SERVICE, new BlueprintServiceDefinitionParser());
 	}
 }
