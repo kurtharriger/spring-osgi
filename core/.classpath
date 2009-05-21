@@ -26,5 +26,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.asm/3.0.0.BUILD-SNAPSHOT/org.springframework.asm-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/org.springframework.asm/3.0.0.BUILD-SNAPSHOT/org.springframework.asm-3.0.0.BUILD-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/org.springframework.expression/3.0.0.BUILD-SNAPSHOT/org.springframework.expression-3.0.0.BUILD-SNAPSHOT.jar" sourcepath="M2_REPO/org/springframework/org.springframework.expression/3.0.0.BUILD-SNAPSHOT/org.springframework.expression-3.0.0.BUILD-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/antlr/com.springsource.org.antlr/3.0.1/com.springsource.org.antlr-3.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/rfc124/api/2.0.0-m1-SNAPSHOT/api-2.0.0-m1-SNAPSHOT.jar"/> 	
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

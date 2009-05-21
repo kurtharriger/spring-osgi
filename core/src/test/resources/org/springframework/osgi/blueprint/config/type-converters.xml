@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="
+		http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<description>Type converters config</description>
+
+	<type-converters>
+		<bean
+			class="org.springframework.osgi.blueprint.config.TestComponentConverter" />
+		<ref component="converterB" />
+		<bean id="asianRegionCodeConverter" 
+			class="org.springframework.osgi.blueprint.config.AsianRegionCodeConverter"/>
+	</type-converters>
+
+	<bean id="asianCodeExample" class="org.springframework.osgi.blueprint.config.RegionCodeComponent"> 
+		<argument value="blaBla"/>
+		<argument value="CN+86"/>
+	</bean>
+	
+	<bean id="converterB"
+		class="org.springframework.osgi.blueprint.config.ComponentHolderConverter" />
+
+	<bean id="conversion" class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="propA">
+			<value type="org.springframework.osgi.blueprint.TestComponent">sergey</value> 
+		</property>
+		<property name="propB">
+			<value type="org.springframework.osgi.blueprint.config.ComponentHolder">rachmaninoff</value> 
+		</property>
+	</bean>
+	
+	<bean id="serviceReference" class="org.springframework.osgi.blueprint.TestComponent">
+		<property name="serviceReference" ref="referenceFactory"/>
+	</bean>
+	
+	<bean id="referenceFactory" class="org.springframework.osgi.blueprint.ReferenceDelegateFactory"/>
+	
+</blueprint>

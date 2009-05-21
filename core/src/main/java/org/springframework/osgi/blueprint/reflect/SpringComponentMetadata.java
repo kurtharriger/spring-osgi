@@ -16,9 +16,9 @@
 
 package org.springframework.osgi.blueprint.reflect;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -27,42 +27,45 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Default {@link ComponentMetadata} implementation based on Spring's
- * {@link BeanDefinition}.
+ * Default {@link ComponentMetadata} implementation based on Spring's {@link BeanDefinition}.
  * 
  * @author Costin Leau
  * 
  */
 public class SpringComponentMetadata implements ComponentMetadata {
 
-	protected final String name;
+	private final String name;
 	protected final AbstractBeanDefinition beanDefinition;
+	private final List<String> dependsOn;
 
-
-	// FIXME: allow rare-non abstract bean definition as well 
+	// FIXME: allow rare-non abstract bean definition as well
 	public SpringComponentMetadata(String name, BeanDefinition definition) {
 		if (!(definition instanceof AbstractBeanDefinition)) {
 			throw new IllegalArgumentException("Unknown bean definition passed in" + definition);
 		}
 		this.name = name;
 		this.beanDefinition = (AbstractBeanDefinition) definition;
+
+		String[] dpdOn = beanDefinition.getDependsOn();
+		if (ObjectUtils.isEmpty(dpdOn)) {
+			dependsOn = Collections.<String> emptyList();
+		} else {
+			List<String> dependencies = new ArrayList<String>(dpdOn.length);
+			CollectionUtils.mergeArrayIntoCollection(dpdOn, dependencies);
+			dependsOn = Collections.unmodifiableList(dependencies);
+		}
+
 	}
 
 	public BeanDefinition getBeanDefinition() {
 		return beanDefinition;
 	}
 
-	public Set<String> getExplicitDependencies() {
-		String[] dependsOn = beanDefinition.getDependsOn();
-		if (ObjectUtils.isEmpty(dependsOn)) {
-			return Collections.<String> emptySet();
-		}
-		Set<String> dependencies = new LinkedHashSet<String>(dependsOn.length);
-		CollectionUtils.mergeArrayIntoCollection(dependsOn, dependencies);
-		return Collections.unmodifiableSet(dependencies);
+	public String getId() {
+		return name;
 	}
 
-	public String getName() {
-		return name;
+	public List<String> getExplicitDependencies() {
+		return dependsOn;
 	}
 }

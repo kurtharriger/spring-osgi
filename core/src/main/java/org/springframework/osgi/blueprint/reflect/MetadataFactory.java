@@ -17,14 +17,10 @@
 package org.springframework.osgi.blueprint.reflect;
 
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
-import org.osgi.service.blueprint.reflect.LocalComponentMetadata;
-import org.osgi.service.blueprint.reflect.ServiceExportComponentMetadata;
-import org.osgi.service.blueprint.reflect.ServiceReferenceComponentMetadata;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
- * Adapter factory that allows translating Spring metadata into Blueprint
- * {@link ComponentMetadata}.
+ * Adapter factory that allows translating Spring metadata into Blueprint {@link ComponentMetadata}.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -34,16 +30,14 @@ public class MetadataFactory {
 	private static final BeanDefinitionFactory springFactory = new BeanDefinitionFactory();
 	private static final ComponentMetadataFactory blueprintFactory = new ComponentMetadataFactory();
 
-
 	public static BeanDefinition buildBeanDefinitionFor(ComponentMetadata metadata) {
 		return springFactory.buildBeanDefinitionFor(metadata);
 	}
 
 	/**
-	 * Inspects the given {@link BeanDefinition beanDefinition} and returns the
-	 * appropriate {@link ComponentMetadata metadata} (can be one of
-	 * {@link LocalComponentMetadata}, {@link ServiceExportComponentMetadata},
-	 * or {@link ServiceReferenceComponentMetadata}).
+	 * Inspects the given {@link BeanDefinition beanDefinition} and returns the appropriate {@link ComponentMetadata
+	 * metadata} (can be one of {@link LocalComponentMetadata}, {@link ServiceExportComponentMetadata}, or
+	 * {@link ServiceReferenceComponentMetadata}).
 	 * 
 	 * @param name bean name
 	 * @param beanDefinition Spring bean definition
