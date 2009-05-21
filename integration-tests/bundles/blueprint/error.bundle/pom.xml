@@ -3,15 +3,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>org.springframework.osgi.rfc124.iandt</groupId>
+        <groupId>org.springframework.osgi.iandt.blueprint</groupId>
         <artifactId>bundles</artifactId>
         <version>2.0.0-m1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.springframework.osgi.rfc124.iandt</groupId>
+    <groupId>org.springframework.osgi.iandt.blueprint</groupId>
     <artifactId>error.bundle</artifactId>
 	<packaging>jar</packaging>
-    <name>Spring OSGi RFC124 Test Bundle: Error bundle</name>
+    <name>Spring OSGi Blueprint Test Bundle: Error bundle</name>
     <description>An OSGi bundle that fails on startup</description>
     <url>http://www.springframework.org/osgi</url>
 </project>
