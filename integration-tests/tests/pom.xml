@@ -91,6 +91,12 @@
             <artifactId>spring-osgi-test</artifactId>
             <scope>provided</scope>
         </dependency> 
+
+        <dependency>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-annotation</artifactId>
+            <scope>provided</scope>
+        </dependency>
     	
     	<dependency>
       		<groupId>org.aopalliance</groupId>
