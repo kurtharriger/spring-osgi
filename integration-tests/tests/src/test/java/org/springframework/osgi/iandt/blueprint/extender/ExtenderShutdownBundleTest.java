@@ -34,7 +34,7 @@ import org.springframework.osgi.util.OsgiBundleUtils;
  * 
  * @author Costin Leau
  */
-public class ExtenderShutdownBundleTst extends BaseBlueprintIntegrationTest {
+public class ExtenderShutdownBundleTest extends BaseBlueprintIntegrationTest {
 
 	@Override
 	protected String[] getTestBundlesNames() {
@@ -44,7 +44,7 @@ public class ExtenderShutdownBundleTst extends BaseBlueprintIntegrationTest {
 	public void testExtenderShutdown() throws Exception {
 		final List<Event> events = Collections.synchronizedList(new ArrayList<Event>());
 		Bundle extenderBundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext,
-				"org.osgi.service.blueprint.all");
+				"org.springframework.osgi.blueprint.uber");
 		assertNotNull(extenderBundle);
 
 		EventHandler handler = new EventHandler() {

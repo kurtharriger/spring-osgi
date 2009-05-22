@@ -23,7 +23,7 @@
 	
 
     <spring.osgi.symbolic.name>
-        org.springfrmaework.osgi.blueprint.uber
+        org.springframework.osgi.blueprint.uber
     </spring.osgi.symbolic.name>
     
     <spring.osgi.private.pkg>
