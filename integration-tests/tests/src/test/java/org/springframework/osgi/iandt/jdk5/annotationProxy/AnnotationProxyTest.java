@@ -1,12 +1,10 @@
-
-package org.springframework.osgi.iandt.annotationProxy;
+package org.springframework.osgi.iandt.jdk5.annotationProxy;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
-import org.springframework.osgi.iandt.annotation.proxy.ServiceReferer;
+import org.springframework.osgi.iandt.reference.proxy.ServiceReferer;
 import org.springframework.osgi.iandt.simpleservice.MyService;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiBundleUtils;
 
 /**
@@ -16,14 +14,13 @@ public class AnnotationProxyTest extends BaseIntegrationTest {
 
 	private static final String ANNOTATION_CONST = "org.springframework.osgi.extender.annotation.auto.processing";
 
-
 	protected String getManifestLocation() {
-		return "classpath:org/springframework/osgi/iandt/annotationProxy/AnnotationProxyTest.MF";
+		return "classpath:org/springframework/osgi/iandt/jdk5/annotationProxy/AnnotationProxyTest.MF";
 	}
 
 	protected String[] getTestBundlesNames() {
 		return new String[] { "org.springframework.osgi.iandt, simple.service, " + getSpringDMVersion(),
-			"org.springframework.osgi.iandt, annotation.proxy," + getSpringDMVersion() };
+				"org.springframework.osgi.iandt, annotation.proxy," + getSpringDMVersion() };
 	}
 
 	public AnnotationProxyTest() {
@@ -43,7 +40,7 @@ public class AnnotationProxyTest extends BaseIntegrationTest {
 		assertNotNull("no value specified in the reference", reference.stringValue());
 
 		Bundle simpleServiceBundle = OsgiBundleUtils.findBundleBySymbolicName(bundleContext,
-			"org.springframework.osgi.iandt.simpleservice");
+				"org.springframework.osgi.iandt.simpleservice");
 
 		assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
 		System.out.println("stopping bundle");
@@ -59,8 +56,7 @@ public class AnnotationProxyTest extends BaseIntegrationTest {
 		try {
 			reference.stringValue();
 			fail("ServiceUnavailableException should have been thrown!");
-		}
-		catch (ServiceUnavailableException e) {
+		} catch (ServiceUnavailableException e) {
 			// Expected
 		}
 

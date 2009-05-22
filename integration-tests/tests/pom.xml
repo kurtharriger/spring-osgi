@@ -236,28 +236,39 @@
 		  <groupId>org.springframework.osgi</groupId>
 		  <artifactId>spring-osgi-web</artifactId>
 		  <scope>test</scope>
-		</dependency>	
-		
+		</dependency>
+
+        <dependency>
+           <groupId>org.springframework.osgi.iandt</groupId>
+           <artifactId>annotation.proxy</artifactId>
+           <version>${project.parent.version}</version>                    
+           <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>annotation.proxy</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.osgi.iandt</groupId>
+            <artifactId>component.scan.bundle</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+			
+
+        <dependency>
+            <groupId>org.springframework.osgi.rfc124</groupId>
+            <artifactId>api</artifactId>
+            <scope>provided</scope>
+            <version>2.0.0-m1-SNAPSHOT</version>
+        </dependency>		
     </dependencies>
 
 
-
-    <profiles>
-        <profile>
-            <id>jdk-1.5+</id>
-            <activation>
-                <jdk>!1.4</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.osgi.iandt</groupId>
-                    <artifactId>annotation.proxy</artifactId>
-					<version>${project.parent.version}</version>                    
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 
     <build>
         <plugins>

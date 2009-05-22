@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.bridgemethods;
+package org.springframework.osgi.iandt.jdk5.bridgemethods;
 
 import java.awt.Shape;
 import java.util.Map;
@@ -29,7 +29,6 @@ public class Listener implements GenerifiedListenerInterface<Shape> {
 
 	public static int BIND_CALLS = 0;
 	public static int UNBIND_CALLS = 0;
-
 
 	public void bind(Shape service, Map<String, ?> properties) {
 		System.out.println("calling bind");

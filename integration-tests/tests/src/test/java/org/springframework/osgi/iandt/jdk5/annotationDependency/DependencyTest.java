@@ -1,11 +1,9 @@
-
-package org.springframework.osgi.iandt.annotationDependency;
+package org.springframework.osgi.iandt.jdk5.annotationDependency;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
-import org.springframework.osgi.test.AbstractConfigurableBundleCreatorTests;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
@@ -15,26 +13,26 @@ public class DependencyTest extends BaseIntegrationTest {
 
 	private static final String DEPENDENT_CLASS_NAME = "org.springframework.osgi.iandt.annotation.dependencies.Dependent";
 
-
 	// private static final String SERVICE_2_FILTER = "(service=2)";
 	// private static final String SERVICE_3_FILTER = "(service=3)";
 
 	protected String getManifestLocation() {
-		return "classpath:org/springframework/osgi/iandt/annotationDependency/DependencyTest.MF";
+		return "classpath:org/springframework/osgi/iandt/jdk5/annotationDependency/DependencyTest.MF";
 	}
 
 	public void testDependencies() throws Exception {
 		// waitOnContextCreation("org.springframework.osgi.iandt.simpleservice");
 
 		Bundle dependencyTestBundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi.iandt", "annotation.dependencies", getSpringDMVersion()).getURL().toExternalForm());
+				"org.springframework.osgi.iandt", "annotation.dependencies", getSpringDMVersion()).getURL()
+				.toExternalForm());
 
 		Bundle simpleService2Bundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi.iandt", "simple.service2", getSpringDMVersion()).getURL().toExternalForm());
+				"org.springframework.osgi.iandt", "simple.service2", getSpringDMVersion()).getURL().toExternalForm());
 		Bundle simpleService3Bundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi.iandt", "simple.service3", getSpringDMVersion()).getURL().toExternalForm());
+				"org.springframework.osgi.iandt", "simple.service3", getSpringDMVersion()).getURL().toExternalForm());
 		Bundle simpleServiceBundle = bundleContext.installBundle(getLocator().locateArtifact(
-			"org.springframework.osgi.iandt", "simple.service", getSpringDMVersion()).getURL().toExternalForm());
+				"org.springframework.osgi.iandt", "simple.service", getSpringDMVersion()).getURL().toExternalForm());
 
 		assertNotNull("Cannot find the simple service bundle", simpleServiceBundle);
 		assertNotNull("Cannot find the simple service 2 bundle", simpleService2Bundle);
@@ -42,13 +40,13 @@ public class DependencyTest extends BaseIntegrationTest {
 		assertNotNull("dependencyTest can't be resolved", dependencyTestBundle);
 
 		assertNotSame("simple service bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
-			simpleServiceBundle.getState()));
+				simpleServiceBundle.getState()));
 
 		assertNotSame("simple service 2 bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
-			simpleService2Bundle.getState()));
+				simpleService2Bundle.getState()));
 
 		assertNotSame("simple service 3 bundle is in the activated state!", new Integer(Bundle.ACTIVE), new Integer(
-			simpleService3Bundle.getState()));
+				simpleService3Bundle.getState()));
 
 		startDependencyAsynch(dependencyTestBundle);
 		Thread.sleep(2000); // Yield to give bundle time to get into waiting state.
@@ -98,8 +96,7 @@ public class DependencyTest extends BaseIntegrationTest {
 				try {
 					bundle.start();
 					System.out.println("started dependency test bundle");
-				}
-				catch (BundleException ex) {
+				} catch (BundleException ex) {
 					System.err.println("can't start bundle " + ex);
 				}
 			}

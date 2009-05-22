@@ -224,6 +224,7 @@ limitations under the License.
   <!-- modules for Spring-OSGi -->
   <modules>   
     <module>mock</module>
+    <module>rfc-124</module>
     <module>io</module>
     <module>core</module>
     <module>extender</module>
@@ -232,9 +233,6 @@ limitations under the License.
     <module>web-extender</module>
     <module>bundle-archetype</module>
     <module>annotation</module>
-    <!--
-    <module>rfc-124</module>
-    -->
     <!-- unused at the moment
     <module>release</module>
     -->

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.bridgemethods;
+package org.springframework.osgi.iandt.jdk5.bridgemethods;
 
 import java.util.Map;
 

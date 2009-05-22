@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.componentscanning;
+package org.springframework.osgi.iandt.jdk5.componentscanning;
 
 import java.awt.Shape;
 
@@ -30,7 +30,6 @@ public class OrderedComponentScanningTest extends BaseIntegrationTest {
 	private ComponentBean bean;
 
 	private Shape shape;
-
 
 	@Override
 	protected String[] getTestBundlesNames() {
@@ -51,7 +50,7 @@ public class OrderedComponentScanningTest extends BaseIntegrationTest {
 
 	@Override
 	protected String[] getConfigLocations() {
-		return new String[] { "/org/springframework/osgi/iandt/componentscanning/context.xml" };
+		return new String[] { "/org/springframework/osgi/iandt/jdk5/componentscanning/context.xml" };
 	}
 
 	/**
