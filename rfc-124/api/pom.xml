@@ -20,14 +20,6 @@
   </properties>
   
   <!-- shared dependencies -->
-  <dependencies>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>spring-osgi-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-  </dependencies>
-  
   <build>
     <plugins>
       <plugin>

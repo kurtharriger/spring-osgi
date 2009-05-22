@@ -20,7 +20,6 @@
   <modules>
     <module>bundles</module>
     <module>tests</module>
-    <module>tests-tiger</module>
   </modules>
   
   <build>

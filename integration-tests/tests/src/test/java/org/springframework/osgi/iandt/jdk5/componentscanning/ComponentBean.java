@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.componentscanning;
+package org.springframework.osgi.iandt.jdk5.componentscanning;
 
 import java.awt.Shape;
-import java.io.Serializable;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,14 +35,13 @@ public class ComponentBean {
 
 	private Shape setterInjection;
 
-
 	@Autowired
 	public ComponentBean(Shape Shape) {
 		this.constructorInjection = Shape;
 	}
 
 	public ComponentBean() {
-		//this.constructorShape = Shape;
+		// this.constructorShape = Shape;
 	}
 
 	/**

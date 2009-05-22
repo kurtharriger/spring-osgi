@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.iandt.bridgemethods;
+package org.springframework.osgi.iandt.jdk5.bridgemethods;
 
 import java.awt.Shape;
 import java.awt.geom.Area;
@@ -32,7 +32,7 @@ import org.springframework.osgi.iandt.BaseIntegrationTest;
 public class BridgeMethodTest extends BaseIntegrationTest {
 
 	protected String[] getConfigLocations() {
-		return new String[] { "/org/springframework/osgi/iandt/bridgemethods/config.xml" };
+		return new String[] { "/org/springframework/osgi/iandt/jdk5/bridgemethods/config.xml" };
 	}
 
 	public void testGenerifiedListener() throws Exception {
