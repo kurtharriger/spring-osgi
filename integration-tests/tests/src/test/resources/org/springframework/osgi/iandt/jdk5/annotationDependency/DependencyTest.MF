@@ -4,9 +4,11 @@ Bundle-SymbolicName: org.springframework.osgi.iandt.dependency.functional
 Bundle-Vendor: Spring Framework
 Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator
 Import-Package: junit.framework,
+ org.apache.commons.logging,
  org.osgi.framework,
  org.springframework.aop,
  org.springframework.core.io,
+ org.springframework.test,
  org.springframework.osgi.util,
  org.springframework.osgi.test,
  org.springframework.osgi.test.platform,

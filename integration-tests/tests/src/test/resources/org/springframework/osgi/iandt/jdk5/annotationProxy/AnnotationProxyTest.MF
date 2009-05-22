@@ -5,11 +5,13 @@ Bundle-Vendor: Spring Framework
 Bundle-Activator: org.springframework.osgi.test.JUnitTestActivator
 Bundle-ManifestVersion: 2
 Import-Package: junit.framework,
+ org.apache.commons.logging,
  org.osgi.framework,
  org.springframework.osgi,
  org.springframework.aop,
  org.springframework.core,
  org.springframework.core.io,
+ org.springframework.test,
  org.springframework.osgi.service,
  org.springframework.osgi.extensions.annotation;resolution:=optional,
  org.springframework.osgi.util,
@@ -18,3 +20,4 @@ Import-Package: junit.framework,
  org.springframework.osgi.test.provisioning,
  org.springframework.osgi.iandt.simpleservice,
  org.springframework.osgi.iandt.annotation.proxy;resolution:=optional
+ 

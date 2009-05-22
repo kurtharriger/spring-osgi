@@ -17,7 +17,7 @@
 package org.springframework.osgi.iandt.jdk5.io;
 
 import org.springframework.osgi.iandt.BaseIntegrationTest;
-import org.springframework.osgi.iandt.jdk5.componentscanning.ComponentBean;
+import org.springframework.osgi.iandt.io.component.ComponentBean;
 
 /**
  * Integration test for Spring 2.5 component scan.
@@ -37,7 +37,7 @@ public class ComponentScanTest extends BaseIntegrationTest {
 
 	public void testComponentScan() throws Exception {
 		// force an import on component bean
-		logger.debug(ComponentBean.class);
+		assertNotNull(ComponentBean.class);
 		assertTrue("component scan did not pick up all classes", applicationContext.containsBean("bean"));
 		assertTrue("component scan did not pick up all classes", applicationContext.containsBean("componentBean"));
 	}

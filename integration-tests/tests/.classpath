@@ -38,6 +38,9 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/catalina.osgi/5.5.23-SNAPSHOT/catalina.osgi-5.5.23-SNAPSHOT.jar" sourcepath="/CATALINA_5.5.X"/>
 	<classpathentry kind="var" path="M2_REPO/com/cenqua/clover/clover/2.3.1/clover-2.3.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/spring-osgi-extender/2.0.0-m1-SNAPSHOT/spring-osgi-extender-2.0.0-m1-SNAPSHOT.jar" sourcepath="/OSGI_SRC_ROOT/extender/src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/annotation.dependencies/2.0.0-m1-SNAPSHOT/annotation.dependencies-2.0.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/annotation.proxy/2.0.0-m1-SNAPSHOT/annotation.proxy-2.0.0-m1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/iandt/component.scan.bundle/2.0.0-m1-SNAPSHOT/component.scan.bundle-2.0.0-m1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/springframework/osgi/rfc124/api/2.0.0-m1-SNAPSHOT/api-2.0.0-m1-SNAPSHOT.jar"/> 		
 	<classpathentry kind="output" path="target/test-classes"/>
 </classpath>

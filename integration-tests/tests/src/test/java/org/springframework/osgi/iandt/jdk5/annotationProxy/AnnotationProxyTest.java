@@ -2,7 +2,7 @@ package org.springframework.osgi.iandt.jdk5.annotationProxy;
 
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.iandt.BaseIntegrationTest;
-import org.springframework.osgi.iandt.reference.proxy.ServiceReferer;
+import org.springframework.osgi.iandt.annotation.proxy.ServiceReferer;
 import org.springframework.osgi.iandt.simpleservice.MyService;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.util.OsgiBundleUtils;
