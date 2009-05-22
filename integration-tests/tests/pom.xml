@@ -50,6 +50,24 @@
 		   </exclusions>
 		</dependency>
   
+  
+        <dependency>
+		   <groupId>org.apache.felix</groupId>
+		   <artifactId>org.apache.felix.eventadmin</artifactId>
+		   <version>1.0.0</version>
+		   <scope>provided</scope>
+		   <exclusions>
+            <exclusion>
+  			  <groupId>org.apache.felix</groupId>
+			  <artifactId>org.osgi.core</artifactId>
+            </exclusion>          
+            <exclusion>
+  			  <groupId>org.apache.felix</groupId>
+			  <artifactId>org.osgi.compendium</artifactId>
+            </exclusion>          
+		   </exclusions>
+		</dependency>
+		
 	    <dependency>
             <groupId>net.sourceforge.cglib</groupId>
             <artifactId>com.springsource.net.sf.cglib</artifactId>

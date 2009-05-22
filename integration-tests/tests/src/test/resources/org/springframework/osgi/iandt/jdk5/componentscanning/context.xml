@@ -11,7 +11,7 @@
            http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
 
-	<ctx:component-scan base-package="org.springframework.osgi.iandt.componentscanning"/>
+	<ctx:component-scan base-package="org.springframework.osgi.iandt.jdk5.componentscanning"/>
 
 	<osgi:reference id="shape">
 		<osgi:interfaces>

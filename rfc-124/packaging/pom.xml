@@ -9,11 +9,11 @@
   <groupId>org.springframework.osgi.rfc124.ri</groupId>
   <artifactId>all</artifactId>
   <packaging>bundle</packaging>
-  <name>Spring OSGi RFC 124 RI: Big Bundle</name>
+  <name>Spring OSGi RFC 124 RI: Uber Bundle</name>
   <url>http://www.springframework.org/osgi</url>
   
   <description>
-    Spring/OSGi Blueprint Service Extender and Core Bundle.
+    Spring/OSGi Blueprint Uber Bundle.
   </description>
 
 
@@ -22,9 +22,8 @@
 	<spring.osgi.license.loc>../..</spring.osgi.license.loc>
 	
 
-    <!-- use the name defined by the RFC 124 spec -->
     <spring.osgi.symbolic.name>
-        org.osgi.service.blueprint.all
+        org.springfrmaework.osgi.blueprint.uber
     </spring.osgi.symbolic.name>
     
     <spring.osgi.private.pkg>
@@ -81,9 +80,9 @@
         </dependency>
 
         <dependency>
-          <groupId>org.springframework.osgi</groupId>
-          <artifactId>log4j.osgi</artifactId>
-          <version>1.2.15-SNAPSHOT</version>
+          <groupId>org.apache.log4j</groupId>
+          <artifactId>com.springsource.org.apache.log4j</artifactId>
+          <version>1.2.15</version>
         </dependency>
 
         <dependency>  
@@ -117,16 +116,6 @@
             <version>2.0.0-m1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.osgi.rfc124.ri</groupId>
-            <artifactId>core</artifactId>
-            <version>2.0.0-m1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi.rfc124.ri</groupId>
-            <artifactId>extender</artifactId>
-            <version>2.0.0-m1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.junit</groupId>
             <artifactId>com.springsource.org.junit</artifactId>
             <version>4.5.0</version>
@@ -152,7 +141,7 @@
           <instructions>
            <!-- bundle specific conf -->
            <Bundle-Name>${artifactId}</Bundle-Name>
-           <Bundle-Version>1.0.0.rfc124</Bundle-Version>
+           <Bundle-Version>1.0.0.blueprint</Bundle-Version>
            <Bundle-SymbolicName>${spring.osgi.symbolic.name}</Bundle-SymbolicName>
            <Export-Package>${spring.osgi.export}</Export-Package>
            <Import-Package>${spring.osgi.import}</Import-Package>
