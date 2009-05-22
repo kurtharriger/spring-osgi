@@ -37,12 +37,12 @@ public abstract class BaseBlueprintIntegrationTest extends BaseIntegrationTest {
 		List<String> list = new ArrayList<String>(bundles.length);
 		for (int i = 0; i < bundles.length; i++) {
 			String bundle = bundles[i];
-//			for (int j = 0; j < matches.length; j++) {
-//				String match = matches[j];
-//				if (bundle.indexOf(match) > -1) {
+			for (int j = 0; j < matches.length; j++) {
+				String match = matches[j];
+				if (bundle.indexOf(match) > -1) {
 					list.add(bundle);
-//				}
-//			}
+				}
+			}
 		}
 		System.out.println(ObjectUtils.nullSafeToString(bundles));
 
@@ -51,7 +51,7 @@ public abstract class BaseBlueprintIntegrationTest extends BaseIntegrationTest {
 
 		// install the rfc 124 big bundle
 		list.add("org.springframework.osgi.rfc124,api," + getSpringDMVersion());
-		// list.add("org.springframework.osgi.rfc124.ri,all," + getSpringDMVersion());
+		list.add("org.springframework.osgi.rfc124.ri,all," + getSpringDMVersion());
 
 		System.out.println(list);
 		return list.toArray(new String[list.size()]);
