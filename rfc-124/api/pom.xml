@@ -16,6 +16,7 @@
 	<spring.osgi.import.pkg></spring.osgi.import.pkg>
 	<spring.osgi.export.pkg></spring.osgi.export.pkg>
   	<clover.skip>true</clover.skip>
+	<bundlor.enabled>false</bundlor.enabled>
   	<javadoc.loc>${basedir}/../../docs/src/javadoc</javadoc.loc>
   </properties>
   

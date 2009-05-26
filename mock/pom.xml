@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-mock</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <name>Spring OSGi Mocks</name>
   <url>http://www.springframework.org/osgi</url>
   <description>
@@ -16,10 +16,7 @@
   </description>
   
   <properties>
-  
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
-  
-	<spring.osgi.export.pkg>org.springframework.osgi.mock</spring.osgi.export.pkg>
 	<spring.osgi.symbolic.name>${symName.prefix}.mock</spring.osgi.symbolic.name>
   </properties>
 

@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-web</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <url>http://www.springframework.org/osgi</url>
   <name>Spring OSGi Web Support</name>
   <description>
@@ -30,29 +30,14 @@
 	<servlet.version>2.4</servlet.version>
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 	
-
-    <spring.osgi.export>
-      !org.springframework.osgi.web.*internal*,
-      org.springframework.osgi.web*;version=${spring.osgi.export.version}
-    </spring.osgi.export>
-    
-  	<spring.osgi.private.pkg>
-		org.springframework.osgi.test.internal.util.jar*,
-		org.springframework.osgi.io.internal*,
-		org.springframework.osgi.web.*internal*
-	</spring.osgi.private.pkg>
-
-	<spring.osgi.import.pkg>
-		javax.servlet;version=${servlet.version},
-		org.mortbay*;version=${jetty.osgi.version};resolution:=optional,
-		org.apache.catalina*;version=${catalina.osgi.version};resolution:=optional,
-		org.apache.jasper;resolution:=optional,
-		org.apache.jasper.servlet;resolution:=optional,
-		org.osgi.service.packageadmin;version=1.2;resolution:=optional,
-		org.springframework.web*;version=${spring.base.version};resolution:=optional
-	</spring.osgi.import.pkg>
-	
 	<spring.osgi.symbolic.name>${symName.prefix}.web</spring.osgi.symbolic.name>
+	
+    <jarjar.run>on</jarjar.run>
+	<jarjar.keep>org.springframework.osgi.web.**</jarjar.keep>
+    <jarjar.dep>${maven.dependency.org.springframework.osgi.spring-osgi-test.jar.path}</jarjar.dep>
+    <jarjar.dep.1>${maven.dependency.org.springframework.osgi.spring-osgi-io.jar.path}</jarjar.dep.1>
+    <jarjar.dep.1.exclude>org/springframework/osgi/io/*</jarjar.dep.1.exclude>
+    <jarjar.dep.1.include>org/springframework/osgi/io/internal/**</jarjar.dep.1.include>
   </properties>
   
   <dependencies>
@@ -111,8 +96,6 @@
       <scope>provided</scope>
     </dependency> 
 
-   <!-- we add this dependencies so that the BND plugin can determine their versions -->
-   <!-- they are transitive so it makes sense to use a property instead -->
    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>org.springframework.aop</artifactId>

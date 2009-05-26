@@ -13,10 +13,8 @@
   <url>http://www.springframework.org/osgi</url>
   
   <properties>
-    <!-- root, empty package -->
-    <!-- plugin not yet enabled to avoid further problems -->
-	<spring.osgi.import.pkg>!org.springframework.osgi.iandt, *</spring.osgi.import.pkg>
-	<spring.osgi.export.pkg>${pom.artifactId}*</spring.osgi.export.pkg>
+	
+	<bundlor.enabled>false</bundlor.enabled>
   </properties>
   
   <!-- shared dependencies -->
