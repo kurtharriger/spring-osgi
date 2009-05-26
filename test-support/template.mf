@@ -13,6 +13,7 @@ Import-Template:
  org.apache.felix.*;resolution:=optional,
  junit.*;version=3.8,
  *;resolution:=optional
+Bundle-Activator: org.springframework.osgi.test.internal.support.Activator
 Unversioned-Imports: 
  *
  

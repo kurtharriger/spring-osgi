@@ -6,4 +6,3 @@ Import-Template:
  org.springframework.*;version=${spring.version.range},
  org.apache.commons.logging.*;version=${logging.version.range},
  *;resolution:=optional
-Unversioned-Imports: 

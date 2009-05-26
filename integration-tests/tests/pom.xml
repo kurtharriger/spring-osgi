@@ -11,9 +11,12 @@
     <packaging>jar</packaging>
     <name>Spring OSGi Integration Tests</name>
     <url>http://www.springframework.org/osgi</url>
+
+    <properties>
+       <bundlor.enabled>false</bundlor.enabled>
+    </properties>
   
     <dependencies>
-
         <!-- config admin (from Felix) -->
         <dependency>
 		   <groupId>org.apache.felix</groupId>

@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.osgi</groupId>
   <artifactId>spring-osgi-core</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <url>http://www.springframework.org/osgi</url>
   <name>Spring OSGi Core</name>
   <description>
@@ -20,27 +20,8 @@
     
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 
-  	<spring.osgi.export>
-  	    !org.springframework.osgi.io*,
-  	    !org.springframework.osgi*internal*,
-  	    org.springframework.osgi*;version=${spring.osgi.export.version}
-  	</spring.osgi.export>
-
-	<!-- import property editors which are loaded reflectively -->
-	<spring.osgi.import.pkg>
-		org.aopalliance*;version="0.0.0",
-		org.springframework.aop;version=${spring.base.version},
-		org.springframework.beans.propertyeditors;version=${spring.base.version},
-		org.osgi.service.cm;version=1.2;resolution:=optional,
-		org.osgi.service.startlevel;version=1.0;resolution:=optional,
-	</spring.osgi.import.pkg>
-	
-	<spring.osgi.private.pkg>
-		!org.springframework.osgi.io*,
-  	    org.springframework.osgi*internal*
-	</spring.osgi.private.pkg>
-			
 	<spring.osgi.symbolic.name>${symName.prefix}.core</spring.osgi.symbolic.name>
+	
   </properties>
   
   <dependencies>
@@ -74,7 +55,6 @@
       <artifactId>org.springframework.test</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.aopalliance</groupId>
       <artifactId>com.springsource.org.aopalliance</artifactId>
@@ -103,6 +83,6 @@
         <scope>provided</scope>
         <version>2.0.0-m1-SNAPSHOT</version>
     </dependency>
-    
   </dependencies>
+  
 </project>

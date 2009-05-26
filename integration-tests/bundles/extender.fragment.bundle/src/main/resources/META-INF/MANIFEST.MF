@@ -4,3 +4,4 @@ Bundle-SymbolicName: org.springframework.osgi.iandt.extender.fragment.configurat
 Bundle-Name: ExtenderConfigurationFragment
 Bundle-Vendor: Spring Framework
 Fragment-Host: org.springframework.osgi.extender
+Import-Package: org.osgi.service.packageadmin

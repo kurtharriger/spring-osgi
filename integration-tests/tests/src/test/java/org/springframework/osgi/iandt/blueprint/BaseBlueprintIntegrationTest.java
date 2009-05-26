@@ -51,7 +51,7 @@ public abstract class BaseBlueprintIntegrationTest extends BaseIntegrationTest {
 
 		// install the rfc 124 big bundle
 		list.add("org.springframework.osgi.rfc124,api," + getSpringDMVersion());
-		list.add("org.springframework.osgi.rfc124.ri,all," + getSpringDMVersion());
+		list.add("org.springframework.osgi.rfc124.ri,uber," + getSpringDMVersion());
 
 		System.out.println(list);
 		return list.toArray(new String[list.size()]);

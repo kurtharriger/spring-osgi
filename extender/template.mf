@@ -14,5 +14,4 @@ Import-Template:
  org.springframework.osgi.*;version=${spring.osgi.version.range},
  org.springframework.*;version=${spring.version.range},
  *;resolution:=optional
-Unversioned-Imports: 
- *
+Bundle-Activator: org.springframework.osgi.extender.internal.activator.ChainActivator
