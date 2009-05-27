@@ -19,6 +19,7 @@ package org.springframework.osgi.config;
 
 import java.util.Locale;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -61,7 +62,6 @@ class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		}
 	};
 
-
 	private static final String ACTION = "action";
 
 	private static final String DESTROY_ACTION = "destroy-action";
@@ -73,7 +73,6 @@ class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	private static final String DESTROY_ACTION_PROP = "destroyAction";
 
 	private static final String BUNDLE_PROP = "bundle";
-
 
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		BundleActionCallback callback = new BundleActionCallback();
@@ -90,15 +89,16 @@ class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 				if (nd instanceof Element) {
 					foundElement = true;
 					Object obj = parserContext.getDelegate().parsePropertySubElement((Element) nd,
-						builder.getBeanDefinition());
+							builder.getBeanDefinition());
 					builder.addPropertyValue(BUNDLE_PROP, obj);
 				}
 			}
 		}
+
+		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 	}
 
 	protected Class getBeanClass(Element element) {
 		return BundleFactoryBean.class;
 	}
-
 }

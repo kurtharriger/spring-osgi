@@ -101,5 +101,4 @@ class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionParser {
 	protected void applyDefaultTimeout(BeanDefinitionBuilder builder, OsgiDefaultsDefinition defaults) {
 		builder.addPropertyValue(TIMEOUT_PROP, new TypedStringValue(defaults.getTimeout()));
 	}
-
 }

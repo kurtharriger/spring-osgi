@@ -16,6 +16,7 @@
 
 package org.springframework.osgi.config;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -53,6 +54,7 @@ class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	}
 
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		// parse attributes
 		ParserUtils.parseCustomAttributes(element, builder, new ServiceAttributeCallback());
 
