@@ -82,6 +82,7 @@ public abstract class ServiceParsingUtils {
 		// extract registration/unregistration attributes from
 		// <osgi:registration-listener>
 		BeanDefinitionBuilder localBuilder = BeanDefinitionBuilder.rootBeanDefinition(OsgiServiceRegistrationListenerAdapter.class);
+		localBuilder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 
 		NamedNodeMap attrs = element.getAttributes();
 		for (int x = 0; x < attrs.getLength(); x++) {

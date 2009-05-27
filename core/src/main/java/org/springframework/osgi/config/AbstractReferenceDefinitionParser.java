@@ -164,13 +164,14 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
-
+		
 		Class beanClass = getBeanClass(element);
 		Assert.notNull(beanClass);
 
 		if (beanClass != null) {
 			builder.getRawBeanDefinition().setBeanClass(beanClass);
 		}
+		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 
 		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
 		if (parserContext.isNested()) {
@@ -195,6 +196,8 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 				id.append(value);
 				id.append(BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR);
 			}
+			// disable autowiring for promoted bean
+			def.setAutowireCandidate(false);
 
 			id.append(parserContext.getReaderContext().generateBeanName(def));
 			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, id.toString());
@@ -411,7 +414,8 @@ abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefinitionP
 
 			// create serviceListener adapter
 			RootBeanDefinition wrapperDef = new RootBeanDefinition(OsgiServiceLifecycleListenerAdapter.class);
-
+			wrapperDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			
 			// set the target name (if we have one)
 			if (targetName != null)
 				vals.addPropertyValue(TARGET_BEAN_NAME_PROP, targetName);
