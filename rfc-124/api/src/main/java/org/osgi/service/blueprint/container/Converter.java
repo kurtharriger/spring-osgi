@@ -13,27 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osgi.service.blueprint.convert;
+package org.osgi.service.blueprint.container;
 
 /**
- * Implemented by type converters that extend the type conversion
- * capabilties of a module context container.
+ * Provides access to the type conversions (both predefined and user registered)
+ * that are defined for the blueprint container.
  */
 public interface Converter {
-	
-	/**
-	 * The type that this converter converts String values into.
-	 * @return Class object for the class that this converter converts to
-	 */
-	Class getTargetClass();
 
 	/**
-	 * Convert an object to an instance of the target class.
-	 * @param source the object to be converted
-	 * @return an instance of the class returned by getTargetClass
+	 * Check if the converter is able to convert the given value to the specified
+	 * type.
+	 *
+	 * @return <code>true</code> if the conversion is possible, <code>false</code> otherwise.
+	 */
+	boolean canConvert(Object fromValue, Class toType);
+
+	/**
+	 * Convert an object to an instance of the given class, using the built-in and 
+	 * user-registered type converters as necessary.
+	 * @param fromValue the object to be converted
+	 * @param toType the type that the instance is to be converted to
+	 * @return an instance of the class 'toType'
 	 * @throws Exception if the conversion cannot succeed. This exception is
 	 * checked because callers should expect that not all source objects
 	 * can be successfully converted.
 	 */
-	Object convert(Object source) throws Exception;
+	Object convert(Object fromValue, Class toType) throws Exception;
+	
 }
