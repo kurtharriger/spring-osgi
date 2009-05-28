@@ -32,7 +32,7 @@ public class BundleContextApiTest extends BaseMetadataTest {
 	}
 
 	public void testComponentNames() throws Exception {
-		Set<String> names = blueprintContainer.getComponentNames();
+		Set<String> names = blueprintContainer.getComponentIds();
 		assertEquals(7, names.size());
 	}
 
@@ -46,7 +46,7 @@ public class BundleContextApiTest extends BaseMetadataTest {
 	}
 
 	private void checkBeanAssertion(String name) {
-		assertSame(applicationContext.getBean(name), blueprintContainer.getComponent(name));
+		assertSame(applicationContext.getBean(name), blueprintContainer.getComponentInstance(name));
 	}
 
 	public void testComponentMetadata() {

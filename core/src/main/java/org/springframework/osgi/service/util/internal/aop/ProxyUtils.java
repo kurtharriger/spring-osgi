@@ -36,8 +36,8 @@ public abstract class ProxyUtils {
 
 	public static Object createProxy(Class<?>[] classes, Object target, ClassLoader classLoader,
 			BundleContext bundleContext, List advices) {
-		return createProxy(classes, target, classLoader, bundleContext,
-			(advices != null ? (Advice[]) advices.toArray(new Advice[advices.size()]) : new Advice[0]));
+		return createProxy(classes, target, classLoader, bundleContext, (advices != null ? (Advice[]) advices
+				.toArray(new Advice[advices.size()]) : new Advice[0]));
 	}
 
 	public static Object createProxy(Class<?>[] classes, Object target, final ClassLoader classLoader,
@@ -59,14 +59,13 @@ public abstract class ProxyUtils {
 		factory.setFrozen(true);
 		factory.setOpaque(true);
 		try {
-			return AccessController.doPrivileged(new PrivilegedAction() {
+			return AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
 				public Object run() {
 					return factory.getProxy(classLoader);
 				}
 			});
-		}
-		catch (NoClassDefFoundError ncdfe) {
+		} catch (NoClassDefFoundError ncdfe) {
 			DebugUtils.debugClassLoadingThrowable(ncdfe, bundleContext.getBundle(), classes);
 			throw ncdfe;
 		}

@@ -35,7 +35,7 @@ import org.springframework.beans.factory.config.TypedStringValue;
 /**
  * @author Costin Leau
  */
-public class LocalComponentMetadataTest extends BaseMetadataTest {
+public class BeanComponentMetadataTest extends BaseMetadataTest {
 
 	@Override
 	protected String getConfig() {
@@ -104,7 +104,7 @@ public class LocalComponentMetadataTest extends BaseMetadataTest {
 	}
 
 	public void testNanDouble() throws Exception {
-		System.out.println(blueprintContainer.getComponent("nan"));
+		System.out.println(blueprintContainer.getComponentInstance("nan"));
 		BeanMetadata localMetadata = getLocalMetadata("set");
 		System.out.println(localMetadata.getProperties());
 	}

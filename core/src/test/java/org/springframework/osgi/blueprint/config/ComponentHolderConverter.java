@@ -16,7 +16,7 @@
 
 package org.springframework.osgi.blueprint.config;
 
-import org.osgi.service.blueprint.convert.Converter;
+import org.osgi.service.blueprint.container.Converter;
 
 /**
  * Dummy converter used for testing.
@@ -26,13 +26,13 @@ import org.osgi.service.blueprint.convert.Converter;
  */
 public class ComponentHolderConverter implements Converter {
 
-	public Object convert(Object value) throws RuntimeException {
-		ComponentHolder comp = new ComponentHolder();
-		comp.setProperty(value);
-		return comp;
+	public boolean canConvert(Object fromValue, Class toType) {
+		return ComponentHolder.class.equals(toType);
 	}
 
-	public Class<?> getTargetClass() {
-		return ComponentHolder.class;
+	public Object convert(Object fromValue, Class toType) throws Exception {
+		ComponentHolder comp = new ComponentHolder();
+		comp.setProperty(fromValue);
+		return comp;
 	}
 }

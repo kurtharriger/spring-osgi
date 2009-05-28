@@ -55,39 +55,27 @@ import org.springframework.util.StringUtils;
 
 /**
  * 
- * <code>AbstractRefreshableApplicationContext</code> subclass that implements
- * the {@link ConfigurableOsgiBundleApplicationContext} interface for OSGi
- * environments. Pre-implements a <code>configLocation</code> property, to be
- * populated through the <code>ConfigurableOsgiApplicationContext</code>
+ * <code>AbstractRefreshableApplicationContext</code> subclass that implements the
+ * {@link ConfigurableOsgiBundleApplicationContext} interface for OSGi environments. Pre-implements a
+ * <code>configLocation</code> property, to be populated through the <code>ConfigurableOsgiApplicationContext</code>
  * interface after OSGi bundle startup.
  * 
- * <p>
- * This class is as easy to subclass as
- * <code>AbstractRefreshableApplicationContext</code>(see the javadoc for
- * details): all you need to implement is the <code>loadBeanDefinitions</code>
- * method Note that implementations are supposed to load bean definitions from
- * the files specified by the locations returned by
+ * <p> This class is as easy to subclass as <code>AbstractRefreshableApplicationContext</code>(see the javadoc for
+ * details): all you need to implement is the <code>loadBeanDefinitions</code> method Note that implementations are
+ * supposed to load bean definitions from the files specified by the locations returned by
  * <code>getConfigLocations</code> method.
  * 
- * <p>
- * In addition to the special beans detected by
- * <code>AbstractApplicationContext</code>, this class registers the
- * <code>BundleContextAwareProcessor</code> for processing beans that implement
- * the <code>BundleContextAware</code> interface. Also it interprets resource
- * paths as OSGi bundle resources (either from the bundle class space, bundle
+ * <p> In addition to the special beans detected by <code>AbstractApplicationContext</code>, this class registers the
+ * <code>BundleContextAwareProcessor</code> for processing beans that implement the <code>BundleContextAware</code>
+ * interface. Also it interprets resource paths as OSGi bundle resources (either from the bundle class space, bundle
  * space or jar space).
  * 
- * <p>
- * This application context implementation offers the OSGi-specific,
- * <em>bundle</em> scope.
+ * <p> This application context implementation offers the OSGi-specific, <em>bundle</em> scope.
  * 
- * <p>
- * <strong>Note:</strong> <code>OsgiApplicationContext</code> implementations
- * are generally supposed to configure themselves based on the configuration
- * received through the <code>ConfigurableOsgiBundleApplicationContext</code>
- * interface. In contrast, a stand-alone application context might allow for
- * configuration in custom startup code (for example,
- * <code>GenericApplicationContext</code>).
+ * <p> <strong>Note:</strong> <code>OsgiApplicationContext</code> implementations are generally supposed to configure
+ * themselves based on the configuration received through the <code>ConfigurableOsgiBundleApplicationContext</code>
+ * interface. In contrast, a stand-alone application context might allow for configuration in custom startup code (for
+ * example, <code>GenericApplicationContext</code>).
  * 
  * @author Costin Leau
  * @author Adrian Colyer
@@ -98,6 +86,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		ConfigurableOsgiBundleApplicationContext {
 
 	private static final String EXPORTER_IMPORTER_DEPENDENCY_MANAGER = "org.springframework.osgi.service.dependency.internal.MandatoryDependencyBeanPostProcessor";
+	private static final String BLUEPRINT_BUNDLE = "blueprintBundle";
+	private static final String BLUEPRINT_BUNDLE_CONTEXT = "blueprintBundleContext";
 
 	/** OSGi bundle - determined from the BundleContext */
 	private Bundle bundle;
@@ -118,16 +108,13 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	private ClassLoader classLoader;
 
 	/**
-	 * Internal pattern resolver. The parent one can't be used since it is being
-	 * instantiated inside the constructor when the bundle field is not
-	 * initialized yet.
+	 * Internal pattern resolver. The parent one can't be used since it is being instantiated inside the constructor
+	 * when the bundle field is not initialized yet.
 	 */
 	private ResourcePatternResolver osgiPatternResolver;
 
-
 	/**
-	 * Creates a new <code>AbstractOsgiBundleApplicationContext</code> with no
-	 * parent.
+	 * Creates a new <code>AbstractOsgiBundleApplicationContext</code> with no parent.
 	 */
 	public AbstractOsgiBundleApplicationContext() {
 		super();
@@ -135,8 +122,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	/**
-	 * Creates a new <code>AbstractOsgiBundleApplicationContext</code> with the
-	 * given parent context.
+	 * Creates a new <code>AbstractOsgiBundleApplicationContext</code> with the given parent context.
 	 * 
 	 * @param parent the parent context
 	 */
@@ -147,11 +133,9 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p/>
-	 * Will automatically determine the bundle, create a new
-	 * <code>ResourceLoader</code> (and set its <code>ClassLoader</code> (if
-	 * none is set already) to a custom implementation that will delegate the
-	 * calls to the bundle).
+	 * <p/> Will automatically determine the bundle, create a new <code>ResourceLoader</code> (and set its
+	 * <code>ClassLoader</code> (if none is set already) to a custom implementation that will delegate the calls to the
+	 * bundle).
 	 */
 	public void setBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
@@ -178,9 +162,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	/**
-	 * Returns this application context configuration locations. The default
-	 * implementation will check whether there are any locations configured and,
-	 * if not, will return the default locations.
+	 * Returns this application context configuration locations. The default implementation will check whether there are
+	 * any locations configured and, if not, will return the default locations.
 	 * 
 	 * @return application context configuration locations.
 	 * @see #getDefaultConfigLocations()
@@ -206,18 +189,14 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 
 		try {
 			cleanOsgiBundleScope(getBeanFactory());
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			logger.warn("got exception when closing", ex);
 		}
 	}
 
 	/**
-	 * Returns the default configuration locations to use, for the case where no
-	 * explicit configuration locations have been specified.
-	 * <p>
-	 * Default implementation returns <code>null</code>, requiring explicit
-	 * configuration locations.
+	 * Returns the default configuration locations to use, for the case where no explicit configuration locations have
+	 * been specified. <p> Default implementation returns <code>null</code>, requiring explicit configuration locations.
 	 * 
 	 * @return application context default configuration locations
 	 * @see #setConfigLocations
@@ -249,7 +228,10 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		// add predefined beans
 		// bundleContext
 		addPredefinedBean(beanFactory, BUNDLE_CONTEXT_BEAN_NAME, this.bundleContext);
+		addPredefinedBean(beanFactory, BLUEPRINT_BUNDLE_CONTEXT, this.bundleContext);
+
 		addPredefinedBean(beanFactory, BUNDLE_BEAN_NAME, this.bundle);
+		addPredefinedBean(beanFactory, BLUEPRINT_BUNDLE, this.bundle);
 
 		// register property editors
 		registerPropertyEditors(beanFactory);
@@ -263,8 +245,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 		if (!beanFactory.containsLocalBean(name)) {
 			logger.debug("Registering pre-defined bean named " + name);
 			beanFactory.registerSingleton(name, value);
-		}
-		else {
+		} else {
 			logger.warn("A bean named " + name + " already exists; aborting registration of the predefined value...");
 		}
 	}
@@ -285,10 +266,9 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 				try {
 					Class<?> managerClass = loader.loadClass(EXPORTER_IMPORTER_DEPENDENCY_MANAGER);
 					return BeanUtils.instantiateClass(managerClass);
-				}
-				catch (ClassNotFoundException cnfe) {
+				} catch (ClassNotFoundException cnfe) {
 					throw new ApplicationContextException("Cannot load class " + EXPORTER_IMPORTER_DEPENDENCY_MANAGER,
-						cnfe);
+							cnfe);
 				}
 			}
 		});
@@ -319,9 +299,8 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	}
 
 	/**
-	 * Publishes the application context as an OSGi service. The method
-	 * internally takes care of parsing the bundle headers and determined if
-	 * actual publishing is required or not.
+	 * Publishes the application context as an OSGi service. The method internally takes care of parsing the bundle
+	 * headers and determined if actual publishing is required or not.
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
@@ -337,11 +316,11 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 
 			// export only interfaces
 			Class<?>[] classes = org.springframework.osgi.util.internal.ClassUtils.getClassHierarchy(getClass(),
-				org.springframework.osgi.util.internal.ClassUtils.INCLUDE_INTERFACES);
+					org.springframework.osgi.util.internal.ClassUtils.INCLUDE_INTERFACES);
 
 			// filter classes based on visibility
 			Class<?>[] filterClasses = org.springframework.osgi.util.internal.ClassUtils.getVisibleClasses(classes,
-				this.getClass().getClassLoader());
+					this.getClass().getClassLoader());
 
 			String[] serviceNames = org.springframework.osgi.util.internal.ClassUtils.toStringArray(filterClasses);
 
@@ -350,8 +329,7 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 
 			// Publish under all the significant interfaces we see
 			this.serviceRegistration = getBundleContext().registerService(serviceNames, this, serviceProperties);
-		}
-		else {
+		} else {
 			if (logger.isInfoEnabled()) {
 				logger.info("Not publishing application context OSGi service for bundle "
 						+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
@@ -367,30 +345,24 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 			logger.info("Unpublishing application context OSGi service for bundle "
 					+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			serviceRegistration = null;
-		}
-		else {
+		} else {
 			if (publishContextAsService)
 				logger.info("Application Context service already unpublished");
 		}
 	}
 
 	/**
-	 * Customizes the properties of the application context OSGi service. This
-	 * method is called only if the application context will be published as an
-	 * OSGi service.
+	 * Customizes the properties of the application context OSGi service. This method is called only if the application
+	 * context will be published as an OSGi service.
 	 * 
-	 * <p/>
-	 * The default implementation stores the bundle symbolic name under
-	 * {@link Constants#BUNDLE_SYMBOLICNAME} and
-	 * {@link ConfigurableOsgiBundleApplicationContext#APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME}
-	 * and the bundle version under {@link Constants#BUNDLE_VERSION} property.
+	 * <p/> The default implementation stores the bundle symbolic name under {@link Constants#BUNDLE_SYMBOLICNAME} and
+	 * {@link ConfigurableOsgiBundleApplicationContext#APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME} and the bundle version
+	 * under {@link Constants#BUNDLE_VERSION} property.
 	 * 
-	 * Can be overridden by subclasses to add more properties if needed (for
-	 * example for web applications where multiple application contexts are
-	 * available inside the same bundle).
+	 * Can be overridden by subclasses to add more properties if needed (for example for web applications where multiple
+	 * application contexts are available inside the same bundle).
 	 * 
-	 * @param serviceProperties service properties map (can be casted to
-	 *        {@link Dictionary})
+	 * @param serviceProperties service properties map (can be casted to {@link Dictionary})
 	 */
 	protected void customizeApplicationContextServiceProperties(Map<Object, Object> serviceProperties) {
 		serviceProperties.put(APPLICATION_CONTEXT_SERVICE_PROPERTY_NAME, getBundleSymbolicName());

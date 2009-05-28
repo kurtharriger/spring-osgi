@@ -27,10 +27,7 @@ import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.container.NoSuchComponentException;
-import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
-import org.osgi.service.blueprint.reflect.ServiceMetadata;
-import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -58,7 +55,7 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 		this.bundleContext = bundleContext;
 	}
 
-	public Object getComponent(String name) throws NoSuchComponentException {
+	public Object getComponentInstance(String name) throws NoSuchComponentException {
 		if (applicationContext.containsBean(name)) {
 			return applicationContext.getBean(name);
 		} else {
@@ -75,27 +72,19 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 		}
 	}
 
-	public Set<String> getComponentNames() {
+	public Set<String> getComponentIds() {
 		String[] names = applicationContext.getBeanDefinitionNames();
 		Set<String> components = new LinkedHashSet<String>(names.length);
 		CollectionUtils.mergeArrayIntoCollection(names, components);
 		return Collections.unmodifiableSet(components);
 	}
 
-	public Collection<BeanMetadata> getBeanComponentsMetadata() {
-		return getComponentsMetadataFor(BeanMetadata.class);
-	}
-
-	public Collection<ServiceMetadata> getExportedServicesMetadata() {
-		return getComponentsMetadataFor(ServiceMetadata.class);
-	}
-
-	public Collection<ServiceReferenceMetadata> getReferencedServicesMetadata() {
-		return getComponentsMetadataFor(ServiceReferenceMetadata.class);
+	public Collection<?> getMetadata(Class type) {
+		return getComponentMetadata(type);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends ComponentMetadata> List<T> getComponentsMetadataFor(Class<T> clazz) {
+	private <T extends ComponentMetadata> Collection<T> getComponentMetadata(Class<T> clazz) {
 		List<T> filteredMetadata = new ArrayList<T>();
 		List<ComponentMetadata> metadatas = getComponentMetadataForAllComponents();
 
@@ -105,7 +94,7 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 			}
 		}
 
-		return Collections.unmodifiableList(filteredMetadata);
+		return Collections.unmodifiableCollection(filteredMetadata);
 	}
 
 	private List<ComponentMetadata> getComponentMetadataForAllComponents() {
