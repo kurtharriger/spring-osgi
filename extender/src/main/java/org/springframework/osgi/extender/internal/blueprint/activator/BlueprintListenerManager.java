@@ -22,7 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.blueprint.container.BlueprintContainerListener;
+import org.osgi.service.blueprint.container.BlueprintEvent;
+import org.osgi.service.blueprint.container.BlueprintListener;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.CollectionType;
@@ -36,20 +37,20 @@ import org.springframework.osgi.util.BundleDelegatingClassLoader;
  * @author Costin Leau
  * 
  */
-class BlueprintContainerListenerManager implements BlueprintContainerListener, DisposableBean {
+class BlueprintListenerManager implements BlueprintListener, DisposableBean {
 
 	/** logger */
-	private static final Log log = LogFactory.getLog(BlueprintContainerListenerManager.class);
+	private static final Log log = LogFactory.getLog(BlueprintListenerManager.class);
 
 	private volatile DisposableBean cleanupHook;
-	private volatile List<BlueprintContainerListener> listeners;
+	private volatile List<BlueprintListener> listeners;
 
-	public BlueprintContainerListenerManager(BundleContext context) {
+	public BlueprintListenerManager(BundleContext context) {
 		OsgiServiceCollectionProxyFactoryBean fb = new OsgiServiceCollectionProxyFactoryBean();
 		fb.setBundleContext(context);
 		fb.setCardinality(Cardinality.C_0__N);
 		fb.setCollectionType(CollectionType.LIST);
-		fb.setInterfaces(new Class[] { BlueprintContainerListener.class });
+		fb.setInterfaces(new Class[] { BlueprintListener.class });
 		fb.setBeanClassLoader(BundleDelegatingClassLoader.createBundleClassLoaderFor(context.getBundle()));
 		fb.afterPropertiesSet();
 
@@ -69,24 +70,12 @@ class BlueprintContainerListenerManager implements BlueprintContainerListener, D
 		}
 	}
 
-	public void contextCreated(Bundle bundle) {
-		for (BlueprintContainerListener listener : listeners) {
+	public void blueprintEvent(BlueprintEvent event) {
+		for (BlueprintListener listener : listeners) {
 			try {
-				listener.contextCreated(bundle);
+				listener.blueprintEvent(event);
 			} catch (Exception ex) {
-				log.warn("#contextCreated threw exception when calling listener " + System.identityHashCode(listener),
-						ex);
-			}
-		}
-	}
-
-	public void contextCreationFailed(Bundle bundle, Throwable ex) {
-		for (BlueprintContainerListener listener : listeners) {
-			try {
-				listener.contextCreationFailed(bundle, ex);
-			} catch (Exception excep) {
-				log.warn("#contextCreationFailed threw exception when calling listener "
-						+ System.identityHashCode(listener), excep);
+				log.warn("exception encountered when calling listener " + System.identityHashCode(listener), ex);
 			}
 		}
 	}

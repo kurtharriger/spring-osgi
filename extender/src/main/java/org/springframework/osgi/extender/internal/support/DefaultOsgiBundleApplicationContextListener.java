@@ -32,7 +32,7 @@ import org.springframework.osgi.extender.internal.activator.ContextLoaderListene
  * @author Costin Leau
  * @author Andy Piper
  */
-public class DefaultOsgiBundleApplicationContextListener implements OsgiBundleApplicationContextListener {
+public class DefaultOsgiBundleApplicationContextListener implements OsgiBundleApplicationContextListener<OsgiBundleApplicationContextEvent> {
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(ContextLoaderListener.class);

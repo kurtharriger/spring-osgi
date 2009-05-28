@@ -34,15 +34,19 @@ import org.springframework.osgi.extender.support.ApplicationContextConfiguration
  * 
  * @author Costin Leau
  */
-public class BlueprintModuleListener extends ContextLoaderListener {
+public class BlueprintLoaderListener extends ContextLoaderListener {
 
 	private volatile EventAdminDispatcher dispatcher;
-	private volatile BlueprintContainerListenerManager listenerManager;
+	private volatile BlueprintListenerManager listenerManager;
+	private volatile Bundle bundle;
+	private volatile BlueprintContainerProcessor contextProcessor;
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		this.listenerManager = new BlueprintContainerListenerManager(context);
+		this.listenerManager = new BlueprintListenerManager(context);
 		this.dispatcher = new EventAdminDispatcher(context);
+		this.bundle = context.getBundle();
+		this.contextProcessor = new BlueprintContainerProcessor(dispatcher, listenerManager, bundle);
 
 		super.start(context);
 	}
@@ -70,7 +74,7 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 
 	@Override
 	protected OsgiContextProcessor createContextProcessor() {
-		return new BlueprintContainerProcessor(dispatcher, listenerManager);
+		return contextProcessor;
 	}
 
 	@Override
@@ -79,20 +83,10 @@ public class BlueprintModuleListener extends ContextLoaderListener {
 	}
 
 	@Override
-	protected void maybeAddNamespaceHandlerFor(Bundle bundle, boolean isLazy) {
-		log.debug("Ignoring namespace handling");
-	}
-
-	@Override
-	protected void maybeRemoveNameSpaceHandlerFor(Bundle bundle) {
-		log.debug("Ignoring namespace handling");
-	}
-
-	@Override
 	protected void addApplicationListener(OsgiBundleApplicationContextEventMulticaster multicaster) {
 		super.addApplicationListener(multicaster);
 		// monitor bootstrapping events
-		multicaster.addApplicationListener(dispatcher);
+		multicaster.addApplicationListener(contextProcessor);
 	}
 
 	protected ApplicationContextConfiguration createContextConfig(Bundle bundle) {

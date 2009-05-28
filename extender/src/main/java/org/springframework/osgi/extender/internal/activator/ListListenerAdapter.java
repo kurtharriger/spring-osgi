@@ -16,40 +16,109 @@
 
 package org.springframework.osgi.extender.internal.activator;
 
-import java.util.Iterator;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.util.tracker.ServiceTracker;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
-import org.springframework.util.Assert;
 
 /**
- * Listener interface that delegates to a list of listener. This is useful in
- * OSGi environments when dealing with dynamic collections which can be updated
- * during iteration.
+ * Listener interface that delegates to a list of listener. This is useful in OSGi environments when dealing with
+ * dynamic collections which can be updated during iteration.
  * 
  * @author Costin Leau
  * 
  */
-class ListListenerAdapter implements OsgiBundleApplicationContextListener {
+@SuppressWarnings("unchecked")
+class ListListenerAdapter implements OsgiBundleApplicationContextListener<OsgiBundleApplicationContextEvent>,
+		InitializingBean, DisposableBean {
 
-	private final List listeners;
+	private static final Class<OsgiBundleApplicationContextListener> LISTENER_CLASS =
+			OsgiBundleApplicationContextListener.class;
 
+	private final ServiceTracker tracker;
+	private final Map<Class<? extends OsgiBundleApplicationContextListener>, Class<? extends OsgiBundleApplicationContextEvent>> eventCache =
+			new WeakHashMap<Class<? extends OsgiBundleApplicationContextListener>, Class<? extends OsgiBundleApplicationContextEvent>>();
 
 	/**
 	 * Constructs a new <code>ListListenerAdapter</code> instance.
 	 * 
 	 * @param listeners
 	 */
-	public ListListenerAdapter(List listeners) {
-		Assert.notNull(listeners);
-		this.listeners = listeners;
+	public ListListenerAdapter(BundleContext bundleContext) {
+		this.tracker = new ServiceTracker(bundleContext, OsgiBundleApplicationContextListener.class.getName(), null);
+	}
+
+	public void afterPropertiesSet() {
+		this.tracker.open();
+	}
+
+	public void destroy() {
+		this.tracker.close();
+		eventCache.clear();
 	}
 
 	public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			OsgiBundleApplicationContextListener osgiListener = (OsgiBundleApplicationContextListener) iterator.next();
-			osgiListener.onOsgiApplicationEvent(event);
+		OsgiBundleApplicationContextListener[] listeners =
+				(OsgiBundleApplicationContextListener[]) tracker.getServices();
+
+		synchronized (eventCache) {
+			for (OsgiBundleApplicationContextListener listener : listeners) {
+				Class<? extends OsgiBundleApplicationContextListener> listenerClass = listener.getClass();
+				Class<? extends OsgiBundleApplicationContextEvent> eventType = eventCache.get(listenerClass);
+				if (eventType == null) {
+					eventType = getGenericEventType(listenerClass);
+					eventCache.put(listenerClass, eventType);
+				}
+				if (eventType.isInstance(event)) {
+					listener.onOsgiApplicationEvent(event);
+				}
+			}
 		}
+	}
+
+	static Class<? extends OsgiBundleApplicationContextEvent> getGenericEventType(
+			Class<? extends OsgiBundleApplicationContextListener> clazz) {
+		return getGenericEventType(clazz, clazz);
+	}
+
+	// taken from Spring Framework
+	private static Class<? extends OsgiBundleApplicationContextEvent> getGenericEventType(
+			Class<? extends OsgiBundleApplicationContextListener> currentClass,
+			Class<? extends OsgiBundleApplicationContextListener> ownerClass) {
+		Class<?> classToIntrospect = currentClass;
+		while (classToIntrospect != null) {
+			Type[] ifcs = classToIntrospect.getGenericInterfaces();
+			for (Type ifc : ifcs) {
+				if (ifc instanceof ParameterizedType) {
+					ParameterizedType paramIfc = (ParameterizedType) ifc;
+					Type rawType = paramIfc.getRawType();
+					if (LISTENER_CLASS.equals(rawType)) {
+						Type arg = paramIfc.getActualTypeArguments()[0];
+						if (arg instanceof TypeVariable) {
+							arg = GenericTypeResolver.resolveTypeVariable((TypeVariable) arg, ownerClass);
+						}
+						if (arg instanceof Class) {
+							return (Class) arg;
+						}
+					} else if (LISTENER_CLASS.isAssignableFrom((Class) rawType)) {
+						return getGenericEventType((Class) rawType, ownerClass);
+					}
+				} else if (LISTENER_CLASS.isAssignableFrom((Class) ifc)) {
+					return getGenericEventType((Class) ifc, ownerClass);
+				}
+			}
+			classToIntrospect = classToIntrospect.getSuperclass();
+		}
+		return OsgiBundleApplicationContextEvent.class;
 	}
 }

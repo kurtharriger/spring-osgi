@@ -24,31 +24,34 @@ import org.osgi.service.event.EventConstants;
  */
 interface BlueprintConstants {
 
-	public static final String BUNDLE = "bundle";
-	public static final String BUNDLE_ID = "bundle.id";
-	public static final String BUNDLE_NAME = "bundle.name";
-	public static final String BUNDLE_SYM_NAME = EventConstants.BUNDLE_SYMBOLICNAME;
-	public static final String BUNDLE_VERSION = "bundle.version";
-	public static final String TIMESTAMP = EventConstants.TIMESTAMP;
+	static final String BUNDLE = "bundle";
+	static final String BUNDLE_ID = "bundle.id";
+	static final String BUNDLE_NAME = "bundle.name";
+	static final String BUNDLE_SYM_NAME = EventConstants.BUNDLE_SYMBOLICNAME;
+	static final String BUNDLE_VERSION = "bundle.version";
+	static final String TIMESTAMP = EventConstants.TIMESTAMP;
 
-	public static final String EXTENDER_BUNDLE = org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE;
-	public static final String EXTENDER_BUNDLE_ID = org.osgi.service.blueprint.container.EventConstants.EXTENDER_ID;
-	public static final String EXTENDER_BUNDLE_SYM_NAME = org.osgi.service.blueprint.container.EventConstants.EXTENDER_SYMBOLICNAME;
+	static final String EVENT = EventConstants.EVENT;
 
-	public static final String EXCEPTION = EventConstants.EXCEPTION;
-	public static final String EXCEPTION_CLASS = EventConstants.EXECPTION_CLASS;
-	public static final String EXCEPTION_MESSAGE = EventConstants.EXCEPTION_MESSAGE;
+	static final String EXTENDER_BUNDLE = org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE;
+	static final String EXTENDER_BUNDLE_ID = org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE_ID;
+	static final String EXTENDER_BUNDLE_SYM_NAME = org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE_SYMBOLICNAME;
+	static final String EXTENDER_BUNDLE_VERSION = org.osgi.service.blueprint.container.EventConstants.EXTENDER_BUNDLE_VERSION;
 
-	public static final String SERVICE_OBJECTCLASS = EventConstants.SERVICE_OBJECTCLASS;
-	public static final String SERVICE_FILTER = "service.filter";
+	static final String EXCEPTION = EventConstants.EXCEPTION;
+	static final String EXCEPTION_CLASS = EventConstants.EXECPTION_CLASS;
+	static final String EXCEPTION_MESSAGE = EventConstants.EXCEPTION_MESSAGE;
 
-	public static final String TOPIC_BLUEPRINT_EVENTS = "org/osgi/service/blueprint";
-	public static final String TOPIC_CREATING = TOPIC_BLUEPRINT_EVENTS + "/container/CREATING";
-	public static final String TOPIC_CREATED = TOPIC_BLUEPRINT_EVENTS + "/container/CREATED";
-	public static final String TOPIC_DESTROYING = TOPIC_BLUEPRINT_EVENTS + "/container/DESTROYING";
-	public static final String TOPIC_DESTROYED = TOPIC_BLUEPRINT_EVENTS + "/container/DESTROYED";
-	public static final String TOPIC_WAITING = TOPIC_BLUEPRINT_EVENTS + "/container/WAITING";
-	public static final String TOPIC_FAILURE = TOPIC_BLUEPRINT_EVENTS + "/container/FAILURE";
+	static final String SERVICE_OBJECTCLASS = EventConstants.SERVICE_OBJECTCLASS;
+	static final String SERVICE_FILTER = "service.filter";
 
-	public static final String EVENT_FILTER = EventConstants.EVENT_FILTER;
+	static final String TOPIC_BLUEPRINT_EVENTS = "org/osgi/service/blueprint";
+	static final String TOPIC_CREATING = TOPIC_BLUEPRINT_EVENTS + "/container/CREATING";
+	static final String TOPIC_CREATED = TOPIC_BLUEPRINT_EVENTS + "/container/CREATED";
+	static final String TOPIC_DESTROYING = TOPIC_BLUEPRINT_EVENTS + "/container/DESTROYING";
+	static final String TOPIC_DESTROYED = TOPIC_BLUEPRINT_EVENTS + "/container/DESTROYED";
+	static final String TOPIC_WAITING = TOPIC_BLUEPRINT_EVENTS + "/container/WAITING";
+	static final String TOPIC_FAILURE = TOPIC_BLUEPRINT_EVENTS + "/container/FAILURE";
+
+	static final String EVENT_FILTER = EventConstants.EVENT_FILTER;
 }
