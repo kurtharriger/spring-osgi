@@ -13,32 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.osgi.extender.internal.activator;
 
-package org.springframework.osgi.extender.internal.blueprint.event;
-
-import org.osgi.service.blueprint.container.BlueprintEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 
 /**
- * Dispatcher of {@link OsgiBundleApplicationContextEvent events}. Normally used as an adapter to other event
- * infrastructure such as {@link org.springframework.context.EventAdmin}. If the need arises, this interface might be
- * promoted and moved into Spring DM core.
- * 
  * @author Costin Leau
  */
-interface EventDispatcher {
+public class GenericListener implements OsgiBundleApplicationContextListener<OsgiBundleApplicationContextEvent> {
 
-	void beforeClose(BlueprintEvent event);
+	public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
+	}
 
-	void beforeRefresh(BlueprintEvent event);
-
-	void afterClose(BlueprintEvent event);
-
-	void afterRefresh(BlueprintEvent event);
-
-	void refreshFailure(BlueprintEvent event);
-
-	void waiting(BlueprintEvent event);
-
-	void grace(BlueprintEvent event);
 }

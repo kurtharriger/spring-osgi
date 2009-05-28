@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.springframework.osgi.extender.internal.blueprint.activator.BlueprintModuleListener;
+import org.springframework.osgi.extender.internal.blueprint.activator.BlueprintLoaderListener;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -41,7 +41,7 @@ public class ChainActivator implements BundleActivator {
 	public ChainActivator() {
 		if (BLUEPRINT_AVAILABLE) {
 			log.info("Blueprint API detected; enabling Blueprint extender");
-			CHAIN = new BundleActivator[] { new ContextLoaderListener(), new BlueprintModuleListener() };
+			CHAIN = new BundleActivator[] { new ContextLoaderListener(), new BlueprintLoaderListener() };
 		} else {
 			log.info("Blueprint API not found; disabling Blueprint extender");
 			CHAIN = new BundleActivator[] { new ContextLoaderListener() };

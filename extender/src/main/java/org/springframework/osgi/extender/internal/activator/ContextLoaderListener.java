@@ -31,7 +31,6 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.CachedIntrospectionResults;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
@@ -226,7 +225,8 @@ public class ContextLoaderListener implements BundleActivator {
 		}
 	}
 
-	private class RefreshEventPropagater implements OsgiBundleApplicationContextListener {
+	private class RefreshEventPropagater implements
+			OsgiBundleApplicationContextListener<OsgiBundleApplicationContextEvent> {
 
 		public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
 			if (event instanceof OsgiBundleContextRefreshedEvent) {
@@ -275,16 +275,10 @@ public class ContextLoaderListener implements BundleActivator {
 
 	private volatile OsgiBundleApplicationContextEventMulticaster multicaster;
 
-	/** listeners interested in monitoring managed OSGi appCtxs */
-	private List<?> applicationListeners;
-
-	/** dynamicList clean up hook */
-	private DisposableBean applicationListenersCleaner;
-
 	private volatile LifecycleManager lifecycleManager;
 	private volatile VersionMatcher versionMatcher;
-
 	private volatile OsgiContextProcessor processor;
+	private volatile ListListenerAdapter osgiListeners;
 
 	/**
 	 * <p/> Called by OSGi when this bundle is started. Finds all previously resolved bundles and adds namespace
@@ -318,8 +312,9 @@ public class ContextLoaderListener implements BundleActivator {
 		initListenerService();
 
 		// initialize the configuration once namespace handlers have been detected
-		lifecycleManager = new LifecycleManager(extenderConfiguration, versionMatcher, createContextConfigFactory(),
-				this.processor, bundleContext);
+		lifecycleManager =
+				new LifecycleManager(extenderConfiguration, versionMatcher, createContextConfigFactory(),
+						this.processor, bundleContext);
 
 		// Step 3: discover the bundles that are started
 		// and require context creation
@@ -426,28 +421,22 @@ public class ContextLoaderListener implements BundleActivator {
 		// clear the namespace registry
 		nsManager.destroy();
 
-		// release listeners
-		if (applicationListeners != null) {
-			applicationListeners = null;
-			try {
-				applicationListenersCleaner.destroy();
-			} catch (Exception ex) {
-				log.warn("exception thrown while releasing OSGi event listeners", ex);
-			}
-		}
-
 		// release multicaster
 		if (multicaster != null) {
 			multicaster.removeAllListeners();
 			multicaster = null;
 		}
+		// release listeners
+		osgiListeners.destroy();
+		osgiListeners = null;
 
 		extenderConfiguration.destroy();
 	}
 
 	private void initJavaBeansCache() {
-		Class<?>[] classes = new Class<?>[] { OsgiServiceFactoryBean.class, OsgiServiceProxyFactoryBean.class,
-				OsgiServiceCollectionProxyFactoryBean.class };
+		Class<?>[] classes =
+				new Class<?>[] { OsgiServiceFactoryBean.class, OsgiServiceProxyFactoryBean.class,
+						OsgiServiceCollectionProxyFactoryBean.class };
 
 		CachedIntrospectionResults.acceptClassLoader(OsgiStringUtils.class.getClassLoader());
 
@@ -503,24 +492,8 @@ public class ContextLoaderListener implements BundleActivator {
 	}
 
 	protected void addApplicationListener(OsgiBundleApplicationContextEventMulticaster multicaster) {
-		createListenersList();
+		osgiListeners = new ListListenerAdapter(bundleContext);
 		// register the listener that does the dispatching
-		multicaster.addApplicationListener(new ListListenerAdapter(applicationListeners));
-	}
-
-	/**
-	 * Creates a dynamic OSGi list of OSGi services interested in receiving events for OSGi application contexts.
-	 */
-	private void createListenersList() {
-		OsgiServiceCollectionProxyFactoryBean fb = new OsgiServiceCollectionProxyFactoryBean();
-		fb.setBundleContext(bundleContext);
-		fb.setCardinality(Cardinality.C_0__N);
-		fb.setCollectionType(CollectionType.LIST);
-		fb.setInterfaces(new Class<?>[] { OsgiBundleApplicationContextListener.class });
-		fb.setBeanClassLoader(extenderConfiguration.getClassLoader());
-		fb.afterPropertiesSet();
-
-		applicationListenersCleaner = fb;
-		applicationListeners = (List<?>) fb.getObject();
+		multicaster.addApplicationListener(osgiListeners);
 	}
 }

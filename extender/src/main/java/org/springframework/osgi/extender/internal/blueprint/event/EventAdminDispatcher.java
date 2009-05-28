@@ -19,24 +19,22 @@ package org.springframework.osgi.extender.internal.blueprint.event;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
-import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.osgi.service.blueprint.container.BlueprintEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
-import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
 import org.springframework.util.ClassUtils;
 
 /**
- * Dispatcher that transforms Spring application context lifecycle events into
- * notifications to the OSGi EventAdmin service.
+ * Dispatcher that transforms Spring application context lifecycle events into notifications to the OSGi EventAdmin
+ * service.
  * 
- * <b>Note:</b> This class does not assume the EventAdmin service or classes
- * are available. If the classes are missing, the dispatcher will not publish
- * any events during its life time. If the service is unavailable, the
- * dispatcher will stop sending events until the service becomes available.
+ * <b>Note:</b> This class does not assume the EventAdmin service or classes are available. If the classes are missing,
+ * the dispatcher will not publish any events during its life time. If the service is unavailable, the dispatcher will
+ * stop sending events until the service becomes available.
  * 
  * @author Costin Leau
  */
-public class EventAdminDispatcher implements OsgiBundleApplicationContextListener {
+public class EventAdminDispatcher {
 
 	/** logger */
 	private static final Log log;
@@ -45,82 +43,81 @@ public class EventAdminDispatcher implements OsgiBundleApplicationContextListene
 	private static final boolean eventAdminAvailable;
 
 	static {
-		eventAdminAvailable = ClassUtils.isPresent("org.osgi.service.event.EventAdmin",
-			EventAdminDispatcher.class.getClassLoader());
+		eventAdminAvailable = ClassUtils.isPresent("org.osgi.service.event.EventAdmin", EventAdminDispatcher.class
+				.getClassLoader());
 
 		log = LogFactory.getLog(EventAdminDispatcher.class);
 
 		if (!eventAdminAvailable) {
-			log.info("EventAdmin package not found; no Module Lifecycle Events will be published");
+			log.info("EventAdmin package not found; no Blueprint lifecycle events will be published");
 		}
 	}
 
-
 	/**
-	 * Actual creation of EventAdmin dispatcher. In separate inner class to
-	 * avoid runtime dependency on EventAdmin classes.
+	 * Actual creation of EventAdmin dispatcher. In separate inner class to avoid runtime dependency on EventAdmin
+	 * classes.
 	 * 
 	 * @author Costin Leau
 	 */
 	private static abstract class EventAdminDispatcherFactory {
 
 		private static EventDispatcher createDispatcher(BundleContext bundleContext) {
+			if (log.isTraceEnabled())
+				log.trace("Creating [" + OsgiEventDispatcher.class.getName() + "]");
 			return new OsgiEventDispatcher(bundleContext, PublishType.POST);
 		}
 	}
 
-
 	/** actual dispatcher */
 	private final EventDispatcher dispatcher;
 
-
 	public EventAdminDispatcher(BundleContext bundleContext) {
-		boolean trace = log.isTraceEnabled();
 		if (eventAdminAvailable) {
-			if (trace)
-				log.trace("Creating [org.springframework.osgi.blueprint.context.event.OsgiEventDispatcher]");
 			dispatcher = EventAdminDispatcherFactory.createDispatcher(bundleContext);
-		}
-		else {
+		} else {
 			dispatcher = null;
 		}
 	}
 
-	public void beforeClose(ConfigurableOsgiBundleApplicationContext context) {
+	public void beforeClose(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.beforeClose(context);
+			dispatcher.beforeClose(event);
 		}
 	}
 
-	public void beforeRefresh(ConfigurableOsgiBundleApplicationContext context) {
+	public void beforeRefresh(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.beforeRefresh(context);
+			dispatcher.beforeRefresh(event);
 		}
 	}
 
-	public void afterClose(ConfigurableOsgiBundleApplicationContext context) {
+	public void afterClose(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.afterClose(context);
+			dispatcher.afterClose(event);
 		}
 	}
 
-	public void afterRefresh(ConfigurableOsgiBundleApplicationContext context) {
+	public void afterRefresh(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.afterRefresh(context);
+			dispatcher.afterRefresh(event);
 		}
 	}
 
-	public void refreshFailure(ConfigurableOsgiBundleApplicationContext context, Throwable th) {
+	public void refreshFailure(BlueprintEvent event) {
 		if (dispatcher != null) {
-			dispatcher.refreshFailure(context, th);
+			dispatcher.refreshFailure(event);
 		}
 	}
 
-	public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
+	public void grace(BlueprintEvent event) {
 		if (dispatcher != null) {
-			if (event instanceof BootstrappingDependencyEvent) {
-				dispatcher.waiting((BootstrappingDependencyEvent) event);
-			}
+			dispatcher.grace(event);
+		}
+	}
+
+	public void waiting(BlueprintEvent event) {
+		if (dispatcher != null) {
+			dispatcher.waiting(event);
 		}
 	}
 }

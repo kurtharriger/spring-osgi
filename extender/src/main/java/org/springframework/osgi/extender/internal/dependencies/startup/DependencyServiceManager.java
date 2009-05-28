@@ -1,4 +1,3 @@
-
 package org.springframework.osgi.extender.internal.dependencies.startup;
 
 import java.util.ArrayList;
@@ -29,9 +28,8 @@ import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
- * ServiceListener used for tracking dependent services. Even if the
- * ServiceListener receives event synchronously, mutable properties should be
- * synchronized to guarantee safe publishing between threads.
+ * ServiceListener used for tracking dependent services. Even if the ServiceListener receives event synchronously,
+ * mutable properties should be synchronized to guarantee safe publishing between threads.
  * 
  * @author Costin Leau
  * @author Hal Hildebrand
@@ -41,9 +39,11 @@ public class DependencyServiceManager {
 
 	private static final Log log = LogFactory.getLog(DependencyServiceManager.class);
 
-	protected final Map<MandatoryServiceDependency, String> dependencies = Collections.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
+	protected final Map<MandatoryServiceDependency, String> dependencies = Collections
+			.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
 
-	protected final Map<MandatoryServiceDependency, String> unsatisfiedDependencies = Collections.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
+	protected final Map<MandatoryServiceDependency, String> unsatisfiedDependencies = Collections
+			.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
 
 	private final ContextExecutorAccessor contextStateAccessor;
 
@@ -64,7 +64,6 @@ public class DependencyServiceManager {
 	/** dependency factories */
 	private List<OsgiServiceDependencyFactory> dependencyFactories;
 
-
 	/**
 	 * Actual ServiceListener.
 	 * 
@@ -74,8 +73,8 @@ public class DependencyServiceManager {
 	private class DependencyServiceListener implements ServiceListener {
 
 		/**
-		 * Process serviceChanged events, completing context initialization if
-		 * all the required dependencies are satisfied.
+		 * Process serviceChanged events, completing context initialization if all the required dependencies are
+		 * satisfied.
 		 * 
 		 * @param serviceEvent
 		 */
@@ -123,8 +122,7 @@ public class DependencyServiceManager {
 					// different thread.
 					executeIfDone.run();
 				}
-			}
-			catch (Throwable th) {
+			} catch (Throwable th) {
 				// frameworks will simply not log exception for event handlers
 				log.error("Exception during dependency processing for " + context.getDisplayName(), th);
 				contextStateAccessor.fail(th);
@@ -142,32 +140,31 @@ public class DependencyServiceManager {
 				if (dependency.matches(serviceEvent)) {
 					switch (serviceEvent.getType()) {
 
-						case ServiceEvent.REGISTERED:
-						case ServiceEvent.MODIFIED:
-							unsatisfiedDependencies.remove(dependency);
-							if (debug) {
-								log.debug("Found service for " + context.getDisplayName() + "; eliminating "
-										+ dependency + ", remaining [" + unsatisfiedDependencies + "]");
-							}
+					case ServiceEvent.REGISTERED:
+					case ServiceEvent.MODIFIED:
+						unsatisfiedDependencies.remove(dependency);
+						if (debug) {
+							log.debug("Found service for " + context.getDisplayName() + "; eliminating " + dependency
+									+ ", remaining [" + unsatisfiedDependencies + "]");
+						}
 
-							sendDependencySatisfiedEvent(dependency);
-							break;
+						sendDependencySatisfiedEvent(dependency);
+						break;
 
-						case ServiceEvent.UNREGISTERING:
-							unsatisfiedDependencies.put(dependency, dependency.getBeanName());
-							if (debug) {
-								log.debug("Service unregistered; adding " + dependency);
-							}
-							sendDependencyUnsatisfiedEvent(dependency);
-							break;
-						default: // do nothing
-							if (debug) {
-								log.debug("Unknown service event type for: " + dependency);
-							}
-							break;
+					case ServiceEvent.UNREGISTERING:
+						unsatisfiedDependencies.put(dependency, dependency.getBeanName());
+						if (debug) {
+							log.debug("Service unregistered; adding " + dependency);
+						}
+						sendDependencyUnsatisfiedEvent(dependency);
+						break;
+					default: // do nothing
+						if (debug) {
+							log.debug("Unknown service event type for: " + dependency);
+						}
+						break;
 					}
-				}
-				else {
+				} else {
 					if (trace) {
 						log.trace(dependency + " does not match: "
 								+ OsgiStringUtils.nullSafeToString(serviceEvent.getServiceReference()));
@@ -177,11 +174,9 @@ public class DependencyServiceManager {
 		}
 	}
 
-
 	/**
-	 * Create a dependency manager, indicating the executor bound to, the
-	 * context that contains the dependencies and the task to execute if all
-	 * dependencies are met.
+	 * Create a dependency manager, indicating the executor bound to, the context that contains the dependencies and the
+	 * task to execute if all dependencies are met.
 	 * 
 	 * @param executor
 	 * @param context
@@ -208,16 +203,15 @@ public class DependencyServiceManager {
 		try {
 
 			PrivilegedUtils.executeWithCustomTCCL(context.getClassLoader(),
-				new PrivilegedUtils.UnprivilegedThrowableExecution() {
+					new PrivilegedUtils.UnprivilegedThrowableExecution() {
 
-					public Object run() throws Throwable {
-						doFindDependencies();
-						return null;
-					}
+						public Object run() throws Throwable {
+							doFindDependencies();
+							return null;
+						}
 
-				});
-		}
-		catch (Throwable th) {
+					});
+		} catch (Throwable th) {
 			if (th instanceof Exception)
 				throw ((Exception) th);
 			throw (Error) th;
@@ -248,7 +242,7 @@ public class DependencyServiceManager {
 			log.trace("Looking for dependency factories inside bean factory [" + beanFactory.toString() + "]");
 
 		Map<String, OsgiServiceDependencyFactory> localFactories = BeanFactoryUtils.beansOfTypeIncludingAncestors(
-			beanFactory, OsgiServiceDependencyFactory.class, true, false);
+				beanFactory, OsgiServiceDependencyFactory.class, true, false);
 
 		if (debug)
 			log.debug("Discovered local dependency factories: " + localFactories.keySet());
@@ -261,8 +255,7 @@ public class DependencyServiceManager {
 
 			try {
 				discoveredDependencies = dependencyFactory.getServiceDependencies(bundleContext, beanFactory);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				log.warn("Dependency factory " + dependencyFactory
 						+ " threw exception while detecting dependencies for beanFactory " + beanFactory + " in "
 						+ context.getDisplayName(), ex);
@@ -270,7 +263,8 @@ public class DependencyServiceManager {
 			}
 			// add the dependencies one by one
 			if (discoveredDependencies != null)
-				for (Iterator<OsgiServiceDependency> dependencyIterator = discoveredDependencies.iterator(); dependencyIterator.hasNext();) {
+				for (Iterator<OsgiServiceDependency> dependencyIterator = discoveredDependencies.iterator(); dependencyIterator
+						.hasNext();) {
 					OsgiServiceDependency dependency = dependencyIterator.next();
 					MandatoryServiceDependency msd = new MandatoryServiceDependency(bundleContext, dependency);
 					dependencies.put(msd, dependency.getBeanName());
@@ -305,8 +299,8 @@ public class DependencyServiceManager {
 	}
 
 	/**
-	 * Look at the existing dependencies and create an appropriate filter. This
-	 * method concatenates the filters into one.
+	 * Look at the existing dependencies and create an appropriate filter. This method concatenates the filters into
+	 * one.
 	 * 
 	 * @return
 	 */
@@ -335,29 +329,30 @@ public class DependencyServiceManager {
 
 	// event notification
 	private void sendInitialDependencyEvents() {
-		for (Iterator<MandatoryServiceDependency> iterator = unsatisfiedDependencies.keySet().iterator(); iterator.hasNext();) {
+		for (Iterator<MandatoryServiceDependency> iterator = unsatisfiedDependencies.keySet().iterator(); iterator
+				.hasNext();) {
 			MandatoryServiceDependency entry = iterator.next();
-			OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context,
-				entry.getServiceDependency(), waitTime);
-			BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context,
-				context.getBundle(), nestedEvent);
+			OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context, entry
+					.getServiceDependency(), waitTime);
+			BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, context
+					.getBundle(), nestedEvent);
 			publishEvent(dependencyEvent);
 		}
 	}
 
 	private void sendDependencyUnsatisfiedEvent(MandatoryServiceDependency dependency) {
-		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context,
-			dependency.getServiceDependency(), waitTime);
+		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context, dependency
+				.getServiceDependency(), waitTime);
 		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, context.getBundle(),
-			nestedEvent);
+				nestedEvent);
 		publishEvent(dependencyEvent);
 	}
 
 	private void sendDependencySatisfiedEvent(MandatoryServiceDependency dependency) {
-		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitEndedEvent(context,
-			dependency.getServiceDependency(), waitTime);
+		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitEndedEvent(context, dependency
+				.getServiceDependency(), waitTime);
 		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, context.getBundle(),
-			nestedEvent);
+				nestedEvent);
 		publishEvent(dependencyEvent);
 	}
 
