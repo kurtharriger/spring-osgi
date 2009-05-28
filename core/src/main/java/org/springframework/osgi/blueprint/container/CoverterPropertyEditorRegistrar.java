@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint.convert;
+package org.springframework.osgi.blueprint.container;
 
-import org.osgi.service.blueprint.convert.Converter;
+import org.osgi.service.blueprint.container.Converter;
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
 /**
- * Spring {@link PropertyEditorRegistrar registrar} that handles the
- * registration of RFC 124 {@link Converter converters} inside a bean factory.
+ * Spring {@link PropertyEditorRegistrar registrar} that handles the registration of RFC 124 {@link Converter
+ * converters} inside a bean factory.
  * 
  * @author Costin Leau
  * 
@@ -30,7 +30,6 @@ import org.springframework.beans.PropertyEditorRegistry;
 public class CoverterPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 	private final Converter[] converters;
-
 
 	/**
 	 * Constructs a new <code>CoverterPropertyEditorRegistrar</code> instance.
@@ -43,7 +42,9 @@ public class CoverterPropertyEditorRegistrar implements PropertyEditorRegistrar 
 
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
 		for (Converter converter : converters) {
-			registry.registerCustomEditor(converter.getTargetClass(), new ConverterToPropertyEditorAdapter(converter));
+			// registry.registerCustomEditor(converter.getTargetClass(), new
+			// ConverterToPropertyEditorAdapter(converter));
 		}
+		throw new UnsupportedOperationException("Converters not implemented yet");
 	}
 }

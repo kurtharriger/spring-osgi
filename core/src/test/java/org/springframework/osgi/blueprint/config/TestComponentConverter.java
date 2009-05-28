@@ -16,7 +16,7 @@
 
 package org.springframework.osgi.blueprint.config;
 
-import org.osgi.service.blueprint.convert.Converter;
+import org.osgi.service.blueprint.container.Converter;
 import org.springframework.osgi.blueprint.TestComponent;
 
 /**
@@ -27,13 +27,13 @@ import org.springframework.osgi.blueprint.TestComponent;
  */
 public class TestComponentConverter implements Converter {
 
-	public Object convert(Object value) throws RuntimeException {
-		TestComponent comp = new TestComponent();
-		comp.setPropA(value);
-		return comp;
+	public boolean canConvert(Object fromValue, Class toType) {
+		return TestComponent.class.equals(toType);
 	}
 
-	public Class<?> getTargetClass() {
-		return TestComponent.class;
+	public Object convert(Object fromValue, Class toType) throws Exception {
+		TestComponent comp = new TestComponent();
+		comp.setPropA(fromValue);
+		return comp;
 	}
 }

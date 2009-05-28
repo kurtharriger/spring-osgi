@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.blueprint.convert;
+package org.springframework.osgi.blueprint.container;
 
 import java.beans.PropertyEditorSupport;
 
-import org.osgi.service.blueprint.convert.Converter;
+import org.osgi.service.blueprint.container.Converter;
 import org.springframework.util.Assert;
 
 /**
- * Adapter supporting RFC 124 {@link Converter converters} inside Spring bean
- * factories.
+ * Adapter supporting RFC 124 {@link Converter converters} inside Spring bean factories.
  * 
  * @author Costin Leau
  * 
@@ -31,7 +30,6 @@ import org.springframework.util.Assert;
 public class ConverterToPropertyEditorAdapter extends PropertyEditorSupport {
 
 	private final Converter converter;
-
 
 	/**
 	 * Constructs a new <code>ConverterPropertyEditorAdapter</code> instance.
@@ -50,11 +48,13 @@ public class ConverterToPropertyEditorAdapter extends PropertyEditorSupport {
 
 	@Override
 	public void setValue(Object value) {
-		try {
-			super.setValue(converter.convert(value));
-		}
-		catch (Exception ex) {
-			throw new IllegalArgumentException("Cannot perform conversion", ex);
-		}
+		throw new UnsupportedOperationException("Converters not implemented yet");
+
+		// try {
+		// super.setValue(converter.convert(value));
+		// }
+		// catch (Exception ex) {
+		// throw new IllegalArgumentException("Cannot perform conversion", ex);
+		// }
 	}
 }

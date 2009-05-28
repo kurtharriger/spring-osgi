@@ -19,26 +19,25 @@ package org.springframework.osgi.context.event;
 import java.util.EventListener;
 
 /**
- * OSGi specific listener interested in notifications regarding the life cycle
- * of OSGi application contexts.
+ * OSGi specific listener interested in notifications regarding the life cycle of OSGi application contexts.
  * 
- * <p/> Note that this listener is normally used for distributing events to
- * entities outside the source application context. For events sent inside the
- * application context, consider using an
+ * <p/> Note that this listener is normally used for distributing events to entities outside the source application
+ * context. For events sent inside the application context, consider using an
  * {@link org.springframework.context.ApplicationListener}.
  * 
  * @see OsgiBundleContextRefreshedEvent
  * @see OsgiBundleContextFailedEvent
  * @see OsgiBundleContextClosedEvent
- *
+ * 
  * @author Costin Leau
  */
-public interface OsgiBundleApplicationContextListener extends EventListener {
+public interface OsgiBundleApplicationContextListener<E extends OsgiBundleApplicationContextEvent> extends
+		EventListener {
 
 	/**
 	 * Handles an OSGi application event.
 	 * 
 	 * @param event OSGi application event
 	 */
-	void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event);
+	void onOsgiApplicationEvent(E event);
 }

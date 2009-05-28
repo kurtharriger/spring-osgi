@@ -16,7 +16,7 @@
 
 package org.springframework.osgi.blueprint.config;
 
-import org.osgi.service.blueprint.convert.Converter;
+import org.osgi.service.blueprint.container.Converter;
 
 /**
  * Taken from the TCK.
@@ -25,18 +25,13 @@ import org.osgi.service.blueprint.convert.Converter;
  */
 public class AsianRegionCodeConverter implements Converter {
 
-	private Class targetClass = RegionCode.class;
+	private Class<?> targetClass = RegionCode.class;
 
-
-	public Object convert(Object source) throws Exception {
-		if (source instanceof String) {
-			return new AsianRegionCode((String) source);
-		}
-		// we're supposed to throw an exception if we can't convert
-		throw new Exception("Unconvertable object type");
+	public boolean canConvert(Object fromValue, Class toType) {
+		return (fromValue instanceof String && targetClass.equals(toType));
 	}
 
-	public Class getTargetClass() {
-		return targetClass;
+	public Object convert(Object fromValue, Class toType) throws Exception {
+		return new AsianRegionCode((String) fromValue);
 	}
 }

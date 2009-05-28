@@ -16,34 +16,33 @@
 
 package org.springframework.osgi.context.event;
 
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
 /**
- * Listener dispatching OSGi events to interested listeners. This class acts
- * mainly as an adapter bridging the {@link ApplicationListener} interface with
- * {@link OsgiBundleApplicationContextListener}.
+ * Listener dispatching OSGi events to interested listeners. This class acts mainly as an adapter bridging the
+ * {@link ApplicationListener} interface with {@link OsgiBundleApplicationContextListener}.
  * 
  * @author Costin Leau
  * 
  */
-class ApplicationListenerAdapter implements ApplicationListener {
+class ApplicationListenerAdapter<E extends OsgiBundleApplicationContextEvent> implements ApplicationListener<E> {
 
-	private final OsgiBundleApplicationContextListener osgiListener;
+	private final OsgiBundleApplicationContextListener<E> osgiListener;
 	private final String toString;
 
+	static <E extends OsgiBundleApplicationContextEvent> ApplicationListenerAdapter<E> createAdapter(
+			OsgiBundleApplicationContextListener<E> listener) {
+		return new ApplicationListenerAdapter<E>(listener);
+	}
 
-	public ApplicationListenerAdapter(OsgiBundleApplicationContextListener listener) {
+	private ApplicationListenerAdapter(OsgiBundleApplicationContextListener<E> listener) {
 		this.osgiListener = listener;
 		toString = "ApplicationListenerAdapter for listener " + osgiListener;
 	}
 
 	// filter non-osgi events
-	public void onApplicationEvent(ApplicationEvent event) {
-		if (event instanceof OsgiBundleApplicationContextEvent) {
-			OsgiBundleApplicationContextEvent osgiEvent = (OsgiBundleApplicationContextEvent) event;
-			osgiListener.onOsgiApplicationEvent(osgiEvent);
-		}
+	public void onApplicationEvent(E event) {
+		osgiListener.onOsgiApplicationEvent(event);
 	}
 
 	public boolean equals(Object obj) {

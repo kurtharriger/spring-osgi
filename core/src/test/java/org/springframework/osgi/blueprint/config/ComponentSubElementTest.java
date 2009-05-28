@@ -183,7 +183,7 @@ public class ComponentSubElementTest extends TestCase {
 
 	public void testDependsOnTest() throws Exception {
 		try {
-			System.out.println(BlueprintContainer.getComponent("dependsOnComponent"));
+			System.out.println(BlueprintContainer.getComponentInstance("dependsOnComponent"));
 			fail("expected validation exception");
 		} catch (NoSuchComponentException nsce) {
 		}
