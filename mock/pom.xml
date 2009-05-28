@@ -18,6 +18,7 @@
   <properties>
     <javadoc.loc>${basedir}/../docs/src/javadoc</javadoc.loc>
 	<spring.osgi.symbolic.name>${symName.prefix}.mock</spring.osgi.symbolic.name>
+	<bundlor.enabled>true</bundlor.enabled>
   </properties>
 
 </project>

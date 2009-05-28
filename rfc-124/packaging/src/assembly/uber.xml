@@ -1,0 +1,22 @@
+<assembly>
+  <id>uber-jar</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+    <dependencySet>
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+      <useProjectArtifact>false</useProjectArtifact>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
+    </dependencySet>
+  </dependencySets>
+  <fileSets>
+    <fileSet>
+        <directory>${project.build.directory}/classes</directory>
+        <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>
