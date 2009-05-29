@@ -20,12 +20,12 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.ServiceProxyDestroyedException;
+import org.springframework.osgi.service.importer.support.internal.exception.BlueprintExceptionFactory;
 import org.springframework.util.Assert;
 
 /**
- * Interceptor offering static behaviour around an OSGi service. If the OSGi
- * becomes unavailable, no look up or retries will be executed, the interceptor
- * throwing an exception.
+ * Interceptor offering static behaviour around an OSGi service. If the OSGi becomes unavailable, no look up or retries
+ * will be executed, the interceptor throwing an exception.
  * 
  * @author Costin Leau
  * 
@@ -33,16 +33,14 @@ import org.springframework.util.Assert;
 public class ServiceStaticInterceptor extends ServiceInvoker {
 
 	private static final int hashCode = ServiceStaticInterceptor.class.hashCode() * 13;
-
 	private boolean destroyed = false;
 
 	/** private lock */
 	private final Object lock = new Object();
-
 	private final ServiceReference reference;
-
 	private final BundleContext bundleContext;
-
+	/** standard exception flag */
+	private boolean useBlueprintExceptions = false;
 
 	public ServiceStaticInterceptor(BundleContext context, ServiceReference reference) {
 		Assert.notNull(context);
@@ -66,7 +64,12 @@ public class ServiceStaticInterceptor extends ServiceInvoker {
 				return target;
 		}
 		// throw exception
-		throw new ServiceUnavailableException(reference);
+		throw (useBlueprintExceptions ? BlueprintExceptionFactory.createServiceUnavailableException(reference)
+				: new ServiceUnavailableException(reference));
+	}
+
+	public void setUseBlueprintExceptions(boolean useBlueprintExceptions) {
+		this.useBlueprintExceptions = useBlueprintExceptions;
 	}
 
 	public ServiceReference getServiceReference() {

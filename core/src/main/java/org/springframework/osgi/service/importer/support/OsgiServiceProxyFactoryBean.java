@@ -43,16 +43,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * OSGi (single) service importer. This implementation creates a managed OSGi
- * service proxy that handles the OSGi service dynamics. The returned proxy will
- * select only the best matching OSGi service for the configuration criteria. If
- * the select service goes away (at any point in time), the proxy will
- * automatically search for a replacement without the user intervention.
+ * OSGi (single) service importer. This implementation creates a managed OSGi service proxy that handles the OSGi
+ * service dynamics. The returned proxy will select only the best matching OSGi service for the configuration criteria.
+ * If the select service goes away (at any point in time), the proxy will automatically search for a replacement without
+ * the user intervention.
  * 
- * <p/>
- * Note that the proxy instance remains the same and only the backing OSGi
- * service changes. Due to the dynamic nature of OSGi, the backing object can
- * change during method invocations.
+ * <p/> Note that the proxy instance remains the same and only the backing OSGi service changes. Due to the dynamic
+ * nature of OSGi, the backing object can change during method invocations.
  * 
  * @author Costin Leau
  * @author Adrian Colyer
@@ -86,7 +83,6 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		}
 	};
 
-
 	private static final Log log = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
 
 	private long retryTimeout;
@@ -102,15 +98,14 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	private ApplicationEventPublisher applicationEventPublisher;
 
 	/** internal listeners */
-	private final List<ImporterStateListener> stateListeners = Collections.synchronizedList(new ArrayList<ImporterStateListener>(
-		4));
+	private final List<ImporterStateListener> stateListeners =
+			Collections.synchronizedList(new ArrayList<ImporterStateListener>(4));
 
 	private final ImporterInternalActions controller;
 	/** convenience field * */
 	private boolean mandatory;
 
 	private final Object monitor = new Object();
-
 
 	public OsgiServiceProxyFactoryBean() {
 		controller = new ImporterController(new Executor());
@@ -127,9 +122,8 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * Returns the managed proxy type. If the proxy is not created when this
-	 * method is invoked, the method will try to create a composite interface
-	 * (if only interfaces are specified) or null otherwise.
+	 * Returns the managed proxy type. If the proxy is not created when this method is invoked, the method will try to
+	 * create a composite interface (if only interfaces are specified) or null otherwise.
 	 */
 	public Class<?> getObjectType() {
 		synchronized (monitor) {
@@ -172,10 +166,12 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		final ServiceProviderTCCLInterceptor tcclAdvice = new ServiceProviderTCCLInterceptor();
 		final OsgiServiceLifecycleListener tcclListener = tcclAdvice.new ServiceProviderTCCLListener();
 
-		final ServiceDynamicInterceptor lookupAdvice = new ServiceDynamicInterceptor(getBundleContext(),
-			ClassUtils.getParticularClass(getInterfaces()).getName(), getUnifiedFilter(), getAopClassLoader());
+		final ServiceDynamicInterceptor lookupAdvice =
+				new ServiceDynamicInterceptor(getBundleContext(), ClassUtils.getParticularClass(getInterfaces())
+						.getName(), getUnifiedFilter(), getAopClassLoader());
 
 		lookupAdvice.setRequiredAtStartup(getCardinality().isMandatory());
+		lookupAdvice.setUseBlueprintExceptions(isUseBlueprintExceptions());
 
 		OsgiServiceLifecycleListener[] listeners = addListener(getListeners(), tcclListener);
 
@@ -193,17 +189,18 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		lookupAdvice.setServiceImporterName(getBeanName());
 
 		// create a proxy creator using the existing context
-		ServiceProxyCreator creator = new AbstractServiceProxyCreator(getInterfaces(), getAopClassLoader(),
-			getBeanClassLoader(), getBundleContext(), getContextClassLoader()) {
+		ServiceProxyCreator creator =
+				new AbstractServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBeanClassLoader(),
+						getBundleContext(), getContextClassLoader()) {
 
-			ServiceInvoker createDispatcherInterceptor(ServiceReference reference) {
-				return lookupAdvice;
-			}
+					ServiceInvoker createDispatcherInterceptor(ServiceReference reference) {
+						return lookupAdvice;
+					}
 
-			Advice createServiceProviderTCCLAdvice(ServiceReference reference) {
-				return tcclAdvice;
-			}
-		};
+					Advice createServiceProviderTCCLAdvice(ServiceReference reference) {
+						return tcclAdvice;
+					}
+				};
 
 		ProxyPlusCallback proxyPlusCallback = creator.createServiceProxy(lookupAdvice.getServiceReference());
 
@@ -244,14 +241,12 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	}
 
 	/**
-	 * Sets how long (in milliseconds) should this importer wait between failed
-	 * attempts at rebinding to a service that has been unregistered.
+	 * Sets how long (in milliseconds) should this importer wait between failed attempts at rebinding to a service that
+	 * has been unregistered.
 	 * 
-	 * <p/>
-	 * It is possible to change this value after initialization (while the proxy
-	 * is in place). The new values will be used immediately by the proxy. Any
-	 * in-flight waiting will be restarted using the new values. Note that if
-	 * both values are the same, no restart will be applied.
+	 * <p/> It is possible to change this value after initialization (while the proxy is in place). The new values will
+	 * be used immediately by the proxy. Any in-flight waiting will be restarted using the new values. Note that if both
+	 * values are the same, no restart will be applied.
 	 * 
 	 * @param timeoutInMillis Timeout to set, in milliseconds
 	 */
@@ -269,8 +264,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	}
 
 	/**
-	 * Returns the timeout (in milliseconds) this importer waits while trying to
-	 * find a backing service.
+	 * Returns the timeout (in milliseconds) this importer waits while trying to find a backing service.
 	 * 
 	 * @return timeout in milliseconds
 	 */
@@ -284,9 +278,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p/>
-	 * Since this implementation creates a managed proxy, only <em>single</em>
-	 * cardinalities are accepted.
+	 * <p/> Since this implementation creates a managed proxy, only <em>single</em> cardinalities are accepted.
 	 */
 	public void setCardinality(Cardinality cardinality) {
 		Assert.notNull(cardinality);

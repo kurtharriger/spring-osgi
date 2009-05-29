@@ -49,7 +49,6 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 
 	private ServiceProxyCreator proxyCreator;
 
-
 	protected void setUp() throws Exception {
 		services = new LinkedHashMap();
 
@@ -67,8 +66,9 @@ public class OsgiServiceCollectionProxiesTest extends TestCase {
 		};
 
 		ClassLoader cl = getClass().getClassLoader();
-		proxyCreator = new StaticServiceProxyCreator(new Class<?>[] { Cloneable.class }, cl, cl, ctx,
-			ImportContextClassLoader.UNMANAGED, false);
+		proxyCreator =
+				new StaticServiceProxyCreator(new Class<?>[] { Cloneable.class }, cl, cl, ctx,
+						ImportContextClassLoader.UNMANAGED, false, false);
 	}
 
 	protected void tearDown() throws Exception {
