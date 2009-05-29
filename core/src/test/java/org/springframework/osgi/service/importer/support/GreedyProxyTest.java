@@ -44,7 +44,6 @@ public class GreedyProxyTest extends TestCase {
 
 	private String[] classesAsStrings = new String[] { Serializable.class.getName(), Comparable.class.getName() };
 
-
 	protected void setUp() throws Exception {
 		Class<?>[] classes = new Class<?>[] { Serializable.class, Comparable.class };
 
@@ -54,7 +53,7 @@ public class GreedyProxyTest extends TestCase {
 	private StaticServiceProxyCreator createProxyCreator(Class<?>[] classes) {
 		ClassLoader cl = getClass().getClassLoader();
 		BundleContext ctx = new MockBundleContext();
-		return new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoader.UNMANAGED, true);
+		return new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoader.UNMANAGED, true, false);
 	}
 
 	protected void tearDown() throws Exception {

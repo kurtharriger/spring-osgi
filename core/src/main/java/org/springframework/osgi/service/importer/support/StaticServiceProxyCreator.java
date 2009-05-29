@@ -46,7 +46,8 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 	private final boolean greedyProxying;
 	/** should greedy proxying consider just interfaces ? */
 	private final boolean interfacesOnlyProxying;
-
+	/** use SpringDM or Blueprint exceptions ? */
+	private final boolean useBlueprintExceptions;
 
 	/**
 	 * Constructs a new <code>StaticServiceProxyCreator</code> instance.
@@ -58,9 +59,11 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 	 * @param greedyProxying
 	 */
 	StaticServiceProxyCreator(Class<?>[] classes, ClassLoader aopClassLoader, ClassLoader bundleClassLoader,
-			BundleContext bundleContext, ImportContextClassLoader iccl, boolean greedyProxying) {
+			BundleContext bundleContext, ImportContextClassLoader iccl, boolean greedyProxying,
+			boolean useBlueprintExceptions) {
 		super(classes, aopClassLoader, bundleClassLoader, bundleContext, iccl);
 		this.greedyProxying = greedyProxying;
+		this.useBlueprintExceptions = useBlueprintExceptions;
 
 		boolean onlyInterfaces = true;
 
@@ -79,7 +82,9 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 	}
 
 	ServiceInvoker createDispatcherInterceptor(ServiceReference reference) {
-		return new ServiceStaticInterceptor(bundleContext, reference);
+		ServiceStaticInterceptor interceptor = new ServiceStaticInterceptor(bundleContext, reference);
+		interceptor.setUseBlueprintExceptions(useBlueprintExceptions);
+		return interceptor;
 	}
 
 	Advice createServiceProviderTCCLAdvice(ServiceReference reference) {

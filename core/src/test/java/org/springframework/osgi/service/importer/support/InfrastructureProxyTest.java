@@ -17,6 +17,7 @@
 package org.springframework.osgi.service.importer.support;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -39,13 +40,12 @@ public class InfrastructureProxyTest extends TestCase {
 
 	private final Class<?>[] classes = new Class<?>[] { Serializable.class, Comparable.class };
 
-
 	private StaticServiceProxyCreator createProxyCreator(BundleContext ctx, Class<?>[] classes) {
 		ClassLoader cl = getClass().getClassLoader();
 		if (ctx == null) {
 			ctx = new MockBundleContext();
 		}
-		return new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoader.UNMANAGED, true);
+		return new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoader.UNMANAGED, true, false);
 	}
 
 	protected void setUp() throws Exception {
@@ -86,8 +86,26 @@ public class InfrastructureProxyTest extends TestCase {
 		proxyCreator = createProxyCreator(ctx, classes);
 		InfrastructureProxy proxy = (InfrastructureProxy) proxyCreator.createServiceProxy(ref).proxy;
 		assertEquals(service, proxy.getWrappedObject());
-		InfrastructureProxy anotherProxy = (InfrastructureProxy) proxyCreator.createServiceProxy(new MockServiceReference()).proxy;
+		InfrastructureProxy anotherProxy =
+				(InfrastructureProxy) proxyCreator.createServiceProxy(new MockServiceReference()).proxy;
 		assertFalse(proxy.equals(anotherProxy));
 		assertFalse(anotherProxy.getWrappedObject().equals(proxy.getWrappedObject()));
+	}
+
+	// FIXME: disabled due to some strange certificates problem with Equinox
+	public void tstBlueprintExceptions() throws Exception {
+		MockServiceReference ref = new MockServiceReference(new String[] { Comparable.class.getName() });
+		MockBundleContext ctx = new MockBundleContext() {
+
+			@Override
+			public Object getService(ServiceReference reference) {
+				return null;
+			}
+		};
+		ClassLoader cl = getClass().getClassLoader();
+		StaticServiceProxyCreator creator =
+				new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoader.UNMANAGED, true, true);
+		Comparable proxy = (Comparable) creator.createServiceProxy(ref).proxy;
+		System.out.println(proxy.compareTo(null));
 	}
 }

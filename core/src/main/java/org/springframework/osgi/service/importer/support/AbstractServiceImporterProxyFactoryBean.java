@@ -40,8 +40,8 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 		SmartFactoryBean<Object> {
 
 	private boolean initialized = false;
-
 	private Object proxy;
+	private boolean useBlueprintException = false;
 
 	/** aop classloader */
 	private ChainedClassLoader aopClassLoader;
@@ -160,5 +160,18 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 				return null;
 			}
 		});
+	}
+
+	/**
+	 * Indicates whether Blueprint exceptions are preferred over Spring DM ones.
+	 * 
+	 * @param useBlueprintExceptions
+	 */
+	void setUseBlueprintExceptions(boolean useBlueprintExceptions) {
+		this.useBlueprintException = useBlueprintExceptions;
+	}
+
+	boolean isUseBlueprintExceptions() {
+		return useBlueprintException;
 	}
 }
