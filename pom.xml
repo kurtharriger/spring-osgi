@@ -506,7 +506,7 @@ limitations under the License.
         <plugin>
           <groupId>com.springsource.bundlor</groupId>
           <artifactId>com.springsource.bundlor.maven</artifactId>
-          <version>1.0.0.M4</version>
+          <version>1.0.0.M2</version>
         </plugin>
       </plugins>
     </pluginManagement>
