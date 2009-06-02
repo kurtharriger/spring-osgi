@@ -26,7 +26,8 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.service.blueprint.container.BlueprintContainer;
-import org.osgi.service.blueprint.container.BlueprintContainerListener;
+import org.osgi.service.blueprint.container.BlueprintEvent;
+import org.osgi.service.blueprint.container.BlueprintListener;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
@@ -125,14 +126,23 @@ public class ExtenderBootstrapTest extends BaseBlueprintIntegrationTest {
 
 	public void testModuleContextListener() throws Exception {
 		final List<Bundle> contexts = new ArrayList<Bundle>();
-		BlueprintContainerListener listener = new BlueprintContainerListener() {
+		BlueprintListener listener = new BlueprintListener() {
 
-			public void contextCreated(Bundle bundle) {
-				addToList(bundle);
-			}
+			public void blueprintEvent(BlueprintEvent event) {
 
-			public void contextCreationFailed(Bundle bundle, Throwable ex) {
-				addToList(bundle);
+				switch (event.getType()) {
+				case BlueprintEvent.CREATED:
+					addToList(event.getBundle());
+					break;
+
+				case BlueprintEvent.DESTROYED:
+					addToList(event.getBundle());
+					break;
+
+				default:
+					System.out.println("Received event " + event);
+					break;
+				}
 			}
 
 			private void addToList(Bundle bundle) {
@@ -144,7 +154,7 @@ public class ExtenderBootstrapTest extends BaseBlueprintIntegrationTest {
 		};
 
 		installTestBundle();
-		bundleContext.registerService(BlueprintContainerListener.class.getName(), listener, null);
+		bundleContext.registerService(BlueprintListener.class.getName(), listener, null);
 
 		testBundle.start();
 		synchronized (contexts) {
@@ -162,8 +172,9 @@ public class ExtenderBootstrapTest extends BaseBlueprintIntegrationTest {
 	}
 
 	private void installTestBundle() throws Exception {
-		Resource bundleResource = getLocator().locateArtifact("org.springframework.osgi.iandt.blueprint", "simple.bundle",
-				getSpringDMVersion());
+		Resource bundleResource =
+				getLocator().locateArtifact("org.springframework.osgi.iandt.blueprint", "simple.bundle",
+						getSpringDMVersion());
 		testBundle = bundleContext.installBundle(bundleResource.getDescription(), bundleResource.getInputStream());
 	}
 }

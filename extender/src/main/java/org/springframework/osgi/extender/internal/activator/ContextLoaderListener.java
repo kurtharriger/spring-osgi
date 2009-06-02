@@ -493,6 +493,7 @@ public class ContextLoaderListener implements BundleActivator {
 
 	protected void addApplicationListener(OsgiBundleApplicationContextEventMulticaster multicaster) {
 		osgiListeners = new ListListenerAdapter(bundleContext);
+		osgiListeners.afterPropertiesSet();
 		// register the listener that does the dispatching
 		multicaster.addApplicationListener(osgiListeners);
 	}

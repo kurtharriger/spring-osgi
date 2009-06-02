@@ -26,7 +26,8 @@ import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.blueprint.container.BlueprintContainerListener;
+import org.osgi.service.blueprint.container.BlueprintEvent;
+import org.osgi.service.blueprint.container.BlueprintListener;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
@@ -45,20 +46,26 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 		final List<Bundle> startedBundles = new ArrayList<Bundle>();
 		final Map<Bundle, Throwable> failedBundles = new LinkedHashMap<Bundle, Throwable>();
 
-		BlueprintContainerListener listener = new BlueprintContainerListener() {
+		BlueprintListener listener = new BlueprintListener() {
 
-			public void contextCreated(Bundle bundle) {
-				startedBundles.add(bundle);
-			}
+			public void blueprintEvent(BlueprintEvent event) {
+				switch (event.getType()) {
+				case BlueprintEvent.CREATED:
+					startedBundles.add(event.getBundle());
+					break;
 
-			public void contextCreationFailed(Bundle bundle, Throwable throwable) {
-				failedBundles.put(bundle, throwable);
+				case BlueprintEvent.FAILURE:
+					failedBundles.put(event.getBundle(), event.getException());
+					break;
+
+				default:
+					System.out.println("Received event " + event);
+				}
 			}
 		};
 
 		// register Blueprint registration
-		ServiceRegistration reg = bundleContext.registerService(BlueprintContainerListener.class.getName(), listener,
-				null);
+		ServiceRegistration reg = bundleContext.registerService(BlueprintListener.class.getName(), listener, null);
 
 		EventHandler handler = new EventHandler() {
 
@@ -82,10 +89,11 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 		bundleContext.registerService(EventHandler.class.getName(), handler, prop);
 
 		System.out.println("Installed Bundles " + Arrays.toString(bundleContext.getBundles()));
-		Resource bundleResource = getLocator().locateArtifact("org.springframework.osgi.iandt.blueprint", "error.bundle",
-				getSpringDMVersion());
-		Bundle failingBundle = bundleContext.installBundle(bundleResource.getDescription(), bundleResource
-				.getInputStream());
+		Resource bundleResource =
+				getLocator().locateArtifact("org.springframework.osgi.iandt.blueprint", "error.bundle",
+						getSpringDMVersion());
+		Bundle failingBundle =
+				bundleContext.installBundle(bundleResource.getDescription(), bundleResource.getInputStream());
 
 		// start bundle
 		failingBundle.start();

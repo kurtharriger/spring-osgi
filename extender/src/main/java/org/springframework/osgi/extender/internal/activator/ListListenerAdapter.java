@@ -19,7 +19,6 @@ package org.springframework.osgi.extender.internal.activator;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -68,19 +67,21 @@ class ListListenerAdapter implements OsgiBundleApplicationContextListener<OsgiBu
 	}
 
 	public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
-		OsgiBundleApplicationContextListener[] listeners =
-				(OsgiBundleApplicationContextListener[]) tracker.getServices();
+		Object[] listeners = tracker.getServices();
 
-		synchronized (eventCache) {
-			for (OsgiBundleApplicationContextListener listener : listeners) {
-				Class<? extends OsgiBundleApplicationContextListener> listenerClass = listener.getClass();
-				Class<? extends OsgiBundleApplicationContextEvent> eventType = eventCache.get(listenerClass);
-				if (eventType == null) {
-					eventType = getGenericEventType(listenerClass);
-					eventCache.put(listenerClass, eventType);
-				}
-				if (eventType.isInstance(event)) {
-					listener.onOsgiApplicationEvent(event);
+		if (listeners != null) {
+			synchronized (eventCache) {
+				for (Object listnr : listeners) {
+					OsgiBundleApplicationContextListener listener = (OsgiBundleApplicationContextListener) listnr;
+					Class<? extends OsgiBundleApplicationContextListener> listenerClass = listener.getClass();
+					Class<? extends OsgiBundleApplicationContextEvent> eventType = eventCache.get(listenerClass);
+					if (eventType == null) {
+						eventType = getGenericEventType(listenerClass);
+						eventCache.put(listenerClass, eventType);
+					}
+					if (eventType.isInstance(event)) {
+						listener.onOsgiApplicationEvent(event);
+					}
 				}
 			}
 		}
