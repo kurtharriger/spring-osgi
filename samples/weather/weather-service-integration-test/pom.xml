@@ -12,6 +12,10 @@
   <name>Spring OSGi Samples: Weather Service Integration Test</name>
   <url>http://www.springframework.org/osgi</url>
   
+  <properties>
+    <bundlor.enabled>false</bundlor.enabled>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.osgi.samples</groupId>

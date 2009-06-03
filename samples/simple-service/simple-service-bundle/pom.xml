@@ -10,7 +10,7 @@
   <packaging>jar</packaging>
   <name>Spring OSGi Samples: Simple Service Provider</name>
   <url>http://www.springframework.org/osgi</url>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.springframework</groupId>

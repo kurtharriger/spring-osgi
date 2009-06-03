@@ -8,13 +8,14 @@
   </parent>
   <groupId>org.springframework.osgi.samples</groupId>
   <artifactId>weather-service</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <name>Spring OSGi Samples: Weather Service Provider</name>
   <url>http://www.springframework.org/osgi</url>
+  <description>Weather Service Provider Bundle</description>
+
 
   <properties>
 	 <spring.osgi.license.loc>../../..</spring.osgi.license.loc>  
-     <spring.osgi.export.pkg>org.springframework.osgi.samples.weather.service</spring.osgi.export.pkg>
   </properties>
   
   <dependencies>
