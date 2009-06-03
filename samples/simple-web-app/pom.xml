@@ -11,6 +11,10 @@
   <name>Spring OSGi Samples: Simple Web Application</name>
   <url>http://www.springframework.org/osgi</url>
   <packaging>pom</packaging>
+
+  <properties>
+    <bundlor.enabled>false</bundlor.enabled>
+  </properties>
   
   <modules>
     <module>logging</module>

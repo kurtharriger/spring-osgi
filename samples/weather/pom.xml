@@ -12,19 +12,18 @@
   <name>Spring OSGi Samples: Weather Service</name>
   <url>http://www.springframework.org/osgi</url>
   
-  <properties>
-     <spring.osgi.private.pkg></spring.osgi.private.pkg>
-     <spring.osgi.license.loc>../../..</spring.osgi.license.loc>
-     <bundlor.enabled>false</bundlor.enabled>
-  </properties>
+    <properties>
+       <spring.osgi.license.loc>../../..</spring.osgi.license.loc>
+       <bundlor.enabled>true</bundlor.enabled>
+    </properties>
   
 
-  <modules>
-    <module>weather-dao</module>
-    <module>weather-extension</module>
-    <module>weather-service</module>
-    <module>weather-service-test</module>
-    <module>wiring-bundle</module>
-    <module>weather-service-integration-test</module>
-  </modules>
+    <modules>
+      <module>weather-dao</module>
+      <module>weather-extension</module>
+      <module>weather-service</module>
+      <module>weather-service-test</module>
+      <module>wiring-bundle</module>
+      <module>weather-service-integration-test</module>
+    </modules>
 </project>

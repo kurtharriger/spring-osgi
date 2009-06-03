@@ -14,6 +14,7 @@
 
   <properties>
     <source.jdk>1.5</source.jdk>
+    <bundlor.enabled>false</bundlor.enabled>
   </properties>
   
   <modules>

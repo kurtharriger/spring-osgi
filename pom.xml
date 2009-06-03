@@ -647,7 +647,7 @@ Ignored-Existing-Headers:
             <source>1.5</source>
             <target>1.5</target>
             <debug>true</debug>
-            <fork>false</fork>
+            <fork>true</fork>
           </configuration>
       </plugin>
       <plugin>

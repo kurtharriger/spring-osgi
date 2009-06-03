@@ -11,11 +11,17 @@
   <packaging>pom</packaging>
   <name>Spring OSGi Samples</name>
   <url>http://www.springframework.org/osgi</url>
+
+  <properties>
+    <bundlor.enabled>false</bundlor.enabled>
+  </properties>
+  
   
   <modules>
     <module>simple-service</module>
     <module>weather</module>
     <module>simple-web-app</module>
+    <module>web-console</module>
   </modules>
   
   <reporting>
@@ -48,16 +54,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>jdk-1.5+</id>
-        <activation>
-          <jdk>!1.4</jdk>
-        </activation>
-        <modules>
-          <module>web-console</module>
-        </modules>
-    </profile>
-  </profiles>
-	
 </project>
