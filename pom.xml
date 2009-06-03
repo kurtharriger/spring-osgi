@@ -45,7 +45,7 @@
    <!-- javadoc configuration -->
    <javadoc.loc>${basedir}/docs/src/javadoc</javadoc.loc>
    
-   <clover.ver>2.3.1</clover.ver>
+   <clover.ver>2.5.1</clover.ver>
    <clover.argLine></clover.argLine>
    <clover.skip>false</clover.skip>
    
@@ -664,7 +664,9 @@ Ignored-Existing-Headers:
           <groupId>com.atlassian.maven.plugins</groupId>
           <artifactId>maven-clover2-plugin</artifactId>
           <configuration>
+          <!--
               <licenseLocation>${env.clover.licenseLocation}</licenseLocation>
+              -->
               <generatePdf>false</generatePdf>
               <generateXml>true</generateXml>
               <generateHtml>true</generateHtml>
@@ -813,7 +815,7 @@ Ignored-Existing-Headers:
       <properties>
         <clover.enabled>true</clover.enabled>
         <spring.decorate.osgi.import>!com_cenqua_clover*,${spring.osgi.import}</spring.decorate.osgi.import>
-        <clover.argLine>-Xbootclasspath/a:"${settings.localRepository}${file.separator}com${file.separator}cenqua${file.separator}clover${file.separator}clover${file.separator}${clover.ver}${file.separator}clover-${clover.ver}.jar"
+        <clover.argLine>-Xbootclasspath/a:"${settings.localRepository}${file.separator}com${file.separator}cenqua${file.separator}clover${file.separator}clover${file.separator}${clover.ver}${file.separator}clover-${clover.ver}.jar -Dansi.color"
         </clover.argLine>
       </properties>
     
@@ -826,19 +828,6 @@ Ignored-Existing-Headers:
           <scope>provided</scope>
         </dependency>
       </dependencies>
-      <!--
-        disabled for now since we don't want them to be deployed
-        by the nightly build. Version 2.4 of the deploy plugin
-        has a skip flag but it hasn't been released yet.
-        
-        To have both coverage and run the tests, the CI
-        needs to run two different maven process (as a script).
-
-      <modules>
-        <module>integration-tests/tests</module>
-        <module>integration-tests/tests-tiger</module>
-      </modules>
-      -->
 
     </profile>
   </profiles>

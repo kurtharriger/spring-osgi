@@ -114,6 +114,15 @@
   </dependencies>
 
   	<build>
+  	
+        <extensions>
+          <extension>
+             <groupId>org.springframework.build.aws</groupId>
+             <artifactId> org.springframework.build.aws.maven</artifactId>
+             <version>2.0.0.RELEASE</version>
+          </extension>
+        </extensions>
+      	
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -206,4 +215,23 @@ Export-Package:
 		</plugins>
 	</build>  
 
+
+    <distributionManagement>
+        <downloadUrl>http://www.springframework.org/osgi/</downloadUrl>
+        <site>
+            <id>static.springframework.org</id>
+            <name>SpringFramework.org</name>
+            <url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-osgi/snapshot-site/</url>
+        </site>
+        <repository>
+            <id>spring-milestone</id>
+            <name>Spring Milestone Repository</name>
+            <url>s3://maven.springframework.org/milestone</url>
+        </repository>    
+        <snapshotRepository>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshot Repository</name>
+            <url>s3://maven.springframework.org/snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

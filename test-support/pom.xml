@@ -22,7 +22,7 @@
 	
 	<jarjar.run>on</jarjar.run>
 	<jarjar.keep>org.springframework.osgi.test.**</jarjar.keep>
-    <jarjar.dep>${maven.dependency.org.springframework.osgi.spring-osgi-extender.jar.path}</jarjar.dep>
+    <jarjar.dep>${maven.dependency.org.springframework.osgi.spring-osgi-extender..jar.path}</jarjar.dep>
 	
   </properties>
   
@@ -68,7 +68,8 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-extender</artifactId>
       <version>${project.parent.version}</version>
-	  <optional>true</optional>
+      <classifier></classifier>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
