@@ -137,7 +137,7 @@
             <plugin>
                 <groupId>com.springsource.bundlor</groupId>
                 <artifactId>com.springsource.bundlor.maven</artifactId>
-                <version>1.0.0.M2</version>
+                <version>1.0.0.M4</version>
                 <inherited>false</inherited>
                 <executions>
                   <execution>
