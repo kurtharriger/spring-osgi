@@ -21,8 +21,8 @@
 	<reference id="foo">
 		<!-- nested interface refs not supported any more 
 		<interfaces>
-			<ref component="classname" />
-			<ref component="class" />
+			<ref component-id="classname" />
+			<ref component-id="class" />
 		</interfaces>
 		-->
 		<interfaces>

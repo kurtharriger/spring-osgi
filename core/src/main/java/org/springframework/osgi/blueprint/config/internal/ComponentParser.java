@@ -68,12 +68,13 @@ public class ComponentParser {
 	private static final Log log = LogFactory.getLog(ComponentParser.class);
 
 	public static final String BEAN = "bean";
-	public static final String COMPONENT = "component";
+	public static final String COMPONENT_ID_ATTR = "component-id";
 	public static final String CONSTRUCTOR_ARG = "argument";
+	private static final String FACTORY_REF_ATTR = "factory-ref";
+	private static final String LAZY_INIT_ATTR = "initialization";
+	private static final String LAZY_INIT_VALUE = "lazy";
 
 	public static final String NAMESPACE_URI = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
-
-	private static final String FACTORY_COMPONENT_ATTR = "factory-component";
 
 	private final ParseState parseState;
 
@@ -132,8 +133,8 @@ public class ComponentParser {
 
 		List<String> aliases = new ArrayList<String>(4);
 		if (StringUtils.hasLength(nameAttr)) {
-			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr,
-					BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS);
+			String[] nameArr =
+					StringUtils.tokenizeToStringArray(nameAttr, BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
@@ -165,8 +166,9 @@ public class ComponentParser {
 
 		try {
 			// create definition
-			beanDefinition = BeanDefinitionReaderUtils.createBeanDefinition(null, className, parserContext
-					.getReaderContext().getBeanClassLoader());
+			beanDefinition =
+					BeanDefinitionReaderUtils.createBeanDefinition(null, className, parserContext.getReaderContext()
+							.getBeanClassLoader());
 
 			// parse attributes
 			parseAttributes(ele, beanName, beanDefinition);
@@ -191,8 +193,9 @@ public class ComponentParser {
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {
-						beanName = BeanDefinitionReaderUtils.generateBeanName(beanDefinition, parserContext
-								.getRegistry(), true);
+						beanName =
+								BeanDefinitionReaderUtils.generateBeanName(beanDefinition, parserContext.getRegistry(),
+										true);
 					} else {
 						beanName = parserContext.getReaderContext().generateBeanName(beanDefinition);
 						// TODO: should we support 2.0 behaviour (see below):
@@ -217,11 +220,18 @@ public class ComponentParser {
 	}
 
 	private AbstractBeanDefinition parseAttributes(Element ele, String beanName, AbstractBeanDefinition beanDefinition) {
-		AbstractBeanDefinition bd = parserContext.getDelegate().parseBeanDefinitionAttributes(ele, beanName, null,
-				beanDefinition);
+		AbstractBeanDefinition bd =
+				parserContext.getDelegate().parseBeanDefinitionAttributes(ele, beanName, null, beanDefinition);
+
+		// handle lazy flag (initialize)
+		String lazyInit = ele.getAttribute(LAZY_INIT_ATTR);
+		// check whether the value is "lazy"
+		if (StringUtils.hasText(lazyInit) && lazyInit.equalsIgnoreCase(LAZY_INIT_VALUE)) {
+			bd.setLazyInit(true);
+		}
 
 		// handle factory component
-		String componentFactory = ele.getAttribute(FACTORY_COMPONENT_ATTR);
+		String componentFactory = ele.getAttribute(FACTORY_REF_ATTR);
 		if (StringUtils.hasText(componentFactory)) {
 			bd.setFactoryBeanName(componentFactory);
 		}
@@ -347,8 +357,9 @@ public class ComponentParser {
 	}
 
 	private Object parsePropertyValue(Element ele, BeanDefinition bd, String propertyName) {
-		String elementName = (propertyName != null) ? "<property> element for property '" + propertyName + "'"
-				: "<constructor-arg> element";
+		String elementName =
+				(propertyName != null) ? "<property> element for property '" + propertyName + "'"
+						: "<constructor-arg> element";
 
 		// Should only have one child element: ref, value, list, etc.
 		NodeList nl = ele.getChildNodes();
@@ -382,8 +393,8 @@ public class ComponentParser {
 			ref.setSource(parserContext.extractSource(ele));
 			return ref;
 		} else if (hasValueAttribute) {
-			TypedStringValue valueHolder = new TypedStringValue(ele
-					.getAttribute(BeanDefinitionParserDelegate.VALUE_ATTRIBUTE));
+			TypedStringValue valueHolder =
+					new TypedStringValue(ele.getAttribute(BeanDefinitionParserDelegate.VALUE_ATTRIBUTE));
 			valueHolder.setSource(parserContext.extractSource(ele));
 			return valueHolder;
 		} else if (subElement != null) {
@@ -472,9 +483,9 @@ public class ComponentParser {
 
 	private Object parseRefElement(Element ele) {
 		// A generic reference to any name of any component.
-		String refName = ele.getAttribute(COMPONENT);
+		String refName = ele.getAttribute(COMPONENT_ID_ATTR);
 		if (!StringUtils.hasLength(refName)) {
-			error("'" + COMPONENT + "' is required for <ref> element", ele);
+			error("'" + COMPONENT_ID_ATTR + "' is required for <ref> element", ele);
 			return null;
 		}
 
@@ -489,9 +500,9 @@ public class ComponentParser {
 
 	private Object parseIdRefElement(Element ele) {
 		// A generic reference to any name of any bean/component.
-		String refName = ele.getAttribute(COMPONENT);
+		String refName = ele.getAttribute(COMPONENT_ID_ATTR);
 		if (!StringUtils.hasLength(refName)) {
-			error("'" + COMPONENT + "' is required for <idref> element", ele);
+			error("'" + COMPONENT_ID_ATTR + "' is required for <idref> element", ele);
 			return null;
 		}
 		if (!StringUtils.hasText(refName)) {
@@ -610,8 +621,8 @@ public class ComponentParser {
 		String defaultKeyType = mapEle.getAttribute(BeanDefinitionParserDelegate.KEY_TYPE_ATTRIBUTE);
 		String defaultValueType = mapEle.getAttribute(BeanDefinitionParserDelegate.VALUE_TYPE_ATTRIBUTE);
 
-		List<Element> entryEles = DomUtils
-				.getChildElementsByTagName(mapEle, BeanDefinitionParserDelegate.ENTRY_ELEMENT);
+		List<Element> entryEles =
+				DomUtils.getChildElementsByTagName(mapEle, BeanDefinitionParserDelegate.ENTRY_ELEMENT);
 		ManagedMap<Object, Object> map = new ManagedMap<Object, Object>(entryEles.size());
 		map.setSource(extractSource(mapEle));
 		map.setKeyTypeName(defaultKeyType);
@@ -654,8 +665,9 @@ public class ComponentParser {
 						+ "a 'key' attribute OR a 'key-ref' attribute OR a <key> sub-element", entryEle);
 			}
 			if (hasKeyAttribute) {
-				key = buildTypedStringValueForMap(entryEle.getAttribute(BeanDefinitionParserDelegate.KEY_ATTRIBUTE),
-						defaultKeyType, entryEle);
+				key =
+						buildTypedStringValueForMap(entryEle.getAttribute(BeanDefinitionParserDelegate.KEY_ATTRIBUTE),
+								defaultKeyType, entryEle);
 			} else if (hasKeyRefAttribute) {
 				String refName = entryEle.getAttribute(BeanDefinitionParserDelegate.KEY_REF_ATTRIBUTE);
 				if (!StringUtils.hasText(refName)) {
@@ -680,8 +692,10 @@ public class ComponentParser {
 						+ "'value' attribute OR 'value-ref' attribute OR <value> sub-element", entryEle);
 			}
 			if (hasValueAttribute) {
-				value = buildTypedStringValueForMap(
-						entryEle.getAttribute(BeanDefinitionParserDelegate.VALUE_ATTRIBUTE), defaultValueType, entryEle);
+				value =
+						buildTypedStringValueForMap(
+								entryEle.getAttribute(BeanDefinitionParserDelegate.VALUE_ATTRIBUTE), defaultValueType,
+								entryEle);
 			} else if (hasValueRefAttribute) {
 				String refName = entryEle.getAttribute(BeanDefinitionParserDelegate.VALUE_REF_ATTRIBUTE);
 				if (!StringUtils.hasText(refName)) {

@@ -68,4 +68,8 @@ public class SpringComponentMetadata implements ComponentMetadata {
 	public List<String> getExplicitDependencies() {
 		return dependsOn;
 	}
+
+	public int getInitialization() {
+		return (beanDefinition.isLazyInit() ? INITIALIZATION_LAZY : INITIALIZATION_EAGER);
+	}
 }

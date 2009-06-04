@@ -100,8 +100,4 @@ class SpringBeanMetadata extends SpringComponentMetadata implements BeanMetadata
 	public String getScope() {
 		return beanDefinition.getScope();
 	}
-
-	public boolean isLazyInit() {
-		return beanDefinition.isLazyInit();
-	}
 }

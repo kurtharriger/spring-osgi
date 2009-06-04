@@ -29,7 +29,7 @@
 
 		<registration-listener registration-method="up"
 			unregistration-method="down">
-			<ref component="listener" />
+			<ref component-id="listener" />
 		</registration-listener>
 
 		<registration-listener registration-method="up"
