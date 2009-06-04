@@ -56,9 +56,11 @@ import org.w3c.dom.NodeList;
  * Stateful class that handles the parsing details of a &lt;component&gt; elements. Borrows heavily from
  * {@link BeanDefinitionParserDelegate}.
  * 
- * <b>Note</b>: Due to its stateful nature, this class is not thread safe. <b>Note</b>: Since the namespace is important
- * when parsing elements and since mixed elements, from both rfc124 and Spring can coexist in the same file, reusing the
- * {@link BeanDefinitionParserDelegate delegate} isn't entirely possible since the two state needs to be kept in synch.
+ * <b>Note</b>: Due to its stateful nature, this class is not thread safe.
+ * 
+ * <b>Note</b>: Since the namespace is important when parsing elements and since mixed elements, from both rfc124 and
+ * Spring can coexist in the same file, reusing the {@link BeanDefinitionParserDelegate delegate} isn't entirely
+ * possible since the two state needs to be kept in synch.
  * 
  * @author Costin Leau
  */
@@ -81,6 +83,7 @@ public class ComponentParser {
 	private final Collection<String> usedNames;
 
 	private ParserContext parserContext;
+	private BlueprintDefaultsDefinition defaults;
 
 	public ComponentParser() {
 		this(null, null);
@@ -101,24 +104,19 @@ public class ComponentParser {
 		this.usedNames = (usedNames != null ? usedNames : new LinkedHashSet<String>());
 	}
 
-	public BeanDefinition parse(Element componentElement, ParserContext parserContext) {
-		// save parser context
-		this.parserContext = parserContext;
-
-		// let Spring do its standard parsing
-		BeanDefinitionHolder bdHolder = parseComponentDefinitionElement(componentElement, null);
-
-		return bdHolder.getBeanDefinition();
-	}
-
 	public BeanDefinitionHolder parseAsHolder(Element componentElement, ParserContext parserContext) {
 		// save parser context
 		this.parserContext = parserContext;
+		this.defaults = new BlueprintDefaultsDefinition(componentElement.getOwnerDocument());
 
 		// let Spring do its standard parsing
 		BeanDefinitionHolder bdHolder = parseComponentDefinitionElement(componentElement, null);
 
 		return bdHolder;
+	}
+
+	public BeanDefinition parse(Element componentElement, ParserContext parserContext) {
+		return parseAsHolder(componentElement, parserContext).getBeanDefinition();
 	}
 
 	/**
@@ -228,6 +226,8 @@ public class ComponentParser {
 		// check whether the value is "lazy"
 		if (StringUtils.hasText(lazyInit) && lazyInit.equalsIgnoreCase(LAZY_INIT_VALUE)) {
 			bd.setLazyInit(true);
+		} else {
+			bd.setLazyInit(getDefaults(ele).getDefaultInitialization());
 		}
 
 		// handle factory component
@@ -781,5 +781,12 @@ public class ComponentParser {
 	 */
 	private void error(Node source, Throwable cause) {
 		parserContext.getReaderContext().error(cause.getLocalizedMessage(), source, parseState.snapshot(), cause);
+	}
+
+	private BlueprintDefaultsDefinition getDefaults(Element ele) {
+		if (defaults == null) {
+			defaults = new BlueprintDefaultsDefinition(ele.getOwnerDocument());
+		}
+		return defaults;
 	}
 }

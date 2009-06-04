@@ -101,30 +101,4 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 		assertTrue(metadata instanceof ReferenceMetadata);
 		assertEquals(1234, ((ReferenceMetadata) metadata).getTimeout());
 	}
-
-	public void testSimpleList() throws Exception {
-		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("simpleList");
-		assertEquals(List.class, metadata.getCollectionType());
-		System.out.println(metadata.getComparator());
-	}
-
-	public void testNestedComparator() throws Exception {
-		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("nestedComparator");
-		assertEquals(List.class, metadata.getCollectionType());
-		System.out.println(metadata.getComparator());
-	}
-
-	public void testNestedRefComparator() throws Exception {
-	}
-
-	public void testMemberType() throws Exception {
-		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("memberType");
-		assertEquals(Set.class, metadata.getCollectionType());
-	}
-
-	public void testSortedSet() throws Exception {
-		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("sortedSet");
-		System.out.println(metadata.getCollectionType());
-		assertEquals(SortedSet.class, metadata.getCollectionType());
-	}
 }

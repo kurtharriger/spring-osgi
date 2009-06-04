@@ -9,13 +9,11 @@
 
 	<reference id="simple" interface="java.lang.Cloneable" />
 
-	<bean id="listener"
-		class="org.springframework.osgi.blueprint.ImporterListener" />
+	<bean id="listener" class="org.springframework.osgi.blueprint.ImporterListener" />
 
 	<reference id="options" interface="java.io.Serializable"
 		availability="optional" component-name="foo" filter="(name=foo)">
-		<listener bind-method="bind" unbind-method="unbind"
-			ref="listener" />
+		<listener bind-method="bind" unbind-method="unbind" ref="listener" />
 	</reference>
 
 	<reference id="multipleInterfaces">
@@ -30,8 +28,7 @@
 			<value>java.lang.Cloneable</value>
 			<value>java.io.Serializable</value>
 		</interfaces>
-		<listener bind-method="bindM" unbind-method="unbindM"
-			ref="listener" />
+		<listener bind-method="bindM" unbind-method="unbindM" ref="listener" />
 
 		<listener bind-method="up" unbind-method="down">
 			<bean class="org.springframework.osgi.blueprint.ImporterListener" />
@@ -43,32 +40,5 @@
 
 	<reference id="timeout" interface="java.lang.Cloneable"
 		timeout="1234" />
-	
-	<!-- collections -->
-	<bean id="comparator"
-		class="org.springframework.osgi.blueprint.DummyComparator" />
-
-	<ref-list id="simpleList" interface="java.lang.Cloneable"
-		comparator-ref="comparator" />
-
-	<ref-list id="nestedComparator" interface="java.lang.Cloneable">
-		<comparator>
-			<bean
-				class="org.springframework.osgi.blueprint.DummyComparator" />
-		</comparator>
-	</ref-list>
-
-	<ref-list id="nestedRefComparator" interface="java.lang.Cloneable"
-		ordering-basis="service-reference">
-		<comparator>
-			<ref component-id="comparator" />
-		</comparator>
-	</ref-list>
-
-	<ref-set id="memberType" interface="java.io.Serializable"
-		member-type="service-reference" />
-	 
-	<ref-set id="sortedSet" interface="java.io.Serializable"
-		comparator-ref="comparator" />
 
 </blueprint>

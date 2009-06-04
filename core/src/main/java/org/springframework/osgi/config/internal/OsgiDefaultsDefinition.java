@@ -32,19 +32,14 @@ public class OsgiDefaultsDefinition {
 	private static final String OSGI_NS = "http://www.springframework.org/schema/osgi";
 
 	private static final String DEFAULT_TIMEOUT = "default-timeout";
-
 	private static final String DEFAULT_CARDINALITY = "default-cardinality";
-
 	private static final String TIMEOUT_DEFAULT = "300000";
-
 	private static final String CARDINALITY_DEFAULT = "1..X";
 
 	/** Default value */
 	private String timeout = TIMEOUT_DEFAULT;
-
 	/** Default value */
 	private String cardinality = CARDINALITY_DEFAULT;
-
 
 	public OsgiDefaultsDefinition(Document document) {
 		Assert.notNull(document);
