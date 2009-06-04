@@ -30,14 +30,15 @@ import org.w3c.dom.Element;
 public class BlueprintDefaultsDefinition extends OsgiDefaultsDefinition {
 
 	private static final String BLUEPRINT_NS = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
-
 	private static final String DEFAULT_TIMEOUT = "default-timeout";
-
 	private static final String DEFAULT_CARDINALITY = "default-availability";
-
 	private static final String TIMEOUT_DEFAULT = "300000";
-
 	private static final String CARDINALITY_DEFAULT = "mandatory";
+	private static final String DEFAULT_INITIALIZATION = "default-initialization";
+	private static final String LAZY_INITIALIZATION = "lazy";
+	private static final boolean INITIALIZATION_DEFAULT = true;
+
+	private boolean defaultInitialization;
 
 	/**
 	 * Constructs a new <code>BlueprintDefaultsDefinition</code> instance.
@@ -49,8 +50,17 @@ public class BlueprintDefaultsDefinition extends OsgiDefaultsDefinition {
 		Element root = doc.getDocumentElement();
 		String timeout = root.getAttributeNS(BLUEPRINT_NS, DEFAULT_TIMEOUT);
 		setTimeout(StringUtils.hasText(timeout) ? timeout.trim() : TIMEOUT_DEFAULT);
-
+		// cardinality
 		String cardinality = root.getAttributeNS(BLUEPRINT_NS, DEFAULT_CARDINALITY);
 		setCardinality(StringUtils.hasText(cardinality) ? cardinality.trim() : CARDINALITY_DEFAULT);
+		// default initialization
+		String initialization = root.getAttributeNS(BLUEPRINT_NS, DEFAULT_INITIALIZATION);
+		defaultInitialization =
+				(StringUtils.hasText(initialization) ? initialization.trim().equalsIgnoreCase(LAZY_INITIALIZATION)
+						: INITIALIZATION_DEFAULT);
+	}
+
+	public boolean getDefaultInitialization() {
+		return defaultInitialization;
 	}
 }
