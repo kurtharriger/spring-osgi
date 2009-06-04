@@ -36,7 +36,7 @@ public class BlueprintDefaultsDefinition extends OsgiDefaultsDefinition {
 	private static final String CARDINALITY_DEFAULT = "mandatory";
 	private static final String DEFAULT_INITIALIZATION = "default-initialization";
 	private static final String LAZY_INITIALIZATION = "lazy";
-	private static final boolean INITIALIZATION_DEFAULT = true;
+	private static final boolean INITIALIZATION_DEFAULT = false;
 
 	private boolean defaultInitialization;
 
