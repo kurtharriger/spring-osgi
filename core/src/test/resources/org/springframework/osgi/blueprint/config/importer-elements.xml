@@ -34,11 +34,10 @@
 			ref="listener" />
 
 		<listener bind-method="up" unbind-method="down">
-			<bean id="inner"
-				class="org.springframework.osgi.blueprint.ImporterListener" />
+			<bean class="org.springframework.osgi.blueprint.ImporterListener" />
 		</listener>
 		<listener bind-method="refBind" unbind-method="refUnbind">
-			<ref component="listener" />
+			<ref component-id="listener" />
 		</listener>
 	</reference>
 
@@ -62,7 +61,7 @@
 	<ref-list id="nestedRefComparator" interface="java.lang.Cloneable"
 		ordering-basis="service-reference">
 		<comparator>
-			<ref component="comparator" />
+			<ref component-id="comparator" />
 		</comparator>
 	</ref-list>
 

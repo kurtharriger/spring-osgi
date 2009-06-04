@@ -36,6 +36,7 @@
 
     <!-- other properties -->
     <slf4j.version>1.5.6</slf4j.version>
+    <clover.skip>true</clover.skip>
   </properties>
   
   <!-- shared dependencies -->
@@ -124,9 +125,21 @@
         </extensions>
       	
 		<plugins>
+		
+          <!-- clover plug-in 
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-clover2-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <licenseLocation>${env.clover.licenseLocation}</licenseLocation>
+                    <skip>true</skip>
+                </configuration>
+            </plugin> 
+          	-->	
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2-beta-2</version>
+				<version>2.2-beta-3</version>
 				<inherited>false</inherited>
 				<executions>
 					<execution>

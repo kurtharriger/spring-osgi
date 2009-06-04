@@ -664,9 +664,7 @@ Ignored-Existing-Headers:
           <groupId>com.atlassian.maven.plugins</groupId>
           <artifactId>maven-clover2-plugin</artifactId>
           <configuration>
-          <!--
               <licenseLocation>${env.clover.licenseLocation}</licenseLocation>
-              -->
               <generatePdf>false</generatePdf>
               <generateXml>true</generateXml>
               <generateHtml>true</generateHtml>

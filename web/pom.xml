@@ -34,8 +34,8 @@
 	
     <jarjar.run>on</jarjar.run>
 	<jarjar.keep>org.springframework.osgi.web.**</jarjar.keep>
-    <jarjar.dep>${maven.dependency.org.springframework.osgi.spring-osgi-test.jar.path}</jarjar.dep>
-    <jarjar.dep.1>${maven.dependency.org.springframework.osgi.spring-osgi-io.jar.path}</jarjar.dep.1>
+    <jarjar.dep>${maven.dependency.org.springframework.osgi.spring-osgi-test..jar.path}</jarjar.dep>
+    <jarjar.dep.1>${maven.dependency.org.springframework.osgi.spring-osgi-io..jar.path}</jarjar.dep.1>
     <jarjar.dep.1.exclude>org/springframework/osgi/io/*</jarjar.dep.1.exclude>
     <jarjar.dep.1.include>org/springframework/osgi/io/internal/**</jarjar.dep.1.include>
   </properties>
@@ -51,6 +51,8 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-test</artifactId>
       <optional>true</optional>
+      <version>${project.parent.version}</version>
+      <classifier></classifier>
     </dependency>
 
     <dependency>
@@ -64,6 +66,8 @@
       <groupId>org.springframework.osgi</groupId>
       <artifactId>spring-osgi-io</artifactId>
       <optional>true</optional>
+      <version>${project.parent.version}</version>
+      <classifier></classifier>
     </dependency>
     
    <dependency>

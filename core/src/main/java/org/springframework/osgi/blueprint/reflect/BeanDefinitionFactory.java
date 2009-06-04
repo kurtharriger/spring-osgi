@@ -91,9 +91,10 @@ class BeanDefinitionFactory implements MetadataConstants {
 	@SuppressWarnings("unchecked")
 	private AbstractBeanDefinition buildLocalComponent(BeanMetadata metadata) {
 		// add basic definition properties
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(metadata.getClassName())
-				.setInitMethodName(metadata.getInitMethodName()).setDestroyMethodName(metadata.getDestroyMethodName())
-				.setLazyInit(metadata.isLazyInit()).setScope(metadata.getScope());
+		BeanDefinitionBuilder builder =
+				BeanDefinitionBuilder.genericBeanDefinition(metadata.getClassName()).setInitMethodName(
+						metadata.getInitMethodName()).setDestroyMethodName(metadata.getDestroyMethodName())
+						.setLazyInit(getLazy(metadata)).setScope(metadata.getScope());
 
 		// add factory-method/factory-bean
 		String factoryMethod = metadata.getFactoryMethodName();
@@ -125,6 +126,10 @@ class BeanDefinitionFactory implements MetadataConstants {
 		}
 
 		return builder.getBeanDefinition();
+	}
+
+	private boolean getLazy(ComponentMetadata metadata) {
+		return (metadata.getInitialization() == ComponentMetadata.INITIALIZATION_LAZY ? true : false);
 	}
 
 	private AbstractBeanDefinition buildExporter(ServiceMetadata metadata) {

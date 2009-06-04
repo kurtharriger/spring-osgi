@@ -26,8 +26,7 @@ public interface BeanMetadata extends Target, ComponentMetadata {
 
 	static final String SCOPE_SINGLETON = "singleton";
 	static final String SCOPE_PROTOTYPE = "prototype";
-	static final String SCOPE_BUNDLE = "bundle";
-
+	
 	/**
 	 * The name of the class type specified for this component.
 	 *
@@ -82,19 +81,6 @@ public interface BeanMetadata extends Target, ComponentMetadata {
 	List /* <BeanProperty> */getProperties();
 
 	/**
-	 * Is this component to be lazily instantiated?
-	 *
-	 * ### I assume the default is processed here?
-	 *
-	 * This is the <code>lazy-init</code> attribute or the
-	 * <code>default-lazy-init</code> in the <code>blueprint</code> element
-	 * if not set. ### I've renamed this from isLazy
-	 *
-	 * @return true, iff this component definition specifies lazy instantiation.
-	 */
-	boolean isLazyInit();
-
-	/**
 	 * Provides the name of the optional factory method.
 	 *
 	 * This is the <code>factory-method</code> attribute.
@@ -128,7 +114,6 @@ public interface BeanMetadata extends Target, ComponentMetadata {
 	 *
 	 * @see #SCOPE_SINGLETON
 	 * @see #SCOPE_PROTOTYPE
-	 * @see #SCOPE_BUNDLE
 	 */
 	String getScope();
 

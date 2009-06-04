@@ -15,12 +15,12 @@
 	
 	<bean id="destroy-method" class="java.util.Properties" destroy-method="clear"/>
 
-	<bean id="lazy-init" class="java.lang.Object" lazy-init="true"/>
+	<bean id="lazy-init" class="java.lang.Object" initialization="lazy"/>
 	
 	<bean id="factory-method" class="java.lang.System" factory-method="currentTimeMillis"/>
 	
 	<bean id="thread" class="java.lang.Thread"/>
 	
-	<bean id="factory-component" factory-component="thread" factory-method="getName"/>
+	<bean id="factory-component" factory-ref="thread" factory-method="getName"/>
 	
 </blueprint>

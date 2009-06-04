@@ -32,7 +32,7 @@
 
 	<bean id="idref" class="java.lang.String">
 		<argument>
-			<idref component="constructor-arg" />
+			<idref component-id="constructor-arg"/>
 		</argument>
 	</bean>
 
@@ -48,7 +48,7 @@
 		class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
 			<array>
-				<ref component="char"/>
+				<ref component-id="char"/>
 				<value>literal2</value>
 				<null/>
 			</array>
@@ -77,9 +77,9 @@
 		<property name="propA">
 			<list>
 				<value type="java.lang.String">value</value>
-				<idref component="idref" />
+				<idref component-id="idref" />
 				<null />
-				<ref component="idref" />
+				<ref component-id="idref" />
 			</list>
 		</property>
 	</bean>
@@ -99,9 +99,9 @@
 		<property name="propA">
 			<set>
 				<value type="java.lang.String">value</value>
-				<idref component="idref" />
+				<idref component-id="idref" />
 				<null />
-				<ref component="idref" />
+				<ref component-id="idref" />
 			</set>
 		</property>
 
@@ -115,9 +115,9 @@
 				<entry key-ref="list" value-ref="set" />
 				<entry>
 					<key>
-						<ref component="set" />
+						<ref component-id="set" />
 					</key>
-					<ref component="list" />
+					<ref component-id="list" />
 				</entry>
 			</map>
 		</property>
@@ -196,9 +196,9 @@
 
 	<bean id="instanceFactory" class="org.springframework.osgi.blueprint.FactoryComponent"/>
 	
-	<bean id="noArgInstanceFactory"  factory-method="instanceMethod" factory-component="instanceFactory"/>
+	<bean id="noArgInstanceFactory"  factory-method="instanceMethod" factory-ref="instanceFactory"/>
 
-    <bean id="oneArgInstanceFactory" factory-component="instanceFactory" factory-method="instanceMethod">
+    <bean id="oneArgInstanceFactory" factory-ref="instanceFactory" factory-method="instanceMethod">
         <argument value="iridium"/>
     </bean>
 
@@ -214,7 +214,7 @@
 					<value>java.io.Serializable</value>
 				</interfaces>
 				<comparator>
-					<ref component="namedComparator" />
+					<ref component-id="namedComparator" />
 				</comparator>
 			</ref-list>
 		</property>

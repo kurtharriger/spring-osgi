@@ -12,7 +12,7 @@
 	<type-converters>
 		<bean
 			class="org.springframework.osgi.blueprint.config.TestComponentConverter" />
-		<ref component="converterB" />
+		<ref component-id="converterB" />
 		<bean id="asianRegionCodeConverter" 
 			class="org.springframework.osgi.blueprint.config.AsianRegionCodeConverter"/>
 	</type-converters>
