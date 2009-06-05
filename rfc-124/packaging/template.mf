@@ -1,4 +1,4 @@
-Bundle-Activator: org.springframework.osgi.extender.internal.activator.ChainActivator
+Bundle-Activator: org.springframework.osgi.extender.internal.boot.ChainActivator
 Bundle-Classpath: .,
  com.springsource.net.sf.cglib.jar,
  com.springsource.org.antlr.jar,
