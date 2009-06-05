@@ -20,6 +20,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -27,7 +28,6 @@ import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventM
 import org.springframework.osgi.extender.internal.dependencies.startup.MandatoryImporterDependencyFactory;
 import org.springframework.osgi.extender.support.DefaultOsgiApplicationContextCreator;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.scheduling.timer.TimerTaskExecutor;
 
 /**
@@ -38,10 +38,9 @@ public class ExtenderConfigurationDefaultSettingsTest extends TestCase {
 	private ExtenderConfiguration config;
 	private BundleContext bundleContext;
 
-
 	protected void setUp() throws Exception {
 		bundleContext = new MockBundleContext();
-		config = new ExtenderConfiguration(bundleContext);
+		config = new ExtenderConfiguration(bundleContext, LogFactory.getLog(ExtenderConfiguration.class));
 	}
 
 	protected void tearDown() throws Exception {

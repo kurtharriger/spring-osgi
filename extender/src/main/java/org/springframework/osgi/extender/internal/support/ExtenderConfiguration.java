@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.springframework.beans.BeanUtils;
@@ -51,15 +50,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Configuration class for the extender. Takes care of locating the extender
- * specific configurations and merging the results with the defaults.
+ * Configuration class for the extender. Takes care of locating the extender specific configurations and merging the
+ * results with the defaults.
  * 
  * @author Costin Leau
  */
 public class ExtenderConfiguration implements DisposableBean {
 
 	/** logger */
-	private static final Log log = LogFactory.getLog(ExtenderConfiguration.class);
+	private final Log log;
 
 	private static final String TASK_EXECUTOR_NAME = "taskExecutor";
 
@@ -83,10 +82,12 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private static final String XML_PATTERN = "*.xml";
 
-	private static final String ANNOTATION_DEPENDENCY_FACTORY = "org.springframework.osgi.extensions.annotation.ServiceReferenceDependencyBeanFactoryPostProcessor";
+	private static final String ANNOTATION_DEPENDENCY_FACTORY =
+			"org.springframework.osgi.extensions.annotation.ServiceReferenceDependencyBeanFactoryPostProcessor";
 
 	/** annotation processing system property (kept for backwards compatibility) */
-	private static final String AUTO_ANNOTATION_PROCESSING = "org.springframework.osgi.extender.annotation.auto.processing";
+	private static final String AUTO_ANNOTATION_PROCESSING =
+			"org.springframework.osgi.extender.annotation.auto.processing";
 
 	//
 	// defaults
@@ -122,24 +123,23 @@ public class ExtenderConfiguration implements DisposableBean {
 	/** bundle wrapped class loader */
 	private final ClassLoader classLoader;
 	/** List of context post processors */
-	private final List<OsgiBeanFactoryPostProcessor> postProcessors = Collections.synchronizedList(new ArrayList<OsgiBeanFactoryPostProcessor>(
-		0));
+	private final List<OsgiBeanFactoryPostProcessor> postProcessors =
+			Collections.synchronizedList(new ArrayList<OsgiBeanFactoryPostProcessor>(0));
 	/** List of service dependency factories */
-	private final List<OsgiServiceDependencyFactory> dependencyFactories = Collections.synchronizedList(new ArrayList<OsgiServiceDependencyFactory>(
-		0));
+	private final List<OsgiServiceDependencyFactory> dependencyFactories =
+			Collections.synchronizedList(new ArrayList<OsgiServiceDependencyFactory>(0));
 
 	// fields reading/writing lock
-	private Object lock = new Object();
-
+	private final Object lock = new Object();
 
 	/**
-	 * Constructs a new <code>ExtenderConfiguration</code> instance. Locates the
-	 * extender configuration, creates an application context which will
-	 * returned the extender items.
+	 * Constructs a new <code>ExtenderConfiguration</code> instance. Locates the extender configuration, creates an
+	 * application context which will returned the extender items.
 	 * 
 	 * @param bundleContext extender OSGi bundle context
 	 */
-	public ExtenderConfiguration(BundleContext bundleContext) {
+	public ExtenderConfiguration(BundleContext bundleContext, Log log) {
+		this.log = log;
 		Bundle bundle = bundleContext.getBundle();
 		Properties properties = new Properties(createDefaultProperties());
 
@@ -157,8 +157,7 @@ public class ExtenderConfiguration implements DisposableBean {
 
 			}
 			classLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
-		}
-		else {
+		} else {
 			String[] configs = copyEnumerationToList(enm);
 
 			log.info("Detected extender custom configurations at " + ObjectUtils.nullSafeToString(configs));
@@ -170,38 +169,44 @@ public class ExtenderConfiguration implements DisposableBean {
 			synchronized (lock) {
 				extenderConfiguration = extenderAppCtx;
 				// initialize beans
-				taskExecutor = extenderConfiguration.containsBean(TASK_EXECUTOR_NAME) ? (TaskExecutor) extenderConfiguration.getBean(
-					TASK_EXECUTOR_NAME, TaskExecutor.class)
-						: createDefaultTaskExecutor();
+				taskExecutor =
+						extenderConfiguration.containsBean(TASK_EXECUTOR_NAME) ? (TaskExecutor) extenderConfiguration
+								.getBean(TASK_EXECUTOR_NAME, TaskExecutor.class) : createDefaultTaskExecutor();
 
-				shutdownTaskExecutor = extenderConfiguration.containsBean(SHUTDOWN_TASK_EXECUTOR_NAME) ? (TaskExecutor) extenderConfiguration.getBean(
-					SHUTDOWN_TASK_EXECUTOR_NAME, TaskExecutor.class)
-						: createDefaultShutdownTaskExecutor();
+				shutdownTaskExecutor =
+						extenderConfiguration.containsBean(SHUTDOWN_TASK_EXECUTOR_NAME) ? (TaskExecutor) extenderConfiguration
+								.getBean(SHUTDOWN_TASK_EXECUTOR_NAME, TaskExecutor.class)
+								: createDefaultShutdownTaskExecutor();
 
-				eventMulticaster = extenderConfiguration.containsBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME) ? (OsgiBundleApplicationContextEventMulticaster) extenderConfiguration.getBean(
-					APPLICATION_EVENT_MULTICASTER_BEAN_NAME, OsgiBundleApplicationContextEventMulticaster.class)
-						: createDefaultEventMulticaster();
+				eventMulticaster =
+						extenderConfiguration.containsBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME) ? (OsgiBundleApplicationContextEventMulticaster) extenderConfiguration
+								.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
+										OsgiBundleApplicationContextEventMulticaster.class)
+								: createDefaultEventMulticaster();
 
-				contextCreator = extenderConfiguration.containsBean(CONTEXT_CREATOR_NAME) ? (OsgiApplicationContextCreator) extenderConfiguration.getBean(
-					CONTEXT_CREATOR_NAME, OsgiApplicationContextCreator.class)
-						: createDefaultApplicationContextCreator();
+				contextCreator =
+						extenderConfiguration.containsBean(CONTEXT_CREATOR_NAME) ? (OsgiApplicationContextCreator) extenderConfiguration
+								.getBean(CONTEXT_CREATOR_NAME, OsgiApplicationContextCreator.class)
+								: createDefaultApplicationContextCreator();
 
-				contextEventListener = extenderConfiguration.containsBean(CONTEXT_LISTENER_NAME) ? (OsgiBundleApplicationContextListener) extenderConfiguration.getBean(
-					CONTEXT_LISTENER_NAME, OsgiBundleApplicationContextListener.class)
-						: createDefaultApplicationContextListener();
+				contextEventListener =
+						extenderConfiguration.containsBean(CONTEXT_LISTENER_NAME) ? (OsgiBundleApplicationContextListener) extenderConfiguration
+								.getBean(CONTEXT_LISTENER_NAME, OsgiBundleApplicationContextListener.class)
+								: createDefaultApplicationContextListener();
 			}
 
 			// get post processors
 			postProcessors.addAll(extenderConfiguration.getBeansOfType(OsgiBeanFactoryPostProcessor.class).values());
 
 			// get dependency factories
-			dependencyFactories.addAll(extenderConfiguration.getBeansOfType(OsgiServiceDependencyFactory.class).values());
+			dependencyFactories.addAll(extenderConfiguration.getBeansOfType(OsgiServiceDependencyFactory.class)
+					.values());
 
 			classLoader = extenderConfiguration.getClassLoader();
 			// extender properties using the defaults as backup
 			if (extenderConfiguration.containsBean(PROPERTIES_NAME)) {
-				Properties customProperties = (Properties) extenderConfiguration.getBean(PROPERTIES_NAME,
-					Properties.class);
+				Properties customProperties =
+						(Properties) extenderConfiguration.getBean(PROPERTIES_NAME, Properties.class);
 				Enumeration<?> propertyKey = customProperties.propertyNames();
 				while (propertyKey.hasMoreElements()) {
 					String property = (String) propertyKey.nextElement();
@@ -268,8 +273,7 @@ public class ExtenderConfiguration implements DisposableBean {
 			if (isShutdownTaskExecutorManagedInternally) {
 				try {
 					((DisposableBean) shutdownTaskExecutor).destroy();
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					log.debug("Received exception while shutting down shutdown task executor", ex);
 				}
 				shutdownTaskExecutor = null;
@@ -278,8 +282,8 @@ public class ExtenderConfiguration implements DisposableBean {
 	}
 
 	/**
-	 * Copies the URLs returned by the given enumeration and returns them as an
-	 * array of Strings for consumption by the application context.
+	 * Copies the URLs returned by the given enumeration and returns them as an array of Strings for consumption by the
+	 * application context.
 	 * 
 	 * @param enm
 	 * @return
@@ -293,8 +297,7 @@ public class ExtenderConfiguration implements DisposableBean {
 				String configURLAsString = configURL.toExternalForm();
 				try {
 					urls.add(URLDecoder.decode(configURLAsString, "UTF8"));
-				}
-				catch (UnsupportedEncodingException uee) {
+				} catch (UnsupportedEncodingException uee) {
 					log.warn("UTF8 encoding not supported, using the platform default");
 					urls.add(URLDecoder.decode(configURLAsString));
 				}
@@ -319,15 +322,16 @@ public class ExtenderConfiguration implements DisposableBean {
 		// default JDK 1.4 processor
 		dependencyFactories.add(0, new MandatoryImporterDependencyFactory());
 
-		// load through reflection the dependency and injection processors if running on JDK 1.5 and annotation processing is enabled
+		// load through reflection the dependency and injection processors if running on JDK 1.5 and annotation
+		// processing is enabled
 		if (processAnnotation) {
 			// dependency processor
 			Class<?> annotationProcessor = null;
 			try {
-				annotationProcessor = Class.forName(ANNOTATION_DEPENDENCY_FACTORY, false,
-					ExtenderConfiguration.class.getClassLoader());
-			}
-			catch (ClassNotFoundException cnfe) {
+				annotationProcessor =
+						Class.forName(ANNOTATION_DEPENDENCY_FACTORY, false, ExtenderConfiguration.class
+								.getClassLoader());
+			} catch (ClassNotFoundException cnfe) {
 				log.warn("Spring DM annotation package not found, annotation processing disabled.", cnfe);
 				return;
 			}
@@ -341,8 +345,7 @@ public class ExtenderConfiguration implements DisposableBean {
 			// add injection processor (first in line)
 			postProcessors.add(0, new OsgiAnnotationPostProcessor());
 			log.info("Spring-DM annotation processing enabled");
-		}
-		else {
+		} else {
 			if (debug) {
 				log.debug("Spring-DM annotation processing disabled; [" + ANNOTATION_DEPENDENCY_FACTORY
 						+ "] not loaded");
@@ -353,8 +356,8 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	private TaskExecutor createDefaultTaskExecutor() {
 		// create thread-pool for starting contexts
-		ThreadGroup threadGroup = new ThreadGroup("spring-osgi-extender[" + ObjectUtils.getIdentityHexString(this)
-				+ "]-threads");
+		ThreadGroup threadGroup =
+				new ThreadGroup("spring-osgi-extender[" + ObjectUtils.getIdentityHexString(this) + "]-threads");
 		threadGroup.setDaemon(false);
 
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
@@ -383,7 +386,7 @@ public class ExtenderConfiguration implements DisposableBean {
 	}
 
 	private OsgiBundleApplicationContextListener createDefaultApplicationContextListener() {
-		return new DefaultOsgiBundleApplicationContextListener();
+		return new DefaultOsgiBundleApplicationContextListener(log);
 	}
 
 	private long getShutdownWaitTime(Properties properties) {
@@ -446,8 +449,7 @@ public class ExtenderConfiguration implements DisposableBean {
 	/**
 	 * Indicates if the process annotation is enabled or not.
 	 * 
-	 * @return Returns true if the annotation should be processed or not
-	 *         otherwise.
+	 * @return Returns true if the annotation should be processed or not otherwise.
 	 */
 	public boolean shouldProcessAnnotation() {
 		synchronized (lock) {
@@ -478,12 +480,10 @@ public class ExtenderConfiguration implements DisposableBean {
 	}
 
 	/**
-	 * Sets the flag to force the taskExtender to close up in case of runaway
-	 * threads - this applies *only* if the taskExecutor has been created
-	 * internally.
+	 * Sets the flag to force the taskExtender to close up in case of runaway threads - this applies *only* if the
+	 * taskExecutor has been created internally.
 	 * 
-	 * <p/>
-	 * The flag will cause a best attempt to shutdown the threads.
+	 * <p/> The flag will cause a best attempt to shutdown the threads.
 	 * 
 	 * @param forceThreadShutdown The forceThreadShutdown to set.
 	 */
@@ -523,9 +523,8 @@ public class ExtenderConfiguration implements DisposableBean {
 	}
 
 	/**
-	 * Returns the dependencies factories declared by the extender
-	 * configuration. The list automatically contains the default listeners
-	 * (such as the annotation one).
+	 * Returns the dependencies factories declared by the extender configuration. The list automatically contains the
+	 * default listeners (such as the annotation one).
 	 * 
 	 * @return list of dependency factories
 	 */

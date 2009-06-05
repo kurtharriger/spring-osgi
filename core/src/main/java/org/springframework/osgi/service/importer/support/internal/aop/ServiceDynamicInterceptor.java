@@ -331,7 +331,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private static final int hashCode = ServiceDynamicInterceptor.class.hashCode() * 13;
 
 	/** public logger */
-	private static final Log PUBLIC_LOGGER = LogFactory.getLog(OsgiServiceProxyFactoryBean.class);
+	private static final Log PUBLIC_LOGGER =
+			LogFactory.getLog("org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean");
 
 	private final BundleContext bundleContext;
 

@@ -28,16 +28,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.osgi.config.internal.util.MethodUtils;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.util.internal.ReflectionUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Adapter/wrapper class that handles listener with custom method invocation.
- * Similar in functionality to
- * {@link  org.springframework.osgi.config.internal.adapter.OsgiServiceLifecycleListenerAdapter}.
+ * Adapter/wrapper class that handles listener with custom method invocation. Similar in functionality to
+ * {@link org.springframework.osgi.config.internal.adapter.OsgiServiceLifecycleListenerAdapter}.
  * 
  * @author Costin Leau
  */
@@ -64,16 +62,14 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 	private boolean initialized;
 
 	/**
-	 * Map of methods keyed by the first parameter which indicates the service
-	 * type expected.
+	 * Map of methods keyed by the first parameter which indicates the service type expected.
 	 */
 	private Map registrationMethods, unregistrationMethods;
-
 
 	public void afterPropertiesSet() {
 		Assert.notNull(beanFactory);
 		Assert.isTrue(target != null || StringUtils.hasText(targetBeanName),
-			"one of 'target' or 'targetBeanName' properties has to be set");
+				"one of 'target' or 'targetBeanName' properties has to be set");
 
 		if (target != null)
 			initialized = true;
@@ -122,9 +118,8 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 	}
 
 	/**
-	 * Determine a custom method (if specified) on the given object. If the
-	 * methodName is not null and no method is found, an exception is thrown. If
-	 * the methodName is null/empty, an empty map is returned.
+	 * Determine a custom method (if specified) on the given object. If the methodName is not null and no method is
+	 * found, an exception is thrown. If the methodName is null/empty, an empty map is returned.
 	 * 
 	 * @param methodName
 	 * @return
@@ -142,36 +137,35 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 		// nothing is found, then Dictionaries
 
 		org.springframework.util.ReflectionUtils.doWithMethods(target.getClass(),
-			new org.springframework.util.ReflectionUtils.MethodCallback() {
+				new org.springframework.util.ReflectionUtils.MethodCallback() {
 
-				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-					// do matching on method name
-					if (!MethodUtils.isBridge(method) && methodName.equals(method.getName())) {
-						// take a look at the parameter types
-						Class<?>[] args = method.getParameterTypes();
-						if (args != null && args.length == 1) {
-							Class<?> propType = args[0];
-							if (Dictionary.class.isAssignableFrom(propType) || Map.class.isAssignableFrom(propType)) {
-								if (trace)
-									log.trace("discovered custom method [" + method.toString() + "] on "
-											+ target.getClass());
-							}
-							// see if there was a method already found
-							Method m = (Method) methods.get(methodName);
+					public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+						// do matching on method name
+						if (!method.isBridge() && methodName.equals(method.getName())) {
+							// take a look at the parameter types
+							Class<?>[] args = method.getParameterTypes();
+							if (args != null && args.length == 1) {
+								Class<?> propType = args[0];
+								if (Dictionary.class.isAssignableFrom(propType) || Map.class.isAssignableFrom(propType)) {
+									if (trace)
+										log.trace("discovered custom method [" + method.toString() + "] on "
+												+ target.getClass());
+								}
+								// see if there was a method already found
+								Method m = (Method) methods.get(methodName);
 
-							if (m != null) {
-								if (trace)
-									log.trace("there is already a custom method [" + m.toString() + "];ignoring "
-											+ method);
-							}
-							else {
-								org.springframework.util.ReflectionUtils.makeAccessible(method);
-								methods.put(methodName, method);
+								if (m != null) {
+									if (trace)
+										log.trace("there is already a custom method [" + m.toString() + "];ignoring "
+												+ method);
+								} else {
+									org.springframework.util.ReflectionUtils.makeAccessible(method);
+									methods.put(methodName, method);
+								}
 							}
 						}
 					}
-				}
-			});
+				});
 
 		if (!methods.isEmpty())
 			return methods;
@@ -196,8 +190,7 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 
 			try {
 				((OsgiServiceRegistrationListener) target).registered(service, serviceProperties);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				log.warn("standard registered method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
@@ -222,8 +215,7 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 
 			try {
 				((OsgiServiceRegistrationListener) target).unregistered(service, serviceProperties);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				log.warn("standard unregistered method on [" + target.getClass().getName() + "] threw exception", ex);
 			}
 		}
@@ -231,8 +223,8 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 	}
 
 	/**
-	 * Call the appropriate method (which have the key a type compatible of the
-	 * given service) from the given method map.
+	 * Call the appropriate method (which have the key a type compatible of the given service) from the given method
+	 * map.
 	 * 
 	 * @param target
 	 * @param methods

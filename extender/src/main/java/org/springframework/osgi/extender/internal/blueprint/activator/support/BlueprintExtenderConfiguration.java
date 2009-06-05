@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.extender.internal.blueprint.support;
+package org.springframework.osgi.extender.internal.blueprint.activator.support;
 
+import org.apache.commons.logging.Log;
 import org.osgi.framework.BundleContext;
 import org.springframework.osgi.extender.OsgiApplicationContextCreator;
-import org.springframework.osgi.extender.internal.blueprint.activator.support.BlueprintContainerCreator;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 
 /**
@@ -29,21 +29,18 @@ import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
  */
 public class BlueprintExtenderConfiguration extends ExtenderConfiguration {
 
-	private final Object lock = new Object();
-	private OsgiApplicationContextCreator contextCreator = new BlueprintContainerCreator();
+	private final OsgiApplicationContextCreator contextCreator = new BlueprintContainerCreator();
 
 	/**
 	 * Constructs a new <code>BlueprintExtenderConfiguration</code> instance.
 	 * 
 	 * @param bundleContext
 	 */
-	public BlueprintExtenderConfiguration(BundleContext bundleContext) {
-		super(bundleContext);
+	public BlueprintExtenderConfiguration(BundleContext bundleContext, Log log) {
+		super(bundleContext, log);
 	}
 
 	public OsgiApplicationContextCreator getContextCreator() {
-		synchronized (lock) {
-			return contextCreator;
-		}
+		return contextCreator;
 	}
 }

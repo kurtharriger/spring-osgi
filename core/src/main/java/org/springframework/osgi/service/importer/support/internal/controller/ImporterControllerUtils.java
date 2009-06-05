@@ -18,9 +18,6 @@ package org.springframework.osgi.service.importer.support.internal.controller;
 
 import java.lang.reflect.Field;
 
-import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
-import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
-
 /**
  * Importer-only delegate (it would be nice to have generics).
  * 
@@ -30,34 +27,35 @@ import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactory
 public abstract class ImporterControllerUtils {
 
 	private static final String FIELD_NAME = "controller";
-
 	private static final Field singleProxyField, collectionProxyField;
+	private static final Class<?> singleImporter;
 
 	static {
 		Class<?> clazz = null;
+		String singleImporterName = "org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean";
+		String multiImporterName =
+				"org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean";
 		try {
-			clazz = OsgiServiceProxyFactoryBean.class;
+			ClassLoader cl = ImporterControllerUtils.class.getClassLoader();
+			clazz = cl.loadClass(singleImporterName);
+			singleImporter = clazz;
 			singleProxyField = clazz.getDeclaredField(FIELD_NAME);
 			singleProxyField.setAccessible(true);
 
-			clazz = OsgiServiceCollectionProxyFactoryBean.class;
+			clazz = cl.loadClass(multiImporterName);
 			collectionProxyField = clazz.getDeclaredField(FIELD_NAME);
 			collectionProxyField.setAccessible(true);
-		}
-		catch (NoSuchFieldException ex) {
+		} catch (Exception ex) {
 			throw (RuntimeException) new IllegalStateException("Cannot read field [" + FIELD_NAME + "] on class ["
 					+ clazz + "]").initCause(ex);
 		}
 	}
 
-
 	public static ImporterInternalActions getControllerFor(Object importer) {
-		Field field = (OsgiServiceProxyFactoryBean.class == importer.getClass() ? singleProxyField
-				: collectionProxyField);
+		Field field = (singleImporter == importer.getClass() ? singleProxyField : collectionProxyField);
 		try {
 			return (ImporterInternalActions) field.get(importer);
-		}
-		catch (IllegalAccessException iae) {
+		} catch (IllegalAccessException iae) {
 			throw (RuntimeException) new IllegalArgumentException("Cannot access field [" + FIELD_NAME
 					+ "] on object [" + importer + "]").initCause(iae);
 		}

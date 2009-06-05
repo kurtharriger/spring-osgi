@@ -18,22 +18,22 @@ package org.springframework.osgi.service.importer.support.internal.aop;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.service.importer.ServiceReferenceProxy;
+import org.springframework.osgi.service.importer.support.internal.util.ServiceComparatorUtil;
 import org.springframework.util.Assert;
 
 /**
- * Simple {@link ServiceReference} proxy which simply does delegation, without
- * any extra features. It's main purpose is to allow the consistent behaviour
- * between dynamic and static proxies.
+ * Simple {@link ServiceReference} proxy which simply does delegation, without any extra features. It's main purpose is
+ * to allow the consistent behaviour between dynamic and static proxies.
  * 
  * @author Costin Leau
  * 
  */
-public class StaticServiceReferenceProxy extends BaseServiceReferenceProxy {
+public class StaticServiceReferenceProxy implements ServiceReferenceProxy {
 
 	private static final int HASH_CODE = StaticServiceReferenceProxy.class.hashCode() * 13;
 
 	private final ServiceReference target;
-
 
 	/**
 	 * Constructs a new <code>StaticServiceReferenceProxy</code> instance.
@@ -82,6 +82,6 @@ public class StaticServiceReferenceProxy extends BaseServiceReferenceProxy {
 	}
 
 	public int compareTo(Object other) {
-		return COMPARATOR.compare(target, other);
+		return ServiceComparatorUtil.compare(target, other);
 	}
 }

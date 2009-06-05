@@ -47,14 +47,11 @@ import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.util.Assert;
 
 /**
- * OSGi service dynamic collection - allows iterating while the underlying
- * storage is being shrunk/expanded. This collection is read-only - its content
- * is being retrieved dynamically from the OSGi platform.
+ * OSGi service dynamic collection - allows iterating while the underlying storage is being shrunk/expanded. This
+ * collection is read-only - its content is being retrieved dynamically from the OSGi platform.
  * 
- * <p/>
- * This collection and its iterators are thread-safe. That is, multiple threads
- * can access the collection. However, since the collection is read-only, it
- * cannot be modified by the client.
+ * <p/> This collection and its iterators are thread-safe. That is, multiple threads can access the collection. However,
+ * since the collection is read-only, it cannot be modified by the client.
  * 
  * @see Collection
  * @author Costin Leau
@@ -80,65 +77,65 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				ProxyPlusCallback ppc = null;
 				ImportedOsgiServiceProxy proxy = null;
 
-				// flag used for sending state events 
+				// flag used for sending state events
 				boolean shouldInformStateListeners = false;
 
 				switch (event.getType()) {
 
-					case (ServiceEvent.REGISTERED):
-					case (ServiceEvent.MODIFIED):
-						// same as ServiceEvent.REGISTERED
-						synchronized (serviceProxies) {
-							if (!servicesIdMap.containsKey(serviceId)) {
-								ppc = proxyCreator.createServiceProxy(ref);
-								proxy = ppc.proxy;
-								// let the dynamic collection decide if the service
-								// is added or not (think set, sorted set)
-								if (serviceProxies.add(proxy)) {
-									collectionModified = true;
-									// check if the list was empty before adding something to it
-									shouldInformStateListeners = (serviceProxies.size() == 1);
-									servicesIdMap.put(serviceId, ppc);
-								}
+				case (ServiceEvent.REGISTERED):
+				case (ServiceEvent.MODIFIED):
+					// same as ServiceEvent.REGISTERED
+					synchronized (serviceProxies) {
+						if (!servicesIdMap.containsKey(serviceId)) {
+							ppc = proxyCreator.createServiceProxy(ref);
+							proxy = ppc.proxy;
+							// let the dynamic collection decide if the service
+							// is added or not (think set, sorted set)
+							if (serviceProxies.add(proxy)) {
+								collectionModified = true;
+								// check if the list was empty before adding something to it
+								shouldInformStateListeners = (serviceProxies.size() == 1);
+								servicesIdMap.put(serviceId, ppc);
 							}
 						}
-						// inform listeners
-						// TODO: should this be part of the lock also?
-						if (collectionModified) {
-							OsgiServiceBindingUtils.callListenersBind(context, proxy, ref, listeners);
+					}
+					// inform listeners
+					// TODO: should this be part of the lock also?
+					if (collectionModified) {
+						OsgiServiceBindingUtils.callListenersBind(context, proxy, ref, listeners);
 
-							if (serviceRequiredAtStartup && shouldInformStateListeners)
-								notifySatisfiedStateListeners();
+						if (serviceRequiredAtStartup && shouldInformStateListeners)
+							notifySatisfiedStateListeners();
+					}
+
+					break;
+				case (ServiceEvent.UNREGISTERING):
+					synchronized (serviceProxies) {
+						// remove service id / proxy association
+						ppc = (ProxyPlusCallback) servicesIdMap.remove(serviceId);
+						if (ppc != null) {
+							proxy = ppc.proxy;
+							// remove service proxy
+							collectionModified = serviceProxies.remove(proxy);
+							// invalidate it
+							invalidateProxy(ppc);
+
+							// check if the list is empty
+							shouldInformStateListeners = (serviceProxies.isEmpty());
 						}
+					}
+					// TODO: should this be part of the lock also?
+					if (collectionModified) {
+						OsgiServiceBindingUtils.callListenersUnbind(context, proxy, ref, listeners);
 
-						break;
-					case (ServiceEvent.UNREGISTERING):
-						synchronized (serviceProxies) {
-							// remove service id / proxy association
-							ppc = (ProxyPlusCallback) servicesIdMap.remove(serviceId);
-							if (ppc != null) {
-								proxy = ppc.proxy;
-								// remove service proxy
-								collectionModified = serviceProxies.remove(proxy);
-								// invalidate it
-								invalidateProxy(ppc);
+						if (serviceRequiredAtStartup && shouldInformStateListeners)
+							notifyUnsatisfiedStateListeners();
+					}
 
-								// check if the list is empty
-								shouldInformStateListeners = (serviceProxies.isEmpty());
-							}
-						}
-						// TODO: should this be part of the lock also?
-						if (collectionModified) {
-							OsgiServiceBindingUtils.callListenersUnbind(context, proxy, ref, listeners);
+					break;
 
-							if (serviceRequiredAtStartup && shouldInformStateListeners)
-								notifyUnsatisfiedStateListeners();
-						}
-
-						break;
-
-					default:
-						throw new IllegalArgumentException("unsupported event type:" + event);
+				default:
+					throw new IllegalArgumentException("unsupported event type:" + event);
 				}
 			}
 			// OSGi swallows these exceptions so make sure we get a chance to
@@ -147,8 +144,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				if (log.isWarnEnabled()) {
 					log.warn("serviceChanged() processing failed", re);
 				}
-			}
-			finally {
+			} finally {
 				Thread.currentThread().setContextClassLoader(tccl);
 			}
 		}
@@ -181,7 +177,6 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		// dynamic thread-safe iterator
 		private final Iterator<ImportedOsgiServiceProxy> iter = serviceProxies.iterator();
 
-
 		public boolean hasNext() {
 			mandatoryServiceCheck();
 			return iter.hasNext();
@@ -198,10 +193,11 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		}
 	}
 
-
 	private static final Log log = LogFactory.getLog(OsgiServiceCollection.class);
 
-	private static final Log PUBLIC_LOGGER = LogFactory.getLog(OsgiServiceCollectionProxyFactoryBean.class);
+	private static final Log PUBLIC_LOGGER =
+			LogFactory
+					.getLog("org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean");
 
 	// map of services
 	// NOTE: this collection is protected by the 'serviceProxies' lock.
@@ -241,7 +237,6 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	/** event source (importer) name */
 	private String sourceName;
-
 
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader,
 			ServiceProxyCreator proxyCreator) {
@@ -289,13 +284,13 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				ServiceReference ref = serviceProxy.getServiceReference();
 
 				// get first the destruction callback
-				ProxyPlusCallback ppc = (ProxyPlusCallback) servicesIdMap.get((Long) ref.getProperty(Constants.SERVICE_ID));
+				ProxyPlusCallback ppc =
+						(ProxyPlusCallback) servicesIdMap.get((Long) ref.getProperty(Constants.SERVICE_ID));
 				listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
 
 				try {
 					ppc.destructionCallback.destroy();
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					log.error("Exception occurred while destroying proxy " + ppc.proxy, ex);
 				}
 			}
@@ -321,8 +316,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	}
 
 	/**
-	 * Create the dynamic storage used internally. The storage
-	 * <strong>has</strong> to be thread-safe.
+	 * Create the dynamic storage used internally. The storage <strong>has</strong> to be thread-safe.
 	 */
 	protected DynamicCollection<ImportedOsgiServiceProxy> createInternalDynamicStorage() {
 		return new DynamicCollection<ImportedOsgiServiceProxy>();

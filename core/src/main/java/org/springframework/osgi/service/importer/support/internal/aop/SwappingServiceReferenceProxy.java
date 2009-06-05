@@ -18,23 +18,24 @@ package org.springframework.osgi.service.importer.support.internal.aop;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
+import org.springframework.osgi.service.importer.ServiceReferenceProxy;
+import org.springframework.osgi.service.importer.support.internal.util.ServiceComparatorUtil;
 import org.springframework.util.Assert;
 
 /**
- * Synchronized, swapping {@link ServiceReference} implementation that delegates
- * to an underlying implementation which can be swapped at runtime.
+ * Synchronized, swapping {@link ServiceReference} implementation that delegates to an underlying implementation which
+ * can be swapped at runtime.
  * 
  * <strong>Note:</strong> this class is thread-safe.
  * 
  * @author Costin Leau
  * 
  */
-class SwappingServiceReferenceProxy extends BaseServiceReferenceProxy {
+class SwappingServiceReferenceProxy implements ServiceReferenceProxy {
 
 	private static final int HASH_CODE = SwappingServiceReferenceProxy.class.hashCode() * 13;
 
 	private ServiceReference delegate;
-
 
 	synchronized ServiceReference swapDelegates(ServiceReference newDelegate) {
 		Assert.notNull(newDelegate);
@@ -81,8 +82,9 @@ class SwappingServiceReferenceProxy extends BaseServiceReferenceProxy {
 	}
 
 	public synchronized int compareTo(Object other) {
-		if (other instanceof SwappingServiceReferenceProxy)
-			return COMPARATOR.compare(delegate, ((SwappingServiceReferenceProxy) other).delegate);
-		return COMPARATOR.compare(delegate, other);
+		if (this == other) {
+			return 0;
+		}
+		return ServiceComparatorUtil.compare(delegate, other);
 	}
 }

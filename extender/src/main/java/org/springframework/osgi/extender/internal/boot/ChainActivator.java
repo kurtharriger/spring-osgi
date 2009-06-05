@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.extender.internal.activator;
+package org.springframework.osgi.extender.internal.boot;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.springframework.osgi.extender.internal.activator.ContextLoaderListener;
 import org.springframework.osgi.extender.internal.blueprint.activator.BlueprintLoaderListener;
 import org.springframework.util.ClassUtils;
 
