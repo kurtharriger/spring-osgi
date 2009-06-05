@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+
+	<description>Importer collections configuration</description>
+
+	<!-- collections -->
+	<bean id="comparator" class="org.springframework.osgi.blueprint.DummyComparator" />
+
+	<bean id="compa" class="org.springframework.osgi.blueprint.DummyComparator" />
+
+	<ref-list id="simpleList" interface="java.lang.Cloneable"
+		comparator-ref="comparator" />
+
+	<ref-list id="nestedComparator" interface="java.lang.Cloneable">
+		<comparator>
+			<bean class="org.springframework.osgi.blueprint.DummyComparator" />
+		</comparator>
+	</ref-list>
+
+	<ref-set id="nestedRefComparator" interface="java.lang.Cloneable"
+		ordering-basis="service-reference">
+		<comparator>
+			<ref component-id="compa" />
+		</comparator>
+	</ref-set>
+
+	<ref-set id="memberType" interface="java.io.Serializable"
+		member-type="service-reference" />
+
+	<ref-set id="sortedSet" interface="java.io.Serializable"
+		comparator-ref="compa" />
+
+</blueprint>
