@@ -28,14 +28,15 @@ import org.springframework.osgi.service.importer.support.CollectionType;
 class SpringRefCollectionMetadata extends SpringServiceReferenceComponentMetadata implements RefCollectionMetadata {
 
 	private static final String COLLECTION_PROP = "collectionType";
+	private static final String COMPARATOR = "comparator";
 
 	private final Class<?> collectionType;
-	private final Target comparator = null;
-	private final int memberType = 0;
-	private final int comparisonBasis = 0;
+	private final Target comparator;
+	private final int memberType = -1;
+	private final int orderingBasis = -1;
 
 	/**
-	 * Constructs a new <code>SpringCollectionBasedServiceReferenceComponentMetadata</code> instance.
+	 * Constructs a new <code>SpringRefCollectionMetadata</code> instance.
 	 * 
 	 * @param name
 	 * @param definition
@@ -44,8 +45,11 @@ class SpringRefCollectionMetadata extends SpringServiceReferenceComponentMetadat
 		super(name, definition);
 
 		MutablePropertyValues pvs = definition.getPropertyValues();
+		// collection type
 		CollectionType colType = (CollectionType) MetadataUtils.getValue(pvs, COLLECTION_PROP);
 		collectionType = colType.getCollectionClass();
+		Object comp = MetadataUtils.getValue(pvs, COMPARATOR);
+		comparator = (comp != null ? (Target) ValueFactory.buildValue(comp) : null);
 	}
 
 	public Class<?> getCollectionType() {
@@ -57,10 +61,10 @@ class SpringRefCollectionMetadata extends SpringServiceReferenceComponentMetadat
 	}
 
 	public int getMemberType() {
-		return memberType;
+		throw new UnsupportedOperationException("member type not implemented yet");
 	}
 
 	public int getOrderingBasis() {
-		return comparisonBasis;
+		throw new UnsupportedOperationException("member type not implemented yet");
 	}
 }
