@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.osgi.service.importer.support.internal.collection.comparator;
+package org.springframework.osgi.service.importer.support.internal.util;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -24,21 +24,18 @@ import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.util.OsgiServiceReferenceUtils;
 
 /**
- * Default comparator for sorted collections. It uses the service id property of
- * an OSGi service to determine the order. Thus, by using this comparator, the
- * services added to a collection will be sorted in the order in which they are
+ * Default comparator for sorted collections. It uses the service id property of an OSGi service to determine the order.
+ * Thus, by using this comparator, the services added to a collection will be sorted in the order in which they are
  * published to the OSGi platform.
  * 
- * <p/> This comparator version, provides <i>natural</i> ordering for service
- * references for pre OSGI 4.1 platforms, using the contract from OSGi 4.1 spec:
+ * <p/> This comparator version, provides <i>natural</i> ordering for service references for pre OSGI 4.1 platforms,
+ * using the contract from OSGi 4.1 spec:
  * 
- * <blockquote> If this ServiceReference and the specified ServiceReference have
- * the same service id they are equal. This ServiceReference is less than the
- * specified ServiceReference if it has a lower service ranking and greater if
- * it has a higher service ranking. Otherwise, if this ServiceReference and the
- * specified ServiceReference have the same service ranking, this
- * ServiceReference is less than the specified ServiceReference if it has a
- * higher service id and greater if it has a lower service id. </blockquote>
+ * <blockquote> If this ServiceReference and the specified ServiceReference have the same service id they are equal.
+ * This ServiceReference is less than the specified ServiceReference if it has a lower service ranking and greater if it
+ * has a higher service ranking. Otherwise, if this ServiceReference and the specified ServiceReference have the same
+ * service ranking, this ServiceReference is less than the specified ServiceReference if it has a higher service id and
+ * greater if it has a lower service id. </blockquote>
  * 
  * @see Comparator
  * @author Costin Leau
@@ -49,7 +46,6 @@ public class ServiceReferenceComparator implements Comparator, Serializable {
 	private static final long serialVersionUID = 7552328574956669890L;
 
 	private static final int hashCode = ServiceReferenceComparator.class.hashCode() * 13;
-
 
 	public int compare(Object o1, Object o2) {
 
@@ -65,16 +61,14 @@ public class ServiceReferenceComparator implements Comparator, Serializable {
 		// look first for service references
 		if (o1 instanceof ServiceReference) {
 			ref1 = (ServiceReference) o1;
-		}
-		else {
+		} else {
 			ImportedOsgiServiceProxy obj1 = (ImportedOsgiServiceProxy) o1;
 			ref1 = obj1.getServiceReference();
 		}
 
 		if (o2 instanceof ServiceReference) {
 			ref2 = (ServiceReference) o2;
-		}
-		else {
+		} else {
 			ImportedOsgiServiceProxy obj2 = (ImportedOsgiServiceProxy) o2;
 			ref2 = obj2.getServiceReference();
 		}

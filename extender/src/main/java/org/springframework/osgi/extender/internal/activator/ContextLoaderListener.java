@@ -17,7 +17,6 @@
 
 package org.springframework.osgi.extender.internal.activator;
 
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -41,8 +40,6 @@ import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 import org.springframework.osgi.extender.internal.support.NamespaceManager;
 import org.springframework.osgi.extender.support.internal.ConfigUtils;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
-import org.springframework.osgi.service.importer.support.Cardinality;
-import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.OsgiBundleUtils;
@@ -305,7 +302,6 @@ public class ContextLoaderListener implements BundleActivator {
 		initNamespaceHandlers(bundleContext);
 
 		// Step 2: initialize the extender configuration
-		extenderConfiguration = new ExtenderConfiguration(context);
 		extenderConfiguration = initExtenderConfiguration(bundleContext);
 
 		// init the OSGi event dispatch/listening system
@@ -322,7 +318,7 @@ public class ContextLoaderListener implements BundleActivator {
 	}
 
 	protected ExtenderConfiguration initExtenderConfiguration(BundleContext bundleContext) {
-		return new ExtenderConfiguration(bundleContext);
+		return new ExtenderConfiguration(bundleContext, log);
 	}
 
 	protected OsgiContextProcessor createContextProcessor() {

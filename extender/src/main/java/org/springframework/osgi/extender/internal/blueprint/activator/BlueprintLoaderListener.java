@@ -24,8 +24,8 @@ import org.springframework.osgi.extender.internal.activator.ContextLoaderListene
 import org.springframework.osgi.extender.internal.activator.OsgiContextProcessor;
 import org.springframework.osgi.extender.internal.blueprint.activator.support.BlueprintConfigUtils;
 import org.springframework.osgi.extender.internal.blueprint.activator.support.BlueprintContainerConfig;
+import org.springframework.osgi.extender.internal.blueprint.activator.support.BlueprintExtenderConfiguration;
 import org.springframework.osgi.extender.internal.blueprint.event.EventAdminDispatcher;
-import org.springframework.osgi.extender.internal.blueprint.support.BlueprintExtenderConfiguration;
 import org.springframework.osgi.extender.internal.support.ExtenderConfiguration;
 import org.springframework.osgi.extender.support.ApplicationContextConfiguration;
 
@@ -59,7 +59,7 @@ public class BlueprintLoaderListener extends ContextLoaderListener {
 
 	@Override
 	protected ExtenderConfiguration initExtenderConfiguration(BundleContext bundleContext) {
-		return new BlueprintExtenderConfiguration(bundleContext);
+		return new BlueprintExtenderConfiguration(bundleContext, log);
 	}
 
 	@Override

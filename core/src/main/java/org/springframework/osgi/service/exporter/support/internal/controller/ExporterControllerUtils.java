@@ -18,8 +18,6 @@ package org.springframework.osgi.service.exporter.support.internal.controller;
 
 import java.lang.reflect.Field;
 
-import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
-
 /**
  * Utility class that retrieves the controller associated with a given importer.
  * 
@@ -29,26 +27,24 @@ import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 public abstract class ExporterControllerUtils {
 
 	private static final String FIELD_NAME = "controller";
-
 	private static final Field field;
 
 	static {
+		String className = "org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean";
 		try {
-			field = OsgiServiceFactoryBean.class.getDeclaredField(FIELD_NAME);
+			Class<?> cls = ExporterControllerUtils.class.getClassLoader().loadClass(className);
+			field = cls.getDeclaredField(FIELD_NAME);
 			field.setAccessible(true);
-		}
-		catch (NoSuchFieldException ex) {
+		} catch (Exception ex) {
 			throw (RuntimeException) new IllegalStateException("Cannot read field [" + FIELD_NAME + "] on class ["
-					+ OsgiServiceFactoryBean.class + "]").initCause(ex);
+					+ className + "]").initCause(ex);
 		}
 	}
-
 
 	public static ExporterInternalActions getControllerFor(Object exporter) {
 		try {
 			return (ExporterInternalActions) field.get(exporter);
-		}
-		catch (IllegalAccessException iae) {
+		} catch (IllegalAccessException iae) {
 			throw (RuntimeException) new IllegalArgumentException("Cannot access field [" + FIELD_NAME
 					+ "] on object [" + exporter + "]").initCause(iae);
 		}

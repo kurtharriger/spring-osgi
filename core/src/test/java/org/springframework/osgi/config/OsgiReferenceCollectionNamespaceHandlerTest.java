@@ -41,7 +41,7 @@ import org.springframework.osgi.service.importer.support.internal.collection.Osg
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSet;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedList;
 import org.springframework.osgi.service.importer.support.internal.collection.OsgiServiceSortedSet;
-import org.springframework.osgi.service.importer.support.internal.collection.comparator.ServiceReferenceComparator;
+import org.springframework.osgi.service.importer.support.internal.util.ServiceReferenceComparator;
 
 /**
  * @author Costin Leau

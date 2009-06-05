@@ -17,7 +17,6 @@
 package org.springframework.osgi.extender.internal.support;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 import org.springframework.osgi.context.event.OsgiBundleContextClosedEvent;
@@ -26,17 +25,20 @@ import org.springframework.osgi.context.event.OsgiBundleContextRefreshedEvent;
 import org.springframework.osgi.extender.internal.activator.ContextLoaderListener;
 
 /**
- * Default application context event logger. Logs (using the
- * {@link ContextLoaderListener} logger, the events received.
+ * Default application context event logger. Logs (using the {@link ContextLoaderListener} logger, the events received.
  * 
  * @author Costin Leau
  * @author Andy Piper
  */
-public class DefaultOsgiBundleApplicationContextListener implements OsgiBundleApplicationContextListener<OsgiBundleApplicationContextEvent> {
+public class DefaultOsgiBundleApplicationContextListener implements
+		OsgiBundleApplicationContextListener<OsgiBundleApplicationContextEvent> {
 
 	/** logger */
-	private static final Log log = LogFactory.getLog(ContextLoaderListener.class);
+	private final Log log;
 
+	public DefaultOsgiBundleApplicationContextListener(Log log) {
+		this.log = log;
+	}
 
 	public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
 		String applicationContextString = event.getApplicationContext().getDisplayName();
@@ -47,8 +49,8 @@ public class DefaultOsgiBundleApplicationContextListener implements OsgiBundleAp
 
 		if (event instanceof OsgiBundleContextFailedEvent) {
 			OsgiBundleContextFailedEvent failureEvent = (OsgiBundleContextFailedEvent) event;
-			log.error("Application context refresh failed (" + applicationContextString + ")",
-				failureEvent.getFailureCause());
+			log.error("Application context refresh failed (" + applicationContextString + ")", failureEvent
+					.getFailureCause());
 
 		}
 
@@ -58,8 +60,7 @@ public class DefaultOsgiBundleApplicationContextListener implements OsgiBundleAp
 
 			if (error == null) {
 				log.info("Application context succesfully closed (" + applicationContextString + ")");
-			}
-			else {
+			} else {
 				log.error("Application context close failed (" + applicationContextString + ")", error);
 			}
 		}
