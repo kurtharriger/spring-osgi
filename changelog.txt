@@ -5,6 +5,9 @@ http://www.springframework.org/osgi
 Changes in version 1.2.1 (2009-mm-dd)
 -------------------------------------
 
+General
+* the archetype project now saves locally the manifest generated during packaging
+
 Package org.springframework.osgi.config
 * improved further the definition of generated definitions to avoid IDE validation complains
 
