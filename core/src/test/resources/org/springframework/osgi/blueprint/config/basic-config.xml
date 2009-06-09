@@ -4,9 +4,9 @@
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xsi:schemaLocation="
 		http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
-		beans:default-init-method="init">
-
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	
 	<description>Components just with attributes</description>
 
 	<bean id="simple" class="java.lang.Object"/>

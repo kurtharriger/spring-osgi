@@ -11,6 +11,7 @@ General
 * upgraded to Equinox 3.4.3
 * upgraded to Knopflerfish 2.3.0
 * generified classes (both public and internal)
+* the archetype project now saves locally the manifest generated during packaging
 
 Package org.springframework.osgi.context
 * improved serviceability by using NamedThreadLocal

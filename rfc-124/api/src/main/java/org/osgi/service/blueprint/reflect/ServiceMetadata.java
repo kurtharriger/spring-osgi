@@ -50,7 +50,7 @@ public interface ServiceMetadata extends ComponentMetadata, Target {
 
 	/**
 	 * The component that is to be exported as a service. Value must refer to a component and
-	 * therefore be either a RefMetadata or BeanMetadata.
+	 * therefore be either a RefMetadata, BeanMetadata, or ReferenceMetadata.
 	 *
 	 * Defined in the <code>registration-method</code> attribute.
 	 *
@@ -105,13 +105,4 @@ public interface ServiceMetadata extends ComponentMetadata, Target {
 	 * @return an immutable collection of RegistrationListenerMetadata
 	 */
 	Collection /*<RegistrationListener>*/ getRegistrationListeners();
-
-    /**
-     * The names of any components listed in a "depends-on" attribute for this
-     * component.
-     *
-     * @return an immutable List of component names for components that we have explicitly
-     * declared a dependency on, or an empty set if none.
-     */
-    List/*<String>*/ getExplicitDependencies();
 }

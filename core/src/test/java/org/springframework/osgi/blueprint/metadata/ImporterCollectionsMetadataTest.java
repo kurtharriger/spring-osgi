@@ -15,16 +15,9 @@
  */
 package org.springframework.osgi.blueprint.metadata;
 
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-
-import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
-import org.osgi.service.blueprint.reflect.RefCollectionMetadata;
-import org.osgi.service.blueprint.reflect.RefMetadata;
+import org.osgi.service.blueprint.reflect.RefListMetadata;
 import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
-import org.osgi.service.blueprint.reflect.Target;
 
 /**
  * @author Costin Leau
@@ -45,38 +38,6 @@ public class ImporterCollectionsMetadataTest extends BaseMetadataTest {
 	}
 
 	public void testSimpleList() throws Exception {
-		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("simpleList");
-		assertEquals(List.class, metadata.getCollectionType());
-		Target comparator = metadata.getComparator();
-		assertNotNull(comparator);
-		assertTrue(comparator instanceof RefMetadata);
-		assertEquals("comparator", ((RefMetadata) comparator).getComponentId());
-	}
-
-	public void testNestedComparator() throws Exception {
-		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("nestedComparator");
-		assertEquals(List.class, metadata.getCollectionType());
-		Target comparator = metadata.getComparator();
-		assertNotNull(comparator);
-		assertTrue(comparator instanceof BeanMetadata);
-	}
-
-	public void testNestedRefComparator() throws Exception {
-		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("nestedRefComparator");
-		assertEquals(SortedSet.class, metadata.getCollectionType());
-		Target comparator = metadata.getComparator();
-		assertNotNull(comparator);
-		assertTrue(comparator instanceof RefMetadata);
-		assertEquals("compa", ((RefMetadata) comparator).getComponentId());
-	}
-
-	public void testMemberType() throws Exception {
-		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("memberType");
-		assertEquals(Set.class, metadata.getCollectionType());
-	}
-
-	public void testSortedSet() throws Exception {
-		RefCollectionMetadata metadata = (RefCollectionMetadata) getReferenceMetadata("sortedSet");
-		assertEquals(SortedSet.class, metadata.getCollectionType());
+		RefListMetadata metadata = (RefListMetadata) getReferenceMetadata("simpleList");
 	}
 }

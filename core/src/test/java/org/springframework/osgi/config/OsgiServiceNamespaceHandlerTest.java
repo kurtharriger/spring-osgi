@@ -59,7 +59,6 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 
 	private ServiceRegistration registration;
 
-
 	protected void setUp() throws Exception {
 
 		services.clear();
