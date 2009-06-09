@@ -172,6 +172,7 @@
                 <artifactId>com.springsource.bundlor.maven</artifactId>
                 <version>1.0.0.M2</version>
                 <configuration>
+                    <outputManifest>${basedir}/META-INF/MANIFEST.MF</outputManifest>
                     <failOnWarnings>false</failOnWarnings>
                     <removeNullHeaders>true</removeNullHeaders>
                     <manifestHeaders><![CDATA[Bundle-ManifestVersion: 2
@@ -187,6 +188,7 @@ Spring-DM-Version: ${pom.version}
                         <id>bundle-manifest</id>
                         <phase>package</phase>
                         <goals>
+                            <goal>manifest</goal>
                             <goal>transform</goal>
                         </goals>
                     </execution>
