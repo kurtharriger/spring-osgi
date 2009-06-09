@@ -38,14 +38,14 @@ public abstract class BlueprintExceptionFactory {
 
 	private static abstract class BlueprintFactory {
 		private static RuntimeException createServiceUnavailableException(Filter filter) {
-			return new ServiceUnavailableException("service matching filter=[" + filter + "] unavailable", null, filter
+			return new ServiceUnavailableException("service matching filter=[" + filter + "] unavailable", filter
 					.toString());
 		}
 
 		private static RuntimeException createServiceUnavailableException(ServiceReference reference) {
 			String id = (reference == null ? "null" : "" + OsgiServiceReferenceUtils.getServiceId(reference));
-			return new ServiceUnavailableException("service with id=[" + id + "] unavailable", null, "(service.id="
-					+ id + ")");
+			return new ServiceUnavailableException("service with id=[" + id + "] unavailable", "(service.id=" + id
+					+ ")");
 		}
 	}
 }

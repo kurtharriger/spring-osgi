@@ -55,7 +55,7 @@ class ComponentMetadataFactory implements MetadataConstants {
 			return new SpringReferenceMetadata(name, beanDefinition);
 		}
 		if (isCollectionImporter(beanDefinition)) {
-			return new SpringRefCollectionMetadata(name, beanDefinition);
+			return new SpringRefListMetadata(name, beanDefinition);
 		}
 
 		return new SpringBeanMetadata(name, beanDefinition);

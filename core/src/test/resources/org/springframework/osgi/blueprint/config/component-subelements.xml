@@ -213,9 +213,6 @@
 					<value>java.util.Map</value>
 					<value>java.io.Serializable</value>
 				</interfaces>
-				<comparator>
-					<ref component-id="namedComparator" />
-				</comparator>
 			</ref-list>
 		</property>
 	</bean>

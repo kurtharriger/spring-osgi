@@ -12,26 +12,7 @@
 
 	<bean id="compa" class="org.springframework.osgi.blueprint.DummyComparator" />
 
-	<ref-list id="simpleList" interface="java.lang.Cloneable"
-		comparator-ref="comparator" />
+	<ref-list id="simpleList" interface="java.lang.Cloneable"/>
 
-	<ref-list id="nestedComparator" interface="java.lang.Cloneable">
-		<comparator>
-			<bean class="org.springframework.osgi.blueprint.DummyComparator" />
-		</comparator>
-	</ref-list>
-
-	<ref-set id="nestedRefComparator" interface="java.lang.Cloneable"
-		ordering-basis="service-reference">
-		<comparator>
-			<ref component-id="compa" />
-		</comparator>
-	</ref-set>
-
-	<ref-set id="memberType" interface="java.io.Serializable"
-		member-type="service-reference" />
-
-	<ref-set id="sortedSet" interface="java.io.Serializable"
-		comparator-ref="compa" />
 
 </blueprint>

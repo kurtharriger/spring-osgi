@@ -54,4 +54,8 @@ public class TestComponent {
 	public void setServiceReference(ServiceReference serviceReference) {
 		this.serviceReference = serviceReference;
 	}
+	
+	public void init() {
+		System.out.println("Initialized");
+	}
 }

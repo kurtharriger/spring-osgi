@@ -65,7 +65,7 @@ public class SpringComponentMetadata implements ComponentMetadata {
 		return name;
 	}
 
-	public List<String> getExplicitDependencies() {
+	public List<String> getDependsOn() {
 		return dependsOn;
 	}
 

@@ -24,7 +24,7 @@ import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.BeanProperty;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
-import org.osgi.service.blueprint.reflect.RefCollectionMetadata;
+import org.osgi.service.blueprint.reflect.RefListMetadata;
 import org.osgi.service.blueprint.reflect.ReferenceMetadata;
 import org.osgi.service.blueprint.reflect.ServiceMetadata;
 import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
@@ -76,8 +76,8 @@ class BeanDefinitionFactory implements MetadataConstants {
 		}
 
 		if (metadata instanceof ServiceReferenceMetadata) {
-			if (metadata instanceof RefCollectionMetadata) {
-				return buildReferenceCollection((RefCollectionMetadata) metadata);
+			if (metadata instanceof RefListMetadata) {
+				return buildReferenceCollection((RefListMetadata) metadata);
 			}
 			if (metadata instanceof ReferenceMetadata) {
 				return buildReferenceProxy((ReferenceMetadata) metadata);
@@ -153,7 +153,7 @@ class BeanDefinitionFactory implements MetadataConstants {
 		return builder.getBeanDefinition();
 	}
 
-	private AbstractBeanDefinition buildReferenceCollection(RefCollectionMetadata metadata) {
+	private AbstractBeanDefinition buildReferenceCollection(RefListMetadata metadata) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MULTI_SERVICE_IMPORTER_CLASS);
 		addServiceReferenceProperties(metadata, builder);
 		throw new UnsupportedOperationException("not implemented yet");
