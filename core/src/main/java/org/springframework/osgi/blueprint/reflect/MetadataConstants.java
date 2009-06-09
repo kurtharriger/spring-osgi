@@ -42,7 +42,7 @@ interface MetadataConstants {
 	static String EXPORTER_RANKING_PROP = "ranking";
 	static String EXPORTER_INTFS_PROP = "interfaces";
 	static String EXPORTER_PROPS_PROP = "serviceProperties";
-	static String EXPORTER_AUTO_EXPORT_PROP = "autoExport";
+	static String EXPORTER_AUTO_EXPORT_PROP = "interfaceDetector";
 	static String EXPORTER_TARGET_BEAN_PROP = "targetBean";
 	static String EXPORTER_TARGET_BEAN_NAME_PROP = "targetBeanName";
 

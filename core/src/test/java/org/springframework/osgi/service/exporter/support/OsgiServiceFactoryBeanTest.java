@@ -56,11 +56,9 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 	private BundleContext ctx;
 
-
 	class UpdateableProperties extends Properties implements ServicePropertiesListenerManager {
 
 		public List<ServicePropertiesChangeListener> listeners = new ArrayList<ServicePropertiesChangeListener>();
-
 
 		public void addListener(ServicePropertiesChangeListener listener) {
 			listeners.add(listener);
@@ -77,7 +75,6 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 			}
 		}
 	}
-
 
 	protected void setUp() throws Exception {
 		exporter = new OsgiServiceFactoryBean();
@@ -105,8 +102,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		try {
 			this.exporter.afterPropertiesSet();
 			fail("Expecting IllegalArgumentException");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -118,8 +114,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		try {
 			this.exporter.afterPropertiesSet();
 			fail("Expecting IllegalArgumentException");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -128,8 +123,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		try {
 			this.exporter.afterPropertiesSet();
 			fail("Expecting IllegalArgumentException");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -144,8 +138,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		try {
 			this.exporter.afterPropertiesSet();
 			fail("Expecting IllegalArgumentException");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -157,32 +150,32 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 	}
 
 	public void testAutoDetectClassesForPublishingDisabled() throws Exception {
-		exporter.setAutoExport(AutoExport.DISABLED);
-		Class<?>[] clazz = AutoExport.DISABLED.getExportedClasses(Integer.class);
+		exporter.setInterfaceDetector(DefaultInterfaceDetector.DISABLED);
+		Class<?>[] clazz = DefaultInterfaceDetector.DISABLED.detect(Integer.class);
 		assertNotNull(clazz);
 		assertEquals(0, clazz.length);
 	}
 
 	public void testAutoDetectClassesForPublishingInterfaces() throws Exception {
-		exporter.setAutoExport(AutoExport.INTERFACES);
-		Class<?>[] clazz = AutoExport.INTERFACES.getExportedClasses(HashMap.class);
+		exporter.setInterfaceDetector(DefaultInterfaceDetector.INTERFACES);
+		Class<?>[] clazz = DefaultInterfaceDetector.INTERFACES.detect(HashMap.class);
 		Class<?>[] expected = new Class<?>[] { Cloneable.class, Serializable.class, Map.class };
 
 		assertTrue(compareArrays(expected, clazz));
 	}
 
 	public void testAutoDetectClassesForPublishingClassHierarchy() throws Exception {
-		exporter.setAutoExport(AutoExport.CLASS_HIERARCHY);
-		Class<?>[] clazz = AutoExport.CLASS_HIERARCHY.getExportedClasses(HashMap.class);
+		exporter.setInterfaceDetector(DefaultInterfaceDetector.CLASS_HIERARCHY);
+		Class<?>[] clazz = DefaultInterfaceDetector.CLASS_HIERARCHY.detect(HashMap.class);
 		Class<?>[] expected = new Class<?>[] { HashMap.class, AbstractMap.class };
 		assertTrue(compareArrays(expected, clazz));
 	}
 
 	public void testAutoDetectClassesForPublishingAll() throws Exception {
-		exporter.setAutoExport(AutoExport.ALL_CLASSES);
-		Class<?>[] clazz = AutoExport.ALL_CLASSES.getExportedClasses(HashMap.class);
-		Class<?>[] expected = new Class<?>[] { Map.class, Cloneable.class, Serializable.class, HashMap.class,
-			AbstractMap.class };
+		exporter.setInterfaceDetector(DefaultInterfaceDetector.ALL_CLASSES);
+		Class<?>[] clazz = DefaultInterfaceDetector.ALL_CLASSES.detect(HashMap.class);
+		Class<?>[] expected =
+				new Class<?>[] { Map.class, Cloneable.class, Serializable.class, HashMap.class, AbstractMap.class };
 		assertTrue(compareArrays(expected, clazz));
 	}
 
@@ -190,8 +183,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		try {
 			exporter.registerService(null, new Properties());
 			fail("Expected to throw IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
@@ -200,15 +192,14 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		try {
 			exporter.registerService(new Class[0], new Properties());
 			fail("Expected to throw IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
 
 	public void testRegisterService() throws Exception {
-		Class<?>[] clazz = new Class<?>[] { Serializable.class, HashMap.class, Cloneable.class, Map.class,
-			LinkedHashMap.class };
+		Class<?>[] clazz =
+				new Class<?>[] { Serializable.class, HashMap.class, Cloneable.class, Map.class, LinkedHashMap.class };
 
 		String[] names = new String[clazz.length];
 

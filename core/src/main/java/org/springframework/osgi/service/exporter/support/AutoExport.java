@@ -20,12 +20,13 @@ import org.springframework.core.enums.StaticLabeledEnum;
 import org.springframework.osgi.util.internal.ClassUtils;
 
 /**
- * Enum-like class indicatin class exporters available to
- * {@link OsgiServiceFactoryBean} for registering object as OSGi services.
+ * Enum-like class indicatin class exporters available to {@link OsgiServiceFactoryBean} for registering object as OSGi
+ * services.
  * 
  * @author Costin Leau
+ * @deprecated as of 2.0, use {@link InterfaceDetector}
  */
-public abstract class AutoExport extends StaticLabeledEnum {
+public abstract class AutoExport extends StaticLabeledEnum implements InterfaceDetector {
 
 	/** Do not export anything */
 	public static final AutoExport DISABLED = new AutoExport(0, "DISABLED") {
@@ -34,55 +35,48 @@ public abstract class AutoExport extends StaticLabeledEnum {
 
 		private final Class<?>[] clazz = new Class[0];
 
-
 		Class<?>[] getExportedClasses(Class<?> targetClass) {
 			return clazz;
 		}
 	};
 
 	/**
-	 * Export all interfaces (and their hierarchy) implemented by the given
-	 * class
+	 * Export all interfaces (and their hierarchy) implemented by the given class
 	 */
 	public static final AutoExport INTERFACES = new AutoExport(1, "INTERFACES") {
 
 		private static final long serialVersionUID = -8336152449611885031L;
 
-
 		public Class<?>[] getExportedClasses(Class<?> targetClass) {
-			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.INCLUDE_INTERFACES);
+			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.ClassSet.INTERFACES);
 		}
 	};
 
 	/**
-	 * Export the class hierarchy (all classes inherited by the given target
-	 * excluding Object.class)
+	 * Export the class hierarchy (all classes inherited by the given target excluding Object.class)
 	 */
 	public static final AutoExport CLASS_HIERARCHY = new AutoExport(2, "CLASS_HIERARCHY") {
 
 		private static final long serialVersionUID = 6464782616822538297L;
 
-
 		public Class<?>[] getExportedClasses(Class<?> targetClass) {
-			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.INCLUDE_CLASS_HIERARCHY);
+			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.ClassSet.CLASS_HIERARCHY);
 
 		}
 	};
 
 	/**
-	 * Export every class, inherited or implemented by the given target. Similar
-	 * to {@link #CLASS_HIERARCHY} + {@link #INTERFACES}
+	 * Export every class, inherited or implemented by the given target. Similar to {@link #CLASS_HIERARCHY} +
+	 * {@link #INTERFACES}
 	 */
 	public static final AutoExport ALL_CLASSES = new AutoExport(3, "ALL_CLASSES") {
 
 		private static final long serialVersionUID = -6628398711158262852L;
 
-
 		public Class<?>[] getExportedClasses(Class<?> targetClass) {
-			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.INCLUDE_ALL_CLASSES);
+			return ClassUtils.getClassHierarchy(targetClass, ClassUtils.ClassSet.ALL_CLASSES);
 		}
 	};
-
 
 	/**
 	 * Determines the exported classes given a certain target class.
@@ -91,6 +85,10 @@ public abstract class AutoExport extends StaticLabeledEnum {
 	 * @return array of classes that will be published for the OSGi service.
 	 */
 	abstract Class<?>[] getExportedClasses(Class<?> targetClass);
+
+	public final Class<?>[] detect(Class<?> targetClass) {
+		return getExportedClasses(targetClass);
+	}
 
 	/**
 	 * Constructs a new <code>AutoExport</code> instance.

@@ -85,7 +85,8 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefreshableApplicationContext implements
 		ConfigurableOsgiBundleApplicationContext {
 
-	private static final String EXPORTER_IMPORTER_DEPENDENCY_MANAGER = "org.springframework.osgi.service.dependency.internal.MandatoryDependencyBeanPostProcessor";
+	private static final String EXPORTER_IMPORTER_DEPENDENCY_MANAGER =
+			"org.springframework.osgi.service.dependency.internal.MandatoryDependencyBeanPostProcessor";
 	private static final String BLUEPRINT_BUNDLE = "blueprintBundle";
 	private static final String BLUEPRINT_BUNDLE_CONTEXT = "blueprintBundleContext";
 
@@ -315,12 +316,14 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 			}
 
 			// export only interfaces
-			Class<?>[] classes = org.springframework.osgi.util.internal.ClassUtils.getClassHierarchy(getClass(),
-					org.springframework.osgi.util.internal.ClassUtils.INCLUDE_INTERFACES);
+			Class<?>[] classes =
+					org.springframework.osgi.util.internal.ClassUtils.getClassHierarchy(getClass(),
+							org.springframework.osgi.util.internal.ClassUtils.ClassSet.INTERFACES);
 
 			// filter classes based on visibility
-			Class<?>[] filterClasses = org.springframework.osgi.util.internal.ClassUtils.getVisibleClasses(classes,
-					this.getClass().getClassLoader());
+			Class<?>[] filterClasses =
+					org.springframework.osgi.util.internal.ClassUtils.getVisibleClasses(classes, this.getClass()
+							.getClassLoader());
 
 			String[] serviceNames = org.springframework.osgi.util.internal.ClassUtils.toStringArray(filterClasses);
 

@@ -19,6 +19,7 @@ package org.springframework.osgi.config.internal.util;
 import java.util.Locale;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
@@ -30,13 +31,12 @@ import org.w3c.dom.Element;
 public class ServiceAttributeCallback implements AttributeCallback {
 
 	private static final String AUTOEXPORT = "auto-export";
-	private static final String AUTOEXPORT_PROP = "autoExport";
+	private static final String AUTOEXPORT_PROP = "interfaceDetector";
 	private static final String INTERFACE = "interface";
 	private static final String INTERFACES_PROP = "interfaces";
 	private static final String CCL_PROP = "contextClassLoader";
 	private static final String CONTEXT_CLASSLOADER = "context-class-loader";
 	private static final String REF = "ref";
-
 
 	public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder bldr) {
 		String name = attribute.getLocalName();
@@ -44,8 +44,7 @@ public class ServiceAttributeCallback implements AttributeCallback {
 		if (INTERFACE.equals(name)) {
 			bldr.addPropertyValue(INTERFACES_PROP, attribute.getValue());
 			return false;
-		}
-		else if (REF.equals(name)) {
+		} else if (REF.equals(name)) {
 			return false;
 		}
 
@@ -53,7 +52,7 @@ public class ServiceAttributeCallback implements AttributeCallback {
 			// convert constant to upper case to let Spring do the
 			// conversion
 			String label = attribute.getValue().toUpperCase(Locale.ENGLISH).replace('-', '_');
-			bldr.addPropertyValue(AUTOEXPORT_PROP, label);
+			bldr.addPropertyValue(AUTOEXPORT_PROP, Enum.valueOf(DefaultInterfaceDetector.class, label));
 			return false;
 		}
 
