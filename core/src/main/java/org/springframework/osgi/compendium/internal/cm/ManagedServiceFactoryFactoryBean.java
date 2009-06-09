@@ -48,7 +48,9 @@ import org.springframework.osgi.compendium.internal.cm.ManagedFactoryDisposableI
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
 import org.springframework.osgi.service.exporter.support.AutoExport;
+import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
 import org.springframework.osgi.service.exporter.support.ExportContextClassLoader;
+import org.springframework.osgi.service.exporter.support.InterfaceDetector;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.osgi.service.exporter.support.ServicePropertiesChangeListener;
 import org.springframework.osgi.service.importer.support.internal.collection.DynamicCollection;
@@ -58,11 +60,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * {@link FactoryBean Factory} class that automatically manages instances based
- * on the configuration available inside a {@link ManagedServiceFactory}.
+ * {@link FactoryBean Factory} class that automatically manages instances based on the configuration available inside a
+ * {@link ManagedServiceFactory}.
  * 
- * The factory returns a list of {@link ServiceRegistration} of all published
- * instances.
+ * The factory returns a list of {@link ServiceRegistration} of all published instances.
  * 
  * @author Costin Leau
  */
@@ -94,8 +95,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	}
 
 	/**
-	 * Simple processor that applies the ConfigurationAdmin configuration before
-	 * the bean is initialized.
+	 * Simple processor that applies the ConfigurationAdmin configuration before the bean is initialized.
 	 * 
 	 * @author Costin Leau
 	 */
@@ -124,9 +124,8 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	private class DestructionInvokerCache {
 
 		private final String methodName;
-		final ConcurrentMap<Class<?>, ManagedFactoryDisposableInvoker> cache = new ConcurrentHashMap<Class<?>, ManagedFactoryDisposableInvoker>(
-			4);
-
+		final ConcurrentMap<Class<?>, ManagedFactoryDisposableInvoker> cache =
+				new ConcurrentHashMap<Class<?>, ManagedFactoryDisposableInvoker>(4);
 
 		DestructionInvokerCache(String methodName) {
 			this.methodName = methodName;
@@ -143,7 +142,6 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		}
 
 	}
-
 
 	/** logger */
 	private static final Log log = LogFactory.getLog(ManagedServiceFactoryFactoryBean.class);
@@ -169,16 +167,17 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	/** inner bean service registrations */
 	private final DynamicCollection serviceRegistrations = new DynamicCollection(8);
 	/** read-only view of the registration */
-	private final Collection<ServiceRegistration> userReturnedCollection = Collections.unmodifiableCollection(serviceRegistrations);
+	private final Collection<ServiceRegistration> userReturnedCollection =
+			Collections.unmodifiableCollection(serviceRegistrations);
 	/** lookup map between exporters and associated pids */
-	private final Map<String, OsgiServiceFactoryBean> serviceExporters = new ConcurrentHashMap<String, OsgiServiceFactoryBean>(
-		8);
+	private final Map<String, OsgiServiceFactoryBean> serviceExporters =
+			new ConcurrentHashMap<String, OsgiServiceFactoryBean>(8);
 
 	// exporting template
 	/** listeners */
 	private OsgiServiceRegistrationListener[] listeners = new OsgiServiceRegistrationListener[0];
 	/** auto export */
-	private AutoExport autoExport = AutoExport.DISABLED;
+	private InterfaceDetector detector = DefaultInterfaceDetector.DISABLED;
 	/** ccl */
 	private ExportContextClassLoader ccl = ExportContextClassLoader.UNMANAGED;
 	/** interfaces */
@@ -196,15 +195,13 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	public Map initialInjectionProperties;
 
 	/**
-	 * destroyed flag - used since some CM implementations still call the
-	 * service even though it was unregistered
+	 * destroyed flag - used since some CM implementations still call the service even though it was unregistered
 	 */
 	private boolean destroyed = false;
 
 	private volatile Map serviceProperties;
 	/** special destruction invoker for managed-components/template beans */
 	private volatile DestructionInvokerCache destructionInvokerFactory;
-
 
 	public void afterPropertiesSet() throws Exception {
 
@@ -213,8 +210,9 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 			Assert.notNull(bundleContext, "bundleContext is required");
 			Assert.notNull(templateDefinition, "templateDefinition is required");
 
-			Assert.isTrue(!AutoExport.DISABLED.equals(autoExport) || !ObjectUtils.isEmpty(interfaces),
-				"No service interface(s) specified and auto-export discovery disabled; change at least one of these properties");
+			Assert.isTrue(!DefaultInterfaceDetector.DISABLED.equals(detector) || !ObjectUtils.isEmpty(interfaces),
+					"No service interface(s) specified and auto-export "
+							+ "discovery disabled; change at least one of these properties");
 		}
 
 		processTemplateDefinition();
@@ -275,8 +273,9 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 			Dictionary props = new Hashtable(2);
 			props.put(Constants.SERVICE_PID, factoryPid);
 
-			configurationWatcher = bundleContext.registerService(ManagedServiceFactory.class.getName(),
-				new ConfigurationWatcher(), props);
+			configurationWatcher =
+					bundleContext.registerService(ManagedServiceFactory.class.getName(), new ConfigurationWatcher(),
+							props);
 		}
 	}
 
@@ -303,8 +302,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 
 			if (beanFactory.containsBean(pid)) {
 				updateInstance(pid, props);
-			}
-			else {
+			} else {
 				createInstance(pid, props);
 			}
 		}
@@ -333,15 +331,14 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		serviceExporters.put(pid, exporter);
 		try {
 			serviceRegistrations.add(exporter.getObject());
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			throw new BeanCreationException("Cannot publish bean for pid " + pid, ex);
 		}
 	}
 
 	private OsgiServiceFactoryBean createExporter(String beanName, Object bean) {
 		OsgiServiceFactoryBean exporter = new OsgiServiceFactoryBean();
-		exporter.setAutoExport(autoExport);
+		exporter.setInterfaceDetector(detector);
 		exporter.setBeanClassLoader(classLoader);
 		exporter.setBeanName(beanName);
 		exporter.setBundleContext(bundleContext);
@@ -352,8 +349,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 
 		try {
 			exporter.afterPropertiesSet();
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			throw new BeanCreationException("Cannot publish bean for pid " + beanName, ex);
 		}
 		return exporter;
@@ -391,8 +387,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 			Object registration = null;
 			try {
 				registration = exporterFactory.getObject();
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				// log the exception and continue
 				log.error("Could not retrieve registration for pid " + pid, ex);
 			}
@@ -457,8 +452,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		if (templateDefinition != null && templateDefinition.length > 0) {
 			this.templateDefinition = new RootBeanDefinition();
 			this.templateDefinition.overrideFrom(templateDefinition[0]);
-		}
-		else {
+		} else {
 			this.templateDefinition = null;
 		}
 	}
@@ -469,9 +463,14 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 
 	/**
 	 * @param autoExport The autoExport to set.
+	 * @deprecated
 	 */
 	public void setAutoExport(AutoExport autoExport) {
-		this.autoExport = autoExport;
+		this.detector = autoExport;
+	}
+
+	public void setInterfaceDetector(InterfaceDetector detector) {
+		this.detector = detector;
 	}
 
 	/**
@@ -503,13 +502,11 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	}
 
 	/**
-	 * Sets the properties used when exposing the target as an OSGi service. If
-	 * the given argument implements ({@link ServicePropertiesChangeListener}),
-	 * any updates to the properties will be reflected by the service
+	 * Sets the properties used when exposing the target as an OSGi service. If the given argument implements (
+	 * {@link ServicePropertiesChangeListener}), any updates to the properties will be reflected by the service
 	 * registration.
 	 * 
-	 * @param serviceProperties properties used for exporting the target as an
-	 *        OSGi service
+	 * @param serviceProperties properties used for exporting the target as an OSGi service
 	 */
 	public void setServiceProperties(Map serviceProperties) {
 		this.serviceProperties = serviceProperties;

@@ -32,6 +32,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
+import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
@@ -59,7 +60,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 	private static final String INTERFACES_PROP = "interfaces";
 
-	private static final String AUTOEXPORT_PROP = "autoExport";
+	private static final String AUTOEXPORT_PROP = "interfaceDetector";
 
 	private static final String CCL_PROP = "contextClassLoader";
 
@@ -78,7 +79,6 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 	private static final String CONTEXT_CLASSLOADER = "context-class-loader";
 
-
 	protected Class getBeanClass(Element element) {
 		return OsgiServiceFactoryBean.class;
 	}
@@ -93,8 +93,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 				if (INTERFACE.equals(name)) {
 					bldr.addPropertyValue(INTERFACES_PROP, attribute.getValue());
 					return false;
-				}
-				else if (REF.equals(name)) {
+				} else if (REF.equals(name)) {
 					return false;
 				}
 
@@ -102,7 +101,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 					// convert constant to upper case to let Spring do the
 					// conversion
 					String label = attribute.getValue().toUpperCase(Locale.ENGLISH).replace('-', '_');
-					bldr.addPropertyValue(AUTOEXPORT_PROP, label);
+					bldr.addPropertyValue(AUTOEXPORT_PROP, Enum.valueOf(DefaultInterfaceDetector.class, label));
 					return false;
 				}
 
@@ -159,8 +158,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 		// if we have a named bean use target_bean_name (so we postpone the service creation)
 		if (target instanceof RuntimeBeanReference) {
 			builder.addPropertyValue(TARGET_BEAN_NAME_PROP, ((RuntimeBeanReference) target).getBeanName());
-		}
-		else {
+		} else {
 			// add target (can be either an object instance or a bean
 			// definition)
 			builder.addPropertyValue(TARGET_PROP, target);
@@ -180,7 +178,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 			// check shortcut on the parent
 			if (parent.hasAttribute(INTERFACE)) {
 				parserContext.getReaderContext().error(
-					"either 'interface' attribute or <intefaces> sub-element has be specified", parent);
+						"either 'interface' attribute or <intefaces> sub-element has be specified", parent);
 			}
 			Set interfaces = parsePropertySetElement(parserContext, element, builder.getBeanDefinition());
 			builder.addPropertyValue(INTERFACES_PROP, interfaces);
@@ -205,10 +203,9 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 			if (DomUtils.getChildElementsByTagName(element, BeanDefinitionParserDelegate.ENTRY_ELEMENT).size() > 0) {
 				if (hasRef) {
 					parserContext.getReaderContext().error(
-						"Nested service properties definition cannot be used when attribute 'ref' is specified",
-						element);
-				}
-				else {
+							"Nested service properties definition cannot be used when attribute 'ref' is specified",
+							element);
+				} else {
 					props = parsePropertyMapElement(parserContext, element, builder.getRawBeanDefinition());
 				}
 			}
@@ -219,8 +216,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 
 			if (props != null) {
 				builder.addPropertyValue(Conventions.attributeNameToPropertyName(PROPS_ID), props);
-			}
-			else {
+			} else {
 				parserContext.getReaderContext().error("Invalid service property declaration", element);
 			}
 			return true;
@@ -234,7 +230,7 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 		// check shortcut on the parent
 		if (parent.hasAttribute(REF))
 			parserContext.getReaderContext().error(
-				"nested bean definition/reference cannot be used when attribute 'ref' is specified", parent);
+					"nested bean definition/reference cannot be used when attribute 'ref' is specified", parent);
 		return parsePropertySubElement(parserContext, element, builder.getBeanDefinition());
 	}
 
@@ -257,8 +253,8 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 				// check shortcut on the parent
 				if (element.hasAttribute(REF))
 					context.getReaderContext().error(
-						"nested bean declaration is not allowed if 'ref' attribute has been specified",
-						nestedDefinition);
+							"nested bean declaration is not allowed if 'ref' attribute has been specified",
+							nestedDefinition);
 
 				target = parsePropertySubElement(context, nestedDefinition, builder.getBeanDefinition());
 				// if this is a bean reference (nested <ref>), extract the name

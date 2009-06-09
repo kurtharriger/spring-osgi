@@ -37,6 +37,7 @@ import org.springframework.osgi.compendium.internal.cm.UpdateStrategy;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.service.exporter.support.AutoExport;
+import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
 import org.springframework.osgi.service.exporter.support.ExportContextClassLoader;
 
 /**
@@ -92,8 +93,8 @@ public class ManagedServiceFactoryTest extends TestCase {
 		Object factory = appContext.getBean("&simple");
 		Object intfs = TestUtils.getFieldValue(factory, "interfaces");
 		assertTrue(Arrays.equals((Object[]) intfs, new Class<?>[] { Object.class }));
-		Object autoExport = TestUtils.getFieldValue(factory, "autoExport");
-		assertEquals(AutoExport.ALL_CLASSES, autoExport);
+		Object autoExport = TestUtils.getFieldValue(factory, "detector");
+		assertEquals(DefaultInterfaceDetector.ALL_CLASSES, autoExport);
 	}
 
 	public void testNestedInterfaceElement() throws Exception {

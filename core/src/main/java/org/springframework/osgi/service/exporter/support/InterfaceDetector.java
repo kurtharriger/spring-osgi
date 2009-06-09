@@ -13,16 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.springframework.osgi.compendium.internal.cm;
+package org.springframework.osgi.service.exporter.support;
 
 /**
- * Enum class providing the possible update strategies for managed-service beans.
+ * Service exporter interface that allows auto detection of 'interfaces' of the exported service.
  * 
  * @author Costin Leau
- * 
  */
-public enum UpdateStrategy {
+public interface InterfaceDetector {
 
-	NONE, BEAN_MANAGED, CONTAINER_MANAGED;
+	/**
+	 * Detects the 'interfaces' of the given target, suitable for OSGi service export.
+	 * 
+	 * @param targetClass target class
+	 * @return non-null array of detected interfaces
+	 */
+	Class<?>[] detect(Class<?> targetClass);
 }

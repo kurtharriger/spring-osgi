@@ -38,6 +38,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.service.exporter.support.AutoExport;
+import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
 import org.springframework.util.StringUtils;
 
 /**
@@ -138,8 +139,8 @@ class BeanDefinitionFactory implements MetadataConstants {
 		builder.addPropertyValue(EXPORTER_RANKING_PROP, metadata.getRanking());
 		builder.addPropertyValue(EXPORTER_INTFS_PROP, metadata.getInterfaceNames());
 		builder.addPropertyValue(EXPORTER_PROPS_PROP, metadata.getServiceProperties());
-		builder.addPropertyValue(EXPORTER_AUTO_EXPORT_PROP, StaticLabeledEnumResolver.instance().getLabeledEnumByCode(
-				AutoExport.class, Integer.valueOf(metadata.getAutoExportMode())));
+		builder.addPropertyValue(EXPORTER_AUTO_EXPORT_PROP, DefaultInterfaceDetector.values()[metadata
+				.getAutoExportMode() - 1]);
 
 		BeanMetadataElement beanMetadata = BeanMetadataElementFactory.buildBeanMetadata(metadata.getServiceComponent());
 		if (beanMetadata instanceof RuntimeBeanReference) {

@@ -16,6 +16,8 @@ import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.service.exporter.support.AutoExport;
+import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
+import org.springframework.osgi.service.exporter.support.InterfaceDetector;
 
 /**
  * Default {@link ServiceMetadata} implementation based on Spring's {@link BeanDefinition}.
@@ -25,7 +27,7 @@ import org.springframework.osgi.service.exporter.support.AutoExport;
  */
 class SpringServiceExportComponentMetadata extends SpringComponentMetadata implements ServiceMetadata {
 
-	private static final String AUTO_EXPORT_PROP = "autoExport";
+	private static final String AUTO_EXPORT_PROP = "interfaceDetector";
 	private static final String RANKING_PROP = "ranking";
 	private static final String INTERFACES_PROP = "interfaces";
 	private static final String SERVICE_NAME_PROP = "targetBeanName";
@@ -52,10 +54,10 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 
 		MutablePropertyValues pvs = definition.getPropertyValues();
 
-		String autoExp = (String) MetadataUtils.getValue(pvs, AUTO_EXPORT_PROP);
+		DefaultInterfaceDetector autoExp = (DefaultInterfaceDetector) MetadataUtils.getValue(pvs, AUTO_EXPORT_PROP);
 		// convert the internal numbers
-		autoExport = ((AutoExport) StaticLabeledEnumResolver.instance()
-				.getLabeledEnumByLabel(AutoExport.class, autoExp)).shortValue() + 1;
+		autoExport = autoExp.ordinal() + 1;
+
 		// ranking
 		if (pvs.contains(RANKING_PROP)) {
 			String rank = (String) MetadataUtils.getValue(pvs, RANKING_PROP);
