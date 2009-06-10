@@ -32,6 +32,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.bundle.BundleAction;
+import org.springframework.osgi.bundle.BundleActionEnum;
 import org.springframework.osgi.bundle.BundleFactoryBean;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundle;
@@ -142,8 +143,8 @@ public class BundleFactoryBeanParserTest extends TestCase {
 
 		BundleFactoryBean fb = (BundleFactoryBean) appContext.getBean("&start", BundleFactoryBean.class);
 
-		BundleAction action = getAction(fb);
-		assertSame(BundleAction.START, action);
+		BundleActionEnum action = getAction(fb);
+		assertSame(BundleActionEnum.START, action);
 		assertNull(getDestroyAction(fb));
 
 		assertSame(startBundle, appContext.getBean("start"));
@@ -159,7 +160,7 @@ public class BundleFactoryBeanParserTest extends TestCase {
 		refresh();
 
 		BundleFactoryBean fb = (BundleFactoryBean) appContext.getBean("&stop", BundleFactoryBean.class);
-		assertSame(BundleAction.STOP, getDestroyAction(fb));
+		assertSame(BundleActionEnum.STOP, getDestroyAction(fb));
 
 		assertSame(startBundle, appContext.getBean("stop"));
 
@@ -176,9 +177,9 @@ public class BundleFactoryBeanParserTest extends TestCase {
 
 		BundleFactoryBean fb = (BundleFactoryBean) appContext.getBean("&update", BundleFactoryBean.class);
 
-		BundleAction action = getAction(fb);
-		assertSame(BundleAction.UPDATE, action);
-		assertSame(BundleAction.STOP, getDestroyAction(fb));
+		BundleActionEnum action = getAction(fb);
+		assertSame(BundleActionEnum.UPDATE, action);
+		assertSame(BundleActionEnum.STOP, getDestroyAction(fb));
 
 		assertSame(updateBundle, appContext.getBean("update"));
 		appContext.close();
@@ -211,12 +212,12 @@ public class BundleFactoryBeanParserTest extends TestCase {
 
 		refresh();
 
-		BundleFactoryBean fb = (BundleFactoryBean) appContext.getBean("&updateFromActualLocation",
-			BundleFactoryBean.class);
+		BundleFactoryBean fb =
+				(BundleFactoryBean) appContext.getBean("&updateFromActualLocation", BundleFactoryBean.class);
 		assertEquals(1, INSTALL_BUNDLE_ACTION.size());
 
-		assertSame(BundleAction.UPDATE, getAction(fb));
-		assertSame(BundleAction.UNINSTALL, getDestroyAction(fb));
+		assertSame(BundleActionEnum.UPDATE, getAction(fb));
+		assertSame(BundleActionEnum.UNINSTALL, getDestroyAction(fb));
 
 		assertTrue(((String) INSTALL_BUNDLE_ACTION.get(0)).indexOf(STREAM_TAG) >= -1);
 
@@ -240,11 +241,11 @@ public class BundleFactoryBeanParserTest extends TestCase {
 		ctrl.verify();
 	}
 
-	private BundleAction getAction(BundleFactoryBean fb) {
-		return (BundleAction) TestUtils.getFieldValue(fb, "action");
+	private BundleActionEnum getAction(BundleFactoryBean fb) {
+		return (BundleActionEnum) TestUtils.getFieldValue(fb, "action");
 	}
 
-	private BundleAction getDestroyAction(BundleFactoryBean fb) {
-		return (BundleAction) TestUtils.getFieldValue(fb, "destroyAction");
+	private BundleActionEnum getDestroyAction(BundleFactoryBean fb) {
+		return (BundleActionEnum) TestUtils.getFieldValue(fb, "destroyAction");
 	}
 }
