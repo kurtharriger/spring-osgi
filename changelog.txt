@@ -13,6 +13,9 @@ General
 * generified classes (both public and internal)
 * the archetype project now saves locally the manifest generated during packaging
 
+Package org.springframework.osgi.bundle
+* deprecated BundleAction in favour of the BundleActionEnum enum 
+
 Package org.springframework.osgi.context
 * improved serviceability by using NamedThreadLocal
 
@@ -26,6 +29,8 @@ Package org.springframework.osgi.extender
 Package org.springframework.osgi.service
 * improved serviceability by using NamedInheritableThreadLocal
 * introduced support for dynamic service properties
+* introduced InterfaceDetector for custom auto export scenarios
+* deprecated AutoExport in favour of the DefaultInterfaceDetector enum
 
 Package org.springframework.osgi.mock
 * added OSGi 4.2 methods to the package

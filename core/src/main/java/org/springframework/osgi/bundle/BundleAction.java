@@ -17,59 +17,53 @@
 package org.springframework.osgi.bundle;
 
 import org.springframework.core.enums.StaticLabeledEnum;
+import org.springframework.core.enums.StaticLabeledEnumResolver;
 
 /**
- * Enum-like class for the {@link org.osgi.framework.Bundle} actions supported
- * by {@link BundleFactoryBean}.
+ * Enum-like class for the {@link org.osgi.framework.Bundle} actions supported by {@link BundleFactoryBean}.
  * 
  * @author Costin Leau
- * 
+ * @depreated As of Spring DM 2.0, replaced by {@link BundleActionEnum}
  */
 public class BundleAction extends StaticLabeledEnum {
 
 	private static final long serialVersionUID = 3723986124669884703L;
 
 	/**
-	 * Install bundle. This action is implied by {@link #START} and
-	 * {@link #UPDATE} in case no bundle is found in the existing OSGi
-	 * BundleContext.
+	 * Install bundle. This action is implied by {@link #START} and {@link #UPDATE} in case no bundle is found in the
+	 * existing OSGi BundleContext.
 	 * 
 	 * @see org.osgi.framework.BundleContext#installBundle(String)
 	 */
 	public static final BundleAction INSTALL = new BundleAction(1, "install");
 
 	/**
-	 * Start bundle. If no bundle is found, it will try first to install one
-	 * based on the existing configuration.
+	 * Start bundle. If no bundle is found, it will try first to install one based on the existing configuration.
 	 * 
 	 * @see org.osgi.framework.Bundle#start()
 	 */
 	public static final BundleAction START = new BundleAction(2, "start");
 
 	/**
-	 * Update bundle. If no bundle is found, it will try first to install one
-	 * based on the existing configuration.
+	 * Update bundle. If no bundle is found, it will try first to install one based on the existing configuration.
 	 * 
 	 * @see org.osgi.framework.Bundle#update()
 	 */
 	public static final BundleAction UPDATE = new BundleAction(3, "update");
 
 	/**
-	 * Stop bundle. If no bundle is found, this action does nothing (it will
-	 * trigger loading).
+	 * Stop bundle. If no bundle is found, this action does nothing (it will trigger loading).
 	 * 
 	 * @see org.osgi.framework.Bundle#stop()
 	 */
 	public static final BundleAction STOP = new BundleAction(4, "stop");
 
 	/**
-	 * Uninstall bundle. If no bundle is found, this action does nothing (it
-	 * will trigger loading).
+	 * Uninstall bundle. If no bundle is found, this action does nothing (it will trigger loading).
 	 * 
 	 * @see org.osgi.framework.Bundle#uninstall()
 	 */
 	public static final BundleAction UNINSTALL = new BundleAction(5, "uninstall");
-
 
 	/**
 	 * Constructs a new <code>BundleAction</code> instance.
@@ -79,5 +73,14 @@ public class BundleAction extends StaticLabeledEnum {
 	 */
 	private BundleAction(int code, String label) {
 		super(code, label);
+	}
+
+	BundleActionEnum getBundleActionEnum() {
+		return BundleActionEnum.valueOf(this.getLabel().toUpperCase());
+	}
+
+	static BundleAction getBundleAction(BundleActionEnum enm) {
+		return (BundleAction) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(BundleAction.class,
+				enm.name().toLowerCase());
 	}
 }

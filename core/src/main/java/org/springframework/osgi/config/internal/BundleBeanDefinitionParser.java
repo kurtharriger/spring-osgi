@@ -22,6 +22,7 @@ import java.util.Locale;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.osgi.bundle.BundleActionEnum;
 import org.springframework.osgi.bundle.BundleFactoryBean;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
@@ -57,10 +58,9 @@ public class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
 
 		// do upper case to make sure the constants match
 		private Object parseAction(Element parent, Attr attribute) {
-			return attribute.getValue().toUpperCase(Locale.ENGLISH);
+			return Enum.valueOf(BundleActionEnum.class, attribute.getValue().toUpperCase(Locale.ENGLISH));
 		}
 	};
-
 
 	private static final String ACTION = "action";
 
@@ -68,12 +68,11 @@ public class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
 
 	// class properties
 
-	private static final String ACTION_PROP = "action";
+	private static final String ACTION_PROP = "bundleAction";
 
-	private static final String DESTROY_ACTION_PROP = "destroyAction";
+	private static final String DESTROY_ACTION_PROP = "bundleDestroyAction";
 
 	private static final String BUNDLE_PROP = "bundle";
-
 
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		BundleActionCallback callback = new BundleActionCallback();
@@ -89,8 +88,9 @@ public class BundleBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
 				Node nd = nodes.item(i);
 				if (nd instanceof Element) {
 					foundElement = true;
-					Object obj = parserContext.getDelegate().parsePropertySubElement((Element) nd,
-						builder.getBeanDefinition());
+					Object obj =
+							parserContext.getDelegate().parsePropertySubElement((Element) nd,
+									builder.getBeanDefinition());
 					builder.addPropertyValue(BUNDLE_PROP, obj);
 				}
 			}

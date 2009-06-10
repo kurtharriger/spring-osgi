@@ -24,7 +24,7 @@ import org.springframework.osgi.util.internal.ClassUtils;
  * services.
  * 
  * @author Costin Leau
- * @deprecated as of 2.0, use {@link InterfaceDetector}
+ * @deprecated as of 2.0, replaced by {@link InterfaceDetector}
  */
 public abstract class AutoExport extends StaticLabeledEnum implements InterfaceDetector {
 
