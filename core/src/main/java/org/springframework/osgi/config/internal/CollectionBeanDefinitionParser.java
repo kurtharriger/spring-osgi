@@ -22,7 +22,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
-import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.internal.util.ServiceReferenceComparator;
@@ -58,7 +57,6 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 		}
 	}
 
-
 	private static final String NESTED_COMPARATOR = "comparator";
 
 	private static final String INLINE_COMPARATOR_REF = "comparator-ref";
@@ -81,17 +79,8 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 
 	private static final String BASIS = "basis";
 
-
 	protected Class getBeanClass(Element element) {
 		return OsgiServiceCollectionProxyFactoryBean.class;
-	}
-
-	protected String mandatoryCardinality() {
-		return Cardinality.C_1__N.getLabel();
-	}
-
-	protected String optionalCardinality() {
-		return Cardinality.C_0__N.getLabel();
 	}
 
 	/**
@@ -103,7 +92,7 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 		// add timeout callback
 		GreedyProxyingAttributeCallback greedyProxyingCallback = new GreedyProxyingAttributeCallback();
 		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(callbacks,
-			new AttributeCallback[] { greedyProxyingCallback }));
+				new AttributeCallback[] { greedyProxyingCallback }));
 	}
 
 	protected void parseNestedElements(Element element, ParserContext context, BeanDefinitionBuilder builder) {
@@ -131,8 +120,8 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 			// check duplicate nested and inline bean definition
 			if (hasComparatorRef)
 				context.getReaderContext().error(
-					"nested comparator declaration is not allowed if " + INLINE_COMPARATOR_REF
-							+ " attribute has been specified", comparatorElement);
+						"nested comparator declaration is not allowed if " + INLINE_COMPARATOR_REF
+								+ " attribute has been specified", comparatorElement);
 
 			NodeList nl = comparatorElement.getChildNodes();
 
@@ -173,8 +162,7 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 			if (CollectionType.SET.equals(collectionType())) {
 				builder.addPropertyValue(COLLECTION_TYPE_PROP, CollectionType.SORTED_SET);
 			}
-		}
-		else {
+		} else {
 			builder.addPropertyValue(COLLECTION_TYPE_PROP, collectionType());
 		}
 	}
@@ -210,8 +198,7 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 	}
 
 	/**
-	 * Hook used for indicating the main collection type (set/list) on which
-	 * this parser applies.
+	 * Hook used for indicating the main collection type (set/list) on which this parser applies.
 	 * 
 	 * @return service collection type
 	 */

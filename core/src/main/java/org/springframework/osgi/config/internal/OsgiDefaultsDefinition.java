@@ -16,6 +16,9 @@
 
 package org.springframework.osgi.config.internal;
 
+import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.osgi.config.internal.util.ReferenceParsingUtil;
+import org.springframework.osgi.service.importer.support.Availability;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
@@ -32,28 +35,39 @@ public class OsgiDefaultsDefinition {
 	private static final String OSGI_NS = "http://www.springframework.org/schema/osgi";
 
 	private static final String DEFAULT_TIMEOUT = "default-timeout";
+	private static final String DEFAULT_AVAILABILITY = "default-availability";
 	private static final String DEFAULT_CARDINALITY = "default-cardinality";
 	private static final String TIMEOUT_DEFAULT = "300000";
-	private static final String CARDINALITY_DEFAULT = "1..X";
 
 	/** Default value */
 	private String timeout = TIMEOUT_DEFAULT;
 	/** Default value */
-	private String cardinality = CARDINALITY_DEFAULT;
+	private Availability availability = Availability.MANDATORY;
 
-	public OsgiDefaultsDefinition(Document document) {
+	public OsgiDefaultsDefinition(Document document, ParserContext parserContext) {
 		Assert.notNull(document);
 		Element root = document.getDocumentElement();
 
+		ReferenceParsingUtil.checkAvailabilityAndCardinalityDuplication(root, DEFAULT_AVAILABILITY,
+				DEFAULT_CARDINALITY, parserContext);
+
 		String timeout = root.getAttributeNS(OSGI_NS, DEFAULT_TIMEOUT);
 
-		if (StringUtils.hasText(timeout))
+		if (StringUtils.hasText(timeout)) {
 			setTimeout(timeout);
+		}
+
+		String availability = root.getAttributeNS(OSGI_NS, DEFAULT_AVAILABILITY);
+
+		if (StringUtils.hasText(availability)) {
+			setAvailability(ReferenceParsingUtil.determineAvailability(availability));
+		}
 
 		String cardinality = root.getAttributeNS(OSGI_NS, DEFAULT_CARDINALITY);
 
-		if (StringUtils.hasText(cardinality))
-			setCardinality(cardinality);
+		if (StringUtils.hasText(cardinality)) {
+			setAvailability(ReferenceParsingUtil.determineAvailabilityFromCardinality(cardinality));
+		}
 	}
 
 	public String getTimeout() {
@@ -64,11 +78,11 @@ public class OsgiDefaultsDefinition {
 		this.timeout = timeout;
 	}
 
-	public String getCardinality() {
-		return cardinality;
+	public Availability getAvailability() {
+		return availability;
 	}
 
-	protected void setCardinality(String cardinality) {
-		this.cardinality = cardinality;
+	protected void setAvailability(Availability availability) {
+		this.availability = availability;
 	}
 }

@@ -53,6 +53,6 @@ public class DictionaryEditorTest extends AbstractDependencyInjectionSpringConte
 	}
 
 	public void testSanity() throws Exception {
-
+		System.out.println(String[][].class);
 	}
 }

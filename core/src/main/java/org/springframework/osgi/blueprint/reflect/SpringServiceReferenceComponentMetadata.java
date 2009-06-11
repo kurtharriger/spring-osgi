@@ -27,6 +27,7 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.osgi.service.importer.support.Availability;
 import org.springframework.osgi.service.importer.support.Cardinality;
 
 /**
@@ -40,7 +41,7 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 
 	private static final String FILTER_PROP = "filter";
 	private static final String INTERFACES_PROP = "interfaces";
-	private static final String CARDINALITY_PROP = "cardinality";
+	private static final String AVAILABILITY_PROP = "availability";
 	private static final String SERVICE_NAME_PROP = "serviceBeanName";
 	private static final String LISTENERS_PROP = "listeners";
 
@@ -63,10 +64,11 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 		componentName = (String) MetadataUtils.getValue(pvs, SERVICE_NAME_PROP);
 		filter = (String) MetadataUtils.getValue(pvs, FILTER_PROP);
 
-		Cardinality cardinality = (Cardinality) MetadataUtils.getValue(pvs, CARDINALITY_PROP);
+		Availability avail = (Availability) MetadataUtils.getValue(pvs, AVAILABILITY_PROP);
 
-		availability = (cardinality == null || cardinality.isMandatory() ? ServiceReferenceMetadata.AVAILABILITY_MANDATORY
-				: ServiceReferenceMetadata.AVAILABILITY_OPTIONAL);
+		availability =
+				(Availability.OPTIONAL.equals(avail) ? ServiceReferenceMetadata.AVAILABILITY_OPTIONAL
+						: ServiceReferenceMetadata.AVAILABILITY_MANDATORY);
 
 		// interfaces
 		Object value = MetadataUtils.getValue(pvs, INTERFACES_PROP);

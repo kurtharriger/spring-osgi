@@ -21,7 +21,6 @@ import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
-import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -35,15 +34,13 @@ import org.w3c.dom.Element;
 public class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionParser {
 
 	/**
-	 * Reference attribute callback extension that looks for 'singular'
-	 * reference attributes (such as timeout).
+	 * Reference attribute callback extension that looks for 'singular' reference attributes (such as timeout).
 	 * 
 	 * @author Costin Leau
 	 */
 	static class TimeoutAttributeCallback implements AttributeCallback {
 
 		boolean isTimeoutSpecified = false;
-
 
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
@@ -56,13 +53,11 @@ public class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionPa
 		}
 	}
 
-
 	// call properties
 	private static final String TIMEOUT_PROP = "timeout";
 
 	// XML attributes/elements
 	protected static final String TIMEOUT = "timeout";
-
 
 	protected Class getBeanClass(Element element) {
 		return OsgiServiceProxyFactoryBean.class;
@@ -72,7 +67,7 @@ public class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionPa
 		// add timeout callback
 		TimeoutAttributeCallback timeoutCallback = new TimeoutAttributeCallback();
 		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(callbacks,
-			new AttributeCallback[] { timeoutCallback }));
+				new AttributeCallback[] { timeoutCallback }));
 
 		// look for defaults
 		if (!timeoutCallback.isTimeoutSpecified) {
@@ -80,17 +75,8 @@ public class ReferenceBeanDefinitionParser extends AbstractReferenceDefinitionPa
 		}
 	}
 
-	protected String mandatoryCardinality() {
-		return Cardinality.C_1__1.getLabel();
-	}
-
-	protected String optionalCardinality() {
-		return Cardinality.C_0__1.getLabel();
-	}
-
 	/**
-	 * Apply default definitions to the existing bean definition. In this case,
-	 * it means applying the timeout.
+	 * Apply default definitions to the existing bean definition. In this case, it means applying the timeout.
 	 * 
 	 * This method is called when a certain expected element is not present.
 	 * 

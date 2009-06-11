@@ -137,10 +137,6 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 
-		// add default cardinality
-		if (getCardinality() == null)
-			setCardinality(Cardinality.C_1__N);
-
 		// create shared proxy creator (reused for each new service
 		// joining the collection)
 		proxyCreator =
@@ -210,7 +206,7 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 			throw new IllegalArgumentException("Unknown collection type:" + collectionType);
 		}
 
-		collection.setRequiredAtStartup(getCardinality().isMandatory());
+		collection.setRequiredAtStartup(Availability.MANDATORY.equals(getAvailability()));
 		collection.setListeners(getListeners());
 		collection.setStateListeners(stateListeners);
 		collection.setServiceImporter(this);
@@ -260,18 +256,6 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 		this.collectionType = collectionType;
 	}
 
-	/* override to check proper cardinality - x..N */
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * <p/> Since this implementation creates a managed collection, only <em>multiple</em> cardinalities are accepted.
-	 */
-	public void setCardinality(Cardinality cardinality) {
-		Assert.notNull(cardinality);
-		Assert.isTrue(cardinality.isMultiple(), "Only multiple cardinality ('X..N') accepted");
-		super.setCardinality(cardinality);
-	}
-
 	/**
 	 * Dictates whether <em>greedy</em> proxies are created or not (default).
 	 * 
@@ -289,5 +273,10 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	 */
 	public void setGreedyProxying(boolean greedyProxying) {
 		this.greedyProxying = greedyProxying;
+	}
+
+	@Override
+	Cardinality getInternalCardinality() {
+		return (Availability.OPTIONAL.equals(getAvailability()) ? Cardinality.C_0__N : Cardinality.C_1__N);
 	}
 }

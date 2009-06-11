@@ -40,5 +40,4 @@
 
 	<reference id="timeout" interface="java.lang.Cloneable"
 		timeout="1234" />
-
 </blueprint>

@@ -31,6 +31,7 @@ import org.springframework.osgi.TestUtils;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
+import org.springframework.osgi.service.importer.support.Availability;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.util.OsgiFilterUtils;
@@ -47,7 +48,6 @@ public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 
 	private ServiceReference ref;
 
-
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.serviceFactoryBean = new OsgiServiceCollectionProxyFactoryBean();
@@ -59,7 +59,6 @@ public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 		bundleContext = new MockBundleContext() {
 
 			private final String filter_Serializable = OsgiFilterUtils.unifyFilter(Serializable.class, null);
-
 
 			public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
 				if (this.filter_Serializable.equalsIgnoreCase(filter))
@@ -80,10 +79,11 @@ public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testListenersSetOnCollection() throws Exception {
-		serviceFactoryBean.setCardinality(Cardinality.C_0__N);
+		serviceFactoryBean.setAvailability(Availability.OPTIONAL);
 
-		OsgiServiceLifecycleListener[] listeners = { (OsgiServiceLifecycleListener) MockControl.createControl(
-			OsgiServiceLifecycleListener.class).getMock() };
+		OsgiServiceLifecycleListener[] listeners =
+				{ (OsgiServiceLifecycleListener) MockControl.createControl(OsgiServiceLifecycleListener.class)
+						.getMock() };
 		serviceFactoryBean.setListeners(listeners);
 		serviceFactoryBean.afterPropertiesSet();
 
@@ -93,14 +93,13 @@ public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testMandatoryServiceAtStartupFailure() throws Exception {
-		serviceFactoryBean.setCardinality(Cardinality.C_1__N);
+		serviceFactoryBean.setAvailability(Availability.MANDATORY);
 
 		try {
 			serviceFactoryBean.afterPropertiesSet();
 			serviceFactoryBean.getObject();
 			fail("should have thrown exception");
-		}
-		catch (ServiceUnavailableException ex) {
+		} catch (ServiceUnavailableException ex) {
 			// expected
 		}
 	}
@@ -128,8 +127,7 @@ public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 			// disable filter
 			col.isEmpty();
 			fail("should have thrown exception");
-		}
-		catch (ServiceUnavailableException ex) {
+		} catch (ServiceUnavailableException ex) {
 			// expected
 		}
 	}

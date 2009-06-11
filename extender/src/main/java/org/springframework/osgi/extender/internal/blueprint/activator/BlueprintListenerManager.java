@@ -25,6 +25,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintEvent;
 import org.osgi.service.blueprint.container.BlueprintListener;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.osgi.service.importer.support.Availability;
 import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
@@ -48,7 +49,7 @@ class BlueprintListenerManager implements BlueprintListener, DisposableBean {
 	public BlueprintListenerManager(BundleContext context) {
 		OsgiServiceCollectionProxyFactoryBean fb = new OsgiServiceCollectionProxyFactoryBean();
 		fb.setBundleContext(context);
-		fb.setCardinality(Cardinality.C_0__N);
+		fb.setAvailability(Availability.OPTIONAL);
 		fb.setCollectionType(CollectionType.LIST);
 		fb.setInterfaces(new Class[] { BlueprintListener.class });
 		fb.setBeanClassLoader(BundleDelegatingClassLoader.createBundleClassLoaderFor(context.getBundle()));

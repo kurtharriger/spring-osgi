@@ -16,7 +16,9 @@
 
 package org.springframework.osgi.blueprint.config.internal;
 
+import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.OsgiDefaultsDefinition;
+import org.springframework.osgi.config.internal.util.ReferenceParsingUtil;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,28 +33,32 @@ public class BlueprintDefaultsDefinition extends OsgiDefaultsDefinition {
 
 	private static final String BLUEPRINT_NS = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
 	private static final String DEFAULT_TIMEOUT = "default-timeout";
-	private static final String DEFAULT_CARDINALITY = "default-availability";
+	private static final String DEFAULT_AVAILABILITY = "default-availability";
 	private static final String TIMEOUT_DEFAULT = "300000";
-	private static final String CARDINALITY_DEFAULT = "mandatory";
 	private static final String DEFAULT_INITIALIZATION = "default-initialization";
 	private static final String LAZY_INITIALIZATION = "lazy";
 	private static final boolean INITIALIZATION_DEFAULT = false;
 
+	/** Lazy flag */
 	private boolean defaultInitialization;
 
 	/**
 	 * Constructs a new <code>BlueprintDefaultsDefinition</code> instance.
+	 * @param parserContext
 	 * 
 	 * @param root
 	 */
-	public BlueprintDefaultsDefinition(Document doc) {
-		super(doc);
+	public BlueprintDefaultsDefinition(Document doc, ParserContext parserContext) {
+		super(doc, parserContext);
 		Element root = doc.getDocumentElement();
 		String timeout = root.getAttributeNS(BLUEPRINT_NS, DEFAULT_TIMEOUT);
 		setTimeout(StringUtils.hasText(timeout) ? timeout.trim() : TIMEOUT_DEFAULT);
-		// cardinality
-		String cardinality = root.getAttributeNS(BLUEPRINT_NS, DEFAULT_CARDINALITY);
-		setCardinality(StringUtils.hasText(cardinality) ? cardinality.trim() : CARDINALITY_DEFAULT);
+
+		String availability = root.getAttributeNS(BLUEPRINT_NS, DEFAULT_AVAILABILITY);
+		if (StringUtils.hasText(availability)) {
+			setAvailability(ReferenceParsingUtil.determineAvailability(availability));
+		}
+
 		// default initialization
 		String initialization = root.getAttributeNS(BLUEPRINT_NS, DEFAULT_INITIALIZATION);
 		defaultInitialization =

@@ -19,44 +19,42 @@ package org.springframework.osgi.service.importer.support;
 import org.springframework.core.enums.StaticLabeledEnum;
 
 /**
- * Enum-like class containing the OSGi importer services cardinality. Indicates
- * the number of expected matching services and whether the presence is
- * mandatory or not.
+ * Enum-like class containing the OSGi importer services cardinality. Indicates the number of expected matching services
+ * and whether the presence is mandatory or not.
  * 
  * @author Costin Leau
+ * @deprecated as of Spring DM 2.0, replaced by {@link Availability}
  */
 public class Cardinality extends StaticLabeledEnum {
 
 	private static final long serialVersionUID = 6377096464873348405L;
 
 	/**
-	 * Optional, single cardinality. At most one OSGi service is expected. This
-	 * cardinality indicates an OSGi service reference proxy.
+	 * Optional, single cardinality. At most one OSGi service is expected. This cardinality indicates an OSGi service
+	 * reference proxy.
 	 */
 	public static final Cardinality C_0__1 = new Cardinality(0, "0..1");
 
 	/**
-	 * Optional, multiple cardinality. Zero, one or multiple OSGi services are
-	 * expected. This cardinality indicates an OSGi service managed collection.
+	 * Optional, multiple cardinality. Zero, one or multiple OSGi services are expected. This cardinality indicates an
+	 * OSGi service managed collection.
 	 */
 	public static final Cardinality C_0__N = new Cardinality(1, "0..N");
 
 	/**
-	 * Mandatory, single cardinality. Exactly one OSGi service is expected. This
-	 * cardinality indicates an OSGi service reference proxy.
+	 * Mandatory, single cardinality. Exactly one OSGi service is expected. This cardinality indicates an OSGi service
+	 * reference proxy.
 	 */
 	public static final Cardinality C_1__1 = new Cardinality(2, "1..1");
 
 	/**
-	 * Mandatory, multiple cardinality. At least one OSGi service is expected.
-	 * This cardinality indicates an OSGi service managed collection.
+	 * Mandatory, multiple cardinality. At least one OSGi service is expected. This cardinality indicates an OSGi
+	 * service managed collection.
 	 */
 	public static final Cardinality C_1__N = new Cardinality(3, "1..N");
 
-
 	/**
-	 * Indicates if this cardinality implies that at most one service is
-	 * expected.
+	 * Indicates if this cardinality implies that at most one service is expected.
 	 * 
 	 * @return true if the given cardinality is single, false otherwise
 	 */
@@ -65,8 +63,7 @@ public class Cardinality extends StaticLabeledEnum {
 	}
 
 	/**
-	 * Indicates if this cardinality implies that multiple services are
-	 * expected.
+	 * Indicates if this cardinality implies that multiple services are expected.
 	 * 
 	 * @return true if this cardinality is multiple, false otherwise
 	 */
@@ -75,8 +72,7 @@ public class Cardinality extends StaticLabeledEnum {
 	}
 
 	/**
-	 * Indicates if this cardinality implies that at least one service is
-	 * expected (mandatory cardinality).
+	 * Indicates if this cardinality implies that at least one service is expected (mandatory cardinality).
 	 * 
 	 * @return true if this cardinality is mandatory, false otherwise
 	 */
@@ -85,13 +81,12 @@ public class Cardinality extends StaticLabeledEnum {
 	}
 
 	/**
-	 * Indicates if this cardinality implies that is acceptable for no matching
-	 * services to be found.
+	 * Indicates if this cardinality implies that is acceptable for no matching services to be found.
 	 * 
 	 * @return true if this cardinality is optional, false otherwise
 	 */
 	public boolean isOptional() {
-		return Cardinality.C_0__N.equals(this) || Cardinality.C_0__1.equals(this);
+		return !isMandatory();
 	}
 
 	/**
@@ -102,5 +97,9 @@ public class Cardinality extends StaticLabeledEnum {
 	 */
 	private Cardinality(int code, String label) {
 		super(code, label);
+	}
+
+	Availability getAvailability() {
+		return (isMandatory() ? Availability.MANDATORY : Availability.OPTIONAL);
 	}
 }

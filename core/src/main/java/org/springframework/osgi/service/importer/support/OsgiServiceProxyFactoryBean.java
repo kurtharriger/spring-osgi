@@ -39,7 +39,6 @@ import org.springframework.osgi.service.importer.support.internal.controller.Imp
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
 import org.springframework.osgi.service.importer.support.internal.support.RetryTemplate;
 import org.springframework.osgi.util.internal.ClassUtils;
-import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -103,7 +102,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 
 	private final ImporterInternalActions controller;
 	/** convenience field * */
-	private boolean mandatory;
+	private volatile boolean mandatory = true;
 
 	private final Object monitor = new Object();
 
@@ -111,12 +110,10 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		controller = new ImporterController(new Executor());
 	}
 
+	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
-
-		// add default cardinality
-		if (getCardinality() == null)
-			setCardinality(Cardinality.C_1__1);
+		mandatory = Availability.MANDATORY.equals(getAvailability());
 	}
 
 	/**
@@ -170,7 +167,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 				new ServiceDynamicInterceptor(getBundleContext(), ClassUtils.getParticularClass(getInterfaces())
 						.getName(), getUnifiedFilter(), getAopClassLoader());
 
-		lookupAdvice.setRequiredAtStartup(getCardinality().isMandatory());
+		lookupAdvice.setRequiredAtStartup(Availability.MANDATORY.equals(getAvailability()));
 		lookupAdvice.setUseBlueprintExceptions(isUseBlueprintExceptions());
 
 		OsgiServiceLifecycleListener[] listeners = addListener(getListeners(), tcclListener);
@@ -274,24 +271,14 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		}
 	}
 
-	/* override to check proper cardinality - x..1 */
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * <p/> Since this implementation creates a managed proxy, only <em>single</em> cardinalities are accepted.
-	 */
-	public void setCardinality(Cardinality cardinality) {
-		Assert.notNull(cardinality);
-		Assert.isTrue(cardinality.isSingle(), "only singular cardinality ('X..1') accepted");
-		super.setCardinality(cardinality);
-		synchronized (monitor) {
-			this.mandatory = cardinality.isMandatory();
-		}
-	}
-
 	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
 		synchronized (monitor) {
 			this.applicationEventPublisher = applicationEventPublisher;
 		}
+	}
+
+	@Override
+	Cardinality getInternalCardinality() {
+		return (Availability.OPTIONAL.equals(getAvailability()) ? Cardinality.C_0__1 : Cardinality.C_1__1);
 	}
 }

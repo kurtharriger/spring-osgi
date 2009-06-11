@@ -34,33 +34,18 @@ import org.w3c.dom.Element;
  */
 public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinitionParser {
 
-	private class BlueprintAttrCallback extends BlueprintReferenceAttributeCallback {
-
-		@Override
-		public Object determineAvailability(String value) {
-			return determineCardinality(value);
-		}
-	}
-
-
 	@Override
-	protected Object determineCardinality(String value) {
-		// required
-		return super.determineCardinality(value.startsWith("m") ? "1" : "0");
-	}
-
-	@Override
-	protected OsgiDefaultsDefinition resolveDefaults(Document document) {
-		return new BlueprintDefaultsDefinition(document);
+	protected OsgiDefaultsDefinition resolveDefaults(Document document, ParserContext parserContext) {
+		return new BlueprintDefaultsDefinition(document, parserContext);
 	}
 
 	@Override
 	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks) {
 
 		// add BlueprintAttr Callback
-		AttributeCallback blueprintCallback = new BlueprintAttrCallback();
+		AttributeCallback blueprintCallback = new BlueprintReferenceAttributeCallback();
 		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(
-			new AttributeCallback[] { blueprintCallback }, callbacks));
+				new AttributeCallback[] { blueprintCallback }, callbacks));
 	}
 
 	@Override
