@@ -18,6 +18,7 @@ package org.springframework.osgi.blueprint.config.internal;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
+import org.springframework.osgi.config.internal.util.ReferenceParsingUtil;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
@@ -26,9 +27,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-public abstract class BlueprintReferenceAttributeCallback implements AttributeCallback {
-
-	private static final String CARDINALITY_PROP = "cardinality";
+public class BlueprintReferenceAttributeCallback implements AttributeCallback {
 
 	private static final String AVAILABILITY = "availability";
 
@@ -36,13 +35,12 @@ public abstract class BlueprintReferenceAttributeCallback implements AttributeCa
 
 	private static final String COMPONENT_NAME = "component-name";
 
-
 	public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 		String name = attribute.getLocalName();
 		String value = attribute.getValue();
 
 		if (AVAILABILITY.equals(name)) {
-			builder.addPropertyValue(CARDINALITY_PROP, determineAvailability(value));
+			builder.addPropertyValue(AVAILABILITY, ReferenceParsingUtil.determineAvailability(value));
 			return false;
 		}
 
@@ -53,6 +51,4 @@ public abstract class BlueprintReferenceAttributeCallback implements AttributeCa
 
 		return true;
 	}
-
-	public abstract Object determineAvailability(String value);
 }

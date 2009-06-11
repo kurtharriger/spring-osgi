@@ -30,6 +30,8 @@ import org.w3c.dom.Element;
  */
 public class ServiceAttributeCallback implements AttributeCallback {
 
+	private static final char UNDERSCORE_CHAR = '_';
+	private static final char DASH_CHAR = '-';
 	private static final String AUTOEXPORT = "auto-export";
 	private static final String AUTOEXPORT_PROP = "interfaceDetector";
 	private static final String INTERFACE = "interface";
@@ -51,7 +53,7 @@ public class ServiceAttributeCallback implements AttributeCallback {
 		else if (AUTOEXPORT.equals(name)) {
 			// convert constant to upper case to let Spring do the
 			// conversion
-			String label = attribute.getValue().toUpperCase(Locale.ENGLISH).replace('-', '_');
+			String label = attribute.getValue().toUpperCase(Locale.ENGLISH).replace(DASH_CHAR, UNDERSCORE_CHAR);
 			bldr.addPropertyValue(AUTOEXPORT_PROP, Enum.valueOf(DefaultInterfaceDetector.class, label));
 			return false;
 		}
@@ -60,7 +62,7 @@ public class ServiceAttributeCallback implements AttributeCallback {
 			// convert constant to upper case to let Spring do the
 			// conversion
 
-			String value = attribute.getValue().toUpperCase(Locale.ENGLISH).replace('-', '_');
+			String value = attribute.getValue().toUpperCase(Locale.ENGLISH).replace(DASH_CHAR, UNDERSCORE_CHAR);
 			bldr.addPropertyValue(CCL_PROP, value);
 			return false;
 		}

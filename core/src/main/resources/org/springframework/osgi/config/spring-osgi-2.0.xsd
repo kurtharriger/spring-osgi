@@ -33,9 +33,20 @@
     			]]></xsd:documentation>
     		</xsd:annotation>
     	</xsd:attribute>
+    	<xsd:attribute name="default-availablility" type="TavailabilityOptions" default="mandatory">
+    		<xsd:annotation>
+    			<xsd:documentation><![CDATA[
+    Default availability for all OSGi references (singular or collections) elements that do not explicitly specify one.
+    Default value is 'mandatory' which means that a backing service must exist while 'optional' indicates that it is 
+    acceptable to be no backing service.
+        		]]></xsd:documentation>
+        	</xsd:annotation>
+        </xsd:attribute>
     	<xsd:attribute name="default-cardinality" type="TdefaultCardinalityOptions" default="1..X">
     		<xsd:annotation>
     			<xsd:documentation><![CDATA[
+    As of Spring DM 2.0, 'default-cardinality' has been replaced by 'default-availability' attribute.
+    
     Default cardinality (of the relationship to the backing service(s)) for all OSGi references (singular or collections) 
     elements that do not explicitly specify one.
     Default value is '1..X' (resolved to '1..1' for osgi:reference and '1..N' for osgi:list/set) which means that a backing 
@@ -45,9 +56,28 @@
         	</xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
-    
+
+    <xsd:simpleType name="TavailabilityOptions">
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="mandatory">
+            	<xsd:annotation>
+            		<xsd:documentation><![CDATA[
+    Mandatory service reference - a backing service must exist.
+            		]]></xsd:documentation>
+            	</xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="optional">
+            	<xsd:annotation>
+            		<xsd:documentation><![CDATA[
+    Optional service reference - A backing service can be missing.
+            		]]></xsd:documentation>
+            	</xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+        
     <xsd:simpleType name="TdefaultCardinalityOptions">
-        <xsd:restriction base="xsd:string">
+        <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="1..X">
             	<xsd:annotation>
             		<xsd:documentation><![CDATA[
@@ -198,11 +228,22 @@
     <xsd:complexType name="TsingleReference">
         <xsd:complexContent>
             <xsd:extension base="Treference">
+                 <xsd:attribute name="availability" use="optional" type="TavailabilityOptions">
+                	<xsd:annotation>
+                      	<xsd:documentation><![CDATA[
+    Defines the required availability of the backing service. If not specified, 
+    the default-availability attribute will apply. 'mandatory' means that a backing service 
+    must exist, 'optional' indicates that it is acceptable to have no backing service.
+                      	]]></xsd:documentation>
+                      </xsd:annotation>
+                 </xsd:attribute>
                  <xsd:attribute name="cardinality" use="optional" type="TsingleReferenceCardinality">
                 	<xsd:annotation>
                       	<xsd:documentation><![CDATA[
+	As of Spring DM 2.0, 'cardinality' has been replaced by the 'availability' attribute.
+	                      	
     Defines the required cardinality of the relationship to the backing service. If not specified, 
-    the default-cardinality attribute will apply. A value is '1..1' means that a backing service 
+    the default-cardinality attribute will apply. A value of '1..1' means that a backing service 
     must exist (this is a mandatory service reference). A value of '0..1' indicates that it is 
     acceptable to be no backing service (an optional service reference).
                       	]]></xsd:documentation>
@@ -222,7 +263,7 @@
    </xsd:complexType>
    
    <xsd:simpleType name="TsingleReferenceCardinality">
-        <xsd:restriction base="xsd:token">
+        <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="1..1"/>
             <xsd:enumeration value="0..1"/>
         </xsd:restriction>
@@ -282,10 +323,20 @@
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-			
+			    <xsd:attribute name="availability" use="optional" type="TavailabilityOptions">
+                	<xsd:annotation>
+                      	<xsd:documentation><![CDATA[
+    Defines the required availability of the backing service. If not specified, 
+    the default-availability attribute will apply. 'mandatory' means that a backing service 
+    must exist, 'optional' indicates that it is acceptable to have no backing service.
+                      	]]></xsd:documentation>
+                      </xsd:annotation>
+                </xsd:attribute>
 			    <xsd:attribute name="cardinality" use="optional" type="TcollectionCardinality">
                 	<xsd:annotation>
                       	<xsd:documentation><![CDATA[
+	As of Spring DM 2.0, 'cardinality' has been replaced by the 'availability' attribute.
+	                      	
     Defines the required cardinality of the relationship to the backing services. If not specified, 
     the default-cardinality attribute will apply. A value of '1..N' means that at least one backing 
     service must exist (this is a mandatory service reference. A value of '0..N' indicates that it 
@@ -293,7 +344,6 @@
                       	]]></xsd:documentation>
                       </xsd:annotation>
                 </xsd:attribute>
-
 			    <xsd:attribute name="greedy-proxying" use="optional" type="xsd:boolean" default="false">
                 	<xsd:annotation>
                       	<xsd:documentation><![CDATA[
@@ -303,7 +353,6 @@
                       	]]></xsd:documentation>
                       </xsd:annotation>
                 </xsd:attribute>				
-                				
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -333,14 +382,14 @@
 	</xsd:complexType>
 	
 	<xsd:simpleType name="TorderingBasis">
-		<xsd:restriction base="xsd:token">
+		<xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="service"/>
             <xsd:enumeration value="service-reference"/>
         </xsd:restriction>
 	</xsd:simpleType>
 	
 	<xsd:simpleType name="TcollectionCardinality">
-        <xsd:restriction base="xsd:token">
+        <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="1..N"/>
             <xsd:enumeration value="0..N"/>
         </xsd:restriction>
@@ -520,14 +569,14 @@
     </xsd:complexType>
 
     <xsd:simpleType name="TserviceClassLoaderOptions">
-        <xsd:restriction base="xsd:token">
+        <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="service-provider"/>
             <xsd:enumeration value="unmanaged"/>
         </xsd:restriction>
     </xsd:simpleType>
 
     <xsd:simpleType name="TautoExportModes">
-        <xsd:restriction base="xsd:token">
+        <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="disabled"/>
             <xsd:enumeration value="interfaces"/>
             <xsd:enumeration value="class-hierarchy"/>
@@ -624,7 +673,7 @@
     </xsd:complexType>
 
     <xsd:simpleType name="TbundleAction">
-        <xsd:restriction base="xsd:token">
+        <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="start"/>
             <xsd:enumeration value="stop"/>
             <xsd:enumeration value="install"/>

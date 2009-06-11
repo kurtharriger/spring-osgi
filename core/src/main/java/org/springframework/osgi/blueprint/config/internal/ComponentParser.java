@@ -107,7 +107,7 @@ public class ComponentParser {
 	public BeanDefinitionHolder parseAsHolder(Element componentElement, ParserContext parserContext) {
 		// save parser context
 		this.parserContext = parserContext;
-		this.defaults = new BlueprintDefaultsDefinition(componentElement.getOwnerDocument());
+		this.defaults = new BlueprintDefaultsDefinition(componentElement.getOwnerDocument(), parserContext);
 
 		// let Spring do its standard parsing
 		BeanDefinitionHolder bdHolder = parseComponentDefinitionElement(componentElement, null);
@@ -785,7 +785,7 @@ public class ComponentParser {
 
 	private BlueprintDefaultsDefinition getDefaults(Element ele) {
 		if (defaults == null) {
-			defaults = new BlueprintDefaultsDefinition(ele.getOwnerDocument());
+			defaults = new BlueprintDefaultsDefinition(ele.getOwnerDocument(), parserContext);
 		}
 		return defaults;
 	}

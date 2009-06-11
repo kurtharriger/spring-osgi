@@ -68,7 +68,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	/** Service Bean property of the OSGi service * */
 	private String serviceBeanName;
 
-	private Cardinality cardinality;
+	private Availability availability = Availability.MANDATORY;
 
 	/** bean name */
 	private String beanName = "";
@@ -107,9 +107,9 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 					+ "]  in=[" + filterWithClasses + "]");
 
 		// add the serviceBeanName constraint
-		String filterWithServiceBeanName = OsgiFilterUtils.unifyFilter(
-				OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY, new String[] { serviceBeanName },
-				filterWithClasses);
+		String filterWithServiceBeanName =
+				OsgiFilterUtils.unifyFilter(OsgiServicePropertiesResolver.BEAN_NAME_PROPERTY_KEY,
+						new String[] { serviceBeanName }, filterWithClasses);
 
 		if (trace)
 			log.trace("Unified serviceBeanName [" + ObjectUtils.nullSafeToString(serviceBeanName) + "] and filter=["
@@ -243,19 +243,36 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	 * Returns the cardinality used by this importer.
 	 * 
 	 * @return importer cardinality
+	 * @deprecated As of Spring DM 2.0, replaced by {@link #getAvailability()}
 	 */
 	public Cardinality getCardinality() {
-		return cardinality;
+		return getInternalCardinality();
+	}
+
+	abstract Cardinality getInternalCardinality();
+
+	public Availability getAvailability() {
+		return availability;
 	}
 
 	/**
 	 * Sets the importer cardinality (0..1, 1..1, 0..N, or 1..N). Default is 1..X.
 	 * 
 	 * @param cardinality importer cardinality.
+	 * @deprecated As of Spring DM 2.0, replaced by {@link #setAvailability(Availability)}
 	 */
 	public void setCardinality(Cardinality cardinality) {
 		Assert.notNull(cardinality);
-		this.cardinality = cardinality;
+		this.availability = cardinality.getAvailability();
+	}
+
+	/**
+	 * Sets the importer availability. Default is mandatory ({@link Availability#MANDATORY}
+	 * @param availability
+	 */
+	public void setAvailability(Availability availability) {
+		Assert.notNull(availability);
+		this.availability = availability;
 	}
 
 	/**

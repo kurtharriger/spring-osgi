@@ -36,7 +36,7 @@
 				]]></xsd:documentation>
 			</xsd:annotation>
 			<xsd:simpleType>
-				<xsd:restriction base="xsd:string">
+				<xsd:restriction base="xsd:NMTOKEN">
 		            <xsd:enumeration value="none"/>
 		            <xsd:enumeration value="bean-managed"/>
 		            <xsd:enumeration value="container-managed"/>

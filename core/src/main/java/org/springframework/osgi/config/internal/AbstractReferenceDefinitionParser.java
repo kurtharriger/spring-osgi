@@ -36,10 +36,9 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
-import org.springframework.core.enums.StaticLabeledEnumResolver;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
-import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.osgi.config.internal.util.ReferenceParsingUtil;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
@@ -51,15 +50,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Base class for parsing reference declarations. Contains common functionality
- * such as adding listeners (and their custom methods), interfaces, cardinality
- * and so on.
+ * Base class for parsing reference declarations. Contains common functionality such as adding listeners (and their
+ * custom methods), interfaces, cardinality and so on.
  * 
  * <p/>
  * 
- * <strong>Note:</strong> This parser also handles the cyclic injection between
- * an importer and its listeners by breaking the chain by creating an adapter
- * instead of the listener. The adapter will then do dependency lookup for the
+ * <strong>Note:</strong> This parser also handles the cyclic injection between an importer and its listeners by
+ * breaking the chain by creating an adapter instead of the listener. The adapter will then do dependency lookup for the
  * listener.
  * 
  * @author Costin Leau
@@ -76,10 +73,16 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
-			String value = attribute.getValue();
+			String value = attribute.getValue().trim();
 
 			if (CARDINALITY.equals(name)) {
-				builder.addPropertyValue(CARDINALITY_PROP, determineCardinality(value));
+				builder.addPropertyValue(AVAILABILITY_PROP, ReferenceParsingUtil
+						.determineAvailabilityFromCardinality(value));
+				return false;
+			}
+
+			if (AVAILABILITY.equals(name)) {
+				builder.addPropertyValue(AVAILABILITY_PROP, ReferenceParsingUtil.determineAvailability(value));
 				return false;
 			}
 
@@ -105,11 +108,10 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		}
 	};
 
-
 	// Class properties
 	private static final String LISTENERS_PROP = "listeners";
 
-	private static final String CARDINALITY_PROP = "cardinality";
+	private static final String AVAILABILITY_PROP = "availability";
 
 	private static final String SERVICE_BEAN_NAME_PROP = "serviceBeanName";
 
@@ -130,17 +132,18 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 	private static final String INTERFACES = "interfaces";
 
-	private static final String CARDINALITY = "cardinality";
+	private static final String AVAILABILITY = "availability";
 
-	private static final String ZERO = "0";
+	private static final String CARDINALITY = "cardinality";
 
 	private static final String SERVICE_BEAN_NAME = "bean-name";
 
 	private static final String CONTEXT_CLASSLOADER = "context-class-loader";
 
+	private static final String M = "m";
+
 	// document defaults
 	protected OsgiDefaultsDefinition defaults = null;
-
 
 	/**
 	 * Get OSGi defaults (in case they haven't been resolved).
@@ -148,8 +151,8 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	 * @param document
 	 * @return
 	 */
-	protected OsgiDefaultsDefinition resolveDefaults(Document document) {
-		return new OsgiDefaultsDefinition(document);
+	protected OsgiDefaultsDefinition resolveDefaults(Document document, ParserContext parserContext) {
+		return new OsgiDefaultsDefinition(document, parserContext);
 	}
 
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
@@ -205,8 +208,10 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	}
 
 	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+		ReferenceParsingUtil.checkAvailabilityAndCardinalityDuplication(element, AVAILABILITY, CARDINALITY, context);
+
 		if (defaults == null) {
-			defaults = resolveDefaults(element.getOwnerDocument());
+			defaults = resolveDefaults(element.getOwnerDocument(), context);
 		}
 
 		AttributeCallback callback = new ReferenceAttributesCallback();
@@ -223,13 +228,12 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	}
 
 	private boolean isCardinalitySpecified(BeanDefinitionBuilder builder) {
-		return (builder.getBeanDefinition().getPropertyValues().getPropertyValue(CARDINALITY_PROP) != null);
+		return (builder.getBeanDefinition().getPropertyValues().getPropertyValue(AVAILABILITY_PROP) != null);
 	}
 
 	/**
-	 * If the reference is a nested bean, make it a top-level bean if it's a
-	 * mandatory dependency. This is done so that the beans can be discovered at
-	 * startup and the appCtx can start waiting.
+	 * If the reference is a nested bean, make it a top-level bean if it's a mandatory dependency. This is done so that
+	 * the beans can be discovered at startup and the appCtx can start waiting.
 	 * 
 	 * @param element
 	 * @param context
@@ -251,22 +255,6 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	}
 
 	/**
-	 * Subclasses should override this method to provide the proper mandatory
-	 * cardinality option/string.
-	 * 
-	 * @return mandatory cardinality as a string.
-	 */
-	protected abstract String mandatoryCardinality();
-
-	/**
-	 * Subclasses should overide this method to provide the proper optional
-	 * cardinality option/string.
-	 * 
-	 * @return optional cardinality as a string
-	 */
-	protected abstract String optionalCardinality();
-
-	/**
 	 * Indicate the bean definition class for this element.
 	 * 
 	 * @param element
@@ -275,43 +263,17 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	protected abstract Class getBeanClass(Element element);
 
 	/**
-	 * Utility method declared for reusability. It maintains the
-	 * optional/mandatory option of the cardinality option and returns a
-	 * specialized (singular/multiple) cardinality string.
-	 * 
-	 * @param value cardinality string
-	 * @return the specialized (singular/multiple) cardinality.
-	 */
-	protected Object determineCardinality(String value) {
-		return processCardinalityString((value.startsWith(ZERO) ? optionalCardinality() : mandatoryCardinality()));
-	}
-
-	/**
-	 * Since cardinality contains numbers and the constants name cannot start
-	 * with a number we have to do conversion of the name or of the string. the
-	 * latter is easier and quicker.
-	 * 
-	 * @param value
-	 * @return
-	 */
-	private Cardinality processCardinalityString(String value) {
-		return (Cardinality) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(Cardinality.class,
-			value.toUpperCase(Locale.ENGLISH));
-	}
-
-	/**
 	 * Apply default cardinality.
 	 * 
 	 * @param builder
 	 * @param defaults
 	 */
 	protected void applyDefaultCardinality(BeanDefinitionBuilder builder, OsgiDefaultsDefinition defaults) {
-		builder.addPropertyValue(CARDINALITY_PROP, determineCardinality(defaults.getCardinality()));
+		builder.addPropertyValue(AVAILABILITY_PROP, defaults.getAvailability());
 	}
 
 	/**
-	 * Parse nested elements. In case of a reference definition, this means
-	 * using the listeners.
+	 * Parse nested elements. In case of a reference definition, this means using the listeners.
 	 * 
 	 * 
 	 * @param element
@@ -337,7 +299,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 			// check shortcut on the parent
 			if (parent.hasAttribute(INTERFACE)) {
 				parserContext.getReaderContext().error(
-					"either 'interface' attribute or <intefaces> sub-element has be specified", parent);
+						"either 'interface' attribute or <intefaces> sub-element has be specified", parent);
 			}
 			Set interfaces = parsePropertySetElement(parserContext, element, builder.getBeanDefinition());
 			builder.addPropertyValue(INTERFACES_PROP, interfaces);
@@ -375,8 +337,9 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 					// check inline ref
 					if (listnr.hasAttribute(REF))
-						context.getReaderContext().error(
-							"nested bean declaration is not allowed if 'ref' attribute has been specified", beanDef);
+						context.getReaderContext()
+								.error("nested bean declaration is not allowed if 'ref' attribute has been specified",
+										beanDef);
 
 					target = parsePropertySubElement(context, beanDef, builder.getBeanDefinition());
 

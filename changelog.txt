@@ -31,6 +31,7 @@ Package org.springframework.osgi.service
 * introduced support for dynamic service properties
 * introduced InterfaceDetector for custom auto export scenarios
 * deprecated AutoExport in favour of the DefaultInterfaceDetector enum
+* deprecated Cardinality class in favour of the Availability enum
 
 Package org.springframework.osgi.mock
 * added OSGi 4.2 methods to the package
