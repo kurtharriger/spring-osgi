@@ -19,7 +19,7 @@
 	<!-- full options -->
 	<osgi:reference id="full-options" interface="java.lang.Cloneable"
 		cardinality="1..1" context-class-loader="service-provider"
-		timeout="2000" filter="(c=*)">
+		timeout="2000" filter="(c=*)" sticky="true">
 
 		<osgi:listener>
 			<bean id="listener"
@@ -56,4 +56,5 @@
 			<value>java.io.Externalizable</value>
 		</osgi:interfaces>
 	</osgi:reference>
+	
 </beans>

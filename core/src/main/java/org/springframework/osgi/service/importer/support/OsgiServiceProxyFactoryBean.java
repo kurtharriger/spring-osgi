@@ -104,6 +104,8 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 	/** convenience field * */
 	private volatile boolean mandatory = true;
 
+	private volatile boolean sticky = false;
+
 	private final Object monitor = new Object();
 
 	public OsgiServiceProxyFactoryBean() {
@@ -169,6 +171,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 
 		lookupAdvice.setRequiredAtStartup(Availability.MANDATORY.equals(getAvailability()));
 		lookupAdvice.setUseBlueprintExceptions(isUseBlueprintExceptions());
+		lookupAdvice.setSticky(sticky);
 
 		OsgiServiceLifecycleListener[] listeners = addListener(getListeners(), tcclListener);
 
@@ -269,6 +272,17 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		synchronized (monitor) {
 			return retryTimeout;
 		}
+	}
+
+	/**
+	 * Sets the stickiness of this proxy. If 'false', the proxy will rebind only if the backing service is no longer
+	 * available. If 'true', the rebind will occur every time a 'better' candidate appears. A better service is defined
+	 * by having either a higher ranking or the same ranking and a lower service id.
+	 * 
+	 * @param sticky sticky flag
+	 */
+	public void setSticky(boolean sticky) {
+		this.sticky = sticky;
 	}
 
 	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {

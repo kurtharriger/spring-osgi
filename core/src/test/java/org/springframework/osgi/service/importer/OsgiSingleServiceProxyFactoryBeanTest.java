@@ -47,13 +47,10 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 
 	private BundleContext bundleContext;
 
-
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.serviceFactoryBean = new OsgiServiceProxyFactoryBean();
 		this.serviceFactoryBean.setBeanClassLoader(getClass().getClassLoader());
-		// this.serviceFactoryBean.setApplicationContext(new
-		// GenericApplicationContext());
 		this.mockControl = MockControl.createControl(BundleContext.class);
 		this.bundleContext = (BundleContext) this.mockControl.getMock();
 	}
@@ -62,8 +59,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 		try {
 			this.serviceFactoryBean.afterPropertiesSet();
 			fail("should have throw IllegalArgumentException since bundle context was not set");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -73,8 +69,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 		try {
 			this.serviceFactoryBean.afterPropertiesSet();
 			fail("should have throw IllegalArgumentException since classLoader was not set");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -84,8 +79,7 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 		try {
 			this.serviceFactoryBean.afterPropertiesSet();
 			fail("should have throw IllegalArgumentException since service type was not set");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -97,24 +91,23 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 		try {
 			this.serviceFactoryBean.afterPropertiesSet();
 			fail("should have throw IllegalArgumentException since filter has invalid syntax");
-		}
-		catch (IllegalArgumentException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
 
 	public void testGetObjectTypeCompositeInterface() {
 		this.serviceFactoryBean.setInterfaces(new Class<?>[] { ApplicationContext.class });
-		assertTrue("composite interface not properly created",
-			ApplicationContext.class.isAssignableFrom(this.serviceFactoryBean.getObjectType()));
-		assertTrue("mixing interface not introduced",
-			ImportedOsgiServiceProxy.class.isAssignableFrom(this.serviceFactoryBean.getObjectType()));
+		assertTrue("composite interface not properly created", ApplicationContext.class
+				.isAssignableFrom(this.serviceFactoryBean.getObjectType()));
+		assertTrue("mixing interface not introduced", ImportedOsgiServiceProxy.class
+				.isAssignableFrom(this.serviceFactoryBean.getObjectType()));
 	}
 
 	public void testObjectTypeWOCompositeInterface() {
 		this.serviceFactoryBean.setInterfaces(new Class<?>[] { AbstractApplicationContext.class });
 		assertNull("should not be able to create composite interface when a class is specified",
-			this.serviceFactoryBean.getObjectType());
+				this.serviceFactoryBean.getObjectType());
 	}
 
 	// OsgiServiceUtils are tested independently in error cases, here we
@@ -146,5 +139,4 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.SERVICE_PROVIDER);
 		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
 	}
-
 }
