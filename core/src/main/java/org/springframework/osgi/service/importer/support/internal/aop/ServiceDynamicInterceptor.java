@@ -246,7 +246,7 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 		private boolean updateWrapperIfNecessary(ServiceReference ref) {
 			boolean updated = false;
 			try {
-				if (holder == null || holder.isWorseThen(ref)) {
+				if (holder == null || (!sticky && holder.isWorseThen(ref))) {
 					updated = true;
 					updateReferenceHolders(ref);
 				}
@@ -350,6 +350,8 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 	private List stateListeners = Collections.EMPTY_LIST;
 	/** standard exception flag */
 	private boolean useBlueprintExceptions = false;
+
+	private boolean sticky = false;
 
 	public ServiceDynamicInterceptor(BundleContext context, String filterClassName, Filter filter,
 			ClassLoader classLoader) {
@@ -495,6 +497,10 @@ public class ServiceDynamicInterceptor extends ServiceInvoker implements Initial
 
 	public void setUseBlueprintExceptions(boolean useBlueprintExceptions) {
 		this.useBlueprintExceptions = useBlueprintExceptions;
+	}
+
+	public void setSticky(boolean sticky) {
+		this.sticky = sticky;
 	}
 
 	public boolean equals(Object other) {

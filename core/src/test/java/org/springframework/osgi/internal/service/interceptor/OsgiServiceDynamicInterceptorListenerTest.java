@@ -16,6 +16,7 @@
 
 package org.springframework.osgi.internal.service.interceptor;
 
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -29,11 +30,11 @@ import org.osgi.framework.ServiceReference;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+import org.springframework.osgi.service.importer.ServiceReferenceProxy;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceDynamicInterceptor;
 
 /**
- * Test for the listener rebinding behavior. Makes sure the bind/unbind contract
- * is properly respected.
+ * Test for the listener rebinding behavior. Makes sure the bind/unbind contract is properly respected.
  * 
  * @author Costin Leau
  * 
@@ -47,7 +48,6 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 	private MockBundleContext bundleContext;
 
 	private ServiceReference[] refs;
-
 
 	protected void setUp() throws Exception {
 		listener = new SimpleTargetSourceLifecycleListener();
@@ -66,6 +66,7 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 		interceptor.setRequiredAtStartup(false);
 		interceptor.setProxy(new Object());
 		interceptor.setServiceImporter(new Object());
+		interceptor.setSticky(false);
 
 		interceptor.setRetryTimeout(1);
 
@@ -145,4 +146,52 @@ public class OsgiServiceDynamicInterceptorListenerTest extends TestCase {
 		assertEquals(0, SimpleTargetSourceLifecycleListener.UNBIND);
 	}
 
+	public void testStickinessWhenABetterServiceIsAvailable() throws Exception {
+		interceptor.setSticky(true);
+		interceptor.afterPropertiesSet();
+
+		ServiceListener sl = (ServiceListener) bundleContext.getServiceListeners().iterator().next();
+
+		Dictionary props = new Hashtable();
+		// increase service ranking
+		props.put(Constants.SERVICE_RANKING, new Integer(10));
+
+		ServiceReference ref = new MockServiceReference(null, props, null);
+		ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, ref);
+
+		assertEquals(1, SimpleTargetSourceLifecycleListener.BIND);
+		assertEquals(0, SimpleTargetSourceLifecycleListener.UNBIND);
+
+		sl.serviceChanged(event);
+
+		assertEquals("the proxy is not sticky", 1, SimpleTargetSourceLifecycleListener.BIND);
+		assertEquals(0, SimpleTargetSourceLifecycleListener.UNBIND);
+	}
+
+	public void testStickinessWhenServiceGoesDown() throws Exception {
+		interceptor.setSticky(true);
+		interceptor.afterPropertiesSet();
+
+		ServiceListener sl = (ServiceListener) bundleContext.getServiceListeners().iterator().next();
+
+		Dictionary props = new Hashtable();
+		// increase service ranking
+		props.put(Constants.SERVICE_RANKING, new Integer(10));
+
+		ServiceReference higherRankingRef = new MockServiceReference(null, props, null);
+		refs = new ServiceReference[] { new MockServiceReference(), higherRankingRef };
+
+		assertTrue(Arrays.equals(bundleContext.getServiceReferences(null, null), refs));
+
+		assertEquals(1, SimpleTargetSourceLifecycleListener.BIND);
+		assertEquals(0, SimpleTargetSourceLifecycleListener.UNBIND);
+
+		sl.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, refs[0]));
+
+		assertEquals(2, SimpleTargetSourceLifecycleListener.BIND);
+		assertEquals(0, SimpleTargetSourceLifecycleListener.UNBIND);
+
+		assertSame("incorrect backing reference selected", higherRankingRef, ((ServiceReferenceProxy) interceptor
+				.getServiceReference()).getTargetServiceReference());
+	}
 }

@@ -23,7 +23,7 @@ public class ProxyDestructionTest extends BaseIntegrationTest {
 	}
 
 	/**
-	 * Install the bundles, stop the one provinding the service and then the one
+	 * Install the bundles, stop the one providing the service and then the one
 	 * consuming the service, *after*, an invocation has been made. The test
 	 * checks that shutting down the application context, causes all proxies
 	 * waiting to be destroyed properly.

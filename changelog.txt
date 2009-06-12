@@ -11,7 +11,8 @@ General
 * upgraded to Equinox 3.4.3
 * upgraded to Knopflerfish 2.3.0
 * generified classes (both public and internal)
-* the archetype project now saves locally the manifest generated during packaging
+* updated archetype project to save locally the manifest generated during packaging
+* added new elements to spring-osgi schema
 
 Package org.springframework.osgi.bundle
 * deprecated BundleAction in favour of the BundleActionEnum enum 
@@ -32,6 +33,9 @@ Package org.springframework.osgi.service
 * introduced InterfaceDetector for custom auto export scenarios
 * deprecated AutoExport in favour of the DefaultInterfaceDetector enum
 * deprecated Cardinality class in favour of the Availability enum
+* improved laziness of the backing service retrieval
+* added 'sticky' option on single importers to prevent rebinds if higher ranking services
+  appear while the backing service is still alive
 
 Package org.springframework.osgi.mock
 * added OSGi 4.2 methods to the package
