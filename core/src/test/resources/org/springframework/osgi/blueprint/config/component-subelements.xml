@@ -208,12 +208,7 @@
 	<bean id="nestedRef"
 		class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
-			<ref-list availability="optional">
-				<interfaces>
-					<value>java.util.Map</value>
-					<value>java.io.Serializable</value>
-				</interfaces>
-			</ref-list>
+			<ref-list availability="optional" interface="java.util.Map"/>
 		</property>
 	</bean>
 	

@@ -15,23 +15,15 @@
 		<argument value="java.lang.Cloneable" />
 	</bean>
 
-	<reference id="foo">
+	<reference id="foo" interface="java.io.Serializable">
 		<!--
 			nested interface refs not supported any more <interfaces> <ref
 			component-id="classname" /> <ref component-id="class" />
 			</interfaces>
 		-->
-		<interfaces>
-			<value>java.io.Serializable</value>
-			<value>java.lang.Cloneable</value>
-		</interfaces>
 	</reference>
 
-	<reference id="bar">
-		<interfaces>
-			<value>java.io.Serializable</value>
-			<value>java.lang.Cloneable</value>
-		</interfaces>
+	<reference id="bar" interface="java.io.Serializable">
 	</reference>
 
 

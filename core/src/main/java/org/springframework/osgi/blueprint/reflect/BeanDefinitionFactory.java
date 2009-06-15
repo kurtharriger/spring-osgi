@@ -170,7 +170,7 @@ class BeanDefinitionFactory implements MetadataConstants {
 
 	private void addServiceReferenceProperties(ServiceReferenceMetadata referenceMetadata, BeanDefinitionBuilder builder) {
 		builder.addPropertyValue(IMPORTER_FILTER_PROP, referenceMetadata.getFilter());
-		builder.addPropertyValue(IMPORTER_INTFS_PROP, referenceMetadata.getInterfaceNames());
+		builder.addPropertyValue(IMPORTER_INTFS_PROP, referenceMetadata.getInterfaceName());
 		// FIXME: add binding listeners
 	}
 }

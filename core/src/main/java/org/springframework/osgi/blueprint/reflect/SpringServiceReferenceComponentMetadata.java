@@ -48,7 +48,7 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 	private final String componentName;
 	private final String filter;
 	private final int availability;
-	private final List<String> interfaces;
+	private final String intf;
 	private final Collection<Listener> listeners;
 
 	/**
@@ -73,22 +73,20 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 		// interfaces
 		Object value = MetadataUtils.getValue(pvs, INTERFACES_PROP);
 
-		List<String> intfs = new ArrayList<String>(4);
 		// interface attribute used
 		if (value instanceof String) {
-			intfs.add((String) value);
+			intf = (String) value;
 		}
 
 		else {
 			if (value instanceof Collection) {
 				Collection<TypedStringValue> values = (Collection) value;
 
-				for (TypedStringValue tsv : values) {
-					intfs.add(tsv.getValue());
-				}
+				intf = values.iterator().next().getValue();
+			} else {
+				intf = "";
 			}
 		}
-		interfaces = Collections.unmodifiableList(intfs);
 
 		// listeners
 		List<Listener> foundListeners = new ArrayList<Listener>(4);
@@ -115,8 +113,8 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 		return filter;
 	}
 
-	public List<String> getInterfaceNames() {
-		return interfaces;
+	public String getInterfaceName() {
+		return intf;
 	}
 
 	public Collection<Listener> getServiceListeners() {
