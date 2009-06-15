@@ -53,7 +53,7 @@ public class GreedyProxyTest extends TestCase {
 	private StaticServiceProxyCreator createProxyCreator(Class<?>[] classes) {
 		ClassLoader cl = getClass().getClassLoader();
 		BundleContext ctx = new MockBundleContext();
-		return new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoader.UNMANAGED, true, false);
+		return new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoaderEnum.UNMANAGED, true, false);
 	}
 
 	protected void tearDown() throws Exception {

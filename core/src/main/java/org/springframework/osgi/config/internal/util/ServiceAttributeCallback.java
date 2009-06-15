@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
+import org.springframework.osgi.service.exporter.support.ExportContextClassLoaderEnum;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
@@ -36,7 +37,7 @@ public class ServiceAttributeCallback implements AttributeCallback {
 	private static final String AUTOEXPORT_PROP = "interfaceDetector";
 	private static final String INTERFACE = "interface";
 	private static final String INTERFACES_PROP = "interfaces";
-	private static final String CCL_PROP = "contextClassLoader";
+	private static final String CCL_PROP = "exportContextClassLoader";
 	private static final String CONTEXT_CLASSLOADER = "context-class-loader";
 	private static final String REF = "ref";
 
@@ -63,7 +64,7 @@ public class ServiceAttributeCallback implements AttributeCallback {
 			// conversion
 
 			String value = attribute.getValue().toUpperCase(Locale.ENGLISH).replace(DASH_CHAR, UNDERSCORE_CHAR);
-			bldr.addPropertyValue(CCL_PROP, value);
+			bldr.addPropertyValue(CCL_PROP, ExportContextClassLoaderEnum.valueOf(value));
 			return false;
 		}
 

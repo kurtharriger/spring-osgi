@@ -130,7 +130,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private boolean hasNamedBean;
 	private volatile Class<?>[] interfaces;
 	private InterfaceDetector interfaceDetector = DefaultInterfaceDetector.DISABLED;
-	private volatile ExportContextClassLoader contextClassLoader = ExportContextClassLoader.UNMANAGED;
+	private volatile ExportContextClassLoaderEnum contextClassLoader = ExportContextClassLoaderEnum.UNMANAGED;
 	private volatile Object target;
 	private volatile Class<?> targetClass;
 	/** Default value is same as non-ordered */
@@ -327,8 +327,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		ServiceFactory serviceFactory =
 				new PublishingServiceFactory(classes, target, beanFactory, targetBeanName,
-						(contextClassLoader == ExportContextClassLoader.SERVICE_PROVIDER), classLoader, aopClassLoader,
-						bundleContext);
+						(ExportContextClassLoaderEnum.SERVICE_PROVIDER.equals(contextClassLoader)), classLoader,
+						aopClassLoader, bundleContext);
 
 		if (isBeanBundleScoped())
 			serviceFactory = new OsgiBundleScope.BundleScopeServiceFactory(serviceFactory);
@@ -404,13 +404,30 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * default, {@link ExportContextClassLoader#UNMANAGED} is used.
 	 * 
 	 * <p/> <strong>Note:</strong> Since proxying is required for context class loader manager, the target class has to
-	 * meet certain criterias described in the Spring AOP documentation. In short, final classes are not supported when
+	 * meet certain criteria described in the Spring AOP documentation. In short, final classes are not supported when
+	 * class enhancement is used.
+	 * 
+	 * @param ccl context class loader strategy to use
+	 * @see ExportContextClassLoader
+	 * @deprecated As of Spring DM 2.0, replaced by {@link #setExportContextClassLoader(ExportContextClassLoaderEnum)}
+	 */
+	public void setContextClassLoader(ExportContextClassLoader ccl) {
+		Assert.notNull(ccl);
+		this.contextClassLoader = ccl.getExportContextClassLoaderEnum();
+	}
+
+	/**
+	 * Sets the context class loader management strategy to use when invoking operations on the exposed target bean. By
+	 * default, {@link ExportContextClassLoader#UNMANAGED} is used.
+	 * 
+	 * <p/> <strong>Note:</strong> Since proxying is required for context class loader manager, the target class has to
+	 * meet certain criteria described in the Spring AOP documentation. In short, final classes are not supported when
 	 * class enhancement is used.
 	 * 
 	 * @param ccl context class loader strategy to use
 	 * @see ExportContextClassLoader
 	 */
-	public void setContextClassLoader(ExportContextClassLoader ccl) {
+	public void setExportContextClassLoader(ExportContextClassLoaderEnum ccl) {
 		Assert.notNull(ccl);
 		this.contextClassLoader = ccl;
 	}

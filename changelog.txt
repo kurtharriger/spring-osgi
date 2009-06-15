@@ -31,11 +31,13 @@ Package org.springframework.osgi.service
 * improved serviceability by using NamedInheritableThreadLocal
 * introduced support for dynamic service properties
 * introduced InterfaceDetector for custom auto export scenarios
-* deprecated AutoExport in favour of the DefaultInterfaceDetector enum
-* deprecated Cardinality class in favour of the Availability enum
+* deprecated AutoExport in favour of DefaultInterfaceDetector enum
+* deprecated Cardinality class in favour of Availability enum
 * improved laziness of the backing service retrieval
 * added 'sticky' option on single importers to prevent rebinds if higher ranking services
   appear while the backing service is still alive
+* deprecated ExportContextClassLoader in favour of ExportContextClassLoaderEnum
+* deprecated ImportContextClassLoader in favour of ImportContextClassLoaderEnum
 
 Package org.springframework.osgi.mock
 * added OSGi 4.2 methods to the package

@@ -17,12 +17,13 @@
 package org.springframework.osgi.service.importer.support;
 
 import org.springframework.core.enums.StaticLabeledEnum;
+import org.springframework.core.enums.StaticLabeledEnumResolver;
 
 /**
- * Enum-like class containing the OSGi service importer thread context class
- * loader (TCCL) management options.
+ * Enum-like class containing the OSGi service importer thread context class loader (TCCL) management options.
  * 
  * @author Costin Leau
+ * @deprecated As of Spring DM 2.0, replaced by {@link ImportContextClassLoaderEnum}
  */
 public class ImportContextClassLoader extends StaticLabeledEnum {
 
@@ -34,15 +35,14 @@ public class ImportContextClassLoader extends StaticLabeledEnum {
 	public static final ImportContextClassLoader UNMANAGED = new ImportContextClassLoader(0, "UNMANAGED");
 
 	/**
-	 * The TCCL will be set to the service provider upon service invocation.
+	 * The TCCL will be set to that of the service provider upon service invocation.
 	 */
 	public static final ImportContextClassLoader SERVICE_PROVIDER = new ImportContextClassLoader(1, "SERVICE_PROVIDER");
 
 	/**
-	 * The TCCL will be set to the service provider upon service invocation.
+	 * The TCCL will be set to that of the client upon service invocation.
 	 */
 	public static final ImportContextClassLoader CLIENT = new ImportContextClassLoader(2, "CLIENT");
-
 
 	/**
 	 * Constructs a new <code>ImportContextClassLoader</code> instance.
@@ -54,4 +54,12 @@ public class ImportContextClassLoader extends StaticLabeledEnum {
 		super(code, label);
 	}
 
+	ImportContextClassLoaderEnum getImportContextClassLoaderEnum() {
+		return ImportContextClassLoaderEnum.valueOf(getLabel());
+	}
+
+	static ImportContextClassLoader getImportContextClassLoader(ImportContextClassLoaderEnum enm) {
+		return (ImportContextClassLoader) StaticLabeledEnumResolver.instance().getLabeledEnumByLabel(
+				ImportContextClassLoader.class, enm.name());
+	}
 }

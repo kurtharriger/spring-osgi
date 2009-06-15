@@ -59,7 +59,7 @@ class StaticServiceProxyCreator extends AbstractServiceProxyCreator {
 	 * @param greedyProxying
 	 */
 	StaticServiceProxyCreator(Class<?>[] classes, ClassLoader aopClassLoader, ClassLoader bundleClassLoader,
-			BundleContext bundleContext, ImportContextClassLoader iccl, boolean greedyProxying,
+			BundleContext bundleContext, ImportContextClassLoaderEnum iccl, boolean greedyProxying,
 			boolean useBlueprintExceptions) {
 		super(classes, aopClassLoader, bundleClassLoader, bundleContext, iccl);
 		this.greedyProxying = greedyProxying;

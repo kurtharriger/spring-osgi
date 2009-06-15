@@ -141,7 +141,7 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 		// joining the collection)
 		proxyCreator =
 				new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBeanClassLoader(),
-						getBundleContext(), getContextClassLoader(), greedyProxying, isUseBlueprintExceptions());
+						getBundleContext(), getImportContextClassLoader(), greedyProxying, isUseBlueprintExceptions());
 	}
 
 	/**

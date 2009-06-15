@@ -191,7 +191,7 @@ public final class OsgiServiceProxyFactoryBean extends AbstractServiceImporterPr
 		// create a proxy creator using the existing context
 		ServiceProxyCreator creator =
 				new AbstractServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBeanClassLoader(),
-						getBundleContext(), getContextClassLoader()) {
+						getBundleContext(), getImportContextClassLoader()) {
 
 					ServiceInvoker createDispatcherInterceptor(ServiceReference reference) {
 						return lookupAdvice;

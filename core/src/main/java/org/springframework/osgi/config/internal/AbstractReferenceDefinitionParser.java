@@ -39,6 +39,7 @@ import org.springframework.core.Conventions;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.config.internal.util.ReferenceParsingUtil;
+import org.springframework.osgi.service.importer.support.ImportContextClassLoaderEnum;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
@@ -100,7 +101,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 				// convert constant to upper case to let Spring do the
 				// conversion
 				String val = value.toUpperCase(Locale.ENGLISH).replace('-', '_');
-				builder.addPropertyValue(CCL_PROP, val);
+				builder.addPropertyValue(CCL_PROP, ImportContextClassLoaderEnum.valueOf(val));
 				return false;
 			}
 
@@ -117,7 +118,7 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 	private static final String INTERFACES_PROP = "interfaces";
 
-	private static final String CCL_PROP = "contextClassLoader";
+	private static final String CCL_PROP = "importContextClassLoader";
 
 	private static final String TARGET_BEAN_NAME_PROP = "targetBeanName";
 

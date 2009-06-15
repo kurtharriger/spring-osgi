@@ -30,7 +30,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
-import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
+import org.springframework.osgi.service.importer.support.ImportContextClassLoaderEnum;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 
 /**
@@ -135,8 +135,8 @@ public class OsgiSingleServiceProxyFactoryBeanTest extends TestCase {
 	}
 
 	public void testClassLoadingOptionsConstant() throws Exception {
-		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.CLIENT);
-		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.SERVICE_PROVIDER);
-		serviceFactoryBean.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
+		serviceFactoryBean.setImportContextClassLoader(ImportContextClassLoaderEnum.CLIENT);
+		serviceFactoryBean.setImportContextClassLoader(ImportContextClassLoaderEnum.SERVICE_PROVIDER);
+		serviceFactoryBean.setImportContextClassLoader(ImportContextClassLoaderEnum.UNMANAGED);
 	}
 }

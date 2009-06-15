@@ -47,9 +47,8 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.osgi.compendium.internal.cm.ManagedFactoryDisposableInvoker.DestructionCodes;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
-import org.springframework.osgi.service.exporter.support.AutoExport;
 import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
-import org.springframework.osgi.service.exporter.support.ExportContextClassLoader;
+import org.springframework.osgi.service.exporter.support.ExportContextClassLoaderEnum;
 import org.springframework.osgi.service.exporter.support.InterfaceDetector;
 import org.springframework.osgi.service.exporter.support.OsgiServiceFactoryBean;
 import org.springframework.osgi.service.exporter.support.ServicePropertiesChangeListener;
@@ -179,7 +178,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	/** auto export */
 	private InterfaceDetector detector = DefaultInterfaceDetector.DISABLED;
 	/** ccl */
-	private ExportContextClassLoader ccl = ExportContextClassLoader.UNMANAGED;
+	private ExportContextClassLoaderEnum ccl = ExportContextClassLoaderEnum.UNMANAGED;
 	/** interfaces */
 	private Class<?>[] interfaces;
 	/** class loader */
@@ -342,7 +341,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		exporter.setBeanClassLoader(classLoader);
 		exporter.setBeanName(beanName);
 		exporter.setBundleContext(bundleContext);
-		exporter.setContextClassLoader(ccl);
+		exporter.setExportContextClassLoader(ccl);
 		exporter.setInterfaces(interfaces);
 		exporter.setListeners(listeners);
 		exporter.setTarget(bean);
@@ -461,14 +460,6 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 		this.classLoader = classLoader;
 	}
 
-	/**
-	 * @param autoExport The autoExport to set.
-	 * @deprecated
-	 */
-	public void setAutoExport(AutoExport autoExport) {
-		this.detector = autoExport;
-	}
-
 	public void setInterfaceDetector(InterfaceDetector detector) {
 		this.detector = detector;
 	}
@@ -476,7 +467,7 @@ public class ManagedServiceFactoryFactoryBean implements InitializingBean, BeanC
 	/**
 	 * @param ccl The ccl to set.
 	 */
-	public void setContextClassLoader(ExportContextClassLoader ccl) {
+	public void setExportContextClassLoader(ExportContextClassLoaderEnum ccl) {
 		this.ccl = ccl;
 	}
 

@@ -17,7 +17,6 @@
 package org.springframework.osgi.service.importer.support;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -45,7 +44,7 @@ public class InfrastructureProxyTest extends TestCase {
 		if (ctx == null) {
 			ctx = new MockBundleContext();
 		}
-		return new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoader.UNMANAGED, true, false);
+		return new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoaderEnum.UNMANAGED, true, false);
 	}
 
 	protected void setUp() throws Exception {
@@ -104,7 +103,7 @@ public class InfrastructureProxyTest extends TestCase {
 		};
 		ClassLoader cl = getClass().getClassLoader();
 		StaticServiceProxyCreator creator =
-				new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoader.UNMANAGED, true, true);
+				new StaticServiceProxyCreator(classes, cl, cl, ctx, ImportContextClassLoaderEnum.UNMANAGED, true, true);
 		Comparable proxy = (Comparable) creator.createServiceProxy(ref).proxy;
 		System.out.println(proxy.compareTo(null));
 	}
