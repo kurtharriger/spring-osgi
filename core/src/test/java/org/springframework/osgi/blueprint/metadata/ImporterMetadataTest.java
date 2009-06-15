@@ -51,8 +51,8 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 		ServiceReferenceMetadata metadata = getReferenceMetadata("simple");
 		System.out.println(metadata.getClass().getName());
 		assertNull(metadata.getFilter());
-		List<String> intfs = metadata.getInterfaceNames();
-		assertEquals(Cloneable.class.getName(), intfs.iterator().next());
+		String intf = metadata.getInterfaceName();
+		assertEquals(Cloneable.class.getName(), intf);
 		assertEquals(ReferenceMetadata.AVAILABILITY_MANDATORY, metadata.getAvailability());
 		assertEquals(0, metadata.getServiceListeners().size());
 	}
@@ -60,8 +60,8 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 	public void testBeanWithOptions() throws Exception {
 		ServiceReferenceMetadata metadata = getReferenceMetadata("options");
 		assertEquals("(name=foo)", metadata.getFilter());
-		List<String> intfs = metadata.getInterfaceNames();
-		assertEquals(Serializable.class.getName(), intfs.iterator().next());
+		String intf = metadata.getInterfaceName();
+		assertEquals(Serializable.class.getName(), intf);
 		assertEquals(ReferenceMetadata.AVAILABILITY_OPTIONAL, metadata.getAvailability());
 		Collection<Listener> listeners = metadata.getServiceListeners();
 		assertEquals(1, listeners.size());
@@ -69,10 +69,8 @@ public class ImporterMetadataTest extends BaseMetadataTest {
 
 	public void testMultipleInterfaces() throws Exception {
 		ServiceReferenceMetadata metadata = getReferenceMetadata("multipleInterfaces");
-		List<String> intfs = metadata.getInterfaceNames();
-		Iterator<String> iter = intfs.iterator();
-		assertEquals(Cloneable.class.getName(), iter.next());
-		assertEquals(Serializable.class.getName(), iter.next());
+		String intf = metadata.getInterfaceName();
+		assertEquals(Cloneable.class.getName(), intf);
 		assertEquals(ReferenceMetadata.AVAILABILITY_MANDATORY, metadata.getAvailability());
 		assertEquals(0, metadata.getServiceListeners().size());
 	}
