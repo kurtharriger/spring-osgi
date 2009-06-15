@@ -19,6 +19,7 @@ package org.springframework.osgi.compendium.config.internal;
 import java.util.Locale;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.osgi.compendium.internal.cm.UpdateStrategy;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -33,17 +34,14 @@ public class UpdateStrategyAttributeCallback implements AttributeCallback {
 	private static final String UPDATE_STRATEGY = "update-strategy";
 	private static final String UPDATE_STRATEGY_PROP = "updateStrategy";
 
-
 	public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 		String name = attribute.getLocalName();
 		String value = attribute.getValue();
 
 		// make sure the attribute is
 		if (UPDATE_STRATEGY.equals(name)) {
-			// convert constant to upper case to let Spring do the
-			// conversion
 			String val = value.toUpperCase(Locale.ENGLISH).replace('-', '_');
-			builder.addPropertyValue(UPDATE_STRATEGY_PROP, val);
+			builder.addPropertyValue(UPDATE_STRATEGY_PROP, UpdateStrategy.valueOf(val));
 			return false;
 		}
 

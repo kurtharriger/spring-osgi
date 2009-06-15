@@ -35,11 +35,10 @@ import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 
 /**
- * Internal (package visible) class used for handling common aspects in creating
- * a proxy over OSGi services.
+ * Internal (package visible) class used for handling common aspects in creating a proxy over OSGi services.
  * 
- * Notably, this class creates common aspects such as publishing the
- * bundleContext on a thread-local or handling of thread context classloader.
+ * Notably, this class creates common aspects such as publishing the bundleContext on a thread-local or handling of
+ * thread context classloader.
  * 
  * @author Costin Leau
  */
@@ -62,11 +61,10 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 	/** client bundle context */
 	protected final BundleContext bundleContext;
 
-	private final ImportContextClassLoader iccl;
-
+	private final ImportContextClassLoaderEnum iccl;
 
 	AbstractServiceProxyCreator(Class<?>[] classes, ClassLoader aopClassLoader, ClassLoader bundleClassLoader,
-			BundleContext bundleContext, ImportContextClassLoader iccl) {
+			BundleContext bundleContext, ImportContextClassLoaderEnum iccl) {
 		Assert.notNull(bundleContext);
 		Assert.notNull(aopClassLoader);
 
@@ -105,25 +103,25 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 		advices.add(dispatcherInterceptor);
 
 		return new ProxyPlusCallback(ProxyUtils.createProxy(getInterfaces(reference), null, classLoader, bundleContext,
-			advices), dispatcherInterceptor);
+				advices), dispatcherInterceptor);
 	}
 
 	private Advice determineTCCLAdvice(ServiceReference reference) {
 		try {
-			if (ImportContextClassLoader.CLIENT == iccl) {
+
+			switch (iccl) {
+			case CLIENT:
 				return clientTCCLAdvice;
-			}
-			else if (ImportContextClassLoader.SERVICE_PROVIDER == iccl) {
+			case SERVICE_PROVIDER:
 				return createServiceProviderTCCLAdvice(reference);
-			}
-			else if (ImportContextClassLoader.UNMANAGED == iccl) {
+			case UNMANAGED:
 				// do nothing
 				return null;
+			default:
+				return null;
 			}
-			return null;
 
-		}
-		finally {
+		} finally {
 			if (log.isTraceEnabled()) {
 				log.trace(iccl + " TCCL used for invoking " + OsgiStringUtils.nullSafeToString(reference));
 			}
@@ -135,8 +133,8 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 	}
 
 	/**
-	 * Create service provider TCCL advice. Subclasses should extend this based
-	 * on their configuration (i.e. is a static proxy or is it dynamic).
+	 * Create service provider TCCL advice. Subclasses should extend this based on their configuration (i.e. is a static
+	 * proxy or is it dynamic).
 	 * 
 	 * @param reference service reference
 	 * @return AOP advice
@@ -144,8 +142,7 @@ abstract class AbstractServiceProxyCreator implements ServiceProxyCreator {
 	abstract Advice createServiceProviderTCCLAdvice(ServiceReference reference);
 
 	/**
-	 * Create a dispatcher interceptor that actually execute the call on the
-	 * target service.
+	 * Create a dispatcher interceptor that actually execute the call on the target service.
 	 * 
 	 * @param reference service reference
 	 * @return AOP advice

@@ -36,9 +36,8 @@ import org.springframework.osgi.compendium.internal.cm.ManagedServiceFactoryFact
 import org.springframework.osgi.compendium.internal.cm.UpdateStrategy;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
-import org.springframework.osgi.service.exporter.support.AutoExport;
 import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
-import org.springframework.osgi.service.exporter.support.ExportContextClassLoader;
+import org.springframework.osgi.service.exporter.support.ExportContextClassLoaderEnum;
 
 /**
  * Parsing test for ManagedServiceFactory/<managed-service-factory/>
@@ -48,7 +47,6 @@ import org.springframework.osgi.service.exporter.support.ExportContextClassLoade
 public class ManagedServiceFactoryTest extends TestCase {
 
 	private GenericApplicationContext appContext;
-
 
 	protected void setUp() throws Exception {
 
@@ -106,7 +104,7 @@ public class ManagedServiceFactoryTest extends TestCase {
 	public void testCCLAttribute() throws Exception {
 		Object factory = appContext.getBean("&ccl");
 		Object ccl = TestUtils.getFieldValue(factory, "ccl");
-		assertEquals(ExportContextClassLoader.SERVICE_PROVIDER, ccl);
+		assertEquals(ExportContextClassLoaderEnum.SERVICE_PROVIDER, ccl);
 	}
 
 	public void testContainerUpdateAttr() throws Exception {

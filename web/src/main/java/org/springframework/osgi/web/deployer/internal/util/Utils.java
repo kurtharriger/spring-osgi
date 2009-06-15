@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.osgi.service.importer.support.ImportContextClassLoader;
+import org.springframework.osgi.service.importer.support.ImportContextClassLoaderEnum;
 import org.springframework.osgi.service.importer.support.OsgiServiceProxyFactoryBean;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
 import org.springframework.osgi.util.OsgiStringUtils;
@@ -49,11 +49,9 @@ public abstract class Utils {
 
 	private static final String SLASH = "/";
 
-
 	/**
-	 * Copies the given bundle content to the given target folder. This means
-	 * unpacking the bundle archive. In case of a failure, an exception is
-	 * thrown.
+	 * Copies the given bundle content to the given target folder. This means unpacking the bundle archive. In case of a
+	 * failure, an exception is thrown.
 	 * 
 	 * @param bundle
 	 * @param targetFolder
@@ -86,8 +84,7 @@ public abstract class Utils {
 					if (trace)
 						log.trace("Copying " + url + " to " + targetFile);
 					FileCopyUtils.copy(url.openStream(), targetStream);
-				}
-				catch (IOException ex) {
+				} catch (IOException ex) {
 					//
 					log.error("Cannot copy resource " + entryPath, ex);
 					throw (RuntimeException) new IllegalStateException("IO exception while unpacking bundle "
@@ -99,8 +96,7 @@ public abstract class Utils {
 	}
 
 	/**
-	 * Dedicated utility method used for creating an OSGi reference to
-	 * Jetty/Tomcat/XXX server service.
+	 * Dedicated utility method used for creating an OSGi reference to Jetty/Tomcat/XXX server service.
 	 * 
 	 * @return proxy to the found OSGi service
 	 */
@@ -108,7 +104,7 @@ public abstract class Utils {
 
 		OsgiServiceProxyFactoryBean proxyFB = new OsgiServiceProxyFactoryBean();
 		proxyFB.setBundleContext(bundleContext);
-		proxyFB.setContextClassLoader(ImportContextClassLoader.UNMANAGED);
+		proxyFB.setImportContextClassLoader(ImportContextClassLoaderEnum.UNMANAGED);
 		proxyFB.setInterfaces(new Class<?>[] { proxyType });
 		// use the spring-dm class loader to generate the proxy (since it can see all the needed server classes)
 		proxyFB.setBeanClassLoader(proxyType.getClassLoader());
@@ -122,13 +118,11 @@ public abstract class Utils {
 	}
 
 	/**
-	 * Detects the Jasper/JSP parser (used by the server) and returns a chained
-	 * class-loader which incorporates them all. This allows the web application
-	 * to use servlets and JSP w/o importing them (just like in traditional
+	 * Detects the Jasper/JSP parser (used by the server) and returns a chained class-loader which incorporates them
+	 * all. This allows the web application to use servlets and JSP w/o importing them (just like in traditional
 	 * environments).
 	 * 
-	 * @return chained classloader containing javax. packages and the sever
-	 * classes + Jasper/JSP compiler (if present)
+	 * @return chained classloader containing javax. packages and the sever classes + Jasper/JSP compiler (if present)
 	 */
 	public static ClassLoader chainedWebClassLoaders(Class<?> serverClass) {
 		Assert.notNull(serverClass);
@@ -151,32 +145,27 @@ public abstract class Utils {
 	}
 
 	/**
-	 * Returns the defining classloader of the given class. This method will
-	 * load the class through the given classloader but will return the class
-	 * actual class loader (as in OSGi, a classloader can load classes using
-	 * other loaders).
+	 * Returns the defining classloader of the given class. This method will load the class through the given
+	 * classloader but will return the class actual class loader (as in OSGi, a classloader can load classes using other
+	 * loaders).
 	 * 
 	 * @param className class to load
-	 * @param ClassLoader loader used to load the class (which might contain a
-	 * needed import)
-	 * @return class actual classloader - null if returned, if the class cannot
-	 * be loaded
+	 * @param ClassLoader loader used to load the class (which might contain a needed import)
+	 * @return class actual classloader - null if returned, if the class cannot be loaded
 	 */
 	private static ClassLoader findClassLoaderFor(String className, ClassLoader classLoader) {
 		try {
 			Class<?> clazz = ClassUtils.forName(className, classLoader);
 			return clazz.getClassLoader();
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			return null;
 		}
 	}
 
 	/**
-	 * Creates an URLClassLoader for the given bundle running inside the server
-	 * defined by the given class. This method might create a chained
-	 * classloader suitable for loading server classes, javax.servlet as well as
-	 * compiling JSPs if Jasper is present.
+	 * Creates an URLClassLoader for the given bundle running inside the server defined by the given class. This method
+	 * might create a chained classloader suitable for loading server classes, javax.servlet as well as compiling JSPs
+	 * if Jasper is present.
 	 * 
 	 * @param bundle bundle backing the webapp
 	 * @param serverClass class defining the container running the webapp

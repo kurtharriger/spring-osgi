@@ -50,7 +50,7 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 
 	private BundleContext bundleContext;
 
-	private ImportContextClassLoader contextClassLoader = ImportContextClassLoader.CLIENT;
+	private ImportContextClassLoaderEnum contextClassLoader = ImportContextClassLoaderEnum.CLIENT;
 
 	// not required to be an interface, but usually should be...
 	private Class<?>[] interfaces;
@@ -136,8 +136,21 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	 * 
 	 * @param contextClassLoader import context class loader management strategy
 	 * @see ImportContextClassLoader
+	 * @deprecated As of Spring DM 2.0, replaced by {@link #setImportContextClassLoader(ImportContextClassLoaderEnum))}
 	 */
 	public void setContextClassLoader(ImportContextClassLoader contextClassLoader) {
+		Assert.notNull(contextClassLoader);
+		this.contextClassLoader = contextClassLoader.getImportContextClassLoaderEnum();
+	}
+
+	/**
+	 * Sets the thread context class loader management strategy to use for services imported by this service. By default
+	 * {@link ImportContextClassLoaderEnum#CLIENT} is used.
+	 * 
+	 * @param contextClassLoader import context class loader management strategy
+	 * @see ImportContextClassLoader
+	 */
+	public void setImportContextClassLoader(ImportContextClassLoaderEnum contextClassLoader) {
 		Assert.notNull(contextClassLoader);
 		this.contextClassLoader = contextClassLoader;
 	}
@@ -234,8 +247,18 @@ public abstract class AbstractOsgiServiceImportFactoryBean implements FactoryBea
 	 * Returns the context class loader management strategy.
 	 * 
 	 * @return the context class loader management strategy
+	 * @deprecated As of Spring DM 2.0, replaced by {@link #getImportContextClassLoader()}
 	 */
 	public ImportContextClassLoader getContextClassLoader() {
+		return ImportContextClassLoader.getImportContextClassLoader(contextClassLoader);
+	}
+
+	/**
+	 * Returns the context class loader management strategy.
+	 * 
+	 * @return the context class loader management strategy
+	 */
+	public ImportContextClassLoaderEnum getImportContextClassLoader() {
 		return contextClassLoader;
 	}
 
