@@ -283,7 +283,11 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	 */
 	protected void parseNestedElements(Element element, ParserContext context, BeanDefinitionBuilder builder) {
 		parseInterfaces(element, context, builder);
-		parseListeners(element, context, builder);
+		parseListeners(element, getListenerElementName(), context, builder);
+	}
+
+	protected String getListenerElementName() {
+		return LISTENER;
 	}
 
 	/**
@@ -314,8 +318,9 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 	 * @param context
 	 * @param builder
 	 */
-	protected void parseListeners(Element element, ParserContext context, BeanDefinitionBuilder builder) {
-		List listeners = DomUtils.getChildElementsByTagName(element, LISTENER);
+	protected void parseListeners(Element element, String subElementName, ParserContext context,
+			BeanDefinitionBuilder builder) {
+		List listeners = DomUtils.getChildElementsByTagName(element, subElementName);
 
 		ManagedList listenersRef = new ManagedList();
 		// loop on listeners

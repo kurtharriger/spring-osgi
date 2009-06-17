@@ -19,6 +19,7 @@ package org.springframework.osgi.blueprint.config.internal;
 import java.util.Set;
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.CollectionBeanDefinitionParser;
 import org.springframework.osgi.config.internal.OsgiDefaultsDefinition;
@@ -30,6 +31,8 @@ import org.w3c.dom.Element;
  * 
  */
 public abstract class BlueprintCollectionBeanDefinitionParser extends CollectionBeanDefinitionParser {
+
+	private static final String REFERENCE_LISTENER = "reference-listener";
 
 	@Override
 	protected OsgiDefaultsDefinition resolveDefaults(Document document, ParserContext parserContext) {
@@ -44,5 +47,16 @@ public abstract class BlueprintCollectionBeanDefinitionParser extends Collection
 	@Override
 	protected Object parsePropertySubElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
 		return ComponentParser.parsePropertySubElement(context, beanDef, beanDefinition);
+	}
+
+	@Override
+	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+		super.doParse(element, context, builder);
+		builder.addPropertyValue("useBlueprintExceptions", true);
+	}
+
+	@Override
+	protected String getListenerElementName() {
+		return REFERENCE_LISTENER;
 	}
 }

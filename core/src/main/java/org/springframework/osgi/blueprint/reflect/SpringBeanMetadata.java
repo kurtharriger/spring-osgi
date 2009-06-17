@@ -73,7 +73,7 @@ class SpringBeanMetadata extends SpringComponentMetadata implements BeanMetadata
 		return beanDefinition.getBeanClassName();
 	}
 
-	public String getDestroyMethodName() {
+	public String getDestroyMethod() {
 		return beanDefinition.getDestroyMethodName();
 	}
 
@@ -81,11 +81,11 @@ class SpringBeanMetadata extends SpringComponentMetadata implements BeanMetadata
 		return factoryComponent;
 	}
 
-	public String getFactoryMethodName() {
+	public String getFactoryMethod() {
 		return factoryMethod;
 	}
 
-	public String getInitMethodName() {
+	public String getInitMethod() {
 		return beanDefinition.getInitMethodName();
 	}
 

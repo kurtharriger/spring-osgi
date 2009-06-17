@@ -67,7 +67,7 @@ class SimpleCollectionMetadata implements CollectionMetadata {
 		return collectionType.type;
 	}
 
-	public String getValueTypeName() {
+	public String getValueType() {
 		return typeName;
 	}
 

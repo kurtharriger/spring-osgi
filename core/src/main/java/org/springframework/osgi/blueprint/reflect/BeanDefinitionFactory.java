@@ -36,8 +36,6 @@ import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.core.enums.StaticLabeledEnumResolver;
-import org.springframework.osgi.service.exporter.support.AutoExport;
 import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
 import org.springframework.util.StringUtils;
 
@@ -94,11 +92,11 @@ class BeanDefinitionFactory implements MetadataConstants {
 		// add basic definition properties
 		BeanDefinitionBuilder builder =
 				BeanDefinitionBuilder.genericBeanDefinition(metadata.getClassName()).setInitMethodName(
-						metadata.getInitMethodName()).setDestroyMethodName(metadata.getDestroyMethodName())
-						.setLazyInit(getLazy(metadata)).setScope(metadata.getScope());
+						metadata.getInitMethod()).setDestroyMethodName(metadata.getDestroyMethod()).setLazyInit(
+						getLazy(metadata)).setScope(metadata.getScope());
 
 		// add factory-method/factory-bean
-		String factoryMethod = metadata.getFactoryMethodName();
+		String factoryMethod = metadata.getFactoryMethod();
 		if (StringUtils.hasText(factoryMethod)) {
 			builder.setFactoryMethod(factoryMethod);
 			Target factory = metadata.getFactoryComponent();
@@ -137,10 +135,10 @@ class BeanDefinitionFactory implements MetadataConstants {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(EXPORTER_CLASS);
 		// add properties
 		builder.addPropertyValue(EXPORTER_RANKING_PROP, metadata.getRanking());
-		builder.addPropertyValue(EXPORTER_INTFS_PROP, metadata.getInterfaceNames());
+		builder.addPropertyValue(EXPORTER_INTFS_PROP, metadata.getInterfaces());
 		builder.addPropertyValue(EXPORTER_PROPS_PROP, metadata.getServiceProperties());
-		builder.addPropertyValue(EXPORTER_AUTO_EXPORT_PROP, DefaultInterfaceDetector.values()[metadata
-				.getAutoExportMode() - 1]);
+		builder.addPropertyValue(EXPORTER_AUTO_EXPORT_PROP,
+				DefaultInterfaceDetector.values()[metadata.getAutoExport() - 1]);
 
 		BeanMetadataElement beanMetadata = BeanMetadataElementFactory.buildBeanMetadata(metadata.getServiceComponent());
 		if (beanMetadata instanceof RuntimeBeanReference) {
@@ -170,7 +168,7 @@ class BeanDefinitionFactory implements MetadataConstants {
 
 	private void addServiceReferenceProperties(ServiceReferenceMetadata referenceMetadata, BeanDefinitionBuilder builder) {
 		builder.addPropertyValue(IMPORTER_FILTER_PROP, referenceMetadata.getFilter());
-		builder.addPropertyValue(IMPORTER_INTFS_PROP, referenceMetadata.getInterfaceName());
+		builder.addPropertyValue(IMPORTER_INTFS_PROP, referenceMetadata.getInterface());
 		// FIXME: add binding listeners
 	}
 }

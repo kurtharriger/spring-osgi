@@ -6,10 +6,10 @@
     <version>2.0.0-m1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.springframework.osgi.rfc124</groupId>
+  <groupId>org.springframework.osgi.blueprint</groupId>
   <artifactId>api</artifactId>
   <packaging>jar</packaging>
-  <name>Spring OSGi RFC 124 API</name>
+  <name>Spring OSGi Blueprint API</name>
   <url>http://www.springframework.org/osgi</url>
   
   <properties>

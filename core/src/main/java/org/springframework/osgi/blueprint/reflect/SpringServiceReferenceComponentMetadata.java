@@ -21,14 +21,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.osgi.service.blueprint.reflect.Listener;
+import org.osgi.service.blueprint.reflect.ReferenceListener;
 import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.osgi.service.importer.support.Availability;
-import org.springframework.osgi.service.importer.support.Cardinality;
 
 /**
  * Default {@link ServiceReferenceComponentMetadata} implementation based on Spring's {@link BeanDefinition}.
@@ -49,7 +48,7 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 	private final String filter;
 	private final int availability;
 	private final String intf;
-	private final Collection<Listener> listeners;
+	private final Collection<ReferenceListener> listeners;
 
 	/**
 	 * Constructs a new <code>SpringServiceReferenceComponentMetadata</code> instance.
@@ -89,12 +88,12 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 		}
 
 		// listeners
-		List<Listener> foundListeners = new ArrayList<Listener>(4);
+		List<ReferenceListener> foundListeners = new ArrayList<ReferenceListener>(4);
 		List<? extends AbstractBeanDefinition> listenerDefinitions = (List) MetadataUtils.getValue(pvs, LISTENERS_PROP);
 
 		if (listenerDefinitions != null) {
 			for (AbstractBeanDefinition beanDef : listenerDefinitions) {
-				foundListeners.add(new SimpleListenerMetadata(beanDef));
+				foundListeners.add(new SimpleReferenceListenerMetadata(beanDef));
 			}
 		}
 
@@ -113,11 +112,11 @@ abstract class SpringServiceReferenceComponentMetadata extends SpringComponentMe
 		return filter;
 	}
 
-	public String getInterfaceName() {
+	public String getInterface() {
 		return intf;
 	}
 
-	public Collection<Listener> getServiceListeners() {
+	public Collection<ReferenceListener> getReferenceListeners() {
 		return listeners;
 	}
 }

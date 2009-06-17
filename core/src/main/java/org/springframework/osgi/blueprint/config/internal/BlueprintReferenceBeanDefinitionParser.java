@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinitionParser {
 
+	private static final String REFERENCE_LISTENER = "reference-listener";
+
 	@Override
 	protected OsgiDefaultsDefinition resolveDefaults(Document document, ParserContext parserContext) {
 		return new BlueprintDefaultsDefinition(document, parserContext);
@@ -56,5 +58,16 @@ public class BlueprintReferenceBeanDefinitionParser extends ReferenceBeanDefinit
 	@Override
 	protected Object parsePropertySubElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
 		return ComponentParser.parsePropertySubElement(context, beanDef, beanDefinition);
+	}
+
+	@Override
+	protected void doParse(Element element, ParserContext context, BeanDefinitionBuilder builder) {
+		super.doParse(element, context, builder);
+		builder.addPropertyValue("useBlueprintExceptions", true);
+	}
+
+	@Override
+	protected String getListenerElementName() {
+		return REFERENCE_LISTENER;
 	}
 }

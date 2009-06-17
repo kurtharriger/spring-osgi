@@ -89,7 +89,7 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 		assertEquals(String.class.getName(), param.getValueType());
 		System.out.println("Param value is " + param.getValue());
 		ValueMetadata stv = (ValueMetadata) param.getValue();
-		assertEquals(Boolean.class.getName(), stv.getTypeName());
+		assertEquals(Boolean.class.getName(), stv.getType());
 	}
 
 	public void testConstructorAndNestedValueWOTypes() throws Exception {
@@ -100,7 +100,7 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 		assertEquals(boolean.class.getName(), param.getValueType());
 		System.out.println("Param value is " + param.getValue());
 		ValueMetadata stv = (ValueMetadata) param.getValue();
-		assertEquals(null, stv.getTypeName());
+		assertEquals(null, stv.getType());
 	}
 
 	public void testNanDouble() throws Exception {
@@ -114,10 +114,10 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 		BeanProperty prop = (BeanProperty) localMetadata.getProperties().iterator().next();
 		CollectionMetadata listValue = (CollectionMetadata) prop.getValue();
 		assertEquals(List.class, listValue.getCollectionClass());
-		assertEquals(Double.class.getName(), listValue.getValueTypeName());
+		assertEquals(Double.class.getName(), listValue.getValueType());
 		List<ValueMetadata> list = listValue.getValues();
 		for (ValueMetadata valueString : list) {
-			assertNull(valueString.getTypeName());
+			assertNull(valueString.getType());
 		}
 	}
 
@@ -151,7 +151,7 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 
 	public void testFactoryMethod() throws Exception {
 		BeanMetadata localMetadata = getLocalMetadata("noArgStaticFactory");
-		assertEquals("staticMethod", localMetadata.getFactoryMethodName());
+		assertEquals("staticMethod", localMetadata.getFactoryMethod());
 		List<BeanArgument> params = localMetadata.getArguments();
 		assertNotNull(params);
 		assertTrue(params.isEmpty());
@@ -161,7 +161,7 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 	public void testFactoryArgMethod() throws Exception {
 		BeanMetadata localMetadata = getLocalMetadata("oneArgStaticFactory");
 		assertNull(localMetadata.getFactoryComponent());
-		assertEquals("staticMethod", localMetadata.getFactoryMethodName());
+		assertEquals("staticMethod", localMetadata.getFactoryMethod());
 		List<BeanArgument> params = localMetadata.getArguments();
 		assertNotNull(params);
 		assertEquals(1, params.size());
@@ -170,7 +170,7 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 
 	public void testInstanceFactoryMethod() throws Exception {
 		BeanMetadata localMetadata = getLocalMetadata("noArgInstanceFactory");
-		assertEquals("instanceMethod", localMetadata.getFactoryMethodName());
+		assertEquals("instanceMethod", localMetadata.getFactoryMethod());
 		assertTrue(localMetadata.getArguments().isEmpty());
 		Target factoryComponent = localMetadata.getFactoryComponent();
 		assertTrue(factoryComponent instanceof RefMetadata);
@@ -180,7 +180,7 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 
 	public void testInstanceFactoryArgMethod() throws Exception {
 		BeanMetadata localMetadata = getLocalMetadata("oneArgInstanceFactory");
-		assertEquals("instanceMethod", localMetadata.getFactoryMethodName());
+		assertEquals("instanceMethod", localMetadata.getFactoryMethod());
 		List params = localMetadata.getArguments();
 		assertNotNull(params);
 		assertEquals(1, params.size());
