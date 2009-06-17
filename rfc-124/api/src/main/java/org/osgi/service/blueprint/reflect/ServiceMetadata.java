@@ -66,7 +66,7 @@ public interface ServiceMetadata extends ComponentMetadata, Target {
 	 *
 	 * @return an immutable set of (String) type names, or an empty set if using auto-export
 	 */
-	List/*<String>*/ getInterfaceNames();
+	List/*<String>*/ getInterfaces();
 
 	/**
 	 * Return the auto-export mode specified.
@@ -75,7 +75,7 @@ public interface ServiceMetadata extends ComponentMetadata, Target {
 	 *
 	 * @return One of AUTO_EXPORT_DISABLED, AUTO_EXPORT_INTERFACES, AUTO_EXPORT_CLASS_HIERARCHY, AUTO_EXPORT_ALL_CLASSES
 	 */
-	int getAutoExportMode();
+	int getAutoExport();
 
 	/**
 	 * The user declared properties to be advertised with the service.

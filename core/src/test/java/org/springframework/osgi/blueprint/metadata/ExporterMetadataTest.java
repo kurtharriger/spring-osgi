@@ -50,8 +50,8 @@ public class ExporterMetadataTest extends BaseMetadataTest {
 
 	public void testSimpleBean() throws Exception {
 		ServiceMetadata metadata = getReferenceMetadata("simple");
-		assertEquals(ServiceMetadata.AUTO_EXPORT_DISABLED, metadata.getAutoExportMode());
-		List<String> intfs = metadata.getInterfaceNames();
+		assertEquals(ServiceMetadata.AUTO_EXPORT_DISABLED, metadata.getAutoExport());
+		List<String> intfs = metadata.getInterfaces();
 		assertEquals(1, intfs.size());
 		assertEquals(Map.class.getName(), intfs.iterator().next());
 		assertEquals(123, metadata.getRanking());
@@ -65,9 +65,9 @@ public class ExporterMetadataTest extends BaseMetadataTest {
 
 	public void testNestedBean() throws Exception {
 		ServiceMetadata metadata = getReferenceMetadata("nested");
-		assertEquals(ServiceMetadata.AUTO_EXPORT_ALL_CLASSES, metadata.getAutoExportMode());
+		assertEquals(ServiceMetadata.AUTO_EXPORT_ALL_CLASSES, metadata.getAutoExport());
 
-		List<String> intfs = metadata.getInterfaceNames();
+		List<String> intfs = metadata.getInterfaces();
 		assertEquals(2, intfs.size());
 		Iterator<String> iterator = intfs.iterator();
 		assertEquals(Map.class.getName(), iterator.next());
@@ -79,13 +79,13 @@ public class ExporterMetadataTest extends BaseMetadataTest {
 		Iterator<RegistrationListener> iter = listeners.iterator();
 		RegistrationListener listener = iter.next();
 
-		assertEquals("up", listener.getRegistrationMethodName());
-		assertEquals("down", listener.getUnregistrationMethodName());
+		assertEquals("up", listener.getRegistrationMethod());
+		assertEquals("down", listener.getUnregistrationMethod());
 		assertEquals("listener", ((RefMetadata) listener.getListenerComponent()).getComponentId());
 
 		listener = iter.next();
-		assertEquals("up", listener.getRegistrationMethodName());
-		assertEquals("down", listener.getUnregistrationMethodName());
+		assertEquals("up", listener.getRegistrationMethod());
+		assertEquals("down", listener.getUnregistrationMethod());
 		assertTrue(listener.getListenerComponent() instanceof Target);
 
 		assertTrue(metadata.getServiceComponent() instanceof Target);

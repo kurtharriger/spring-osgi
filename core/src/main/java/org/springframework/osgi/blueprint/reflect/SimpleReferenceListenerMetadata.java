@@ -16,7 +16,7 @@
 
 package org.springframework.osgi.blueprint.reflect;
 
-import org.osgi.service.blueprint.reflect.Listener;
+import org.osgi.service.blueprint.reflect.ReferenceListener;
 import org.osgi.service.blueprint.reflect.Target;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
  * 
  * @author Costin Leau
  */
-public class SimpleListenerMetadata implements Listener {
+public class SimpleReferenceListenerMetadata implements ReferenceListener {
 
 	private static final String BIND_PROP = "bindMethod";
 	private static final String UNBIND_PROP = "unbindMethod";
@@ -35,7 +35,7 @@ public class SimpleListenerMetadata implements Listener {
 	private final String bindMethodName, unbindMethodName;
 	private final Target listenerComponent;
 
-	public SimpleListenerMetadata(AbstractBeanDefinition beanDefinition) {
+	public SimpleReferenceListenerMetadata(AbstractBeanDefinition beanDefinition) {
 		MutablePropertyValues pvs = beanDefinition.getPropertyValues();
 		bindMethodName = (String) MetadataUtils.getValue(pvs, BIND_PROP);
 		unbindMethodName = (String) MetadataUtils.getValue(pvs, UNBIND_PROP);
@@ -56,13 +56,13 @@ public class SimpleListenerMetadata implements Listener {
 	 * @param unbindMethodName
 	 * @param listenerComponent
 	 */
-	public SimpleListenerMetadata(String bindMethodName, String unbindMethodName, Target listenerComponent) {
+	public SimpleReferenceListenerMetadata(String bindMethodName, String unbindMethodName, Target listenerComponent) {
 		this.bindMethodName = bindMethodName;
 		this.unbindMethodName = unbindMethodName;
 		this.listenerComponent = listenerComponent;
 	}
 
-	public String getBindMethodName() {
+	public String getBindMethod() {
 		return bindMethodName;
 	}
 
@@ -70,7 +70,7 @@ public class SimpleListenerMetadata implements Listener {
 		return listenerComponent;
 	}
 
-	public String getUnbindMethodName() {
+	public String getUnbindMethod() {
 		return unbindMethodName;
 	}
 }

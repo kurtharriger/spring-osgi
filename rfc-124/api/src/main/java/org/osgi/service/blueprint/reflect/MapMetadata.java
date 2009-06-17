@@ -28,17 +28,15 @@ public interface MapMetadata extends NonNullMetadata {
 	 * The key-type specified for map keys, or null if none given
 	 *
 	 * Defined in the <code>key-type</code> attribute.
-	 * ### should we have getRuntimeKeyType?
 	 */
-	String getKeyTypeName();
+	String getKeyType();
 
     /**
      * The value-type specified for the array
      *
-	 * ### should we have getRuntimeValueType?
      * The <code>value-type</code> attribute.
      */
-	String getValueTypeName();
+	String getValueType();
 
     /**
      * The of Metadata objects that describe the value.

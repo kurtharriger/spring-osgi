@@ -13,20 +13,20 @@
 
 	<reference id="options" interface="java.io.Serializable"
 		availability="optional" component-name="foo" filter="(name=foo)">
-		<listener bind-method="bind" unbind-method="unbind" ref="listener" />
+		<reference-listener bind-method="bind" unbind-method="unbind" ref="listener" />
 	</reference>
 
 	<reference id="multipleInterfaces" interface="java.lang.Cloneable"/>
 
 	<reference id="multipleListeners" interface="java.lang.Cloneable">
-		<listener bind-method="bindM" unbind-method="unbindM" ref="listener" />
+		<reference-listener bind-method="bindM" unbind-method="unbindM" ref="listener" />
 
-		<listener bind-method="up" unbind-method="down">
+		<reference-listener bind-method="up" unbind-method="down">
 			<bean class="org.springframework.osgi.blueprint.ImporterListener" />
-		</listener>
-		<listener bind-method="refBind" unbind-method="refUnbind">
+		</reference-listener>
+		<reference-listener bind-method="refBind" unbind-method="refUnbind">
 			<ref component-id="listener" />
-		</listener>
+		</reference-listener>
 	</reference>
 
 	<reference id="timeout" interface="java.lang.Cloneable"

@@ -15,9 +15,15 @@
  */
 package org.springframework.osgi.blueprint.metadata;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.RefListMetadata;
+import org.osgi.service.blueprint.reflect.RefMetadata;
+import org.osgi.service.blueprint.reflect.ReferenceListener;
 import org.osgi.service.blueprint.reflect.ServiceReferenceMetadata;
+import org.osgi.service.blueprint.reflect.Target;
 
 /**
  * @author Costin Leau
@@ -39,5 +45,21 @@ public class ImporterCollectionsMetadataTest extends BaseMetadataTest {
 
 	public void testSimpleList() throws Exception {
 		RefListMetadata metadata = (RefListMetadata) getReferenceMetadata("simpleList");
+	}
+
+	public void testListeners() throws Exception {
+		RefListMetadata metadata = (RefListMetadata) getReferenceMetadata("listeners");
+		Collection<ReferenceListener> listeners = metadata.getReferenceListeners();
+		assertEquals(3, listeners.size());
+
+		Iterator<ReferenceListener> iterator = listeners.iterator();
+		ReferenceListener listener = iterator.next();
+		assertEquals("bindM", listener.getBindMethod());
+		assertEquals("unbindM", listener.getUnbindMethod());
+		assertTrue(listener.getListenerComponent() instanceof RefMetadata);
+		listener = iterator.next();
+		assertTrue(listener.getListenerComponent() instanceof Target);
+		listener = iterator.next();
+		assertTrue(listener.getListenerComponent() instanceof RefMetadata);
 	}
 }

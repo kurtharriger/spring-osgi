@@ -167,7 +167,7 @@ abstract class AbstractServiceImporterProxyFactoryBean extends AbstractOsgiServi
 	 * 
 	 * @param useBlueprintExceptions
 	 */
-	void setUseBlueprintExceptions(boolean useBlueprintExceptions) {
+	public void setUseBlueprintExceptions(boolean useBlueprintExceptions) {
 		this.useBlueprintException = useBlueprintExceptions;
 	}
 

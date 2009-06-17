@@ -55,11 +55,11 @@ public class SimpleRegistrationListener implements RegistrationListener {
 		return listenerComponent;
 	}
 
-	public String getRegistrationMethodName() {
+	public String getRegistrationMethod() {
 		return registrationMethod;
 	}
 
-	public String getUnregistrationMethodName() {
+	public String getUnregistrationMethod() {
 		return unregistrationMethod;
 	}
 }

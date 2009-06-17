@@ -6,10 +6,10 @@
     <version>2.0.0-m1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.springframework.osgi.rfc124</groupId>
-  <artifactId>rfc124</artifactId>
+  <groupId>org.springframework.osgi</groupId>
+  <artifactId>blueprint</artifactId>
   <packaging>pom</packaging>
-  <name>Spring OSGi RFC 124</name>
+  <name>Spring OSGi Blueprint Artifacts</name>
   <url>http://www.springframework.org/osgi</url>
   
   <properties>

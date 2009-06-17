@@ -49,16 +49,15 @@ public interface ServiceReferenceMetadata extends ComponentMetadata {
 	 * The interface type that the matching service must support
 	 *
 	 * Defined in the <code>interface</code> attribute.
-	 *
 	 * @return the String name of the requested service interface
 	 */
-	String getInterfaceName();
+	String getInterface();
 
 	/**
 	 * The value of the component-name attribute, if specified. This specifies
 	 * the name of a component that is registered in the service registry. This will
 	 * create an automatic filter (appended wit the filter if set) to select this
-	 * component based on its automatic ###name attribute.
+	 * component based on its automatic id attribute.
 	 *
 	 * Defined in the <code>component-name</code> attribute.
 	 *
@@ -81,8 +80,8 @@ public interface ServiceReferenceMetadata extends ComponentMetadata {
 	 *
 	 * Defined in the <code>listener</code> elements.
 	 *
-	 * @return an immutable collection of registered ListenerMetadata
+	 * @return an immutable collection of ReferenceListener objects
 	 */
-	Collection /*<Listener>*/ getServiceListeners();
+	Collection /*<ReferenceListener>*/ getReferenceListeners();
 
 }

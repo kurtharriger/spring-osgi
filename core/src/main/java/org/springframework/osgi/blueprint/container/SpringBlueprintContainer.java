@@ -43,9 +43,7 @@ import org.springframework.util.CollectionUtils;
  */
 public class SpringBlueprintContainer implements BlueprintContainer {
 
-	/**
-	 * cannot use a ConfigurableBeanFactory since the context is not yet refreshed at construction time
-	 */
+	// cannot use a ConfigurableBeanFactory since the context is not yet refreshed at construction time
 	private final ConfigurableApplicationContext applicationContext;
 	private final BundleContext bundleContext;
 	private transient ConfigurableListableBeanFactory beanFactory;
@@ -117,5 +115,9 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 		}
 
 		return beanFactory;
+	}
+
+	public int getCompliance() {
+		return BlueprintCompliance.STRICT.ordinal() + 1;
 	}
 }

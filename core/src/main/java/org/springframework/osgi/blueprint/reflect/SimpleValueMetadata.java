@@ -51,7 +51,7 @@ public class SimpleValueMetadata implements ValueMetadata {
 		return value;
 	}
 
-	public String getTypeName() {
+	public String getType() {
 		return typeName;
 	}
 }

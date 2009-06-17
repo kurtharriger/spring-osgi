@@ -63,7 +63,7 @@ class BeanMetadataElementFactory {
 
 		if (value instanceof ValueMetadata) {
 			ValueMetadata typedString = (ValueMetadata) value;
-			String specifiedType = typedString.getTypeName();
+			String specifiedType = typedString.getType();
 			if (specifiedType == null) {
 				specifiedType = defaultTypeName;
 			}
@@ -100,21 +100,21 @@ class BeanMetadataElementFactory {
 			Collection coll;
 			if (List.class.isAssignableFrom(type)) {
 				ManagedList<BeanMetadataElement> list = new ManagedList<BeanMetadataElement>(values.size());
-				list.setElementTypeName(collection.getValueTypeName());
+				list.setElementTypeName(collection.getValueType());
 				coll = list;
 			} else if (Set.class.isAssignableFrom(type)) {
 				ManagedSet<BeanMetadataElement> set = new ManagedSet<BeanMetadataElement>(values.size());
-				set.setElementTypeName(collection.getValueTypeName());
+				set.setElementTypeName(collection.getValueType());
 				coll = set;
 			} else if (Object[].class.isAssignableFrom(type)) {
-				ManagedArray array = new ManagedArray(collection.getValueTypeName(), values.size());
+				ManagedArray array = new ManagedArray(collection.getValueType(), values.size());
 				coll = array;
 			} else {
 				throw new IllegalArgumentException("Cannot create collection for type " + type);
 			}
 
 			for (Metadata val : values) {
-				coll.add(BeanMetadataElementFactory.buildBeanMetadata(val, collection.getValueTypeName()));
+				coll.add(BeanMetadataElementFactory.buildBeanMetadata(val, collection.getValueType()));
 			}
 			return (BeanMetadataElement) coll;
 		}
@@ -122,11 +122,11 @@ class BeanMetadataElementFactory {
 		if (value instanceof MapMetadata) {
 			MapMetadata mapValue = (MapMetadata) value;
 			List<MapEntry> entries = mapValue.getEntries();
-			String defaultKeyType = mapValue.getKeyTypeName();
-			String defaultValueType = mapValue.getValueTypeName();
+			String defaultKeyType = mapValue.getKeyType();
+			String defaultValueType = mapValue.getValueType();
 
-			ManagedMap<BeanMetadataElement, BeanMetadataElement> managedMap = new ManagedMap<BeanMetadataElement, BeanMetadataElement>(
-					entries.size());
+			ManagedMap<BeanMetadataElement, BeanMetadataElement> managedMap =
+					new ManagedMap<BeanMetadataElement, BeanMetadataElement>(entries.size());
 			managedMap.setKeyTypeName(defaultKeyType);
 			managedMap.setValueTypeName(defaultValueType);
 

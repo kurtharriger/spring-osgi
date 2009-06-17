@@ -50,11 +50,11 @@ public class SimpleMapMetadata implements MapMetadata {
 		return entries;
 	}
 
-	public String getKeyTypeName() {
+	public String getKeyType() {
 		return keyValueType;
 	}
 
-	public String getValueTypeName() {
+	public String getValueType() {
 		return valueValueType;
 	}
 }

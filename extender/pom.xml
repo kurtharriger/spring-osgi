@@ -42,7 +42,7 @@
              <scope>test</scope>
          </dependency>
          <dependency>
-             <groupId>org.springframework.osgi.rfc124</groupId>
+             <groupId>org.springframework.osgi.blueprint</groupId>
              <artifactId>api</artifactId>
              <scope>provided</scope>
              <version>2.0.0-m1-SNAPSHOT</version>

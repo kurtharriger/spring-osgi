@@ -14,10 +14,7 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.core.enums.StaticLabeledEnumResolver;
-import org.springframework.osgi.service.exporter.support.AutoExport;
 import org.springframework.osgi.service.exporter.support.DefaultInterfaceDetector;
-import org.springframework.osgi.service.exporter.support.InterfaceDetector;
 
 /**
  * Default {@link ServiceMetadata} implementation based on Spring's {@link BeanDefinition}.
@@ -119,11 +116,11 @@ class SpringServiceExportComponentMetadata extends SpringComponentMetadata imple
 		listeners = Collections.unmodifiableCollection(foundListeners);
 	}
 
-	public int getAutoExportMode() {
+	public int getAutoExport() {
 		return autoExport;
 	}
 
-	public List<String> getInterfaceNames() {
+	public List<String> getInterfaces() {
 		return interfaces;
 	}
 
