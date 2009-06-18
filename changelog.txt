@@ -38,6 +38,7 @@ Package org.springframework.osgi.service
   appear while the backing service is still alive
 * deprecated ExportContextClassLoader in favour of ExportContextClassLoaderEnum
 * deprecated ImportContextClassLoader in favour of ImportContextClassLoaderEnum
+* service collection can now contain service references instead of just service proxies
 
 Package org.springframework.osgi.mock
 * added OSGi 4.2 methods to the package

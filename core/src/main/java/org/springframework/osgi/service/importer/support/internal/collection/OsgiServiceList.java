@@ -26,13 +26,11 @@ import org.osgi.framework.Filter;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 
 /**
- * OSGi service dynamic collection - allows iterating while the underlying
- * storage is being shrunk/expanded. This collection is read-only - its content
- * is being retrieved dynamically from the OSGi platform.
+ * OSGi service dynamic collection - allows iterating while the underlying storage is being shrunk/expanded. This
+ * collection is read-only - its content is being retrieved dynamically from the OSGi platform.
  * 
- * <p/> This collection and its iterators are thread-safe. That is, multiple
- * threads can access the collection. However, since the collection is
- * read-only, it cannot be modified by the client.
+ * <p/> This collection and its iterators are thread-safe. That is, multiple threads can access the collection. However,
+ * since the collection is read-only, it cannot be modified by the client.
  * 
  * @author Costin Leau
  * 
@@ -43,7 +41,6 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 
 		// dynamic iterator
 		private final ListIterator iter;
-
 
 		public OsgiServiceListIterator(int index) {
 			iter = storage.listIterator(index);
@@ -99,12 +96,10 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 
 	};
 
-
 	/**
 	 * cast the collection to a specialized collection
 	 */
 	protected List storage;
-
 
 	public OsgiServiceList(Filter filter, BundleContext context, ClassLoader classLoader,
 			ServiceProxyCreator proxyCreator) {
@@ -113,7 +108,7 @@ public class OsgiServiceList extends OsgiServiceCollection implements List, Rand
 
 	protected DynamicCollection createInternalDynamicStorage() {
 		storage = new DynamicList();
-		return (DynamicList) storage;
+		return (DynamicCollection) storage;
 	}
 
 	public Object get(int index) {

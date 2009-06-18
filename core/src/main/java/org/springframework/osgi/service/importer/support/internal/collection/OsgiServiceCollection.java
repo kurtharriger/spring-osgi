@@ -38,7 +38,6 @@ import org.springframework.osgi.service.importer.DefaultOsgiServiceDependency;
 import org.springframework.osgi.service.importer.ImportedOsgiServiceProxy;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
-import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.internal.aop.ProxyPlusCallback;
 import org.springframework.osgi.service.importer.support.internal.aop.ServiceProxyCreator;
 import org.springframework.osgi.service.importer.support.internal.dependency.ImporterStateListener;
@@ -58,12 +57,22 @@ import org.springframework.util.Assert;
  */
 public class OsgiServiceCollection implements Collection, InitializingBean, CollectionProxy, DisposableBean {
 
+	private static class EventResult {
+		static final EventResult DEFAULT = new EventResult();
+
+		Object proxy = null;
+		// flag used for sending state events
+		boolean shouldInformStateListeners = false;
+		// has the collection content modified
+		boolean collectionModified = false;
+	}
+
 	/**
 	 * Listener tracking the OSGi services which form the dynamic collection.
 	 * 
 	 * @author Costin Leau
 	 */
-	private class Listener implements ServiceListener {
+	private abstract class BaseListener implements ServiceListener {
 
 		public void serviceChanged(ServiceEvent event) {
 			ClassLoader tccl = Thread.currentThread().getContextClassLoader();
@@ -72,63 +81,31 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				Thread.currentThread().setContextClassLoader(classLoader);
 				ServiceReference ref = event.getServiceReference();
 				Long serviceId = (Long) ref.getProperty(Constants.SERVICE_ID);
-				boolean collectionModified = false;
-
-				ProxyPlusCallback ppc = null;
-				ImportedOsgiServiceProxy proxy = null;
-
-				// flag used for sending state events
-				boolean shouldInformStateListeners = false;
+				EventResult state = null;
 
 				switch (event.getType()) {
 
 				case (ServiceEvent.REGISTERED):
 				case (ServiceEvent.MODIFIED):
 					// same as ServiceEvent.REGISTERED
-					synchronized (serviceProxies) {
-						if (!servicesIdMap.containsKey(serviceId)) {
-							ppc = proxyCreator.createServiceProxy(ref);
-							proxy = ppc.proxy;
-							// let the dynamic collection decide if the service
-							// is added or not (think set, sorted set)
-							if (serviceProxies.add(proxy)) {
-								collectionModified = true;
-								// check if the list was empty before adding something to it
-								shouldInformStateListeners = (serviceProxies.size() == 1);
-								servicesIdMap.put(serviceId, ppc);
-							}
-						}
-					}
+					state = addService(serviceId, ref);
 					// inform listeners
-					// TODO: should this be part of the lock also?
-					if (collectionModified) {
-						OsgiServiceBindingUtils.callListenersBind(context, proxy, ref, listeners);
+					if (state.collectionModified) {
+						OsgiServiceBindingUtils.callListenersBind(context, state.proxy, ref, listeners);
 
-						if (serviceRequiredAtStartup && shouldInformStateListeners)
+						if (serviceRequiredAtStartup && state.shouldInformStateListeners)
 							notifySatisfiedStateListeners();
 					}
 
 					break;
 				case (ServiceEvent.UNREGISTERING):
-					synchronized (serviceProxies) {
-						// remove service id / proxy association
-						ppc = (ProxyPlusCallback) servicesIdMap.remove(serviceId);
-						if (ppc != null) {
-							proxy = ppc.proxy;
-							// remove service proxy
-							collectionModified = serviceProxies.remove(proxy);
-							// invalidate it
-							invalidateProxy(ppc);
+					state = removeService(serviceId, ref);
 
-							// check if the list is empty
-							shouldInformStateListeners = (serviceProxies.isEmpty());
-						}
-					}
 					// TODO: should this be part of the lock also?
-					if (collectionModified) {
-						OsgiServiceBindingUtils.callListenersUnbind(context, proxy, ref, listeners);
+					if (state.collectionModified) {
+						OsgiServiceBindingUtils.callListenersUnbind(context, state.proxy, ref, listeners);
 
-						if (serviceRequiredAtStartup && shouldInformStateListeners)
+						if (serviceRequiredAtStartup && state.shouldInformStateListeners)
 							notifyUnsatisfiedStateListeners();
 					}
 
@@ -164,6 +141,100 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 				}
 			}
 		}
+
+		protected abstract EventResult addService(Long id, ServiceReference reference);
+
+		protected abstract EventResult removeService(Long id, ServiceReference reference);
+	}
+
+	private class ServiceInstanceListener extends BaseListener {
+
+		@Override
+		protected EventResult addService(Long serviceId, ServiceReference ref) {
+			synchronized (services) {
+				if (!servicesIdMap.containsKey(serviceId)) {
+					ProxyPlusCallback ppc = proxyCreator.createServiceProxy(ref);
+					ImportedOsgiServiceProxy proxy = ppc.proxy;
+
+					EventResult state = new EventResult();
+					state.proxy = proxy;
+
+					// let the dynamic collection decide if the service
+					// is added or not (think set, sorted set)
+					if (services.add(proxy)) {
+						state.collectionModified = true;
+						// check if the list was empty before adding something to it
+						state.shouldInformStateListeners = (services.size() == 1);
+						servicesIdMap.put(serviceId, ppc);
+					}
+					return state;
+				}
+			}
+			return EventResult.DEFAULT;
+		}
+
+		@Override
+		protected EventResult removeService(Long serviceId, ServiceReference ref) {
+
+			synchronized (services) {
+				// remove service id / proxy association
+				ProxyPlusCallback ppc = (ProxyPlusCallback) servicesIdMap.remove(serviceId);
+
+				if (ppc != null) {
+					EventResult state = new EventResult();
+					state.proxy = ppc.proxy;
+					// remove service proxy
+					state.collectionModified = services.remove(ppc.proxy);
+					// invalidate it
+					invalidateProxy(ppc);
+					// check if the list is empty
+					state.shouldInformStateListeners = (services.isEmpty());
+
+					return state;
+				}
+			}
+
+			return EventResult.DEFAULT;
+		}
+	}
+
+	private class ServiceReferenceListener extends BaseListener {
+
+		@Override
+		protected EventResult addService(Long serviceId, ServiceReference ref) {
+			synchronized (services) {
+				if (!servicesIdMap.containsKey(serviceId)) {
+					EventResult state = new EventResult();
+					if (services.add(ref)) {
+						state.collectionModified = true;
+						// check if the list was empty before adding something to it
+						state.shouldInformStateListeners = (services.size() == 1);
+						servicesIdMap.put(serviceId, VALUE);
+					}
+					return state;
+				}
+				return EventResult.DEFAULT;
+			}
+		}
+
+		@Override
+		protected EventResult removeService(Long serviceId, ServiceReference ref) {
+			synchronized (services) {
+				// remove service id / VALUE association
+				if (servicesIdMap.remove(serviceId) != null) {
+					EventResult state = new EventResult();
+					state.proxy = ref;
+					// remove service proxy
+					state.collectionModified = services.remove(ref);
+					// check if the list is empty
+					state.shouldInformStateListeners = (services.isEmpty());
+
+					return state;
+				}
+			}
+
+			return EventResult.DEFAULT;
+		}
 	}
 
 	/**
@@ -172,17 +243,17 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	 * @author Costin Leau
 	 * 
 	 */
-	protected class OsgiServiceIterator implements Iterator<ImportedOsgiServiceProxy> {
+	protected class OsgiServiceIterator implements Iterator<Object> {
 
 		// dynamic thread-safe iterator
-		private final Iterator<ImportedOsgiServiceProxy> iter = serviceProxies.iterator();
+		private final Iterator<Object> iter = services.iterator();
 
 		public boolean hasNext() {
 			mandatoryServiceCheck();
 			return iter.hasNext();
 		}
 
-		public ImportedOsgiServiceProxy next() {
+		public Object next() {
 			mandatoryServiceCheck();
 			return iter.next();
 		}
@@ -206,7 +277,7 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	/**
 	 * The dynamic collection.
 	 */
-	protected DynamicCollection<ImportedOsgiServiceProxy> serviceProxies;
+	protected DynamicCollection<Object> services;
 
 	private boolean serviceRequiredAtStartup = true;
 
@@ -238,6 +309,11 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	/** event source (importer) name */
 	private String sourceName;
 
+	/** generate proxies or use service references */
+	private final boolean generateProxies;
+
+	private final static ProxyPlusCallback VALUE = new ProxyPlusCallback(null, null);
+
 	public OsgiServiceCollection(Filter filter, BundleContext context, ClassLoader classLoader,
 			ServiceProxyCreator proxyCreator) {
 		Assert.notNull(classLoader, "ClassLoader is required");
@@ -248,12 +324,13 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		this.classLoader = classLoader;
 
 		this.proxyCreator = proxyCreator;
-		listener = new Listener();
+		generateProxies = (proxyCreator != null);
+		listener = (generateProxies ? new ServiceInstanceListener() : new ServiceReferenceListener());
 	}
 
 	public void afterPropertiesSet() {
 		// create service proxies collection
-		this.serviceProxies = createInternalDynamicStorage();
+		this.services = createInternalDynamicStorage();
 
 		dependency = new DefaultOsgiServiceDependency(sourceName, filter, serviceRequiredAtStartup);
 
@@ -278,24 +355,34 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	public void destroy() {
 		OsgiListenerUtils.removeServiceListener(context, listener);
 
-		synchronized (serviceProxies) {
-			for (Iterator<ImportedOsgiServiceProxy> iterator = serviceProxies.iterator(); iterator.hasNext();) {
-				ImportedOsgiServiceProxy serviceProxy = iterator.next();
-				ServiceReference ref = serviceProxy.getServiceReference();
+		synchronized (services) {
 
-				// get first the destruction callback
-				ProxyPlusCallback ppc =
-						(ProxyPlusCallback) servicesIdMap.get((Long) ref.getProperty(Constants.SERVICE_ID));
-				listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
+			if (generateProxies) {
+				// unwrap and destroy proxies
+				for (Object item : services) {
+					ImportedOsgiServiceProxy serviceProxy = (ImportedOsgiServiceProxy) item;
+					ServiceReference ref = serviceProxy.getServiceReference();
 
-				try {
-					ppc.destructionCallback.destroy();
-				} catch (Exception ex) {
-					log.error("Exception occurred while destroying proxy " + ppc.proxy, ex);
+					// get first the destruction callback
+					ProxyPlusCallback ppc =
+							(ProxyPlusCallback) servicesIdMap.get((Long) ref.getProperty(Constants.SERVICE_ID));
+					listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
+
+					try {
+						ppc.destructionCallback.destroy();
+					} catch (Exception ex) {
+						log.error("Exception occurred while destroying proxy " + ppc.proxy, ex);
+					}
+				}
+			} else {
+				// pass the service reference directly
+				for (Object item : services) {
+					ServiceReference ref = (ServiceReference) item;
+					listener.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, ref));
 				}
 			}
 
-			serviceProxies.clear();
+			services.clear();
 			servicesIdMap.clear();
 		}
 	}
@@ -304,13 +391,13 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	 * Check to see whether at least one service is available.
 	 */
 	protected void mandatoryServiceCheck() {
-		if (serviceRequiredAtStartup && serviceProxies.isEmpty())
+		if (serviceRequiredAtStartup && services.isEmpty())
 			throw new ServiceUnavailableException(filter);
 	}
 
 	public boolean isSatisfied() {
 		if (serviceRequiredAtStartup)
-			return (!serviceProxies.isEmpty());
+			return (!services.isEmpty());
 		else
 			return true;
 	}
@@ -318,8 +405,8 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 	/**
 	 * Create the dynamic storage used internally. The storage <strong>has</strong> to be thread-safe.
 	 */
-	protected DynamicCollection<ImportedOsgiServiceProxy> createInternalDynamicStorage() {
-		return new DynamicCollection<ImportedOsgiServiceProxy>();
+	protected DynamicCollection<Object> createInternalDynamicStorage() {
+		return new DynamicCollection<Object>();
 	}
 
 	private void invalidateProxy(ProxyPlusCallback ppc) {
@@ -334,19 +421,19 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 		this.sourceName = name;
 	}
 
-	public Iterator<ImportedOsgiServiceProxy> iterator() {
+	public Iterator<Object> iterator() {
 		return new OsgiServiceIterator();
 	}
 
 	public int size() {
 		mandatoryServiceCheck();
-		return serviceProxies.size();
+		return services.size();
 	}
 
 	public String toString() {
 		mandatoryServiceCheck();
-		synchronized (serviceProxies) {
-			return serviceProxies.toString();
+		synchronized (services) {
+			return services.toString();
 		}
 	}
 
@@ -379,12 +466,12 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	public boolean contains(Object o) {
 		mandatoryServiceCheck();
-		return serviceProxies.contains(o);
+		return services.contains(o);
 	}
 
 	public boolean containsAll(Collection c) {
 		mandatoryServiceCheck();
-		return serviceProxies.containsAll(c);
+		return services.containsAll(c);
 	}
 
 	public boolean isEmpty() {
@@ -394,12 +481,12 @@ public class OsgiServiceCollection implements Collection, InitializingBean, Coll
 
 	public Object[] toArray() {
 		mandatoryServiceCheck();
-		return serviceProxies.toArray();
+		return services.toArray();
 	}
 
 	public Object[] toArray(Object[] array) {
 		mandatoryServiceCheck();
-		return serviceProxies.toArray(array);
+		return services.toArray(array);
 	}
 
 	/**

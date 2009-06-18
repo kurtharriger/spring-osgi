@@ -18,6 +18,7 @@ package org.springframework.osgi.service.importer;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -32,7 +33,7 @@ import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceReference;
 import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.osgi.service.importer.support.Availability;
-import org.springframework.osgi.service.importer.support.Cardinality;
+import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.util.OsgiFilterUtils;
 
@@ -130,5 +131,26 @@ public class OsgiServiceCollectionProxyFactoryBeanTest extends TestCase {
 		} catch (ServiceUnavailableException ex) {
 			// expected
 		}
+	}
+
+	public void testServiceReferenceMemberType() throws Exception {
+		serviceFactoryBean.setMemberType(MemberType.SERVICE_REFERENCE);
+		serviceFactoryBean.setInterfaces(new Class<?>[] { Serializable.class });
+		serviceFactoryBean.afterPropertiesSet();
+
+		Collection col = (Collection) serviceFactoryBean.getObject();
+
+		assertFalse(col.isEmpty());
+		assertSame(ref, col.iterator().next());
+
+		Set listeners = bundleContext.getServiceListeners();
+		ServiceListener list = (ServiceListener) listeners.iterator().next();
+		ServiceReference ref2 = new MockServiceReference();
+		list.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, ref2));
+
+		assertEquals(2, col.size());
+		Iterator iter = col.iterator();
+		iter.next();
+		assertSame(ref2, iter.next());
 	}
 }

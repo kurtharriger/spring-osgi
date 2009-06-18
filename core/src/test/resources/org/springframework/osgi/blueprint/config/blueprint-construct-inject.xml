@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+	<!-- Wrapped char array -->
+	<bean id="compWrappedCharArray" class="org.springframework.osgi.blueprint.TestComponent">
+		<argument>
+			<array value-type="java.lang.Character">
+				<value>a</value>
+				<value>b</value>
+			</array>
+		</argument>
+	</bean>
+
+	<!-- Primitive short array -->
+	<bean id="compPrimShortArray" class="org.springframework.osgi.blueprint.TestComponent">
+		<argument>
+			<array value-type="short">
+				<value>3</value>
+				<value>4</value>
+			</array>
+		</argument>
+	</bean>
+
+	<!-- Date array -->
+	<bean id="compDateArray" class="org.springframework.osgi.blueprint.TestComponent">
+		<argument>
+			<array value-type="java.util.Date">
+				<value>19 Feb 2009</value>
+				<value>20 Feb 2009</value>
+			</array>
+		</argument>
+	</bean>
+
+	<!-- URL array -->
+	<bean id="compURLArray" class="org.springframework.osgi.blueprint.TestComponent">
+		<argument>
+			<array value-type="java.net.URL">
+				<value>http://www.osgi.org</value>
+				<value>http://www.gmail.com</value>
+			</array>
+		</argument>
+	</bean>
+
+	<!-- Class array -->
+	<bean id="compClassArray" class="org.springframework.osgi.blueprint.TestComponent">
+		<argument>
+			<array value-type="java.lang.Class">
+				<value>java.lang.String</value>
+				<value>java.lang.Boolean</value>
+			</array>
+		</argument>
+	</bean>
+
+	<!-- Locale array -->
+	<bean id="compLocaleArray" class="org.springframework.osgi.blueprint.TestComponent">
+		<argument>
+			<array value-type="java.util.Locale">
+				<value>en_US</value>
+				<value>zh_CN</value>
+			</array>
+		</argument>
+	</bean>
+</blueprint>

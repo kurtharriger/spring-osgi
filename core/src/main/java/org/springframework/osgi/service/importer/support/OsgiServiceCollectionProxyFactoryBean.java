@@ -124,6 +124,8 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	/** greedy-proxying */
 	private boolean greedyProxying = false;
 
+	private MemberType memberType = MemberType.SERVICE_OBJECT;
+
 	/** internal listeners */
 	private final List<ImporterStateListener> stateListeners =
 			Collections.synchronizedList(new ArrayList<ImporterStateListener>(4));
@@ -137,11 +139,16 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 
-		// create shared proxy creator (reused for each new service
-		// joining the collection)
-		proxyCreator =
-				new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBeanClassLoader(),
-						getBundleContext(), getImportContextClassLoader(), greedyProxying, isUseBlueprintExceptions());
+		if (MemberType.SERVICE_OBJECT.equals(memberType)) {
+			// create shared proxy creator (reused for each new service
+			// joining the collection)
+			proxyCreator =
+					new StaticServiceProxyCreator(getInterfaces(), getAopClassLoader(), getBeanClassLoader(),
+							getBundleContext(), getImportContextClassLoader(), greedyProxying,
+							isUseBlueprintExceptions());
+		} else {
+			proxyCreator = null;
+		}
 	}
 
 	/**
@@ -273,6 +280,26 @@ public final class OsgiServiceCollectionProxyFactoryBean extends AbstractService
 	 */
 	public void setGreedyProxying(boolean greedyProxying) {
 		this.greedyProxying = greedyProxying;
+	}
+
+	/**
+	 * Sets the member type of this service collection.
+	 * 
+	 * @return the collection member type
+	 */
+	public MemberType getMemberType() {
+		return memberType;
+	}
+
+	/**
+	 * Sets the member type of this service collection. The collection can hold either service proxies (the default)
+	 * indicated by {@link MemberType#SERVICE_OBJECT} or service references {@link MemberType#SERVICE_REFERENCE}.
+	 * 
+	 * @param type the collection member type
+	 */
+	public void setMemberType(MemberType type) {
+		Assert.notNull(type);
+		this.memberType = type;
 	}
 
 	@Override

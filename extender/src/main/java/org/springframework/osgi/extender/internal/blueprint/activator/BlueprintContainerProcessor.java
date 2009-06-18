@@ -27,6 +27,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
+import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
@@ -101,6 +102,9 @@ public class BlueprintContainerProcessor implements OsgiBundleApplicationContext
 				addPredefinedBean(beanFactory, BLUEPRINT_CONTAINER_BEAN_NAME, blueprintContainer, logger);
 				// add extender bundle
 				addPredefinedBean(beanFactory, BLUEPRINT_EXTENDER_BEAN_NAME, extenderBundle, logger);
+
+				// add Blueprint built-in converters
+				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
 			}
 
 			private void addPredefinedBean(ConfigurableListableBeanFactory beanFactory, String beanName, Object value,
