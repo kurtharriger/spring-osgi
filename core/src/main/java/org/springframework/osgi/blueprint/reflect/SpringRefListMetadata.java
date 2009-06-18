@@ -17,14 +17,17 @@
 package org.springframework.osgi.blueprint.reflect;
 
 import org.osgi.service.blueprint.reflect.RefListMetadata;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.osgi.service.importer.support.MemberType;
 
 /**
  * @author Costin Leau
  */
 class SpringRefListMetadata extends SpringServiceReferenceComponentMetadata implements RefListMetadata {
 
-	private final int memberType = -1;
+	private final int memberType;
+	private static final String MEMBER_TYPE_PROP = "memberType";
 
 	/**
 	 * Constructs a new <code>SpringRefCollectionMetadata</code> instance.
@@ -34,9 +37,19 @@ class SpringRefListMetadata extends SpringServiceReferenceComponentMetadata impl
 	 */
 	public SpringRefListMetadata(String name, BeanDefinition definition) {
 		super(name, definition);
+
+		MemberType type = MemberType.SERVICE_OBJECT;
+
+		MutablePropertyValues pvs = beanDefinition.getPropertyValues();
+		if (pvs.contains(MEMBER_TYPE_PROP)) {
+			String value = (String) MetadataUtils.getValue(pvs, MEMBER_TYPE_PROP);
+			type = MemberType.valueOf(value);
+		}
+
+		memberType = type.ordinal() + 1;
 	}
 
 	public int getMemberType() {
-		throw new UnsupportedOperationException("member type not implemented yet");
+		return memberType;
 	}
 }

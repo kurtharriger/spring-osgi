@@ -23,6 +23,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.util.AttributeCallback;
 import org.springframework.osgi.config.internal.util.ParserUtils;
 import org.springframework.osgi.service.importer.support.CollectionType;
+import org.springframework.osgi.service.importer.support.MemberType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.service.importer.support.internal.util.ServiceReferenceComparator;
 import org.springframework.util.xml.DomUtils;
@@ -45,12 +46,13 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 	 * 
 	 * @author Costin Leau
 	 */
-	static class GreedyProxyingAttributeCallback implements AttributeCallback {
+	static class CollectionAttributeCallback implements AttributeCallback {
 
 		public boolean process(Element parent, Attr attribute, BeanDefinitionBuilder builder) {
 			String name = attribute.getLocalName();
-			if (GREEDY_PROXYING.equals(name)) {
-				builder.addPropertyValue(GREEDY_PROXYING_PROPERTY, attribute.getValue());
+			if (MEMBER_TYPE.equals(name)) {
+				builder.addPropertyValue(MEMBER_TYPE_PROPERTY, MemberType.valueOf(attribute.getValue().toUpperCase()
+						.replace('-', '_')));
 				return false;
 			}
 			return true;
@@ -69,9 +71,9 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 
 	private static final String SERVICE_REFERENCE_ORDER = "service-reference";
 
-	private static final String GREEDY_PROXYING = "greedy-proxying";
+	private static final String MEMBER_TYPE = "member-type";
 
-	private static final String GREEDY_PROXYING_PROPERTY = "greedyProxying";
+	private static final String MEMBER_TYPE_PROPERTY = "memberType";
 
 	private static final Comparator SERVICE_REFERENCE_COMPARATOR = new ServiceReferenceComparator();
 
@@ -90,7 +92,7 @@ public abstract class CollectionBeanDefinitionParser extends AbstractReferenceDe
 	 */
 	protected void parseAttributes(Element element, BeanDefinitionBuilder builder, AttributeCallback[] callbacks) {
 		// add timeout callback
-		GreedyProxyingAttributeCallback greedyProxyingCallback = new GreedyProxyingAttributeCallback();
+		CollectionAttributeCallback greedyProxyingCallback = new CollectionAttributeCallback();
 		super.parseAttributes(element, builder, ParserUtils.mergeCallbacks(callbacks,
 				new AttributeCallback[] { greedyProxyingCallback }));
 	}

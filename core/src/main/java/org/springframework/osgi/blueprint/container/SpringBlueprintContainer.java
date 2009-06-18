@@ -83,12 +83,12 @@ public class SpringBlueprintContainer implements BlueprintContainer {
 
 	@SuppressWarnings("unchecked")
 	private <T extends ComponentMetadata> Collection<T> getComponentMetadata(Class<T> clazz) {
-		List<T> filteredMetadata = new ArrayList<T>();
 		List<ComponentMetadata> metadatas = getComponentMetadataForAllComponents();
+		List<T> filteredMetadata = new ArrayList<T>(metadatas.size());
 
 		for (ComponentMetadata metadata : metadatas) {
 			if (clazz.isInstance(metadata)) {
-				metadatas.add((T) metadata);
+				filteredMetadata.add((T) metadata);
 			}
 		}
 

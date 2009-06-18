@@ -30,6 +30,17 @@ public class TestComponent {
 	private Object propB;
 	private ServiceReference serviceReference;
 
+	public TestComponent() {
+	}
+
+	public TestComponent(Object arg) {
+		propA = arg;
+	}
+
+	public TestComponent(Object arg1, Object arg2) {
+		propA = arg1;
+		propB = arg2;
+	}
 
 	public Object getPropA() {
 		return propA;
@@ -54,7 +65,7 @@ public class TestComponent {
 	public void setServiceReference(ServiceReference serviceReference) {
 		this.serviceReference = serviceReference;
 	}
-	
+
 	public void init() {
 		System.out.println("Initialized");
 	}
