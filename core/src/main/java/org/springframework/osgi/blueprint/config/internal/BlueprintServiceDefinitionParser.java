@@ -19,7 +19,9 @@ package org.springframework.osgi.blueprint.config.internal;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.config.internal.ServiceBeanDefinitionParser;
 import org.w3c.dom.Element;
@@ -42,5 +44,12 @@ public class BlueprintServiceDefinitionParser extends ServiceBeanDefinitionParse
 	@Override
 	protected Object parsePropertySubElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
 		return ComponentParser.parsePropertySubElement(context, beanDef, beanDefinition);
+	}
+
+	@Override
+	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
+			throws BeanDefinitionStoreException {
+		return ParsingUtils.resolveId(element, definition, parserContext, shouldGenerateId(),
+				shouldGenerateIdAsFallback());
 	}
 }

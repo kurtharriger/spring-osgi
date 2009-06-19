@@ -45,7 +45,7 @@ public class BlueprintConfigUtils {
 	public static final String BLUEPRINT_HEADER = "Bundle-Blueprint";
 
 	/** Standard wait for dependencies header */
-	public static final String BLUEPRINT_WAIT_FOR_DEPS = "blueprint.wait-for-dependencies";
+	public static final String BLUEPRINT_GRACE_PERIOD = "blueprint.graceperiod";
 	/** Standard timeout header */
 	public static final String BLUEPRINT_TIMEOUT = "blueprint.timeout";
 
@@ -129,14 +129,14 @@ public class BlueprintConfigUtils {
 	}
 
 	/**
-	 * Shortcut for finding the boolean value for {@link #BLUEPRINT_WAIT_FOR_DEPS} directive using the given headers.
+	 * Shortcut for finding the boolean value for {@link #BLUEPRINT_GRACE_PERIOD} directive using the given headers.
 	 * Assumes the headers belong to a Spring powered bundle.
 	 * 
 	 * @param headers
 	 * @return
 	 */
 	public static boolean getWaitForDependencies(Dictionary headers) {
-		String value = getBlueprintDirectiveValue(headers, BLUEPRINT_WAIT_FOR_DEPS);
+		String value = getBlueprintDirectiveValue(headers, BLUEPRINT_GRACE_PERIOD);
 
 		return (value != null ? Boolean.valueOf(value).booleanValue() : ConfigUtils.DIRECTIVE_WAIT_FOR_DEPS_DEFAULT);
 	}

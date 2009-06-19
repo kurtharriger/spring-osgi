@@ -30,6 +30,7 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -183,17 +184,13 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 		AbstractBeanDefinition def = builder.getBeanDefinition();
 
 		if (parserContext.isNested()) {
-			StringBuilder id = new StringBuilder();
 			String value = element.getAttribute(AbstractBeanDefinitionParser.ID_ATTRIBUTE);
-			if (StringUtils.hasText(value)) {
-				id.append(value);
-				id.append(BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR);
-			}
+			value = (StringUtils.hasText(value) ? value + BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR : "");
+			String generatedName = generateBeanName(value, def, parserContext);
 
-			id.append(parserContext.getReaderContext().generateBeanName(def));
-			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, id.toString());
+			BeanDefinitionHolder holder = new BeanDefinitionHolder(def, generatedName);
 			BeanDefinitionReaderUtils.registerBeanDefinition(holder, parserContext.getRegistry());
-			return createBeanReferenceDefinition(id.toString());
+			return createBeanReferenceDefinition(generatedName);
 		}
 
 		return def;
@@ -396,5 +393,19 @@ public abstract class AbstractReferenceDefinitionParser extends AbstractBeanDefi
 
 	protected Set parsePropertySetElement(ParserContext context, Element beanDef, BeanDefinition beanDefinition) {
 		return context.getDelegate().parseSetElement(beanDef, beanDefinition);
+	}
+
+	protected String generateBeanName(String prefix, BeanDefinition def, ParserContext parserContext) {
+		BeanDefinitionRegistry registry = parserContext.getRegistry();
+		String name = prefix + BeanDefinitionReaderUtils.generateBeanName(def, registry);
+		String generated = name;
+		int counter = 0;
+
+		while (registry.containsBeanDefinition(name)) {
+			generated = name + BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR + counter;
+			counter++;
+		}
+
+		return generated;
 	}
 }

@@ -17,11 +17,15 @@
 package org.springframework.osgi.blueprint.config.internal;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -33,6 +37,10 @@ import org.w3c.dom.NodeList;
  * @author Costin Leau
  */
 public class ParsingUtils {
+
+	public static final String BLUEPRINT_GENERATED_NAME_PREFIX = ".";
+	/** Constant for the id attribute */
+	public static final String ID_ATTRIBUTE = "id";
 
 	public static BeanDefinitionHolder decorateAndRegister(Element ele, BeanDefinitionHolder bdHolder,
 			ParserContext parserContext) {
@@ -47,12 +55,11 @@ public class ParsingUtils {
 		if (bdHolder != null) {
 			try {
 				// Register the final decorated instance.
-				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder,
-					parserContext.getReaderContext().getRegistry());
-			}
-			catch (BeanDefinitionStoreException ex) {
+				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, parserContext.getReaderContext()
+						.getRegistry());
+			} catch (BeanDefinitionStoreException ex) {
 				parserContext.getReaderContext().error(
-					"Failed to register bean definition with name '" + bdHolder.getBeanName() + "'", ele, ex);
+						"Failed to register bean definition with name '" + bdHolder.getBeanName() + "'", ele, ex);
 			}
 			// register component (and send registration events)
 			parserContext.registerComponent(new BeanComponentDefinition(bdHolder));
@@ -88,17 +95,16 @@ public class ParsingUtils {
 
 		String namespaceUri = node.getNamespaceURI();
 		if (!parserContext.getDelegate().isDefaultNamespace(namespaceUri) && !isRFC124Namespace(namespaceUri)) {
-			NamespaceHandler handler = parserContext.getReaderContext().getNamespaceHandlerResolver().resolve(
-				namespaceUri);
+			NamespaceHandler handler =
+					parserContext.getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
 			if (handler != null) {
 				return handler.decorate(node, originalDef, new ParserContext(parserContext.getReaderContext(),
-					parserContext.getDelegate()));
-			}
-			else if (namespaceUri.startsWith("http://www.springframework.org/")) {
+						parserContext.getDelegate()));
+			} else if (namespaceUri.startsWith("http://www.springframework.org/")) {
 				parserContext.getReaderContext().error(
-					"Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", node);
-			}
-			else {
+						"Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]",
+						node);
+			} else {
 				// A custom namespace, not to be handled by Spring - maybe "xml:...".
 			}
 		}
@@ -111,5 +117,44 @@ public class ParsingUtils {
 
 	public static boolean isRFC124Namespace(String namespaceURI) {
 		return (ComponentParser.NAMESPACE_URI.equals(namespaceURI));
+	}
+
+	/**
+	 * Generates a Blueprint specific bean name.
+	 * 
+	 * @param definition
+	 * @param registry
+	 * @param isInnerBean
+	 * @return
+	 * @throws BeanDefinitionStoreException
+	 */
+	public static String generateBlueprintBeanName(BeanDefinition definition, BeanDefinitionRegistry registry,
+			boolean isInnerBean) throws BeanDefinitionStoreException {
+
+		String initialName =
+				BLUEPRINT_GENERATED_NAME_PREFIX
+						+ BeanDefinitionReaderUtils.generateBeanName(definition, registry, isInnerBean);
+
+		String generatedName = initialName;
+		int counter = 0;
+		while (registry.containsBeanDefinition(generatedName)) {
+			generatedName = initialName + BeanDefinitionReaderUtils.GENERATED_BEAN_NAME_SEPARATOR + counter;
+			counter++;
+		}
+
+		return generatedName;
+	}
+
+	public static String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext,
+			boolean shouldGenerateId, boolean shouldGenerateIdAsFallback) throws BeanDefinitionStoreException {
+		if (shouldGenerateId) {
+			return generateBlueprintBeanName(definition, parserContext.getRegistry(), false);
+		} else {
+			String id = element.getAttribute(ID_ATTRIBUTE);
+			if (!StringUtils.hasText(id) && shouldGenerateIdAsFallback) {
+				id = generateBlueprintBeanName(definition, parserContext.getRegistry(), false);
+			}
+			return id;
+		}
 	}
 }

@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.osgi.service.blueprint.container.Converter;
 import org.springframework.beans.PropertyEditorRegistrar;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.osgi.blueprint.config.internal.ComponentParser;
+import org.springframework.osgi.blueprint.config.internal.ParsingUtils;
 import org.springframework.osgi.blueprint.container.CoverterPropertyEditorRegistrar;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
@@ -51,12 +53,12 @@ public class TypeConverterBeanDefinitionParser extends AbstractBeanDefinitionPar
 
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 
-		BeanDefinitionBuilder registrarDefinitionBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition(CoverterPropertyEditorRegistrar.class);
+		BeanDefinitionBuilder registrarDefinitionBuilder =
+				BeanDefinitionBuilder.genericBeanDefinition(CoverterPropertyEditorRegistrar.class);
 
 		List<Element> components = DomUtils.getChildElementsByTagName(element, ComponentParser.BEAN);
-		List<Element> componentRefs = DomUtils.getChildElementsByTagName(element,
-				BeanDefinitionParserDelegate.REF_ELEMENT);
+		List<Element> componentRefs =
+				DomUtils.getChildElementsByTagName(element, BeanDefinitionParserDelegate.REF_ELEMENT);
 
 		ManagedList<Object> converterList = new ManagedList<Object>(componentRefs.size() + components.size());
 
@@ -81,5 +83,12 @@ public class TypeConverterBeanDefinitionParser extends AbstractBeanDefinitionPar
 	@Override
 	protected boolean shouldGenerateId() {
 		return true;
+	}
+
+	@Override
+	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
+			throws BeanDefinitionStoreException {
+		return ParsingUtils.resolveId(element, definition, parserContext, shouldGenerateId(),
+				shouldGenerateIdAsFallback());
 	}
 }
