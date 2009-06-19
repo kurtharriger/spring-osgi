@@ -11,21 +11,26 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.osgi.context.DelegatedExecutionOsgiBundleApplicationContext;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
+import org.springframework.osgi.extender.event.BootstrappingDependenciesEvent;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
 import org.springframework.osgi.extender.internal.util.PrivilegedUtils;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitEndedEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWaitStartingEvent;
+import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * ServiceListener used for tracking dependent services. Even if the ServiceListener receives event synchronously,
@@ -39,11 +44,11 @@ public class DependencyServiceManager {
 
 	private static final Log log = LogFactory.getLog(DependencyServiceManager.class);
 
-	protected final Map<MandatoryServiceDependency, String> dependencies = Collections
-			.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
+	protected final Map<MandatoryServiceDependency, String> dependencies =
+			Collections.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
 
-	protected final Map<MandatoryServiceDependency, String> unsatisfiedDependencies = Collections
-			.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
+	protected final Map<MandatoryServiceDependency, String> unsatisfiedDependencies =
+			Collections.synchronizedMap(new LinkedHashMap<MandatoryServiceDependency, String>());
 
 	private final ContextExecutorAccessor contextStateAccessor;
 
@@ -149,6 +154,8 @@ public class DependencyServiceManager {
 						}
 
 						sendDependencySatisfiedEvent(dependency);
+						sendBootstrappingDependenciesEvent();
+
 						break;
 
 					case ServiceEvent.UNREGISTERING:
@@ -157,6 +164,7 @@ public class DependencyServiceManager {
 							log.debug("Service unregistered; adding " + dependency);
 						}
 						sendDependencyUnsatisfiedEvent(dependency);
+						sendBootstrappingDependenciesEvent();
 						break;
 					default: // do nothing
 						if (debug) {
@@ -241,8 +249,9 @@ public class DependencyServiceManager {
 		if (trace)
 			log.trace("Looking for dependency factories inside bean factory [" + beanFactory.toString() + "]");
 
-		Map<String, OsgiServiceDependencyFactory> localFactories = BeanFactoryUtils.beansOfTypeIncludingAncestors(
-				beanFactory, OsgiServiceDependencyFactory.class, true, false);
+		Map<String, OsgiServiceDependencyFactory> localFactories =
+				BeanFactoryUtils.beansOfTypeIncludingAncestors(beanFactory, OsgiServiceDependencyFactory.class, true,
+						false);
 
 		if (debug)
 			log.debug("Discovered local dependency factories: " + localFactories.keySet());
@@ -294,7 +303,7 @@ public class DependencyServiceManager {
 		}
 
 		// send dependency event before registering the filter
-		sendInitialDependencyEvents();
+		sendInitialBootstrappingEvents();
 		OsgiListenerUtils.addServiceListener(bundleContext, listener, filter);
 	}
 
@@ -305,13 +314,17 @@ public class DependencyServiceManager {
 	 * @return
 	 */
 	protected String createDependencyFilter() {
+		if (unsatisfiedDependencies.isEmpty()) {
+			return null;
+		}
+
 		boolean multiple = unsatisfiedDependencies.size() > 1;
 		StringBuilder sb = new StringBuilder(100 * unsatisfiedDependencies.size());
 		if (multiple) {
 			sb.append("(|");
 		}
-		for (Iterator<MandatoryServiceDependency> i = unsatisfiedDependencies.keySet().iterator(); i.hasNext();) {
-			sb.append((i.next()).filterAsString);
+		for (MandatoryServiceDependency dependency : unsatisfiedDependencies.keySet()) {
+			sb.append(dependency.filterAsString);
 		}
 		if (multiple) {
 			sb.append(')');
@@ -327,36 +340,66 @@ public class DependencyServiceManager {
 		OsgiListenerUtils.removeServiceListener(bundleContext, listener);
 	}
 
+	private List<OsgiServiceDependencyEvent> getUnsatisfiedDependenciesAsEvents() {
+		List<OsgiServiceDependencyEvent> dependencies =
+				new ArrayList<OsgiServiceDependencyEvent>(unsatisfiedDependencies.size());
+
+		for (MandatoryServiceDependency entry : unsatisfiedDependencies.keySet()) {
+			OsgiServiceDependencyEvent nestedEvent =
+					new OsgiServiceDependencyWaitStartingEvent(context, entry.getServiceDependency(), waitTime);
+			dependencies.add(nestedEvent);
+		}
+
+		return Collections.unmodifiableList(dependencies);
+	}
+
 	// event notification
-	private void sendInitialDependencyEvents() {
-		for (Iterator<MandatoryServiceDependency> iterator = unsatisfiedDependencies.keySet().iterator(); iterator
-				.hasNext();) {
-			MandatoryServiceDependency entry = iterator.next();
-			OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context, entry
-					.getServiceDependency(), waitTime);
-			BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, context
-					.getBundle(), nestedEvent);
+	private void sendInitialBootstrappingEvents() {
+
+		// send the fine grained event
+		List<OsgiServiceDependencyEvent> events = getUnsatisfiedDependenciesAsEvents();
+		for (OsgiServiceDependencyEvent nestedEvent : events) {
+			BootstrappingDependencyEvent dependencyEvent =
+					new BootstrappingDependencyEvent(context, context.getBundle(), nestedEvent);
 			publishEvent(dependencyEvent);
 		}
+
+		// followed by the composite one
+		String filterAsString = createDependencyFilter();
+		Filter filter = (filterAsString != null ? OsgiFilterUtils.createFilter(filterAsString) : null);
+		BootstrappingDependenciesEvent event =
+				new BootstrappingDependenciesEvent(context, context.getBundle(), events, filter, waitTime);
+
+		publishEvent(event);
 	}
 
 	private void sendDependencyUnsatisfiedEvent(MandatoryServiceDependency dependency) {
-		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitStartingEvent(context, dependency
-				.getServiceDependency(), waitTime);
-		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, context.getBundle(),
-				nestedEvent);
+		OsgiServiceDependencyEvent nestedEvent =
+				new OsgiServiceDependencyWaitStartingEvent(context, dependency.getServiceDependency(), waitTime);
+		BootstrappingDependencyEvent dependencyEvent =
+				new BootstrappingDependencyEvent(context, context.getBundle(), nestedEvent);
 		publishEvent(dependencyEvent);
 	}
 
 	private void sendDependencySatisfiedEvent(MandatoryServiceDependency dependency) {
-		OsgiServiceDependencyEvent nestedEvent = new OsgiServiceDependencyWaitEndedEvent(context, dependency
-				.getServiceDependency(), waitTime);
-		BootstrappingDependencyEvent dependencyEvent = new BootstrappingDependencyEvent(context, context.getBundle(),
-				nestedEvent);
+		OsgiServiceDependencyEvent nestedEvent =
+				new OsgiServiceDependencyWaitEndedEvent(context, dependency.getServiceDependency(), waitTime);
+		BootstrappingDependencyEvent dependencyEvent =
+				new BootstrappingDependencyEvent(context, context.getBundle(), nestedEvent);
 		publishEvent(dependencyEvent);
 	}
 
-	private void publishEvent(BootstrappingDependencyEvent dependencyEvent) {
+	private void sendBootstrappingDependenciesEvent() {
+		List<OsgiServiceDependencyEvent> events = getUnsatisfiedDependenciesAsEvents();
+		String filterAsString = createDependencyFilter();
+		Filter filter = (filterAsString != null ? OsgiFilterUtils.createFilter(filterAsString) : null);
+		BootstrappingDependenciesEvent event =
+				new BootstrappingDependenciesEvent(context, context.getBundle(), events, filter, waitTime);
+
+		publishEvent(event);
+	}
+
+	private void publishEvent(OsgiBundleApplicationContextEvent dependencyEvent) {
 		this.contextStateAccessor.getEventMulticaster().multicastEvent(dependencyEvent);
 	}
 }

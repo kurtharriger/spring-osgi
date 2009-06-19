@@ -24,6 +24,7 @@ import org.osgi.framework.Bundle;
 import org.springframework.core.io.Resource;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
+import org.springframework.osgi.extender.event.BootstrappingDependenciesEvent;
 import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
 import org.springframework.osgi.service.importer.OsgiServiceDependency;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
@@ -37,7 +38,8 @@ import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWait
 public abstract class DepedencyEventTest extends AbstractEventTest {
 
 	private List refreshEvents = Collections.synchronizedList(new ArrayList(10));
-
+	private List<BootstrappingDependenciesEvent> graceEvents =
+			Collections.synchronizedList(new ArrayList<BootstrappingDependenciesEvent>(10));
 
 	protected void onSetUp() throws Exception {
 		refreshEvents.clear();
@@ -50,7 +52,9 @@ public abstract class DepedencyEventTest extends AbstractEventTest {
 				if (event instanceof BootstrappingDependencyEvent) {
 					eventList.add(event);
 				}
-				else {
+				if (event instanceof BootstrappingDependenciesEvent) {
+					graceEvents.add((BootstrappingDependenciesEvent) event);
+				} else {
 					refreshEvents.add(event);
 				}
 				synchronized (lock) {
@@ -67,17 +71,17 @@ public abstract class DepedencyEventTest extends AbstractEventTest {
 		assertTrue("should start with an empty list", eventList.isEmpty());
 
 		// install the dependency bundle
-		Resource bundle = getLocator().locateArtifact("org.springframework.osgi.iandt", "dependencies",
-			getSpringDMVersion());
+		Resource bundle =
+				getLocator().locateArtifact("org.springframework.osgi.iandt", "dependencies", getSpringDMVersion());
 
-		Resource dependency1 = getLocator().locateArtifact("org.springframework.osgi.iandt", "simple.service",
-			getSpringDMVersion());
+		Resource dependency1 =
+				getLocator().locateArtifact("org.springframework.osgi.iandt", "simple.service", getSpringDMVersion());
 
-		Resource dependency2 = getLocator().locateArtifact("org.springframework.osgi.iandt", "simple.service2",
-			getSpringDMVersion());
+		Resource dependency2 =
+				getLocator().locateArtifact("org.springframework.osgi.iandt", "simple.service2", getSpringDMVersion());
 
-		Resource dependency3 = getLocator().locateArtifact("org.springframework.osgi.iandt", "simple.service3",
-			getSpringDMVersion());
+		Resource dependency3 =
+				getLocator().locateArtifact("org.springframework.osgi.iandt", "simple.service3", getSpringDMVersion());
 
 		Bundle bnd = bundleContext.installBundle(bundle.getURL().toExternalForm());
 
@@ -137,8 +141,11 @@ public abstract class DepedencyEventTest extends AbstractEventTest {
 			// at least 3 events have to be received
 			assertTrue(refreshEvents.size() >= 3);
 
-		}
-		finally {
+			for (BootstrappingDependenciesEvent event : graceEvents) {
+				System.out.println(event.getDependenciesAsFilter());
+			}
+
+		} finally {
 			bnd.uninstall();
 
 			bnd1.uninstall();
