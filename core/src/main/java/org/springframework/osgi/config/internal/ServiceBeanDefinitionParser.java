@@ -148,6 +148,9 @@ public class ServiceBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 				else if (LISTENER.equals(name)) {
 					listeners.add(parseListener(parserContext, subElement, builder));
 				}
+				else if (BeanDefinitionParserDelegate.DESCRIPTION_ELEMENT.equals(name)) {
+					builder.getRawBeanDefinition().setDescription(subElement.getTextContent());
+				}
 
 				// nested bean reference/declaration
 				else

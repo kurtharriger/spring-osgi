@@ -109,7 +109,7 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 		// Configure the bean definition reader with the context
 		// resource loading environment.
 		beanDefinitionReader.setResourceLoader(this);
-		
+
 		// add a specialized DocumentLoader to load blueprint configs w/o a schema location
 		beanDefinitionReader.setDocumentLoader(new BlueprintDocumentLoader());
 
@@ -142,10 +142,12 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	}
 
 	/**
-	 * Loads the bean definitions with the given <code>XmlBeanDefinitionReader</code>. <p> The lifecycle of the bean
-	 * factory is handled by the refreshBeanFactory method; therefore this method is just supposed to load and/or
-	 * register bean definitions. <p> Delegates to a ResourcePatternResolver for resolving location patterns into
-	 * Resource instances.
+	 * Loads the bean definitions with the given <code>XmlBeanDefinitionReader</code>.
+	 * 
+	 * <p> The lifecycle of the bean factory is handled by the refreshBeanFactory method; therefore this method is just
+	 * supposed to load and/or register bean definitions.
+	 * 
+	 * <p> Delegates to a ResourcePatternResolver for resolving location patterns into Resource instances.
 	 * 
 	 * @throws org.springframework.beans.BeansException in case of bean registration errors
 	 * @throws java.io.IOException if the required XML document isn't found
@@ -155,12 +157,33 @@ public class OsgiBundleXmlApplicationContext extends AbstractDelegatedExecutionA
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
-		String[] configLocations = getConfigLocations();
+		String[] configLocations = expandLocations(getConfigLocations());
 		if (configLocations != null) {
 			for (int i = 0; i < configLocations.length; i++) {
 				reader.loadBeanDefinitions(configLocations[i]);
 			}
 		}
+	}
+
+	/**
+	 * Expands any folder entries supplied as configuration location. I.e. config/ becomes config/*.xml.
+	 * 
+	 * @param configLocations
+	 * @return
+	 */
+	private String[] expandLocations(String[] configLocations) {
+		String[] expanded = null;
+		if (configLocations != null) {
+			expanded = new String[configLocations.length];
+			for (int i = 0; i < configLocations.length; i++) {
+				String location = configLocations[i];
+				if (location.endsWith("/")) {
+					location = location + "*.xml";
+				}
+				expanded[i] = location;
+			}
+		}
+		return expanded;
 	}
 
 	/**

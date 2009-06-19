@@ -192,10 +192,12 @@ public class ComponentParser {
 				try {
 					if (containingBean != null) {
 						beanName =
-								BeanDefinitionReaderUtils.generateBeanName(beanDefinition, parserContext.getRegistry(),
+								ParsingUtils.generateBlueprintBeanName(beanDefinition, parserContext.getRegistry(),
 										true);
 					} else {
-						beanName = parserContext.getReaderContext().generateBeanName(beanDefinition);
+						beanName =
+								ParsingUtils.generateBlueprintBeanName(beanDefinition, parserContext.getRegistry(),
+										false);
 						// TODO: should we support 2.0 behaviour (see below):
 						// 
 						// Register an alias for the plain bean class name, if still possible,
