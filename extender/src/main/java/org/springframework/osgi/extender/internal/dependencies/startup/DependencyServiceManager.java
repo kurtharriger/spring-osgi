@@ -30,7 +30,6 @@ import org.springframework.osgi.service.importer.event.OsgiServiceDependencyWait
 import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiListenerUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * ServiceListener used for tracking dependent services. Even if the ServiceListener receives event synchronously,
@@ -340,7 +339,7 @@ public class DependencyServiceManager {
 		OsgiListenerUtils.removeServiceListener(bundleContext, listener);
 	}
 
-	private List<OsgiServiceDependencyEvent> getUnsatisfiedDependenciesAsEvents() {
+	List<OsgiServiceDependencyEvent> getUnsatisfiedDependenciesAsEvents() {
 		List<OsgiServiceDependencyEvent> dependencies =
 				new ArrayList<OsgiServiceDependencyEvent>(unsatisfiedDependencies.size());
 

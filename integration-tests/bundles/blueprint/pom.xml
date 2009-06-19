@@ -39,6 +39,7 @@
   <modules>
     <module>simple.bundle</module>
     <module>error.bundle</module>
+    <module>waiting.bundle</module>
   </modules>
 
  <build>

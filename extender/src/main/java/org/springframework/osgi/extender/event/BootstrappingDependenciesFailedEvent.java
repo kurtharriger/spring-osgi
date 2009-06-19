@@ -23,41 +23,26 @@ import java.util.List;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Filter;
 import org.springframework.context.ApplicationContext;
-import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
+import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
-import org.springframework.util.Assert;
 
 /**
- * Spring-DM Extender bootstrapping event. Used during the application context discovery phase, before an application
- * context is fully initialized. Similar to {@link BootstrappingDependencyEvent}, this event contains the information
- * regarding all unsatisfied dependencies.
- * 
- * Consider using this event {@link BootstrappingDependencyEvent} for getting a global overview of the waiting
- * application and {@link BootstrappingDependencyEvent} for finding out specific information.
- * 
- * <p/> It can be used to receive status updates for contexts started by the extender.
+ * Bootstrapping event indicating a context has failed to initializsed due to unsatisfied mandatory dependencies.
  * 
  * @author Costin Leau
  */
-public class BootstrappingDependenciesEvent extends OsgiBundleApplicationContextEvent {
+public class BootstrappingDependenciesFailedEvent extends OsgiBundleContextFailedEvent {
 
 	private final Collection<OsgiServiceDependencyEvent> dependencyEvents;
 	private final Collection<String> dependencyFilters;
 	private final Filter dependenciesFilter;
-	private final long timeLeft;
 
-	/**
-	 * Constructs a new <code>BootstrappingDependencyEvent</code> instance.
-	 * 
-	 * @param source
-	 */
-	public BootstrappingDependenciesEvent(ApplicationContext source, Bundle bundle,
-			Collection<OsgiServiceDependencyEvent> nestedEvents, Filter filter, long timeLeft) {
-		super(source, bundle);
-		Assert.notNull(nestedEvents);
+	public BootstrappingDependenciesFailedEvent(ApplicationContext source, Bundle bundle, Throwable th,
+			Collection<OsgiServiceDependencyEvent> nestedEvents, Filter filter) {
+		super(source, bundle, th);
+
 		this.dependencyEvents = nestedEvents;
 		this.dependenciesFilter = filter;
-		this.timeLeft = timeLeft;
 
 		List<String> depFilters = new ArrayList<String>(dependencyEvents.size());
 
@@ -83,9 +68,5 @@ public class BootstrappingDependenciesEvent extends OsgiBundleApplicationContext
 
 	public Collection<String> getDependencyFilters() {
 		return dependencyFilters;
-	}
-
-	public long getTimeToWait() {
-		return timeLeft;
 	}
 }

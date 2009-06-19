@@ -44,9 +44,13 @@ interface BlueprintConstants {
 
 	static final String SERVICE_OBJECTCLASS = EventConstants.SERVICE_OBJECTCLASS;
 	static final String SERVICE_FILTER = "service.filter";
+	static final String SERVICE_FILTER_2 = "service.Filter";
+	static final String DEPENDENCIES = "dependencies";
+	static final String ALL_DEPENDENCIES = "dependencies.all";
 
 	static final String TOPIC_BLUEPRINT_EVENTS = "org/osgi/service/blueprint";
 	static final String TOPIC_CREATING = TOPIC_BLUEPRINT_EVENTS + "/container/CREATING";
+	static final String TOPIC_GRACE = TOPIC_BLUEPRINT_EVENTS + "/container/GRACE_PERIOD";
 	static final String TOPIC_CREATED = TOPIC_BLUEPRINT_EVENTS + "/container/CREATED";
 	static final String TOPIC_DESTROYING = TOPIC_BLUEPRINT_EVENTS + "/container/DESTROYING";
 	static final String TOPIC_DESTROYED = TOPIC_BLUEPRINT_EVENTS + "/container/DESTROYED";

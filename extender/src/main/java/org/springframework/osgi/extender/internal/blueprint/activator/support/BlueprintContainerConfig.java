@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.springframework.osgi.extender.support.ApplicationContextConfiguration;
+import org.springframework.osgi.extender.support.internal.ConfigUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
@@ -39,7 +40,7 @@ public class BlueprintContainerConfig extends ApplicationContextConfiguration {
 	private final boolean createAsync;
 	private final boolean waitForDep;
 	private final boolean publishContext;
-
+	private final boolean hasTimeout;
 	private final String toString;
 
 	public BlueprintContainerConfig(Bundle bundle) {
@@ -47,33 +48,38 @@ public class BlueprintContainerConfig extends ApplicationContextConfiguration {
 
 		Dictionary headers = bundle.getHeaders();
 
+		hasTimeout = BlueprintConfigUtils.hasTimeout(headers);
 		long option = BlueprintConfigUtils.getTimeOut(headers);
-
-		// translate from sec into ms
-		timeout = (option >= 0 ? option * 1000 : option);
+		// no need to translate into ms
+		timeout = (option >= 0 ? option : ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT * 1000);
 		createAsync = BlueprintConfigUtils.getCreateAsync(headers);
 		waitForDep = BlueprintConfigUtils.getWaitForDependencies(headers);
 		publishContext = BlueprintConfigUtils.getPublishContext(headers);
 
 		StringBuilder buf = new StringBuilder();
-		buf.append("Rfc124 Module Config [Bundle=");
+		buf.append("Blueprint Config [Bundle=");
 		buf.append(OsgiStringUtils.nullSafeSymbolicName(bundle));
-		buf.append("]isRFC124Bundle=");
+		buf.append("]isBlueprintBundle=");
 		buf.append(isSpringPoweredBundle());
 		buf.append("|async=");
 		buf.append(createAsync);
-		buf.append("|wait-for-deps=");
+		buf.append("|graceperiod=");
 		buf.append(waitForDep);
 		buf.append("|publishCtx=");
 		buf.append(publishContext);
 		buf.append("|timeout=");
-		buf.append(timeout / 1000);
+		buf.append(timeout);
 		buf.append("s");
 		toString = buf.toString();
 
 		if (log.isTraceEnabled()) {
 			log.trace("Configuration: " + toString);
 		}
+	}
+
+	@Override
+	public boolean isTimeoutDeclared() {
+		return hasTimeout;
 	}
 
 	public long getTimeout() {

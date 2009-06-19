@@ -106,6 +106,14 @@ public class BlueprintConfigUtils {
 		return null;
 	}
 
+	public static boolean hasTimeout(Dictionary headers) {
+		String header = getSymNameHeader(headers);
+		if (header != null) {
+			return StringUtils.hasText(ConfigUtils.getDirectiveValue(header, BLUEPRINT_TIMEOUT));
+		}
+		return false;
+	}
+
 	/**
 	 * Shortcut for finding the boolean value for {@link #BLUEPRINT_TIMEOUT} directive using the given headers.
 	 * 

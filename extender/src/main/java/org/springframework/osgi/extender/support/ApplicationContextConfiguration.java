@@ -34,9 +34,8 @@ import org.springframework.util.ObjectUtils;
 /**
  * Configuration class for Spring-DM application contexts.
  * 
- * Determines the configuration information available in a bundle for
- * constructing an application context. Reads all the Spring-DM options present
- * in the bundle header.
+ * Determines the configuration information available in a bundle for constructing an application context. Reads all the
+ * Spring-DM options present in the bundle header.
  * 
  * @author Adrian Colyer
  * @author Costin Leau
@@ -47,31 +46,21 @@ public class ApplicationContextConfiguration {
 	private static final Log log = LogFactory.getLog(ApplicationContextConfiguration.class);
 
 	private final Bundle bundle;
-
 	private final ConfigurationScanner configurationScanner;
-
 	private final boolean asyncCreation;
-
 	private final String[] configurationLocations;
-
 	private final boolean isSpringPoweredBundle;
-
 	private final boolean publishContextAsService;
-
 	private final boolean waitForDeps;
-
 	private final String toString;
-
 	private final long timeout;
-
+	private final boolean hasTimeout;
 
 	/**
-	 * Constructs a new <code>ApplicationContextConfiguration</code> instance
-	 * from the given bundle. Uses the {@link DefaultConfigurationScanner}
-	 * internally for discovering Spring-powered bundles.
+	 * Constructs a new <code>ApplicationContextConfiguration</code> instance from the given bundle. Uses the
+	 * {@link DefaultConfigurationScanner} internally for discovering Spring-powered bundles.
 	 * 
-	 * @param bundle bundle for which the application context configuration is
-	 *        created
+	 * @param bundle bundle for which the application context configuration is created
 	 */
 	public ApplicationContextConfiguration(Bundle bundle) {
 		this(bundle, new DefaultConfigurationScanner());
@@ -89,6 +78,9 @@ public class ApplicationContextConfiguration {
 
 		this.isSpringPoweredBundle = !ObjectUtils.isEmpty(configs);
 		this.configurationLocations = configs;
+
+		hasTimeout = ConfigUtils.isDirectiveDefined(headers, ConfigUtils.DIRECTIVE_TIMEOUT);
+
 		long option = ConfigUtils.getTimeOut(headers);
 		// translate into ms
 		this.timeout = (option >= 0 ? option * 1000 : option);
@@ -120,39 +112,36 @@ public class ApplicationContextConfiguration {
 	/**
 	 * Indicates if the given bundle is "Spring-Powered" or not.
 	 * 
-	 * True if this bundle has at least one defined application context
-	 * configuration file.
+	 * True if this bundle has at least one defined application context configuration file.
 	 * 
-	 * <p/>
-	 * A bundle is "Spring-Powered" if it has at least one configuration
-	 * resource.
+	 * <p/> A bundle is "Spring-Powered" if it has at least one configuration resource.
 	 */
 	public boolean isSpringPoweredBundle() {
 		return this.isSpringPoweredBundle;
 	}
 
+	public boolean isTimeoutDeclared() {
+		return hasTimeout;
+	}
+
 	/**
-	 * Returns the timeout (in milliseconds) an application context needs to
-	 * wait for mandatory dependent services.
+	 * Returns the timeout (in milliseconds) an application context needs to wait for mandatory dependent services.
 	 */
 	public long getTimeout() {
 		return this.timeout;
 	}
 
 	/**
-	 * Indicates if an application context needs to be created asynchronously or
-	 * not.
+	 * Indicates if an application context needs to be created asynchronously or not.
 	 * 
-	 * Should the application context wait for all non-optional service
-	 * references to be satisfied before starting?
+	 * Should the application context wait for all non-optional service references to be satisfied before starting?
 	 */
 	public boolean isCreateAsynchronously() {
 		return this.asyncCreation;
 	}
 
 	/**
-	 * Indicates if the application context needs to be published as a service
-	 * or not.
+	 * Indicates if the application context needs to be published as a service or not.
 	 * 
 	 * @return Returns the publishContextAsService.
 	 */
@@ -163,16 +152,15 @@ public class ApplicationContextConfiguration {
 	/**
 	 * Indicates if the configuration must wait for dependencies.
 	 * 
-	 * @return true if the configuration indicates that dependencies should be
-	 *         waited for.
+	 * @return true if the configuration indicates that dependencies should be waited for.
 	 */
 	public boolean isWaitForDependencies() {
 		return waitForDeps;
 	}
 
 	/**
-	 * Returns the locations of the configuration resources used to build the
-	 * application context (as Spring resource paths).
+	 * Returns the locations of the configuration resources used to build the application context (as Spring resource
+	 * paths).
 	 * 
 	 * @return configuration paths
 	 */

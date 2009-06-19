@@ -16,6 +16,8 @@
 
 package org.springframework.osgi.extender.internal.blueprint.activator;
 
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
@@ -29,8 +31,10 @@ import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
 import org.springframework.osgi.blueprint.container.support.BlueprintContainerServicePublisher;
 import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.ConfigurableOsgiBundleApplicationContext;
+import org.springframework.osgi.context.event.OsgiBundleApplicationContextEvent;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextListener;
-import org.springframework.osgi.extender.event.BootstrappingDependencyEvent;
+import org.springframework.osgi.extender.event.BootstrappingDependenciesEvent;
+import org.springframework.osgi.extender.event.BootstrappingDependenciesFailedEvent;
 import org.springframework.osgi.extender.internal.activator.OsgiContextProcessor;
 import org.springframework.osgi.extender.internal.blueprint.event.EventAdminDispatcher;
 
@@ -39,8 +43,8 @@ import org.springframework.osgi.extender.internal.blueprint.event.EventAdminDisp
  * 
  * @author Costin Leau
  */
-public class BlueprintContainerProcessor implements OsgiBundleApplicationContextListener<BootstrappingDependencyEvent>,
-		OsgiContextProcessor {
+public class BlueprintContainerProcessor implements
+		OsgiBundleApplicationContextListener<OsgiBundleApplicationContextEvent>, OsgiContextProcessor {
 
 	private final EventAdminDispatcher dispatcher;
 	private final BlueprintListenerManager listenerManager;
@@ -54,31 +58,34 @@ public class BlueprintContainerProcessor implements OsgiBundleApplicationContext
 	}
 
 	public void postProcessClose(ConfigurableOsgiBundleApplicationContext context) {
-		BlueprintEvent event = new BlueprintEvent(BlueprintEvent.DESTROYED, context.getBundle(), extenderBundle);
+		BlueprintEvent destroyedEvent =
+				new BlueprintEvent(BlueprintEvent.DESTROYED, context.getBundle(), extenderBundle);
 
-		listenerManager.blueprintEvent(event);
-		dispatcher.afterClose(event);
+		listenerManager.blueprintEvent(destroyedEvent);
+		dispatcher.afterClose(destroyedEvent);
 	}
 
 	public void postProcessRefresh(ConfigurableOsgiBundleApplicationContext context) {
-		BlueprintEvent event = new BlueprintEvent(BlueprintEvent.CREATED, context.getBundle(), extenderBundle);
+		BlueprintEvent createdEvent = new BlueprintEvent(BlueprintEvent.CREATED, context.getBundle(), extenderBundle);
 
-		listenerManager.blueprintEvent(event);
-		dispatcher.afterRefresh(event);
+		listenerManager.blueprintEvent(createdEvent);
+		dispatcher.afterRefresh(createdEvent);
 	}
 
 	public void postProcessRefreshFailure(ConfigurableOsgiBundleApplicationContext context, Throwable th) {
-		BlueprintEvent event = new BlueprintEvent(BlueprintEvent.FAILURE, context.getBundle(), extenderBundle, th);
+		BlueprintEvent failureEvent =
+				new BlueprintEvent(BlueprintEvent.FAILURE, context.getBundle(), extenderBundle, th);
 
-		listenerManager.blueprintEvent(event);
-		dispatcher.refreshFailure(event);
+		listenerManager.blueprintEvent(failureEvent);
+		dispatcher.refreshFailure(failureEvent);
 	}
 
 	public void preProcessClose(ConfigurableOsgiBundleApplicationContext context) {
-		BlueprintEvent event = new BlueprintEvent(BlueprintEvent.DESTROYING, context.getBundle(), extenderBundle);
+		BlueprintEvent destroyingEvent =
+				new BlueprintEvent(BlueprintEvent.DESTROYING, context.getBundle(), extenderBundle);
 
-		listenerManager.blueprintEvent(event);
-		dispatcher.beforeClose(event);
+		listenerManager.blueprintEvent(destroyingEvent);
+		dispatcher.beforeClose(destroyingEvent);
 	}
 
 	public void preProcessRefresh(final ConfigurableOsgiBundleApplicationContext context) {
@@ -119,14 +126,34 @@ public class BlueprintContainerProcessor implements OsgiBundleApplicationContext
 			}
 		});
 
-		BlueprintEvent event = new BlueprintEvent(BlueprintEvent.CREATING, context.getBundle(), extenderBundle);
-		listenerManager.blueprintEvent(event);
+		BlueprintEvent creatingEvent = new BlueprintEvent(BlueprintEvent.CREATING, context.getBundle(), extenderBundle);
+		listenerManager.blueprintEvent(creatingEvent);
 
-		dispatcher.beforeRefresh(event);
+		dispatcher.beforeRefresh(creatingEvent);
 	}
 
-	public void onOsgiApplicationEvent(BootstrappingDependencyEvent evt) {
-		// FIXME: add grace/waiting event
-		BlueprintEvent event = new BlueprintEvent(BlueprintEvent.GRACE_PERIOD, evt.getBundle(), extenderBundle);
+	public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent evt) {
+
+		if (evt instanceof BootstrappingDependenciesEvent) {
+			BootstrappingDependenciesEvent event = (BootstrappingDependenciesEvent) evt;
+			Collection<String> flts = event.getDependencyFilters();
+			String[] filters = flts.toArray(new String[flts.size()]);
+			BlueprintEvent graceEvent =
+					new BlueprintEvent(BlueprintEvent.GRACE_PERIOD, evt.getBundle(), extenderBundle, filters);
+			listenerManager.blueprintEvent(graceEvent);
+			dispatcher.grace(graceEvent);
+			return;
+		}
+
+		if (evt instanceof BootstrappingDependenciesFailedEvent) {
+			BootstrappingDependenciesFailedEvent event = (BootstrappingDependenciesFailedEvent) evt;
+			Collection<String> flts = event.getDependencyFilters();
+			String[] filters = flts.toArray(new String[flts.size()]);
+			BlueprintEvent failureEvent =
+					new BlueprintEvent(BlueprintEvent.FAILURE, evt.getBundle(), extenderBundle, filters, event
+							.getFailureCause());
+			listenerManager.blueprintEvent(failureEvent);
+			dispatcher.refreshFailure(failureEvent);
+		}
 	}
 }

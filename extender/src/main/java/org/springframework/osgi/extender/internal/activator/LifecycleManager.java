@@ -49,13 +49,12 @@ import org.springframework.osgi.extender.internal.support.OsgiBeanFactoryPostPro
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
 import org.springframework.osgi.extender.internal.util.concurrent.RunnableTimedExecution;
 import org.springframework.osgi.extender.support.ApplicationContextConfiguration;
-import org.springframework.osgi.extender.support.internal.ConfigUtils;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 
 /**
- * Manager handling the startup/shutdown threading issues regarding OSGi
- * contexts. Used by {@link ContextLoaderListener}.
+ * Manager handling the startup/shutdown threading issues regarding OSGi contexts. Used by {@link ContextLoaderListener}
+ * .
  * 
  * 
  * @author Costin Leau
@@ -66,11 +65,11 @@ class LifecycleManager implements DisposableBean {
 	private static final Log log = LogFactory.getLog(LifecycleManager.class);
 
 	/**
-	 * The contexts we are currently managing. Keys are bundle ids, values are
-	 * ServiceDependentOsgiApplicationContexts for the application context
+	 * The contexts we are currently managing. Keys are bundle ids, values are ServiceDependentOsgiApplicationContexts
+	 * for the application context
 	 */
-	private final Map<Long, ConfigurableOsgiBundleApplicationContext> managedContexts = new ConcurrentHashMap<Long, ConfigurableOsgiBundleApplicationContext>(
-		16);
+	private final Map<Long, ConfigurableOsgiBundleApplicationContext> managedContexts =
+			new ConcurrentHashMap<Long, ConfigurableOsgiBundleApplicationContext>(16);
 
 	/** listener counter - used to properly synchronize shutdown */
 	private Counter contextsStarted = new Counter("contextsStarted");
@@ -91,8 +90,7 @@ class LifecycleManager implements DisposableBean {
 	private final TaskExecutor shutdownTaskExecutor;
 
 	/**
-	 * Task executor which uses the same thread for running tasks. Used when
-	 * doing a synchronous wait-for-dependencies.
+	 * Task executor which uses the same thread for running tasks. Used when doing a synchronous wait-for-dependencies.
 	 */
 	private final TaskExecutor sameThreadTaskExecutor = new SyncTaskExecutor();
 
@@ -110,7 +108,6 @@ class LifecycleManager implements DisposableBean {
 	private final ApplicationContextConfigurationFactory contextConfigurationFactory;
 
 	private final VersionMatcher versionMatcher;
-
 
 	LifecycleManager(ExtenderConfiguration extenderConfiguration, VersionMatcher versionMatcher,
 			ApplicationContextConfigurationFactory appCtxCfgFactory, OsgiContextProcessor processor,
@@ -134,20 +131,15 @@ class LifecycleManager implements DisposableBean {
 	}
 
 	/**
-	 * Context creation is a potentially long-running activity (certainly more
-	 * than we want to do on the synchronous event callback).
+	 * Context creation is a potentially long-running activity (certainly more than we want to do on the synchronous
+	 * event callback).
 	 * 
-	 * <p/>
-	 * Based on our configuration, the context can be started on the same thread
-	 * or on a different one.
+	 * <p/> Based on our configuration, the context can be started on the same thread or on a different one.
 	 * 
-	 * <p/>
-	 * Kick off a background activity to create an application context for the
-	 * given bundle if needed.
+	 * <p/> Kick off a background activity to create an application context for the given bundle if needed.
 	 * 
-	 * <b>Note:</b> Make sure to do the fastest filtering first to avoid
-	 * slow-downs on platforms with a big number of plugins and wiring (i.e.
-	 * Eclipse platform).
+	 * <b>Note:</b> Make sure to do the fastest filtering first to avoid slow-downs on platforms with a big number of
+	 * plugins and wiring (i.e. Eclipse platform).
 	 * 
 	 * @param bundle
 	 */
@@ -182,8 +174,7 @@ class LifecycleManager implements DisposableBean {
 
 		try {
 			localApplicationContext = contextCreator.createApplicationContext(localBundleContext);
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			log.error("Cannot create application context for bundle " + bundleString, ex);
 			return;
 		}
@@ -194,8 +185,8 @@ class LifecycleManager implements DisposableBean {
 		}
 
 		// create a dedicated hook for this application context
-		BeanFactoryPostProcessor processingHook = new OsgiBeanFactoryPostProcessorAdapter(localBundleContext,
-			postProcessors);
+		BeanFactoryPostProcessor processingHook =
+				new OsgiBeanFactoryPostProcessorAdapter(localBundleContext, postProcessors);
 
 		// add in the post processors
 		localApplicationContext.addBeanFactoryPostProcessor(processingHook);
@@ -230,8 +221,7 @@ class LifecycleManager implements DisposableBean {
 			// for the async stuff use the executor
 			executor = taskExecutor;
 			creationType = "Asynchronous";
-		}
-		else {
+		} else {
 			// for the sync stuff, use this thread
 			executor = sameThreadTaskExecutor;
 			creationType = "Synchronous";
@@ -243,28 +233,27 @@ class LifecycleManager implements DisposableBean {
 
 		// wait/no wait for dependencies behaviour
 		if (config.isWaitForDependencies()) {
-			DependencyWaiterApplicationContextExecutor appCtxExecutor = new DependencyWaiterApplicationContextExecutor(
-				localApplicationContext, !asynch, extenderConfiguration.getDependencyFactories());
+			DependencyWaiterApplicationContextExecutor appCtxExecutor =
+					new DependencyWaiterApplicationContextExecutor(localApplicationContext, !asynch,
+							extenderConfiguration.getDependencyFactories());
 
 			long timeout;
 			// check whether a timeout has been defined
 
-			if (ConfigUtils.isDirectiveDefined(bundle.getHeaders(), ConfigUtils.DIRECTIVE_TIMEOUT)) {
+			if (config.isTimeoutDeclared()) {
 				timeout = config.getTimeout();
 				if (debug)
-					log.debug("Setting bundle-defined, wait-for-dependencies timeout value=" + timeout
+					log.debug("Setting bundle-defined, wait-for-dependencies/graceperiod timeout value=" + timeout
 							+ " ms, for bundle " + bundleString);
 
-			}
-			else {
+			} else {
 				timeout = extenderConfiguration.getDependencyWaitTime();
 				if (debug)
-					log.debug("Setting globally defined wait-for-dependencies timeout value=" + timeout
+					log.debug("Setting globally defined wait-for-dependencies/graceperiod timeout value=" + timeout
 							+ " ms, for bundle " + bundleString);
 			}
 
 			appCtxExecutor.setTimeout(config.getTimeout());
-
 			appCtxExecutor.setWatchdog(timer);
 			appCtxExecutor.setTaskExecutor(executor);
 			appCtxExecutor.setMonitoringCounter(contextsStarted);
@@ -272,8 +261,7 @@ class LifecycleManager implements DisposableBean {
 			appCtxExecutor.setDelegatedMulticaster(this.multicaster);
 
 			contextsStarted.increment();
-		}
-		else {
+		} else {
 			// do nothing; by default contexts do not wait for services.
 		}
 
@@ -281,14 +269,14 @@ class LifecycleManager implements DisposableBean {
 	}
 
 	/**
-	 * Closing an application context is a potentially long-running activity,
-	 * however, we *have* to do it synchronously during the event process as the
-	 * BundleContext object is not valid once we return from this method.
+	 * Closing an application context is a potentially long-running activity, however, we *have* to do it synchronously
+	 * during the event process as the BundleContext object is not valid once we return from this method.
 	 * 
 	 * @param bundle
 	 */
 	protected void maybeCloseApplicationContextFor(Bundle bundle) {
-		final ConfigurableOsgiBundleApplicationContext context = (ConfigurableOsgiBundleApplicationContext) managedContexts.remove(Long.valueOf(bundle.getBundleId()));
+		final ConfigurableOsgiBundleApplicationContext context =
+				(ConfigurableOsgiBundleApplicationContext) managedContexts.remove(Long.valueOf(bundle.getBundleId()));
 		if (context == null) {
 			return;
 		}
@@ -296,7 +284,6 @@ class LifecycleManager implements DisposableBean {
 		RunnableTimedExecution.execute(new Runnable() {
 
 			private final String toString = "Closing runnable for context " + context.getDisplayName();
-
 
 			public void run() {
 				closeApplicationContext(context);
@@ -310,8 +297,7 @@ class LifecycleManager implements DisposableBean {
 	}
 
 	/**
-	 * Closes an application context. This is a convenience methods that invokes
-	 * the event notification as well.
+	 * Closes an application context. This is a convenience methods that invokes the event notification as well.
 	 * 
 	 * @param ctx
 	 */
@@ -322,8 +308,7 @@ class LifecycleManager implements DisposableBean {
 		processor.preProcessClose(ctx);
 		try {
 			ctx.close();
-		}
-		finally {
+		} finally {
 			processor.postProcessClose(ctx);
 		}
 	}
@@ -371,19 +356,20 @@ class LifecycleManager implements DisposableBean {
 		}
 
 		final List<Runnable> taskList = new ArrayList<Runnable>(managedContexts.size());
-		final List<ConfigurableOsgiBundleApplicationContext> closedContexts = Collections.synchronizedList(new ArrayList<ConfigurableOsgiBundleApplicationContext>());
+		final List<ConfigurableOsgiBundleApplicationContext> closedContexts =
+				Collections.synchronizedList(new ArrayList<ConfigurableOsgiBundleApplicationContext>());
 		final Object[] contextClosingDown = new Object[1];
 
 		for (i = 0; i < bundles.length; i++) {
 			Long id = new Long(bundles[i].getBundleId());
-			final ConfigurableOsgiBundleApplicationContext context = (ConfigurableOsgiBundleApplicationContext) managedContexts.get(id);
+			final ConfigurableOsgiBundleApplicationContext context =
+					(ConfigurableOsgiBundleApplicationContext) managedContexts.get(id);
 			if (context != null) {
 				closedContexts.add(context);
 				// add a new runnable
 				taskList.add(new Runnable() {
 
 					private final String toString = "Closing runnable for context " + context.getDisplayName();
-
 
 					public void run() {
 						contextClosingDown[0] = context;
@@ -405,7 +391,7 @@ class LifecycleManager implements DisposableBean {
 		// start the ripper >:)
 		for (int j = 0; j < tasks.length; j++) {
 			if (RunnableTimedExecution.execute(tasks[j], extenderConfiguration.getShutdownWaitTime(),
-				shutdownTaskExecutor)) {
+					shutdownTaskExecutor)) {
 				if (debug) {
 					log.debug(contextClosingDown[0] + " context did not close successfully; forcing shutdown...");
 				}
@@ -420,8 +406,7 @@ class LifecycleManager implements DisposableBean {
 	}
 
 	/**
-	 * Do some additional waiting so the service dependency listeners detect the
-	 * shutdown.
+	 * Do some additional waiting so the service dependency listeners detect the shutdown.
 	 */
 	private void stopTaskExecutor() {
 		boolean debug = log.isDebugEnabled();

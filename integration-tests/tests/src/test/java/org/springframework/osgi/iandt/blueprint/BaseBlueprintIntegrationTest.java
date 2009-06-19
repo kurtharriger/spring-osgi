@@ -50,8 +50,8 @@ public abstract class BaseBlueprintIntegrationTest extends BaseIntegrationTest {
 		list.add("org.apache.felix, org.apache.felix.eventadmin, 1.0.0");
 
 		// install the rfc 124 big bundle
-		list.add("org.springframework.osgi.rfc124,api," + getSpringDMVersion());
-		list.add("org.springframework.osgi.rfc124.ri,uber," + getSpringDMVersion());
+		list.add("org.springframework.osgi.blueprint,api," + getSpringDMVersion());
+		list.add("org.springframework.osgi.blueprint.ri,uber," + getSpringDMVersion());
 
 		System.out.println(list);
 		return list.toArray(new String[list.size()]);

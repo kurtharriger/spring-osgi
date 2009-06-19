@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.blueprint.container.BlueprintEvent;
@@ -34,6 +33,7 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.springframework.osgi.util.OsgiBundleUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Actual {@link EventAdmin} dispatcher. Implemented as a package-protected generic class that can be further configured
@@ -80,36 +80,36 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 		Dictionary<String, Object> props = init(event);
 
 		Throwable th = event.getException();
-
 		props.put(EXCEPTION, th);
 		props.put(EXCEPTION_CLASS, th.getClass().getName());
 		String msg = th.getMessage();
 		props.put(EXCEPTION_MESSAGE, (msg != null ? msg : ""));
-
+		initDependencies(props, event);
 		sendEvent(new Event(TOPIC_FAILURE, props));
 	}
 
 	public void grace(BlueprintEvent event) {
 		Dictionary<String, Object> props = init(event);
-		// OsgiServiceDependencyEvent dependencyEvent = event.getDependencyEvent();
-		// OsgiServiceDependency dependency = dependencyEvent.getServiceDependency();
-		//
-		// Filter filter = dependency.getServiceFilter();
-		// props.put(EVENT_FILTER, filter.toString());
-		// props.put(SERVICE_FILTER, filter.toString());
-		// props.put(SERVICE_OBJECTCLASS, extractObjectClassFromFilter(filter));
-		sendEvent(new Event(TOPIC_WAITING, props));
+		initDependencies(props, event);
+		sendEvent(new Event(TOPIC_GRACE, props));
+	}
+
+	private void initDependencies(Dictionary<String, Object> props, BlueprintEvent event) {
+		String[] deps = event.getDependencies();
+		if (!ObjectUtils.isEmpty(deps)) {
+			props.put(DEPENDENCIES, deps[0]);
+			props.put(SERVICE_FILTER, deps[0]);
+			props.put(SERVICE_FILTER_2, deps[0]);
+			props.put(SERVICE_OBJECTCLASS, extractObjectClassFromFilter(deps[0]));
+			props.put(ALL_DEPENDENCIES, deps);
+		}
 	}
 
 	public void waiting(BlueprintEvent event) {
 	}
 
-	private String[] extractObjectClassFromFilter(Filter filter) {
-		if (filter == null) {
-			return new String[0];
-		}
+	private String[] extractObjectClassFromFilter(String filterString) {
 		List<String> matches = null;
-		String filterString = filter.toString();
 		Matcher matcher = PATTERN.matcher(filterString);
 		while (matcher.find()) {
 			if (matches == null) {
