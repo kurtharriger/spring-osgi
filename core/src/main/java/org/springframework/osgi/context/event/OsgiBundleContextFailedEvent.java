@@ -20,8 +20,7 @@ import org.osgi.framework.Bundle;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Event raised when the initialization of an <code>ApplicationContext</code>
- * failed.
+ * Event raised when the initialization of an <code>ApplicationContext</code> failed.
  * 
  * @author Costin Leau
  * 
@@ -30,16 +29,12 @@ public class OsgiBundleContextFailedEvent extends OsgiBundleApplicationContextEv
 
 	private final Throwable cause;
 
-
 	/**
 	 * Constructs a new <code>OsgiBundleContextFailedEvent</code> instance.
 	 * 
-	 * @param source the <code>ApplicationContext</code> that has failed (must
-	 * not be <code>null</code>)
-	 * @param bundle the OSGi bundle associated with the source application
-	 * context
-	 * @param cause optional <code>Throwable</code> indicating the cause of
-	 * the failure
+	 * @param source the <code>ApplicationContext</code> that has failed (must not be <code>null</code>)
+	 * @param bundle the OSGi bundle associated with the source application context
+	 * @param cause optional <code>Throwable</code> indicating the cause of the failure
 	 */
 	public OsgiBundleContextFailedEvent(ApplicationContext source, Bundle bundle, Throwable cause) {
 		super(source, bundle);
@@ -47,8 +42,7 @@ public class OsgiBundleContextFailedEvent extends OsgiBundleApplicationContextEv
 	}
 
 	/**
-	 * Returns the <code>Throwable</code> that caused the application context
-	 * to fail.
+	 * Returns the <code>Throwable</code> that caused the application context to fail.
 	 * 
 	 * @return the cause of the failure.
 	 */

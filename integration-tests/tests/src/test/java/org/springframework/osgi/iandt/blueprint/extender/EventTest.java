@@ -41,53 +41,70 @@ import org.springframework.osgi.iandt.blueprint.BaseBlueprintIntegrationTest;
  */
 public class EventTest extends BaseBlueprintIntegrationTest {
 
-	public void testFailingBundleEvents() throws Exception {
+	final List<Bundle> startedBundles = new ArrayList<Bundle>();
+	final Map<Bundle, Throwable> failedBundles = new LinkedHashMap<Bundle, Throwable>();
+	private ServiceRegistration reg1, reg2;
 
-		final List<Bundle> startedBundles = new ArrayList<Bundle>();
-		final Map<Bundle, Throwable> failedBundles = new LinkedHashMap<Bundle, Throwable>();
+	BlueprintListener listener = new BlueprintListener() {
 
-		BlueprintListener listener = new BlueprintListener() {
+		public void blueprintEvent(BlueprintEvent event) {
+			switch (event.getType()) {
+			case BlueprintEvent.CREATED:
+				startedBundles.add(event.getBundle());
+				break;
 
-			public void blueprintEvent(BlueprintEvent event) {
-				switch (event.getType()) {
-				case BlueprintEvent.CREATED:
-					startedBundles.add(event.getBundle());
-					break;
+			case BlueprintEvent.FAILURE:
+				failedBundles.put(event.getBundle(), event.getException());
+				break;
 
-				case BlueprintEvent.FAILURE:
-					failedBundles.put(event.getBundle(), event.getException());
-					break;
-
-				default:
-					System.out.println("Received event " + event);
-				}
+			default:
+				System.out.println("Received event " + event);
 			}
-		};
+		}
+	};
+
+	EventHandler handler = new EventHandler() {
+
+		public void handleEvent(Event event) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("Received event ").append(event).append(" w/ properties \n");
+
+			String[] propNames = event.getPropertyNames();
+
+			for (String propName : propNames) {
+				builder.append(propName).append("=").append(event.getProperty(propName)).append("\n");
+			}
+
+			System.out.println(builder.toString());
+		}
+	};
+	
+	@Override
+	protected void onSetUp() throws Exception {
+		startedBundles.clear();
+		failedBundles.clear();
 
 		// register Blueprint registration
-		ServiceRegistration reg = bundleContext.registerService(BlueprintListener.class.getName(), listener, null);
+		reg1 = bundleContext.registerService(BlueprintListener.class.getName(), listener, null);
 
-		EventHandler handler = new EventHandler() {
-
-			public void handleEvent(Event event) {
-				StringBuilder builder = new StringBuilder();
-				builder.append("Received event ").append(event).append(" w/ properties \n");
-
-				String[] propNames = event.getPropertyNames();
-
-				for (String propName : propNames) {
-					builder.append(propName).append("=").append(event.getProperty(propName)).append("\n");
-				}
-
-				System.out.println(builder.toString());
-			}
-		};
-
+		// register EventAdmin
 		String[] topics = new String[] { "org/osgi/service/*" };
 		Dictionary<String, Object> prop = new Hashtable<String, Object>();
 		prop.put(EventConstants.EVENT_TOPIC, topics);
-		bundleContext.registerService(EventHandler.class.getName(), handler, prop);
+		reg2 = bundleContext.registerService(EventHandler.class.getName(), handler, prop);
 
+	}
+
+	@Override
+	protected void onTearDown() throws Exception {
+		startedBundles.clear();
+		failedBundles.clear();
+
+		reg1.unregister();
+		reg2.unregister();
+	}
+
+	public void testFailingBundleEvents() throws Exception {
 		System.out.println("Installed Bundles " + Arrays.toString(bundleContext.getBundles()));
 		Resource bundleResource =
 				getLocator().locateArtifact("org.springframework.osgi.iandt.blueprint", "error.bundle",
@@ -99,9 +116,21 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 		failingBundle.start();
 		Thread.sleep(1000 * 3);
 
-		reg.unregister();
-
 		assertEquals(1, failedBundles.size());
 		assertEquals(failingBundle, failedBundles.keySet().iterator().next());
+	}
+
+	public void testFailureOnDependenciesEvent() throws Exception {
+		System.out.println("Installed Bundles " + Arrays.toString(bundleContext.getBundles()));
+		Resource bundleResource =
+				getLocator().locateArtifact("org.springframework.osgi.iandt.blueprint", "waiting.bundle",
+						getSpringDMVersion());
+		Bundle failingBundle =
+				bundleContext.installBundle(bundleResource.getDescription(), bundleResource.getInputStream());
+
+		failingBundle.start();
+		Thread.sleep(1000 * 5);
+		assertEquals(1, failedBundles.size());
+		System.out.println("Failed bundles are " + failedBundles.values());
 	}
 }

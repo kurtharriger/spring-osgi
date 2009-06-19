@@ -26,6 +26,7 @@ import java.util.TimerTask;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Filter;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -35,7 +36,10 @@ import org.springframework.osgi.context.OsgiBundleApplicationContextExecutor;
 import org.springframework.osgi.context.event.OsgiBundleApplicationContextEventMulticaster;
 import org.springframework.osgi.context.event.OsgiBundleContextFailedEvent;
 import org.springframework.osgi.extender.OsgiServiceDependencyFactory;
+import org.springframework.osgi.extender.event.BootstrappingDependenciesFailedEvent;
 import org.springframework.osgi.extender.internal.util.concurrent.Counter;
+import org.springframework.osgi.service.importer.event.OsgiServiceDependencyEvent;
+import org.springframework.osgi.util.OsgiFilterUtils;
 import org.springframework.osgi.util.OsgiStringUtils;
 import org.springframework.util.Assert;
 
@@ -381,13 +385,19 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 
 	}
 
+	public void fail(Throwable t) {
+		fail(t, false);
+	}
+
 	/**
 	 * Fail creating the context. Figure out unsatisfied dependencies and provide a very nice log message before closing
-	 * the appContext. <p/> Normally this method is called when an exception is caught.
+	 * the appContext.
+	 * 
+	 * <p/> Normally this method is called when an exception is caught.
 	 * 
 	 * @param t - the offending Throwable which caused our demise
 	 */
-	public void fail(Throwable t) {
+	private void fail(Throwable t, boolean skipEvent) {
 
 		// this will not thrown any exceptions (it just logs them)
 		close();
@@ -398,11 +408,11 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 			if (dependencyDetector == null || dependencyDetector.getUnsatisfiedDependencies().isEmpty()) {
 				buf.append("none");
 			} else {
-				for (Iterator<MandatoryServiceDependency> dependencies = dependencyDetector
-						.getUnsatisfiedDependencies().keySet().iterator(); dependencies.hasNext();) {
-					MandatoryServiceDependency dependency = dependencies.next();
+				for (Iterator<MandatoryServiceDependency> iterator =
+						dependencyDetector.getUnsatisfiedDependencies().keySet().iterator(); iterator.hasNext();) {
+					MandatoryServiceDependency dependency = iterator.next();
 					buf.append(dependency.toString());
-					if (dependencies.hasNext()) {
+					if (iterator.hasNext()) {
 						buf.append(", ");
 					}
 				}
@@ -424,8 +434,10 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 		log.error(message.toString(), t);
 
 		// send notification
-		delegatedMulticaster.multicastEvent(new OsgiBundleContextFailedEvent(delegateContext, delegateContext
-				.getBundle(), t));
+		if (!skipEvent) {
+			delegatedMulticaster.multicastEvent(new OsgiBundleContextFailedEvent(delegateContext, delegateContext
+					.getBundle(), t));
+		}
 	}
 
 	/**
@@ -433,26 +445,39 @@ public class DependencyWaiterApplicationContextExecutor implements OsgiBundleApp
 	 */
 	private void timeout() {
 		ApplicationContextException e;
+		List<OsgiServiceDependencyEvent> events = null;
+		String filterAsString = null;
+
 		synchronized (monitor) {
 			// deregister listener to get an accurate snapshot of the
 			// unsatisfied dependencies.
 
 			if (dependencyDetector != null) {
 				dependencyDetector.deregister();
+				events = dependencyDetector.getUnsatisfiedDependenciesAsEvents();
+				filterAsString = dependencyDetector.createDependencyFilter();
 			}
 		}
 
+		Filter filter = (filterAsString != null ? OsgiFilterUtils.createFilter(filterAsString) : null);
+
 		log.warn("Timeout occurred before finding service dependencies for [" + delegateContext.getDisplayName() + "]");
 
-		e = new ApplicationContextException("Application context initialization for '"
-				+ AccessController.doPrivileged(new PrivilegedAction<String>() {
-
-					public String run() {
-						return OsgiStringUtils.nullSafeSymbolicName(getBundle());
-					}
-				}) + "' has timed out");
+		// generate exception
+		e =
+				new ApplicationContextException("Application context initialization for '"
+						+ AccessController.doPrivileged(new PrivilegedAction<String>() {
+							public String run() {
+								return OsgiStringUtils.nullSafeSymbolicName(getBundle());
+							}
+						}) + "' has timed out waiting for " + filterAsString);
 		e.fillInStackTrace();
-		fail(e);
+
+		// send notification
+		delegatedMulticaster.multicastEvent(new BootstrappingDependenciesFailedEvent(delegateContext, delegateContext
+				.getBundle(), e, events, filter));
+
+		fail(e, true);
 	}
 
 	protected DependencyServiceManager createDependencyServiceListener(Runnable task) {
