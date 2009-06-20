@@ -41,8 +41,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean,
-		BeanFactoryAware {
+public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycleListener, InitializingBean, BeanFactoryAware {
 
 	private static final Log log = LogFactory.getLog(OsgiServiceLifecycleListenerAdapter.class);
 
@@ -98,7 +97,7 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 	 */
 	private void initialize() {
 
-		Class<?> clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
+		Class clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
 
 		isLifecycleListener = OsgiServiceLifecycleListener.class.isAssignableFrom(clazz);
 		if (isLifecycleListener)
@@ -110,15 +109,15 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 		if (StringUtils.hasText(bindMethod)) {
 			// determine methods using ServiceReference signature
 			bindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, bindMethod,
-				new Class<?>[] { ServiceReference.class });
+				new Class[] { ServiceReference.class });
 
-			if (bindReference != null)
+			if (bindReference != null) {
 				org.springframework.util.ReflectionUtils.makeAccessible(bindReference);
-
+			}
 			else if (bindMethods.isEmpty()) {
 				String beanName = (target == null ? "" : " bean [" + targetBeanName + "] ;");
-				throw new IllegalArgumentException("Custom bind method [" + bindMethod
-						+ "] (with proper signature) not found on " + beanName + "class " + clazz);
+				throw new IllegalArgumentException("Custom bind method [" + bindMethod + "] not found on " + beanName
+						+ "class " + clazz);
 			}
 		}
 
@@ -126,15 +125,15 @@ public class OsgiServiceLifecycleListenerAdapter implements OsgiServiceLifecycle
 
 		if (StringUtils.hasText(unbindMethod)) {
 			unbindReference = org.springframework.util.ReflectionUtils.findMethod(clazz, unbindMethod,
-				new Class<?>[] { ServiceReference.class });
+				new Class[] { ServiceReference.class });
 
-			if (unbindReference != null)
+			if (unbindReference != null) {
 				org.springframework.util.ReflectionUtils.makeAccessible(unbindReference);
-
+			}
 			else if (unbindMethods.isEmpty()) {
 				String beanName = (target == null ? "" : " bean [" + targetBeanName + "] ;");
-				throw new IllegalArgumentException("Custom unbind method [" + unbindMethod
-						+ "] (with proper signature) not found on " + beanName + "class " + clazz);
+				throw new IllegalArgumentException("Custom unbind method [" + unbindMethod + "] not found on "
+						+ beanName + "class " + clazz);
 			}
 		}
 

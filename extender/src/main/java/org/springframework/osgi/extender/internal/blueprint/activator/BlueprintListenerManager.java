@@ -17,16 +17,16 @@
 package org.springframework.osgi.extender.internal.blueprint.activator;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintEvent;
 import org.osgi.service.blueprint.container.BlueprintListener;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.service.importer.support.Availability;
-import org.springframework.osgi.service.importer.support.Cardinality;
 import org.springframework.osgi.service.importer.support.CollectionType;
 import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
 import org.springframework.osgi.util.BundleDelegatingClassLoader;
@@ -45,6 +45,27 @@ class BlueprintListenerManager implements BlueprintListener, DisposableBean {
 
 	private volatile DisposableBean cleanupHook;
 	private volatile List<BlueprintListener> listeners;
+	private final Timer eventDispatcher = new Timer("BlueprintEvent Dispatcher", true);
+
+	private class Task extends TimerTask {
+
+		private final BlueprintEvent event;
+
+		Task(BlueprintEvent event) {
+			this.event = event;
+		}
+
+		@Override
+		public void run() {
+			for (BlueprintListener listener : listeners) {
+				try {
+					listener.blueprintEvent(event);
+				} catch (Exception ex) {
+					log.warn("exception encountered when calling listener " + System.identityHashCode(listener), ex);
+				}
+			}
+		}
+	}
 
 	public BlueprintListenerManager(BundleContext context) {
 		OsgiServiceCollectionProxyFactoryBean fb = new OsgiServiceCollectionProxyFactoryBean();
@@ -60,6 +81,9 @@ class BlueprintListenerManager implements BlueprintListener, DisposableBean {
 	}
 
 	public void destroy() {
+		eventDispatcher.cancel();
+		eventDispatcher.purge();
+
 		if (cleanupHook != null) {
 			try {
 				cleanupHook.destroy();
@@ -72,12 +96,10 @@ class BlueprintListenerManager implements BlueprintListener, DisposableBean {
 	}
 
 	public void blueprintEvent(BlueprintEvent event) {
-		for (BlueprintListener listener : listeners) {
-			try {
-				listener.blueprintEvent(event);
-			} catch (Exception ex) {
-				log.warn("exception encountered when calling listener " + System.identityHashCode(listener), ex);
-			}
-		}
+		if (log.isTraceEnabled())
+			log.trace("Scheduled background dispatch for blueprint event " + event);
+
+		// schedule for execution right away
+		eventDispatcher.schedule(new Task(event), 0);
 	}
 }

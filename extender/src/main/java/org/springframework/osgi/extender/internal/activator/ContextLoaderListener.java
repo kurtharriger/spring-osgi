@@ -227,9 +227,15 @@ public class ContextLoaderListener implements BundleActivator {
 
 		public void onOsgiApplicationEvent(OsgiBundleApplicationContextEvent event) {
 			if (event instanceof OsgiBundleContextRefreshedEvent) {
+				if (log.isTraceEnabled()) {
+					log.trace("Calling post-refresh on processor " + processor);
+				}
 				processor.postProcessRefresh((ConfigurableOsgiBundleApplicationContext) event.getApplicationContext());
 			}
 			if (event instanceof OsgiBundleContextFailedEvent) {
+				if (log.isTraceEnabled()) {
+					log.trace("Calling fail-refresh on processor " + processor);
+				}
 				OsgiBundleContextFailedEvent failureEvent = (OsgiBundleContextFailedEvent) event;
 				processor.postProcessRefreshFailure(((ConfigurableOsgiBundleApplicationContext) event
 						.getApplicationContext()), failureEvent.getFailureCause());

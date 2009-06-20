@@ -23,14 +23,13 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 
 /**
- * Utility class that executes the given Runnable task on the given task
- * executor or , if none is given, to a new thread.
+ * Utility class that executes the given Runnable task on the given task executor or , if none is given, to a new
+ * thread.
  * 
- * <p/> If the thread does not return in the given amount of time, it will be
- * interrupted and a logging message sent.
+ * <p/> If the thread does not return in the given amount of time, it will be interrupted and a logging message sent.
  * 
- * <p/> This class is intended for usage inside the framework, mainly by the
- * extender package for controlling runaway threads.
+ * <p/> This class is intended for usage inside the framework, mainly by the extender package for controlling runaway
+ * threads.
  * 
  * @see Counter
  * @see Thread
@@ -42,13 +41,11 @@ public abstract class RunnableTimedExecution {
 	/** logger */
 	private static final Log log = LogFactory.getLog(RunnableTimedExecution.class);
 
-
 	private static class MonitoredRunnable implements Runnable {
 
 		private Runnable task;
 
 		private Counter counter;
-
 
 		public MonitoredRunnable(Runnable task, Counter counter) {
 			this.task = task;
@@ -58,8 +55,7 @@ public abstract class RunnableTimedExecution {
 		public void run() {
 			try {
 				task.run();
-			}
-			finally {
+			} finally {
 				counter.decrement();
 			}
 		}
@@ -68,7 +64,6 @@ public abstract class RunnableTimedExecution {
 	private static class SimpleTaskExecutor implements TaskExecutor, DisposableBean {
 
 		private Thread thread;
-
 
 		public void execute(Runnable task) {
 			thread = new Thread(task);
@@ -82,7 +77,6 @@ public abstract class RunnableTimedExecution {
 			}
 		}
 	}
-
 
 	public static boolean execute(Runnable task, long waitTime) {
 		return execute(task, waitTime, null);
@@ -112,9 +106,8 @@ public abstract class RunnableTimedExecution {
 			if (internallyManaged) {
 				try {
 					((DisposableBean) taskExecutor).destroy();
-				}
-				catch (Exception e) {
-					// no exception is thrown, nothing to worry
+				} catch (Exception e) {
+					log.error("Exception thrown while destroying internally managed thread executor", e);
 				}
 			}
 			return true;

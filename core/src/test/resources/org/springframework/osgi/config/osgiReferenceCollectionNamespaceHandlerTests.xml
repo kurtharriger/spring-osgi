@@ -4,7 +4,7 @@
 	xmlns:osgi="http://www.springframework.org/schema/osgi"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd"
 	osgi:default-timeout="10">
 
@@ -60,4 +60,14 @@
 		</osgi:comparator>
 	</osgi:list>
 
+	<!--
+	<beans:bean id="primitiveArray"
+		class="org.springframework.osgi.blueprint.PrimitiveArrayConstructorInjection">
+		<beans:constructor-arg type="int[]">
+			<beans:array value-type="int">
+				<beans:value>1</beans:value>
+			</beans:array>
+		</beans:constructor-arg>
+	</beans:bean>
+	-->
 </beans:beans>

@@ -25,12 +25,12 @@ import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.BeanProperty;
 import org.osgi.service.blueprint.reflect.CollectionMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.osgi.service.blueprint.reflect.Metadata;
 import org.osgi.service.blueprint.reflect.NullMetadata;
 import org.osgi.service.blueprint.reflect.PropsMetadata;
 import org.osgi.service.blueprint.reflect.RefMetadata;
 import org.osgi.service.blueprint.reflect.Target;
 import org.osgi.service.blueprint.reflect.ValueMetadata;
-import org.springframework.beans.factory.config.TypedStringValue;
 
 /**
  * @author Costin Leau
@@ -188,5 +188,39 @@ public class BeanComponentMetadataTest extends BaseMetadataTest {
 		assertTrue(factoryComponent instanceof RefMetadata);
 		assertEquals("instanceFactory", ((RefMetadata) factoryComponent).getComponentId());
 		assertTrue(localMetadata.getProperties().isEmpty());
+	}
+
+	public void testEmptyArray() throws Exception {
+		BeanMetadata localMetadata = getLocalMetadata("arrayItem");
+		List<BeanArgument> args = localMetadata.getArguments();
+		for (BeanArgument beanArgument : args) {
+			CollectionMetadata mt = (CollectionMetadata) beanArgument.getValue();
+			assertNull(mt.getValueType());
+		}
+	}
+
+	public void tstPrimitiveArray() throws Exception {
+		BeanMetadata localMetadata = getLocalMetadata("primitiveArray");
+		List<BeanArgument> args = localMetadata.getArguments();
+		for (BeanArgument beanArgument : args) {
+			CollectionMetadata mt = (CollectionMetadata) beanArgument.getValue();
+			assertNull(mt.getValueType());
+		}
+	}
+
+	public void testCompDateArray() throws Exception {
+		BeanMetadata localMetadata = getLocalMetadata("compURLArray");
+		System.out.println(blueprintContainer.getComponentInstance("compDateArray"));
+		for (BeanArgument argument : (List<BeanArgument>) localMetadata.getArguments()) {
+			System.out.println(argument.getValueType());
+			CollectionMetadata mt = (CollectionMetadata) argument.getValue();
+			System.out.println(mt.getValueType());
+			System.out.println(mt.getCollectionClass());
+			System.out.println(mt.getValues());
+			for (ValueMetadata meta : (List<ValueMetadata>) mt.getValues()) {
+				System.out.println(meta.getType());
+				System.out.println(meta.getStringValue());
+			}
+		}
 	}
 }

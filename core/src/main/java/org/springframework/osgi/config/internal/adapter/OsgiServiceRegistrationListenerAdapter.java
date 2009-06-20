@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
  * {@link org.springframework.osgi.config.internal.adapter.OsgiServiceLifecycleListenerAdapter}.
  * 
  * @author Costin Leau
+ * 
  */
 public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegistrationListener, InitializingBean,
 		BeanFactoryAware {
@@ -88,7 +89,7 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 	 * Initialise adapter. Determine custom methods and do validation.
 	 */
 	private void initialize() {
-		Class<?> clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
+		Class clazz = (target == null ? beanFactory.getType(targetBeanName) : target.getClass());
 
 		isListener = OsgiServiceRegistrationListener.class.isAssignableFrom(clazz);
 		if (isListener)
@@ -96,20 +97,7 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 				log.debug(clazz.getName() + " is a registration listener");
 
 		registrationMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, registrationMethod);
-
-		if (StringUtils.hasText(registrationMethod) && registrationMethods.isEmpty()) {
-			String beanName = (target == null ? "" : " bean [" + targetBeanName + "] ;");
-			throw new IllegalArgumentException("Custom registration method [" + registrationMethod
-					+ "] (with proper signature) not found on " + beanName + "class " + clazz);
-		}
-
 		unregistrationMethods = CustomListenerAdapterUtils.determineCustomMethods(clazz, unregistrationMethod);
-
-		if (StringUtils.hasText(unregistrationMethod) && unregistrationMethods.isEmpty()) {
-			String beanName = (target == null ? "" : " bean [" + targetBeanName + "] ;");
-			throw new IllegalArgumentException("Custom unregistration method [" + unregistrationMethod
-					+ "] (with proper signature) not found on " + beanName + "class " + clazz);
-		}
 
 		if (!isListener && (registrationMethods.isEmpty() && unregistrationMethods.isEmpty()))
 			throw new IllegalArgumentException("target object needs to implement "
@@ -143,9 +131,9 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 						// do matching on method name
 						if (!method.isBridge() && methodName.equals(method.getName())) {
 							// take a look at the parameter types
-							Class<?>[] args = method.getParameterTypes();
+							Class[] args = method.getParameterTypes();
 							if (args != null && args.length == 1) {
-								Class<?> propType = args[0];
+								Class propType = args[0];
 								if (Dictionary.class.isAssignableFrom(propType) || Map.class.isAssignableFrom(propType)) {
 									if (trace)
 										log.trace("discovered custom method [" + method.toString() + "] on "
@@ -290,4 +278,5 @@ public class OsgiServiceRegistrationListenerAdapter implements OsgiServiceRegist
 	public void setTargetBeanName(String targetBeanName) {
 		this.targetBeanName = targetBeanName;
 	}
+
 }

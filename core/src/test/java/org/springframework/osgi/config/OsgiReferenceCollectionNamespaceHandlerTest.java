@@ -213,4 +213,6 @@ public class OsgiReferenceCollectionNamespaceHandlerTest extends TestCase {
 	private OsgiServiceLifecycleListener[] getListeners(Object proxy) {
 		return (OsgiServiceLifecycleListener[]) TestUtils.getFieldValue(proxy, "listeners");
 	}
+	
+	
 }

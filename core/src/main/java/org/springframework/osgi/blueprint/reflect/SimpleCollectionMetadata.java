@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.osgi.service.blueprint.reflect.CollectionMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
+import org.springframework.util.StringUtils;
 
 /**
  * Basic {@link CollectionMetadata} implementation.
@@ -56,7 +57,7 @@ class SimpleCollectionMetadata implements CollectionMetadata {
 	public SimpleCollectionMetadata(List<Metadata> values, CollectionType type, String valueTypeName) {
 		this.values = values;
 		this.collectionType = type;
-		this.typeName = valueTypeName;
+		this.typeName = (StringUtils.hasText(valueTypeName) ? valueTypeName : null);
 	}
 
 	public SimpleCollectionMetadata(List<Metadata> values, Class<?> type, String valueTypeName) {

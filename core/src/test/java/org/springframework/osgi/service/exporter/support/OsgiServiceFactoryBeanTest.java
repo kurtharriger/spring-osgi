@@ -38,6 +38,8 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.osgi.mock.MockBundleContext;
 import org.springframework.osgi.mock.MockServiceRegistration;
+import org.springframework.osgi.service.exporter.OsgiServiceRegistrationListener;
+import org.springframework.osgi.service.exporter.TestRegistrationListener;
 
 /**
  * @author Costin Leau
@@ -55,6 +57,16 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 	private MockControl ctxCtrl;
 
 	private BundleContext ctx;
+
+	class MockServiceFactory implements ServiceFactory {
+
+		public Object getService(Bundle bundle, ServiceRegistration registration) {
+			return null;
+		}
+
+		public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
+		}
+	}
 
 	class UpdateableProperties extends Properties implements ServicePropertiesListenerManager {
 
@@ -224,7 +236,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		String beanName = "boo";
 		exporter.setTargetBeanName(beanName);
 
-		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), false);
+		beanFactoryControl.expectAndReturn(beanFactory.isPrototype(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), proxy.getClass());
 		beanFactoryControl.replay();
@@ -278,9 +290,9 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		String beanName = "fooBar";
 		exporter.setTargetBeanName(beanName);
 		exporter.setInterfaces(new Class<?>[] { service.getClass() });
-		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
+		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), service.getClass());
 		beanFactoryControl.replay();
 		exporter.afterPropertiesSet();
 		exporter.registerService(new Class<?>[] { service.getClass() }, new Properties());
@@ -294,15 +306,10 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		final ServiceFactory[] factory = new ServiceFactory[1];
 
 		final Object actualService = new Object();
-		Object service = new ServiceFactory() {
-
+		Object service = new MockServiceFactory() {
 			public Object getService(Bundle arg0, ServiceRegistration arg1) {
 				return actualService;
 			}
-
-			public void ungetService(Bundle arg0, ServiceRegistration arg1, Object arg2) {
-			}
-
 		};
 
 		BundleContext ctx = new MockBundleContext() {
@@ -316,9 +323,10 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 		String beanName = "fooBar";
 
-		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), true);
+		beanFactoryControl.expectAndReturn(beanFactory.isPrototype(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
+		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), service.getClass());
 		beanFactoryControl.replay();
 
 		exporter.setBundleContext(ctx);
@@ -381,15 +389,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 	}
 
 	public void testServiceFactory() throws Exception {
-		ServiceFactory factory = new ServiceFactory() {
-
-			public Object getService(Bundle bundle, ServiceRegistration registration) {
-				return null;
-			}
-
-			public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
-			}
-		};
+		ServiceFactory factory = new MockServiceFactory();
 
 		ctx = new MockBundleContext();
 		exporter.setBundleContext(ctx);
@@ -422,4 +422,77 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		assertEquals("jobs", reg.getReference().getProperty("steve"));
 		assertNotNull(reg.getReference().getProperty("updated"));
 	}
+
+	public void testPrototypeServiceFactory() throws Exception {
+		ServiceFactory factory = new MockServiceFactory();
+		String beanName = "prototype-sf";
+		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
+		beanFactoryControl.expectAndReturn(beanFactory.isPrototype(beanName), true);
+		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), factory);
+		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), factory.getClass());
+		exporter.setTargetBeanName(beanName);
+		exporter.setInterfaces(new Class<?>[] { Serializable.class });
+		beanFactoryControl.replay();
+
+		try {
+			exporter.afterPropertiesSet();
+			fail("should have thrown validation exception for prototyped service factories");
+		} catch (IllegalArgumentException ex) {
+			// expected
+		}
+	}
+
+	public void testPrototypeServiceFactoryRegistration() throws Exception {
+		TestRegistrationListener listener = new TestRegistrationListener();
+
+		ServiceFactory factory = new MockServiceFactory();
+		String beanName = "prototype-sf";
+		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
+		beanFactoryControl.expectAndReturn(beanFactory.isPrototype(beanName), false);
+		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), factory);
+		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), factory.getClass());
+		exporter.setTargetBeanName(beanName);
+		exporter.setInterfaces(new Class<?>[] { Serializable.class });
+		exporter.setListeners(new OsgiServiceRegistrationListener[] { listener });
+
+		beanFactoryControl.replay();
+		assertEquals(listener.registered.size(), 0);
+		assertEquals(listener.unregistered.size(), 0);
+
+		exporter.afterPropertiesSet();
+		assertEquals(listener.registered.size(), 1);
+		assertEquals(listener.unregistered.size(), 0);
+
+		assertNull(listener.registered.keySet().iterator().next());
+		exporter.destroy();
+		assertEquals(listener.unregistered.size(), 1);
+		assertNull(listener.unregistered.keySet().iterator().next());
+	}
+
+	public void testPrototypeNonServiceFactoryRegistration() throws Exception {
+		TestRegistrationListener listener = new TestRegistrationListener();
+
+		Object obj = new Object();
+		String beanName = "prototype-non-sf";
+		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
+		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), obj);
+		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), obj.getClass());
+		exporter.setTargetBeanName(beanName);
+		exporter.setInterfaces(new Class<?>[] { Object.class });
+		exporter.setListeners(new OsgiServiceRegistrationListener[] { listener });
+
+		beanFactoryControl.replay();
+		assertEquals(listener.registered.size(), 0);
+		assertEquals(listener.unregistered.size(), 0);
+
+		exporter.afterPropertiesSet();
+		assertEquals(listener.registered.size(), 1);
+		assertEquals(listener.unregistered.size(), 0);
+
+		assertNull(listener.registered.keySet().iterator().next());
+		exporter.destroy();
+		assertEquals(listener.unregistered.size(), 1);
+		assertNull(listener.unregistered.keySet().iterator().next());
+	}
+
 }

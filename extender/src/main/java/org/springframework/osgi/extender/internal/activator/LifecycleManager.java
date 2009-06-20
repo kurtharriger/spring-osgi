@@ -205,6 +205,9 @@ class LifecycleManager implements DisposableBean {
 
 			public void run() {
 				// post refresh events are caught through events
+				if (log.isTraceEnabled()) {
+					log.trace("Calling pre-refresh on processor " + processor);
+				}
 				processor.preProcessRefresh(localApplicationContext);
 				localApplicationContext.refresh();
 			}
@@ -302,13 +305,20 @@ class LifecycleManager implements DisposableBean {
 	 * @param ctx
 	 */
 	private void closeApplicationContext(ConfigurableOsgiBundleApplicationContext ctx) {
-		if (log.isDebugEnabled())
+		if (log.isDebugEnabled()) {
 			log.debug("Closing application context " + ctx.getDisplayName());
+		}
 
+		if (log.isTraceEnabled()) {
+			log.trace("Calling pre-close on processor " + processor);
+		}
 		processor.preProcessClose(ctx);
 		try {
 			ctx.close();
 		} finally {
+			if (log.isTraceEnabled()) {
+				log.trace("Calling post close on processor " + processor);
+			}
 			processor.postProcessClose(ctx);
 		}
 	}

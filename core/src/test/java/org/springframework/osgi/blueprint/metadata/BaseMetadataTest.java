@@ -19,10 +19,14 @@ package org.springframework.osgi.blueprint.metadata;
 import junit.framework.TestCase;
 
 import org.osgi.service.blueprint.container.BlueprintContainer;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
+import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 
@@ -44,6 +48,12 @@ public abstract class BaseMetadataTest extends TestCase {
 		applicationContext = new GenericApplicationContext();
 		applicationContext.setClassLoader(getClass().getClassLoader());
 		applicationContext.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
+		applicationContext.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
+
+			public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
+			}
+		});
 		reader = new XmlBeanDefinitionReader(applicationContext);
 		reader.loadBeanDefinitions(new ClassPathResource(getConfig(), getClass()));
 		applicationContext.refresh();
