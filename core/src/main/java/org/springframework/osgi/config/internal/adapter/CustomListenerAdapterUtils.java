@@ -36,7 +36,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * 
  */
-abstract class CustomListenerAdapterUtils {
+public abstract class CustomListenerAdapterUtils {
 
 	private static final Log log = LogFactory.getLog(CustomListenerAdapterUtils.class);
 
@@ -53,16 +53,16 @@ abstract class CustomListenerAdapterUtils {
 	 * @param possibleArgumentTypes
 	 * @return
 	 */
-	static Map determineCustomMethods(final Class<?> target, final String methodName,
+	static Map<Class<?>, Method> determineCustomMethods(final Class<?> target, final String methodName,
 			final Class<?>[] possibleArgumentTypes) {
 
 		if (!StringUtils.hasText(methodName)) {
-			return Collections.EMPTY_MAP;
+			return Collections.<Class<?>, Method> emptyMap();
 		}
 
 		Assert.notEmpty(possibleArgumentTypes);
 
-		final Map methods = new LinkedHashMap(3);
+		final Map<Class<?>, Method> methods = new LinkedHashMap<Class<?>, Method>(3);
 
 		final boolean trace = log.isTraceEnabled();
 
@@ -112,8 +112,8 @@ abstract class CustomListenerAdapterUtils {
 	 * @param methodName
 	 * @return
 	 */
-	static Map determineCustomMethods(Class<?> target, final String methodName) {
-		return determineCustomMethods(target, methodName, new Class<?>[] { Dictionary.class, Map.class });
+	static Map<Class<?>, Method> determineCustomMethods(Class<?> target, final String methodName) {
+		return determineCustomMethods(target, methodName, new Class[] { Dictionary.class, Map.class });
 	}
 
 	/**
@@ -126,15 +126,15 @@ abstract class CustomListenerAdapterUtils {
 	 * @param properties
 	 */
 	// the properties field is Dictionary implementing a Map interface
-	static void invokeCustomMethods(Object target, Map methods, Object service, Map properties) {
+	static void invokeCustomMethods(Object target, Map<Class<?>, Method> methods, Object service, Map<?, ?> properties) {
 		if (methods != null && !methods.isEmpty()) {
 			boolean trace = log.isTraceEnabled();
 
 			Object[] args = new Object[] { service, properties };
-			for (Iterator iter = methods.entrySet().iterator(); iter.hasNext();) {
-				Map.Entry entry = (Map.Entry) iter.next();
-				Class<?> key = (Class) entry.getKey();
-				Method method = (Method) entry.getValue();
+			for (Iterator<Map.Entry<Class<?>, Method>> iter = methods.entrySet().iterator(); iter.hasNext();) {
+				Map.Entry<Class<?>, Method> entry = iter.next();
+				Class<?> key = entry.getKey();
+				Method method = entry.getValue();
 				// find the compatible types (accept null service)
 				if (service == null || key.isInstance(service)) {
 					if (trace)

@@ -27,10 +27,9 @@ import org.springframework.osgi.service.exporter.support.internal.controller.Exp
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterControllerUtils;
 
 /**
- * BeanPostProcessor registered for detecting the dependency between service
- * importer and service exporters. Besides bean detection, this component also
- * listens to specific importer events to determine whether a potential
- * associated exporter needs to be disabled temporarily.
+ * BeanPostProcessor registered for detecting the dependency between service importer and service exporters. Besides
+ * bean detection, this component also listens to specific importer events to determine whether a potential associated
+ * exporter needs to be disabled temporarily.
  * 
  * @author Costin Leau
  * 
@@ -41,7 +40,6 @@ public class MandatoryDependencyBeanPostProcessor implements BeanFactoryAware, B
 	private MandatoryServiceDependencyManager manager;
 	private ConfigurableBeanFactory beanFactory;
 
-
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof OsgiServiceFactoryBean) {
 			manager.addServiceExporter(bean, beanName);
@@ -51,7 +49,8 @@ public class MandatoryDependencyBeanPostProcessor implements BeanFactoryAware, B
 
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		// disable publication until all the dependencies have been fulfilled
-		if (bean instanceof OsgiServiceFactoryBean) {
+		// ignore inner beans
+		if (bean instanceof OsgiServiceFactoryBean && beanFactory.containsLocalBean(beanName)) {
 			String exporterName = beanName;
 			if (beanFactory.isFactoryBean(beanName)) {
 				exporterName = BeanFactory.FACTORY_BEAN_PREFIX + beanName;

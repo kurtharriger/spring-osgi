@@ -81,6 +81,8 @@ public class EventTest extends BaseBlueprintIntegrationTest {
 	
 	@Override
 	protected void onSetUp() throws Exception {
+		
+		System.out.println(file.toURI());
 		startedBundles.clear();
 		failedBundles.clear();
 

@@ -95,7 +95,7 @@ public class ExtenderConfiguration implements DisposableBean {
 
 	// default dependency wait time (in milliseconds)
 	private static final long DEFAULT_DEP_WAIT = ConfigUtils.DIRECTIVE_TIMEOUT_DEFAULT * 1000;
-	private static final long DEFAULT_SHUTDOWN_WAIT = 10 * 1000;
+	private static final long DEFAULT_SHUTDOWN_WAIT = 60 * 1000;
 	private static final boolean DEFAULT_PROCESS_ANNOTATION = false;
 
 	private ConfigurableOsgiBundleApplicationContext extenderConfiguration;

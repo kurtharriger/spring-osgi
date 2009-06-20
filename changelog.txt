@@ -13,6 +13,7 @@ General
 * generified classes (both public and internal)
 * updated archetype project to save locally the manifest generated during packaging
 * added new elements to spring-osgi schema
+* align various features with the OSGi 4.2 Blueprint spec
 
 Package org.springframework.osgi.bundle
 * deprecated BundleAction in favour of the BundleActionEnum enum 
@@ -39,6 +40,7 @@ Package org.springframework.osgi.service
 * deprecated ExportContextClassLoader in favour of ExportContextClassLoaderEnum
 * deprecated ImportContextClassLoader in favour of ImportContextClassLoaderEnum
 * service collection can now contain service references instead of just service proxies
+* service exporter returns a 'safe' service registration that forbids unregistration
 
 Package org.springframework.osgi.mock
 * added OSGi 4.2 methods to the package

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -43,6 +45,9 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  */
 class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
+
+	/** logger */
+	private static final Log log = LogFactory.getLog(OsgiEventDispatcher.class);
 
 	// match the class inside object class (and use a non backing reference group)
 	private static final Pattern PATTERN = Pattern.compile("objectClass=(?:[^\\)]+)");
@@ -106,6 +111,7 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 	}
 
 	public void waiting(BlueprintEvent event) {
+		throw new UnsupportedOperationException("waiting event dispatch not supported yet");
 	}
 
 	private String[] extractObjectClassFromFilter(String filterString) {
@@ -162,14 +168,16 @@ class OsgiEventDispatcher implements EventDispatcher, BlueprintConstants {
 	}
 
 	private void sendEvent(Event osgiEvent) {
-		if (osgiEvent != null) {
-			ServiceReference ref = bundleContext.getServiceReference(EVENT_ADMIN);
-			if (ref != null) {
-				EventAdmin eventAdmin = (EventAdmin) bundleContext.getService(ref);
-				if (eventAdmin != null) {
-					publisher.publish(eventAdmin, osgiEvent);
-				}
+		boolean trace = log.isTraceEnabled();
+		ServiceReference ref = bundleContext.getServiceReference(EVENT_ADMIN);
+		if (ref != null) {
+			EventAdmin eventAdmin = (EventAdmin) bundleContext.getService(ref);
+			if (eventAdmin != null) {
+				log.trace("Broadcasting OSGi event " + osgiEvent);
+				publisher.publish(eventAdmin, osgiEvent);
 			}
+		} else {
+			log.trace("No event admin found for broadcasting event " + osgiEvent);
 		}
 	}
 }

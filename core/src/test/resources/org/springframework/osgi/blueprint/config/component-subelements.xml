@@ -32,7 +32,7 @@
 
 	<bean id="idref" class="java.lang.String">
 		<argument>
-			<idref component-id="constructor-arg"/>
+			<idref component-id="constructor-arg" />
 		</argument>
 	</bean>
 
@@ -44,19 +44,17 @@
 		</property>
 	</bean>
 
-	<bean id="array"
-		class="org.springframework.osgi.blueprint.TestComponent">
+	<bean id="array" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
 			<array>
-				<ref component-id="char"/>
+				<ref component-id="char" />
 				<value>literal2</value>
-				<null/>
+				<null />
 			</array>
 		</property>
 	</bean>
-	
-	<bean id="mixedCollection" 
-		class="org.springframework.osgi.blueprint.TestComponent">
+
+	<bean id="mixedCollection" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
 			<list value-type="java.lang.String">
 				<value>literal</value>
@@ -72,8 +70,7 @@
 		</property>
 	</bean>
 
-	<bean id="list"
-		class="org.springframework.osgi.blueprint.TestComponent">
+	<bean id="list" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
 			<list>
 				<value type="java.lang.String">value</value>
@@ -84,8 +81,7 @@
 		</property>
 	</bean>
 
-	<bean id="listWDefaultType"
-		class="org.springframework.osgi.blueprint.TestComponent">
+	<bean id="listWDefaultType" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
 			<list value-type="java.lang.Double">
 				<value>0.0</value>
@@ -94,8 +90,7 @@
 		</property>
 	</bean>
 
-	<bean id="set"
-		class="org.springframework.osgi.blueprint.TestComponent">
+	<bean id="set" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
 			<set>
 				<value type="java.lang.String">value</value>
@@ -107,8 +102,7 @@
 
 	</bean>
 
-	<bean id="map"
-		class="org.springframework.osgi.blueprint.TestComponent">
+	<bean id="map" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
 			<map>
 				<entry key="foo" value="bar" />
@@ -123,8 +117,7 @@
 		</property>
 	</bean>
 
-	<bean id="props"
-		class="org.springframework.osgi.blueprint.TestComponent">
+	<bean id="props" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
 			<props>
 				<prop key="one">two</prop>
@@ -133,34 +126,29 @@
 		</property>
 	</bean>
 
-	<bean id="null"
-		class="org.springframework.osgi.blueprint.TestComponent">
+	<bean id="null" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
 			<null />
 		</property>
 	</bean>
 
-	<bean id="compZeroLengthString"
-		class="org.springframework.osgi.blueprint.TestComponent">
+	<bean id="compZeroLengthString" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA" value="" />
 	</bean>
 
-	<!-- 
+	<!--
 		<bean id="dateConstructor"
-		class="org.springframework.osgi.blueprint.DateConstructor">
-		<argument value="6/1/1999" type="java.util.Date"/> 
-		</bean>
+		class="org.springframework.osgi.blueprint.DateConstructor"> <argument
+		value="6/1/1999" type="java.util.Date"/> </bean>
 	-->
 
-	<bean id="nan" factory-method="valueOf"
-		class="java.lang.Double">
+	<bean id="nan" factory-method="valueOf" class="java.lang.Double">
 		<argument value="NaN" type="double" />
 	</bean>
 
 	<bean id="ambigousConstructor"
 		class="org.springframework.osgi.blueprint.AmbigousTestComponent">
-		<argument type="java.lang.String"
-			value="compThreeArgOverride" />
+		<argument type="java.lang.String" value="compThreeArgOverride" />
 		<argument type="java.lang.Object" value="true">
 		</argument>
 		<argument type="java.lang.String">
@@ -186,36 +174,79 @@
 		<argument value="123" index="2" />
 		<argument value="981" index="0" />
 	</bean>
-	
-	
-	<bean id="noArgStaticFactory" class="org.springframework.osgi.blueprint.FactoryComponent" factory-method="staticMethod"/>
 
-    <bean id="oneArgStaticFactory" class="org.springframework.osgi.blueprint.FactoryComponent" factory-method="staticMethod">
-        <argument value="iridium"/>
-    </bean>
 
-	<bean id="instanceFactory" class="org.springframework.osgi.blueprint.FactoryComponent"/>
-	
-	<bean id="noArgInstanceFactory"  factory-method="instanceMethod" factory-ref="instanceFactory"/>
+	<bean id="noArgStaticFactory" class="org.springframework.osgi.blueprint.FactoryComponent"
+		factory-method="staticMethod" />
 
-    <bean id="oneArgInstanceFactory" factory-ref="instanceFactory" factory-method="instanceMethod">
-        <argument value="iridium"/>
-    </bean>
+	<bean id="oneArgStaticFactory" class="org.springframework.osgi.blueprint.FactoryComponent"
+		factory-method="staticMethod">
+		<argument value="iridium" />
+	</bean>
 
-	<bean id="namedComparator"
-		class="org.springframework.osgi.blueprint.DummyComparator" />
+	<bean id="instanceFactory" class="org.springframework.osgi.blueprint.FactoryComponent" />
 
-	<bean id="nestedRef"
-		class="org.springframework.osgi.blueprint.TestComponent">
+	<bean id="noArgInstanceFactory" factory-method="instanceMethod"
+		factory-ref="instanceFactory" />
+
+	<bean id="oneArgInstanceFactory" factory-ref="instanceFactory"
+		factory-method="instanceMethod">
+		<argument value="iridium" />
+	</bean>
+
+	<bean id="namedComparator" class="org.springframework.osgi.blueprint.DummyComparator" />
+
+	<bean id="nestedRef" class="org.springframework.osgi.blueprint.TestComponent">
 		<property name="propA">
-			<ref-list availability="optional" interface="java.util.Map"/>
+			<ref-list availability="optional" interface="java.util.Map" />
 		</property>
 	</bean>
-	
-	<bean id="ambigousComponent" class="org.springframework.osgi.blueprint.AmbigousTestComponent">
+
+	<bean id="ambigousComponent"
+		class="org.springframework.osgi.blueprint.AmbigousTestComponent">
 		<property name="ambigousProp">
 			<value type="java.lang.String">123</value>
 		</property>
 	</bean>
+
+
+	<bean id="arrayItem" class="org.springframework.osgi.blueprint.ArrayItem">
+		<argument>
+			<list>
+			</list>
+		</argument>
+	</bean>
+
+	<!--  SPR-5844
+	<bean id="primitiveArray"
+		class="org.springframework.osgi.blueprint.PrimitiveArrayConstructorInjection">
+		<argument type="int[]">
+			<array value-type="int">
+				<value>1</value>
+			</array>
+		</argument>
+	</bean>
+	 -->
+	 
+	<bean id="compDateArray" factory-method="makeInstance"
+		class="org.springframework.osgi.blueprint.ConstructorInjectionStaticFactory">
+		<argument>
+			<array value-type="java.util.Date">
+				<value>19 Feb 2009</value>
+				<value>20 Feb 2009</value>
+			</array>
+		</argument>
+	</bean>
 	
+	<!-- Injection of an URL array -->
+	<bean id="compURLArray" factory-method="makeInstance"
+		class="org.springframework.osgi.blueprint.ConstructorInjectionStaticFactory">
+		<argument>
+			<array value-type="java.net.URL">
+				<value>http://www.osgi.org</value>
+				<value>http://www.gmail.com</value>
+			</array>
+		</argument>
+	</bean>	
+
 </blueprint>

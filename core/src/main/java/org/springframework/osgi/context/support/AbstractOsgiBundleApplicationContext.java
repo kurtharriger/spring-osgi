@@ -344,12 +344,12 @@ public abstract class AbstractOsgiBundleApplicationContext extends AbstractRefre
 	 * Unpublishes the application context OSGi service.
 	 */
 	private void unpublishContextAsOsgiService() {
-		if (!OsgiServiceUtils.unregisterService(serviceRegistration)) {
+		if (OsgiServiceUtils.unregisterService(serviceRegistration)) {
 			logger.info("Unpublishing application context OSGi service for bundle "
 					+ OsgiStringUtils.nullSafeNameAndSymName(bundle));
 			serviceRegistration = null;
 		} else {
-			if (publishContextAsService)
+			if (!publishContextAsService)
 				logger.info("Application Context service already unpublished");
 		}
 	}

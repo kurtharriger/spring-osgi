@@ -46,6 +46,7 @@ import org.springframework.osgi.service.exporter.OsgiServicePropertiesResolver;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterController;
 import org.springframework.osgi.service.exporter.support.internal.controller.ExporterInternalActions;
 import org.springframework.osgi.service.exporter.support.internal.support.PublishingServiceFactory;
+import org.springframework.osgi.service.exporter.support.internal.support.ServiceRegistrationWrapper;
 import org.springframework.osgi.util.OsgiServiceUtils;
 import org.springframework.osgi.util.internal.ClassUtils;
 import org.springframework.osgi.util.internal.MapBasedDictionary;
@@ -123,6 +124,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	private volatile OsgiServicePropertiesResolver propertiesResolver;
 	private volatile BeanFactory beanFactory;
 	private volatile ServiceRegistration serviceRegistration;
+	private volatile ServiceRegistration safeServiceRegistration;
+
 	private volatile Map serviceProperties;
 	private volatile ServicePropertiesChangeListener propertiesListener;
 	private volatile int ranking;
@@ -173,11 +176,14 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			Assert.isTrue(beanFactory.containsBean(targetBeanName), "Cannot locate bean named '" + targetBeanName
 					+ "' inside the running bean factory.");
 
-			if (beanFactory.isSingleton(targetBeanName)) {
-				target = beanFactory.getBean(targetBeanName);
-				targetClass = target.getClass();
-			} else {
-				targetClass = beanFactory.getType(targetBeanName);
+			// lazily get the target class
+			targetClass = beanFactory.getType(targetBeanName);
+
+			if (targetClass != null) {
+				if ((ServiceFactory.class.isAssignableFrom(targetClass)) && beanFactory.isPrototype(targetBeanName)) {
+					throw new IllegalArgumentException(
+							"Prototype ServiceFactories are not supported - consider making them singleton");
+				}
 			}
 
 			// when running inside a container, add the dependency between this bean and the target one
@@ -243,8 +249,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 				cbf.registerDependentBean(targetBeanName, beanName);
 			}
 		} else {
-			log
-					.warn("The running bean factory cannot support dependencies between beans - importer/exporter dependency cannot be enforced");
+			log.warn("The running bean factory cannot support dependencies between beans "
+					+ "- importer/exporter dependency cannot be enforced");
 		}
 	}
 
@@ -303,6 +309,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 		ServiceRegistration reg = registerService(mergedClasses, serviceProperties);
 
 		serviceRegistration = notifyListeners(target, (Map) serviceProperties, reg);
+		safeServiceRegistration = new ServiceRegistrationWrapper(serviceRegistration);
 	}
 
 	/**
@@ -313,10 +320,8 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * @return the ServiceRegistration
 	 */
 	ServiceRegistration registerService(Class<?>[] classes, Dictionary serviceProperties) {
-		Assert
-				.notEmpty(
-						classes,
-						"at least one class has to be specified for exporting (if autoExport is enabled then maybe the object doesn't implement any interface)");
+		Assert.notEmpty(classes, "at least one class has to be specified for exporting "
+				+ "(if autoExport is enabled then maybe the object doesn't implement any interface)");
 
 		// create an array of classnames (used for registering the service)
 		String[] names = ClassUtils.toStringArray(classes);
@@ -365,11 +370,11 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 	 * <p/> Returns a {@link ServiceRegistration} to the OSGi service for the target object.
 	 */
 	public ServiceRegistration getObject() throws Exception {
-		return serviceRegistration;
+		return safeServiceRegistration;
 	}
 
 	public Class<? extends ServiceRegistration> getObjectType() {
-		return (serviceRegistration != null ? serviceRegistration.getClass() : ServiceRegistration.class);
+		return ServiceRegistration.class;
 	}
 
 	public boolean isSingleton() {
@@ -386,6 +391,7 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 
 		unregisterService(serviceRegistration);
 		serviceRegistration = null;
+		safeServiceRegistration = null;
 	}
 
 	/**
