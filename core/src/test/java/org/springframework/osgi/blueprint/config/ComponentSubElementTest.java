@@ -27,9 +27,12 @@ import junit.framework.TestCase;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.container.NoSuchComponentException;
 import org.springframework.beans.BeanMetadataElement;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -37,6 +40,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.osgi.blueprint.TestComponent;
 import org.springframework.osgi.blueprint.container.SpringBlueprintContainer;
+import org.springframework.osgi.blueprint.container.support.BlueprintEditorRegistrar;
 import org.springframework.osgi.context.support.BundleContextAwareProcessor;
 import org.springframework.osgi.mock.MockBundleContext;
 
@@ -60,6 +64,12 @@ public class ComponentSubElementTest extends TestCase {
 		context = new GenericApplicationContext();
 		context.setClassLoader(getClass().getClassLoader());
 		context.getBeanFactory().addBeanPostProcessor(new BundleContextAwareProcessor(bundleContext));
+		context.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
+
+			public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+				beanFactory.addPropertyEditorRegistrar(new BlueprintEditorRegistrar());
+			}
+		});
 
 		reader = new XmlBeanDefinitionReader(context);
 		reader.loadBeanDefinitions(new ClassPathResource(CONFIG, getClass()));
