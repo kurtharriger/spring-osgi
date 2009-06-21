@@ -45,6 +45,7 @@ class BlueprintListenerManager implements BlueprintListener, DisposableBean {
 
 	private volatile DisposableBean cleanupHook;
 	private volatile List<BlueprintListener> listeners;
+	// FIXME: remove asynch delivery
 	private final Timer eventDispatcher = new Timer("BlueprintEvent Dispatcher", true);
 
 	private class Task extends TimerTask {
@@ -96,10 +97,7 @@ class BlueprintListenerManager implements BlueprintListener, DisposableBean {
 	}
 
 	public void blueprintEvent(BlueprintEvent event) {
-		if (log.isTraceEnabled())
-			log.trace("Scheduled background dispatch for blueprint event " + event);
-
 		// schedule for execution right away
-		eventDispatcher.schedule(new Task(event), 0);
+		new Task(event).run();
 	}
 }
