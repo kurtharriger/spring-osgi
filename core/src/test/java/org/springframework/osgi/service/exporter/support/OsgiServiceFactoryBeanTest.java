@@ -236,8 +236,10 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		String beanName = "boo";
 		exporter.setTargetBeanName(beanName);
 
+		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.isPrototype(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
+		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), proxy);
 		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), proxy.getClass());
 		beanFactoryControl.replay();
 
@@ -290,6 +292,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		String beanName = "fooBar";
 		exporter.setTargetBeanName(beanName);
 		exporter.setInterfaces(new Class<?>[] { service.getClass() });
+		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
 		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), service.getClass());
@@ -323,6 +326,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 
 		String beanName = "fooBar";
 
+		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.isPrototype(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), service);
@@ -426,6 +430,7 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 	public void testPrototypeServiceFactory() throws Exception {
 		ServiceFactory factory = new MockServiceFactory();
 		String beanName = "prototype-sf";
+		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.isPrototype(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), factory);
@@ -442,11 +447,12 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		}
 	}
 
-	public void testPrototypeServiceFactoryRegistration() throws Exception {
+	public void testNonSingletonServiceFactoryRegistration() throws Exception {
 		TestRegistrationListener listener = new TestRegistrationListener();
 
 		ServiceFactory factory = new MockServiceFactory();
 		String beanName = "prototype-sf";
+		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.isPrototype(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), factory);
@@ -469,11 +475,12 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		assertNull(listener.unregistered.keySet().iterator().next());
 	}
 
-	public void testPrototypeNonServiceFactoryRegistration() throws Exception {
+	public void testNonSingletonNonServiceFactoryRegistration() throws Exception {
 		TestRegistrationListener listener = new TestRegistrationListener();
 
 		Object obj = new Object();
 		String beanName = "prototype-non-sf";
+		beanFactoryControl.expectAndReturn(beanFactory.isSingleton(beanName), false);
 		beanFactoryControl.expectAndReturn(beanFactory.containsBean(beanName), true);
 		beanFactoryControl.expectAndReturn(beanFactory.getBean(beanName), obj);
 		beanFactoryControl.expectAndReturn(beanFactory.getType(beanName), obj.getClass());
@@ -494,5 +501,4 @@ public class OsgiServiceFactoryBeanTest extends TestCase {
 		assertEquals(listener.unregistered.size(), 1);
 		assertNull(listener.unregistered.keySet().iterator().next());
 	}
-
 }

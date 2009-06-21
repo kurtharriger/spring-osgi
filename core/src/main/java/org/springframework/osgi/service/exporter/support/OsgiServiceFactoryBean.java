@@ -176,9 +176,14 @@ public class OsgiServiceFactoryBean extends AbstractOsgiServiceExporter implemen
 			Assert.isTrue(beanFactory.containsBean(targetBeanName), "Cannot locate bean named '" + targetBeanName
 					+ "' inside the running bean factory.");
 
-			// lazily get the target class
-			targetClass = beanFactory.getType(targetBeanName);
-
+			if (beanFactory.isSingleton(targetBeanName)) {
+				target = beanFactory.getBean(targetBeanName);
+				targetClass = target.getClass();
+			} else {
+				// lazily get the target class
+				targetClass = beanFactory.getType(targetBeanName);
+			}
+			
 			if (targetClass != null) {
 				if ((ServiceFactory.class.isAssignableFrom(targetClass)) && beanFactory.isPrototype(targetBeanName)) {
 					throw new IllegalArgumentException(
