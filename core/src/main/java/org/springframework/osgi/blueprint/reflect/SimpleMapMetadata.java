@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.osgi.service.blueprint.reflect.MapEntry;
 import org.osgi.service.blueprint.reflect.MapMetadata;
+import org.springframework.util.StringUtils;
 
 /**
  * Simple implementation for {@link MapValue} interface.
@@ -42,8 +43,9 @@ public class SimpleMapMetadata implements MapMetadata {
 	 */
 	public SimpleMapMetadata(List<MapEntry> entries, String keyTypeName, String valueTypeName) {
 		this.entries = entries;
-		this.keyValueType = keyTypeName;
-		this.valueValueType = valueTypeName;
+		this.keyValueType = (StringUtils.hasText(keyTypeName) ? keyTypeName : null);
+		this.valueValueType = (StringUtils.hasText(valueTypeName) ? valueTypeName : null);
+		;
 	}
 
 	public List<MapEntry> getEntries() {
