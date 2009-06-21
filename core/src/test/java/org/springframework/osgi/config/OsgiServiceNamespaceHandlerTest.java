@@ -198,8 +198,8 @@ public class OsgiServiceNamespaceHandlerTest extends TestCase {
 		unregister((ServiceRegistration) target);
 		assertEquals(1, CustomRegistrationListener.UNREG_CALLS);
 		// check service instance passed around
-		//assertSame(appContext.getBean("string"), CustomRegistrationListener.SERVICE_REG);
-		//assertSame(appContext.getBean("string"), CustomRegistrationListener.SERVICE_UNREG);
+		assertSame(appContext.getBean("string"), CustomRegistrationListener.SERVICE_REG);
+		assertSame(appContext.getBean("string"), CustomRegistrationListener.SERVICE_UNREG);
 	}
 
 	private OsgiServiceRegistrationListener[] getListeners(OsgiServiceFactoryBean exporter) {
