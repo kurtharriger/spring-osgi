@@ -37,7 +37,7 @@ class ComponentMetadataFactory implements MetadataConstants {
 	 * @return
 	 */
 	static ComponentMetadata buildMetadata(String name, BeanDefinition beanDefinition) {
-		// shortcut (to avoid re-rewrapping)
+		// shortcut (to avoid re-re-wrapping)
 		Object metadata = beanDefinition.getAttribute(COMPONENT_METADATA_ATTRIBUTE);
 		if (metadata instanceof ComponentMetadata)
 			return (ComponentMetadata) metadata;
@@ -55,7 +55,7 @@ class ComponentMetadataFactory implements MetadataConstants {
 			return new SpringReferenceMetadata(name, beanDefinition);
 		}
 		if (isCollectionImporter(beanDefinition)) {
-			return new SpringRefListMetadata(name, beanDefinition);
+			return new SpringReferenceListMetadata(name, beanDefinition);
 		}
 
 		return new SpringBeanMetadata(name, beanDefinition);

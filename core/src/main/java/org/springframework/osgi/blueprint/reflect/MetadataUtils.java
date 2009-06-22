@@ -24,9 +24,6 @@ import java.util.Map;
 
 import org.osgi.service.blueprint.reflect.BeanArgument;
 import org.osgi.service.blueprint.reflect.BeanProperty;
-import org.osgi.service.blueprint.reflect.MapEntry;
-import org.osgi.service.blueprint.reflect.Metadata;
-import org.osgi.service.blueprint.reflect.NonNullMetadata;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
